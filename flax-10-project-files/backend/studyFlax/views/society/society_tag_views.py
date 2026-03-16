@@ -11,7 +11,6 @@ from .helpers import (
 
 MAX_TAGS = 7
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def society_tag_list(request, society_id):
@@ -23,11 +22,9 @@ def society_tag_list(request, society_id):
         return get_tags(society)
     return create_tag(request, society)
 
-
 def get_tags(society):
     tags = SocietyTag.objects.filter(society=society)
     return Response(SocietyTagSerialiser(tags, many=True).data)
-
 
 def create_tag(request, society):
     if not is_society_admin(request.user, society):
@@ -39,7 +36,6 @@ def create_tag(request, society):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save(society=society)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -58,13 +54,11 @@ def society_tag_detail(request, society_id, tag_id):
         return delete_tag(tag)
     return update_tag(tag, request.data)
 
-
 def get_tag_or_none(society, tag_id):
     try:
         return SocietyTag.objects.get(society=society, pk=tag_id)
     except SocietyTag.DoesNotExist:
         return None
-
 
 def update_tag(tag, data):
     serialiser = SocietyTagSerialiser(tag, data=data, partial=True)
@@ -72,7 +66,6 @@ def update_tag(tag, data):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
     return Response(serialiser.data)
-
 
 def delete_tag(tag):
     tag.delete()

@@ -1,3 +1,7 @@
+"""
+Views for society announcement listing, creation, update, and deletion.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -9,10 +13,8 @@ from .helpers import (
     society_not_found_response, permission_denied_response
 )
 
-
 def is_silent_request(request):
     return request.query_params.get('silent', '').lower() == 'true'
-
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -25,11 +27,9 @@ def announcement_list(request, society_id):
         return get_announcements(society)
     return create_announcement(request, society, is_silent_request(request))
 
-
 def get_announcements(society):
     announcements = SocietyAnnouncement.objects.filter(society=society)
     return Response(SocietyAnnouncementSerialiser(announcements, many=True).data)
-
 
 def create_announcement(request, society, silent=False):
     if not is_society_admin(request.user, society):
@@ -43,15 +43,12 @@ def create_announcement(request, society, silent=False):
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data, status=status.HTTP_201_CREATED)
 
-
 def get_image_urls(data):
     return data.get('images') or data.get('image_urls', [])
-
 
 def save_announcement_images(announcement, image_urls):
     for i, url in enumerate(image_urls):
         SocietyAnnouncementImage.objects.create(announcement=announcement, url=url, order=i)
-
 
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -59,11 +56,9 @@ def announcement_detail(request, society_id, announcement_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-
     announcement = get_announcement_or_none(society, announcement_id)
     if not announcement:
         return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
-
     if request.method == 'GET':
         return Response(SocietyAnnouncementSerialiser(announcement).data)
     if not is_society_admin(request.user, society):
@@ -73,13 +68,11 @@ def announcement_detail(request, society_id, announcement_id):
         return delete_announcement(announcement, silent)
     return update_announcement(announcement, request.data, silent)
 
-
 def get_announcement_or_none(society, announcement_id):
     try:
         return SocietyAnnouncement.objects.get(society=society, pk=announcement_id)
     except SocietyAnnouncement.DoesNotExist:
         return None
-
 
 def update_announcement(announcement, data, silent=False):
     context = {'skip_notification': silent}
@@ -93,11 +86,9 @@ def update_announcement(announcement, data, silent=False):
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data)
 
-
 def update_announcement_images(announcement, image_urls):
     announcement.images.all().delete()
     save_announcement_images(announcement, image_urls)
-
 
 def delete_announcement(announcement, silent=False):
     if silent:

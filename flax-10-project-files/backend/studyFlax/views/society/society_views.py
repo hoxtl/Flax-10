@@ -7,7 +7,6 @@ from studyFlax.serialisers import SocietyListSerialiser
 from studyFlax.signals.society_notifications import notify_society_members
 from .helpers import handle_image_urls, get_society_or_404, is_society_admin, society_not_found_response, permission_denied_response
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def society_list(request):
@@ -15,12 +14,10 @@ def society_list(request):
         return get_societies(request)
     return create_society(request)
 
-
 def get_societies(request):
     societies = Society.objects.all()
     data = build_society_list_data(societies, request)
     return Response(data)
-
 
 def build_society_list_data(societies, request):
     result = []
@@ -32,13 +29,11 @@ def build_society_list_data(societies, request):
         result.append(society_data)
     return result
 
-
 def get_user_membership(user, society):
     try:
         return SocietyMembership.objects.get(user=user, society=society)
     except SocietyMembership.DoesNotExist:
         return None
-
 
 def create_society(request):
     data = request.data.copy()
@@ -51,7 +46,6 @@ def create_society(request):
     handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -66,7 +60,6 @@ def publish_changes(request, society_id):
     notify_society_members(society, notification)
     return Response({'status': 'published'})
 
-
 def build_update_notification(society, changes):
     message = build_change_message(changes)
     action_url = get_notification_action_url(society.id, changes)
@@ -78,12 +71,10 @@ def build_update_notification(society, changes):
         'action_url': action_url,
     }
 
-
 def get_notification_action_url(society_id, changes):
     if is_only_announcement_changes(changes):
         return f"/societies?id={society_id}&tab=announcements"
     return f"/societies?id={society_id}"
-
 
 def is_only_announcement_changes(changes):
     announcement_keys = {'announcements_added', 'announcements_updated', 'announcements_deleted'}
@@ -91,7 +82,6 @@ def is_only_announcement_changes(changes):
     has_announcements = any(changes.get(k) for k in announcement_keys)
     has_events = any(changes.get(k) for k in event_keys)
     return has_announcements and not has_events
-
 
 def build_change_message(changes):
     parts = []
@@ -102,7 +92,6 @@ def build_change_message(changes):
     parts.extend(format_change_list(changes.get('announcements_updated', []), 'Updated announcement'))
     parts.extend(format_change_list(changes.get('announcements_deleted', []), 'Deleted announcement'))
     return ' | '.join(parts) if parts else None
-
 
 def format_change_list(items, prefix):
     return [f"{prefix}: {item}" for item in items[:3]]

@@ -64,12 +64,10 @@ def delete_module(request, module, user):
     module.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 def notify_enrolled_students(module):
     enrollments = Enrollment.objects.filter(module=module).select_related('student')
     notifications = [build_module_deleted_notification(e.student, module) for e in enrollments]
     Notification.objects.bulk_create(notifications)
-
 
 def build_module_deleted_notification(student, module):
     return Notification(
