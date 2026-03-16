@@ -282,7 +282,7 @@ export function AttendanceWidget() {
     start_time: r.start_time,
     attended: r.attended,
     event_type: r.event_type
-  }));
+  })).sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
 
   const attendedEvents = markedEvents.filter((e) => e.attended);
   const missedEvents = markedEvents.filter((e) => !e.attended);
