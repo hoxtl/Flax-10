@@ -187,7 +187,7 @@ function StudyTimeSection({
         <span className={styles.contextCardEmoji}>📚</span>
         <h3 className={styles.contextCardTitle}>Auto-scheduler capacity</h3>
         <ul className={styles.contextCardList}>
-          <li>Customizable, desirable study length per day(must be in half-hours)</li>
+          <li>Customizable, desirable study length per day(must be in quarter-hours)</li>
         </ul>
       </div>
     </div>
@@ -235,7 +235,6 @@ function WeekPreferenceSection({
         <h3 className={styles.contextCardTitle}>Weekly scheduling focus</h3>
         <ul className={styles.contextCardList}>
           <li>Pick whether auto-scheduling should prioritize weekdays or weekends</li>
-          <li>Used as the default when building schedules from deadlines</li>
         </ul>
       </div>
     </div>
@@ -283,7 +282,6 @@ function WorktimePreferenceSection({
         <h3 className={styles.contextCardTitle}>Daily scheduling window</h3>
         <ul className={styles.contextCardList}>
           <li>Choose whether schedule blocks should default to day, night, or both</li>
-          <li>Used as the default when generating schedules from deadlines</li>
         </ul>
       </div>
     </div>
@@ -332,13 +330,13 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
           setMinutesPerDay(nextStudyTime);
           setInitialMinutesPerDay(nextStudyTime);
         }
-        if (data?.week_preferences) {
-          setWeekPreference(data.week_preferences);
-          setInitialWeekPreference(data.week_preferences);
+        if (data?.week_preference) {
+          setWeekPreference(data.week_preference);
+          setInitialWeekPreference(data.week_preference);
         }
-        if (data?.worktime_preferences) {
-          setWorktimePreference(data.worktime_preferences);
-          setInitialWorktimePreference(data.worktime_preferences);
+        if (data?.worktime_preference) {
+          setWorktimePreference(data.worktime_preference);
+          setInitialWorktimePreference(data.worktime_preference);
         }
       })
       .finally(() => setLoading(false));
@@ -400,7 +398,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
         onWeekPreferenceChange={setWeekPreference}
         onSubmit={async (e) => {
           e.preventDefault();
-          const ok = await onWeekPreferenceSave({ week_preferences: weekPreference });
+          const ok = await onWeekPreferenceSave({ week_preference: weekPreference });
           if (ok) {
             setInitialWeekPreference(weekPreference);
             setWeekSaveSignal((s) => s + 1);
@@ -415,7 +413,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
        onWorktimePreferenceChange={setWorktimePreference}
        onSubmit={async (e) => {
          e.preventDefault();
-         const ok = await onWorktimePreferenceSave({ worktime_preferences: worktimePreference });
+         const ok = await onWorktimePreferenceSave({ worktime_preference: worktimePreference });
          if (ok) {
            setInitialWorktimePreference(worktimePreference);
            setWorktimeSaveSignal((s) => s + 1);

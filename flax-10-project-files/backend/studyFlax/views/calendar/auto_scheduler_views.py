@@ -18,8 +18,8 @@ def _resolved_preferences(user, payload):
     if settings is not None:
         preferred_start = preferred_start or getattr(settings, 'wake_time', None)
         preferred_end = preferred_end or getattr(settings, 'sleep_time', None)
-        week_preference = week_preference or getattr(settings, 'week_preferences', None)
-        worktime_preference = worktime_preference or getattr(settings, 'worktime_preferences', None)
+        week_preference = week_preference or getattr(settings, 'week_preference', None)
+        worktime_preference = worktime_preference or getattr(settings, 'worktime_preference', None)
 
     return {
         'preferred_start_time': preferred_start,

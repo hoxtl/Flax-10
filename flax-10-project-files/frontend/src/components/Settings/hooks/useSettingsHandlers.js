@@ -264,7 +264,7 @@ async function saveWeekPreference(data, setSuccessMessage, setIsSaving) {
   if (!hasToken()) return false;
   setIsSaving(true);
   const { ok } = await patchSettings({
-    week_preferences: data.week_preferences,
+    week_preference: data.week_preference,
   }).catch(() => ({ ok: false }));
   const msg = ok ? "Week preference saved!" : "Failed to save week preference";
   showTemporaryMessage(setSuccessMessage, msg);
@@ -276,7 +276,7 @@ async function saveWorktimePreference(data, setSuccessMessage, setIsSaving) {
   if (!hasToken()) return false;
   setIsSaving(true);
   const { ok } = await patchSettings({
-    worktime_preferences: data.worktime_preferences,
+    worktime_preference: data.worktime_preference,
   }).catch(() => ({ ok: false }));
   const msg = ok ? "Worktime preference saved!" : "Failed to save worktime preference";
   showTemporaryMessage(setSuccessMessage, msg);

@@ -42,7 +42,7 @@ class AutoScheduleRequestSerialiser(serializers.Serializer):
     title = serializers.CharField(max_length=100, required=False, default='Auto schedule')
     preferred_start_time = serializers.TimeField(required=False, allow_null=True)
     preferred_end_time = serializers.TimeField(required=False, allow_null=True)
-    worktime_preference = serializers.ChoiceField(choices=['day', 'night', 'both'], default='both')
+    worktime_preference = serializers.ChoiceField(choices=['day', 'night', 'both'], required=False, allow_null=True)
     week_preference = serializers.ChoiceField(choices=['weekdays', 'weekends', 'both'], required=False, allow_null=True)
     clear_existing = serializers.BooleanField(default=False)
     deadline_preferences = DeadlinePlanningPreferenceSerialiser(many=True)

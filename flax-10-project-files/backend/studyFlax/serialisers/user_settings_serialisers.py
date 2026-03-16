@@ -24,6 +24,6 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
             'sleep_time',
             'wake_time',
             'preferred_study_minutes_per_day',
-            'week_preferences', 
-            'worktime_preferences',
+            'week_preference',
+            'worktime_preference',
             'major_locked']
