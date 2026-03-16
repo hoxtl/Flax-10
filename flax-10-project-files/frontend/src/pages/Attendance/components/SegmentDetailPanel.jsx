@@ -67,7 +67,7 @@ export default function SegmentDetailPanel({
                 className={styles.statusToggleBtn}
                 onClick={() => handleToggle(event.id, event.attended)}
                 loading={toggling[event.id]}
-                title={event.attended ? "Mark as missed" : "Mark as attended"}
+                data-tooltip={event.attended ? "Mark as missed" : "Mark as attended"}
               >
                 {event.attended ? "Attended" : "Missed"}
               </PrimaryButton>
