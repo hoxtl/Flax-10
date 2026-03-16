@@ -26,7 +26,7 @@ module_task_templates = {
         ("{module} programming assignment",    "Complete the coding task and submit via KEATS. Test your solution locally first.", "high",   4, 3),
         ("{module} past paper",                "Work through the past exam paper under timed conditions.",                         "high",   3, 5),
         ("{module} revision: data structures", "Review lecture notes and re-implement key algorithms from scratch.",               "medium", 2, 2),
-        ("{module} group project check-in",    "Review teammates' pull requests and update your section of the codebase.",         "urgent", 2, 1),
+        ("{module} group project check-in",    "Review teammates' pull requests and update your section of the codebase.",         "high",   2, 1),
     ],
     "AI": [
         ("{module} model evaluation writeup", "Write up the evaluation section for the ML coursework.",              "high",   3, 3),
@@ -54,18 +54,18 @@ module_task_templates = {
     ],
     "LS4101": [
         ("{module} Lab Report: Microscopy",       "Write up the microscopy practical. Include labelled diagrams and interpretation.", "high",   4, 3),
-        ("{module} Microscopy Quiz prep",        "Review staining techniques and cell identification before the KEATS quiz.",         "urgent", 1, 1),
+        ("{module} Microscopy Quiz prep",        "Review staining techniques and cell identification before the KEATS quiz.",         "high",   1, 1),
         ("{module} Cell Division Diagram",      "Produce annotated mitosis and meiosis diagrams. Submit via KEATS.",               "medium", 2, 5),
     ],
     "LS4202": [
         ("{module} Enzyme Kinetics Problems",     "Complete the Michaelis-Menten and inhibition problem set. Submit via KEATS.",       "high",   4, 2),
         ("{module} Protein Folding Assignment", "Draft the protein structure and folding section. Check KEATS for rubric.",        "medium", 3, 4),
-        ("{module} Metabolic Pathway Quiz",      "Revise glycolysis and TCA cycle before the KEATS quiz.",                          "urgent", 2, 6),
+        ("{module} Metabolic Pathway Quiz",      "Revise glycolysis and TCA cycle before the KEATS quiz.",                          "high",   2, 6),
     ],
     "LS": [
         ("{module} lab report",          "Write up the lab practical. Include methodology and data analysis.",           "high",   4, 3),
-        ("{module} essay plan",          "Draft a 300-word outline for the upcoming essay.",                             "urgent", 2, 1),
-        ("{module} KEATS quiz",          "Complete the online quiz before midnight. Review lecture notes first.",        "urgent", 1, 1),
+        ("{module} essay plan",          "Draft a 300-word outline for the upcoming essay.",                             "high",   2, 1),
+        ("{module} KEATS quiz",          "Complete the online quiz before midnight. Review lecture notes first.",        "high",   1, 1),
         ("{module} revision: key pathways", "Make a diagram of the main metabolic/cellular pathways from this week.",   "medium", 2, 4),
     ],
     "LW": [
@@ -113,7 +113,7 @@ module_task_templates = {
     ],
     "NU": [
         ("{module} reflective portfolio entry", "Write a Gibbs cycle reflection on last week's clinical placement.", "high",   3, 2),
-        ("{module} OSCE prep",                  "Practise the clinical skill steps and review the assessment criteria.", "urgent", 3, 3),
+        ("{module} OSCE prep",                  "Practise the clinical skill steps and review the assessment criteria.", "high",   3, 3),
     ],
     "DE": [
         ("{module} clinical case report", "Document the patient case — diagnosis, treatment plan and reflection.", "high",   4, 4),
@@ -177,14 +177,9 @@ task_list_fixtures = (
 personal_task_fixtures = (
     # ── Overdue ──
     ("Submit ethics form",              "Missed the window — chase the admin office and resubmit ASAP.",              "urgent", 1, -1, "University"),
-    ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "urgent", 1, -2, "Finance"),
-    ("Return library books",            "Two books overdue — return before the fine increases further.",               "medium", 1, -3, "University"),
-    ("Reply to careers email",          "Careers service sent a follow-up — respond and confirm your slot.",          "high",   1, -4, "Internships"),
-    ("File lecture notes — week 5",     "Consolidate and file your notes before the backlog grows.",                  "medium", 2, -5, "University"),
-    ("Cancel free trial",               "Free period ended — cancel before the next billing cycle.",                  "low",    1, -6, "Finance"),
-    ("Log gym sessions for the month",  "Track all sessions in your fitness log before you forget the details.",      "low",    1, -7, "Health"),
+    ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "high",   1, -2, "Finance"),
 
-    # ── Urgent / today ──
+    # ── Today ──
     ("Send supervisor check-in",        "Confirm this week's milestones and attach your latest draft snapshot.",       "urgent", 1,  0, "University"),
     ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
     ("Scan KEATS for surprises",        "Quick sweep of module pages for hidden updates, new files, and changes.",   "low",    1,  0, "University"),
@@ -199,13 +194,13 @@ personal_task_fixtures = (
     ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
 
     # ── Day 3 ──
-    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "high",   1,  3, "Internships"),
+    ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "urgent", 1,  3, "Internships"),
     ("Seminar talking points prep",     "Re-read the core text and draft two sharp questions for discussion.",       "medium", 2,  3, "University"),
     ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
 
     # ── Day 4 ──
     ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
-    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "high",   4,  4, "University"),
+    ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "urgent", 4,  4, "University"),
 
     # ── Day 5 ──
     ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),
@@ -223,7 +218,7 @@ personal_task_fixtures = (
     ("Respond to LinkedIn messages",    "Reply to any internship or network messages.",                              "medium", 1,  7, "Internships"),
 
     # ── Day 8-10 ──
-    ("Apply to summer internship",      "Submit application before deadline — check requirements on portal.",       "urgent", 2,  8, "Internships"),
+    ("Apply to summer internship",      "Submit application before deadline — check requirements on portal.",       "high",   2,  8, "Internships"),
     ("Gym session",                     "Upper body + core. Don't skip leg day next time.",                         "low",    2,  9, "Health"),
     ("Practice interview questions",    "Go through the STAR method for behavioural questions.",                    "high",   2,  10, "Internships"),
 
@@ -237,7 +232,7 @@ personal_task_fixtures = (
 
     # ── Day 22-35 ──
     ("Reach out to alumni network",     "Message two people for a 15-minute informational chat.",                   "medium", 2,  25, "Internships"),
-    ("Final essay polish pass",         "Read it aloud, tighten the argument, and clean up phrasing before submit.", "urgent", 2,  28, "University"),
+    ("Final essay polish pass",         "Read it aloud, tighten the argument, and clean up phrasing before submit.", "high",   2,  28, "University"),
     ("Budget review",                   "Check your spending against this month's budget.",                         "medium", 1,  30, "Finance"),
     ("Back up laptop files",            "Upload everything to Google Drive or external hard drive.",                "low",    1,  35, "Home & Admin"),
 
@@ -246,6 +241,13 @@ personal_task_fixtures = (
     ("Read: The Pragmatic Programmer",  "Chapter 2-3. Note anything applicable to your project.",                   "low",    2,  14, "Reading List"),
     ("Read: Why Nations Fail",          "First 4 chapters. Consider how it connects to your IR module.",            "low",    3,  20, "Reading List"),
 )
+
+reading_fixtures = [ 
+    ("Module Handbook", "Ch.9", 1, 45),
+    ("Advanced Topics", "Ch.5", 41, 80),
+    ("Case Studies & Applications", "Ch.3", 35, 78),
+    ("Core Principles", "Ch.13", 121,155),
+]
 
 __all__ = [
     "category_fixtures",
@@ -269,4 +271,5 @@ __all__ = [
     "MODULE_PILL_COLORS",
     "task_list_fixtures",
     "personal_task_fixtures",
+    "reading_fixtures",
 ]

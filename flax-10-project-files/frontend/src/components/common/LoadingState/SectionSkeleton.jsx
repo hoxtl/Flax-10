@@ -1,8 +1,5 @@
 import styles from "./SectionSkeleton.module.css";
-
-function SkeletonBlock({ className = "" }) {
-    return <div className={`${styles.skeleton} ${className}`.trim()} />;
-}
+import SkeletonBlock from "./SkeletonBlock";
 
 export default function SectionSkeleton({
     label = "Loading section",

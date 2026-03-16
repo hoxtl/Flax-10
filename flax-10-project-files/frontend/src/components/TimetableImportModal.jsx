@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import StandardModal from './common/StandardModal/StandardModal';
+import FormField from './common/FormField/FormField';
+import PrimaryButton from './common/PrimaryButton/PrimaryButton';
+import TextInput from './common/TextInput/TextInput';
 import styles from './TimetableImportModal.module.css';
 
 async function tryImport(url, onImport) {
@@ -26,12 +29,13 @@ function ModalForm({ url, setUrl, loading, error, onClose, handleSubmit }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <p className={styles.instructions}>Paste your timetable URL (.ics file or timetable page link)</p>
-      <input type="url" value={url} onChange={(e) => setUrl(e.target.value)}
-        placeholder="https://example.com/timetable.ics" className={styles.input} required autoFocus />
-      {error && <p className={styles.error}>{error}</p>}
+      <FormField label="Timetable URL" error={error}>
+        <TextInput type="url" value={url} onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://example.com/timetable.ics" className={styles.input} required autoFocus />
+      </FormField>
       <div className={styles.actions}>
-        <button type="button" onClick={onClose} className={styles.cancelBtn} disabled={loading}>Cancel</button>
-        <button type="submit" className={styles.importBtn} disabled={loading}>{loading ? 'Importing...' : 'Import'}</button>
+        <PrimaryButton type="button" onClick={onClose} className={styles.cancelBtn} variant="ghost" pill disabled={loading}>Cancel</PrimaryButton>
+        <PrimaryButton type="submit" className={styles.importBtn} pill disabled={loading}>{loading ? 'Importing...' : 'Import'}</PrimaryButton>
       </div>
     </form>
   );

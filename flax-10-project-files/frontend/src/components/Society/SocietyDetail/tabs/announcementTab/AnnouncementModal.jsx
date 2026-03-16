@@ -9,35 +9,54 @@ import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
-import ConfirmModal from "../../../../common/ConfirmModal";
+import ConfirmModal from "../../../../common/ConfirmModal/ConfirmModal";
 import StandardModal from "../../../../common/StandardModal/StandardModal";
+import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
 import "../../../../Calendar/EventModal/EventModal.css";
 import { fetchSocietyEvent } from "../../../../../api/societyApi";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
-export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
+const findPinConflict = (announcements, formId) =>
+    announcements.find(a => a.pinned && a.id !== formId);
+
+const handlePinnedSubmit = async (form, announcements, confirmFn, onSubmit) => {
+    const other = findPinConflict(announcements, form.id);
+    if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
+    onSubmit(form);
+};
+
+const makeSubmit = (form, announcements, confirmFn, onSubmit, setError) =>
+    async () => {
+        const err = validateForm(form);
+        if (err) return setError(err);
+        if (form.pinned) return handlePinnedSubmit(form, announcements, confirmFn, onSubmit);
+        onSubmit(form);
+    };
+
+const useAnnounceForm = (announcement, societyId, onSubmit, announcements) => {
     const [form, setForm] = useState(getInitialForm(announcement));
     const [error, setError] = useState("");
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const fileRef = useRef(null);
     const confirmFn = useConfirm();
-    const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
-
     useEffect(() => { loadLinkedEvent(announcement, societyId, setForm); }, [announcement, societyId]);
+    const submit = makeSubmit(form, announcements, confirmFn, onSubmit, setError);
+    return { form, setForm, error, setError, submit };
+};
 
-    const handleDelete = () => { onDelete?.(announcement.id); onClose(); };
-    const hasEvent = !!announcement?.event_id;
+export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
+    const { form, setForm, error, setError, submit } = useAnnounceForm(announcement, societyId, onSubmit, announcements);
+    const [showDelete, setShowDelete] = useState(false);
+    const fileRef = useRef(null);
+    const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
     return (
         <>
             <StandardModal title={announcement ? "Edit Announcement" : "Add Announcement"} onClose={onClose}>
                 <ModalContent form={form} update={update} fileRef={fileRef} tags={tags}
-                    error={error} setError={setError} onClose={onClose}
-                    onSubmit={async (f) => await handleSubmit(f, setError, onSubmit, announcements, confirmFn)}
-                    isEdit={!!announcement} setForm={setForm}
-                    onDeleteClick={() => setShowDeleteConfirm(true)} />
+                    error={error} onClose={onClose} onSubmit={submit} isEdit={!!announcement}
+                    onDeleteClick={() => setShowDelete(true)} setForm={setForm} />
             </StandardModal>
-            {showDeleteConfirm && <DeleteConfirmModal hasEvent={hasEvent} onConfirm={handleDelete} onCancel={() => setShowDeleteConfirm(false)} />}
+            {showDelete && <DeleteConfirmModal hasEvent={!!announcement?.event_id}
+                onConfirm={() => { onDelete?.(announcement.id); onClose(); }} onCancel={() => setShowDelete(false)} />}
         </>
     );
 }
@@ -65,16 +84,6 @@ function DeleteConfirmModal({ hasEvent, onConfirm, onCancel }) {
     return <ConfirmModal title="Delete Announcement" message={message} onConfirm={onConfirm} onCancel={onCancel} />;
 }
 
-/** Form submission handler with pinning conflict resolution. */
-async function handleSubmit(form, setError, onSubmit, announcements, confirmFn) {
-    const err = validateForm(form);
-    if (err) return setError(err);
-    if (form.pinned) {
-        const other = announcements.find(a => a.pinned && a.id !== form.id);
-        if (other) return await handlePinConflict(form, other, confirmFn, onSubmit);
-    }
-    onSubmit(form);
-}
 
 async function handlePinConflict(form, other, confirmFn, onSubmit) {
     const ok = await confirmFn({
@@ -182,12 +191,12 @@ function EventFields({ form, update, setForm }) {
 function ModalFooter({ onClose, onSubmit, isEdit, onDelete }) {
     return (
         <div className={styles.footer}>
-            {isEdit && <button className={styles.deleteBtn} onClick={onDelete}>Delete</button>}
+            {isEdit && <PrimaryButton variant="danger" pill onClick={onDelete}>Delete</PrimaryButton>}
             <div className={styles.footerRight}>
-                <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-                <button className={styles.submitBtn} onClick={onSubmit}>
+                <PrimaryButton variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
+                <PrimaryButton variant="primary" pill onClick={onSubmit}>
                     {isEdit ? "Save Changes" : "Add Announcement"}
-                </button>
+                </PrimaryButton>
             </div>
         </div>
     );

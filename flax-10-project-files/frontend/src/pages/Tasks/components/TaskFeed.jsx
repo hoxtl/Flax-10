@@ -9,38 +9,28 @@ import CreateTaskBar from "./CreateTaskBar";
 import TaskSection from "./TaskSection";
 import TaskFeedToolbar from "./TaskFeedToolbar";
 import CompletedTasksSection from "./CompletedTasksSection";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
+import PageHeader from "../../../components/common/PageHeader/PageHeader";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
 import toolbarStyles from "./TaskFeedToolbar.module.css";
 import sectionStyles from "./TaskFeedSections.module.css";
 
 import useTaskFeedData from "../hooks/useTaskFeedData";
+import { isReadingList } from "../hooks/useCreateTaskBar";
+import SuggestedReadingsSection from "./SuggestedReadingsSection";
 
 const styles = { ...layoutStyles, ...toolbarStyles, ...sectionStyles };
 const SECTION_SHOW_LIMIT = 8;
-
-function TaskFeedHeader({ title }) {
-  return (
-    <header className={styles.listHeader}>
-      <div className={styles.listHeaderTitleWrap}>
-        <h1 className={styles.listHeaderTitle} title={title}>{title}</h1>
-      </div>
-      <div className={styles.listHeaderDivider} aria-hidden />
-    </header>
-  );
-}
 
 function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask, onAddTask, onCreateTask }) {
   const toolbarProps = { search: data.search, onSearchChange: data.setSearch, searchInputRef: data.searchInputRef, sortBy: data.sortBy, onSortChange: data.setSortBy, filterRef: data.filterRef, isFilterOpen: data.isFilterOpen, onFilterOpenChange: data.setIsFilterOpen, activeFilterCount: data.activeFilterCount, activeFilterTab: data.activeFilterTab, onFilterTabChange: data.setActiveFilterTab, filterQuery: data.filterQuery, onFilterQueryChange: data.setFilterQuery, visibleListItems: data.visibleListItems, filterListIds: data.filterListIds, onToggleList: data.toggleListFilter, moduleGroupKeys: data.moduleGroupKeys, groupedVisibleModuleItems: data.groupedVisibleModuleItems, filterModuleCodes: data.filterModuleCodes, onToggleModule: data.toggleModuleFilter, onClearAllFilters: data.clearAllFilters };
   return (
     <div className={styles.subHeader}>
-      <div className={styles.bannerRow}>
-        <EstTimeHelpBanner message="Not sure how long it'll take? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage="Help me estimate how long this task might take — what time block should I pick?" />
-      </div>
       <div className={styles.createRow}>
         {onAddTask ? <div className={styles.createBarWrap}><CreateTaskBar lists={lists} defaultListId={activeListId} defaultDueDate={defaultDueDateForNewTask} onAddTask={onAddTask} /></div> : <div className={styles.subHeaderSpacer} aria-hidden />}
-        {onCreateTask && <button type="button" className={styles.addBtn} onClick={onCreateTask}><Plus size={13} /> Full Planning</button>}
+        {onCreateTask && <PrimaryButton type="button" className={styles.fullPlanBtn} onClick={onCreateTask} pill><Plus size={13} /> Full Planning</PrimaryButton>}
       </div>
       <div className={styles.quickAddDivider} aria-hidden />
       <TaskFeedToolbar {...toolbarProps} />
@@ -51,12 +41,11 @@ function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask
 function SearchEmptyBlock({ data }) {
   if (!data.showSearchEmptyState) return null;
   return (
-    <div className={styles.searchEmptyCard}>
-      <span className={styles.searchEmptyEmoji}>🔍</span>
-      <p className={styles.searchEmptyMessage}>No tasks match &ldquo;{data.search}&rdquo;</p>
-      <p className={styles.searchEmptyHint}>Try a different keyword or check your spelling</p>
-      <button type="button" className={styles.searchEmptyBtn} onClick={() => data.setSearch("")}>Clear search</button>
-    </div>
+    <SearchEmptyState
+      query={data.search}
+      itemLabel="tasks"
+      onClear={() => data.setSearch("")}
+    />
   );
 }
 
@@ -100,7 +89,7 @@ function CompletedBlock({ data, lists, onToggleComplete, onDeleteTask, onEditTas
   return <CompletedTasksSection tasks={data.filteredCompleted} sortBy={data.sortBy} listMap={data.listMap} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />;
 }
 
-function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask }) {
+function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask, readingList, onTaskAdded, taskCount }) {
   return (
     <div className={styles.sectionsWrap}>
       <div className={styles.sections} key={`sections-${activeListId ?? "all"}`}>
@@ -111,8 +100,12 @@ function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, active
         <ThisWeekSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
         <LaterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
         <AllTasksSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+        {readingList && (
+        <SuggestedReadingsSection key={activeListId} onTaskAdded={onTaskAdded} taskCount={taskCount} />
+      )}
         <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
       </div>
+      
     </div>
   );
 }
@@ -123,11 +116,19 @@ function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, active
 export default function TaskFeed(props) {
   const data = useTaskFeedData(props);
   const sectionPropsWithHandlers = { ...data.sectionProps, onToggleComplete: props.onToggleComplete, onDeleteTask: props.onDeleteTask, onEditTask: props.onEditTask };
+  const activeList = (props.lists || []).find(l => String(l.id) === String(props.activeListId));
+  const readingList = isReadingList(activeList);
   return (
     <div className={styles.feed}>
-      <TaskFeedHeader title={data.headerTitle} />
+      <PageHeader
+        title={data.headerTitle}
+        subtitle="Plan coursework, deadlines, and day-to-day admin in one place."
+        compact
+      />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
-      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} />
+      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} 
+      readingList={readingList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
+      />
     </div>
   );
 }

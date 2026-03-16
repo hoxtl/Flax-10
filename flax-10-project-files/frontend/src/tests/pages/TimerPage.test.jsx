@@ -148,6 +148,11 @@ describe('TimerPage Integration', () => {
         expect(container).toBeInTheDocument();
     });
 
+    it('shows the focus page skeleton before the page settles', () => {
+        helpers.renderTimerPage({ settle: false });
+        expect(screen.getByTestId('focus-page-skeleton')).toBeInTheDocument();
+    });
+
     it('cycles focus transition messages and hides after 10s', () => {
         mockLocationState = { fromTaskPlay: true };
         helpers.renderTimerPage();

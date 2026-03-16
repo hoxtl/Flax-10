@@ -15,8 +15,8 @@
 .modulesScroll {
   display: flex;
   overflow-x: auto;
-  gap: 12px;
-  padding: 4px 0 12px;
+  gap: 8px;
+  padding: 2px 0 8px;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
@@ -30,11 +30,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 140px;
-  padding: 12px;
+  width: 96px;
+  padding: 8px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -47,19 +47,19 @@
 }
 
 .moduleIcon {
-  font-size: 18px;
-  margin-bottom: 6px;
+  font-size: 13px;
+  margin-bottom: 3px;
 }
 
 .moduleCode {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 1px;
 }
 
 .moduleName {
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 500;
   color: var(--muted);
   line-height: 1.2;
@@ -167,15 +167,49 @@
   gap: 3px;
 }
 
+.fullNameRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .fullName {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
+.rolePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
+  background: color-mix(in oklab, var(--primary-soft, var(--panel)) 60%, var(--panel));
+  color: var(--primary-700, var(--primary));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .description {
   font-size: 14px;
   color: var(--text);
+}
+
+.teacherEmail {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.teacherEmail a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.teacherEmail a:hover {
+  text-decoration: underline;
 }
 
 .reminder {
@@ -204,8 +238,8 @@
 
 .twoCol {
   display: grid;
-  grid-template-columns: 1fr 290px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 258px;
+  gap: 18px;
   align-items: start;
 }
 
@@ -224,48 +258,26 @@
 .rightCol {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   position: sticky;
   top: 20px;
 }
 
 .glassCard {
   position: relative;
-  background: rgba(246, 244, 241, 0.55);
+  background: var(--surface-glass-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--surface-glass-card-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow:
-    0 2px 8px rgba(74, 52, 33, 0.06),
-    0 8px 32px rgba(74, 52, 33, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: var(--surface-glass-card-shadow);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-[data-theme="dark"] .glassCard {
-  background: rgba(26, 19, 16, 0.6);
-  border-color: rgba(180, 164, 144, 0.18);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(180, 164, 144, 0.08);
-}
-
 .glassCard:hover {
-  box-shadow:
-    0 4px 16px rgba(74, 52, 33, 0.10),
-    0 16px 48px rgba(74, 52, 33, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: var(--surface-glass-card-hover-shadow);
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .glassCard:hover {
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    0 16px 48px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(180, 164, 144, 0.12);
 }
 
 /* Subtle gradient sheen across top of card */
@@ -304,7 +316,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 12px;
+  padding: 14px 16px 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -329,11 +341,11 @@
 }
 
 .widgetContent {
-  padding: 0 20px 20px;
+  padding: 0 14px 14px;
 }
 
 .modulesWidget .widgetContent {
-  padding: 16px 20px 20px;
+  padding: 10px 14px 14px;
 }
 
 .personaCard {
@@ -777,11 +789,11 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .badgesCount {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text);
   line-height: 1;
@@ -792,34 +804,39 @@
 }
 
 .badgesCountLabel {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--muted);
 }
 
 .badgesGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 11px;
-  border-radius: 100px;
-  border: 1px solid;
-  font-size: 12px;
-  font-weight: 500;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
   color: var(--text);
   cursor: default;
-  background: rgba(255, 255, 255, 0.35);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
   backdrop-filter: blur(8px);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-[data-theme="dark"] .badge {
-  background: rgba(180, 164, 144, 0.08);
+.badgeGold {
+  background: color-mix(in srgb, #f59e0b 12%, transparent);
+  border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+}
+
+.badgeSilver {
+  background: color-mix(in srgb, #9ca3af 12%, transparent);
+  border-color: color-mix(in srgb, #9ca3af 28%, transparent);
+}
+
+.badgeBronze {
+  background: color-mix(in srgb, #92400e 10%, transparent);
+  border-color: color-mix(in srgb, #92400e 24%, transparent);
 }
 
 .badge:hover {
@@ -834,14 +851,8 @@
 }
 
 .badgesMore {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 11px;
-  border-radius: 100px;
-  border: 1px solid var(--border);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .emptyBadges {
@@ -1306,8 +1317,22 @@
 .mobileBio {
   font-size: 13px;
   opacity: 0.9;
-  margin: 0 0 16px;
+  margin: 0 0 8px;
   font-weight: 500;
+}
+
+.mobileRolePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 3px 10px;
+  margin-bottom: 12px;
 }
 
 .mobileActions {
@@ -1377,10 +1402,10 @@
 
 .societiesScroll {
   display: flex;
-  gap: 1.25rem;
+  gap: 0.65rem;
   overflow-x: auto;
-  padding: 0.5rem 0;
-  margin-top: 1rem;
+  padding: 0.1rem 0 0.2rem;
+  margin-top: 0.2rem;
   scrollbar-width: none;
   /* Firefox */
 }
@@ -1392,13 +1417,13 @@
 
 .societyCard {
   flex: 0 0 auto;
-  width: 100px;
+  width: 70px;
   background: none;
   border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   cursor: pointer;
   transition: transform 0.2s ease;
   padding: 0;
@@ -1407,7 +1432,7 @@
 .societyCard:hover .socLogoWrap {
   border-color: var(--primary);
   background: var(--hover);
-  transform: scale(1.02);
+  transform: scale(1.015);
 }
 
 .societyCard:hover .socName {
@@ -1415,10 +1440,10 @@
 }
 
 .socLogoWrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  background: var(--surface-hover, #f3f4f6);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface-card-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1434,15 +1459,15 @@
 }
 
 .socInitial {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #8b6e4e);
+  color: var(--primary);
 }
 
 .socName {
-  font-size: 0.85rem;
+  font-size: 0.66rem;
   font-weight: 500;
-  color: var(--text, #1f2937);
+  color: var(--text);
   text-align: center;
   width: 100%;
   white-space: nowrap;

@@ -5,6 +5,10 @@ body,
   background: var(--surface-page);
 }
 
+html {
+  font-size: 14px;
+}
+
 :root {
   font-family: var(--font-body);
   line-height: 1.5;

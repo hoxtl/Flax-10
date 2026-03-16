@@ -2,6 +2,7 @@
  * Plan timeline read modal — task or event detail overlay.
  */
 
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { formatTime } from "../utils/dateFormatUtils";
 
 export function PlanReadDetailModal({
@@ -58,16 +59,10 @@ export function PlanReadDetailModal({
           <p className={styles.actionHubReadDescription}>{data.description}</p>
         )}
         <div className={styles.actionHubReadFooter}>
-          <button type="button" className={styles.actionHubReadBtn} onClick={handleEdit}>
-            Edit
-          </button>
-          <button type="button" className={styles.actionHubReadBtnDanger} onClick={handleDelete}>
-            Delete
-          </button>
+          <PrimaryButton type="button" className={styles.actionHubReadBtn} variant="ghost" pill onClick={handleEdit}>Edit</PrimaryButton>
+          <PrimaryButton type="button" className={styles.actionHubReadBtnDanger} variant="danger" pill onClick={handleDelete}>Delete</PrimaryButton>
         </div>
-        <button type="button" className={styles.actionHubReadClose} onClick={onClose} aria-label="Close">
-          ×
-        </button>
+        <PrimaryButton type="button" className={styles.actionHubReadClose} variant="ghost" size="small" pill onClick={onClose} aria-label="Close">×</PrimaryButton>
       </div>
     </div>
   );

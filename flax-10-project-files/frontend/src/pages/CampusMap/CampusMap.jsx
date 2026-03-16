@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./CampusMap.module.css";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
@@ -10,6 +11,36 @@ import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 import { UserJourneySection } from "../../components/CampusMap/UserJourneySection"
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+const MIN_MAP_SKELETON_MS = 900;
+
+function CampusMapSkeleton() {
+  return (
+    <div className={styles.skeletonOverlay} data-testid="campus-map-skeleton" aria-busy="true">
+      <aside className={styles.sidebar}>
+        <section className={styles.sidebarHeader}>
+          <SkeletonBlock className={styles.skeletonSidebarTitle} />
+          <SkeletonBlock className={styles.skeletonSidebarSubtitle} />
+        </section>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <section key={index} className={styles.section}>
+            <SkeletonBlock className={styles.skeletonSectionLabel} />
+            <SkeletonBlock className={styles.skeletonPanelCard} />
+            <SkeletonBlock className={styles.skeletonPanelCardTall} />
+          </section>
+        ))}
+      </aside>
+      <div className={styles.mapWrapper}>
+        <SkeletonBlock className={styles.skeletonMapPane} />
+        <div className={styles.campusQuickNav}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonBlock key={index} className={styles.skeletonQuickNavBtn} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function travelTime(seconds) {
   const mins = Math.round(seconds / 60);
@@ -64,6 +95,7 @@ export default function CampusMap() {
   const [customDestination, setCustomDestination] = useState(null);
   const [manualStart, setManualStart] = useState("");
   const [manualDestination, setManualDestination] = useState("");
+  const [minSkeletonElapsed, setMinSkeletonElapsed] = useState(false);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
@@ -72,6 +104,14 @@ export default function CampusMap() {
     const handleResize = () => setIsMobile(window.innerWidth < 900);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setMinSkeletonElapsed(true);
+    }, MIN_MAP_SKELETON_MS);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Variants for the bottom sheet states
@@ -86,7 +126,7 @@ export default function CampusMap() {
   const homePopup = useRef(null);
 
   useEffect(() => {
-    if (map.current) return;
+    if (map.current || !mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -248,6 +288,16 @@ export default function CampusMap() {
       map.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!mapLoaded || !map.current) return;
+    const id = requestAnimationFrame(() => {
+      if (typeof map.current?.resize === "function") {
+        map.current.resize();
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [mapLoaded, isMobile]);
 
   // Load user's home address on the map
   useEffect(() => {
@@ -624,11 +674,18 @@ export default function CampusMap() {
       duration: 1500
     });
   }
+  
+  const showInitialSkeleton = !mapLoaded || !minSkeletonElapsed;
 
   return (
     <div className={styles.page}>
+      {showInitialSkeleton && (
+        <CampusMapSkeleton />
+      )}
+
       <motion.aside
         className={styles.sidebar}
+        style={showInitialSkeleton ? { visibility: "hidden" } : undefined}
         initial={isMobile ? "closed" : false}
         animate={isMobile ? undefined : { y: 0 }}
         drag={isMobile ? "y" : false}
@@ -1155,7 +1212,7 @@ export default function CampusMap() {
         </div>
       </motion.aside>
 
-      <div className={styles.mapWrapper}>
+      <div className={styles.mapWrapper} style={showInitialSkeleton ? { visibility: "hidden" } : undefined}>
         <div ref={mapContainer} className={styles.mapContainer} />
 
         {/* Floating campus quick-fly buttons */}

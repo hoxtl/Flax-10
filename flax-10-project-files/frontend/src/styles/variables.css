@@ -8,6 +8,110 @@
   --font-weight-title: 700;
   --font-weight-task: 500;
   --font-weight-caption: 400;
+  --font-sans: var(--font-body);
+
+  /* Core shared scales */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-pill: 9999px;
+  --radius: var(--radius-lg);
+  --card-radius: var(--radius-2xl);
+  --radius-control: var(--radius-md);
+
+  --text-2xs: 0.6rem;
+  --text-xs: 0.7rem;
+  --text-sm: 0.8rem;
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --shadow-sm: 0 1px 3px rgba(74, 52, 33, 0.06);
+  --shadow-md: 0 4px 16px rgba(74, 52, 33, 0.08);
+  --shadow-lg: 0 8px 32px rgba(74, 52, 33, 0.12);
+  --shadow-xl: 0 20px 60px rgba(74, 52, 33, 0.14);
+  --shadow-card: 0 8px 30px rgba(44, 24, 16, 0.08);
+  --shadow-popover: 0 12px 30px rgba(44, 24, 16, 0.12);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+  --card-padding: var(--space-5);
+  --card-padding-lg: var(--space-6);
+  --card-radius-token: var(--radius-2xl);
+  --card-border: 1px solid var(--border);
+  --card-shadow: var(--shadow-card);
+  --card-shadow-rest: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  --card-shadow-strong: var(--shadow-lg);
+  --card-hover-transform: translateY(-2px);
+  --card-hover-transform-strong: translateY(-4px);
+  --card-icon-surface: var(--surface);
+  --card-icon-radius: var(--radius-md);
+
+  --stroke-soft: 1px solid var(--border);
+  --stroke-strong: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  --focus-ring: 0 0 0 3px rgba(123, 103, 81, 0.15);
+  --focus-ring-strong: 0 0 0 3px rgba(123, 103, 81, 0.22);
+
+  --control-height: 36px;
+  --control-height-sm: 30px;
+  --control-radius: var(--radius-control);
+  --control-padding-y: var(--space-2);
+  --control-padding-x: var(--space-3);
+  --control-border: 1px solid var(--border);
+  --input-height: var(--control-height);
+  --input-height-sm: var(--control-height-sm);
+  --input-padding: var(--control-padding-y) var(--control-padding-x);
+  --input-radius: var(--control-radius);
+  --input-border: var(--control-border);
+  --input-focus-ring: var(--focus-ring);
+
+  --btn-height: var(--control-height);
+  --btn-height-sm: var(--control-height-sm);
+  --btn-radius: var(--control-radius);
+  --btn-padding: var(--space-2) var(--space-4);
+  --btn-padding-sm: var(--space-1) var(--space-3);
+  --btn-font-size: var(--text-base);
+  --btn-font-weight: 600;
+
+  --dropdown-radius: var(--radius-lg);
+  --dropdown-shadow: var(--shadow-popover);
+  --dropdown-border: var(--stroke-soft);
+  --dropdown-padding: var(--space-1);
+  --dropdown-item-padding: var(--space-2) var(--space-3);
+  --dropdown-item-radius: var(--radius-md);
+  --filter-dropdown-width: 280px;
+  --filter-dropdown-width-sm: 240px;
+  --filter-dropdown-max-width: min(90vw, var(--filter-dropdown-width));
+  --user-filter-dropdown-width: 360px;
+  --user-filter-dropdown-max-width: min(94vw, var(--user-filter-dropdown-width));
+
+  --modal-radius: var(--radius-xl);
+  --modal-padding: var(--space-6);
+  --modal-shadow: var(--shadow-modal);
+
+  --chip-radius: var(--radius-md);
+  --chip-padding: var(--space-1) var(--space-2);
+  --chip-font-size: var(--text-xs);
+  --chip-font-weight: 600;
 
   /* Semantic text colors for typography */
   --text-charcoal: var(--primary);
@@ -44,6 +148,11 @@
   --panel: #FFFCFA;
   --sidebar: #EEEAE4;
   --border: rgba(74, 52, 33, 0.12);
+  --paper: #f8f5f2;
+  --paper-strong: #f2ede6;
+  --glass: rgba(248, 245, 242, 0.88);
+  --glass-border: rgba(74, 52, 33, 0.12);
+  --kcl-accent: #9d2235;
 
   /* Semantic text & surfaces (light) */
   --text: #1A1A1A;
@@ -53,6 +162,7 @@
   --muted: #9CA3AF;
 
   --primary: #7B6751;
+  --primary-light: color-mix(in srgb, var(--primary) 12%, transparent);
   --primary-strong: #5c4d3e;
   --sage: #8C9A86;
   --accent: var(--primary);
@@ -82,6 +192,55 @@
   --bento-card-bg: #FFFCFA;
   --surface: #F8F5F2;
   --soft-paper: #FFFCFA;
+  --surface-paper: #fffdfa;
+  --surface-panel: var(--panel);
+  --surface-card: var(--card-bg);
+  --surface-card-muted: var(--surface);
+  --surface-page: var(--bg);
+  --surface-search: var(--search-bg);
+  --surface-raised: #ffffff;
+  --surface-warm: #f5efe8;
+  --surface-card-glass: rgba(255, 252, 250, 0.82);
+  --surface-hero: linear-gradient(180deg, rgba(255, 252, 250, 0.96) 0%, rgba(248, 245, 242, 0.94) 100%);
+  --surface-hero-glow: none;
+  --surface-glass-card: rgba(246, 244, 241, 0.55);
+  --surface-glass-card-border: rgba(255, 255, 255, 0.55);
+  --surface-glass-card-shadow:
+    0 2px 8px rgba(74, 52, 33, 0.06),
+    0 8px 32px rgba(74, 52, 33, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --surface-glass-card-hover-shadow:
+    0 4px 16px rgba(74, 52, 33, 0.10),
+    0 16px 48px rgba(74, 52, 33, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --surface-overlay-strong: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+  --surface-report-icon: rgba(255, 255, 255, 0.8);
+  --shadow-report-icon: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  --auth-geo-hero-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface-page) 78%, var(--surface-warm) 22%) 0%,
+    color-mix(in srgb, var(--surface-page) 58%, var(--primary) 12%) 100%
+  );
+  --auth-geo-glow-a: color-mix(in srgb, var(--primary) 18%, transparent);
+  --auth-geo-glow-b: color-mix(in srgb, var(--border) 65%, transparent);
+  --auth-geo-shape-a: color-mix(in srgb, var(--primary) 30%, transparent);
+  --auth-geo-shape-b: color-mix(in srgb, var(--muted) 24%, transparent);
+  --auth-geo-shape-c: color-mix(in srgb, var(--primary) 20%, transparent);
+  --auth-geo-shape-d: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-shape-e: color-mix(in srgb, var(--border) 45%, transparent);
+  --auth-geo-shape-border-a: color-mix(in srgb, var(--primary) 30%, var(--border));
+  --auth-geo-shape-border-b: color-mix(in srgb, var(--muted) 35%, var(--border));
+  --auth-geo-shape-border-c: color-mix(in srgb, var(--primary) 26%, var(--border));
+  --auth-geo-shape-border-d: color-mix(in srgb, var(--primary) 22%, var(--border));
+  --auth-geo-shape-border-e: color-mix(in srgb, var(--border) 80%, transparent);
+  --auth-geo-shape-highlight: color-mix(in srgb, #ffffff 20%, transparent);
+  --auth-geo-shape-shadow: 0 10px 36px color-mix(in srgb, var(--primary) 18%, transparent);
+  --auth-geo-fade-overlay: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface-page) 90%, transparent),
+    color-mix(in srgb, var(--surface-page) 20%, transparent),
+    color-mix(in srgb, var(--surface-page) 82%, transparent)
+  );
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
   --dot-meal: var(--neutral);
@@ -137,6 +296,16 @@
   --frame-bg: rgba(248, 245, 242, 0.88);
   --frame-border: rgba(0, 0, 0, 0.06);
   --frame-blur: 20px;
+  --frame-shadow: 0 10px 28px rgba(74, 52, 33, 0.06);
+
+  --type-display: clamp(2.4rem, 5vw, 4.4rem);
+  --type-page: clamp(1.7rem, 2.7vw, 2.25rem);
+  --type-section: clamp(1.1rem, 1.6vw, 1.35rem);
+  --type-card: 1rem;
+  --type-metric: clamp(1.8rem, 3vw, 2.6rem);
+  --type-body: 0.95rem;
+  --type-supporting: 0.82rem;
+  --type-eyebrow: 0.72rem;
 
   --now-banner-bg: rgba(255, 255, 255, 0.6);
   --now-banner-bg-idle: rgba(255, 251, 240, 0.6);
@@ -240,6 +409,10 @@
   --bg: #1a1310;
   --panel: #241a14;
   --sidebar: #201812;
+  --paper: #1a1310;
+  --paper-strong: #241a14;
+  --glass: rgba(26, 19, 16, 0.86);
+  --glass-border: rgba(180, 155, 126, 0.16);
 
   --border: rgba(180, 155, 126, 0.18);
 
@@ -253,6 +426,7 @@
   --muted: #94a3b8;
 
   --primary: #B89B7E;
+  --primary-light: color-mix(in srgb, var(--primary) 20%, transparent);
   --primary-strong: #D4B896;
   --sage: #a3b18a;
   --accent: #B89B7E;
@@ -281,6 +455,55 @@
   --user-details-text: #f1f5f9;
 
   --surface: #241a14;
+  --surface-panel: var(--panel);
+  --surface-card: var(--card-bg);
+  --surface-card-muted: var(--surface);
+  --surface-page: var(--bg);
+  --surface-search: var(--search-bg);
+  --surface-raised: #2c211b;
+  --surface-warm: #2a1d17;
+  --surface-paper: #241a14;
+  --surface-card-glass: rgba(36, 26, 20, 0.84);
+  --surface-hero: linear-gradient(180deg, rgba(36, 26, 20, 0.94) 0%, rgba(26, 19, 16, 0.92) 100%);
+  --surface-hero-glow: none;
+  --surface-glass-card: rgba(26, 19, 16, 0.6);
+  --surface-glass-card-border: rgba(180, 164, 144, 0.18);
+  --surface-glass-card-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(180, 164, 144, 0.08);
+  --surface-glass-card-hover-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 16px 48px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(180, 164, 144, 0.12);
+  --surface-overlay-strong: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.62));
+  --surface-report-icon: rgba(241, 245, 249, 0.85);
+  --shadow-report-icon: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  --auth-geo-hero-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface-page) 84%, #000000 16%) 0%,
+    color-mix(in srgb, var(--surface-page) 72%, var(--primary) 28%) 100%
+  );
+  --auth-geo-glow-a: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-glow-b: color-mix(in srgb, var(--border) 70%, transparent);
+  --auth-geo-shape-a: color-mix(in srgb, var(--primary) 32%, transparent);
+  --auth-geo-shape-b: color-mix(in srgb, var(--muted) 18%, transparent);
+  --auth-geo-shape-c: color-mix(in srgb, var(--primary) 28%, transparent);
+  --auth-geo-shape-d: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-shape-e: color-mix(in srgb, var(--border) 50%, transparent);
+  --auth-geo-shape-border-a: color-mix(in srgb, var(--primary) 40%, var(--border));
+  --auth-geo-shape-border-b: color-mix(in srgb, var(--muted) 30%, var(--border));
+  --auth-geo-shape-border-c: color-mix(in srgb, var(--primary) 34%, var(--border));
+  --auth-geo-shape-border-d: color-mix(in srgb, var(--primary) 30%, var(--border));
+  --auth-geo-shape-border-e: color-mix(in srgb, var(--border) 86%, transparent);
+  --auth-geo-shape-highlight: color-mix(in srgb, #ffffff 12%, transparent);
+  --auth-geo-shape-shadow: 0 10px 36px color-mix(in srgb, #000000 38%, transparent);
+  --auth-geo-fade-overlay: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface-page) 90%, transparent),
+    color-mix(in srgb, var(--surface-page) 18%, transparent),
+    color-mix(in srgb, var(--surface-page) 86%, transparent)
+  );
 
   /* Topbar (dark) */
   --topbar-bg: rgba(26, 19, 16, 0.95);
@@ -291,6 +514,7 @@
   --frame-bg: rgba(36, 26, 20, 0.85);
   --frame-border: rgba(180, 155, 126, 0.15);
   --frame-blur: 20px;
+  --frame-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
 
   --now-banner-bg: rgba(255, 255, 255, 0.08);
   --now-banner-bg-idle: rgba(255, 255, 255, 0.06);

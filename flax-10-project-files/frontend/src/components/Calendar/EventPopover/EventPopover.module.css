@@ -75,12 +75,8 @@
 }
 
 .tagBadge {
-    display: inline-block;
-    padding: 2px 8px;
     font-size: 0.7rem;
     font-weight: 500;
-    border-radius: 12px;
-    color: var(--c-white, #fff);
 }
 
 .badgeRow {
@@ -91,12 +87,8 @@
 }
 
 .contextBadge {
-    display: inline-block;
-    padding: 2px 8px;
     font-size: 0.7rem;
     font-weight: var(--font-weight-task, 500);
-    border-radius: var(--radius-pill, 12px);
-    color: var(--c-white, #fff);
 }
 
 .actions {
@@ -105,22 +97,11 @@
 }
 
 .actionBtn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--muted, #666);
-    padding: 4px 6px;
-    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    font-size: 0.8rem;
-}
-
-.actionBtn:hover {
-    background: var(--hover, #f5f5f5);
-    color: var(--primary, #886a4a);
+    min-width: 34px;
+    padding-inline: 10px;
 }
 
 .detailRow {

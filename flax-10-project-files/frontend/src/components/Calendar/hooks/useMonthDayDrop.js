@@ -4,7 +4,7 @@ import { useCalendar } from "../../../context/CalendarContext";
 import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
-import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
+import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
 
 export function useMonthDayDrop(targetDate) {
     const { events } = useCalendar();
@@ -22,6 +22,7 @@ export function useMonthDayDrop(targetDate) {
 }
 
 async function moveEventToDate(event, targetDate, editEvent, addEvent, addException, allEvents, confirmFn) {
+    if (isReadOnlyEvent(event)) return;
     if (hasRecurrence(event)) {
         await handleRecurringMove(event, targetDate, editEvent, addEvent, addException, allEvents, confirmFn);
     } else {

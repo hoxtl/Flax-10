@@ -5,7 +5,13 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus, ChevronDown, Calendar, Clock } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  ChevronDown,
+  Calendar,
+  Clock,
+} from "lucide-react";
 import { SegmentedControl } from "../ui/SegmentedControl";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
@@ -46,10 +52,16 @@ function parseRouteOption(r) {
 function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange }) {
   const hasActive = routes.some(r => r.id === activeNav);
   const trigger = <NavDropdownTrigger title={title} hasActive={hasActive} />;
+  const handleSelect = (nextId) => {
+    if (nextId === "modules") {
+      window.dispatchEvent(new CustomEvent("modules:show-all"));
+    }
+    onNavChange?.(nextId);
+  };
   return (
     <div className={styles.navGroup}>
       <AnimatedDropdown customTrigger={trigger} options={routes.map(parseRouteOption)}
-        value={activeNav} onChange={onNavChange} hideCheckmark={true}
+        value={activeNav} onChange={handleSelect} hideCheckmark={true}
         isOpen={isOpen} onOpenChange={onOpenChange} />
     </div>
   );
@@ -98,20 +110,32 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   );
 }
 
-function QuickTabs({ onAddClick }) {
+function AddTab({ onAddClick }) {
+  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }];
+  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && onAddClick?.()} />;
+}
+
+function NotifTab() {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
-  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }, { type: "separator" }, { title: "Notifications", icon: Bell, badge: unreadCount }];
-  const change = (i) => i === 0 ? onAddClick?.() : i === 2 && togglePanel();
-  return <ExpandableTabs tabs={tabs} onChange={change} />;
+  const tabs = [{ title: "Notifications", icon: Bell, badge: unreadCount }];
+  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && togglePanel()} />;
 }
 
 function ActionPill({ onAddClick, onNavChange }) {
+  const openQuickActions = () => window.dispatchEvent(new CustomEvent("quick-actions:open"));
   return (
     <div className={styles.actionPill}>
+      <button type="button" className={styles.quickActionsBtn} onClick={openQuickActions}>
+        Quick actions
+        <span className={styles.quickActionsKey}>/</span>
+      </button>
+      <div className={styles.pillDivider} />
+      <AddTab onAddClick={onAddClick} />
+      <div className={styles.pillDivider} />
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs onAddClick={onAddClick} />
+      <NotifTab />
       <NotificationPanel onNavChange={onNavChange} />
     </div>
   );

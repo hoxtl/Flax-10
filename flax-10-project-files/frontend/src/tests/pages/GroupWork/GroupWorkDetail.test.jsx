@@ -62,6 +62,12 @@ describe('GroupWorkDetail', () => {
     expect(screen.getByText(/Member User/i)).toBeTruthy();
   });
 
+  it('shows the skeleton shimmer while loading', () => {
+    useProject.mockReturnValue({ project: null, loading: true });
+    renderComponent();
+    expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
+  });
+
   it('switches tabs', () => {
     renderComponent();
     const availabilityTab = screen.getByText("Availability");

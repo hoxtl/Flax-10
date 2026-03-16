@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import PageHeader from '../../components/common/PageHeader/PageHeader';
+import AppPage from '../../components/common/AppPage/AppPage';
 import SummaryCards from '../../components/Analytics/SummaryCards';
 import ProductivityCards from '../../components/Analytics/ProductivityCards';
 import StudyHoursChart from '../../components/Analytics/StudyHoursChart';
@@ -11,8 +11,8 @@ import PlannedVsActualChart from '../../components/Analytics/PlannedVsActualChar
 import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
-import PageSkeleton from '../../components/common/LoadingState/PageSkeleton';
 import Tabs from '../../components/common/Tabs/Tabs';
+import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
 import styles from './AnalyticsPage.module.css';
 
@@ -35,6 +35,39 @@ const fadeUp = {
     transition: { delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] },
   }),
 };
+
+function AnalyticsSkeleton() {
+  return (
+    <div className={styles.page} aria-busy="true">
+      <div className={styles.skeletonHeader}>
+        <div className={styles.skeletonTitleGroup}>
+          <SkeletonBlock className={styles.skeletonTitle} />
+          <SkeletonBlock className={styles.skeletonSubtitle} />
+        </div>
+        <div className={styles.skeletonPeriodToggle}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <SkeletonBlock key={index} className={styles.skeletonPeriodBtn} />
+          ))}
+        </div>
+      </div>
+      <div className={styles.skeletonTabs}>
+        <SkeletonBlock className={styles.skeletonTab} />
+        <SkeletonBlock className={styles.skeletonTab} />
+      </div>
+      <div className={styles.skeletonSummaryGrid}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SkeletonBlock key={index} className={styles.skeletonSummaryCard} />
+        ))}
+      </div>
+      <div className={styles.skeletonAnalyticsGrid}>
+        <SkeletonBlock className={styles.skeletonAnalyticsCardTall} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardTall} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardWide} />
+        <SkeletonBlock className={styles.skeletonAnalyticsCardWide} />
+      </div>
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -132,29 +165,30 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className={styles.page}>
-      <PageHeader
-        title="Analytics"
-        subtitle="Your study patterns & performance"
-        action={
-          <div className={styles.periodToggle}>
-            {PERIODS.map(p => (
-              <button
-                key={p.value}
-                className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-                onClick={() => handlePeriodChange(p.value)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        }
-      />
+    <AppPage
+      width="xl"
+      className={styles.page}
+      title="Analytics"
+      subtitle="Your study patterns & performance"
+      action={
+        <div className={styles.periodToggle}>
+          {PERIODS.map(p => (
+            <button
+              key={p.value}
+              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
+              onClick={() => handlePeriodChange(p.value)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
 
       {error && <div className={styles.errorBanner}>{error}</div>}
-      {loading && <PageSkeleton label="Loading analytics" cardCount={6} cardHeight="100px" columns={3} />}
+      {loading && <AnalyticsSkeleton />}
 
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
-    </div>
+    </AppPage>
   );
 }

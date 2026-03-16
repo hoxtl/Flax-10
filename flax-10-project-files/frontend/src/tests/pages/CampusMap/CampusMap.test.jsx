@@ -84,6 +84,14 @@ describe("CampusMap", () => {
     });
   });
 
+  it("shows the shared skeleton before the map finishes loading", () => {
+    mockMapInstance.on.mockImplementation(function () {
+      return mockMapInstance;
+    });
+    render(<CampusMap />);
+    expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument();
+  });
+
   it("renders StudyFlax Map title and subtitle", async () => {
     render(<CampusMap />);
     expect(screen.getByText("StudyFlax Map")).toBeInTheDocument();
@@ -115,6 +123,9 @@ describe("CampusMap", () => {
 
   it("selecting a campus shows campus name in chip", async () => {
     render(<CampusMap />);
+    await waitFor(() =>
+      expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
+    );
     const strandButtons = await screen.findAllByRole("button", { name: /Strand/ });
     fireEvent.click(strandButtons[0]);
     await waitFor(() => expect(screen.getByText("Strand Campus")).toBeInTheDocument());

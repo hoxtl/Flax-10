@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { DatePickerButton } from './DatePickerButton';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
@@ -10,7 +12,7 @@ export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, 
     return (
         <div className={styles.nav}>
             <NavArrow direction="left" onClick={onPrev} />
-            {showToday && <button className={styles.todayBtn} onClick={onToday}>Today</button>}
+            {showToday && <PrimaryButton className={styles.todayBtn} variant="ghost" onClick={onToday} pill>Today</PrimaryButton>}
             <NavArrow direction="right" onClick={onNext} />
             <DatePickerButton selectedDate={selectedDate} onDatePick={onDatePick} />
             {title && <h2 className={styles.title}>{title}</h2>}
@@ -89,20 +91,52 @@ function SearchIconButton({ onClick }) {
     );
 }
 
-function SearchExpanded({ value, onChange, onClose, onBlur }) {
-    return (
-        <div className={styles.searchWrapper}>
-            <SearchBar value={value} onChange={onChange} placeholder="Search events..." className={styles.searchBar} onBlur={onBlur} />
-            <button className={styles.searchClose} onClick={onClose}><X size={16} /></button>
-        </div>
-    );
-}
-
 export function SearchButton({ value, onChange }) {
     const [isExpanded, setIsExpanded] = useState(false);
-    const toggle = () => { if (isExpanded && value) onChange(''); setIsExpanded(p => !p); };
+    const inputRef = useRef(null);
+
+    const toggle = () => {
+        if (isExpanded && value) onChange('');
+        setIsExpanded(p => !p);
+    };
     const blur = () => { if (!value) setIsExpanded(false); };
 
-    if (!isExpanded) return <SearchIconButton onClick={toggle} />;
-    return <SearchExpanded value={value} onChange={onChange} onClose={toggle} onBlur={blur} />;
+    useEffect(() => {
+        if (isExpanded) {
+            const t = setTimeout(() => inputRef.current?.querySelector?.('input')?.focus(), 120);
+            return () => clearTimeout(t);
+        }
+    }, [isExpanded]);
+
+    return (
+        <div className={styles.searchContainer}>
+            <AnimatePresence mode="wait">
+                {isExpanded ? (
+                    <motion.div
+                        key="search-expanded"
+                        className={styles.searchWrapper}
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 'auto', opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                        <div ref={inputRef} className={styles.searchInner}>
+                            <SearchBar value={value} onChange={onChange} placeholder="Search events..." className={styles.searchBar} onBlur={blur} />
+                            <button className={styles.searchClose} onClick={toggle} aria-label="Close search"><X size={14} /></button>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="search-icon"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.15 }}
+                    >
+                        <SearchIconButton onClick={toggle} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }

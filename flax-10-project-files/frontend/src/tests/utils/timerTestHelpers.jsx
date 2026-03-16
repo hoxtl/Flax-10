@@ -7,11 +7,21 @@ import { vi } from 'vitest';
 import { TimerProvider } from '../../context/TimerContext';
 
 /** Renders TimerPage with necessary providers/mocks implicitly handled if needed */
-export const renderTimerPage = () => render(
-    <TimerProvider>
-        <TimerPage />
-    </TimerProvider>
-);
+export const renderTimerPage = ({ settle = true } = {}) => {
+    const view = render(
+        <TimerProvider>
+            <TimerPage />
+        </TimerProvider>
+    );
+    if (settle) {
+        try {
+            act(() => vi.advanceTimersByTime(500));
+        } catch (_) {
+            // Some tests intentionally switch back to real timers.
+        }
+    }
+    return view;
+};
 
 /** Renders TimerSettings in isolation */
 export const renderTimerSettings = (props) => render(<TimerSettings {...props} />);

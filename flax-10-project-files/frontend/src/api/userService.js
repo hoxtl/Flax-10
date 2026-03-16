@@ -67,10 +67,11 @@ export async function geocodeAddress(address) {
   return null;
 }
 
-export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '') {
+export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '') {
   let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
   if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
   if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
   if (yearFilter) url += `&year=${encodeURIComponent(yearFilter)}`;
+  if (roleFilter) url += `&role=${encodeURIComponent(roleFilter)}`;
   return apiFetch(url, { headers: authHeaders() });
 }

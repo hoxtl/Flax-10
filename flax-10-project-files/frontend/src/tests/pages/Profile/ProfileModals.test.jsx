@@ -104,10 +104,10 @@ describe('ProfileModals', () => {
         expect(screen.getByText('No modules found')).toBeTruthy();
     });
 
-    it('renders tasks modal when showTasks is true', () => {
+    it('renders tasks modal when showTasks is true', async () => {
         renderModals({ state: { showTasks: true } });
         expect(screen.getByText('Tasks')).toBeTruthy();
-        expect(screen.getByText('Tasks feature coming soon...')).toBeTruthy();
+        await waitFor(() => expect(screen.getByText(/No active tasks right now/i)).toBeTruthy());
     });
 
     it('renders events modal when showEvents is true', () => {

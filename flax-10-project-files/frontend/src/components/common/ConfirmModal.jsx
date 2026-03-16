@@ -4,7 +4,7 @@ import styles from "./ConfirmModal.module.css";
 export default function ConfirmModal({ title, message, onConfirm, onCancel, onAlternate, confirmText = "Confirm", cancelText = "Cancel", alternateText, isDanger = false }) {
     const btnClass = isDanger ? styles.dangerBtn : styles.primaryBtn;
     return (
-        <StandardModal title={title} onClose={onCancel}>
+        <StandardModal title={title} onClose={onCancel} backdropClassName={styles.backdrop}>
             <div className={styles.modalBody}>
                 <div className={styles.message}>{message}</div>
                 <div className={styles.buttons}>

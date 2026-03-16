@@ -2,18 +2,20 @@ from rest_framework import serializers
 from studyFlax.models import Module
 from studyFlax.models import User
 from studyFlax.serialisers.deadline_serialisers import DeadlineSummarySerialiser
+from studyFlax.serialisers.reading_serialisers import ReadingSummarySerialiser
 
 class ModuleSerialiser(serializers.ModelSerializer):
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
+    readings = ReadingSummarySerialiser(many=True, read_only=True)
 
     class Meta:
         model = Module
-        fields = ['id', 'module_code', 'module_name', 'description', 'created_by', 
-                'created_by_name', 'start_time', 'end_time', 'location', 
-                'recurrence_rule','is_recurring', 'deadlines', 'created_by_email']
+        fields = ['id', 'module_code', 'module_name', 'description', 'department',
+                'course', 'created_by', 'created_by_name', 'start_time', 'end_time',
+                'location', 'recurrence_rule', 'is_recurring', 'deadlines', 'created_by_email', 'readings']
         read_only_fields = ['created_by']
         
     def validate(self, validated_data):
@@ -34,7 +36,10 @@ class ModuleSerialiser(serializers.ModelSerializer):
     def get_created_by_name(self, obj):
         try:
             if obj.created_by:
-                return f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+                name = f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+                if getattr(obj.created_by, 'role', None) == 'teacher' and not name.startswith('Dr.'):
+                    return f"Dr. {name}"
+                return name
         except Exception:
             pass
         return 'Unknown'

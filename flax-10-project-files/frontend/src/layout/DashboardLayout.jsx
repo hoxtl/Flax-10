@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import styles from "./DashboardLayout.module.css";
 import TopBar from "../components/Dashboard/Topbar";
+import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
 import Sidebar from "../components/Dashboard/Sidebar";
 import WeekBar from "../components/Dashboard/WeekBar";
 import QuickAddModal from "../components/Dashboard/QuickAddModal";
@@ -14,6 +15,7 @@ import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
 import CreateSocietyModal from "../components/Society/CreateSocietyModal";
 import DeadlineModal from "../components/Modules/DeadlineModal";
+import ReadingModal from "../components/Modules/ReadingModal";
 import { createSociety } from "../api/societyApi";
 import { createTask, fetchTaskLists } from "../api/taskService";
 import { getModules, getEnrollments } from "../api/moduleApi";
@@ -21,25 +23,23 @@ import { isEnrolledIn } from "../components/Modules/utils/moduleUtils";
 import CreateTaskModal from "../pages/Tasks/components/CreateTaskModal";
 import { useTimerContext } from "../context/TimerContext";
 import { LeaveTimerModal } from "../components/Timer/TimerPopups";
-
-function useIsMobile(breakpoint = 900) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < breakpoint);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [breakpoint]);
-  return isMobile;
-}
+import useBreakpoint from "../hooks/useBreakpoint";
 
 function parseStoredUser(user) {
+  const formatYear = (year) => {
+    if (!year) return "Year: ";
+    const trimmed = String(year).trim();
+    if (/^year\s+/i.test(trimmed)) return trimmed;
+    if (!Number.isNaN(Number(trimmed))) return `Year ${trimmed}`;
+    return trimmed;
+  };
   const name =
     user.first_name && user.last_name
       ? `${user.first_name} ${user.last_name}`
       : user.username;
   return {
     name,
-    year: user.year ? `Year ${user.year}` : "Year: ",
+    year: formatYear(user.year),
     major: user.major || "Major: ",
     email: user.email,
     username: user.username,
@@ -155,7 +155,8 @@ function useModalStates() {
   const [showSocietyModal, setShowSocietyModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [deadlineModule, setDeadlineModule] = useState(null);
-  return { showQuickAdd, setShowQuickAdd, showSocietyModal, setShowSocietyModal, showTaskModal, setShowTaskModal, deadlineModule, setDeadlineModule };
+  const [readingModule, setReadingModule] = useState(null);
+  return { showQuickAdd, setShowQuickAdd, showSocietyModal, setShowSocietyModal, showTaskModal, setShowTaskModal, deadlineModule, setDeadlineModule, readingModule, setReadingModule };
 }
 
 function useTimerNav(activeNav, onNavChange, t) {
@@ -169,7 +170,7 @@ function useTimerNav(activeNav, onNavChange, t) {
 
 function useDashboardState(activeNav, onNavChange) {
   const location = useLocation();
-  const isMobile = useIsMobile(900);
+  const isMobile = useBreakpoint(900);
   const user = useUserSync();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const modals = useModalStates();
@@ -188,6 +189,7 @@ function useDashboardState(activeNav, onNavChange) {
     else if (id === 'task') modals.setShowTaskModal(true);
     else if (id === 'create_module') onPickNav('modules_create');
     else if (id === 'add_deadline') modals.setDeadlineModule(extra);
+    else if (id === 'add_reading') modals.setReadingModule(extra);
     else modal.openModal(null, id, selectedDate);
   };
   return { isMobile, user, mobileSidebarOpen, setMobileSidebarOpen, selectedDate, showWeekBar, modal, onPickNav, onSelectType, handleNavChange, pendingNav, setPendingNav, t, ...modals };
@@ -301,6 +303,12 @@ function DashboardModals({ state }) {
           startCreating={true}
         />
       )}
+      {state.readingModule && (
+        <ReadingModal
+          module={state.readingModule}
+          onClose={() => state.setReadingModule(null)}
+        />
+      )}
     </>
   );
 }
@@ -318,6 +326,7 @@ function DashboardMain({ state, onNavChange, children }) {
     isMobile,
     t,
     setPendingNav,
+    setShowTaskModal,
   } = state;
   return (
     <>
@@ -342,6 +351,10 @@ function DashboardMain({ state, onNavChange, children }) {
         {children}
       </MainArea>
       <DashboardModals state={state} />
+      <QuickCommandBar
+        onNavChange={onNavChange}
+        onOpenTask={() => setShowTaskModal(true)}
+      />
     </>
   );
 }

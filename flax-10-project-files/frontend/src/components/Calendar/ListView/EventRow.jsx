@@ -4,17 +4,10 @@ import { useEventModal } from '../../../context/CalendarContext';
 import { useQuickActions } from '../hooks/useQuickActions';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
+import Badge from '../../common/Badge/Badge';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import styles from './ListView.module.css';
-
-function isAllDay(event) {
-    if (event.all_day || event.is_all_day) return true;
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
-    const startMidnight = start.getHours() === 0 && start.getMinutes() === 0;
-    const endMidnight = end.getHours() === 0 && end.getMinutes() === 0;
-    const nextDay = end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth();
-    return startMidnight && endMidnight && nextDay;
-}
+import { isAllDay } from '../utils/eventUtils';
 
 function formatEventTime(event) {
     if (isAllDay(event)) return 'All day';
@@ -63,9 +56,9 @@ function getTagBadges(event, accentColor) {
 }
 
 function TagBadge({ badge }) {
-    const baseClass = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
-    const style = badge.color ? { backgroundColor: badge.color, color: '#fff' } : {};
-    return <span className={baseClass} style={style}>{badge.label}</span>;
+    const className = badge.type === 'source' ? styles.sourceBadge : styles.tagBadge;
+    const style = badge.color ? { backgroundColor: badge.color, color: 'var(--c-white)', borderColor: badge.color } : undefined;
+    return <Badge className={className} tone={badge.type === 'source' ? "default" : "muted"} style={style}>{badge.label}</Badge>;
 }
 
 function DetailRow({ label, value, muted, full }) {
@@ -80,13 +73,10 @@ function DetailRow({ label, value, muted, full }) {
 }
 
 function DetailButton({ variant = 'secondary', onClick, children }) {
-    const className = variant === 'primary'
-        ? `${styles.detailButton} ${styles.detailButtonPrimary}`
-        : styles.detailButton;
     return (
-        <button type="button" className={className} onClick={onClick}>
+        <PrimaryButton type="button" className={styles.detailButton} onClick={onClick} variant={variant === 'primary' ? 'primary' : 'ghost'} size="small" pill>
             {children}
-        </button>
+        </PrimaryButton>
     );
 }
 

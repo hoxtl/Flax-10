@@ -21,6 +21,7 @@ export function sortTasks(tasks, sortBy, listMap) {
     priority:   (a, b) => compareTaskPriority(a, b),
     due:        (a, b) => compareTaskDue(a, b),
     alpha:      (a, b) => a.title.localeCompare(b.title),
+    "alpha-desc": (a, b) => b.title.localeCompare(a.title),
     list:       (a, b) => compareList(a, b, listMap),
     date_added: (a, b) => (b.id ?? 0) - (a.id ?? 0),
     est_time:   (a, b) => compareTaskEstimatedTime(a, b),

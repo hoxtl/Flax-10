@@ -38,6 +38,8 @@ export function PlanFreeRow({
   setSlotPopoverRowId,
   isBestGap = false,
   assignedTask = null,
+  nextAssignedTask = null,
+  onSkipTask = null,
 }) {
   const gapContext = row.gapContext || { type: "study" };
   const gapStartDate = getGapStartDate(selectedDate, row.gapStartMins);
@@ -55,7 +57,7 @@ export function PlanFreeRow({
   );
 
   function startTask(task) {
-    if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task);
+    if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task, nextAssignedTask);
   }
 
   function isOverdue(task) {
@@ -130,6 +132,17 @@ export function PlanFreeRow({
             <div className={styles.planTimelineGapShortTaskRow}>
               <span className={styles.planTimelineGapTaskTitle} title={withUrgencyEmoji(top1)}>{withUrgencyEmoji(top1)}</span>
               <span className={styles.planTimelineGapTaskMeta}>{taskDurationMins(top1)}m</span>
+              {onSkipTask && top1.id && (
+                <button
+                  type="button"
+                  className={styles.planTimelineGapSkipBtn}
+                  onClick={() => onSkipTask(top1.id)}
+                  aria-label={`Skip ${top1.title}`}
+                  title="Skip — show next suggestion"
+                >
+                  ✕
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.planTimelineGapStartBtnSm}
@@ -236,6 +249,17 @@ export function PlanFreeRow({
             <span className={styles.planTimelineGapRail} aria-hidden />
             <div className={styles.planTimelineGapActions}>
             <span className={styles.planTimelineGapTaskMeta}>({taskDurationMins(candidateTask)}m)</span>
+            {onSkipTask && candidateTask.id && (
+              <button
+                type="button"
+                className={styles.planTimelineGapSkipBtn}
+                onClick={() => onSkipTask(candidateTask.id)}
+                aria-label={`Skip ${candidateTask.title}`}
+                title="Skip — show next suggestion"
+              >
+                ✕
+              </button>
+            )}
             <button
               type="button"
               className={styles.planTimelineGapStartBtnSm}

@@ -1,4 +1,6 @@
 import styles from "../../pages/Timer/TimerPage.module.css";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import StandardModal from "../common/StandardModal/StandardModal";
 import { formatTime } from './TimerComponents';
 
 const OvertimeContent = ({ mode, time, onAction, isLastSession }) => {
@@ -6,7 +8,7 @@ const OvertimeContent = ({ mode, time, onAction, isLastSession }) => {
     const subtitle = <p>{mode === 'work' ? "You're in overtime mode." : "Time to get back to work."}</p>;
     const timeDiv = <div className={styles.overtimeTime}>{formatTime(time)}</div>;
     const btnLabel = mode === 'work' ? (isLastSession ? "Finish Goal" : "Start Break") : "Start Work";
-    const btn = <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>{btnLabel}</button>;
+    const btn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>{btnLabel}</PrimaryButton>;
     return <div className={styles.overtimeContent}>{title}{subtitle}{timeDiv}{btn}</div>;
 };
 
@@ -31,38 +33,35 @@ const GoalSummary = ({ sessions, workTime, breakTime }) => {
 };
 
 export const GoalModal = ({ sessions, workTime, breakTime, onAction }) => {
-    const title = <div className={styles.modalTitle}>🎉 Goal Reached!</div>;
+    const title = "Goal reached";
     const summary = <GoalSummary sessions={sessions} workTime={workTime} breakTime={breakTime} />;
-    const btn = <button className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={onAction}>Start New Goal</button>;
-    const content = <div className={styles.modalContent}>{title}{summary}{btn}</div>;
-    return <div className={styles.modalOverlay}>{content}</div>;
+    const btn = <PrimaryButton className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={onAction} pill>Start New Goal</PrimaryButton>;
+    const content = <div className={styles.modalContent}>{summary}{btn}</div>;
+    return <StandardModal title={title} onClose={onAction} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 
 export const BreakModal = ({ onAction }) => {
-    const title = <div className={styles.modalTitle}>Focus Session Complete!</div>;
     const msg = <div className={styles.modalMessage}>Great job! Time to take a well-deserved break.</div>;
-    const btn = <button className={`${styles.button} ${styles.primary}`} onClick={onAction}>Start Break</button>;
-    const content = <div className={styles.modalContent}>{title}{msg}{btn}</div>;
-    return <div className={styles.modalOverlay}>{content}</div>;
+    const btn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>Start Break</PrimaryButton>;
+    const content = <div className={styles.modalContent}>{msg}{btn}</div>;
+    return <StandardModal title="Focus session complete" onClose={onAction} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 
 export const LeaveTimerModal = ({ onCancel, onPause, onExit }) => {
-    const title = <div className={styles.modalTitle}>Leave focus time?</div>;
     const msg = <div className={`${styles.modalMessage} ${styles.leaveModalMessage}`}>Your timer is still running.</div>;
-    const pBtn = <button className={`${styles.button} ${styles.primary}`} onClick={onPause}>Pause Timer</button>;
-    const eBtn = <button className={`${styles.button} ${styles.leaveBtnExit}`} onClick={onExit}>Exit</button>;
-    const cBtn = <button className={`${styles.button} ${styles.leaveBtnCancel}`} onClick={onCancel}>Cancel</button>;
+    const pBtn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onPause} pill>Pause Timer</PrimaryButton>;
+    const eBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnExit}`} variant="secondary" onClick={onExit} pill>Exit</PrimaryButton>;
+    const cBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnCancel}`} variant="ghost" onClick={onCancel} pill>Cancel</PrimaryButton>;
     const btns = <div className={styles.leaveModalButtons}>{pBtn}{eBtn}{cBtn}</div>;
-    const content = <div className={styles.modalContent}>{title}{msg}{btns}</div>;
-    return <div className={`${styles.modalOverlay} ${styles.leaveModalOverlay}`}>{content}</div>;
+    const content = <div className={styles.modalContent}>{msg}{btns}</div>;
+    return <StandardModal title="Leave focus time?" onClose={onCancel} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 
 export const EndEarlyModal = ({ onConfirm, onCancel }) => {
-    const title = <div className={styles.modalTitle}>End Session Early?</div>;
     const msg = <div className={`${styles.modalMessage} ${styles.leaveModalMessage}`}>If you end session early it won't count as a completed session.</div>;
-    const cBtn = <button className={`${styles.button} ${styles.leaveBtnCancel}`} onClick={onCancel}>Cancel</button>;
-    const eBtn = <button className={`${styles.button} ${styles.danger}`} onClick={onConfirm}>End Session</button>;
+    const cBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnCancel}`} variant="ghost" onClick={onCancel} pill>Cancel</PrimaryButton>;
+    const eBtn = <PrimaryButton className={`${styles.button} ${styles.danger}`} variant="danger" onClick={onConfirm} pill>End Session</PrimaryButton>;
     const btns = <div className={styles.leaveModalButtons}>{cBtn}{eBtn}</div>;
-    const content = <div className={styles.modalContent}>{title}{msg}{btns}</div>;
-    return <div className={`${styles.modalOverlay} ${styles.leaveModalOverlay}`}>{content}</div>;
+    const content = <div className={styles.modalContent}>{msg}{btns}</div>;
+    return <StandardModal title="End session early?" onClose={onCancel} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };

@@ -4,19 +4,21 @@ import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
 import { calculatePopoverPosition, calculateArrowPosition } from './popoverUtils';
 import { isAllDayEvent } from '../utils/eventDisplayUtils';
 import { formatTimeRange } from '../utils/dateUtils';
+import Badge from '../../common/Badge/Badge';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import styles from './EventPopover.module.css';
 
-const EVENT_ACCENTS = { module: "#7B9BAD", society: "#C4906A" };
+const EVENT_ACCENTS = { module: "var(--sage)", society: "var(--primary)" };
 
 function ContextBadge({ event }) {
     if (!event) return null;
     if (event.module_name || event.moduleCode || event.module) {
         const label = event.module_name || event.moduleCode || `Module ${event.module}`;
-        return <span className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.module }}>{label}</span>;
+        return <Badge className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.module, borderColor: EVENT_ACCENTS.module, color: 'var(--c-white)' }}>{label}</Badge>;
     }
     if (event.society_name || event.society_id) {
         const label = event.society_name || 'Society Event';
-        return <span className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.society }}>{label}</span>;
+        return <Badge className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.society, borderColor: EVENT_ACCENTS.society, color: 'var(--c-white)' }}>{label}</Badge>;
     }
     return null;
 }
@@ -28,16 +30,23 @@ function PopoverHeader({ title, tag, actions, onClose, readOnly, event }) {
                 <h3 className={styles.title}>{title}</h3>
                 <div className={styles.badgeRow}>
                     <ContextBadge event={event} />
-                    {tag && <span className={styles.tagBadge} style={{ backgroundColor: tag.color }}>{tag.label}</span>}
+                    {tag && <Badge className={styles.tagBadge} style={{ backgroundColor: tag.color, borderColor: tag.color, color: 'var(--c-white)' }}>{tag.label}</Badge>}
                 </div>
             </div>
             {!readOnly && (
                 <div className={styles.actions}>
                     {actions?.map((act, i) => (
-                        <button key={i} className={styles.actionBtn} onClick={() => { onClose(); act.onClick(); }} title={act.label}
-                            style={act.variant === 'danger' ? { color: 'var(--danger, #dc3545)' } : {}}>
+                        <PrimaryButton
+                            key={i}
+                            className={styles.actionBtn}
+                            onClick={() => { onClose(); act.onClick(); }}
+                            title={act.label}
+                            variant={act.variant === 'danger' ? 'danger' : 'ghost'}
+                            size="small"
+                            pill
+                        >
                             {act.label === 'Edit' ? <Pencil size={14} /> : act.label === 'Delete' ? <Trash2 size={14} /> : act.label}
-                        </button>
+                        </PrimaryButton>
                     ))}
                 </div>
             )}
