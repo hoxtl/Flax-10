@@ -764,7 +764,11 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       setUpcomingDeadlines(Array.isArray(refreshedDeadlines) ? refreshedDeadlines : []);
       refetchTasks();
       const allocationCount = result?.event_allocations?.length || 0;
-      showToast(`Auto schedule created${allocationCount ? ` with ${allocationCount} study block${allocationCount === 1 ? "" : "s"}` : ""}.`);
+      if (allocationCount === 0) {
+        showToast("Invalid study time window configurations. Please revise your preference settings.");
+      } else {
+        showToast(`Auto schedule created with ${allocationCount} study block${allocationCount === 1 ? "" : "s"}.`);
+      }
     } catch {
       showToast("Couldn't auto-schedule right now. Try again.");
     } finally {

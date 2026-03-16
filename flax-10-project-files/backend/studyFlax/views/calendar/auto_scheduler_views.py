@@ -29,16 +29,33 @@ def _resolved_preferences(user, payload):
     }
 
 def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
+    day_start = datetime.combine(current_day, time(0, 0))
+    day_end = datetime.combine(current_day + timedelta(days=1), time(0, 0))
+
+    window_start, window_end = day_start, day_end
+
+    # Highest priority: sleep window boundaries.
     if wake_time and sleep_time:
-        return (
-            datetime.combine(current_day, wake_time),
-            datetime.combine(current_day, sleep_time),
-        )
+        sleep_window_start = datetime.combine(current_day, wake_time)
+        sleep_window_end = datetime.combine(current_day, sleep_time)
+        if sleep_window_end <= sleep_window_start:
+            sleep_window_end += timedelta(days=1)
+        window_start = max(window_start, sleep_window_start)
+        window_end = min(window_end, sleep_window_end)
+
+    # Next priority: worktime preference narrows the current window.
     if worktime_preference == 'day':
-        return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(18, 0))
-    if worktime_preference == 'night':
-        return datetime.combine(current_day, time(18, 0)), datetime.combine(current_day + timedelta(days=1), time(2, 0))
-    return datetime.combine(current_day, wake_time), datetime.combine(current_day, sleep_time)
+        work_window_start = datetime.combine(current_day, time(8, 0))
+        work_window_end = datetime.combine(current_day, time(18, 0))
+        window_start = max(window_start, work_window_start)
+        window_end = min(window_end, work_window_end)
+    elif worktime_preference == 'night':
+        work_window_start = datetime.combine(current_day, time(18, 0))
+        work_window_end = datetime.combine(current_day + timedelta(days=1), time(2, 0))
+        window_start = max(window_start, work_window_start)
+        window_end = min(window_end, work_window_end)
+
+    return window_start, window_end
 
 
 def _is_allowed_day(current_day, week_preference):
@@ -128,7 +145,26 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferenc
             current_day += timedelta(days=1)
             continue
 
-        remaining_minutes = daily_budget
+        window_start, window_end = _resolve_window(
+            current_day,
+            preferences['wake_time'],
+            preferences['sleep_time'],
+            preferences['worktime_preference'],
+        )
+
+        if timezone.is_naive(window_start):
+            window_start = timezone.make_aware(window_start)
+        if timezone.is_naive(window_end):
+            window_end = timezone.make_aware(window_end)
+
+        if window_end <= window_start:
+            current_day += timedelta(days=1)
+            continue
+
+        # Priority order: sleep constraints > worktime preferences > study budget.
+        max_window_minutes = int((window_end - window_start).total_seconds() // 60)
+        remaining_minutes = min(daily_budget, max_window_minutes)
+
         for deadline in deadlines:
             deadline_due_date = timezone.localtime(deadline.start_due_date).date()
             if current_day > deadline_due_date or remaining_minutes <= 0:
@@ -136,21 +172,6 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferenc
 
             requested_minutes = deadline_map[deadline.id]
             allocation_minutes = min(requested_minutes, remaining_minutes)
-
-            window_start, window_end = _resolve_window(
-                current_day,
-                preferences['wake_time'],
-                preferences['sleep_time'],
-                preferences['worktime_preference'],
-            )
-
-            if timezone.is_naive(window_start):
-                window_start = timezone.make_aware(window_start)
-            if timezone.is_naive(window_end):
-                window_end = timezone.make_aware(window_end)
-
-            if window_end <= window_start:
-                window_end = window_end + timedelta(days=1)
 
             busy = _busy_slots_for_day(user, window_start, window_end)
             block_start, block_end = _find_first_gap(busy, window_start, window_end, allocation_minutes)
