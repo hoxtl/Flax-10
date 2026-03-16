@@ -1,4 +1,6 @@
-import traceback
+"""
+Views for managing course change requests by users and admins.
+"""
 
 from django.utils import timezone
 from rest_framework import status
@@ -13,152 +15,113 @@ from studyFlax.models import Enrollment, CalendarEvent
 from studyFlax.serialisers.course_change_serialisers import CourseChangeRequestSerialiser
 from studyFlax.views.user.settings_views import get_modules_for_major, enroll_user_in_modules
 
-
 def _get_user_settings(user):
-    """Get or create user settings safely, always providing required field defaults."""
+    """Get or create user settings, providing required field defaults."""
     obj, _ = UserSettings.objects.get_or_create(
         user=user,
-        defaults={
-            'theme': 'light',
-            'timezone': 'Europe/London',
-            'major': '',
-            'year': '',
-        },
+        defaults={'theme': 'light', 'timezone': 'Europe/London', 'major': '', 'year': ''},
     )
     return obj
 
+def _create_course_change_request(user, requested_course):
+    """Validate and create a course change request."""
+    settings_obj = _get_user_settings(user)
+    current_course = settings_obj.major or ''
+    if requested_course == current_course:
+        raise ValueError('Requested course is the same as your current course')
+    if CourseChangeRequest.objects.filter(user=user, status='pending').exists():
+        raise ValueError('You already have a pending course change request')
+    return CourseChangeRequest.objects.create(
+        user=user, requested_course=requested_course, current_course=current_course,
+    )
+
+def _handle_delete_request(req):
+    """Cancel a pending course change request and return the appropriate response."""
+    if not req or req.status != 'pending':
+        return Response({'error': 'No pending request to cancel'}, status=status.HTTP_404_NOT_FOUND)
+    req.delete()
+    return Response({'message': 'Course change request cancelled.'}, status=status.HTTP_200_OK)
+
+def _apply_approval(req):
+    """Update user settings and enrolments when a course change is approved."""
+    settings_obj = _get_user_settings(req.user)
+    old_module_ids = [m.pk for m in get_modules_for_major(settings_obj.major)]
+    CalendarEvent.objects.filter(
+        user=req.user, module_id__in=old_module_ids,
+        source__in=['module_enrollment', 'module_deadline'],
+    ).delete()
+    Enrollment.objects.filter(student=req.user, module_id__in=old_module_ids).delete()
+    settings_obj.major = req.requested_course
+    settings_obj.save()
+    enroll_user_in_modules(req.user, get_modules_for_major(req.requested_course))
+    Notification.objects.create(
+        user=req.user, title='Course change approved',
+        message=f'Your request to change to {req.requested_course} has been approved. Your course has been updated.',
+        notification_type='general', action_url='/settings?tab=account',
+    )
+
+def _apply_rejection(req):
+    """Notify the user that their course change request was rejected."""
+    Notification.objects.create(
+        user=req.user, title='Course change rejected',
+        message=f'Your request to change to {req.requested_course} was rejected. You can submit a new request from settings.',
+        notification_type='general', action_url='/settings?tab=account',
+    )
+
+def _apply_decision(req, decision):
+    """Set the request status and apply approval or rejection side-effects."""
+    req.status = 'approved' if decision == 'approve' else 'rejected'
+    req.resolved_at = timezone.now()
+    req.save()
+    if req.status == 'approved':
+        _apply_approval(req)
+    else:
+        _apply_rejection(req)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def request_course_change(request):
+    """Submit a request to change the user's enrolled course."""
+    requested_course = (request.data.get('requested_course') or '').strip()
+    if not requested_course:
+        return Response({'error': 'requested_course is required'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        requested_course = (request.data.get('requested_course') or '').strip()
-        if not requested_course:
-            return Response(
-                {'error': 'requested_course is required'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        settings_obj = _get_user_settings(request.user)
-        current_course = settings_obj.major or ''
-
-        if requested_course == current_course:
-            return Response(
-                {'error': 'Requested course is the same as your current course'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if CourseChangeRequest.objects.filter(user=request.user, status='pending').exists():
-            return Response(
-                {'error': 'You already have a pending course change request'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        req = CourseChangeRequest.objects.create(
-            user=request.user,
-            requested_course=requested_course,
-            current_course=current_course,
-        )
+        req = _create_course_change_request(request.user, requested_course)
         return Response(CourseChangeRequestSerialiser(req).data, status=status.HTTP_201_CREATED)
-
+    except ValueError as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        traceback.print_exc()
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def my_course_change_request(request):
-    try:
-        req = (
-            CourseChangeRequest.objects
-            .filter(user=request.user)
-            .order_by('-created_at')
-            .first()
-        )
-        if request.method == 'DELETE':
-            if not req or req.status != 'pending':
-                return Response({'error': 'No pending request to cancel'}, status=status.HTTP_404_NOT_FOUND)
-            req.delete()
-            return Response({'message': 'Course change request cancelled.'}, status=status.HTTP_200_OK)
-        if not req:
-            return Response(None)
-        return Response(CourseChangeRequestSerialiser(req).data)
-    except Exception as e:
-        traceback.print_exc()
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    """Retrieve or cancel the current user's latest course change request."""
+    req = CourseChangeRequest.objects.filter(user=request.user).order_by('-created_at').first()
+    if request.method == 'DELETE':
+        return _handle_delete_request(req)
+    return Response(CourseChangeRequestSerialiser(req).data if req else None)
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def list_course_change_requests(request):
-    try:
-        qs = CourseChangeRequest.objects.filter(status='pending').select_related('user')
-        return Response(CourseChangeRequestSerialiser(qs, many=True).data)
-    except Exception as e:
-        traceback.print_exc()
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    """List all pending course change requests for admin review."""
+    qs = CourseChangeRequest.objects.filter(status='pending').select_related('user')
+    return Response(CourseChangeRequestSerialiser(qs, many=True).data)
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def resolve_course_change_request(request, request_id):
+    """Approve or reject a pending course change request."""
     try:
         req = CourseChangeRequest.objects.select_related('user').get(pk=request_id)
     except CourseChangeRequest.DoesNotExist:
         return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+    decision = request.data.get('decision')
+    if decision not in ('approve', 'reject'):
+        return Response({'error': "decision must be 'approve' or 'reject'"}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        decision = request.data.get('decision')
-        if decision not in ('approve', 'reject'):
-            return Response(
-                {'error': "decision must be 'approve' or 'reject'"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        req.status = 'approved' if decision == 'approve' else 'rejected'
-        req.resolved_at = timezone.now()
-        req.save()
-
-        if req.status == 'approved':
-            settings_obj = _get_user_settings(req.user)
-            old_major = settings_obj.major
-            settings_obj.major = req.requested_course
-            settings_obj.save()
-
-            # Remove old course enrollments and their calendar events
-            old_modules = get_modules_for_major(old_major)
-            old_module_ids = [m.pk for m in old_modules]
-            CalendarEvent.objects.filter(
-                user=req.user,
-                module_id__in=old_module_ids,
-                source__in=['module_enrollment', 'module_deadline'],
-            ).delete()
-            Enrollment.objects.filter(
-                student=req.user,
-                module_id__in=old_module_ids,
-            ).delete()
-
-            # Enroll in new course modules
-            new_modules = get_modules_for_major(req.requested_course)
-            enroll_user_in_modules(req.user, new_modules)
-
-            Notification.objects.create(
-                user=req.user,
-                title='Course change approved',
-                message=f'Your request to change to {req.requested_course} has been approved. Your course has been updated.',
-                notification_type='general',
-                action_url='/settings?tab=account',
-            )
-        else:
-            Notification.objects.create(
-                user=req.user,
-                title='Course change rejected',
-                message=f'Your request to change to {req.requested_course} was rejected. You can submit a new request from settings.',
-                notification_type='general',
-                action_url='/settings?tab=account',
-            )
-
+        _apply_decision(req, decision)
         return Response(CourseChangeRequestSerialiser(req).data)
     except Exception as e:
-        traceback.print_exc()
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
