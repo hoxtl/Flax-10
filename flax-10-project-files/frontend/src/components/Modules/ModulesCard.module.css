@@ -66,11 +66,46 @@
     gap: 0.6rem;
 }
 
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
 .headerIdentity {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     min-width: 0;
+}
+
+.tutorAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+}
+
+.tutorAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tutorAvatarFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.6rem;
+    font-weight: 700;
 }
 
 .iconWrap {
@@ -108,6 +143,15 @@
     font-size: 0.78rem;
     color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.courseText {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -159,6 +203,20 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.relatedRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+
+.relatedChip {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+    background: color-mix(in srgb, var(--surface-card) 78%, var(--module-accent, var(--primary)) 8%);
+    border-color: color-mix(in srgb, var(--module-accent, var(--primary)) 22%, var(--border));
 }
 
 .actions {

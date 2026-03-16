@@ -55,9 +55,9 @@ class Task(models.Model):
 
     estimated_blocks = models.PositiveIntegerField(null=True, blank=True)
     completed_blocks = models.PositiveIntegerField(default=0)
-
+    page_count = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    reading = models.ForeignKey('studyFlax.Reading', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
     def __str__(self):
         return self.title

@@ -16,12 +16,77 @@ from studyFlax.fixtures.data_fixtures import (
     course_fixtures, event_title_fixtures, description_fixtures,
     location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
-    module_deadline_fixtures, deadline_fixtures,
+    module_deadline_fixtures, deadline_fixtures, reading_fixtures
 )
 
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
+STUDENT_INTRO_SNIPPETS = [
+    "I thrive on turning busy uni weeks into a game plan that is actually realistic.",
+    "I am most in my zone when my calendar is tidy, my goals are clear, and my notes are colour-coded.",
+    "I love practical learning and finding smart ways to make heavy weeks feel lighter.",
+    "I am a momentum person - small daily wins keep me consistent and confident.",
+    "I am curious, collaborative, and always up for a focused study sprint with friends.",
+]
+
+STUDENT_STUDY_SNIPPETS = [
+    "My weekly rhythm is active recall, short deep-work blocks, and a Sunday reset so deadlines never sneak up.",
+    "I split assignments into mini-milestones, track progress visually, and leave buffer time for edits.",
+    "I prefer focused sessions over marathon cramming, and I build in breaks so quality stays high.",
+    "I learn best by explaining concepts out loud, building summary sheets, and revisiting them through the week.",
+    "I keep a practical system: plan early, execute steadily, review often, and avoid panic mode.",
+]
+
+STUDENT_PERSONALITY_SNIPPETS = [
+    "Outside class, I recharge with long walks, good playlists, and trying new cafes around London.",
+    "When I am not studying, I am usually at a society event, working on side projects, or exploring new places in the city.",
+    "I enjoy meeting new people, sharing revision tricks, and making difficult topics feel approachable.",
+    "I care about great grades, but I care just as much about building healthy habits that last beyond uni.",
+    "I bring friendly energy to group work and I am usually the one turning chaos into a clear next step.",
+]
+
+TEACHING_SPECIALISMS = [
+    "applied machine learning and responsible AI systems",
+    "clinical decision-making in acute and community care",
+    "behavioural economics and policy evaluation",
+    "distributed systems, cloud platforms, and software architecture",
+    "public health strategy, prevention science, and epidemiology",
+    "digital media, cultural analysis, and communication theory",
+    "biostatistics, research design, and health data interpretation",
+    "financial strategy, risk analysis, and corporate governance",
+    "educational psychology, learning science, and assessment design",
+    "human-centred product design and service innovation",
+    "international business strategy and cross-cultural leadership",
+]
+
+PHD_UNIVERSITIES = [
+    "University of Cambridge",
+    "University of Oxford",
+    "Imperial College London",
+    "University College London",
+    "The London School of Economics and Political Science",
+    "ETH Zurich",
+    "Stanford University",
+    "Massachusetts Institute of Technology",
+    "University of Toronto",
+    "National University of Singapore",
+    "University of Melbourne",
+    "University of Edinburgh",
+]
+
+PRIOR_UNIVERSITIES = [
+    "University of Manchester",
+    "University of Bristol",
+    "University of Warwick",
+    "University of Leeds",
+    "University of Glasgow",
+    "Durham University",
+    "King's College London",
+    "University of Birmingham",
+    "University of Nottingham",
+    "University of Sheffield",
+]
 
 SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
 SEED_DAYS  = 365
@@ -69,45 +134,64 @@ def generate_unique_username(first, last, existing):
     return username
 
 
-def build_user(first, last, existing):
+def build_user(first, last, existing, role='student'):
     """Construct an unsaved User with a KCL email address and hashed password."""
     username = generate_unique_username(first, last, existing)
+    if role == 'teacher':
+        specialism = random.choice(TEACHING_SPECIALISMS)
+        phd_uni = random.choice(PHD_UNIVERSITIES)
+        prior_uni = random.choice([u for u in PRIOR_UNIVERSITIES if u != phd_uni] or PRIOR_UNIVERSITIES)
+        bio = (
+            f"Dr. {first} {last} specialises in {specialism}. "
+            f"They completed their PhD at {phd_uni} after earlier study at {prior_uni}. "
+            "Known for energetic, discussion-rich teaching, they combine academic rigour with practical, career-ready skills and clear feedback students can use immediately."
+        )
+    else:
+        bio = (
+            f"I am {first}, and {random.choice(STUDENT_INTRO_SNIPPETS)} "
+            f"{random.choice(STUDENT_STUDY_SNIPPETS)} "
+            f"{random.choice(STUDENT_PERSONALITY_SNIPPETS)}"
+        )
     user = User(
         username=username,
         email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
         first_name=first,
         last_name=last,
+        bio=bio,
+        role=role,
     )
     user.set_password(DEFAULT_PASSWORD)
     return user
 
 
-def build_users_list(needed):
+def build_users_list(needed, role='student'):
     """Return a list of *needed* unsaved User instances with unique names and usernames."""
     users_to_create = []
     for _ in range(needed):
         first, last = generate_unique_name(users_to_create)
-        users_to_create.append(build_user(first, last, users_to_create))
+        users_to_create.append(build_user(first, last, users_to_create, role=role))
     return users_to_create
 
 
 def build_settings_for_new_users():
     """Return a list of UserSettings instances for every user that has no settings row yet."""
     new_users = User.objects.filter(settings__isnull=True)
-    return [
-        UserSettings(
-            user=u,
-            theme=random.choice(['light', 'dark']),
-            timezone='Europe/London',
-            year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
-            major=random.choice(course_fixtures),
-            sleep_time=time(23, 0),
-            wake_time=time(7, 0),
-            mode=random.choice(['light', 'dark']),
-            homepage_widgets=[],
+    settings = []
+    for u in new_users:
+        settings.append(
+            UserSettings(
+                user=u,
+                theme=random.choice(['light', 'dark']),
+                timezone='Europe/London',
+                year='' if getattr(u, 'role', None) == 'teacher' else random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
+                major=random.choice(course_fixtures),
+                sleep_time=time(23, 0),
+                wake_time=time(7, 0),
+                mode=random.choice(['light', 'dark']),
+                homepage_widgets=[],
+            )
         )
-        for u in new_users
-    ]
+    return settings
 
 
 def build_event(user, title, tags, day_offset, hour):
@@ -396,69 +480,72 @@ TASK_LABELS = [
 def build_study_sessions_for_user(user, profile='balanced'):
     """
     Returns a list of StudySession instances across the past 90 days.
-
     Profiles:
       'balanced'   – steady weekday studier, short weekend dips   (janedoe)
       'night_owl'  – late evening sessions, irregular weekends     (charlie)
       'consistent' – high volume, long streaks                     (random fixture users)
+      'power_user' – studies every day, long sessions, heavy volume
     """
     from studyFlax.models.timer.sessionModel import StudySession
-
     now      = timezone.now()
     sessions = []
-
     # profile-specific knobs
     if profile == 'night_owl':
         preferred_hours     = [20, 21, 22, 23]
         weekend_probability = 0.55
         skip_day_prob       = 0.25
+        sessions_per_day    = (1, 3)
         work_choices        = [25, 50, 75, 100]
     elif profile == 'consistent':
         preferred_hours     = [9, 10, 14, 15, 16]
         weekend_probability = 0.70
         skip_day_prob       = 0.10
+        sessions_per_day    = (2, 4)
         work_choices        = [50, 75, 100, 125]
+    elif profile == 'power_user':
+        preferred_hours     = [8, 9, 10, 11, 13, 14, 15, 16, 19, 20]
+        weekend_probability = 0.95
+        skip_day_prob       = 0.04
+        sessions_per_day    = (3, 6)
+        work_choices        = [75, 100, 125, 150, 175, 200]
     else:  # balanced
         preferred_hours     = [9, 10, 11, 14, 15, 16]
         weekend_probability = 0.40
         skip_day_prob       = 0.20
+        sessions_per_day    = (1, 3)
         work_choices        = [25, 50, 75]
-
     for day_offset in range(90):
         session_date = now - timedelta(days=day_offset)
         is_weekend   = session_date.weekday() >= 5
-
-        # decide whether to study today
         if is_weekend and random.random() > weekend_probability:
             continue
         if not is_weekend and random.random() < skip_day_prob:
             continue
-
-        sessions_today = random.randint(1, 3)
+        sessions_today = random.randint(*sessions_per_day)
         hours_used     = random.sample(preferred_hours, min(sessions_today, len(preferred_hours)))
-
         for hour in hours_used:
             work_mins  = random.choice(work_choices)
+            if profile == 'power_user' and random.random() < 0.15:
+                work_mins += random.choice([25, 50])
             break_mins = (work_mins // 25) * 5
             n_sessions = work_mins // 25
-            status     = 'Overtime' if random.random() < 0.08 else 'Completed'
-
-            start = session_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+            overtime_prob = 0.20 if profile == 'power_user' else 0.08
+            status     = 'Overtime' if random.random() < overtime_prob else 'Completed'
+            start = session_date.replace(hour=hour, minute=random.randint(0, 15), second=0, microsecond=0)
             end   = start + timedelta(minutes=work_mins + break_mins)
-
             block_id = int(start.timestamp() * 1000)
-
             sessions.append(StudySession(
                 user=user,
                 study_block_id=block_id,
                 start_time=start,
                 end_time=end,
-                duration=work_mins,
-                break_duration=break_mins,
+                duration=work_mins * 60,
+                break_duration=break_mins * 60,
                 session_count=n_sessions,
                 task=random.choice(TASK_LABELS),
                 status=status,
             ))
+    return sessions
 
     return sessions
 
@@ -514,3 +601,53 @@ def build_theme_sessions_for_user(user, profile='balanced'):
             ))
 
     return sessions
+
+# Reading seeding helpers
+
+def _build_readings(module, title, chapter, start, end, now):
+    from studyFlax.models import Reading
+    deadline = now + timedelta(days=random.randint(7,28))
+    if Reading.objects.filter(module=module, title=title).exists():
+        return None
+    return Reading(
+        module=module, title=title, chapter=chapter, start_page=start, end_page=end, deadline=deadline,
+    )
+
+def build_readings_for_module(module):
+    from studyFlax.models import Reading
+    now = timezone.now()
+    reading_examples = random.sample(reading_fixtures, random.randint(1,2))
+    readings = []
+    for suffix, chapter, start, end in reading_examples:
+        read = _build_readings(module, f"{module.module_name}: {suffix}", chapter, start, end, now)
+        if read:
+            readings.append(read)
+    return readings
+
+def _build_reading_task(user, reading, reading_list):
+    from studyFlax.models import Task
+    pages = reading.page_count()
+    if pages <= 0:
+        return None
+    if Task.objects.filter(user=user, reading=reading).exists():
+        return None
+    speed = round(random.uniform(1.2, 2.5), 1)
+    return Task(
+        user=user, task_list=reading_list, module=reading.module,
+        reading=reading, title=f"Read: {reading.title}",
+        page_count=pages, time_spent_minutes=round(pages * speed),
+        completed=True, completed_at=timezone.now() - timedelta(days=random.randint(1, 14)),
+        priority='medium', energy_level='medium', due_date=reading.deadline,
+    )
+
+def build_reading_user_history_(user, modules, reading_list):
+    from studyFlax.models import Reading
+    tasks = []
+    for module in random.sample(modules, min(2, len(modules))):
+        readings = list(Reading.objects.filter(module=module))
+        if not readings:
+            continue
+        task = _build_reading_task(user, random.choice(readings), reading_list)
+        if task: 
+            tasks.append(task)
+    return tasks

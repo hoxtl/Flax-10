@@ -53,6 +53,7 @@ export function MiniTimeline({
   const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
   const [eventCtxMenu, setEventCtxMenu] = useState(null);
   const [sleepWindow, setSleepWindow] = useState({ sleepTime: "23:00", wakeTime: "07:00" });
+  const [skippedGapTasks, setSkippedGapTasks] = useState({}); // { [rowId]: Set<taskId> }
   const conflictPopoverRef = useRef(null);
   const slotPopoverRef = useRef(null);
   const timelineScrollRef = useRef(null);
@@ -176,7 +177,8 @@ export function MiniTimeline({
 
     for (const row of freeRows) {
       const mins = row.minutes || 0;
-      const candidates = queue.filter((t) => !used.has(t.id) && getTasksThatFitGap([t], mins).suggested);
+      const skipped = skippedGapTasks[row.id];
+      const candidates = queue.filter((t) => !used.has(t.id) && !(skipped && skipped.has(t.id)) && getTasksThatFitGap([t], mins).suggested);
       const pick = candidates
         .sort((a, b) => compareRank(rankForGap(a, mins), rankForGap(b, mins)))[0];
       if (!pick) continue;
@@ -192,12 +194,22 @@ export function MiniTimeline({
     }
 
     return { map, nextMap };
-  }, [rows, suggestableTasks, now]);
+  }, [rows, suggestableTasks, now, skippedGapTasks]);
 
   const currentBlock = useMemo(
     () => (!hasTimerSession && isToday(selectedDate)) ? (sortedEvents || []).find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) : null,
     [hasTimerSession, selectedDate, sortedEvents]
   );
+
+  const onSkipGapTask = useCallback((rowId, taskId) => {
+    setSkippedGapTasks((prev) => {
+      const next = { ...prev };
+      const set = new Set(prev[rowId] || []);
+      set.add(taskId);
+      next[rowId] = set;
+      return next;
+    });
+  }, []);
 
   const renderRow = useCallback(
     (row) => {
@@ -221,6 +233,7 @@ export function MiniTimeline({
             isBestGap={row.id === bestFreeRowId}
             assignedTask={assignedGapTasks.map[row.id] || null}
             nextAssignedTask={assignedGapTasks.nextMap[row.id] || null}
+            onSkipTask={(taskId) => onSkipGapTask(row.id, taskId)}
           />
         );
       }
@@ -269,7 +282,7 @@ export function MiniTimeline({
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef, sleepWindow]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef, sleepWindow, onSkipGapTask, assignedGapTasks]
   );
 
   return (

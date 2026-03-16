@@ -101,6 +101,8 @@
   --filter-dropdown-width: 280px;
   --filter-dropdown-width-sm: 240px;
   --filter-dropdown-max-width: min(90vw, var(--filter-dropdown-width));
+  --user-filter-dropdown-width: 360px;
+  --user-filter-dropdown-max-width: min(94vw, var(--user-filter-dropdown-width));
 
   --modal-radius: var(--radius-xl);
   --modal-padding: var(--space-6);

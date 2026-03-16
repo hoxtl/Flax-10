@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15;
 
 export default function useModuleSorting(modules) {
     const [currentPage, setCurrentPage] = useState(1);

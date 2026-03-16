@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.society import SocietyMembership
 
 
@@ -212,7 +213,7 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
     weekly_goal      = user.weekly_goal_hours or 20
     week_ago         = now - timedelta(days=7)
     weekly_mins      = sum(s.duration for s in sessions_all if s.end_time >= week_ago)
-    weekly_hrs       = weekly_mins / 60
+    weekly_hrs       = weekly_mins / 3600
 
     if weekly_hrs >= weekly_goal:
         badge('goal_getter', 'Goal Getter', '🎯', 'Hit your weekly study goal', 'silver')
@@ -223,7 +224,7 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
         wstart = now - timedelta(days=7 * (week_offset + 1))
         wend   = now - timedelta(days=7 *  week_offset)
         wmins  = sum(s.duration for s in sessions_all if wstart <= s.end_time < wend)
-        if wmins / 60 >= weekly_goal:
+        if wmins / 3600 >= weekly_goal:
             weeks_hit += 1
     if weeks_hit >= 4:
         badge('consistent_goals', 'Consistent Goals', '📆',
@@ -239,7 +240,7 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
 def get_weekly_study_hours(sessions_all):
     week_ago = timezone.now() - timedelta(days=7)
     week_sessions = [s for s in sessions_all if s.end_time >= week_ago]
-    return round(sum(s.duration for s in week_sessions) / 60, 1)
+    return round(sum(s.duration for s in week_sessions) / 3600, 1)
 
 
 def get_society_image(society):
@@ -275,7 +276,10 @@ def profile_summary_view(request):
     current_streak, longest_streak = compute_streaks(sessions_all)
     persona = derive_persona(sessions_90)
 
-    module_count = Enrollment.objects.filter(student=user).count()
+    if getattr(user, 'role', None) == 'teacher':
+        module_count = Module.objects.filter(created_by=user).count()
+    else:
+        module_count = Enrollment.objects.filter(student=user).count()
     badges = compute_badges(
         sessions_all, sessions_90,
         current_streak, longest_streak,
@@ -286,6 +290,8 @@ def profile_summary_view(request):
     weekly_goal  = user.weekly_goal_hours or 20
 
     memberships = SocietyMembership.objects.filter(user=user).select_related('society')
+    if getattr(user, 'role', None) == 'teacher':
+        memberships = memberships.none()
     societies = [
         {
             'id': m.society.id,

@@ -140,7 +140,7 @@ function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder
       className={triggerClassName || `${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}>
       {!hideIcon && <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>}
       <span className={selDate && !triggerClassName ? styles.triggerValueMono : ""}>{displayValue}</span>
-      {selDate && <button type="button" className={styles.clearBtn} onClick={handleClear}>✕</button>}
+      {selDate && <span role="button" className={styles.clearBtn} onClick={handleClear}>✕</span>}
     </button>
   );
 }

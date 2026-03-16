@@ -58,6 +58,11 @@
   color: var(--text, #111);
   background: var(--bg, #f9fafb);
 }
+.tabBtn:focus,
+.tabBtn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
 .tabActive {
   color: var(--accent, #6c47ff) !important;
   font-weight: 600;
@@ -94,6 +99,64 @@
   margin-bottom: 1.25rem;
 }
 
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.filterGroupsWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-top: 9px;
+}
+
+.filterGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.filterGroupLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filterButtons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clearFiltersBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--card-bg, var(--surface, #fff));
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: inherit;
+  margin-bottom: 9px;
+}
+
+.clearFiltersBtn:hover {
+  background-color: var(--danger-bg);
+  border-color: var(--danger);
+}
+
 .cardTitle {
   font-size: 1.1rem;
   font-weight: 650;
@@ -124,6 +187,20 @@
 .search:focus {
   border-color: var(--accent, #6c47ff);
   box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
+}
+
+.searchCompact {
+  width: 130px;
+  min-width: 130px;
+  margin-left: auto;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 8px 8px 8px;
+  flex-shrink: 0;
 }
 
 .table {

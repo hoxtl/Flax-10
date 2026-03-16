@@ -79,7 +79,7 @@ def resolve_teacher_request(request, user_id):
         Notification.objects.create(
             user=user,
             title='Teacher role approved',
-            message='Your request for teacher access has been approved. You can now create and manage modules.',
+            message='Your request for teacher access has been approved! You can now create and manage modules.',
             notification_type='general',
             action_url='/modules',
         )

@@ -31,6 +31,11 @@ def get_members(request, society):
 
 
 def join_society(user, society):
+    if getattr(user, 'role', None) == 'teacher':
+        return Response(
+            {'error': 'Teachers cannot join societies.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
     if get_membership(user, society):
         return Response({'error': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
     membership = SocietyMembership.objects.create(user=user, society=society)
@@ -43,6 +48,11 @@ def add_collaborator(request, society):
     user = find_user_by_identifier(request.data)
     if not user:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    if getattr(user, 'role', None) == 'teacher':
+        return Response(
+            {'error': 'Teachers cannot join societies.'},
+            status=status.HTTP_403_FORBIDDEN
+        )
     if get_membership(user, society):
         return Response({'error': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
     role = request.data.get('role', 'editor')
