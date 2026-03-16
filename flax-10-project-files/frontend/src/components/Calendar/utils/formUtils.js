@@ -56,13 +56,16 @@ function getDefaultForm(options) {
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
     const error = validateForm(form);
-    if (error) return setError(error);
+    if (error) {
+        setError(error);
+        return false;
+    }
 
     const data = buildEventData(form);
     const others = allEvents.filter(ev => ev.id !== (event?.id));
-    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return;
+    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return false;
 
-    await submitEvent(event, data, actions, onClose, setError, confirmFn);
+    return await submitEvent(event, data, actions, onClose, setError, confirmFn);
 }
 
 function validateForm(form) {
@@ -74,8 +77,10 @@ async function submitEvent(event, data, actions, onClose, setError, confirmFn) {
     try {
         await saveEvent(event, data, actions, confirmFn);
         onClose();
+        return true;
     } catch (err) {
         setError(err.message);
+        return false;
     }
 }
 

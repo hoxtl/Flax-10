@@ -1,15 +1,16 @@
+"""
+Model representing a user's membership in a society with role and subscription.
+"""
 from django.db import models
 
 from ..auth.userModel import User
 from .societyModel import Society
-
 
 ROLE_CHOICES = [
     ('member', 'Member'),
     ('editor', 'Editor'),
     ('admin', 'Admin'),
 ]
-
 
 class SocietyMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='society_memberships')

@@ -1,3 +1,7 @@
+"""
+Views for listing, creating, updating, and deleting modules.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -20,7 +24,7 @@ def get_modules(request):
         modules = Module.objects.filter(created_by=request.user)
     else:
         modules = Module.objects.all()
-    serialiser = ModuleSerialiser(modules, many=True)
+    serialiser = ModuleSerialiser(modules, many=True, context={'request': request})
     return Response(serialiser.data)
 
 def create_module(request):
@@ -28,7 +32,8 @@ def create_module(request):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     module = serialiser.save()
-    return Response(ModuleSerialiser(module).data, status=status.HTTP_201_CREATED)
+    created_module_serialiser = ModuleSerialiser(module, context={'request': request})
+    return Response(created_module_serialiser.data, status=status.HTTP_201_CREATED)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -36,7 +41,7 @@ def module_detail(request, module_id):
     module = get_object_or_404(Module, id=module_id)
     user = request.user
     if request.method == 'GET': 
-        return Response(ModuleSerialiser(module).data)
+        return Response(ModuleSerialiser(module, context={'request': request}).data)
     if request.method == 'PUT': 
         return update_module(request, module, user)
     if request.method == 'DELETE':
@@ -64,12 +69,10 @@ def delete_module(request, module, user):
     module.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
 def notify_enrolled_students(module):
     enrollments = Enrollment.objects.filter(module=module).select_related('student')
     notifications = [build_module_deleted_notification(e.student, module) for e in enrollments]
     Notification.objects.bulk_create(notifications)
-
 
 def build_module_deleted_notification(student, module):
     return Notification(

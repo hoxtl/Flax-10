@@ -1,6 +1,6 @@
 .modalBackdrop {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
+    background: color-mix(in srgb, #000 52%, transparent);
+    backdrop-filter: blur(3px);
 }
 
 .modalShell {
@@ -30,18 +30,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
-    background: #f8fafc;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    padding: 10px 11px;
+    background: color-mix(in srgb, var(--surface-card) 90%, var(--surface-raised) 10%);
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
 .preview {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 500;
-    color: #333;
+    font-weight: 600;
+    color: var(--text);
 }
 
 .preview span:first-child {
@@ -58,40 +58,43 @@
 }
 
 .actions button {
-    background: var(--surface-card);
-    border: var(--stroke-soft);
+    background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
     padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
+    font-size: 0.86rem;
+    color: var(--text);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .actions button:hover {
-    background: #f1f5f9;
+    background: var(--hover);
+    border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
 }
 
 .actions .delete:hover {
-    background: #fee2e2;
-    color: #dc2626;
-    border-color: #fca5a5;
+    background: color-mix(in srgb, var(--danger) 20%, transparent);
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 48%, var(--border));
 }
 
 .addBtn {
     width: 100%;
     margin-top: 16px;
     padding: 12px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
+    background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
+    color: color-mix(in srgb, var(--text) 96%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+    border-radius: 10px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .addBtn:hover {
-    opacity: 0.9;
+    background: color-mix(in srgb, var(--primary) 100%, var(--surface-raised));
+    border-color: color-mix(in srgb, var(--primary) 75%, var(--border));
 }
 
 /* Form Styles */
@@ -107,7 +110,7 @@
     gap: 8px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 .form input[type="text"] {
@@ -116,6 +119,8 @@
     border-radius: var(--input-radius);
     font-size: 1rem;
     box-sizing: border-box;
+    background: var(--surface-search);
+    color: var(--text);
 }
 
 .colorRow {
@@ -135,10 +140,11 @@
 
 
 .error {
-    color: #dc2626;
+    color: var(--danger);
     font-size: 0.9rem;
     padding: 8px;
-    background: #fee2e2;
+    background: color-mix(in srgb, var(--danger) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger) 44%, transparent);
     border-radius: var(--radius-md);
     margin-top: 8px;
     text-align: center;
@@ -160,13 +166,15 @@
 }
 
 .cancelBtn {
-    background: #e2e8f0;
-    color: #475569;
+    background: color-mix(in srgb, var(--surface-card) 78%, var(--surface-raised));
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
 }
 
 .saveBtn {
-    background: var(--primary);
-    color: white;
+    background: color-mix(in srgb, var(--primary) 90%, var(--surface-raised));
+    color: var(--text);
+    border: 1px solid color-mix(in srgb, var(--primary) 58%, var(--border));
 }
 
 .saveBtn:disabled {
@@ -202,6 +210,11 @@
 .emojiPreviewBtn:hover {
     border-color: var(--primary);
     background: var(--hover);
+}
+
+:global(:root[data-theme="dark"]) .modalShell {
+    background: color-mix(in srgb, var(--surface-card) 90%, #000 10%);
+    border-color: color-mix(in srgb, var(--border) 90%, transparent);
 }
 
 .emojiHint {

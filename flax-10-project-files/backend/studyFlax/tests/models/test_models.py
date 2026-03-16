@@ -111,7 +111,6 @@ class ModelStringTests(TestCase):
         )
         self.assertIn('dark', str(session))
 
-
 class ReportedSocietyAdminTest(TestCase):
     """Tests for reported society admin."""
     def setUp(self):

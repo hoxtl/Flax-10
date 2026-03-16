@@ -28,7 +28,7 @@
   .btn {
     margin-top: 1.25rem;
     padding: 0.75rem;
-    background: var(--primary, #8B6914);
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;

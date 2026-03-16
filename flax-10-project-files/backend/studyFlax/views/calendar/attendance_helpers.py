@@ -1,4 +1,6 @@
-"""Helpers for attendance views. Single responsibility: data lookup and stats building."""
+"""
+Helpers for attendance views.
+"""
 
 from collections import defaultdict
 
@@ -6,7 +8,6 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from studyFlax.models import CalendarEvent
-
 
 def _normalize_event_type(name):
     """Map tag name to display type: Small group, Lecture, Practical/lab, Other."""
@@ -20,7 +21,6 @@ def _normalize_event_type(name):
     if "practical" in lower or "lab" in lower:
         return "Practical/lab"
     return "Other"
-
 
 def _infer_type_from_title_and_desc(event):
     """Infer type from title/description only (Briefing=other, then LGT=lecture, SmG=small group)."""
@@ -37,7 +37,6 @@ def _infer_type_from_title_and_desc(event):
         return "Practical/lab"
     return None
 
-
 def _event_type_from_record(record):
     """Derive display type: title/description first, then tag."""
     event = getattr(record, "event", None)
@@ -48,7 +47,6 @@ def _event_type_from_record(record):
         return from_title
     tag_name = getattr(getattr(event, "tag", None), "name", None) or ""
     return _normalize_event_type(tag_name)
-
 
 def _validate_event_for_attendance(user, event_id):
     """Return (event, None) on success or (None, detail_string) on failure."""
@@ -62,7 +60,6 @@ def _validate_event_for_attendance(user, event_id):
         return None, "Only timetable events can have attendance recorded."
     return event, None
 
-
 def get_event_for_attendance(user, event_id):
     """Resolve and validate event; return (event, None) or (None, error_response)."""
     event, detail = _validate_event_for_attendance(user, event_id)
@@ -71,21 +68,17 @@ def get_event_for_attendance(user, event_id):
         return None, Response({"detail": detail}, status=code)
     return event, None
 
+def _tally_record(r, by_type):
+    event_type = _event_type_from_record(r)
+    key = "attended" if r.attended else "missed"
+    by_type[event_type][key] += 1
+    return 1 if r.attended else 0
 
 def build_attendance_stats(records):
-    """Build overall and by_type stats from attendance records. One responsibility: aggregate."""
-    attended_total = 0
-    missed_total = 0
     by_type = defaultdict(lambda: {"attended": 0, "missed": 0})
-    for r in records:
-        event_type = _event_type_from_record(r)
-        if r.attended:
-            attended_total += 1
-            by_type[event_type]["attended"] += 1
-        else:
-            missed_total += 1
-            by_type[event_type]["missed"] += 1
+    record_list = list(records)
+    attended = sum(_tally_record(r, by_type) for r in record_list)
     return {
-        "overall": {"attended": attended_total, "missed": missed_total},
+        "overall": {"attended": attended, "missed": len(record_list) - attended},
         "by_type": dict(by_type),
     }

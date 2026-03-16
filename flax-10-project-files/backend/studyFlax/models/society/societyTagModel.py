@@ -1,7 +1,9 @@
+"""
+Model for tags belonging to a society, used to categorise announcements and events.
+"""
 from django.db import models
 
 from .societyModel import Society
-
 
 class SocietyTag(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='tags')

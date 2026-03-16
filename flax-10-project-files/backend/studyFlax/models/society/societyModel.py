@@ -1,5 +1,7 @@
+"""
+Model for student societies with ratification status and category metadata.
+"""
 from django.db import models
-
 
 RATIFICATION_STATUS = [
     ('none', 'Not Requested'),
@@ -12,7 +14,6 @@ VALID_CATEGORIES = [
     'sports', 'cultural', 'academic', 'arts',
     'social', 'religious', 'volunteering', 'media'
 ]
-
 
 class Society(models.Model):
     name = models.CharField(max_length=200)

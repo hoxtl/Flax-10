@@ -1,9 +1,11 @@
+"""
+Model for society events with recurrence and optional announcement link.
+"""
 from django.db import models
 
 from .societyModel import Society
 from .societyTagModel import SocietyTag
 from .societyAnnouncementModel import SocietyAnnouncement
-
 
 RECURRENCE_CHOICES = [
     ('none', 'None'),
@@ -13,7 +15,6 @@ RECURRENCE_CHOICES = [
     ('monthly', 'Monthly'),
     ('yearly', 'Yearly'),
 ]
-
 
 class SocietyEvent(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='events')

@@ -68,14 +68,10 @@ function EventPopupContainer() {
     const toast = useToast();
     const notify = useNotify();
     const showToast = (title, message) => {
-        if (typeof notify === "function" && message !== undefined) {
-            notify(title, message);
-            return;
-        }
         if (typeof toast === "function") {
-            toast(message === undefined ? title : `${title}: ${message}`);
-            return;
+            toast(message === undefined ? title : `${title}: ${message}`, { variant: "info" });
         }
+        if (typeof notify === "function" && message !== undefined) notify(title, message);
     };
     const { handleDeleteRequest } = useEventDeletion();
 

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../lib/kclCourses';
 import SearchBar from '../common/SearchBar/SearchBar';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import styles from './ModuleCourseFilter.module.css';
 
 const TABS = [
@@ -82,6 +83,7 @@ export default function ModuleCourseFilter({ selectedCourses, onToggleCourse, fi
     const filteredGroups = filterCourseGroups(KCL_DEPARTMENTS, filterQuery);
     const flatFiltered = Object.values(filteredGroups).flat();
     const activeCount = selectedCourses.length + (filterMode !== 'all' ? 1 : 0);
+    const hasFilterQuery = String(filterQuery || "").trim().length > 0;
 
     return (
         <div ref={ref} className={styles.wrapper}>
@@ -113,7 +115,13 @@ export default function ModuleCourseFilter({ selectedCourses, onToggleCourse, fi
                                     inputClassName={styles.searchInput}
                                 />
                                 <div className={styles.listContainer}>
-                                    {flatFiltered.length === 0 && <p className={styles.empty}>No courses found</p>}
+                                    {hasFilterQuery && flatFiltered.length === 0 && (
+                                        <SearchEmptyState
+                                            query={filterQuery}
+                                            itemLabel="courses"
+                                            hint="Try a different keyword or choose another department."
+                                        />
+                                    )}
                                     {filterQuery ? (
                                         <div className={styles.itemList}>
                                             {flatFiltered.map(course => (

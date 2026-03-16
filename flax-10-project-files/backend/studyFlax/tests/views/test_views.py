@@ -1,1 +1,0 @@
-"""General view test placeholder."""

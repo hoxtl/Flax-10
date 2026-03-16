@@ -1,21 +1,28 @@
+"""
+Views for calendar event listing and creation.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.serialisers.event_serialisers import (
+from studyFlax.serialisers.calendar.event_serialisers import (
     CalendarEventSerialiser,
     CalendarEventCreateSerialiser
 )
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models import User
 from .event_helpers import (
     check_event_overlap,
     filter_events_by_date_range,
     parse_date_param,
     expand_recurring_events
 )
-from .timetable_service import sync_timetable_if_needed
+from .timetable_service import sync_timetable_if_needed, TimetableSyncError
 from .society_sync_service import get_synced_society_events
+import logging
 
+logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -24,36 +31,35 @@ def event_list(request):
         return get_events(request)
     return create_event(request)
 
+def _calendar_is_shared(owner, viewer):
+    from studyFlax.models.social.shareModel import CalendarShare
+    return CalendarShare.objects.filter(owner=owner, shared_with=viewer).exists()
 
-from studyFlax.models import User
+def _log_timetable_sync_error(exc):
+    logger.warning("Timetable sync skipped: %s", str(exc))
+
+def _resolve_target_user(request):
+    user_id = request.query_params.get('user_id')
+    if not user_id:
+        safe_sync_timetable(request.user)
+        return request.user
+    try:
+        target = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return None
+    if target != request.user and not _calendar_is_shared(target, request.user):
+        return None
+    return target
 
 def get_events(request):
-    requested_user_id = request.query_params.get('user_id')
-    
-    if requested_user_id:
-        try:
-            target_user = User.objects.get(id=requested_user_id)
-        except User.DoesNotExist:
-            return Response([])
-            
-        # Check if target_user has shared their calendar with request.user
-        if target_user != request.user:
-            from studyFlax.models.social.shareModel import CalendarShare
-            is_shared_with_me = CalendarShare.objects.filter(owner=target_user, shared_with=request.user).exists()
-            if not is_shared_with_me:
-                return Response([]) # Gracefully deny access
-    else:
-        target_user = request.user
-        safe_sync_timetable(target_user) # Only sync if it's the current user
-
+    target_user = _resolve_target_user(request)
+    if target_user is None:
+        return Response([])
     start = parse_date_param(request.query_params.get('start'))
     end = parse_date_param(request.query_params.get('end'))
-    
     personal = get_personal_events(target_user, request.query_params, start, end, is_viewer=target_user != request.user)
     society = get_synced_society_events(target_user, start, end)
-    
     return Response(personal + society)
-
 
 def get_personal_events(user, query_params, start, end, is_viewer=False):
     base_events = CalendarEvent.objects.filter(user=user)
@@ -63,7 +69,6 @@ def get_personal_events(user, query_params, start, end, is_viewer=False):
     if is_viewer:
         events_data = [mask_private_event(e) if e.get('is_private') else e for e in events_data]
     return events_data
-
 
 def mask_private_event(event):
     return {
@@ -76,13 +81,11 @@ def mask_private_event(event):
         'tag_details': None,
     }
 
-
 def safe_sync_timetable(user):
     try:
         sync_timetable_if_needed(user)
-    except Exception:
-        pass
-
+    except TimetableSyncError as exc:
+        _log_timetable_sync_error(exc)
 
 def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)
