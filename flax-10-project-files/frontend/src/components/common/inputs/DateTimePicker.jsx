@@ -191,12 +191,14 @@ function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly, setOp
       <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(hour)} onChange={v => changeHour(Number(v))}
-          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd} />
+          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
       </div>
       <span className={styles.timeSep}>:</span>
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(minute)} onChange={v => changeMinute(Number(v))}
-          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd} />
+          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
       </div>
       <button type="button" className={styles.doneBtn} onClick={() => setOpen(false)}>Done</button>
     </div>
@@ -231,11 +233,16 @@ function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute,
   }, [value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM]);
 }
 
+function isInsidePortaledDropdown(target) {
+  return target.closest('[data-dropdown-portal="true"]') !== null;
+}
+
 function useClickOutside(open, ref, dropdownRef, setOpen) {
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e) => {
       if (ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target)) return;
+      if (isInsidePortaledDropdown(e.target)) return;
       setOpen(false);
     };
     const handleEsc = (e) => { if (e.key === "Escape") setOpen(false); };
