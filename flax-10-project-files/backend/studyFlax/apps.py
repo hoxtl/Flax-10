@@ -1,3 +1,6 @@
+"""
+Django app configuration for the studyFlax application.
+"""
 from django.apps import AppConfig
 
 class StudyflaxConfig(AppConfig):
