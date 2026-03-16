@@ -27,15 +27,9 @@ function getStoredTheme(fallback) {
     return stored === 'light' || stored === 'dark' ? stored : fallback;
 }
 
-export function ThemeProvider({ children, initialTheme = 'light' }) {
-    const [theme, setThemeState] = useState(() => getStoredTheme(initialTheme));
-    const sessionStart = useRef(new Date().toISOString());
-    const currentTheme = useRef(theme);
-
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-    }, [theme]);
+function useThemeSession(theme, setThemeState) {
+  const sessionStart = useRef(new Date().toISOString());
+  const currentTheme = useRef(theme);
 
   useEffect(() => {
     const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
@@ -43,21 +37,27 @@ export function ThemeProvider({ children, initialTheme = 'light' }) {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, []);
 
-  function toggleTheme() {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
+  function applyThemeChange(newTheme) {
     logThemeSession(currentTheme.current, sessionStart.current);
     sessionStart.current = new Date().toISOString();
     currentTheme.current = newTheme;
     setThemeState(newTheme);
   }
 
-  function setTheme(newTheme) {
-    if (newTheme === theme) return;
-    logThemeSession(currentTheme.current, sessionStart.current);
-    sessionStart.current = new Date().toISOString();
-    currentTheme.current = newTheme;
-    setThemeState(newTheme);
-  }
+  return { applyThemeChange };
+}
+
+export function ThemeProvider({ children, initialTheme = 'light' }) {
+  const [theme, setThemeState] = useState(() => getStoredTheme(initialTheme));
+  const { applyThemeChange } = useThemeSession(theme, setThemeState);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => applyThemeChange(theme === 'light' ? 'dark' : 'light');
+  const setTheme = (newTheme) => { if (newTheme !== theme) applyThemeChange(newTheme); };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
