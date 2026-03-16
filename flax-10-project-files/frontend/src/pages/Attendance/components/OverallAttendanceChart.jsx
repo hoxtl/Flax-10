@@ -55,8 +55,8 @@ export default function OverallAttendanceChart({ data, attended, missed, onSegme
         }
       />
       <div className={styles.legend}>
-        <span>Attended: {attended}</span>
-        <span>Missed: {missed}</span>
+        <span className={styles.legendAttended}>Attended: {attended}</span>
+        <span className={styles.legendMissed}>Missed: {missed}</span>
       </div>
     </>
   );

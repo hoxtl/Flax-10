@@ -13,6 +13,7 @@ import { getModules } from "../../api/moduleApi";
 import ProfileHeader from "./components/ProfileHeader";
 import {
   PersonaCard,
+  AttendanceWidget,
   StudyDNA,
   MiniHeatmap,
   ThisWeek,
