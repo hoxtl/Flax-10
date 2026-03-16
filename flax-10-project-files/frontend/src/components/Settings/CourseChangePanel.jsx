@@ -10,7 +10,7 @@ import {
   requestTeacherRole,
   cancelTeacherRoleRequest,
 } from "../../api/adminApi";
-import { getUserProfile } from "../../api/userService";
+import { useAuth } from "../../context/AuthContext";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader } from "./SettingsUI";
@@ -43,20 +43,9 @@ function clearCachedTeacherRequest() {
   try { localStorage.removeItem(TEACHER_REQUEST_CACHE_KEY); } catch (_) {}
 }
 
-function syncRoleToStorage(role) {
-  try {
-    const stored = localStorage.getItem("user");
-    if (!stored) return;
-    const u = JSON.parse(stored);
-    if (u.role !== role) {
-      u.role = role;
-      localStorage.setItem("user", JSON.stringify(u));
-      window.dispatchEvent(new Event("auth-changed"));
-    }
-  } catch (_) {}
-}
 
-function CourseChangeSection({ user }) {
+function CourseChangeSection() {
+  const { profile, loading: authLoading, refreshProfile } = useAuth();
   const [existingRequest, setExistingRequest] = useState(null);
   const [currentCourse, setCurrentCourse] = useState("");
   const [loading, setLoading] = useState(true);
@@ -69,13 +58,13 @@ function CourseChangeSection({ user }) {
 
   useEffect(() => {
     let isCancelled = false;
-    Promise.all([
-      getMyCourseChangeRequest().catch(() => null),
-      getUserProfile().catch(() => null),
-    ]).then(([req, profile]) => {
+    if (authLoading) return;
+
+    getMyCourseChangeRequest()
+      .then((req) => {
       if (isCancelled) return;
       setExistingRequest(req || null);
-      setCurrentCourse(req?.current_course || profile?.major || user?.major || "Not set");
+      setCurrentCourse(req?.current_course || profile?.major || "Not set");
       if (req?.status === "approved") {
         const key = `ccr_approved_seen_${req.id}`;
         if (localStorage.getItem(key)) {
@@ -87,7 +76,7 @@ function CourseChangeSection({ user }) {
       }
     }).finally(() => { if (!isCancelled) setLoading(false); });
     return () => { isCancelled = true; };
-  }, []);
+  }, [profile, authLoading]);
 
   const isPending = existingRequest?.status === "pending";
   const isApproved = existingRequest?.status === "approved" && showApproved;
@@ -267,8 +256,7 @@ function TeacherApplyModal({ onClose, onSuccess }) {
 }
 
 function TeacherRoleSection() {
-  const [liveRole, setLiveRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { profile, loading: authLoading, refreshProfile } = useAuth();
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState("");
   const [cancelling, setCancelling] = useState(false);
@@ -278,26 +266,16 @@ function TeacherRoleSection() {
   );
 
   useEffect(() => {
-    getUserProfile()
-      .then((data) => {
-        if (data?.role) {
-          setLiveRole(data.role);
-          syncRoleToStorage(data.role);
-          if (data.role === "pending_teacher") {
-            setCachedTeacherRequest();
-            setTeacherNotice("Request sent.");
-          }
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    if (!authLoading && profile?.role === "pending_teacher") {
+      setCachedTeacherRequest();
+      setTeacherNotice("Request sent.");
+    }
+  }, [profile, authLoading]);
 
   const handleApplySuccess = (res) => {
     setMessage(res?.message || "Request submitted!");
     setStatus("done");
-    syncRoleToStorage("pending_teacher");
-    setLiveRole("pending_teacher");
+    refreshProfile();
     setCachedTeacherRequest();
     setTeacherNotice("Request sent.");
     setShowModal(false);
@@ -307,8 +285,7 @@ function TeacherRoleSection() {
     setCancelling(true);
     try {
       await cancelTeacherRoleRequest();
-      syncRoleToStorage("student");
-      setLiveRole("student");
+      refreshProfile();
       setStatus(null);
       clearCachedTeacherRequest();
       setTeacherNotice("");
@@ -320,7 +297,9 @@ function TeacherRoleSection() {
     }
   };
 
-  if (loading) return <SectionSkeleton label="Loading role info" rows={1} />;
+  if (authLoading) return <SectionSkeleton label="Loading role info" rows={1} />;
+
+  const liveRole = profile?.role;
 
   return (
     <div className={styles.academicSection}>
