@@ -6,9 +6,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
+from studyFlax.views.user.settings_views import get_or_create_user_settings
 
 def update_user_name(user, data):
     if 'first_name' in data:
@@ -45,10 +45,7 @@ def patch_settings(settings, data, user):
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    settings, _ = UserSettings.objects.get_or_create(
-        user=request.user,
-        defaults={'theme': 'light', 'timezone': 'Europe/London'},
-    )
+    settings = get_or_create_user_settings(request.user)
     if request.method == 'GET':
         return Response(UserSettingsSerialiser(settings).data)
     error = apply_user_updates(request.user, request.data)

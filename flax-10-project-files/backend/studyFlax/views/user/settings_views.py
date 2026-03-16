@@ -10,10 +10,15 @@ from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get_modules_for_major
 
-def get_or_create_settings(user):
-    settings, _ = UserSettings.objects.get_or_create(
-        user=user, defaults={'theme': 'light', 'timezone': 'Europe/London'}
-    )
+DEFAULT_SETTINGS = {
+    "theme": "light",
+    "timezone": "Europe/London",
+}
+
+def get_or_create_user_settings(user, defaults=None):
+    """Return persisted user settings with safe defaults."""
+    payload = DEFAULT_SETTINGS | (defaults or {})
+    settings, _ = UserSettings.objects.get_or_create(user=user, defaults=payload)
     return settings
 
 def apply_settings_updates(settings, data):
@@ -27,7 +32,7 @@ def apply_settings_updates(settings, data):
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    settings = get_or_create_settings(request.user)
+    settings = get_or_create_user_settings(request.user)
     if request.method == 'GET':
         serialized = UserSettingsSerialiser(settings).data
         return Response({**serialized, "settings": dict(serialized)})
@@ -39,7 +44,7 @@ def onboarding_view(request):
     year, major = request.data.get('year'), request.data.get('major')
     if not year or not major:
         return Response({'error': 'year and major are required'}, status=status.HTTP_400_BAD_REQUEST)
-    settings, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings = get_or_create_user_settings(request.user)
     settings.year, settings.major = year, major
     settings.save()
     enrolled_count = enroll_user_in_modules(request.user, get_modules_for_major(major))
