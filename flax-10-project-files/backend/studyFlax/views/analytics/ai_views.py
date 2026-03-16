@@ -9,7 +9,6 @@ from rest_framework import status
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
-from collections import defaultdict
 
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
@@ -19,13 +18,17 @@ from .session_analytics_service import compute_peak_hour, compute_streaks, fmt_h
 try:
     import openai
     OpenAI = getattr(openai, 'OpenAI', None)
+    OpenAIError = getattr(openai, "OpenAIError", Exception)
     openai_available = OpenAI is not None
-except Exception:
+except ImportError:
     OpenAI = None
+    OpenAIError = Exception
     openai_available = False
 
+OPENAI_API_ERROR_TYPES = (OpenAIError, IndexError, TypeError, KeyError, AttributeError)
+
 def _check_openai():
-    """Return (api_key, error_response) — error_response is None when available."""
+    """Return (api_key, error_response) with None error when available."""
     if not openai_available:
         return None, Response({'error': 'OpenAI package not installed'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
     api_key = getattr(settings, 'OPENAI_API_KEY', None)
@@ -107,14 +110,54 @@ def _build_user_context(user, days=30):
         f"- Upcoming calendar events (next 14 days):\n{_format_upcoming(user)}"
     )
 
+def _extract_days(value, default=30):
+    """Parse a days value from request payload with fallback default."""
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+def _handle_openai_error(exc):
+    """Return consistent OpenAI failures."""
+    return Response({'error': str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def _days_or_error(request, default=30):
+    days = _extract_days(request.data.get('days'), default)
+    if days is None:
+        return None, Response({'error': 'days must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
+    return days, None
+
+def _is_openai_response_valid(response):
+    """Return True only when the completion payload includes message content."""
+    choices = getattr(response, "choices", None) or []
+    if not choices:
+        return False
+    first = choices[0]
+    message = getattr(first, "message", None)
+    return getattr(message, "content", None) is not None
+
+def _build_chat_request(request):
+    """Validate and build the context/messages payload for ai_chat."""
+    messages = request.data.get('messages', [])
+    if not messages:
+        return None, Response({'error': 'messages array required'}, status=status.HTTP_400_BAD_REQUEST)
+    days = _extract_days(request.data.get('days'), 30)
+    if days is None:
+        return None, Response({'error': 'days must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
+    context = _build_user_context(request.user, days)
+    system_msg = f"{SYSTEM_PROMPT}\n\nCurrent student data:\n{context}"
+    return {'messages': messages, 'system_msg': system_msg}, None
+
 SYSTEM_PROMPT = (
     "You are StudyFlax AI, a friendly and insightful study coach built into a student time management app.\n"
-    "You have access to the student's real study data — their sessions, patterns, calendar, and habits.\n"
+    "You have access to the student's real study data - their sessions, patterns, calendar, and habits.\n"
     "Give personalised, actionable advice based on their actual data.\n"
     "Be encouraging but honest. Keep responses concise (2-4 paragraphs max unless asked for a schedule).\n"
     "When suggesting schedules, use specific times based on their peak study hours.\n"
     "Format schedule recommendations as clear bullet points with times.\n"
-    "Never make up data — only reference what's in the context provided."
+    "Never make up data - only reference what's in the context provided."
 )
 
 INSIGHT_PROMPT_TEMPLATE = (
@@ -133,6 +176,26 @@ def _call_openai(api_key, messages, max_tokens=800):
         model='gpt-4o', messages=messages, max_tokens=max_tokens, temperature=0.7,
     )
 
+def _openai_response_or_error(api_key, messages, max_tokens=800):
+    try:
+        return _call_openai(api_key, messages, max_tokens), None
+    except OPENAI_API_ERROR_TYPES as exc:
+        return None, _handle_openai_error(exc)
+
+def _content_or_error(response):
+    if not _is_openai_response_valid(response):
+        return None, _handle_openai_error('OpenAI response was incomplete')
+    return response.choices[0].message.content, None
+
+def _insight_messages(context):
+    return [
+        {'role': 'system', 'content': SYSTEM_PROMPT},
+        {'role': 'user', 'content': INSIGHT_PROMPT_TEMPLATE.format(context=context)},
+    ]
+
+def _chat_messages(payload):
+    return [{'role': 'system', 'content': payload['system_msg']}] + payload['messages']
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_ai_insights(request):
@@ -140,16 +203,17 @@ def get_ai_insights(request):
     api_key, err = _check_openai()
     if err:
         return err
-    days = int(request.data.get('days', 30))
+    days, err = _days_or_error(request, 30)
+    if err:
+        return err
     context = _build_user_context(request.user, days)
-    try:
-        resp = _call_openai(api_key, [
-            {'role': 'system', 'content': SYSTEM_PROMPT},
-            {'role': 'user', 'content': INSIGHT_PROMPT_TEMPLATE.format(context=context)},
-        ])
-        return Response({'insights': resp.choices[0].message.content, 'contextUsed': context})
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    response, err = _openai_response_or_error(api_key, _insight_messages(context))
+    if err:
+        return err
+    content, err = _content_or_error(response)
+    if err:
+        return err
+    return Response({'insights': content, 'contextUsed': context})
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -158,14 +222,13 @@ def ai_chat(request):
     api_key, err = _check_openai()
     if err:
         return err
-    messages = request.data.get('messages', [])
-    if not messages:
-        return Response({'error': 'messages array required'}, status=status.HTTP_400_BAD_REQUEST)
-    days = int(request.data.get('days', 30))
-    context = _build_user_context(request.user, days)
-    system_msg = f"{SYSTEM_PROMPT}\n\nCurrent student data:\n{context}"
-    try:
-        resp = _call_openai(api_key, [{'role': 'system', 'content': system_msg}] + messages, 600)
-        return Response({'reply': resp.choices[0].message.content})
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    payload, err = _build_chat_request(request)
+    if err:
+        return err
+    response, err = _openai_response_or_error(api_key, _chat_messages(payload), 600)
+    if err:
+        return err
+    content, err = _content_or_error(response)
+    if err:
+        return err
+    return Response({'reply': content})

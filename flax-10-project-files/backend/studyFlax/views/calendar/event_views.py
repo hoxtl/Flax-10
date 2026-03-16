@@ -18,8 +18,11 @@ from .event_helpers import (
     parse_date_param,
     expand_recurring_events
 )
-from .timetable_service import sync_timetable_if_needed
+from .timetable_service import sync_timetable_if_needed, TimetableSyncError
 from .society_sync_service import get_synced_society_events
+import logging
+
+logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -31,6 +34,9 @@ def event_list(request):
 def _calendar_is_shared(owner, viewer):
     from studyFlax.models.social.shareModel import CalendarShare
     return CalendarShare.objects.filter(owner=owner, shared_with=viewer).exists()
+
+def _log_timetable_sync_error(exc):
+    logger.warning("Timetable sync skipped: %s", str(exc))
 
 def _resolve_target_user(request):
     user_id = request.query_params.get('user_id')
@@ -78,8 +84,8 @@ def mask_private_event(event):
 def safe_sync_timetable(user):
     try:
         sync_timetable_if_needed(user)
-    except Exception:
-        pass
+    except TimetableSyncError as exc:
+        _log_timetable_sync_error(exc)
 
 def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)

@@ -4,7 +4,13 @@ Serialisers for user registration, authentication, and profile display.
 
 from rest_framework import serializers
 from studyFlax.models import User
-from studyFlax.serialisers.common import format_teacher_name, build_profile_photo_url
+from studyFlax.serialisers.common import (
+    build_profile_photo_url,
+    can_view_user_stats,
+    format_teacher_name,
+    is_shared_with_requester,
+    is_user_sharing_with,
+)
 
 class RegistrationUserSerialiser(serializers.Serializer):
     username = serializers.CharField(max_length=150)
@@ -41,7 +47,7 @@ class UserSerialiser(serializers.ModelSerializer):
     is_sharing = serializers.SerializerMethodField()
     modules = serializers.SerializerMethodField()
     study_hours_this_week = serializers.SerializerMethodField()
-    study_streak = serializers.SerializerMethodField()
+    study_streak = serializers.SerializerMethodField(method_name='get_study_hours_this_week')
 
     class Meta:
         model = User
@@ -83,42 +89,23 @@ class UserSerialiser(serializers.ModelSerializer):
         return obj.sharing_with.count()
 
     def get_is_shared_with_me(self, obj):
-        # Has obj shared their calendar with request.user?
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.sharing_with.filter(shared_with=request.user).exists()
-        return False
+        return is_shared_with_requester(obj, self.context.get('request'))
 
     def get_is_sharing(self, obj):
-        # Has request.user shared their calendar with obj?
-        request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
-            return False
-            
-        if request.user == obj:
-            return True
-            
-        return request.user.sharing_with.filter(shared_with=obj).exists()
+        return is_user_sharing_with(obj, self.context.get('request'), allow_self=True)
 
     def get_modules(self, obj):
         settings = getattr(obj, 'settings', None)
         return getattr(settings, 'modules', []) if settings else []
 
-    def get_study_hours_this_week(self, obj):
-        request = self.context.get('request')
-        is_self = request and request.user.is_authenticated and request.user == obj
-        if not (is_self or self.get_is_shared_with_me(obj)):
+    def _get_study_stat(self, request, _obj):
+        if not can_view_user_stats(request, _obj):
             return None
-        # Placeholder for exact implementation, needs StudySession logic
         return 0
 
-    def get_study_streak(self, obj):
+    def get_study_hours_this_week(self, obj):
         request = self.context.get('request')
-        is_self = request and request.user.is_authenticated and request.user == obj
-        if not (is_self or self.get_is_shared_with_me(obj)):
-            return None
-        # Placeholder for exact implementation, needs StudySession logic
-        return 0
+        return self._get_study_stat(request, obj)
 
 class LoggedUserSerialiser(serializers.Serializer):
     username = serializers.CharField()

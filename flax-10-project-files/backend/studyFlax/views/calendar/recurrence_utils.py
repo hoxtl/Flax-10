@@ -2,8 +2,6 @@
 Shared recurrence and date-range utilities for calendar expansion.
 """
 
-from __future__ import annotations
-
 import calendar
 from datetime import timedelta
 
@@ -54,4 +52,3 @@ def next_society_occurrence(current, recurrence):
     if recurrence == 'yearly':
         return add_years(current, 1)
     return current + timedelta(days=365)
-

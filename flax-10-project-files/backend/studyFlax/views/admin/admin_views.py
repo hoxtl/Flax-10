@@ -12,22 +12,42 @@ from studyFlax.models.notifications.notificationModel import Notification
 
 User = get_user_model()
 
+def _not_found(message):
+    return Response({'error': message}, status=status.HTTP_404_NOT_FOUND)
+
+def _authenticated_user_or_response(request):
+    user = request.user
+    if user.is_authenticated:
+        return user, None
+    return None, Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+
+def _pending_teacher_or_response(user_id):
+    try:
+        return User.objects.get(id=user_id, role='pending_teacher'), None
+    except User.DoesNotExist:
+        return None, _not_found('No pending teacher request found for this user')
+
+def _user_by_id_or_response(user_id):
+    try:
+        return User.objects.get(id=user_id), None
+    except User.DoesNotExist:
+        return None, _not_found('User not found')
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def user_list(request):
     """Return all users with basic info for the admin dashboard."""
     users = User.objects.all().order_by('date_joined')
-    data = [_serialize_user(u) for u in users]
+    data = [_serialise_user(u) for u in users]
     return Response(data)
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def ban_user(request, user_id):
     """Ban or unban a user by their ID."""
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    user, error = _user_by_id_or_response(user_id)
+    if error:
+        return error
 
     if user.is_staff:
         return Response({'error': 'Cannot ban staff users'}, status=status.HTTP_400_BAD_REQUEST)
@@ -52,20 +72,16 @@ def _apply_ban_action(user, action, reason):
 def teacher_requests(request):
     """List all users who have requested the teacher role."""
     users = User.objects.filter(role='pending_teacher').order_by('date_joined')
-    data = [_serialize_user(u) for u in users]
+    data = [_serialise_user(u) for u in users]
     return Response(data)
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def resolve_teacher_request(request, user_id):
     """Approve or reject a pending teacher role request."""
-    try:
-        user = User.objects.get(id=user_id, role='pending_teacher')
-    except User.DoesNotExist:
-        return Response(
-            {'error': 'No pending teacher request found for this user'},
-            status=status.HTTP_404_NOT_FOUND,
-        )
+    user, error = _pending_teacher_or_response(user_id)
+    if error:
+        return error
     decision = request.data.get('decision')
     if decision not in ('approve', 'reject'):
         return Response(
@@ -109,7 +125,7 @@ def _teacher_notification_content(approved):
 def reported_societies(request):
     """List all reported societies with report details."""
     reports = SocietyReport.objects.select_related('society', 'reporter').order_by('-created_at')
-    data = [_serialize_report(r) for r in reports]
+    data = [_serialise_report(r) for r in reports]
     return Response(data)
 
 @api_view(['DELETE'])
@@ -166,9 +182,9 @@ def _notify_society_ban(creator, society_name, reason):
 @api_view(['POST'])
 def request_teacher_role(request):
     """Allow a student to request the teacher role."""
-    user = request.user
-    if not user.is_authenticated:
-        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    user, error = _authenticated_user_or_response(request)
+    if error:
+        return error
     if user.role == 'teacher':
         return Response({'error': 'You are already a teacher'}, status=status.HTTP_400_BAD_REQUEST)
     if user.role == 'pending_teacher':
@@ -180,16 +196,16 @@ def request_teacher_role(request):
 @api_view(['POST'])
 def cancel_teacher_role_request(request):
     """Allow a pending_teacher to cancel their request and revert to student."""
-    user = request.user
-    if not user.is_authenticated:
-        return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    user, error = _authenticated_user_or_response(request)
+    if error:
+        return error
     if user.role != 'pending_teacher':
         return Response({'error': 'No pending teacher request to cancel'}, status=status.HTTP_400_BAD_REQUEST)
     user.role = 'student'
     user.save()
     return Response({'message': 'Teacher role request cancelled.'})
 
-def _serialize_user(u):
+def _serialise_user(u):
     """Serialise a user object into a dictionary for API responses."""
     return {
         'id': u.id,
@@ -205,7 +221,7 @@ def _serialize_user(u):
         'ban_reason': u.ban_reason,
     }
 
-def _serialize_report(r):
+def _serialise_report(r):
     """Serialise a society report into a dictionary for API responses."""
     return {
         'id': r.id,

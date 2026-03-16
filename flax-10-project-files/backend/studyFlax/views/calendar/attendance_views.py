@@ -4,10 +4,15 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db import DatabaseError
 
 from studyFlax.models import EventAttendance
 
 from .attendance_helpers import get_event_for_attendance, build_attendance_stats
+
+def _internal_error(detail):
+    """Return a standard internal-server-response payload."""
+    return Response({"detail": detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def _safe_attendance_stats_response(request):
     """Fetch stats and return Response; on failure return 500 with detail."""
@@ -18,9 +23,9 @@ def _safe_attendance_stats_response(request):
             .only("attended", "event__id", "event__tag__name")
         )
         return Response(build_attendance_stats(records))
-    except Exception as e:
+    except DatabaseError:
         detail = "Attendance data is unavailable. Run migrations: python manage.py migrate"
-        return Response({"detail": detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return _internal_error(detail)
 
 def _attendance_response(obj, event, created):
     return Response({
@@ -60,8 +65,5 @@ def attendance_records(request):
         )
         data = [{"event_id": eid, "attended": att} for eid, att in records]
         return Response(data)
-    except Exception:
-        return Response(
-            {"detail": "Attendance records unavailable."},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+    except DatabaseError:
+        return _internal_error("Attendance records unavailable.")

@@ -25,3 +25,28 @@ def format_teacher_name(user) -> str:
     if getattr(user, "role", None) == "teacher" and not name.startswith("Dr."):
         return f"Dr. {name}"
     return name or "Unknown"
+
+
+def is_shared_with_requester(owner, request):
+    """Return true if owner has explicitly shared with the requesting user."""
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    return owner.sharing_with.filter(shared_with=user).exists()
+
+
+def is_user_sharing_with(owner, request, *, allow_self=False):
+    """Return true if request.user is sharing their calendar with owner."""
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if allow_self and user == owner:
+        return True
+    return user.sharing_with.filter(shared_with=owner).exists()
+
+
+def can_view_user_stats(request, user_obj):
+    """Return true when a user can access another user's study visibility fields."""
+    request_user = getattr(request, "user", None)
+    is_owner = request_user and request_user.is_authenticated and request_user == user_obj
+    return bool(is_owner or is_shared_with_requester(user_obj, request))

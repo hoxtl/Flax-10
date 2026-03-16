@@ -1,13 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-#Router
 router = DefaultRouter()
 from studyFlax.views.timerViews import StudySessionViewSet
-router.register(r'timer/history', StudySessionViewSet, basename='study-session')
-
 from studyFlax.views.social.share_views import CalendarShareViewSet
-router.register(r'social', CalendarShareViewSet, basename='social')
+
+def _register_router():
+    router.register(r'timer/history', StudySessionViewSet, basename='study-session')
+    router.register(r'social', CalendarShareViewSet, basename='social')
+
+_register_router()
 
 # Authentication
 from studyFlax.views.authentication.register_view import register_view
@@ -69,17 +71,9 @@ from studyFlax.views.society import (
 # Notifications
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 
-from studyFlax.views.user.profile_summary_view import profile_summary_view
-from studyFlax.views.user.check_username_view import check_username
-from studyFlax.views.user.user_search_view import user_search
-from studyFlax.views.authentication.password_reset_request_view import reset_password_view
-from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
-from studyFlax.views.user.profile_view import profile_view, another_user_profile_view
-
 # Analytics
 from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
-from studyFlax.views.user.settings_views import onboarding_view
 from studyFlax.views.authentication.home_address_view import home_address_view
 
 # Admin
@@ -98,7 +92,6 @@ from studyFlax.views.admin.course_change_views import (
 
 urlpatterns = [
     path("", include(router.urls)),
-    #path("hello/", hello, name="hello"),
 
     # Authentication
     path("auth/register/", register_view, name='auth-register'),
@@ -186,7 +179,6 @@ urlpatterns = [
     path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
-    path("settings/", user_settings_view, name='user-settings'),
 
     # Societies
     path("societies/", society_list, name="society-list"),
@@ -212,14 +204,6 @@ urlpatterns = [
     path("societies/<int:society_id>/ratification/reject/", reject_ratification, name="society-ratification-reject"),
     path("admin/societies/pending-ratifications/", pending_ratifications, name="pending-ratifications"),
 
-    path("profile/", profile_view, name='user-profile'),
-    path("users/<int:user_id>/profile/", another_user_profile_view, name='another-user-profile'),
-    path('profile/summary/', profile_summary_view, name='profile-summary'),
-    path("check-username/", check_username, name='check-username'),
-    path("users/search/", user_search, name='user-search'),
-    path("auth/password-reset/request/", reset_password_view, name='password-reset-request'),
-    path("auth/password-reset/confirm/", confirm_password_reset_view, name='password-reset-confirm'),
-
     # Analytics
     path('analytics/summary/', get_analytics_summary, name='analytics-summary'),
     path('analytics/progress/', get_progress_data, name='analytics-progress'),
@@ -227,7 +211,6 @@ urlpatterns = [
     path('analytics/theme-stats/', get_theme_stats, name='analytics-theme-stats'),
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
-    path('onboarding/', onboarding_view, name='onboarding'),
     path("user/home-address/", home_address_view, name='home_address'),
 
     # Admin

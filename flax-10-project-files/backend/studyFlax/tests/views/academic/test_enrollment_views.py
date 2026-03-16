@@ -102,7 +102,7 @@ class EnrollmentViewTests(BaseTestCase):
     def test_cannot_disenroll_from_core_module(self):
         UserSettings.objects.create(user=self.user, major='Computer Science')
         enrollment = Enrollment.objects.create(student=self.user, module=self.module)
-        with patch('studyFlax.views.modules.enrollment_views.course_to_module_prefixes', {'Computer Science': ['5C']}):
+        with patch('studyFlax.views.modules.enrollment_logic.get_course_prefixes', return_value=['5C']):
             response = self.client.delete(f'/api/enrollments/{enrollment.id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -126,7 +126,7 @@ class ModuleAndEnrollmentHelperCoverageTest(TestCase):
         from studyFlax.views.modules.enrollment_views import is_core_module
         self.assertFalse(is_core_module(self.student, self.module))
 
-    @patch('studyFlax.views.modules.enrollment_views.course_to_module_prefixes', {'Coverage Major': ['CS']})
+    @patch('studyFlax.views.modules.enrollment_logic.get_course_prefixes', return_value=['CS'])
     def test_is_core_module_true_with_matching_prefix(self):
         from studyFlax.views.modules.enrollment_views import is_core_module
         UserSettings.objects.create(user=self.student, major='Coverage Major')

@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
 from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordConfirmSerialiser
+from django.db import DatabaseError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ def confirm_password_reset_view(request):
         return Response({'error': 'The reset link expired or has been used already...'}, status=status.HTTP_400_BAD_REQUEST)
     except ResetPasswordToken.DoesNotExist:
         return Response({'error': 'Reset link does not exist...'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        logger.error(f"Error during password reset: {str(e)}")
-        return Response({'error': 'Error occurred for password reset confirmation...'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except DatabaseError as exc:
+        logger.error("Database issue during password reset")
+        logger.debug("Error details", exc_info=exc)
+        return Response({'error': 'Unable to update credentials now. Please try again shortly.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)

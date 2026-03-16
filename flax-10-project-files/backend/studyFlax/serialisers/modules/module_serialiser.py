@@ -4,9 +4,10 @@ Serialiser for modules including deadlines and readings.
 
 from rest_framework import serializers
 from studyFlax.models import Module
-from studyFlax.serialisers.common import ensure_teacher_user, format_teacher_name, build_profile_photo_url
+from studyFlax.serialisers.common import ensure_teacher_user, format_teacher_name
 from studyFlax.serialisers.calendar.deadline_serialisers import DeadlineSummarySerialiser
 from studyFlax.serialisers.modules.reading_serialisers import ReadingSummarySerialiser
+
 
 class ModuleSerialiser(serializers.ModelSerializer):
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
@@ -14,6 +15,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
     created_by_profile_photo_url = serializers.SerializerMethodField()
+    created_by_username = serializers.SerializerMethodField()
     readings = ReadingSummarySerialiser(many=True, read_only=True)
 
     class Meta:
@@ -21,7 +23,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
         fields = ['id', 'module_code', 'module_name', 'description', 'department',
                   'course', 'created_by', 'created_by_name', 'start_time', 'end_time',
                   'location', 'recurrence_rule', 'is_recurring', 'deadlines', 'created_by_email',
-                  'created_by_profile_photo_url', 'readings']
+                  'created_by_profile_photo_url', 'created_by_username', 'readings']
         read_only_fields = ['created_by']
 
     def validate(self, validated_data):
@@ -40,21 +42,20 @@ class ModuleSerialiser(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def get_created_by_name(self, obj):
-        try:
-            return format_teacher_name(obj.created_by)
-        except Exception:
-            return 'Unknown'
+        return format_teacher_name(obj.created_by)
 
     def get_created_by_email(self, obj):
-        try:
-            return obj.created_by.email if obj.created_by else None
-        except Exception:
-            return None
+        created_by = getattr(obj, "created_by", None)
+        return getattr(created_by, "email", None)
 
     def get_created_by_profile_photo_url(self, obj):
-        try:
-            if not obj.created_by:
-                return None
-            return build_profile_photo_url(obj.created_by.profile_photo, self.context.get('request'))
-        except Exception:
+        created_by = getattr(obj, "created_by", None)
+        profile_photo = getattr(created_by, "profile_photo", None)
+        if not profile_photo:
             return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(profile_photo.url) if request else profile_photo.url
+
+    def get_created_by_username(self, obj):
+        created_by = getattr(obj, "created_by", None)
+        return getattr(created_by, "username", None)

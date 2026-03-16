@@ -2,7 +2,6 @@
 Service for expanding and serialising synced society calendar events.
 """
 
-from datetime import timedelta
 from studyFlax.models.society import SocietyCalendarSync, SocietyEvent
 from studyFlax.serialisers.society.society_serialisers import get_society_color
 from .recurrence_utils import is_time_overlap, next_society_occurrence

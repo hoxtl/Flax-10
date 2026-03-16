@@ -5,7 +5,7 @@ Serialisers for calendar sharing between users.
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from studyFlax.models.social.shareModel import CalendarShare
-from studyFlax.serialisers.common import build_profile_photo_url
+from studyFlax.serialisers.common import build_profile_photo_url, is_shared_with_requester, is_user_sharing_with
 
 User = get_user_model()
 
@@ -32,16 +32,10 @@ class CalendarShareUserSerialiser(serializers.ModelSerializer):
         return build_profile_photo_url(obj.profile_photo, self.context.get("request"))
 
     def get_is_sharing(self, obj):
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return request.user.sharing_with.filter(shared_with=obj).exists()
-        return False
+        return is_user_sharing_with(obj, self.context.get("request"))
 
     def get_is_shared_with_me(self, obj):
-        request = self.context.get("request")
-        if request and request.user.is_authenticated:
-            return obj.sharing_with.filter(shared_with=request.user).exists()
-        return False
+        return is_shared_with_requester(obj, self.context.get("request"))
 
 class CalendarShareSerialiser(serializers.ModelSerializer):
     """Serialiser purely representing the CalendarShare relationship."""
