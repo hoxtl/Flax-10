@@ -44,6 +44,27 @@ vi.mock("../../api/adminApi", () => ({
 
 vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
 
+vi.mock("../../components/Pagination/Pagination", () => ({
+  Pagination: ({ currentPage, totalPages, onPageChange }) =>
+    totalPages > 1 ? (
+      <div>
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          ← Previous
+        </button>
+        <span>{`Page ${currentPage} of ${totalPages}`}</span>
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next →
+        </button>
+      </div>
+    ) : null,
+}));
+
 import * as api from "../../api/adminApi";
 import AdminPage from "../../pages/Admin/AdminPage";
 
@@ -184,6 +205,38 @@ describe("AdminPage – Users tab", () => {
     });
     expect(screen.queryByText("Alice Smith")).toBeNull();
     expect(screen.getByText("Bob Jones")).toBeTruthy();
+  });
+
+  it("filters users by selected status filter", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByText("Alice Smith"));
+    fireEvent.click(screen.getByRole("button", { name: "Banned" }));
+    await waitFor(() => expect(screen.getByText("Bob Jones")).toBeTruthy());
+    expect(screen.queryByText("Alice Smith")).toBeNull();
+    expect(screen.queryByText("Staff User")).toBeNull();
+  });
+
+  it("paginates users list when there are more than 20 users", async () => {
+    const manyUsers = Array.from({ length: 21 }, (_, i) => ({
+      id: i + 1,
+      username: `user${i + 1}`,
+      email: `u${i + 1}@mail.com`,
+      first_name: `User${i + 1}`,
+      last_name: "Test",
+      role: "student",
+      is_active: true,
+      is_staff: false,
+      is_superuser: false,
+    }));
+    api.fetchAdminUsers.mockResolvedValue(manyUsers);
+
+    render(<AdminPage />);
+    await waitFor(() => expect(screen.getByText("User1 Test")).toBeTruthy());
+    expect(screen.queryByText("User21 Test")).toBeNull();
+
+    fireEvent.click(screen.getByText("Next →"));
+    await waitFor(() => expect(screen.getByText("User21 Test")).toBeTruthy());
+    expect(screen.queryByText("User1 Test")).toBeNull();
   });
 
   it("shows empty state when search has no matches", async () => {
