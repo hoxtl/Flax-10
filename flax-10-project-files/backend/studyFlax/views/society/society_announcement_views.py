@@ -9,12 +9,13 @@ from rest_framework.response import Response
 from studyFlax.models.society import SocietyAnnouncement, SocietyAnnouncementImage
 from studyFlax.serialisers import SocietyAnnouncementSerialiser
 from .helpers import (
-    get_society_or_404, is_society_admin,
-    society_not_found_response, permission_denied_response
+    get_society_or_404,
+    get_society_object_or_none,
+    is_society_admin,
+    is_silent_request,
+    society_not_found_response,
+    permission_denied_response,
 )
-
-def is_silent_request(request):
-    return request.query_params.get('silent', '').lower() == 'true'
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -56,7 +57,7 @@ def announcement_detail(request, society_id, announcement_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-    announcement = get_announcement_or_none(society, announcement_id)
+    announcement = get_society_object_or_none(SocietyAnnouncement, society, announcement_id)
     if not announcement:
         return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
@@ -67,12 +68,6 @@ def announcement_detail(request, society_id, announcement_id):
     if request.method == 'DELETE':
         return delete_announcement(announcement, silent)
     return update_announcement(announcement, request.data, silent)
-
-def get_announcement_or_none(society, announcement_id):
-    try:
-        return SocietyAnnouncement.objects.get(society=society, pk=announcement_id)
-    except SocietyAnnouncement.DoesNotExist:
-        return None
 
 def update_announcement(announcement, data, silent=False):
     context = {'skip_notification': silent}

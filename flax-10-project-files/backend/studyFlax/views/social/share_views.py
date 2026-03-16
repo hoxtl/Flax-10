@@ -7,8 +7,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from studyFlax.models.social.shareModel import CalendarShare
-from studyFlax.serializers.socialSerializer import CalendarShareSerializer, CalendarShareUserSerializer
 from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.serialisers.social_serialisers import (
+    CalendarShareSerialiser,
+    CalendarShareUserSerialiser,
+)
 
 User = get_user_model()
 
@@ -34,7 +37,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
     queryset = CalendarShare.objects.all()
-    serializer_class = CalendarShareSerializer
+    serializer_class = CalendarShareSerialiser
 
     @action(detail=True, methods=['post'], url_path='share')
     def share(self, request, pk=None):
@@ -48,7 +51,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
         if not created:
             return Response({"error": "You are already sharing with this user."}, status=status.HTTP_400_BAD_REQUEST)
         _notify_calendar_shared(request.user, target_user)
-        return Response(CalendarShareSerializer(share_obj).data, status=status.HTTP_201_CREATED)
+        return Response(CalendarShareSerialiser(share_obj).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'], url_path='unshare')
     def unshare(self, request, pk=None):
@@ -70,8 +73,10 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
         shared_with_users = User.objects.filter(shared_with_me__owner=target_user)
         page = self.paginate_queryset(shared_with_users)
         if page is not None:  # pragma: no cover
-            return self.get_paginated_response(CalendarShareUserSerializer(page, many=True, context={'request': request}).data)
-        return Response(CalendarShareUserSerializer(shared_with_users, many=True, context={'request': request}).data)
+            serialiser = CalendarShareUserSerialiser(page, many=True, context={'request': request})
+            return self.get_paginated_response(serialiser.data)
+        serialiser = CalendarShareUserSerialiser(shared_with_users, many=True, context={'request': request})
+        return Response(serialiser.data)
 
     @action(detail=True, methods=['get'], url_path='shared-with-me')
     def shared_with_me(self, request, pk=None):
@@ -82,5 +87,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
         owners = User.objects.filter(sharing_with__shared_with=target_user)
         page = self.paginate_queryset(owners)
         if page is not None:  # pragma: no cover
-            return self.get_paginated_response(CalendarShareUserSerializer(page, many=True, context={'request': request}).data)
-        return Response(CalendarShareUserSerializer(owners, many=True, context={'request': request}).data)
+            serialiser = CalendarShareUserSerialiser(page, many=True, context={'request': request})
+            return self.get_paginated_response(serialiser.data)
+        serialiser = CalendarShareUserSerialiser(owners, many=True, context={'request': request})
+        return Response(serialiser.data)

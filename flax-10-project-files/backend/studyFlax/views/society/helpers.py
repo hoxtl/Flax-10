@@ -1,3 +1,7 @@
+"""
+Shared helpers for society views.
+"""
+
 from rest_framework import status
 from rest_framework.response import Response
 from studyFlax.models.society import Society, SocietyMembership, SocietyImage
@@ -35,6 +39,9 @@ def require_society(view_func):
          return view_func(request, society, *args, **kwargs)
     return wrapper
 
+def is_silent_request(request):
+    return request.query_params.get('silent', '').lower() == 'true'
+
 def handle_image_urls(society, data):
     image_urls = data.get('image_urls') or data.get('images')
     if image_urls is None:
@@ -42,3 +49,12 @@ def handle_image_urls(society, data):
     society.images.all().delete()
     for url in image_urls:
         SocietyImage.objects.create(society=society, url=url, is_cover=True)
+
+def get_society_object_or_none(model, society, object_id):
+    """
+    Return a society-related object for the given model or None if it does not exist.
+    """
+    try:
+        return model.objects.get(society=society, pk=object_id)
+    except model.DoesNotExist:
+        return None

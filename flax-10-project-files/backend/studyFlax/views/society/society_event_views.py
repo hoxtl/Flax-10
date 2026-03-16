@@ -9,8 +9,12 @@ from rest_framework.response import Response
 from studyFlax.models.society import SocietyEvent
 from studyFlax.serialisers import SocietyEventSerialiser
 from .helpers import (
-    get_society_or_404, is_society_admin,
-    society_not_found_response, permission_denied_response
+    get_society_or_404,
+    get_society_object_or_none,
+    is_society_admin,
+    is_silent_request,
+    society_not_found_response,
+    permission_denied_response,
 )
 
 @api_view(['GET', 'POST'])
@@ -39,16 +43,13 @@ def create_event(request, society):
     serialiser.save(society=society)
     return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
-def is_silent_request(request):
-    return request.query_params.get('silent', '').lower() == 'true'
-
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def event_detail(request, society_id, event_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-    event = get_event_or_none(society, event_id)
+    event = get_society_object_or_none(SocietyEvent, society, event_id)
     if not event:
         return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
@@ -59,12 +60,6 @@ def event_detail(request, society_id, event_id):
     if request.method == 'DELETE':
         return delete_event(event, silent)
     return update_event(event, request.data, silent)
-
-def get_event_or_none(society, event_id):
-    try:
-        return SocietyEvent.objects.get(society=society, pk=event_id)
-    except SocietyEvent.DoesNotExist:
-        return None
 
 def update_event(event, data, silent=False):
     context = {'skip_notification': silent}
@@ -91,7 +86,7 @@ def _add_exception_date(event, date):
 def add_society_event_exception(request, society_id, event_id):
     society = get_society_or_404(society_id)
     if not society: return society_not_found_response()
-    event = get_event_or_none(society, event_id)
+    event = get_society_object_or_none(SocietyEvent, society, event_id)
     if not event: return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
     if not is_society_admin(request.user, society): return permission_denied_response()
     date = request.data.get('date')

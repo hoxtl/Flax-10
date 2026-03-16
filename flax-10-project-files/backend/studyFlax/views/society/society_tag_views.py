@@ -5,8 +5,11 @@ from rest_framework.response import Response
 from studyFlax.models.society import SocietyTag
 from studyFlax.serialisers import SocietyTagSerialiser
 from .helpers import (
-    get_society_or_404, is_society_admin,
-    society_not_found_response, permission_denied_response
+    get_society_or_404,
+    get_society_object_or_none,
+    is_society_admin,
+    society_not_found_response,
+    permission_denied_response,
 )
 
 MAX_TAGS = 7
@@ -46,19 +49,13 @@ def society_tag_detail(request, society_id, tag_id):
     if not is_society_admin(request.user, society):
         return permission_denied_response()
 
-    tag = get_tag_or_none(society, tag_id)
+    tag = get_society_object_or_none(SocietyTag, society, tag_id)
     if not tag:
         return Response({'error': 'Tag not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'DELETE':
         return delete_tag(tag)
     return update_tag(tag, request.data)
-
-def get_tag_or_none(society, tag_id):
-    try:
-        return SocietyTag.objects.get(society=society, pk=tag_id)
-    except SocietyTag.DoesNotExist:
-        return None
 
 def update_tag(tag, data):
     serialiser = SocietyTagSerialiser(tag, data=data, partial=True)
