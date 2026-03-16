@@ -29,13 +29,19 @@ def _resolved_preferences(user, payload):
     }
 
 def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
-    day_start = datetime.combine(current_day, time(0, 0))
-    day_end = datetime.combine(current_day + timedelta(days=1), time(0, 0))
+    has_sleep_window = bool(wake_time and sleep_time)
 
-    window_start, window_end = day_start, day_end
+    if has_sleep_window:
+        window_start = datetime.combine(current_day, wake_time)
+        window_end = datetime.combine(current_day, sleep_time)
+        if window_end <= window_start:
+            window_end += timedelta(days=1)
+    else:
+        window_start = datetime.combine(current_day, time(0, 0))
+        window_end = datetime.combine(current_day + timedelta(days=1), time(0, 0))
 
     # Highest priority: sleep window boundaries.
-    if wake_time and sleep_time:
+    if has_sleep_window:
         sleep_window_start = datetime.combine(current_day, wake_time)
         sleep_window_end = datetime.combine(current_day, sleep_time)
         if sleep_window_end <= sleep_window_start:
@@ -47,13 +53,20 @@ def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
     if worktime_preference == 'day':
         work_window_start = datetime.combine(current_day, time(8, 0))
         work_window_end = datetime.combine(current_day, time(18, 0))
-        window_start = max(window_start, work_window_start)
-        window_end = min(window_end, work_window_end)
+        if has_sleep_window:
+            window_start = max(window_start, work_window_start)
+            window_end = min(window_end, work_window_end)
+        else:
+            window_start, window_end = work_window_start, work_window_end
+            
     elif worktime_preference == 'night':
         work_window_start = datetime.combine(current_day, time(18, 0))
         work_window_end = datetime.combine(current_day + timedelta(days=1), time(2, 0))
-        window_start = max(window_start, work_window_start)
-        window_end = min(window_end, work_window_end)
+        if has_sleep_window:
+            window_start = max(window_start, work_window_start)
+            window_end = min(window_end, work_window_end)
+        else:
+            window_start, window_end = work_window_start, work_window_end
 
     return window_start, window_end
 
