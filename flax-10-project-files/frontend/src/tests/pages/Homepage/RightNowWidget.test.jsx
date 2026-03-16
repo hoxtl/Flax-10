@@ -99,7 +99,7 @@ describe('RightNowWidget', () => {
             timerTask: 'Study JS',
             onOpenTimer: vi.fn(),
         });
-        expect(screen.getByText(/FOCUS/)).toBeTruthy();
+        expect(screen.getByText(/Focus/i)).toBeTruthy();
         expect(screen.getByText('Open timer →')).toBeTruthy();
     });
 
@@ -123,7 +123,7 @@ describe('RightNowWidget', () => {
             timeLeft: 300,
             breakTime: 5,
         });
-        expect(screen.getByText(/BREAK/)).toBeTruthy();
+        expect(screen.getByText(/Break/i)).toBeTruthy();
     });
 
     it('renders non-today view with first event', () => {
@@ -154,7 +154,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             navigatorContext: {},
         });
-        expect(screen.getByText('Nothing planned today')).toBeTruthy();
+        expect(screen.getByText('Nothing scheduled today')).toBeTruthy();
     });
 
     it('renders conflict summary when conflicts present', () => {
@@ -193,7 +193,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText('TOMORROW')).toBeTruthy();
+        expect(screen.getByText('Tomorrow', { selector: 'p' })).toBeTruthy();
         expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
     });
 
@@ -259,7 +259,8 @@ describe('RightNowWidget', () => {
             sortedEvents: [{ title: 'Campus Event', start_time: futureTime, location: 'Waterloo' }],
             tflDelays: [{}],
         });
-        expect(screen.getByText(/Northern.*Minor/)).toBeTruthy();
+        expect(screen.getByText(/Northern/i)).toBeTruthy();
+        expect(screen.getByText(/Minor delays/i)).toBeTruthy();
         fireEvent.click(screen.getByLabelText('Dismiss delay alert'));
         expect(screen.queryByLabelText('Dismiss delay alert')).toBeNull();
     });
@@ -321,7 +322,8 @@ describe('RightNowWidget', () => {
             sortedEvents: [{ title: 'Campus Class', start_time: startTime, location: 'Waterloo' }],
             tflDelays: [{}],
         });
-        expect(screen.getByText(/Victoria.*leave in/)).toBeTruthy();
+        expect(screen.getByText(/Victoria/i)).toBeTruthy();
+        expect(screen.getByText(/leave in/i)).toBeTruthy();
     });
 
     it('header shows singular event when eventCount is 1', () => {
