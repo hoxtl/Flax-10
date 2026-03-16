@@ -102,23 +102,92 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(response.data['title'], 'Named schedule')
         self.assertEqual(len(response.data['event_allocations']), 2)
 
-    def test_same_name_schedule_overwrites_previous_and_creates_notification(self):
-        payload = {
-            'title': 'Reusable Name',
-            'worktime_preference': 'day',
-            'week_preference': 'both',
-            'deadline_preferences': [
-                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30},
-            ],
-        }
-        first = self.client.post(self.url, payload, format='json')
+    def test_create_manual_schedule_requires_title(self):
+        event = self._build_schedule_event('Untitled Session')
+
+        response = self.client.post(self.url, {
+            'mode': 'manual',
+            'event_ids': [event.id],
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['detail'], 'title is required for manual schedules.')
+
+    def test_manual_schedule_same_name_overwrites_previous_and_creates_notification(self):
+        first_event = self._build_schedule_event('Manual Session A')
+        second_event = self._build_schedule_event('Manual Session B', start_offset_hours=2)
+
+        first = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Manual Reusable Name',
+            'event_ids': [first_event.id],
+        }, format='json')
         self.assertEqual(first.status_code, status.HTTP_201_CREATED)
 
-        second = self.client.post(self.url, payload, format='json')
+        second = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Manual Reusable Name',
+            'event_ids': [second_event.id],
+        }, format='json')
         self.assertEqual(second.status_code, status.HTTP_201_CREATED)
         self.assertTrue(second.data['overwritten'])
-        self.assertEqual(Schedule.objects.filter(user=self.user, title='Reusable Name').count(), 1)
+        self.assertEqual(Schedule.objects.filter(user=self.user, title='Manual Reusable Name').count(), 1)
         self.assertTrue(Notification.objects.filter(user=self.user, title='Schedule overwritten').exists())
+
+    def test_schedule_list_get_returns_user_schedules(self):
+        event = self._build_schedule_event('Listed session')
+        create_response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Listable Schedule',
+            'event_ids': [event.id],
+        }, format='json')
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+
+        list_response = self.client.get(self.url)
+        self.assertEqual(list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(list_response.data), 1)
+        self.assertEqual(list_response.data[0]['title'], 'Listable Schedule')
+
+    def test_schedule_detail_get_and_patch_requests(self):
+        first_event = self._build_schedule_event('Patch Session A')
+        second_event = self._build_schedule_event('Patch Session B', start_offset_hours=2)
+
+        existing_response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Existing Name',
+            'event_ids': [first_event.id],
+        }, format='json')
+        self.assertEqual(existing_response.status_code, status.HTTP_201_CREATED)
+
+        target_response = self.client.post(self.url, {
+            'mode': 'manual',
+            'title': 'Target Name',
+            'event_ids': [second_event.id],
+        }, format='json')
+        self.assertEqual(target_response.status_code, status.HTTP_201_CREATED)
+        target_id = target_response.data['id']
+
+        get_response = self.client.get(f'/api/schedules/{target_id}/')
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_response.data['title'], 'Target Name')
+
+        patch_response = self.client.patch(
+            f'/api/schedules/{target_id}/',
+            {'title': 'Existing Name'},
+            format='json',
+        )
+        self.assertEqual(patch_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(patch_response.data['overwritten'])
+        self.assertEqual(patch_response.data['title'], 'Existing Name')
+        self.assertEqual(Schedule.objects.filter(user=self.user, title='Existing Name').count(), 1)
+
+        invalid_patch_response = self.client.patch(
+            f'/api/schedules/{target_id}/',
+            {'title': '   '},
+            format='json',
+        )
+        self.assertEqual(invalid_patch_response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(invalid_patch_response.data['detail'], 'title is required.')
 
     def test_preferred_daily_budget_limits_allocations_per_day(self):
         second_deadline = Deadline.objects.create(
@@ -184,3 +253,14 @@ class ScheduleViewsTests(BaseTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(len(response.data['event_allocations']), 1)
+
+def _build_schedule_event(self, title, start_offset_days=1, start_offset_hours=0):
+        schedule_tag = Tag.objects.get(name='Schedule')
+        start = timezone.now() + timedelta(days=start_offset_days, hours=start_offset_hours)
+        return CalendarEvent.objects.create(
+            user=self.user,
+            title=title,
+            start_time=start,
+            end_time=start + timedelta(hours=1),
+            tag=schedule_tag,
+        )
