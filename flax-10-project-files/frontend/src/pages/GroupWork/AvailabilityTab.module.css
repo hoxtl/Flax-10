@@ -224,67 +224,16 @@
     color: #b04b4b;
 }
 
-/* Modal Styles */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(60, 42, 32, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal {
-    background: var(--card-bg);
-    padding: 24px;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: var(--shadow-xl);
-}
-
-.modal h4 {
-    margin: 0 0 12px 0;
-    font-size: 18px;
-    color: var(--text);
-}
-
-.modal p {
-    margin: 0 0 24px 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-}
-
-.modalButtons {
-    display: flex;
-    gap: 12px;
-}
-
-.cancelBtn,
-.confirmBtn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.cancelBtn {
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-secondary);
-}
-
-.confirmBtn {
-    border: none;
-    background: var(--primary);
-    color: #fff;
+@media (max-width: 600px) {
+    .slotRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .memberList {
+        margin: 4px 0;
+    }
 }
 
 .loading,
