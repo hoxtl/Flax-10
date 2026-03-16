@@ -5,7 +5,6 @@ from django.db import models as db_models
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
 
-
 class StudySessionViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows study sessions to be viewed or edited.
