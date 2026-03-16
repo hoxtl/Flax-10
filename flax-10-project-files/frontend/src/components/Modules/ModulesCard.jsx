@@ -79,10 +79,13 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
 }
 
 function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings, upcomingTasksCount, classmatesCount }) {
+    const moduleTitle = module.module_code
+        ? `${module.module_name} (${module.module_code})`
+        : module.module_name;
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
-            <h3 className={styles.moduleTitle}>{module.module_name}</h3>
+            <h3 className={styles.moduleTitle}>{moduleTitle}</h3>
             {module.description && <Description text={module.description} />}
             <QuickMeta module={module} />
             <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
@@ -97,28 +100,31 @@ function getTutorImage(moduleData) {
         id: moduleData?.created_by,
         name: moduleData?.created_by_name,
         role: 'teacher',
+        username: moduleData?.created_by_username,
         profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
     }, { allowGeneric: true });
 }
 
 function TutorAvatar({ module }) {
     const src = getTutorImage(module);
-    if (!src) return null;
     const initials = (module.created_by_name || 'T')
         .split(/\s+/).filter(Boolean)
         .map(p => p[0]).join('').slice(0, 2).toUpperCase();
     return (
         <div className={styles.tutorAvatar} title={module.created_by_name || 'Tutor'}>
-            <img
-                src={src}
-                alt={module.created_by_name || 'Tutor'}
-                className={styles.tutorAvatarImg}
-                onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling.style.display = 'flex';
-                }}
-            />
-            <span className={styles.tutorAvatarFallback} style={{ display: 'none' }}>{initials}</span>
+            {src && (
+                <img
+                    src={src}
+                    alt={module.created_by_name || 'Tutor'}
+                    className={styles.tutorAvatarImg}
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling.style.display = 'flex';
+                    }}
+                />
+            )}
+            <span className={styles.tutorAvatarFallback} style={src ? { display: 'none' } : undefined}>{initials}</span>
         </div>
     );
 }
@@ -131,13 +137,6 @@ function CardHeader({ module, enrolled, isCore }) {
             <div className={styles.headerTopRow}>
                 <div className={styles.headerIdentity}>
                     <div className={styles.iconWrap}>📚</div>
-                    <EntityLinkChip
-                        to={`/modules?moduleId=${module.id}`}
-                        className={styles.moduleCode}
-                        title={`Open ${module.module_code}`}
-                    >
-                        {module.module_code}
-                    </EntityLinkChip>
                 </div>
                 <div className={styles.headerRight}>
                     {enrolled && (
@@ -148,8 +147,10 @@ function CardHeader({ module, enrolled, isCore }) {
                     <TutorAvatar module={module} />
                 </div>
             </div>
-            <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
-            {course && <span className={styles.courseText}>{course}</span>}
+            <div className={styles.headerChips}>
+                {course && <span className={styles.courseText}>{course}</span>}
+                <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+            </div>
         </div>
     );
 }

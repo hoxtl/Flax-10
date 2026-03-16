@@ -64,6 +64,17 @@ function buildNonHumanAvatar(seedKey = "") {
   return `https://picsum.photos/seed/${encodeURIComponent(seedKey)}/96/96`;
 }
 
+function buildStudentFallback(seedKey = "") {
+  const hash = getHash(seedKey);
+  if (hash % 10 === 0) {
+    return null;
+  }
+  if (hash % 4 === 0) {
+    return buildNonHumanAvatar(seedKey);
+  }
+  return buildGenderAvatar(seedKey, "unknown");
+}
+
 const FIXED_PROFILE_PHOTOS = {
   // Core fixed accounts
   johndoe: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=96&h=96&q=80",
@@ -120,10 +131,12 @@ export function getTutorPhotoFallback({ fullName = "", username = "", role = "",
   const byName = FIXED_NAME_PHOTOS[normalise(fullName)];
   if (byName) return byName;
 
-  // New/unknown users should render initials unless they upload a real photo.
-  // `allowGeneric` is kept for backwards compatibility but no longer generates random avatars.
   if (!allowGeneric) return null;
-  return null;
+
+  const normalisedRole = normalise(role);
+  const seedKey = seed || username || fullName;
+  if (normalisedRole === "teacher") return buildGenderAvatar(seedKey, inferGender({ fullName, username }));
+  return buildStudentFallback(seedKey);
 }
 
 export function getResolvedUserPhoto(user, options = {}) {

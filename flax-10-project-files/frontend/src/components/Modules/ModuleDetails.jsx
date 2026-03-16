@@ -62,7 +62,9 @@ function getTutorImage(moduleData) {
         id: moduleData?.created_by,
         name: moduleData?.created_by_name,
         role: 'teacher',
+        username: moduleData?.created_by_username,
         profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
     }, { allowGeneric: true });
 }
 
@@ -73,6 +75,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     const nextDeadline = getNextDeadline(sortedDeadlines);
     const timelineProgress = getTimelineProgress(sortedDeadlines);
     const nextClass = getNextClassText(module.start_time, module.end_time);
+    const moduleTutorPhoto = getTutorImage(module);
 
     return (
         <div className={styles.container}>
@@ -94,17 +97,19 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                     <div className={styles.heroMetaItem}>
                         <span className={styles.heroMetaLabel}>Tutor</span>
                         <div className={styles.tutorInline}>
-                            <img
-                                className={styles.tutorPhoto}
-                                src={getTutorImage(module)}
-                                alt={`${module.created_by_name || "Tutor"} profile`}
-                                onError={(e) => {
-                                    e.currentTarget.style.display = "none";
-                                    const fallback = e.currentTarget.nextElementSibling;
-                                    if (fallback) fallback.style.display = "inline-flex";
-                                }}
-                            />
-                            <span className={styles.tutorAvatarFallback}>{getInitials(module.created_by_name || "Tutor")}</span>
+                            {moduleTutorPhoto && (
+                                <img
+                                    className={styles.tutorPhoto}
+                                    src={moduleTutorPhoto}
+                                    alt={`${module.created_by_name || "Tutor"} profile`}
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = "none";
+                                        const fallback = e.currentTarget.nextElementSibling;
+                                        if (fallback) fallback.style.display = "inline-flex";
+                                    }}
+                                />
+                            )}
+                            <span className={styles.tutorAvatarFallback} style={moduleTutorPhoto ? { display: "none" } : undefined}>{getInitials(module.created_by_name || "Tutor")}</span>
                             {module.created_by
                                 ? (
                                     <EntityLinkChip to={`/profile/${module.created_by}`} className={styles.heroMetaValue}>
