@@ -7,7 +7,6 @@ from .fixtures import get_sample_tags
 from rest_framework.test import APIClient
 from django.test import TestCase
 
-
 class BaseTestCase(TestCase):
     """Base test case with common setup."""
 
@@ -25,14 +24,11 @@ class BaseTestCase(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def create_sample_tags(self):
-        """Create sample tags in database."""
         for tag_data in get_sample_tags():
             Tag.objects.create(**tag_data, is_default=True)
 
     def get_tag_by_name(self, name):
-        """Get tag by name."""
         return Tag.objects.get(name=name)
-
 
 class BaseEventTestCase(BaseTestCase):
     """Base test case for event tests."""
@@ -42,17 +38,14 @@ class BaseEventTestCase(BaseTestCase):
         self.url = "/api/events/"
 
     def assert_event_response(self, response, expected_status):
-        """Assert response status."""
         self.assertEqual(response.status_code, expected_status)
 
     def assert_event_data(self, event, expected):
-        """Assert event data matches expected."""
         self.assertEqual(event["title"], expected["title"])
         if "description" in expected:
             self.assertEqual(event["description"], expected["description"])
 
     def create_event_in_db(self, event_data, user=None):
-        """Create event directly in database."""
         user = user or self.user
         tag_id = event_data.pop("tag", None)
         rule = self._create_recurrence(event_data.pop("recurrence_rule", None))

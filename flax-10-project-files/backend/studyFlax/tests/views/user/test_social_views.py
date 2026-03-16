@@ -11,7 +11,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 
 from studyFlax.models.calendar.categoryModel import Category
 from studyFlax.models.social.shareModel import CalendarShare
-from studyFlax.serialisers.social_serialisers import (
+from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareSerialiser,
     CalendarShareUserSerialiser,
 )

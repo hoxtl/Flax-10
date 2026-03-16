@@ -18,7 +18,7 @@ class StudySessionSerializerTest(TestCase):
         self.user = make_user(username='timeruser')
 
     def test_serializer_creates_session_with_user(self):
-        from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
+        from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
         from unittest.mock import MagicMock
 
         now = timezone.now()
@@ -40,7 +40,7 @@ class StudySessionSerializerTest(TestCase):
         self.assertEqual(instance.user, self.user)
 
     def test_serializer_read_only_fields(self):
-        from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
+        from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
 
         session = make_session(self.user)
         serializer = StudySessionSerializer(session)
@@ -51,7 +51,7 @@ class StudySessionSerializerTest(TestCase):
         self.assertIn("status", data)
 
     def test_serializer_all_fields_present(self):
-        from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
+        from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
 
         session = make_session(self.user)
         serializer = StudySessionSerializer(session)

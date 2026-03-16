@@ -1,13 +1,13 @@
-"""Backend tests for email utils."""
+"""
+Backend tests for email utils.
+"""
 
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-
 User = get_user_model()
-
 
 class EmailUtilsTest(TestCase):
     """Tests for email utils."""

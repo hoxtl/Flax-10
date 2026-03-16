@@ -3,15 +3,10 @@ Backend tests for system tags.
 """
 
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from studyFlax.models import Tag, CalendarEvent
 from django.utils import timezone
 from datetime import timedelta
-
-User = get_user_model()
-
-def make_user():
-    return User.objects.create_user(username='taguser', email='tag@example.com', password='pass')
+from studyFlax.tests.helpers.factories import make_user
 
 class GetSystemTagTest(TestCase):
     """Tests for get_system_tag and related helpers."""

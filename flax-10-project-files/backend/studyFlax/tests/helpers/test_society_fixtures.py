@@ -1,9 +1,10 @@
-"""Backend tests for society fixtures."""
+"""
+Backend tests for society fixtures.
+"""
 
 from datetime import date
 
 from django.test import TestCase
-
 
 class SocietyFixturesTest(TestCase):
     """Tests for society fixtures."""

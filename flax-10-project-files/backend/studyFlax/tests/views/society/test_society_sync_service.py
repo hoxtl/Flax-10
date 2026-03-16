@@ -3,7 +3,6 @@ Backend tests for society sync service.
 """
 
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta, datetime, timezone as dt_timezone
 

@@ -157,7 +157,7 @@ class ConfirmPasswordResetViewTest(TestCase):
 class ResetPasswordSerializerTest(TestCase):
     """Tests for reset password serializer."""
     def test_normalise_email(self):
-        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordSerialiser
+        from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
         serializer = ResetPasswordSerialiser()
         self.assertEqual(
             serializer.normalise_lowercase_email('  TEST@Example.COM  '),
@@ -165,14 +165,14 @@ class ResetPasswordSerializerTest(TestCase):
         )
 
     def test_confirm_passwords_match(self):
-        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+        from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordConfirmSerialiser
         serializer = ResetPasswordConfirmSerialiser()
         data = {'new_password': 'abc12345', 'confirm_password': 'abc12345', 'token': 'tok'}
         self.assertEqual(serializer.validate_passwords(data), data)
 
     def test_confirm_passwords_mismatch(self):
         from rest_framework.exceptions import ValidationError
-        from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+        from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordConfirmSerialiser
 
         serializer = ResetPasswordConfirmSerialiser()
         data = {'new_password': 'abc12345', 'confirm_password': 'different', 'token': 'tok'}
@@ -191,7 +191,7 @@ class RegistrationSerializerEmailTest(TestCase):
         )
 
     def test_duplicate_email_rejected(self):
-        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import RegistrationUserSerialiser
         data = {
             'username': 'newuser',
             'email': 'existing@test.com',
@@ -212,7 +212,7 @@ class AuthAndTaskCoverageTest(TestCase):
         self.user = User.objects.create_user(username='auth_cov', email='auth_cov@example.com', password='pass')
 
     def test_user_serializer_without_request_returns_false_and_none_values(self):
-        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
         serializer = UserSerialiser(self.user)
         self.assertFalse(serializer.data['is_shared_with_me'])
         self.assertFalse(serializer.data['is_sharing'])
@@ -220,7 +220,7 @@ class AuthAndTaskCoverageTest(TestCase):
         self.assertIsNone(serializer.data['study_streak'])
 
     def test_user_serializer_with_settings_modules(self):
-        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
         UserSettings.objects.create(user=self.user, modules=['CS200'])
         request = self.factory.get('/')
         request.user = self.user
@@ -244,7 +244,7 @@ class SerializerCoverageTest(TestCase):
         )
 
     def test_registration_serializer_duplicate_username(self):
-        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import RegistrationUserSerialiser
         data = {
             'username': 'ser_user',
             'email': 'new@test.com',
@@ -258,7 +258,7 @@ class SerializerCoverageTest(TestCase):
         self.assertIn('username', serializer.errors)
 
     def test_user_serializer_is_sharing_self(self):
-        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
         factory = APIRequestFactory()
         request = factory.get('/')
         request.user = self.user
@@ -266,7 +266,7 @@ class SerializerCoverageTest(TestCase):
         self.assertTrue(serializer.data['is_sharing'])
 
     def test_user_serializer_teacher_name_prefixed_with_dr(self):
-        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
         teacher = User.objects.create_user(
             username='teach_name',
             email='teach_name@test.com',
@@ -279,7 +279,7 @@ class SerializerCoverageTest(TestCase):
         self.assertEqual(serializer.data['name'], 'Dr. Alex Stone')
 
     def test_deadline_serializer_non_teacher_validation(self):
-        from studyFlax.serialisers.deadline_serialisers import DeadlineSerialiser
+        from studyFlax.serialisers.calendar.deadline_serialisers import DeadlineSerialiser
         factory = APIRequestFactory()
         request = factory.post('/')
         request.user = self.user
@@ -288,13 +288,13 @@ class SerializerCoverageTest(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_user_settings_serializer_valid_major_update(self):
-        from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
+        from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
         settings = UserSettings.objects.create(user=self.user, theme='light', timezone='Europe/London')
         serializer = UserSettingsSerialiser(settings, data={'major': 'Physics'}, partial=True)
         self.assertTrue(serializer.is_valid())
 
     def test_registration_serializer_passwords_mismatch(self):
-        from studyFlax.serialisers.auth_serialisers import RegistrationUserSerialiser
+        from studyFlax.serialisers.auth.auth_serialisers import RegistrationUserSerialiser
         data = {
             'username': 'mismatch_user',
             'email': 'mismatch@test.com',
@@ -308,7 +308,7 @@ class SerializerCoverageTest(TestCase):
         self.assertIn('password', serializer.errors)
 
     def test_society_event_serialiser_announcement_prefix(self):
-        from studyFlax.serialisers.society_serialisers import SocietyEventSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyEventSerialiser
         from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
         from studyFlax.models.society.societyEventModel import SocietyEvent
         society = Society.objects.create(name='PrefixSoc', bio='bio', admin_emails='a@b.com')

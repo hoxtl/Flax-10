@@ -9,17 +9,11 @@ from django.contrib.auth import get_user_model
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyMembershipModel import SocietyMembership
 from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
+from studyFlax.tests.helpers.factories import (
+    make_society, make_society_admin, make_society_member,
+)
 
 User = get_user_model()
-
-def make_society(name='Test Society'):
-    return Society.objects.create(name=name, bio='Test', admin_emails='admin@test.com')
-
-def make_admin(user, society):
-    return SocietyMembership.objects.create(user=user, society=society, role='admin')
-
-def make_member(user, society):
-    return SocietyMembership.objects.create(user=user, society=society, role='member')
 
 class SocietyTagViewExtendedTest(TestCase):
     def setUp(self):
@@ -27,7 +21,7 @@ class SocietyTagViewExtendedTest(TestCase):
         self.admin = User.objects.create_user(username='stag_admin', email='stag_admin@e.com', password='pass')
         self.other = User.objects.create_user(username='stag_other', email='stag_other@e.com', password='pass')
         self.society = make_society('Tag View Society')
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_update_tag(self):
@@ -72,7 +66,7 @@ class SocietySerializerEdgeCaseTest(TestCase):
     def test_profile_photo_url_with_request_and_photo(self):
         from unittest.mock import MagicMock, PropertyMock, patch
         from rest_framework.test import APIRequestFactory
-        from studyFlax.serialisers.society_serialisers import SocietyMembershipSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyMembershipSerialiser
         user = User.objects.create_user(username='mphoto', email='mphoto@test.com', password='pass')
         society = Society.objects.create(name='PhotoSoc', bio='b', admin_emails='a@b.com')
         membership = SocietyMembership.objects.create(user=user, society=society, role='member')
@@ -87,7 +81,7 @@ class SocietySerializerEdgeCaseTest(TestCase):
         self.assertIn('/media/profile_photos/test.jpg', profile_photo_url)
 
     def test_has_reported_false_without_request(self):
-        from studyFlax.serialisers.society_serialisers import SocietyDetailSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyDetailSerialiser
         society = Society.objects.create(name='NoReqSoc', bio='b', admin_emails='a@b.com')
         serializer = SocietyDetailSerialiser(society)
         self.assertFalse(serializer.data['has_reported'])
@@ -98,7 +92,7 @@ class SocietyAnnouncementViewTest(TestCase):
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.member = User.objects.create_user(username='member', email='member@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_get_announcements(self):
@@ -138,7 +132,7 @@ class SocietyTagViewTest(TestCase):
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.other = User.objects.create_user(username='other', email='other@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_get_tags(self):
@@ -170,7 +164,7 @@ class RatificationViewTest(TestCase):
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.superuser = User.objects.create_superuser(username='super', email='super@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_request_ratification(self):
@@ -221,7 +215,7 @@ class CalendarSyncViewTest(TestCase):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', email='user@example.com', password='pass')
         self.society = make_society()
-        make_member(self.user, self.society)
+        make_society_member(self.user, self.society)
         self.client.force_authenticate(user=self.user)
 
     def test_sync_status_not_synced(self):
@@ -256,7 +250,7 @@ class PublishChangesViewTest(TestCase):
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.other = User.objects.create_user(username='other', email='other@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_publish_changes(self):

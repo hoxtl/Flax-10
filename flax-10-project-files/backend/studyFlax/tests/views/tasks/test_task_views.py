@@ -288,7 +288,7 @@ class TaskSerializerTest(TestCase):
         self.user = make_user('taskser_user', 'taskser@e.com')
 
     def test_serializer_marks_completed_at_on_completion(self):
-        from studyFlax.serialisers.task_serialisers import TaskSerialiser
+        from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
 
         task = Task.objects.create(user=self.user, title='Test', completed=False)
         serializer = TaskSerialiser(task, data={'completed': True}, partial=True)
@@ -298,7 +298,7 @@ class TaskSerializerTest(TestCase):
         self.assertIsNotNone(updated.completed_at)
 
     def test_serializer_clears_completed_at_on_reopen(self):
-        from studyFlax.serialisers.task_serialisers import TaskSerialiser
+        from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
 
         task = Task.objects.create(
             user=self.user,
@@ -313,7 +313,7 @@ class TaskSerializerTest(TestCase):
         self.assertIsNone(updated.completed_at)
 
     def test_task_list_serializer_task_count(self):
-        from studyFlax.serialisers.task_serialisers import TaskListSerialiser
+        from studyFlax.serialisers.tasks.task_serialisers import TaskListSerialiser
 
         task_list = TaskList.objects.create(user=self.user, name='Work')
         Task.objects.create(user=self.user, task_list=task_list, title='Active')

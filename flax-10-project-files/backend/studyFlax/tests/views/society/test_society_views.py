@@ -10,17 +10,11 @@ from django.utils import timezone
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyMembershipModel import SocietyMembership
 from studyFlax.models.society.societyEventModel import SocietyEvent
+from studyFlax.tests.helpers.factories import (
+    make_society, make_society_admin, make_society_member,
+)
 
 User = get_user_model()
-
-def make_society(name='Test Society'):
-    return Society.objects.create(name=name, bio='Test', admin_emails='admin@test.com')
-
-def make_admin(user, society):
-    return SocietyMembership.objects.create(user=user, society=society, role='admin')
-
-def make_member(user, society):
-    return SocietyMembership.objects.create(user=user, society=society, role='member')
 
 class SocietyListViewTest(TestCase):
     def setUp(self):
@@ -52,7 +46,7 @@ class SocietyDetailViewTest(TestCase):
         self.user = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.other = User.objects.create_user(username='other', email='other@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.user, self.society)
+        make_society_admin(self.user, self.society)
         self.client.force_authenticate(user=self.user)
 
     def test_get_society_detail(self):
@@ -95,7 +89,7 @@ class MembershipViewTest(TestCase):
         self.member = User.objects.create_user(username='member', email='member@example.com', password='pass')
         self.other = User.objects.create_user(username='other', email='other@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
+        make_society_admin(self.admin, self.society)
         self.client.force_authenticate(user=self.admin)
 
     def test_get_members(self):
@@ -120,7 +114,7 @@ class MembershipViewTest(TestCase):
         self.assertEqual(response.data['error'], 'Teachers cannot join societies.')
 
     def test_join_already_member(self):
-        make_member(self.member, self.society)
+        make_society_member(self.member, self.society)
         self.client.force_authenticate(user=self.member)
         response = self.client.post(f'/api/societies/{self.society.id}/members/')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -157,13 +151,13 @@ class MembershipViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_leave_society(self):
-        make_member(self.member, self.society)
+        make_society_member(self.member, self.society)
         self.client.force_authenticate(user=self.member)
         response = self.client.delete(f'/api/societies/{self.society.id}/members/me/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_remove_member_as_admin(self):
-        make_member(self.member, self.society)
+        make_society_member(self.member, self.society)
         response = self.client.delete(f'/api/societies/{self.society.id}/members/{self.member.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -172,7 +166,7 @@ class MembershipViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_role(self):
-        make_member(self.member, self.society)
+        make_society_member(self.member, self.society)
         response = self.client.patch(f'/api/societies/{self.society.id}/members/{self.member.id}/', {'role': 'editor'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -240,7 +234,7 @@ class ToggleSubscriptionViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_toggle_subscription_on(self):
-        membership = make_member(self.user, self.society)
+        membership = make_society_member(self.user, self.society)
         membership.is_subscribed = False
         membership.save()
         response = self.client.patch(self.url, {'is_subscribed': True})
@@ -248,7 +242,7 @@ class ToggleSubscriptionViewTest(TestCase):
         self.assertTrue(response.data['is_subscribed'])
 
     def test_toggle_subscription_off(self):
-        membership = make_member(self.user, self.society)
+        membership = make_society_member(self.user, self.society)
         membership.is_subscribed = True
         membership.save()
         response = self.client.patch(self.url, {'is_subscribed': False}, format='json')
@@ -256,7 +250,7 @@ class ToggleSubscriptionViewTest(TestCase):
         self.assertFalse(response.data['is_subscribed'])
 
     def test_toggle_subscription_default_flips(self):
-        membership = make_member(self.user, self.society)
+        membership = make_society_member(self.user, self.society)
         original = membership.is_subscribed
         response = self.client.patch(self.url, {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -268,8 +262,8 @@ class SocietyEventViewTest(TestCase):
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
         self.member = User.objects.create_user(username='member', email='member@example.com', password='pass')
         self.society = make_society()
-        make_admin(self.admin, self.society)
-        make_member(self.member, self.society)
+        make_society_admin(self.admin, self.society)
+        make_society_member(self.member, self.society)
         self.client.force_authenticate(user=self.admin)
         self.event_data = {
             'title': 'Test Event',

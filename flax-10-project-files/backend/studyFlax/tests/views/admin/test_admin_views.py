@@ -1,33 +1,19 @@
-from django.test import TestCase
+"""Backend tests for admin views."""
+
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyReportModel import SocietyReport
+from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
 
 User = get_user_model()
 
-def make_admin(username='admin', password='adminpass'):
-    return User.objects.create_superuser(
-        username=username, email=f'{username}@example.com', password=password,
-        is_staff=True, is_superuser=True,
-    )
-
-def make_user(username='user', password='userpass', role='student', is_active=True):
-    return User.objects.create_user(
-        username=username, email=f'{username}@example.com',
-        password=password, is_active=is_active,
-    )
-
-def authed_client(user):
-    client = APIClient()
-    client.force_authenticate(user=user)
-    return client
-
 class AdminUserListTest(TestCase):
     def setUp(self):
-        self.admin = make_admin()
+        self.admin = make_superuser()
         self.url = '/api/admin/users/'
 
     def test_admin_can_list_users(self):
@@ -59,7 +45,7 @@ class AdminUserListTest(TestCase):
 
 class AdminBanUserTest(TestCase):
     def setUp(self):
-        self.admin = make_admin()
+        self.admin = make_superuser()
         self.target = make_user('target')
         self.url = f'/api/admin/users/{self.target.id}/ban/'
 
@@ -117,7 +103,7 @@ class AdminBanUserTest(TestCase):
 
 class AdminTeacherRequestsTest(TestCase):
     def setUp(self):
-        self.admin = make_admin()
+        self.admin = make_superuser()
         self.list_url = '/api/admin/teacher-requests/'
 
     def _make_pending(self, username):
@@ -198,7 +184,7 @@ class RequestTeacherRoleTest(TestCase):
 
 class AdminReportedSocietiesTest(TestCase):
     def setUp(self):
-        self.admin = make_admin()
+        self.admin = make_superuser()
         self.list_url = '/api/admin/reported-societies/'
         self.reporter = make_user('reporter')
         self.society = Society.objects.create(name='Test Society', ratification_status='none')

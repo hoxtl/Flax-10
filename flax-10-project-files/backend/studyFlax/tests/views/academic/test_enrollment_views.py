@@ -14,7 +14,7 @@ from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
 from studyFlax.models.auth.userSettingsModel import UserSettings
 
 class EnrollmentViewTests(BaseTestCase):
-    """Tests for  """
+    """Tests for enrollment views."""
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'

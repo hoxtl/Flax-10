@@ -246,7 +246,7 @@ class SocietySerializerCoverageTest(TestCase):
         self.society = Society.objects.create(name='Serializer Cov', bio='bio', admin_emails='admin@example.com')
 
     def test_list_serializer_uses_image_field_before_related_images(self):
-        from studyFlax.serialisers.society_serialisers import SocietyListSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyListSerialiser
         self.society.image = 'https://example.com/direct.jpg'
         self.society.save()
         SocietyTag.objects.create(society=self.society, label='General', color='#123456')
@@ -256,7 +256,7 @@ class SocietySerializerCoverageTest(TestCase):
         self.assertEqual(serializer.data['cover_image'], 'https://example.com/direct.jpg')
 
     def _make_announcement_serialiser(self):
-        from studyFlax.serialisers.society_serialisers import SocietyAnnouncementSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyAnnouncementSerialiser
         return SocietyAnnouncementSerialiser
 
     def test_announcement_serializer_event_id(self):
@@ -293,7 +293,7 @@ class SocietySerializerCoverageTest(TestCase):
         self.assertTrue(getattr(updated, '_skip_notification', False))
 
     def test_event_calendar_serializer_color_and_source(self):
-        from studyFlax.serialisers.society_serialisers import SocietyEventCalendarSerialiser
+        from studyFlax.serialisers.society.society_serialisers import SocietyEventCalendarSerialiser
         announcement = SocietyAnnouncement.objects.create(society=self.society, title='Announcement', content='Body')
         event = self.society.events.create(
             title='Event',
