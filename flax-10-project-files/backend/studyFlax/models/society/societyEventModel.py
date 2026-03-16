@@ -1,3 +1,6 @@
+"""
+Model for society events with recurrence and optional announcement link.
+"""
 from django.db import models
 
 from .societyModel import Society

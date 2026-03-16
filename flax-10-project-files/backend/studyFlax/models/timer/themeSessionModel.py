@@ -1,3 +1,6 @@
+"""
+Model tracking which UI theme a user was using during a timed session.
+"""
 from django.db import models
 from ..auth.userModel import User
 

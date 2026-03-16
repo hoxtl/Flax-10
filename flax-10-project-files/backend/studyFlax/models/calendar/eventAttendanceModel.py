@@ -1,3 +1,6 @@
+"""
+Model tracking per-user attendance records for timetable events.
+"""
 from django.db import models
 
 from ..auth.userModel import User

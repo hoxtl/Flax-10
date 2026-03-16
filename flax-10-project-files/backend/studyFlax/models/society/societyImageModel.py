@@ -1,3 +1,6 @@
+"""
+Model for images associated with a society, including cover image flag.
+"""
 from django.db import models
 
 from .societyModel import Society

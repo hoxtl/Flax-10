@@ -1,7 +1,12 @@
+"""
+Models for task lists and individual tasks with priority, status, and scheduling.
+"""
 from django.db import models
+
 from studyFlax.models.auth.userModel import User
-from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.constants import PRIORITY_CHOICES
 from studyFlax.models.groupwork.groupwork_models import GroupProject
+from studyFlax.models.modules.moduleModel import Module
 
 class TaskList(models.Model):
     CATEGORY_CHOICES = [
@@ -20,12 +25,6 @@ class TaskList(models.Model):
         return f"{self.user.username} - {self.name}"
 
 class Task(models.Model):
-    PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
-        ('urgent', 'Urgent'),
-    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
     assigned_to = models.ManyToManyField(User, related_name='assigned_tasks', blank=True)
     group_project = models.ForeignKey(GroupProject, on_delete=models.CASCADE, null=True, blank=True, related_name='tasks')
@@ -35,8 +34,8 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     status = models.CharField(
-        max_length=20, 
-        choices=[('todo', 'To Do'), ('in_progress', 'In Progress'), ('done', 'Done')], 
+        max_length=20,
+        choices=[('todo', 'To Do'), ('in_progress', 'In Progress'), ('done', 'Done')],
         default='todo'
     )
     energy_level = models.CharField(
@@ -51,12 +50,12 @@ class Task(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True, help_text='When the task was marked complete; used for Seeds Grown Today.')
     add_to_calendar = models.BooleanField(default=False)
     time_spent_minutes = models.PositiveIntegerField(default=0)
-
     estimated_blocks = models.PositiveIntegerField(null=True, blank=True)
     completed_blocks = models.PositiveIntegerField(default=0)
     page_count = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     reading = models.ForeignKey('studyFlax.Reading', on_delete=models.SET_NULL, null=True, blank=True, related_name='tasks')
+
     def __str__(self):
         return self.title

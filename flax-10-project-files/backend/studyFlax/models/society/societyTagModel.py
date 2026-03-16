@@ -1,3 +1,6 @@
+"""
+Model for tags belonging to a society, used to categorise announcements and events.
+"""
 from django.db import models
 
 from .societyModel import Society

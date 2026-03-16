@@ -1,3 +1,6 @@
+"""
+Model for student societies with ratification status and category metadata.
+"""
 from django.db import models
 
 RATIFICATION_STATUS = [

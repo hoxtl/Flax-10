@@ -1,3 +1,6 @@
+"""
+Model representing a user's membership in a society with role and subscription.
+"""
 from django.db import models
 
 from ..auth.userModel import User

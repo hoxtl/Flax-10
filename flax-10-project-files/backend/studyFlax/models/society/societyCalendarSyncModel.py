@@ -1,3 +1,6 @@
+"""
+Model tracking which users have synced a society's events to their calendar.
+"""
 from django.db import models
 
 from ..auth.userModel import User

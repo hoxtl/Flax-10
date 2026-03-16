@@ -1,19 +1,14 @@
+"""
+Model representing a user's calendar event with recurrence, tags, and priority.
+"""
 from django.db import models
 
 from ..auth.userModel import User
+from ..constants import PRIORITY_CHOICES
 from .recurrenceRuleModel import RecurrenceRule
 from .tagModel import Tag
 
-PRIORITY_CHOICES = [
-    ('low', 'Low'),
-    ('medium', 'Medium'),
-    ('high', 'High'),
-    ('urgent', 'Urgent'),
-]
-
 class CalendarEvent(models.Model):
-    # TODO: Make user field required when authentication is enabled
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='events')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
@@ -30,6 +25,5 @@ class CalendarEvent(models.Model):
     reminder_minutes = models.JSONField(default=list, blank=True)
     source = models.CharField(max_length=100, null=True, blank=True)
     external_id = models.CharField(max_length=255, null=True, blank=True)
-    
     module = models.ForeignKey('studyFlax.Module', on_delete=models.CASCADE, null=True, blank=True, related_name='calendar_events')
     is_private = models.BooleanField(default=False)
