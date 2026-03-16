@@ -118,11 +118,13 @@ export function ConflictPairRow({
                   onEventContextMenu?.(r.item, e.clientX, e.clientY);
                 }}
                 onClick={(e) => {
+                  if (isReadOnlyEvent(r.item)) return;
                   const rect = e.currentTarget.getBoundingClientRect();
                   if (onCardClick) onCardClick(r.item, null, rect);
                   else onEdit?.(r.item, r.item.tag);
                 }}
                 onKeyDown={(e) => {
+                  if (isReadOnlyEvent(r.item)) return;
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     const rect = e.currentTarget.getBoundingClientRect();
@@ -130,6 +132,7 @@ export function ConflictPairRow({
                     else onEdit?.(r.item, r.item.tag);
                   }
                 }}
+                style={{ cursor: isReadOnlyEvent(r.item) ? "default" : undefined }}
               >
                 <div className={styles.planTimelineConflictPairCardAccent} aria-hidden />
                 <span className={styles.planTimelineConflictPairCardTime}>

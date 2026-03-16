@@ -440,27 +440,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           description: task.description || "",
         });
         await loadEvents();
-        if (nextTask) {
-          showToast(`"${task.title}" added. Also slot in "${nextTask.title}"?`, {
-            actionLabel: "Slot in →",
-            durationMs: 6000,
-            onAction: async () => {
-              const nextDuration = (nextTask.estimated_blocks || 1) * 25;
-              const nextStart = endDate;
-              const nextEnd = new Date(nextStart.getTime() + nextDuration * 60000);
-              await addEvent({
-                title: nextTask.title,
-                start_time: nextStart.toISOString(),
-                end_time: nextEnd.toISOString(),
-                description: nextTask.description || "",
-              });
-              await loadEvents();
-              showToast(`"${nextTask.title}" added to your schedule.`);
-            },
-          });
-        } else {
-          showToast(`"${task.title}" added to your schedule at ${formatTime(gapStartDate.toISOString())}`);
-        }
+        showToast(`"${task.title}" added to your schedule.`);
       } catch {
         showToast("Couldn't add to schedule. Try again.");
       }
