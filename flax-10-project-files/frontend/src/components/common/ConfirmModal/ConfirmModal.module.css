@@ -18,6 +18,10 @@
     border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
+.buttonsCentered {
+    justify-content: center;
+}
+
 .cancelBtn,
 .alternateBtn,
 .confirmBtn {
