@@ -17,7 +17,6 @@ from .event_fixtures import (
 )
 from .module_fixtures import module_fixtures
 from .deadline_fixtures import deadline_fixtures, module_deadline_fixtures
-from .society_fixtures import SOCIETY_DATA
 
 # Per-module-prefix task templates
 # Format: (title_template, description, priority, estimated_blocks, days_from_now)
@@ -153,7 +152,7 @@ module_task_templates = {
     ],
 }
 
-# Module-specific pill colors for Action Hub / Today's Plan (LS4101/LS4202 distinct)
+# Module-specific pill colours for Action Hub / Today's Plan (LS4101/LS4202 distinct)
 MODULE_PILL_COLORS = {
     "LS4101": "#5D4037",   # Deep Earth Brown
     "LS4202": "#C4A77D",   # Muted Clay
@@ -266,7 +265,6 @@ __all__ = [
     "module_fixtures",
     "deadline_fixtures",
     "module_deadline_fixtures",
-    "SOCIETY_DATA",
     "module_task_templates",
     "MODULE_PILL_COLORS",
     "task_list_fixtures",

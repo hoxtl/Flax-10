@@ -149,7 +149,7 @@ SOCIETY_DATA = [
     ('Art Club', 'Creative expression.', 'Art projects and exhibitions.', 'arts', ['Exhibition', 'Workshop', 'Social']),
     ('Photography Society', 'Through the lens.', 'Photo walks and exhibitions.', 'arts', ['Photo Walk', 'Exhibition', 'Workshop']),
     ('Drama Society', 'Theatre and performance.', 'Produce plays and shows.', 'arts', ['Rehearsal', 'Performance', 'Social']),
-    ('Painting Society', 'Colors on canvas.', 'Painting sessions and exhibitions.', 'arts', ['Workshop', 'Exhibition', 'Social']),
+    ('Painting Society', 'Colours on canvas.', 'Painting sessions and exhibitions.', 'arts', ['Workshop', 'Exhibition', 'Social']),
     ('Sculpture Club', '3D art creation.', 'Sculpting workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
     ('Digital Art Society', 'Art meets technology.', 'Digital creation workshops.', 'arts', ['Workshop', 'Exhibition', 'Social']),
     ('Fashion Society', 'Style and design.', 'Fashion shows and workshops.', 'arts', ['Show', 'Workshop', 'Social']),
