@@ -45,12 +45,7 @@ from .seed_societies import (
 User = get_user_model()
 
 class Command(BaseCommand):
-    """Seeds the database with a structured, realistic dataset.
-
-    Orchestrates the full seeding pipeline: users → categories/tags →
-    events → modules → deadlines → enrollments → study sessions.
-    All steps are idempotent.
-    """
+    """Seeds the database with a structured, realistic dataset."""
 
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 

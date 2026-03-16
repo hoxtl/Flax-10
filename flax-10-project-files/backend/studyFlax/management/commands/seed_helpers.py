@@ -99,7 +99,6 @@ def is_username_taken(username, existing):
     )
 
 def generate_unique_name(existing):
-    """Generate a first/last name pair not already used by any user."""
     first, last = faker.first_name(), faker.last_name()
     while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()

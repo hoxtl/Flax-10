@@ -1,3 +1,6 @@
+"""
+Fixture data and helper functions for seeding societies, events, and categories.
+"""
 import random
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -99,7 +102,6 @@ EVENT_TEMPLATES = {
 }
 
 def get_events_for_category(category):
-    """Get event templates for a society category."""
     return EVENT_TEMPLATES.get(category, EVENT_TEMPLATES['social'])
 
 # Society data with categories
@@ -231,7 +233,6 @@ SOCIETY_DATA = [
 ]
 
 def build_society_seed_data():
-    """Build society seed data from the structured format."""
     result = []
     for name, bio, about, category, tags in SOCIETY_DATA:
         society = build_society_dict(name, bio, about, category, tags)
@@ -244,7 +245,6 @@ CATEGORY_MAPPING = {
 }
 
 def build_society_dict(name, bio, about, category, tags):
-    """Build a single society dictionary."""
     image = get_random_category_image(category)
     mapped_category = CATEGORY_MAPPING.get(category, category)
     return {

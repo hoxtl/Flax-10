@@ -19,44 +19,27 @@ User = get_user_model()
 TABLES = [
     'studyFlax_calendarevent', 'studyFlax_tag', 'studyFlax_category',
     'studyFlax_recurrencerule', 'studyFlax_usersettings', 'studyFlax_notification',
-    'studyFlax_timetablesource', 'studyFlax_user',
+    'studyFlax_timetablesource',
     'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
     'studyFlax_societyevent', 'studyFlax_societyimage',
-    'studyFlax_deadline',
-    'studyFlax_enrollment',
-    'studyFlax_module',
-    'studyFlax_calendarevent',
-    'studyFlax_tag',
-    'studyFlax_category',
-    #'studyFlax_task',
-    #'studyFlax_tasklist',
-    'studyFlax_recurrencerule',
-    'studyFlax_usersettings',
-    'studyFlax_notification',
-    'studyFlax_timetablesource',
-    'studyFlax_user',
+    'studyFlax_deadline', 'studyFlax_enrollment', 'studyFlax_module',
     'studyFlax_groupproject', 'studyFlax_groupmembership',
     'studyFlax_meetingsuggestion', 'studyFlax_meetingresponse',
-    'studyFlax_studysession',
-    'studyFlax_themesession',
+    'studyFlax_studysession', 'studyFlax_themesession',
     'studyFlax_reading',
+    'studyFlax_user',
 ]
 
 SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'role'}
 
 def get_superuser_data():
-    """Return serialised superuser records, excluding auth-only and audit fields.
-
-    The returned dicts are suitable for passing directly to
-    User.objects.create_superuser after the wipe.
-    """
+    """Return serialised superuser records, excluding auth-only and audit fields."""
     return [
         {k: v for k, v in u.items() if k in SUPERUSER_RESTORE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()
     ]
 
 def truncate_tables(cursor, tables, stdout):
-    """TRUNCATE each table in *tables* with RESTART IDENTITY CASCADE."""
     for table in tables:
         cursor.execute(f'TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;')
         stdout.write(f"  ✓  {table}")
@@ -113,7 +96,6 @@ def _print_success_footer(stdout, style):
     stdout.write("")
 
 def confirm_truncate(stdout):
-    """Print a confirmation prompt and return True only if the operator types 'yes'."""
     div = "─" * 40
     stdout.write("")
     stdout.write(div)
@@ -128,11 +110,7 @@ def confirm_truncate(stdout):
     return answer == 'yes'
 
 class Command(BaseCommand):
-    """Clears all application data and resets database sequences.
-
-    Superusers are snapshotted before the wipe and restored afterwards so
-    that the development environment remains accessible after an unseed.
-    """
+    """Clears all application data and resets database sequences."""
 
     help = 'Cleans the database using PostgreSQL TRUNCATE CASCADE, preserving superusers.'
 

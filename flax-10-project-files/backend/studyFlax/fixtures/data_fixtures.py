@@ -1,3 +1,6 @@
+"""
+Aggregate fixture data combining users, events, modules, deadlines, and tasks.
+"""
 from .user_fixtures import (
     category_fixtures,
     tag_fixtures,
@@ -158,7 +161,6 @@ MODULE_PILL_COLORS = {
     "LS4202": "#C4A77D",   # Muted Clay
 }
 
-# ── Task lists seeded per user ─────────────────────────────────────────────
 # Format: (name, category, emoji)
 task_list_fixtures = (
     ("University",   "uni",      "📘"),
@@ -170,78 +172,63 @@ task_list_fixtures = (
     ("Home & Admin", "personal", "🏠"),
 )
 
-# ── Personal tasks seeded for every user ───────────────────────────────────
 # Format: (title, description, priority, estimated_blocks, days_from_now, list_name)
 # list_name must match one of the names in task_list_fixtures above
 personal_task_fixtures = (
-    # ── Overdue ──
     ("Submit ethics form",              "Missed the window — chase the admin office and resubmit ASAP.",              "urgent", 1, -1, "University"),
     ("Pay rent",                        "Bank transfer due — check landlord details before sending.",                  "high",   1, -2, "Finance"),
 
-    # ── Today ──
     ("Send supervisor check-in",        "Confirm this week's milestones and attach your latest draft snapshot.",       "urgent", 1,  0, "University"),
     ("Plan the week ahead",             "Look at the week's deadlines and block out study time in your calendar.",   "medium", 1,  0, "Personal"),
     ("Scan KEATS for surprises",        "Quick sweep of module pages for hidden updates, new files, and changes.",   "low",    1,  0, "University"),
 
-    # ── Day 1 ──
     ("Beat the weekly KEATS quiz",      "Complete the quiz in one focused block before the midnight lockout.",       "urgent", 1,  1, "University"),
     ("Morning run",                     "30 min — don't skip it this week.",                                         "low",    1,  1, "Health"),
 
-    # ── Day 2 ──
     ("Book a Maughan deep-focus slot",  "Reserve a quiet room and lock in a distraction-free revision sprint.",      "medium", 1,  2, "University"),
     ("Build this week's flashcard pack","Turn lecture takeaways into an Anki deck you can actually reuse later.",    "low",    2,  2, "University"),
     ("Track spending this week",        "Log all expenses and check you're on budget.",                              "low",    1,  2, "Finance"),
 
-    # ── Day 3 ──
     ("Research internship deadlines",   "Check application deadlines for your target companies.",                    "urgent", 1,  3, "Internships"),
     ("Seminar talking points prep",     "Re-read the core text and draft two sharp questions for discussion.",       "medium", 2,  3, "University"),
     ("GP appointment",                  "Nothing urgent — just a general check-up.",                                 "low",    1,  3, "Health"),
 
-    # ── Day 4 ──
     ("Book dentist appointment",        "Overdue — call and book for sometime next month.",                          "low",    1,  4, "Health"),
     ("Past-paper speed run",            "Attempt one full paper in exam conditions and note your weak spots.",       "urgent", 4,  4, "University"),
 
-    # ── Day 5 ──
     ("Update CV",                       "Add the latest project or placement before applying to grad roles.",        "medium", 2,  5, "Internships"),
     ("Read journal article",            "Annotate the assigned paper for next week's seminar.",                      "medium", 2,  5, "Reading List"),
     ("Draft personal statement section","Write 200 words on your academic motivation.",                              "high",   3,  5, "Internships"),
 
-    # ── Day 6 ──
     ("Tidy desk and study space",       "A clear space = a clear mind. 15 mins max.",                                "low",    1,  6, "Home & Admin"),
     ("Plan next week's meals",          "Decide on 3-4 dinners and write a shopping list.",                         "low",    1,  6, "Home & Admin"),
     ("Ship lab report draft v1",        "Submit your first draft early so you still have time to iterate.",          "high",   3,  6, "University"),
 
-    # ── Day 7 ──
     ("Weekly review",                   "Go through what you completed and what carried over from last week.",       "medium", 1,  7, "Personal"),
     ("Renew railcard",                  "Check expiry date and renew online before it runs out.",                   "low",    1,  7, "Finance"),
     ("Respond to LinkedIn messages",    "Reply to any internship or network messages.",                              "medium", 1,  7, "Internships"),
 
-    # ── Day 8-10 ──
     ("Apply to summer internship",      "Submit application before deadline — check requirements on portal.",       "high",   2,  8, "Internships"),
     ("Gym session",                     "Upper body + core. Don't skip leg day next time.",                         "low",    2,  9, "Health"),
     ("Practice interview questions",    "Go through the STAR method for behavioural questions.",                    "high",   2,  10, "Internships"),
 
-    # ── Day 11-14 ──
     ("Buy train ticket home",           "Book the cheapest advance ticket while they're still available.",          "medium", 1,  11, "Finance"),
     ("Mid-semester self-assessment",    "Reflect on your progress and identify two areas to improve.",              "medium", 2,  12, "Personal"),
 
-    # ── Day 15-21 ──
     ("Sort student email aliases",      "Check your KCL email is forwarded correctly.",                             "low",    1,  16, "Home & Admin"),
     ("Deep clean the kitchen",          "Full wipe-down — fridge, oven, surfaces.",                                 "low",    2,  18, "Home & Admin"),
 
-    # ── Day 22-35 ──
     ("Reach out to alumni network",     "Message two people for a 15-minute informational chat.",                   "medium", 2,  25, "Internships"),
     ("Final essay polish pass",         "Read it aloud, tighten the argument, and clean up phrasing before submit.", "high",   2,  28, "University"),
     ("Budget review",                   "Check your spending against this month's budget.",                         "medium", 1,  30, "Finance"),
     ("Back up laptop files",            "Upload everything to Google Drive or external hard drive.",                "low",    1,  35, "Home & Admin"),
 
-    # ── Reading list ──
     ("Read: Thinking, Fast and Slow",   "Kahneman — read chapters 1-5 and take notes.",                             "low",    3,  10, "Reading List"),
     ("Read: The Pragmatic Programmer",  "Chapter 2-3. Note anything applicable to your project.",                   "low",    2,  14, "Reading List"),
     ("Read: Why Nations Fail",          "First 4 chapters. Consider how it connects to your IR module.",            "low",    3,  20, "Reading List"),
 )
 
-reading_fixtures = [ 
+reading_fixtures = [
     ("Module Handbook", "Ch.9", 1, 45),
     ("Advanced Topics", "Ch.5", 41, 80),
     ("Case Studies & Applications", "Ch.3", 35, 78),
