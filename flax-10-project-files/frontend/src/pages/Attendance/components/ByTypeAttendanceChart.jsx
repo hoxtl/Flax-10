@@ -21,6 +21,8 @@ export default function ByTypeAttendanceChart({ data, onSegmentClick }) {
 
   return (
     <>
+      {/* Spacer to align with `% attended` line in Overall chart */}
+      <p className={styles.percentLine} style={{ visibility: "hidden" }}>spacer</p>
       <PieChart
         series={[
           {
@@ -48,7 +50,9 @@ export default function ByTypeAttendanceChart({ data, onSegmentClick }) {
       />
       <div className={styles.legend}>
         {data.map(({ label, value }) => (
-          <span key={label}>{label}: {value}</span>
+          <span key={label} style={{ color: "var(--muted)", fontWeight: 600 }}>
+            {label}: {value}
+          </span>
         ))}
       </div>
     </>

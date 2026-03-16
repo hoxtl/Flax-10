@@ -77,12 +77,12 @@
 }
 
 .legendAttended {
-  color: #2D8B5A !important;
+  color: var(--muted) !important;
   font-weight: 600;
 }
 
 .legendMissed {
-  color: #C0392B !important;
+  color: var(--muted) !important;
   font-weight: 600;
 }
 
