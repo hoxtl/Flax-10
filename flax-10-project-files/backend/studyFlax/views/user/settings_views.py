@@ -8,7 +8,6 @@ from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialis
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
 
-
 def get_or_create_settings(user):
     settings, _ = UserSettings.objects.get_or_create(
         user=user, defaults={'theme': 'light', 'timezone': 'Europe/London'}
@@ -32,7 +31,6 @@ def user_settings_view(request):
         return Response({**serialized, "settings": dict(serialized)})
     return apply_settings_updates(settings, request.data)
 
-
 def get_modules_for_major(major):
     prefixes = course_to_module_prefixes.get(major, [])
     if not prefixes:
@@ -42,7 +40,6 @@ def get_modules_for_major(major):
 
 def enroll_user_in_modules(user, modules):
     return sum(1 for m in modules if enroll_user_in_module(user, m)[1])
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

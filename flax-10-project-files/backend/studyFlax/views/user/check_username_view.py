@@ -3,7 +3,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import User
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_username(request):

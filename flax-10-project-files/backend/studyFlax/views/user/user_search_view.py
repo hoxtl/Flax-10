@@ -1,3 +1,7 @@
+"""
+View for searching and filtering users.
+"""
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -5,60 +9,47 @@ from studyFlax.models.auth.userModel import User
 from studyFlax.serialisers.auth_serialisers import UserSerialiser
 from django.db.models import Q
 
+_FILTER_MAP = {
+    'module': 'enrollments__module__module_code__in',
+    'course': 'settings__major__in',
+    'society': 'society_memberships__society_id__in',
+    'year': 'settings__year__in',
+    'role': 'role__in',
+}
+
+def _parse_csv(param):
+    """Split a comma-separated parameter string into a cleaned list."""
+    return [v.strip() for v in param.split(',') if v.strip()]
+
+def _apply_csv_filters(users, params):
+    """Apply comma-separated value filters from request params to the queryset."""
+    for param_name, lookup in _FILTER_MAP.items():
+        values = _parse_csv(params.get(param_name, ''))
+        users = users.filter(**{lookup: values}).distinct() if values else users
+    return users
+
+def _apply_filters(request):
+    """Apply all query parameter filters to the user queryset."""
+    params = request.query_params
+    users = User.objects.exclude(id=request.user.id)
+    query = params.get('q', '').strip()
+    if query:
+        users = users.filter(
+            Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        ).distinct()
+    return _apply_csv_filters(users, params)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_search(request):
-    query = request.query_params.get('q', '').strip()
-    module_param = request.query_params.get('module', '').strip()
-    course_param = request.query_params.get('course', '').strip()
-    society_param = request.query_params.get('society', '').strip()
-    year_param = request.query_params.get('year', '').strip()
-    role_param = request.query_params.get('role', '').strip()
-    
-    users = User.objects.exclude(id=request.user.id)
-    
-    if query:
-        users = users.filter(
-            Q(username__icontains=query) |
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query)
-        ).distinct()
-        
-    if module_param:
-        module_codes = [m.strip() for m in module_param.split(',') if m.strip()]
-        if module_codes:
-            users = users.filter(enrollments__module__module_code__in=module_codes).distinct()
-
-    if course_param:
-        courses = [course.strip() for course in course_param.split(',') if course.strip()]
-        if courses:
-            users = users.filter(settings__major__in=courses).distinct()
-
-    if society_param:
-        society_ids = [s.strip() for s in society_param.split(',') if s.strip()]
-        if society_ids:
-            users = users.filter(society_memberships__society_id__in=society_ids).distinct()
-
-    if year_param:
-        years = [year.strip() for year in year_param.split(',') if year.strip()]
-        if years:
-            users = users.filter(settings__year__in=years).distinct()
-
-    if role_param:
-        roles = [role.strip() for role in role_param.split(',') if role.strip()]
-        if roles:
-            users = users.filter(role__in=roles).distinct()
-            
+    """Search for users by name, module, course, society, year, or role."""
+    users = _apply_filters(request)
     offset = int(request.query_params.get('offset', 0))
     limit = int(request.query_params.get('limit', 20))
-    
     total_count = users.count()
-    users = users[offset:offset+limit]
-    serializer = UserSerialiser(users, many=True, context={'request': request})
-    
+    serialiser = UserSerialiser(users[offset:offset + limit], many=True, context={'request': request})
     return Response({
-        'results': serializer.data,
+        'results': serialiser.data,
         'total_count': total_count,
-        'has_more': offset + limit < total_count
+        'has_more': offset + limit < total_count,
     })
