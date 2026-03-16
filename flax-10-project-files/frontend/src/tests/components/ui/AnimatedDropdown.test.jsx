@@ -3,18 +3,13 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import AnimatedDropdown from '../../../components/common/AnimatedDropdown';
 
 vi.mock('framer-motion', () => ({
-  motion: new Proxy(
-    {},
-    {
-      get: (_, tag) => {
-        const Tag = typeof tag === 'string' ? tag : 'div';
-        return ({ children, ...props }) => {
-          const { initial, animate, exit, transition, variants, whileTap, ...rest } = props;
-          return <Tag {...rest}>{children}</Tag>;
-        };
-      },
-    }
-  ),
+  motion: new Proxy({}, {
+    get: (_, tag) => {
+      const Tag = typeof tag === 'string' ? tag : 'div';
+      return ({ children, initial, animate, exit, transition, variants, whileTap, ...rest }) =>
+        <Tag {...rest}>{children}</Tag>;
+    },
+  }),
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
@@ -270,29 +265,16 @@ describe('AnimatedDropdown', () => {
     expect(screen.getByText('Option A1')).toBeInTheDocument();
   });
 
-  it('supports controlled open state with isOpen and onOpenChange', () => {
-    const onOpenChange = vi.fn();
-    const { rerender } = render(
-      <AnimatedDropdown
-        value=""
-        onChange={vi.fn()}
-        placeholder="Select"
-        options={OPTIONS}
-        isOpen={false}
-        onOpenChange={onOpenChange}
-      />
-    );
+  it('controlled closed state hides options', () => {
+    render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select"
+      options={OPTIONS} isOpen={false} onOpenChange={vi.fn()} />);
     expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
-    rerender(
-      <AnimatedDropdown
-        value=""
-        onChange={vi.fn()}
-        placeholder="Select"
-        options={OPTIONS}
-        isOpen={true}
-        onOpenChange={onOpenChange}
-      />
-    );
+  });
+
+  it('controlled open state shows options and calls onOpenChange on select', () => {
+    const onOpenChange = vi.fn();
+    render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select"
+      options={OPTIONS} isOpen={true} onOpenChange={onOpenChange} />);
     expect(screen.getByText('Option A1')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Option A1'));
     expect(onOpenChange).toHaveBeenCalledWith(false);

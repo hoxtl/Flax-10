@@ -16,49 +16,21 @@ def get_or_create_settings(user):
     return settings
 
 def apply_settings_updates(settings, data):
-<<<<<<< HEAD
-    if 'theme' in data:
-        settings.theme = data['theme']
-    if 'mode' in data:
-        settings.mode = data['mode']
-    if 'timezone' in data:
-        settings.timezone = data['timezone']
-    if 'homepage_widgets' in data:
-        settings.homepage_widgets = data['homepage_widgets']
-    settings.save()
-=======
     serializer = UserSettingsSerialiser(settings, data=data, partial=True)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     serializer.save()
     payload = serializer.data
     return Response({**payload, "settings": dict(payload)})
->>>>>>> origin/main
 
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
     settings = get_or_create_settings(request.user)
     if request.method == 'GET':
-<<<<<<< HEAD
-        return Response({
-            'theme': settings.theme, 
-            'mode': settings.mode, 
-            'timezone': settings.timezone,
-            'homepage_widgets': settings.homepage_widgets
-        })
-    apply_settings_updates(settings, request.data)
-    return Response({
-        'theme': settings.theme, 
-        'mode': settings.mode, 
-        'timezone': settings.timezone,
-        'homepage_widgets': settings.homepage_widgets
-    })
-=======
         serialized = UserSettingsSerialiser(settings).data
         return Response({**serialized, "settings": dict(serialized)})
     return apply_settings_updates(settings, request.data)
->>>>>>> origin/main
 
 
 def get_modules_for_major(major):

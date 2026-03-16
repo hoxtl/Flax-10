@@ -2,8 +2,6 @@
  * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
  */
 
-import { createPortal } from "react-dom";
-
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import FormField from "../../../components/common/FormField/FormField";
@@ -231,11 +229,10 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
 
 export default function CreateTaskModal(props) {
   const state = useCreateTaskModal(props);
-  return createPortal(
+  return (
     <>
       <CreateTaskModalView state={state} addToScheduleLabel={props.addToScheduleLabel ?? "Add to today's schedule"} onDeleteTask={props.onDeleteTask} />
       {state.sleepWarning && <SleepWarningModal {...state.sleepWarningProps} />}
-    </>,
-    document.body
+    </>
   );
 }

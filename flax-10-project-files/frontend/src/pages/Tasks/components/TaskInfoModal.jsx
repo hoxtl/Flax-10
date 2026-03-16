@@ -2,7 +2,6 @@
  * Modal showing a read-only summary of a task's details.
  */
 
-import { createPortal } from "react-dom";
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
@@ -110,7 +109,7 @@ export function TaskInfoModal({ task, listName, onClose }) {
     getReadingSpeed().then(setSpeedData).catch(() => setSpeedData(null));
   }, [pageCount]);
 
-  const modal = (
+  return (
       <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
@@ -118,5 +117,4 @@ export function TaskInfoModal({ task, listName, onClose }) {
         <InfoModalFooter onClose={onClose} />
       </StandardModal>
   );
-  return createPortal(modal, document.body);
 }
