@@ -107,7 +107,7 @@ export default function IntelligenceGrid({
   return (
     <div className={styles.gridContainer}>
 
-      <div className={styles.bentoGrid}>
+      <div className={styles.bentoGrid} data-testid="bento-grid">
         {/* Pinned Hero Section inside the grid container */}
         {layout.includes("hero") && (
           <div 
