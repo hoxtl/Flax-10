@@ -6,6 +6,10 @@ import { vi } from 'vitest';
 
 import { TimerProvider } from '../../context/TimerContext';
 
+function advanceTimeSafely() {
+    try { act(() => vi.advanceTimersByTime(500)); } catch (_) {}
+}
+
 /** Renders TimerPage with necessary providers/mocks implicitly handled if needed */
 export const renderTimerPage = ({ settle = true } = {}) => {
     const view = render(
@@ -13,13 +17,7 @@ export const renderTimerPage = ({ settle = true } = {}) => {
             <TimerPage />
         </TimerProvider>
     );
-    if (settle) {
-        try {
-            act(() => vi.advanceTimersByTime(500));
-        } catch (_) {
-            // Some tests intentionally switch back to real timers.
-        }
-    }
+    if (settle) advanceTimeSafely();
     return view;
 };
 
