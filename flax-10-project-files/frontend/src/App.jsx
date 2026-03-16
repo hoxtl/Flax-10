@@ -20,6 +20,7 @@ import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { ToastProvider } from "./context/ToastContext";
 import { NotificationToast } from "./components/Notifications";
 import AttendancePrompt from "./components/Attendance/AttendancePrompt";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -92,6 +93,7 @@ function isBannedFromStorage() {
 }
 
 function resolveScreen(authed, user, showWelcome) {
+  console.log('[App] resolveScreen - authed:', authed, 'user:', !!user, 'showWelcome:', showWelcome);
   if (!authed || !user) return "auth";
   if (showWelcome) return "welcome";
   return "app";
@@ -147,13 +149,6 @@ async function loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTh
   }
 }
 
-function checkOnboarding(setShowOnboarding) {
-  getUserProfile()
-    .then((data) => {
-      if (!data?.major || data.major === "") setShowOnboarding(true);
-    })
-    .catch(() => { });
-}
 
 // Custom hooks
 function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
@@ -184,15 +179,13 @@ function readActiveNav() {
 }
 
 function useAppState() {
+  const { user, authenticated: authed, profile, loading: authLoading } = useAuth();
   const [activeNav, setActiveNavState] = useState(readActiveNav);
-  const [user, setUser] = useState(() => readUser());
-  const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
   const [isBanned, setIsBanned] = useState(() => isBannedFromStorage());
 
-  useSyncAuth(setAuthed, setUser, setIsBanned, setShowWelcome);
   const { initialTheme, initialMode, isLoadingTheme } = useThemeState(authed);
 
   const setActiveNav = useCallback((nav) => {
@@ -200,17 +193,14 @@ function useAppState() {
     setActiveNavState(nav);
   }, []);
 
-  useEffect(() => {
-    // Moved custom 'navigate' event listener to AppScreen where useNavigate is available
-  }, []);
-
   return {
     activeNav,
     setActiveNav,
     initialTheme,
     initialMode,
-    isLoadingTheme,
+    isLoadingTheme: isLoadingTheme || authLoading,
     user,
+    profile,
     authed,
     showWelcome,
     setShowWelcome,
@@ -219,10 +209,15 @@ function useAppState() {
 }
 
 function useOnboardingCheck() {
+  const { profile, loading } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
   useEffect(() => {
-    checkOnboarding(setShowOnboarding);
-  }, []);
+    if (!loading && profile && (!profile.major || profile.major === "")) {
+      setShowOnboarding(true);
+    }
+  }, [profile, loading]);
+
   return [showOnboarding, setShowOnboarding];
 }
 
@@ -525,9 +520,22 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
   const state = useAppState();
-  if (state.isLoadingTheme) return null;
+  console.log('[App] AppContent render - isLoadingTheme:', state.isLoadingTheme, 'authed:', state.authed);
+  if (state.isLoadingTheme) {
+    console.log('[App] rendering NULL (loading theme/auth)');
+    return null;
+  }
   const screen = resolveScreen(state.authed, state.user, state.showWelcome);
+  console.log('[App] rendering screen:', screen);
   return (
     <ThemeProvider initialTheme={state.initialTheme} initialMode={state.initialMode}>
       <div style={ROOT_STYLE}>
