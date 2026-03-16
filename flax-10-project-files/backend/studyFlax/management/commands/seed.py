@@ -44,7 +44,6 @@ from .seed_societies import (
 
 User = get_user_model()
 
-
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset.
 

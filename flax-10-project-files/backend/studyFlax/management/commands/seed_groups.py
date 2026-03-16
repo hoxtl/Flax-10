@@ -16,24 +16,22 @@ User = get_user_model()
 
 FIXTURE_USERNAMES = ['johndoe', 'janedoe', 'charlie']
 
-
 def _get_fixture_user_map():
     return {u.username: u for u in User.objects.filter(username__in=FIXTURE_USERNAMES)}
 
+def _pick_owner(fixture_user_objs):
+    return fixture_user_objs.get(random.choice(FIXTURE_USERNAMES))
+
+def _build_project_defaults(owner, code_prefix, now):
+    due = (now + timedelta(days=random.randint(20, 45))).replace(hour=23, minute=59)
+    return {'owner': owner, 'course_code': f"{code_prefix}{random.randint(4000, 6000)}", 'deadline': due}
+
 def _create_single_project(name, code_prefix, desc, fixture_user_objs, now):
-    owner_username = random.choice(FIXTURE_USERNAMES)
-    owner = fixture_user_objs.get(owner_username)
+    owner = _pick_owner(fixture_user_objs)
     if not owner:
         return
-    due = (now + timedelta(days=random.randint(20, 45))).replace(hour=23, minute=59)
-    project, created = GroupProject.objects.get_or_create(
-        name=name,
-        defaults={
-            'owner': owner,
-            'course_code': f"{code_prefix}{random.randint(4000, 6000)}",
-            'deadline': due,
-        },
-    )
+    defaults = _build_project_defaults(owner, code_prefix, now)
+    project, created = GroupProject.objects.get_or_create(name=name, defaults=defaults)
     if created:
         GroupMembership.objects.get_or_create(project=project, user=owner, defaults={'role': 'owner'})
 

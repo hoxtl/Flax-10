@@ -44,7 +44,6 @@ TABLES = [
 
 SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'role'}
 
-
 def get_superuser_data():
     """Return serialised superuser records, excluding auth-only and audit fields.
 
@@ -56,39 +55,62 @@ def get_superuser_data():
         for u in User.objects.filter(is_superuser=True).values()
     ]
 
-
 def truncate_tables(cursor, tables, stdout):
     """TRUNCATE each table in *tables* with RESTART IDENTITY CASCADE."""
     for table in tables:
         cursor.execute(f'TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;')
         stdout.write(f"  ✓  {table}")
 
+def _build_superuser_payload(data):
+    return {
+        "username": data.get("username"),
+        "email": data.get("email"),
+        "first_name": data.get("first_name") or "",
+        "last_name": data.get("last_name") or "",
+        "is_superuser": True,
+        "is_staff": True,
+        "role": data.get("role") or "teacher",
+    }
+
+def _attempt_restore(payload):
+    try:
+        User.objects.create_superuser(password='1234', **payload)
+        return None
+    except (IntegrityError, TypeError, ValueError) as exc:
+        return (payload.get("username", "?"), str(exc))
 
 def restore_superusers(superusers_data, stdout):
-    """Re-create each superuser from the serialised data saved before the wipe.
-
-    If restoration fails due to schema drift (e.g. DB columns not represented in
-    the current User model), print a warning and continue so unseed can finish.
-    """
     if not superusers_data:
         return []
-    failed = []
-    for data in superusers_data:
-        payload = {
-            "username": data.get("username"),
-            "email": data.get("email"),
-            "first_name": data.get("first_name") or "",
-            "last_name": data.get("last_name") or "",
-            "is_superuser": True,
-            "is_staff": True,
-            "role": data.get("role") or "teacher",
-        }
-        try:
-            User.objects.create_superuser(password='1234', **payload)
-        except (IntegrityError, TypeError, ValueError) as exc:
-            failed.append((payload.get("username", "?"), str(exc)))
-    return failed
+    results = [_attempt_restore(_build_superuser_payload(d)) for d in superusers_data]
+    return [r for r in results if r is not None]
 
+def _print_restore_warnings(failed_restores, stdout, style):
+    if not failed_restores:
+        return
+    stdout.write("")
+    stdout.write(style.WARNING("  ⚠️  Some superusers could not be restored automatically."))
+    for username, reason in failed_restores:
+        stdout.write(style.WARNING(f"     - {username}: {reason}"))
+    stdout.write(style.WARNING("  Run `python manage.py createsuperuser` to recreate them manually."))
+
+def _print_restore_results(superusers_data, failed_restores, stdout, style):
+    failed_names = {name for name, _ in failed_restores}
+    for su in superusers_data:
+        username = su.get("username", "?")
+        prefix = "  ✓" if username not in failed_names else "  ✗"
+        stdout.write(f"{prefix}  {username}")
+    _print_restore_warnings(failed_restores, stdout, style)
+
+def _print_success_footer(stdout, style):
+    div = "─" * 40
+    stdout.write("")
+    stdout.write(style.SUCCESS(div))
+    stdout.write(style.SUCCESS("  ✅  Database cleared"))
+    stdout.write(style.SUCCESS(div))
+    stdout.write("")
+    stdout.write("  Run  python manage.py seed  to reseed.")
+    stdout.write("")
 
 def confirm_truncate(stdout):
     """Print a confirmation prompt and return True only if the operator types 'yes'."""
@@ -105,7 +127,6 @@ def confirm_truncate(stdout):
     stdout.write("")
     return answer == 'yes'
 
-
 class Command(BaseCommand):
     """Clears all application data and resets database sequences.
 
@@ -116,40 +137,16 @@ class Command(BaseCommand):
     help = 'Cleans the database using PostgreSQL TRUNCATE CASCADE, preserving superusers.'
 
     def handle(self, *args, **options):
-        """Snapshot superusers, confirm intent, truncate tables, and restore superusers."""
         superusers_data = get_superuser_data()
         if not superusers_data:
             self.stdout.write(self.style.WARNING("  No superusers found — database will be completely emptied."))
-
         if not confirm_truncate(self.stdout):
             self.stdout.write("  Cancelled.")
-            self.stdout.write("")
             return
-
         self.stdout.write("  Clearing tables...")
         with connection.cursor() as cursor:
             truncate_tables(cursor, TABLES, self.stdout)
-
-        self.stdout.write("")
-        self.stdout.write("  Restoring superusers...")
+        self.stdout.write("\n  Restoring superusers...")
         failed_restores = restore_superusers(superusers_data, self.stdout)
-        failed_names = {name for name, _ in failed_restores}
-        for su in superusers_data:
-            username = su.get("username", "?")
-            prefix = "  ✓" if username not in failed_names else "  ✗"
-            self.stdout.write(f"{prefix}  {username}")
-        if failed_restores:
-            self.stdout.write("")
-            self.stdout.write(self.style.WARNING("  ⚠️  Some superusers could not be restored automatically."))
-            for username, reason in failed_restores:
-                self.stdout.write(self.style.WARNING(f"     - {username}: {reason}"))
-            self.stdout.write(self.style.WARNING("  Run `python manage.py createsuperuser` to recreate them manually."))
-
-        div = "─" * 40
-        self.stdout.write("")
-        self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write(self.style.SUCCESS("  ✅  Database cleared"))
-        self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write("")
-        self.stdout.write("  Run  python manage.py seed  to reseed.")
-        self.stdout.write("")
+        _print_restore_results(superusers_data, failed_restores, self.stdout, self.style)
+        _print_success_footer(self.stdout, self.style)
