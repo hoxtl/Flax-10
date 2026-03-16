@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from studyFlax.models import User
 
 class ResetPasswordSerialiser(serializers.Serializer):
     email = serializers.EmailField()

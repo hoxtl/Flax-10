@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from studyFlax.models import Deadline
-from django.utils.dateparse import parse_datetime
+from studyFlax.serialisers.common import ensure_teacher_user
 
 class DeadlineSerialiser(serializers.ModelSerializer):
     module_code = serializers.CharField(source='module.module_code', read_only=True)
@@ -14,9 +14,8 @@ class DeadlineSerialiser(serializers.ModelSerializer):
         read_only_fields = ['module']
 
     def validate(self, validated_data):
-        user = self.context['request'].user
-        if  not user.is_teacher():
-            raise serializers.ValidationError("Only teachers are allowed to manage modules")
+        request = self.context.get('request')
+        ensure_teacher_user(request, "Only teachers are allowed to manage modules")
         start = validated_data.get('start_due_date')
         end = validated_data.get('end_due_date')
         if start and end and end <= start:

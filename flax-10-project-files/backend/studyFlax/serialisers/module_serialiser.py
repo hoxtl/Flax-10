@@ -1,23 +1,10 @@
-"""
-Serialiser for academic modules.
-"""
-
 from rest_framework import serializers
 from studyFlax.models import Module
-from studyFlax.models import User
+from studyFlax.serialisers.common import ensure_teacher_user, format_teacher_name
 from studyFlax.serialisers.deadline_serialisers import DeadlineSummarySerialiser
 from studyFlax.serialisers.reading_serialisers import ReadingSummarySerialiser
 
-def _format_teacher_name(created_by):
-    """Return the creator's name, prefixed with Dr. for teachers."""
-    name = f"{created_by.first_name} {created_by.last_name}".strip()
-    if getattr(created_by, 'role', None) == 'teacher' and not name.startswith('Dr.'):
-        return f"Dr. {name}"
-    return name
-
 class ModuleSerialiser(serializers.ModelSerializer):
-    """Serialiser for module instances including deadlines and readings."""
-
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
@@ -32,10 +19,8 @@ class ModuleSerialiser(serializers.ModelSerializer):
         read_only_fields = ['created_by']
 
     def validate(self, validated_data):
-        """Ensure only teachers may create modules."""
-        user = self.context['request'].user
-        if user and not user.is_teacher():
-            raise serializers.ValidationError("Only teachers are allowed to create modules")
+        request = self.context.get('request')
+        ensure_teacher_user(request, "Only teachers are allowed to create modules")
         return validated_data
 
     def create(self, validated_data):
@@ -49,9 +34,8 @@ class ModuleSerialiser(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def get_created_by_name(self, obj):
-        """Return the formatted display name of the module creator."""
         try:
-            return _format_teacher_name(obj.created_by) if obj.created_by else 'Unknown'
+            return format_teacher_name(obj.created_by)
         except Exception:
             return 'Unknown'
 

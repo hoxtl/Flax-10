@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from studyFlax.models import User
-from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.serialisers.common import format_teacher_name
+from studyFlax.serialisers.society_serialisers import build_profile_photo_url
 
 class RegistrationUserSerialiser(serializers.Serializer):
     username = serializers.CharField(max_length=150)
@@ -55,10 +56,7 @@ class UserSerialiser(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def get_name(self, obj):
-        name = f"{obj.first_name} {obj.last_name}".strip()
-        if getattr(obj, 'role', None) == 'teacher' and not name.startswith("Dr."):
-            return f"Dr. {name}"
-        return name
+        return format_teacher_name(obj)
 
     def get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)
@@ -71,10 +69,7 @@ class UserSerialiser(serializers.ModelSerializer):
         return self.get_settings_field(obj, 'major')
 
     def get_profile_photo_url(self, obj):
-        if not obj.profile_photo:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(obj.profile_photo.url) if request else None
+        return build_profile_photo_url(obj.profile_photo, self.context.get('request'))
 
     def get_shared_by_count(self, obj):
         # People who have shared their calendar with obj

@@ -1,8 +1,42 @@
+"""
+Serialisers for societies, memberships, announcements, events and tags.
+"""
+
 from rest_framework import serializers
 from studyFlax.models.society import (
     Society, SocietyMembership, SocietyTag, SocietyImage,
     SocietyAnnouncement, SocietyAnnouncementImage, SocietyEvent
 )
+
+def build_profile_photo_url(photo, request):
+    """Return the absolute URL for a profile photo, or None."""
+    if not photo:
+        return None
+    return request.build_absolute_uri(photo.url) if request else None
+
+class HasReportedMixin:
+    """Adds a get_has_reported method for society serialisers."""
+
+    def get_has_reported(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.reports.filter(reporter=request.user).exists()
+        return False
+
+class SilentNotificationMixin:
+    """Skips notifications on create/update when context has skip_notification."""
+
+    def create(self, validated_data):
+        instance = self.Meta.model(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
 
 class SocietyTagSerialiser(serializers.ModelSerializer):
     class Meta:
@@ -28,12 +62,9 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
         fields = ['id', 'user', 'username', 'role', 'joined_at', 'is_admin', 'is_subscribed', 'profile_photo_url']
 
     def get_profile_photo_url(self, obj):
-        if not obj.user.profile_photo:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(obj.user.profile_photo.url) if request else None
+        return build_profile_photo_url(obj.user.profile_photo, self.context.get('request'))
 
-class SocietyListSerialiser(serializers.ModelSerializer):
+class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     has_reported = serializers.SerializerMethodField()
@@ -48,28 +79,10 @@ class SocietyListSerialiser(serializers.ModelSerializer):
         first_img = obj.images.first()
         return first_img.url if first_img else None
 
-    def get_has_reported(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.reports.filter(reporter=request.user).exists()
-        return False
-
-class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
+class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
     event_id = serializers.SerializerMethodField()
-
-    def create(self, validated_data):
-        instance = SocietyAnnouncement(**validated_data)
-        if self.context.get('skip_notification'):
-            instance._skip_notification = True
-        instance.save()
-        return instance
-
-    def update(self, instance, validated_data):
-        if self.context.get('skip_notification'):
-            instance._skip_notification = True
-        return super().update(instance, validated_data)
 
     def get_event_id(self, obj):
         event = obj.events.first()
@@ -82,20 +95,8 @@ class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
             'pinned', 'images', 'created_at', 'updated_at', 'event_id'
         ]
 
-class SocietyEventSerialiser(serializers.ModelSerializer):
+class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
-
-    def create(self, validated_data):
-        instance = SocietyEvent(**validated_data)
-        if self.context.get('skip_notification'):
-            instance._skip_notification = True
-        instance.save()
-        return instance
-
-    def update(self, instance, validated_data):
-        if self.context.get('skip_notification'):
-            instance._skip_notification = True
-        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -138,7 +139,7 @@ SOCIETY_COLORS = [
 def get_society_color(society_id):
     return SOCIETY_COLORS[society_id % len(SOCIETY_COLORS)]
 
-class SocietyDetailSerialiser(serializers.ModelSerializer):
+class SocietyDetailSerialiser(HasReportedMixin, serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     tags = SocietyTagSerialiser(many=True, read_only=True)
     images = SocietyImageSerialiser(many=True, read_only=True)
@@ -152,9 +153,3 @@ class SocietyDetailSerialiser(serializers.ModelSerializer):
             'id', 'name', 'bio', 'about', 'image', 'categories', 'is_ratified', 'ratification_status',
             'date_created', 'member_count', 'tags', 'images', 'announcements', 'events', 'admin_emails', 'has_reported'
         ]
-
-    def get_has_reported(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.reports.filter(reporter=request.user).exists()
-        return False
