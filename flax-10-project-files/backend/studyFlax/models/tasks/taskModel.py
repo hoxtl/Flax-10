@@ -3,7 +3,6 @@ from studyFlax.models.auth.userModel import User
 from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.groupwork.groupwork_models import GroupProject
 
-
 class TaskList(models.Model):
     CATEGORY_CHOICES = [
         ('uni', 'University'),

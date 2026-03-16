@@ -1,17 +1,23 @@
+"""
+Serialisers for user settings and preferences.
+"""
+
 from rest_framework import serializers
 from studyFlax.models.auth.userSettingsModel import UserSettings
 
-
 class UserSettingsSerialiser(serializers.ModelSerializer):
+    """Serialiser for user application settings."""
+
     major_locked = serializers.SerializerMethodField(read_only=True)
 
     def get_major_locked(self, obj):
+        """Return True if the major has already been set."""
         return bool(obj.major)
 
     def validate_major(self, value):
-        if self.instance and self.instance.major:
-            if value != self.instance.major:
-                raise serializers.ValidationError("major cannot be changed once set")
+        """Prevent changing the major once it has been set."""
+        if self.instance and self.instance.major and value != self.instance.major:
+            raise serializers.ValidationError("major cannot be changed once set")
         return value
 
     class Meta:

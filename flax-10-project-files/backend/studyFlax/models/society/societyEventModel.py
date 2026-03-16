@@ -4,7 +4,6 @@ from .societyModel import Society
 from .societyTagModel import SocietyTag
 from .societyAnnouncementModel import SocietyAnnouncement
 
-
 RECURRENCE_CHOICES = [
     ('none', 'None'),
     ('daily', 'Daily'),
@@ -13,7 +12,6 @@ RECURRENCE_CHOICES = [
     ('monthly', 'Monthly'),
     ('yearly', 'Yearly'),
 ]
-
 
 class SocietyEvent(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='events')

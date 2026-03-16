@@ -2,7 +2,6 @@ from rest_framework import serializers
 from studyFlax.models import User
 from studyFlax.models.auth.userSettingsModel import UserSettings
 
-
 class RegistrationUserSerialiser(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
@@ -25,8 +24,6 @@ class RegistrationUserSerialiser(serializers.Serializer):
         if User.objects.filter(email=email_value).exists():
             raise serializers.ValidationError("This email is already registered")
         return email_value
-
-
 
 class UserSerialiser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -124,7 +121,6 @@ class UserSerialiser(serializers.ModelSerializer):
             return None
         # Placeholder for exact implementation, needs StudySession logic
         return 0
-
 
 class LoggedUserSerialiser(serializers.Serializer):
     username = serializers.CharField()

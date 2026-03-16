@@ -1,7 +1,6 @@
 from django.db import models
 from .userModel import User
 
-
 class CourseChangeRequest(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),

@@ -2,7 +2,6 @@ import random
 from datetime import datetime, timedelta
 from django.utils import timezone
 
-
 # Valid society categories (consolidated to 8)
 VALID_CATEGORIES = [
     'sports', 'cultural', 'academic', 'arts',
@@ -99,11 +98,9 @@ EVENT_TEMPLATES = {
     ],
 }
 
-
 def get_events_for_category(category):
     """Get event templates for a society category."""
     return EVENT_TEMPLATES.get(category, EVENT_TEMPLATES['social'])
-
 
 # Society data with categories
 # Format: (name, bio, about, category, tags)
@@ -233,7 +230,6 @@ SOCIETY_DATA = [
     ('Social Media Society', 'Digital content.', 'Content creation workshops.', 'media', ['Workshop', 'Social', 'Production']),
 ]
 
-
 def build_society_seed_data():
     """Build society seed data from the structured format."""
     result = []
@@ -242,12 +238,10 @@ def build_society_seed_data():
         result.append(society)
     return result
 
-
 # Map old categories to consolidated ones
 CATEGORY_MAPPING = {
     'gaming': 'social', 'music': 'arts', 'dance': 'arts', 'professional': 'academic'
 }
-
 
 def build_society_dict(name, bio, about, category, tags):
     """Build a single society dictionary."""
@@ -260,27 +254,18 @@ def build_society_dict(name, bio, about, category, tags):
         'image': f'http://localhost:8000/static/seed_images/societies/{image}',
     }
 
-
 def get_random_category_image(category):
-    """Get a random image filename for a category."""
     mapped = CATEGORY_MAPPING.get(category, category)
     images = CATEGORY_IMAGES.get(mapped, CATEGORY_IMAGES['social'])
-    # Prefer original category images if they exist in the merged list
     original_prefix = f'{category}' if category != mapped else None
-    if original_prefix:
-        original_images = [img for img in images if img.startswith(original_prefix)]
-        if original_images:
-            return random.choice(original_images)
-    return random.choice(images)
-
+    original_images = [img for img in images if img.startswith(original_prefix)] if original_prefix else []
+    return random.choice(original_images or images)
 
 def build_event_datetime(hour, duration_mins, day_of_week=None):
-    """Build start and end datetime for an event."""
     base_date = get_next_occurrence(day_of_week)
     start = timezone.make_aware(datetime.combine(base_date, datetime.min.time().replace(hour=hour)))
     end = start + timedelta(minutes=duration_mins)
     return start, end
-
 
 def get_next_occurrence(day_of_week):
     """Get the next date for a given day of week (0=Mon, 6=Sun)."""

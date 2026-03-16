@@ -1,7 +1,6 @@
 from django.db import models
 from studyFlax.models.auth.userModel import User
 
-
 NOTIFICATION_TYPES = [
     ('general', 'General'),
     ('society_event', 'Society Event'),

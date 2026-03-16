@@ -34,7 +34,6 @@ class CalendarShareUserSerializer(serializers.ModelSerializer):
             return obj.sharing_with.filter(shared_with=request.user).exists()
         return False
 
-
 class CalendarShareSerializer(serializers.ModelSerializer):
     """Serializer purely representing the CalendarShare relationship."""
     class Meta:

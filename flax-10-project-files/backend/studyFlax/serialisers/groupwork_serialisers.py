@@ -5,7 +5,6 @@ from studyFlax.models.groupwork.groupwork_models import (
     GroupMembership,
 )
 
-
 class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
 
@@ -19,7 +18,6 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "member_count",
             "created_at",
         ]
-
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.username", read_only=True)

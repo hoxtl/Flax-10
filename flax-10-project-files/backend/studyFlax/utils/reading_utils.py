@@ -1,20 +1,22 @@
-import math
-from studyFlax.models.tasks.taskModel import Task 
+"""
+Utility functions for estimating reading time and updating task estimates.
+"""
 
-DEFAULT_PAGE_TIME = 2.0 
+import math
+from studyFlax.models.tasks.taskModel import Task
+
+DEFAULT_PAGE_TIME = 2.0
 MINUTES_PER_BLOCK = 25
 
 def get_avg_time_per_page(user):
-    
     reading_tasks = Task.objects.filter(
-        user=user, completed=True, 
+        user=user, completed=True,
         reading__isnull=False, time_spent_minutes__gt=0
     ).select_related('reading')
-
-    manual_tasks = Task.objects.filter( 
+    manual_tasks = Task.objects.filter(
         user=user, completed=True,
-        reading__isnull=True, page_count__isnull=False, time_spent_minutes__gt=0,)
-
+        reading__isnull=True, page_count__isnull=False, time_spent_minutes__gt=0,
+    )
     total_pages = sum(task.reading.page_count() for task in reading_tasks) + sum(task.page_count for task in manual_tasks)
     total_minutes = sum(task.time_spent_minutes for task in reading_tasks) + sum(task.time_spent_minutes for task in manual_tasks)
     if total_pages == 0:

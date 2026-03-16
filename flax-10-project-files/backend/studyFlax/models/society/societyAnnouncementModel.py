@@ -3,7 +3,6 @@ from django.db import models
 from .societyModel import Society
 from .societyTagModel import SocietyTag
 
-
 class SocietyAnnouncement(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='announcements')
     title = models.CharField(max_length=200)
@@ -18,7 +17,6 @@ class SocietyAnnouncement(models.Model):
 
     def __str__(self):
         return f"{self.society.name} - {self.title}"
-
 
 class SocietyAnnouncementImage(models.Model):
     announcement = models.ForeignKey(

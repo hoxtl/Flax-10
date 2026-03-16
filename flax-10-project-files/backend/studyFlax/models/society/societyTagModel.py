@@ -2,7 +2,6 @@ from django.db import models
 
 from .societyModel import Society
 
-
 class SocietyTag(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='tags')
     label = models.CharField(max_length=50)

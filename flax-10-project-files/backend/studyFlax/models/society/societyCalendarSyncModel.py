@@ -3,7 +3,6 @@ from django.db import models
 from ..auth.userModel import User
 from .societyModel import Society
 
-
 class SocietyCalendarSync(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='society_calendar_syncs')
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='calendar_syncs')

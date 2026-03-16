@@ -1,6 +1,5 @@
 from django.db import models
 
-
 RATIFICATION_STATUS = [
     ('none', 'Not Requested'),
     ('pending', 'Pending Approval'),
@@ -12,7 +11,6 @@ VALID_CATEGORIES = [
     'sports', 'cultural', 'academic', 'arts',
     'social', 'religious', 'volunteering', 'media'
 ]
-
 
 class Society(models.Model):
     name = models.CharField(max_length=200)

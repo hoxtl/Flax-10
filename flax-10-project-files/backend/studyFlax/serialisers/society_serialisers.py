@@ -4,24 +4,20 @@ from studyFlax.models.society import (
     SocietyAnnouncement, SocietyAnnouncementImage, SocietyEvent
 )
 
-
 class SocietyTagSerialiser(serializers.ModelSerializer):
     class Meta:
         model = SocietyTag
         fields = ['id', 'label', 'color']
-
 
 class SocietyImageSerialiser(serializers.ModelSerializer):
     class Meta:
         model = SocietyImage
         fields = ['id', 'url', 'is_cover']
 
-
 class SocietyAnnouncementImageSerialiser(serializers.ModelSerializer):
     class Meta:
         model = SocietyAnnouncementImage
         fields = ['id', 'url', 'order']
-
 
 class SocietyMembershipSerialiser(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
@@ -36,7 +32,6 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
             return None
         request = self.context.get('request')
         return request.build_absolute_uri(obj.user.profile_photo.url) if request else None
-
 
 class SocietyListSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
@@ -58,7 +53,6 @@ class SocietyListSerialiser(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.reports.filter(reporter=request.user).exists()
         return False
-
 
 class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
@@ -87,7 +81,6 @@ class SocietyAnnouncementSerialiser(serializers.ModelSerializer):
             'id', 'title', 'content', 'tag', 'tag_data',
             'pinned', 'images', 'created_at', 'updated_at', 'event_id'
         ]
-
 
 class SocietyEventSerialiser(serializers.ModelSerializer):
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
@@ -118,7 +111,6 @@ class SocietyEventSerialiser(serializers.ModelSerializer):
             'exception_dates', 'announcement', 'created_at'
         ]
 
-
 class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
     """Serializer for society events displayed in personal calendar."""
     society_name = serializers.CharField(source='society.name', read_only=True)
@@ -138,16 +130,13 @@ class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
     def get_source(self, obj):
         return 'society'
 
-
 SOCIETY_COLORS = [
     '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3',
     '#00BCD4', '#009688', '#4CAF50', '#FF9800', '#FF5722',
 ]
 
-
 def get_society_color(society_id):
     return SOCIETY_COLORS[society_id % len(SOCIETY_COLORS)]
-
 
 class SocietyDetailSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)

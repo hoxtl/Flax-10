@@ -3,7 +3,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-
 def send_reset_password_email(user, reset_link):
     """
     Function to send reset password link email to user

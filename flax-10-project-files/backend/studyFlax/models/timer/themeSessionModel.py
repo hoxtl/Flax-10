@@ -1,7 +1,6 @@
 from django.db import models
 from ..auth.userModel import User
 
-
 class ThemeSession(models.Model):
     THEME_CHOICES = [('light', 'Light'), ('dark', 'Dark')]
 
