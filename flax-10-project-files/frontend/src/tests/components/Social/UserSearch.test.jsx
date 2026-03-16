@@ -52,18 +52,17 @@ import { searchUsers } from '../../../api/userService';
 import { fetchSocieties } from '../../../api/societyApi';
 
 describe('UserResultItem', () => {
-    it('renders user initials and name', () => {
+    it('renders user name and handle', () => {
         const user = { id: 1, first_name: 'Alice', last_name: 'Smith', username: 'asmith' };
         render(<UserResultItem user={user} onSelect={vi.fn()} />);
-        expect(screen.getByText('A')).toBeTruthy(); // initial
         expect(screen.getByText('Alice Smith')).toBeTruthy();
         expect(screen.getByText('@asmith')).toBeTruthy();
     });
 
-    it('uses username initial when no first_name', () => {
+    it('uses username text when no first_name', () => {
         const user = { id: 2, username: 'bob' };
         render(<UserResultItem user={user} onSelect={vi.fn()} />);
-        expect(screen.getByText('b')).toBeTruthy();
+        expect(screen.getByText('@bob')).toBeTruthy();
     });
 
     it('renders empty first/last name with space', () => {
@@ -179,6 +178,7 @@ describe('UserSearch', () => {
         fireEvent.click(screen.getByText('Filter'));
         expect(screen.getByText('Courses')).toBeTruthy();
         expect(screen.getByText('Year')).toBeTruthy();
+        expect(screen.getByText('Role')).toBeTruthy();
         expect(screen.getByText('Societies')).toBeTruthy();
     });
 
@@ -211,7 +211,7 @@ describe('UserSearch', () => {
         fireEvent.change(input, { target: { value: 'ali' } });
 
         await waitFor(() => {
-            expect(searchUsers).toHaveBeenCalledWith('ali', '', '', 0, 20, '');
+            expect(searchUsers).toHaveBeenCalledWith('ali', '', '', 0, 20, '', '');
         });
         await screen.findByText('@asmith');
 
@@ -232,7 +232,7 @@ describe('UserSearch', () => {
         const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
         fireEvent.focus(userSearchInput);
         await new Promise((r) => setTimeout(r, 350));
-        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', 'Computer Science', '', 0, 20, ''));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', 'Computer Science', '', 0, 20, '', ''));
     });
 
     it('can search with year filter', async () => {
@@ -246,7 +246,21 @@ describe('UserSearch', () => {
         const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
         fireEvent.focus(userSearchInput);
         await new Promise((r) => setTimeout(r, 350));
-        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', '', '', 0, 20, 'Year 2'));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', '', '', 0, 20, 'Year 2', ''));
+    });
+
+    it('can search with role filter', async () => {
+        searchUsers.mockResolvedValueOnce([]);
+        render(<UserSearch onUserSelect={vi.fn()} />);
+
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Role'));
+        fireEvent.click(screen.getByText('Professor'));
+
+        const userSearchInput = screen.getAllByTestId('search-bar').find((el) => el.getAttribute('placeholder') === 'Search users...');
+        fireEvent.focus(userSearchInput);
+        await new Promise((r) => setTimeout(r, 350));
+        await waitFor(() => expect(searchUsers).toHaveBeenCalledWith('', '', '', 0, 20, '', 'teacher'));
     });
 
     it('toggles course and society filters on and off', async () => {

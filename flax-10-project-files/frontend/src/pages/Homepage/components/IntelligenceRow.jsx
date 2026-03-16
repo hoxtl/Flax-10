@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
+import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { getUserProfile } from "../../../api/userService";
+import { loadTermConfig } from "../../../lib/termConfig";
+import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
 import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 import { ConfirmModal } from "../../../components/common";
@@ -24,17 +31,17 @@ import WeeklyGoalWidget from "./WeeklyGoalWidget";
 import PhotoWidget from "./PhotoWidget";
 
 const CATALOGUE = [
-  { id: "hero",              label: "Intelligence Hero",   icon: "✨", col: 2, row: 2 },
-  { id: "deadlines",        label: "Deadlines",           icon: "⏰", col: 1, row: 2 },
-  { id: "todayTasks",       label: "Today's Tasks",       icon: "✅", col: 1, row: 2 },
-  { id: "rightNow",         label: "Right Now",           icon: "⌚", col: 1, row: 2 },
-  { id: "studyPulse",       label: "Focus Windows",       icon: "📊", col: 1, row: 2 },
-  { id: "semesterOverview", label: "Semester Overview",   icon: "📅", col: 2, row: 2 },
-  { id: "studyStreak",      label: "Study Streak",        icon: "🔥", col: 1, row: 1 },
-  { id: "weeklyGoal",       label: "Weekly Goal",         icon: "🎯", col: 1, row: 1 },
-  { id: "photo",            label: "Photo",               icon: "🖼️", col: 1, row: 1 },
-  { id: "quickActions",     label: "Quick Actions",       icon: "⚡", col: 1, row: 1 },
-  { id: "socialDiscover",   label: "Discovery",           icon: "🌍", col: 1, row: 1 },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2 },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2 },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2 },
+  { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2 },
+  { id: "studyPulse", label: "Focus Windows", icon: "📊", col: 1, row: 2 },
+  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2 },
+  { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1 },
+  { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1 },
+  { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1 },
+  { id: "quickActions", label: "Quick Actions", icon: "⚡", col: 1, row: 1 },
+  { id: "socialDiscover", label: "Discovery", icon: "🌍", col: 1, row: 1 },
 ];
 
 const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks"];
@@ -52,6 +59,145 @@ function useTflDelays() {
   return delays;
 }
 
+function useCourseChangePending() {
+  const [request, setRequest] = useState(null);
+  useEffect(() => {
+    getMyCourseChangeRequest()
+      .then((data) => {
+        const status = String(data?.status || "").toLowerCase();
+        if (status === "pending" || (data?.requested_course && status !== "approved" && status !== "rejected")) {
+          setRequest(data);
+        }
+      })
+      .catch(() => { });
+  }, []);
+  return request;
+}
+
+function useTeacherRequestPending() {
+  const [pending, setPending] = useState(false);
+  useEffect(() => {
+    getUserProfile()
+      .then((data) => {
+        if (data?.role === "pending_teacher") setPending(true);
+      })
+      .catch(() => { });
+  }, []);
+  return pending;
+}
+
+function getSemesterProgress(now = new Date()) {
+  const cfg = loadTermConfig();
+  const startDate = new Date(cfg?.startDate);
+  if (Number.isNaN(startDate.getTime())) return null;
+
+  startDate.setHours(0, 0, 0, 0);
+  const extraWeeks = cfg?.hasReadingWeek ? 1 : 0;
+  const totalWeeks = Math.max(1, Number(cfg?.totalWeeks || 0) + extraWeeks);
+  const totalDays = totalWeeks * 7;
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + totalDays - 1);
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const elapsedDays = Math.floor((today - startDate) / (24 * 60 * 60 * 1000));
+  const clampedElapsed = Math.min(Math.max(elapsedDays + 1, 0), totalDays);
+  const pct = Math.round((clampedElapsed / totalDays) * 100);
+
+  return {
+    pct,
+    hasStarted: today >= startDate,
+    isFinished: today > endDate,
+  };
+}
+
+function SemesterProgressWidget() {
+  const progress = getSemesterProgress();
+  if (!progress) return null;
+
+  let label = "Semester not started";
+  if (progress.isFinished) label = "Semester completed";
+  else if (progress.hasStarted) label = `${progress.pct}% through term`;
+
+  return (
+    <div className={styles.semesterWidget}>
+      <div className={styles.semesterWidgetHead}>
+        <span className={styles.semesterWidgetLabel}>Semester progress</span>
+        <span className={styles.semesterWidgetValue}>{progress.pct}%</span>
+      </div>
+      <div className={styles.semesterWidgetTrack} aria-hidden="true">
+        <div className={styles.semesterWidgetFill} style={{ width: `${progress.pct}%` }} />
+      </div>
+      <span className={styles.semesterWidgetMeta}>{label}</span>
+    </div>
+  );
+}
+
+function CourseChangeCard({ request, onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.courseChangeCard}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
+      <div className={styles.courseChangeBody}>
+        <span className={styles.courseChangeLabel}>Course change status: pending</span>
+        <span className={styles.courseChangeSub}>
+          Your request to switch
+          {request.requested_course ? <> to <strong>{request.requested_course}</strong></> : null}
+          {" "}is under admin review.
+        </span>
+      </div>
+      <button
+        type="button"
+        className={styles.courseChangeViewBtn}
+        onClick={() => navigate("/settings?tab=account")}
+      >
+        View
+      </button>
+      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
+        &times;
+      </button>
+    </motion.div>
+  );
+}
+
+function TeacherRequestCard({ onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.courseChangeCard}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <GraduationCap size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
+      <div className={styles.courseChangeBody}>
+        <span className={styles.courseChangeLabel}>Teacher access status: pending</span>
+        <span className={styles.courseChangeSub}>
+          Your teacher application is under admin review.
+        </span>
+      </div>
+      <button
+        type="button"
+        className={styles.courseChangeViewBtn}
+        onClick={() => navigate("/settings?tab=course")}
+      >
+        View
+      </button>
+      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
+        &times;
+      </button>
+    </motion.div>
+  );
+}
+
 export default function IntelligenceRow({
   displayName,
   slot1TodayTasks,
@@ -62,6 +208,10 @@ export default function IntelligenceRow({
   recommendation,
 }) {
   const tflDelays = useTflDelays();
+  const courseChangeRequest = useCourseChangePending();
+  const teacherRequestPending = useTeacherRequestPending();
+  const [showCourseChange, setShowCourseChange] = useState(true);
+  const [showTeacherRequest, setShowTeacherRequest] = useState(true);
   const { summary, loading: profileLoading } = useProfileSummary();
   const [edit, setEdit] = useState(false);
   const [showAdd, setShowAdd] = useState(false);

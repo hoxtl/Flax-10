@@ -12,8 +12,13 @@ export function SleepWarningModal({ sleepTime, wakeTime, onConfirm, onCancel }) 
   };
 
   return (
-    <StandardModal title="You should be resting!" onClose={onCancel} size="sm">
-      <div className={styles.body}>
+    <StandardModal
+      title="You should be resting!"
+      onClose={onCancel}
+      size="sm"
+      modalClassName={styles.sleepWarningModal}
+    >
+      <div className={styles.body} data-testid="sleep-warning">
         <p className={styles.message}>
           Your sleep schedule is set from <strong>{formatTime(sleepTime)}</strong> to{" "}
           <strong>{formatTime(wakeTime)}</strong>. Working at this hour can affect your focus and wellbeing the next day.

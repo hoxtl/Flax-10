@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import { APP_ROUTES } from "./lib/routes";
 import { getUserSettings, getUserProfile } from "./api/userService";
@@ -24,6 +30,7 @@ import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
 import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
+import BannedPage from "./pages/Banned/BannedPage";
 
 import "./App.css";
 
@@ -80,6 +87,10 @@ function isAuthenticated() {
   return !!localStorage.getItem("token");
 }
 
+function isBannedFromStorage() {
+  return localStorage.getItem("banned") === "1";
+}
+
 function resolveScreen(authed, user, showWelcome) {
   if (!authed || !user) return "auth";
   if (showWelcome) return "welcome";
@@ -87,16 +98,16 @@ function resolveScreen(authed, user, showWelcome) {
 }
 
 function resolveRouteContent(activeNav, user, setActiveNav) {
-  const baseNav = activeNav.split('_')[0];
-  const navParam = activeNav.split('_').slice(1).join('_');
+  const baseNav = activeNav.split("_")[0];
+  const navParam = activeNav.split("_").slice(1).join("_");
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
     const extraProps = { user, onNavChange: setActiveNav };
     // Pass the search param or create flag to modules view if provided
-    if (baseNav === 'modules' && navParam === 'create') {
+    if (baseNav === "modules" && navParam === "create") {
       extraProps.initialCreate = true;
-    } else if (baseNav === 'modules' && navParam) {
+    } else if (baseNav === "modules" && navParam) {
       extraProps.initialSearch = navParam;
     }
     return { ...el, props: { ...el.props, ...extraProps } };
@@ -145,16 +156,17 @@ function checkOnboarding(setShowOnboarding) {
 }
 
 // Custom hooks
-function useSyncAuth(setAuthed, setUser, setShowWelcome) {
+function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
   useEffect(() => {
     const sync = () => {
       setAuthed(isAuthenticated());
       setUser(readUser());
+      setBanned(isBannedFromStorage());
       setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
     };
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
-  }, [setAuthed, setUser, setShowWelcome]);
+  }, [setAuthed, setUser, setBanned, setShowWelcome]);
 }
 
 function useThemeState(authed) {
@@ -178,7 +190,9 @@ function useAppState() {
   const [showWelcome, setShowWelcome] = useState(
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
-  useSyncAuth(setAuthed, setUser, setShowWelcome);
+  const [isBanned, setIsBanned] = useState(() => isBannedFromStorage());
+
+  useSyncAuth(setAuthed, setUser, setIsBanned, setShowWelcome);
   const { initialTheme, initialMode, isLoadingTheme } = useThemeState(authed);
 
   const setActiveNav = useCallback((nav) => {
@@ -200,6 +214,7 @@ function useAppState() {
     authed,
     showWelcome,
     setShowWelcome,
+    isBanned,
   };
 }
 
@@ -255,6 +270,7 @@ function AuthRoutes({ location }) {
   return (
     <Routes location={location}>
       <Route path="/login" element={<AuthPage />} />
+      <Route path="/signup" element={<AuthPage initialSignIn={false} />} />
       <Route path="/reset-password" element={<PasswordResetRequest />} />
       <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
@@ -300,7 +316,13 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
   if (activeNav === "profile")
-    return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+    return (
+      <Profile
+        user={user}
+        onBack={() => setActiveNav("home")}
+        onNavigate={setActiveNav}
+      />
+    );
   if (activeNav.startsWith("profile_"))
     return renderProfileView(activeNav, setActiveNav, user);
   return resolveRouteContent(activeNav, user, setActiveNav);
@@ -308,7 +330,14 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
 
 function renderProfileView(activeNav, setActiveNav, user) {
   const viewedUserId = activeNav.split("_")[1];
-  return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+  return (
+    <Profile
+      user={user}
+      viewedUserId={viewedUserId}
+      onBack={() => setActiveNav("home")}
+      onNavigate={setActiveNav}
+    />
+  );
 }
 
 function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
@@ -331,7 +360,7 @@ function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
   const handleComplete = () => {
     setShowOnboarding(false);
-    window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
+    window.dispatchEvent(new CustomEvent("navigate", { detail: "settings" }));
   };
   return (
     <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
@@ -345,74 +374,89 @@ function AppScreen({ activeNav, setActiveNav, user }) {
   const navigate = useNavigate();
   useSyncNavFromUrl(location.pathname, setActiveNav);
 
-  const handleNavChange = useCallback((id) => {
-    if (id.startsWith("societies_")) {
-      setActiveNav("societies");
-      const parts = id.split("_");
-      const socId = parts[1];
-      const tab = parts[2];
-      const url = tab ? `/societies?id=${socId}&tab=${tab}` : `/societies?id=${socId}`;
-      navigate(url);
-      return;
-    }
+  const handleNavChange = useCallback(
+    (id) => {
+      if (id.startsWith("societies_")) {
+        setActiveNav("societies");
+        const parts = id.split("_");
+        const socId = parts[1];
+        const tab = parts[2];
+        const url = tab
+          ? `/societies?id=${socId}&tab=${tab}`
+          : `/societies?id=${socId}`;
+        navigate(url);
+        return;
+      }
 
-    if (id.startsWith("group-work_")) {
-      const parts = id.split("_");
-      const projectId = parts[1];
-      const tab = parts[2];
-      const url = tab ? `/group-work?project=${projectId}&tab=${tab}` : `/group-work?project=${projectId}`;
-      handleNavChange(url);
-      return;
-    }
+      if (id.startsWith("group-work_")) {
+        const parts = id.split("_");
+        const projectId = parts[1];
+        const tab = parts[2];
+        const url = tab
+          ? `/group-work?project=${projectId}&tab=${tab}`
+          : `/group-work?project=${projectId}`;
+        handleNavChange(url);
+        return;
+      }
 
-    if (id === "profile") {
-      setActiveNav("profile");
-      navigate("/profile");
-      return;
-    }
+      if (id === "profile") {
+        setActiveNav("profile");
+        navigate("/profile");
+        return;
+      }
 
-    if (id.startsWith("profile_")) {
-      const viewedUserId = id.split("_")[1];
-      setActiveNav(id);
-      navigate(`/profile/${viewedUserId}`);
-      return;
-    }
+      if (id.startsWith("profile_")) {
+        const viewedUserId = id.split("_")[1];
+        setActiveNav(id);
+        navigate(`/profile/${viewedUserId}`);
+        return;
+      }
 
-    if (id === "settings") {
-      setActiveNav("settings");
-      navigate("/settings");
-      return;
-    }
+      if (id === "settings") {
+        setActiveNav("settings");
+        navigate("/settings");
+        return;
+      }
 
-    if (id.startsWith('/')) {
-      navigate(id);
-      return;
-    }
+      if (id.startsWith("/")) {
+        navigate(id);
+        return;
+      }
 
-    const baseNav = id.split('?')[0];
-    const route = APP_ROUTES.find((r) => r.id === baseNav);
+      const baseNav = id.split("?")[0];
+      const route = APP_ROUTES.find((r) => r.id === baseNav);
 
-    if (route) {
-      setActiveNav(baseNav);
-      const queryPart = id.includes('?') ? `?${id.split('?')[1]}` : '';
-      navigate(`${route.path}${queryPart}`);
-    } else {
-      setActiveNav(id);
-    }
-  }, [navigate, setActiveNav]);
+      if (route) {
+        setActiveNav(baseNav);
+        const queryPart = id.includes("?") ? `?${id.split("?")[1]}` : "";
+        navigate(`${route.path}${queryPart}`);
+      } else {
+        setActiveNav(id);
+      }
+    },
+    [navigate, setActiveNav],
+  );
 
   useEffect(() => {
     const handleGlobalNavigate = (e) => handleNavChange(e.detail);
-    window.addEventListener('navigate', handleGlobalNavigate);
-    return () => window.removeEventListener('navigate', handleGlobalNavigate);
+    window.addEventListener("navigate", handleGlobalNavigate);
+    return () => window.removeEventListener("navigate", handleGlobalNavigate);
   }, [handleNavChange]);
 
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
         <ScrollToTop />
-        <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
-          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
+        <DashboardLayout
+          activeNav={activeNav}
+          onNavChange={handleNavChange}
+          user={user}
+        >
+          <AnimatedDashboardContent
+            activeNav={activeNav}
+            setActiveNav={setActiveNav}
+            user={user}
+          />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
@@ -443,8 +487,22 @@ function useSyncNavFromUrl(pathname, setActiveNav) {
 
 // Screen render
 function renderScreen(screen, state) {
-  const { user, authed, showWelcome, setShowWelcome, activeNav, setActiveNav } =
-    state;
+  const {
+    user,
+    authed,
+    showWelcome,
+    setShowWelcome,
+    activeNav,
+    setActiveNav,
+    isBanned,
+  } = state;
+  if (isBanned)
+    return (
+      <BannedPage
+        key="banned"
+        reason={localStorage.getItem("ban_reason") || ""}
+      />
+    );
   if (screen === "auth") return <AuthScreen key="auth" />;
   if (screen === "welcome")
     return (

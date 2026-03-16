@@ -12,6 +12,8 @@ def update_user_name(user, data):
         user.first_name = data['first_name']
     if 'last_name' in data:
         user.last_name = data['last_name']
+    if 'email' in data:
+        user.email = data['email']
 
 def update_user_password(user, data):
     password = data.get('password')
@@ -41,7 +43,10 @@ def patch_settings(settings, data, user):
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    settings, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings, _ = UserSettings.objects.get_or_create(
+        user=request.user,
+        defaults={'theme': 'light', 'timezone': 'Europe/London'},
+    )
     if request.method == 'GET':
         return Response(UserSettingsSerialiser(settings).data)
     error = apply_user_updates(request.user, request.data)

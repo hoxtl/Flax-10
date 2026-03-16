@@ -14,7 +14,6 @@ import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { viewSwapMotion } from "../../components/common";
 
 function CalendarPageSkeleton({ showSearch = true }) {
   return (
@@ -72,7 +71,6 @@ export default function CalendarPage() {
   const { displayMode } = useCalendar();
   const isListOrTable = displayMode === "list" || displayMode === "table";
   const showFilters = true;
-  const calendarViewKey = `${viewMode}-${displayMode}`;
 
   if (isLoading && allEvents.length === 0) {
     return (
@@ -111,6 +109,10 @@ export default function CalendarPage() {
           </AnimatePresence>
         </main>
       </div>
+
+      <main className={styles.mainContent}>
+        <Calendar />
+      </main>
 
       <EventPopups />
     </AppPage>

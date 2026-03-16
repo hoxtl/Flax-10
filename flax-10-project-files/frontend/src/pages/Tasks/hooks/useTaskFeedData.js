@@ -87,7 +87,7 @@ function useTaskFeedBuckets(filtered, filteredCompleted, search) {
 
 function useTaskFeedEffects(searchInputRef, filterRef, isFilterOpen, setIsFilterOpen) {
   useEffect(() => {
-    const handler = (e) => { const tag = e.target?.tagName; const isEditing = tag === "INPUT" || tag === "TEXTAREA" || e.target?.contentEditable === "true"; if (e.key === "/" && !isEditing) { e.preventDefault(); searchInputRef.current?.focus(); } if (e.key === "n" && !isEditing) { e.preventDefault(); document.querySelector('input[aria-label="Task name"]')?.focus(); } if (e.key === "Escape" && isEditing) e.target.blur(); };
+    const handler = (e) => { const tag = e.target?.tagName; const isEditing = tag === "INPUT" || tag === "TEXTAREA" || e.target?.contentEditable === "true"; if (e.key === "n" && !isEditing) { e.preventDefault(); document.querySelector('input[aria-label="Task name"]')?.focus(); } if (e.key === "Escape" && isEditing) e.target.blur(); };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [searchInputRef]);

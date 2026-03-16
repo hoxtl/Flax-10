@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import { createPortal } from "react-dom";
 import styles from "./StandardModal.module.css";
 
 export function ModalHeader({ title, subtitle, onClose, centerText }) {
@@ -38,19 +39,20 @@ export default function StandardModal({
         contentClassName
     ].filter(Boolean).join(" ");
 
-    return (
+    return createPortal(
         <div className={backdropClasses} onMouseDown={onClose} ref={backdropRef}>
             <div className={modalClasses} onMouseDown={e => e.stopPropagation()}>
                 {!hideHeader && title && (
-                    <ModalHeader 
-                        title={title} 
-                        subtitle={subtitle} 
-                        onClose={onClose} 
-                        centerText={centerText} 
+                    <ModalHeader
+                        title={title}
+                        subtitle={subtitle}
+                        onClose={onClose}
+                        centerText={centerText}
                     />
                 )}
                 <div className={contentClasses}>{children}</div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

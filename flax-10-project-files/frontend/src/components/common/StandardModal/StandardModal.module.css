@@ -3,8 +3,13 @@
    ====================================================== */
 
 @keyframes backdropIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalIn {
@@ -12,6 +17,7 @@
     opacity: 0;
     transform: translateY(12px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -40,17 +46,28 @@
   border-radius: var(--modal-radius);
   box-shadow:
     var(--modal-shadow),
-    0 0 0 1px rgba(255,255,255,0.06) inset;
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   padding: var(--modal-padding);
   display: flex;
   flex-direction: column;
   animation: modalIn 0.25s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
-.sizeSm { width: min(420px, 92vw); }
-.sizeMd { width: min(520px, 92vw); }
-.sizeLg { width: min(720px, 94vw); }
-.sizeXl { width: min(920px, 96vw); }
+.sizeSm {
+  width: min(420px, 92vw);
+}
+
+.sizeMd {
+  width: min(520px, 92vw);
+}
+
+.sizeLg {
+  width: min(720px, 94vw);
+}
+
+.sizeXl {
+  width: min(920px, 96vw);
+}
 
 .header {
   display: flex;
@@ -123,6 +140,7 @@
   overflow-y: auto;
   flex: 1;
 }
+
 .contentCentered {
   display: flex;
   flex-direction: column;

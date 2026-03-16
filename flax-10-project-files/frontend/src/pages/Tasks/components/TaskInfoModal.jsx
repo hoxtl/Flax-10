@@ -10,6 +10,9 @@ import StandardModal from "../../../components/common/StandardModal/StandardModa
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import styles from "./TaskInfoModal.module.css";
 
+import { useState, useEffect } from "react";
+import { getReadingSpeed } from "../../../api/readingApi";
+
 function InfoRow({ icon, label, value, full = false }) {
   return (
     <div className={full ? styles.infoRowFull : styles.infoRow}>
@@ -28,11 +31,25 @@ function InfoHero({ task }) {
   );
 }
 
-function InfoGridSection({ task, listName, dueFormatted, due }) {
+function ReadingSpeedRows({ task, speedData }) {
+  const pageCount = task.reading_page_count ?? task.page_count ?? null;
+  if (!pageCount) return null;
+  return (
+    <>
+      <InfoRow icon={<BookOpen size={14} strokeWidth={2} />} label="Pages" value={`${pageCount} pages`} full />
+      <InfoRow icon={<Zap size={14} strokeWidth={2} />} label="Reading speed"
+        value={speedData?.is_personalised ? `${speedData.avg_min_per_page.toFixed(1)} min/page` : "Complete a task with the timer to personalise"} full
+      />
+    </>
+  );
+}
+
+function InfoGridSection({ task, listName, dueFormatted, due, speedData }) {
   return (
     <div className={styles.infoGrid}>
-      <InfoRow icon={<Flag size={14} strokeWidth={2} />}  label="Priority" value={PRIORITY_LABELS[task.priority] || task.priority || "—"} />
-      <InfoRow icon={<Zap size={14} strokeWidth={2} />}   label="Sessions" value={formatFocusBlocks(task.estimated_blocks)} />
+      <InfoRow icon={<Flag size={14} strokeWidth={2} />} label="Priority" value={PRIORITY_LABELS[task.priority] || task.priority || "—"} />
+      <InfoRow icon={<Zap size={14} strokeWidth={2} />} label="Sessions" value={formatFocusBlocks(task.estimated_blocks)} />
+      <ReadingSpeedRows task={task} speedData={speedData} />
       <InfoRow icon={<Clock size={14} strokeWidth={2} />} label="Due date" value={dueFormatted || due?.label || "—"} full />
       {listName && (
         <div className={styles.infoRowFull}>
@@ -47,7 +64,7 @@ function InfoGridSection({ task, listName, dueFormatted, due }) {
   );
 }
 
-function InfoModalBody({ task, listName }) {
+function InfoModalBody({ task, listName, speedData }) {
   const due = formatDueDate(task.due_date);
   const dueFormatted = task.due_date
     ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
@@ -55,7 +72,7 @@ function InfoModalBody({ task, listName }) {
   return (
     <div className={styles.infoModalBody}>
       <InfoHero task={task} />
-      <InfoGridSection task={task} listName={listName} dueFormatted={dueFormatted} due={due} />
+      <InfoGridSection task={task} listName={listName} dueFormatted={dueFormatted} due={due} speedData={speedData} />
     </div>
   );
 }
@@ -84,13 +101,20 @@ function InfoModalFooter({ onClose }) {
   );
 }
 
-/** Portal modal displaying read-only task details. */
 export function TaskInfoModal({ task, listName, onClose }) {
+  const [speedData, setSpeedData] = useState(null);
+  const pageCount = task.reading_page_count ?? task.page_count ?? null;
+
+  useEffect(() => {
+    if (!pageCount) return;
+    getReadingSpeed().then(setSpeedData).catch(() => setSpeedData(null));
+  }, [pageCount]);
+
   const modal = (
       <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
-        <InfoModalBody task={task} listName={listName} />
+        <InfoModalBody task={task} listName={listName} speedData={speedData} />
         <InfoModalFooter onClose={onClose} />
       </StandardModal>
   );

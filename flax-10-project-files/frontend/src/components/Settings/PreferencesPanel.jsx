@@ -1,6 +1,13 @@
-import { useState } from "react";
+/**
+ * Combined Preferences panel covering Appearance (theme) and Sleep Schedule.
+ * Each section saves independently via its own submit handler.
+ */
+import { useState, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { getUserSettings } from "../../api/userService";
+import DateTimePicker from "../../pages/Tasks/components/DateTimePicker";
 import { SectionHeader, SubmitButton, ThemeSelector, ThemeGridSelector } from "./SettingsUI";
+import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 
 function ModeFormGroup({ mode, onChange }) {
@@ -40,15 +47,93 @@ function usePreferencesForm() {
   return { formData, handleModeChange, handleThemeChange };
 }
 
-export default function PreferencesPanel({ onSave, isSaving }) {
-  const { formData, handleModeChange, handleThemeChange } = usePreferencesForm();
-  const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
+export default function PreferencesPanel({ onSave, onSleepSave, isSaving }) {
+  const { mode, setMode, theme, setTheme } = useTheme();
+  const { formData, handleModeChange, handleThemeChange: handleLocalThemeChange } = usePreferencesForm();
+
+  const [sleepTime, setSleepTime] = useState("23:00");
+  const [wakeTime, setWakeTime] = useState("07:00");
+  const [loadingSleep, setLoadingSleep] = useState(true);
+
+  useEffect(() => {
+    getUserSettings()
+      .then((data) => {
+        if (data?.sleep_time) setSleepTime(data.sleep_time.slice(0, 5));
+        if (data?.wake_time) setWakeTime(data.wake_time.slice(0, 5));
+      })
+      .finally(() => setLoadingSleep(false));
+  }, []);
+
+  const handlePreferencesSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  const handleSleepSubmit = (e) => {
+    e.preventDefault();
+    onSleepSave({ sleep_time: sleepTime, wake_time: wakeTime });
+  };
+
+  const sleepDuration = () => {
+    const [sh, sm] = sleepTime.split(":").map(Number);
+    const [wh, wm] = wakeTime.split(":").map(Number);
+    let mins = wh * 60 + wm - (sh * 60 + sm);
+    if (mins <= 0) mins += 24 * 60;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  };
+
+  if (loadingSleep) return <SectionSkeleton label="Loading preferences" rows={6} />;
+
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <SectionHeader title="Appearance" description="Customize how StudyFlax looks" />
-      <ModeFormGroup mode={formData.mode} onChange={handleModeChange} />
-      <ThemeGridFormGroup theme={formData.theme} onChange={handleThemeChange} />
-      <SubmitButton isSaving={isSaving} label="Save Preferences" savingLabel="Saving..." />
-    </form>
+    <div className={styles.preferencesContainer}>
+      <form onSubmit={handlePreferencesSubmit} className={styles.form}>
+        <SectionHeader title="Appearance" description="Customize how StudyFlax looks" />
+        <ModeFormGroup mode={formData.mode} onChange={handleModeChange} />
+        <ThemeGridFormGroup theme={formData.theme} onChange={handleLocalThemeChange} />
+        <SubmitButton isSaving={isSaving} label="Save Appearance" savingLabel="Saving..." />
+      </form>
+
+      <div className={styles.formDivider} />
+
+      <form onSubmit={handleSleepSubmit} className={styles.form}>
+        <SectionHeader
+          title="Sleep Schedule"
+          description="We'll warn you if you try to add tasks during your sleep window."
+        />
+
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label>Bedtime</label>
+            <DateTimePicker
+              value={sleepTime}
+              onChange={(v) => setSleepTime(v || "23:00")}
+              placeholder="Pick bedtime"
+              timeOnly
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Wake up</label>
+            <DateTimePicker
+              value={wakeTime}
+              onChange={(v) => setWakeTime(v || "07:00")}
+              placeholder="Pick wake time"
+              timeOnly
+            />
+          </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label>Sleep duration</label>
+          <div className={styles.sleepDurationCard}>
+            <div className={styles.sleepDurationMain}>{sleepDuration()}</div>
+          </div>
+        </div>
+
+        <SubmitButton isSaving={isSaving} label="Save Sleep Schedule" savingLabel="Saving..." />
+      </form>
+    </div>
   );
 }

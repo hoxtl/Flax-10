@@ -14,6 +14,7 @@ def user_search(request):
     course_param = request.query_params.get('course', '').strip()
     society_param = request.query_params.get('society', '').strip()
     year_param = request.query_params.get('year', '').strip()
+    role_param = request.query_params.get('role', '').strip()
     
     users = User.objects.exclude(id=request.user.id)
     
@@ -43,6 +44,11 @@ def user_search(request):
         years = [year.strip() for year in year_param.split(',') if year.strip()]
         if years:
             users = users.filter(settings__year__in=years).distinct()
+
+    if role_param:
+        roles = [role.strip() for role in role_param.split(',') if role.strip()]
+        if roles:
+            users = users.filter(role__in=roles).distinct()
             
     offset = int(request.query_params.get('offset', 0))
     limit = int(request.query_params.get('limit', 20))

@@ -8,33 +8,39 @@ import styles from "./ReportSocietyModal.module.css";
 import { reportSociety } from "../../../api/societyApi";
 
 /** Form for reporting a society with a specific reason. */
-export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
-    const [reason, setReason] = useState("");
-    const [state, setState] = useState({ submitting: false, error: "" });
+const FormContent = ({ reason, onTextChange, error, submitting }) => (
+    <div className={styles.container}>
+        <textarea className={styles.textarea} placeholder="Reason..." value={reason}
+            onChange={onTextChange} rows={4} disabled={submitting} />
+        {error && <p className={styles.error}>{error}</p>}
+    </div>
+);
 
-    const handleSubmit = async () => {
+const makeOnSubmit = (reason, setState, societyId, onReportSuccess, onClose) =>
+    async () => {
         if (!reason.trim()) return setState(s => ({ ...s, error: "Please provide a reason." }));
         setState({ submitting: true, error: "" });
         try {
-            await reportSociety(society.id, reason.trim());
-            onReportSuccess?.();
-            onClose();
-        } catch (err) {
-            setState({ submitting: false, error: "Failed to submit report." });
+            await reportSociety(societyId, reason.trim());
+        } catch {
+            return setState({ submitting: false, error: "Failed to submit report." });
         }
+        onReportSuccess?.();
+        onClose();
     };
 
+export default function ReportSocietyModal({ society, onClose, onReportSuccess }) {
+    const [reason, setReason] = useState("");
+    const [state, setState] = useState({ submitting: false, error: "" });
+    const onSubmit = makeOnSubmit(reason, setState, society.id, onReportSuccess, onClose);
+
     return (
-        <StandardModal title={`Report "${society.name}"`}
-            subtitle="Please let us know why you are reporting this society." onClose={onClose}>
-            <div className={styles.container}>
-                <textarea className={styles.textarea} placeholder="Reason..." value={reason}
-                    onChange={(e) => { setReason(e.target.value); setState(s => ({ ...s, error: "" })); }}
-                    rows={4} disabled={state.submitting} />
-                {state.error && <p className={styles.error}>{state.error}</p>}
-                <ReportActions onClose={onClose} onSubmit={handleSubmit}
-                    submitting={state.submitting} disabled={!reason.trim()} />
-            </div>
+        <StandardModal title={`Report "${society.name}"`} onClose={onClose}
+            subtitle="Please let us know why you are reporting this society.">
+            <FormContent reason={reason} onTextChange={e => setReason(e.target.value)}
+                error={state.error} submitting={state.submitting} />
+            <ReportActions onClose={onClose} onSubmit={onSubmit}
+                submitting={state.submitting} disabled={!reason.trim()} />
         </StandardModal>
     );
 }

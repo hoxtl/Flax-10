@@ -6,6 +6,8 @@ class Module(models.Model):
     module_code = models.CharField(max_length=20, unique=True)
     module_name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    department = models.CharField(max_length=100, blank=True)
+    course = models.CharField(max_length=100, blank=True)
     created_by = models.ForeignKey(
         User, 
         on_delete=models.CASCADE,

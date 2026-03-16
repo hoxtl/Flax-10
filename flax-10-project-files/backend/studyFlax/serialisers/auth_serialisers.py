@@ -51,12 +51,17 @@ class UserSerialiser(serializers.ModelSerializer):
             'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
             'modules', 'study_hours_this_week', 'study_streak',
             'role',
+            'is_active',
+            'ban_reason',
             'is_superuser',
         ]
         read_only_fields = ['id']
 
     def get_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
+        name = f"{obj.first_name} {obj.last_name}".strip()
+        if getattr(obj, 'role', None) == 'teacher' and not name.startswith("Dr."):
+            return f"Dr. {name}"
+        return name
 
     def get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)

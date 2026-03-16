@@ -1,7 +1,28 @@
+import { useMemo, useState } from 'react';
 import styles from "../../pages/Timer/TimerPage.module.css";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../common/StandardModal/StandardModal";
 import { formatTime } from './TimerComponents';
+
+const BREAK_SUGGESTIONS = [
+    'Stand up and stretch for 2 minutes',
+    'Look at something 20 feet away for 20 seconds',
+    'Drink a glass of water',
+    'Take 5 deep breaths',
+    'Walk to another room and back',
+    'Roll your shoulders and neck',
+    'Close your eyes and rest for a moment',
+    'Do a quick breathing exercise',
+];
+
+const OvertimeContent = ({ mode, time, onAction, isLastSession }) => {
+    const title = <h3>{mode === 'work' ? "Time's Up!" : "Break Over!"}</h3>;
+    const subtitle = <p>{mode === 'work' ? "You're in overtime mode." : "Time to get back to work."}</p>;
+    const timeDiv = <div className={styles.overtimeTime}>{formatTime(time)}</div>;
+    const btnLabel = mode === 'work' ? (isLastSession ? "Finish Goal" : "Start Break") : "Start Work";
+    const btn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>{btnLabel}</PrimaryButton>;
+    return <div className={styles.overtimeContent}>{title}{subtitle}{timeDiv}{btn}</div>;
+};
 
 export const OvertimePopup = ({ mode, time, onAction, isLastSession }) => {
     const title = mode === 'work' ? "Time's Up!" : "Break Over!";
@@ -12,9 +33,9 @@ export const OvertimePopup = ({ mode, time, onAction, isLastSession }) => {
         <StandardModal title={title} subtitle={subtitle} onClose={onAction} size="sm" centerText>
             <div className={styles.overtimeContent}>
                 <div className={styles.overtimeTime}>{formatTime(time)}</div>
-                <PrimaryButton 
-                    className={`${styles.button} ${styles.primary}`} 
-                    onClick={onAction} 
+                <PrimaryButton
+                    className={`${styles.button} ${styles.primary}`}
+                    onClick={onAction}
                     pill
                 >
                     {btnLabel}
@@ -39,18 +60,50 @@ const GoalSummary = ({ sessions, workTime, breakTime }) => {
     return <div className={styles.summaryContainerWrapper}>{title}{container}</div>;
 };
 
+const MOODS = [
+    { key: 'hard', emoji: '😤', label: 'Hard' },
+    { key: 'good', emoji: '😊', label: 'Good' },
+    { key: 'locked_in', emoji: '🔥', label: 'Locked in' },
+];
+
 export const GoalModal = ({ sessions, workTime, breakTime, onAction }) => {
+    const [mood, setMood] = useState(null);
+
+    const handleComplete = () => {
+        if (mood) try { sessionStorage.setItem('lastSessionMood', mood); } catch { }
+        onAction();
+    };
+
     const title = "Goal reached";
     const summary = <GoalSummary sessions={sessions} workTime={workTime} breakTime={breakTime} />;
-    const btn = <PrimaryButton className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={onAction} pill>Start New Goal</PrimaryButton>;
-    const content = <div className={styles.modalContent}>{summary}{btn}</div>;
-    return <StandardModal title={title} onClose={onAction} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
+    const moodPicker = (
+        <div className={styles.moodPickerRow}>
+            <span className={styles.moodPickerLabel}>How did that feel?</span>
+            <div className={styles.moodOptions}>
+                {MOODS.map(m => (
+                    <button
+                        key={m.key}
+                        className={`${styles.moodBtn} ${mood === m.key ? styles.moodBtnActive : ''}`}
+                        onClick={() => setMood(m.key)}
+                    >
+                        <span>{m.emoji}</span>
+                        <span className={styles.moodBtnLabel}>{m.label}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+    const btn = <PrimaryButton className={`${styles.button} ${styles.primary} ${styles.goalButton}`} onClick={handleComplete} pill>Start New Goal</PrimaryButton>;
+    const content = <div className={styles.modalContent}>{summary}{moodPicker}{btn}</div>;
+    return <StandardModal title={title} onClose={handleComplete} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 
 export const BreakModal = ({ onAction }) => {
+    const tip = useMemo(() => BREAK_SUGGESTIONS[Math.floor(Math.random() * BREAK_SUGGESTIONS.length)], []);
     const msg = <div className={styles.modalMessage}>Great job! Time to take a well-deserved break.</div>;
+    const suggestion = <div className={styles.breakSuggestion}>💡 {tip}</div>;
     const btn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>Start Break</PrimaryButton>;
-    const content = <div className={styles.modalContent}>{msg}{btn}</div>;
+    const content = <div className={styles.modalContent}>{msg}{suggestion}{btn}</div>;
     return <StandardModal title="Focus session complete" onClose={onAction} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 

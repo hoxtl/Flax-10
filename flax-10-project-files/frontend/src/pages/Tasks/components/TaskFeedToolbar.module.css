@@ -14,7 +14,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -35,14 +35,6 @@
 }
 .searchInput {
     padding-right: 34px;
-    background: var(--search-bg, var(--panel));
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-.searchInput::placeholder {
-    font-weight: 400;
-    font-size: 0.95rem;
 }
 .searchClear {
     position: absolute;
@@ -142,7 +134,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 12px;
   background: transparent;
   border: 1px solid var(--widget-border);
   border-radius: 10px;
@@ -177,9 +169,8 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 360px;
-  max-width: min(92vw, 360px);
-  max-width: min(92vw, 360px);
+  width: var(--filter-dropdown-width, 360px);
+  max-width: var(--filter-dropdown-max-width, min(92vw, 360px));
   background: var(--surface-card);
   border: 1px solid var(--widget-border);
   border-radius: 12px;

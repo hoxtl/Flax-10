@@ -117,6 +117,18 @@ class MembershipViewTest(TestCase):
         response = self.client.post(f'/api/societies/{self.society.id}/members/')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_teacher_cannot_join_society(self):
+        teacher = User.objects.create_user(
+            username='teacher_user',
+            email='teacher@test.com',
+            password='pass',
+            role='teacher',
+        )
+        self.client.force_authenticate(user=teacher)
+        response = self.client.post(f'/api/societies/{self.society.id}/members/')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data['error'], 'Teachers cannot join societies.')
+
     def test_join_already_member(self):
         make_member(self.member, self.society)
         self.client.force_authenticate(user=self.member)
@@ -130,6 +142,20 @@ class MembershipViewTest(TestCase):
     def test_add_collaborator_by_email(self):
         response = self.client.post(f'/api/societies/{self.society.id}/members/', {'email': 'other@example.com'})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_add_collaborator_teacher_blocked(self):
+        teacher = User.objects.create_user(
+            username='teacher_collab',
+            email='teacher.collab@test.com',
+            password='pass',
+            role='teacher',
+        )
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/members/',
+            {'username': teacher.username}
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data['error'], 'Teachers cannot join societies.')
 
     def test_add_collaborator_not_found(self):
         response = self.client.post(f'/api/societies/{self.society.id}/members/', {'username': 'nobody'})

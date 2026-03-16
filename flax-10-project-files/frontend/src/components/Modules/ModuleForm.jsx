@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { createModule, updateModule } from '../../api/moduleApi';
 import { serialiseModule } from './utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from './utils/moduleHelpers';
+import { KCL_DEPARTMENTS } from '../../lib/kclCourses';
+import AnimatedDropdown from '../common/AnimatedDropdown/AnimatedDropdown';
 import styles from './ModuleForm.module.css'
+import DateTimePicker from '../common/inputs/DateTimePicker';
 
 
 async function saveModule(is_editing, module, form_data) {
@@ -38,6 +41,7 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
     return (
         <form onSubmit={onSubmit} className={styles.form}>
+            <DepartmentCourseFields form_data={form_data} errors={errors} onChange={onChange} />
             <NameFields form_data={form_data} errors={errors} is_editing={is_editing} onChange={onChange} />
             <DescriptionLocationFields form_data={form_data} onChange={onChange} />
             <TimeFields form_data={form_data} errors={errors} onChange={onChange} />
@@ -47,6 +51,48 @@ function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmi
         </form>
     );
 }
+const DEPARTMENT_OPTIONS = Object.keys(KCL_DEPARTMENTS).map(d => ({ value: d, label: d }));
+
+function DepartmentCourseFields({ form_data, errors, onChange }) {
+    const courseOptions = useMemo(() => {
+        if (!form_data.department) return [];
+        const courses = KCL_DEPARTMENTS[form_data.department] || [];
+        return courses.map(c => ({ value: c, label: c }));
+    }, [form_data.department]);
+
+    const handleDepartmentChange = (dept) => {
+        onChange('department', dept);
+        onChange('course', '');
+    };
+
+    return (
+        <>
+            <FormGroup label="Department" error={errors.department} required>
+                <AnimatedDropdown
+                    value={form_data.department}
+                    onChange={handleDepartmentChange}
+                    options={DEPARTMENT_OPTIONS}
+                    searchable
+                    placeholder="Select a department..."
+                    searchPlaceholder="Search departments"
+                    emptyMessage="No departments found"
+                />
+            </FormGroup>
+            <FormGroup label="Course" error={errors.course} required>
+                <AnimatedDropdown
+                    value={form_data.course}
+                    onChange={(v) => onChange('course', v)}
+                    options={courseOptions}
+                    searchable
+                    placeholder={form_data.department ? "Select a course..." : "Select a department first"}
+                    searchPlaceholder="Search courses"
+                    emptyMessage="No courses found"
+                />
+            </FormGroup>
+        </>
+    );
+}
+
 function NameFields({ form_data, errors, is_editing, onChange }) {
     return (
         <>
@@ -78,10 +124,10 @@ function TimeFields({ form_data, errors, onChange }) {
     return (
         <>
             <FormGroup label="First Lecture Date & Time" error={errors.start_time} required>
-                <input type="datetime-local" className={getInput(errors.start_time, styles)} value={form_data.start_time} onChange={(e) => onChange('start_time', e.target.value)} />
+                <DateTimePicker value={form_data.start_time} onChange={val => onChange('start_time', val)} placeholder="Pick date & time" />
             </FormGroup>
             <FormGroup label="Lecture End Time" error={errors.end_time} required>
-                <input type="datetime-local" className={getInput(errors.end_time, styles)} value={form_data.end_time} onChange={(e) => onChange('end_time', e.target.value)} />
+                <DateTimePicker value={form_data.end_time} onChange={val => onChange('end_time', val)} placeholder="Pick date & time" />
             </FormGroup>
         </>
     );

@@ -5,12 +5,22 @@ from rest_framework.response import Response
 from studyFlax.serialisers.auth_serialisers import UserSerialiser
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models import User
 from datetime import timedelta
 from django.utils import timezone
 
 
 def get_module_data(user):
+    taught_modules = Module.objects.filter(created_by=user).only('module_code')
+    is_teacher = getattr(user, 'role', None) == 'teacher'
+
+    # Prefer "modules taught" for teachers and for any user that owns modules.
+    # This keeps profile module lists accurate even when role data is stale.
+    if is_teacher or taught_modules.exists():
+        module_codes = sorted([m.module_code for m in taught_modules])
+        return module_codes, len(module_codes)
+
     enrollments = Enrollment.objects.filter(student=user).select_related('module')
     module_codes = sorted([e.module.module_code for e in enrollments])
     return module_codes, len(module_codes)

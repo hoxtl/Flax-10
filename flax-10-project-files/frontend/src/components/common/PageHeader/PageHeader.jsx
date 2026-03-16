@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import styles from "./PageHeader.module.css";
 
@@ -7,18 +8,26 @@ import styles from "./PageHeader.module.css";
  *   title    – required string, shown as the h1
  *   subtitle – optional string, shown below the title
  *   action   – optional ReactNode, floated to the right (e.g. a button or toggle)
+ *   onBack   – optional function, if provided, shows a back button on the left
  */
-export default function PageHeader({ title, subtitle, action }) {
+export default function PageHeader({ title, subtitle, action, onBack, compact = false }) {
   return (
     <motion.div
-      className={styles.header}
+      className={`${styles.header} ${compact ? styles.headerCompact : ""}`}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className={styles.titleGroup}>
-        <h1 className={styles.title}>{title}</h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      <div className={styles.leftGroup}>
+        {onBack && (
+          <button className={styles.backButton} onClick={onBack} aria-label="Go back">
+            <ArrowLeft size={18} strokeWidth={2.5} />
+          </button>
+        )}
+        <div className={styles.titleGroup}>
+          <h1 className={styles.title}>{title}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </div>
       </div>
       {action && <div className={styles.action}>{action}</div>}
     </motion.div>

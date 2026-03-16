@@ -62,7 +62,8 @@ const TreeSvg = ({ style }) => (
 );
 
 const TreeScene = ({ progress }) => {
-    const clipStyle = { clipPath: calculateClip(progress), transition: 'clip-path 1s linear' };
+    const displayProgress = Math.max(15, progress);
+    const clipStyle = { clipPath: calculateClip(displayProgress), transition: 'clip-path 1s linear' };
     return (
         <div className={styles.scene}>
             <TreeSvg style={clipStyle} />
