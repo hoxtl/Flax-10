@@ -68,6 +68,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
     handleSleepSave,
     handleStudyTimeSave,
     handleWeekPreferenceSave,
+    handleWorktimePreferenceSave,
   } = handlers;
 
   return (
@@ -85,7 +86,8 @@ function SettingsPanel({ activeTab, handlers, user }) {
             onSave={handlePreferencesSave}
             onSleepSave={handleSleepSave}
             onStudyTimeSave={handleStudyTimeSave}
-            onWeekPreferenceSave={handleWeekPreferenceSave} 
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
             isSaving={isSaving}
           />
         )}

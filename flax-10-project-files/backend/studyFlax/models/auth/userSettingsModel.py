@@ -10,6 +10,11 @@ class UserSettings(models.Model):
         ('weekends', 'Weekends'),
         ('both', 'Both'),
     ]
+    WORKTIME_PREFERENCE_CHOICES = [
+        ('day', 'Day'),
+        ('night', 'Night'),
+        ('both', 'Both'),
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')
     theme = models.CharField(max_length=50)
     timezone = models.CharField(max_length=100)
@@ -22,3 +27,4 @@ class UserSettings(models.Model):
     homepage_widgets = models.JSONField(default=list, blank=True)
     preferred_study_minutes_per_day = models.PositiveIntegerField(default=120)
     week_preferences = models.CharField(max_length=10, choices=WEEK_PREFERENCE_CHOICES, default='both')
+    worktime_preferences = models.CharField(max_length=10, choices=WORKTIME_PREFERENCE_CHOICES, default='both')

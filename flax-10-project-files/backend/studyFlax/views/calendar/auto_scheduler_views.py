@@ -13,16 +13,18 @@ def _resolved_preferences(user, payload):
     preferred_start = payload.get('preferred_start_time')
     preferred_end = payload.get('preferred_end_time')
     week_preference = payload.get('week_preference')
+    worktime_preference = payload.get('worktime_preference')
 
     if settings is not None:
         preferred_start = preferred_start or getattr(settings, 'wake_time', None)
         preferred_end = preferred_end or getattr(settings, 'sleep_time', None)
         week_preference = week_preference or getattr(settings, 'week_preferences', None)
+        worktime_preference = worktime_preference or getattr(settings, 'worktime_preferences', None)
 
     return {
         'preferred_start_time': preferred_start,
         'preferred_end_time': preferred_end,
-        'worktime_preference': payload.get('worktime_preference') or 'both',
+        'worktime_preference': worktime_preference or 'both',
         'week_preference': week_preference or 'both',
     }
 
@@ -56,6 +58,9 @@ def _find_first_gap(busy_slots, window_start, window_end, duration_minutes):
             return current, current + required
         if busy_start <= current < busy_end:
             current = busy_end
+            continue
+        if busy_start > current:
+            current = max(current, busy_end)
     if window_end - current >= required:
         return current, current + required
     return None, None

@@ -242,13 +242,61 @@ function WeekPreferenceSection({
   );
 }
 
+function WorktimePreferenceSection({
+  worktimePreference,
+  onWorktimePreferenceChange,
+  onSubmit,
+  isSaving,
+  hasUnsaved,
+  saveSignal,
+}) {
+  return (
+    <div className={styles.twoColLayout}>
+      <div>
+        <div className={styles.settingsTile}>
+          <form onSubmit={onSubmit}>
+            <SectionHeader title="Preferred Worktime" />
+            <div className={styles.formGroup}>
+              <label htmlFor="worktime-preferences">Preferred study period for auto-scheduling</label>
+              <select
+                id="worktime-preferences"
+                value={worktimePreference}
+                onChange={(e) => onWorktimePreferenceChange(e.target.value)}
+              >
+                <option value="both">Any time (day and night)</option>
+                <option value="day">Daytime only</option>
+                <option value="night">Nighttime only</option>
+              </select>
+            </div>
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Worktime Preference"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
+          </form>
+        </div>
+      </div>
+      <div className={styles.contextCard}>
+        <span className={styles.contextCardEmoji}>⏰</span>
+        <h3 className={styles.contextCardTitle}>Daily scheduling window</h3>
+        <ul className={styles.contextCardList}>
+          <li>Choose whether schedule blocks should default to day, night, or both</li>
+          <li>Used as the default when generating schedules from deadlines</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 /**
  * @param {object} props
  * @param {Function} props.onSave - Saves theme preference
  * @param {Function} props.onSleepSave - Saves sleep schedule
  * @param {boolean} props.isSaving
  */
-export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave, onWeekPreferenceSave = async () => false }) {
+export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave, onWeekPreferenceSave, onWorktimePreferenceSave}) {
   const { theme, setTheme } = useTheme();
   const [sleepTime, setSleepTime] = useState("23:00");
   const [wakeTime, setWakeTime] = useState("07:00");
@@ -262,6 +310,9 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
   const [weekPreference, setWeekPreference] = useState("both");
   const [initialWeekPreference, setInitialWeekPreference] = useState("both");
   const [weekSaveSignal, setWeekSaveSignal] = useState(0);
+  const [worktimePreference, setWorktimePreference] = useState("both");
+  const [initialWorktimePreference, setInitialWorktimePreference] = useState("both");
+  const [worktimeSaveSignal, setWorktimeSaveSignal] = useState(0);
 
   useEffect(() => {
     getUserSettings()
@@ -285,6 +336,10 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
           setWeekPreference(data.week_preferences);
           setInitialWeekPreference(data.week_preferences);
         }
+        if (data?.worktime_preferences) {
+          setWorktimePreference(data.worktime_preferences);
+          setInitialWorktimePreference(data.worktime_preferences);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -297,6 +352,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
   const hasUnsavedStudyTime = minutesPerDay !== initialMinutesPerDay;
   const hasUnsavedWeekPreference = weekPreference !== initialWeekPreference;
+  const hasUnsavedWorktimePreference = worktimePreference !== initialWorktimePreference;
 
   if (loading) return <SectionSkeleton label="Loading preferences" rows={4} />;
 
@@ -354,6 +410,21 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
         hasUnsaved={hasUnsavedWeekPreference}
         saveSignal={weekSaveSignal}
       />
+      <WorktimePreferenceSection
+       worktimePreference={worktimePreference}
+       onWorktimePreferenceChange={setWorktimePreference}
+       onSubmit={async (e) => {
+         e.preventDefault();
+         const ok = await onWorktimePreferenceSave({ worktime_preferences: worktimePreference });
+         if (ok) {
+           setInitialWorktimePreference(worktimePreference);
+           setWorktimeSaveSignal((s) => s + 1);
+         }
+       }}
+       isSaving={isSaving}
+       hasUnsaved={hasUnsavedWorktimePreference}
+       saveSignal={worktimeSaveSignal}
+     />
     </div>
   );
 }
