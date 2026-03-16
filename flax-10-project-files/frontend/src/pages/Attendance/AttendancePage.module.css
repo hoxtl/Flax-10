@@ -182,17 +182,22 @@
 }
 
 .btnAttended:hover:not(:disabled) {
-  opacity: 0.9;
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
 }
 
 .btnMissed {
   background: var(--panel);
   color: var(--text);
   border: 1px solid var(--border);
+  transition: all 0.2s ease;
 }
 
 .btnMissed:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btnAttended:disabled,
