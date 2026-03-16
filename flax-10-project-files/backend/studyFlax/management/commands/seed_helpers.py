@@ -160,7 +160,7 @@ def _build_single_settings(user):
         theme=random.choice(['light', 'dark']),
         timezone='Europe/London',
         year='' if is_teacher else random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
-        major=random.choice(course_fixtures),
+        major='' if is_teacher else random.choice(course_fixtures),
         sleep_time=time(23, 0),
         wake_time=time(7, 0),
         mode=random.choice(['light', 'dark']),

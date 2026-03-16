@@ -13,6 +13,7 @@ from studyFlax.fixtures.data_fixtures import (
     location_fixtures, lecture_theatre_fixtures,
     breakfast_fixtures, lunch_fixtures, dinner_fixtures,
     module_deadline_fixtures, deadline_fixtures,
+    get_course_prefixes,
 )
 
 SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
@@ -159,12 +160,10 @@ def build_module_event(code, name, description, admin, weekly_rule):
 
 def get_user_modules(user, all_modules):
     """Return (core_modules, extra_modules) matched to the user's declared major."""
-    from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
     major = getattr(getattr(user, 'settings', None), 'major', None)
-    prefixes = course_to_module_prefixes.get(major, [])
-    core = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)][:3]
-    non_core = [m for m in all_modules if m not in core]
-    extras = random.sample(non_core, min(1, len(non_core)))
+    prefixes = get_course_prefixes(major)
+    core = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)]
+    extras = []
     return core, extras
 
 def create_lecture_event(user, module, start, end, lecture_tag):

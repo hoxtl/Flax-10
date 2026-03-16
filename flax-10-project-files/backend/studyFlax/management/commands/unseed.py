@@ -75,7 +75,7 @@ def _print_restore_warnings(failed_restores, stdout, style):
     stdout.write(style.WARNING("  ⚠️  Some superusers could not be restored automatically."))
     for username, reason in failed_restores:
         stdout.write(style.WARNING(f"     - {username}: {reason}"))
-    stdout.write(style.WARNING("  Run `python manage.py createsuperuser` to recreate them manually."))
+    stdout.write(style.WARNING("  Run python manage.py createsuperuser to recreate them manually."))
 
 def _print_restore_results(superusers_data, failed_restores, stdout, style):
     failed_names = {name for name, _ in failed_restores}
@@ -117,7 +117,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         superusers_data = get_superuser_data()
         if not superusers_data:
-            self.stdout.write(self.style.WARNING("  No superusers found — database will be completely emptied."))
+            self.stdout.write(self.style.WARNING("  No superusers found - database will be completely emptied."))
         if not confirm_truncate(self.stdout):
             self.stdout.write("  Cancelled.")
             return

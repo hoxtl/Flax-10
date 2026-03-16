@@ -26,42 +26,23 @@ FIXTURE_USERS = [
     {'username': 'amiller', 'email': 'a.miller@kcl.ac.uk',  'first_name': 'Alice',   'last_name': 'Miller', 'is_superuser': False, 'is_staff': False},
     {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',  'first_name': 'Sam',     'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': False},
     {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',   'first_name': 'Hina',    'last_name': 'Patel',  'is_superuser': False, 'is_staff': False},
-    {'username': 'echen',   'email': 'e.chen@kcl.ac.uk',    'first_name': 'Eric',    'last_name': 'Chen',   'is_superuser': False, 'is_staff': False},
-    {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',  'first_name': 'James',   'last_name': 'Murphy', 'is_superuser': False, 'is_staff': False},
 ]
 
 ROLE_LABELS = {
     'johndoe': 'admin',
     'janedoe': 'student', 'charlie': 'student',
     'riley': 'student', 'nina': 'student', 'omar': 'student', 'sofia': 'student', 'liamk': 'student',
-    'amiller': 'teacher', 'srahwan': 'teacher',
-    'hpatel':  'teacher', 'echen':   'teacher', 'jmurphy': 'teacher',
+    'amiller': 'teacher', 'srahwan': 'teacher', 'hpatel':  'teacher',
 }
 
 TEACHER_USERNAMES = {
-    'amiller', 'srahwan', 'hpatel', 'echen', 'jmurphy',
+    'amiller', 'srahwan', 'hpatel',
 }
 
 TEACHER_BIOS = {
     'amiller': "Dr. Alice Miller specialises in political theory and comparative public policy. She completed her PhD at the London School of Economics after reading PPE at the University of Warwick. Her classes are energetic, debate-led, and focused on helping students turn complex ideas into sharp, persuasive arguments.",
     'srahwan': "Dr. Sam Rahwan specialises in acute and community nursing education. He completed his PhD at the University of Edinburgh following postgraduate clinical study at King's College London. His teaching style is scenario-driven, practical, and confidence-building, especially for placements and OSCE preparation.",
     'hpatel': "Dr. Hina Patel specialises in biostatistics and population health analytics. She completed her PhD at Imperial College London after earlier study at University College London. She is known for making difficult statistical ideas click quickly through clear frameworks, relatable case studies, and highly actionable feedback.",
-    'echen': "Dr. Eric Chen specialises in distributed systems, software architecture, and cloud engineering. He completed his PhD at the University of Cambridge after studying computer science at the University of Manchester. His sessions blend strong theory with real engineering trade-offs so students build production-ready thinking.",
-    'jmurphy': "Dr. James Murphy specialises in applied mathematics, optimisation, and quantitative modelling. He completed his PhD at the University of Oxford after studying mathematics at Durham University. His lectures are high-energy, intuitive, and packed with worked examples that make exam preparation feel structured and achievable.",
-    'swan': "Dr. Sarah Wan specialises in AI ethics, governance, and algorithmic accountability. She completed her PhD at Stanford University after studying data science at University College London. Her seminars are current, discussion-rich, and challenge students to connect technical design choices with human impact.",
-    'rkapoor': "Dr. Ravi Kapoor specialises in entrepreneurship strategy and innovation management. He completed his PhD at the University of Toronto after business study at the University of Birmingham. His classes are practical and fast-paced, with a strong focus on execution, storytelling, and real startup decision-making.",
-    'lturner': "Dr. Laura Turner specialises in health psychology and behaviour change science. She completed her PhD at the University of Bristol after earlier study at the University of Glasgow. She brings warm, high-challenge teaching that helps students link theory to clinical and community outcomes.",
-    'dnguyen': "Dr. David Nguyen specialises in software delivery, DevOps, and scalable backend systems. He completed his PhD at the National University of Singapore after studying engineering at the University of Leeds. His teaching is hands-on and collaborative, built around practical workflows students can apply immediately.",
-    'ofarrell': "Dr. Olivia Farrell specialises in digital culture, media narratives, and online communities. She completed her PhD at the University of Melbourne after studying communication at the University of Nottingham. Her classes are lively, critical, and designed to sharpen analytical writing and confident discussion.",
-    'mkhan': "Dr. Maya Khan specialises in epidemiology, prevention policy, and health equity. She completed her PhD at ETH Zurich after earlier study at the University of Sheffield. Her sessions connect evidence to policy in a way that feels practical, urgent, and genuinely motivating.",
-    'tbrown': "Dr. Theo Brown specialises in corporate finance, market risk, and portfolio strategy. He completed his PhD at Massachusetts Institute of Technology after economics study at the University of Bristol. His teaching combines technical depth with applied decision-making used in real financial environments.",
-    'ayamada': "Dr. Aiko Yamada specialises in human-centred design, service design, and product experimentation. She completed her PhD at the University of Cambridge after design study at the University of Manchester. Her studio-style classes are creative, rigorous, and centred on measurable user outcomes.",
-    'fnunes': "Dr. Felipe Nunes specialises in international business operations and cross-border strategy. He completed his PhD at the University of Oxford after management study at the University of Leeds. His classes are globally minded, case-based, and focused on making strategic frameworks practical.",
-    'cellis': "Dr. Chloe Ellis specialises in public law, governance, and policy implementation. She completed her PhD at University College London after legal study at Durham University. She teaches with clear structure and sharp argument coaching so students build confident legal reasoning quickly.",
-    'bkwame': "Dr. Ben Kwame specialises in macroeconomic policy and applied econometrics. He completed his PhD at the University of Edinburgh after studying economics at the University of Glasgow. His lectures are interactive, data-led, and built to help students connect models to real-world outcomes.",
-    'hlewis': "Dr. Hannah Lewis specialises in neuroscience, learning science, and evidence-based study strategy. She completed her PhD at Imperial College London after biological sciences study at the University of Nottingham. Her teaching helps students master both difficult content and smarter study habits.",
-    'jpark': "Dr. Jun Park specialises in machine learning for healthcare and responsible clinical AI deployment. He completed his PhD at Stanford University after engineering study at King's College London. His classes combine technical challenge with practical healthcare context and strong ethical framing.",
-    'asmith': "Dr. Amelia Smith specialises in mathematics education, assessment design, and inclusive pedagogy. She completed her PhD at the University of Toronto after mathematics study at the University of Warwick. Her teaching is supportive, high-standard, and focused on helping students communicate complex ideas clearly.",
 }
 
 STUDENT_BIOS = {
@@ -135,11 +116,18 @@ def _create_single_fixture_user(data, stdout):
 
 def create_fixture_users(stdout):
     stdout.write("Creating fixture users...")
-    for data in FIXTURE_USERS:
+    role_order = {'admin': 0, 'student': 1, 'teacher': 2}
+    ordered_fixtures = sorted(
+        FIXTURE_USERS,
+        key=lambda data: (
+            role_order.get(ROLE_LABELS.get(data['username'], 'student'), 1),
+            data['username'],
+        ),
+    )
+    for data in ordered_fixtures:
         _create_single_fixture_user(data, stdout)
 
-def _compute_random_counts(needed):
-    target_teacher_count = 14
+def _compute_random_counts(needed, target_teacher_count=14):
     current_teacher_count = User.objects.filter(role='teacher').count()
     teacher_needed = max(0, target_teacher_count - current_teacher_count)
     random_teacher_count = min(teacher_needed, needed)
@@ -154,12 +142,12 @@ def _build_new_users(student_count, teacher_count):
         new_users.extend(build_users_list(teacher_count, role='teacher'))
     return new_users
 
-def create_random_users(stdout):
+def create_random_users(stdout, target_teacher_count=14):
     needed = USER_COUNT - User.objects.count()
     if needed <= 0:
         stdout.write("Enough users already exist.")
         return
-    student_count, teacher_count = _compute_random_counts(needed)
+    student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
     stdout.write(
         f"Seeding {needed} random users "
         f"({student_count} students, {teacher_count} teachers)..."

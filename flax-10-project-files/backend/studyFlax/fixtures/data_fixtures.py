@@ -21,6 +21,11 @@ from .event_fixtures import (
 from .module_fixtures import module_fixtures
 from .deadline_fixtures import deadline_fixtures, module_deadline_fixtures
 
+
+def get_course_prefixes(course):
+    """Return module code prefixes mapped to the given course."""
+    return course_to_module_prefixes.get(course, [])
+
 # Per-module-prefix task templates
 # Format: (title_template, description, priority, estimated_blocks, days_from_now)
 module_task_templates = {

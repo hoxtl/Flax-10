@@ -7,7 +7,7 @@ Run with::
 
 Creates fixture users, random users, categories, tags, recurrence rules,
 calendar events, modules, deadlines, enrollments, study sessions and theme
-sessions. All operations are idempotent — running the command on an already-
+sessions. All operations are idempotent - running the command on an already-
 seeded database will not produce duplicates.
 """
 
@@ -29,7 +29,13 @@ from studyFlax.fixtures.data_fixtures import (
 )
 from .seed_helpers import build_readings_for_module, build_reading_user_history_
 from studyFlax.utils.reading_utils import update_reading_estimates
-from .seed_users import create_admin_user, create_fixture_users, create_random_users
+from .seed_users import (
+    FIXTURE_USERS,
+    ROLE_LABELS,
+    create_admin_user,
+    create_fixture_users,
+    create_random_users,
+)
 from .seed_events import create_events_for_users
 from .seed_modules import create_modules, create_deadlines, create_enrollments
 from .seed_tasks import create_tasks
@@ -49,6 +55,14 @@ class Command(BaseCommand):
 
     help = 'Seeds the database with structured data based on fixtures and Faker.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--teacher-count',
+            type=int,
+            default=14,
+            help='Target total number of teacher accounts.',
+        )
+
     def _load_shared_data(self):
         self.users = list(User.objects.filter(is_staff=False))
         self.categories = list(Category.objects.all())
@@ -57,6 +71,7 @@ class Command(BaseCommand):
         self.modules = list(Module.objects.all())
 
     def handle(self, *args, **options):
+        self.teacher_count = options.get('teacher_count', 14) or 14
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self._seed_users()
         self._seed_catalogue()
@@ -67,7 +82,7 @@ class Command(BaseCommand):
     def _seed_users(self):
         create_admin_user(self.stdout)
         create_fixture_users(self.stdout)
-        create_random_users(self.stdout)
+        create_random_users(self.stdout, target_teacher_count=self.teacher_count)
         self.users = list(User.objects.filter(is_staff=False))
 
     def _seed_catalogue(self):
@@ -108,6 +123,7 @@ class Command(BaseCommand):
                 name=name, user=user,
                 defaults={'color': color, 'is_default': is_default},
             )
+        self.categories = list(Category.objects.all())
 
     def _resolve_tag_user(self, category):
         if category and category.user:
@@ -116,20 +132,41 @@ class Command(BaseCommand):
             return random.choice(self.users)
         return None
 
+    def _tag_faker(self):
+        from faker import Faker
+        return Faker('en_GB')
+
+    def _ensure_categories_loaded(self):
+        if not hasattr(self, 'categories'):
+            self.categories = list(Category.objects.all())
+
+    def _tag_color(self, name, faker_obj):
+        if name == 'Routine':
+            return '#94a3b8'
+        if name == 'Wellness':
+            return '#94a3b8'
+        return faker_obj.hex_color()
+
+    def _tag_category(self):
+        if not self.categories or random.random() <= 0.3:
+            return None
+        return random.choice(self.categories)
+
+    def _create_tag(self, name, duration, faker_obj):
+        category = self._tag_category()
+        user = self._resolve_tag_user(category)
+        color = self._tag_color(name, faker_obj)
+        Tag.objects.get_or_create(
+            name=name, user=user,
+            defaults={'category': category, 'default_duration': duration, 'color': color},
+        )
+
     def _create_tags(self):
         self.stdout.write("Seeding tags...")
-        from faker import Faker
-        f = Faker('en_GB')
-        routine_color = '#94a3b8'
-        wellness_color = '#94a3b8'
+        self._ensure_categories_loaded()
+        faker_obj = self._tag_faker()
         for name, duration in tag_fixtures:
-            category = random.choice(self.categories) if self.categories and random.random() > 0.3 else None
-            user = self._resolve_tag_user(category)
-            color = routine_color if name == 'Routine' else (wellness_color if name == 'Wellness' else f.hex_color())
-            Tag.objects.get_or_create(
-                name=name, user=user,
-                defaults={'category': category, 'default_duration': duration, 'color': color},
-            )
+            self._create_tag(name, duration, faker_obj)
         self._create_module_pill_tags()
 
     def _create_module_pill_tags(self):
@@ -194,15 +231,26 @@ class Command(BaseCommand):
             ("Readings",    Reading.objects.count()),
         ]
 
+    def _ordered_fixture_users(self):
+        role_order = {'admin': 0, 'student': 1, 'teacher': 2}
+        entries = ((item['username'], ROLE_LABELS.get(item['username'], 'student')) for item in FIXTURE_USERS)
+        return sorted(entries, key=lambda pair: (role_order.get(pair[1], 1), pair[0]))
+
+    def _print_fixture_users(self):
+        self.stdout.write("  Fixture users (password: 1234)")
+        for username, role in self._ordered_fixture_users():
+            self.stdout.write(f"  {username:<12}  {role}")
+
+    def _print_database_stats(self):
+        self.stdout.write("  Database")
+        for label, count in self._build_stats():
+            self.stdout.write(f"  {label:<14}  {count}")
+
     def print_stats(self):
         div = "\u2500" * 40
         self.stdout.write(self.style.SUCCESS(div))
         self.stdout.write(self.style.SUCCESS("  Seeding complete"))
         self.stdout.write(self.style.SUCCESS(div))
-        self.stdout.write("  Fixture users (password: 1234)")
-        for user, role in [('johndoe', 'admin'), ('janedoe', 'student'), ('charlie', 'student')]:
-            self.stdout.write(f"  {user:<12}  {role}")
-        self.stdout.write("  Database")
-        for label, count in self._build_stats():
-            self.stdout.write(f"  {label:<14}  {count}")
+        self._print_fixture_users()
+        self._print_database_stats()
         self.stdout.write(self.style.SUCCESS(div))
