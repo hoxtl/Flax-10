@@ -3,18 +3,25 @@ import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../common/StandardModal/StandardModal";
 import { formatTime } from './TimerComponents';
 
-const OvertimeContent = ({ mode, time, onAction, isLastSession }) => {
-    const title = <h3>{mode === 'work' ? "Time's Up!" : "Break Over!"}</h3>;
-    const subtitle = <p>{mode === 'work' ? "You're in overtime mode." : "Time to get back to work."}</p>;
-    const timeDiv = <div className={styles.overtimeTime}>{formatTime(time)}</div>;
-    const btnLabel = mode === 'work' ? (isLastSession ? "Finish Goal" : "Start Break") : "Start Work";
-    const btn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>{btnLabel}</PrimaryButton>;
-    return <div className={styles.overtimeContent}>{title}{subtitle}{timeDiv}{btn}</div>;
-};
-
 export const OvertimePopup = ({ mode, time, onAction, isLastSession }) => {
-    const content = <OvertimeContent mode={mode} time={time} onAction={onAction} isLastSession={isLastSession} />;
-    return <div className={styles.overtimePopup}>{content}</div>;
+    const title = mode === 'work' ? "Time's Up!" : "Break Over!";
+    const subtitle = mode === 'work' ? "You're in overtime mode." : "Time to get back to work.";
+    const btnLabel = mode === 'work' ? (isLastSession ? "Finish Goal" : "Start Break") : "Start Work";
+
+    return (
+        <StandardModal title={title} subtitle={subtitle} onClose={onAction} size="sm" centerText>
+            <div className={styles.overtimeContent}>
+                <div className={styles.overtimeTime}>{formatTime(time)}</div>
+                <PrimaryButton 
+                    className={`${styles.button} ${styles.primary}`} 
+                    onClick={onAction} 
+                    pill
+                >
+                    {btnLabel}
+                </PrimaryButton>
+            </div>
+        </StandardModal>
+    );
 };
 
 export const SummaryPill = ({ label, value, type }) => {
@@ -47,21 +54,32 @@ export const BreakModal = ({ onAction }) => {
     return <StandardModal title="Focus session complete" onClose={onAction} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
 };
 
+import ConfirmModal from "../common/ConfirmModal/ConfirmModal";
+
 export const LeaveTimerModal = ({ onCancel, onPause, onExit }) => {
-    const msg = <div className={`${styles.modalMessage} ${styles.leaveModalMessage}`}>Your timer is still running.</div>;
-    const pBtn = <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onPause} pill>Pause Timer</PrimaryButton>;
-    const eBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnExit}`} variant="secondary" onClick={onExit} pill>Exit</PrimaryButton>;
-    const cBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnCancel}`} variant="ghost" onClick={onCancel} pill>Cancel</PrimaryButton>;
-    const btns = <div className={styles.leaveModalButtons}>{pBtn}{eBtn}{cBtn}</div>;
-    const content = <div className={styles.modalContent}>{msg}{btns}</div>;
-    return <StandardModal title="Leave focus time?" onClose={onCancel} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
+    return (
+        <ConfirmModal
+            title="Leave focus time?"
+            message="Your timer is still running."
+            onConfirm={onPause}
+            onCancel={onCancel}
+            onAlternate={onExit}
+            confirmText="Pause Timer"
+            alternateText="Exit"
+            cancelText="Cancel"
+        />
+    );
 };
 
 export const EndEarlyModal = ({ onConfirm, onCancel }) => {
-    const msg = <div className={`${styles.modalMessage} ${styles.leaveModalMessage}`}>If you end session early it won't count as a completed session.</div>;
-    const cBtn = <PrimaryButton className={`${styles.button} ${styles.leaveBtnCancel}`} variant="ghost" onClick={onCancel} pill>Cancel</PrimaryButton>;
-    const eBtn = <PrimaryButton className={`${styles.button} ${styles.danger}`} variant="danger" onClick={onConfirm} pill>End Session</PrimaryButton>;
-    const btns = <div className={styles.leaveModalButtons}>{cBtn}{eBtn}</div>;
-    const content = <div className={styles.modalContent}>{msg}{btns}</div>;
-    return <StandardModal title="End session early?" onClose={onCancel} size="sm" modalClassName={styles.modalContent}>{content}</StandardModal>;
+    return (
+        <ConfirmModal
+            title="End session early?"
+            message="If you end session early it won't count as a completed session."
+            onConfirm={onConfirm}
+            onCancel={onCancel}
+            confirmText="End Session"
+            isDanger={true}
+        />
+    );
 };
