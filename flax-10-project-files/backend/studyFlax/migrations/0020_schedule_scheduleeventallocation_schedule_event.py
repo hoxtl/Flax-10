@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=50)),
-                ('preferred_start_time', models.TimeField(blank=True, null=True)),
-                ('preferred_end_time', models.TimeField(blank=True, null=True)),
+                ('wake_time', models.TimeField(blank=True, null=True)),
+                ('sleep_time', models.TimeField(blank=True, null=True)),
                 ('worktime_preference', models.CharField(choices=[('day', 'Day'), ('night', 'Night'), ('both', 'Both')], default='both', max_length=10)),
                 ('week_preference', models.CharField(choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends'), ('both', 'Both')], default='both', max_length=10)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

@@ -10,35 +10,35 @@ from .system_tags import get_schedule_tag
 def _resolved_preferences(user, payload):
     settings = getattr(user, 'settings', None)
 
-    preferred_start = payload.get('preferred_start_time')
-    preferred_end = payload.get('preferred_end_time')
+    wake_time = payload.get('wake_time')
+    sleep_time = payload.get('sleep_time')
     week_preference = payload.get('week_preference')
     worktime_preference = payload.get('worktime_preference')
 
     if settings is not None:
-        preferred_start = preferred_start or getattr(settings, 'wake_time', None)
-        preferred_end = preferred_end or getattr(settings, 'sleep_time', None)
+        wake_time = wake_time or getattr(settings, 'wake_time', None)
+        sleep_time = sleep_time or getattr(settings, 'sleep_time', None)
         week_preference = week_preference or getattr(settings, 'week_preference', None)
         worktime_preference = worktime_preference or getattr(settings, 'worktime_preference', None)
 
     return {
-        'preferred_start_time': preferred_start,
-        'preferred_end_time': preferred_end,
+        'wake_time': wake_time,
+        'sleep_time': sleep_time,
         'worktime_preference': worktime_preference,
         'week_preference': week_preference,
     }
 
-def _resolve_window(current_day, preferred_start, preferred_end, worktime_preference):
-    if preferred_start and preferred_end:
+def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
+    if wake_time and sleep_time:
         return (
-            datetime.combine(current_day, preferred_start),
-            datetime.combine(current_day, preferred_end),
+            datetime.combine(current_day, wake_time),
+            datetime.combine(current_day, sleep_time),
         )
     if worktime_preference == 'day':
         return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(18, 0))
     if worktime_preference == 'night':
         return datetime.combine(current_day, time(18, 0)), datetime.combine(current_day + timedelta(days=1), time(2, 0))
-    return datetime.combine(current_day, time(8, 0)), datetime.combine(current_day, time(23, 0))
+    return datetime.combine(current_day, wake_time), datetime.combine(current_day, sleep_time)
 
 
 def _is_allowed_day(current_day, week_preference):
@@ -102,8 +102,8 @@ def build_auto_schedule(request):
         schedule = Schedule.objects.create(
             title=payload['title'],
             user=request.user,
-            preferred_start_time=resolved_preferences['preferred_start_time'],
-            preferred_end_time=resolved_preferences['preferred_end_time'],
+            wake_time=resolved_preferences['wake_time'],
+            sleep_time=resolved_preferences['sleep_time'],
             worktime_preference=resolved_preferences['worktime_preference'],
             week_preference=resolved_preferences['week_preference'],
         )
@@ -139,8 +139,8 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferenc
 
             window_start, window_end = _resolve_window(
                 current_day,
-                preferences['preferred_start_time'],
-                preferences['preferred_end_time'],
+                preferences['wake_time'],
+                preferences['sleep_time'],
                 preferences['worktime_preference'],
             )
 
