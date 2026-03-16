@@ -98,6 +98,11 @@
   --dropdown-padding: var(--space-1);
   --dropdown-item-padding: var(--space-2) var(--space-3);
   --dropdown-item-radius: var(--radius-md);
+  --filter-dropdown-width: 280px;
+  --filter-dropdown-width-sm: 240px;
+  --filter-dropdown-max-width: min(90vw, var(--filter-dropdown-width));
+  --user-filter-dropdown-width: 360px;
+  --user-filter-dropdown-max-width: min(94vw, var(--user-filter-dropdown-width));
 
   --modal-radius: var(--radius-xl);
   --modal-padding: var(--space-6);
@@ -211,6 +216,31 @@
   --surface-overlay-strong: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
   --surface-report-icon: rgba(255, 255, 255, 0.8);
   --shadow-report-icon: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  --auth-geo-hero-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface-page) 78%, var(--surface-warm) 22%) 0%,
+    color-mix(in srgb, var(--surface-page) 58%, var(--primary) 12%) 100%
+  );
+  --auth-geo-glow-a: color-mix(in srgb, var(--primary) 18%, transparent);
+  --auth-geo-glow-b: color-mix(in srgb, var(--border) 65%, transparent);
+  --auth-geo-shape-a: color-mix(in srgb, var(--primary) 30%, transparent);
+  --auth-geo-shape-b: color-mix(in srgb, var(--muted) 24%, transparent);
+  --auth-geo-shape-c: color-mix(in srgb, var(--primary) 20%, transparent);
+  --auth-geo-shape-d: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-shape-e: color-mix(in srgb, var(--border) 45%, transparent);
+  --auth-geo-shape-border-a: color-mix(in srgb, var(--primary) 30%, var(--border));
+  --auth-geo-shape-border-b: color-mix(in srgb, var(--muted) 35%, var(--border));
+  --auth-geo-shape-border-c: color-mix(in srgb, var(--primary) 26%, var(--border));
+  --auth-geo-shape-border-d: color-mix(in srgb, var(--primary) 22%, var(--border));
+  --auth-geo-shape-border-e: color-mix(in srgb, var(--border) 80%, transparent);
+  --auth-geo-shape-highlight: color-mix(in srgb, #ffffff 20%, transparent);
+  --auth-geo-shape-shadow: 0 10px 36px color-mix(in srgb, var(--primary) 18%, transparent);
+  --auth-geo-fade-overlay: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface-page) 90%, transparent),
+    color-mix(in srgb, var(--surface-page) 20%, transparent),
+    color-mix(in srgb, var(--surface-page) 82%, transparent)
+  );
   /* Day-strip / date navigator dots (semantic) */
   --dot-lecture: var(--study);
   --dot-meal: var(--neutral);
@@ -449,6 +479,31 @@
   --surface-overlay-strong: linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.62));
   --surface-report-icon: rgba(241, 245, 249, 0.85);
   --shadow-report-icon: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  --auth-geo-hero-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface-page) 84%, #000000 16%) 0%,
+    color-mix(in srgb, var(--surface-page) 72%, var(--primary) 28%) 100%
+  );
+  --auth-geo-glow-a: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-glow-b: color-mix(in srgb, var(--border) 70%, transparent);
+  --auth-geo-shape-a: color-mix(in srgb, var(--primary) 32%, transparent);
+  --auth-geo-shape-b: color-mix(in srgb, var(--muted) 18%, transparent);
+  --auth-geo-shape-c: color-mix(in srgb, var(--primary) 28%, transparent);
+  --auth-geo-shape-d: color-mix(in srgb, var(--primary) 24%, transparent);
+  --auth-geo-shape-e: color-mix(in srgb, var(--border) 50%, transparent);
+  --auth-geo-shape-border-a: color-mix(in srgb, var(--primary) 40%, var(--border));
+  --auth-geo-shape-border-b: color-mix(in srgb, var(--muted) 30%, var(--border));
+  --auth-geo-shape-border-c: color-mix(in srgb, var(--primary) 34%, var(--border));
+  --auth-geo-shape-border-d: color-mix(in srgb, var(--primary) 30%, var(--border));
+  --auth-geo-shape-border-e: color-mix(in srgb, var(--border) 86%, transparent);
+  --auth-geo-shape-highlight: color-mix(in srgb, #ffffff 12%, transparent);
+  --auth-geo-shape-shadow: 0 10px 36px color-mix(in srgb, #000000 38%, transparent);
+  --auth-geo-fade-overlay: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--surface-page) 90%, transparent),
+    color-mix(in srgb, var(--surface-page) 18%, transparent),
+    color-mix(in srgb, var(--surface-page) 86%, transparent)
+  );
 
   /* Topbar (dark) */
   --topbar-bg: rgba(26, 19, 16, 0.95);

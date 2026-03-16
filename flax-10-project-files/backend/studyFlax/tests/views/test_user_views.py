@@ -76,6 +76,65 @@ class ProfileViewTest(TestCase):
         response = self.client.get('/api/users/99999/profile/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_teacher_profile_returns_only_taught_modules(self):
+        teacher = User.objects.create_user(
+            username='teacher1',
+            email='teacher1@example.com',
+            password='pass',
+            first_name='Teach',
+            last_name='Er',
+            role='teacher',
+        )
+        other_teacher = User.objects.create_user(
+            username='teacher2',
+            email='teacher2@example.com',
+            password='pass',
+            first_name='Other',
+            last_name='Teach',
+            role='teacher',
+        )
+        taught = Module.objects.create(
+            module_code='CS9001',
+            module_name='Teaching Module',
+            created_by=teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timezone.timedelta(hours=2),
+        )
+        Module.objects.create(
+            module_code='CS9002',
+            module_name='Not Mine',
+            created_by=other_teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timezone.timedelta(hours=2),
+        )
+        Enrollment.objects.create(student=teacher, module=taught)
+
+        response = self.client.get(f'/api/users/{teacher.id}/profile/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['modules'], ['CS9001'])
+        self.assertEqual(response.data['module_count'], 1)
+
+    def test_profile_prefers_taught_modules_when_role_is_stale(self):
+        creator = User.objects.create_user(
+            username='creator1',
+            email='creator1@example.com',
+            password='pass',
+            first_name='Create',
+            last_name='Or',
+            role='student',
+        )
+        Module.objects.create(
+            module_code='CS9010',
+            module_name='Creator Module',
+            created_by=creator,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timezone.timedelta(hours=2),
+        )
+        response = self.client.get(f'/api/users/{creator.id}/profile/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['modules'], ['CS9010'])
+        self.assertEqual(response.data['module_count'], 1)
+
     def test_unauthenticated(self):
         response = APIClient().get('/api/profile/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])

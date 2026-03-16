@@ -1,0 +1,181 @@
+.wrapper {
+    position: relative;
+}
+
+.filterBtn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    height: 100%;
+}
+
+.filterBtn:hover {
+    background: var(--hover);
+    border-color: var(--primary);
+}
+
+.badge {
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    right: 0;
+    width: var(--filter-dropdown-width);
+    max-width: var(--filter-dropdown-max-width);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.listContainer {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.searchInput {
+    font-size: var(--text-base);
+    line-height: 1.35;
+}
+
+.groups {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.groupHeading {
+    margin: 0 0 8px 8px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.item:hover {
+    background-color: var(--hover);
+}
+
+.checkbox {
+    cursor: pointer;
+    accent-color: var(--primary);
+    margin: 0;
+}
+
+.itemLabel {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.expandBtn {
+    padding: 8px;
+    font-size: 0.85rem;
+    color: var(--primary);
+    text-align: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    width: 100%;
+}
+
+.collapseBtn {
+    color: var(--muted);
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+
+.tab {
+    background: transparent;
+    color: var(--text);
+    border: none;
+    padding: 6px 16px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+    font-weight: 600;
+}
+
+.tabActive {
+    background: var(--primary);
+    color: white;
+}
+
+.radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.radioChecked {
+    border-color: var(--primary);
+    background: var(--primary);
+    box-shadow: inset 0 0 0 3px var(--panel);
+}
+
+.itemActive {
+    background-color: var(--hover);
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .dropdown {
+        width: var(--filter-dropdown-width-sm);
+    }
+}

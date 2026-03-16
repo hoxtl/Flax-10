@@ -3,6 +3,7 @@
  * potentially including a specific "Browse" or "Create" action card.
  */
 import styles from "./SocietiesPage.module.css";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import SocietyCard from "../../components/Society/SocietyCard";
 import BrowseCard from "../../components/Society/BrowseCard";
 import CreateCard from "../../components/Society/CreateCard";
@@ -37,7 +38,7 @@ function SectionHeader({ title, type, onAction }) {
 /** Renders the grid of societies along with type-specific action cards. */
 function SectionGrid({ items, type, onAction, allSocieties, onSelect, onReport, onUnreport }) {
     return (
-        <div className={styles.grid}>
+        <div className={gridStyles.grid}>
             {type === "admin" && <CreateCard onClick={onAction} />}
             {type === "member" && <BrowseCard onClick={onAction} societies={allSocieties} />}
             {items.map(s => (

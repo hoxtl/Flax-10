@@ -67,6 +67,17 @@ describe('Discover', () => {
         await waitFor(() => expect(screen.getByText('@bob')).toBeTruthy());
     });
 
+    it('shows professor pill and Dr prefix for teacher cards', async () => {
+        searchUsers.mockResolvedValue({
+            results: [{ id: 7, username: 'teach', first_name: 'Sam', last_name: 'Rahwan', role: 'teacher' }],
+            total_count: 1,
+        });
+        render(<Discover onNavChange={vi.fn()} />);
+        await waitFor(() => expect(screen.getByText('@teach')).toBeTruthy());
+        expect(screen.getByText('Dr. Sam Rahwan')).toBeTruthy();
+        expect(screen.getByText('Professor')).toBeTruthy();
+    });
+
     it('calls onNavChange with profile id when user card is clicked', async () => {
         searchUsers.mockResolvedValue({
             results: [{ id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' }],

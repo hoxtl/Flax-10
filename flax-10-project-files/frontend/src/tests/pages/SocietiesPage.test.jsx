@@ -88,10 +88,11 @@ vi.mock('../../components/Society/CreateSocietyModal', () => ({
 }));
 
 vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
-    default: ({ society, onClose }) => (
+    default: ({ society, onClose, onReportSuccess }) => (
         <div data-testid="report-modal">
             <span>Report: {society?.name}</span>
             <button onClick={onClose}>CloseReport</button>
+            <button onClick={onReportSuccess}>SuccessReport</button>
         </div>
     ),
 }));
@@ -311,4 +312,21 @@ describe('SocietiesPage', () => {
         expect(mockUseSocieties.updateSocietyLocally).not.toHaveBeenCalled();
         errSpy.mockRestore();
     });
+
+    it('onReportSuccess marks society as reported in My view', async () => {
+        mockUseSocieties.societies = [{ id: 'r1', name: 'Report Me', is_member: true }];
+        renderWithRouter(<SocietiesPage />);
+        fireEvent.click(screen.getByText('ReportInSection'));
+        fireEvent.click(screen.getByText('SuccessReport'));
+        expect(mockUseSocieties.updateSocietyLocally).toHaveBeenCalledWith('r1', { has_reported: true });
+    });
+
+    it('onReportSuccess marks society as reported in All view', async () => {
+        mockUseSocieties.societies = [{ id: 'r2', name: 'Report All' }];
+        render(<MemoryRouter initialEntries={['/?tab=all']}><SocietiesPage /></MemoryRouter>);
+        fireEvent.click(screen.getByText('ReportSociety'));
+        fireEvent.click(screen.getByText('SuccessReport'));
+        expect(mockUseSocieties.updateSocietyLocally).toHaveBeenCalledWith('r2', { has_reported: true });
+    });
+
 });

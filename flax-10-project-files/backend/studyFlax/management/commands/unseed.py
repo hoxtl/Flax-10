@@ -39,6 +39,7 @@ TABLES = [
     'studyFlax_meetingsuggestion', 'studyFlax_meetingresponse',
     'studyFlax_studysession',
     'studyFlax_themesession',
+    'studyFlax_reading',
 ]
 
 SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'role'}

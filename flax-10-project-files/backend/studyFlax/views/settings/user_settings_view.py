@@ -12,6 +12,8 @@ def update_user_name(user, data):
         user.first_name = data['first_name']
     if 'last_name' in data:
         user.last_name = data['last_name']
+    if 'email' in data:
+        user.email = data['email']
 
 def update_user_password(user, data):
     password = data.get('password')

@@ -1,0 +1,85 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow: hidden;
+  animation: alertIn 0.3s ease-out;
+}
+
+.alert[data-exiting="true"] {
+  animation: alertOut 0.25s ease-in forwards;
+}
+
+@keyframes alertIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 80px;
+  }
+}
+
+@keyframes alertOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 80px;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Variants ────────────────────────────────── */
+
+.success {
+  background: color-mix(in srgb, var(--success-text, #15803d) 10%, transparent);
+  color: var(--success-text, #15803d);
+  border: 1px solid color-mix(in srgb, var(--success-text, #15803d) 25%, transparent);
+}
+
+.error {
+  background: color-mix(in srgb, #dc2626 8%, transparent);
+  color: #dc2626;
+  border: 1px solid color-mix(in srgb, #dc2626 20%, transparent);
+}
+
+.info {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.warning {
+  background: color-mix(in srgb, #d97706 8%, transparent);
+  color: #92400e;
+  border: 1px solid color-mix(in srgb, #d97706 20%, transparent);
+}

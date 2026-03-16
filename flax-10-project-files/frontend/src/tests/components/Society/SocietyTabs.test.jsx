@@ -2,11 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('../../../components/Society/SocietyDetail/tabs/AboutTab', () => ({
-    default: ({ about }) => <div data-testid="about-tab">{about || 'About'}</div>,
+    default: ({ about, onUpdate }) => (
+        <div data-testid="about-tab">
+            {about || 'About'}
+            <button data-testid="update-about" onClick={() => onUpdate({ bio: 'new' })}>Update</button>
+        </div>
+    ),
 }));
 
 vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab', () => ({
-    default: () => <div data-testid="calendar-tab" />,
+    default: ({ onViewAnnouncement }) => (
+        <div data-testid="calendar-tab">
+            <button data-testid="view-ann" onClick={() => onViewAnnouncement?.(5)}>View Ann</button>
+        </div>
+    ),
 }));
 
 vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab', () => ({
@@ -53,5 +62,19 @@ describe('SocietyTabs', () => {
         render(<SocietyTabs activeTab="calendar" onTabChange={onTabChange} society={baseSociety} />);
         fireEvent.click(screen.getByText('About'));
         expect(onTabChange).toHaveBeenCalledWith('about');
+    });
+
+    it('onViewAnnouncement in CalendarTab calls onTabChange with announcements', () => {
+        const onTabChange = vi.fn();
+        render(<SocietyTabs activeTab="calendar" onTabChange={onTabChange} society={baseSociety} />);
+        fireEvent.click(screen.getByTestId('view-ann'));
+        expect(onTabChange).toHaveBeenCalledWith('announcements', 5);
+    });
+
+    it('AboutTab onUpdate callback calls outer onUpdate', () => {
+        const onUpdate = vi.fn();
+        render(<SocietyTabs activeTab="about" onTabChange={vi.fn()} society={baseSociety} onUpdate={onUpdate} />);
+        fireEvent.click(screen.getByTestId('update-about'));
+        expect(onUpdate).toHaveBeenCalledWith({ bio: 'new' });
     });
 });

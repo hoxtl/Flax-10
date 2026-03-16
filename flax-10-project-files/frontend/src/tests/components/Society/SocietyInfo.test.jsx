@@ -155,8 +155,35 @@ describe('SocietyInfo', () => {
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 
+    it('uses empty array when both categories and category are falsy', () => {
+        render(<SocietyInfo society={{ ...baseSociety, categories: undefined, category: undefined }} editMode={false} />);
+        expect(screen.getByTestId('category-display')).toBeTruthy();
+    });
+
+    it('CategorySection handles null categories prop', () => {
+        render(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />);
+        expect(screen.getByTestId('category-display')).toBeTruthy();
+    });
+
     it('renders Ratified badge when society is ratified', () => {
         render(<SocietyInfo society={{ ...baseSociety, is_ratified: true }} editMode={false} />);
         expect(screen.getByText('Ratified')).toBeTruthy();
+    });
+
+    it('CategorySection updates value when categories prop changes', () => {
+        const { rerender } = render(
+            <SocietyInfo society={{ ...baseSociety, categories: ['Sports'] }} editMode={true} />
+        );
+        expect(screen.getByTestId('category-display')).toBeTruthy();
+        rerender(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />);
+        expect(screen.getByTestId('category-display')).toBeTruthy();
+    });
+
+    it('CategorySection useEffect covers true branch when categories changes to truthy', () => {
+        const { rerender } = render(
+            <SocietyInfo society={{ ...baseSociety, categories: null }} editMode={true} />
+        );
+        rerender(<SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} />);
+        expect(screen.getByTestId('category-display')).toBeTruthy();
     });
 });

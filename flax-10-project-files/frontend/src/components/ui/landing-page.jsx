@@ -142,10 +142,13 @@ function ScrollGlobe({
     const animate = () => {
       const target = targetTransformRef.current;
       const current = smoothTransformRef.current;
-      const ease = 0.16;
+      const ease = 0.1;
       current.left = lerp(current.left, target.left, ease);
       current.top = lerp(current.top, target.top, ease);
       current.scale = lerp(current.scale, target.scale, ease);
+      if (Math.abs(current.left - target.left) < 0.02) current.left = target.left;
+      if (Math.abs(current.top - target.top) < 0.02) current.top = target.top;
+      if (Math.abs(current.scale - target.scale) < 0.002) current.scale = target.scale;
       const nextTransform = `translate3d(${current.left}vw, ${current.top}vh, 0) translate3d(-50%, -50%, 0) scale3d(${current.scale}, ${current.scale}, 1)`;
       setDisplayTransform(nextTransform);
       animationTickerRef.current = requestAnimationFrame(animate);
@@ -271,6 +274,7 @@ function ScrollGlobe({
             className={cx(
               styles.section,
               index === 0 ? styles.sectionFirst : "",
+              index === sections.length - 1 ? styles.sectionLast : "",
               section.align === "center" ? styles.sectionCenter : "",
               section.align === "right" ? styles.sectionRight : "",
               isAlternate ? styles.sectionAlternate : "",

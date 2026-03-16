@@ -48,8 +48,8 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 360px;
-  max-width: min(92vw, 360px);
+  width: var(--filter-dropdown-width);
+  max-width: var(--filter-dropdown-max-width);
   background: var(--panel, #FFFCFA);
   border: 1px solid var(--border, rgba(74, 52, 33, 0.12));
   border-radius: 12px;

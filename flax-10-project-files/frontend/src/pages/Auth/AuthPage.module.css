@@ -1,4 +1,14 @@
 .pageWrap {
+  --auth-card-bg: var(--panel);
+  --auth-form-bg: color-mix(in srgb, var(--panel) 94%, var(--surface-page));
+  --auth-title-fg: var(--text);
+  --auth-input-bg: color-mix(in srgb, var(--surface-page) 55%, var(--panel));
+  --auth-input-border: color-mix(in srgb, var(--primary) 24%, var(--border));
+  --auth-input-fg: var(--text);
+  --auth-input-placeholder: color-mix(in srgb, var(--muted) 78%, transparent);
+  --auth-input-focus-bg: var(--panel);
+  --auth-input-focus-border: color-mix(in srgb, var(--primary) 62%, var(--border));
+  --auth-input-focus-ring: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
   height: 100vh;
   min-height: 100vh;
   width: 100%;
@@ -8,11 +18,11 @@
 }
 
 .authFormCard {
-  width: min(900px, 100%);
+  width: min(620px, 100%);
   margin: 0;
   padding-bottom: 12px;
-  padding-left: max(12px, env(safe-area-inset-left));
-  padding-right: max(12px, env(safe-area-inset-right));
+  padding-left: 0;
+  padding-right: 0;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -21,7 +31,7 @@
 
 .authPanelCard {
   width: 100%;
-  max-width: 860px;
+  max-width: 600px;
   margin: 0;
   position: relative;
 }
@@ -38,10 +48,17 @@
   color: var(--muted);
 }
 
+.kclAccent {
+  font-style: italic;
+  color: var(--kcl-accent);
+}
+
 @media (max-width: 768px) {
   .authFormCard {
     width: 100%;
     margin: 0;
     padding-bottom: 12px;
+    padding-left: 0;
+    padding-right: 0;
   }
 }

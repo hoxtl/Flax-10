@@ -5,6 +5,16 @@
 import { useCallback } from "react";
 import { createTask, updateTask, deleteTask } from "../../../api/taskService";
 import useTasksLoad from "./useTasksLoad";
+import { recalculatePendingBlocks } from "../utils/readingSpeedUtils";
+
+function useToggleComplete(editTask, setTasks) { 
+  return useCallback(async(id, current) => {
+    const updated = await editTask(id, {completed: !current});
+    if (current === false && (updated?.reading_id || updated?.page_count)) 
+      setTasks((prev) => recalculatePendingBlocks(prev.map((t) => (t.id === id ? updated: t))));
+    return updated;
+  }, [editTask, setTasks]);
+}
 
 export default function useTasks(filters = {}) {
   const { tasks, setTasks, loading, initialLoading, load } = useTasksLoad(filters);
@@ -20,6 +30,6 @@ export default function useTasks(filters = {}) {
     return updated;
   }, [setTasks]);
   const removeTask = useCallback(async (id) => { await deleteTask(id); setTasks((prev) => prev.filter((t) => t.id !== id)); }, [setTasks]);
-  const toggleComplete = useCallback((id, current) => editTask(id, { completed: !current }), [editTask]);
+  const toggleComplete = useToggleComplete(editTask, setTasks);
   return { tasks, loading, initialLoading, addTask, editTask, removeTask, toggleComplete, reload: load };
 }

@@ -53,13 +53,12 @@
     background: var(--bg);
     position: relative;
     z-index: 2;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 }
 
-.bannerRow {
-  width: 100%;
-  margin-bottom: 10px;
-  flex-shrink: 0;
+.inlineBanner {
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .createRow {
@@ -67,9 +66,9 @@
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
-  margin-bottom: 2px;
+  margin-bottom: 0;
 }
 .createRow .createBarWrap {
   flex: 1;
@@ -79,6 +78,11 @@
 .subHeader .createBarWrap { width: 100%; }
 .subHeaderSpacer { flex: 1; min-width: 0; }
 
+.fullPlanBtn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .createBarWrap {
     width: 100%;
     min-width: 0;
@@ -86,7 +90,7 @@
 
 .subHeader .toolbar {
     border-bottom: none;
-    padding: 8px 0;
+    padding: 4px 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -136,7 +140,7 @@
     flex-direction: column;
     position: relative;
     z-index: 0;
-    margin-top: 24px;
+    margin-top: 14px;
 }
 .sections {
     display: flex;

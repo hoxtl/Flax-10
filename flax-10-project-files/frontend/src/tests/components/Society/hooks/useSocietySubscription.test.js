@@ -82,4 +82,26 @@ describe('useSocietySubscription', () => {
         expect(apiToggle).not.toHaveBeenCalled();
         expect(updateLocalSociety).not.toHaveBeenCalled();
     });
+
+    it('handles toggle errors gracefully', async () => {
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        apiToggle.mockRejectedValue(new Error('fail'));
+        
+        // Subscribe failure
+        const { result: resSub } = renderHook(() =>
+            useSocietySubscription(1, { is_subscribed: false }, updateLocalSociety)
+        );
+        await act(async () => { await resSub.current.toggleSubscription(); });
+        expect(spy).toHaveBeenCalledWith('Subscription failed:', expect.any(Error));
+
+        // Unsubscribe failure
+        spy.mockClear();
+        const { result: resUnsub } = renderHook(() =>
+            useSocietySubscription(1, { is_subscribed: true }, updateLocalSociety)
+        );
+        await act(async () => { await resUnsub.current.toggleSubscription(); });
+        expect(spy).toHaveBeenCalledWith('Unsubscription failed:', expect.any(Error));
+        
+        spy.mockRestore();
+    });
 });

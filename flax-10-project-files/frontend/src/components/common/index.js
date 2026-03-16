@@ -8,6 +8,7 @@ export { default as PageHeader } from "./PageHeader/PageHeader";
 export { default as PageTransition } from "./PageTransition/PageTransition";
 export { default as PageToolbar } from "./PageToolbar/PageToolbar";
 export { default as PrimaryButton } from "./PrimaryButton/PrimaryButton";
+export { default as RequestStatusCard } from "./RequestStatusCard/RequestStatusCard";
 export { default as ScrollToTop } from "./ScrollToTop/ScrollToTop";
 export { default as SearchBar } from "./SearchBar/SearchBar";
 export { default as SectionHeader } from "./SectionHeader/SectionHeader";
