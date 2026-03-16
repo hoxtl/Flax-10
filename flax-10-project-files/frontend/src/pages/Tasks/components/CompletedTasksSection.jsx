@@ -1,0 +1,69 @@
+/**
+ * Collapsible section that lists completed tasks.
+ */
+
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+import TaskCard from "./TaskCard";
+import { sortTasks } from "../utils/taskSortUtils";
+import { getListColor } from "../utils/listColorUtils";
+
+import styles from "./TaskFeedSections.module.css";
+
+const BODY_ANIM = {
+  initial: { height: 0, opacity: 0, y: -4 },
+  animate: { height: "auto", opacity: 1, y: 0 },
+  exit:    { height: 0, opacity: 0, y: -4 },
+  transition: { height: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.2, ease: "easeOut" }, y: { duration: 0.2, ease: "easeOut" } },
+};
+
+function CompletedHeader({ count, showDone, onToggle }) {
+  return (
+    <button type="button" className={styles.sectionHeader} onClick={onToggle} aria-expanded={showDone}>
+      <span className={styles.sectionIcon}>🎯</span>
+      <span className={styles.sectionTitle}>Completed</span>
+      <span className={styles.sectionStatsChip}>
+        <span className={styles.sectionCountWrap}>
+          <span className={styles.sectionCountPill} aria-label={`${count} tasks`}>{count}</span>
+        </span>
+        <span className={styles.sectionChevronBtn} aria-hidden>
+          <motion.span className={styles.sectionChevron} animate={{ rotate: showDone ? 0 : -90 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+            <ChevronDown size={16} />
+          </motion.span>
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function CompletedTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask }) {
+  const list = listMap[String(task.task_list)];
+  return (
+    <div className={styles.taskRow}>
+      <TaskCard task={task} listName={list?.name} listColor={getListColor(list, list?.idx)} lists={lists} onToggle={() => onToggleComplete(task.id, task.completed)} onDelete={() => onDeleteTask(task.id)} onEdit={(data, meta) => onEditTask(task.id, data, meta)} isCompletedSection />
+    </div>
+  );
+}
+
+/** Renders a collapsible list of completed tasks. */
+export default function CompletedTasksSection({ tasks, sortBy, listMap, lists, onToggleComplete, onDeleteTask, onEditTask }) {
+  const [showDone, setShowDone] = useState(true);
+  if (tasks.length === 0) return null;
+  const sorted = sortTasks(tasks, sortBy, listMap);
+  return (
+    <div className={`${styles.completedSection} ${styles.sectionAccentDone}`}>
+      <CompletedHeader count={tasks.length} showDone={showDone} onToggle={() => setShowDone(s => !s)} />
+      <AnimatePresence initial={false}>
+        {showDone && (
+          <motion.div key="completed-body" {...BODY_ANIM} style={{ overflow: "hidden" }}>
+            <div className={styles.completedCards}>
+              {sorted.map(task => <CompletedTaskRow key={task.id} task={task} listMap={listMap} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />)}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

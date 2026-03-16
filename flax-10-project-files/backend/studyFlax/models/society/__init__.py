@@ -5,3 +5,4 @@ from .societyImageModel import SocietyImage
 from .societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
 from .societyEventModel import SocietyEvent, RECURRENCE_CHOICES
 from .societyCalendarSyncModel import SocietyCalendarSync
+from .societyReportModel import SocietyReport

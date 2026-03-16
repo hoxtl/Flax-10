@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNotifications } from '../../context/NotificationContext';
 import { playNotificationSound } from './utils/notificationSound';
+import { executeNotificationAction, parseNotificationAction, hasNotificationAction } from './utils/notificationAction';
 import './NotificationToast.css';
 
 export function NotificationToast() {
@@ -25,11 +26,15 @@ function useToastRefs() {
 
 function useShowNext(queueRef, setCurrentToast) {
     return useCallback(() => {
-        if (queueRef.current.length === 0) return setCurrentToast(null);
-        setCurrentToast(queueRef.current.shift());
-        playNotificationSound();
-        setTimeout(() => setCurrentToast(prev => prev ? null : prev), 3000);
+        showNextToast(queueRef, setCurrentToast);
     }, [queueRef, setCurrentToast]);
+}
+
+export function showNextToast(queueRef, setCurrentToast) {
+    if (queueRef.current.length === 0) return setCurrentToast(null);
+    setCurrentToast(queueRef.current.shift());
+    playNotificationSound();
+    setTimeout(() => setCurrentToast(prev => prev ? null : prev), 3000);
 }
 
 function useToastEffect(notifications, loading, refs, currentToast, showNext) {
@@ -53,8 +58,14 @@ function queueNew(notifications, refs, currentToast, showNext) {
 }
 
 function Toast({ notification }) {
+    const isClickable = hasNotificationAction(notification);
+    const handleClick = () => {
+        const action = parseNotificationAction(notification);
+        executeNotificationAction(action);
+    };
+
     return (
-        <div className="notification-toast">
+        <div className={`notification-toast ${isClickable ? 'clickable' : ''}`} onClick={isClickable ? handleClick : undefined}>
             <span className="toast-title">{notification.title}</span>
             <span className="toast-message">{notification.message}</span>
         </div>

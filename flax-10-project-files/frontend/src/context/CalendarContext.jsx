@@ -1,9 +1,11 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useMemo } from "react";
 import { calendarReducer, initialState } from "./calendarReducer";
 import { useReminderNotifications } from "../components/Notifications/hooks/useReminderNotifications";
+import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
+const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all' };
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
@@ -20,31 +22,53 @@ export function CalendarProvider({ children }) {
 
 export function useCalendar() {
     const context = useContext(CalendarContext);
-    if (!context) {
-        throw new Error('useCalendar must be used within CalendarProvider');
-    }
-    return getFilteredContext(context);
+    const filter = context?.filter;
+    const searchQuery = context?.searchQuery;
+    const events = context?.events;
+
+    const filteredEvents = useMemo(() => {
+        if (!events) return [];
+        return applyFilters(events, filter, searchQuery);
+    }, [events, filter, searchQuery]);
+
+    return useMemo(() => {
+        if (!context) return DEFAULT_CONTEXT;
+        return { ...context, events: filteredEvents, allEvents: context.events };
+    }, [context, filteredEvents]);
 }
 
-function getFilteredContext(context) {
-    const currentFilter = Array.isArray(context.filter) ? context.filter : [context.filter];
-    const filteredEvents = filterEventsByTag(context.events, currentFilter);
-    return { ...context, events: filteredEvents, allEvents: context.events };
+function applyFilters(events, filter, searchQuery) {
+    let result = filterEventsByTag(events, filter);
+    return filterEventsBySearch(result, searchQuery);
 }
 
 function filterEventsByTag(events, filter) {
-    if (filter.includes('all')) return events;
-    return events.filter(e => filter.includes(e.tag_name?.toLowerCase()));
+    const currentFilter = Array.isArray(filter) ? filter : [filter];
+    if (currentFilter.includes('all')) return events;
+    return events.filter(e => currentFilter.includes(getEffectiveTagName(e)));
+}
+
+function filterEventsBySearch(events, query) {
+    if (!query || !query.trim()) return events;
+    const q = query.toLowerCase().trim();
+    return events.filter(e => matchesSearch(e, q));
+}
+
+function matchesSearch(event, query) {
+    const title = (event.title || '').toLowerCase();
+    const description = (event.description || '').toLowerCase();
+    const location = (event.location || '').toLowerCase();
+    return title.includes(query) || description.includes(query) || location.includes(query);
 }
 
 export function useCalendarData(props = {}) {
-    const context = useContext(CalendarContext);
-    const filtered = context ? getFilteredContext(context) : null;
-    return {
-        selectedDate: props.selectedDate ?? filtered?.selectedDate ?? new Date(),
-        events: props.events ?? filtered?.events ?? [],
-        viewMode: props.viewMode ?? filtered?.viewMode ?? 'month',
-    };
+    const calendarState = useCalendar();
+    return useMemo(() => ({
+        selectedDate: props.selectedDate ?? calendarState.selectedDate ?? new Date(),
+        events: props.events ?? calendarState.events ?? [],
+        viewMode: props.viewMode ?? calendarState.viewMode ?? 'month',
+        displayMode: props.displayMode ?? calendarState.displayMode ?? 'grid',
+    }), [props.selectedDate, props.events, props.viewMode, props.displayMode, calendarState]);
 }
 
 export function useCalendarDispatch() {
@@ -72,11 +96,11 @@ export function useEventPopup() {
     const dispatch = useContext(CalendarDispatchContext);
 
     if (!context || !dispatch) {
-        return { popupEvent: null, popupAnchorRect: null, openPopup: () => {}, closePopup: () => {} };
+        return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect } = context;
+    const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
     const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
 }

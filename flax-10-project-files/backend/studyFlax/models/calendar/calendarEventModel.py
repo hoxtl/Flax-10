@@ -32,3 +32,4 @@ class CalendarEvent(models.Model):
     external_id = models.CharField(max_length=255, null=True, blank=True)
     
     module = models.ForeignKey('studyFlax.Module', on_delete=models.CASCADE, null=True, blank=True, related_name='calendar_events')
+    is_private = models.BooleanField(default=False)

@@ -1,0 +1,189 @@
+  /* ── Planned vs Actual Nudge Card ── */
+  .pvaNudgeCard {
+    border-radius: 12px;
+    background: #F9F8F6;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .pvaNudgeTitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(107, 83, 68, 0.6);
+    margin: 0;
+  }
+  .pvaBarsWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .pvaBarRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pvaBarLabel {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: rgba(107, 83, 68, 0.55);
+    width: 40px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .pvaBarTrack {
+    flex: 1;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgba(107, 83, 68, 0.1);
+    overflow: hidden;
+  }
+  .pvaBarFill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+  }
+  .pvaBarFillPlanned { background: #90CAF9; }
+  .pvaBarFillActual  { background: #66BB6A; }
+  .pvaBarVal {
+    font-size: 0.6rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: rgba(107, 83, 68, 0.65);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .pvaNudgeWarn {
+    font-size: 0.65rem;
+    color: #FF9F67;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── Weekly Mini-Heatmap ── */
+  .weeklyHeatmapCard {
+    border-radius: 12px;
+    background: #F9F8F6;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .weeklyHeatmapTitle {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(107, 83, 68, 0.6);
+    margin: 0;
+  }
+  .weeklyHeatmapRow {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  .weeklyHeatmapCell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .weeklyHeatmapBlock {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  .weeklyHeatmapDayLabel {
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: rgba(107, 83, 68, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .bentoFoundation {
+    grid-area: foundation;
+    grid-column: 1 / -1;
+    min-width: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+  }
+  .bentoFoundationChart {
+    min-width: 0;
+    width: 100%;
+  }
+  .bentoFoundationHeatmap {
+    min-width: 200px;
+  }
+  .bentoFoundationTitle {
+    grid-column: 1 / -1;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--home-text-label);
+    margin: 0 0 0.5rem;
+  }
+  .growthAnalyticsBarWrap {
+    height: 220px;
+  }
+  .miniTimelinePillEventPassed {
+    opacity: 0.4;
+  }
+  .deadlinesWrap {
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .progressRingWrap {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .progressRingSvg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .progressRingBg {
+    stroke: var(--border);
+    opacity: 0.6;
+  }
+  .progressRingFill {
+    stroke: var(--primary);
+    transition: stroke-dashoffset 0.4s ease;
+  }
+  .progressRingLabel {
+    position: relative;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+

@@ -3,10 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
 import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
+import { PageTransition } from '../../components/common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-const bgStyle = { position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(circle at 50% 35%, rgba(240,237,232,0.0), rgba(240,237,232,0.55))" };
-const centerStyle = { position: "relative", zIndex: 1, display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "2rem" };
 
 function useConfirmForm() {
   const [formData, setFormData] = useState({ new_password: '', confirm_password: '' });
@@ -61,7 +60,7 @@ function SuccessMessage({ success }) {
     <div className={styles.success}>
       <strong>✅ Success!</strong>
       <p>{success}</p>
-      <p style={{ marginTop: '10px', fontSize: '0.9em' }}>Redirecting to login page...</p>
+      <p className={styles.infoText}>Redirecting to login page...</p>
     </div>
   );
 }
@@ -81,7 +80,7 @@ function ConfirmForm({ formData, loading, onSubmit, onChange }) {
   return (
     <form onSubmit={onSubmit} className={styles.form}>
       <PasswordField id="new_password" label="New Password" value={formData.new_password} onChange={onChange} loading={loading} />
-      <small style={{ color: 'var(--muted)', fontSize: '0.85em' }}>Minimum Length: 8 characters</small>
+      <small className={styles.hintText}>Minimum Length: 8 characters</small>
       <PasswordField id="confirm_password" label="Confirm New Password" value={formData.confirm_password} onChange={onChange} loading={loading} />
       <button type="submit" className={styles.button} disabled={loading}>
         {loading ? 'Resetting Password...' : 'Reset Password'}
@@ -105,13 +104,15 @@ function ResetCard({ formData, loading, error, success, passwordError, onSubmit,
 
 function ConfirmPageLayout({ children }) {
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
-      <AuthHeroGeometric />
-      <div aria-hidden="true" style={bgStyle} />
-      <AuthBrand />
-      <AuthFooter absolute />
-      <div style={centerStyle}>{children}</div>
-    </div>
+    <PageTransition>
+      <div className={styles.heroPage}>
+        <AuthHeroGeometric />
+        <div aria-hidden="true" className={styles.heroOverlay} />
+        <AuthBrand />
+        <AuthFooter absolute />
+        <div className={styles.centerContent}>{children}</div>
+      </div>
+    </PageTransition>
   );
 }
 

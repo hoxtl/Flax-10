@@ -26,8 +26,6 @@ export const updateMemberRole = (societyId, userId, role) =>
 export const addCollaborator = (societyId, identifier, role) =>
     postJson(`${BASE}/${societyId}/members/`, { username: identifier, role });
 
-export const searchUsers = (query) => fetchApi(`/users/search/?q=${encodeURIComponent(query)}`);
-
 // Tags
 export const fetchSocietyTags = (societyId) => fetchApi(`${BASE}/${societyId}/tags/`);
 
@@ -42,14 +40,14 @@ export const deleteSocietyTag = (societyId, tagId) =>
 // Announcements
 export const fetchAnnouncements = (societyId) => fetchApi(`${BASE}/${societyId}/announcements/`);
 
-export const createAnnouncement = (societyId, data) =>
-    postJson(`${BASE}/${societyId}/announcements/`, data);
+export const createAnnouncement = (societyId, data, silent = false) =>
+    postJson(`${BASE}/${societyId}/announcements/${silentQuery(silent)}`, data);
 
-export const updateAnnouncement = (societyId, announcementId, data) =>
-    patchJson(`${BASE}/${societyId}/announcements/${announcementId}/`, data);
+export const updateAnnouncement = (societyId, announcementId, data, silent = false) =>
+    patchJson(`${BASE}/${societyId}/announcements/${announcementId}/${silentQuery(silent)}`, data);
 
-export const deleteAnnouncement = (societyId, announcementId) =>
-    deleteRequest(`${BASE}/${societyId}/announcements/${announcementId}/`);
+export const deleteAnnouncement = (societyId, announcementId, silent = false) =>
+    deleteRequest(`${BASE}/${societyId}/announcements/${announcementId}/${silentQuery(silent)}`);
 
 // Calendar Sync
 export const getSyncStatus = (societyId) => fetchApi(`${BASE}/${societyId}/calendar-sync-status/`);
@@ -58,20 +56,35 @@ export const syncCalendar = (societyId) => postJson(`${BASE}/${societyId}/calend
 
 export const unsyncCalendar = (societyId) => deleteRequest(`${BASE}/${societyId}/calendar-unsync/`);
 
+// Reporting
+export const reportSociety = (societyId, reason) => postJson(`${BASE}/${societyId}/report/`, { reason });
+export const unreportSociety = (societyId) => deleteRequest(`${BASE}/${societyId}/report/`);
+
+// Subscription
+export const toggleSubscription = (societyId, isSubscribed) =>
+    patchJson(`${BASE}/${societyId}/subscribe/`, { is_subscribed: isSubscribed });
+
 // Ratification
 export const requestRatification = (societyId) =>
     postJson(`${BASE}/${societyId}/ratification/request/`, {});
 
 // Events
 export const fetchSocietyEvent = (societyId, eventId) => fetchApi(`${BASE}/${societyId}/events/${eventId}/`);
-export const createSocietyEvent = (societyId, data) =>
-    postJson(`${BASE}/${societyId}/events/`, data);
 
-export const updateSocietyEvent = (societyId, eventId, data) =>
-    patchJson(`${BASE}/${societyId}/events/${eventId}/`, data);
+export const createSocietyEvent = (societyId, data, silent = false) =>
+    postJson(`${BASE}/${societyId}/events/${silentQuery(silent)}`, data);
 
-export const deleteSocietyEvent = (societyId, eventId) =>
-    deleteRequest(`${BASE}/${societyId}/events/${eventId}/`);
+export const updateSocietyEvent = (societyId, eventId, data, silent = false) =>
+    patchJson(`${BASE}/${societyId}/events/${eventId}/${silentQuery(silent)}`, data);
+
+export const deleteSocietyEvent = (societyId, eventId, silent = false) =>
+    deleteRequest(`${BASE}/${societyId}/events/${eventId}/${silentQuery(silent)}`);
+
+export const addExceptionDate = (societyId, eventId, date, silent = false) =>
+    postJson(`${BASE}/${societyId}/events/${eventId}/exception/${silentQuery(silent)}`, { date });
+
+// Publish changes (sends notification to members)
+export const publishChanges = (societyId, changes = {}) => postJson(`${BASE}/${societyId}/publish/`, changes);
 
 // Helpers
 function postJson(url, data) {
@@ -84,4 +97,8 @@ function patchJson(url, data) {
 
 function deleteRequest(url) {
     return fetchApi(url, { method: 'DELETE' });
+}
+
+function silentQuery(silent) {
+    return silent ? '?silent=true' : '';
 }

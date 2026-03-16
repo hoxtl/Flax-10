@@ -25,8 +25,10 @@ export function useTimer(initWork, initBreak, initSessions) {
     return {
         ...state,
         updateTime: (type, val) => updateSettings(dispatch, state.mode, state.isActive, type, val),
+        updateSettings: (payload) => dispatch({ type: 'UPDATE_SETTINGS', payload }),
         resetTimer: () => dispatch({ type: 'RESET' }),
         setIsActive: (v) => dispatch({ type: 'SET_ACTIVE', payload: v }),
+        togglePause: () => dispatch({ type: 'TOGGLE_PAUSE' }),
         setMode: (v) => dispatch({ type: 'SET_MODE', payload: v }),
         setTimeLeft: (v) => dispatch({ type: 'SET_TIME_LEFT', payload: v }),
         setCompletedSessions: (v) => dispatch({ type: 'SET_COMPLETED', payload: v })

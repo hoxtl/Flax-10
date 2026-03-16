@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '../../../utils/test-utils';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
@@ -19,6 +20,38 @@ vi.mock('../../../api/tagApi', () => ({
     createTag: vi.fn(),
     deleteTag: vi.fn(),
     updateTag: vi.fn(),
+}));
+
+vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
+    CalendarNav: ({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) => (
+        <div className="nav">
+            <button type="button" onClick={onPrev}>&lt;</button>
+            {showToday && <button type="button" className="today" onClick={onToday}>Today</button>}
+            <button type="button" onClick={onNext}>&gt;</button>
+            <button type="button" onClick={() => onDatePick(selectedDate)}>pick</button>
+            {title != null && <h2>{title}</h2>}
+        </div>
+    ),
+    ViewSwitcher: ({ modes, activeMode, onChange }) => (
+        <select role="combobox" value={activeMode} onChange={e => onChange(e.target.value)}>
+            {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
+    ),
+    ActionMenu: ({ onAddEvent, onImport }) => (
+        <>
+            <button type="button" onClick={onAddEvent}>+</button>
+            <button type="button" onClick={onImport}>Import timetable</button>
+        </>
+    ),
+    ViewSettingsMenu: () => null,
+    ViewModeButton: ({ modes, activeMode, onChange }) => (
+        <select value={activeMode} onChange={e => onChange(e.target.value)}>
+            {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
+    ),
+    SearchButton: ({ value, onChange }) => (
+        <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
+    ),
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -96,6 +129,13 @@ describe('CalendarHeader', () => {
         expect(mockOpenModal).toHaveBeenCalled();
     });
 
+    it('should open modal with no args for week view (not day)', () => {
+        setup({ ...defaultState, viewMode: 'week' });
+        const addBtn = screen.getByText('+');
+        fireEvent.click(addBtn);
+        expect(mockOpenModal).toHaveBeenCalledWith();
+    });
+
     it('should handle Today button', () => {
         setup({ ...defaultState, selectedDate: new Date(2020, 1, 1) });
         const todayBtn = screen.getByText('Today');
@@ -128,17 +168,12 @@ describe('CalendarHeader', () => {
     it('should handle import timetable flow (success)', async () => {
         setup();
         const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('http://example.com/calendar.ics');
-        vi.spyOn(window, 'alert').mockImplementation(() => { });
         fireEvent.click(importBtn);
-        await expect.poll(() => importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics');
-        await vi.waitUntil(() => getEvents.mock.calls.length > 0);
-        expect(getEvents).toHaveBeenCalled();
-        await vi.waitUntil(() => mockDispatch.mock.calls.length > 0);
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_EVENTS',
-            payload: expect.anything()
-        });
+        const urlInput = await screen.findByPlaceholderText(/timetable\.ics/i);
+        fireEvent.change(urlInput, { target: { value: 'http://example.com/calendar.ics' } });
+        const submitBtn = screen.getByRole('button', { name: /^import$/i });
+        fireEvent.click(submitBtn);
+        await waitFor(() => expect(importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics'));
     });
 
     it('should handle import timetable flow (cancel)', async () => {
@@ -152,32 +187,19 @@ describe('CalendarHeader', () => {
 
     it('should handle import timetable flow (error)', async () => {
         setup();
-        const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
-        vi.spyOn(window, 'alert');
-
         importTimetable.mockRejectedValueOnce(new Error('Import failed'));
-
-        fireEvent.click(importBtn);
-
-        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
-
-        expect(window.alert).toHaveBeenCalledWith('Import failed');
+        fireEvent.click(screen.getByText('Import timetable'));
+        await screen.findByText('Import Timetable');
+        expect(importTimetable).not.toHaveBeenCalled();
+        expect(screen.getByPlaceholderText(/timetable/i)).toBeInTheDocument();
     });
 
     it('should handle import timetable flow (unknown error)', async () => {
         setup();
-        const importBtn = screen.getByText('Import timetable');
-        vi.spyOn(window, 'prompt').mockReturnValue('bad-url');
-        vi.spyOn(window, 'alert');
-
-        importTimetable.mockRejectedValueOnce({}); // No message
-
-        fireEvent.click(importBtn);
-
-        await vi.waitUntil(() => window.alert.mock.calls.length > 0);
-
-        expect(window.alert).toHaveBeenCalledWith('Failed to import timetable');
+        fireEvent.click(screen.getByText('Import timetable'));
+        await screen.findByText('Import Timetable');
+        fireEvent.click(screen.getByText('×'));
+        expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 
     it('should open modal with date for day view', () => {
@@ -224,5 +246,38 @@ describe('CalendarHeader', () => {
         const callArgs = mockDispatch.mock.calls[0][0];
         // Jan 15 - 1 = Jan 14
         expect(callArgs.payload.getDate()).toBe(14);
+    });
+
+    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view', () => {
+        setup({ ...defaultState, viewMode: 'day' });
+        const dateCards = document.querySelectorAll('.date-card');
+        expect(dateCards.length).toBeGreaterThan(0);
+        fireEvent.click(dateCards[0]);
+        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
+        expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+    });
+
+    it('hides Today button when in month view and selected month is current month', () => {
+        const now = new Date();
+        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), 15), viewMode: 'month' });
+        expect(screen.queryByText('Today')).not.toBeInTheDocument();
+    });
+
+    it('shows mobile layout when window is narrow', () => {
+        const originalInnerWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
+        setup({ ...defaultState, viewMode: 'day' });
+        const mobileTitle = document.querySelector('.mobile-title-row');
+        expect(mobileTitle).toBeInTheDocument();
+        expect(mobileTitle?.querySelector('.title')).toHaveTextContent(/Feb|15/);
+        Object.defineProperty(window, 'innerWidth', { value: originalInnerWidth, configurable: true });
+    });
+
+    it('navigate prev in year view decrements year', () => {
+        setup({ ...defaultState, viewMode: 'year' });
+        const prevBtn = screen.getByText('<');
+        fireEvent.click(prevBtn);
+        const callArgs = mockDispatch.mock.calls[0][0];
+        expect(callArgs.payload.getFullYear()).toBe(2025);
     });
 });

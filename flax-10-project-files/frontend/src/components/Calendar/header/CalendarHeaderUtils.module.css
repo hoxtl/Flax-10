@@ -1,0 +1,133 @@
+/* Shared Calendar Header Components */
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Shared 32×32 icon button base */
+.arrowBtn,
+.actionBtn,
+.settingsBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+:root[data-theme="dark"] .arrowBtn,
+:root[data-theme="dark"] .actionBtn,
+:root[data-theme="dark"] .settingsBtn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.arrowBtn svg,
+.actionBtn svg,
+.settingsBtn svg {
+    stroke: currentColor;
+    fill: none;
+    width: 18px;
+    height: 18px;
+}
+
+.arrowBtn:hover,
+.actionBtn:hover,
+.settingsBtn:hover {
+    background: var(--hover);
+}
+
+.todayBtn {
+    padding: 6px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: transparent;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s;
+}
+
+:root[data-theme="dark"] .todayBtn {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.todayBtn:hover {
+    background: var(--hover);
+}
+
+.title {
+    margin: 0;
+    margin-left: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+/* Action Menu */
+.actionMenu {
+    position: relative;
+}
+
+/* Search */
+.searchContainer {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.searchWrapper {
+    overflow: hidden;
+}
+
+.searchInner {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.searchBar {
+    flex: none;
+    min-width: 180px;
+}
+
+.searchBar input {
+    padding: 6px 12px 6px 32px;
+    font-size: 0.85rem;
+    height: 32px;
+}
+
+.searchClose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.searchClose:hover {
+    background: var(--hover);
+    color: var(--text);
+}

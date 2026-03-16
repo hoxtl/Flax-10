@@ -19,8 +19,6 @@ class ResetPasswordToken(models.Model):
     
 
     def is_token_valid(self):
-        if not self.expires_at:
-            return False
         return (not self.token_used and timezone.now() < self.expires_at)
     
 

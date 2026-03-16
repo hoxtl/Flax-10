@@ -1,7 +1,6 @@
-import { findOverlappingEvents } from './overlapUtils';
+import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
-
-
+import { validateDateRange } from './dateValidation';
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
@@ -16,9 +15,10 @@ function getFormFromEvent(event, options = {}) {
         end_time: formatForInput(event.end_time),
         recurrence: getRecurrenceFromEvent(event),
         reminder: Array.isArray(event.reminder_minutes) ? event.reminder_minutes : [],
-        tag: event.tag || event.tag_details?.id || options.initialTag || null,
-        location: event.locution || event.location || '',
+        tag: event.tag ?? event.tag_details?.id ?? null,
+        location: event.location || '',
         all_day: isAllDay(event),
+        is_private: event.is_private ?? false,
     };
 }
 
@@ -49,71 +49,60 @@ function getDefaultForm(options) {
         reminder: [],
         tag: options.initialTag || null,
         location: '', all_day: false,
+        is_private: false,
     };
 }
 
-export async function validateAndSubmit(e, form, event, actions, onClose, setError, setOverlapWarning, allEvents, forceSave = false) {
+export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
     const error = validateForm(form);
     if (error) return setError(error);
 
     const data = buildEventData(form);
-    if (!forceSave && hasOverlaps(data, event, allEvents, setOverlapWarning)) return;
+    const others = allEvents.filter(ev => ev.id !== (event?.id));
+    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return;
 
-    await submitEvent(event, data, actions, onClose, setError);
-}
-
-function hasOverlaps(data, event, allEvents, setOverlapWarning) {
-    const others = allEvents.filter(e => e.id !== (event?.id));
-    const overlapping = findOverlappingEvents({ ...data, id: event?.id }, others);
-
-    if (overlapping.length > 0) {
-        setOverlapWarning(overlapping);
-        return true;
-    }
-    return false;
+    await submitEvent(event, data, actions, onClose, setError, confirmFn);
 }
 
 function validateForm(form) {
-    if (new Date(form.start_time) >= new Date(form.end_time)) return 'Start must be before end';
     if (!form.title.trim()) return 'Title is required';
-    return null;
+    return validateDateRange(form.start_time, form.end_time);
 }
 
-async function submitEvent(event, data, actions, onClose, setError) {
+async function submitEvent(event, data, actions, onClose, setError, confirmFn) {
     try {
-        await saveEvent(event, data, actions);
+        await saveEvent(event, data, actions, confirmFn);
         onClose();
     } catch (err) {
         setError(err.message);
     }
 }
 
-async function saveEvent(event, data, actions) {
+async function saveEvent(event, data, actions, confirmFn) {
     if (!event?.id) {
         await actions.addEvent(data);
     } else if (hasRecurrence(event)) {
-        await handleRecurringEdit(event, data, actions);
+        await handleRecurringEdit(event, data, actions, confirmFn);
     } else {
-        await actions.editEvent(extractBaseEventId(event.id), data);
+        await actions.editEvent(extractBaseEventId(event.id, event), data);
     }
 }
 
-async function handleRecurringEdit(event, data, actions) {
-    const choice = confirmRecurringEdit();
-    const baseId = extractBaseEventId(event.id);
+async function handleRecurringEdit(event, data, actions, confirmFn) {
+    const choice = await confirmFn({
+        title: "Recurring Event",
+        message: "This is a recurring event. How would you like to edit it?",
+        confirmText: "Edit ALL occurrences",
+        cancelText: "Edit ONLY this occurrence"
+    });
+    const baseId = extractBaseEventId(event.id, event);
 
     if (choice) {
         await actions.editEvent(baseId, data);
     } else {
         await editSingleOccurrence(event, data, actions, baseId);
     }
-}
-
-function confirmRecurringEdit() {
-    return window.confirm(
-        'This is a recurring event.\n\nOK = Edit ALL occurrences\nCancel = Edit only this occurrence'
-    );
 }
 
 async function editSingleOccurrence(event, data, actions, baseId) {
@@ -124,37 +113,29 @@ async function editSingleOccurrence(event, data, actions, baseId) {
     await actions.addEvent(singleEventData);
 }
 
-export async function confirmDelete(event, actions, onClose) {
-    if (hasRecurrence(event)) {
-        await handleRecurringDelete(event, actions, onClose);
-    } else {
-        await handleSingleDelete(event, actions, onClose);
-    }
+export async function executeDelete(event, actions) {
+    const baseId = extractBaseEventId(event.id, event);
+    await actions.removeEvent(baseId);
 }
 
-async function handleRecurringDelete(event, actions, onClose) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Delete ALL occurrences\nCancel = Delete only this occurrence'
-    );
-    const baseId = extractBaseEventId(event.id);
-    if (choice) {
-        await actions.removeEvent(baseId);
-    } else {
-        const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
-        await actions.addException(baseId, dateStr);
-    }
-    onClose();
+export async function deleteRecurrenceOccurrence(event, actions) {
+    const baseId = extractBaseEventId(event.id, event);
+    const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
+    await actions.addException(baseId, dateStr);
 }
 
-async function handleSingleDelete(event, actions, onClose) {
-    if (!confirm('Delete this event?')) return;
-    await actions.removeEvent(extractBaseEventId(event.id));
-    onClose();
+export function isRecurringEvent(event) {
+    return hasRecurrence(event);
 }
 
 function buildEventData(form) {
     const data = buildBaseEventData(form);
-    addRecurrenceIfNeeded(data, form);
+    const { frequency, interval, end_date } = form.recurrence || {};
+    if (frequency && frequency !== 'none') {
+        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
+    } else {
+        data.recurrence_rule = null;
+    }
     return data;
 }
 
@@ -168,22 +149,13 @@ function buildBaseEventData(form) {
         tag: form.tag || null,
         reminder_minutes: form.reminder,
         all_day: form.all_day,
+        is_private: form.is_private ?? false,
     };
 }
 
-function addRecurrenceIfNeeded(data, form) {
-    const { frequency, interval, end_date } = form.recurrence || {};
-    if (frequency && frequency !== 'none') {
-        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
-    } else {
-        data.recurrence_rule = null;
-    }
-}
-
 function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16); // Fallback
+    if (!d) return new Date().toISOString().slice(0, 16);
     const date = typeof d === 'string' ? new Date(d) : d;
-    // Adjust for timezone to ensure the input shows local time
     const offset = date.getTimezoneOffset() * 60000;
     const localDate = new Date(date.getTime() - offset);
     return localDate.toISOString().slice(0, 16);

@@ -1,0 +1,2576 @@
+/* Homepage slots & layout — focus banner, overlays, bento, triage, intRow, etc. (renamed from ActionHub) */
+  .triageDeadlines {
+    border-radius: var(--card-radius-token);
+    border: var(--card-border);
+    box-shadow: var(--card-shadow-rest);
+    background: var(--surface-card);
+    padding: var(--card-padding);
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .triageDeadlines > *:first-child {
+    flex: 1;
+    min-height: 0;
+  }
+  .triageDeadlines :global([class*="row"]) {
+    background: transparent !important;
+  }
+  .triageModules {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: flex-start;
+    gap: 8px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--card-border);
+    background: var(--surface-card);
+    box-shadow: var(--card-shadow-rest);
+    min-width: 120px;
+    max-width: 180px;
+    min-height: 120px;
+    max-height: 160px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .triageDeadlinesFooter {
+    margin-top: auto;
+    padding-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .triageDeadlinesLink {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--restoration-sage);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .triageDeadlinesLink:hover {
+    color: var(--restoration-earth, #6B5344);
+    text-decoration: underline;
+  }
+  .triageFocus {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--card-border);
+    background: var(--surface-card);
+    min-width: 140px;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    box-shadow: var(--card-shadow-rest);
+  }
+  .triageFocusActive {
+    border-color: rgba(135, 169, 107, 0.5);
+    box-shadow: 0 0 16px rgba(135, 169, 107, 0.35);
+  }
+  .triageFocus:hover,
+  .triageModules:hover,
+  .triageDeadlines:hover,
+  .foundation:hover {
+    transform: var(--card-hover-transform);
+    box-shadow: var(--card-shadow-hover);
+  }
+  .triageFocusLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--home-text-meta);
+  }
+  .triageFocusTime {
+    font-size: 1.75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal, #2d352d);
+    margin: 0;
+    letter-spacing: 0.05em;
+  }
+  .triageFocusActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .triageFocusBtn {
+    padding: 0.4rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--restoration-sage);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .smartInsightStartBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-task);
+    background: var(--restoration-sage, #52796f);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s, box-shadow 0.2s;
+  }
+  .smartInsightStartBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+  .triageFocusBtnSecondary {
+    padding: 0.4rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: transparent;
+    color: var(--restoration-sage);
+    border: 1px solid var(--restoration-sage);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .triageFocusBtnSecondary:hover {
+    background: rgba(135, 169, 107, 0.15);
+  }
+  .triageDeadlinesEmpty {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--home-text-meta);
+    padding: 0.5rem 0;
+  }
+  .triageDeadlinesEmptyIcon {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+  .triageModulePill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-sage-dark, #2d352d);
+    background: rgba(135, 169, 107, 0.1);
+    border: 1px solid rgba(135, 169, 107, 0.2);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .triageModulePill:hover {
+    background: rgba(135, 169, 107, 0.2);
+  }
+  .triageModulePillDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .triageModulePillDotRed {
+    background: #E85555;
+  }
+  .triageModulePillDotGreen {
+    background: var(--restoration-sage);
+  }
+  .triageModulesEmpty {
+    font-size: 0.75rem;
+    color: var(--home-text-meta);
+  }
+  .foundation {
+    grid-area: foundation;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    align-items: start;
+    margin-top: 12px;
+    padding: var(--card-padding);
+    border-radius: var(--card-radius-token);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--card-border);
+    background: color-mix(in srgb, var(--surface-card) 88%, rgba(238, 220, 130, 0.18));
+    box-shadow: var(--card-shadow-rest);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .foundationChartWrap {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .foundationChartTitle {
+    font-size: var(--home-font-meta);
+    font-weight: 700;
+    color: var(--restoration-charcoal, #2d352d);
+    margin: 0 0 4px;
+  }
+  .foundationBarChart {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 120px;
+    padding: 8px 0;
+  }
+  .foundationBarGroup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .foundationBar {
+    width: 100%;
+    max-width: 32px;
+    min-height: 6px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.35s ease;
+  }
+  .foundationBarLabel {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--restoration-charcoal, #2d352d);
+  }
+  .foundationChartFooter {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+  }
+  .foundationChartLink {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--restoration-sage);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(135, 169, 107, 0.4);
+    background: rgba(255, 255, 255, 0.6);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .foundationChartLink:hover {
+    color: var(--restoration-earth, #6B5344);
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--restoration-sage);
+    text-decoration: none;
+  }
+  .foundationSeedsWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 160px;
+  }
+  .foundationSeeds {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .foundationSeedsIcon {
+    font-size: 1.5rem;
+    animation: sway 2.5s ease-in-out infinite;
+  }
+  .foundationSeedsValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal, #2d352d);
+  }
+  .foundationSeedsLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--home-text-meta);
+  }
+  .foundationStreak {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .foundationStreakIcon {
+    font-size: 1.5rem;
+  }
+  .foundationStreakValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--restoration-charcoal, #2d352d);
+  }
+  .foundationStreakLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--home-text-meta);
+  }
+  .foundationChart {
+    min-width: 0;
+    height: 220px;
+  }
+  .foundationHeatmapWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  .foundationHeatmapTitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--home-text-meta);
+    margin: 0;
+  }
+  .foundationHeatmapGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 3px;
+    width: 140px;
+  }
+  .foundationHeatmapCell {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    min-width: 0;
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+  .spineGutter80 {
+    padding-left: 80px;
+  }
+  .timelineTrackWithGutter {
+    position: relative;
+  }
+  .timelineTrackWithGutter::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: transparent;
+    pointer-events: none;
+  }
+  .pillBorder4 {
+    border-left-width: 4px !important;
+    border-left-style: solid !important;
+  }
+  .gapSoftGold {
+    background: var(--restoration-gold-soft) !important;
+    border-radius: 8px;
+  }
+  .replanBtn {
+    padding: 7px 16px;
+    border-radius: 9999px;
+    border: 1px solid rgba(196, 164, 109, 0.5);
+    background: #f9f3df;
+    color: #7a6747;
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .replanBtn:hover { background: #fdf8ea; border-color: rgba(196, 164, 109, 0.68); }
+  .replanBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .bentoHero {
+    grid-area: hero;
+    min-width: 0;
+    min-height: 120px;
+    overflow: hidden;
+    border-radius: var(--home-card-radius);
+    background: #8B6F47;
+    color: #FFFFFF;
+    border: none;
+    /* Only solid block on page — clear anchor; subtle shadow so it reads as one block */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  .heroRow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    min-width: 0;
+    padding: 1rem 1.25rem;
+    border-radius: 0;
+    background: transparent;
+  }
+  .heroCompletionRingWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+  .heroCompletionRing {
+    position: relative;
+    width: 56px;
+    height: 56px;
+  }
+  .heroCompletionRingSvg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .heroCompletionRingBg {
+    transition: stroke 0.2s;
+  }
+  .heroCompletionRingFill {
+    transition: stroke-dasharray 0.5s ease;
+  }
+  .heroCompletionRingIcon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .heroSeedsGrownText {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  }
+  .heroSessionRow {
+    padding: 1rem 1.25rem 0.5rem;
+  }
+  .heroSessionLabel {
+    font-size: var(--home-font-meta);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .heroSessionTitle {
+    font-size: var(--home-font-task);
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0.25rem 0 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .heroSessionProgressWrap {
+    padding: 0 1.25rem;
+    margin-top: 0.5rem;
+  }
+  .heroSessionProgressBar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+  .heroSessionProgressFill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+    transition: width 0.4s ease;
+  }
+  .heroSessionActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem 1rem;
+  }
+  .heroSessionBtn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: var(--home-font-meta);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.95);
+    color: #8B6F47;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .heroSessionBtn:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+  .heroSessionBtnSecondary {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: var(--home-font-meta);
+    font-weight: 600;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .heroSessionBtnSecondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  /* Ghost buttons: thin border, no fill — Flax-brown for Pause/Restart */
+  .heroSessionBtnGhost {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: var(--home-font-meta);
+    font-weight: 600;
+    background: transparent;
+    color: var(--restoration-earth, #6B5344);
+    border: 1px solid var(--restoration-earth, #6B5344);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+  }
+  .heroSessionBtnGhost:hover {
+    background: rgba(107, 83, 68, 0.08);
+    transform: translateY(-1px);
+  }
+  /* End Session: ghost style, Soft Coral text only */
+  .heroSessionBtnEnd {
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+    font-size: var(--home-font-meta);
+    font-weight: 600;
+    background: transparent;
+    color: var(--soft-coral, #c67b5c);
+    border: 1px solid var(--soft-coral, #c67b5c);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+  }
+  .heroSessionBtnEnd:hover {
+    background: rgba(198, 123, 92, 0.1);
+    transform: translateY(-1px);
+  }
+  .bentoPomodoro {
+    min-width: 0;
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    z-index: 2;
+    background: var(--home-bg);
+  }
+  .bentoSpine {
+    grid-area: center;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    align-self: stretch;
+    /* Match IntelligenceRow's intelligenceRowWrap + section max-width */
+    padding: 0 18px 24px;
+    max-width: calc(1200px + 36px);
+    margin: 0 auto;
+    width: 100%;
+  }
+  .zoomParallaxWrap {
+    width: 100%;
+    min-width: 0;
+  }
+  .bentoRight {
+    grid-area: right;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-self: start;
+  }
+  .enrollmentCard {
+    border-radius: 12px;
+    border: 1px solid rgba(107, 83, 68, 0.2);
+    background: #F9F8F6;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .enrollmentCard:hover {
+    box-shadow: 0 8px 28px rgba(74, 52, 33, 0.12), 0 0 0 1px rgba(180, 140, 100, 0.2);
+    transform: translateY(-2px);
+  }
+  .enrollmentTitle {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-title);
+    letter-spacing: 0.04em;
+    color: var(--text-charcoal);
+    margin: 0;
+    text-transform: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .enrollmentNumberWrap {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+  }
+  .enrollmentNumber {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-charcoal);
+    line-height: 1.1;
+  }
+  .enrollmentNumberLabel {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: var(--font-weight-caption);
+    color: #b8956e;
+    margin: 0;
+  }
+  .enrollmentDots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 6px 0 2px;
+  }
+  .enrollmentDots > span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    margin-left: -5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  .enrollmentDots > span:first-child {
+    margin-left: 0;
+  }
+  .enrollmentDotSage {
+    background: var(--color-sage-primary, #52796f);
+  }
+  .enrollmentDotFlax {
+    background: #c4a35a;
+  }
+  .enrollmentDotEarth {
+    background: #6B5344;
+  }
+  .enrollmentQuestion {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: var(--font-weight-caption);
+    color: var(--text-muted-sage);
+    margin: 0;
+    text-align: center;
+  }
+  .enrollmentCta {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: var(--font-weight-task);
+    color: var(--color-sage-primary, #52796f);
+    text-decoration: none;
+    margin-top: 2px;
+    transition: color 0.15s, text-decoration 0.15s;
+  }
+  .enrollmentCta:hover {
+    color: var(--primary-strong, #4A3421);
+    text-decoration: underline;
+  }
+
+
+/* ─── Intelligence Row slot shared utilities ─────────────────────────────── */
+
+.intRowSlotContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.intRowSlotText {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #5c4d3e;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.intRowSlotMeta {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: #9a8778;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.intRowSlotLink {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  text-decoration: none;
+  margin-top: auto;
+  padding-top: 4px;
+  transition: color 0.15s;
+}
+.intRowSlotLink:hover { color: #57534e; text-decoration: underline; }
+
+/* ─── Day Progress slot ──────────────────────────────────────────────────── */
+
+.intRowProgressWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.intRowProgressStats {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.intRowProgressBig {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2d352d;
+  line-height: 1;
+}
+
+.intRowProgressLabel {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #7B6751;
+}
+
+.intRowProgressBarTrack {
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.12);
+  overflow: hidden;
+}
+
+.intRowProgressBarFill {
+  height: 100%;
+  border-radius: 99px;
+  background: #4A3421;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowProgressSub {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  color: #9a8778;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+/* ─── Focus Windows slot ─────────────────────────────────────────────────── */
+
+.intRowFocusNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #2d352d;
+  line-height: 1;
+  margin: 0;
+}
+
+/* ─── Deadline slot ──────────────────────────────────────────────────────── */
+
+.intRowDeadlineList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.intRowDeadlineCard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(123, 103, 81, 0.05);
+  border: 1px solid rgba(123, 103, 81, 0.1);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.intRowDeadlineCard:hover {
+  background: rgba(123, 103, 81, 0.09);
+  border-color: rgba(123, 103, 81, 0.2);
+}
+
+.intRowDeadlinePills {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.intRowDeadlinePill {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(74, 52, 33, 0.08);
+  color: #5c4d3e;
+  border: 1px solid rgba(74, 52, 33, 0.12);
+}
+
+.intRowDeadlinePillType {
+  background: rgba(132, 169, 140, 0.12);
+  color: #4a7a57;
+  border-color: rgba(132, 169, 140, 0.25);
+}
+
+.intRowDeadlineBottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intRowDeadlineName {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2d352d;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowDeadlineDays {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7B6751;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.intRowDeadlineDaysUrgent { color: #C0714E; }
+.intRowDeadlineDaysMed { color: #B8860B; }
+
+/* Legacy ring (kept for compat) */
+.intRowHealthRing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.intRowRingSvg { width: 52px; height: 52px; transform: rotate(-90deg); flex-shrink: 0; }
+.intRowRingBg { fill: none; stroke: rgba(123,103,81,0.12); stroke-width: 3; }
+.intRowRingFill { fill: none; stroke: #4A3421; stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 0.6s ease; }
+.intRowRingPct { font-family: "Lexend",system-ui,sans-serif; font-size: 0.85rem; font-weight: 800; color: #2d352d; }
+
+/* Legacy urgency dots */
+.intRowUrgencyDot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; background: #9a8778; }
+.urgencyHigh .intRowUrgencyDot, .intRowUrgencyDot.urgencyHigh { background: #C0714E; }
+.urgencyMedium .intRowUrgencyDot, .intRowUrgencyDot.urgencyMedium { background: #B8860B; }
+.urgencyLow .intRowUrgencyDot, .intRowUrgencyDot.urgencyLow { background: #84A98C; }
+
+/* Legacy energy bar */
+.intRowEnergyBar { height: 5px; border-radius: 99px; background: rgba(123,103,81,0.12); overflow: hidden; }
+.intRowEnergyFill { height: 100%; border-radius: 99px; background: #4A3421; }
+
+/* Legacy deadline row */
+.intRowDeadlineRow { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 4px 0; }
+.intRowDeadlineTitle { font-size: 0.8rem; font-weight: 600; color: #2d352d; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.intRowDeadlineTime { font-family: "JetBrains Mono", monospace; font-size: 0.68rem; color: #7B6751; }
+
+/* ── Focus banner (top of page when timer is running) ── */
+.focusBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 20px;
+  background: #2d352d;
+  border-radius: 12px;
+  margin: 0 24px 16px;
+  gap: 12px;
+}
+.focusBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.focusBannerBadge {
+  flex-shrink: 0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #84A98C;
+  color: #fff;
+}
+.focusBannerBadgeBreak {
+  background: #C0714E;
+}
+.focusBannerTask {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(248, 245, 242, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.focusBannerRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.focusBannerTime {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #84A98C;
+  letter-spacing: 0.04em;
+}
+.focusBannerBtn {
+  background: none;
+  border: 1px solid rgba(248, 245, 242, 0.2);
+  color: rgba(248, 245, 242, 0.75);
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.focusBannerBtn:hover {
+  background: rgba(248, 245, 242, 0.1);
+  border-color: rgba(248, 245, 242, 0.35);
+  color: #F8F5F2;
+}
+
+/* ── Right Now slot — active timer view ── */
+.intRowNowTimerTrack {
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.12);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.intRowNowTimerFill {
+  height: 100%;
+  border-radius: 99px;
+  background: #84A98C;
+  transition: width 1s linear;
+}
+.intRowNowTimerBtn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 7px 0;
+  background: none;
+  border: 1px solid rgba(123, 103, 81, 0.18);
+  border-radius: 8px;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #7B6751;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.intRowNowTimerBtn:hover {
+  background: rgba(123, 103, 81, 0.05);
+  border-color: rgba(123, 103, 81, 0.32);
+  color: #4A3421;
+}
+
+/* Up Next mini-list inside Right Now card */
+.intRowNowUpNext {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.intRowNowUpNextRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.intRowNowUpNextTime {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #9a8778;
+  flex-shrink: 0;
+}
+
+.intRowNowUpNextTitle {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(45, 53, 45, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowNowScheduleLink {
+  display: block;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(123, 103, 81, 0.7);
+  text-decoration: none;
+  margin-top: 6px;
+  transition: color 0.15s;
+}
+
+.intRowNowScheduleLink:hover {
+  color: #4A3421;
+}
+
+/* Conflict warning strip — full-width banner at top of Right Now card */
+.intRowNowConflictChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(192, 113, 78, 0.08);
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #9B3A2A;
+  box-sizing: border-box;
+}
+
+/* TFL chip — styled transit alert inside Right Now card */
+.intRowNowTflChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(192, 75, 55, 0.06);
+  border: 1px solid rgba(192, 75, 55, 0.18);
+}
+.intRowNowTflChipIcon {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.intRowNowTflChipBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.intRowNowTflChipLeave {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #9B3A2A;
+  letter-spacing: 0.02em;
+}
+.intRowNowTflChipFor {
+  font-family: var(--font-sans, "Lexend", sans-serif);
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(155, 58, 42, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* TFL delay row inside Right Now card (legacy — kept for safety) */
+.intRowNowTflRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(192, 75, 55, 0.06);
+  border: 1px solid rgba(192, 75, 55, 0.18);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: #9B3A2A;
+  letter-spacing: 0.01em;
+}
+.intRowNowTflRow strong {
+  font-weight: 700;
+}
+
+/* Smart nudge hint — shown inside Right Now gap state */
+.intRowNowNudge {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(123, 103, 81, 0.06);
+  border-left: 2px solid rgba(123, 103, 81, 0.3);
+  font-family: var(--font-sans, "Lexend", sans-serif);
+  font-size: 0.73rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #6b5040;
+  line-height: 1.45;
+}
+.intRowNowNudgeTask {
+  font-style: normal;
+  font-weight: 700;
+  color: #4A3421;
+}
+
+/* Day recap stat row — endOfDay state */
+.intRowNowDayRecap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.63rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.03em;
+}
+.intRowNowDayRecapDot {
+  color: rgba(154, 135, 120, 0.5);
+}
+
+/* Today vs yesterday comparison — endOfDay state */
+.intRowNowVsYesterday {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9a8778;
+}
+.intRowNowVsYesterdayUp   { color: #5a8a65; }
+.intRowNowVsYesterdayDown { color: #C0714E; }
+.intRowNowVsYesterdayFlat { color: #9a8778; }
+
+/* Tomorrow preview block — endOfDay state */
+.intRowNowTomorrowPreview {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.05);
+  border: 1px solid rgba(123, 103, 81, 0.12);
+}
+.intRowNowTomorrowLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7B6751;
+  flex-shrink: 0;
+}
+.intRowNowTomorrowEvent {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2d352d;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intRowNowTomorrowTime {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9a8778;
+  flex-shrink: 0;
+}
+
+/* ─── Deadline card: non-link variant + pill buttons ─────────────────────── */
+
+.intRowDeadlinePillLink {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.intRowDeadlinePillLink:hover {
+  background: rgba(74, 52, 33, 0.14);
+  color: #4A3421;
+}
+
+.intRowDeadlinePillBtn {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.intRowDeadlinePillBtn:hover {
+  background: rgba(132, 169, 140, 0.2);
+}
+
+/* ─── Right Now slot ─────────────────────────────────────────────────────── */
+
+.intRowNowSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.intRowNowItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.intRowNowBadge {
+  flex-shrink: 0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 0;
+  margin-top: 2px;
+  background: none;
+  border: none;
+}
+
+.intRowNowBadgeNow {
+  color: #5c4d3e;
+}
+
+.intRowNowBadgeNext {
+  color: #7B6751;
+}
+
+/* "Upcoming" section container */
+.intRowNowUpcoming {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.intRowNowUpcomingLabel {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #b0a59e;
+  margin-bottom: 4px;
+}
+
+.intRowNowBadgeFree {
+  background: rgba(132, 169, 140, 0.15);
+  color: #4a7a57;
+  border: 1px solid rgba(132, 169, 140, 0.35);
+}
+
+.intRowNowBadgeConflict {
+  background: rgba(192, 113, 78, 0.12);
+  color: #C0714E;
+  border: 1px solid rgba(192, 113, 78, 0.3);
+}
+
+.intRowNowBadgeDone {
+  background: rgba(132, 169, 140, 0.15);
+  color: #4a7a57;
+  border: 1px solid rgba(132, 169, 140, 0.35);
+}
+
+.intRowNowItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.intRowNowItemTitle {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c2420;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.intRowNowItemTime {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 12px;
+  color: #8a7d76;
+  letter-spacing: 0;
+}
+
+.intRowNowNextCard {
+  background: #ffffff;
+  border: 1px solid #e8ddd8;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intRowNowCountdownPill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.intRowNowEmptyText {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 13px;
+  font-style: italic;
+  color: #b0a59e;
+  font-weight: 400;
+}
+
+/* ─── Shared popup overlay (deadline card + module card) ─────────────────── */
+
+.deadlineDetailOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(44, 24, 16, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: deadlineOverlayIn 0.2s ease;
+}
+
+@keyframes deadlineOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.deadlineDetailCard {
+  background: #fffcf8;
+  border-radius: 20px;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  box-shadow: 0 20px 60px rgba(44, 24, 16, 0.14), 0 4px 16px rgba(44, 24, 16, 0.06);
+  padding: 24px 26px 20px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: deadlineCardIn 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes deadlineCardIn {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.deadlineDetailHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.deadlineDetailPills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.deadlineDetailClose {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(74, 52, 33, 0.22);
+  background: rgba(74, 52, 33, 0.08);
+  color: #3d2d20;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.deadlineDetailClose:hover {
+  background: rgba(74, 52, 33, 0.14);
+  color: #1a0e08;
+  border-color: rgba(74, 52, 33, 0.35);
+}
+
+.deadlineDetailTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0 0 6px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.deadlineDetailDate {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #8c6d3f;
+  margin: 0 0 10px;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.deadlineDetailDate::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c4a46d;
+  flex-shrink: 0;
+}
+
+.deadlineDetailDesc {
+  font-size: 0.875rem;
+  color: #5a4a3a;
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+
+.deadlineDetailMeta {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: #8b7355;
+  margin: 0 0 10px;
+}
+.deadlineDetailMetaIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #a89279;
+}
+
+.deadlineDetailLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(139, 115, 85, 0.07);
+  border: 1px solid rgba(139, 115, 85, 0.14);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #736048;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  align-self: flex-start;
+}
+.deadlineDetailLink:hover {
+  background: rgba(139, 115, 85, 0.12);
+  color: #2c1810;
+  border-color: rgba(139, 115, 85, 0.22);
+}
+
+/* ─── Module card popup (same overlay as deadline card) ──────────────────── */
+
+.moduleCardCard {
+  background: #fffcf8;
+  border-radius: 20px;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  box-shadow: 0 20px 60px rgba(44, 24, 16, 0.14), 0 4px 16px rgba(44, 24, 16, 0.06);
+  padding: 24px 26px 20px;
+  max-width: 380px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: deadlineCardIn 0.28s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.moduleCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.moduleCardColorBar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.moduleCardCode {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2c1810;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.moduleCardName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #8b7355;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.moduleCardDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 115, 85, 0.12), transparent);
+  margin-bottom: 14px;
+}
+
+.moduleCardLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px;
+  border-radius: 9999px;
+  background: #2c1810;
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #fffcf8;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  align-self: flex-start;
+  cursor: pointer;
+}
+.moduleCardLink:hover {
+  background: #1a0e08;
+  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.18);
+}
+
+.moduleCardDept {
+  font-size: 12px;
+  color: #a89279;
+  margin: 0 0 6px;
+}
+
+.moduleCardDesc {
+  font-size: 12px;
+  color: #8b7355;
+  line-height: 1.5;
+  margin: 4px 0 8px;
+}
+
+.moduleCardLeader {
+  font-size: 11px;
+  color: #a89279;
+  margin: 0 0 8px;
+}
+
+/* ─── Day Progress status badge ──────────────────────────────────────────── */
+
+.intRowProgressStatusBadge {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.intRowProgressStatusAhead {
+  background: rgba(132, 169, 140, 0.15);
+  color: #4a7a57;
+  border: 1px solid rgba(132, 169, 140, 0.35);
+}
+
+.intRowProgressStatusOntrack {
+  background: rgba(184, 134, 11, 0.1);
+  color: #8a7000;
+  border: 1px solid rgba(184, 134, 11, 0.25);
+}
+
+.intRowProgressStatusBehind {
+  background: rgba(192, 113, 78, 0.1);
+  color: #C0714E;
+  border: 1px solid rgba(192, 113, 78, 0.25);
+}
+
+/* ─── Focus Windows smart redesign ───────────────────────────────────────── */
+
+/* Simplified Focus Windows: no gradient, same card base */
+.intRowFocusWrapSimple {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin: -4px 0 0;
+}
+.intRowFocusHeadline {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowFocusHeadlineNum {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowFocusHeadlineWord {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+}
+.intRowFocusHeadlineDot {
+  color: #a8a29e;
+  font-size: 0.75rem;
+  margin: 0 2px;
+}
+.intRowFocusBestWindow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px 6px 10px;
+  border-radius: 12px;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  border-left: 4px solid #a8a29e;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.intRowFocusBestWindowLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #57534e;
+  margin-bottom: 2px;
+}
+.intRowFocusBestWindowTime {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c2420;
+}
+.intRowFocusBestWindowDur {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #57534e;
+  background: #e7e5e4;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+.intRowFocusBestWindowLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.intRowFocusStatRow {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #a8a29e;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Outer wrapper for enhanced Focus Windows card (legacy) */
+.intRowFocusWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+/* Summary stat line: "2 windows · 1h 20m free" */
+.intRowFocusSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowFocusSummaryNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2d352d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowFocusSummaryLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+.intRowFocusSummaryDot {
+  color: rgba(154, 135, 120, 0.5);
+  font-size: 0.7rem;
+  margin: 0 2px;
+}
+
+/* 7-day chart label */
+.intRowFocusChartLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a8778;
+  margin-bottom: 4px;
+}
+
+/* 7-day chart wrapper */
+.intRowFocusSparkline {
+  margin-top: auto;
+  flex: 1;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+/* Analytics CTA link below chart */
+.intRowFocusAnalyticsCta {
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #9a8778;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+.intRowFocusAnalyticsCta:hover {
+  color: #4A3421;
+}
+
+.intRowFocusWindowsTitle {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7B6751;
+  margin: 0 0 8px;
+}
+
+.intRowFocusWindowList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.intRowFocusWindow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.05);
+  border: 1px solid rgba(123, 103, 81, 0.1);
+}
+
+.intRowFocusWindowCurrent {
+  background: rgba(132, 169, 140, 0.1);
+  border-color: rgba(132, 169, 140, 0.35);
+}
+
+.intRowFocusWindowPast {
+  opacity: 0.4;
+}
+
+.intRowFocusWindowTime {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #4A3421;
+  letter-spacing: 0.02em;
+}
+
+.intRowFocusWindowDur {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #84A98C;
+}
+
+.intRowFocusSuggest {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(74, 52, 33, 0.04);
+  border-left: 2px solid rgba(74, 52, 33, 0.3);
+}
+
+.intRowFocusSuggestLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a8778;
+}
+
+.intRowFocusSuggestTask {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2d352d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+/* ─── Focus Windows: stat chips row ─────────────────────────────────────── */
+
+.intRowFocusStats {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(123, 103, 81, 0.1);
+  flex-wrap: wrap;
+}
+
+.intRowFocusChip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: rgba(123, 103, 81, 0.06);
+  border: 1px solid rgba(123, 103, 81, 0.13);
+  flex: 1;
+  min-width: 0;
+}
+
+.intRowFocusChipUp {
+  background: rgba(132, 169, 140, 0.08);
+  border-color: rgba(132, 169, 140, 0.22);
+}
+
+.intRowFocusChipDown {
+  background: rgba(192, 113, 78, 0.07);
+  border-color: rgba(192, 113, 78, 0.18);
+}
+
+.intRowFocusChipIcon {
+  font-size: 0.72rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.intRowFocusChipValue {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #4A3421;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.intRowFocusChipUp .intRowFocusChipValue {
+  color: #4a7a57;
+}
+
+.intRowFocusChipDown .intRowFocusChipValue {
+  color: #9B4A30;
+}
+
+.intRowFocusChipLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Focus Windows v2: summary line + window cards + micro-stats ─────── */
+
+.intRowFocusSummaryLine {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.intRowFocusSummaryBig {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c2420;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.intRowFocusSummaryWord {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.81rem;
+  font-weight: 400;
+  color: #8a7d76;
+}
+
+.intRowFocusWindowCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #e8ddd8;
+  transition: box-shadow 0.15s;
+  position: relative;
+}
+
+.intRowFocusWindowCard:hover {
+  box-shadow: 0 2px 10px rgba(74, 52, 33, 0.08);
+}
+
+.intRowFocusWindowCardCurrent {
+  border-color: rgba(74, 178, 120, 0.35);
+  background: rgba(74, 178, 120, 0.03);
+}
+
+.intRowFocusWindowCardPast {
+  opacity: 0.4;
+}
+
+.intRowFocusWindowCardLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.intRowFocusWindowNowDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ab278;
+  flex-shrink: 0;
+  margin-top: 4px;
+  animation: focusWindowNowPulse 2s ease-in-out infinite;
+}
+
+@keyframes focusWindowNowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 178, 120, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(74, 178, 120, 0); }
+}
+
+.intRowFocusWindowCardTimes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.intRowFocusWindowCardTime {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #2c2420;
+  white-space: nowrap;
+}
+
+.intRowFocusWindowCardCtx {
+  font-size: 0.69rem;
+  color: #b0a59e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.intRowFocusWindowCardRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.intRowFocusWindowCardDur {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3d5f42;
+  background: #ecf7ec;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.intRowFocusWindowStartBtn {
+  display: none;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.69rem;
+  font-weight: 500;
+  color: #7B6751;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+
+.intRowFocusWindowStartBtn:hover {
+  color: #4a3728;
+}
+
+.intRowFocusWindowCard:hover .intRowFocusWindowStartBtn {
+  display: block;
+}
+
+.intRowFocusMore {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  padding: 2px 0;
+}
+
+.intRowFocusMicroStats {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.intRowFocusMicroStatsUp {
+  color: #4a7a57;
+}
+
+.intRowFocusMicroStatsDown {
+  color: #9B4A30;
+}
+
+.intRowFocusMicroStatsSep {
+  color: #c4b8b0;
+}
+
+.intRowFocusFooterLink {
+  display: block;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: auto;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.intRowFocusFooterLink:hover {
+  color: #57534e;
+  text-decoration: underline;
+}
+
+/* ─── Deadlines v2: compact urgency rows ────────────────────────────────── */
+
+.intRowDeadlineList2 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.intRowDeadlineRow2 {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px 7px 13px;
+  border-left: 2px solid #d4c9c2;
+  border-radius: 0 6px 6px 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+.intRowDeadlineRow2:hover {
+  background: rgba(74, 55, 40, 0.04);
+}
+
+/* Urgency: <7 days red, 7–14 amber, 14+ green — border + subtle bg, slightly muted */
+.intRowDeadlineRow2Red {
+  border-left-color: rgba(185, 28, 28, 0.75);
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Red:hover {
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Amber {
+  border-left-color: rgba(217, 119, 6, 0.8);
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Amber:hover {
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Green {
+  border-left-color: rgba(22, 163, 74, 0.8);
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Green:hover {
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Grey  {
+  border-left-color: #d4c9c2;
+  background: transparent;
+}
+
+.intRowDeadline2Line1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intRowDeadline2Pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.intRowDeadline2ModuleCode {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #5a4a3a;
+  background: rgba(74, 55, 40, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intRowDeadline2TypePill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.intRowDeadline2TypePill:hover { opacity: 0.75; }
+
+.intRowDeadline2TypePillExam { background: #fee2e2; color: #b91c1c; }
+.intRowDeadline2TypePillCw   { background: #dbeafe; color: #1d4ed8; }
+.intRowDeadline2TypePillPresentation { background: #f3e8ff; color: #7e22ce; }
+.intRowDeadline2TypePillQuiz { background: #e8f4f0; color: #2d5f50; }
+
+.intRowDeadline2Days {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: #8a7d76;
+}
+.intRowDeadline2DaysRed   { color: #b91c1c; }
+.intRowDeadline2DaysAmber { color: #d97706; }
+.intRowDeadline2DaysGreen { color: #16a34a; }
+.intRowDeadline2DaysGrey  { color: #8a7d76; }
+
+.intRowDeadline2Title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2c2420;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.intRowDeadline2BarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.intRowDeadline2BarTrack {
+  width: 60px;
+  height: 3px;
+  background: rgba(74, 55, 40, 0.1);
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.intRowDeadline2BarFill {
+  height: 100%;
+  border-radius: 2px;
+  background: #8a7d76;
+  transition: width 0.4s ease;
+}
+.intRowDeadline2BarFillRed   { background: #c4574b; }
+.intRowDeadline2BarFillAmber { background: #c49a4b; }
+.intRowDeadline2BarFillGreen { background: #6b8f71; }
+.intRowDeadline2BarFillGrey  { background: #8a7d76; }
+
+.intRowDeadline2TaskCount {
+  font-size: 0.625rem;
+  color: #8a7d76;
+  white-space: nowrap;
+}
+
+.intRowDeadline2NotStarted {
+  font-size: 0.625rem;
+  color: #c4b8b0;
+  font-style: italic;
+  margin-top: 1px;
+}
+
+/* ─── Day Progress — breakdown + time alloc + nudge ─────────────────────── */
+
+.intRowProgressBreakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.02em;
+}
+
+.intRowProgressBreakdownDot {
+  opacity: 0.45;
+}
+
+.intRowProgressBreakdownOverdue {
+  color: #C0714E;
+  font-weight: 700;
+}
+
+.intRowTimeAlloc {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.intRowTimeAllocBar {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.08);
+  overflow: hidden;
+  display: flex;
+}
+
+.intRowTimeAllocSegStudy {
+  height: 100%;
+  background: #7B9BAD;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegPersonal {
+  height: 100%;
+  background: #84A98C;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegOther {
+  height: 100%;
+  background: #A08B72;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.intRowTimeAllocLegendItem {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.intRowTimeAllocLegendItem::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.intRowTimeAllocLegendStudy { color: #7B9BAD; }
+.intRowTimeAllocLegendStudy::before { background: #7B9BAD; }
+
+.intRowTimeAllocLegendPersonal { color: #5a8a65; }
+.intRowTimeAllocLegendPersonal::before { background: #84A98C; }
+
+.intRowTimeAllocLegendOther { color: #9a8778; }
+.intRowTimeAllocLegendOther::before { background: #A08B72; }
+
+.intRowProgressNudge {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #9a8778;
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.intRowProgressNudgeAhead {
+  color: #5a8a65;
+}
+
+/* Streak badge — shown next to status badge when streak >= 2 */
+.intRowProgressStreak {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(192, 113, 78, 0.1);
+  border: 1px solid rgba(192, 113, 78, 0.25);
+  color: #C0714E;
+  white-space: nowrap;
+}
+
+/* vs last week comparison line */
+.intRowProgressVsWeek {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: #9a8778;
+}
+.intRowProgressVsWeekUp   { color: #5a8a65; }
+.intRowProgressVsWeekDown { color: #C0714E; }
+.intRowProgressVsWeekFlat { color: #9a8778; }
+
+/* ── Smart Nudge (slot4) ─────────────────────────────────────────────────── */
+
+.intRowNudgeWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.intRowNudgeMessage {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(45, 53, 45, 0.85);
+}
+
+.intRowNudgeTaskName {
+  font-weight: 700;
+  color: #2d352d;
+}
+
+.intRowNudgeDue {
+  font-weight: 700;
+  color: #C0714E;
+}
+
+.intRowNudgeWin {
+  font-weight: 700;
+  color: #4A7A57;
+}
+
+.intRowNudgeAction {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 10px;
+  background: rgba(74, 52, 33, 0.08);
+  border: 1px solid rgba(74, 52, 33, 0.15);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #4A3421;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  align-self: flex-start;
+}
+
+.intRowNudgeAction:hover {
+  background: rgba(74, 52, 33, 0.14);
+  border-color: rgba(74, 52, 33, 0.25);
+}
+
+.intRowNudgeFallback {
+  font-family: var(--font-body, "Lexend", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #9a8778;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Smart Nudge — peak hours fallback */
+.intRowNudgePeakWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.intRowNudgePeakLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7B6751;
+}
+.intRowNudgePeakHours {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.intRowNudgePeakHour {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid rgba(132, 169, 140, 0.3);
+  color: #5a8a65;
+}
+
+/* This Week card wrapper */
+.intRowWeekWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+.intRowWeekStat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.intRowWeekStatNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #2d352d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.intRowWeekStatLabel {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+.intRowWeekStatDot {
+  color: rgba(154, 135, 120, 0.5);
+  font-size: 0.7rem;
+  margin: 0 2px;
+}
+
+/* Productivity Snapshot card wrapper */
+.intRowProductivityWrap {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  height: 100%;
+}

@@ -22,14 +22,20 @@ async function logThemeSession(theme, startedAt) {
   }
 }
 
-export function ThemeProvider({ children, initialTheme = 'light' }) {
-  const [theme, setThemeState] = useState(initialTheme);
-  const sessionStart = useRef(new Date().toISOString());
-  const currentTheme = useRef(initialTheme);
+function getStoredTheme(fallback) {
+    const stored = localStorage.getItem('theme');
+    return stored === 'light' || stored === 'dark' ? stored : fallback;
+}
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+export function ThemeProvider({ children, initialTheme = 'light' }) {
+    const [theme, setThemeState] = useState(() => getStoredTheme(initialTheme));
+    const sessionStart = useRef(new Date().toISOString());
+    const currentTheme = useRef(theme);
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
   useEffect(() => {
     const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);

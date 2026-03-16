@@ -1,3 +1,7 @@
+"""
+Shared fixture builders and sample payloads for backend tests.
+"""
+
 from datetime import datetime, timedelta, timezone
 
 def get_datetime_str(hours_offset=0, days_offset=0):

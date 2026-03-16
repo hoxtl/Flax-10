@@ -1,6 +1,7 @@
 import { useNotifications } from '../../context/NotificationContext';
 import { useEffect, useRef, useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
+import { executeNotificationAction, parseNotificationAction, hasNotificationAction } from './utils/notificationAction';
 import './NotificationPanel.css';
 
 export function NotificationPanel() {
@@ -14,7 +15,7 @@ export function NotificationPanel() {
     return (
         <div className="notification-panel" ref={panelRef}>
             <PanelHeader onMarkAllRead={markAllRead} onClearAll={clearAll} count={notifications.length} />
-            <NotificationList notifications={notifications} onDismiss={dismissNotification} />
+            <NotificationList notifications={notifications} onDismiss={dismissNotification} onClose={closePanel} />
         </div>
     );
 }
@@ -72,7 +73,7 @@ function MenuDropdown({ onRead, onClear, close }) {
     );
 }
 
-function NotificationList({ notifications, onDismiss }) {
+function NotificationList({ notifications, onDismiss, onClose }) {
     if (notifications.length === 0) {
         return <div className="notification-empty">No notifications</div>;
     }
@@ -80,17 +81,26 @@ function NotificationList({ notifications, onDismiss }) {
     return (
         <ul className="notification-list">
             {notifications.map(n => (
-                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} />
+                <NotificationItem key={n.id} notification={n} onDismiss={onDismiss} onClose={onClose} />
             ))}
         </ul>
     );
 }
 
-function NotificationItem({ notification, onDismiss }) {
+function NotificationItem({ notification, onDismiss, onClose }) {
     const { id, title, message, read, created_at } = notification;
+    const isClickable = hasNotificationAction(notification);
+
+    const handleClick = (e) => {
+        if (e.target.closest('.dismiss-btn')) return;
+        if (!isClickable) return;
+        onClose();
+        const action = parseNotificationAction(notification);
+        executeNotificationAction(action);
+    };
 
     return (
-        <li className={`notification-item ${read ? '' : 'unread'}`}>
+        <li className={`notification-item ${read ? '' : 'unread'} ${isClickable ? 'clickable' : ''}`} onClick={handleClick}>
             <div className="notification-content">
                 <span className="notification-title">{title}</span>
                 <span className="notification-message">{message}</span>

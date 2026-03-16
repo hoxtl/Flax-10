@@ -1,248 +1,61 @@
-import { useState, useEffect, useCallback } from "react";
-import * as api from "../../../api/societyApi";
-import { addHourToTime } from "../../Calendar/utils/dateUtils";
+import { useSocietyCore } from './useSocietyCore';
+import { useSocietyTags } from './useSocietyTags';
+import { useSocietyEvents } from './useSocietyEvents';
+import { useSocietyAnnouncements } from './useSocietyAnnouncements';
+import { useSocietyMembers } from './useSocietyMembers';
+import { useSocietyMembership } from './useSocietyMembership';
 
-function transformAnnouncementData(data) {
-    const images = (data.images || [])
-        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
-        .filter(Boolean);
+const getAnnouncementTitle = (data, id) =>
+    data.society?.announcements?.find(a => a.id === id)?.title;
+
+const wrapAnnouncement = (action, fn, tracker, isSilent, titleFn) =>
+    (id, d) => {
+        tracker?.trackAnnouncement(action, titleFn ? titleFn(id) : d.title);
+        return fn(id, d, isSilent);
+    };
+
+const wrapEvent = (action, fn, tracker, isSilent, titleFn) =>
+    (id, d) => {
+        tracker?.trackEvent(action, titleFn ? titleFn(id, d) : d.title);
+        return fn(id, d, isSilent);
+    };
+
+const buildAnnouncementHandlers = (data, tracker, isSilent) => ({
+    addAnnouncement: (d) => { tracker?.trackAnnouncement('Added', d.title); return data.addAnnouncement(d, isSilent); },
+    updateAnnouncement: wrapAnnouncement('Updated', data.updateAnnouncement, tracker, isSilent),
+    deleteAnnouncement: wrapAnnouncement('Deleted', data.deleteAnnouncement, tracker, isSilent, (id) => getAnnouncementTitle(data, id)),
+});
+
+const buildEventHandlers = (data, tracker, isSilent) => ({
+    addEvent: (d) => { tracker?.trackEvent('Added', d.title); return data.addEvent(d, isSilent); },
+    updateEvent: wrapEvent('Updated', data.updateEvent, tracker, isSilent),
+    deleteEvent: (id, title) => wrapEvent('Deleted', data.deleteEvent, tracker, isSilent, () => title)(id),
+    addException: (id, d) => data.addException(id, d, isSilent),
+});
+
+const buildTagHandlers = (data) => ({
+    onAddTag: data.addTag,
+    onDeleteTag: data.deleteTag,
+    onUpdateTag: data.updateTag,
+});
+
+export const buildHandlers = (data, editMode, tracker) => ({
+    ...data,
+    ...buildAnnouncementHandlers(data, tracker, editMode),
+    ...buildEventHandlers(data, tracker, editMode),
+    ...buildTagHandlers(data),
+});
+
+export const useSocietyDetail = (id) => {
+    const core = useSocietyCore(id);
+    const tags = useSocietyTags(id, core.society, core.setSociety);
+    const events = useSocietyEvents(id, core.setSociety, core.fetchSociety);
+    const announcements = useSocietyAnnouncements(id, core.setSociety, events);
+    const members = useSocietyMembers(id, core.setSociety);
+    const membership = useSocietyMembership(id, core.setSociety);
 
     return {
-        title: data.title,
-        content: data.content,
-        tag: parseTagId(data.tag),
-        pinned: data.pinned,
-        image_urls: images
+        ...core, ...tags, ...events, ...announcements,
+        ...members, ...membership
     };
-}
-
-function parseTagId(tag) {
-    if (tag === null || tag === undefined || tag === '') return null;
-    const parsed = parseInt(tag, 10);
-    return isNaN(parsed) ? null : parsed;
-}
-
-function transformEventData(data) {
-    if (data.start_time && data.end_time) return transformIsoEventData(data);
-    return transformLegacyEventData(data);
-}
-
-function transformIsoEventData(data) {
-    return {
-        title: data.title,
-        description: data.description || "",
-        location: data.location || "",
-        start_time: normalizeIsoTime(data.start_time),
-        end_time: normalizeIsoTime(data.end_time),
-        all_day: data.all_day || false,
-        tag: parseTagId(data.tag),
-        recurrence: getRecurrence(data),
-        recurrence_end_date: getRecurrenceEndDate(data),
-        announcement: data.announcement || null
-    };
-}
-
-function transformLegacyEventData(data) {
-    const time = data.time || "12:00";
-    const endTime = data.endTime || addHourToTime(time);
-    return {
-        title: data.title,
-        description: data.description || "",
-        location: data.location || "",
-        start_time: `${data.date}T${time}:00`,
-        end_time: `${data.date}T${endTime}:00`,
-        all_day: data.allDay || false,
-        tag: parseTagId(data.tag),
-        recurrence: data.recurrence || "none"
-    };
-}
-
-function normalizeIsoTime(datetime) {
-    const str = typeof datetime === 'string' ? datetime : new Date(datetime).toISOString();
-    return str.includes('T') && str.length === 16 ? `${str}:00` : str;
-}
-
-function getRecurrence(data) {
-    const rec = data.recurrence;
-    if (!rec || rec === 'none' || rec.frequency === 'none') return 'none';
-    return typeof rec === 'string' ? rec : rec.frequency;
-}
-
-function getRecurrenceEndDate(data) {
-    const rec = data.recurrence;
-    if (typeof rec === 'object' && rec?.end_date) return rec.end_date;
-    return data.recurrence_end_date || null;
-}
-
-export function useSocietyDetail(societyId) {
-    const [society, setSociety] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const loadSociety = useCallback(async () => {
-        if (!societyId) return;
-        try {
-            setLoading(true);
-            const data = await api.fetchSociety(societyId);
-            setSociety(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [societyId]);
-
-    useEffect(() => { loadSociety(); }, [loadSociety]);
-
-    const updateSociety = async (updates) => {
-        const updated = await api.updateSociety(societyId, updates);
-        setSociety(prev => ({ ...prev, ...updated }));
-        await loadSociety();
-    };
-
-    const addTag = async (tagData) => {
-        const newTag = await api.createSocietyTag(societyId, tagData);
-        setSociety(prev => ({ ...prev, tags: [...(prev.tags || []), newTag] }));
-    };
-
-    const updateTag = async (tagId, data) => {
-        const updated = await api.updateSocietyTag(societyId, tagId, data);
-        setSociety(prev => ({
-            ...prev,
-            tags: prev.tags.map(t => t.id === tagId ? updated : t)
-        }));
-    };
-
-    const deleteTag = async (tagId) => {
-        await api.deleteSocietyTag(societyId, tagId);
-        setSociety(prev => ({ ...prev, tags: prev.tags.filter(t => t.id !== tagId) }));
-    };
-
-    const addAnnouncement = async (data) => {
-        const apiData = transformAnnouncementData(data);
-        const announcement = await api.createAnnouncement(societyId, apiData);
-        setSociety(prev => ({
-            ...prev,
-            announcements: [...(prev.announcements || []), announcement]
-        }));
-        if (data.addAsEvent) {
-            try {
-                await addEvent({
-                    ...data,
-                    description: data.content,
-                    tag: data.tag || null,
-                    announcement: announcement.id
-                });
-            } catch (error) {
-                console.error('Failed to add event for announcement:', error);
-            }
-        }
-        return announcement;
-    };
-
-    const addEvent = async (data) => {
-        const apiData = transformEventData(data);
-        const event = await api.createSocietyEvent(societyId, apiData);
-        setSociety(prev => ({ ...prev, events: [...(prev.events || []), event] }));
-        return event;
-    };
-
-    const updateEvent = async (eventId, data) => {
-        const apiData = transformEventData(data);
-        const event = await api.updateSocietyEvent(societyId, eventId, apiData);
-        setSociety(prev => ({ ...prev, events: prev.events.map(e => e.id === eventId ? event : e) }));
-        return event;
-    };
-
-    const deleteEvent = async (eventId) => {
-        await api.deleteSocietyEvent(societyId, eventId);
-        setSociety(prev => ({ ...prev, events: prev.events.filter(e => e.id !== eventId) }));
-    };
-
-    const updateAnnouncement = async (announcementId, data) => {
-        const apiData = transformAnnouncementData(data);
-        const updated = await api.updateAnnouncement(societyId, announcementId, apiData);
-        setSociety(prev => ({ ...prev, announcements: prev.announcements.map(a => a.id === announcementId ? updated : a) }));
-
-        if (data.addAsEvent) {
-            try {
-                const eventId = updated.event_id || data.event_id;
-
-                const eventData = {
-                    ...data,
-                    description: data.content,
-                    tag: data.tag || null,
-                    announcement: updated.id
-                };
-
-                if (eventId) {
-                    await updateEvent(eventId, eventData);
-                } else {
-                    await addEvent(eventData);
-                }
-            } catch (error) {
-                console.error('Failed to sync event for announcement update:', error);
-            }
-        }
-        return updated;
-    };
-
-    const deleteAnnouncement = async (announcementId) => {
-        await api.deleteAnnouncement(societyId, announcementId);
-        setSociety(prev => ({ ...prev, announcements: prev.announcements.filter(a => a.id !== announcementId) }));
-    };
-
-    const joinSociety = async () => {
-        await api.joinSociety(societyId);
-        setSociety(prev => ({ ...prev, is_member: true, member_count: prev.member_count + 1 }));
-    };
-
-    const leaveSociety = async () => {
-        await api.leaveSociety(societyId, 'me');
-        setSociety(prev => ({ ...prev, is_member: false, member_count: Math.max(0, prev.member_count - 1) }));
-    };
-
-    const deleteSociety = async () => {
-        await api.deleteSociety(societyId);
-    };
-
-    const [members, setMembers] = useState([]);
-
-    const fetchMembers = useCallback(async () => {
-        const data = await api.fetchMembers(societyId);
-        setMembers(data);
-    }, [societyId]);
-
-    const updateMemberRole = async (userId, role) => {
-        await api.updateMemberRole(societyId, userId, role);
-        setMembers(prev => prev.map(m => m.user === userId ? { ...m, role } : m));
-    };
-
-    const removeMember = async (userId) => {
-        await api.leaveSociety(societyId, userId);
-        setMembers(prev => prev.filter(m => m.user !== userId));
-        setSociety(prev => ({ ...prev, member_count: Math.max(0, prev.member_count - 1) }));
-    };
-
-    const addCollaborator = async (identifier, role) => {
-        const member = await api.addCollaborator(societyId, identifier, role);
-        setMembers(prev => [...prev, member]);
-        setSociety(prev => ({ ...prev, member_count: prev.member_count + 1 }));
-        return member;
-    };
-
-    const requestRatification = async () => {
-        await api.requestRatification(societyId);
-        setSociety(prev => ({ ...prev, ratification_status: 'pending' }));
-    };
-
-    return {
-        society, loading, error, refresh: loadSociety, updateSociety,
-        addTag, updateTag, deleteTag,
-        addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent,
-        joinSociety, leaveSociety, deleteSociety,
-        members, fetchMembers, updateMemberRole, removeMember, addCollaborator,
-        requestRatification
-    };
-}
+};

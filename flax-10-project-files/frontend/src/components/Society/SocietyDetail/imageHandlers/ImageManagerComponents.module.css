@@ -1,0 +1,246 @@
+.modalShell {
+    width: min(520px, 92vw);
+}
+
+.modalShellWide {
+    width: min(600px, 92vw);
+}
+
+.modalContent {
+    padding-top: 0;
+}
+
+/* Common styles for image management sub-components and modals. */
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text, #1f2937);
+}
+
+.close {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--muted, #6b7280);
+    padding: 0;
+}
+
+.close:hover {
+    color: var(--text, #1f2937);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.imageCard {
+    aspect-ratio: 4/3;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    position: relative;
+    border: 2px solid transparent;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.imageCard:hover {
+    transform: translateY(-2px);
+}
+
+.pinned {
+    border-color: var(--primary-color, #9E7E5D);
+}
+
+.pinnedBadge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.pinBtn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.imageCard:hover .pinBtn {
+    opacity: 1;
+}
+
+.deleteBtn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: #ef4444;
+}
+
+.imageCard:hover .deleteBtn {
+    opacity: 1;
+}
+
+.addCard {
+    aspect-ratio: 4/3;
+    border: 2px dashed var(--border, #e5e7eb);
+    border-radius: 12px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.addCard:hover {
+    border-color: var(--primary-color, #9E7E5D);
+    background: var(--hover, #f9fafb);
+}
+
+.addIcon {
+    font-size: 2rem;
+    color: var(--muted, #9ca3af);
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: var(--stroke-soft);
+    padding-bottom: 8px;
+}
+
+.tab {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--muted, #6b7280);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.activeTab {
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+}
+
+.dropZone {
+    height: 160px;
+    border: 2px dashed var(--border, #e5e7eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted, #6b7280);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropZone:hover {
+    border-color: var(--primary-color, #9E7E5D);
+    background: var(--hover, #f9fafb);
+}
+
+.photoSelectGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.photoSelectCard {
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.selected {
+    border-color: var(--primary-color, #9E7E5D);
+    transform: scale(0.95);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.cancelBtn {
+    padding: var(--btn-padding-sm);
+    border: var(--stroke-soft);
+    background: var(--surface-card);
+    border-radius: var(--btn-radius);
+    cursor: pointer;
+}
+
+.confirmBtn {
+    padding: var(--btn-padding-sm);
+    border: none;
+    background: var(--primary-color, #9E7E5D);
+    color: white;
+    border-radius: var(--btn-radius);
+    cursor: pointer;
+}
+
+.confirmBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: var(--muted, #6b7280);
+    margin: 8px 0 0;
+}

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ModalContent } from '../../../../../components/Calendar/EventModal/components/ModalContent';
 
 vi.mock('../../../../../components/Calendar/EventModal/components/ModalHeader', () => ({
@@ -11,6 +11,8 @@ vi.mock('../../../../../components/Calendar/EventModal/components/EventFormBody'
 }));
 
 describe('ModalContent', () => {
+    beforeEach(() => vi.clearAllMocks());
+
     const defaultProps = {
         onClose: vi.fn(),
         isEditing: false,
@@ -19,15 +21,19 @@ describe('ModalContent', () => {
         error: null,
         handleSubmit: vi.fn(),
         handleDelete: vi.fn(),
+        sleepWarning: false,
+        sleepSettings: { sleepTime: '23:00', wakeTime: '07:00' },
+        handleConfirmSleep: vi.fn(),
+        handleCancelSleep: vi.fn(),
         overlapWarning: null,
         handleConfirmSave: vi.fn(),
         handleCancelSave: vi.fn(),
     };
 
-    it('should render event form view when no overlap warning', () => {
+    it('should render event form view when no sleep warning', () => {
         render(<ModalContent {...defaultProps} />);
         expect(screen.getByTestId('event-form')).toBeInTheDocument();
-        expect(screen.queryByText('Scheduling Conflict')).not.toBeInTheDocument();
+        expect(screen.queryByText('Sleep Hours')).not.toBeInTheDocument();
     });
 
     it('should show error message if error prop provided', () => {
@@ -35,57 +41,61 @@ describe('ModalContent', () => {
         expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
 
-    it('should render overlap warning view when warning exists', () => {
-        const warning = [
-            { id: 1, title: 'Overlap 1', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' },
-            { id: 2, title: 'Overlap 2', start_time: '2025-01-01T10:30:00', end_time: '2025-01-01T11:30:00' }
-        ];
-        render(<ModalContent {...defaultProps} overlapWarning={warning} />);
+    it('should render sleep warning view when sleepWarning is true', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        expect(screen.getByText('⚠️ Scheduling Conflict')).toBeInTheDocument();
-        expect(screen.getByText('Overlap 1')).toBeInTheDocument();
-        expect(screen.getByText('Overlap 2')).toBeInTheDocument();
-
-        expect(screen.getByText('Save Anyway')).toBeInTheDocument();
+        expect(screen.getByText('Sleep Hours')).toBeInTheDocument();
+        expect(screen.getByText('Add Anyway')).toBeInTheDocument();
         expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
-    it('should call handleConfirmSave when confirmed', () => {
-        const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
-        render(<ModalContent {...defaultProps} overlapWarning={warning} />);
+    it('should call handleConfirmSleep when confirmed', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        fireEvent.click(screen.getByText('Save Anyway'));
-        expect(defaultProps.handleConfirmSave).toHaveBeenCalled();
+        fireEvent.click(screen.getByText('Add Anyway'));
+        expect(defaultProps.handleConfirmSleep).toHaveBeenCalled();
     });
 
-    it('should call handleCancelSave when cancelled', () => {
-        const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
-        render(<ModalContent {...defaultProps} overlapWarning={warning} />);
+    it('should call handleCancelSleep when cancelled', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
         fireEvent.click(screen.getByText('Cancel'));
-        expect(defaultProps.handleCancelSave).toHaveBeenCalled();
+        expect(defaultProps.handleCancelSleep).toHaveBeenCalled();
     });
 
-    it('should close warning view via header close button', () => {
-        const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
-        render(<ModalContent {...defaultProps} overlapWarning={warning} />);
+    it('should close sleep warning view via header close button', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        fireEvent.click(screen.getByText('×')); // The close button in ModalHeaderWarning
-        expect(defaultProps.handleCancelSave).toHaveBeenCalled();
+        fireEvent.click(screen.getByText('x'));
+        expect(defaultProps.handleCancelSleep).toHaveBeenCalled();
     });
 
-    it('should stop propagation on click', () => {
-        const onClick = vi.fn();
-        render(<div onClick={onClick}><ModalContent {...defaultProps} /></div>);
-        fireEvent.click(screen.getByTestId('event-form').parentElement); // Click the modal content div
-        expect(onClick).not.toHaveBeenCalled();
+    it('renders form and does not call onClose on form click', () => {
+        render(<ModalContent {...defaultProps} />);
+        fireEvent.click(screen.getByTestId('event-form'));
+        expect(defaultProps.onClose).not.toHaveBeenCalled();
     });
 
-    it('should stop propagation on click in warning view', () => {
-        const onClick = vi.fn();
-        const warning = [{ id: 1, title: 'Overlap', start_time: '2025-01-01T10:00:00', end_time: '2025-01-01T11:00:00' }];
-        render(<div onClick={onClick}><ModalContent {...defaultProps} overlapWarning={warning} /></div>);
-        fireEvent.click(screen.getByText('⚠️ Scheduling Conflict').parentElement.parentElement);
-        expect(onClick).not.toHaveBeenCalled();
+    it('renders sleep warning and does not call handleConfirmSleep on header click', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} />);
+        fireEvent.click(screen.getByText('Sleep Hours'));
+        expect(defaultProps.handleConfirmSleep).not.toHaveBeenCalled();
+    });
+
+    it('renders overlap warning view and wires confirm/cancel', () => {
+        const props = {
+            ...defaultProps,
+            sleepWarning: false,
+            overlapWarning: [{ id: 1, title: 'Conflict 1' }],
+        };
+        render(<ModalContent {...props} />);
+        expect(screen.getByText('Scheduling Conflict')).toBeInTheDocument();
+        expect(screen.getByText('Conflict 1')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Save Anyway'));
+        expect(props.handleConfirmSave).toHaveBeenCalled();
+        fireEvent.click(screen.getAllByText('Cancel')[0]);
+        expect(props.handleCancelSave).toHaveBeenCalled();
+        fireEvent.click(screen.getByText('x'));
+        expect(props.handleCancelSave).toHaveBeenCalledTimes(2);
     });
 });

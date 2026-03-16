@@ -1,0 +1,282 @@
+/**
+ * TaskFeed section styles: section headers, task rows, completed block,
+ * search empty state, and show-more button.
+ */
+
+.section {
+    position: relative;
+}
+
+.sectionOverdue .sectionBody {
+    background: rgba(192, 90, 62, 0.03);
+    border-radius: 0 0 8px 0;
+}
+.sectionOverdue .sectionHeader {
+    background: rgba(192, 90, 62, 0.04);
+    border-radius: 0 8px 0 0;
+}
+
+.sectionHeader {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s, color 0.2s, transform 0.2s;
+    margin-bottom: 2px;
+}
+.sectionHeader:hover {
+    background: rgba(123, 103, 81, 0.04);
+}
+
+.sectionHeaderDanger { color: var(--danger, #C05A3E); }
+.sectionHeaderDanger .sectionTitle { color: var(--danger, #C05A3E); }
+.sectionHeaderDanger .sectionIcon  { color: var(--danger, #C05A3E); opacity: 1; }
+
+.sectionIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.02rem;
+    line-height: 1;
+}
+
+.sectionTitle {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    line-height: 1;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+}
+.sectionAccentDanger .sectionTitle { color: var(--danger, #C05A3E); }
+
+.sectionCountWrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.sectionStatsChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 4px 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--card-bg);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.16s ease;
+}
+.sectionHeader:hover .sectionStatsChip {
+    border-color: var(--border);
+    background: var(--card-bg);
+    transform: scale(1.02);
+}
+.sectionRing {
+    flex-shrink: 0;
+}
+.sectionRingFill {
+    stroke: var(--sage, #8C9A86);
+    transition: stroke-dasharray 0.5s ease;
+}
+.sectionRingDanger { stroke: var(--danger, #C05A3E); }
+.sectionCountPill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: auto;
+    height: auto;
+    padding: 1px 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(123, 103, 81, 0.09);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    letter-spacing: 0.01em;
+}
+.sectionCountDone {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted);
+    font-family: var(--font-body);
+}
+.sectionCountDoneMuted {
+    color: var(--muted);
+}
+
+.sectionChevronBtn {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.sectionHeader:hover .sectionChevronBtn {
+    border-color: var(--border);
+    transform: scale(1.06);
+}
+.sectionChevron {
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.sectionEmptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    gap: 6px;
+}
+.sectionEmptyIcon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.sectionEmptyMessage {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+}
+.sectionEmptySub {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.3;
+}
+
+.showMoreWrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 4px 0;
+}
+.showMoreBtn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
+    border: 1px solid rgba(74, 52, 33, 0.38);
+    border-radius: 9999px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+        0 10px 28px rgba(74, 52, 33, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.showMoreBtn:hover {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow:
+        0 18px 42px rgba(74, 52, 33, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+.showMoreBtn:active {
+    transform: translateY(0) scale(0.99);
+}
+.showMoreBtn::before {
+    content: "";
+    position: absolute;
+    inset: -45% -70%;
+    background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%);
+    transform: translateX(-60%) rotate(8deg);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 20px 50px rgba(74, 52, 33, 0.28);
+}
+.showMoreBtn:hover::before {
+    opacity: 1;
+    animation: taskBtnSheen 1.15s ease forwards;
+}
+
+.sectionBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 2px 0 4px;
+}
+
+.taskRow {
+    border-bottom: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px 6px;
+    box-shadow: var(--card-shadow);
+    transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.taskRow:hover {
+    background: var(--hover-light);
+    transform: translateY(-0.5px);
+    box-shadow: var(--shadow-sm);
+}
+.taskRow:active {
+    background: rgba(123, 103, 81, 0.06);
+    transform: translateY(0);
+}
+
+.taskRow:last-child {
+    border-bottom: none;
+}
+
+.completedSection {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border, rgba(74, 52, 33, 0.12));
+    opacity: 0.65;
+    transition: opacity 0.2s;
+}
+.completedSection:hover {
+    opacity: 0.85;
+}
+
+.sectionAccentDone .sectionTitle {
+    color: var(--sage, #8C9A86);
+}
+.sectionAccentDone .sectionIcon {
+    color: var(--sage, #8C9A86);
+}
+.sectionAccentDone .sectionCountPill {
+    color: var(--sage, #8C9A86);
+    background: rgba(140, 154, 134, 0.14);
+}
+
+.completedCards {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 2px 0 4px;
+}
+
+@keyframes taskBtnSheen {
+    to {
+        transform: translateX(60%) rotate(8deg);
+    }
+}

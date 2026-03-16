@@ -31,6 +31,8 @@ export default defineConfig({
         '**/*.config.js',
         'src/setupTests.js',
       ],
+      // Uncomment to enforce 100% coverage once achieved:
+      // thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 },
     },
   },
 })

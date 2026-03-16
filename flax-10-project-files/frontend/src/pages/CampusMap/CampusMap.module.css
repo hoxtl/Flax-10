@@ -5,7 +5,32 @@
   overflow: hidden;
   background: var(--bg, #f0e9df);
   font-family: inherit;
+  position: relative;
 }
+
+.skeletonOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  background: var(--bg, #f0e9df);
+  pointer-events: none;
+}
+
+.skeletonSidebarTitle { width: 170px; height: 28px; }
+.skeletonSidebarSubtitle { width: 220px; height: 12px; margin-top: 8px; }
+.skeletonSectionLabel { width: 120px; height: 12px; border-radius: 999px; }
+.skeletonPanelCard { width: 100%; height: 44px; }
+.skeletonPanelCardTall { width: 100%; height: 110px; }
+.skeletonMapPane {
+  width: 100%;
+  height: 100%;
+  background: rgba(236, 240, 245, 0.96);
+  border-left: 1px solid rgba(173, 181, 193, 0.16);
+}
+.skeletonQuickNavBtn { width: 82px; height: 28px; border-radius: 999px; }
 
 .sidebar {
   width: 340px;
@@ -33,7 +58,7 @@
 
 .sidebarHeader {
   padding: 20px 20px 14px;
-  border-bottom: 1px solid var(--border, rgba(var(--c-cocoa), 0.10));
+  border-bottom: 1px solid var(--border, rgba(var(--c-cocoa), 0.1));
   background: var(--panel, #faf7f4);
   position: sticky;
   top: 0;
@@ -57,7 +82,7 @@
 .sidebarSubtitle {
   margin: 5px 0 0;
   font-size: 0.78rem;
-  color: var(--muted, rgba(var(--brown-text), 0.50));
+  color: var(--muted, rgba(var(--brown-text), 0.5));
   font-weight: 500;
 }
 
@@ -77,7 +102,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted, rgba(var(--brown-text), 0.50));
+  color: var(--muted, rgba(var(--brown-text), 0.5));
 }
 
 .stepBadge {
@@ -88,7 +113,7 @@
   height: 18px;
   border-radius: 50%;
   background: rgba(var(--c-cocoa), 0.12);
-  color: rgba(var(--brown-text), 0.70);
+  color: rgba(var(--brown-text), 0.7);
   font-size: 0.65rem;
   font-weight: 800;
 }
@@ -147,17 +172,19 @@
 .clearBtn {
   background: none;
   border: none;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
+  color: var(--muted, rgba(var(--brown-text), 0.4));
   cursor: pointer;
   font-size: 0.75rem;
   padding: 2px 4px;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
   flex-shrink: 0;
 }
 
 .clearBtn:hover {
-  color: rgba(var(--brown-text), 0.80);
+  color: rgba(var(--brown-text), 0.8);
   background: rgba(var(--c-cocoa), 0.08);
 }
 
@@ -169,9 +196,9 @@
   width: 100%;
   padding: 9px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(var(--c-cocoa), 0.20);
-  background: rgba(255, 255, 255, 0.70);
-  color: rgba(var(--brown-text), 0.80);
+  border: 1px solid rgba(var(--c-cocoa), 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(var(--brown-text), 0.8);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -181,10 +208,10 @@
 }
 
 .geoBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.90);
-  border-color: rgba(var(--c-cocoa), 0.30);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(var(--c-cocoa), 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(var(--c-cocoa), 0.10);
+  box-shadow: 0 4px 12px rgba(var(--c-cocoa), 0.1);
 }
 
 .geoBtn:disabled {
@@ -210,19 +237,19 @@
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text, rgba(var(--brown-text), 0.80));
+  color: var(--text, rgba(var(--brown-text), 0.8));
   text-align: left;
   transition: all 130ms ease;
 }
 
 .campusBtn:hover {
   background: rgba(var(--c-cocoa), 0.06);
-  border-color: rgba(var(--c-cocoa), 0.10);
+  border-color: rgba(var(--c-cocoa), 0.1);
 }
 
 .campusBtnActive {
   background: rgba(var(--c-cocoa), 0.09);
-  border-color: rgba(var(--c-cocoa), 0.20);
+  border-color: rgba(var(--c-cocoa), 0.2);
   color: rgba(var(--brown-text), 0.95);
 }
 
@@ -240,7 +267,7 @@
   gap: 8px;
   padding: 20px 10px;
   text-align: center;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
+  color: var(--muted, rgba(var(--brown-text), 0.4));
   font-size: 0.8rem;
 }
 
@@ -261,7 +288,7 @@
 .routeError {
   padding: 10px 12px;
   background: rgba(200, 50, 50, 0.08);
-  border: 1px solid rgba(200, 50, 50, 0.20);
+  border: 1px solid rgba(200, 50, 50, 0.2);
   border-radius: 8px;
   font-size: 0.8rem;
   color: #a33;
@@ -278,7 +305,7 @@
 }
 
 .modeCard:not(.modeCardDisabled):hover {
-  box-shadow: 0 4px 16px rgba(var(--c-cocoa), 0.10);
+  box-shadow: 0 4px 16px rgba(var(--c-cocoa), 0.1);
 }
 
 .modeCardDisabled {
@@ -306,7 +333,7 @@
 .modeName {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text, rgba(var(--brown-text), 0.90));
+  color: var(--text, rgba(var(--brown-text), 0.9));
 }
 
 .modeBadge {
@@ -316,13 +343,13 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--c-green);
-  background: rgba(42, 122, 58, 0.10);
+  background: rgba(42, 122, 58, 0.1);
   padding: 1px 6px;
   border-radius: 4px;
 }
 
 .modeBadgeSoon {
-  color: rgba(var(--brown-text), 0.50);
+  color: rgba(var(--brown-text), 0.5);
   background: rgba(var(--c-cocoa), 0.08);
 }
 
@@ -374,7 +401,7 @@
   padding: 6px 0;
   background: none;
   border: none;
-  border-top: 1px solid rgba(var(--c-cocoa), 0.10);
+  border-top: 1px solid rgba(var(--c-cocoa), 0.1);
   cursor: pointer;
   font-size: 0.75rem;
   font-weight: 600;
@@ -383,7 +410,7 @@
 }
 
 .stepsToggle:hover {
-  color: rgba(var(--c-cocoa), 0.90);
+  color: rgba(var(--c-cocoa), 0.9);
 }
 
 .stepsList {
@@ -415,7 +442,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: rgba(var(--c-cocoa), 0.10);
+  background: rgba(var(--c-cocoa), 0.1);
   font-size: 0.6rem;
   font-weight: 800;
   color: rgba(var(--brown-text), 0.65);
@@ -528,7 +555,9 @@
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 :global(.campusMarker:hover .campusMarkerInner) {
@@ -569,29 +598,37 @@
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: #4A3421;
+  background: #4a3421;
   border: 2.5px solid white;
-  box-shadow: 0 2px 8px rgba(var(--c-cocoa), 0.40);
+  box-shadow: 0 2px 8px rgba(var(--c-cocoa), 0.4);
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.6); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .spinner {
   display: inline-block;
   width: 13px;
   height: 13px;
-  border: 2px solid rgba(var(--c-cocoa), 0.20);
-  border-top-color: rgba(var(--c-cocoa), 0.70);
+  border: 2px solid rgba(var(--c-cocoa), 0.2);
+  border-top-color: rgba(var(--c-cocoa), 0.7);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 :global(.mapboxgl-popup-content) {
@@ -617,7 +654,7 @@
   flex-direction: column;
   gap: 8px;
   padding-top: 10px;
-  border-top: 1px solid rgba(74, 52, 33, 0.10);
+  border-top: 1px solid rgba(74, 52, 33, 0.1);
 }
 
 .tflLeg {
@@ -627,7 +664,7 @@
   padding: 8px 10px;
   background: rgba(74, 52, 33, 0.03);
   border-radius: 8px;
-  border-left: 3px solid #0019A8;
+  border-left: 3px solid #0019a8;
 }
 
 .tflLegIcon {
@@ -647,18 +684,220 @@
 .tflLegMode {
   font-size: 0.8rem;
   font-weight: 700;
-  color: rgba(43, 30, 20, 0.90);
+  color: rgba(43, 30, 20, 0.9);
 }
 
 .tflLegDetail {
   font-size: 0.72rem;
-  color: rgba(43, 30, 20, 0.60);
+  color: rgba(43, 30, 20, 0.6);
   line-height: 1.4;
   word-break: break-word;
 }
 
 .tflLegTime {
   font-size: 0.68rem;
-  color: rgba(43, 30, 20, 0.45);
+  color: var(--c-grey);
+  opacity: 0.45;
   font-style: italic;
+}
+
+/* TfL Delays Section */
+.statusIcon {
+  font-size: 1rem;
+}
+
+.loadingDisruptions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.goodService {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--success-bg);
+  border: 1px solid var(--success-bg);
+  border-radius: 10px;
+}
+
+.goodServiceIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.goodServiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.goodServiceText strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--success-text);
+}
+
+.goodServiceText span {
+  font-size: 0.75rem;
+  color: var(--success-text);
+  opacity: 0.8;
+}
+
+.disruptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.disruptionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 8px;
+}
+
+.disruptionBadge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.disruptionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.disruptionSeverity {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-red);
+}
+
+.disruptionReason {
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+.lastUpdated {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* Hide the drag handle on desktop*/
+@media (min-width: 901px) {
+  .dragHandle {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    position: relative;
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    max-width: none;
+    height: 85vh;
+    z-index: 100;
+    border-radius: 20px 20px 0 0;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+  }
+
+  .mapWrapper {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .dragHandle {
+    width: 40px;
+    height: 5px;
+    background: rgba(var(--c-cocoa), 0.2);
+    border-radius: 10px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+
+  .sidebarHeader {
+    padding-top: 5px;
+  }
+
+  .campusQuickNav {
+    bottom: 80px;
+    transition: bottom 0.3s ease;
+  }
+}
+
+:global(.homePointer) {
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 2px 4px rgba(black, 0.3));
+}
+
+:global(.homePointer:hover) {
+  transform: scale(1.15);
+}
+
+:global(.homePopupContent) {
+  padding: 8px;
+  text-align: center;
+}
+
+:global(.homePopupTitle) {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+:global(.homePopupAddress) {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  max-width: 200px;
+  line-height: 1.3;
+}
+
+:global(.homePopupButton) {
+  padding: 6px 12px;
+  background: var(--primary);
+  color: var(--c-white);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
 }

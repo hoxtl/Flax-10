@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
+
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import useOnboarding from "./hooks/useOnboarding";
 import OnboardingForm from "./OnboardingForm";
 import SuccessScreen from "./SuccessScreen";
+
 import styles from "./OnboardingModal.module.css";
 
 function getCourseOptions() {

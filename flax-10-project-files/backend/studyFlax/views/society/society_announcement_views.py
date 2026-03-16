@@ -10,6 +10,10 @@ from .helpers import (
 )
 
 
+def is_silent_request(request):
+    return request.query_params.get('silent', '').lower() == 'true'
+
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def announcement_list(request, society_id):
@@ -19,7 +23,7 @@ def announcement_list(request, society_id):
 
     if request.method == 'GET':
         return get_announcements(society)
-    return create_announcement(request, society)
+    return create_announcement(request, society, is_silent_request(request))
 
 
 def get_announcements(society):
@@ -27,16 +31,21 @@ def get_announcements(society):
     return Response(SocietyAnnouncementSerialiser(announcements, many=True).data)
 
 
-def create_announcement(request, society):
+def create_announcement(request, society, silent=False):
     if not is_society_admin(request.user, society):
         return permission_denied_response()
-    serialiser = SocietyAnnouncementSerialiser(data=request.data)
+    context = {'skip_notification': silent}
+    serialiser = SocietyAnnouncementSerialiser(data=request.data, context=context)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     announcement = serialiser.save(society=society)
-    save_announcement_images(announcement, request.data.get('image_urls', []))
+    save_announcement_images(announcement, get_image_urls(request.data))
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data, status=status.HTTP_201_CREATED)
+
+
+def get_image_urls(data):
+    return data.get('images') or data.get('image_urls', [])
 
 
 def save_announcement_images(announcement, image_urls):
@@ -59,9 +68,10 @@ def announcement_detail(request, society_id, announcement_id):
         return Response(SocietyAnnouncementSerialiser(announcement).data)
     if not is_society_admin(request.user, society):
         return permission_denied_response()
+    silent = is_silent_request(request)
     if request.method == 'DELETE':
-        return delete_announcement(announcement)
-    return update_announcement(announcement, request.data)
+        return delete_announcement(announcement, silent)
+    return update_announcement(announcement, request.data, silent)
 
 
 def get_announcement_or_none(society, announcement_id):
@@ -71,13 +81,15 @@ def get_announcement_or_none(society, announcement_id):
         return None
 
 
-def update_announcement(announcement, data):
-    serialiser = SocietyAnnouncementSerialiser(announcement, data=data, partial=True)
+def update_announcement(announcement, data, silent=False):
+    context = {'skip_notification': silent}
+    serialiser = SocietyAnnouncementSerialiser(announcement, data=data, partial=True, context=context)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
-    if 'image_urls' in data:
-        update_announcement_images(announcement, data['image_urls'])
+    image_urls = get_image_urls(data)
+    if 'images' in data or 'image_urls' in data:
+        update_announcement_images(announcement, image_urls)
     announcement.refresh_from_db()
     return Response(SocietyAnnouncementSerialiser(announcement).data)
 
@@ -87,6 +99,8 @@ def update_announcement_images(announcement, image_urls):
     save_announcement_images(announcement, image_urls)
 
 
-def delete_announcement(announcement):
+def delete_announcement(announcement, silent=False):
+    if silent:
+        announcement._skip_notification = True
     announcement.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

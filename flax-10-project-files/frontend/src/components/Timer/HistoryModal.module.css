@@ -1,117 +1,89 @@
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+.modalShell {
+    width: min(555px, 92vw);
+}
+
+.modalContent {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal {
-    background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #111827;
-}
-
-.closeButton {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #6b7280;
+    flex-direction: column;
+    gap: var(--space-5);
 }
 
 .clearButton {
-    padding: 0.5rem 1rem;
+    padding: var(--btn-padding-sm);
     background-color: #fee2e2;
     color: #dc2626;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--btn-radius);
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: var(--text-base);
 }
 
 .list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .studyBlockCard {
-    background: #f9fafb;
-    padding: 1rem;
-    border-radius: 12px;
-    border: 1px solid #f3f4f6;
-    margin-bottom: 0.75rem;
+    background: var(--surface-card-muted);
+    padding: var(--card-padding);
+    border-radius: var(--radius-lg);
+    border: var(--stroke-soft);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
     transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .studyBlockCard:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border-color: #e5e7eb;
+    box-shadow: var(--shadow-sm);
 }
 
 .blockHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.5rem;
+    border-bottom: var(--stroke-soft);
+    padding-bottom: var(--space-2);
 }
 
 .blockDate {
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
     font-size: 0.95rem;
 }
 
 .blockTime {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--muted);
     font-weight: 500;
 }
 
 .statsRow {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.statsRow::-webkit-scrollbar {
+    display: none;
 }
 
 .statPill {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 20px;
     font-weight: 500;
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    white-space: nowrap;
 }
 
 .focusPill {
@@ -124,6 +96,13 @@
     color: #065f46;
 }
 
+.pausePill {
+    background: #fef08a;
+    /* Soft Yellow */
+    color: #854d0e;
+    /* Darker Yellow/Brown for text */
+}
+
 .sessionPill {
     background: #e0e7ff;
     color: #3730a3;
@@ -131,7 +110,7 @@
 
 .empty {
     text-align: center;
-    color: #9ca3af;
+    color: var(--muted);
     font-style: italic;
     padding: 2rem;
 }

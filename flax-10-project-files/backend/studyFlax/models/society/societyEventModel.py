@@ -29,6 +29,7 @@ class SocietyEvent(models.Model):
     announcement = models.ForeignKey(
         SocietyAnnouncement, on_delete=models.SET_NULL, null=True, blank=True, related_name='events'
     )
+    exception_dates = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

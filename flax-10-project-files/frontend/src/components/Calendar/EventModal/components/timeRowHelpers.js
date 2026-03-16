@@ -1,24 +1,25 @@
-export function getType(isAllDay) {
-    return isAllDay ? 'date' : 'datetime-local';
-}
+/**
+ * Helpers for TimeRow date/time input handling.
+ * Provides type resolution, value formatting, and change handlers for all-day and timed events.
+ */
 
-export function handleDateChange(field, isAllDay, update) {
-    return (e) => {
-        let val = e.target.value;
-        if (isAllDay && val) {
-            val = adjustForAllDay(val, field);
-        }
-        update(field)({ target: { value: val } });
+/** Returns a change handler for the DateTimePicker in all-day mode. */
+export function handleDateOnlyPickerChange(field, update) {
+    return (val) => {
+        if (!val) return update(field)({ target: { value: "" } });
+        const adjusted = field === 'end_time' ? addOneDay(val) : val;
+        update(field)({ target: { value: adjusted + 'T00:00' } });
     };
 }
 
-function adjustForAllDay(val, field) {
-    if (field === 'end_time') {
-        const date = new Date(val);
-        date.setDate(date.getDate() + 1);
-        val = date.toISOString().split('T')[0];
-    }
-    return val + 'T00:00';
+function addOneDay(dateStr) {
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+}
+
+export function handleDatePickerChange(field, update) {
+    return (isoString) => update(field)({ target: { value: isoString } });
 }
 
 export function getDisplayValue(value, isAllDay, field) {

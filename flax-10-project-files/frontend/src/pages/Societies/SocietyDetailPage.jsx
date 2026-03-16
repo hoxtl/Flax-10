@@ -1,7 +1,12 @@
+/**
+ * SocietyDetailPage provides the comprehensive view for a single society.
+ * Includes hero visuals, detailed info, event calendars, and administration tools.
+ */
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
+import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
 import SocietyHero from "../../components/Society/SocietyDetail/SocietyHero";
 import SocietyInfo from "../../components/Society/SocietyDetail/SocietyInfo";
 import SocietyTabs from "../../components/Society/SocietyDetail/tabs/SocietyTabs";
@@ -10,133 +15,229 @@ import CoverImageModal from "../../components/Society/SocietyDetail/imageHandler
 import ImageGalleryModal from "../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal";
 import SettingsModal from "../../components/Society/SocietyDetail/SettingsModal";
 import AnnouncementModal from "../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal";
+import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
+import MemberDirectoryModal from "../../components/Society/SocietyDetail/MemberDirectoryModal";
+import { Flag } from "lucide-react";
+import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
+import { SocietyDetailSkeleton } from "./SocietySkeletons";
+import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
 
-export default function SocietyDetailPage({ societyId, onBack }) {
-    const hookData = useSocietyDetail(societyId);
-    const { society, loading, error, updateSociety, members } = hookData;
-    const location = useLocation();
-    const [activeTab, setActiveTab] = useState(location.state?.activeTab || "calendar");
-    const [focusAnnouncementId, setFocusAnnouncementId] = useState(location.state?.announcementId || null);
+import {
+    getImageUrls, getAvailablePhotos, scrollContentToTop,
+    wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
+    wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
+} from "./SocietyDetailPageUtils";
+
+/** Manages the active tab and scroll orientation for the detail page. */
+function usePageState(initialTab, location) {
+    const [params, setParams] = useSearchParams();
+    const activeTab = params.get('tab') || initialTab || location.state?.activeTab || "calendar";
+    const focusId = params.get('announcementId') || location.state?.announcementId;
+
+    const setTab = (tab, announcementId = null) => {
+        setParams(prev => {
+            prev.set('tab', tab);
+            if (announcementId) prev.set('announcementId', announcementId);
+            else prev.delete('announcementId');
+            return prev;
+        }, { replace: true });
+    };
+
+    return { activeTab, focusAnnouncementId: focusId, handleTabChange: setTab };
+}
+
+/** Container for all modular visibility states in the detail page. */
+function useModalState() {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [showCoverModal, setShowCoverModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-
-    useEffect(() => {
-        if (location.state?.activeTab) {
-            window.history.replaceState({}, document.title);
-        }
-    }, []);
-
-    const handleTabChange = (tab, announcementId = null) => {
-        setActiveTab(tab);
-        setFocusAnnouncementId(announcementId);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [showMembersModal, setShowMembersModal] = useState(false);
+    return {
+        editingAnnouncement, setEditingAnnouncement, galleryOpen, setGalleryOpen,
+        editMode, setEditMode, showCoverModal, setShowCoverModal,
+        showSettings, setShowSettings, showReportModal, setShowReportModal,
+        showMembersModal, setShowMembersModal
     };
+}
 
-    const handleAnnouncementSave = (data, conflictingAnnouncement) => {
-        const { updateAnnouncement, addAnnouncement } = buildHandlers(hookData);
+
+/** Aggregates all data and action handlers for the page components. */
+function useSocietyPageData(societyId, initialTab) {
+    const hookData = useSocietyDetail(societyId);
+    const { society, updateSociety, updateLocalSociety } = hookData;
+    const location = useLocation();
+    const page = usePageState(initialTab, location);
+    const modals = useModalState();
+    const handleUnreport = useUnreportSociety((id, fields) => updateLocalSociety(fields));
+    const subscription = useSocietySubscription(societyId, society, updateLocalSociety);
+    const tracker = useChangeTracker();
+    const handlers = buildHandlers(hookData, modals.editMode, tracker);
+    return { ...handlers, page, modals, handleUnreport, subscription, tracker };
+}
+
+function usePageStateHandlers(data, onBack) {
+    const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
+    return {
+        state: modals,
+        setS: modals.setShowSettings, setR: modals.setShowReportModal, setG: modals.setGalleryOpen,
+        setCE: modals.setShowCoverModal, setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
+        updateS: updateSociety, updateLS: updateLocalSociety, fetchM: fetchMembers, removeM: removeMember,
+        onDelete: async () => { await deleteSociety(); onBack(); },
+        onReport: () => modals.setShowReportModal(true),
+        onAnnounceSubmit: (d, conflict) => {
+            if (conflict) data.updateAnnouncement(conflict.id, { ...conflict, pinned: false }, false);
+            if (d.id) data.updateAnnouncement(d.id, d, false); else data.addAnnouncement(d, false);
+            modals.setEditingAnnouncement(null);
+        },
+        onAnnounceDelete: (id) => { data.deleteAnnouncement(id, false); modals.setEditingAnnouncement(null); }
     };
+}
 
-    if (loading) return <div className={styles.page}>Loading...</div>;
-    if (error || !society) return <NotFound onBack={onBack} />;
+const ModalsContainer = ({ state, data, handlers, societyId }) => {
+    const isAdmin = data.society && ['admin', 'editor'].includes(data.society.role);
+    const urls = getImageUrls(data.society?.images);
+    return (
+        <>
+            {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
+            {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
+            {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.activeGallery?.index} onClose={() => handlers.setG(null)} />}
+            {state.showCoverModal && <CoverImageModal images={urls} availablePhotos={getAvailablePhotos(data.society)} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
+            {state.showMembersModal && <MemberDirectoryModal societyName={data.society.name} members={data.members} onFetchMembers={handlers.fetchM} onRemoveMember={handlers.removeM} isAdmin={isAdmin} onClose={() => handlers.setM(false)} />}
+            {state.editingAnnouncement && <AnnouncementModal announcements={data.society.announcements} announcement={state.editingAnnouncement} societyId={societyId} onClose={() => handlers.setEA(null)} onSubmit={(d, conflict) => handlers.onAnnounceSubmit(d, conflict)} onDelete={(id) => handlers.onAnnounceDelete(id)} tags={data.society.tags} />}
+        </>
+    );
+};
 
-    const canEdit = society.is_admin;
-    const availablePhotos = getAvailablePhotos(society);
-    const handlers = buildHandlers(hookData);
-    const updateImages = (imgs) => updateSociety({ images: imgs, image: imgs[0] || null });
-    const handleDelete = async () => { await handlers.deleteSociety(); onBack(); };
+const TabSection = ({ data }) => (
+    <div className={styles.tabSection}>
+        <SocietyTabs activeTab={data.page.activeTab} onTabChange={data.page.handleTabChange}
+            society={data.society} editMode={data.modals.editMode} onUpdate={data.updateSociety}
+            eventHandlers={{ onAdd: data.addEvent, onUpdate: data.updateEvent, onDelete: data.deleteEvent, onAddException: data.addException }}
+            announcementHandlers={{ addAnnouncement: data.addAnnouncement, updateAnnouncement: data.updateAnnouncement, deleteAnnouncement: data.deleteAnnouncement }}
+            tags={data.society.tags}
+            tagHandlers={{ onAddTag: data.onAddTag, onDeleteTag: data.onDeleteTag, onUpdateTag: data.onUpdateTag }}
+            focusAnnouncementId={data.page.focusAnnouncementId} onEditAnnouncement={data.modals.setEditingAnnouncement} />
+    </div>
+);
+
+const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
+    <div className={styles.page}>
+        <TopBar onBack={onBack} onSettings={() => handlers.setS(true)} isAdmin={isAdmin}
+            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)} />
+        <SocietyHero society={data.society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })}
+            onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} />
+        <SocietyInfo society={data.society} editMode={data.modals.editMode} onUpdateSociety={data.updateSociety}
+            isSubscribed={data.subscription.isSubscribed} onJoin={data.joinSociety} onLeave={data.leaveSociety}
+            canEdit={data.society.is_admin} onViewMembers={() => handlers.setM(true)} onToggleSubscription={data.subscription.toggleSubscription}
+            onToggleEditMode={() => handleToggleEditMode(data.modals, data.tracker, data.publishChanges)} />
+        <div className={styles.mainContent}>
+            <TabSection data={data} />
+            <SocietySidebar society={data.society} editMode={data.modals.editMode} onAddAnnouncement={data.addAnnouncement}
+                onUpdateAnnouncement={data.updateAnnouncement} onAddEvent={data.addEvent} tags={data.society.tags} />
+        </div>
+    </div>
+);
+
+export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
+    const data = useSocietyPageData(societyId, initialTab);
+    const handlers = usePageStateHandlers(data, onBack);
+    useSocietyInit(useLocation());
+    if (data.loading) return <SocietyDetailSkeleton />;
+    if (!data.society) return <NotFound onBack={onBack} />;
+    const isAdmin = ['admin', 'editor'].includes(data.society.role);
 
     return (
-        <div className={styles.page}>
-            <TopBar onBack={onBack} isAdmin={society.role === 'admin'}
-                onSettings={() => setShowSettings(true)} />
-            <SocietyHero society={society} onImageClick={() => setGalleryOpen(true)}
-                editMode={editMode} onUpdateName={(name) => updateSociety({ name })}
-                onEditImages={() => setShowCoverModal(true)} />
-            <SocietyInfo society={society} editMode={editMode} onUpdateSociety={updateSociety}
-                onJoin={handlers.joinSociety} onLeave={handlers.leaveSociety}
-                canEdit={canEdit} onToggleEditMode={() => setEditMode(!editMode)} />
-            <MainContent activeTab={activeTab} setActiveTab={handleTabChange} society={society}
-                editMode={editMode} handlers={handlers} focusAnnouncementId={focusAnnouncementId}
-                onEditAnnouncement={setEditingAnnouncement} />
-            {galleryOpen && <ImageGalleryModal images={getImageUrls(society.images)} onClose={() => setGalleryOpen(false)} />}
-            {showCoverModal && <CoverImageModal images={getImageUrls(society.images)} availablePhotos={availablePhotos}
-                onClose={() => setShowCoverModal(false)} onUpdate={updateImages} />}
-            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} onDelete={handleDelete}
-                members={members} onFetchMembers={handlers.fetchMembers} onUpdateRole={handlers.updateMemberRole}
-                onRemoveMember={handlers.removeMember} onAddCollaborator={handlers.addCollaborator}
-                ratificationStatus={society.ratification_status} isRatified={society.is_ratified}
-                onRequestRatification={handlers.requestRatification} />}
-            {editingAnnouncement && <AnnouncementModal announcement={editingAnnouncement} tags={society.tags}
-                onClose={() => setEditingAnnouncement(null)}
-                onSubmit={(data, conflict) => {
-                    if (conflict) handlers.updateAnnouncement(conflict.id, { ...conflict, pinned: false });
-                    if (data.id) handlers.updateAnnouncement(data.id, data);
-                    else handlers.addAnnouncement(data);
-                    setEditingAnnouncement(null);
-                }}
-                societyId={societyId} announcements={society.announcements} />}
-        </div>
+        <>
+            <DetailLayout data={data} handlers={handlers} onBack={onBack} isAdmin={isAdmin} />
+            <ModalsContainer state={handlers.state} data={data} handlers={handlers} societyId={societyId} />
+        </>
     );
 }
 
-function buildHandlers(hookData) {
-    const { updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
-        requestRatification } = hookData;
+/** Handles one-time initialization effects like scrolling to top. */
+function useSocietyInit(location) {
+    useEffect(() => {
+        scrollContentToTop();
+        if (location.state?.activeTab) window.history.replaceState({}, document.title);
+    }, []);
+}
+
+/** Manages the transition between view and edit modes. */
+async function handleToggleEditMode(modals, tracker, publish) {
+    if (modals.editMode && tracker.hasChanges()) {
+        await publish(tracker.getChangeSummary());
+        tracker.resetChanges();
+    }
+    modals.setEditMode(!modals.editMode);
+}
+
+/** Constructs event operations bound to current editing context. */
+function buildEventHandlers(hookData, editMode, trackEvent) {
+    const { addEvent, updateEvent, deleteEvent, addException } = hookData;
     return {
-        updateSociety, addAnnouncement, updateAnnouncement, deleteAnnouncement,
-        addEvent, updateEvent, deleteEvent, addTag, deleteTag, joinSociety, leaveSociety,
-        deleteSociety, fetchMembers, updateMemberRole, removeMember, addCollaborator,
-        requestRatification
+        addEvent: wrapAddEvent(addEvent, editMode, trackEvent),
+        updateEvent: wrapUpdateEvent(updateEvent, editMode, trackEvent),
+        deleteEvent: wrapDeleteEvent(deleteEvent, editMode, trackEvent),
+        addException: (eventId, date) => addException(eventId, date, editMode),
     };
 }
 
-function getImageUrls(images) {
-    return (images || []).map(i => i.url || i);
+/** Constructs announcement operations bound to current editing context. */
+function buildAnnouncementHandlers(hookData, editMode, trackAnnouncement) {
+    const { addAnnouncement, updateAnnouncement, deleteAnnouncement } = hookData;
+    return {
+        addAnnouncement: wrapAddAnnouncement(addAnnouncement, editMode, trackAnnouncement),
+        updateAnnouncement: wrapUpdateAnnouncement(updateAnnouncement, editMode, trackAnnouncement),
+        deleteAnnouncement: wrapDeleteAnnouncement(deleteAnnouncement, editMode, trackAnnouncement)
+    };
 }
 
-function getAvailablePhotos(society) {
-    const announcementImages = (society.announcements || []).flatMap(a => a.images?.map(i => i.url) || []);
-    const currentCovers = new Set(getImageUrls(society.images));
-    return announcementImages.filter(img => !currentCovers.has(img));
+/** Aggregates all data and action handlers for the page components. */
+function buildHandlers(hookData, editMode, changeTracker) {
+    const { trackEvent, trackAnnouncement } = changeTracker;
+    return {
+        ...hookData,
+        ...buildEventHandlers(hookData, editMode, trackEvent),
+        ...buildAnnouncementHandlers(hookData, editMode, trackAnnouncement),
+        onAddTag: hookData.addTag,
+        onDeleteTag: hookData.deleteTag,
+        onUpdateTag: hookData.updateTag
+    };
 }
 
-function TopBar({ onBack, isAdmin, onSettings }) {
+/** Toggles the reporting status of the society. */
+function ReportButton({ hasReported, onReport, onUnreport }) {
+    const style = { color: hasReported ? 'var(--primary)' : 'var(--text-secondary)', padding: '0.4rem', cursor: 'pointer', opacity: hasReported ? 1 : 0.7 };
+    const title = hasReported ? "You have reported this society. Click to unreport." : "Report Society";
+    return (
+        <button className={styles.settingsBtn} style={style} onClick={hasReported ? onUnreport : onReport} title={title}>
+            <Flag size={20} fill={hasReported ? "currentColor" : "none"} strokeWidth={hasReported ? 1 : 2} />
+        </button>
+    );
+}
+
+/** Common header for the detail view including navigation and settings. */
+function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
     return (
         <div className={styles.topBar}>
-            <button className={styles.backBtn} onClick={onBack}>&larr; Back to Societies</button>
-            {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
+            <button className={styles.backBtn} onClick={onBack}>&larr; Back to All Societies</button>
+            <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', alignItems: 'center' }}>
+                <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
+                {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
+            </div>
         </div>
     );
 }
 
+/** Simple error display when a society record is missing. */
 function NotFound({ onBack }) {
     return (
         <div className={styles.notFound}>
             <p>Society not found.</p>
             <button onClick={onBack}>Back to Societies</button>
-        </div>
-    );
-}
-
-function MainContent({ activeTab, setActiveTab, society, editMode, handlers, focusAnnouncementId, onEditAnnouncement }) {
-    const tags = society.tags || [];
-    const tagHandlers = { onAddTag: handlers.addTag, onDeleteTag: handlers.deleteTag };
-    const eventHandlers = { onAdd: handlers.addEvent, onUpdate: handlers.updateEvent, onDelete: handlers.deleteEvent };
-    const announcementHandlers = { onAdd: handlers.addAnnouncement, onUpdate: handlers.updateAnnouncement, onDelete: handlers.deleteAnnouncement };
-    return (
-        <div className={styles.mainContent}>
-            <div className={styles.tabSection}>
-                <SocietyTabs activeTab={activeTab} onTabChange={setActiveTab} society={society}
-                    editMode={editMode} onUpdate={handlers.updateSociety} eventHandlers={eventHandlers}
-                    announcementHandlers={announcementHandlers} tags={tags} tagHandlers={tagHandlers}
-                    focusAnnouncementId={focusAnnouncementId} onEditAnnouncement={onEditAnnouncement} />
-            </div>
-            <SocietySidebar society={society} editMode={editMode} tags={tags}
-                onAddAnnouncement={handlers.addAnnouncement} onUpdateAnnouncement={handlers.updateAnnouncement} onAddEvent={handlers.addEvent} />
         </div>
     );
 }

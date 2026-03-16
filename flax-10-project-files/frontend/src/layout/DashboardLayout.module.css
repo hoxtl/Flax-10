@@ -1,28 +1,60 @@
 .root {
   display: flex;
+  gap: 0;
   height: 100vh;
   overflow: hidden;
   background: var(--bg);
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.root>* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow-y: auto;
+  height: 100vh;
+  overflow-x: hidden;
   min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  border-radius: 0;
+  border-left: 1px solid var(--frame-border);
+}
+
+.mainContent {
+  flex: 1;
+  min-height: min-content;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
+  height: auto;
+  overflow-y: visible;
+  overflow-x: hidden;
+  padding: 0 var(--space-6) var(--space-6);
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg);
 }
 
-/* Mobile overlay behind sidebar drawer */
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--surface-overlay);
+  backdrop-filter: blur(4px);
   z-index: 50;
 }
 
@@ -32,4 +64,48 @@
   top: 0;
   bottom: 0;
   z-index: 60;
+  border-radius: 0 12px 12px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.scrollToTop {
+  position: fixed;
+  bottom: var(--space-7, 28px);
+  right: var(--space-7, 28px);
+  z-index: 9999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: var(--surface-paper);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.scrollToTop:hover {
+  background: var(--primary-strong);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .root {
+    flex-direction: column;
+  }
+
+  .main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding-bottom: 0;
+  }
 }

@@ -6,21 +6,23 @@ import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
 import { getEventType } from './utils/eventUtils';
 import { useTags } from '../../context/TagContext';
-import { EventMenuButton } from './EventMenu';
+import { getEventTheme } from './utils/eventStyleUtils';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const eventType = getEventType(event);
-    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    if (eventType !== 'personal' || readOnly) {
+        return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    }
     return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
 }
 
 function ReadOnlyEvent({ event, style, minWidth }) {
     const { openPopup } = useEventPopup();
+    const tags = useTags();
+    const theme = getEventTheme(event, tags);
     const height = parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
-    const eventStyle = buildReadOnlyStyle(style, event);
-    const className = getReadOnlyClassName(event);
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -28,8 +30,8 @@ function ReadOnlyEvent({ event, style, minWidth }) {
     };
 
     return (
-        <div className={className} style={eventStyle} onClick={handleClick}>
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={handleClick} data-event-id={event.id}>
+            <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
         </div>
     );
 }
@@ -42,46 +44,36 @@ function getReadOnlyClassName(event) {
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
-    const { openModal } = useEventModal();
-    const { openPopup, closePopup } = useEventPopup();
-    const { removeEvent, editEvent } = useEventActions();
-    const theme = useTags().getTag(event.tag);
-    const refs = useEventRefs();
+    const { editEvent } = useEventActions();
+    const { openPopup } = useEventPopup();
+    const theme = getEventTheme(event, useTags());
+    const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
-    const onClick = createPopupClickHandler(refs, isDragging, resize.isResizing, openPopup, event);
+
+    const onClick = (e) => {
+        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
+        if (isDragging || resize.isResizing) return;
+        const rect = refs.event.current?.getBoundingClientRect();
+        openPopup(event, rect);
+    };
 
     return (
         <EventCard event={event} style={style} theme={theme} refs={refs}
             resize={resize} isDragging={isDragging} dragProps={dragProps}
-            onClick={onClick} minWidth={minWidthForDetails}
-            onEdit={() => { closePopup(); openModal(event); }} onDelete={() => { closePopup(); removeEvent(event.id); }} />
+            onClick={onClick} minWidth={minWidthForDetails} />
     );
 }
 
-function useEventRefs() {
-    return { event: useRef(null), resizeEnded: useRef(false) };
-}
-
-function createPopupClickHandler(refs, isDragging, isResizing, openPopup, event) {
-    return (e) => {
-        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
-        if (isDragging || isResizing) return;
-        const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
-    };
-}
-
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onEdit, onDelete }) {
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth }) {
     const height = resize.resizePreview || parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, resize.isResizing);
-    const renderStyle = buildStyle(style, resize.resizePreview, theme);
+    const renderStyle = buildStyle(style, theme, resize.resizePreview);
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            {onEdit && onDelete && <EventMenuButton onEdit={onEdit} onDelete={onDelete} />}
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} data-event-id={event.id} {...dragProps}>
+            <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>
     );
@@ -98,7 +90,7 @@ function ResizeHandle({ onStart }) {
     return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
-function EventContent({ event, height, width, minWidth }) {
+function EventContent({ event, theme, height, width, minWidth }) {
     const showTime = height >= 30 && width >= minWidth;
     const showDesc = height >= 60 && width >= minWidth;
     const isSociety = event.source === 'society';
@@ -106,7 +98,6 @@ function EventContent({ event, height, width, minWidth }) {
     return (
         <div className="event-content">
             <div className="event-title">
-                {isSociety && <span className="society-badge">●</span>}
                 {event.title}
             </div>
             {isSociety && showTime && <div className="society-name">{event.society_name}</div>}
@@ -122,18 +113,10 @@ function TimeDisplay({ event }) {
     return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
-function buildReadOnlyStyle(baseStyle, event) {
-    const style = { ...baseStyle };
-    if (event.source === 'society' && event.society_color) {
-        style.borderLeftColor = event.society_color;
-    }
-    return style;
-}
-
-function buildStyle(baseStyle, resizePreview, theme) {
+function buildStyle(baseStyle, theme, resizePreview) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
-    style.borderLeftColor = theme ? theme.color : '#8B7355';
+    style.borderLeftColor = theme.color;
     return style;
 }
 

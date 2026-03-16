@@ -1,71 +1,40 @@
-import { useCalendarData, useCalendarDispatch } from '../../../context/CalendarContext';
+import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
+import { getMonthWeeks } from '../utils/dateUtils';
 import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
 import './MonthView.css';
 
-/*
-    Shows full month view of the calendar.
-    Props are optional - falls back to CalendarContext if not provided.
-*/
-export function MonthView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly, onEventClick, customTags }) {
-    const data = useCalendarData({ selectedDate: propDate, events: propEvents });
-    const contextDispatch = useCalendarDispatch();
-    const weeks = getMonthWeeks(data.selectedDate);
+export function MonthView({ selectedDate, events, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
+    const { selectedDate: contextDate, events: contextEvents, readOnly: contextReadOnly } = useCalendar();
+    const dispatch = useCalendarDispatch();
+    const cur = selectedDate || contextDate;
+    const evs = events || contextEvents || [];
+    const isReadOnly = readOnly ?? contextReadOnly;
 
-    const handleDateSelect = onDateSelect || createDispatchHandler(contextDispatch);
+    const navToDay = (date) => {
+        dispatch?.({ type: 'SET_SELECTED_DATE', payload: date });
+        dispatch?.({ type: 'SET_VIEW_MODE', payload: 'day' });
+    };
 
     return (
         <div className="month-view">
-            <WeekdayHeader />
-            <MonthGrid weeks={weeks} events={data.events} cur={data.selectedDate} onDateSelect={handleDateSelect}
-                readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
+            <MonthGrid
+                cur={cur} events={evs} onDateSelect={onDateSelect} readOnly={isReadOnly}
+                onEventClick={onEventClick} onMoreClick={onMoreClick || navToDay} customTags={customTags}
+            />
         </div>
     );
 }
 
-function createDispatchHandler(dispatch) {
-    if (!dispatch) return null;
-    return (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
-}
-
-function MonthGrid({ weeks, events, cur, onDateSelect, readOnly, onEventClick, customTags }) {
+function MonthGrid({ cur, events, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
+    const weeks = getMonthWeeks(cur);
     return (
         <div className="month-grid">
-            {weeks.map((week, i) => (
-                <WeekRow key={i} days={week} events={events} cur={cur} onDateSelect={onDateSelect}
-                    readOnly={readOnly} onEventClick={onEventClick} customTags={customTags} />
+            <WeekdayHeader />
+            {weeks.map((w, i) => (
+                <WeekRow key={i} days={w} events={events} cur={cur} onDateSelect={onDateSelect}
+                    readOnly={readOnly} onEventClick={onEventClick} onMoreClick={onMoreClick} customTags={customTags} />
             ))}
         </div>
     );
-}
-
-function getMonthWeeks(date) {
-    const weeks = [];
-    const current = getStartDate(date);
-    const last = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    while (shouldContinue(current, last)) {
-        weeks.push(generateWeek(current));
-    }
-    return weeks;
-}
-
-function shouldContinue(current, last) {
-    if (current <= last) return true;
-    return current.getDay() !== 0;
-}
-
-function getStartDate(date) {
-    const d = new Date(date.getFullYear(), date.getMonth(), 1);
-    d.setDate(d.getDate() - d.getDay());
-    return d;
-}
-
-function generateWeek(current) {
-    const week = [];
-    for (let i = 0; i < 7; i++) {
-        week.push(new Date(current));
-        current.setDate(current.getDate() + 1);
-    }
-    return week;
 }

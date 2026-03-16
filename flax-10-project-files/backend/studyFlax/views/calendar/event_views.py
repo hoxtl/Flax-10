@@ -25,20 +25,56 @@ def event_list(request):
     return create_event(request)
 
 
+from studyFlax.models import User
+
 def get_events(request):
-    safe_sync_timetable(request.user)
+    requested_user_id = request.query_params.get('user_id')
+    
+    if requested_user_id:
+        try:
+            target_user = User.objects.get(id=requested_user_id)
+        except User.DoesNotExist:
+            return Response([])
+            
+        # Check if target_user has shared their calendar with request.user
+        if target_user != request.user:
+            from studyFlax.models.social.shareModel import CalendarShare
+            is_shared_with_me = CalendarShare.objects.filter(owner=target_user, shared_with=request.user).exists()
+            if not is_shared_with_me:
+                return Response([]) # Gracefully deny access
+    else:
+        target_user = request.user
+        safe_sync_timetable(target_user) # Only sync if it's the current user
+
     start = parse_date_param(request.query_params.get('start'))
     end = parse_date_param(request.query_params.get('end'))
-    personal = get_personal_events(request.user, request.query_params, start, end)
-    society = get_synced_society_events(request.user, start, end)
+    
+    personal = get_personal_events(target_user, request.query_params, start, end, is_viewer=target_user != request.user)
+    society = get_synced_society_events(target_user, start, end)
+    
     return Response(personal + society)
 
 
-def get_personal_events(user, query_params, start, end):
+def get_personal_events(user, query_params, start, end, is_viewer=False):
     base_events = CalendarEvent.objects.filter(user=user)
     filtered = filter_events_by_date_range(base_events, query_params)
     expanded = expand_recurring_events(filtered, start, end)
-    return CalendarEventSerialiser(expanded, many=True).data
+    events_data = CalendarEventSerialiser(expanded, many=True).data
+    if is_viewer:
+        events_data = [mask_private_event(e) if e.get('is_private') else e for e in events_data]
+    return events_data
+
+
+def mask_private_event(event):
+    return {
+        **event,
+        'title': 'Busy',
+        'description': '',
+        'location': None,
+        'tag': None,
+        'tag_name': None,
+        'tag_details': None,
+    }
 
 
 def safe_sync_timetable(user):

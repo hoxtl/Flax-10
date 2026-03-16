@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
 
 function makeRef(el) { return { current: el }; }
 
-function setup(open = true, overrides = {}) {
+let lastUnmount = null;
+
+function setup(open = true) {
   const el = document.createElement('div');
   const menuEl = document.createElement('div');
   const taskMenuEl = document.createElement('div');
@@ -26,16 +28,22 @@ function setup(open = true, overrides = {}) {
     useOutsideClick(open, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId)
   );
 
+  lastUnmount = unmount;
   return { el, menuEl, taskMenuEl, fabEl, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId, rerender, unmount };
 }
 
-afterEach(() => { document.body.innerHTML = ''; });
+afterEach(() => {
+  lastUnmount?.();
+  lastUnmount = null;
+  document.body.innerHTML = '';
+});
 
 describe('useOutsideClick', () => {
   it('does not add listeners when open is false', () => {
     const addSpy = vi.spyOn(document, 'addEventListener');
     setup(false);
-    expect(addSpy).not.toHaveBeenCalled();
+    expect(addSpy).not.toHaveBeenCalledWith('mousedown', expect.any(Function));
+    expect(addSpy).not.toHaveBeenCalledWith('keydown', expect.any(Function));
     addSpy.mockRestore();
   });
 
@@ -56,21 +64,21 @@ describe('useOutsideClick', () => {
     const { setMenuOpen } = setup(true);
     const outside = document.createElement('div');
     document.body.appendChild(outside);
-    document.dispatchEvent(new MouseEvent('mousedown', { target: outside, bubbles: true }));
+    outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(setMenuOpen).toHaveBeenCalledWith(false);
   });
 
-  it('does not close menu when clicking inside menuRef', () => {
+  it('does not call setMenuOpen when clicking inside menuRef', () => {
     const { menuEl, setMenuOpen } = setup(true);
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    Object.defineProperty(MouseEvent.prototype, 'target', { get: () => menuEl, configurable: true });
+    menuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    expect(setMenuOpen).not.toHaveBeenCalled();
   });
 
   it('closes taskMenu when clicking outside taskMenuRef and not dots btn', () => {
     const { setTaskMenuId } = setup(true);
     const outside = document.createElement('div');
     document.body.appendChild(outside);
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(setTaskMenuId).toHaveBeenCalledWith(null);
   });
 
@@ -87,7 +95,7 @@ describe('useOutsideClick', () => {
     const { onClose } = setup(true);
     const outside = document.createElement('div');
     document.body.appendChild(outside);
-    document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -120,39 +128,24 @@ describe('useOutsideClick', () => {
     const onClose = vi.fn();
     const setMenuOpen = vi.fn();
     const setTaskMenuId = vi.fn();
-    expect(() => {
-      renderHook(() => useOutsideClick(true, panelRef, menuRef, taskMenuRef, { current: null }, onClose, setMenuOpen, setTaskMenuId));
-      document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    }).not.toThrow();
+    const { unmount } = renderHook(() =>
+      useOutsideClick(true, panelRef, menuRef, taskMenuRef, { current: null }, onClose, setMenuOpen, setTaskMenuId)
+    );
+    const outside = document.createElement('div');
+    document.body.appendChild(outside);
+    expect(() => outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))).not.toThrow();
+    unmount();
   });
 
-  it('does not call setMenuOpen when clicking inside menuRef', () => {
-    const { menuEl, setMenuOpen } = setup(true);
-    menuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    expect(setMenuOpen).not.toHaveBeenCalled();
-  });
-  
   it('does not call setTaskMenuId when clicking inside taskMenuRef', () => {
     const { taskMenuEl, setTaskMenuId } = setup(true);
     taskMenuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(setTaskMenuId).not.toHaveBeenCalled();
   });
 
-  it('does not call setMenuOpen when clicking inside menuRef', () => {
-    const { menuEl, setMenuOpen } = setup(true);
-    menuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    expect(setMenuOpen).not.toHaveBeenCalled();
-  });
-  
-  it('does not call setTaskMenuId when clicking inside taskMenuRef', () => {
-    const { taskMenuEl, setTaskMenuId } = setup(true);
-    taskMenuEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-    expect(setTaskMenuId).not.toHaveBeenCalled();
-  });
-  
-  it('does not call onClose when clicking inside panelRef', () => {
-    const { el, onClose } = setup(true);
-    el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  it('does not call onClose when clicking inside fabRef', () => {
+    const { fabEl, onClose } = setup(true);
+    fabEl.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     expect(onClose).not.toHaveBeenCalled();
   });
 });

@@ -3,6 +3,7 @@ import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 import { useEventPopup } from '../../../../context/CalendarContext';
 import { useTags } from '../../../../context/TagContext';
 import { calculateEventLayout } from './allDayRowHelpers';
+import { getEventTheme } from '../../utils/eventStyleUtils';
 import './AllDayRow.css';
 
 export function AllDayRow({ days, events, readOnly }) {
@@ -24,16 +25,14 @@ export function AllDayRow({ days, events, readOnly }) {
 function AllDayEventBar({ item, readOnly }) {
     const { event, startCol, endCol, row } = item;
     const { openPopup } = useEventPopup();
-    const { getTag } = useTags();
-
-    const tag = getTag ? getTag(event.tag) : null;
-    const color = event.society_color || tag?.color || '#3b82f6';
+    const tags = useTags();
+    const theme = getEventTheme(event, tags);
 
     const style = {
         gridColumnStart: startCol,
         gridColumnEnd: endCol,
         gridRow: row,
-        backgroundColor: color
+        backgroundColor: theme.color
     };
 
     const handleClick = (ev) => {
@@ -43,7 +42,7 @@ function AllDayEventBar({ item, readOnly }) {
     };
 
     return (
-        <div className="all-day-event-bar" style={style} onClick={handleClick}>
+        <div className="all-day-event-bar" style={style} onClick={handleClick} data-event-id={event.id}>
             {event.title}
         </div>
     );

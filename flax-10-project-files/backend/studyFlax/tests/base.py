@@ -1,12 +1,17 @@
-from django.test import TestCase
+"""
+Shared base classes and assertion helpers for backend tests.
+"""
+
+from rest_framework.test import APITestCase
 from studyFlax.models import Tag, CalendarEvent, RecurrenceRule
 from .fixtures import get_sample_tags, SAMPLE_TAGS
 from rest_framework.test import APIClient
+from django.test import TestCase
+
 class BaseTestCase(TestCase):
     """Base test case with common setup."""
     
     def setUp(self):
-        """Set up test environment."""
         from studyFlax.models import User
         self.user = User.objects.create(
             email="test@example.com", 
@@ -31,7 +36,6 @@ class BaseEventTestCase(BaseTestCase):
     """Base test case for event tests."""
     
     def setUp(self):
-        """Set up event test environment."""
         super().setUp()
         self.url = "/api/events/"
     
@@ -70,5 +74,4 @@ class BaseEventTestCase(BaseTestCase):
         for f in ['start_time', 'end_time']:
             if isinstance(data.get(f), str):
                 data[f] = datetime.fromisoformat(data[f].replace('Z', '+00:00'))
-
 

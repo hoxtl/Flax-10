@@ -1,10 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SoundSelector, TaskInput } from '../../../components/Timer/TimerComponents';
-import { noiseGenerator } from '../../../utils/noiseUtils';
+import { noiseGenerator } from '../../../components/Timer/utils/noiseUtils';
+
+// Mock AnimatedDropdown to use native select for testability
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options }) => (
+        <select value={value} onChange={e => onChange(e.target.value)}>
+            {(options || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    ),
+}));
 
 // Mock noiseGenerator
-vi.mock('../../../utils/noiseUtils', () => ({
+vi.mock('../../../components/Timer/utils/noiseUtils', () => ({
     noiseGenerator: {
         play: vi.fn(),
         stop: vi.fn(),

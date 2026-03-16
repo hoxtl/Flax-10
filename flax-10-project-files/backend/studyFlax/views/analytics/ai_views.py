@@ -11,9 +11,11 @@ from studyFlax.models.timer.themeSessionModel import ThemeSession
 from collections import defaultdict
 
 try:
-    from openai import OpenAI
-    openai_available = True
-except ImportError:
+    import openai  # pragma: no cover
+    OpenAI = getattr(openai, 'OpenAI', None)
+    openai_available = OpenAI is not None
+except Exception:  # pragma: no cover
+    OpenAI = None
     openai_available = False
 
 
@@ -27,6 +29,7 @@ def _build_user_context(user, days=30):
 
     total_study_minutes = sum(s.duration for s in sessions)
     total_break_minutes = sum(s.break_duration for s in sessions)
+    total_pause_seconds = sum(s.pause_duration for s in sessions)
     session_count = sessions.count()
     avg_session = round(total_study_minutes / session_count, 1) if session_count else 0
     overtime_count = sessions.filter(status='Overtime').count()
@@ -78,6 +81,7 @@ Student profile for {user.first_name} {user.last_name}:
 - Total study sessions: {session_count}
 - Total study time: {round(total_study_minutes / 60, 1)} hours
 - Total break time: {round(total_break_minutes / 60, 1)} hours
+- Total pause duration: {round(total_pause_seconds / 60, 1)} minutes
 - Average session length: {avg_session} minutes
 - Overtime sessions: {overtime_count} (ran past planned time)
 - Current streak: {streak} consecutive days
@@ -129,7 +133,7 @@ Student data:
             max_tokens=800,
             temperature=0.7,
         )
-        return Response({'insights': response.choices[0].message.content, 'context_used': user_context})
+        return Response({'insights': response.choices[0].message.content, 'contextUsed': user_context})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

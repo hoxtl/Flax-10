@@ -1,0 +1,121 @@
+.page {
+    min-height: 100%;
+    display: flex;
+    align-items: stretch;
+    overflow-x: hidden;
+    gap: 0;
+    font-family: var(--font-body);
+    font-size: 0.94rem;
+    background: var(--bg);
+}
+
+.page input,
+.page select,
+.page textarea,
+.page button {
+    font-family: inherit;
+}
+
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: calc(50% + 110px);
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 12px;
+    font-size: 0.82rem;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+.toastUndoBtn {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    color: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.toastUndoBtn:hover { background: rgba(255,255,255,0.35); }
+.toastClose {
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 0.2rem;
+    font-size: 0.75rem;
+}
+.toastClose:hover { opacity: 1; }
+
+.toastDelete {
+    background: var(--primary-strong);
+}
+
+@media (max-width: 900px) {
+    .toast {
+        left: 50%;
+    }
+}
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+.skelSidebar {
+  width: 220px;
+  min-width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--sidebar, var(--panel));
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px 24px;
+  gap: 10px;
+}
+.skelSidebarTitle {
+  height: 20px;
+  width: 100px;
+  margin-bottom: 4px;
+}
+.skelSidebarRow {
+  height: 34px;
+  width: 100%;
+  border-radius: 8px;
+}
+.skelDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+.skelFeed {
+  flex: 1;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skelFeedHeader {
+  height: 40px;
+  width: 220px;
+  margin-bottom: 8px;
+}
+.skelTaskRow {
+  height: 52px;
+  width: 100%;
+  border-radius: 10px;
+}

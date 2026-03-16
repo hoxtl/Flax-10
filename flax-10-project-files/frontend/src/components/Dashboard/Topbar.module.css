@@ -1,149 +1,190 @@
 .container {
+  --feature-accent: var(--primary);
+  --feature-tint: color-mix(in srgb, var(--feature-accent) 16%, transparent);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 32px;
-  background: rgba(246, 244, 241, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 1px 0 rgba(74, 52, 33, 0.06);
+  padding: 10px 24px;
+  background: var(--glass);
+  backdrop-filter: blur(var(--frame-blur));
+  -webkit-backdrop-filter: blur(var(--frame-blur));
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(74, 52, 33, 0.04);
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 500;
+  flex-shrink: 0;
+  font-family: var(--font-body);
 }
 
-.greeting {
-  display: flex;
-  flex-direction: column;
-}
-
-.subGreeting {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.nameRow {
+.leftSection {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 24px;
 }
 
-.name {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 800;
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 12px;
+}
+
+.logoMark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--feature-accent), color-mix(in srgb, var(--feature-accent) 45%, var(--accent)));
+  box-shadow: 0 4px 12px rgba(112, 79, 56, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.logoMark::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.brandName {
+  font-family: var(--font-heading);
+  font-size: var(--type-card);
+  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.date {
-  font-size: 14px;
-  color: var(--muted);
-  font-weight: 500;
+.navContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
+
+.navGroup {
+  position: relative;
+}
+
+.navGroupTrigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navGroupTrigger:hover {
+  background-color: var(--hover);
+}
+
+.navGroupTriggerActive {
+  background: var(--feature-tint);
+  color: var(--feature-accent);
+}
+
+.chevronClosed {
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
+}
+
+.dropdownIcon {
+  font-size: 1.1em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownLabel {
+  position: relative;
+  z-index: 1;
+}
+
+
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.search {
-  position: relative;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: var(--muted);
-  pointer-events: none;
-}
-
-.searchInput {
-  padding-left: 32px;
-  padding-right: 14px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  font-size: 13px;
-  outline: none;
-  background: var(--search-bg);
-  color: var(--text);
-  width: 200px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.searchInput:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.12);
-}
-
-.searchInput::placeholder {
-  color: var(--muted);
-}
-
-.addBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
-  border: none;
-  cursor: pointer;
+.toolsWrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 2px 8px rgba(74, 52, 33, 0.2);
+  gap: 8px;
 }
 
-.addBtn:hover {
-  box-shadow: 0 4px 12px rgba(74, 52, 33, 0.3);
-  transform: translateY(-1px);
-}
-
-.addBtn:active {
-  transform: scale(0.92);
-  box-shadow: none;
-}
-
-.addIcon {
-  color: #fff;
-  font-size: 20px;
-  line-height: 1;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-}
 
 .actionPill {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-card-glass);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: 10px;
   padding: 2px;
   gap: 2px;
   box-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
   height: 36px;
   position: relative;
+}
+
+.quickActionsBtn {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 0 10px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.quickActionsBtn:hover {
+  background: var(--hover);
+}
+
+.quickActionsKey {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-card) 85%, transparent);
 }
 
 .pillDivider {
@@ -159,16 +200,16 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
+:root[data-theme="dark"] .quickActionsBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
 :root[data-theme="dark"] .container {
-  background: rgba(26, 19, 16, 0.80);
-  border-bottom: 1px solid rgba(180, 164, 144, 0.10);
+  background: var(--glass);
+  border-bottom: 1px solid var(--glass-border);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-:root[data-theme="dark"] .searchInput {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-:root[data-theme="dark"] .searchInput:focus {
-  background: rgba(255, 255, 255, 0.08);
+:root[data-theme="dark"] .navGroupTriggerActive {
+  background: var(--feature-tint);
 }

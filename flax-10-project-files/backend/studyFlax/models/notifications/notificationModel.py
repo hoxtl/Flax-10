@@ -10,6 +10,7 @@ NOTIFICATION_TYPES = [
     ('ratification_request', 'Ratification Request'),
     ('ratification_approved', 'Ratification Approved'),
     ('ratification_rejected', 'Ratification Rejected'),
+    ('meeting_suggestion', 'Meeting Suggestion'),
 ]
 
 class Notification(models.Model):
@@ -18,6 +19,8 @@ class Notification(models.Model):
     message = models.TextField(blank=True)
     notification_type = models.CharField(max_length=30, choices=NOTIFICATION_TYPES, default='general')
     society_id = models.IntegerField(null=True, blank=True)
+    action_url = models.CharField(max_length=255, null=True, blank=True)
+    scroll_to_id = models.CharField(max_length=255, null=True, blank=True)
     read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

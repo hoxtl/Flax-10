@@ -1,5 +1,6 @@
+/* Styles for the SocietyHero carousel header. */
 .hero {
-    height: 310px;
+    height: 360px;
     background-size: cover;
     background-position: center;
     position: relative;

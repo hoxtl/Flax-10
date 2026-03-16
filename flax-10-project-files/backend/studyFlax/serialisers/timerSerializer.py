@@ -6,7 +6,7 @@ class StudySessionSerializer(serializers.ModelSerializer):
         model = StudySession
         fields = [
             'id', 'start_time', 'end_time', 'duration', 
-            'break_duration', 'session_count', 'study_block_id', 
+            'break_duration', 'pause_duration', 'session_count', 'study_block_id', 
             'task', 'status', 'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'user']

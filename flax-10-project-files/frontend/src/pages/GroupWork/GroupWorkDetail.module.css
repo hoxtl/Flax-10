@@ -1,0 +1,344 @@
+
+.container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.skeletonDeleteBtn { width: 110px; height: 30px; border-radius: 999px; }
+.skeletonProjectTitle { width: min(280px, 60%); height: 32px; }
+.skeletonProjectMeta { width: min(220px, 50%); height: 14px; margin-top: 6px; }
+.skeletonProgressBar { width: 100%; height: 12px; margin-top: 14px; border-radius: 999px; }
+.skeletonStats { width: 160px; height: 12px; margin-top: 8px; }
+.skeletonDeadlinePill { width: 124px; height: 34px; border-radius: 999px; }
+.skeletonMembersTitle { width: 90px; height: 16px; margin-bottom: 12px; }
+.skeletonMemberPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+}
+.skeletonAvatar { width: 24px; height: 24px; border-radius: 50%; }
+.skeletonMemberName { width: 90px; height: 12px; border-radius: 8px; }
+.skeletonAddMemberForm {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+.skeletonAddMemberInput { flex: 1; height: 40px; }
+.skeletonAddMemberBtn { width: 80px; height: 40px; border-radius: 999px; }
+.skeletonTab { width: 110px; height: 36px; border-radius: 999px; }
+.skeletonTaskPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+.skeletonTaskRow { width: 100%; height: 54px; }
+
+.metaText, .metaRow {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nameInput {
+    font-size: 24px;
+    margin: 0 0 4px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: var(--text);
+    width: 100%;
+}
+
+.courseInput, .dateInput {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 0;
+}
+
+.dateInput {
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.headerSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.headerInfo {
+    flex: 1;
+}
+
+.progressContainer {
+    margin-top: 12px;
+}
+
+.statsText {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.loading, .empty {
+    text-align: center;
+    margin-top: 48px;
+    color: var(--text-secondary);
+}
+
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.backButton {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: none;
+    background: var(--hover);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.deleteProjectBtn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Project header */
+.projectHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.projectLeft {
+    flex: 1;
+}
+
+.projectNameInput {
+    font-size: 24px;
+    margin: 0 0 4px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: var(--text);
+    width: 100%;
+}
+
+.projectNameInput:focus {
+    outline: none;
+    border-bottom: 1px solid var(--border);
+}
+
+.courseCodeInput {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 0;
+    margin-right: 4px;
+}
+
+.courseCodeInput:focus {
+    outline: none;
+}
+
+.progressBarOuter {
+    height: 12px;
+    border-radius: 6px;
+    background: var(--border);
+    overflow: visible;
+    display: flex;
+    margin-bottom: 4px;
+    margin-top: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.progressBarInner {
+    display: flex;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.progressSegment {
+    height: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.progressTooltip {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tooltipDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.deadlinePill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--hover);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.deadlineInput {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    color: var(--primary);
+}
+
+/* Members section */
+.membersSection {
+    margin-top: 24px;
+}
+
+.membersTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.membersList {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.memberPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--hover);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.removeBtn {
+    margin-left: 4px;
+    font-size: 11px;
+    border: none;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+/* Add member form */
+.addMemberForm {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.addMemberInput {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+}
+
+.addMemberBtn {
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Tabs */
+.tabsRow {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 24px;
+    padding-bottom: 15px;
+}
+
+.tab {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.tabActive {
+    background: var(--primary);
+    color: white;
+}

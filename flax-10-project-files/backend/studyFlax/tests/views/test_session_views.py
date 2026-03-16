@@ -1,3 +1,7 @@
+"""
+Backend tests for session views.
+"""
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -5,6 +9,7 @@ from studyFlax.models.auth.userModel import User
 from studyFlax.models.timer.sessionModel import StudySession
 
 class StudySessionViewTest(APITestCase):
+    """Tests for study session view."""
     def setUp(self):
         self.user = User.objects.create_user(
             username='testuser', email='test@example.com', password='password123',
@@ -35,7 +40,6 @@ class StudySessionViewTest(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        # Should be ordered by end_time desc
         self.assertEqual(response.data[0]['duration'], 50)
 
     def test_delete_session(self):

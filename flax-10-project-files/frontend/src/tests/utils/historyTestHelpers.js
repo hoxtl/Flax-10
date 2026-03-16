@@ -45,6 +45,6 @@ export const expectDatesPresent = () => {
 };
 
 export const expectSessionCounts = () => {
-    const singleSessionPills = screen.getAllByText(/1 Sessions/);
+    const singleSessionPills = screen.getAllByText(/1 Session$/); // Use $ or exact to avoid catching '1 Sessions' if it still exists somehow, but regex /1 Session/ works
     expect(singleSessionPills).toHaveLength(2);
 };

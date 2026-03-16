@@ -1,7 +1,6 @@
 .month-view {
     background: var(--calendar-bg);
     border-radius: 8px;
-    overflow: hidden;
 }
 
 .weekday-header {
@@ -9,6 +8,9 @@
     grid-template-columns: repeat(7, 1fr);
     background: var(--calendar-bg);
     border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .weekday-label {
@@ -86,7 +88,7 @@
 
 .day-cell.is-today .day-number {
     background-color: var(--primary);
-    color: white;
+    color: var(--c-white);
     border-radius: 50%;
     width: 24px;
     height: 24px;

@@ -2,12 +2,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from datetime import timedelta
 from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
+from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
 
 
 def get_or_create_settings(user):
@@ -17,27 +16,22 @@ def get_or_create_settings(user):
     return settings
 
 def apply_settings_updates(settings, data):
-    if 'theme' in data:
-        settings.theme = data['theme']
-    if 'timezone' in data:
-        settings.timezone = data['timezone']
-    settings.save()
+    serializer = UserSettingsSerialiser(settings, data=data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.save()
+    payload = serializer.data
+    return Response({**payload, "settings": dict(payload)})
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
     settings = get_or_create_settings(request.user)
     if request.method == 'GET':
-        return Response({'theme': settings.theme, 'timezone': settings.timezone})
-    apply_settings_updates(settings, request.data)
-    return Response({'theme': settings.theme, 'timezone': settings.timezone})
+        serialized = UserSettingsSerialiser(settings).data
+        return Response({**serialized, "settings": dict(serialized)})
+    return apply_settings_updates(settings, request.data)
 
-def get_lecture_tag():
-    try:
-        from studyFlax.models.calendar.tagModel import Tag
-        return Tag.objects.filter(name='Lecture').first()
-    except Exception:
-        return None
 
 def get_modules_for_major(major):
     prefixes = course_to_module_prefixes.get(major, [])
@@ -46,28 +40,8 @@ def get_modules_for_major(major):
     pattern = r'^(' + '|'.join(prefixes) + ')'
     return list(Module.objects.filter(module_code__regex=pattern))
 
-def create_lecture_events(user, module, lecture_tag):
-    for week in range(10):
-        start = module.start_time + timedelta(weeks=week)
-        end = module.end_time + timedelta(weeks=week)
-        CalendarEvent.objects.get_or_create(
-            user=user, title=f"Lecture: {module.module_name}", start_time=start,
-            defaults={'end_time': end, 'location': module.location,
-                      'description': module.module_name, 'tag': lecture_tag,
-                      'priority': 'high', 'source': 'module_enrollment'}
-        )
-
-
-def enroll_user_in_module(user, module, lecture_tag):
-    _, created = Enrollment.objects.get_or_create(student=user, module=module)
-    if created:
-        create_lecture_events(user, module, lecture_tag)
-    return created
-
-
 def enroll_user_in_modules(user, modules):
-    lecture_tag = get_lecture_tag()
-    return sum(1 for m in modules if enroll_user_in_module(user, m, lecture_tag))
+    return sum(1 for m in modules if enroll_user_in_module(user, m)[1])
 
 
 @api_view(['POST'])

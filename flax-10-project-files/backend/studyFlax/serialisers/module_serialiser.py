@@ -2,19 +2,20 @@ from rest_framework import serializers
 from studyFlax.models import Module
 from studyFlax.models import User
 from studyFlax.serialisers.deadline_serialisers import DeadlineSummarySerialiser
+from studyFlax.serialisers.reading_serialisers import ReadingSummarySerialiser
 
 class ModuleSerialiser(serializers.ModelSerializer):
-    created_by_name = serializers.CharField(source='created_by.first_name', read_only=True)
-    is_recurring = serializers.BooleanField(write_only=True, required=False, default=False)
-    deadlines = DeadlineSummarySerialiser(many=True, read_only = True)
+    is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
+    deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
     created_by_name = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
+    readings = ReadingSummarySerialiser(many=True, read_only=True)
 
     class Meta:
         model = Module
-        fields = ['id', 'module_code', 'module_name', 'description', 'created_by', 
-                'created_by_name', 'start_time', 'end_time', 'location', 
-                'recurrence_rule','is_recurring', 'deadlines', 'created_by_email']
+        fields = ['id', 'module_code', 'module_name', 'description', 'department',
+                'course', 'created_by', 'created_by_name', 'start_time', 'end_time',
+                'location', 'recurrence_rule', 'is_recurring', 'deadlines', 'created_by_email', 'readings']
         read_only_fields = ['created_by']
         
     def validate(self, validated_data):
@@ -33,10 +34,19 @@ class ModuleSerialiser(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def get_created_by_name(self, obj):
-        if obj.created_by:
-            return f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+        try:
+            if obj.created_by:
+                name = f"{obj.created_by.first_name} {obj.created_by.last_name}".strip()
+                if getattr(obj.created_by, 'role', None) == 'teacher' and not name.startswith('Dr.'):
+                    return f"Dr. {name}"
+                return name
+        except Exception:
+            pass
         return 'Unknown'
 
     def get_created_by_email(self, obj):
-        return obj.created_by.email if obj.created_by else None
+        try:
+            return obj.created_by.email if obj.created_by else None
+        except Exception:
+            return None
     

@@ -15,7 +15,7 @@ export default function PillFilters({ active, onChange, items }) {
       <div className={styles.row}>
         {pills.map((p) => (
           <PillItem
-            key={p.key} pill={p} active={active}
+            key={p.id} pill={p} active={active}
             counts={counts} onChange={onChange}
           />
         ))}
@@ -30,20 +30,26 @@ export default function PillFilters({ active, onChange, items }) {
  * Combines the static 'All' option with dynamic tags from context.
  */
 function getAllPills(tags) {
-  return [{ key: "all", label: "All" }, ...tags.map(t => ({ key: t.label.toLowerCase(), label: t.label }))];
+  const uniqueTags = Array.from(
+    new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
+  );
+  return [
+    { id: "all", key: "all", label: "All" },
+    ...uniqueTags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
+  ];
 }
 
 /**
  * Renders an individual pill button.
  */
 function PillItem({ pill, active, counts, onChange }) {
-  const isActive = checkActive(active, pill.key);
   return (
     <BasePill
       label={pill.label}
       count={counts[pill.key] || 0}
       isActive={checkActive(active, pill.key)}
       onClick={() => onChange(pill.key)}
+      color={pill.color}
     />
   );
 }
@@ -53,19 +59,10 @@ function PillItem({ pill, active, counts, onChange }) {
  * Handles both string (single) and array (multi) active states.
  */
 function checkActive(active, key) {
-  if (Array.isArray(active)) return active === key || active.includes(key);
+  if (Array.isArray(active)) return active.includes(key);
   return active === key;
 }
 
 function ManagerButton({ onClick }) {
   return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
-}
-
-function PillRow({ pills, active, counts, onChange, onManage }) {
-  return (
-    <div className={styles.row}>
-      {pills.map((p) => <PillItem key={p.key} pill={p} active={active} counts={counts} onChange={onChange} />)}
-      <ManagerButton onClick={onManage} />
-    </div>
-  );
 }

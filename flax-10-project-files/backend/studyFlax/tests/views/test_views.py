@@ -1,1 +1,1 @@
-# Placeholder for general view tests
+"""General view test placeholder."""

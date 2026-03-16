@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getHistory, saveSession, clearHistory } from '../../utils/historyUtils';
+import { getHistory, saveSession, clearHistory } from '../../components/Timer/utils/historyUtils';
 import { fetchApi } from '../../api/client';
 
 vi.mock('../../api/client', () => ({
@@ -52,6 +52,6 @@ describe('historyUtils', () => {
 
     it('clearHistory calls API', async () => {
         await clearHistory();
-        expect(fetchApi).toHaveBeenCalledWith('/timer/history/', { method: 'DELETE' });
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/clear_history/', { method: 'DELETE' });
     });
 });

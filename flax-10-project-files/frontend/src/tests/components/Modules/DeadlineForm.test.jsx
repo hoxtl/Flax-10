@@ -13,7 +13,21 @@ vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     TYPES_WITH_LOCATION: ['exam', 'presentation'],
 }));
 
-vi.mock('../DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder }) => (
+        <select
+            aria-label={placeholder}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+        >
+            {(options || []).map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+        </select>
+    ),
+}));
+
+vi.mock('../../../components/Modules/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {
@@ -68,5 +82,23 @@ describe('DeadlineForm', () => {
         const { container } = render(<DeadlineForm onSubmit={onSubmit} onCancel={vi.fn()} />);
         fireEvent.submit(container.querySelector('form'));
         expect(onSubmit).toHaveBeenCalled();
+    });
+
+    it('should include description in submitted form', () => {
+        const onSubmit = vi.fn();
+        const { container } = render(<DeadlineForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+        fireEvent.change(container.querySelector('input[type="text"]'), { target: { value: 'Test' } });
+        const textarea = container.querySelector('textarea');
+        fireEvent.change(textarea, { target: { value: 'Optional notes' } });
+        const dateInputs = container.querySelectorAll('input[type="datetime-local"]');
+        if (dateInputs.length) fireEvent.change(dateInputs[0], { target: { value: '2026-06-01T10:00' } });
+        fireEvent.click(screen.getByText('Add Deadline'));
+        expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ description: 'Optional notes' }));
+    });
+
+    it('should show location field when type is presentation', () => {
+        render(<DeadlineForm onSubmit={vi.fn()} onCancel={vi.fn()} />);
+        fireEvent.change(screen.getByRole('combobox'), { target: { value: 'presentation' } });
+        expect(screen.getByText('Location')).toBeInTheDocument();
     });
 });

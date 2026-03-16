@@ -1,52 +1,22 @@
-.overlay {
-    position: fixed;
-    inset: 0;
+.modalBackdrop {
     background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
     backdrop-filter: blur(2px);
 }
 
-.modal {
-    background: var(--panel);
+.modalShell {
     width: 90%;
     max-width: 400px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     max-height: 80vh;
     overflow: visible;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-.close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-    padding: 0;
-    line-height: 1;
+.modalContent {
+    overflow: visible;
 }
 
 .content {
-    padding: 20px;
     overflow: visible;
 }
 
@@ -88,8 +58,8 @@
 }
 
 .actions button {
-    background: var(--panel);
-    border: 1px solid #ddd;
+    background: var(--surface-card);
+    border: var(--stroke-soft);
     padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
@@ -111,17 +81,17 @@
     width: 100%;
     margin-top: 16px;
     padding: 12px;
-    background: #2563eb;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, opacity 0.2s;
 }
 
 .addBtn:hover {
-    background: #1d4ed8;
+    opacity: 0.9;
 }
 
 /* Form Styles */
@@ -141,10 +111,11 @@
 }
 
 .form input[type="text"] {
-    padding: 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    padding: var(--input-padding);
+    border: var(--input-border);
+    border-radius: var(--input-radius);
     font-size: 1rem;
+    box-sizing: border-box;
 }
 
 .colorRow {
@@ -168,7 +139,7 @@
     font-size: 0.9rem;
     padding: 8px;
     background: #fee2e2;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     margin-top: 8px;
     text-align: center;
 }
@@ -194,7 +165,7 @@
 }
 
 .saveBtn {
-    background: #2563eb;
+    background: var(--primary);
     color: white;
 }
 
@@ -218,9 +189,9 @@
     width: 50px;
     height: 50px;
     font-size: 28px;
-    border: 1px solid var(--border, #cbd5e1);
-    border-radius: 8px;
-    background: var(--bg, #fff);
+    border: var(--input-border);
+    border-radius: var(--input-radius);
+    background: var(--surface-card);
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -229,8 +200,8 @@
 }
 
 .emojiPreviewBtn:hover {
-    border-color: var(--primary-color, #2563eb);
-    background: var(--hover, #f8fafc);
+    border-color: var(--primary);
+    background: var(--hover);
 }
 
 .emojiHint {

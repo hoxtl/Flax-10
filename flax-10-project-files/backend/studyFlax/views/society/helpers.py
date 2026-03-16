@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from studyFlax.models.society import Society, SocietyMembership
+from studyFlax.models.society import Society, SocietyMembership, SocietyImage
 
 
 def get_society_or_404(society_id):
@@ -36,8 +36,17 @@ def permission_denied_response():
 
 def require_society(view_func):
     def wrapper(request, society_id, *args, **kwargs):
-        society = get_society_or_404(society_id)
-        if not society:
-            return society_not_found_response()
-        return view_func(request, society, *args, **kwargs)
+         society = get_society_or_404(society_id)
+         if not society:
+             return society_not_found_response()
+         return view_func(request, society, *args, **kwargs)
     return wrapper
+
+
+def handle_image_urls(society, data):
+    image_urls = data.get('image_urls') or data.get('images')
+    if image_urls is None:
+        return
+    society.images.all().delete()
+    for url in image_urls:
+        SocietyImage.objects.create(society=society, url=url, is_cover=True)
