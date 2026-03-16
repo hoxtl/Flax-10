@@ -3,6 +3,7 @@ import { fetchTasks } from "../../../api/taskService";
 import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
+import { useAuth } from "../../../context/AuthContext";
 
 async function tryLoadProfile(setProfileData, setLoading, userId, isPolling = false) {
   try {
@@ -26,19 +27,37 @@ async function tryLoadEvents(setAllEvents, userId) {
 }
 
 function useProfileData(userId) {
+  const { profile: authProfile, loading: authLoading, refreshProfile } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isSelf = !userId || (authProfile && String(authProfile.id) === String(userId));
+
   useEffect(() => {
+    if (isSelf) {
+      if (!authLoading) {
+        setProfileData(authProfile);
+        setLoading(false);
+      }
+      return;
+    }
+
+    setLoading(true);
     tryLoadProfile(setProfileData, setLoading, userId);
     const intervalId = setInterval(() => {
       tryLoadProfile(setProfileData, setLoading, userId, true);
-    }, 5000); // Poll every 5 seconds for real-time cross-device sync
+    }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [userId]);
+  }, [userId, authProfile, authLoading, isSelf]);
 
-  const reload = () => tryLoadProfile(setProfileData, setLoading, userId);
+  const reload = () => {
+    if (isSelf) {
+      refreshProfile();
+    } else {
+      tryLoadProfile(setProfileData, setLoading, userId);
+    }
+  };
 
   const setOptimisticShare = (isSharing) => {
     setProfileData(prev => {
