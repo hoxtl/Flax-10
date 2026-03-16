@@ -2,7 +2,7 @@
  * Tests for EventPopover - event detail popover component.
  */
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventPopover } from '../../../../components/Calendar/EventPopover/EventPopover';
 import { createMockEvent, createMockTag } from '../mocks/calendarMocks';
 
@@ -10,6 +10,15 @@ vi.mock('../../../../components/Calendar/EventPopover/popoverUtils', () => ({
     calculatePopoverPosition: () => ({ top: 100, left: 200, placement: 'right' }),
     calculateArrowPosition: () => 50,
 }));
+
+class MockResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+}
+
+beforeEach(() => { global.ResizeObserver = MockResizeObserver; });
+afterEach(() => { delete global.ResizeObserver; });
 
 describe('EventPopover', () => {
     const anchor = { top: 100, left: 100, right: 150, bottom: 150, width: 50, height: 50 };
