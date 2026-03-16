@@ -3,7 +3,6 @@ Tests for analytics views including session summaries, progress, theme stats, an
 """
 
 import random
-import uuid
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -16,7 +15,6 @@ from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 
 User = get_user_model()
 
-
 def make_session(user, duration=60, break_duration=10, pause_duration=0, status_val='Completed', hours_ago=1):
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
@@ -26,7 +24,6 @@ def make_session(user, duration=60, break_duration=10, pause_duration=0, status_
         pause_duration=pause_duration, status=status_val,
         study_block_id=random.randint(1, 999999), session_count=1
     )
-
 
 class AnalyticsSummaryViewTest(TestCase):
     """Tests for the analytics summary endpoint."""
@@ -91,7 +88,6 @@ class AnalyticsSummaryViewTest(TestCase):
         response = APIClient().get('/api/analytics/summary/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
-
 class ProgressDataViewTest(TestCase):
     """Tests for the analytics progress endpoint."""
 
@@ -120,7 +116,6 @@ class ProgressDataViewTest(TestCase):
     def test_progress_days_param(self):
         response = self.client.get('/api/analytics/progress/?days=14')
         self.assertEqual(response.data['period_days'], 14)
-
 
 class ThemeViewsTest(TestCase):
     """Tests for the theme session logging and theme stats endpoints."""
@@ -191,7 +186,6 @@ class ThemeViewsTest(TestCase):
         )
         response = self.client.get('/api/analytics/theme-stats/')
         self.assertTrue(response.data['summary']['is_night_owl'])
-
 
 class AIViewsTest(TestCase):
     """Tests for the AI insights and AI chat analytics endpoints."""

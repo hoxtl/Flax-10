@@ -17,22 +17,17 @@ from studyFlax.models.society.societyTagModel import SocietyTag
 
 User = get_user_model()
 
-
 def make_society(name='Ann Society'):
     return Society.objects.create(name=name, bio='Bio', admin_emails='a@test.com')
-
 
 def make_admin(user, society):
     return SocietyMembership.objects.create(user=user, society=society, role='admin')
 
-
 def make_member(user, society):
     return SocietyMembership.objects.create(user=user, society=society, role='member')
 
-
 def make_announcement(society, title='Announcement', content='Content'):
     return SocietyAnnouncement.objects.create(society=society, title=title, content=content)
-
 
 class AnnouncementCreateExtendedTest(TestCase):
     """Tests for announcement create extended."""
@@ -102,7 +97,6 @@ class AnnouncementCreateExtendedTest(TestCase):
             {'title': 'X', 'content': 'Y'}
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
 class AnnouncementDetailExtendedTest(TestCase):
     """Tests for announcement detail extended."""
@@ -195,7 +189,6 @@ class AnnouncementDetailExtendedTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
 class SocietyViewCoverageTest(TestCase):
     """Tests for society view branches not yet covered."""
 
@@ -253,7 +246,6 @@ class SocietyViewCoverageTest(TestCase):
         response = self.client.delete('/api/societies/99999/calendar-unsync/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
 class SocietySerializerCoverageTest(TestCase):
     """Tests for society serializer branches not yet covered."""
 
@@ -272,31 +264,37 @@ class SocietySerializerCoverageTest(TestCase):
         serializer = SocietyListSerialiser(self.society, context={'request': request})
         self.assertEqual(serializer.data['cover_image'], 'https://example.com/direct.jpg')
 
-    def test_announcement_serializer_create_update_and_event_id(self):
+    def _make_announcement_serialiser(self):
         from studyFlax.serialisers.society_serialisers import SocietyAnnouncementSerialiser
+        return SocietyAnnouncementSerialiser
+
+    def test_announcement_serializer_event_id(self):
         from studyFlax.models.society.societyEventModel import SocietyEvent
+        Serialiser = self._make_announcement_serialiser()
         announcement = SocietyAnnouncement.objects.create(society=self.society, title='Title', content='Content')
         event = SocietyEvent.objects.create(
-            society=self.society,
-            title='Linked',
-            start_time=timezone.now(),
-            end_time=timezone.now() + timedelta(hours=1),
-            recurrence='none',
+            society=self.society, title='Linked', start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1), recurrence='none',
             announcement=announcement,
         )
-        serializer = SocietyAnnouncementSerialiser(announcement, context={'skip_notification': True})
+        serializer = Serialiser(announcement, context={'skip_notification': True})
         self.assertEqual(serializer.data['event_id'], event.id)
-        create_serializer = SocietyAnnouncementSerialiser(
+
+    def test_announcement_serializer_create(self):
+        Serialiser = self._make_announcement_serialiser()
+        create_serializer = Serialiser(
             data={'title': 'Created', 'content': 'Body'},
             context={'skip_notification': True},
         )
         self.assertTrue(create_serializer.is_valid(), create_serializer.errors)
         created = create_serializer.save(society=self.society)
         self.assertTrue(getattr(created, '_skip_notification', False))
-        update_serializer = SocietyAnnouncementSerialiser(
-            created,
-            data={'content': 'Updated'},
-            partial=True,
+
+    def test_announcement_serializer_update(self):
+        Serialiser = self._make_announcement_serialiser()
+        announcement = SocietyAnnouncement.objects.create(society=self.society, title='Original', content='Body')
+        update_serializer = Serialiser(
+            announcement, data={'content': 'Updated'}, partial=True,
             context={'skip_notification': True},
         )
         self.assertTrue(update_serializer.is_valid(), update_serializer.errors)

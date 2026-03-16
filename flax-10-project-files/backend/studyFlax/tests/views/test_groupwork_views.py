@@ -8,9 +8,7 @@ from studyFlax.models.groupwork.groupwork_models import (
     GroupMembership,
 )
 
-
 User = get_user_model()
-
 
 def make_user(username="groupuser", email="group@example.com"):
     return User.objects.create_user(
@@ -18,7 +16,6 @@ def make_user(username="groupuser", email="group@example.com"):
         email=email,
         password="pass",
     )
-
 
 class GroupProjectListViewTest(TestCase):
     def setUp(self):
@@ -35,34 +32,20 @@ class GroupProjectListViewTest(TestCase):
         membership = GroupMembership.objects.get(project=project, user=self.user)
         self.assertEqual(membership.role, "owner")
 
+    def _create_project_with_owner(self, name, code, owner):
+        project = GroupProject.objects.create(name=name, course_code=code, owner=owner)
+        GroupMembership.objects.create(project=project, user=owner, role="owner")
+        return project
+
     def test_list_projects_only_shows_owned_or_member(self):
         other = make_user("other", "other@example.com")
-        foreign = GroupProject.objects.create(
-            name="Other Project",
-            course_code="OTR1",
-            owner=other,
-        )
-        GroupMembership.objects.create(
-            project=foreign,
-            user=other,
-            role="owner",
-        )
-        own = GroupProject.objects.create(
-            name="My Project",
-            course_code="CS202",
-            owner=self.user,
-        )
-        GroupMembership.objects.create(
-            project=own,
-            user=self.user,
-            role="owner",
-        )
+        self._create_project_with_owner("Other Project", "OTR1", other)
+        self._create_project_with_owner("My Project", "CS202", self.user)
         res = self.client.get("/api/group-work/projects/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         names = {item["name"] for item in res.data}
         self.assertIn("My Project", names)
         self.assertNotIn("Other Project", names)
-
 
 class GroupProjectDeleteViewTest(TestCase):
     def setUp(self):

@@ -13,7 +13,6 @@ from ..base import BaseTestCase
 from studyFlax.models import Module, User
 from studyFlax.serialisers import ModuleSerialiser
 
-
 class ModuleViewTests(BaseTestCase):
 
     """Tests for module view."""
@@ -84,7 +83,6 @@ class ModuleViewTests(BaseTestCase):
             end_time=(timezone.now() + timedelta(hours=1)).isoformat())
         response = self.client.post('/api/modules/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
 
 class ModuleSerialiserTests(TestCase):
     """Tests for module serialiser."""
@@ -164,7 +162,6 @@ class ModuleSerialiserTests(TestCase):
 
         result = serializer.get_created_by_email(FakeModule())
         self.assertIsNone(result)
-
 
 class ModuleViewCoverageTest(TestCase):
     """Tests for module view branches not yet covered."""

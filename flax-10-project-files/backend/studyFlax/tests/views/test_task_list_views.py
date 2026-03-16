@@ -11,7 +11,6 @@ from studyFlax.models.tasks.taskModel import Task, TaskList
 
 User = get_user_model()
 
-
 class TaskViewCoverageTest(TestCase):
     """Tests for task_views branches not yet covered."""
 

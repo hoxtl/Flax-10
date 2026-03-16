@@ -19,7 +19,6 @@ from studyFlax.models.society.societyImageModel import SocietyImage
 
 User = get_user_model()
 
-
 def make_session(user, duration=60, status_val='Completed', hours_ago=2):
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
@@ -28,7 +27,6 @@ def make_session(user, duration=60, status_val='Completed', hours_ago=2):
         duration=duration, break_duration=10, pause_duration=0, status=status_val,
         study_block_id=random.randint(1, 999999), session_count=1
     )
-
 
 class ProfileSummaryViewTest(TestCase):
     """Tests for profile summary view."""

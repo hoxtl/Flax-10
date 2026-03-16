@@ -14,10 +14,8 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
 def make_user(username='taskuser_ext', email='taskext@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
-
 
 def make_task(user, title='Test Task', task_list=None, priority='medium',
               completed=False, due_date=None, estimated_blocks=None):
@@ -26,7 +24,6 @@ def make_task(user, title='Test Task', task_list=None, priority='medium',
         priority=priority, completed=completed,
         due_date=due_date, estimated_blocks=estimated_blocks,
     )
-
 
 class SyncCalendarEventForTaskTest(TestCase):
     """Unit tests for the sync_calendar_event_for_task helper."""

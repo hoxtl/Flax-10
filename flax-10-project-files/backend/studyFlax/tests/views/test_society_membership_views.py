@@ -12,7 +12,6 @@ from studyFlax.models.society.societyMembershipModel import SocietyMembership
 
 User = get_user_model()
 
-
 class MembershipViewCoverageTest(TestCase):
     """Tests for membership view error branches."""
 

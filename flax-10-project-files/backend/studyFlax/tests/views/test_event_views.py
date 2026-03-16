@@ -236,7 +236,6 @@ class ExceptionDateViewTests(BaseEventTestCase):
         response = self.client.post(url, {}, format='json')
         self.assert_event_response(response, status.HTTP_400_BAD_REQUEST)
 
-
 class EventViewsSharedCalendarTest(BaseEventTestCase):
     """Tests for event views shared calendar."""
     def setUp(self):

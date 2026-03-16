@@ -16,13 +16,11 @@ from studyFlax.models.timer.themeSessionModel import ThemeSession
 
 User = get_user_model()
 
-
 def make_user():
     return User.objects.create_user(
         username='aiuser', email='ai@example.com', password='pass',
         first_name='AI', last_name='User'
     )
-
 
 def make_session(user, duration=60, status='Completed', days_ago=0):
     now = timezone.now() - timedelta(days=days_ago)
@@ -31,7 +29,6 @@ def make_session(user, duration=60, status='Completed', days_ago=0):
         end_time=now, duration=duration, break_duration=0,
         pause_duration=0, session_count=1, study_block_id=1, status=status
     )
-
 
 class BuildUserContextTest(TestCase):
     """Unit tests for _build_user_context."""
@@ -96,7 +93,6 @@ class BuildUserContextTest(TestCase):
         make_session(self.user, duration=60, days_ago=1)
         context = _build_user_context(self.user, days=30)
         self.assertIn('Peak study hours:', context)
-
 
 class GetAiInsightsViewTest(TestCase):
     """Tests for get_ai_insights view."""
@@ -168,7 +164,6 @@ class GetAiInsightsViewTest(TestCase):
         response = self.client.post('/api/analytics/ai-insights/', {'days': 7})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('last 7 days', response.data['contextUsed'])
-
 
 class AiChatViewTest(TestCase):
     """Tests for ai_chat view."""

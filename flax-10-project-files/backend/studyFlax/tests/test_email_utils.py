@@ -9,7 +9,6 @@ from django.test import TestCase
 
 User = get_user_model()
 
-
 class EmailUtilsTest(TestCase):
     """Tests for email utils."""
     def setUp(self):

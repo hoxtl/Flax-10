@@ -11,22 +11,17 @@ from django.utils import timezone
 from studyFlax.models.society.societyModel import Society
 from studyFlax.models.society.societyMembershipModel import SocietyMembership
 from studyFlax.models.society.societyEventModel import SocietyEvent
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
 
 User = get_user_model()
-
 
 def make_society(name='Test Society'):
     return Society.objects.create(name=name, bio='Bio', admin_emails='a@test.com')
 
-
 def make_admin(user, society):
     return SocietyMembership.objects.create(user=user, society=society, role='admin')
 
-
 def make_member(user, society):
     return SocietyMembership.objects.create(user=user, society=society, role='member')
-
 
 def make_event(society, title='Test Event', recurrence='none'):
     return SocietyEvent.objects.create(
@@ -34,7 +29,6 @@ def make_event(society, title='Test Event', recurrence='none'):
         start_time=timezone.now() + timezone.timedelta(days=1),
         end_time=timezone.now() + timezone.timedelta(days=1, hours=2),
     )
-
 
 class SocietyEventCreateExtendedTest(TestCase):
     """Tests for society event create extended."""
@@ -70,7 +64,6 @@ class SocietyEventCreateExtendedTest(TestCase):
     def test_get_events_nonexistent_society(self):
         response = self.client.get('/api/societies/99999/events/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
 class SocietyEventDetailExtendedTest(TestCase):
     """Tests for society event detail extended."""
@@ -135,7 +128,6 @@ class SocietyEventDetailExtendedTest(TestCase):
             {'title': 'Silent Update'}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
 class AddSocietyEventExceptionTest(TestCase):
     """Tests for add society event exception."""

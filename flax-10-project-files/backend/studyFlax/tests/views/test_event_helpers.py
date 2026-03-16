@@ -14,7 +14,6 @@ from studyFlax.models import CalendarEvent, User
 from studyFlax.models.calendar.recurrenceRuleModel import RecurrenceRule
 from studyFlax.models.timer.themeSessionModel import ThemeSession
 
-
 class EventHelpersCoverageTest(TestCase):
     """Tests for event helpers coverage."""
     def test_parse_date_param_returns_datetime(self):
@@ -33,7 +32,6 @@ class EventHelpersCoverageTest(TestCase):
             end_time = start_time + timedelta(hours=1)
 
         self.assertEqual(get_base_instance(Event(), Rule()), [])
-
 
 class CalendarAndAnalyticsHelperCoverageTest(TestCase):
     """Tests for calendar and analytics helper branches."""
@@ -84,7 +82,6 @@ class CalendarAndAnalyticsHelperCoverageTest(TestCase):
         force_authenticate(request, user=user)
         return request
 
-
 class TimetableServiceCoverageTest(TestCase):
     """Tests for timetable_service branches."""
 
@@ -103,7 +100,6 @@ class TimetableServiceCoverageTest(TestCase):
         with patch('studyFlax.views.calendar.timetable_service.urlopen', return_value=mock_response):
             result = fetch_url_text('http://example.com/test.ics')
         self.assertIn('VCALENDAR', result)
-
 
 class EventHelperCoverageTest(TestCase):
     """Tests for event_helper functions not yet covered."""

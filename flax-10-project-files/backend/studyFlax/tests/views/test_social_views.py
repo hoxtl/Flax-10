@@ -104,7 +104,6 @@ class CalendarShareViewTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
 class CalendarShareUserSerializerPhotoTest(APITestCase):
     """Tests for calendar share user serializer photo."""
     def setUp(self):
@@ -158,7 +157,6 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
         serializer = CalendarShareUserSerializer(self.user2, context={'request': request})
         self.assertTrue(serializer.data['is_shared_with_me'])
 
-
 class CalendarShareSerializerTest(APITestCase):
     """Tests for calendar share serializer."""
     def setUp(self):
@@ -205,7 +203,6 @@ class CalendarShareSerializerTest(APITestCase):
         share = serializer.save()
         self.assertEqual(share.owner, self.owner)
         self.assertEqual(share.shared_with, self.viewer)
-
 
 class SocialAndCategoryCoverageTest(TestCase):
     """Tests for CalendarShare __str__ and Category __str__ methods."""

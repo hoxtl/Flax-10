@@ -2,13 +2,11 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
 from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
 from studyFlax.models.auth.userSettingsModel import UserSettings
 
 User = get_user_model()
-
 
 def make_admin(username='admin', password='adminpass'):
     return User.objects.create_superuser(
@@ -19,7 +17,6 @@ def make_admin(username='admin', password='adminpass'):
         is_superuser=True,
     )
 
-
 def make_user(username='user', password='userpass', is_active=True):
     return User.objects.create_user(
         username=username,
@@ -28,12 +25,10 @@ def make_user(username='user', password='userpass', is_active=True):
         is_active=is_active,
     )
 
-
 def authed_client(user):
     client = APIClient()
     client.force_authenticate(user=user)
     return client
-
 
 class RequestCourseChangeTest(TestCase):
     def setUp(self):
@@ -76,7 +71,6 @@ class RequestCourseChangeTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
 class MyCourseChangeRequestTest(TestCase):
     def setUp(self):
         self.user = make_user()
@@ -100,7 +94,6 @@ class MyCourseChangeRequestTest(TestCase):
     def test_unauthenticated_is_rejected(self):
         response = APIClient().get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 class ListCourseChangeRequestsTest(TestCase):
     def setUp(self):
@@ -132,7 +125,6 @@ class ListCourseChangeRequestsTest(TestCase):
         response = authed_client(self.admin).get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
-
 
 class ResolveCourseChangeRequestTest(TestCase):
     def setUp(self):

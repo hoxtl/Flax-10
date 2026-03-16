@@ -16,18 +16,14 @@ from studyFlax.models.notifications.notificationModel import Notification
 
 User = get_user_model()
 
-
 def make_user(username='siguser', email='sig@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
-
 
 def make_society(name='Signal Society'):
     return Society.objects.create(name=name, bio='Bio', admin_emails='a@test.com')
 
-
 def make_member(user, society, role='member'):
     return SocietyMembership.objects.create(user=user, society=society, role=role, is_subscribed=True)
-
 
 def make_event(society, title='Event', recurrence='none'):
     return SocietyEvent.objects.create(
@@ -36,7 +32,6 @@ def make_event(society, title='Event', recurrence='none'):
         end_time=timezone.now() + timezone.timedelta(days=1, hours=2),
         recurrence=recurrence,
     )
-
 
 class NotifyMembersOnEventTest(TestCase):
     """Tests for notify_members_on_event signal."""
@@ -116,7 +111,6 @@ class NotifyMembersOnEventTest(TestCase):
         notifications = Notification.objects.filter(notification_type='society_event')
         self.assertEqual(notifications.count(), 0)
 
-
 class NotifyMembersOnAnnouncementTest(TestCase):
     """Tests for notify_members_on_announcement signal."""
 
@@ -183,7 +177,6 @@ class NotifyMembersOnAnnouncementTest(TestCase):
         notifications = Notification.objects.filter(notification_type='society_announcement')
         self.assertEqual(notifications.count(), 0)
 
-
 class HandleSocietyDeleteTest(TestCase):
     """Tests for handle_society_delete signal (admin deletion path)."""
 
@@ -212,7 +205,6 @@ class HandleSocietyDeleteTest(TestCase):
         self.society.delete()
         notifications = Notification.objects.filter(notification_type='society_deleted')
         self.assertEqual(notifications.count(), 0)
-
 
 class SignalHelperFunctionsTest(TestCase):
     """Unit tests for individual helper functions in society_notifications.py."""
@@ -299,7 +291,6 @@ class SignalHelperFunctionsTest(TestCase):
         self.assertFalse(SocietyAnnouncement.objects.filter(id=ann.id).exists())
         self.assertEqual(Notification.objects.count(), 0)
 
-
 class MembershipAndSyncHelperCoverageTest(TestCase):
     """Tests for membership and calendar-sync helper function branches."""
 
@@ -341,7 +332,6 @@ class MembershipAndSyncHelperCoverageTest(TestCase):
         force_authenticate(delete_request, user=self.other)
         delete_response = unsync_calendar(delete_request, self.society.id)
         self.assertTrue(delete_response.data['deleted'])
-
 
 class RatificationSignalCoverageTest(TestCase):
     """Tests for ratification signal skip_notification."""

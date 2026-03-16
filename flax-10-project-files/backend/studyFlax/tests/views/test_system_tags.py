@@ -10,10 +10,8 @@ from datetime import timedelta
 
 User = get_user_model()
 
-
 def make_user():
     return User.objects.create_user(username='taguser', email='tag@example.com', password='pass')
-
 
 class GetSystemTagTest(TestCase):
     """Tests for get_system_tag and related helpers."""
@@ -74,7 +72,6 @@ class GetSystemTagTest(TestCase):
         self.assertTrue(result.is_default)
         self.assertIsNone(result.user)
 
-
 class CreateSystemTagTest(TestCase):
     """Tests for create_system_tag."""
 
@@ -87,7 +84,6 @@ class CreateSystemTagTest(TestCase):
         self.assertIsNone(tag.user)
         self.assertEqual(tag.color, '#FF0000')
         self.assertEqual(tag.default_duration, 90)
-
 
 class MergeTagsTest(TestCase):
     """Tests for merge_duplicate_tags and consolidate_tags."""
@@ -118,7 +114,6 @@ class MergeTagsTest(TestCase):
         self.assertFalse(Tag.objects.filter(id=tag2.id).exists())
         tag1.refresh_from_db()
         self.assertTrue(tag1.is_default)
-
 
 class UpdateTagFieldsTest(TestCase):
     """Tests for update_tag_fields."""
@@ -155,7 +150,6 @@ class UpdateTagFieldsTest(TestCase):
         changed = update_tag_fields(tag, config)
         self.assertFalse(changed)
 
-
 class ShortcutFunctionsTest(TestCase):
     """Tests for get_lecture_tag, get_deadline_tag, etc."""
 
@@ -178,7 +172,6 @@ class ShortcutFunctionsTest(TestCase):
         from studyFlax.views.calendar.system_tags import get_societies_tag
         tag = get_societies_tag()
         self.assertEqual(tag.name, 'Societies')
-
 
 class FixUntaggedEventsTest(TestCase):
     """Tests for fix_untagged_deadline_events, fix_deadline_events, fix_exam_events."""

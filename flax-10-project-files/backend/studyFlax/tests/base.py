@@ -2,9 +2,8 @@
 Shared base classes and assertion helpers for backend tests.
 """
 
-from rest_framework.test import APITestCase
 from studyFlax.models import Tag, CalendarEvent, RecurrenceRule
-from .fixtures import get_sample_tags, SAMPLE_TAGS
+from .fixtures import get_sample_tags
 from rest_framework.test import APIClient
 from django.test import TestCase
 

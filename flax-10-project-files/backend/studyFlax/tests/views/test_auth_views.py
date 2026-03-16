@@ -154,7 +154,6 @@ class ConfirmPasswordResetViewTest(TestCase):
             response = self.client.post(self.url, {'token': str(token.token), 'new_password': 'newpass123', 'confirm_password': 'newpass123'})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class ResetPasswordSerializerTest(TestCase):
     """Tests for reset password serializer."""
     def test_normalise_email(self):
@@ -180,7 +179,6 @@ class ResetPasswordSerializerTest(TestCase):
         with self.assertRaises(ValidationError):
             serializer.validate_passwords(data)
 
-
 class RegistrationSerializerEmailTest(TestCase):
     """Tests for RegistrationUserSerialiser duplicate email validation."""
 
@@ -205,7 +203,6 @@ class RegistrationSerializerEmailTest(TestCase):
         serializer = RegistrationUserSerialiser(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('email', serializer.errors)
-
 
 class AuthAndTaskCoverageTest(TestCase):
     """Tests for auth serializer and task helper branches."""
@@ -237,7 +234,6 @@ class AuthAndTaskCoverageTest(TestCase):
         Task.objects.create(user=self.user, title='Other')
         tasks = get_user_tasks(self.user, {'list': str(task_list.id)})
         self.assertEqual(tasks.count(), 1)
-
 
 class SerializerCoverageTest(TestCase):
     """Tests for serializer branches not yet covered."""

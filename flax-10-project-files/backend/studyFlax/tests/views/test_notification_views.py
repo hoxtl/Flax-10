@@ -60,7 +60,6 @@ class NotificationViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Notification.objects.filter(user=self.user).count(), 0)
 
-
 class NotificationAndProfileCoverageTest(TestCase):
     """Tests for notification and profile helper branches."""
 

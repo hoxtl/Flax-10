@@ -14,14 +14,11 @@ from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 
 User = get_user_model()
 
-
 def make_user(username='taskuser', email='task@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
 
-
 def make_task_list(user, name='My List', category='personal', archived=False):
     return TaskList.objects.create(user=user, name=name, category=category, archived=archived)
-
 
 def make_task(user, title='Test Task', task_list=None, priority='medium',
               completed=False, due_date=None, estimated_blocks=None):
@@ -30,7 +27,6 @@ def make_task(user, title='Test Task', task_list=None, priority='medium',
         priority=priority, completed=completed,
         due_date=due_date, estimated_blocks=estimated_blocks,
     )
-
 
 class TaskListListViewTest(TestCase):
     """Tests for task list list view."""
@@ -84,7 +80,6 @@ class TaskListListViewTest(TestCase):
         self.client.force_authenticate(user=None)
         response = self.client.get('/api/tasks/lists/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 class TaskListDetailViewTest(TestCase):
     """Tests for task list detail view."""
@@ -140,7 +135,6 @@ class TaskListDetailViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.task_list.refresh_from_db()
         self.assertTrue(self.task_list.archived)
-
 
 class TaskListViewTest(TestCase):
     """Tests for task list view."""
@@ -227,7 +221,6 @@ class TaskListViewTest(TestCase):
             CalendarEvent.objects.filter(source='task', external_id=str(task.id)).exists()
         )
 
-
 class TaskDetailViewTest(TestCase):
     """Tests for task detail view."""
     def setUp(self):
@@ -304,7 +297,6 @@ class TaskDetailViewTest(TestCase):
             CalendarEvent.objects.filter(source='task', external_id=str(task.id)).count(), 1
         )
 
-
 class TaskSerializerTest(TestCase):
     """Tests for task serializer."""
     def setUp(self):
@@ -344,7 +336,6 @@ class TaskSerializerTest(TestCase):
 
         serializer = TaskListSerialiser(task_list)
         self.assertEqual(serializer.data['task_count'], 1)
-
 
 class LogTaskTimeViewTest(TestCase):
     """Tests for log task time view."""

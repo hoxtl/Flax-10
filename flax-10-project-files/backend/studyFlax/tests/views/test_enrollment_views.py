@@ -13,7 +13,6 @@ from ..base import BaseTestCase
 from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
 from studyFlax.models.auth.userSettingsModel import UserSettings
 
-
 class EnrollmentViewTests(BaseTestCase):
     """Tests for  """
     def setUp(self):
@@ -106,7 +105,6 @@ class EnrollmentViewTests(BaseTestCase):
         with patch('studyFlax.views.modules.enrollment_views.course_to_module_prefixes', {'Computer Science': ['5C']}):
             response = self.client.delete(f'/api/enrollments/{enrollment.id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
 
 class ModuleAndEnrollmentHelperCoverageTest(TestCase):
     """Tests for module and enrollment helper function branches."""

@@ -18,7 +18,6 @@ from studyFlax.models.society.societyMembershipModel import SocietyMembership
 
 User = get_user_model()
 
-
 class ProfileViewTest(TestCase):
     """Tests for profile view."""
     def setUp(self):
@@ -76,39 +75,24 @@ class ProfileViewTest(TestCase):
         response = self.client.get('/api/users/99999/profile/')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_teacher_profile_returns_only_taught_modules(self):
-        teacher = User.objects.create_user(
-            username='teacher1',
-            email='teacher1@example.com',
-            password='pass',
-            first_name='Teach',
-            last_name='Er',
-            role='teacher',
+    def _make_teacher(self, username, email, first_name, last_name):
+        return User.objects.create_user(
+            username=username, email=email, password='pass',
+            first_name=first_name, last_name=last_name, role='teacher',
         )
-        other_teacher = User.objects.create_user(
-            username='teacher2',
-            email='teacher2@example.com',
-            password='pass',
-            first_name='Other',
-            last_name='Teach',
-            role='teacher',
-        )
-        taught = Module.objects.create(
-            module_code='CS9001',
-            module_name='Teaching Module',
-            created_by=teacher,
-            start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(hours=2),
-        )
-        Module.objects.create(
-            module_code='CS9002',
-            module_name='Not Mine',
-            created_by=other_teacher,
-            start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(hours=2),
-        )
-        Enrollment.objects.create(student=teacher, module=taught)
 
+    def _make_module(self, code, name, created_by):
+        return Module.objects.create(
+            module_code=code, module_name=name, created_by=created_by,
+            start_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(hours=2),
+        )
+
+    def test_teacher_profile_returns_only_taught_modules(self):
+        teacher = self._make_teacher('teacher1', 'teacher1@example.com', 'Teach', 'Er')
+        other_teacher = self._make_teacher('teacher2', 'teacher2@example.com', 'Other', 'Teach')
+        taught = self._make_module('CS9001', 'Teaching Module', teacher)
+        self._make_module('CS9002', 'Not Mine', other_teacher)
+        Enrollment.objects.create(student=teacher, module=taught)
         response = self.client.get(f'/api/users/{teacher.id}/profile/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['modules'], ['CS9001'])
@@ -116,20 +100,10 @@ class ProfileViewTest(TestCase):
 
     def test_profile_prefers_taught_modules_when_role_is_stale(self):
         creator = User.objects.create_user(
-            username='creator1',
-            email='creator1@example.com',
-            password='pass',
-            first_name='Create',
-            last_name='Or',
-            role='student',
+            username='creator1', email='creator1@example.com',
+            password='pass', first_name='Create', last_name='Or', role='student',
         )
-        Module.objects.create(
-            module_code='CS9010',
-            module_name='Creator Module',
-            created_by=creator,
-            start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(hours=2),
-        )
+        self._make_module('CS9010', 'Creator Module', creator)
         response = self.client.get(f'/api/users/{creator.id}/profile/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['modules'], ['CS9010'])
@@ -138,7 +112,6 @@ class ProfileViewTest(TestCase):
     def test_unauthenticated(self):
         response = APIClient().get('/api/profile/')
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
-
 
 class CheckUsernameViewTest(TestCase):
     """Tests for check username view."""
@@ -172,7 +145,6 @@ class CheckUsernameViewTest(TestCase):
         response = self.client.post('/api/check-username/', {'username': 'testuser'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data['available'])
-
 
 class UserSearchViewTest(TestCase):
     """Tests for user search view."""
@@ -225,7 +197,6 @@ class UserSearchViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 1)
 
-
 class HomeAddressViewTest(TestCase):
     """Tests for home address view."""
     def setUp(self):
@@ -248,7 +219,6 @@ class HomeAddressViewTest(TestCase):
     def test_post_home_address_empty(self):
         response = self.client.post('/api/user/home-address/', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
 class UserSettingsViewTest(TestCase):
     """Tests for user settings view."""
@@ -285,7 +255,6 @@ class UserSettingsViewTest(TestCase):
         response = self.client.patch('/api/settings/', {'major': 'Math'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-
 class OnboardingViewTest(TestCase):
     """Tests for onboarding view."""
     def setUp(self):
@@ -307,7 +276,6 @@ class OnboardingViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['enrolled_modules'], 0)
 
-
 class ProfileViewCoverageTest(TestCase):
     """Tests for profile_view update photo branch."""
 
@@ -322,7 +290,6 @@ class ProfileViewCoverageTest(TestCase):
     def test_patch_remove_photo(self):
         response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
 
 class UserSearchCoverageTest(TestCase):
     """Tests for user_search_view society filter."""

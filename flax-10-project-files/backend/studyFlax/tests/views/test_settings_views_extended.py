@@ -19,10 +19,8 @@ from rest_framework.test import force_authenticate
 
 User = get_user_model()
 
-
 def make_user(username='settuser', email='sett@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
-
 
 def make_module(module_code, module_name, creator):
     now = timezone.now()
@@ -33,7 +31,6 @@ def make_module(module_code, module_name, creator):
         start_time=now,
         end_time=now + timedelta(hours=1),
     )
-
 
 class UserSettingsViewTest(TestCase):
     """Tests for user_settings_view (GET/PATCH /api/settings/)."""
@@ -82,7 +79,6 @@ class UserSettingsViewTest(TestCase):
         self.client.force_authenticate(user=None)
         response = self.client.get('/api/settings/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
 
 class OnboardingViewTest(TestCase):
     """Tests for onboarding_view (POST /api/onboarding/)."""
@@ -137,7 +133,6 @@ class OnboardingViewTest(TestCase):
         response = self.client.post('/api/onboarding/', {'year': '2', 'major': 'Computer Science'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
 class GetModulesForMajorTest(TestCase):
     """Unit tests for get_modules_for_major."""
 
@@ -160,7 +155,6 @@ class GetModulesForMajorTest(TestCase):
         result = get_modules_for_major('')
         self.assertEqual(result, [])
 
-
 class EnrollUserInModulesTest(TestCase):
     """Unit tests for enroll_user_in_modules."""
 
@@ -182,7 +176,6 @@ class EnrollUserInModulesTest(TestCase):
         count = enroll_user_in_modules(self.user, [m])
         self.assertEqual(count, 0)
         self.assertEqual(Enrollment.objects.filter(student=self.user, module=m).count(), 1)
-
 
 class LegacyUserSettingsViewTests(TestCase):
     """Directly exercise helper-based settings endpoints."""
@@ -227,7 +220,6 @@ class LegacyUserSettingsViewTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['theme'], 'dark')
-
 
 class UserSettingsSerializerTests(TestCase):
     """Unit tests for UserSettingsSerialiser validation and computed fields."""

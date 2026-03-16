@@ -8,7 +8,6 @@ from django.test.client import RequestFactory
 
 from studyFlax.views.hello import hello
 
-
 class HelloViewTest(TestCase):
     """Tests for hello view."""
     def setUp(self):

@@ -14,10 +14,8 @@ from studyFlax.models.tasks.taskModel import Task
 
 User = get_user_model()
 
-
 def make_user(username='timeruser', email='timer@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
-
 
 def make_session(user, duration=60, status_str='Completed'):
     now = timezone.now()
@@ -32,7 +30,6 @@ def make_session(user, duration=60, status_str='Completed'):
         study_block_id=1234,
         status=status_str,
     )
-
 
 class StudySessionSerializerTest(TestCase):
     """Tests for timerSerializer.py (StudySessionSerializer)."""
@@ -82,7 +79,6 @@ class StudySessionSerializerTest(TestCase):
         ]
         for field in expected_fields:
             self.assertIn(field, serializer.data)
-
 
 class StudySessionViewSetTest(TestCase):
     """Tests for timerViews.py (StudySessionViewSet)."""

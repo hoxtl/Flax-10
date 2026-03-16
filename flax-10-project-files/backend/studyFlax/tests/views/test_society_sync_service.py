@@ -14,14 +14,11 @@ from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSyn
 
 User = get_user_model()
 
-
 def make_user(username='syncuser', email='sync@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
 
-
 def make_society(name='Sync Society'):
     return Society.objects.create(name=name, bio='Bio', admin_emails='a@a.com')
-
 
 def make_event(society, title='Event', recurrence='none', start=None, end=None):
     start = start or timezone.now() + timedelta(days=1)
@@ -29,7 +26,6 @@ def make_event(society, title='Event', recurrence='none', start=None, end=None):
     return SocietyEvent.objects.create(
         society=society, title=title, start_time=start, end_time=end, recurrence=recurrence
     )
-
 
 class GetSyncedSocietyIdsTest(TestCase):
     """Tests for get synced society ids."""
@@ -47,7 +43,6 @@ class GetSyncedSocietyIdsTest(TestCase):
         SocietyCalendarSync.objects.create(user=self.user, society=self.society)
         result = get_synced_society_ids(self.user)
         self.assertIn(self.society.id, result)
-
 
 class GetSyncedSocietyEventsTest(TestCase):
     """Tests for get synced society events."""
@@ -75,7 +70,6 @@ class GetSyncedSocietyEventsTest(TestCase):
         make_event(other_society, 'Hidden Event')
         result = get_synced_society_events(self.user)
         self.assertEqual(result, [])
-
 
 class SerializeEventTest(TestCase):
     """Tests for serialize event."""
@@ -120,7 +114,6 @@ class SerializeEventTest(TestCase):
         self.assertEqual(data['announcement'], ann.id)
         self.assertIn('📢', data['title'])
 
-
 class ShouldContinueTest(TestCase):
     """Tests for should continue."""
     def test_stops_when_current_exceeds_end(self):
@@ -144,7 +137,6 @@ class ShouldContinueTest(TestCase):
         now = timezone.now()
         tomorrow = (now + timedelta(days=1)).date()
         self.assertTrue(should_continue(now, now + timedelta(days=2), tomorrow))
-
 
 class IsInRangeTest(TestCase):
     """Tests for is in range."""
@@ -179,7 +171,6 @@ class IsInRangeTest(TestCase):
             now - timedelta(minutes=30), timedelta(hours=1),
             now, now + timedelta(hours=2)
         ))
-
 
 class GetNextOccurrenceTest(TestCase):
     """Tests for get next occurrence."""
@@ -217,7 +208,6 @@ class GetNextOccurrenceTest(TestCase):
         result = get_next_occurrence(self.base, 'unknown')
         self.assertEqual(result, self.base + timedelta(days=365))
 
-
 class AddMonthTest(TestCase):
     """Tests for add month."""
     def test_normal_month(self):
@@ -240,7 +230,6 @@ class AddMonthTest(TestCase):
         result = add_month(dt)
         self.assertEqual(result.day, 28)
 
-
 class AddYearTest(TestCase):
     """Tests for add year."""
     def test_normal_year(self):
@@ -255,7 +244,6 @@ class AddYearTest(TestCase):
         result = add_year(dt)
         self.assertEqual(result.year, 2025)
         self.assertEqual(result.day, 28)
-
 
 class ExpandRecurringTest(TestCase):
     """Tests for expand recurring."""
@@ -300,7 +288,6 @@ class ExpandRecurringTest(TestCase):
         view_end = timezone.now() + timedelta(days=10)
         result = expand_recurring(event, view_start, view_end)
         self.assertLessEqual(len(result), 366)
-
 
 class ExpandAndSerializeTest(TestCase):
     """Tests for expand and serialize."""
