@@ -493,7 +493,7 @@ class Command(BaseCommand):
 
         # map username → (study_profile, theme_profile)
         PROFILES = {
-            'janedoe': ('balanced',    'balanced'),
+            'janedoe': ('power_user',  'consistent'),
             'charlie': ('night_owl',   'night_owl'),
             'amiller': ('consistent',  'consistent'),
             'srahwan': ('balanced',    'balanced'),
