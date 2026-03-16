@@ -13,7 +13,7 @@ from studyFlax.models.groupwork.groupwork_models import (
     GroupProject,
     GroupMembership,
 )
-from studyFlax.serialisers.groupwork_serialisers import (
+from studyFlax.serialisers.tasks.groupwork_serialisers import (
     GroupProjectSerialiser,
     GroupMembershipSerialiser,
 )

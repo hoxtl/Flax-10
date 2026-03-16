@@ -7,7 +7,6 @@ from __future__ import annotations
 import calendar
 from datetime import timedelta
 
-
 def is_time_overlap(event_start, event_end, view_start, view_end):
     """Return True if two time ranges overlap."""
     return event_start < view_end and event_end > view_start

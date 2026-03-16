@@ -1,3 +1,7 @@
+"""
+Service for syncing and parsing timetable events from external ICS sources.
+"""
+
 import re
 from datetime import datetime, timedelta, timezone as dt_timezone
 from urllib.parse import urlparse, urljoin

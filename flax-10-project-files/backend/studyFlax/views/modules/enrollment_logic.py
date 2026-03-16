@@ -1,3 +1,7 @@
+"""
+Business logic for enrolling users in modules and creating related events.
+"""
+
 from studyFlax.models import Enrollment, CalendarEvent, Module, Tag
 from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes

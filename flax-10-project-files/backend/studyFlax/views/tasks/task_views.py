@@ -11,7 +11,7 @@ from django.db.models import Q
 from datetime import timedelta
 
 from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.serialisers.task_serialisers import TaskSerialiser, TaskListSerialiser
+from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser, TaskListSerialiser
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.utils.reading_utils import update_reading_estimates
 

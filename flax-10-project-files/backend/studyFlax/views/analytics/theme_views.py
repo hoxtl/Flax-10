@@ -11,6 +11,7 @@ from datetime import timedelta
 from collections import defaultdict
 
 from studyFlax.models.timer.themeSessionModel import ThemeSession
+from .session_analytics_service import fmt_hour
 
 def _validate_theme_data(data):
     """Validate theme session payload. Return (start, end, theme, error_msg)."""
@@ -40,14 +41,6 @@ def log_theme_session(request):
         started_at=start, ended_at=end, duration_minutes=duration_minutes,
     )
     return Response({'status': 'logged', 'duration_minutes': duration_minutes}, status=status.HTTP_201_CREATED)
-
-def _fmt_hour(h):
-    """Format an hour integer as '9am' / '3pm'."""
-    if h is None:
-        return None
-    suffix = 'am' if h < 12 else 'pm'
-    display = h if h <= 12 else h - 12
-    return f"{display or 12}{suffix}"
 
 def _aggregate_by_hour(sessions):
     """Split sessions into dark/light hourly totals."""
@@ -79,8 +72,8 @@ def _build_theme_response(sessions, days):
             'light_percentage': round(light / total * 100, 1) if total else 0,
             'dark_percentage': round(dark / total * 100, 1) if total else 0,
             'is_night_owl': _compute_night_owl(dark_hours, dark),
-            'peak_dark_hour': _fmt_hour(max(dark_hours, key=dark_hours.get) if dark_hours else None),
-            'peak_light_hour': _fmt_hour(max(light_hours, key=light_hours.get) if light_hours else None),
+            'peak_dark_hour': fmt_hour(max(dark_hours, key=dark_hours.get) if dark_hours else None),
+            'peak_light_hour': fmt_hour(max(light_hours, key=light_hours.get) if light_hours else None),
         },
         'hourly_dark': [dark_hours.get(h, 0) for h in range(24)],
         'hourly_light': [light_hours.get(h, 0) for h in range(24)],

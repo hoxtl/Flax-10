@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
-from studyFlax.serialisers.reset_password_serialisers import ResetPasswordConfirmSerialiser
+from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordConfirmSerialiser
 import logging
 
 logger = logging.getLogger(__name__)

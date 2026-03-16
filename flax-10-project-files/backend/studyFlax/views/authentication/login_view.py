@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.authtoken.models import Token
-from studyFlax.serialisers.auth_serialisers import UserSerialiser, LoggedUserSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser, LoggedUserSerialiser
 
 User = get_user_model()
 

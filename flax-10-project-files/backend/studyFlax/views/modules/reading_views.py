@@ -1,3 +1,7 @@
+"""
+Views for listing, creating, and managing module reading assignments.
+"""
+
 import math
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -6,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from studyFlax.models import Module, Reading, Task, Enrollment
 from studyFlax.models.tasks.taskModel import TaskList
-from studyFlax.serialisers.reading_serialisers import ReadingSerialiser
+from studyFlax.serialisers.modules.reading_serialisers import ReadingSerialiser
 from studyFlax.utils.reading_utils import estimated_time_reading, get_avg_time_per_page, DEFAULT_PAGE_TIME, MINUTES_PER_BLOCK
 
 @api_view(['GET', 'POST'])

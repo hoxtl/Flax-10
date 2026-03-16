@@ -12,7 +12,7 @@ from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
 from studyFlax.models.auth.userSettingsModel import UserSettings
 from studyFlax.models.notifications.notificationModel import Notification
 from studyFlax.models import Enrollment, CalendarEvent
-from studyFlax.serialisers.course_change_serialisers import CourseChangeRequestSerialiser
+from studyFlax.serialisers.modules.course_change_serialisers import CourseChangeRequestSerialiser
 from studyFlax.views.user.settings_views import get_modules_for_major, enroll_user_in_modules
 
 def _get_user_settings(user):

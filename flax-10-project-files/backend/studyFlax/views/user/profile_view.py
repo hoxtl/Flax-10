@@ -1,8 +1,12 @@
+"""
+Views for retrieving and updating user profile data.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.serialisers.auth_serialisers import UserSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.modules.enrollmentModel import Enrollment
 from studyFlax.models.modules.moduleModel import Module

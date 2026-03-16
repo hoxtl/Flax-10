@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from studyFlax.models.social.shareModel import CalendarShare
 from studyFlax.models.notifications.notificationModel import Notification
-from studyFlax.serialisers.social_serialisers import (
+from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareSerialiser,
     CalendarShareUserSerialiser,
 )

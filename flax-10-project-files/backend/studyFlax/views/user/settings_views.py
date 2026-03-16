@@ -1,9 +1,13 @@
+"""
+Views for retrieving and updating user preferences and onboarding data.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
+from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get_modules_for_major
 
 def get_or_create_settings(user):

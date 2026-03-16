@@ -14,7 +14,7 @@ from collections import defaultdict
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.timer.themeSessionModel import ThemeSession
-from .session_analytics_service import compute_peak_hour, compute_streaks
+from .session_analytics_service import compute_peak_hour, compute_streaks, fmt_hour
 
 try:
     import openai
@@ -51,12 +51,6 @@ def _compute_session_stats(sessions):
     overtime = sessions.filter(status='Overtime').count()
     return total_study, total_break, total_pause, count, avg, overtime
 
-def _fmt_hour(h):
-    """Format an hour integer as '9am' / '3pm'."""
-    suffix = 'am' if h < 12 else 'pm'
-    display = h if h <= 12 else h - 12
-    return f"{display or 12}{suffix}"
-
 def _compute_theme_pct(themes):
     """Return dark-mode percentage from theme sessions."""
     dark = sum(s.duration_minutes for s in themes if s.theme == 'dark')
@@ -87,7 +81,6 @@ def _build_stats_summary(sessions, themes):
         'current_streak': current_streak, 'peak_hour': peak_hour,
     }
 
-
 def _build_stats_lines(sessions, themes):
     """Return a formatted multi-line string of study statistics."""
     stats = _build_stats_summary(sessions, themes)
@@ -99,7 +92,7 @@ def _build_stats_lines(sessions, themes):
         f"- Average session length: {stats['avg']} minutes\n"
         f"- Overtime sessions: {stats['overtime']} (ran past planned time)\n"
         f"- Current streak: {stats['current_streak']} consecutive days\n"
-        f"- Peak study hour: {_fmt_hour(stats['peak_hour'])}\n"
+        f"- Peak study hour: {fmt_hour(stats['peak_hour'])}\n"
         f"- Dark mode usage: {stats['dark_pct']}% ({stats['owl_label']})"
     )
 

@@ -1,3 +1,7 @@
+"""
+Views for syncing and unsyncing society events with a user's calendar.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated

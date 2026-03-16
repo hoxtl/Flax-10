@@ -1,10 +1,14 @@
+"""
+View for retrieving and updating user account settings.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
-from studyFlax.serialisers.auth_serialisers import UserSerialiser
+from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 
 def update_user_name(user, data):
     if 'first_name' in data:

@@ -1,3 +1,7 @@
+"""
+Helpers for building and formatting society update notifications.
+"""
+
 def is_only_announcement_changes(changes):
     announcement_keys = {'announcements_added', 'announcements_updated', 'announcements_deleted'}
     event_keys = {'events_added', 'events_updated', 'events_deleted'}

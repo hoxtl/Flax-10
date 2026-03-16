@@ -1,10 +1,11 @@
-"""Shared StudySession analytics helpers used by multiple views."""
+"""
+Shared StudySession analytics helpers used by multiple views.
+"""
 
 from collections import defaultdict
 from datetime import timedelta
 
 from django.utils import timezone
-
 
 def get_session_dates(sessions):
     """Return sorted unique session end dates."""
@@ -47,4 +48,12 @@ def compute_recent_active_days(sessions, days=7):
 def compute_active_days(sessions):
     """Return distinct active days across sessions."""
     return len(set(s.end_time.date() for s in sessions))
+
+def fmt_hour(h):
+    """Format an hour integer as '9am' / '3pm', or None if h is None."""
+    if h is None:
+        return None
+    suffix = 'am' if h < 12 else 'pm'
+    display = h if h <= 12 else h - 12
+    return f"{display or 12}{suffix}"
 

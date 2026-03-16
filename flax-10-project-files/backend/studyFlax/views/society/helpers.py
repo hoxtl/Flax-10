@@ -51,9 +51,7 @@ def handle_image_urls(society, data):
         SocietyImage.objects.create(society=society, url=url, is_cover=True)
 
 def get_society_object_or_none(model, society, object_id):
-    """
-    Return a society-related object for the given model or None if it does not exist.
-    """
+    """Return a society-related object for the given model or None if it does not exist."""
     try:
         return model.objects.get(society=society, pk=object_id)
     except model.DoesNotExist:

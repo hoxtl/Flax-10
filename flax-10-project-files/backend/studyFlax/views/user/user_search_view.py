@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.auth.userModel import User
-from studyFlax.serialisers.auth_serialisers import UserSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
 from django.db.models import Q
 
 _FILTER_MAP = {

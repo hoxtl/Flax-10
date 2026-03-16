@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from studyFlax.models import User
 from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
-from studyFlax.serialisers.reset_password_serialisers import ResetPasswordSerialiser
+from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
 from studyFlax.utils.email_utils import send_reset_password_email
 from django.conf import settings
 import logging

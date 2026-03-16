@@ -1,3 +1,7 @@
+"""
+Helpers for managing and retrieving system-level calendar tags.
+"""
+
 from studyFlax.models import Tag, CalendarEvent
 
 SYSTEM_TAG_CONFIG = {
