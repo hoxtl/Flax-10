@@ -5,6 +5,7 @@ Service for expanding and serialising synced society calendar events.
 from datetime import timedelta
 from studyFlax.models.society import SocietyCalendarSync, SocietyEvent
 from studyFlax.serialisers.society_serialisers import get_society_color
+from .recurrence_utils import is_time_overlap, next_society_occurrence
 
 def get_synced_society_events(user, start_date=None, end_date=None):
     synced_ids = get_synced_society_ids(user)
@@ -53,33 +54,10 @@ def should_continue(current, end_date, recurrence_end):
 
 def is_in_range(start, duration, view_start, view_end):
     end = start + duration
-    return start < view_end and end > view_start
+    return is_time_overlap(start, end, view_start, view_end)
 
 def get_next_occurrence(current, recurrence):
-    if recurrence == 'daily':
-        return current + timedelta(days=1)
-    if recurrence == 'weekly':
-        return current + timedelta(weeks=1)
-    if recurrence == 'biweekly':
-        return current + timedelta(weeks=2)
-    if recurrence == 'monthly':
-        return add_month(current)
-    if recurrence == 'yearly':
-        return add_year(current)
-    return current + timedelta(days=365)
-
-def add_month(dt):
-    month = dt.month + 1
-    year = dt.year + (month - 1) // 12
-    month = ((month - 1) % 12) + 1
-    day = min(dt.day, 28)
-    return dt.replace(year=year, month=month, day=day)
-
-def add_year(dt):
-    try:
-        return dt.replace(year=dt.year + 1)
-    except ValueError:
-        return dt.replace(year=dt.year + 1, day=28)
+    return next_society_occurrence(current, recurrence)
 
 def serialize_event(event, idx, start_override=None, end_override=None):
     return {

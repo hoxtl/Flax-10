@@ -5,8 +5,9 @@ Helper functions for calendar event filtering, expansion, and overlap checking.
 from django.db.models import Q
 from datetime import datetime, timedelta, timezone
 from itertools import takewhile
-import calendar
 import types
+
+from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
 def filter_events_by_date_range(queryset, params):
     start = params.get('start')
@@ -81,33 +82,18 @@ def is_occurrence_valid(dt, dur, v_start, v_end, rule):
     if is_exception(dt, rule): return False
     return is_time_overlap(dt, dt + dur, v_start, v_end)
 
-def is_time_overlap(e_start, e_end, v_start, v_end):
-    return e_start < v_end and e_end > v_start
-
 def is_exception(dt, rule):
     if not rule.exception_dates: return False
     return dt.strftime('%Y-%m-%d') in rule.exception_dates
 
 def calc_occurrence(start, rule, num):
-    delta = rule.interval * num
-    freq = rule.frequency
-    
-    if freq == 'daily': return start + timedelta(days=delta)
-    if freq == 'weekly': return start + timedelta(weeks=delta)
-    if freq == 'monthly': return add_months(start, delta)
-    if freq == 'yearly': return add_years(start, delta)
-    return None
+    return _calc_occurrence(start, rule.frequency, rule.interval, num)
 
 def add_months(dt, months):
-    m = dt.month + months
-    y = dt.year + (m - 1) // 12
-    m = ((m - 1) % 12) + 1
-    d = min(dt.day, calendar.monthrange(y, m)[1])
-    return dt.replace(year=y, month=m, day=d)
+    return _add_months(dt, months)
 
 def add_years(dt, years):
-    try: return dt.replace(year=dt.year + years)
-    except ValueError: return dt.replace(year=dt.year + years, day=28)
+    return _add_years(dt, years)
 
 def create_instance(base, start, dur, idx):
     return types.SimpleNamespace(
