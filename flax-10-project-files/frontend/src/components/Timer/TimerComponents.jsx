@@ -132,7 +132,7 @@ const SOUND_OPTIONS = [
     { value: 'brown', label: 'Brown Noise 🏔️' },
 ];
 
-const SoundControls = ({ noiseType, setNoiseType }) => {
+const SoundControls = ({ noiseType, setNoiseType, volume, setVolume }) => {
     const lbl = <span className={styles.label}>Calming Sound:</span>;
     const dropdown = (
         <AnimatedDropdown
@@ -144,26 +144,38 @@ const SoundControls = ({ noiseType, setNoiseType }) => {
             className={styles.soundDropdown}
         />
     );
-    return <div className={styles.soundControls}>{lbl}{dropdown}</div>;
+    const slider = noiseType !== 'none' ? (
+        <input
+            type="range"
+            className={styles.volumeSlider}
+            min={0} max={1} step={0.05}
+            value={volume}
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            aria-label="Volume"
+            title={`Volume: ${Math.round(volume * 100)}%`}
+        />
+    ) : null;
+    return <div className={styles.soundControls}>{lbl}{dropdown}{slider}</div>;
 };
 
-const applyNoise = (noiseType) => {
+const applyNoise = (noiseType, volume) => {
     if (noiseType === 'none') return noiseGenerator.stop();
     noiseGenerator.play(noiseType);
-    noiseGenerator.setVolume(0.5);
+    noiseGenerator.setVolume(volume);
 };
 
-const useNoiseEffect = (noiseType) => {
+const useNoiseEffect = (noiseType, volume) => {
     useEffect(() => {
-        applyNoise(noiseType);
+        applyNoise(noiseType, volume);
         return () => noiseGenerator.stop();
-    }, [noiseType]);
+    }, [noiseType, volume]);
 };
 
 export const SoundSelector = () => {
     const [noiseType, setNoiseType] = useState('none');
-    useNoiseEffect(noiseType);
-    const ctrl = <SoundControls noiseType={noiseType} setNoiseType={setNoiseType} />;
+    const [volume, setVolume] = useState(0.5);
+    useNoiseEffect(noiseType, volume);
+    const ctrl = <SoundControls noiseType={noiseType} setNoiseType={setNoiseType} volume={volume} setVolume={setVolume} />;
     return <div className={styles.soundSelectorContainer}>{ctrl}</div>;
 };
 

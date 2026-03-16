@@ -235,7 +235,7 @@ def get_weekly_study_hours(sessions_all):
     """Return total study hours in the last 7 days."""
     week_ago = timezone.now() - timedelta(days=7)
     week_sessions = [s for s in sessions_all if s.end_time >= week_ago]
-    return round(sum(s.duration for s in week_sessions) / 60, 1)
+    return round(sum(s.duration for s in week_sessions) / 3600, 1)
 
 def get_society_image(society):
     """Resolve primary image from Society or the first related SocietyImage."""

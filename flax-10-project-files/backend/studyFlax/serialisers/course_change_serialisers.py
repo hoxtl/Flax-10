@@ -2,6 +2,7 @@ from rest_framework import serializers
 from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
 
 class CourseChangeRequestSerialiser(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
@@ -11,6 +12,7 @@ class CourseChangeRequestSerialiser(serializers.ModelSerializer):
         model = CourseChangeRequest
         fields = [
             'id',
+            'user_id',
             'username',
             'first_name',
             'last_name',
