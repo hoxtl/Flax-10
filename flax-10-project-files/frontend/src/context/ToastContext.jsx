@@ -3,15 +3,12 @@ import AppToast from '../components/common/AppToast/AppToast';
 
 const ToastContext = createContext(null);
 
-export function ToastProvider({ children }) {
+function useToastState() {
     const [toast, setToast] = useState(null);
     const timeoutRef = useRef(null);
 
     const closeToast = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
+        if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
         setToast(null);
     }, []);
 
@@ -25,12 +22,14 @@ export function ToastProvider({ children }) {
             icon: opts.icon || null,
         });
         const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
-        timeoutRef.current = setTimeout(() => {
-            setToast(null);
-            timeoutRef.current = null;
-        }, duration);
+        timeoutRef.current = setTimeout(() => { setToast(null); timeoutRef.current = null; }, duration);
     }, []);
 
+    return { toast, closeToast, showToast };
+}
+
+export function ToastProvider({ children }) {
+    const { toast, closeToast, showToast } = useToastState();
     return (
         <ToastContext.Provider value={showToast}>
             {children}
