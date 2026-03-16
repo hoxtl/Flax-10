@@ -130,7 +130,7 @@
 
 .eventList {
   list-style: none;
-  padding: 0;
+  padding: 32px 0 0 0;
   margin: 0;
 }
 
@@ -288,7 +288,7 @@
 
 .detailList {
   list-style: none;
-  padding: 0;
+  padding: 32px 4px 0 0; /* Top padding for tooltips */
   margin: 0;
   max-height: 380px;
   overflow-y: auto;
