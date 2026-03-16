@@ -11,43 +11,136 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='task',
-            name='page_count',
-            field=models.PositiveIntegerField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='usersettings',
-            name='preferred_study_minutes_per_day',
-            field=models.PositiveIntegerField(default=120),
-        ),
-        migrations.AddField(
-            model_name='usersettings',
-            name='week_preference',
-            field=models.CharField(choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends'), ('both', 'Both')], default='both', max_length=10),
-        ),
-        migrations.AddField(
-            model_name='usersettings',
-            name='worktime_preference',
-            field=models.CharField(choices=[('day', 'Day'), ('night', 'Night'), ('both', 'Both')], default='both', max_length=10),
-        ),
-        migrations.CreateModel(
-            name='Reading',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('chapter', models.CharField(blank=True, default='', max_length=100)),
-                ('start_page', models.PositiveIntegerField()),
-                ('end_page', models.PositiveIntegerField()),
-                ('deadline', models.DateTimeField()),
-                ('estimated_minutes', models.PositiveIntegerField(blank=True, help_text='Leave blank to auto-calculate from the page count', null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('module', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='readings', to='studyFlax.module')),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "studyFlax_task" ADD COLUMN IF NOT EXISTS "page_count" integer NULL;',
+                    reverse_sql='ALTER TABLE "studyFlax_task" DROP COLUMN IF EXISTS "page_count";',
+                ),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='task',
+                    name='page_count',
+                    field=models.PositiveIntegerField(blank=True, null=True),
+                ),
             ],
         ),
-        migrations.AddField(
-            model_name='task',
-            name='reading',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tasks', to='studyFlax.reading'),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "studyFlax_usersettings" ADD COLUMN IF NOT EXISTS "preferred_study_minutes_per_day" integer NOT NULL DEFAULT 120;',
+                    reverse_sql='ALTER TABLE "studyFlax_usersettings" DROP COLUMN IF EXISTS "preferred_study_minutes_per_day";',
+                ),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='usersettings',
+                    name='preferred_study_minutes_per_day',
+                    field=models.PositiveIntegerField(default=120),
+                ),
+            ],
+        ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "studyFlax_usersettings" ADD COLUMN IF NOT EXISTS "week_preference" varchar(10) NOT NULL DEFAULT \'both\';',
+                    reverse_sql='ALTER TABLE "studyFlax_usersettings" DROP COLUMN IF EXISTS "week_preference";',
+                ),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='usersettings',
+                    name='week_preference',
+                    field=models.CharField(choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends'), ('both', 'Both')], default='both', max_length=10),
+                ),
+            ],
+        ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "studyFlax_usersettings" ADD COLUMN IF NOT EXISTS "worktime_preference" varchar(10) NOT NULL DEFAULT \'both\';',
+                    reverse_sql='ALTER TABLE "studyFlax_usersettings" DROP COLUMN IF EXISTS "worktime_preference";',
+                ),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='usersettings',
+                    name='worktime_preference',
+                    field=models.CharField(choices=[('day', 'Day'), ('night', 'Night'), ('both', 'Both')], default='both', max_length=10),
+                ),
+            ],
+        ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql=(
+                        'CREATE TABLE IF NOT EXISTS "studyFlax_reading" ('
+                        '"id" bigserial NOT NULL PRIMARY KEY, '
+                        '"title" varchar(200) NOT NULL, '
+                        '"chapter" varchar(100) NOT NULL DEFAULT \'\', '
+                        '"start_page" integer NOT NULL, '
+                        '"end_page" integer NOT NULL, '
+                        '"deadline" timestamp with time zone NOT NULL, '
+                        '"estimated_minutes" integer NULL, '
+                        '"created_at" timestamp with time zone NOT NULL, '
+                        '"module_id" bigint NOT NULL REFERENCES "studyFlax_module" ("id") DEFERRABLE INITIALLY DEFERRED'
+                        ');'
+                    ),
+                    reverse_sql='DROP TABLE IF EXISTS "studyFlax_reading";',
+                ),
+            ],
+            state_operations=[
+                migrations.CreateModel(
+                    name='Reading',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('title', models.CharField(max_length=200)),
+                        ('chapter', models.CharField(blank=True, default='', max_length=100)),
+                        ('start_page', models.PositiveIntegerField()),
+                        ('end_page', models.PositiveIntegerField()),
+                        ('deadline', models.DateTimeField()),
+                        ('estimated_minutes', models.PositiveIntegerField(blank=True, help_text='Leave blank to auto-calculate from the page count', null=True)),
+                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('module', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='readings', to='studyFlax.module')),
+                    ],
+                ),
+            ],
+        ),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    sql='ALTER TABLE "studyFlax_task" ADD COLUMN IF NOT EXISTS "reading_id" bigint NULL;',
+                    reverse_sql='ALTER TABLE "studyFlax_task" DROP COLUMN IF EXISTS "reading_id";',
+                ),
+                migrations.RunSQL(
+                    sql=(
+                        'DO $$ '
+                        'BEGIN '
+                        'IF NOT EXISTS ('
+                        "SELECT 1 FROM pg_constraint WHERE conname = 'studyFlax_task_reading_id_fk'"
+                        ') THEN '
+                        'ALTER TABLE "studyFlax_task" '
+                        'ADD CONSTRAINT "studyFlax_task_reading_id_fk" '
+                        'FOREIGN KEY ("reading_id") '
+                        'REFERENCES "studyFlax_reading" ("id") '
+                        'DEFERRABLE INITIALLY DEFERRED; '
+                        'END IF; '
+                        'END $$;'
+                    ),
+                    reverse_sql='ALTER TABLE "studyFlax_task" DROP CONSTRAINT IF EXISTS "studyFlax_task_reading_id_fk";',
+                ),
+                migrations.RunSQL(
+                    sql='CREATE INDEX IF NOT EXISTS "studyFlax_task_reading_id_idx" ON "studyFlax_task" ("reading_id");',
+                    reverse_sql='DROP INDEX IF EXISTS "studyFlax_task_reading_id_idx";',
+                ),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='task',
+                    name='reading',
+                    field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tasks', to='studyFlax.reading'),
+                ),
+            ],
         ),
     ]
