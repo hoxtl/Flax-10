@@ -9,7 +9,6 @@ from studyFlax.models import EventAttendance
 
 from .attendance_helpers import get_event_for_attendance, build_attendance_stats
 
-
 def _safe_attendance_stats_response(request):
     """Fetch stats and return Response; on failure return 500 with detail."""
     try:
@@ -23,36 +22,32 @@ def _safe_attendance_stats_response(request):
         detail = "Attendance data is unavailable. Run migrations: python manage.py migrate"
         return Response({"detail": detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def _attendance_response(obj, event, created):
+    return Response({
+        "id": obj.id, "event_id": event.id,
+        "attended": obj.attended, "recorded_at": obj.recorded_at,
+        "created": created,
+    })
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def record_attendance(request):
-    """Record or update attendance for a timetable event. Body: { event_id, attended }."""
     event_id = request.data.get("event_id")
     attended = request.data.get("attended", True)
     event, error = get_event_for_attendance(request.user, event_id)
     if error is not None:
         return error
     obj, created = EventAttendance.objects.update_or_create(
-        user=request.user,
-        event=event,
+        user=request.user, event=event,
         defaults={"attended": bool(attended)},
     )
-    return Response({
-        "id": obj.id,
-        "event_id": event.id,
-        "attended": obj.attended,
-        "recorded_at": obj.recorded_at,
-        "created": created,
-    })
-
+    return _attendance_response(obj, event, created)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def attendance_stats(request):
     """Return attendance stats for the current user: overall and by event type."""
     return _safe_attendance_stats_response(request)
-
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

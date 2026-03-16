@@ -9,7 +9,6 @@ from studyFlax.serialisers.event_serialisers import (
 )
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 
-
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def event_detail(request, pk):
@@ -21,11 +20,9 @@ def event_detail(request, pk):
         return update_event(event, request.data)
     return delete_event(event)
 
-
 def get_event(event):
     serialiser = CalendarEventSerialiser(event)
     return Response(serialiser.data)
-
 
 def update_event(event, data):
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
@@ -34,11 +31,9 @@ def update_event(event, data):
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
 
-
 def delete_event(event):
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

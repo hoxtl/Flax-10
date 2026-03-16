@@ -4,7 +4,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .timetable_service import sync_timetable
 
-
 def validate_source_url(raw):
     url = (raw or "").strip().split()[0] if raw else ""
     if not url:

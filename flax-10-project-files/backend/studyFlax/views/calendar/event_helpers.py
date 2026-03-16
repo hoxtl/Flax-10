@@ -1,6 +1,12 @@
+"""
+Helper functions for calendar event filtering, expansion, and overlap checking.
+"""
+
 from django.db.models import Q
 from datetime import datetime, timedelta, timezone
+from itertools import takewhile
 import calendar
+import types
 
 def filter_events_by_date_range(queryset, params):
     start = params.get('start')
@@ -10,26 +16,34 @@ def filter_events_by_date_range(queryset, params):
     recurring = Q(recurrence_rule__isnull=False)
     return apply_filter(queryset, start, end, recurring)
 
+def _apply_start_end_filter(qs, start, end, rec_q, non_rec):
+    in_range = Q(start_time__lte=end) & Q(end_time__gte=start)
+    if rec_q is not None:
+        return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
+    return qs.filter(non_rec & in_range)
+
+def _apply_start_only_filter(qs, start, rec_q):
+    if rec_q is not None:
+        return qs.filter(Q(end_time__gte=start) | rec_q)
+    return qs.filter(end_time__gte=start)
+
 def apply_filter(qs, start, end, rec_q):
     non_rec = Q(recurrence_rule__isnull=True)
     if start and end:
-        in_range = Q(start_time__lte=end) & Q(end_time__gte=start)
-        if rec_q is not None:
-            return qs.filter((non_rec & in_range) | (rec_q & Q(start_time__lte=end)))
-        return qs.filter(non_rec & in_range)
+        return _apply_start_end_filter(qs, start, end, rec_q, non_rec)
     if start:
-        if rec_q is not None:
-            return qs.filter(Q(end_time__gte=start) | rec_q)
-        return qs.filter(end_time__gte=start)
+        return _apply_start_only_filter(qs, start, rec_q)
     return qs.filter(start_time__lte=end)
+
+def _expand_event(event, start_date, end_date):
+    if event.recurrence_rule:
+        return generate_instances(event, start_date, end_date)
+    return [event]
 
 def expand_recurring_events(events, start_date=None, end_date=None):
     expanded = []
     for event in events:
-        if event.recurrence_rule:
-            expanded.extend(generate_instances(event, start_date, end_date))
-        else:
-            expanded.append(event)
+        expanded.extend(_expand_event(event, start_date, end_date))
     return expanded
 
 def generate_instances(event, view_start, view_end):
@@ -52,14 +66,9 @@ def is_base_valid(event, v_start, v_end):
 def add_future_occurrences(instances, event, v_start, v_end):
     rule = event.recurrence_rule
     dur = event.end_time - event.start_time
-    limit = rule.count or 1000
-    
-    for i in range(1, limit + 1):
-        dt = calc_occurrence(event.start_time, rule, i)
-        if stop_generation(dt, v_end, rule): break
-        
-        if is_occurrence_valid(dt, dur, v_start, v_end, rule):
-            instances.append(create_instance(event, dt, dur, i))
+    all_pairs = ((calc_occurrence(event.start_time, rule, i), i) for i in range(1, (rule.count or 1000) + 1))
+    in_range = takewhile(lambda x: not stop_generation(x[0], v_end, rule), all_pairs)
+    instances.extend(create_instance(event, dt, dur, i) for dt, i in in_range if is_occurrence_valid(dt, dur, v_start, v_end, rule))
 
 def stop_generation(dt, v_end, rule):
     if not dt: return False
@@ -101,22 +110,19 @@ def add_years(dt, years):
     except ValueError: return dt.replace(year=dt.year + years, day=28)
 
 def create_instance(base, start, dur, idx):
-    class Evt:
-        def __init__(self):
-            self.id = int(base.id) * 10000 + idx
-            self.title = base.title
-            self.description = base.description
-            self.start_time = start
-            self.end_time = start + dur
-            self.location = base.location
-            self.tag = base.tag
-            self.recurrence_rule = base.recurrence_rule
-            self.reminder_minutes = base.reminder_minutes
-            self.module = base.module
-            self.is_private = getattr(base, 'is_private', False)
-            self.source = getattr(base, 'source', None)
-            self.external_id = getattr(base, 'external_id', None)
-    return Evt()
+    return types.SimpleNamespace(
+        id=int(base.id) * 10000 + idx, title=base.title,
+        description=base.description,
+        start_time=start, end_time=start + dur,
+        location=base.location,
+        tag=base.tag,
+        recurrence_rule=base.recurrence_rule,
+        reminder_minutes=base.reminder_minutes,
+        module=base.module,
+        is_private=getattr(base, 'is_private', False),
+        source=getattr(base, 'source', None),
+        external_id=getattr(base, 'external_id', None),
+    )
 
 def check_event_overlap(user, data):
     s, e = data['start_time'], data['end_time']

@@ -1,49 +1,48 @@
-from datetime import timedelta, datetime
+"""
+Service for expanding and serialising synced society calendar events.
+"""
+
+from datetime import timedelta
 from studyFlax.models.society import SocietyCalendarSync, SocietyEvent
 from studyFlax.serialisers.society_serialisers import get_society_color
 
-
 def get_synced_society_events(user, start_date=None, end_date=None):
-    """Get all society events from societies the user has synced."""
     synced_ids = get_synced_society_ids(user)
     if not synced_ids:
         return []
     events = SocietyEvent.objects.filter(society_id__in=synced_ids).select_related('society', 'tag')
     return expand_and_serialize(events, start_date, end_date)
 
-
 def get_synced_society_ids(user):
     return list(SocietyCalendarSync.objects.filter(user=user).values_list('society_id', flat=True))
 
+def _expand_event(event, start_date, end_date):
+    if event.recurrence and event.recurrence != 'none':
+        return expand_recurring(event, start_date, end_date)
+    return [serialize_event(event, 0)]
 
 def expand_and_serialize(events, start_date, end_date):
     result = []
     for event in events:
-        if event.recurrence and event.recurrence != 'none':
-            result.extend(expand_recurring(event, start_date, end_date))
-        else:
-            result.append(serialize_event(event, 0))
+        result.extend(_expand_event(event, start_date, end_date))
     return result
 
+def _collect_instance(event, idx, current, duration, start_date, end_date):
+    if is_in_range(current, duration, start_date, end_date):
+        return [serialize_event(event, idx, current, current + duration)]
+    return []
 
 def expand_recurring(event, start_date, end_date):
     if not start_date or not end_date:
         return [serialize_event(event, 0)]
-
     instances = []
     duration = event.end_time - event.start_time
-    current = event.start_time
-    idx = 0
-
-    while should_continue(current, end_date, event.recurrence_end_date):
-        if is_in_range(current, duration, start_date, end_date):
-            instances.append(serialize_event(event, idx, current, current + duration))
+    current, idx = event.start_time, 0
+    while should_continue(current, end_date, event.recurrence_end_date) and idx <= 365:
+        instances.extend(_collect_instance(event, idx, current, duration, start_date, end_date))
         current = get_next_occurrence(current, event.recurrence)
         idx += 1
-        if idx > 365:
-            break
     return instances
-
 
 def should_continue(current, end_date, recurrence_end):
     if current > end_date:
@@ -52,11 +51,9 @@ def should_continue(current, end_date, recurrence_end):
         return False
     return True
 
-
 def is_in_range(start, duration, view_start, view_end):
     end = start + duration
     return start < view_end and end > view_start
-
 
 def get_next_occurrence(current, recurrence):
     if recurrence == 'daily':
@@ -71,7 +68,6 @@ def get_next_occurrence(current, recurrence):
         return add_year(current)
     return current + timedelta(days=365)
 
-
 def add_month(dt):
     month = dt.month + 1
     year = dt.year + (month - 1) // 12
@@ -79,13 +75,11 @@ def add_month(dt):
     day = min(dt.day, 28)
     return dt.replace(year=year, month=month, day=day)
 
-
 def add_year(dt):
     try:
         return dt.replace(year=dt.year + 1)
     except ValueError:
         return dt.replace(year=dt.year + 1, day=28)
-
 
 def serialize_event(event, idx, start_override=None, end_override=None):
     return {
@@ -94,8 +88,7 @@ def serialize_event(event, idx, start_override=None, end_override=None):
         'description': event.description,
         'start_time': (start_override or event.start_time).isoformat(),
         'end_time': (end_override or event.end_time).isoformat(),
-        'location': event.location,
-        'source': 'society',
+        'location': event.location, 'source': 'society',
         'society_id': event.society_id,
         'society_name': event.society.name,
         'society_color': get_society_color(event.society_id),

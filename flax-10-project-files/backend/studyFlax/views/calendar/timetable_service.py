@@ -7,7 +7,6 @@ from icalendar import Calendar
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models.calendar.timetableSourceModel import TimetableSource
 
-
 def sync_timetable(source_url, user=None):
     source_key = get_source_key(source_url)
     try:
