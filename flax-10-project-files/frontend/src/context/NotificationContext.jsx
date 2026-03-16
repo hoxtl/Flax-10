@@ -61,29 +61,24 @@ function isRoleChangeNotification(notification) {
     return ROLE_CHANGE_TITLES.has((notification.title || '').toLowerCase());
 }
 
+function reloadIfRoleChanged(oldRole, newRole) {
+    if (oldRole !== newRole) setTimeout(() => window.location.reload(), 1500);
+}
+
+function applySessionUpdate(profile) {
+    const stored = JSON.parse(localStorage.getItem('user') || '{}');
+    const updated = { ...stored, role: profile.role, name: profile.name, major: profile.major, year: profile.year, bio: profile.bio };
+    localStorage.setItem('user', JSON.stringify(updated));
+    window.dispatchEvent(new Event('auth-changed'));
+    reloadIfRoleChanged(stored.role, profile.role);
+}
+
 async function refreshUserSession() {
-    try {
-        const profile = await getUserProfile();
-        if (!profile) return;
-        const stored = JSON.parse(localStorage.getItem('user') || '{}');
-        const oldRole = stored.role;
-        const updated = {
-            ...stored,
-            role: profile.role,
-            name: profile.name,
-            major: profile.major,
-            year: profile.year,
-            bio: profile.bio,
-        };
-        localStorage.setItem('user', JSON.stringify(updated));
-        window.dispatchEvent(new Event('auth-changed'));
-        // If the role actually changed, reload so every component picks up the new role
-        if (oldRole !== profile.role) {
-            setTimeout(() => window.location.reload(), 1500);
-        }
-    } catch (err) {
+    const profile = await getUserProfile().catch(err => {
         console.error('Failed to refresh user session after role change:', err);
-    }
+        return null;
+    });
+    if (profile) applySessionUpdate(profile);
 }
 
 function processNewNotifications(fresh, knownIds, setNotifications) {
@@ -128,10 +123,14 @@ function useNotificationActions(set, knownIds) {
     return { addNotification, dismissNotification, markAllRead, clearAll };
 }
 
+function trackKnownId(knownIds, id) {
+    if (knownIds?.current) knownIds.current.add(id);
+}
+
 async function createNotify(notification, set, knownIds) {
     try {
         const created = await api.createNotification(notification);
-        if (knownIds?.current) knownIds.current.add(created.id);
+        trackKnownId(knownIds, created.id);
         set(prev => [created, ...prev]);
     } catch (err) { console.error('Failed to create notification:', err); }
 }
