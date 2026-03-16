@@ -102,17 +102,9 @@ export default function CalendarPage() {
         </div>
 
         <main className={styles.mainContent}>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={calendarViewKey} {...viewSwapMotion}>
-              <Calendar />
-            </motion.div>
-          </AnimatePresence>
+          <Calendar />
         </main>
       </div>
-
-      <main className={styles.mainContent}>
-        <Calendar />
-      </main>
 
       <EventPopups />
     </AppPage>
