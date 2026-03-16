@@ -88,8 +88,8 @@ describe('EventModal', () => {
     });
 
     it('should call onClose when overlay clicked', () => {
-        const { container } = renderModal();
-        const overlay = container.firstChild;
+        renderModal();
+        const overlay = document.querySelector('[class*="backdrop"]');
         fireEvent.mouseDown(overlay);
         expect(mockOnClose).toHaveBeenCalled();
     });
@@ -114,8 +114,8 @@ describe('EventModal', () => {
     });
 
     it('should call handleSubmit on submit', () => {
-        const { container } = renderModal();
-        const form = container.querySelector('form');
+        renderModal();
+        const form = document.querySelector('form');
         fireEvent.submit(form);
         expect(mockFormLogic.handleSubmit).toHaveBeenCalled();
     });

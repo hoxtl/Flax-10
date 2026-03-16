@@ -105,11 +105,14 @@ describe('useEventForm', () => {
 
     it('sets sleepWarning when event is during sleep window', async () => {
         const event = { id: 1 };
-        FormUtilsModule.getInitialForm.mockReturnValueOnce({ ...mockInitialForm, start_time: '2026-03-10T23:30:00' });
+        const formWithTime = { ...mockInitialForm, start_time: '2026-03-10T23:30:00' };
+        FormUtilsModule.getInitialForm.mockReturnValue(formWithTime);
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
         const { result } = renderHook(() => useEventForm(event, vi.fn()));
-        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
+        await act(async () => {}); // Wait for sleepSettings to load
+        act(() => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(result.current.sleepWarning).toBe(true);
+        FormUtilsModule.getInitialForm.mockReturnValue(mockInitialForm);
     });
 
     it('confirms pending submit after sleep warning', async () => {
