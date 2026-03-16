@@ -41,7 +41,7 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     module_code = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
-    reading_id = serializers.IntegerField(source='reading.id', read_only=True)
+    reading_id = serializers.SerializerMethodField()
     reading_page_count = serializers.SerializerMethodField()
     group_project_name = serializers.SerializerMethodField()
     assignees_info = serializers.SerializerMethodField()
@@ -62,6 +62,9 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
+
+    def get_reading_id(self, obj):
+        return obj.reading_id if obj.reading_id else None
 
     def get_reading_page_count(self, obj):
         return obj.reading.page_count() if obj.reading_id else None

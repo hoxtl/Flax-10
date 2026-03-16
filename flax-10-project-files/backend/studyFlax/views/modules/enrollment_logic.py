@@ -2,15 +2,22 @@
 Business logic for enrolling users in modules and creating related events.
 """
 
+import logging
+
 from studyFlax.models import Enrollment, CalendarEvent, Module, Tag
 from studyFlax.views.modules.deadline_event_helpers import create_enrollment_deadline_events
 from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
 
+logger = logging.getLogger(__name__)
+
 def enroll_user_in_module(user, module):
-    """Enroll a user in a module and create related events."""
+    """Enroll a user in a module and create related calendar events."""
     enrollment, created = Enrollment.objects.get_or_create(student=user, module=module)
     if created:
-        create_enrollment_events(user, module)
+        try:
+            create_enrollment_events(user, module)
+        except Exception:
+            logger.exception("Failed to create events for %s / %s", user, module)
     return enrollment, created
 
 def get_modules_for_major(major):
@@ -21,8 +28,13 @@ def get_modules_for_major(major):
     return list(Module.objects.filter(module_code__regex=pattern))
 
 def enroll_user_in_modules(user, modules):
-    """Return the number of new modules the user was enrolled in."""
-    return sum(1 for module in modules if enroll_user_in_module(user, module)[1])
+    """Enroll a user in every module in the list, returning the count of new enrolments."""
+    count = 0
+    for module in modules:
+        _, created = enroll_user_in_module(user, module)
+        if created:
+            count += 1
+    return count
 
 def is_core_module(user, module):
     """Return True if the module is core for the user's course."""

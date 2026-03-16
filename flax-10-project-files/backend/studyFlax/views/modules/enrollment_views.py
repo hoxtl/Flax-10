@@ -43,13 +43,6 @@ def enrollment_detail(request, enrollment_id):
         return Response(EnrollmentSerialiser(enrollment).data)
     return delete_enrollment(request, enrollment)
 
-def is_core_module(user, module):
-    user_course = getattr(getattr(user, 'settings', None), 'major', None)
-    if not user_course:
-        return False
-    core_prefixes = course_to_module_prefixes.get(user_course, [])
-    return module.module_code[:2] in core_prefixes
-
 def delete_enrollment(request, enrollment):
     if enrollment.student != request.user:
         return Response( {"error": "You can only disenroll yourself."}, status = status.HTTP_403_FORBIDDEN)
