@@ -3,6 +3,7 @@ import * as api from '../api/notificationApi';
 import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
 import { playNotificationSound } from '../components/Notifications/utils/notificationSound';
 import { parseNotificationAction } from '../components/Notifications/utils/notificationAction';
+import { getUserProfile } from '../api/userService';
 
 const NotificationContext = createContext(null);
 const POLL_INTERVAL = 30000;
@@ -49,11 +50,53 @@ function useNotificationPolling(notifications, setNotifications, knownIds) {
     }, [setNotifications, knownIds]);
 }
 
+const ROLE_CHANGE_TITLES = new Set([
+    'teacher role approved',
+    'teacher request rejected',
+    'course change approved',
+    'course change rejected',
+]);
+
+function isRoleChangeNotification(notification) {
+    return ROLE_CHANGE_TITLES.has((notification.title || '').toLowerCase());
+}
+
+async function refreshUserSession() {
+    try {
+        const profile = await getUserProfile();
+        if (!profile) return;
+        const stored = JSON.parse(localStorage.getItem('user') || '{}');
+        const oldRole = stored.role;
+        const updated = {
+            ...stored,
+            role: profile.role,
+            name: profile.name,
+            major: profile.major,
+            year: profile.year,
+            bio: profile.bio,
+        };
+        localStorage.setItem('user', JSON.stringify(updated));
+        window.dispatchEvent(new Event('auth-changed'));
+        // If the role actually changed, reload so every component picks up the new role
+        if (oldRole !== profile.role) {
+            setTimeout(() => window.location.reload(), 1500);
+        }
+    } catch (err) {
+        console.error('Failed to refresh user session after role change:', err);
+    }
+}
+
 function processNewNotifications(fresh, knownIds, setNotifications) {
     const newOnes = fresh.filter(n => !knownIds.has(n.id));
     if (newOnes.length === 0) return;
-    newOnes.forEach(n => { notifyUser(n); knownIds.add(n.id); });
+    let needsSessionRefresh = false;
+    newOnes.forEach(n => {
+        notifyUser(n);
+        knownIds.add(n.id);
+        if (isRoleChangeNotification(n)) needsSessionRefresh = true;
+    });
     setNotifications(fresh);
+    if (needsSessionRefresh) refreshUserSession();
 }
   
 async function pollNotifications(knownIds, setNotifications) {

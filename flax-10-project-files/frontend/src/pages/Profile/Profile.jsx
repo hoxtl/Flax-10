@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import AchievementsModal from "./AchievementsModal";
 import styles from "./Profile.module.css";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ProfileModals from "./ProfileModals";
 import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
@@ -75,7 +76,7 @@ function useProfileAnalytics(isSelf) {
   return data;
 }
 
-function ProfileHome({ onNavigate, visibility, viewedUserId, modules }) {
+function ProfileHome({ onNavigate, visibility, viewedUserId, modules, role }) {
   const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const analyticsData = useProfileAnalytics(visibility.canViewAnalytics);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -85,16 +86,17 @@ function ProfileHome({ onNavigate, visibility, viewedUserId, modules }) {
 
   return (
     <div className={styles.profileHome}>
-      <ProfileColumns
-        summary={summary}
-        analyticsData={analyticsData}
-        visibility={visibility}
-        onNavigate={onNavigate}
-        refetch={refetch}
-        onShowAchievements={() => setShowAchievements(true)}
-        modules={modules}
-        peakHour={peakHour}
-      />
+        <ProfileColumns
+            summary={summary}
+            analyticsData={analyticsData}
+            visibility={visibility}
+            onNavigate={onNavigate}
+            refetch={refetch}
+            onShowAchievements={() => setShowAchievements(true)}
+            modules={modules}
+            role={role}
+            peakHour={peakHour}
+        />
       {showAchievements && <AchievementsModal badges={summary?.badges} onClose={() => setShowAchievements(false)} />}
     </div>
   );
@@ -106,10 +108,10 @@ function computePeakHour(grid) {
   return Math.max(...totals) > 0 ? totals.indexOf(Math.max(...totals)) : null;
 }
 
-function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements, modules, peakHour }) {
+function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, onShowAchievements, modules, role, peakHour }) {
   const bentoStack = (
     <>
-      <ModulesSection modules={modules} onNavigate={onNavigate} />
+      <ModulesSection modules={modules} onNavigate={onNavigate} role={role} />
       {visibility.canViewSocieties && <SocietiesSection societies={summary?.societies} onNavigate={onNavigate} />}
       {visibility.canViewAchievements && <BadgesSection badges={summary?.badges} onOpen={onShowAchievements} />}
     </>
@@ -138,7 +140,7 @@ function ProfileContent({ user, state, visibility, onNavigate }) {
   return (
     <div className={styles.content}>
       <ProfileHeader user={profileData || user} profileData={profileData} taskCount={state.taskCount} upcomingEventCount={upcomingEventCount} handlers={handlers} visibility={visibility} />
-      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} />
+      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} role={profileData?.role || user?.role} />
       {visibility.canViewCalendar && <SharedCalendarSection events={filteredEvents} />}
     </div>
   );
@@ -162,7 +164,17 @@ export default function Profile({ user, viewedUserId, onNavigate, onNavChange })
   const { filteredEvents, modules } = useProfileBodyData(state);
 
   if (state.loading) return <ProfileSkeleton />;
-  if (!state.profileData) return <div className={styles.container}>User not found.</div>;
+  if (!state.profileData) {
+    return (
+      <div className={styles.container}>
+        <EmptyState
+          icon="👤"
+          title="Profile unavailable"
+          description="Could not load this profile. Try logging out and back in, or return to the home page."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

@@ -342,6 +342,10 @@
   line-height: 1.4;
 }
 
+.sectionLast .sectionInner {
+  padding-right: 16px;
+}
+
 .sectionContent {
   margin-top: 14px;
 }

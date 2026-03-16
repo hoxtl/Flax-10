@@ -269,6 +269,19 @@ class SerializerCoverageTest(TestCase):
         serializer = UserSerialiser(self.user, context={'request': request})
         self.assertTrue(serializer.data['is_sharing'])
 
+    def test_user_serializer_teacher_name_prefixed_with_dr(self):
+        from studyFlax.serialisers.auth_serialisers import UserSerialiser
+        teacher = User.objects.create_user(
+            username='teach_name',
+            email='teach_name@test.com',
+            password='pass',
+            first_name='Alex',
+            last_name='Stone',
+            role='teacher',
+        )
+        serializer = UserSerialiser(teacher)
+        self.assertEqual(serializer.data['name'], 'Dr. Alex Stone')
+
     def test_deadline_serializer_non_teacher_validation(self):
         from studyFlax.serialisers.deadline_serialisers import DeadlineSerialiser
         factory = APIRequestFactory()

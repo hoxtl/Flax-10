@@ -1,6 +1,8 @@
 import { isEnrolledIn } from './utils/moduleUtils.js';
-import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
+import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
+import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
 import GridCard from '../common/Card/GridCard';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -34,12 +36,28 @@ function getCardClass(enrolled, is_teacher) {
     return cls;
 }
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines }) {
+function normalizeModuleCode(code) {
+    return String(code || "").toUpperCase().replace(/\s+/g, "");
+}
+
+function resolveClassmatesCount(module) {
+    return (
+        module?.classmates_count ??
+        module?.enrollment_count ??
+        module?.enrolled_count ??
+        module?.class_size ??
+        null
+    );
+}
+
+export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, onManageReadings, taskCountsByModule = {} }) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);
     const isCore = enrollment?.is_core || false;
     const department = getDepartment(module.module_code, module.department);
     const accent = DEPARTMENT_ACCENTS[department] || "var(--primary)";
+    const upcomingTasksCount = taskCountsByModule[normalizeModuleCode(module.module_code)] || 0;
+    const classmatesCount = resolveClassmatesCount(module);
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
     return (
         <GridCard
@@ -48,44 +66,85 @@ export default function ModulesCard({ module, enrollments, isTeacher, onViewModu
             onClick={() => !isTeacher && onViewModule(module)}
         >
             <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
+                upcomingTasksCount={upcomingTasksCount}
+                classmatesCount={classmatesCount}
                 onView={(e) => stop(e, onViewModule)}
                 onEdit={(e) => stop(e, onEdit)}
                 onDelete={(e) => stop(e, onDelete)}
                 onToggle={(e) => stop(e, onEnrollmentToggle)}
-                onManageDeadlines={(e) => stop(e, onManageDeadlines)} />
+                onManageDeadlines={(e) => stop(e, onManageDeadlines)} 
+                onManageReadings={(e) => stop(e, onManageReadings)}/> 
         </GridCard>
     );
 }
 
-function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings, upcomingTasksCount, classmatesCount }) {
     return (
         <div className={styles.content}>
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
             <h3 className={styles.moduleTitle}>{module.module_name}</h3>
             {module.description && <Description text={module.description} />}
             <QuickMeta module={module} />
+            <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
-                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines} />
+                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines}  onManageReadings={onManageReadings}/>
+        </div>
+    );
+}
+
+function getTutorImage(moduleCode, tutorName) {
+    return getTutorPhotoFallback({ fullName: tutorName, seed: moduleCode, allowGeneric: true });
+}
+
+function TutorAvatar({ module }) {
+    const src = getTutorImage(module.module_code, module.created_by_name);
+    if (!src) return null;
+    const initials = (module.created_by_name || 'T')
+        .split(/\s+/).filter(Boolean)
+        .map(p => p[0]).join('').slice(0, 2).toUpperCase();
+    return (
+        <div className={styles.tutorAvatar} title={module.created_by_name || 'Tutor'}>
+            <img
+                src={src}
+                alt={module.created_by_name || 'Tutor'}
+                className={styles.tutorAvatarImg}
+                onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                }}
+            />
+            <span className={styles.tutorAvatarFallback} style={{ display: 'none' }}>{initials}</span>
         </div>
     );
 }
 
 function CardHeader({ module, enrolled, isCore }) {
     const department = getDepartment(module.module_code, module.department);
+    const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
             <div className={styles.headerTopRow}>
                 <div className={styles.headerIdentity}>
                     <div className={styles.iconWrap}>📚</div>
-                    <span className={styles.moduleCode}>{module.module_code}</span>
+                    <EntityLinkChip
+                        to={`/modules?moduleId=${module.id}`}
+                        className={styles.moduleCode}
+                        title={`Open ${module.module_code}`}
+                    >
+                        {module.module_code}
+                    </EntityLinkChip>
                 </div>
-                {enrolled && (
-                    <span className={styles.enrolledBadge}>
-                        {isCore ? '📌 Core' : '✓ Enrolled'}
-                    </span>
-                )}
+                <div className={styles.headerRight}>
+                    {enrolled && (
+                        <span className={styles.enrolledBadge}>
+                            {isCore ? '📌 Core' : '✓ Enrolled'}
+                        </span>
+                    )}
+                    <TutorAvatar module={module} />
+                </div>
             </div>
             <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+            {course && <span className={styles.courseText}>{course}</span>}
         </div>
     );
 }
@@ -119,20 +178,51 @@ function MetaPill({ icon, text }) {
     return <span className={styles.metaPill}>{icon} {text}</span>;
 }
 
-function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines }) {
+function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
+    const hasClassmates = Number.isFinite(Number(classmatesCount)) && Number(classmatesCount) > 0;
+    const hasTasks = Number.isFinite(Number(upcomingTasksCount)) && Number(upcomingTasksCount) > 0;
+
+    if (!hasTasks && !hasClassmates) return null;
+
+    return (
+        <div className={styles.relatedRow}>
+            {hasTasks && (
+                <EntityLinkChip
+                    to={`/tasks?module=${encodeURIComponent(module.module_code || "")}`}
+                    className={styles.relatedChip}
+                    title="Open tasks linked to this module"
+                >
+                    ✅ {upcomingTasksCount} upcoming task{upcomingTasksCount === 1 ? "" : "s"}
+                </EntityLinkChip>
+            )}
+            {hasClassmates && (
+                <EntityLinkChip
+                    to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
+                    className={styles.relatedChip}
+                    title="Find classmates in this module"
+                >
+                    👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
+                </EntityLinkChip>
+            )}
+        </div>
+    );
+}
+
+function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings }) {
     return (
         <div className={styles.actions}>
             {isTeacher
-                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} />
+                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} onManageReadings={onManageReadings}/>
                 : <StudentActions enrolled={enrolled} isCore={isCore} onToggle={onToggle} onView={onView} />}
         </div>
     );
 }
 
-function TeacherActions({ onEdit, onDelete, onManageDeadlines }) {
+function TeacherActions({ onEdit, onDelete, onManageDeadlines, onManageReadings }) {
     return (
         <>
             <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
+            <button className={styles.deadlineButton} onClick={onManageReadings}>Readings</button>
             <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
             <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
         </>
