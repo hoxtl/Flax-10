@@ -1,3 +1,7 @@
+/**
+ * EventFormBody - Main form content for event creation/editing.
+ * Includes fields for title, description, tags, time, recurrence, and privacy.
+ */
 import { FormField } from './FormField';
 import { TagField } from './TagField';
 import { RecurrenceField } from './RecurrenceField';
@@ -5,31 +9,28 @@ import { TimeRow } from './TimeRow';
 import { ActionButtons } from './ActionButtons';
 import { ReminderField } from './ReminderField';
 
+function PrivacyButton({ isActive, label, onClick }) {
+    return (
+        <button type="button" className={`privacy-btn${isActive ? ' active' : ''}`} onClick={onClick}>
+            {label}
+        </button>
+    );
+}
+
 function PrivacyToggle({ value, onChange }) {
     const isPrivate = value === true;
     return (
         <div className="form-field">
             <label>Visibility</label>
             <div className="privacy-toggle">
-                <button
-                    type="button"
-                    className={`privacy-btn${!isPrivate ? ' active' : ''}`}
-                    onClick={() => onChange(false)}
-                >
-                    🌐 Public
-                </button>
-                <button
-                    type="button"
-                    className={`privacy-btn${isPrivate ? ' active' : ''}`}
-                    onClick={() => onChange(true)}
-                >
-                    🔒 Private
-                </button>
+                <PrivacyButton isActive={!isPrivate} label="🌐 Public" onClick={() => onChange(false)} />
+                <PrivacyButton isActive={isPrivate} label="🔒 Private" onClick={() => onChange(true)} />
             </div>
         </div>
     );
 }
 
+/** Form body component with all event input fields and submit action. */
 export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, showReminder = true, tags }) {
     const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
     const setRecurrence = (r) => setForm(f => ({ ...f, recurrence: r }));

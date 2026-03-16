@@ -1,9 +1,10 @@
-/* TableView Container */
+/* TableView Container - scrollable for sticky header */
 .container {
     flex: 1;
     min-height: 0;
-    height: calc(100vh - 280px);
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
+    overflow-x: auto;
     background: var(--bg);
 }
 
@@ -54,11 +55,9 @@
 }
 
 .todayRow {
-    background: linear-gradient(
-        to right,
-        rgba(184, 155, 126, 0.14),
-        rgba(184, 155, 126, 0.04)
-    );
+    background: linear-gradient(to right,
+            rgba(184, 155, 126, 0.14),
+            rgba(184, 155, 126, 0.04));
 }
 
 /* Cells */
@@ -195,37 +194,30 @@
     margin-top: 4px;
 }
 
-.dateEditBtn {
+.dateEditBtn, .dateEditBtnCancel {
     padding: 4px 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    border: none;
     border-radius: 6px;
-    background: var(--primary);
-    color: var(--c-white);
-    cursor: pointer;
-    transition: opacity 0.15s;
-}
-
-.dateEditBtn:hover {
-    opacity: 0.9;
-}
-
-.dateEditBtnCancel {
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--muted);
     cursor: pointer;
     transition: all 0.15s;
 }
 
-.dateEditBtnCancel:hover {
-    background: var(--hover);
+.dateEditBtn {
+    border: none;
+    background: var(--primary);
+    color: var(--c-white);
 }
+
+.dateEditBtn:hover { opacity: 0.9; }
+
+.dateEditBtnCancel {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+}
+
+.dateEditBtnCancel:hover { background: var(--hover); }
 
 .locationCell {
     color: var(--text);

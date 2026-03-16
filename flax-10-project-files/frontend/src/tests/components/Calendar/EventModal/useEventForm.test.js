@@ -103,30 +103,22 @@ describe('useEventForm', () => {
         expect(typeof result.current.handleCancelSleep).toBe('function');
     });
 
-    it('sets sleepWarning when event is during sleep window and confirms pending submit', async () => {
-        const onClose = vi.fn();
+    it('sets sleepWarning when event is during sleep window', async () => {
         const event = { id: 1 };
-        const startTime = '2026-03-10T23:30:00';
-        FormUtilsModule.getInitialForm.mockReturnValueOnce({
-            ...mockInitialForm,
-            start_time: startTime,
-        });
+        FormUtilsModule.getInitialForm.mockReturnValueOnce({ ...mockInitialForm, start_time: '2026-03-10T23:30:00' });
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
+        const { result } = renderHook(() => useEventForm(event, vi.fn()));
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
+        expect(result.current.sleepWarning).toBe(true);
+    });
 
-        const { result } = renderHook(() => useEventForm(event, onClose));
-
-        await act(async () => {
-            const mockE = { preventDefault: vi.fn() };
-            result.current.handleSubmit(mockE);
-        });
-
-        // sleepWarning should have been set and then cleared by confirm handler
-        await act(async () => {
-            result.current.handleConfirmSleep();
-        });
-
-        // validateAndSubmit should have been called at least once (initial submit),
-        // and pendingSubmit path exercised via handleConfirmSleep
+    it('confirms pending submit after sleep warning', async () => {
+        const event = { id: 1 };
+        FormUtilsModule.getInitialForm.mockReturnValueOnce({ ...mockInitialForm, start_time: '2026-03-10T23:30:00' });
+        SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
+        const { result } = renderHook(() => useEventForm(event, vi.fn()));
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
+        await act(async () => { result.current.handleConfirmSleep(); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalled();
     });
 

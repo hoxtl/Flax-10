@@ -1,3 +1,9 @@
+/**
+ * dateUtils - Date manipulation and formatting utilities for calendar views.
+ * Provides week/month calculations, formatting, and day comparison helpers.
+ */
+
+/** Returns array of 7 dates representing the week containing the given date. */
 export function getWeekDays(date) {
     const start = getStartOfWeek(date);
     return Array.from({ length: 7 }, (_, i) => addDays(start, i));

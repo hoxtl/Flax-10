@@ -1,3 +1,7 @@
+/**
+ * DraggableEvent - Event block with drag, resize, and click interactions.
+ * Renders personal events as draggable/resizable, others as read-only.
+ */
 import { useRef } from 'react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
@@ -9,6 +13,7 @@ import { useTags } from '../../context/TagContext';
 import { getEventTheme } from './utils/eventStyleUtils';
 import './DraggableEvent.css';
 
+/** Event block component with drag-and-drop and resize support. */
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const eventType = getEventType(event);
     if (eventType !== 'personal' || readOnly) {
@@ -43,24 +48,26 @@ function getReadOnlyClassName(event) {
     return 'draggable-event';
 }
 
-function EditableEvent({ event, style, minWidthForDetails }) {
+function useEditableEventState(event) {
     const { editEvent } = useEventActions();
     const { openPopup } = useEventPopup();
     const theme = getEventTheme(event, useTags());
     const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
+    return { openPopup, theme, refs, dragProps, isDragging, resize };
+}
 
+function EditableEvent({ event, style, minWidthForDetails }) {
+    const state = useEditableEventState(event);
     const onClick = (e) => {
-        if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
-        if (isDragging || resize.isResizing) return;
-        const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
+        if (state.refs.resizeEnded.current) { state.refs.resizeEnded.current = false; return; }
+        if (state.isDragging || state.resize.isResizing) return;
+        state.openPopup(event, state.refs.event.current?.getBoundingClientRect());
     };
-
     return (
-        <EventCard event={event} style={style} theme={theme} refs={refs}
-            resize={resize} isDragging={isDragging} dragProps={dragProps}
+        <EventCard event={event} style={style} theme={state.theme} refs={state.refs}
+            resize={state.resize} isDragging={state.isDragging} dragProps={state.dragProps}
             onClick={onClick} minWidth={minWidthForDetails} />
     );
 }

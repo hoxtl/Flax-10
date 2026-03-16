@@ -1,3 +1,7 @@
+/**
+ * useQuickActions - Quick action buttons for module/society events.
+ * Provides Leave (module) and Unsync (society) actions for external events.
+ */
 import { useTags } from '../../../context/TagContext';
 import { useNotify } from '../../Notifications/hooks/useNotify';
 import { useCalendarEvents } from './useCalendarEvents';
@@ -5,24 +9,29 @@ import { useModuleDisenrollment } from '../../Modules/hooks/useModuleDisenrollme
 import { getEventType } from '../utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
 
+function handleModuleAction(event, disenrollFromModule, loadEvents) {
+    disenrollFromModule(event.module, loadEvents);
+}
+
+async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
+    await unsyncCalendar(event.society_id);
+    await refreshTags();
+    loadEvents();
+    notify('Unsync Successful', `Calendar for ${event.society_name || 'this society'} is now unsynced.`);
+}
+
+/** Hook returning quick action config for module/society events. */
 export function useQuickActions(event) {
     const { loadEvents } = useCalendarEvents();
     const { disenrollFromModule } = useModuleDisenrollment();
     const { refreshTags } = useTags();
     const notify = useNotify();
-
     const type = getEventType(event);
 
     const handleAction = async (e) => {
         if (e) e.stopPropagation();
-        if (type === 'module') {
-            disenrollFromModule(event.module, loadEvents);
-        } else if (type === 'society') {
-            await unsyncCalendar(event.society_id);
-            await refreshTags();
-            loadEvents();
-            notify('Unsync Successful', `Calendar for ${event.society_name || 'this society'} is now unsynced.`);
-        }
+        if (type === 'module') handleModuleAction(event, disenrollFromModule, loadEvents);
+        else if (type === 'society') await handleSocietyAction(event, refreshTags, loadEvents, notify);
     };
 
     if (type === 'module') return { label: 'Leave', onClick: handleAction };

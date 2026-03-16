@@ -158,23 +158,28 @@ const DropdownPanel = forwardRef(function DropdownPanel({ pos, timeOnly, dateOnl
   );
 });
 
+function CalendarHeader({ viewM, viewY, prevMonth, nextMonth }) {
+  return (
+    <div className={styles.calHeader}>
+      <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
+      <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
+      <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
+    </div>
+  );
+}
+
+function DayCell({ day, index, isToday, isSel, selectDay }) {
+  const cls = `${styles.dayCell} ${!day ? styles.dayCellEmpty : ""} ${day && isToday(day) ? styles.dayCellToday : ""} ${day && isSel(day) ? styles.dayCellSel : ""}`;
+  return <button key={index} type="button" disabled={!day} onClick={() => day && selectDay(day)} className={cls}>{day || ""}</button>;
+}
+
 function CalendarSection({ viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay }) {
   return (
     <>
-      <div className={styles.calHeader}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
-        <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
-        <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
-      </div>
+      <CalendarHeader viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} />
       <div className={styles.calGrid}>
         {DAYS.map(d => <div key={d} className={styles.dayHeader}>{d}</div>)}
-        {days.map((d, i) => (
-          <button key={i} type="button" disabled={!d} onClick={() => d && selectDay(d)}
-            className={`${styles.dayCell} ${!d ? styles.dayCellEmpty : ""}
-              ${d && isToday(d) ? styles.dayCellToday : ""} ${d && isSel(d) ? styles.dayCellSel : ""}`}>
-            {d || ""}
-          </button>
-        ))}
+        {days.map((d, i) => <DayCell key={i} day={d} index={i} isToday={isToday} isSel={isSel} selectDay={selectDay} />)}
       </div>
     </>
   );
