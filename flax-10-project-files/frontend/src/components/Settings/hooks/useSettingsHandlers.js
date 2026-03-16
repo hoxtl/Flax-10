@@ -223,7 +223,11 @@ export default function useSettingsHandlers() {
   const handleStudyTimeSave = async (data) => {
     return saveStudyTime(data, setSuccessMessage, setIsSaving);
   };
-  
+
+  const handleWeekPreferenceSave = async (data) => {
+    return saveWeekPreference(data, setSuccessMessage, setIsSaving);
+  };
+
   return {
     isSaving,
     successMessage,
@@ -235,6 +239,7 @@ export default function useSettingsHandlers() {
     handleHomeAddressSave,
     handleSleepSave,
     handleStudyTimeSave,
+    handleWeekPreferenceSave,
   };
 }
 
@@ -245,6 +250,18 @@ async function saveStudyTime(data, setSuccessMessage, setIsSaving) {
     preferred_study_minutes_per_day: data.preferred_study_minutes_per_day,
   }).catch(() => ({ ok: false }));
   const msg = ok ? "Study time preference saved!" : "Failed to save study time preference";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+  return ok;
+}
+
+async function saveWeekPreference(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return false;
+  setIsSaving(true);
+  const { ok } = await patchSettings({
+    week_preferences: data.week_preferences,
+  }).catch(() => ({ ok: false }));
+  const msg = ok ? "Week preference saved!" : "Failed to save week preference";
   showTemporaryMessage(setSuccessMessage, msg);
   setIsSaving(false);
   return ok;

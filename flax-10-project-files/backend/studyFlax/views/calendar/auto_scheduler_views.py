@@ -7,6 +7,25 @@ from studyFlax.models import CalendarEvent, Deadline, Schedule, Notification, Sc
 from studyFlax.serialisers import AutoScheduleRequestSerialiser, ScheduleSerialiser
 from .system_tags import get_schedule_tag
 
+def _resolved_preferences(user, payload):
+    settings = getattr(user, 'settings', None)
+
+    preferred_start = payload.get('preferred_start_time')
+    preferred_end = payload.get('preferred_end_time')
+    week_preference = payload.get('week_preference')
+
+    if settings is not None:
+        preferred_start = preferred_start or getattr(settings, 'wake_time', None)
+        preferred_end = preferred_end or getattr(settings, 'sleep_time', None)
+        week_preference = week_preference or getattr(settings, 'week_preferences', None)
+
+    return {
+        'preferred_start_time': preferred_start,
+        'preferred_end_time': preferred_end,
+        'worktime_preference': payload.get('worktime_preference') or 'both',
+        'week_preference': week_preference or 'both',
+    }
+
 def _resolve_window(current_day, preferred_start, preferred_end, worktime_preference):
     if preferred_start and preferred_end:
         return (
@@ -57,6 +76,7 @@ def build_auto_schedule(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
     payload = serialiser.validated_data
+    resolved_preferences = _resolved_preferences(request.user, payload)
     deadline_map = {item['deadline_id']: item['ideal_minutes_per_day'] for item in payload['deadline_preferences']}
     deadlines = list(
         Deadline.objects.filter(
@@ -77,21 +97,21 @@ def build_auto_schedule(request):
         schedule = Schedule.objects.create(
             title=payload['title'],
             user=request.user,
-            preferred_start_time=payload.get('preferred_start_time'),
-            preferred_end_time=payload.get('preferred_end_time'),
-            worktime_preference=payload['worktime_preference'],
-            week_preference=payload['week_preference'],
+            preferred_start_time=resolved_preferences['preferred_start_time'],
+            preferred_end_time=resolved_preferences['preferred_end_time'],
+            worktime_preference=resolved_preferences['worktime_preference'],
+            week_preference=resolved_preferences['week_preference'],
         )
         schedule.deadline.set(deadlines)
 
-        _allocate_deadline_blocks(schedule, request.user, deadlines, deadline_map, payload)
+        _allocate_deadline_blocks(schedule, request.user, deadlines, deadline_map, resolved_preferences)
 
     response_payload = ScheduleSerialiser(schedule).data
     response_payload['overwritten'] = overwritten
     return Response(response_payload, status=status.HTTP_201_CREATED)
 
 
-def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
+def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferences):
     schedule_tag = get_schedule_tag()
     start_date = timezone.localtime(timezone.now()).date()
     end_date = max(timezone.localtime(deadline.start_due_date).date() for deadline in deadlines)
@@ -99,7 +119,7 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
     daily_budget = _daily_budget_minutes(user)
 
     while current_day <= end_date:
-        if not _is_allowed_day(current_day, payload['week_preference']):
+        if not _is_allowed_day(current_day, preferences['week_preference']):
             current_day += timedelta(days=1)
             continue
 
@@ -114,9 +134,9 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, payload):
 
             window_start, window_end = _resolve_window(
                 current_day,
-                payload.get('preferred_start_time'),
-                payload.get('preferred_end_time'),
-                payload['worktime_preference'],
+                preferences['preferred_start_time'],
+                preferences['preferred_end_time'],
+                preferences['worktime_preference'],
             )
 
             if timezone.is_naive(window_start):

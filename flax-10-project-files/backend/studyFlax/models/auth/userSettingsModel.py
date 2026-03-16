@@ -5,6 +5,11 @@ from django.db import models
 from .userModel import User
 
 class UserSettings(models.Model):
+    WEEK_PREFERENCE_CHOICES = [
+        ('weekdays', 'Weekdays'),
+        ('weekends', 'Weekends'),
+        ('both', 'Both'),
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')
     theme = models.CharField(max_length=50)
     timezone = models.CharField(max_length=100)
@@ -16,3 +21,4 @@ class UserSettings(models.Model):
     mode = models.CharField(max_length=50, default='light')
     homepage_widgets = models.JSONField(default=list, blank=True)
     preferred_study_minutes_per_day = models.PositiveIntegerField(default=120)
+    week_preferences = models.CharField(max_length=10, choices=WEEK_PREFERENCE_CHOICES, default='both')

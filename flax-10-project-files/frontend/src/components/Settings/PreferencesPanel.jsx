@@ -187,7 +187,55 @@ function StudyTimeSection({
         <span className={styles.contextCardEmoji}>📚</span>
         <h3 className={styles.contextCardTitle}>Auto-scheduler capacity</h3>
         <ul className={styles.contextCardList}>
-          <li>Customizable, desirable study length per day(must be divisible by 30)</li>
+          <li>Customizable, desirable study length per day(must be in half-hours)</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function WeekPreferenceSection({
+  weekPreference,
+  onWeekPreferenceChange,
+  onSubmit,
+  isSaving,
+  hasUnsaved,
+  saveSignal,
+}) {
+  return (
+    <div className={styles.twoColLayout}>
+      <div>
+        <div className={styles.settingsTile}>
+          <form onSubmit={onSubmit}>
+            <SectionHeader title="Preferred Week Period" />
+            <div className={styles.formGroup}>
+              <label htmlFor="week-preferences">Preferred days for auto-scheduling</label>
+              <select
+                id="week-preferences"
+                value={weekPreference}
+                onChange={(e) => onWeekPreferenceChange(e.target.value)}
+              >
+                <option value="both">Both weekdays and weekends</option>
+                <option value="weekdays">Weekdays only</option>
+                <option value="weekends">Weekends only</option>
+              </select>
+            </div>
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Week Preference"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
+          </form>
+        </div>
+      </div>
+      <div className={styles.contextCard}>
+        <span className={styles.contextCardEmoji}>📅</span>
+        <h3 className={styles.contextCardTitle}>Weekly scheduling focus</h3>
+        <ul className={styles.contextCardList}>
+          <li>Pick whether auto-scheduling should prioritize weekdays or weekends</li>
+          <li>Used as the default when building schedules from deadlines</li>
         </ul>
       </div>
     </div>
@@ -200,7 +248,7 @@ function StudyTimeSection({
  * @param {Function} props.onSleepSave - Saves sleep schedule
  * @param {boolean} props.isSaving
  */
-export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave }) {
+export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave, onWeekPreferenceSave = async () => false }) {
   const { theme, setTheme } = useTheme();
   const [sleepTime, setSleepTime] = useState("23:00");
   const [wakeTime, setWakeTime] = useState("07:00");
@@ -211,6 +259,9 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
   const [minutesPerDay, setMinutesPerDay] = useState("120");
   const [initialMinutesPerDay, setInitialMinutesPerDay] = useState("120");
   const [studySaveSignal, setStudySaveSignal] = useState(0);
+  const [weekPreference, setWeekPreference] = useState("both");
+  const [initialWeekPreference, setInitialWeekPreference] = useState("both");
+  const [weekSaveSignal, setWeekSaveSignal] = useState(0);
 
   useEffect(() => {
     getUserSettings()
@@ -230,6 +281,10 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
           setMinutesPerDay(nextStudyTime);
           setInitialMinutesPerDay(nextStudyTime);
         }
+        if (data?.week_preferences) {
+          setWeekPreference(data.week_preferences);
+          setInitialWeekPreference(data.week_preferences);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -241,6 +296,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
 
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
   const hasUnsavedStudyTime = minutesPerDay !== initialMinutesPerDay;
+  const hasUnsavedWeekPreference = weekPreference !== initialWeekPreference;
 
   if (loading) return <SectionSkeleton label="Loading preferences" rows={4} />;
 
@@ -282,6 +338,21 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
         isSaving={isSaving}
         hasUnsaved={hasUnsavedSleep}
         saveSignal={sleepSaveSignal}
+      />
+      <WeekPreferenceSection
+        weekPreference={weekPreference}
+        onWeekPreferenceChange={setWeekPreference}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const ok = await onWeekPreferenceSave({ week_preferences: weekPreference });
+          if (ok) {
+            setInitialWeekPreference(weekPreference);
+            setWeekSaveSignal((s) => s + 1);
+          }
+        }}
+        isSaving={isSaving}
+        hasUnsaved={hasUnsavedWeekPreference}
+        saveSignal={weekSaveSignal}
       />
     </div>
   );
