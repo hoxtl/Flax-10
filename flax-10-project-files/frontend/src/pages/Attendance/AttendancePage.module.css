@@ -346,6 +346,7 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
+  transform: translateY(8px);
   transition: all 0.2s ease;
   z-index: 1000;
 }
@@ -353,6 +354,7 @@
 .statusToggleBtn[data-tooltip]:hover::after {
   opacity: 1;
   visibility: visible;
+  transform: translateY(0);
 }
 
 /* Tooltip Arrow */
