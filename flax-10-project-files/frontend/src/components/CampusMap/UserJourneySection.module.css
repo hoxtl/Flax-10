@@ -44,9 +44,9 @@
 }
 
 .goButton:hover:not(:disabled) {
-  background: var(--primary-dark);
+  opacity: 0.88;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
 .goButton:disabled {
