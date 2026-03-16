@@ -20,6 +20,7 @@ import ModuleCourseFilter from '../../components/Modules/ModuleCourseFilter';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
+import SearchEmptyState from '../../components/common/SearchEmptyState/SearchEmptyState.jsx';
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -230,14 +231,14 @@ function MainView({ state }) {
             )}
         >
             <ModuleToolbar search={search} sorting={sorting} />
-            <ModuleResults sorting={sorting} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
+            <ModuleResults sorting={sorting} search={search} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
                 setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} />
         </AppPage>
     );
 }
 
 function ModuleToolbar({ search, sorting }) {
-    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'deadlines', label: 'Deadlines' }];
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }, { value: 'deadlines', label: 'Deadlines' }];
     const selectedCourses = sorting.selectedCourses || [];
     const onToggleCourse = sorting.toggleCourse || (() => {});
     return (
@@ -255,8 +256,20 @@ function ModuleToolbar({ search, sorting }) {
     );
 }
 
-function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule }) {
-    if (sorting.results.length === 0) return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
+function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule }) {
+    if (sorting.results.length === 0) {
+        const hasSearch = String(search.query || "").trim().length > 0;
+        if (hasSearch) {
+            return (
+                <SearchEmptyState
+                    query={search.query}
+                    itemLabel="modules"
+                    onClear={() => search.onQueryChange("")}
+                />
+            );
+        }
+        return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
+    }
     return (
         <div>
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
@@ -266,6 +279,7 @@ function ModuleResults({ sorting, hook, isTeacher, setViewingModule, setEditingM
                 onEdit={(m) => { setEditingModule(m); setShowForm(true); }}
                 onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
                 onManageDeadlines={setDeadlineModule}
+                taskCountsByModule={hook.taskCountsByModule}
             />
             <Pagination currentPage={sorting.currentPage} totalPages={sorting.totalPages} onPageChange={sorting.setCurrentPage} />
             <BackToTop />

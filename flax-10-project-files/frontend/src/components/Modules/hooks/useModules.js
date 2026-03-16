@@ -1,13 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
+import { fetchTasks } from '../../../api/taskService.js';
 import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
-function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn) {
+function useModuleActions(
+  modules,
+  enrollments,
+  loading,
+  setModules,
+  setEnrollments,
+  notify,
+  confirmFn,
+  taskCountsByModule,
+) {
   return {
     modules, enrollments, loading,
+    taskCountsByModule,
     handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
     handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
@@ -19,12 +30,36 @@ function useModuleActions(modules, enrollments, loading, setModules, setEnrollme
   };
 }
 
-async function loadData(setLoading, setModules, setEnrollments, notify) {
+function normalizeModuleCode(code) {
+  return String(code || "").toUpperCase().replace(/\s+/g, "");
+}
+
+function buildTaskCounts(tasks = []) {
+  return tasks.reduce((acc, task) => {
+    if (task?.completed) return acc;
+    const code = normalizeModuleCode(task?.module_code);
+    if (!code) return acc;
+    acc[code] = (acc[code] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+async function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
   try {
     setLoading(true);
-    const [modules_data, enrollments_data] = await Promise.all([getModules(), getEnrollments()]);
-    setModules(modules_data);
-    setEnrollments(enrollments_data);
+    const [modulesRes, enrollmentsRes, tasksRes] = await Promise.allSettled([
+      getModules(),
+      getEnrollments(),
+      fetchTasks(),
+    ]);
+    if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
+    if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+
+    setModules(modulesRes.value || []);
+    setEnrollments(enrollmentsRes.value || []);
+    setTaskCountsByModule(
+      tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {},
+    );
   } catch (err) {
     notify(err.message, 'error');
   } finally {
@@ -84,10 +119,20 @@ export default function useModules() {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [enrollments, setEnrollments] = useState([]);
+  const [taskCountsByModule, setTaskCountsByModule] = useState({});
   const { addNotification } = useNotifications();
   const notify = createNotify(addNotification);
   const confirmFn = useConfirm();
 
-  useEffect(() => { loadData(setLoading, setModules, setEnrollments, notify); }, []);
-  return useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn);
+  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, []);
+  return useModuleActions(
+    modules,
+    enrollments,
+    loading,
+    setModules,
+    setEnrollments,
+    notify,
+    confirmFn,
+    taskCountsByModule,
+  );
 }

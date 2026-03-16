@@ -1,5 +1,7 @@
-import { formatDuration, formatTime, getDepartment } from './utils/moduleUtils.js';
+import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
+import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
 import styles from './ModuleDetails.module.css';
 
 function getSortedDeadlines(deadlines = []) {
@@ -55,33 +57,16 @@ function getInitials(name) {
 }
 
 function getTutorImage(moduleCode, tutorName) {
-    const tutorKey = `${tutorName || ""}`.trim().toLowerCase();
-    const fallbackIndex = Math.abs(
-        [...`${moduleCode || "module"}-${tutorName || "tutor"}`]
-            .reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
-    );
-
-    const tutorPhotos = {
-        "alice miller": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=96&h=96&q=80",
-        "sam rahwan": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&h=96&q=80",
-        "james murphy": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=96&h=96&q=80",
-        "eric chen": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=96&h=96&q=80",
-        "hena patel": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&h=96&q=80",
-        "sarah wan": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=96&h=96&q=80",
-    };
-
-    const genericPhotos = [
-        "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=96&h=96&q=80",
-        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=96&h=96&q=80",
-        "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=96&h=96&q=80",
-        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=96&h=96&q=80",
-    ];
-
-    return tutorPhotos[tutorKey] || genericPhotos[fallbackIndex % genericPhotos.length];
+    return getTutorPhotoFallback({
+        fullName: tutorName,
+        seed: moduleCode,
+        allowGeneric: true,
+    });
 }
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     const department = getDepartment(module.module_code, module.department);
+    const course = getCourse(module.module_code, module.course);
     const sortedDeadlines = getSortedDeadlines(module.deadlines);
     const nextDeadline = getNextDeadline(sortedDeadlines);
     const timelineProgress = getTimelineProgress(sortedDeadlines);
@@ -93,8 +78,9 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
             <section className={styles.hero}>
                 <div className={styles.heroTop}>
-                    <span className={styles.moduleCode}>{module.module_code}</span>
+                    <EntityLinkChip to="/modules" className={styles.moduleCode}>{module.module_code}</EntityLinkChip>
                     <span className={styles.departmentChip}>{department}</span>
+                    {course && <span className={styles.courseChip}>{course}</span>}
                     {is_enrolled && <span className={styles.enrolledBadge}>✓ Enrolled</span>}
                 </div>
                 <h1 className={styles.moduleTitle}>{module.module_name}</h1>
@@ -117,7 +103,13 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                                 }}
                             />
                             <span className={styles.tutorAvatarFallback}>{getInitials(module.created_by_name || "Tutor")}</span>
-                            <span className={styles.heroMetaValue}>{module.created_by_name || "Unknown"}</span>
+                            {module.created_by
+                                ? (
+                                    <EntityLinkChip to={`/profile/${module.created_by}`} className={styles.heroMetaValue}>
+                                        {module.created_by_name || "Unknown"}
+                                    </EntityLinkChip>
+                                )
+                                : <span className={styles.heroMetaValue}>{module.created_by_name || "Unknown"}</span>}
                         </div>
                     </div>
                     <div className={styles.heroMetaItem}>
@@ -142,17 +134,19 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                 <div className={styles.mainColumn}>
                     <article className={styles.sectionCard}>
                         <h2 className={styles.sectionTitle}>Schedule</h2>
-                        <div className={styles.scheduleGrid}>
-                            <InfoCard icon="📅" label="Day & time" value={nextClass} />
-                            <InfoCard icon="⏱️" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
-                            <InfoCard icon="📍" label="Location" value={module.location || 'To be announced'} />
+                        <div className={styles.scheduleRow}>
+                            <ScheduleItem icon="📅" label="Day & time" value={nextClass} />
+                            <span className={styles.scheduleDivider} />
+                            <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
+                            <span className={styles.scheduleDivider} />
+                            <ScheduleItem icon="📍" label="Location" value={module.location || 'To be announced'} />
                         </div>
                         {module.recurrence_rule && <RecurringBadge />}
                     </article>
 
                     <article className={styles.sectionCard}>
                         <h2 className={styles.sectionTitle}>Assignments</h2>
-                        <DeadlinesSection deadlines={sortedDeadlines} />
+                        <DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} />
                     </article>
                 </div>
 
@@ -184,13 +178,13 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     );
 }
 
-function InfoCard({ icon, label, value }) {
+function ScheduleItem({ icon, label, value }) {
     return (
-        <div className={styles.infoCard}>
-            <div className={styles.infoIcon}>{icon}</div>
+        <div className={styles.scheduleItem}>
+            <span className={styles.scheduleIcon}>{icon}</span>
             <div>
-                <div className={styles.infoLabel}>{label}</div>
-                <div className={styles.infoValue}>{value}</div>
+                <div className={styles.scheduleLabel}>{label}</div>
+                <div className={styles.scheduleValue}>{value}</div>
             </div>
         </div>
     );
@@ -211,7 +205,7 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
         : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in module</button>;
 }
 
-function DeadlinesSection({ deadlines }) {
+function DeadlinesSection({ deadlines, moduleCode }) {
     if (!deadlines?.length) return <p className={styles.emptyText}>No assignments yet.</p>;
 
     return (
@@ -224,7 +218,13 @@ function DeadlinesSection({ deadlines }) {
                         <div className={styles.deadlineBody}>
                             <div className={styles.deadlineTitleRow}>
                                 <span className={styles.deadlinesType}>{DEADLINE_LABELS[d.deadline_type]}</span>
-                                <span className={styles.deadlineTitle}>{d.title}</span>
+                                <EntityLinkChip
+                                    to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`}
+                                    className={styles.deadlineTitle}
+                                    title="Open related tasks"
+                                >
+                                    {d.title}
+                                </EntityLinkChip>
                                 <span className={`${styles.urgencyTag} ${styles[urgency]}`}>
                                     {getUrgencyText(urgency)}
                                 </span>

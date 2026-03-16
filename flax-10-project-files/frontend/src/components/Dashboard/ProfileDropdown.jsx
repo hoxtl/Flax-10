@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../Authentication/utils/userUtils";
 import { getUserProfile } from "../../api/userService";
@@ -70,10 +71,10 @@ function DropdownMenu({ isOpen, onClose, onSettingsClick, onLogoutClick, onProfi
     <div className={styles.dropdown} ref={dropdownRef}>
       <DropdownHeader user={user} profilePhotoUrl={profilePhotoUrl} />
       <Divider />
-      <MenuItem icon="👤" label="Profile" onClick={onProfileClick} />
-      <MenuItem icon="⚙️" label="Settings" onClick={onSettingsClick} />
+      <MenuItem icon={<UserRound size={16} />} label="Profile" onClick={onProfileClick} />
+      <MenuItem icon={<Settings size={16} />} label="Settings" onClick={onSettingsClick} />
       <Divider />
-      <MenuItem icon="🚪" label="Log out" onClick={onLogoutClick} isDanger />
+      <MenuItem icon={<LogOut size={16} />} label="Log out" onClick={onLogoutClick} isDanger />
     </div>
   );
 }
@@ -107,6 +108,7 @@ async function loadProfileData(setProfileData) {
 function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
   const [isOpen, setIsOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
+  const closeTimerRef = useRef(null);
   useEffect(() => { loadProfileData(setProfileData); }, []);
   useEffect(() => {
     const syncProfile = () => { loadProfileData(setProfileData); };
@@ -116,7 +118,27 @@ function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
   const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
   const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
   const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
-  return { isOpen, setIsOpen, profileData, handleSettingsClick, handleLogoutClick, handleProfileClick };
+  const onHoverEnter = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    setIsOpen(true);
+  };
+  const onHoverLeave = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 180);
+  };
+  useEffect(() => () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+  }, []);
+  return {
+    isOpen,
+    setIsOpen,
+    profileData,
+    handleSettingsClick,
+    handleLogoutClick,
+    handleProfileClick,
+    onHoverEnter,
+    onHoverLeave,
+  };
 }
 
 function buildDisplayUser(user, profileData) {
@@ -136,7 +158,16 @@ function resolveYearDisplay(year) {
 }
 
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
-  const { isOpen, setIsOpen, profileData, handleSettingsClick, handleLogoutClick, handleProfileClick } =
+  const {
+    isOpen,
+    setIsOpen,
+    profileData,
+    handleSettingsClick,
+    handleLogoutClick,
+    handleProfileClick,
+    onHoverEnter,
+    onHoverLeave,
+  } =
     useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick);
   const initials = getInitials(user?.name) || "?";
   const profilePhotoUrl = profileData?.profile_photo_url;
@@ -144,7 +175,7 @@ export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, 
   const displayYear = resolveYearDisplay(displayUser.year);
   const displayMajor = displayUser.major || "CS";
   return (
-    <div className={styles.container}>
+    <div className={styles.container} onMouseEnter={onHoverEnter} onMouseLeave={onHoverLeave}>
       <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => setIsOpen(!isOpen)} />
       <DropdownMenu
         isOpen={isOpen}

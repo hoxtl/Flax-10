@@ -1,10 +1,11 @@
 import styles from './UserAvatar.module.css';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback';
 
 export default function UserAvatar({ user, onClick, avatarOnly = false, size }) {
     if (!user) return null;
 
     const initial = getInitial(user);
-    const photoUrl = user.profile_photo_url || user.profile_photo || user.avatar;
+    const photoUrl = getResolvedUserPhoto(user);
     const fullName = getFullName(user);
 
     if (avatarOnly) return <AvatarCircle initial={initial} photoUrl={photoUrl} size={size} />;

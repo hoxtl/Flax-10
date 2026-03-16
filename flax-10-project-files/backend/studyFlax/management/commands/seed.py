@@ -60,11 +60,26 @@ class Command(BaseCommand):
         {'username': 'johndoe', 'email': 'john.doe@kcl.ac.uk',  'first_name': 'John',    'last_name': 'Doe',    'is_superuser': True,  'is_staff': True},
         {'username': 'janedoe', 'email': 'jane.doe@kcl.ac.uk',  'first_name': 'Jane',    'last_name': 'Doe',    'is_superuser': False, 'is_staff': False},
         {'username': 'charlie', 'email': 'charlie@kcl.ac.uk',   'first_name': 'Charlie', 'last_name': 'Smith',  'is_superuser': False, 'is_staff': False},
+        # ── Teachers ──
         {'username': 'amiller', 'email': 'a.miller@kcl.ac.uk',  'first_name': 'Alice',   'last_name': 'Miller', 'is_superuser': False, 'is_staff': False},
         {'username': 'srahwan', 'email': 's.rahwan@kcl.ac.uk',  'first_name': 'Sam',     'last_name': 'Rahwan', 'is_superuser': False, 'is_staff': False},
         {'username': 'hpatel',  'email': 'h.patel@kcl.ac.uk',   'first_name': 'Hina',    'last_name': 'Patel',  'is_superuser': False, 'is_staff': False},
         {'username': 'echen',   'email': 'e.chen@kcl.ac.uk',    'first_name': 'Eric',    'last_name': 'Chen',   'is_superuser': False, 'is_staff': False},
         {'username': 'jmurphy', 'email': 'j.murphy@kcl.ac.uk',  'first_name': 'James',   'last_name': 'Murphy', 'is_superuser': False, 'is_staff': False},
+        {'username': 'swan',    'email': 's.wan@kcl.ac.uk',     'first_name': 'Sarah',   'last_name': 'Wan',    'is_superuser': False, 'is_staff': False},
+        {'username': 'rkapoor', 'email': 'r.kapoor@kcl.ac.uk',  'first_name': 'Ravi',    'last_name': 'Kapoor', 'is_superuser': False, 'is_staff': False},
+        {'username': 'lturner', 'email': 'l.turner@kcl.ac.uk',  'first_name': 'Laura',   'last_name': 'Turner', 'is_superuser': False, 'is_staff': False},
+        {'username': 'dnguyen', 'email': 'd.nguyen@kcl.ac.uk',  'first_name': 'David',   'last_name': 'Nguyen', 'is_superuser': False, 'is_staff': False},
+        {'username': 'ofarrell','email': 'o.farrell@kcl.ac.uk', 'first_name': 'Olivia',  'last_name': "Farrell",'is_superuser': False, 'is_staff': False},
+        {'username': 'mkhan',   'email': 'm.khan@kcl.ac.uk',    'first_name': 'Maria',   'last_name': 'Khan',   'is_superuser': False, 'is_staff': False},
+        {'username': 'tbrown',  'email': 't.brown@kcl.ac.uk',   'first_name': 'Thomas',  'last_name': 'Brown',  'is_superuser': False, 'is_staff': False},
+        {'username': 'ayamada', 'email': 'a.yamada@kcl.ac.uk',  'first_name': 'Aiko',    'last_name': 'Yamada', 'is_superuser': False, 'is_staff': False},
+        {'username': 'fnunes',  'email': 'f.nunes@kcl.ac.uk',   'first_name': 'Felipe',  'last_name': 'Nunes',  'is_superuser': False, 'is_staff': False},
+        {'username': 'cellis',  'email': 'c.ellis@kcl.ac.uk',   'first_name': 'Charlotte','last_name': 'Ellis', 'is_superuser': False, 'is_staff': False},
+        {'username': 'bkwame',  'email': 'b.kwame@kcl.ac.uk',   'first_name': 'Benjamin','last_name': 'Kwame',  'is_superuser': False, 'is_staff': False},
+        {'username': 'hlewis',  'email': 'h.lewis@kcl.ac.uk',   'first_name': 'Hannah',  'last_name': 'Lewis',  'is_superuser': False, 'is_staff': False},
+        {'username': 'jpark',   'email': 'j.park@kcl.ac.uk',    'first_name': 'Jin',     'last_name': 'Park',   'is_superuser': False, 'is_staff': False},
+        {'username': 'asmith',  'email': 'a.smith@kcl.ac.uk',   'first_name': 'Adam',    'last_name': 'Smith',  'is_superuser': False, 'is_staff': False},
     ]
 
     ROLE_LABELS = {
@@ -72,9 +87,19 @@ class Command(BaseCommand):
         'janedoe': 'student', 'charlie': 'student',
         'amiller': 'teacher', 'srahwan': 'teacher',
         'hpatel':  'teacher', 'echen':   'teacher', 'jmurphy': 'teacher',
+        'swan':    'teacher', 'rkapoor': 'teacher', 'lturner': 'teacher',
+        'dnguyen': 'teacher', 'ofarrell':'teacher', 'mkhan':   'teacher',
+        'tbrown':  'teacher', 'ayamada': 'teacher', 'fnunes':  'teacher',
+        'cellis':  'teacher', 'bkwame':  'teacher', 'hlewis':  'teacher',
+        'jpark':   'teacher', 'asmith':  'teacher',
     }
 
-    TEACHER_USERNAMES = {'amiller', 'srahwan', 'hpatel', 'echen', 'jmurphy'}
+    TEACHER_USERNAMES = {
+        'amiller', 'srahwan', 'hpatel', 'echen', 'jmurphy',
+        'swan', 'rkapoor', 'lturner', 'dnguyen', 'ofarrell',
+        'mkhan', 'tbrown', 'ayamada', 'fnunes', 'cellis',
+        'bkwame', 'hlewis', 'jpark', 'asmith',
+    }
 
     def _load_shared_data(self):
         self.users      = list(User.objects.filter(is_staff=False))
@@ -364,6 +389,9 @@ class Command(BaseCommand):
             'hpatel':  ('consistent',  'consistent'),
             'echen':   ('night_owl',   'night_owl'),
             'jmurphy': ('balanced',    'consistent'),
+            'swan':    ('balanced',    'balanced'),
+            'rkapoor': ('consistent',  'consistent'),
+            'lturner': ('night_owl',   'balanced'),
         }
 
         total_study = 0

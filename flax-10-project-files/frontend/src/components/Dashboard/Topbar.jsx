@@ -5,7 +5,13 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus, ChevronDown, Calendar, Clock } from "lucide-react";
+import {
+  Bell,
+  Plus,
+  ChevronDown,
+  Calendar,
+  Clock,
+} from "lucide-react";
 import { SegmentedControl } from "../ui/SegmentedControl";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
@@ -117,8 +123,14 @@ function NotifTab() {
 }
 
 function ActionPill({ onAddClick, onNavChange }) {
+  const openQuickActions = () => window.dispatchEvent(new CustomEvent("quick-actions:open"));
   return (
     <div className={styles.actionPill}>
+      <button type="button" className={styles.quickActionsBtn} onClick={openQuickActions}>
+        Quick actions
+        <span className={styles.quickActionsKey}>/</span>
+      </button>
+      <div className={styles.pillDivider} />
       <AddTab onAddClick={onAddClick} />
       <div className={styles.pillDivider} />
       <ThemeToggle />

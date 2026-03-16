@@ -52,6 +52,15 @@ describe('UserAvatar', () => {
         expect(img).toHaveAttribute('src', 'https://example.com/av.gif');
     });
 
+    it('uses seeded tutor photo when no uploaded photo exists', () => {
+        const user = { username: 'srahwan' };
+        const { container } = render(<UserAvatar user={user} avatarOnly={true} />);
+        const img = container.querySelector('img');
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('src');
+        expect(img.getAttribute('src')).toContain('images.unsplash.com');
+    });
+
     it('shows initial from first_name', () => {
         const user = { username: 'alice', first_name: 'Alice', last_name: 'X' };
         render(<UserAvatar user={user} avatarOnly={true} />);
