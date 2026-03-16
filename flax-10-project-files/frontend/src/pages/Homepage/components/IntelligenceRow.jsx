@@ -5,10 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
-import { getUserProfile } from "../../../api/userService";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
-import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 import { ConfirmModal } from "../../../components/common";
 import {
@@ -18,6 +16,8 @@ import {
   getCurrentEvent,
   getUpcomingEvent
 } from "./IntelligenceUtils";
+
+import { useAuth } from "../../../context/AuthContext";
 
 import IntelligenceGrid from "./IntelligenceGrid";
 import { IntelligenceHero } from "./IntelligenceWidgets";
@@ -75,14 +75,15 @@ function useCourseChangePending() {
 }
 
 function useTeacherRequestPending() {
+  const { profile, loading } = useAuth();
   const [pending, setPending] = useState(false);
   useEffect(() => {
-    getUserProfile()
-      .then((data) => {
-        if (data?.role === "pending_teacher") setPending(true);
-      })
-      .catch(() => { });
-  }, []);
+    if (!loading && profile?.role === "pending_teacher") {
+      setPending(true);
+    } else if (!loading) {
+      setPending(false);
+    }
+  }, [profile, loading]);
   return pending;
 }
 
@@ -212,7 +213,7 @@ export default function IntelligenceRow({
   const teacherRequestPending = useTeacherRequestPending();
   const [showCourseChange, setShowCourseChange] = useState(true);
   const [showTeacherRequest, setShowTeacherRequest] = useState(true);
-  const { summary, loading: profileLoading } = useProfileSummary();
+  const { profile, loading: profileLoading } = useAuth();
   const [edit, setEdit] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [layout, setLayout] = useState(() => {
@@ -268,8 +269,8 @@ export default function IntelligenceRow({
   const nextStepTxt = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
   const nextStepMeta = recommendation?.meta || null;
 
-  const weekly = !profileLoading ? summary?.weekly : null;
-  const streaks = !profileLoading ? summary?.streaks : null;
+  const weekly = !profileLoading ? profile?.summary?.weekly : null;
+  const streaks = !profileLoading ? profile?.summary?.streaks : null;
   const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
   const currentStreak = Number.isFinite(streaks?.current) && streaks.current > 0 ? `${streaks.current}-day streak` : null;
 

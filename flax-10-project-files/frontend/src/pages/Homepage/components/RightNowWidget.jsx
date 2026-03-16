@@ -224,12 +224,15 @@ function ConflictSummary({ conflicts, onDismiss }) {
   const label = overlapTime
     ? `Warning: Schedule overlap at ${overlapTime}`
     : `${count} schedule overlap${count === 1 ? "" : "s"} today`;
-  return (
-    <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
-      <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
-      <span className={styles.alertTextWarn}>{label}</span>
-    </motion.div>
-  );
+    return (
+        <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
+            <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
+            <span className={styles.alertTextWarn}>{label}</span>
+            <button type="button" className={styles.alertDismiss} onClick={onDismiss} aria-label="Dismiss warning">
+                <X size={12} strokeWidth={2} />
+            </button>
+        </motion.div>
+    );
 }
 
 function CommuteContextCard({ campus, journey, loading, leaveByInfo }) {
