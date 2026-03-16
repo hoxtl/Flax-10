@@ -488,6 +488,12 @@ function RatificationsTab() {
   const { currentPage, setCurrentPage, totalPages, pageItems } =
     usePaginatedItems(items);
 
+  const navigateToSociety = (societyId) => {
+    window.dispatchEvent(
+      new CustomEvent("navigate", { detail: `societies_${societyId}` }),
+    );
+  };
+
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -549,6 +555,8 @@ function RatificationsTab() {
                 className={styles.listRow}
                 variants={rowAnim}
                 layout
+                onClick={() => navigateToSociety(s.society_id ?? s.id)}
+                style={{ cursor: "pointer" }}
               >
                 <div className={styles.listInfo}>
                   <span className={styles.listName}>{s.name}</span>
@@ -561,14 +569,20 @@ function RatificationsTab() {
                   <button
                     className={styles.approveBtn}
                     disabled={busy === s.id}
-                    onClick={() => decide(s.id, "approve")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(s.id, "approve");
+                    }}
                   >
                     ✓ Approve
                   </button>
                   <button
                     className={styles.rejectBtn}
                     disabled={busy === s.id}
-                    onClick={() => decide(s.id, "reject")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(s.id, "reject");
+                    }}
                   >
                     ✗ Reject
                   </button>
@@ -582,7 +596,7 @@ function RatificationsTab() {
   );
 }
 
-function TeacherRequestsTab() {
+function TeacherRequestsTab({ onNavigate }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
@@ -650,6 +664,8 @@ function TeacherRequestsTab() {
                 className={styles.listRow}
                 variants={rowAnim}
                 layout
+                onClick={() => onNavigate?.(`profile_${u.id}`)}
+                style={{ cursor: "pointer" }}
               >
                 <div className={styles.listInfo}>
                   <span className={styles.listName}>
@@ -663,14 +679,20 @@ function TeacherRequestsTab() {
                   <button
                     className={styles.approveBtn}
                     disabled={busy === u.id}
-                    onClick={() => decide(u.id, "approve")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(u.id, "approve");
+                    }}
                   >
                     ✓ Approve
                   </button>
                   <button
                     className={styles.rejectBtn}
                     disabled={busy === u.id}
-                    onClick={() => decide(u.id, "reject")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(u.id, "reject");
+                    }}
                   >
                     ✗ Reject
                   </button>
@@ -821,7 +843,7 @@ function ReportedSocietiesTab() {
   );
 }
 
-function CourseChangeRequestsTab() {
+function CourseChangeRequestsTab({ onNavigate }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
@@ -889,6 +911,10 @@ function CourseChangeRequestsTab() {
                 className={styles.listRow}
                 variants={rowAnim}
                 layout
+                onClick={() => {
+                  if (r.user_id) onNavigate?.(`profile_${r.user_id}`);
+                }}
+                style={{ cursor: r.user_id ? "pointer" : "default" }}
               >
                 <div className={styles.listInfo}>
                   <span className={styles.listName}>
@@ -907,14 +933,20 @@ function CourseChangeRequestsTab() {
                   <button
                     className={styles.approveBtn}
                     disabled={busy === r.id}
-                    onClick={() => decide(r.id, "approve")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(r.id, "approve");
+                    }}
                   >
                     ✓ Approve
                   </button>
                   <button
                     className={styles.rejectBtn}
                     disabled={busy === r.id}
-                    onClick={() => decide(r.id, "reject")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(r.id, "reject");
+                    }}
                   >
                     ✗ Reject
                   </button>
@@ -966,9 +998,13 @@ function AdminPage({ onNavChange }) {
         <motion.div key={activeTab} {...fadeUp} className={styles.tabContent}>
           {activeTab === "users" && <UsersTab onNavigate={onNavChange} />}
           {activeTab === "ratifications" && <RatificationsTab />}
-          {activeTab === "teachers" && <TeacherRequestsTab />}
+          {activeTab === "teachers" && (
+            <TeacherRequestsTab onNavigate={onNavChange} />
+          )}
           {activeTab === "reports" && <ReportedSocietiesTab />}
-          {activeTab === "course-changes" && <CourseChangeRequestsTab />}
+          {activeTab === "course-changes" && (
+            <CourseChangeRequestsTab onNavigate={onNavChange} />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
