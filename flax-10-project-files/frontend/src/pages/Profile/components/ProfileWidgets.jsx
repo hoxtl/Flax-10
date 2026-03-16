@@ -329,9 +329,10 @@ export function AttendanceWidget() {
   };
 
   const attendanceLabel = isLowAttendance ? (
-    <div className={styles.attendanceWarning}>
-      ⚠️ Low Attendance ({Math.round(attendancePct)}%)
-    </div>
+            <div className={styles.attendanceWarning}>
+              <span className={styles.warningIcon}>⚡</span>
+              <span>Low Attendance ({Math.round(attendancePct)}%)</span>
+            </div>
   ) : null;
 
   return (
