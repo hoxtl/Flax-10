@@ -3,10 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.models.modules.moduleModel import Module
 from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
-from studyFlax.fixtures.data_fixtures import course_to_module_prefixes
-from studyFlax.views.modules.enrollment_logic import enroll_user_in_module
+from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get_modules_for_major
 
 def get_or_create_settings(user):
     settings, _ = UserSettings.objects.get_or_create(
@@ -30,16 +28,6 @@ def user_settings_view(request):
         serialized = UserSettingsSerialiser(settings).data
         return Response({**serialized, "settings": dict(serialized)})
     return apply_settings_updates(settings, request.data)
-
-def get_modules_for_major(major):
-    prefixes = course_to_module_prefixes.get(major, [])
-    if not prefixes:
-        return []
-    pattern = r'^(' + '|'.join(prefixes) + ')'
-    return list(Module.objects.filter(module_code__regex=pattern))
-
-def enroll_user_in_modules(user, modules):
-    return sum(1 for m in modules if enroll_user_in_module(user, m)[1])
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
