@@ -17,6 +17,7 @@ from .calendar.eventAttendanceModel import *
 from .modules.moduleModel import *
 from .modules.enrollmentModel import *
 from .modules.deadlineModel import *
+from .modules.readingModel import *
 
 # Notifications
 from .notifications.notificationModel import *

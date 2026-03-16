@@ -25,7 +25,8 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const inputRef = useRef(null);
   const cardRef = useRef(null);
   const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
-  return { sortedLists, title, setTitle, estimatedBlocks, setEstimatedBlocks, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate };
+  const [pageCount, setPageCount] = useState(null);
+  return { sortedLists, title, setTitle, estimatedBlocks, setEstimatedBlocks, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
 }
 
 function useEnrolledModulesEffect(setEnrolledModules) {
@@ -136,6 +137,8 @@ function useCreateTaskBarOptions(state) {
   return { moduleOptions, listOptions };
 }
 
+export const isReadingList = (list) => list?.name?.toLowerCase().includes('reading') ?? false;
+
 export default function useCreateTaskBar(props) {
   const { lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef } = props;
   const state = useCreateTaskBarFormState(lists, defaultListId, defaultDueDate);
@@ -146,5 +149,6 @@ export default function useCreateTaskBar(props) {
   const { handleSubmit } = useCreateTaskBarHandlers(state, onAddTask);
   const { handleInputBlur, handleInputKeyDown } = useCreateTaskBarInputHandlers(state);
   const { moduleOptions, listOptions } = useCreateTaskBarOptions(state);
-  return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions };
+  const selectedList = state.sortedLists.find(l => String(l.id) === (state.taskListId));  
+  return { ...state, handleSubmit, handleInputBlur, handleInputKeyDown, showOptions: state.inputFocused, moduleOptions, listOptions, isReadingList: isReadingList(selectedList) };
 }

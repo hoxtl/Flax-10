@@ -274,6 +274,7 @@ function ScrollGlobe({
             className={cx(
               styles.section,
               index === 0 ? styles.sectionFirst : "",
+              index === sections.length - 1 ? styles.sectionLast : "",
               section.align === "center" ? styles.sectionCenter : "",
               section.align === "right" ? styles.sectionRight : "",
               isAlternate ? styles.sectionAlternate : "",

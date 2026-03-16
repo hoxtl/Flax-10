@@ -16,7 +16,7 @@ import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 import { usePagination } from "../../hooks/usePagination";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 /** Exploratory view for the full directory of societies. */
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {

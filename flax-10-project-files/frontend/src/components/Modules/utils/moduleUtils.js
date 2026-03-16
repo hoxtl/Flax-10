@@ -115,8 +115,8 @@ export function serialiseModule(form_data) {
         description: form_data.description,
         department: form_data.department,
         course: form_data.course,
-        start_time: form_data.start_time,
-        end_time: form_data.end_time,
+        start_time: form_data.start_time ? new Date(form_data.start_time).toISOString() : '',
+        end_time: form_data.end_time ? new Date(form_data.end_time).toISOString() : '',
         location: form_data.location,
         is_recurring: form_data.is_recurring !== false
     };

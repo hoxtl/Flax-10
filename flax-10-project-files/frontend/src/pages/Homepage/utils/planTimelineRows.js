@@ -312,13 +312,16 @@ export function computePlanTimelineRows(sortedEvents, selectedDate, dayStart, da
   }
 
   const sorted = [...entries].sort((a, b) => (a.startMins ?? 0) - (b.startMins ?? 0));
-  const showNow = selectedDate && now && isToday(selectedDate);
-  const nowMins = showNow ? Math.max(0, (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes()) : null;
-  if (showNow && nowMins != null && nowMins >= 0) {
-    insertNowMarker(sorted, nowMins);
-  }
 
   addSpacing(sorted);
   const grouped = groupOverlappingEvents(sorted);
+
+  // Insert now-marker AFTER grouping so it doesn't split conflict groups
+  const showNow = selectedDate && now && isToday(selectedDate);
+  const nowMins = showNow ? Math.max(0, (now.getHours() - DAY_START_HOUR) * 60 + now.getMinutes()) : null;
+  if (showNow && nowMins != null && nowMins >= 0) {
+    insertNowMarker(grouped, nowMins);
+  }
+
   return injectHourMarks(grouped);
 }

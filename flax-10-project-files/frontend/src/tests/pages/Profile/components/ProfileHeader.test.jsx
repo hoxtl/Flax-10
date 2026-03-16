@@ -202,6 +202,21 @@ describe('ProfileHeader', () => {
     expect(document.body.textContent).toMatch(/·/);
   });
 
+  it('shows department and hides year for professors', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'echen', first_name: 'Eric', last_name: 'Chen', role: 'teacher' }}
+        profileData={{ year: 'Year 2', major: 'Spanish' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.getAllByText('Professor').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Department: Spanish').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Year 2/)).toBeNull();
+  });
+
   it('hides stats when visibility flags are false', () => {
     render(
       <ProfileHeader

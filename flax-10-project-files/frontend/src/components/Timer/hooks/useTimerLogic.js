@@ -9,7 +9,7 @@ export function useTimerLogic(activeTaskId, setActiveTaskId, activeTaskMeta) {
   const t = useTimer();
   const [task, setTask] = useState('');
   const notify = useNotify();
-  const { modal, setModal, startNext, resetBlockId, endEarly } = useTimerFlow({ ...t, task }, notify);
+  const { modal, setModal, startNext, resetBlockId, endEarly } = useTimerFlow({ ...t, task, activeTaskId}, notify);
   const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly);
   const ot = t.timeLeft <= 0;
 
