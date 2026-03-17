@@ -5,7 +5,7 @@ Public re-exports for the serialisers package.
 from .calendar.event_serialisers import CalendarEventSerialiser, CalendarEventCreateSerialiser
 from .calendar.tag_serialisers import TagSerialiser, CategorySerialiser
 from .calendar.deadline_serialisers import DeadlineSerialiser
-from .modules.module_serialiser import ModuleSerialiser
+from .modules.module_serialisers import ModuleSerialiser
 from .modules.enrollment_serialisers import EnrollmentSerialiser
 from .auth.auth_serialisers import RegistrationUserSerialiser, UserSerialiser, LoggedUserSerialiser
 from .notifications.notification_serialisers import NotificationSerialiser

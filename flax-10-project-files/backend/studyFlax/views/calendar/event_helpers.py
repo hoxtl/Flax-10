@@ -10,6 +10,8 @@ from types import SimpleNamespace
 
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
+MAX_SIMULTANEOUS_OVERLAPS = 3
+
 def filter_events_by_date_range(queryset, params):
     start = params.get('start')
     end = params.get('end')
@@ -20,10 +22,16 @@ def filter_events_by_date_range(queryset, params):
 
 def _apply_start_end_filter(qs, start, end, recurring_qs, non_recurring_qs):
     overlap = Q(start_time__lte=end) & Q(end_time__gte=start)
-    return qs.filter((non_recurring_qs & overlap) | (recurring_qs & Q(start_time__lte=end)))
+    base = non_recurring_qs & overlap
+    if recurring_qs is not None:
+        return qs.filter(base | (recurring_qs & Q(start_time__lte=end)))
+    return qs.filter(base)
 
 def _apply_start_only_filter(qs, start, recurring_qs, non_recurring_qs):
-    return qs.filter(Q(end_time__gte=start) | recurring_qs)
+    base = Q(end_time__gte=start)
+    if recurring_qs is not None:
+        return qs.filter(base | recurring_qs)
+    return qs.filter(base)
 
 def apply_filter(qs, start, end, recurring_qs):
     non_recurring_qs = Q(recurrence_rule__isnull=True)
@@ -121,6 +129,15 @@ def _build_instance(base, start, dur, idx):
 def check_event_overlap(user, data):
     s, e = data['start_time'], data['end_time']
     return user.events.filter(start_time__lt=e, end_time__gt=s).exists()
+
+def overlap_count(user, start_time, end_time, exclude_id=None):
+    qs = user.events.filter(start_time__lt=end_time, end_time__gt=start_time)
+    if exclude_id:
+        qs = qs.exclude(id=exclude_id)
+    return qs.count()
+
+def exceeds_overlap_limit(user, start_time, end_time, exclude_id=None):
+    return overlap_count(user, start_time, end_time, exclude_id) >= MAX_SIMULTANEOUS_OVERLAPS
 
 def parse_date_param(ds):
     return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None

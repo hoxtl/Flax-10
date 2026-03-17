@@ -24,6 +24,15 @@ def _do_reset(token_str, new_password):
     token.save()
     return user
 
+def _handle_reset_error(exc):
+    if isinstance(exc, DatabaseError):
+        logger.error("Database issue during password reset")
+        logger.debug("Error details", exc_info=exc)
+        return Response({'error': 'Unable to update credentials now. Please try again shortly.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    logger.error("Unexpected error during password reset")
+    logger.debug("Error details", exc_info=exc)
+    return Response({'error': 'An unexpected error occurred. Please try again.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 @api_view(['POST'])
 def confirm_password_reset_view(request):
     """Confirm a token-based password reset and update the user's password."""
@@ -38,7 +47,5 @@ def confirm_password_reset_view(request):
         return Response({'error': 'The reset link expired or has been used already...'}, status=status.HTTP_400_BAD_REQUEST)
     except ResetPasswordToken.DoesNotExist:
         return Response({'error': 'Reset link does not exist...'}, status=status.HTTP_400_BAD_REQUEST)
-    except DatabaseError as exc:
-        logger.error("Database issue during password reset")
-        logger.debug("Error details", exc_info=exc)
-        return Response({'error': 'Unable to update credentials now. Please try again shortly.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    except (DatabaseError, Exception) as exc:
+        return _handle_reset_error(exc)

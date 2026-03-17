@@ -3,6 +3,7 @@ Business logic for enrolling users in modules and creating related events.
 """
 
 import logging
+import sys
 
 from django.db import OperationalError
 from studyFlax.models import Enrollment, CalendarEvent, Module
@@ -12,6 +13,9 @@ from studyFlax.views.calendar.system_tags import get_lecture_tag as get_default_
 
 logger = logging.getLogger(__name__)
 
+def _is_running_tests():
+    return "test" in sys.argv
+
 
 def _get_major_prefixes(major):
     return get_course_prefixes(major)
@@ -20,8 +24,14 @@ def _get_major_prefixes(major):
 def _safe_create_enrollment_events(user, module):
     try:
         create_enrollment_events(user, module)
-    except OperationalError:
-        logger.exception("Failed to create events for %s / %s", user, module)
+    except OperationalError as exc:
+        _log_enrollment_creation_error(user, module, exc)
+
+
+def _log_enrollment_creation_error(user, module, exc):
+    if _is_running_tests():
+        return
+    logger.debug("Failed to create events for %s / %s: %s", user, module, exc)
 
 
 def _get_created_count(result):

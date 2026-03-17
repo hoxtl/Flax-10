@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 
 import { getUserSettings } from "../../../../api/userService";
 import { isToday } from "../../../../components/Calendar/utils/dateUtils";
+import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
 import { DAY_START_HOUR, DAY_END_HOUR } from "../../utils/timelineUtils";
 import { formatTime } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
@@ -323,7 +324,7 @@ export function MiniTimeline({
             {renderRow(row)}
           </motion.div>
         ))}
-        {eventCtxMenu && (
+        {eventCtxMenu && !isReadOnlyEvent(eventCtxMenu.eventItem) && (
           <EventContextMenu
             eventItem={eventCtxMenu.eventItem}
             pos={{ x: eventCtxMenu.x, y: eventCtxMenu.y }}

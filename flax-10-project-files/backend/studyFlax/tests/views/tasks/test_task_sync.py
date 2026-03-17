@@ -17,7 +17,7 @@ class SyncCalendarEventForTaskTest(TestCase):
         self.user = make_user()
 
     def test_sync_creates_event_for_task_with_due_date(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Due Task', due_date=due)
         sync_calendar_event_for_task(task)
@@ -26,7 +26,7 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_deletes_event_when_completed(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Completed', due_date=due, completed=True)
         CalendarEvent.objects.create(
@@ -39,7 +39,7 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_deletes_event_when_no_due_date(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'NoDue')
         CalendarEvent.objects.create(
@@ -52,7 +52,7 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_uses_estimated_blocks_for_duration(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Blocks', due_date=due, estimated_blocks=4)
         sync_calendar_event_for_task(task)
@@ -61,7 +61,7 @@ class SyncCalendarEventForTaskTest(TestCase):
         self.assertEqual(duration, 100)
 
     def test_sync_updates_existing_event(self):
-        from studyFlax.views.tasks.task_views import sync_calendar_event_for_task
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Existing', due_date=due)
         CalendarEvent.objects.create(

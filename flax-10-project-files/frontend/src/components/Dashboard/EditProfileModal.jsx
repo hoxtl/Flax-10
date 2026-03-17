@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
 import { updateUserProfile } from '../../api/userService';
 import { getInitials } from '../Authentication/utils/userUtils';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 import FormField from '../common/FormField/FormField';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';
@@ -9,15 +10,26 @@ import TextInput from '../common/TextInput/TextInput';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
+function resolveProfilePhoto(user) {
+  return getResolvedUserPhoto(user, {
+    allowGeneric: false,
+    seed: user?.username || user?.id || user?.name,
+  });
+}
+
 function useProfileForm(user) {
   const [username, setUsername] = useState(user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(user?.profile_photo_url || null);
+  const [previewUrl, setPreviewUrl] = useState(resolveProfilePhoto(user));
   const [removePhoto, setRemovePhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  useEffect(() => {
+    setPreviewUrl(resolveProfilePhoto(user));
+    setRemovePhoto(false);
+  }, [user]);
   return { username, setUsername, bio, setBio, profilePhoto, setProfilePhoto, previewUrl, setPreviewUrl, removePhoto, setRemovePhoto, loading, setLoading, error, setError, success, setSuccess };
 }
 
@@ -109,13 +121,13 @@ function PhotoActions({ previewUrl, profilePhotoUrl, onChange, onRemove }) {
   );
 }
 
-function PhotoSection({ previewUrl, initials, user, onPhotoChange, onRemovePhoto }) {
+function PhotoSection({ previewUrl, initials, canRemovePhoto, onPhotoChange, onRemovePhoto }) {
   return (
     <div className={styles.photoSection}>
       <div className={styles.photoPreview}>
         <PhotoPreview previewUrl={previewUrl} initials={initials} />
       </div>
-      <PhotoActions previewUrl={previewUrl} profilePhotoUrl={user?.profile_photo_url} onChange={onPhotoChange} onRemove={onRemovePhoto} />
+      <PhotoActions previewUrl={previewUrl} profilePhotoUrl={canRemovePhoto ? previewUrl : null} onChange={onPhotoChange} onRemove={onRemovePhoto} />
     </div>
   );
 }
@@ -150,11 +162,12 @@ function ModalForm({ form, user, onClose, onSubmit }) {
   const initials = user?.name ? getInitials(user.name) : username.substring(0, 2).toUpperCase();
   const onPhotoChange = (e) => handlePhotoChange(e, setProfilePhoto, setPreviewUrl, setRemovePhoto);
   const onRemovePhoto = () => handleRemovePhoto(setProfilePhoto, setPreviewUrl, setRemovePhoto);
+  const canRemovePhoto = Boolean(previewUrl);
   return (
     <form onSubmit={onSubmit} className={styles.form}>
       {success && <div className={styles.success}>{success}</div>}
       {error && <div className={styles.error}>{error}</div>}
-      <PhotoSection previewUrl={previewUrl} initials={initials} user={user} onPhotoChange={onPhotoChange} onRemovePhoto={onRemovePhoto} />
+      <PhotoSection previewUrl={previewUrl} initials={initials} canRemovePhoto={canRemovePhoto} onPhotoChange={onPhotoChange} onRemovePhoto={onRemovePhoto} />
       <UsernameField username={username} setUsername={setUsername} />
       <BioField bio={bio} setBio={setBio} />
       <FormActions loading={loading} onClose={onClose} />

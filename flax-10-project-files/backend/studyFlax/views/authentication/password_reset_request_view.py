@@ -60,4 +60,6 @@ def reset_password_view(request):
         logger.warning("No user with such email found")
     except EMAIL_SEND_ERRORS as exc:
         return _email_error_response(exc)
+    except Exception as exc:
+        return _email_error_response(exc)
     return Response({'message': "Reset password email sent."}, status=status.HTTP_200_OK)

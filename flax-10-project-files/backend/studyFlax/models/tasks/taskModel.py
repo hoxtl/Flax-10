@@ -5,7 +5,7 @@ from django.db import models
 
 from studyFlax.models.auth.userModel import User
 from studyFlax.models.constants import PRIORITY_CHOICES
-from studyFlax.models.groupwork.groupwork_models import GroupProject
+from studyFlax.models.groupwork.groupworkModel import GroupProject
 from studyFlax.models.modules.moduleModel import Module
 
 class TaskList(models.Model):

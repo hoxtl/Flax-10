@@ -9,9 +9,9 @@ class StudySessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudySession
         fields = [
-            'id', 'start_time', 'end_time', 'duration', 
-            'break_duration', 'session_count', 'study_block_id', 
-            'task', 'status', 'created_at'
+            'id', 'start_time', 'end_time', 'duration',
+            'pause_duration', 'break_duration', 'session_count',
+            'study_block_id', 'task', 'status', 'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'user']
 
