@@ -109,10 +109,4 @@
   color: var(--muted);
 }
 
-.empty {
-  margin: var(--space-6) 0;
-  text-align: center;
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
 
