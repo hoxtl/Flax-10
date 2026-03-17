@@ -39,6 +39,7 @@ from .seed_helpers import (
     build_lecture_events, create_lecture_event, build_deadlines_for_module,
     create_deadline_calendar_event, build_study_sessions_for_user,
     build_theme_sessions_for_user, build_readings_for_module, build_reading_user_history_,
+    seed_attendance_for_user,
 )
 from studyFlax.models.timer.sessionModel import StudySession
 from studyFlax.models.timer.themeSessionModel import ThemeSession
@@ -802,6 +803,8 @@ class Command(BaseCommand):
         self._seed_reading_history_janedoe()
         self._seed_reading_history_random_students()
         self.stdout.write( f" {Reading.objects.count()} total readings in database.")
+        self.stdout.write("Seeding attendance records..")
+        self._seed_attendance()
     
     def _seed_readings_for_modules(self):
         readings = []
@@ -836,8 +839,16 @@ class Command(BaseCommand):
         count = sum(1 for s in sample if self._seed_reading_history_user(s) > 0)
         self.stdout.write(f" {count} random students seeded with reading history.")
 
+    def _seed_attendance(self):
+        """Seed EventAttendance records for all student users with past timetable events."""
+        from studyFlax.models import EventAttendance
+        students = list(User.objects.filter(role='student'))
+        total = sum(seed_attendance_for_user(s) for s in students)
+        self.stdout.write(f" {total} attendance records seeded across {len(students)} students.")
+
     def print_stats(self):
         """Print a summary of all fixture users and database record counts."""
+        from studyFlax.models import EventAttendance
         div = "─" * 40
         self.stdout.write(self.style.SUCCESS(div))
         self.stdout.write(self.style.SUCCESS("  Seeding complete"))
@@ -857,7 +868,8 @@ class Command(BaseCommand):
             ("Tags",        Tag.objects.count()),
             ("Events",      CalendarEvent.objects.count()),
             ("Societies",   Society.objects.count()),
-            ("Readings",   Reading.objects.count()),
+            ("Readings",    Reading.objects.count()),
+            ("Attendance",  EventAttendance.objects.count()),
         ]
         for label, count in stats:
             self.stdout.write(f"  {label:<14}  {count}")

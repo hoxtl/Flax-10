@@ -354,7 +354,13 @@ def create_lecture_event(user, module, start, end, lecture_tag):
 
     Uses get_or_create keyed on (user, title, start_time) so that
     re-running the seed command never duplicates events.
+    A deterministic external_id is assigned so EventAttendance can be recorded.
     """
+    import uuid
+    external_id = str(uuid.uuid5(
+        uuid.NAMESPACE_OID,
+        f"{user.pk}:{module.module_code}:{start.isoformat()}",
+    ))
     CalendarEvent.objects.get_or_create(
         user=user,
         title=f"Lecture: {module.module_name}",
@@ -367,7 +373,8 @@ def create_lecture_event(user, module, start, end, lecture_tag):
             'priority': 'high',
             'recurrence_rule': None,
             'module': module,
-            'source': 'module_enrollment',
+            'source': 'timetable',
+            'external_id': external_id,
         },
     )
 
@@ -651,3 +658,35 @@ def build_reading_user_history_(user, modules, reading_list):
         if task: 
             tasks.append(task)
     return tasks
+
+
+def seed_attendance_for_user(user):
+    """Bulk-create EventAttendance records for all past timetable events belonging to *user*.
+
+    Only creates records that do not already exist. Randomly marks ~75 % as attended
+    to produce realistic chart data.
+    """
+    from studyFlax.models import EventAttendance
+    now = timezone.now()
+    past_events = (
+        CalendarEvent.objects.filter(
+            user=user,
+            source='timetable',
+            end_time__lt=now,
+        ).exclude(external_id=None).exclude(external_id='')
+    )
+    existing_ids = set(
+        EventAttendance.objects.filter(user=user).values_list('event_id', flat=True)
+    )
+    records = []
+    for event in past_events:
+        if event.pk in existing_ids:
+            continue
+        records.append(EventAttendance(
+            user=user,
+            event=event,
+            attended=random.random() < 0.75,
+        ))
+    if records:
+        EventAttendance.objects.bulk_create(records, ignore_conflicts=True)
+    return len(records)
