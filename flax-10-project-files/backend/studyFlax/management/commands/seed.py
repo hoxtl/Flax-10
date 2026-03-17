@@ -24,9 +24,9 @@ from studyFlax.models import (
     Module, Enrollment, Deadline, Reading,
     Society,
 )
-from studyFlax.models.tasks.task_model import Task, TaskList
-from studyFlax.models.groupwork.groupwork_model import GroupProject
-from studyFlax.models.calendar.event_attendance_model import EventAttendance
+from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.groupwork.groupworkModel import GroupProject
+from studyFlax.models.calendar.eventAttendanceModel import EventAttendance
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     MODULE_PILL_COLORS, lecture_theatre_fixtures,
@@ -317,16 +317,16 @@ class Command(BaseCommand):
         self.stdout.write(f" {count} random students seeded with reading history.")
 
     def _seed_attendance(self):
+        _EA = EventAttendance
         now = timezone.now()
         students = list(User.objects.filter(role='student'))
-        events_created = attendance_created = 0
+        weeks_back = int((now - _ATT_SEED_START).days / 7)
 
+        # Build all session data up-front (no DB queries yet)
+        all_session_data = []  # (user, profile, session_dict)
         for user in students:
             profile = _ATT_USER_PROFILES.get(user.username, random.choice(_ATT_RANDOM_PROFILES))
             modules = [e.module for e in Enrollment.objects.filter(student=user).select_related('module')]
-            if not modules:
-                continue
-            weeks_back = int((now - _ATT_SEED_START).days / 7)
             for module in modules:
                 for week_offset in range(weeks_back + 1):
                     week_start = _ATT_SEED_START + timedelta(weeks=week_offset)
@@ -335,24 +335,51 @@ class Command(BaseCommand):
                     for s in _att_week_sessions(module.module_code, week_start):
                         if s['start'] >= now:
                             continue
-                        event, created = CalendarEvent.objects.get_or_create(
-                            user=user, source=s['source'], external_id=s['external_id'],
-                            defaults={
-                                'title': s['title'], 'description': s['description'],
-                                'start_time': s['start'], 'end_time': s['end'],
-                                'location': s['location'], 'priority': 'high',
-                            },
-                        )
-                        if created:
-                            events_created += 1
-                        base = profile['attend_rate']
-                        adjusted = profile['type_bias'].get(s['type_label'], base)
-                        attended = (_stable_hash(f"{user.username}:{s['external_id']}") % 1000) / 1000.0 < adjusted
-                        _, att_created = EventAttendance.objects.get_or_create(
-                            user=user, event=event, defaults={'attended': attended},
-                        )
-                        if att_created:
-                            attendance_created += 1
+                        all_session_data.append((user, profile, s))
+
+        # Bulk-create missing CalendarEvents
+        existing_keys = set(
+            CalendarEvent.objects.filter(source='timetable').values_list('user_id', 'external_id')
+        )
+        new_events = [
+            CalendarEvent(
+                user=user, source=s['source'], external_id=s['external_id'],
+                title=s['title'], description=s['description'],
+                start_time=s['start'], end_time=s['end'],
+                location=s['location'], priority='high',
+            )
+            for user, _profile, s in all_session_data
+            if (user.pk, s['external_id']) not in existing_keys
+        ]
+        CalendarEvent.objects.bulk_create(new_events, ignore_conflicts=True)
+        events_created = len(new_events)
+
+        # Re-fetch all relevant events keyed by (user_id, external_id)
+        all_ext_ids = {s['external_id'] for _u, _p, s in all_session_data}
+        event_map = {
+            (e.user_id, e.external_id): e
+            for e in CalendarEvent.objects.filter(source='timetable', external_id__in=all_ext_ids)
+        }
+
+        # Bulk-create missing EventAttendance records
+        existing_att = set(
+            _EA.objects.filter(
+                event__source='timetable', event__external_id__in=all_ext_ids,
+            ).values_list('user_id', 'event_id')
+        )
+        new_att = []
+        for user, profile, s in all_session_data:
+            event = event_map.get((user.pk, s['external_id']))
+            if event is None:
+                continue
+            if (user.pk, event.pk) in existing_att:
+                continue
+            base = profile['attend_rate']
+            adjusted = profile['type_bias'].get(s['type_label'], base)
+            attended = (_stable_hash(f"{user.username}:{s['external_id']}") % 1000) / 1000.0 < adjusted
+            new_att.append(_EA(user=user, event=event, attended=attended))
+        _EA.objects.bulk_create(new_att, ignore_conflicts=True)
+        attendance_created = len(new_att)
 
         self.stdout.write(f"  Created {events_created} timetable events and {attendance_created} attendance records.")
 
