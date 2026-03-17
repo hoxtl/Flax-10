@@ -9,6 +9,12 @@ import styles from "./TaskBoardView.module.css";
 
 // --- Sub-components (Restored & Refactored) ---
 
+function filterAssignees(assignees, members) {
+  if (!Array.isArray(assignees) || !Array.isArray(members)) return assignees || [];
+  const memberIds = new Set(members.map(m => String(m.user)));
+  return assignees.filter(a => memberIds.has(String(a.id)));
+}
+
 function CardHeader({ t, pColor, onUpdate, onDelete }) {
     const onChange = (e) => onUpdate(t.id, { priority: e.target.value });
     return (
@@ -41,16 +47,23 @@ function BoardCard({ t, isDone, pColor, onUpdate, onDelete, members, handleDragS
     const triggerRef = useRef(null);
     const togglePopup = (e) => { e.stopPropagation(); setShowAssignPopup(v => !v); };
     const onCtxMenu = e => { e.preventDefault(); setShowAssignPopup(true); };
-    const toggleAssignee = buildToggleAssignee(t.assignees_info || [], t.id, onUpdate);
+    const visibleAssignees = filterAssignees(t.assignees_info || [], members);
+    const toggleAssignee = buildToggleAssignee(visibleAssignees, t.id, onUpdate);
 
     return (
         <div className={`${styles.boardCard} ${isDone ? styles.boardCardDone : ""} ${showAssignPopup ? styles.boardCardActive : ""}`}
             draggable onDragStart={(e) => handleDragStart(e, t.id)} onContextMenu={onCtxMenu}>
             <CardHeader t={t} pColor={pColor} onUpdate={onUpdate} onDelete={onDelete} />
             <div className={styles.cardTitle}>{t.title}</div>
-            <CardFooter t={t} assignees={t.assignees_info || []} onUpdate={onUpdate} triggerRef={triggerRef} togglePopup={togglePopup} />
-            <TaskAssigneePopup isOpen={showAssignPopup} onClose={() => setShowAssignPopup(false)} members={members}
-                assignees={t.assignees_info || []} onToggleAssignee={toggleAssignee} triggerRef={triggerRef} />
+            <CardFooter t={t} assignees={visibleAssignees} onUpdate={onUpdate} triggerRef={triggerRef} togglePopup={togglePopup} />
+            <TaskAssigneePopup
+                isOpen={showAssignPopup}
+                onClose={() => setShowAssignPopup(false)}
+                members={members}
+                assignees={visibleAssignees}
+                onToggleAssignee={toggleAssignee}
+                triggerRef={triggerRef}
+            />
         </div>
     );
 }
