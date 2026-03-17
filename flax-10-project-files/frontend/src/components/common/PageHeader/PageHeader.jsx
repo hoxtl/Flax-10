@@ -1,5 +1,5 @@
-import { ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import BackButton from "../BackButton/BackButton.jsx";
 import styles from "./PageHeader.module.css";
 
 /**
@@ -20,9 +20,7 @@ export default function PageHeader({ title, subtitle, action, onBack, compact = 
     >
       <div className={styles.leftGroup}>
         {onBack && (
-          <button className={styles.backButton} onClick={onBack} aria-label="Go back">
-            <ArrowLeft size={18} strokeWidth={2.5} />
-          </button>
+          <BackButton onClick={onBack} className={styles.backButton} />
         )}
         <div className={styles.titleGroup}>
           <h1 className={styles.title}>{title}</h1>

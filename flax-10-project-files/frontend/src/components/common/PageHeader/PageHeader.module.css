@@ -40,18 +40,7 @@
 }
 
 .backButton {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-lg);
-  color: var(--text-secondary);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+  margin-right: -4px;
 }
 
 .backButton:hover {
