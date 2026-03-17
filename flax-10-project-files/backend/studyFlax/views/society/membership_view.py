@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.society import SocietyMembership, SocietyCalendarSync
-from studyFlax.models.auth.userModel import User
+from studyFlax.models.auth.user_model import User
 from studyFlax.serialisers import SocietyMembershipSerialiser
 from .helpers import (
     get_society_or_404, get_membership, is_society_admin,

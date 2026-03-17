@@ -5,7 +5,7 @@ import secrets
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
-from .userModel import User
+from .user_model import User
 
 class ResetPasswordToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reset_tokens')

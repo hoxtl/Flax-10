@@ -9,9 +9,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 
 User = get_user_model()
 

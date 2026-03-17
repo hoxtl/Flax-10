@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.society.societyEventModel import SocietyEvent
+from studyFlax.models.society.society_event_model import SocietyEvent
 from studyFlax.tests.helpers.factories import make_society, make_society_admin, make_society_member
 
 User = get_user_model()

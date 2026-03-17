@@ -2,7 +2,7 @@
 Model storing external timetable feed URLs and sync state per user.
 """
 from django.db import models
-from ..auth.userModel import User
+from ..auth.user_model import User
 
 class TimetableSource(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

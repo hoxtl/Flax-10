@@ -2,7 +2,7 @@
 Model for reading assignments linked to a module with page range and deadline.
 """
 from django.db import models
-from .moduleModel import Module
+from .module_model import Module
 
 class Reading(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='readings')

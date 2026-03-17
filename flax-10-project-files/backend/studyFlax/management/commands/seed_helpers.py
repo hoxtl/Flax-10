@@ -487,7 +487,7 @@ def build_study_sessions_for_user(user, profile='balanced'):
       'consistent' – high volume, long streaks                     (random fixture users)
       'power_user' – studies every day, long sessions, heavy volume
     """
-    from studyFlax.models.timer.sessionModel import StudySession
+    from studyFlax.models.timer.session_model import StudySession
     now      = timezone.now()
     sessions = []
     # profile-specific knobs
@@ -560,7 +560,7 @@ def build_theme_sessions_for_user(user, profile='balanced'):
       'night_owl'  – mostly dark, especially evenings (20-23h)
       'consistent' – mixed, slight light preference
     """
-    from studyFlax.models.timer.themeSessionModel import ThemeSession
+    from studyFlax.models.timer.theme_session_model import ThemeSession
 
     now      = timezone.now()
     sessions = []

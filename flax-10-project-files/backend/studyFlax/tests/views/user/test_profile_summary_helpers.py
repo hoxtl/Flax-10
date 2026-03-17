@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.timer.session_model import StudySession
 
 User = get_user_model()
 

@@ -9,9 +9,9 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory
 
-from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.tasks.taskModel import Task
+from studyFlax.models.auth.user_settings_model import UserSettings
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.tasks.task_model import Task
 
 User = get_user_model()
 
@@ -146,8 +146,8 @@ class SerializerCoverageTest(TestCase):
 
     def test_society_event_serialiser_announcement_prefix(self):
         from studyFlax.serialisers.society.society_serialisers import SocietyEventSerialiser
-        from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
-        from studyFlax.models.society.societyEventModel import SocietyEvent
+        from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
+        from studyFlax.models.society.society_event_model import SocietyEvent
         society = Society.objects.create(name='PrefixSoc', bio='bio', admin_emails='a@b.com')
         ann = SocietyAnnouncement.objects.create(society=society, title='Announcement', content='Body')
         event = SocietyEvent.objects.create(

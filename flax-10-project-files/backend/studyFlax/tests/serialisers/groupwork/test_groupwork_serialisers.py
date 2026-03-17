@@ -1,4 +1,4 @@
-from studyFlax.models.groupwork.groupworkModel import GroupMembership, GroupProject
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.serialisers.tasks.groupwork_serialisers import (
     GroupMembershipSerialiser,
 )

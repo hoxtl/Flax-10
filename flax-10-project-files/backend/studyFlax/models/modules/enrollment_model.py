@@ -2,8 +2,8 @@
 Model representing a student's enrollment in a module.
 """
 from django.db import models
-from ..auth.userModel import User
-from .moduleModel import Module
+from ..auth.user_model import User
+from .module_model import Module
 
 class Enrollment(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enrollments")

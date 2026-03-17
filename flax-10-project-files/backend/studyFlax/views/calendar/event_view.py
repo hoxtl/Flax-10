@@ -10,7 +10,7 @@ from studyFlax.serialisers.calendar.event_serialisers import (
     CalendarEventSerialiser,
     CalendarEventCreateSerialiser
 )
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models import User
 from .event_helpers import (
     check_event_overlap,
@@ -37,7 +37,7 @@ def event_list(request):
     return create_event(request)
 
 def _calendar_is_shared(owner, viewer):
-    from studyFlax.models.social.shareModel import CalendarShare
+    from studyFlax.models.social.share_model import CalendarShare
     return CalendarShare.objects.filter(owner=owner, shared_with=viewer).exists()
 
 def _log_timetable_sync_error(exc):

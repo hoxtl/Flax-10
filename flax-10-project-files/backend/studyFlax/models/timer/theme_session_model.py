@@ -2,7 +2,7 @@
 Model tracking which UI theme a user was using during a timed session.
 """
 from django.db import models
-from ..auth.userModel import User
+from ..auth.user_model import User
 
 class ThemeSession(models.Model):
     THEME_CHOICES = [('light', 'Light'), ('dark', 'Dark')]

@@ -10,9 +10,9 @@ from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
 
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
 from studyFlax.models.society import SocietyMembership
 from studyFlax.views.analytics.session_analytics_service import compute_peak_hour, compute_recent_active_days, compute_streaks
 

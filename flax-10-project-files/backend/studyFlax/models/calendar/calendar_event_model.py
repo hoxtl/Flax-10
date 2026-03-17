@@ -3,10 +3,10 @@ Model representing a user's calendar event with recurrence, tags, and priority.
 """
 from django.db import models
 
-from ..auth.userModel import User
+from ..auth.user_model import User
 from ..constants import PRIORITY_CHOICES
-from .recurrenceRuleModel import RecurrenceRule
-from .tagModel import Tag
+from .recurrence_rule_model import RecurrenceRule
+from .tag_model import Tag
 
 class CalendarEvent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='events')

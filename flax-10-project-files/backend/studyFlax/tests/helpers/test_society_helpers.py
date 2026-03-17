@@ -7,9 +7,9 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
 
-from studyFlax.models.society.societyImageModel import SocietyImage
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.society_image_model import SocietyImage
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_model import Society
 
 User = get_user_model()
 

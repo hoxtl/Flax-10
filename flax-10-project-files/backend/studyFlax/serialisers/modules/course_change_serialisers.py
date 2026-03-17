@@ -3,7 +3,7 @@ Serialisers for course change requests.
 """
 
 from rest_framework import serializers
-from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
 
 class CourseChangeRequestSerialiser(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id', read_only=True)

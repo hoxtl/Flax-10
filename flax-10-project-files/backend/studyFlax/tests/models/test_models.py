@@ -8,19 +8,19 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 from studyFlax.models import Tag, Category, RecurrenceRule
-from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.calendar.eventAttendanceModel import EventAttendance
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyReportModel import SocietyReport
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
-from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
-from studyFlax.models.society.societyEventModel import SocietyEvent
-from studyFlax.models.society.societyImageModel import SocietyImage
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyTagModel import SocietyTag
-from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.calendar.event_attendance_model import EventAttendance
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_report_model import SocietyReport
+from studyFlax.models.society.society_announcement_model import SocietyAnnouncement, SocietyAnnouncementImage
+from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
+from studyFlax.models.society.society_event_model import SocietyEvent
+from studyFlax.models.society.society_image_model import SocietyImage
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_tag_model import SocietyTag
+from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.admin import ReportedSociety, ReportedSocietyAdmin
 
 User = get_user_model()

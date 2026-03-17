@@ -2,7 +2,7 @@
 Model for tracking user requests to change their enrolled course.
 """
 from django.db import models
-from .userModel import User
+from .user_model import User
 
 class CourseChangeRequest(models.Model):
     STATUS_CHOICES = [

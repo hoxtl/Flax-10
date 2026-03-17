@@ -1,8 +1,8 @@
-from studyFlax.models.groupwork.groupworkModel import (
+from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
 )
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.tests.helpers.base import BaseTestCase
 from studyFlax.tests.helpers.factories import make_user
 

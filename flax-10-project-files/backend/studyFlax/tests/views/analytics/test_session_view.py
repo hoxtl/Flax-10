@@ -5,8 +5,8 @@ Backend tests for session views.
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from studyFlax.models.auth.userModel import User
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.auth.user_model import User
+from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionViewTest(APITestCase):
     """Tests for study session view."""

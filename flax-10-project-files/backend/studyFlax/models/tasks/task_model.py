@@ -3,10 +3,10 @@ Models for task lists and individual tasks with priority, status, and scheduling
 """
 from django.db import models
 
-from studyFlax.models.auth.userModel import User
+from studyFlax.models.auth.user_model import User
 from studyFlax.models.constants import PRIORITY_CHOICES
-from studyFlax.models.groupwork.groupworkModel import GroupProject
-from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.groupwork.groupwork_model import GroupProject
+from studyFlax.models.modules.module_model import Module
 
 class TaskList(models.Model):
     CATEGORY_CHOICES = [

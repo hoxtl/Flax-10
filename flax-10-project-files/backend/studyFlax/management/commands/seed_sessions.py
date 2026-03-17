@@ -4,8 +4,8 @@ Orchestrates bulk creation of study sessions and theme sessions.
 
 from django.contrib.auth import get_user_model
 
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from .seed_session_helpers import build_study_sessions_for_user, build_theme_sessions_for_user
 
 User = get_user_model()

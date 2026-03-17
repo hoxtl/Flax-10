@@ -10,7 +10,7 @@ from unittest.mock import patch
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
+from studyFlax.models.auth.reset_password_token_model import ResetPasswordToken
 
 from django.contrib.auth import get_user_model
 

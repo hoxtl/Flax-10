@@ -3,8 +3,8 @@ Model for event tags with colour, icon, and default duration.
 """
 from django.db import models
 
-from ..auth.userModel import User
-from .categoryModel import Category
+from ..auth.user_model import User
+from .category_model import Category
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)

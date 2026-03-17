@@ -11,7 +11,7 @@ from studyFlax.serialisers.calendar.event_serialisers import (
     CalendarEventSerialiser,
     CalendarEventCreateSerialiser
 )
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from .event_helpers import exceeds_overlap_limit
 
 @api_view(['GET', 'PUT', 'DELETE'])

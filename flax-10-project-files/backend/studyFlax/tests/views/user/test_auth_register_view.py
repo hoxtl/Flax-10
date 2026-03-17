@@ -7,7 +7,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 User = get_user_model()
 

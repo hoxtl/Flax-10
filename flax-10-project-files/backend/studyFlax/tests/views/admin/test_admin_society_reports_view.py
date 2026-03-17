@@ -5,10 +5,10 @@ Tests for admin society report workflows.
 from django.test import TestCase
 from rest_framework import status
 
-from studyFlax.models.notifications.notificationModel import Notification
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyReportModel import SocietyReport
+from studyFlax.models.notifications.notification_model import Notification
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
 
 

@@ -8,8 +8,8 @@ from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from studyFlax.models.tasks.taskModel import Task
-from studyFlax.models.groupwork.groupworkModel import GroupProject, GroupMembership
+from studyFlax.models.tasks.task_model import Task
+from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMembership
 from studyFlax.fixtures.groupwork_fixtures import GROUP_PROJECT_FIXTURES, GROUP_TASK_TEMPLATES
 
 User = get_user_model()

@@ -5,9 +5,9 @@ Backend tests for deadline model.
 from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
-from studyFlax.models.auth.userModel import User
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.deadlineModel import Deadline
+from studyFlax.models.auth.user_model import User
+from studyFlax.models.modules.module_model import Module
+from studyFlax.models.modules.deadline_model import Deadline
 
 class DeadlineModelTests(TestCase):
     """Test suite for Deadline model."""
