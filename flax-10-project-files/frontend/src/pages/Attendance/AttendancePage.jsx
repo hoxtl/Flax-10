@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
 import { useTimetableEvents } from "./hooks/useTimetableEvents";
 import { useAttendanceRecords } from "./hooks/useAttendanceRecords";
@@ -24,19 +24,6 @@ export default function AttendancePage() {
   const { stats, loading, error, refetch: refetchStats } = useAttendanceStats();
   const { recordsByEventId, refetch: refetchRecords } = useAttendanceRecords();
   const { events: timetableEvents, loading: eventsLoading } = useTimetableEvents();
-
-  const chartsColRef = useRef(null);
-  const [chartsHeight, setChartsHeight] = useState(null);
-
-  useEffect(() => {
-    const el = chartsColRef.current;
-    if (!el) return;
-    const obs = new ResizeObserver(([entry]) => {
-      setChartsHeight(entry.contentRect.height);
-    });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
 
   const refetchAll = () => {
     refetchStats();
@@ -125,7 +112,7 @@ export default function AttendancePage() {
 
       <div className={styles.mainGrid}>
         {/* Left: charts */}
-        <div className={styles.chartsCol} ref={chartsColRef}>
+        <div className={styles.chartsCol}>
           {totalMarked === 0 && (
             <p className={styles.empty}>
               No attendance recorded yet. Use the list to mark events, or you'll get a prompt during or after class.
@@ -155,10 +142,7 @@ export default function AttendancePage() {
 
         {/* Right: list panel, height-capped to match left column */}
         {!eventsLoading && (
-          <div
-            className={styles.listCol}
-            style={chartsHeight ? { maxHeight: chartsHeight } : undefined}
-          >
+          <div className={styles.listCol}>
             {selectedSegment ? (
               <SegmentDetailPanel
                 segmentLabel={detailPanelLabel}

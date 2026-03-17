@@ -1,6 +1,11 @@
 .page {
   padding: 1.5rem 2rem;
-  max-width: 1200px;
+  max-width: 100%;
+  height: calc(100vh - 72px); /* topbar ≈48px + layout bottom-padding 24px */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .title {
@@ -81,14 +86,19 @@
 /* ── Two-column grid ─────────────────────────────────────────────────────── */
 
 .mainGrid {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 @media (max-width: 860px) {
-  .mainGrid { grid-template-columns: 1fr; }
+  .page { height: auto; overflow: visible; }
+  .mainGrid { grid-template-columns: 1fr; align-items: start; flex: none; }
+  .chartsCol { overflow-y: visible; }
+  .listCol { min-height: 400px; }
 }
 
 /* ── Left: charts ────────────────────────────────────────────────────────── */
@@ -97,6 +107,10 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 .chartCard {
@@ -120,13 +134,15 @@
 .listCol {
   display: flex;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
 }
 
 .listPanel {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--panel);
@@ -188,10 +204,10 @@
 /* ── Record / Marked list ────────────────────────────────────────────────── */
 
 .recordSection {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 0.875rem 1.25rem;
   overflow: hidden;
 }
@@ -200,16 +216,15 @@
   font-size: 0.8125rem;
   color: var(--muted);
   margin: 0 0 0.75rem;
-  flex-shrink: 0;
 }
 
 .eventList {
+  flex: 1;
+  min-height: 0;
   list-style: none;
   padding: 0;
   margin: 0;
   overflow-y: auto;
-  flex: 1;
-  min-height: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
@@ -330,9 +345,10 @@
 /* ── Segment detail panel ────────────────────────────────────────────────── */
 
 .detailPanel {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 1.25rem;
   border-radius: 12px;
   background: var(--panel);
@@ -386,8 +402,6 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  flex: 1;
-  min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
