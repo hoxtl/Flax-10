@@ -227,7 +227,7 @@ function _push_chunked_group(result, group, base_row) {
     const end = Math.max(...items.map((item) => item.endMins));
     result.push({
       type: "eventGroup",
-      id: `group-${base_row.id}-${Math.floor(i / chunk_size)}`,
+      id: `group-${base_row.id}-${Math.floor(i / chunkSize)}`,
       items,
       startMins: start,
       endMins: end,
