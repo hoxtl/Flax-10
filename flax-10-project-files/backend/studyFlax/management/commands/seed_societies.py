@@ -122,7 +122,7 @@ def _seed_society_members(society, admin_counts, member_counts, student_users):
 def create_society_memberships(stdout):
     stdout.write("Seeding society memberships...")
     SocietyMembership.objects.filter(user__role='teacher').delete()
-    student_users = list(User.objects.filter(is_staff=False, role='student'))
+    student_users = list(User.objects.filter(role='student'))
     admin_counts = {u.id: 0 for u in student_users}
     member_counts = {u.id: 0 for u in student_users}
     for society in Society.objects.all():

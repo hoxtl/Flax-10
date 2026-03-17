@@ -50,6 +50,16 @@ from .seed_societies import (
 
 User = get_user_model()
 
+
+def _seed_user_pool():
+    return list(User.objects.filter(role__in=['student', 'teacher']))
+
+
+def _display_role(username, role):
+    if username == 'johndoe':
+        return 'admin/student'
+    return role
+
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset."""
 
@@ -64,7 +74,7 @@ class Command(BaseCommand):
         )
 
     def _load_shared_data(self):
-        self.users = list(User.objects.filter(is_staff=False))
+        self.users = _seed_user_pool()
         self.categories = list(Category.objects.all())
         self.tags = list(Tag.objects.all())
         self.rules = list(RecurrenceRule.objects.all())
@@ -83,7 +93,7 @@ class Command(BaseCommand):
         create_admin_user(self.stdout)
         create_fixture_users(self.stdout)
         create_random_users(self.stdout, target_teacher_count=self.teacher_count)
-        self.users = list(User.objects.filter(is_staff=False))
+        self.users = _seed_user_pool()
 
     def _seed_catalogue(self):
         self._create_recurrence_rules()
@@ -234,7 +244,8 @@ class Command(BaseCommand):
     def _ordered_fixture_users(self):
         role_order = {'admin': 0, 'student': 1, 'teacher': 2}
         entries = ((item['username'], ROLE_LABELS.get(item['username'], 'student')) for item in FIXTURE_USERS)
-        return sorted(entries, key=lambda pair: (role_order.get(pair[1], 1), pair[0]))
+        sorted_entries = sorted(entries, key=lambda pair: (role_order.get(pair[1], 1), pair[0]))
+        return [(username, _display_role(username, role)) for username, role in sorted_entries]
 
     def _print_fixture_users(self):
         self.stdout.write("  Fixture users (password: 1234)")
