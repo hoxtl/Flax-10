@@ -89,10 +89,10 @@ def _build_stats_lines(sessions, themes):
     stats = _build_stats_summary(sessions, themes)
     return (
         f"- Total study sessions: {stats['count']}\n"
-        f"- Total study time: {round(stats['total_study'] / 60, 1)} hours\n"
-        f"- Total break time: {round(stats['total_break'] / 60, 1)} hours\n"
+        f"- Total study time: {round(stats['total_study'] / 3600, 1)} hours\n"
+        f"- Total break time: {round(stats['total_break'] / 3600, 1)} hours\n"
         f"- Total pause duration: {round(stats['total_pause'] / 60, 1)} minutes\n"
-        f"- Average session length: {stats['avg']} minutes\n"
+        f"- Average session length: {round(stats['avg'] / 60, 1)} minutes\n"
         f"- Overtime sessions: {stats['overtime']} (ran past planned time)\n"
         f"- Current streak: {stats['current_streak']} consecutive days\n"
         f"- Peak study hour: {fmt_hour(stats['peak_hour'])}\n"
@@ -138,6 +138,10 @@ def _is_openai_response_valid(response):
     message = getattr(first, "message", None)
     return getattr(message, "content", None) is not None
 
+def _sanitise_messages(messages):
+    """Strip any non-standard fields before sending to OpenAI."""
+    return [{'role': m['role'], 'content': m['content']} for m in messages if 'role' in m and 'content' in m]
+
 def _build_chat_request(request):
     """Validate and build the context/messages payload for ai_chat."""
     messages = request.data.get('messages', [])
@@ -148,7 +152,16 @@ def _build_chat_request(request):
         return None, Response({'error': 'days must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
     context = _build_user_context(request.user, days)
     system_msg = f"{SYSTEM_PROMPT}\n\nCurrent student data:\n{context}"
-    return {'messages': messages, 'system_msg': system_msg}, None
+    return {'messages': _sanitise_messages(messages), 'system_msg': system_msg}, None
+
+SCHEDULE_EXTRACTION_PROMPT = (
+    "You are a schedule parser. Extract any study/work schedule events from the given text.\n"
+    "Return ONLY a JSON array of events. If no schedule is present, return [].\n"
+    "Each event must have: title (string), start_time (ISO 8601 datetime), end_time (ISO 8601 datetime), description (string).\n"
+    "Resolve relative day names (e.g. 'Monday') to absolute dates using the current date provided.\n"
+    "If no end time is specified, assume 1 hour after start. Use 24-hour times.\n"
+    "Return nothing except valid JSON."
+)
 
 SYSTEM_PROMPT = (
     "You are StudyFlax AI, a friendly and insightful study coach built into a student time management app.\n"
@@ -169,16 +182,43 @@ INSIGHT_PROMPT_TEMPLATE = (
     "Student data:\n{context}"
 )
 
-def _call_openai(api_key, messages, max_tokens=800):
+def _extract_schedule_events(api_key, reply_text, today_str):
+    """Extract structured calendar events from an AI reply. Returns [] on any failure."""
+    try:
+        messages = [
+            {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
+            {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
+        ]
+        response, err = _openai_response_or_error(api_key, messages, max_tokens=400, model='gpt-4o-mini')
+        if err:
+            return []
+        content, err = _content_or_error(response)
+        if err:
+            return []
+        import json
+        raw = content.strip()
+        # Strip markdown code fences if present
+        if raw.startswith('```'):
+            raw = raw.split('```')[1]
+            if raw.startswith('json'):
+                raw = raw[4:]
+        events = json.loads(raw)
+        if not isinstance(events, list):
+            return []
+        return events
+    except Exception:
+        return []
+
+def _call_openai(api_key, messages, max_tokens=800, model='gpt-4o'):
     """Make a chat completion request to OpenAI."""
     client = OpenAI(api_key=api_key)
     return client.chat.completions.create(
-        model='gpt-4o', messages=messages, max_tokens=max_tokens, temperature=0.7,
+        model=model, messages=messages, max_tokens=max_tokens, temperature=0.7,
     )
 
-def _openai_response_or_error(api_key, messages, max_tokens=800):
+def _openai_response_or_error(api_key, messages, max_tokens=800, model='gpt-4o'):
     try:
-        return _call_openai(api_key, messages, max_tokens), None
+        return _call_openai(api_key, messages, max_tokens, model), None
     except OPENAI_API_ERROR_TYPES as exc:
         return None, _handle_openai_error(exc)
 
@@ -231,4 +271,6 @@ def ai_chat(request):
     content, err = _content_or_error(response)
     if err:
         return err
-    return Response({'reply': content})
+    today_str = timezone.now().strftime('%Y-%m-%d')
+    suggested_events = _extract_schedule_events(api_key, content, today_str)
+    return Response({'reply': content, 'suggested_events': suggested_events})
