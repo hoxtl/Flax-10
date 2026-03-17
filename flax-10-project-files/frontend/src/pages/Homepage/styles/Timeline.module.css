@@ -1662,7 +1662,7 @@
     font-weight: 800;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: #2f261f;
+    color: var(--widget-text-primary);
   }
 
   .timelineHeaderActionLink {
