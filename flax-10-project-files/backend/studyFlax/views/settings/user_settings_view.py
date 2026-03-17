@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
-from studyFlax.views.user.settings_views import get_or_create_user_settings
+from studyFlax.views.user.settings_view import get_or_create_user_settings
 
 def update_user_name(user, data):
     if 'first_name' in data:

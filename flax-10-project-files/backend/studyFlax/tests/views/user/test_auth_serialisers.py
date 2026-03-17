@@ -78,7 +78,7 @@ class AuthAndTaskCoverageTest(TestCase):
         self.assertEqual(serializer.data['modules'], ['CS200'])
 
     def test_get_user_tasks_list_filter_helper(self):
-        from studyFlax.views.tasks.task_views import get_user_tasks
+        from studyFlax.views.tasks.task_view import get_user_tasks
         task_list = self.user.task_lists.create(name='Personal', category='personal')
         Task.objects.create(user=self.user, title='Listed', task_list=task_list)
         Task.objects.create(user=self.user, title='Other')

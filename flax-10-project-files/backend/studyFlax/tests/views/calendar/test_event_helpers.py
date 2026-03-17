@@ -63,7 +63,7 @@ class CalendarAndAnalyticsHelperCoverageTest(TestCase):
         self.assertEqual(generate_instances(event, None, None), [event])
 
     def test_theme_stats_peak_light_hour_branch(self):
-        from studyFlax.views.analytics.theme_views import get_theme_stats
+        from studyFlax.views.analytics.theme_view import get_theme_stats
         user = User.objects.create_user(username='theme_cov', email='theme_cov@example.com', password='pass')
         ThemeSession.objects.create(
             user=user,

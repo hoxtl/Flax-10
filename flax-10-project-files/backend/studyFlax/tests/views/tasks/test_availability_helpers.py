@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from django.utils import timezone
 
-from studyFlax.models.groupwork.groupwork_models import (
+from studyFlax.models.groupwork.groupworkModel import (
     GroupMembership,
     GroupProject,
     MeetingResponse,
@@ -25,7 +25,7 @@ class AvailabilityHelperCoverageTest(BaseTestCase):
     """Unit tests for _build_member_entry initials branches."""
 
     def test_initials_from_name_when_both_set(self):
-        from studyFlax.views.groupwork.availability_views import _build_member_entry
+        from studyFlax.views.groupwork.availability_view import _build_member_entry
         m = MagicMock()
         m.user.id = 1
         m.user.username = 'jdoe'
@@ -35,7 +35,7 @@ class AvailabilityHelperCoverageTest(BaseTestCase):
         self.assertEqual(entry['initials'], 'JD')
 
     def test_initials_from_username_when_no_name(self):
-        from studyFlax.views.groupwork.availability_views import _build_member_entry
+        from studyFlax.views.groupwork.availability_view import _build_member_entry
         m = MagicMock()
         m.user.id = 2
         m.user.username = 'ab_user'
@@ -45,7 +45,7 @@ class AvailabilityHelperCoverageTest(BaseTestCase):
         self.assertEqual(entry['initials'], 'AB')
 
     def test_serialize_responses_returns_list(self):
-        from studyFlax.views.groupwork.availability_views import _serialize_responses
+        from studyFlax.views.groupwork.availability_view import _serialize_responses
         project = _make_project(self.user, 'SerResp')
         member = make_user('ser_resp_m', 'ser_resp_m@e.com')
         GroupMembership.objects.create(project=project, user=member, role='member')

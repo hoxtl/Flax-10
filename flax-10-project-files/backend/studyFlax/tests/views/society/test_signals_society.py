@@ -289,16 +289,16 @@ class MembershipAndSyncHelperCoverageTest(TestCase):
         self.admin_membership = SocietyMembership.objects.create(user=self.admin, society=self.society, role='admin')
 
     def test_find_user_by_identifier_email_and_none(self):
-        from studyFlax.views.society.membership_views import find_user_by_identifier
+        from studyFlax.views.society.membership_view import find_user_by_identifier
         self.assertEqual(find_user_by_identifier({'email': 'other_cov@example.com'}), self.other)
         self.assertIsNone(find_user_by_identifier({}))
 
     def test_get_membership_by_user_id_none(self):
-        from studyFlax.views.society.membership_views import get_membership_by_user_id
+        from studyFlax.views.society.membership_view import get_membership_by_user_id
         self.assertIsNone(get_membership_by_user_id(self.society, 99999))
 
     def test_leave_or_remove_sets_skip_notification_for_self(self):
-        from studyFlax.views.society.membership_views import leave_or_remove
+        from studyFlax.views.society.membership_view import leave_or_remove
         SocietyMembership.objects.create(user=self.other, society=self.society, role='member')
         SocietyCalendarSync.objects.create(user=self.other, society=self.society)
         request = self.factory.delete('/')
@@ -308,7 +308,7 @@ class MembershipAndSyncHelperCoverageTest(TestCase):
         self.assertFalse(SocietyCalendarSync.objects.filter(user=self.other, society=self.society).exists())
 
     def test_sync_status_true_and_unsync_deleted_true(self):
-        from studyFlax.views.society.calendar_sync_views import sync_status, unsync_calendar
+        from studyFlax.views.society.calendar_sync_view import sync_status, unsync_calendar
         SocietyMembership.objects.create(user=self.other, society=self.society, role='member')
         SocietyCalendarSync.objects.create(user=self.other, society=self.society)
         request = self.factory.get('/')
