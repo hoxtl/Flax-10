@@ -83,7 +83,7 @@ describe("Settings", () => {
   it("calls onBack when back button is clicked", () => {
     const onBack = vi.fn();
     render(<Settings user={{}} onBack={onBack} />);
-    fireEvent.click(screen.getByText("←"));
+    fireEvent.click(screen.getByRole("button", { name: /back/i }));
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 

@@ -105,7 +105,7 @@ function resolveRouteContent(activeNav, user, setActiveNav) {
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
-    const extraProps = { user, onNavChange: setActiveNav };
+    const extraProps = { user, onNavChange: setActiveNav, onBack: () => setActiveNav("home") };
     // Pass the search param or create flag to modules view if provided
     if (baseNav === "modules" && navParam === "create") {
       extraProps.initialCreate = true;
@@ -329,7 +329,8 @@ function renderProfileView(activeNav, setActiveNav, user, onNavChange) {
     <Profile
       user={user}
       viewedUserId={viewedUserId}
-      onBack={() => setActiveNav("home")}
+      onBack={() => setActiveNav("users")}
+      backLabel="Back to All Users"
       onNavigate={onNavChange}
     />
   );
