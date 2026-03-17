@@ -27,19 +27,19 @@ STUDY_PROFILES = {
         'preferred_hours': [20, 21, 22, 23],
         'weekend_probability': 0.55,
         'skip_day_prob': 0.25,
-        'work_choices': [25, 50, 75, 100],
+        'work_choices': [30, 45, 60, 90, 120],
     },
     'consistent': {
         'preferred_hours': [9, 10, 14, 15, 16],
         'weekend_probability': 0.70,
         'skip_day_prob': 0.10,
-        'work_choices': [50, 75, 100, 125],
+        'work_choices': [45, 60, 75, 90, 105],
     },
     'balanced': {
         'preferred_hours': [9, 10, 11, 14, 15, 16],
         'weekend_probability': 0.40,
         'skip_day_prob': 0.20,
-        'work_choices': [25, 50, 75],
+        'work_choices': [25, 35, 50, 60, 75],
     },
 }
 
@@ -71,13 +71,15 @@ def _build_single_study_session(user, start, work_mins, break_mins, n_sessions):
     from studyFlax.models.timer.sessionModel import StudySession
     status = 'Overtime' if random.random() < 0.08 else 'Completed'
     end = start + timedelta(minutes=work_mins + break_mins)
+    pause_secs = random.randint(0, max(60, work_mins * 6))  # 0 to ~10% of work time
     return StudySession(
         user=user,
         study_block_id=int(start.timestamp() * 1000),
         start_time=start,
         end_time=end,
-        duration=work_mins,
-        break_duration=break_mins,
+        duration=work_mins * 60,
+        break_duration=break_mins * 60,
+        pause_duration=pause_secs,
         session_count=n_sessions,
         task=random.choice(TASK_LABELS),
         status=status,
@@ -88,10 +90,12 @@ def _build_day_study_sessions(user, session_date, config):
     hours = random.sample(config['preferred_hours'], count)
     sessions = []
     for hour in hours:
-        work_mins = random.choice(config['work_choices'])
+        base_mins = random.choice(config['work_choices'])
+        work_mins = max(15, base_mins + random.randint(-8, 8))
         break_mins = (work_mins // 25) * 5
-        start = session_date.replace(hour=hour, minute=0, second=0, microsecond=0)
-        sessions.append(_build_single_study_session(user, start, work_mins, break_mins, work_mins // 25))
+        start_min = random.randint(0, 3) * 5  # start on a 5-min boundary: 0, 5, 10, 15
+        start = session_date.replace(hour=hour, minute=start_min, second=0, microsecond=0)
+        sessions.append(_build_single_study_session(user, start, work_mins, break_mins, max(1, work_mins // 25)))
     return sessions
 
 def build_study_sessions_for_user(user, profile='balanced'):
