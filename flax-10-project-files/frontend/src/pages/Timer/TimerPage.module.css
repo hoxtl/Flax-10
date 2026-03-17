@@ -1,5 +1,6 @@
 /* timerLayout: top-aligned centered column, replaces the old centered hero */
 .timerLayout {
+    --focus-accent: #c8102e;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -34,6 +35,15 @@
 @media (max-width: 900px) {
     .timerGrid {
         grid-template-columns: 1fr;
+    }
+
+    .timerMainTopRow {
+        grid-template-columns: 1fr;
+    }
+
+    .timerHeroWrap {
+        flex-direction: column;
+        align-items: center;
     }
 }
 
@@ -200,6 +210,16 @@
     background: var(--border);
 }
 
+.sessionDotCheckmark {
+    color: white;
+    font-size: 0.58rem;
+    font-weight: 800;
+    line-height: 1;
+    position: relative;
+    top: -0.5px;
+    left: -0.5px;
+}
+
 @keyframes dotPulse {
     0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
     60%  { box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 0%, transparent); }
@@ -231,6 +251,28 @@
 .liveStat strong {
     color: var(--text);
     font-weight: 600;
+}
+
+/* === Focus Progress Strip === */
+
+.linearProgressWrap {
+    width: 100%;
+}
+
+.linearProgressBar {
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+}
+
+.linearProgressFill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 65%, var(--sage)));
+    border-radius: inherit;
+    transition: width 0.35s linear;
 }
 
 /* === Block Stats Card === */
@@ -329,16 +371,57 @@
     border: var(--card-border);
     border-radius: var(--card-radius-token);
     box-shadow: var(--card-shadow-rest);
-    padding: var(--card-padding-lg);
+    padding: 0.85rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
     transition: box-shadow 0.2s ease;
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 94%, var(--primary) 6%), var(--surface-card));
 }
 
 .timerMainCard:hover {
     box-shadow: var(--card-shadow-hover);
+}
+
+.timerMainTopRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr minmax(200px, 250px);
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.timerMainTopTask {
+    min-width: 0;
+}
+
+.timerMainTopSound {
+    width: 100%;
+}
+
+.timerHeroWrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    margin-top: 0.05rem;
+}
+
+.timerBlockStatsCompact {
+    max-width: 170px;
+    min-width: 150px;
+    padding: 0.55rem 0.6rem;
+}
+
+.inlinePresetSection {
+    width: 100%;
+    margin-top: 0.3rem;
+}
+
+.presetOutsideSection {
+    width: 100%;
 }
 
 .timerSettingsRow {
@@ -373,6 +456,34 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+}
+
+.timerSoundCardInline {
+    padding: var(--card-padding);
+    gap: 0.5rem;
+}
+
+.timerSoundCardInline .soundSelectorContainer {
+    margin-top: 0;
+    gap: 0.35rem;
+}
+
+.timerSoundCardInline .soundControls {
+    justify-content: flex-start;
+    gap: 0.45rem;
+}
+
+.timerSoundCardInline .label {
+    font-size: 0.72rem;
+}
+
+.timerSoundCardInline .soundDropdown {
+    min-width: 145px;
+}
+
+.timerSoundCardInline .musicLinks {
+    width: 100%;
+    justify-content: flex-start;
 }
 
 /* Zoom-in transition when navigating from task Play */
@@ -455,6 +566,8 @@
     font-size: 3.5rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
+    font-family: "JetBrains Mono", "Roboto Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0.01em;
     color: var(--primary);
     margin: 0.5rem 0;
     line-height: 1;
@@ -587,41 +700,41 @@
 
 .settings {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: var(--card-border);
+    gap: 1rem;
+    margin-top: 0.2rem;
+    padding-top: 0;
+    border-top: none;
 }
 
 .settingItem {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.35rem;
     align-items: center;
 }
 
 .label {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     color: var(--muted);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .input {
-    width: 60px;
-    padding: 0.4rem;
-    border: var(--card-border);
-    border-radius: var(--radius-sm);
+    width: 68px;
+    padding: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 16%, var(--border));
+    border-radius: 12px;
     text-align: center;
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--text);
-    background: var(--surface-card);
+    background: color-mix(in srgb, var(--focus-accent) 4%, var(--surface-card));
 }
 
 .input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 15%, transparent);
+    border-color: color-mix(in srgb, var(--focus-accent) 45%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus-accent) 15%, transparent);
 }
 
 .modeIndicator {
@@ -811,6 +924,10 @@
     border-radius: var(--card-radius-token);
     box-shadow: var(--card-shadow-rest);
     padding: 0.75rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    flex-wrap: wrap;
 }
 
 .todayBannerStats {
@@ -922,17 +1039,87 @@
 }
 
 .presetPanelLabel {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     color: var(--muted);
+    border-left: 3px solid var(--primary);
+    padding-left: 0.5rem;
 }
 
 .presetPanelGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
+}
+
+.presetSuggestionCard {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 30%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 9%, var(--surface-card));
+    border-radius: 12px;
+    padding: 0.45rem 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.presetSuggestionText {
+    font-size: 0.72rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.presetSuggestionBtn {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 45%, transparent);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--focus-accent) 15%, var(--surface-card));
+    color: color-mix(in srgb, var(--focus-accent) 78%, #111);
+    cursor: pointer;
+}
+
+.presetSuggestionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.timerSettingsDivider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0.1rem 0;
+}
+
+.autoBreakContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+}
+
+.autoBreakLabel {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.autoBreakTime {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.autoBreakText {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
 }
 
 /* Vertical list layout for presets */
@@ -950,29 +1137,50 @@
     width: 100%;
 }
 
-.presetListItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0.45rem 0.6rem;
-    background: none;
+.presetFavoriteBtn {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
     border: none;
-    border-left: 3px solid transparent;
-    border-radius: 0 6px 6px 0;
+    background: transparent;
+    color: #b08928;
+    font-size: 0.74rem;
+    line-height: 1;
     cursor: pointer;
-    transition: background 0.12s, border-color 0.12s;
+    z-index: 2;
+    opacity: 0.8;
+}
+
+.presetFavoriteBtn:hover {
+    opacity: 1;
+}
+
+.presetListItem {
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: center;
+    width: 100%;
+    padding: 0.58rem 0.65rem 0.58rem 1.2rem;
+    background: color-mix(in srgb, var(--primary) 5%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, transform 0.1s;
     text-align: left;
-    gap: 0.5rem;
+    gap: 0.18rem;
 }
 
 .presetListItem:hover:not(:disabled) {
-    background: var(--hover);
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+    transform: translateY(-1px);
 }
 
 .presetListItemActive {
-    border-left-color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 7%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 16%, transparent);
 }
 
 .presetListItemActive:hover {
@@ -985,20 +1193,19 @@
 }
 
 .presetListItemName {
-    font-size: 0.82rem;
+    font-size: 0.79rem;
     font-weight: 600;
     color: var(--text);
-    white-space: nowrap;
-    flex: 1;
+    white-space: normal;
+    line-height: 1.15;
     text-align: left;
 }
 
 .presetListItemMeta {
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
 /* Legacy: keep for any lingering references */
@@ -1218,6 +1425,45 @@
     line-height: 1.4;
 }
 
+.activeBreakGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    margin: 0.6rem 0 1rem;
+}
+
+.activeBreakBtn {
+    text-align: left;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+    border-radius: 10px;
+    padding: 0.45rem 0.6rem;
+    background: var(--surface-card);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+}
+
+.activeBreakBtn:hover {
+    background: var(--hover);
+}
+
+.activeBreakBtnSelected {
+    border-color: color-mix(in srgb, var(--focus-accent) 38%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 9%, var(--surface-card));
+}
+
+.activeBreakLabel {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.activeBreakHint {
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
 .goalButton {
     margin-top: 2rem;
     width: 100%;
@@ -1246,7 +1492,10 @@
 .soundControls {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
 }
 
 .soundDropdown {
@@ -1269,7 +1518,7 @@
 }
 
 .taskInputWrap {
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -1490,19 +1739,20 @@
 
 .taskInput {
     width: 100%;
-    padding: 0.75rem;
-    border: none;
-    background: transparent;
-    border-bottom: 2px solid var(--border);
-    font-size: 1.2rem;
-    text-align: center;
+    padding: 0.82rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+    background: color-mix(in srgb, var(--primary) 7%, var(--surface-card));
+    border-radius: 12px;
+    font-size: 1.02rem;
+    text-align: left;
     color: var(--text);
     transition: all 0.2s ease;
 }
 
 .taskInput:focus {
     outline: none;
-    border-bottom-color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .taskInput::placeholder {
@@ -1522,7 +1772,7 @@
 .taskInputHasValue {
     color: var(--primary);
     font-weight: 600;
-    border-bottom-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 .taskInputHasValue::placeholder {
@@ -1530,19 +1780,59 @@
     opacity: 0.7;
 }
 
+.taskInputCompact {
+    font-size: 0.92rem;
+    padding: 0.52rem 0.8rem;
+}
+
 .taskPickBtn {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--primary);
-    background: none;
-    border: none;
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
     cursor: pointer;
     font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
+    padding: 0.3rem 0.68rem;
+    border-radius: 999px;
 }
 
 .taskPickBtn:hover {
     background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.taskInputActionsCompact {
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+}
+
+.taskQuickBtn {
+    font-size: 0.72rem;
+    color: white;
+    background: color-mix(in srgb, var(--focus-accent) 82%, black);
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 55%, black);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+}
+
+.taskQuickBtn:hover {
+    filter: brightness(1.05);
+}
+
+.taskJustStartBtn {
+    font-size: 0.72rem;
+    color: color-mix(in srgb, var(--focus-accent) 78%, #000);
+    background: color-mix(in srgb, var(--focus-accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 30%, transparent);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0.3rem 0.68rem;
+    border-radius: 999px;
+}
+
+.taskJustStartBtn:hover {
+    background: color-mix(in srgb, var(--focus-accent) 18%, transparent);
 }
 
 .taskPickDropdown {
@@ -1775,6 +2065,24 @@
     .timerMainCard {
         padding: var(--card-padding);
     }
+
+    .todayBanner {
+        gap: 0.55rem;
+    }
+
+    .todayInlineNudge {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .smartNudgeSingleRow {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .quickAdjustRow {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 380px) {
@@ -1800,6 +2108,291 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted);
+}
+
+.smartNudgeCard,
+.focusChecklistCard,
+.sessionLogCard {
+    width: 100%;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: 0.75rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.smartNudgeSingle {
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--surface-card)), var(--surface-card));
+}
+
+.selectedTaskCard {
+    width: 100%;
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 26%, transparent);
+    border-radius: 14px;
+    padding: 0.7rem 0.82rem;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--focus-accent) 9%, var(--surface-card)), var(--surface-card));
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.selectedTaskTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.selectedTaskEyebrow {
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.selectedTaskModule {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--focus-accent) 72%, #000);
+    background: color-mix(in srgb, var(--focus-accent) 14%, transparent);
+    border-radius: 999px;
+    padding: 0.15rem 0.45rem;
+}
+
+.selectedTaskTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+}
+
+.selectedTaskMetaRow {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.selectedTaskMetaRow span {
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--hover) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: 999px;
+    padding: 0.12rem 0.45rem;
+}
+
+.selectedTaskActions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    justify-content: flex-end;
+}
+
+.selectedTaskContribution {
+    font-size: 0.67rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.selectedTaskLink {
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--focus-accent) 72%, #000);
+    text-decoration: none;
+    border-bottom: 1px dotted color-mix(in srgb, var(--focus-accent) 45%, transparent);
+}
+
+.sectionAccentLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    position: relative;
+    padding-left: 0.55rem;
+}
+
+.sectionAccentLabel::before {
+    content: '';
+    width: 3px;
+    height: 0.75rem;
+    background: var(--primary);
+    border-radius: 999px;
+    position: absolute;
+    left: 0;
+    top: 55%;
+    transform: translateY(-50%);
+}
+
+.smartNudgeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.smartNudgeItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.16rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px dashed color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.smartNudgeItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.smartNudgeTitle {
+    font-size: 0.84rem;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.smartNudgeMeta {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.smartNudgeSingleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.smartNudgeMain {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.1rem;
+}
+
+.smartNudgeActionBtn {
+    padding: 0.38rem 0.86rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    color: var(--primary);
+    font-size: 0.73rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.12s, background 0.12s;
+}
+
+.smartNudgeActionBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.smartNudgeActionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.focusChecklistRows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.focusChecklistRow {
+    display: flex;
+    gap: 0.45rem;
+    align-items: flex-start;
+}
+
+.focusChecklistRow input {
+    margin-top: 0.1rem;
+}
+
+.focusChecklistTitle {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.focusChecklistHint {
+    margin: 0;
+    font-size: 0.68rem;
+    color: var(--muted);
+}
+
+.sessionLogHeader {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.sessionLogTable {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-top: 0.3rem;
+    table-layout: fixed;
+}
+
+.sessionLogTable thead {
+    color: var(--muted);
+    font-size: 0.68rem;
+    text-align: left;
+}
+
+.sessionLogTable th,
+.sessionLogTable td {
+    padding: 0.42rem 0.25rem;
+    border-bottom: 1px solid var(--card-border-color, var(--border));
+    text-align: left;
+    font-size: 0.74rem;
+    color: var(--text);
+}
+
+.sessionLogTable th:first-child,
+.sessionLogTable td:first-child {
+    width: 23%;
+}
+
+.sessionLogTable th:nth-child(2),
+.sessionLogTable td:nth-child(2) {
+    width: 16%;
+}
+
+.sessionLogTable th:nth-child(3),
+.sessionLogTable td:nth-child(3) {
+    width: 44%;
+}
+
+.sessionLogTable th:last-child,
+.sessionLogTable td:last-child {
+    width: 17%;
+    text-align: right;
+}
+
+.sessionLogTable tbody tr:hover td {
+    color: var(--text);
+    background: var(--hover);
+}
+
+.sessionLogTable td {
+    color: var(--text);
+}
+
+.sessionLogEmpty {
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding: 0.65rem 0 0.15rem;
 }
 
 /* === Daily Goal Widget (inside Quick Start card) === */
@@ -1960,6 +2553,95 @@
     align-items: center;
     gap: 0.25rem;
     white-space: nowrap;
+}
+
+.todayMilestone {
+    display: flex;
+    flex-direction: column;
+    gap: 0.08rem;
+    min-width: 160px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 22%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 7%, var(--surface-card));
+}
+
+.todayMilestoneLabel {
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.todayMilestoneText {
+    font-size: 0.74rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.todayMilestoneMeta {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.todayInlineNudge {
+    width: auto;
+    margin-left: auto;
+    border-top: none;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+}
+
+.todayInlineNudgeCopy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.06rem;
+}
+
+.todayInlineNudgeTitle {
+    font-size: 0.8rem;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.todayInlineNudgeText {
+    font-size: 0.69rem;
+    color: var(--muted);
+    line-height: 1.15;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.todayInlineNudgeBtn {
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.todayInlineNudgeBtn:hover {
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.todayBannerControls {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: auto;
 }
 
 /* === Streak Warning Banner === */
@@ -2127,6 +2809,219 @@
 
 /* === Circular Timer Ring === */
 
+/* === Big Timer Circle (animation + time + controls inside ring) === */
+.timerCircleWrap {
+    position: relative;
+    width: 318px;
+    height: 318px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.timerCircleWrap::before {
+    content: "";
+    position: absolute;
+    inset: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--focus-accent) 14%, transparent) 0%, transparent 68%);
+    opacity: 0.32;
+}
+
+.timerCircleContent {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.timerCircleContent .timerDisplay {
+    font-size: 2.7rem;
+    margin: 0;
+}
+
+.timerCircleAnimClip {
+    width: 82px;
+    height: 82px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.timerCircleAnimClip .focusAnimWrapper {
+    transform: scale(0.62);
+    transform-origin: top center;
+    flex-shrink: 0;
+}
+
+.timerCircleAnimClip .focusAnimArea {
+    min-height: unset;
+}
+
+.timerCirclePrimaryBtn {
+    margin-top: 0.25rem;
+    padding: 0.5rem 1.75rem;
+    background: color-mix(in srgb, var(--focus-accent) 85%, black);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.94rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    letter-spacing: 0.02em;
+}
+
+.timerCircleSecondaryBtns {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.15rem;
+}
+
+.timerCircleSecondaryBtn {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 28%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 10%, transparent);
+    color: color-mix(in srgb, var(--focus-accent) 78%, #000);
+    border-radius: 999px;
+    padding: 0.24rem 0.78rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.timerCircleSecondaryBtn:hover {
+    background: color-mix(in srgb, var(--focus-accent) 15%, transparent);
+}
+
+.timerCircleActive::before {
+    animation: breathPulse 8s ease-in-out infinite;
+}
+
+.timerCircleDeep::before {
+    animation-duration: 5.5s;
+}
+
+.timerCirclePrimaryBtnRunning {
+    background: color-mix(in srgb, var(--focus-accent) 72%, black);
+}
+
+.timerPrimaryIcon {
+    display: inline-flex;
+    width: 1em;
+    justify-content: center;
+    margin-right: 0.35rem;
+    transition: transform 0.2s ease;
+}
+
+.timerPrimaryLabel {
+    display: inline-block;
+    transition: opacity 0.2s ease;
+}
+
+.rightRailTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+    margin-bottom: 0.55rem;
+}
+
+.rightRailTabBtn {
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: 999px;
+    padding: 0.33rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--surface-card);
+    cursor: pointer;
+}
+
+.rightRailTabBtnActive {
+    color: color-mix(in srgb, var(--focus-accent) 75%, #000);
+    border-color: color-mix(in srgb, var(--focus-accent) 32%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 10%, transparent);
+}
+
+.rightRailTabBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.quickAdjustRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.45rem;
+}
+
+.quickAdjustBtn {
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    color: color-mix(in srgb, var(--text) 85%, var(--primary));
+    border-radius: 999px;
+    padding: 0.32rem 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.12s;
+}
+
+.quickAdjustBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.quickAdjustBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.timerCirclePrimaryBtn:hover {
+    background: color-mix(in srgb, var(--focus-accent) 90%, black);
+    transform: scale(1.04);
+}
+
+.timerCirclePrimaryBtn:active {
+    transform: scale(0.97);
+}
+
+.timerProgressActive {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 50%, transparent));
+    animation: ringPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary) 28%, transparent));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary) 45%, transparent));
+    }
+}
+
+@keyframes breathPulse {
+    0%,
+    100% {
+        transform: scale(0.96);
+        opacity: 0.28;
+    }
+
+    50% {
+        transform: scale(1.03);
+        opacity: 0.5;
+    }
+}
+
 .timerRingWrap {
     position: relative;
     width: 220px;
@@ -2183,7 +3078,7 @@
     border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
 }
 
-/* === Music Links === */
+/* === Music Links (legacy) === */
 
 .musicLinks {
     display: flex;
@@ -2208,6 +3103,149 @@
     background: color-mix(in srgb, var(--primary) 10%, transparent);
     color: var(--primary);
     border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+/* === Music Stations === */
+
+.musicStationsWrap {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+}
+
+.musicStationsLabel {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+}
+
+.musicStationsList {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.musicStationBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--hover);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.28rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.musicStationBtn:hover {
+    transform: translateY(-1px);
+}
+
+.musicStation_spotify {
+    color: #6b7280;
+}
+
+.musicStation_spotify:hover,
+.musicStation_spotify.musicStationBtnActive {
+    background: #1db95422;
+    color: #1db954;
+    border-color: #1db95444;
+}
+
+.musicStation_youtube {
+    color: #6b7280;
+}
+
+.musicStation_youtube:hover,
+.musicStation_youtube.musicStationBtnActive {
+    background: #ff000018;
+    color: #ff0000;
+    border-color: #ff000033;
+}
+
+.musicStationBtn svg {
+    flex-shrink: 0;
+}
+
+/* Embed player */
+
+.musicEmbedWrap {
+    width: 100%;
+    margin-top: 0.35rem;
+    border-radius: var(--radius-lg, 10px);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface-card);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.musicEmbedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 0.55rem;
+    background: color-mix(in srgb, var(--hover) 60%, transparent);
+    border-bottom: 1px solid var(--border);
+}
+
+.musicEmbedTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.musicEmbedActions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.musicEmbedExternal {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.musicEmbedExternal:hover {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.musicEmbedClose {
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.musicEmbedClose:hover {
+    color: var(--danger, #ef4444);
+    background: color-mix(in srgb, var(--danger, #ef4444) 10%, transparent);
+}
+
+.musicEmbedIframe {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 0 0 var(--radius-lg, 10px) var(--radius-lg, 10px);
 }
 
 /* === Auto-Start Toggle === */
@@ -2238,7 +3276,15 @@
 .pageActions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
+}
+
+.pageBackBtn {
+    margin-right: 0.2rem;
+}
+
+.focusEntryBackBtn {
+    align-self: flex-start;
 }
 
 /* === Focus Animation System === */
@@ -2280,27 +3326,12 @@
     pointer-events: none;
 }
 
-/* Focus overlay back button */
+/* Focus overlay back button — always visible */
 .focusBackBtn {
     position: absolute;
     top: 1.25rem;
     left: 1.25rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--muted);
-    background: var(--hover);
-    border: var(--card-border);
-    border-radius: 999px;
-    padding: 0.3rem 0.8rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.4s ease, background 0.15s;
-    pointer-events: none;
-}
-
-.focusBackBtnVisible {
-    opacity: 1;
-    pointer-events: auto;
+    z-index: 10;
 }
 
 .focusBackBtn:hover {
@@ -2360,4 +3391,3 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-
