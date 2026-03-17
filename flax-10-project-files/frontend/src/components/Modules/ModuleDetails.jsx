@@ -80,7 +80,9 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
     return (
         <div className={styles.container}>
-            <BackButton onClick={onBack} label="Back to all modules" />
+            <div className={styles.backButtonHeader}>
+                <BackButton onClick={onBack} label="Back to All Modules" />
+            </div>
 
             <section className={styles.hero}>
                 <div className={styles.heroTop}>

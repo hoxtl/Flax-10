@@ -4,6 +4,10 @@
     padding-bottom: var(--space-8);
 }
 
+.backButtonHeader {
+    padding: 24px 0 12px;
+}
+
 .hero {
     background: var(--surface-card);
     border: var(--stroke-soft);
