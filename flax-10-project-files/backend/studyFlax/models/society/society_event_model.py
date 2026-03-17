@@ -3,9 +3,9 @@ Model for society events with recurrence and optional announcement link.
 """
 from django.db import models
 
-from .societyModel import Society
-from .societyTagModel import SocietyTag
-from .societyAnnouncementModel import SocietyAnnouncement
+from .society_model import Society
+from .society_tag_model import SocietyTag
+from .society_announcement_model import SocietyAnnouncement
 
 RECURRENCE_CHOICES = [
     ('none', 'None'),

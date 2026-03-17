@@ -8,11 +8,11 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 User = get_user_model()
 

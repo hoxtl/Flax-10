@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from django.db import DatabaseError
 
-from studyFlax.models.auth.courseChangeRequestModel import CourseChangeRequest
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.models import Enrollment, CalendarEvent
 from studyFlax.serialisers.modules.course_change_serialisers import CourseChangeRequestSerialiser
 from studyFlax.views.user.settings_view import get_modules_for_major, enroll_user_in_modules

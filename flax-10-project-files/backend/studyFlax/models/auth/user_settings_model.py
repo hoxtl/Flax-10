@@ -5,7 +5,7 @@ from datetime import time
 
 from django.db import models
 
-from .userModel import User
+from .user_model import User
 
 class UserSettings(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='settings')

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from django.utils import timezone
 
-from studyFlax.models.groupwork.groupworkModel import (
+from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
     MeetingResponse,

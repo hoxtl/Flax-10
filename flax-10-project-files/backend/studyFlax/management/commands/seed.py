@@ -24,9 +24,9 @@ from studyFlax.models import (
     Module, Enrollment, Deadline, Reading,
     Society,
 )
-from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.groupwork.groupwork_models import GroupProject
-from studyFlax.models.calendar.eventAttendanceModel import EventAttendance
+from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.groupwork.groupwork_model import GroupProject
+from studyFlax.models.calendar.event_attendance_model import EventAttendance
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     MODULE_PILL_COLORS, lecture_theatre_fixtures,
@@ -114,8 +114,8 @@ def _att_week_sessions(module_code, week_start):
             "location": _det_choice(lecture_theatre_fixtures, f"{module_code}{src_key}"),
         })
     return sessions
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.utils.reading_utils import update_reading_estimates
 from .seed_users import (
     FIXTURE_USERS,

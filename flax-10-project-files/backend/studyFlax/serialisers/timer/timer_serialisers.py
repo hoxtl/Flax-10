@@ -3,7 +3,7 @@ Serialiser for study session timer records.
 """
 
 from rest_framework import serializers
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionSerializer(serializers.ModelSerializer):
     class Meta:

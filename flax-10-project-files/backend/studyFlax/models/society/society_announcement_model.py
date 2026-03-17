@@ -3,8 +3,8 @@ Models for society announcements and their associated images.
 """
 from django.db import models
 
-from .societyModel import Society
-from .societyTagModel import SocietyTag
+from .society_model import Society
+from .society_tag_model import SocietyTag
 
 class SocietyAnnouncement(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='announcements')

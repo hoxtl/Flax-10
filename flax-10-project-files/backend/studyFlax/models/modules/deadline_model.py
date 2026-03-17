@@ -2,7 +2,7 @@
 Model for module assessment deadlines such as exams, coursework, and quizzes.
 """
 from django.db import models
-from .moduleModel import Module
+from .module_model import Module
 
 DEADLINE_TYPES = [
     ('exam', 'Exam'),

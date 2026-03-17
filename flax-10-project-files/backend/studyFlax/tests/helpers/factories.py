@@ -54,7 +54,7 @@ def make_announcement(society, title='Announcement', content='Content'):
     return SocietyAnnouncement.objects.create(society=society, title=title, content=content)
 
 def make_session(user, duration=60, break_duration=10, pause_duration=0, status_val='Completed', hours_ago=1):
-    from studyFlax.models.timer.sessionModel import StudySession
+    from studyFlax.models.timer.session_model import StudySession
     end = timezone.now() - timedelta(hours=hours_ago)
     start = end - timedelta(minutes=duration)
     return StudySession.objects.create(
@@ -65,12 +65,12 @@ def make_session(user, duration=60, break_duration=10, pause_duration=0, status_
     )
 
 def make_task_list(user, name='My List', category='personal', archived=False):
-    from studyFlax.models.tasks.taskModel import TaskList
+    from studyFlax.models.tasks.task_model import TaskList
     return TaskList.objects.create(user=user, name=name, category=category, archived=archived)
 
 def make_task(user, title='Test Task', task_list=None, priority='medium',
               completed=False, due_date=None, estimated_blocks=None):
-    from studyFlax.models.tasks.taskModel import Task
+    from studyFlax.models.tasks.task_model import Task
     return Task.objects.create(
         user=user, title=title, task_list=task_list,
         priority=priority, completed=completed,
@@ -78,7 +78,7 @@ def make_task(user, title='Test Task', task_list=None, priority='medium',
     )
 
 def make_module(module_code, module_name, creator):
-    from studyFlax.models.modules.moduleModel import Module
+    from studyFlax.models.modules.module_model import Module
     now = timezone.now()
     return Module.objects.create(
         module_code=module_code, module_name=module_name,

@@ -6,7 +6,7 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from studyFlax.models.society import Society, SocietyMembership
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.notifications.notification_model import Notification
 
 User = get_user_model()
 

@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 
-from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.tests.helpers.factories import make_user
 
 
@@ -61,7 +61,7 @@ class TaskGroupProjectFilterTest(TestCase):
     """Tests for get_user_tasks group_project filter."""
     def test_filter_tasks_by_group_project(self):
         from studyFlax.views.tasks.task_view import get_user_tasks
-        from studyFlax.models.groupwork.groupworkModel import GroupProject, GroupMembership
+        from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMembership
         user = make_user('gp_filter', 'gp_filter@e.com')
         project = GroupProject.objects.create(name='GP', owner=user)
         GroupMembership.objects.create(project=project, user=user, role='owner')
@@ -76,8 +76,8 @@ class TaskUpdateReadingEstimateTest(TestCase):
     """Tests for task update triggering reading estimate refresh."""
     def test_completing_task_with_reading_triggers_estimate_update(self):
         from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
-        from studyFlax.models.modules.moduleModel import Module
-        from studyFlax.models.modules.readingModel import Reading
+        from studyFlax.models.modules.module_model import Module
+        from studyFlax.models.modules.reading_model import Reading
         user = make_user('rdest_user', 'rdest@e.com')
         now = timezone.now()
         module = Module.objects.create(

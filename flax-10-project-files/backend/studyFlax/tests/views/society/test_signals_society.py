@@ -7,12 +7,12 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
-from studyFlax.models.society.societyEventModel import SocietyEvent
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
+from studyFlax.models.society.society_event_model import SocietyEvent
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.tests.helpers.factories import make_user, make_society, make_society_event
 
 User = get_user_model()

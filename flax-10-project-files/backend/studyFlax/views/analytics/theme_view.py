@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
 
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from .session_analytics_service import fmt_hour
 
 def _validate_theme_data(data):

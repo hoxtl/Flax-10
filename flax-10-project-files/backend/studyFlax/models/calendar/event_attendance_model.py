@@ -3,8 +3,8 @@ Model tracking per-user attendance records for timetable events.
 """
 from django.db import models
 
-from ..auth.userModel import User
-from .calendarEventModel import CalendarEvent
+from ..auth.user_model import User
+from .calendar_event_model import CalendarEvent
 
 class EventAttendance(models.Model):
     """One record per user per timetable event: did they attend?"""

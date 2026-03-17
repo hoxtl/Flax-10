@@ -3,7 +3,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.society.societyReportModel import SocietyReport
+from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.tests.helpers.factories import make_society
 
 User = get_user_model()

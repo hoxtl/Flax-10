@@ -8,7 +8,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from studyFlax.models.society.societyEventModel import SocietyEvent
+from studyFlax.models.society.society_event_model import SocietyEvent
 from studyFlax.tests.helpers.factories import (
     make_society, make_society_admin, make_society_event, make_society_member,
 )

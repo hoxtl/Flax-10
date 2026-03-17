@@ -6,7 +6,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import models as db_models
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.timer.session_model import StudySession
 from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
 
 
@@ -27,7 +27,7 @@ class StudySessionViewSet(viewsets.ModelViewSet):
     def _increment_task_completed_blocks(self, task_id):
         if not task_id:
             return
-        from studyFlax.models.tasks.taskModel import Task
+        from studyFlax.models.tasks.task_model import Task
 
         Task.objects.filter(id=task_id, user=self.request.user).update(
             completed_blocks=db_models.F("completed_blocks") + 1

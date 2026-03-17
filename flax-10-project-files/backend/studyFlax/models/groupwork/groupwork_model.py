@@ -3,7 +3,7 @@ Models for group projects, memberships, meeting suggestions, and responses.
 """
 from django.db import models
 
-from studyFlax.models.auth.userModel import User
+from studyFlax.models.auth.user_model import User
 
 class GroupProject(models.Model):
     name = models.CharField(max_length=255)
