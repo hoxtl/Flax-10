@@ -842,3 +842,59 @@ button:disabled {
   }
 }
 
+
+@media (max-width: 560px) {
+  .page {
+    padding: 1rem 0.75rem 1.5rem;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .tabBtn {
+    font-size: 0.76rem;
+    padding: 0.5rem 0.62rem;
+  }
+
+  .filterButtons {
+    width: 100%;
+  }
+
+  .filterButtons > * {
+    flex: 1 1 auto;
+  }
+
+  .badge,
+  .badgeTeacher,
+  .badgeStudent,
+  .badgePending,
+  .badgeActive,
+  .badgeBanned,
+  .staffBadge {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .banBtn,
+  .unbanBtn,
+  .approveBtn,
+  .rejectBtn,
+  .dismissBtn {
+    flex: 1 1 calc(50% - 0.25rem);
+    text-align: center;
+  }
+
+  .empty {
+    padding: 1.6rem 0;
+    font-size: 0.86rem;
+  }
+
+  .errorMsg {
+    font-size: 0.8rem;
+  }
+
+  .spinnerWrap {
+    padding: 2rem 0;
+  }
+}
