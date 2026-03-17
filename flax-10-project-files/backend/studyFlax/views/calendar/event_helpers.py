@@ -10,6 +10,8 @@ from types import SimpleNamespace
 
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
+MAX_SIMULTANEOUS_OVERLAPS = 3
+
 def filter_events_by_date_range(queryset, params):
     start = params.get('start')
     end = params.get('end')
@@ -121,6 +123,15 @@ def _build_instance(base, start, dur, idx):
 def check_event_overlap(user, data):
     s, e = data['start_time'], data['end_time']
     return user.events.filter(start_time__lt=e, end_time__gt=s).exists()
+
+def overlap_count(user, start_time, end_time, exclude_id=None):
+    qs = user.events.filter(start_time__lt=end_time, end_time__gt=start_time)
+    if exclude_id:
+        qs = qs.exclude(id=exclude_id)
+    return qs.count()
+
+def exceeds_overlap_limit(user, start_time, end_time, exclude_id=None):
+    return overlap_count(user, start_time, end_time, exclude_id) >= MAX_SIMULTANEOUS_OVERLAPS
 
 def parse_date_param(ds):
     return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None

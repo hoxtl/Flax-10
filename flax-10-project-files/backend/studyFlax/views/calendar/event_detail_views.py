@@ -12,6 +12,7 @@ from studyFlax.serialisers.calendar.event_serialisers import (
     CalendarEventCreateSerialiser
 )
 from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from .event_helpers import exceeds_overlap_limit
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -28,7 +29,36 @@ def get_event(event):
     serialiser = CalendarEventSerialiser(event)
     return Response(serialiser.data)
 
+def _is_locked_event(event):
+    source = (event.source or '').lower()
+    if source == 'society':
+        return True
+    if source.startswith('module_'):
+        return True
+    return event.title.lower().startswith('lecture:')
+
+def _locked_event_response():
+    return Response(
+        {'error': 'Lecture and society events are read-only.'},
+        status=status.HTTP_403_FORBIDDEN,
+    )
+
+def _pick_time(event, data, field):
+    return data.get(field, getattr(event, field))
+
+def _overlap_limit_response():
+    return Response(
+        {'error': 'Cannot have more than 3 overlapping events.'},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
+
 def update_event(event, data):
+    if _is_locked_event(event):
+        return _locked_event_response()
+    start_time = _pick_time(event, data, 'start_time')
+    end_time = _pick_time(event, data, 'end_time')
+    if exceeds_overlap_limit(event.user, start_time, end_time, exclude_id=event.id):
+        return _overlap_limit_response()
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -36,6 +66,8 @@ def update_event(event, data):
     return Response(CalendarEventSerialiser(event).data)
 
 def delete_event(event):
+    if _is_locked_event(event):
+        return _locked_event_response()
     event.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 

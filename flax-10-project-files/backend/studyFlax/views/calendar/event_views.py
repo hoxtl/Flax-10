@@ -14,6 +14,7 @@ from studyFlax.models.calendar.calendarEventModel import CalendarEvent
 from studyFlax.models import User
 from .event_helpers import (
     check_event_overlap,
+    exceeds_overlap_limit,
     filter_events_by_date_range,
     parse_date_param,
     expand_recurring_events
@@ -91,7 +92,10 @@ def create_event(request):
     serialiser = CalendarEventCreateSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    overlap = check_event_overlap(request.user, serialiser.validated_data)
+    data = serialiser.validated_data
+    if exceeds_overlap_limit(request.user, data['start_time'], data['end_time']):
+        return Response({'error': 'Cannot have more than 3 overlapping events.'}, status=status.HTTP_400_BAD_REQUEST)
+    overlap = check_event_overlap(request.user, data)
     event = serialiser.save(user=request.user)
     response_data = CalendarEventSerialiser(event).data
     response_data['has_overlap'] = overlap
