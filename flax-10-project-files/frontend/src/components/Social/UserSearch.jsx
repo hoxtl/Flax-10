@@ -156,6 +156,7 @@ const FilterSearchInput = ({ query, setQuery, tab }) => (
     <SearchBar
         value={query}
         onChange={setQuery}
+        showShortcutHint={false}
         placeholder={tab === 'courses'
             ? 'Search courses or departments...'
             : tab === 'years'
@@ -320,7 +321,14 @@ function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDpdwn, l
     const onFocus = () => setFocus();
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer} ${fullWidth ? styles.fullWidthSearch : ''}`} ref={containerRef}>
-            <SearchBar value={query} onChange={setQuery} onFocus={onFocus} placeholder="Search users..." className={fullWidth ? styles.searchBarFull : styles.searchBarContainer} />
+      <SearchBar
+        value={query}
+        onChange={setQuery}
+        onFocus={onFocus}
+        placeholder="Search users..."
+        showShortcutHint={false}
+        className={fullWidth ? styles.searchBarFull : styles.searchBarContainer}
+      />
             {showDpdwn && <SearchDropdown loading={loading} query={query} userResults={userResults} onUserSelect={handleSel} compact={compact} />}
         </div>
     );
