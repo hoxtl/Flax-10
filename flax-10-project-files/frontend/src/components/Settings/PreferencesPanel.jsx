@@ -54,14 +54,12 @@ function AppearanceSection({ theme, onChange, isSaving }) {
         <div className={styles.settingsTile}>
           <SectionHeader
             title="Appearance"
-            description="Customize how StudyFlax looks"
           />
           <div className={styles.formGroup}>
             <label>Interface Mode</label>
             <ThemeSelector value={theme.mode} onChange={(m) => onChange({ ...theme, mode: m })} />
           </div>
-          <div className={styles.formGroup} style={{ marginTop: '32px' }}>
-            <label>Color Theme</label>
+          <div className={styles.formGroup} style={{ marginTop: '16px' }}>
             <ThemeGridSelector value={theme.theme} onChange={(t) => onChange({ ...theme, theme: t })} />
           </div>
           <SubmitButton
@@ -73,11 +71,12 @@ function AppearanceSection({ theme, onChange, isSaving }) {
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>🎨</span>
-        <h3 className={styles.contextCardTitle}>Theme preferences</h3>
+        <h3 className={styles.contextCardTitle}>Picking a theme</h3>
+        <p className={styles.contextCardBody}>Choose a palette that suits your study style:</p>
         <ul className={styles.contextCardList}>
-          <li>Consistent look across every page</li>
-          <li>Lower eye strain during long sessions</li>
-          <li>Personalised experience on login</li>
+          <li>🔥 Warm — cosy, earthy tones for long sessions</li>
+          <li>❄️ Cool — clean blues and greens for focus</li>
+          <li>🌸 Soft — gentle pastels, easy at night</li>
         </ul>
       </div>
     </div>
