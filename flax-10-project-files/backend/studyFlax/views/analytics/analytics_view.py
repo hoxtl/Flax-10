@@ -29,13 +29,13 @@ def _aggregate_totals(sessions):
     return {k: v or 0 for k, v in agg.items()}
 
 def _build_daily_breakdown(sessions):
-    """Build sorted daily work/break/session-count breakdown."""
+    """Build sorted daily work/break/session-count breakdown. work and break are in minutes."""
     daily = defaultdict(lambda: {'date': '', 'work': 0, 'break': 0, 'sessions': 0})
     for s in sessions:
         key = s.end_time.date().isoformat()
         daily[key]['date'] = key
-        daily[key]['work'] += s.duration / 60
-        daily[key]['break'] += s.break_duration / 60
+        daily[key]['work'] += s.duration
+        daily[key]['break'] += s.break_duration
         daily[key]['sessions'] += 1
     return sorted(daily.values(), key=lambda x: x['date'])
 
@@ -43,7 +43,7 @@ def _build_heatmap(sessions):
     """Build a 7x24 heatmap of study minutes by weekday and hour."""
     data = [[0] * 24 for _ in range(7)]
     for s in sessions:
-        data[s.end_time.weekday()][s.end_time.hour] += s.duration / 60
+        data[s.end_time.weekday()][s.end_time.hour] += s.duration
     return data
 
 def _build_analytics_response(sessions, days):
@@ -74,11 +74,11 @@ def _build_summary_dict(sessions, totals, current_streak, longest_streak):
     """Assemble the summary dict from precomputed values."""
     return {
         'total_sessions': sessions.count(),
-        'total_study_hours': round(totals['total_study'] / 3600, 1),
-        'total_break_hours': round(totals['total_break'] / 3600, 1),
+        'total_study_hours': round(totals['total_study'] / 60, 1),
+        'total_break_hours': round(totals['total_break'] / 60, 1),
         'total_pause_duration': totals['total_pause'],
-        'avg_session_minutes': round(totals['avg_dur'] / 60, 1),
-        'longest_session_minutes': round(totals['max_dur'] / 60, 1),
+        'avg_session_minutes': round(totals['avg_dur'], 1),
+        'longest_session_minutes': round(totals['max_dur'], 1),
         'current_streak_days': current_streak,
         'longest_streak_days': longest_streak,
         'overtime_sessions': sessions.filter(status='Overtime').count(),
@@ -94,7 +94,7 @@ def _build_actual_by_day(sessions):
     """Aggregate actual study minutes per day from sessions."""
     by_day = defaultdict(int)
     for s in sessions:
-        by_day[s.end_time.date().isoformat()] += s.duration / 60
+        by_day[s.end_time.date().isoformat()] += s.duration
     return by_day
 
 def _build_planned_by_day(events):

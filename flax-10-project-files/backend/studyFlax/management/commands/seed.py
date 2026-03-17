@@ -317,9 +317,16 @@ class Command(BaseCommand):
         self.stdout.write(f" {count} random students seeded with reading history.")
 
     def _seed_attendance(self):
+<<<<<<< Updated upstream
         _EA = EventAttendance
         now = timezone.now()
         students = list(User.objects.filter(role='student'))
+=======
+        from studyFlax.models import EventAttendance
+        now = timezone.now()
+        students = list(User.objects.filter(role='student'))
+        events_created = attendance_created = 0
+>>>>>>> Stashed changes
         weeks_back = int((now - _ATT_SEED_START).days / 7)
 
         # Build all session data up-front (no DB queries yet)
@@ -327,12 +334,21 @@ class Command(BaseCommand):
         for user in students:
             profile = _ATT_USER_PROFILES.get(user.username, random.choice(_ATT_RANDOM_PROFILES))
             modules = [e.module for e in Enrollment.objects.filter(student=user).select_related('module')]
+<<<<<<< Updated upstream
+=======
+            if not modules:
+                continue
+
+            # Build all candidate sessions for this user upfront
+            candidates = []
+>>>>>>> Stashed changes
             for module in modules:
                 for week_offset in range(weeks_back + 1):
                     week_start = _ATT_SEED_START + timedelta(weeks=week_offset)
                     if _ATT_READING_WEEK[0] <= week_start <= _ATT_READING_WEEK[1]:
                         continue
                     for s in _att_week_sessions(module.module_code, week_start):
+<<<<<<< Updated upstream
                         if s['start'] >= now:
                             continue
                         all_session_data.append((user, profile, s))
@@ -380,6 +396,63 @@ class Command(BaseCommand):
             new_att.append(_EA(user=user, event=event, attended=attended))
         _EA.objects.bulk_create(new_att, ignore_conflicts=True)
         attendance_created = len(new_att)
+=======
+                        if s['start'] < now:
+                            candidates.append(s)
+
+            if not candidates:
+                continue
+
+            candidate_ext_ids = {s['external_id'] for s in candidates}
+
+            # Bulk fetch existing events for this user
+            existing_events = {
+                e.external_id: e
+                for e in CalendarEvent.objects.filter(user=user, external_id__in=candidate_ext_ids)
+            }
+
+            # Bulk create missing events
+            new_events = [
+                CalendarEvent(
+                    user=user, source=s['source'], external_id=s['external_id'],
+                    title=s['title'], description=s['description'],
+                    start_time=s['start'], end_time=s['end'],
+                    location=s['location'], priority='high',
+                )
+                for s in candidates
+                if s['external_id'] not in existing_events
+            ]
+            if new_events:
+                CalendarEvent.objects.bulk_create(new_events, ignore_conflicts=True)
+                events_created += len(new_events)
+
+            # Re-fetch all events (existing + newly created)
+            all_events = {
+                e.external_id: e
+                for e in CalendarEvent.objects.filter(user=user, external_id__in=candidate_ext_ids)
+            }
+
+            # Bulk fetch existing attendance event IDs
+            existing_att_ids = set(
+                EventAttendance.objects.filter(
+                    user=user, event__in=all_events.values()
+                ).values_list('event_id', flat=True)
+            )
+
+            # Bulk create missing attendance records
+            new_att = []
+            for s in candidates:
+                event = all_events.get(s['external_id'])
+                if not event or event.id in existing_att_ids:
+                    continue
+                base = profile['attend_rate']
+                adjusted = profile['type_bias'].get(s['type_label'], base)
+                attended = (_stable_hash(f"{user.username}:{s['external_id']}") % 1000) / 1000.0 < adjusted
+                new_att.append(EventAttendance(user=user, event=event, attended=attended))
+            if new_att:
+                EventAttendance.objects.bulk_create(new_att, ignore_conflicts=True)
+                attendance_created += len(new_att)
+>>>>>>> Stashed changes
 
         self.stdout.write(f"  Created {events_created} timetable events and {attendance_created} attendance records.")
 

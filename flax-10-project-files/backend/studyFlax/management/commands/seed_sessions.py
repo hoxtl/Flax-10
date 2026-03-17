@@ -11,14 +11,20 @@ from .seed_session_helpers import build_study_sessions_for_user, build_theme_ses
 User = get_user_model()
 
 PROFILES = {
-    'janedoe': ('balanced', 'balanced'),
+    'johndoe': ('consistent', 'consistent'),
+    'janedoe': ('consistent', 'balanced'),
     'charlie': ('night_owl', 'night_owl'),
+    'riley':   ('balanced', 'balanced'),
+    'nina':    ('consistent', 'consistent'),
+    'omar':    ('night_owl', 'balanced'),
+    'sofia':   ('balanced', 'consistent'),
+    'liamk':   ('consistent', 'consistent'),
     'amiller': ('consistent', 'consistent'),
     'srahwan': ('balanced', 'balanced'),
-    'hpatel': ('consistent', 'consistent'),
-    'echen': ('night_owl', 'night_owl'),
+    'hpatel':  ('consistent', 'consistent'),
+    'echen':   ('night_owl', 'night_owl'),
     'jmurphy': ('balanced', 'consistent'),
-    'swan': ('balanced', 'balanced'),
+    'swan':    ('balanced', 'balanced'),
     'rkapoor': ('consistent', 'consistent'),
     'lturner': ('night_owl', 'balanced'),
 }
