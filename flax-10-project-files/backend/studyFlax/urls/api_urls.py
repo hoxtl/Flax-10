@@ -31,6 +31,7 @@ from studyFlax.views.calendar.event_views import event_list
 from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
 from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
 from studyFlax.views.calendar.timetable_views import timetable_import
+from studyFlax.views.calendar.event_map_view import calendar_events_map_view
 from studyFlax.views.calendar.attendance_views import (
     record_attendance,
     attendance_stats,
@@ -117,6 +118,7 @@ urlpatterns = [
     path("tags/<int:pk>/", tag_detail, name="tag-detail"),
     path("categories/", category_list, name="category-list"),
     path("timetable/import/", timetable_import, name="timetable-import"),
+    path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
 
     # Modules
     path("modules/", module_list, name="module-list"),

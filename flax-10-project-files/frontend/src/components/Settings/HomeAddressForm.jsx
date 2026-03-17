@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import EmptyState from "../common/EmptyState/EmptyState";
+import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import TextInput from "../common/TextInput/TextInput";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
@@ -47,6 +49,21 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
         <div>
           <div className={styles.settingsTile}>
             <div className={styles.formGroup}>
+                <label htmlFor="homeAddress" className={styles.label}>
+                    Address
+                </label>
+                <LocationAutocomplete
+                    value={homeAddress}
+                    onChange={setHomeAddress}
+                    placeholder="e.g., 123 Example Street, London, E1 B23"
+                />
+                  {error && (
+                    <EmptyState
+                      icon="⚠️"
+                      title="Could not save address"
+                      description={error}
+                    />
+                  )}
               <label htmlFor="homeAddress">Address</label>
               <TextInput
                 id="homeAddress"
