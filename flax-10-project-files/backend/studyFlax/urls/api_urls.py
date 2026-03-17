@@ -37,7 +37,6 @@ from studyFlax.views.calendar.attendance_view import (
     attendance_stats,
     attendance_records,
 )
-
 # Modules
 from studyFlax.views.modules.module_view import module_list, module_detail
 from studyFlax.views.modules.enrollment_view import enrollment_list, enrollment_detail
@@ -118,7 +117,9 @@ urlpatterns = [
     path("tags/<int:pk>/", tag_detail, name="tag-detail"),
     path("categories/", category_list, name="category-list"),
     path("timetable/import/", timetable_import, name="timetable-import"),
-    path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
+    path("attendance/record/", record_attendance, name="attendance-record"),
+    path("attendance/stats/", attendance_stats, name="attendance-stats"),
+    path("attendance/records/", attendance_records, name="attendance-records"),
 
     # Modules
     path("modules/", module_list, name="module-list"),
@@ -170,11 +171,6 @@ urlpatterns = [
         delete_suggestion,
         name="group-suggestion-delete",
     ),
-
-    # Attendance
-    path("attendance/record/", record_attendance, name="attendance-record"),
-    path("attendance/stats/", attendance_stats, name="attendance-stats"),
-    path("attendance/records/", attendance_records, name="attendance-records"),
 
     # Notifications
     path("notifications/", notification_list, name="notification-list"),
