@@ -2,8 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-from studyFlax.views.timer.timer_views import StudySessionViewSet
-from studyFlax.views.social.share_views import CalendarShareViewSet
+from studyFlax.views.timer.timer_view import StudySessionViewSet
+from studyFlax.views.social.share_view import CalendarShareViewSet
 
 def _register_router():
     router.register(r'timer/history', StudySessionViewSet, basename='study-session')
@@ -23,42 +23,42 @@ from studyFlax.views.user.profile_view import profile_view, another_user_profile
 from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.user.user_search_view import user_search
-from studyFlax.views.user.settings_views import onboarding_view
+from studyFlax.views.user.settings_view import onboarding_view
 from studyFlax.views.settings.user_settings_view import user_settings_view
 
 # Calendar
-from studyFlax.views.calendar.event_views import event_list
-from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
-from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
-from studyFlax.views.calendar.timetable_views import timetable_import
+from studyFlax.views.calendar.event_view import event_list
+from studyFlax.views.calendar.event_detail_view import event_detail, add_exception_date
+from studyFlax.views.calendar.tag_view import tag_list, tag_detail, category_list
+from studyFlax.views.calendar.timetable_view import timetable_import
 from studyFlax.views.calendar.event_map_view import calendar_events_map_view
-from studyFlax.views.calendar.attendance_views import (
+from studyFlax.views.calendar.attendance_view import (
     record_attendance,
     attendance_stats,
     attendance_records,
 )
 
 # Modules
-from studyFlax.views.modules.module_views import module_list, module_detail
-from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
-from studyFlax.views.modules.reading_views import (
+from studyFlax.views.modules.module_view import module_list, module_detail
+from studyFlax.views.modules.enrollment_view import enrollment_list, enrollment_detail
+from studyFlax.views.modules.reading_view import (
     reading_list, reading_detail, load_task, 
     suggested_readings, reading_speed
 )
-from studyFlax.views.modules.deadline_views import deadline_list, deadline_detail, upcoming_deadlines
+from studyFlax.views.modules.deadline_view import deadline_list, deadline_detail, upcoming_deadlines
 
 # Tasks
-from studyFlax.views.tasks.task_views import (
+from studyFlax.views.tasks.task_view import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
 )
-from studyFlax.views.groupwork.groupwork_views import (
+from studyFlax.views.groupwork.groupwork_view import (
     group_project_list,
     group_project_members,
     group_project_detail,
     group_project_member_detail,
 )
-from studyFlax.views.groupwork.availability_views import group_availability
-from studyFlax.views.groupwork.suggestion_views import create_suggestion, respond_to_suggestion, delete_suggestion
+from studyFlax.views.groupwork.availability_view import group_availability
+from studyFlax.views.groupwork.suggestion_view import create_suggestion, respond_to_suggestion, delete_suggestion
 
 # Societies
 from studyFlax.views.society import (
@@ -73,18 +73,18 @@ from studyFlax.views.society import (
 from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
 
 # Analytics
-from studyFlax.views.analytics.analytics_views import get_analytics_summary, get_progress_data
+from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.authentication.home_address_view import home_address_view
 
 # Admin
-from studyFlax.views.admin.admin_views import (
+from studyFlax.views.admin.admin_view import (
     user_list, ban_user,
     teacher_requests, resolve_teacher_request,
     reported_societies, dismiss_report, ban_reported_society,
     request_teacher_role, cancel_teacher_role_request,
 )
-from studyFlax.views.admin.course_change_views import (
+from studyFlax.views.admin.course_change_view import (
     request_course_change,
     my_course_change_request,
     list_course_change_requests,

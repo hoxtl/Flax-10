@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from studyFlax.models.groupwork.groupwork_models import GroupMembership
+from studyFlax.models.groupwork.groupworkModel import GroupMembership
 from studyFlax.models.notifications.notificationModel import Notification
 
 @receiver(post_save, sender=GroupMembership)

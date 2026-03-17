@@ -35,4 +35,4 @@ from studyFlax.models.tasks.taskModel import Task, TaskList
 from .social import *
 
 # Group work
-from .groupwork.groupwork_models import GroupProject, GroupMembership
+from .groupwork.groupworkModel import GroupProject, GroupMembership

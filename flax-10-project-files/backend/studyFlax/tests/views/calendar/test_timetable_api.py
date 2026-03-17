@@ -31,14 +31,14 @@ class TimetableViewTest(TestCase):
         response = self.client.post('/api/timetable/import/', {'source_url': ''})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch('studyFlax.views.calendar.timetable_views.sync_timetable')
+    @patch('studyFlax.views.calendar.timetable_view.sync_timetable')
     def test_import_success(self, mock_sync):
         mock_sync.return_value = {'created': 3, 'updated': 0, 'source_url': 'https://example.com/cal.ics'}
         response = self.client.post('/api/timetable/import/', {'source_url': 'https://example.com/cal.ics'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['created'], 3)
 
-    @patch('studyFlax.views.calendar.timetable_views.sync_timetable')
+    @patch('studyFlax.views.calendar.timetable_view.sync_timetable')
     def test_import_value_error(self, mock_sync):
         mock_sync.side_effect = ValueError('No .ics link found')
         response = self.client.post('/api/timetable/import/', {'source_url': 'https://example.com/page'})
@@ -51,13 +51,13 @@ class TimetableViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_validate_source_url_strips_whitespace(self):
-        from studyFlax.views.calendar.timetable_views import validate_source_url
+        from studyFlax.views.calendar.timetable_view import validate_source_url
         url, err = validate_source_url('  https://example.com/cal.ics  extra')
         self.assertEqual(url, 'https://example.com/cal.ics')
         self.assertIsNone(err)
 
     def test_validate_source_url_none(self):
-        from studyFlax.views.calendar.timetable_views import validate_source_url
+        from studyFlax.views.calendar.timetable_view import validate_source_url
         url, err = validate_source_url(None)
         self.assertIsNone(url)
         self.assertIsNotNone(err)
