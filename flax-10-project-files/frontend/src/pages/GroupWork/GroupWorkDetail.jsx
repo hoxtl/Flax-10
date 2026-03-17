@@ -1,4 +1,5 @@
 import { useState } from "react";
+import UserSearch from "../../components/Social/UserSearch";
 import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
 import { getUserColor } from "./utils/priorityUtils";
 import GroupTasksTab from "./GroupTasksTab";
@@ -63,19 +64,25 @@ function BackButton({ onClick }) {
 }
 
 function AddMemberForm({ projectId, onAdded }) {
-  const [userId, setUserId] = useState("");
-  const handleSubmit = async e => {
-    e.preventDefault();
-    if (!userId.trim()) return;
-    const body = JSON.stringify({ user: Number(userId), role: "member" });
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/`, { method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body });
-    if (res.ok) { onAdded(await res.json()); setUserId(""); }
+  const handleSelect = async (user) => {
+    if (!user?.id) return;
+    const body = JSON.stringify({ user: user.id, role: "member" });
+    const res = await fetch(`/api/group-work/projects/${projectId}/members/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      body,
+    });
+    if (res.ok) onAdded(await res.json());
   };
   return (
-    <form onSubmit={handleSubmit} className={styles.addMemberForm}>
-      <input value={userId} onChange={e => setUserId(e.target.value)} placeholder="Add member by user ID" className={styles.addMemberInput} />
-      <button type="submit" className={styles.addMemberBtn}>Add</button>
-    </form>
+    <div className={styles.addMemberForm}>
+      <UserSearch
+        onUserSelect={handleSelect}
+        fullWidth
+        hideFilter
+        compact
+      />
+    </div>
   );
 }
 
