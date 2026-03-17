@@ -57,6 +57,16 @@ class UserSettingsViewTest(TestCase):
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password('newpassword123'))
 
+    def test_patch_short_password_returns_400(self):
+        response = self.client.patch('/api/settings/', {'password': 'short'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_email_updates_user_email(self):
+        response = self.client.patch('/api/settings/', {'email': 'new@example.com'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.email, 'new@example.com')
+
     def test_unauthenticated_denied(self):
         self.client.force_authenticate(user=None)
         response = self.client.get('/api/settings/')
@@ -202,6 +212,11 @@ class LegacyUserSettingsViewTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['theme'], 'dark')
+
+    def test_patch_locked_major_returns_400(self):
+        UserSettings.objects.create(user=self.user, major='Physics', theme='light', timezone='Europe/London')
+        response = self.call_legacy_view('patch', '/api/user/settings/', {'major': 'Biochemistry'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class UserSettingsSerializerTests(TestCase):
     """Unit tests for UserSettingsSerialiser validation and computed fields."""

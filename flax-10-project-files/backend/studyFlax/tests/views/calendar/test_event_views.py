@@ -300,3 +300,25 @@ class EventViewsSharedCalendarTest(BaseEventTestCase):
 
         self.assert_event_response(response, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['title'], 'My Secret')
+
+
+class EventCreateOverlapLimitTests(BaseEventTestCase):
+    """Creating a 4th overlapping event returns 400."""
+
+    def test_create_fourth_overlapping_event_returns_400(self):
+        start = get_datetime_str(hours_offset=10)
+        end = get_datetime_str(hours_offset=11)
+        for i in range(3):
+            self.create_event_in_db({
+                'title': f'Overlap {i}',
+                'start_time': start,
+                'end_time': end,
+            })
+        data = {
+            'title': 'Fourth Overlap',
+            'start_time': start,
+            'end_time': end,
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assert_event_response(response, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('overlapping', response.data['error'])

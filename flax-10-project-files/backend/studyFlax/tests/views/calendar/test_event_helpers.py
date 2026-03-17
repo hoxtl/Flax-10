@@ -120,3 +120,129 @@ class EventHelperCoverageTest(TestCase):
         )
         result = get_base_instance(event, rule)
         self.assertEqual(result, [event])
+
+
+class RecurrenceEndDateTest(TestCase):
+    """Recurrence rule end_date stops instance generation."""
+
+    def test_end_date_stops_recurrence_expansion(self):
+        from studyFlax.views.calendar.event_helpers import expand_recurring_events
+
+        now = timezone.now()
+        rule = RecurrenceRule.objects.create(
+            frequency='daily', interval=1,
+            end_date=(now + timedelta(days=2)).date(),
+        )
+        user = User.objects.create_user(
+            username='enddate_user', email='enddate@example.com', password='pass',
+        )
+        event = CalendarEvent.objects.create(
+            user=user, title='Daily', start_time=now,
+            end_time=now + timedelta(hours=1), recurrence_rule=rule,
+        )
+        view_start = now - timedelta(days=1)
+        view_end = now + timedelta(days=30)
+        instances = expand_recurring_events([event], view_start, view_end)
+        for inst in instances:
+            self.assertLessEqual(inst.start_time.date(), rule.end_date)
+
+
+class ApplyFilterNoneRecurringTests(TestCase):
+    """_apply_start_end_filter and _apply_start_only_filter with recurring_qs=None."""
+
+    def test_apply_start_end_filter_with_none_recurring(self):
+        from studyFlax.views.calendar.event_helpers import _apply_start_end_filter
+        from django.db.models import Q
+
+        qs = CalendarEvent.objects.none()
+        start = timezone.now()
+        end = start + timedelta(days=1)
+        non_recurring = Q(recurrence_rule__isnull=True)
+        result = _apply_start_end_filter(qs, start, end, None, non_recurring)
+        self.assertEqual(result.count(), 0)
+
+    def test_apply_start_only_filter_with_none_recurring(self):
+        from studyFlax.views.calendar.event_helpers import _apply_start_only_filter
+        from django.db.models import Q
+
+        qs = CalendarEvent.objects.none()
+        start = timezone.now()
+        non_recurring = Q(recurrence_rule__isnull=True)
+        result = _apply_start_only_filter(qs, start, None, non_recurring)
+        self.assertEqual(result.count(), 0)
+
+    def test_apply_filter_dispatches_none_recurring(self):
+        from studyFlax.views.calendar.event_helpers import apply_filter
+
+        qs = CalendarEvent.objects.none()
+        start = timezone.now()
+        end = start + timedelta(days=1)
+        self.assertEqual(apply_filter(qs, start, end, None).count(), 0)
+        self.assertEqual(apply_filter(qs, start, None, None).count(), 0)
+
+
+class WrapperFunctionCoverageTest(TestCase):
+    """Tests for wrapper functions: get_next_occurrence, is_exception_date, should_stop_generating."""
+
+    def test_get_next_occurrence_returns_incremented_date(self):
+        from studyFlax.views.calendar.event_helpers import get_next_occurrence
+        start = timezone.now()
+        result = get_next_occurrence(start, 'daily', 1, 1)
+        self.assertIsNotNone(result)
+
+    def test_is_exception_date_true_when_date_in_list(self):
+        from studyFlax.views.calendar.event_helpers import is_exception_date
+        rule = RecurrenceRule.objects.create(
+            frequency='daily', interval=1,
+            exception_dates=[timezone.now().strftime('%Y-%m-%d')],
+        )
+        self.assertTrue(is_exception_date(timezone.now(), rule))
+
+    def test_is_exception_date_false_when_no_exceptions(self):
+        from studyFlax.views.calendar.event_helpers import is_exception_date
+        rule = RecurrenceRule.objects.create(frequency='daily', interval=1)
+        self.assertFalse(is_exception_date(timezone.now(), rule))
+
+    def test_should_stop_generating_true_past_end(self):
+        from studyFlax.views.calendar.event_helpers import should_stop_generating
+        rule = RecurrenceRule.objects.create(frequency='daily', interval=1)
+        future = timezone.now() + timedelta(days=10)
+        past_end = timezone.now() - timedelta(days=1)
+        self.assertTrue(should_stop_generating(future, past_end, rule))
+
+    def test_should_stop_generating_false_within_range(self):
+        from studyFlax.views.calendar.event_helpers import should_stop_generating
+        rule = RecurrenceRule.objects.create(frequency='daily', interval=1)
+        now = timezone.now()
+        self.assertFalse(should_stop_generating(now, now + timedelta(days=5), rule))
+
+
+class InternalHelperCoverageTest(TestCase):
+    """Tests for internal helper branches: None start, exception dates."""
+
+    def test_should_stop_generation_none_start_returns_true(self):
+        from studyFlax.views.calendar.event_helpers import _should_stop_generation
+        rule = RecurrenceRule.objects.create(frequency='daily', interval=1)
+        self.assertTrue(_should_stop_generation(None, timezone.now(), rule))
+
+    def test_is_instance_visible_false_on_exception_date(self):
+        from studyFlax.views.calendar.event_helpers import _is_instance_visible
+        now = timezone.now()
+        rule = RecurrenceRule.objects.create(
+            frequency='daily', interval=1,
+            exception_dates=[now.strftime('%Y-%m-%d')],
+        )
+        result = _is_instance_visible(
+            now, now + timedelta(hours=1),
+            now - timedelta(days=1), now + timedelta(days=1), rule,
+        )
+        self.assertFalse(result)
+
+    def test_is_occurrence_visible_false_on_none_start(self):
+        from studyFlax.views.calendar.event_helpers import _is_occurrence_visible
+        rule = RecurrenceRule.objects.create(frequency='daily', interval=1)
+        now = timezone.now()
+        result = _is_occurrence_visible(
+            None, timedelta(hours=1), now, now + timedelta(days=1), rule,
+        )
+        self.assertFalse(result)

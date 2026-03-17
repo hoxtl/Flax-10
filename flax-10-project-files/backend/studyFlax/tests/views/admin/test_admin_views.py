@@ -1,15 +1,22 @@
-"""Backend tests for admin views."""
+"""
+Tests for admin management views: users, bans, teacher requests, societies.
+"""
+
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 
+from studyFlax.models.notifications.notificationModel import Notification
 from studyFlax.models.society.societyModel import Society
+from studyFlax.models.society.societyMembershipModel import SocietyMembership
 from studyFlax.models.society.societyReportModel import SocietyReport
 from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
 
 User = get_user_model()
+
 
 class AdminUserListTest(TestCase):
     def setUp(self):
@@ -42,6 +49,7 @@ class AdminUserListTest(TestCase):
         bob = next(u for u in data if u['username'] == 'bob')
         self.assertIn('is_active', bob)
         self.assertIn('ban_reason', bob)
+
 
 class AdminBanUserTest(TestCase):
     def setUp(self):
@@ -101,6 +109,7 @@ class AdminBanUserTest(TestCase):
         response = authed_client(regular).post(self.url, {'action': 'ban', 'reason': ''}, format='json')
         self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
 
+
 class AdminTeacherRequestsTest(TestCase):
     def setUp(self):
         self.admin = make_superuser()
@@ -151,6 +160,7 @@ class AdminTeacherRequestsTest(TestCase):
         response = authed_client(regular).get(self.list_url)
         self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
 
+
 class RequestTeacherRoleTest(TestCase):
     def setUp(self):
         self.url = '/api/request-teacher-role/'
@@ -181,6 +191,7 @@ class RequestTeacherRoleTest(TestCase):
     def test_unauthenticated_request_returns_401(self):
         response = APIClient().post(self.url)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
 
 class AdminReportedSocietiesTest(TestCase):
     def setUp(self):
@@ -217,6 +228,7 @@ class AdminReportedSocietiesTest(TestCase):
         response = authed_client(self.admin).delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
 class LoginBannedUserTest(TestCase):
     def setUp(self):
         self.url = '/api/auth/login/'
@@ -236,3 +248,79 @@ class LoginBannedUserTest(TestCase):
     def test_banned_response_contains_correct_ban_reason(self):
         response = APIClient().post(self.url, {'username': 'banneduser', 'password': 'pass'})
         self.assertEqual(response.data.get('ban_reason'), 'Violated community guidelines')
+
+
+class BanReportedSocietyTest(TestCase):
+    def setUp(self):
+        self.admin = make_superuser()
+        self.reporter = make_user('reporter_ban')
+        self.creator = make_user('creator_ban')
+        self.society = Society.objects.create(name='BanSoc', bio='bio', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=self.creator, society=self.society, role='admin')
+        self.report = SocietyReport.objects.create(society=self.society, reporter=self.reporter, reason='Spam')
+
+    def test_ban_society_deletes_it(self):
+        url = f'/api/admin/reports/{self.report.id}/ban/'
+        response = authed_client(self.admin).post(url, {'reason': 'Violated rules'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Society.objects.filter(id=self.society.id).exists())
+
+    def test_ban_society_notifies_creator(self):
+        url = f'/api/admin/reports/{self.report.id}/ban/'
+        authed_client(self.admin).post(url, {'reason': 'Bad content'}, format='json')
+        self.assertTrue(Notification.objects.filter(user=self.creator).exists())
+
+    def test_ban_society_without_reason(self):
+        url = f'/api/admin/reports/{self.report.id}/ban/'
+        response = authed_client(self.admin).post(url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_ban_society_nonexistent_report_returns_404(self):
+        url = '/api/admin/reports/999999/ban/'
+        response = authed_client(self.admin).post(url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_ban_society_no_admin_membership(self):
+        society2 = Society.objects.create(name='NoAdmin', bio='bio', admin_emails='a@b.com')
+        report2 = SocietyReport.objects.create(society=society2, reporter=self.reporter, reason='Spam')
+        url = f'/api/admin/reports/{report2.id}/ban/'
+        response = authed_client(self.admin).post(url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Society.objects.filter(id=society2.id).exists())
+
+    def test_non_admin_cannot_ban_society(self):
+        url = f'/api/admin/reports/{self.report.id}/ban/'
+        response = authed_client(self.reporter).post(url, {}, format='json')
+        self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
+
+
+class CancelTeacherRoleRequestTest(TestCase):
+    def setUp(self):
+        self.url = '/api/cancel-teacher-role/'
+
+    def test_pending_teacher_can_cancel(self):
+        user = make_user('cancel_pending')
+        user.role = 'pending_teacher'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user.refresh_from_db()
+        self.assertEqual(user.role, 'student')
+
+    def test_student_cannot_cancel(self):
+        user = make_user('cancel_student')
+        user.role = 'student'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_teacher_cannot_cancel(self):
+        user = make_user('cancel_teacher')
+        user.role = 'teacher'
+        user.save()
+        response = authed_client(user).post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unauthenticated_cannot_cancel(self):
+        response = APIClient().post(self.url)
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])

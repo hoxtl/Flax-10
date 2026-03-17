@@ -85,7 +85,7 @@ def mask_private_event(event):
 def safe_sync_timetable(user):
     try:
         sync_timetable_if_needed(user)
-    except TimetableSyncError as exc:
+    except Exception as exc:
         _log_timetable_sync_error(exc)
 
 def create_event(request):

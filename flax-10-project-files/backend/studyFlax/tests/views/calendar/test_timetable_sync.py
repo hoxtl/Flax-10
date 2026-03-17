@@ -213,9 +213,9 @@ class TimetableSyncTest(TestCase):
     @patch("studyFlax.views.calendar.timetable_service.load_events")
     @patch("studyFlax.views.calendar.timetable_service.update_source_status")
     def test_sync_timetable_failure(self, mock_status, mock_load):
-        from studyFlax.views.calendar.timetable_service import sync_timetable
+        from studyFlax.views.calendar.timetable_service import sync_timetable, TimetableSyncError
         mock_load.side_effect = ValueError("No .ics link found")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TimetableSyncError):
             sync_timetable("https://example.com/page", self.user)
         mock_status.assert_called_once()
         args = mock_status.call_args[0]
@@ -236,3 +236,26 @@ class TimetableSyncTest(TestCase):
         mock_fetch.return_value = SAMPLE_ICS
         events = load_events("https://example.com/cal.ics", "example.com")
         self.assertEqual(len(events), 1)
+
+
+class TimetableImportViewTest(TestCase):
+    """Tests for the timetable_import view endpoint."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="tt_view", email="ttview@example.com", password="pass",
+        )
+        from rest_framework.test import APIClient
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = "/api/timetable/import/"
+
+    @patch("studyFlax.views.calendar.timetable_views.sync_timetable")
+    def test_sync_error_returns_503(self, mock_sync):
+        from studyFlax.views.calendar.timetable_service import TimetableSyncError
+        mock_sync.side_effect = TimetableSyncError("upstream failed")
+        response = self.client.post(
+            self.url, {"source_url": "https://example.com/cal.ics"}, format="json",
+        )
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("Unable to sync", response.data["detail"])

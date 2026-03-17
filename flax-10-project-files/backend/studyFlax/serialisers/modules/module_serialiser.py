@@ -42,10 +42,16 @@ class ModuleSerialiser(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def get_created_by_name(self, obj):
-        return format_teacher_name(obj.created_by)
+        try:
+            return format_teacher_name(obj.created_by)
+        except Exception:
+            return 'Unknown'
 
     def get_created_by_email(self, obj):
-        created_by = getattr(obj, "created_by", None)
+        try:
+            created_by = obj.created_by
+        except Exception:
+            return None
         return getattr(created_by, "email", None)
 
     def get_created_by_profile_photo_url(self, obj):

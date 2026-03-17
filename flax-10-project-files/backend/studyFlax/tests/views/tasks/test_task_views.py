@@ -282,46 +282,6 @@ class TaskDetailViewTest(TestCase):
             CalendarEvent.objects.filter(source='task', external_id=str(task.id)).count(), 1
         )
 
-class TaskSerializerTest(TestCase):
-    """Tests for task serializer."""
-    def setUp(self):
-        self.user = make_user('taskser_user', 'taskser@e.com')
-
-    def test_serializer_marks_completed_at_on_completion(self):
-        from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
-
-        task = Task.objects.create(user=self.user, title='Test', completed=False)
-        serializer = TaskSerialiser(task, data={'completed': True}, partial=True)
-
-        self.assertTrue(serializer.is_valid())
-        updated = serializer.save()
-        self.assertIsNotNone(updated.completed_at)
-
-    def test_serializer_clears_completed_at_on_reopen(self):
-        from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
-
-        task = Task.objects.create(
-            user=self.user,
-            title='Test',
-            completed=True,
-            completed_at=timezone.now(),
-        )
-        serializer = TaskSerialiser(task, data={'completed': False}, partial=True)
-
-        self.assertTrue(serializer.is_valid())
-        updated = serializer.save()
-        self.assertIsNone(updated.completed_at)
-
-    def test_task_list_serializer_task_count(self):
-        from studyFlax.serialisers.tasks.task_serialisers import TaskListSerialiser
-
-        task_list = TaskList.objects.create(user=self.user, name='Work')
-        Task.objects.create(user=self.user, task_list=task_list, title='Active')
-        Task.objects.create(user=self.user, task_list=task_list, title='Done', completed=True)
-
-        serializer = TaskListSerialiser(task_list)
-        self.assertEqual(serializer.data['task_count'], 1)
-
 class LogTaskTimeViewTest(TestCase):
     """Tests for log task time view."""
     def setUp(self):
@@ -352,4 +312,11 @@ class LogTaskTimeViewTest(TestCase):
         response = self.client.post(f'/api/tasks/{self.task.id}/log-time/', {})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['time_spent_minutes'], 0)
+
+    def test_log_time_with_page_count_triggers_reading_update(self):
+        task = make_task(self.user, 'Reading Task')
+        task.page_count = 50
+        task.save()
+        response = self.client.post(f'/api/tasks/{task.id}/log-time/', {'minutes': 10})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 

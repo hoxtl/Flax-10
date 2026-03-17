@@ -333,3 +333,25 @@ class RatificationSignalCoverageTest(TestCase):
         society.ratification_status = 'pending'
         society.save()
         self.assertEqual(Notification.objects.count(), initial_count)
+
+    def test_rejected_status_notifies_editors(self):
+        from studyFlax.signals.ratification_notifications import get_status_message
+        msg = get_status_message('TestSociety', 'rejected')
+        self.assertIn('rejected', msg)
+        self.assertIn('TestSociety', msg)
+
+    def test_approved_status_message(self):
+        from studyFlax.signals.ratification_notifications import get_status_message
+        msg = get_status_message('TestSociety', 'approved')
+        self.assertIn('approved', msg)
+
+    def test_fetch_old_status_returns_none_for_missing_pk(self):
+        from studyFlax.signals.ratification_notifications import _fetch_old_status
+        self.assertIsNone(_fetch_old_status(999999))
+
+    def test_resolve_event_action_returns_none_when_not_created_and_no_update(self):
+        from studyFlax.signals.society_notifications import _resolve_event_action
+        from unittest.mock import MagicMock
+        instance = MagicMock()
+        instance._is_update = False
+        self.assertIsNone(_resolve_event_action(instance, created=False))

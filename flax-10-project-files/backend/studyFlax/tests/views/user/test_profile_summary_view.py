@@ -337,3 +337,30 @@ class ProfileSummaryViewTest(TestCase):
         sessions = [self._make_session_for_persona(days_ago=i + 8, hour=10, duration=45) for i in range(7)]
         persona = derive_persona(sessions)
         self.assertEqual(persona['id'], 'afternoon_peak')
+
+    def test_teacher_profile_uses_module_count_from_created(self):
+        teacher = User.objects.create_user(
+            username='teach_prof', email='teach_prof@example.com',
+            password='pass', first_name='Dr', last_name='Smith', role='teacher',
+        )
+        self.client.force_authenticate(user=teacher)
+        Module.objects.create(
+            module_code='CS999', module_name='Advanced AI',
+            created_by=teacher, start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['societies'], [])
+
+    def test_teacher_profile_returns_empty_societies(self):
+        teacher = User.objects.create_user(
+            username='teach_soc', email='teach_soc@example.com',
+            password='pass', first_name='Dr', last_name='Jones', role='teacher',
+        )
+        self.client.force_authenticate(user=teacher)
+        society = Society.objects.create(name='TeachSoc', bio='bio', admin_emails='a@b.com')
+        SocietyMembership.objects.create(user=teacher, society=society, role='member')
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['societies'], [])

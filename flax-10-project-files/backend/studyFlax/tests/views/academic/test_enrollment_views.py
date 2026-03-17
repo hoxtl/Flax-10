@@ -127,7 +127,7 @@ class ModuleAndEnrollmentHelperCoverageTest(TestCase):
         self.assertFalse(is_core_module(self.student, self.module))
 
     @patch('studyFlax.views.modules.enrollment_logic.get_course_prefixes', return_value=['CS'])
-    def test_is_core_module_true_with_matching_prefix(self):
+    def test_is_core_module_true_with_matching_prefix(self, _mock_prefixes):
         from studyFlax.views.modules.enrollment_views import is_core_module
         UserSettings.objects.create(user=self.student, major='Coverage Major')
         self.assertTrue(is_core_module(self.student, self.module))
@@ -137,3 +137,10 @@ class ModuleAndEnrollmentHelperCoverageTest(TestCase):
         notification = build_module_deleted_notification(self.student, self.module)
         self.assertEqual(notification.user, self.student)
         self.assertEqual(notification.notification_type, 'module_deleted')
+
+    @patch('studyFlax.views.modules.enrollment_logic.create_enrollment_events')
+    def test_safe_create_enrollment_events_catches_operational_error(self, mock_create):
+        from django.db import OperationalError
+        from studyFlax.views.modules.enrollment_logic import _safe_create_enrollment_events
+        mock_create.side_effect = OperationalError('db error')
+        _safe_create_enrollment_events(self.student, self.module)
