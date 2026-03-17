@@ -1,3 +1,6 @@
+"""
+Model storing external timetable feed URLs and sync state per user.
+"""
 from django.db import models
 from ..auth.userModel import User
 

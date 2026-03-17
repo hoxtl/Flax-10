@@ -13,18 +13,14 @@ from studyFlax.models.society.societyModel import Society
 
 User = get_user_model()
 
-
 def make_user(username='miscuser', email='misc@example.com'):
     return User.objects.create_user(username=username, email=email, password='pass')
-
 
 def make_society(name='Misc Society'):
     return Society.objects.create(name=name, bio='Bio', admin_emails='a@test.com')
 
-
 def make_member(user, society):
     return SocietyMembership.objects.create(user=user, society=society, role='member')
-
 
 class SocietyHelpersTest(TestCase):
     """Tests for society helpers."""

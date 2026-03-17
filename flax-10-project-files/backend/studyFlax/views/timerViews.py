@@ -1,15 +1,16 @@
+"""
+ViewSet for creating and managing study timer sessions.
+"""
+
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import models as db_models
 from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.serialisers.timer_serialisers import StudySessionSerializer
-
+from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
 
 class StudySessionViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows study sessions to be viewed or edited.
-    """
+    """API endpoint that allows study sessions to be viewed or edited."""
     serializer_class = StudySessionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -32,9 +33,7 @@ class StudySessionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['delete'])
     def clear_history(self, request):
-        """
-        Delete all study sessions for the current user.
-        """
+        """Delete all study sessions for the current user."""
         deleted_count, _ = self.get_queryset().delete()
         return Response(
             {"message": f"Successfully deleted {deleted_count} sessions."},

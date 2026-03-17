@@ -1,8 +1,10 @@
+"""
+Model tracking which users have synced a society's events to their calendar.
+"""
 from django.db import models
 
 from ..auth.userModel import User
 from .societyModel import Society
-
 
 class SocietyCalendarSync(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='society_calendar_syncs')

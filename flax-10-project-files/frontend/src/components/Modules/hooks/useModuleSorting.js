@@ -18,6 +18,10 @@ export default function useModuleSorting(modules) {
     const totalPages = Math.ceil(results.length / PAGE_SIZE);
 
     const handleNewSort = (sort) => { setSortBy(sort); setCurrentPage(1); };
+    const clearFilters = () => {
+        setSelectedCourses([]);
+        setCurrentPage(1);
+    };
 
-    return { pageModules, results, selectedCourses, toggleCourse, sortBy, currentPage, totalPages, handleNewSort, setCurrentPage };
+    return { pageModules, results, selectedCourses, toggleCourse, sortBy, currentPage, totalPages, handleNewSort, setCurrentPage, clearFilters };
 }

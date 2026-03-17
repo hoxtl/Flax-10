@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import styles from "./OnboardingModal.module.css";
 
 const hintStyle = {
-  background: 'var(--hover-bg, #f5f5f5)', borderRadius: '10px',
+  background: 'var(--surface)', borderRadius: '10px',
   padding: '0.9rem 1rem', fontSize: '0.88rem',
   color: 'var(--text)', marginBottom: '1.5rem', lineHeight: 1.6,
 };
