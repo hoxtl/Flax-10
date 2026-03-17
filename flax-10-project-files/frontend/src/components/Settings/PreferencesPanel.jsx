@@ -10,155 +10,226 @@ import { SectionHeader, SubmitButton, ThemeSelector, ThemeGridSelector } from ".
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 
-function ModeFormGroup({ mode, onChange }) {
+function sleepDuration(sleepTime, wakeTime) {
+  const [sh, sm] = sleepTime.split(":").map(Number);
+  const [wh, wm] = wakeTime.split(":").map(Number);
+  let mins = wh * 60 + wm - (sh * 60 + sm);
+  if (mins <= 0) mins += 24 * 60;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return { label: m > 0 ? `${h}h ${m}m` : `${h}h`, meta: `${mins} minutes total` };
+}
+
+function SleepCard({ totalMins, duration }) {
+  const h = totalMins / 60;
+  // Map hours to position on scale: 0h=0%, 10h=100%
+  const pct = Math.min(98, Math.max(2, (h / 10) * 100));
+  // Colors match the gradient: amber → green → violet
+  const color = h > 9 ? "#7c3aed" : h >= 7 ? "#15803d" : h >= 5 ? "#eab308" : "#f59e0b";
+  const qualityLabel = h > 9 ? "Too much" : h >= 7 ? "Great" : h >= 5 ? "Fair" : "Low";
+
   return (
-    <div className={styles.formGroup}>
-      <label>Interface Mode</label>
-      <p className={styles.formDescription}>Choose between light or dark mode.</p>
-      <ThemeSelector value={mode} onChange={onChange} />
+    <div className={styles.sleepDurationCard} role="status" aria-live="polite" style={{ "--sleepLabelColor": color }}>
+      <span className={styles.sleepMoonWatermark}>🌙</span>
+      <div className={styles.sleepCardTopRow}>
+        <div>
+          <div className={styles.sleepDurationMain}>{duration.label}</div>
+          <div className={styles.sleepDurationMeta}>{duration.meta}</div>
+        </div>
+        <span className={styles.sleepBatteryLabel}>
+          {qualityLabel}
+        </span>
+      </div>
+      <div className={styles.sleepGradientTrack}>
+        <div className={styles.sleepGradientIndicator} style={{ left: `${pct}%` }} />
+      </div>
     </div>
   );
 }
 
-function ThemeGridFormGroup({ theme, onChange }) {
+function AppearanceSection({ theme, onChange, isSaving }) {
   return (
-    <div className={styles.formGroup} style={{ marginTop: '32px' }}>
-      <label>Color Theme</label>
-      <p className={styles.formDescription}>Personalize your StudyFlax interface with a custom color palette.</p>
-      <ThemeGridSelector value={theme} onChange={onChange} />
+    <div className={styles.twoColLayout}>
+      <div>
+        <div className={styles.settingsTile}>
+          <SectionHeader
+            title="Appearance"
+            description="Customize how StudyFlax looks"
+          />
+          <div className={styles.formGroup}>
+            <label>Interface Mode</label>
+            <ThemeSelector value={theme.mode} onChange={(m) => onChange({ ...theme, mode: m })} />
+          </div>
+          <div className={styles.formGroup} style={{ marginTop: '32px' }}>
+            <label>Color Theme</label>
+            <ThemeGridSelector value={theme.theme} onChange={(t) => onChange({ ...theme, theme: t })} />
+          </div>
+          <SubmitButton
+            isSaving={isSaving}
+            label="Save Appearance"
+            savingLabel="Saving..."
+          />
+        </div>
+      </div>
+      <div className={styles.contextCard}>
+        <span className={styles.contextCardEmoji}>🎨</span>
+        <h3 className={styles.contextCardTitle}>Theme preferences</h3>
+        <ul className={styles.contextCardList}>
+          <li>Consistent look across every page</li>
+          <li>Lower eye strain during long sessions</li>
+          <li>Personalised experience on login</li>
+        </ul>
+      </div>
     </div>
   );
 }
 
-function usePreferencesForm() {
-  const { mode, setMode, theme, setTheme } = useTheme();
-  const [formData, setFormData] = useState({ mode, theme });
-
-  const handleModeChange = (newMode) => {
-    setFormData(prev => ({ ...prev, mode: newMode }));
-    setMode(newMode);
-  };
-
-  const handleThemeChange = (newTheme) => {
-    setFormData(prev => ({ ...prev, theme: newTheme }));
-    setTheme(newTheme);
-  };
-
-  return { formData, handleModeChange, handleThemeChange };
-}
-
-export default function PreferencesPanel({ onSave, onSleepSave, isSaving, activeSubTab = "themes" }) {
-  const { formData, handleModeChange, handleThemeChange: handleLocalThemeChange } = usePreferencesForm();
-
-  const [sleepTime, setSleepTime] = useState("23:00");
-  const [wakeTime, setWakeTime] = useState("07:00");
-  const [loadingSleep, setLoadingSleep] = useState(true);
-
-  useEffect(() => {
-    getUserSettings()
-      .then((data) => {
-        if (data?.sleep_time) setSleepTime(data.sleep_time.slice(0, 5));
-        if (data?.wake_time) setWakeTime(data.wake_time.slice(0, 5));
-      })
-      .finally(() => setLoadingSleep(false));
-  }, []);
-
-  const handlePreferencesSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  const handleSleepSubmit = (e) => {
-    e.preventDefault();
-    onSleepSave({ sleep_time: sleepTime, wake_time: wakeTime });
-  };
-
-  const getSleepStats = () => {
-    const [sh, sm] = sleepTime.split(":").map(Number);
-    const [wh, wm] = wakeTime.split(":").map(Number);
-    let mins = wh * 60 + wm - (sh * 60 + sm);
-    if (mins <= 0) mins += 24 * 60;
-    const h = Math.floor(mins / 60);
-    const m = mins % 60;
-    const totalHours = h + m / 60;
-    
-    // Map 4h-12h to 0-100% for the gradient track
-    const minH = 4;
-    const maxH = 12;
-    const pct = Math.min(100, Math.max(0, ((totalHours - minH) / (maxH - minH)) * 100));
-    
-    return {
-      label: m > 0 ? `${h}h ${m}m` : `${h}h`,
-      percentage: pct
-    };
-  };
-
-  if (loadingSleep) return <SectionSkeleton label="Loading preferences" rows={6} />;
-
-  const stats = getSleepStats();
+function SleepSection({
+  sleepTime,
+  wakeTime,
+  onSleepChange,
+  onWakeChange,
+  onSubmit,
+  isSaving,
+  hasUnsaved,
+  saveSignal,
+}) {
+  const duration = sleepDuration(sleepTime, wakeTime);
+  const [sh, sm] = sleepTime.split(":").map(Number);
+  const [wh, wm] = wakeTime.split(":").map(Number);
+  let totalMins = wh * 60 + wm - (sh * 60 + sm);
+  if (totalMins <= 0) totalMins += 24 * 60;
 
   return (
-    <div className={styles.preferencesContainer}>
-      <div className={styles.preferencesContent}>
-        {activeSubTab === 'themes' && (
-          <form onSubmit={handlePreferencesSubmit} className={styles.form}>
-            <SectionHeader title="Appearance" description="Customize how StudyFlax looks" />
-            <ModeFormGroup mode={formData.mode} onChange={handleModeChange} />
-            <ThemeGridFormGroup theme={formData.theme} onChange={handleLocalThemeChange} />
-            <SubmitButton isSaving={isSaving} label="Save Appearance" savingLabel="Saving..." />
-          </form>
-        )}
-
-        {activeSubTab === 'sleep' && (
-          <form onSubmit={handleSleepSubmit} className={styles.form}>
+    <div className={styles.twoColLayout}>
+      <div>
+        <div className={styles.settingsTile}>
+          <form onSubmit={onSubmit}>
             <SectionHeader
               title="Sleep Schedule"
               description="We'll warn you if you try to add tasks during your sleep window."
             />
-
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Bedtime</label>
                 <DateTimePicker
                   value={sleepTime}
-                  onChange={(v) => setSleepTime(v || "23:00")}
+                  onChange={(v) => onSleepChange(v || "23:00")}
                   placeholder="Pick bedtime"
                   timeOnly
                 />
               </div>
-
               <div className={styles.formGroup}>
                 <label>Wake up</label>
                 <DateTimePicker
                   value={wakeTime}
-                  onChange={(v) => setWakeTime(v || "07:00")}
+                  onChange={(v) => onWakeChange(v || "07:00")}
                   placeholder="Pick wake time"
                   timeOnly
                 />
               </div>
             </div>
-
             <div className={styles.formGroup}>
               <label>Sleep duration</label>
-              <div className={styles.sleepDurationCard}>
-                <div className={styles.sleepMoonWatermark}>🌙</div>
-                <div className={stats.percentage > 40 && stats.percentage < 70 ? styles.sleepDurationMainIdeal : styles.sleepDurationMain}>
-                  {stats.label}
-                </div>
-                <div className={styles.sleepDurationMeta}>
-                  {stats.percentage > 40 && stats.percentage < 70 ? "Ideal performance" : "Outside recommended range"}
-                </div>
-                <div className={styles.sleepGradientTrack}>
-                  <div 
-                    className={styles.sleepGradientIndicator} 
-                    style={{ left: `${stats.percentage}%` }}
-                  />
-                </div>
-              </div>
+              <SleepCard totalMins={totalMins} duration={duration} />
             </div>
-
-            <SubmitButton isSaving={isSaving} label="Save Sleep Schedule" savingLabel="Saving..." />
+            <SubmitButton
+              isSaving={isSaving}
+              label="Save Sleep Schedule"
+              savingLabel="Saving..."
+              hasUnsaved={hasUnsaved}
+              saveSignal={saveSignal}
+            />
           </form>
+        </div>
+      </div>
+      <div className={styles.contextCard}>
+        <span className={styles.contextCardEmoji}>🌙</span>
+        <h3 className={styles.contextCardTitle}>Sleep planning</h3>
+        <p className={styles.contextCardBody}>
+          StudyFlax uses these hours to reduce late-night prompts and schedule tasks around your rest.
+        </p>
+        <ul className={styles.contextCardList}>
+          <li>Fewer distractions during sleep hours</li>
+          <li>Better timing for reminders and sessions</li>
+          <li>More realistic daily study plans</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default function PreferencesPanel({ onSave, onSleepSave, isSaving, activeSubTab = "themes" }) {
+  const { mode, setMode, theme, setTheme } = useTheme();
+  const [sleepTime, setSleepTime] = useState("23:00");
+  const [wakeTime, setWakeTime] = useState("07:00");
+  const [initialSleepTime, setInitialSleepTime] = useState("23:00");
+  const [initialWakeTime, setInitialWakeTime] = useState("07:00");
+  const [loadingSleep, setLoadingSleep] = useState(true);
+  const [sleepSaveSignal, setSleepSaveSignal] = useState(0);
+
+  useEffect(() => {
+    getUserSettings()
+      .then((data) => {
+        if (data?.sleep_time) {
+          const nextSleepTime = data.sleep_time.slice(0, 5);
+          setSleepTime(nextSleepTime);
+          setInitialSleepTime(nextSleepTime);
+        }
+        if (data?.wake_time) {
+          const nextWakeTime = data.wake_time.slice(0, 5);
+          setWakeTime(nextWakeTime);
+          setInitialWakeTime(nextWakeTime);
+        }
+      })
+      .finally(() => setLoadingSleep(false));
+  }, []);
+
+  const handlePreferencesSubmit = (newData) => {
+    if (newData.mode) setMode(newData.mode);
+    if (newData.theme) setTheme(newData.theme);
+    onSave(newData);
+  };
+
+  const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
+
+  if (loadingSleep) return <SectionSkeleton label="Loading preferences" rows={6} />;
+
+  return (
+    <div className={styles.preferencesContainer}>
+      <div className={styles.preferencesContent}>
+        {activeSubTab === 'themes' && (
+          <form onSubmit={(e) => { e.preventDefault(); handlePreferencesSubmit({ mode, theme }); }}>
+            <AppearanceSection
+              theme={{ mode, theme }}
+              onChange={(newData) => {
+                if (newData.mode) setMode(newData.mode);
+                if (newData.theme) setTheme(newData.theme);
+              }}
+              isSaving={isSaving}
+            />
+          </form>
+        )}
+
+        {activeSubTab === 'sleep' && (
+          <SleepSection
+            sleepTime={sleepTime}
+            wakeTime={wakeTime}
+            onSleepChange={setSleepTime}
+            onWakeChange={setWakeTime}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const ok = await onSleepSave({ sleep_time: sleepTime, wake_time: wakeTime });
+              if (ok) {
+                setInitialSleepTime(sleepTime);
+                setInitialWakeTime(wakeTime);
+                setSleepSaveSignal((s) => s + 1);
+              }
+            }}
+            isSaving={isSaving}
+            hasUnsaved={hasUnsavedSleep}
+            saveSignal={sleepSaveSignal}
+          />
         )}
       </div>
     </div>
