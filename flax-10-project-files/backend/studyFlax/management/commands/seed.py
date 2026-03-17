@@ -17,6 +17,7 @@ from collections import defaultdict
 from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.db import connection
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent, 
     UserSettings, Module, Enrollment, Deadline,
@@ -146,6 +147,7 @@ class Command(BaseCommand):
         self.categories = list(Category.objects.all())
         self.create_tags()
         self._load_shared_data()
+        self._ensure_calendarevent_schema_defaults()
         self.create_events_for_users()
         self.create_modules()
         self.modules = list(Module.objects.all())
@@ -162,7 +164,79 @@ class Command(BaseCommand):
         self.create_study_sessions()
         self.create_readings()
         self.print_stats()  
-        
+
+    def _default_sql_for_column_type(self, data_type):
+        """Return a safe SQL default literal for a required column's type."""
+        if data_type == 'boolean':
+            return 'FALSE'
+        if data_type in {'smallint', 'integer', 'bigint', 'numeric', 'real', 'double precision', 'decimal'}:
+            return '0'
+        if data_type == 'json':
+            return "'[]'::json"
+        if data_type == 'jsonb':
+            return "'[]'::jsonb"
+        if data_type in {'character varying', 'character', 'text'}:
+            return "''"
+        if data_type == 'date':
+            return 'CURRENT_DATE'
+        if data_type.startswith('timestamp'):
+            return 'CURRENT_TIMESTAMP'
+        if data_type == 'time without time zone':
+            return "'00:00:00'::time"
+        if data_type == 'uuid':
+            return "'00000000-0000-0000-0000-000000000000'::uuid"
+        return None
+
+    def _ensure_calendarevent_schema_defaults(self):
+        """Patch required DB columns unknown to the Django model (schema drift)."""
+        table_name = CalendarEvent._meta.db_table
+        model_columns = {field.column for field in CalendarEvent._meta.local_fields}
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT column_name, data_type
+                FROM information_schema.columns
+                WHERE table_schema = current_schema()
+                  AND table_name = %s
+                  AND is_nullable = 'NO'
+                  AND column_default IS NULL
+                ORDER BY ordinal_position
+                """,
+                [table_name],
+            )
+            required_without_default = cursor.fetchall()
+
+        drifted_columns = [
+            (column_name, data_type)
+            for column_name, data_type in required_without_default
+            if column_name != 'id' and column_name not in model_columns
+        ]
+        if not drifted_columns:
+            return
+
+        self.stdout.write(
+            self.style.WARNING(
+                "Detected schema drift on CalendarEvent; applying DB defaults for required unknown columns."
+            )
+        )
+
+        quoted_table = connection.ops.quote_name(table_name)
+        with connection.cursor() as cursor:
+            for column_name, data_type in drifted_columns:
+                default_sql = self._default_sql_for_column_type(data_type)
+                if not default_sql:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"  Skipped {column_name} ({data_type}) - no safe default mapping."
+                        )
+                    )
+                    continue
+                quoted_column = connection.ops.quote_name(column_name)
+                cursor.execute(
+                    f"ALTER TABLE {quoted_table} ALTER COLUMN {quoted_column} SET DEFAULT {default_sql}"
+                )
+                self.stdout.write(f"  Set default {column_name} ({data_type}) -> {default_sql}")
 
     def create_admin_user(self):
         """Create the johndoe superuser if one does not already exist."""
