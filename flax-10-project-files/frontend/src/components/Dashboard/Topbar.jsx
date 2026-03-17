@@ -124,8 +124,14 @@ function NotifTab() {
 }
 
 function ActionPill({ onNavChange }) {
+  const openQuickActions = () => window.dispatchEvent(new CustomEvent("quick-actions:open"));
   return (
     <div className={styles.actionPill}>
+      <button type="button" className={styles.quickActionsBtn} onClick={openQuickActions}>
+        Quick actions
+        <span className={styles.quickActionsKey}>/</span>
+      </button>
+      <div className={styles.pillDivider} />
       <ThemeToggle />
       <div className={styles.pillDivider} />
       <NotifTab />
