@@ -58,6 +58,17 @@ class MembershipViewCoverageTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_add_collaborator_by_username(self):
+        target = User.objects.create_user(
+            username='collab_target', email='collab_target@test.com', password='pass'
+        )
+        response = self.client.post(
+            f'/api/societies/{self.society.id}/members/',
+            {'username': target.username},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_add_teacher_collaborator_denied(self):
         teacher = User.objects.create_user(
             username='teacher_mem', email='teacher_mem@test.com', password='pass'
