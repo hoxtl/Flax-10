@@ -5,13 +5,14 @@ import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import styles from "./GroupWorkDetail.module.css";
 
 function GroupWorkDetailSkeleton({ onBack }) {
   return (
     <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
       <div className={styles.topBar}>
-        <BackButton onClick={onBack} />
+        <BackButton onClick={onBack} label="Back to All Projects" />
         <SkeletonBlock className={styles.skeletonDeleteBtn} />
       </div>
       <section className={styles.headerSection}>
@@ -53,14 +54,6 @@ function GroupWorkDetailSkeleton({ onBack }) {
   );
 }
 
-function BackButton({ onClick }) {
-  return (
-    <button type="button" onClick={onClick} className={styles.backButton}>
-      <span>←</span>
-      <span>Back to all projects</span>
-    </button>
-  );
-}
 
 function AddMemberForm({ projectId, onAdded }) {
   const [userId, setUserId] = useState("");
@@ -196,7 +189,7 @@ export default function GroupProjectDetail({ projectId, onBack }) {
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
-        <BackButton onClick={onBack} />
+        <BackButton onClick={onBack} label="Back to All Projects" />
         <button type="button" onClick={d.handleDeleteProject} className={styles.deleteProjectBtn}>Delete project</button>
       </div>
       <ProjectHeader project={d.project} members={d.members} onPatch={d.patchProject} taskStats={d.taskStats} />

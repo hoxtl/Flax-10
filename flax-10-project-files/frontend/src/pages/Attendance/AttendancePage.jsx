@@ -1,4 +1,6 @@
 import { useState } from "react";
+import AppPage from "../../components/common/AppPage/AppPage";
+import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
 import { useTimetableEvents } from "./hooks/useTimetableEvents";
 import { useAttendanceRecords } from "./hooks/useAttendanceRecords";
@@ -57,20 +59,19 @@ export default function AttendancePage() {
 
   if (loading) {
     return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Attendance</h1>
-        <p className={styles.subtitle}>Loading…</p>
-      </div>
+      <AppPage title="Attendance" subtitle="Loading…">
+        <div className={styles.loadingContainer}>
+          <p>Please wait while we fetch your stats...</p>
+        </div>
+      </AppPage>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Attendance</h1>
-        <p className={styles.subtitle}>Track your attendance for lectures, small groups, and labs.</p>
+      <AppPage title="Attendance" subtitle="Track your attendance for lectures, small groups, and labs.">
         <p className={styles.error}>{error}</p>
-      </div>
+      </AppPage>
     );
   }
 
@@ -81,13 +82,17 @@ export default function AttendancePage() {
   const byTypeData = withByTypeColors(byTypeEntries);
   const hasAnyData = (overall.attended + overall.missed) > 0 || byTypeEntries.length > 0;
 
-  return (
-    <div className={styles.page}>
-      <h1 className={styles.title}>Attendance</h1>
-      <p className={styles.subtitle}>
-        Track your attendance for lectures, small groups, and labs.
-      </p>
+  const tabOptions = [
+    { value: TAB_RECORD, label: `Record (${unmarkedEvents.length})` },
+    { value: TAB_MARKED, label: `Marked (${markedEvents.length})` },
+  ];
 
+  return (
+    <AppPage
+      title="Attendance"
+      subtitle="Track your attendance for lectures, small groups, and labs."
+      width="xl"
+    >
       {!hasAnyData && (
         <p className={styles.empty}>
           No attendance recorded yet. Use the list below to mark events, or you’ll get a prompt during or after class.
@@ -129,35 +134,29 @@ export default function AttendancePage() {
       {!eventsLoading && (
         <div className={styles.listPanel}>
           <div className={styles.attendanceTabs}>
-            <button
-              type="button"
-              className={listTab === TAB_RECORD ? styles.attendanceTabActive : styles.attendanceTab}
-              onClick={() => setListTab(TAB_RECORD)}
-            >
-              Record attendance ({unmarkedEvents.length})
-            </button>
-            <button
-              type="button"
-              className={listTab === TAB_MARKED ? styles.attendanceTabActive : styles.attendanceTab}
-              onClick={() => setListTab(TAB_MARKED)}
-            >
-              Marked attendance ({markedEvents.length})
-            </button>
+            <SegmentedControl
+              options={tabOptions}
+              value={listTab}
+              onChange={setListTab}
+              fill
+            />
           </div>
-          {listTab === TAB_RECORD && (
-            <RecordAttendanceList
-              events={unmarkedEvents}
-              onRecorded={refetchAll}
-            />
-          )}
-          {listTab === TAB_MARKED && (
-            <MarkedAttendanceList
-              markedEvents={markedEvents}
-              onRecorded={refetchAll}
-            />
-          )}
+          <div className={styles.listContent}>
+            {listTab === TAB_RECORD && (
+              <RecordAttendanceList
+                events={unmarkedEvents}
+                onRecorded={refetchAll}
+              />
+            )}
+            {listTab === TAB_MARKED && (
+              <MarkedAttendanceList
+                markedEvents={markedEvents}
+                onRecorded={refetchAll}
+              />
+            )}
+          </div>
         </div>
       )}
-    </div>
+    </AppPage>
   );
 }

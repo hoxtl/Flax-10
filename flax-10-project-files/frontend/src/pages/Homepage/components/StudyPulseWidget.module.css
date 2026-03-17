@@ -28,10 +28,11 @@
 }
 
 .headerIconWrap {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: rgba(196, 164, 109, 0.08);
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,16 +40,16 @@
 }
 
 .headerIcon {
-  color: #C4A46D;
+  color: var(--widget-accent);
   flex-shrink: 0;
 }
 
 .headerTitle {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 12px;
-  font-weight: 700;
-  color: #2c1810;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -56,7 +57,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  color: #9b856f;
+  color: var(--widget-text-secondary);
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 600;
@@ -69,13 +70,13 @@
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  color: #8e775f;
+  color: var(--widget-text-tertiary);
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .headerLink:hover {
-  color: #8B7355;
+  color: var(--widget-accent);
   transform: translateX(1px);
 }
 
@@ -92,12 +93,13 @@
   flex-direction: column;
   width: 55%;
   flex-shrink: 0;
+  padding-left: 4px;
   padding-right: 16px;
 }
 
 .divider {
   width: 1px;
-  background: rgba(139, 115, 85, 0.08);
+  background: var(--widget-border);
   flex-shrink: 0;
   align-self: stretch;
 }
@@ -121,8 +123,8 @@
 
 .ringWrap {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,7 +137,7 @@
 
 .ringTrack {
   fill: none;
-  stroke: #F0EBE3;
+  stroke: var(--surface-inner);
 }
 
 .ringFill {
@@ -154,7 +156,7 @@
 .ringPct {
   font-size: 13px;
   font-weight: 700;
-  color: #1A1207;
+  color: var(--widget-text-primary);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -167,7 +169,7 @@
 
 .ringHours {
   font-size: 11px;
-  color: #A89279;
+  color: var(--widget-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -177,7 +179,7 @@
   gap: 3px;
   font-size: 10px;
   font-weight: 600;
-  color: #C4946D;
+  color: var(--widget-accent);
 }
 
 /* ─── Daily bars ──────────────────────────────── */
@@ -196,14 +198,14 @@
 .dailyDay {
   font-size: 9px;
   font-weight: 700;
-  color: #A89279;
+  color: var(--widget-text-secondary);
   width: 10px;
   text-align: center;
   flex-shrink: 0;
 }
 
 .dailyDayToday {
-  color: #2c1810;
+  color: var(--widget-text-primary);
   font-weight: 800;
 }
 
@@ -211,7 +213,7 @@
   flex: 1;
   height: 4px;
   border-radius: 2px;
-  background: #F0EBE3;
+  background: var(--surface-inner);
   overflow: hidden;
   position: relative;
 }
@@ -227,7 +229,7 @@
 
 .dailyHours {
   font-size: 9px;
-  color: #A89279;
+  color: var(--widget-text-secondary);
   width: 24px;
   text-align: right;
   flex-shrink: 0;
@@ -235,7 +237,7 @@
 }
 
 .dailyHoursToday {
-  color: #2c1810;
+  color: var(--widget-text-primary);
   font-weight: 700;
 }
 
@@ -271,15 +273,15 @@
   margin-bottom: auto;
   padding: 10px 11px;
   border-radius: 12px;
-  border: 1px solid rgba(139, 115, 85, 0.08);
-  background: rgba(248, 243, 236, 0.55);
+  border: 1px solid var(--widget-border);
+  background: var(--surface-inner);
 }
 
 /* ─── Right column ────────────────────────────── */
 .windowLabel {
   font-size: 9px;
   font-weight: 600;
-  color: #A89279;
+  color: var(--widget-text-tertiary);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0 0 6px;
@@ -295,7 +297,7 @@
 .windowTime {
   font-size: 13px;
   font-weight: 700;
-  color: #1A1207;
+  color: var(--widget-text-primary);
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
@@ -305,8 +307,8 @@
   align-items: center;
   padding: 2px 8px;
   border-radius: 5px;
-  background: #F5F0E8;
-  color: #736048;
+  background: var(--surface-raised);
+  color: var(--widget-text-secondary);
   font-size: 10px;
   font-weight: 600;
   flex-shrink: 0;
@@ -314,14 +316,14 @@
 
 .windowNext {
   font-size: 10px;
-  color: #A89279;
+  color: var(--widget-text-secondary);
   margin: 5px 0 0;
   line-height: 1.4;
 }
 
 .windowEmpty {
   font-size: 12px;
-  color: #B8A890;
+  color: var(--widget-text-secondary);
   margin: 4px 0 0;
 }
 
@@ -333,18 +335,18 @@
   margin-top: 12px;
   padding: 7px 10px;
   border-radius: 8px;
-  background: #FAFAF6;
-  border: 1px solid rgba(139, 115, 85, 0.05);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
 }
 
 .peakIcon {
-  color: #C4A46D;
+  color: var(--widget-accent);
   flex-shrink: 0;
 }
 
 .peakText {
   font-size: 10px;
-  color: #8B7355;
+  color: var(--widget-text-secondary);
   font-weight: 500;
 }
 
@@ -352,21 +354,23 @@
 .startBtn {
   width: 100%;
   margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #3b2819 0%, #5a3d26 100%);
-  color: #FFFCF8;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--color-primary-solid);
+  color: var(--color-on-primary);
   font-size: 11px;
-  font-weight: 600;
-  border: none;
+  font-weight: 700;
+  border: 1px solid var(--color-primary-strong);
   cursor: pointer;
   text-align: center;
-  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
-  letter-spacing: 0.01em;
-  box-shadow: 0 10px 20px rgba(60, 40, 24, 0.12);
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .startBtn:hover {
-  background: linear-gradient(135deg, #2f1f13 0%, #4d331f 100%);
-  transform: translateY(-1px);
+  background: var(--color-primary-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import BackButton from "../BackButton/BackButton.jsx";
 import styles from "./PageHeader.module.css";
 
 /**
@@ -7,8 +8,9 @@ import styles from "./PageHeader.module.css";
  *   title    – required string, shown as the h1
  *   subtitle – optional string, shown below the title
  *   action   – optional ReactNode, floated to the right (e.g. a button or toggle)
+ *   onBack   – optional function, if provided, shows a back button on the left
  */
-export default function PageHeader({ title, subtitle, action, compact = false }) {
+export default function PageHeader({ title, subtitle, action, onBack, compact = false }) {
   return (
     <motion.div
       className={`${styles.header} ${compact ? styles.headerCompact : ""}`}
@@ -16,9 +18,14 @@ export default function PageHeader({ title, subtitle, action, compact = false })
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className={styles.titleGroup}>
-        <h1 className={styles.title}>{title}</h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+      <div className={styles.leftGroup}>
+        {onBack && (
+          <BackButton onClick={onBack} className={styles.backButton} />
+        )}
+        <div className={styles.titleGroup}>
+          <h1 className={styles.title}>{title}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </div>
       </div>
       {action && <div className={styles.action}>{action}</div>}
     </motion.div>

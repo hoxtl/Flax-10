@@ -4,8 +4,9 @@
 }
 
 .message {
-    color: var(--text);
-    line-height: 1.6;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-size: var(--text-base);
 }
 
 .buttons {
@@ -13,10 +14,16 @@
     justify-content: flex-end;
     gap: var(--space-3);
     flex-wrap: wrap;
+    padding-top: var(--space-4);
+    border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.buttonsCentered {
+    justify-content: center;
 }
 
 .cancelBtn,
 .alternateBtn,
 .confirmBtn {
-    min-width: 112px;
+    min-width: 108px;
 }

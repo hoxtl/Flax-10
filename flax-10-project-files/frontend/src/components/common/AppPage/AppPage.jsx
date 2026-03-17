@@ -9,6 +9,7 @@ export default function AppPage({
   title,
   subtitle,
   action,
+  onBack,
   toolbar,
   width = "xl",
   className = "",
@@ -20,8 +21,8 @@ export default function AppPage({
 
   return (
     <section className={joinClassNames(styles.page, widthClass, className)} {...props}>
-      {(title || subtitle || action) && (
-        <PageHeader title={title} subtitle={subtitle} action={action} />
+      {(title || subtitle || action || onBack) && (
+        <PageHeader title={title} subtitle={subtitle} action={action} onBack={onBack} />
       )}
       {toolbar && <div className={styles.toolbar}>{toolbar}</div>}
       <div className={joinClassNames(styles.content, contentClassName)}>{children}</div>

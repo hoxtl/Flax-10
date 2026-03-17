@@ -36,12 +36,12 @@
 
   /* Urgent Orange: deadline pressure signal */
   .bentoGrid.urgentOrangeActive .triageDeadlines {
-    border: 1.5px solid var(--urgency-accent, #FF9F67) !important;
-    box-shadow: 0 0 0 3px rgba(255, 159, 103, 0.12);
+    border: 1.5px solid var(--danger-border) !important;
+    box-shadow: 0 0 0 3px var(--danger-bg);
   }
   .bentoGrid.urgentOrangeActive .triageHero {
-    border: 1.5px solid var(--urgency-accent, #FF9F67) !important;
-    box-shadow: 0 0 0 3px rgba(255, 159, 103, 0.10);
+    border: 1.5px solid var(--danger-border) !important;
+    box-shadow: 0 0 0 3px var(--danger-bg);
   }
 
   /* Top Triage Row: 3-column grid; all align to top */

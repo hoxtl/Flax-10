@@ -15,6 +15,7 @@ import ModuleDetails from '../../components/Modules/ModuleDetails.jsx';
 import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import AnimatedDropdown from '../../components/common/AnimatedDropdown';
 import ModuleCourseFilter from '../../components/Modules/ModuleCourseFilter';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
@@ -91,7 +92,7 @@ function useModulesPage(initialSearch = '', initialCreate = false) {
         return () => window.removeEventListener("modules:show-all", showAllModules);
     }, [setSearchParams]);
 
-    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook , reading_module, setReadingModule };
+    return { is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook, reading_module, setReadingModule };
 }
 
 function useMainView(state) {
@@ -180,7 +181,7 @@ export default function ModulesPage({ initialSearch = '', initialCreate = false 
             {!show_form && !viewing_module && deadline_module && (
                 <DeadlineModal module={deadline_module} onClose={() => setDeadlineModule(null)} />
             )}
-             {!show_form && !viewing_module && reading_module && (
+            {!show_form && !viewing_module && reading_module && (
                 <ReadingModal module={reading_module} onClose={() => setReadingModule(null)} />
             )}
         </>
@@ -236,17 +237,17 @@ function MainView({ state }) {
                 </PrimaryButton>
             )}
         >
-            <ModuleToolbar search={search} sorting={sorting} isTeacher={is_teacher}/>
+            <ModuleToolbar search={search} sorting={sorting} isTeacher={is_teacher} />
             <ModuleResults sorting={sorting} search={search} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule}
-                setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} setReadingModule={setReadingModule}/>
+                setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} setReadingModule={setReadingModule} />
         </AppPage>
     );
 }
 
-function ModuleToolbar({ search, sorting , isTeacher}) {
+function ModuleToolbar({ search, sorting, isTeacher }) {
     const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }, { value: 'deadlines', label: 'Deadlines' }];
     const selectedCourses = sorting.selectedCourses || [];
-    const onToggleCourse = sorting.toggleCourse || (() => {});
+    const onToggleCourse = sorting.toggleCourse || (() => { });
     return (
         <PageToolbar
             searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
@@ -256,7 +257,7 @@ function ModuleToolbar({ search, sorting , isTeacher}) {
                         <ModuleCourseFilter selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} filterMode={search.filter} onFilterModeChange={search.onFilterChange} />
                     )}
                     <ToolbarSortControl>
-                        <AnimatedDropdown className={styles.sortDropdown} value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
+                        <SegmentedControl value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
                     </ToolbarSortControl>
                 </>
             }
@@ -264,7 +265,7 @@ function ModuleToolbar({ search, sorting , isTeacher}) {
     );
 }
 
-function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule,  setReadingModule  }) {
+function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule }) {
     const activeCourses = sorting.selectedCourses || [];
     const hasActiveFilter = search.filter !== 'all' || activeCourses.length > 0;
     if (sorting.results.length === 0) {

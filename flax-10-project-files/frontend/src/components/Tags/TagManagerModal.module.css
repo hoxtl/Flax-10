@@ -73,10 +73,15 @@
     border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
 }
 
-.actions .delete:hover {
-    background: color-mix(in srgb, var(--danger) 20%, transparent);
+.actions .delete {
     color: var(--danger);
-    border-color: color-mix(in srgb, var(--danger) 48%, var(--border));
+    border-color: color-mix(in srgb, var(--danger) 30%, var(--border));
+}
+
+.actions .delete:hover {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+    border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
 }
 
 .addBtn {

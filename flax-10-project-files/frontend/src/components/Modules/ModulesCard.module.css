@@ -34,11 +34,9 @@
     top: 0;
     bottom: 0;
     width: 6px;
-    background: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--sage) 68%, var(--primary) 32%),
-        color-mix(in srgb, var(--sage) 44%, transparent)
-    );
+    background: linear-gradient(to bottom,
+            color-mix(in srgb, var(--sage) 68%, var(--primary) 32%),
+            color-mix(in srgb, var(--sage) 44%, transparent));
     box-shadow: 1px 0 0 color-mix(in srgb, var(--sage) 35%, transparent);
     pointer-events: none;
 }
@@ -109,8 +107,8 @@
 }
 
 .iconWrap {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--card-icon-radius);
     display: grid;
     place-items: center;
@@ -301,6 +299,7 @@
     color: var(--text);
     cursor: pointer;
 }
+
 .deadlineButton:hover {
     background: var(--hover);
 }

@@ -1,0 +1,29 @@
+.backButton {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: none;
+    background: var(--hover);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.backButton:hover {
+    background: var(--border);
+    transform: translateX(-2px);
+}
+
+.arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.backButton:hover .arrow {
+    transform: translateX(-1px);
+}

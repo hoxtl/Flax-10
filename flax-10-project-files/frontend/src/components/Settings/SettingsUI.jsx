@@ -6,16 +6,27 @@ import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import FormField from "../common/FormField/FormField";
+export { FormField };
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import TextInput from "../common/TextInput/TextInput";
+import { THEME_GROUPS } from "../../context/ThemeConstants";
 
 const TAB_CONFIG = [
-  { id: "account",     label: "Account",     icon: User,     group: "My Details" },
-  { id: "home",        label: "Location",    icon: MapPin,   group: "My Details" },
-  { id: "security",    label: "Security",    icon: Lock,     group: "My Details" },
-  { id: "preferences", label: "Preferences", icon: Palette,  group: "Preferences" },
-  { id: "course",      label: "Teacher Access", icon: BookOpen, group: "Teacher" },
+  { id: "account", label: "Account", icon: User, group: "My Details" },
+  { id: "home", label: "Location", icon: MapPin, group: "My Details" },
+  { id: "security", label: "Security", icon: Lock, group: "My Details" },
+  { 
+    id: "preferences", 
+    label: "Preferences", 
+    icon: Palette, 
+    group: "Preferences",
+    children: [
+      { id: "preferences_themes", label: "Themes" },
+      { id: "preferences_sleep", label: "Sleep Time" }
+    ]
+  },
+  { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
 ];
 
 function getProfileCompletion(user) {
@@ -64,16 +75,40 @@ export function SettingsSidebar({ activeTab, onChange, user }) {
             <div className={styles.sidebarSectionLabel}>{group}</div>
             {TAB_CONFIG.filter((t) => t.group === group).map((tab) => {
               const Icon = tab.icon;
+              const isParentActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
+              const hasChildren = Boolean(tab.children);
+
               return (
-                <button
-                  key={tab.id}
-                  className={`${styles.navItem} ${activeTab === tab.id ? styles.navItemActive : ""}`}
-                  onClick={() => onChange(tab.id)}
-                  aria-current={activeTab === tab.id ? "page" : undefined}
-                >
-                  <Icon className={styles.navIcon} size={15} strokeWidth={2} />
-                  {tab.label}
-                </button>
+                <div key={tab.id} className={styles.navItemGroup}>
+                  <button
+                    className={`${styles.navItem} ${activeTab === tab.id ? styles.navItemActive : ""} ${isParentActive && hasChildren ? styles.navItemParentActive : ""}`}
+                    onClick={() => onChange(hasChildren ? tab.children[0].id : tab.id)}
+                    aria-current={activeTab === tab.id ? "page" : undefined}
+                    aria-expanded={hasChildren ? isParentActive : undefined}
+                  >
+                    <Icon className={styles.navIcon} size={15} strokeWidth={2} />
+                    {tab.label}
+                    {hasChildren && (
+                      <span className={`${styles.chevron} ${isParentActive ? styles.chevronRotated : ""}`}>
+                        ▾
+                      </span>
+                    )}
+                  </button>
+                  
+                  {hasChildren && isParentActive && (
+                    <div className={styles.subItems}>
+                      {tab.children.map((child) => (
+                        <button
+                          key={child.id}
+                          className={`${styles.subItem} ${activeTab === child.id ? styles.subItemActive : ""}`}
+                          onClick={() => onChange(child.id)}
+                        >
+                          {child.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -148,16 +183,7 @@ export function SubmitButton({
   );
 }
 
-export function FormInput({
-  id,
-  label,
-  type = "text",
-  value,
-  onChange,
-  required,
-  name,
-  maxLength,
-}) {
+export function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength, autoComplete }) {
   const remaining = maxLength ? maxLength - value.length : null;
   return (
     <FormField
@@ -166,23 +192,11 @@ export function FormInput({
       label={
         <>
           {label}
-      {maxLength && (
-        <span className={styles.fieldMeta}>
-          ({remaining} characters remaining)
-        </span>
-      )}
+          {maxLength && <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>({remaining} characters remaining)</span>}
         </>
       }
     >
-      <TextInput
-        type={type}
-        id={id}
-        name={name || id}
-        value={value}
-        onChange={onChange}
-        required={required}
-        maxLength={maxLength}
-      />
+      <TextInput type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} autoComplete={autoComplete} />
     </FormField>
   );
 }
@@ -215,7 +229,7 @@ export function ThemeSelector({ value, onChange }) {
     <div className={styles.themeSelector}>
       {[
         { id: "light", label: "Light" },
-        { id: "dark",  label: "Dark" },
+        { id: "dark", label: "Dark" },
       ].map((opt) => (
         <button
           key={opt.id}
@@ -235,6 +249,50 @@ export function ThemeSelector({ value, onChange }) {
             </span>
           </div>
         </button>
+      ))}
+    </div>
+  );
+}
+
+function ThemePreview({ type, data }) {
+  return (
+    <div className={styles.themePreview} style={{ background: data.bg, borderColor: data.border }}>
+      <span className={styles.swatchTitle} style={{ color: data.text }}>{type}</span>
+      <div className={styles.swatchGrid}>
+        <div className={styles.swatch} style={{ background: data.primary }} />
+        <div className={styles.swatch} style={{ background: data.highlight }} />
+        <div className={styles.swatch} style={{ background: data.card }} />
+        <div className={styles.swatch} style={{ background: data.sidebar }} />
+      </div>
+    </div>
+  );
+}
+
+function ThemeCard({ t, currentTheme, onChange }) {
+  const isActive = currentTheme === t.id;
+  return (
+    <div className={`${styles.themeCard} ${isActive ? styles.active : ''}`} onClick={() => onChange(t.id)}>
+      <span className={styles.themeName}>{t.name}</span>
+      <div className={styles.themePreviewContainer}>
+        <ThemePreview type="Light" data={t.light} />
+        <ThemePreview type="Dark" data={t.dark} />
+      </div>
+    </div>
+  );
+}
+
+export function ThemeGridSelector({ value, onChange }) {
+  return (
+    <div>
+      {THEME_GROUPS.map(group => (
+        <div key={group.label} style={{ marginBottom: '24px' }}>
+          <p className={styles.groupLabel}>{group.label}</p>
+          <div className={styles.themeGrid}>
+            {group.themes.map(t => (
+              <ThemeCard key={t.id} t={t} currentTheme={value} onChange={onChange} />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

@@ -25,6 +25,8 @@ function SuccessEmoji() {
   );
 }
 
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+
 export default function SuccessScreen({ major, onComplete }) {
   return (
     <motion.div key="success" initial={{ opacity: 0, scale: 0.96 }}
@@ -36,7 +38,7 @@ export default function SuccessScreen({ major, onComplete }) {
         Your modules for <strong>{major}</strong> have been added to your profile.
       </p>
       <EnrolmentsHint />
-      <button className={styles.btn} onClick={onComplete}>Open Settings</button>
+      <PrimaryButton onClick={onComplete} pill width="100%">Open Settings</PrimaryButton>
     </motion.div>
   );
 }

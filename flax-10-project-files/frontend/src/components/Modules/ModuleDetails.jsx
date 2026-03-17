@@ -3,6 +3,7 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.j
 import { formatDate } from '../Calendar/utils/dateUtils.js';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback.js';
+import BackButton from '../common/BackButton/BackButton.jsx';
 import styles from './ModuleDetails.module.css';
 
 function getSortedDeadlines(deadlines = []) {
@@ -79,7 +80,9 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
     return (
         <div className={styles.container}>
-            <button className={styles.backButton} onClick={onBack}>← Back to all modules</button>
+            <div className={styles.backButtonHeader}>
+                <BackButton onClick={onBack} label="Back to All Modules" />
+            </div>
 
             <section className={styles.hero}>
                 <div className={styles.heroTop}>

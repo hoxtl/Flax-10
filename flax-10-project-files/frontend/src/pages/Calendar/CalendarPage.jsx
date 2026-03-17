@@ -1,4 +1,6 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import AppPage from "../../components/common/AppPage/AppPage";
 import { Calendar } from "../../components/Calendar/Calendar";
 import PillFilters from "../../components/Tags/PillFilters";
 import {
@@ -72,30 +74,39 @@ export default function CalendarPage() {
 
   if (isLoading && allEvents.length === 0) {
     return (
-      <CalendarPageSkeleton showSearch={!isListOrTable} />
+      <AppPage title="Calendar" subtitle="Schedule & events" width="full">
+        <CalendarPageSkeleton showSearch={!isListOrTable} />
+      </AppPage>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.stickyHeader}>
-        <CalendarHeader />
-        {showFilters && (
-          <div className={styles.filters}>
-            <PillFilters
-              active={filter}
-              onChange={handleFilterChange}
-              items={visibleItems}
-            />
-          </div>
-        )}
+    <AppPage
+      title="Calendar"
+      subtitle="Your scheduled events and study sessions"
+      width="full"
+      className={styles.page}
+    >
+      <div className={styles.calendarContainer}>
+        <div className={styles.stickyHeader}>
+          <CalendarHeader />
+          {showFilters && (
+            <div className={styles.filters}>
+              <PillFilters
+                active={filter}
+                onChange={handleFilterChange}
+                items={visibleItems}
+              />
+            </div>
+          )}
+        </div>
+
+        <main className={styles.mainContent}>
+          <Calendar />
+        </main>
       </div>
 
-      <main className={styles.mainContent}>
-        <Calendar />
-      </main>
-
       <EventPopups />
-    </div>
+    </AppPage>
   );
 }

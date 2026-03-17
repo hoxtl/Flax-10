@@ -12,7 +12,7 @@
   text-align: center;
   background: var(--panel, #f6f4f1);
   border-radius: 8px;
-  color: var(--muted, #8b7355);
+  color: var(--muted, var(--color-primary));
 }
 
 .calendar-view-relative-wrapper {

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import styles from "./BannedPage.module.css";
 
 function handleBackToAuth() {
@@ -54,16 +55,15 @@ function BannedReason({ reason }) {
   );
 }
 
-function BackButton() {
+function BannedBackButton() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.42, duration: 0.3 }}
+      style={{ display: 'flex', justifyContent: 'center' }}
     >
-      <button className={styles.backBtn} onClick={handleBackToAuth}>
-        Back to Sign In
-      </button>
+      <BackButton onClick={handleBackToAuth} label="Back to Sign In" />
     </motion.div>
   );
 }
@@ -79,7 +79,7 @@ export default function BannedPage({ reason }) {
       <BannedIcon />
       <BannedHeading />
       <BannedReason reason={reason} />
-      <BackButton />
+      <BannedBackButton />
     </motion.div>
   );
 }

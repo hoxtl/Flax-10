@@ -2,7 +2,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useTheme } from '../../context/ThemeContext';
 
 const DailyBreakdownChart = ({ data, theme: themeProp, height = 300 }) => {
-  const { theme } = useTheme();
+  const { mode: theme } = useTheme();
   const resolvedTheme = themeProp ?? theme;
   const last7Days = data?.slice(-7) ?? [];
   const dates = last7Days.map(d => new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' }));

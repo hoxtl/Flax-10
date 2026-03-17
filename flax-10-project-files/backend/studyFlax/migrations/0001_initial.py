@@ -420,7 +420,7 @@ class Migration(migrations.Migration):
             name='UserSettings',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('theme', models.CharField(max_length=50)),
+                ('theme', models.CharField(default='flax', max_length=50)),
                 ('timezone', models.CharField(max_length=100)),
                 ('year', models.CharField(blank=True, default='', max_length=50)),
                 ('major', models.CharField(blank=True, default='', max_length=100)),

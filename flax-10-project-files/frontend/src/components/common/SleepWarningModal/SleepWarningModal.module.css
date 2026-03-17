@@ -1,39 +1,20 @@
-.overlay {
-  position: fixed;
-  inset: 0;
+.body {
   display: grid;
-  place-items: center;
-  background: var(--surface-overlay);
-  z-index: 1500;
-  padding: var(--space-4);
+  gap: var(--space-3);
 }
 
-.modal {
-  width: min(520px, 100%);
-  padding: var(--modal-padding);
-  border-radius: var(--modal-radius);
-  background: var(--surface-card);
-  border: var(--card-border);
-  box-shadow: var(--modal-shadow);
-  display: grid;
-  gap: var(--space-4);
-}
-
-.title {
+.message {
   margin: 0;
-  color: var(--text);
-  font-size: var(--text-xl);
-}
-
-.body,
-.question {
-  margin: 0;
-  color: var(--text);
-  line-height: 1.6;
-}
-
-.question {
   color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: var(--text-base);
+}
+
+.question {
+  margin: 0;
+  color: var(--text);
+  font-weight: 500;
+  font-size: var(--text-base);
 }
 
 .actions {
@@ -41,6 +22,8 @@
   justify-content: flex-end;
   gap: var(--space-3);
   flex-wrap: wrap;
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .cancelBtn,
