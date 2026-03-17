@@ -15,6 +15,7 @@ import AnimatedDropdown from "../../components/common/AnimatedDropdown";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
 import { usePagination } from "../../hooks/usePagination";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 
 const PAGE_SIZE = 15;
 
@@ -62,7 +63,7 @@ function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
     return (
         <>
             <header className={styles.header}>
-                <button onClick={onBack} className={styles.backBtn}>← Back</button>
+                <BackButton onClick={onBack} label="Back" />
             </header>
             <div className={styles.browseToolbar}>
                 <div className={styles.browseSearch}>

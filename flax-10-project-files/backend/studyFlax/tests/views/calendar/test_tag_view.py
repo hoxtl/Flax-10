@@ -124,8 +124,8 @@ class TagListTests(BaseTestCase):
 
     def test_tag_list_with_enrollment_shows_system_tags(self):
         from django.utils import timezone
-        from studyFlax.models.modules.enrollmentModel import Enrollment
-        from studyFlax.models.modules.moduleModel import Module
+        from studyFlax.models.modules.enrollment_model import Enrollment
+        from studyFlax.models.modules.module_model import Module
 
         Module.objects.create(
             module_code='ZZZ999',
@@ -155,9 +155,9 @@ class TagListTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_tag_list_with_society_sync_shows_societies_tag(self):
-        from studyFlax.models.society.societyModel import Society
-        from studyFlax.models.society.societyMembershipModel import SocietyMembership
-        from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
+        from studyFlax.models.society.society_model import Society
+        from studyFlax.models.society.society_membership_model import SocietyMembership
+        from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
         from studyFlax.views.calendar.system_tags import get_societies_tag
         society = Society.objects.create(name='TagSyncSoc', bio='bio', admin_emails='a@b.com')
         SocietyMembership.objects.create(user=self.user, society=society, role='member')

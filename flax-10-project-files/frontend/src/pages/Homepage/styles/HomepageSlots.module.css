@@ -1,359 +1,4 @@
 /* Homepage slots & layout — focus banner, overlays, bento, triage, intRow, etc. (renamed from ActionHub) */
-  .triageDeadlines {
-    border-radius: var(--card-radius-token);
-    border: var(--card-border);
-    box-shadow: var(--card-shadow-rest);
-    background: var(--surface-card);
-    padding: var(--card-padding);
-    min-width: 0;
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .triageDeadlines > *:first-child {
-    flex: 1;
-    min-height: 0;
-  }
-  .triageDeadlines :global([class*="row"]) {
-    background: transparent !important;
-  }
-  .triageModules {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    align-content: flex-start;
-    gap: 8px;
-    padding: var(--card-padding);
-    border-radius: var(--card-radius-token);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: var(--card-border);
-    background: var(--surface-card);
-    box-shadow: var(--card-shadow-rest);
-    min-width: 120px;
-    max-width: 180px;
-    min-height: 120px;
-    max-height: 160px;
-    overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .triageDeadlinesFooter {
-    margin-top: auto;
-    padding-top: 8px;
-    display: flex;
-    justify-content: flex-end;
-  }
-  .triageDeadlinesLink {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--restoration-sage);
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-  .triageDeadlinesLink:hover {
-    color: var(--restoration-earth, #6B5344);
-    text-decoration: underline;
-  }
-  .triageFocus {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: var(--card-padding);
-    border-radius: var(--card-radius-token);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: var(--card-border);
-    background: var(--surface-card);
-    min-width: 140px;
-    overflow: hidden;
-    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-    box-shadow: var(--card-shadow-rest);
-  }
-  .triageFocusActive {
-    border-color: rgba(135, 169, 107, 0.5);
-    box-shadow: 0 0 16px rgba(135, 169, 107, 0.35);
-  }
-  .triageFocus:hover,
-  .triageModules:hover,
-  .triageDeadlines:hover,
-  .foundation:hover {
-    transform: var(--card-hover-transform);
-    box-shadow: var(--card-shadow-hover);
-  }
-  .triageFocusLabel {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--home-text-meta);
-  }
-  .triageFocusTime {
-    font-size: 1.75rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--restoration-charcoal, #2d352d);
-    margin: 0;
-    letter-spacing: 0.05em;
-  }
-  .triageFocusActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    justify-content: center;
-  }
-  .triageFocusBtn {
-    padding: 0.4rem 0.85rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: var(--restoration-sage);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: filter 0.15s, transform 0.1s;
-  }
-  .smartInsightStartBtn {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: var(--font-weight-task);
-    background: var(--restoration-sage, #52796f);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: filter 0.15s, transform 0.1s, box-shadow 0.2s;
-  }
-  .smartInsightStartBtn:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
-  }
-  .triageFocusBtnSecondary {
-    padding: 0.4rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: transparent;
-    color: var(--restoration-sage);
-    border: 1px solid var(--restoration-sage);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-  .triageFocusBtnSecondary:hover {
-    background: rgba(135, 169, 107, 0.15);
-  }
-  .triageDeadlinesEmpty {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    color: var(--home-text-meta);
-    padding: 0.5rem 0;
-  }
-  .triageDeadlinesEmptyIcon {
-    font-size: 1rem;
-    opacity: 0.8;
-  }
-  .triageModulePill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-sage-dark, #2d352d);
-    background: rgba(135, 169, 107, 0.1);
-    border: 1px solid rgba(135, 169, 107, 0.2);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .triageModulePill:hover {
-    background: rgba(135, 169, 107, 0.2);
-  }
-  .triageModulePillDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .triageModulePillDotRed {
-    background: #E85555;
-  }
-  .triageModulePillDotGreen {
-    background: var(--restoration-sage);
-  }
-  .triageModulesEmpty {
-    font-size: 0.75rem;
-    color: var(--home-text-meta);
-  }
-  .foundation {
-    grid-area: foundation;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-    align-items: start;
-    margin-top: 12px;
-    padding: var(--card-padding);
-    border-radius: var(--card-radius-token);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: var(--card-border);
-    background: color-mix(in srgb, var(--surface-card) 88%, rgba(238, 220, 130, 0.18));
-    box-shadow: var(--card-shadow-rest);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .foundationChartWrap {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .foundationChartTitle {
-    font-size: var(--home-font-meta);
-    font-weight: 700;
-    color: var(--restoration-charcoal, #2d352d);
-    margin: 0 0 4px;
-  }
-  .foundationBarChart {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    height: 120px;
-    padding: 8px 0;
-  }
-  .foundationBarGroup {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-  }
-  .foundationBar {
-    width: 100%;
-    max-width: 32px;
-    min-height: 6px;
-    border-radius: 4px 4px 0 0;
-    transition: height 0.35s ease;
-  }
-  .foundationBarLabel {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: var(--restoration-charcoal, #2d352d);
-  }
-  .foundationChartFooter {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 8px;
-  }
-  .foundationChartLink {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--restoration-sage);
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 1px solid rgba(135, 169, 107, 0.4);
-    background: rgba(255, 255, 255, 0.6);
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
-  }
-  .foundationChartLink:hover {
-    color: var(--restoration-earth, #6B5344);
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--restoration-sage);
-    text-decoration: none;
-  }
-  .foundationSeedsWrap {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-width: 160px;
-  }
-  .foundationSeeds {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .foundationSeedsIcon {
-    font-size: 1.5rem;
-    animation: sway 2.5s ease-in-out infinite;
-  }
-  .foundationSeedsValue {
-    font-size: 1.25rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--restoration-charcoal, #2d352d);
-  }
-  .foundationSeedsLabel {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--home-text-meta);
-  }
-  .foundationStreak {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  .foundationStreakIcon {
-    font-size: 1.5rem;
-  }
-  .foundationStreakValue {
-    font-size: 1.25rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--restoration-charcoal, #2d352d);
-  }
-  .foundationStreakLabel {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--home-text-meta);
-  }
-  .foundationChart {
-    min-width: 0;
-    height: 220px;
-  }
-  .foundationHeatmapWrap {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-  }
-  .foundationHeatmapTitle {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--home-text-meta);
-    margin: 0;
-  }
-  .foundationHeatmapGrid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 3px;
-    width: 140px;
-  }
-  .foundationHeatmapCell {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 4px;
-    min-width: 0;
-  }
-  @keyframes sway {
-    0%, 100% { transform: rotate(-4deg); }
-    50% { transform: rotate(4deg); }
-  }
   .spineGutter80 {
     padding-left: 80px;
   }
@@ -381,9 +26,9 @@
   .replanBtn {
     padding: 7px 16px;
     border-radius: 9999px;
-    border: 1px solid rgba(196, 164, 109, 0.5);
-    background: #f9f3df;
-    color: #7a6747;
+    border: 1px solid var(--widget-border);
+    background: var(--widget-accent-soft);
+    color: var(--widget-text-primary);
     font-family: var(--font-body), "Lexend", system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
@@ -399,163 +44,11 @@
     min-height: 120px;
     overflow: hidden;
     border-radius: var(--home-card-radius);
-    background: #8B6F47;
+    background: var(--widget-surface-raised);
     color: #FFFFFF;
     border: none;
     /* Only solid block on page — clear anchor; subtle shadow so it reads as one block */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  .heroRow {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    min-width: 0;
-    padding: 1rem 1.25rem;
-    border-radius: 0;
-    background: transparent;
-  }
-  .heroCompletionRingWrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.35rem;
-    flex-shrink: 0;
-  }
-  .heroCompletionRing {
-    position: relative;
-    width: 56px;
-    height: 56px;
-  }
-  .heroCompletionRingSvg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-  .heroCompletionRingBg {
-    transition: stroke 0.2s;
-  }
-  .heroCompletionRingFill {
-    transition: stroke-dasharray 0.5s ease;
-  }
-  .heroCompletionRingIcon {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-  .heroSeedsGrownText {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    text-align: center;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  }
-  .heroSessionRow {
-    padding: 1rem 1.25rem 0.5rem;
-  }
-  .heroSessionLabel {
-    font-size: var(--home-font-meta);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.9);
-  }
-  .heroSessionTitle {
-    font-size: var(--home-font-task);
-    font-weight: 700;
-    color: #FFFFFF;
-    margin: 0.25rem 0 0;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  }
-  .heroSessionProgressWrap {
-    padding: 0 1.25rem;
-    margin-top: 0.5rem;
-  }
-  .heroSessionProgressBar {
-    height: 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.2);
-    overflow: hidden;
-  }
-  .heroSessionProgressFill {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
-    transition: width 0.4s ease;
-  }
-  .heroSessionActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem 1rem;
-  }
-  .heroSessionBtn {
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
-    font-size: var(--home-font-meta);
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.95);
-    color: #8B6F47;
-    border: none;
-    cursor: pointer;
-    transition: filter 0.15s, transform 0.1s;
-  }
-  .heroSessionBtn:hover {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
-  }
-  .heroSessionBtnSecondary {
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
-    font-size: var(--home-font-meta);
-    font-weight: 600;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-  .heroSessionBtnSecondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-  /* Ghost buttons: thin border, no fill — Flax-brown for Pause/Restart */
-  .heroSessionBtnGhost {
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
-    font-size: var(--home-font-meta);
-    font-weight: 600;
-    background: transparent;
-    color: var(--restoration-earth, #6B5344);
-    border: 1px solid var(--restoration-earth, #6B5344);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    transition: background 0.15s, color 0.15s, transform 0.1s;
-  }
-  .heroSessionBtnGhost:hover {
-    background: rgba(107, 83, 68, 0.08);
-    transform: translateY(-1px);
-  }
-  /* End Session: ghost style, Soft Coral text only */
-  .heroSessionBtnEnd {
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
-    font-size: var(--home-font-meta);
-    font-weight: 600;
-    background: transparent;
-    color: var(--soft-coral, #c67b5c);
-    border: 1px solid var(--soft-coral, #c67b5c);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.1s;
-  }
-  .heroSessionBtnEnd:hover {
-    background: rgba(198, 123, 92, 0.1);
-    transform: translateY(-1px);
   }
   .bentoPomodoro {
     min-width: 0;
@@ -592,8 +85,8 @@
   }
   .enrollmentCard {
     border-radius: 12px;
-    border: 1px solid rgba(107, 83, 68, 0.2);
-    background: #F9F8F6;
+    border: 1px solid var(--widget-border);
+    background: var(--widget-surface-secondary);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     padding: 14px 16px;
     display: flex;
@@ -638,7 +131,7 @@
     font-family: var(--font-body);
     font-size: 0.8rem;
     font-weight: var(--font-weight-caption);
-    color: #b8956e;
+    color: var(--widget-text-tertiary);
     margin: 0;
   }
   .enrollmentDots {
@@ -652,9 +145,9 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--widget-surface);
     margin-left: -5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   .enrollmentDots > span:first-child {
     margin-left: 0;
@@ -672,7 +165,7 @@
     font-family: var(--font-body);
     font-size: 0.8rem;
     font-weight: var(--font-weight-caption);
-    color: var(--text-muted-sage);
+    color: var(--widget-text-secondary);
     margin: 0;
     text-align: center;
   }
@@ -705,7 +198,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.82rem;
   font-weight: 500;
-  color: #5c4d3e;
+  color: var(--widget-text-secondary);
   margin: 0;
   line-height: 1.4;
 }
@@ -729,7 +222,7 @@
   padding-top: 4px;
   transition: color 0.15s;
 }
-.intRowSlotLink:hover { color: #57534e; text-decoration: underline; }
+.intRowSlotLink:hover { color: var(--widget-text-primary); text-decoration: underline; }
 
 /* ─── Day Progress slot ──────────────────────────────────────────────────── */
 
@@ -750,7 +243,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 2rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   line-height: 1;
 }
 
@@ -771,7 +264,7 @@
 .intRowProgressBarFill {
   height: 100%;
   border-radius: 99px;
-  background: #4A3421;
+  background: var(--widget-accent);
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -789,7 +282,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.8rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   line-height: 1;
   margin: 0;
 }
@@ -834,7 +327,7 @@
   padding: 2px 7px;
   border-radius: 99px;
   background: rgba(74, 52, 33, 0.08);
-  color: #5c4d3e;
+  color: var(--widget-text-secondary);
   border: 1px solid rgba(74, 52, 33, 0.12);
 }
 
@@ -855,7 +348,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.8rem;
   font-weight: 600;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   margin: 0;
   flex: 1;
   min-width: 0;
@@ -885,7 +378,7 @@
 .intRowRingSvg { width: 52px; height: 52px; transform: rotate(-90deg); flex-shrink: 0; }
 .intRowRingBg { fill: none; stroke: rgba(123,103,81,0.12); stroke-width: 3; }
 .intRowRingFill { fill: none; stroke: #4A3421; stroke-width: 3; stroke-linecap: round; transition: stroke-dasharray 0.6s ease; }
-.intRowRingPct { font-family: "Lexend",system-ui,sans-serif; font-size: 0.85rem; font-weight: 800; color: #2d352d; }
+.intRowRingPct { font-family: "Lexend",system-ui,sans-serif; font-size: 0.85rem; font-weight: 800; color: var(--widget-text-primary); }
 
 /* Legacy urgency dots */
 .intRowUrgencyDot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; background: #9a8778; }
@@ -899,7 +392,7 @@
 
 /* Legacy deadline row */
 .intRowDeadlineRow { display: flex; align-items: center; gap: 8px; text-decoration: none; padding: 4px 0; }
-.intRowDeadlineTitle { font-size: 0.8rem; font-weight: 600; color: #2d352d; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.intRowDeadlineTitle { font-size: 0.8rem; font-weight: 600; color: var(--widget-text-primary); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .intRowDeadlineTime { font-family: "JetBrains Mono", monospace; font-size: 0.68rem; color: #7B6751; }
 
 /* ── Focus banner (top of page when timer is running) ── */
@@ -908,7 +401,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 9px 20px;
-  background: #2d352d;
+  background: var(--widget-surface-raised);
   border-radius: 12px;
   margin: 0 24px 16px;
   gap: 12px;
@@ -1209,7 +702,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1329,7 +822,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 13px;
   font-weight: 600;
-  color: #2c2420;
+  color: var(--widget-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1398,9 +891,9 @@
 }
 
 .deadlineDetailCard {
-  background: #fffcf8;
+  background: var(--widget-surface);
   border-radius: 20px;
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  border: 1px solid var(--widget-border);
   box-shadow: 0 20px 60px rgba(44, 24, 16, 0.14), 0 4px 16px rgba(44, 24, 16, 0.06);
   padding: 24px 26px 20px;
   max-width: 420px;
@@ -1454,7 +947,7 @@
 .deadlineDetailTitle {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 0 0 6px;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -1520,14 +1013,14 @@
 }
 .deadlineDetailLink:hover {
   background: rgba(139, 115, 85, 0.12);
-  color: #2c1810;
+  color: var(--widget-text-primary);
   border-color: rgba(139, 115, 85, 0.22);
 }
 
 /* ─── Module card popup (same overlay as deadline card) ──────────────────── */
 
 .moduleCardCard {
-  background: #fffcf8;
+  background: var(--widget-surface);
   border-radius: 20px;
   border: 1px solid rgba(139, 115, 85, 0.12);
   box-shadow: 0 20px 60px rgba(44, 24, 16, 0.14), 0 4px 16px rgba(44, 24, 16, 0.06);
@@ -1563,7 +1056,7 @@
 .moduleCardCode {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   margin: 0 0 4px;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -1589,11 +1082,11 @@
   justify-content: center;
   padding: 9px 20px;
   border-radius: 9999px;
-  background: #2c1810;
+  background: var(--widget-accent);
   border: none;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #fffcf8;
+  color: var(--widget-surface);
   text-decoration: none;
   transition: background 0.2s, box-shadow 0.2s;
   align-self: flex-start;
@@ -1717,7 +1210,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2c2420;
+  color: var(--widget-text-primary);
 }
 .intRowFocusBestWindowDur {
   font-family: var(--font-body, "Quicksand", sans-serif);
@@ -1763,7 +1256,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.15rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   letter-spacing: -0.02em;
   line-height: 1;
 }
@@ -1889,7 +1382,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.78rem;
   font-weight: 600;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1976,7 +1469,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2c2420;
+  color: var(--widget-text-primary);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -2048,7 +1541,7 @@
   font-family: var(--font-body, "Quicksand", sans-serif);
   font-size: 0.875rem;
   font-weight: 500;
-  color: #2c2420;
+  color: var(--widget-text-primary);
   white-space: nowrap;
 }
 
@@ -2255,7 +1748,7 @@
 .intRowDeadline2Title {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #2c2420;
+  color: var(--widget-text-primary);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -2457,7 +1950,7 @@
 
 .intRowNudgeTaskName {
   font-weight: 700;
-  color: #2d352d;
+  color: var(--widget-text-primary);
 }
 
 .intRowNudgeDue {
@@ -2549,7 +2042,7 @@
   font-family: "Lexend", system-ui, sans-serif;
   font-size: 1.3rem;
   font-weight: 800;
-  color: #2d352d;
+  color: var(--widget-text-primary);
   letter-spacing: -0.02em;
   line-height: 1;
 }

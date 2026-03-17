@@ -9,25 +9,23 @@ import styles from "./StudyPulseWidget.module.css";
 /* ─── Ring constants ───────────────────────────── */
 const RING_SIZE = 56;
 const STROKE_W  = 5;
-const RADIUS    = (RING_SIZE - STROKE_W) / 2;
+const RADIUS    = (RING_SIZE - STROKE_W - 3) / 2; // Added 3px buffer to prevent edge clipping
 const CIRC      = 2 * Math.PI * RADIUS;
 
 const MOCK = { pct: 48, studied: 9.6, goal: 20, streak: 4 };
 const DAY_SHORT = ["M", "T", "W", "T", "F", "S", "S"];
 
 function getRingColor(pct) {
-  if (pct <= 25) return "#B87A6D";
-  if (pct <= 50) return "#C4946D";
-  if (pct <= 75) return "#C4A46D";
-  return "#7BB38E";
+  if (pct <= 30) return "var(--home-urgency-danger)";
+  if (pct <= 70) return "var(--color-primary)";
+  return "var(--sage)";
 }
 
 function getDailyBarColor(pct, isToday) {
-  if (isToday) return "#2c1810";
-  if (pct >= 1)   return "#7BB38E";
-  if (pct >= 0.5) return "#C4A46D";
-  if (pct > 0)    return "#C4946D";
-  return null;
+  if (isToday) return "var(--color-primary-solid)";
+  if (pct >= 0.8) return "var(--sage)";
+  if (pct >= 0.4) return "var(--color-primary)";
+  return "color-mix(in srgb, var(--color-primary) 35%, transparent)";
 }
 
 function getTodayIdx() {
@@ -138,12 +136,12 @@ function buildInsights({ streak, todayStudied, todayGoal, weeklyRemaining, daysL
 }
 
 const INSIGHT_STYLES = {
-  warning: { color: "#C4946D", bg: "rgba(196, 148, 109, 0.06)" },
-  alert:   { color: "#A86060", bg: "rgba(168, 96, 96, 0.06)" },
-  info:    { color: "#8B7355", bg: "rgba(139, 115, 85, 0.05)" },
-  success: { color: "#5A8C6A", bg: "rgba(90, 140, 106, 0.06)" },
-  accent:  { color: "#C4A46D", bg: "rgba(196, 164, 109, 0.08)" },
-  neutral: { color: "#A89279", bg: "transparent" },
+  warning: { color: "var(--home-urgency-warning)", bg: "color-mix(in srgb, var(--home-urgency-warning) 12%, transparent)" },
+  alert:   { color: "var(--home-urgency-danger)", bg: "color-mix(in srgb, var(--home-urgency-danger) 12%, transparent)" },
+  info:    { color: "var(--color-primary)", bg: "color-mix(in srgb, var(--color-primary) 8%, transparent)" },
+  success: { color: "var(--sage)", bg: "var(--success-bg)" },
+  accent:  { color: "var(--color-highlight)", bg: "color-mix(in srgb, var(--color-highlight) 12%, transparent)" },
+  neutral: { color: "var(--text-secondary)", bg: "transparent" },
 };
 
 export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus, deadlines = [] }) {
@@ -248,7 +246,7 @@ export function StudyPulseWidget({ windows = [], now = new Date(), onStartFocus,
         <div className={styles.leftCol}>
           <div className={styles.ringRow}>
             <div className={styles.ringWrap} aria-label={`${pct}% of weekly goal`} role="img">
-              <svg width={RING_SIZE} height={RING_SIZE} className={styles.ring}>
+              <svg width={RING_SIZE} height={RING_SIZE} viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`} className={styles.ring}>
                 <circle cx={RING_SIZE/2} cy={RING_SIZE/2} r={RADIUS} className={styles.ringTrack} strokeWidth={STROKE_W} />
                 <motion.circle
                   cx={RING_SIZE/2} cy={RING_SIZE/2} r={RADIUS}

@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework import status
 
-from studyFlax.models.groupwork.groupworkModel import (
+from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
     MeetingSuggestion,

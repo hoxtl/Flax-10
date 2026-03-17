@@ -7,9 +7,9 @@ from rest_framework.test import APIClient
 from rest_framework.test import APIRequestFactory
 from rest_framework import status
 
-from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
-from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.views.user.settings_view import user_settings_view as legacy_user_settings_view
 from studyFlax.tests.helpers.factories import make_user, make_module
 from rest_framework.test import force_authenticate

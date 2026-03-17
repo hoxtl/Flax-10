@@ -9,8 +9,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory
 
-from studyFlax.models.calendar.categoryModel import Category
-from studyFlax.models.social.shareModel import CalendarShare
+from studyFlax.models.calendar.category_model import Category
+from studyFlax.models.social.share_model import CalendarShare
 from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareSerialiser,
     CalendarShareUserSerialiser,

@@ -8,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.dateparse import parse_datetime
-from studyFlax.models.groupwork.groupworkModel import GroupProject, MeetingSuggestion, MeetingResponse
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.groupwork.groupwork_model import GroupProject, MeetingSuggestion, MeetingResponse
+from studyFlax.models.notifications.notification_model import Notification
 
 def _notify_members_of_suggestion(project, suggestion, requester):
     """Notify all project members except the requester of a new meeting suggestion."""

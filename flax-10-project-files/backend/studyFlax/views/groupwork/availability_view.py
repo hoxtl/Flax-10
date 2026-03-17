@@ -8,8 +8,8 @@ from datetime import timedelta
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.groupwork.groupworkModel import GroupProject
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.groupwork.groupwork_model import GroupProject
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.views.calendar.event_helpers import expand_recurring_events
 
 def _get_user_events(members, start, end):

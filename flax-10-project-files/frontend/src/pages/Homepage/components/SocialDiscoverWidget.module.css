@@ -16,10 +16,11 @@
 }
 
 .headerIconWrap {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: rgba(184, 139, 139, 0.08);
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,15 +29,15 @@
 
 .headerIcon {
   flex-shrink: 0;
-  color: #B38B8B;
+  color: var(--color-primary);
 }
 
 .headerLabel {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: #2c1810;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -81,7 +82,7 @@
 
 .coursemateText {
   font-size: 11px;
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   line-height: 1.3;
 }
 
@@ -91,25 +92,25 @@
   justify-content: center;
   padding: 4px 12px;
   border-radius: 9999px;
-  background: rgba(139, 115, 85, 0.06);
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
   font-size: 10px;
-  font-weight: 500;
-  color: #8b7355;
+  font-weight: 600;
+  color: var(--widget-text-secondary);
   text-decoration: none;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   align-self: flex-start;
 }
 
 .subtleLink:hover {
-  background: rgba(139, 115, 85, 0.11);
-  color: #5a4a3a;
-  border-color: rgba(139, 115, 85, 0.2);
+  background: var(--surface-raised);
+  color: var(--widget-text-primary);
+  border-color: var(--widget-accent);
 }
 
 .coursemateCount {
-  font-weight: 650;
-  color: #2c1810;
+  font-weight: 700;
+  color: var(--widget-text-primary);
 }
 
 .societyCard {
@@ -118,22 +119,22 @@
   gap: 9px;
   padding: 9px 10px;
   border-radius: 12px;
-  background: rgba(139, 115, 85, 0.03);
-  border: 1px solid rgba(139, 115, 85, 0.05);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
   text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .societyCard:hover {
-  background: rgba(139, 115, 85, 0.07);
-  border-color: rgba(139, 115, 85, 0.1);
+  background: var(--surface-raised);
+  border-color: var(--widget-accent);
 }
 
 /* Divider */
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(139, 115, 85, 0.12) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--widget-border) 50%, transparent 100%);
   margin: 12px 0;
   flex-shrink: 0;
 }
@@ -164,13 +165,13 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgba(139, 115, 85, 0.1);
+  background: var(--widget-icon-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   flex-shrink: 0;
 }
 
@@ -178,7 +179,7 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #f0e6d9;
+  background: var(--surface-inner);
   flex-shrink: 0;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -198,7 +199,7 @@
 .skeletonLine {
   height: 12px;
   border-radius: 4px;
-  background: #f0e6d9;
+  background: var(--surface-inner);
   width: 80%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -206,7 +207,7 @@
 .skeletonLineShort {
   height: 10px;
   border-radius: 4px;
-  background: #f0e6d9;
+  background: var(--surface-inner);
   width: 50%;
   animation: shimmer 1.5s ease-in-out infinite 0.2s;
 }
@@ -222,7 +223,7 @@
 .societyName {
   font-size: 12px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -230,12 +231,12 @@
 
 .societyMeta {
   font-size: 10px;
-  color: #a89279;
+  color: var(--widget-text-tertiary);
 }
 
 .noSocietyText {
   font-size: 12px;
-  color: #b8a890;
+  color: var(--widget-text-tertiary);
   margin: 0;
 }
 
@@ -254,9 +255,9 @@
 .societySpotlightLabel {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #c4b8a0;
+  color: var(--widget-text-tertiary);
   margin: 0 0 6px;
 }
 
@@ -268,11 +269,11 @@
   margin-top: 2px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgba(196, 164, 109, 0.04);
+  background: var(--widget-icon-bg);
 }
 
 .studyTipIcon {
-  color: #C4A46D;
+  color: var(--color-highlight);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -280,7 +281,7 @@
 .studyTipText {
   font-size: 11px;
   font-style: italic;
-  color: #8b7355;
+  color: var(--widget-text-secondary);
   line-height: 1.4;
-  font-weight: 500;
+  font-weight: 600;
 }

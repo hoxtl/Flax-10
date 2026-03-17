@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import AchievementsModal from "./AchievementsModal";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import styles from "./Profile.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ProfileModals from "./ProfileModals";
@@ -13,6 +14,7 @@ import { getModules } from "../../api/moduleApi";
 import ProfileHeader from "./components/ProfileHeader";
 import {
   PersonaCard,
+  AttendanceWidget,
   StudyDNA,
   MiniHeatmap,
   ThisWeek,
@@ -125,6 +127,7 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
     <div className={styles.twoCol}>
       <div className={styles.leftCol}>
         <PersonaCard persona={summary?.persona} peakHour={peakHour} />
+        <AttendanceWidget />
         <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={n => fetchApi('/profile/', { method: 'PATCH', body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
         <StudyDNA heatmap={analyticsData?.heatmap} />
         <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
@@ -155,7 +158,7 @@ function SharedCalendarSection({ events }) {
   );
 }
 
-export default function Profile({ user, viewedUserId, onNavigate, onNavChange }) {
+export default function Profile({ user, viewedUserId, onNavigate, onNavChange, onBack, backLabel = "Back" }) {
   const navFn = onNavigate || onNavChange;
   const state = useProfileState(viewedUserId);
   state.onNavChange = navFn;
@@ -178,6 +181,7 @@ export default function Profile({ user, viewedUserId, onNavigate, onNavChange })
 
   return (
     <div className={styles.container}>
+      {onBack && <BackButton onClick={onBack} label={backLabel} className={styles.backButton} />}
       <ProfileContent user={user} state={state} visibility={visibility} onNavigate={navFn} />
       <ProfileModals user={user} state={state} modules={modules} filteredEvents={filteredEvents} visibility={visibility} onNavChange={navFn} />
     </div>

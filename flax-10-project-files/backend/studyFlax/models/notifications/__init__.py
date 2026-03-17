@@ -1,1 +1,1 @@
-from .notificationModel import Notification
+from .notification_model import Notification

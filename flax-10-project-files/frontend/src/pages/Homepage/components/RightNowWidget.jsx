@@ -79,7 +79,7 @@ function useLiveClock() {
   useEffect(() => {
     const id = setInterval(
       () => setClock(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
-      30000
+      1000
     );
     return () => clearInterval(id);
   }, []);
@@ -109,7 +109,7 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
       urgency: "critical",
       lineName,
       severity,
-      message: `${lineName} Line: ${severity} — leave now for ${nextEvent.title}`,
+      message: <><b>{lineName} Line</b>: {severity} — leave <b>now</b> for {nextEvent.title}</>,
       leaveByStr,
       hasSevere,
     };
@@ -119,7 +119,7 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
       urgency: "urgent",
       lineName,
       severity,
-      message: `${lineName} Line: ${severity} — leave in ${minsUntilLeave}m for ${nextEvent.title}`,
+      message: <><b>{lineName} Line</b>: {severity} — leave in <b>{minsUntilLeave}m</b> for {nextEvent.title}</>,
       leaveByStr,
       hasSevere,
     };
@@ -128,7 +128,7 @@ function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
     urgency: "info",
     lineName,
     severity,
-    message: `${lineName} Line: ${severity} — leave by ${leaveByStr} for ${nextEvent.title}`,
+    message: <><b>{lineName} Line</b>: {severity} — leave by <b>{leaveByStr}</b> for {nextEvent.title}</>,
     leaveByStr,
     hasSevere,
   };
@@ -168,7 +168,7 @@ function ActiveEventCard({ currentBlock, timeRangeStr, timeLeftStr, currentProgr
       : null;
   const band = getTimeLeftBand(minutesLeft);
   const timeLeftColor =
-    band === "under10" ? "#dc3545" : band === "10to30" ? "#d4850a" : "#4A7C5A";
+    band === "under10" ? "var(--home-urgency-danger)" : band === "10to30" ? "var(--home-urgency-warning)" : "var(--sage)";
 
   return (
     <motion.div className={styles.currentEventCard} {...fadeIn(0.07)}>
@@ -224,15 +224,15 @@ function ConflictSummary({ conflicts, onDismiss }) {
   const label = overlapTime
     ? `Warning: Schedule overlap at ${overlapTime}`
     : `${count} schedule overlap${count === 1 ? "" : "s"} today`;
-  return (
-    <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
-      <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
-      <span className={styles.alertTextWarn}>{label}</span>
-      <button type="button" className={styles.alertDismiss} onClick={onDismiss} aria-label="Dismiss warning">
-        <X size={12} strokeWidth={2} />
-      </button>
-    </motion.div>
-  );
+    return (
+        <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
+            <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
+            <span className={styles.alertTextWarn}>{label}</span>
+            <button type="button" className={styles.alertDismiss} onClick={onDismiss} aria-label="Dismiss warning">
+                <X size={12} strokeWidth={2} />
+            </button>
+        </motion.div>
+    );
 }
 
 function CommuteContextCard({ campus, journey, loading, leaveByInfo }) {
@@ -276,13 +276,14 @@ function CommuteContextCard({ campus, journey, loading, leaveByInfo }) {
 
 // ─── Shared header for early-return views ───────────────────────────────────
 
-function SimpleHeader() {
+function SimpleHeader({ liveClock }) {
   return (
     <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
       <div className={styles.headerIconWrap}>
         <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
       </div>
       <span className={styles.headerLabel}>Right Now</span>
+      {liveClock && <span className={styles.headerMeta}>{liveClock}</span>}
     </motion.div>
   );
 }
@@ -306,15 +307,16 @@ export function RightNowWidget({
   taskWidgetItemsOnly = [],
 }) {
   const nav = navigatorContext || {};
-  const nowMs = now.getTime();
+  const safeNow = (now instanceof Date && !isNaN(now)) ? now : new Date();
+  const nowMs = safeNow.getTime();
   const liveClock = useLiveClock();
   const [showConflictAlert, setShowConflictAlert] = useState(true);
   const [showTflAlert, setShowTflAlert] = useState(true);
   const [commuteInfo, setCommuteInfo] = useState(null);
   const [loadingCommute, setLoadingCommute] = useState(false);
 
-  const currentBlock = nav.currentBlock ?? nav.current ?? getCurrentBlock(sortedEvents || [], now);
-  const nextEvent = nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], now);
+  const currentBlock = nav.currentBlock ?? nav.current ?? getCurrentBlock(sortedEvents || [], safeNow);
+  const nextEvent = nav.nextItem ?? nav.next ?? getNextEvent(sortedEvents || [], safeNow);
   const nextEventTarget = nextEvent?.start_time ? new Date(nextEvent.start_time) : null;
   const countdown = useCountdown(nextEventTarget);
   const conflicts = Array.isArray(nav.overlaps) ? nav.overlaps : [];
@@ -363,9 +365,9 @@ export function RightNowWidget({
   const currentProgressPct =
     currentBlock?.start_time && currentBlock?.end_time
       ? Math.min(100, Math.max(0,
-          ((nowMs - new Date(currentBlock.start_time).getTime()) /
-            (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
-        ))
+        ((nowMs - new Date(currentBlock.start_time).getTime()) /
+          (new Date(currentBlock.end_time).getTime() - new Date(currentBlock.start_time).getTime())) * 100
+      ))
       : null;
   const timeRangeStr =
     currentBlock?.start_time && currentBlock?.end_time
@@ -383,10 +385,11 @@ export function RightNowWidget({
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
+        <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+          <span className={styles.clockTime}>{fmt(timeLeft)}</span>
+          <span className={styles.clockLabel}>{isBreak ? "Break" : "Focus"} · {timerTask || (isBreak ? "Break time" : "Focus session")}</span>
+        </motion.div>
         <motion.div className={styles.timerBlock} {...fadeIn(0.07)}>
-          <p className={styles.timerLabel}>
-            {isBreak ? "BREAK" : "FOCUS"} · {timerTask || (isBreak ? "Break time" : "Focus session")} · {fmt(timeLeft)} left
-          </p>
           <div className={styles.progressTrack}>
             <div className={styles.progressFill} style={{ width: `${pct}%` }} />
           </div>
@@ -404,7 +407,11 @@ export function RightNowWidget({
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
-        <motion.div {...fadeIn(0.07)}>
+        <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+          <span className={styles.clockTime}>{liveClock}</span>
+          <span className={styles.clockLabel}>Not today's view</span>
+        </motion.div>
+        <motion.div {...fadeIn(0.1)}>
           {firstEv ? (
             <>
               <p className={styles.upNextTitle}>{firstEv.title}</p>
@@ -427,13 +434,17 @@ export function RightNowWidget({
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
+        <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+          <span className={styles.clockTime}>{liveClock}</span>
+          <span className={styles.clockLabel}>End of day</span>
+        </motion.div>
         <motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
           <div className={styles.endOfDayTopRow}>
             <motion.div
               animate={{ rotate: [0, 8, -8, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <Sparkles size={26} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+              <Sparkles size={22} strokeWidth={1.25} color="var(--color-primary)" aria-hidden />
             </motion.div>
             <div>
               <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
@@ -447,14 +458,11 @@ export function RightNowWidget({
             </div>
           </div>
           {tomorrowFirstEvent && (
-            <>
-              <div className={styles.sectionDivider} />
-              <div className={styles.tomorrowSection}>
-                <p className={styles.tomorrowLabel}>TOMORROW</p>
-                <p className={styles.tomorrowFirstTitle}>{tomorrowFirstEvent.title}</p>
-                {tomorrowTime && <p className={styles.tomorrowFirstTime}>at {tomorrowTime}</p>}
-              </div>
-            </>
+            <div className={styles.tomorrowSection}>
+              <p className={styles.tomorrowLabel}>Tomorrow</p>
+              <p className={styles.tomorrowFirstTitle}>{tomorrowFirstEvent.title}</p>
+              {tomorrowTime && <p className={styles.tomorrowFirstTime}>at {tomorrowTime}</p>}
+            </div>
           )}
         </motion.div>
       </div>
@@ -466,12 +474,15 @@ export function RightNowWidget({
     return (
       <div className={styles.root}>
         <SimpleHeader liveClock={liveClock} />
-        <motion.div className={styles.emptyDay} {...fadeIn(0.07)}>
+        <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+          <span className={styles.clockTime}>{liveClock}</span>
+          <span className={styles.clockLabel}>Nothing scheduled today</span>
+        </motion.div>
+        <motion.div className={styles.emptyDay} {...fadeIn(0.1)}>
           <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-            <Sun size={30} strokeWidth={1.25} color="#C4A46D" aria-hidden />
+            <Sun size={28} strokeWidth={1.25} color="var(--color-primary)" aria-hidden />
           </motion.div>
-          <p className={styles.emptyDayTitle}>Nothing planned today</p>
-          <p className={styles.emptyDaySubtitle}>Enjoy your day</p>
+          <p className={styles.emptyDayTitle}>Free day — enjoy it!</p>
           {tomorrowFirstEvent && tomorrowTime && (
             <p className={styles.emptyDayTomorrow}>
               Tomorrow: {tomorrowFirstEvent.title} at {tomorrowTime}
@@ -486,6 +497,14 @@ export function RightNowWidget({
   return (
     <div className={styles.root}>
       <WidgetHeader eventCount={eventCount} taskCount={tasksPending} />
+
+      {/* Live clock prominently in header meta via WidgetHeader - also show in top area */}
+      <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+        <span className={styles.clockTime}>{liveClock}</span>
+        <span className={styles.clockLabel}>
+          {currentBlock ? "In session" : nextEvent ? "Up next" : "Free now"}
+        </span>
+      </motion.div>
 
       <AnimatePresence>
         {showConflictAlert && conflicts.length > 0 && (

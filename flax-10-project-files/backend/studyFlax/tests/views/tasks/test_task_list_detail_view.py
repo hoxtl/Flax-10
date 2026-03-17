@@ -6,7 +6,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.tasks.taskModel import TaskList
+from studyFlax.models.tasks.task_model import TaskList
 from studyFlax.tests.helpers.factories import make_task, make_task_list, make_user
 
 

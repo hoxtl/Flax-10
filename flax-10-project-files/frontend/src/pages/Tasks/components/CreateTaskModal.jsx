@@ -2,14 +2,13 @@
  * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
  */
 
-import { createPortal } from "react-dom";
-
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import { X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
@@ -34,7 +33,9 @@ function CreateTaskModalHeader({ isEditMode, onClose }) {
   return (
     <div className={styles.header}>
       <h2 className={styles.title}>{isEditMode ? "Edit task" : "New task"}</h2>
-      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>✕</PrimaryButton>
+      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>
+        <X size={18} strokeWidth={2.5} />
+      </PrimaryButton>
     </div>
   );
 }
@@ -214,7 +215,6 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
       onClose={onClose}
       hideHeader
       size="xl"
-      backdropClassName={styles.modalBackdrop}
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
@@ -229,11 +229,10 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
 
 export default function CreateTaskModal(props) {
   const state = useCreateTaskModal(props);
-  return createPortal(
+  return (
     <>
       <CreateTaskModalView state={state} addToScheduleLabel={props.addToScheduleLabel ?? "Add to today's schedule"} onDeleteTask={props.onDeleteTask} />
       {state.sleepWarning && <SleepWarningModal {...state.sleepWarningProps} />}
-    </>,
-    document.body
+    </>
   );
 }

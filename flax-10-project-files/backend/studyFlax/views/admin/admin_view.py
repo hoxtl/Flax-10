@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
-from studyFlax.models.society.societyReportModel import SocietyReport
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.society.society_report_model import SocietyReport
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.notifications.notification_model import Notification
 
 User = get_user_model()
 

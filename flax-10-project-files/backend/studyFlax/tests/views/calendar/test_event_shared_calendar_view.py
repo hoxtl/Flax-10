@@ -37,7 +37,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
         )
 
     def test_get_shared_calendar_events(self):
-        from studyFlax.models.social.shareModel import CalendarShare
+        from studyFlax.models.social.share_model import CalendarShare
 
         CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
         self._make_event(self.owner, 'Public Event')
@@ -46,7 +46,7 @@ class EventSharedCalendarTests(BaseEventTestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_private_events_masked_for_viewer(self):
-        from studyFlax.models.social.shareModel import CalendarShare
+        from studyFlax.models.social.share_model import CalendarShare
 
         CalendarShare.objects.create(owner=self.owner, shared_with=self.viewer)
         self._make_event(self.owner, 'Secret Event', is_private=True)

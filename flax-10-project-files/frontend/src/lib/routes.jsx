@@ -9,6 +9,7 @@ import AdminPage from "../pages/Admin/AdminPage";
 import TasksPage from "../pages/Tasks/TasksPage";
 import GroupWorkIndexPage from "../pages/GroupWork/GroupWorkIndexPage";
 import Discover from "../pages/Discover/Discover";
+import AttendancePage from "../pages/Attendance/AttendancePage";
 
 export const APP_ROUTES = [
   { id: "home", label: "Home", icon: "🏠", path: "/", element: <Homepage /> },
@@ -18,6 +19,13 @@ export const APP_ROUTES = [
     icon: "🗓️",
     path: "/calendar",
     element: <CalendarPage />,
+  },
+  {
+    id: "attendance",
+    label: "Attendance",
+    icon: "✔️",
+    path: "/attendance",
+    element: <AttendancePage />,
   },
   {
     id: "timer",

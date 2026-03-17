@@ -11,8 +11,8 @@ from django.utils import timezone
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from studyFlax.models import CalendarEvent, User
-from studyFlax.models.calendar.recurrenceRuleModel import RecurrenceRule
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.calendar.recurrence_rule_model import RecurrenceRule
+from studyFlax.models.timer.theme_session_model import ThemeSession
 
 class EventHelpersCoverageTest(TestCase):
     """Tests for event helpers coverage."""

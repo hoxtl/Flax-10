@@ -11,23 +11,111 @@ sessions. All operations are idempotent - running the command on an already-
 seeded database will not produce duplicates.
 """
 
+import hashlib
 import random
+from datetime import datetime, timedelta, timezone as dt_timezone
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
     Module, Enrollment, Deadline, Reading,
     Society,
 )
-from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.groupwork.groupworkModel import GroupProject
+from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.groupwork.groupwork_model import GroupProject
+from studyFlax.models.calendar.event_attendance_model import EventAttendance
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
-    MODULE_PILL_COLORS,
+    MODULE_PILL_COLORS, lecture_theatre_fixtures,
 )
-from .seed_helpers import build_readings_for_module, build_reading_user_history_
+from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
+from studyFlax.fixtures.groupwork_fixtures import GROUP_PROJECT_FIXTURES, GROUP_TASK_TEMPLATES
+from .seed_helpers import (
+    build_users_list, build_settings_for_new_users, build_events_for_user,
+    build_meal_events, build_today_afternoon_events, build_module_event, get_user_modules,
+    build_lecture_events, create_lecture_event, build_deadlines_for_module,
+    create_deadline_calendar_event, build_study_sessions_for_user,
+    build_theme_sessions_for_user, build_readings_for_module, build_reading_user_history_,
+)
+
+# ── Attendance seeding constants ────────────────────────────────────────────
+_ATT_SEED_START = datetime(2026, 1, 15, tzinfo=dt_timezone.utc)
+_ATT_READING_WEEK = (
+    datetime(2026, 2, 23, tzinfo=dt_timezone.utc),
+    datetime(2026, 2, 27, tzinfo=dt_timezone.utc),
+)
+_SESSION_TEMPLATES = [
+    ("Lecture",       "Lecture: {module}",   "Weekly lecture session.",       2, "lgt"),
+    ("Lecture",       "LGT: {module}",       "Large group teaching session.", 1, "lgt2"),
+    ("Small group",   "SmG: {module}",       "Small group tutorial session.", 1, "smg"),
+    ("Small group",   "Seminar: {module}",   "Interactive seminar session.",  1, "sem"),
+    ("Practical/lab", "Practical: {module}", "Lab practical session.",        3, "prac"),
+    ("Practical/lab", "Lab: {module}",       "Scheduled laboratory session.", 2, "lab"),
+    ("Other",         "Briefing: {module}",  "Module briefing and Q&A.",      1, "brief"),
+    ("Other",         "Workshop: {module}",  "Applied workshop session.",     2, "ws"),
+]
+_ATT_USER_PROFILES = {
+    "johndoe": {"attend_rate": 0.90, "type_bias": {"Practical/lab": 0.98, "Lecture": 0.88}},
+    "janedoe": {"attend_rate": 0.95, "type_bias": {"Lecture": 0.98, "Small group": 0.92}},
+    "charlie": {"attend_rate": 0.82, "type_bias": {"Lecture": 0.75, "Other": 0.90}},
+    "riley":   {"attend_rate": 0.88, "type_bias": {"Small group": 0.95, "Lecture": 0.85}},
+    "nina":    {"attend_rate": 0.93, "type_bias": {}},
+    "omar":    {"attend_rate": 0.78, "type_bias": {"Practical/lab": 0.95, "Lecture": 0.70}},
+    "sofia":   {"attend_rate": 0.91, "type_bias": {"Small group": 0.97, "Other": 0.85}},
+    "liamk":   {"attend_rate": 0.85, "type_bias": {"Lecture": 0.80, "Practical/lab": 0.95}},
+}
+_ATT_RANDOM_PROFILES = [
+    {"attend_rate": 0.95, "type_bias": {}},
+    {"attend_rate": 0.88, "type_bias": {"Lecture": 0.85}},
+    {"attend_rate": 0.75, "type_bias": {"Practical/lab": 0.95, "Lecture": 0.68}},
+    {"attend_rate": 0.82, "type_bias": {"Small group": 0.92}},
+    {"attend_rate": 0.70, "type_bias": {}},
+    {"attend_rate": 0.98, "type_bias": {}},
+    {"attend_rate": 0.60, "type_bias": {"Practical/lab": 0.90}},
+]
+
+
+def _stable_hash(s):
+    return int(hashlib.md5(s.encode()).hexdigest(), 16)
+
+
+def _det_choice(items, seed_str):
+    return items[_stable_hash(seed_str) % len(items)]
+
+
+def _att_week_sessions(module_code, week_start):
+    week_key = week_start.strftime("%Y%m%d")
+    n = (_stable_hash(f"{module_code}{week_key}") % 3) + 2
+    indices = sorted(set(
+        _stable_hash(f"{module_code}{week_key}{i}") % len(_SESSION_TEMPLATES)
+        for i in range(n * 3)
+    ))[:n]
+    sessions, used_days = [], set()
+    for i in indices:
+        type_label, title_tmpl, desc, dur_h, src_key = _SESSION_TEMPLATES[i % len(_SESSION_TEMPLATES)]
+        day_seed = f"{module_code}{week_key}{src_key}"
+        day = _stable_hash(day_seed) % 5
+        while day in used_days:
+            day = (day + 1) % 5
+        used_days.add(day)
+        hour = _det_choice([9, 10, 11, 14, 15, 16], f"{day_seed}{day}")
+        start = (week_start + timedelta(days=day)).replace(hour=hour, minute=0, second=0, microsecond=0)
+        sessions.append({
+            "title": title_tmpl.format(module=module_code),
+            "description": desc,
+            "start": start,
+            "end": start + timedelta(hours=dur_h),
+            "type_label": type_label,
+            "source": "timetable",
+            "external_id": f"{src_key}-{module_code}-{start.strftime('%Y%m%dT%H%M')}",
+            "location": _det_choice(lecture_theatre_fixtures, f"{module_code}{src_key}"),
+        })
+    return sessions
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.utils.reading_utils import update_reading_estimates
 from .seed_users import (
     FIXTURE_USERS,
@@ -191,7 +279,9 @@ class Command(BaseCommand):
         self._seed_readings_for_modules()
         self._seed_reading_history_janedoe()
         self._seed_reading_history_random_students()
-        self.stdout.write(f" {Reading.objects.count()} total readings in database.")
+        self.stdout.write( f" {Reading.objects.count()} total readings in database.")
+        self.stdout.write("Seeding attendance records..")
+        self._seed_attendance()
 
     def _seed_readings_for_modules(self):
         readings = []
@@ -226,7 +316,48 @@ class Command(BaseCommand):
         count = sum(1 for s in sample if self._seed_reading_history_user(s) > 0)
         self.stdout.write(f" {count} random students seeded with reading history.")
 
+    def _seed_attendance(self):
+        now = timezone.now()
+        students = list(User.objects.filter(role='student'))
+        events_created = attendance_created = 0
+
+        for user in students:
+            profile = _ATT_USER_PROFILES.get(user.username, random.choice(_ATT_RANDOM_PROFILES))
+            modules = [e.module for e in Enrollment.objects.filter(student=user).select_related('module')]
+            if not modules:
+                continue
+            weeks_back = int((now - _ATT_SEED_START).days / 7)
+            for module in modules:
+                for week_offset in range(weeks_back + 1):
+                    week_start = _ATT_SEED_START + timedelta(weeks=week_offset)
+                    if _ATT_READING_WEEK[0] <= week_start <= _ATT_READING_WEEK[1]:
+                        continue
+                    for s in _att_week_sessions(module.module_code, week_start):
+                        if s['start'] >= now:
+                            continue
+                        event, created = CalendarEvent.objects.get_or_create(
+                            user=user, source=s['source'], external_id=s['external_id'],
+                            defaults={
+                                'title': s['title'], 'description': s['description'],
+                                'start_time': s['start'], 'end_time': s['end'],
+                                'location': s['location'], 'priority': 'high',
+                            },
+                        )
+                        if created:
+                            events_created += 1
+                        base = profile['attend_rate']
+                        adjusted = profile['type_bias'].get(s['type_label'], base)
+                        attended = (_stable_hash(f"{user.username}:{s['external_id']}") % 1000) / 1000.0 < adjusted
+                        _, att_created = EventAttendance.objects.get_or_create(
+                            user=user, event=event, defaults={'attended': attended},
+                        )
+                        if att_created:
+                            attendance_created += 1
+
+        self.stdout.write(f"  Created {events_created} timetable events and {attendance_created} attendance records.")
+
     def _build_stats(self):
+        from studyFlax.models import EventAttendance
         return [
             ("Users",       User.objects.count()),
             ("Modules",     Module.objects.count()),
@@ -239,6 +370,7 @@ class Command(BaseCommand):
             ("Events",      CalendarEvent.objects.count()),
             ("Societies",   Society.objects.count()),
             ("Readings",    Reading.objects.count()),
+            ("Attendance",  EventAttendance.objects.count()),
         ]
 
     def _ordered_fixture_users(self):

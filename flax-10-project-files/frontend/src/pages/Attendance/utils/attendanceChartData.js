@@ -4,8 +4,8 @@ export function buildOverallChartData(overall) {
   const attended = overall?.attended ?? 0;
   const missed = overall?.missed ?? 0;
   return [
-    { id: 0, value: attended, label: "Attended", color: "#4caf50" },
-    { id: 1, value: missed, label: "Missed", color: "#f44336" },
+    { id: 0, value: attended, label: "Attended", color: "#2D8B5A" },
+    { id: 1, value: missed, label: "Missed", color: "#C0392B" },
   ].filter((d) => d.value > 0);
 }
 
@@ -44,10 +44,10 @@ export function getEventTypeLabel(event) {
 }
 
 const TYPE_COLOR_MAP = {
-  Lecture: "#ff9800",
-  "Small group": "#009688",
-  "Practical/lab": "#2196f3",
-  Other: "#9c27b0",
+  Lecture: "#D4AF37",          // Mustard Gold
+  "Small group": "#148C7D",     // Deep Teal
+  "Practical/lab": "#2E5BFF",   // Royal Blue
+  Other: "#E67E22",             // Warm Terracotta
 };
 
 export function buildByTypeChartData(by_type) {
@@ -72,6 +72,6 @@ export function withByTypeColors(byTypeEntries) {
   return byTypeEntries.map((d, i) => ({
     ...d,
     id: i,
-    color: d.color ?? ["#2196f3", "#9c27b0", "#ff9800", "#009688"][i % 4],
+    color: d.color ?? ["#D4AF37", "#148C7D", "#2E5BFF", "#E67E22"][i % 4],
   }));
 }

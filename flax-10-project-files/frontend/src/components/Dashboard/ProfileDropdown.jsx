@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
 import { getInitials } from "../Authentication/utils/userUtils";
-import { getUserProfile } from "../../api/userService";
+import { useAuth } from "../../context/AuthContext";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 
 function useClickOutside(ref, onClose, isActive) {
@@ -87,37 +87,16 @@ function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   );
 }
 
-async function fetchProfileData() {
-  try { return await getUserProfile(); }
-  catch (error) { console.error("Failed to load profile:", error); return null; }
-}
-
-function updateLocalStoragePhoto(url) {
-  const current = JSON.parse(localStorage.getItem("user") || "{}");
-  current.profile_photo_url = url;
-  localStorage.setItem("user", JSON.stringify(current));
-}
-
-async function loadProfileData(setProfileData) {
-  const data = await fetchProfileData();
-  if (!data) return;
-  setProfileData(data);
-  if (data.profile_photo_url) updateLocalStoragePhoto(data.profile_photo_url);
-}
 
 function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
+  const { profile: profileData, refreshProfile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [profileData, setProfileData] = useState(null);
   const closeTimerRef = useRef(null);
-  useEffect(() => { loadProfileData(setProfileData); }, []);
-  useEffect(() => {
-    const syncProfile = () => { loadProfileData(setProfileData); };
-    window.addEventListener("auth-changed", syncProfile);
-    return () => window.removeEventListener("auth-changed", syncProfile);
-  }, []);
+
   const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
   const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
   const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
+  
   const onHoverEnter = () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsOpen(true);
@@ -126,9 +105,11 @@ function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     closeTimerRef.current = setTimeout(() => setIsOpen(false), 180);
   };
+
   useEffect(() => () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
   }, []);
+
   return {
     isOpen,
     setIsOpen,

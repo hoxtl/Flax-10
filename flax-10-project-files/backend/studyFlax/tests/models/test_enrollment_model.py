@@ -6,9 +6,9 @@ from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
 from django.db import IntegrityError
-from studyFlax.models.auth.userModel import User
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.modules.enrollmentModel import Enrollment
+from studyFlax.models.auth.user_model import User
+from studyFlax.models.modules.module_model import Module
+from studyFlax.models.modules.enrollment_model import Enrollment
 
 class EnrollmentModelTests(TestCase):
     """ Test suite for Enrollment model."""

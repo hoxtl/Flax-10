@@ -7,8 +7,8 @@ from rest_framework import status
 from django.utils import timezone
 from datetime import timedelta
 
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.tasks.taskModel import Task
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.factories import make_user, make_session, authed_client
 
 class StudySessionSerializerTest(TestCase):

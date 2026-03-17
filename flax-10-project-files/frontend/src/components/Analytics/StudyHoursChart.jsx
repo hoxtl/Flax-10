@@ -2,7 +2,7 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import { useTheme } from '../../context/ThemeContext';
 
 const StudyHoursChart = ({ data }) => {
-  const { theme } = useTheme();
+  const { mode: theme } = useTheme();
   const dates = data.map(d => new Date(d.date));
   const studyHours = data.map(d => (d.work / 60).toFixed(1));
   const breakHours = data.map(d => (d.break / 60).toFixed(1));
