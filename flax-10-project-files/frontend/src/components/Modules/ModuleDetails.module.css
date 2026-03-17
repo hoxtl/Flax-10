@@ -4,22 +4,6 @@
     padding-bottom: var(--space-8);
 }
 
-.backButton {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
-    transition: opacity 0.2s;
-}
-
-.backButton:hover {
-    opacity: 0.8;
-}
-
 .hero {
     background: var(--surface-card);
     border: var(--stroke-soft);

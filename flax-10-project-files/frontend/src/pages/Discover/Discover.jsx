@@ -9,6 +9,7 @@ import SearchBar from "../../components/common/SearchBar/SearchBar";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
+import ErrorBoundary from "../../components/common/ErrorBoundary/ErrorBoundary";
 
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
 import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
@@ -207,7 +208,7 @@ function DiscoverSkeleton() {
   );
 }
 
-export default function Discover({ onNavChange }) {
+export default function Discover({ onNavChange, onBack }) {
     const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
 
@@ -226,9 +227,15 @@ export default function Discover({ onNavChange }) {
         />;
 
     return (
-        <AppPage className={styles.container} title="Discover" subtitle="Find course mates and study partners">
-            {srch}
-            {content}
-        </AppPage>
+        <ErrorBoundary>
+            <AppPage 
+                className={styles.container} 
+                title="Discover" 
+                subtitle="Find course mates and study partners"
+            >
+                {srch}
+                {content}
+            </AppPage>
+        </ErrorBoundary>
     );
 }

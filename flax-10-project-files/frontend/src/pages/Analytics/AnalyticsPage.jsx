@@ -70,7 +70,7 @@ function AnalyticsSkeleton() {
   );
 }
 
-export default function AnalyticsPage() {
+export default function AnalyticsPage({ onBack }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedPeriod = Number(searchParams.get('period'));
   const requestedTab = searchParams.get('tab');

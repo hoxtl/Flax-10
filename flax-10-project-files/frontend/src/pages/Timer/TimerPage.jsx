@@ -5,6 +5,7 @@ import { useNotificationPermission } from "../../components/Timer/utils/timerUti
 import { useTimerContext } from "../../context/TimerContext";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import AppPage from "../../components/common/AppPage/AppPage";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import analyticsService from "../../api/analyticsService";
 import {
@@ -316,13 +317,11 @@ export default function TimerPage() {
       {focusMode && (
         <div className={styles.focusOverlay}>
           <button className={styles.focusOverlayClose} onClick={() => setFocusMode(false)}>✕ Exit focus</button>
-          <button
+          <BackButton
             className={`${styles.focusBackBtn} ${showBackBtn ? styles.focusBackBtnVisible : ''}`}
             onClick={() => setFocusMode(false)}
-            aria-label="Exit focus mode"
-          >
-            ← Back
-          </button>
+            label="Back"
+          />
           <FocusOverlayContent t={t} />
         </div>
       )}
