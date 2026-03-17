@@ -132,6 +132,7 @@ export function PlanEventRow({
           tabIndex={0}
           className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""} ${durationMins > 0 ? styles.planTimelineCardWithDuration : ""}`}
           onContextMenu={(e) => {
+            if (isReadOnly) return;
             e.preventDefault();
             e.stopPropagation();
             onEventContextMenu?.(item, e.clientX, e.clientY);

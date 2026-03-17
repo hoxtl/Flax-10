@@ -219,6 +219,23 @@ function addSpacing(sorted) {
 }
 
 /** Merge consecutive overlapping event rows into eventGroup rows. */
+function _push_chunked_group(result, group, base_row) {
+  const chunkSize = 3;
+  for (let i = 0; i < group.length; i += chunkSize) {
+    const items = group.slice(i, i + chunkSize);
+    const start = Math.min(...items.map((item) => item.startMins));
+    const end = Math.max(...items.map((item) => item.endMins));
+    result.push({
+      type: "eventGroup",
+      id: `group-${base_row.id}-${Math.floor(i / chunk_size)}`,
+      items,
+      startMins: start,
+      endMins: end,
+      spacingBeforePx: i === 0 ? base_row.spacingBeforePx : 0,
+    });
+  }
+}
+
 function groupOverlappingEvents(sorted) {
   const result = [];
   let i = 0;
@@ -239,14 +256,7 @@ function groupOverlappingEvents(sorted) {
       j++;
     }
     if (group.length > 1) {
-      result.push({
-        type: "eventGroup",
-        id: `group-${r.id}`,
-        items: group,
-        startMins: r.startMins,
-        endMins: groupEndMins,
-        spacingBeforePx: r.spacingBeforePx,
-      });
+      _push_chunked_group(result, group, r);
     } else {
       result.push(r);
     }
