@@ -67,11 +67,13 @@ export async function geocodeAddress(address) {
   return null;
 }
 
-export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '') {
-  let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
-  if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
-  if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
-  if (yearFilter) url += `&year=${encodeURIComponent(yearFilter)}`;
-  if (roleFilter) url += `&role=${encodeURIComponent(roleFilter)}`;
-  return apiFetch(url, { headers: authHeaders() });
+export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '', sortBy = 'name') {
+    let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
+    if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
+    if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
+    if (yearFilter) url += `&year=${encodeURIComponent(yearFilter)}`;
+    if (roleFilter) url += `&role=${encodeURIComponent(roleFilter)}`;
+    const ordering = sortBy === 'name-desc' ? '-name' : 'name';
+    url += `&ordering=${ordering}`;
+    return apiFetch(url, { headers: authHeaders() });
 }
