@@ -1,17 +1,12 @@
 /**
- * Academic panel — course change requests and teacher role management.
+ * Academic panel — teacher role management.
  */
 import { useState, useEffect } from "react";
-import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import {
-  requestCourseChange,
-  getMyCourseChangeRequest,
-  cancelCourseChangeRequest,
   requestTeacherRole,
   cancelTeacherRoleRequest,
 } from "../../api/adminApi";
 import { useAuth } from "../../context/AuthContext";
-import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader } from "./SettingsUI";
 import StandardModal from "../common/StandardModal/StandardModal";
@@ -20,12 +15,8 @@ import RequestStatusCard from "../common/RequestStatusCard/RequestStatusCard";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 
-const groupedCourses = Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
-  label: dept,
-  options: courses.map((c) => ({ value: c, label: c })),
-}));
-
 const TEACHER_REQUEST_CACHE_KEY = "teacher_request_pending";
+
 
 function getCachedTeacherRequest() {
   try {
@@ -43,159 +34,6 @@ function clearCachedTeacherRequest() {
   try { localStorage.removeItem(TEACHER_REQUEST_CACHE_KEY); } catch (_) {}
 }
 
-
-function CourseChangeSection() {
-  const { profile, loading: authLoading, refreshProfile } = useAuth();
-  const [existingRequest, setExistingRequest] = useState(null);
-  const [currentCourse, setCurrentCourse] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showApproved, setShowApproved] = useState(true);
-
-  useEffect(() => {
-    let isCancelled = false;
-    if (authLoading) return;
-
-    getMyCourseChangeRequest()
-      .then((req) => {
-      if (isCancelled) return;
-      setExistingRequest(req || null);
-      setCurrentCourse(req?.current_course || profile?.major || "Not set");
-      if (req?.status === "approved") {
-        const key = `ccr_approved_seen_${req.id}`;
-        if (localStorage.getItem(key)) {
-          setShowApproved(false);
-        } else {
-          localStorage.setItem(key, "true");
-          setTimeout(() => setShowApproved(false), 5000);
-        }
-      }
-    }).finally(() => { if (!isCancelled) setLoading(false); });
-    return () => { isCancelled = true; };
-  }, [profile, authLoading]);
-
-  const isPending = existingRequest?.status === "pending";
-  const isApproved = existingRequest?.status === "approved" && showApproved;
-  const isRejected = existingRequest?.status === "rejected";
-  const showForm = !loading && (!existingRequest || isRejected || (existingRequest?.status === "approved" && !showApproved));
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); setSuccess("");
-    if (!selectedCourse) { setError("Please select a course."); return; }
-    setSubmitting(true);
-    try {
-      const result = await requestCourseChange(selectedCourse);
-      setExistingRequest(result);
-      setSelectedCourse("");
-      setSuccess("Course change request submitted.");
-    } catch (err) {
-      setError(err.message || "Failed to submit. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleCancel = async () => {
-    setCancelling(true); setError("");
-    try {
-      await cancelCourseChangeRequest();
-      setExistingRequest(null);
-    } catch (e) {
-      setError(e.message || "Failed to cancel.");
-    } finally {
-      setCancelling(false);
-    }
-  };
-
-  if (loading) return <SectionSkeleton label="Loading course info" rows={2} />;
-
-  return (
-    <div className={styles.academicSection}>
-      <SectionHeader
-        title="Course Change"
-        description="Switching degrees? Drop a request and an admin will take it from there 📋"
-      />
-
-      <div className={styles.twoColLayout}>
-        <div className={styles.academicSectionInner}>
-          <div className={styles.currentCourseRow}>
-            <div className={styles.currentCourseInfo}>
-              <span className={styles.currentCourseLabel}>Current course</span>
-              <span className={styles.currentCourseName}>{currentCourse}</span>
-            </div>
-
-            {isPending && (
-              <div className={styles.statusTagActionRow}>
-                <span className={`${styles.statusTag} ${styles.statusTagPending}`}>
-                  ⏳ Change pending · <em className={styles.fieldMeta}>{existingRequest.requested_course}</em>
-                </span>
-                <button type="button" className={styles.cancelRequestBtn} disabled={cancelling} onClick={handleCancel}>
-                  {cancelling ? "Cancelling…" : "Cancel"}
-                </button>
-              </div>
-            )}
-
-            {isApproved && (
-              <span className={`${styles.statusTag} ${styles.statusTagSuccess}`}>
-                ✅ Approved · <em className={styles.fieldMeta}>{existingRequest.requested_course}</em>
-              </span>
-            )}
-          </div>
-
-          <InlineAlert
-            message={isRejected ? `Request to change to ${existingRequest.requested_course} was rejected. Submit a new one below.` : null}
-            variant="error"
-          />
-
-          <InlineAlert message={error} variant="error" />
-
-          {showForm && (
-            <form onSubmit={handleSubmit}>
-              <div className={styles.changeRequestArea}>
-                <div className={styles.changeRequestLabel}>Request a different course</div>
-                <AnimatedDropdown
-                  value={selectedCourse}
-                  onChange={setSelectedCourse}
-                  options={groupedCourses}
-                  grouped
-                  searchable
-                  placeholder="Search for a course..."
-                  searchPlaceholder="Type to search courses"
-                  emptyMessage="No courses found"
-                  menuMaxHeight={260}
-                />
-                <InlineAlert message={success} variant="success" />
-                <div className={`${styles.formActions} ${styles.formActionsPadded}`}>
-                  <PrimaryButton type="submit" disabled={submitting} pill>
-                    {submitting ? "Submitting…" : "Submit Request"}
-                  </PrimaryButton>
-                </div>
-              </div>
-            </form>
-          )}
-        </div>
-
-        <div className={styles.contextCard}>
-          <span className={styles.contextCardEmoji}>📋</span>
-          <h3 className={styles.contextCardTitle}>Why request a change?</h3>
-          <p className={styles.contextCardBody}>
-            Updating your course helps us personalise your deadlines, module recommendations, and schedule.
-          </p>
-          <ul className={styles.contextCardList}>
-            <li>Tailored module suggestions</li>
-            <li>Correct deadline calendar</li>
-            <li>Accurate lecturer links</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function TeacherApplyModal({ onClose, onSuccess }) {
   const [reason, setReason] = useState("");
@@ -377,7 +215,6 @@ function TeacherRoleSection() {
 export default function CourseChangePanel({ user }) {
   return (
     <div className={styles.form}>
-      <CourseChangeSection user={user} />
       <TeacherRoleSection />
     </div>
   );

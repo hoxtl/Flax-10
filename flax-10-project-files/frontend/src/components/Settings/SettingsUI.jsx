@@ -1,7 +1,7 @@
 /**
  * Shared UI primitives and the sidebar navigation for the Settings page.
  */
-import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
+import { User, Lock, MapPin, BookOpen, Paintbrush, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
@@ -16,16 +16,8 @@ const TAB_CONFIG = [
   { id: "account", label: "Account", icon: User, group: "My Details" },
   { id: "home", label: "Location", icon: MapPin, group: "My Details" },
   { id: "security", label: "Security", icon: Lock, group: "My Details" },
-  { 
-    id: "preferences", 
-    label: "Preferences", 
-    icon: Palette, 
-    group: "Preferences",
-    children: [
-      { id: "preferences_themes", label: "Themes" },
-      { id: "preferences_sleep", label: "Sleep Time" }
-    ]
-  },
+  { id: "preferences_themes", label: "Themes", icon: Paintbrush, group: "Preferences" },
+  { id: "preferences_sleep", label: "Sleep Time", icon: Moon, group: "Preferences" },
   { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
 ];
 
@@ -75,40 +67,16 @@ export function SettingsSidebar({ activeTab, onChange, user }) {
             <div className={styles.sidebarSectionLabel}>{group}</div>
             {TAB_CONFIG.filter((t) => t.group === group).map((tab) => {
               const Icon = tab.icon;
-              const isParentActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
-              const hasChildren = Boolean(tab.children);
-
               return (
-                <div key={tab.id} className={styles.navItemGroup}>
-                  <button
-                    className={`${styles.navItem} ${activeTab === tab.id ? styles.navItemActive : ""} ${isParentActive && hasChildren ? styles.navItemParentActive : ""}`}
-                    onClick={() => onChange(hasChildren ? tab.children[0].id : tab.id)}
-                    aria-current={activeTab === tab.id ? "page" : undefined}
-                    aria-expanded={hasChildren ? isParentActive : undefined}
-                  >
-                    <Icon className={styles.navIcon} size={15} strokeWidth={2} />
-                    {tab.label}
-                    {hasChildren && (
-                      <span className={`${styles.chevron} ${isParentActive ? styles.chevronRotated : ""}`}>
-                        ▾
-                      </span>
-                    )}
-                  </button>
-                  
-                  {hasChildren && isParentActive && (
-                    <div className={styles.subItems}>
-                      {tab.children.map((child) => (
-                        <button
-                          key={child.id}
-                          className={`${styles.subItem} ${activeTab === child.id ? styles.subItemActive : ""}`}
-                          onClick={() => onChange(child.id)}
-                        >
-                          {child.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <button
+                  key={tab.id}
+                  className={`${styles.navItem} ${activeTab === tab.id ? styles.navItemActive : ""}`}
+                  onClick={() => onChange(tab.id)}
+                  aria-current={activeTab === tab.id ? "page" : undefined}
+                >
+                  <Icon className={styles.navIcon} size={15} strokeWidth={2} />
+                  {tab.label}
+                </button>
               );
             })}
           </div>

@@ -7,7 +7,6 @@ import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import {
   Bell,
-  Plus,
   ChevronDown,
   Calendar,
   Clock,
@@ -117,11 +116,6 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   );
 }
 
-function AddTab({ onAddClick }) {
-  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }];
-  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && onAddClick?.()} />;
-}
-
 function NotifTab() {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -129,7 +123,7 @@ function NotifTab() {
   return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && togglePanel()} />;
 }
 
-function ActionPill({ onAddClick, onNavChange }) {
+function ActionPill({ onNavChange }) {
   const openQuickActions = () => window.dispatchEvent(new CustomEvent("quick-actions:open"));
   return (
     <div className={styles.actionPill}>
@@ -137,8 +131,6 @@ function ActionPill({ onAddClick, onNavChange }) {
         Quick actions
         <span className={styles.quickActionsKey}>/</span>
       </button>
-      <div className={styles.pillDivider} />
-      <AddTab onAddClick={onAddClick} />
       <div className={styles.pillDivider} />
       <ThemeToggle />
       <div className={styles.pillDivider} />
@@ -170,9 +162,9 @@ const TopbarTools = ({ onNavChange, activeNav }) => (
   </div>
 );
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
-  const action = <ActionPill onAddClick={onAddClick} onNavChange={onNavChange} />;
+  const action = <ActionPill onNavChange={onNavChange} />;
   const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
   return <div className={styles.actions}>{tools}{action}{pDrop}</div>;
 }
@@ -184,8 +176,8 @@ const TopBarLeftSection = ({ onNavChange, activeNav, user }) => (
   </div>
 );
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   const left = <TopBarLeftSection onNavChange={onNavChange} activeNav={activeNav} user={user} />;
-  const right = <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
+  const right = <div className={styles.rightSection}><TopBarActions user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
   return <header className={styles.container}>{left}{right}</header>;
 }
