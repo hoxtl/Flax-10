@@ -11,12 +11,12 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
-from studyFlax.models.society.societyImageModel import SocietyImage
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
+from studyFlax.models.society.society_image_model import SocietyImage
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.timer.session_model import StudySession
 from studyFlax.tests.helpers.factories import make_session
 
 User = get_user_model()

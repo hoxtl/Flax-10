@@ -1,6 +1,6 @@
 from rest_framework import status
 
-from studyFlax.models.groupwork.groupworkModel import GroupMembership, GroupProject
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.tests.helpers.base import BaseTestCase
 from studyFlax.tests.helpers.factories import make_user
 

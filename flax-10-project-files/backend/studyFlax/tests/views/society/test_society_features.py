@@ -6,9 +6,9 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
 from studyFlax.tests.helpers.factories import (
     make_society, make_society_admin, make_society_member,
 )
@@ -25,7 +25,7 @@ class SocietyTagViewExtendedTest(TestCase):
         self.client.force_authenticate(user=self.admin)
 
     def test_update_tag(self):
-        from studyFlax.models.society.societyTagModel import SocietyTag
+        from studyFlax.models.society.society_tag_model import SocietyTag
         tag = SocietyTag.objects.create(society=self.society, label='Old', color='#000')
         response = self.client.patch(
             f'/api/societies/{self.society.id}/tags/{tag.id}/',
@@ -35,20 +35,20 @@ class SocietyTagViewExtendedTest(TestCase):
         self.assertEqual(response.data['label'], 'New')
 
     def test_update_tag_invalid(self):
-        from studyFlax.models.society.societyTagModel import SocietyTag
+        from studyFlax.models.society.society_tag_model import SocietyTag
         tag = SocietyTag.objects.create(society=self.society, label='Old', color='#000')
         response = self.client.patch(f'/api/societies/{self.society.id}/tags/{tag.id}/', {'label': ''})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_tag_non_admin(self):
-        from studyFlax.models.society.societyTagModel import SocietyTag
+        from studyFlax.models.society.society_tag_model import SocietyTag
         tag = SocietyTag.objects.create(society=self.society, label='Tag', color='#000')
         self.client.force_authenticate(user=self.other)
         response = self.client.patch(f'/api/societies/{self.society.id}/tags/{tag.id}/', {'label': 'Hack'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_tag_exceeds_max(self):
-        from studyFlax.models.society.societyTagModel import SocietyTag
+        from studyFlax.models.society.society_tag_model import SocietyTag
         for index in range(7):
             SocietyTag.objects.create(society=self.society, label=f'Tag{index}', color='#000')
         response = self.client.post(
@@ -149,7 +149,7 @@ class SocietyTagViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_tag(self):
-        from studyFlax.models.society.societyTagModel import SocietyTag
+        from studyFlax.models.society.society_tag_model import SocietyTag
         tag = SocietyTag.objects.create(society=self.society, label='Sports', color='#FF0000')
         response = self.client.delete(f'/api/societies/{self.society.id}/tags/{tag.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

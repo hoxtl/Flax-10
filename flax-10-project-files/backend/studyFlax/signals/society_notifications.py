@@ -5,7 +5,7 @@ Signals for society event, announcement, membership, and deletion notifications.
 from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from studyFlax.models.society import Society, SocietyEvent, SocietyAnnouncement, SocietyMembership
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.notifications.notification_model import Notification
 
 _deleting_societies = set()
 

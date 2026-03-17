@@ -9,8 +9,8 @@ from django.test import TestCase
 from django.utils import timezone
 from unittest.mock import patch
 
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.calendar.timetableSourceModel import TimetableSource
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.calendar.timetable_source_model import TimetableSource
 
 User = get_user_model()
 

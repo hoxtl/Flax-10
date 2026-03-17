@@ -20,6 +20,7 @@ import { TaskCompletionProvider } from "./context/TaskCompletionContext";
 import { ToastProvider } from "./context/ToastContext";
 import { NotificationToast } from "./components/Notifications";
 import AttendancePrompt from "./components/Attendance/AttendancePrompt";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -92,6 +93,7 @@ function isBannedFromStorage() {
 }
 
 function resolveScreen(authed, user, showWelcome) {
+  console.log('[App] resolveScreen - authed:', authed, 'user:', !!user, 'showWelcome:', showWelcome);
   if (!authed || !user) return "auth";
   if (showWelcome) return "welcome";
   return "app";
@@ -103,7 +105,7 @@ function resolveRouteContent(activeNav, user, setActiveNav) {
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
-    const extraProps = { user, onNavChange: setActiveNav };
+    const extraProps = { user, onNavChange: setActiveNav, onBack: () => setActiveNav("home") };
     // Pass the search param or create flag to modules view if provided
     if (baseNav === "modules" && navParam === "create") {
       extraProps.initialCreate = true;
@@ -130,28 +132,23 @@ function onBackToAuth() {
 }
 
 // Async helpers
-async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
+async function loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme) {
   if (!authed) {
     setIsLoadingTheme(false);
     return;
   }
   try {
     const s = await getUserSettings();
-    setInitialTheme(s.theme || "light");
+    setInitialTheme(s.theme || "flax");
+    setInitialMode(s.mode || "light");
   } catch {
-    setInitialTheme("light");
+    setInitialTheme("flax");
+    setInitialMode("light");
   } finally {
     setIsLoadingTheme(false);
   }
 }
 
-function checkOnboarding(setShowOnboarding) {
-  getUserProfile()
-    .then((data) => {
-      if (!data?.major || data.major === "") setShowOnboarding(true);
-    })
-    .catch(() => {});
-}
 
 // Custom hooks
 function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
@@ -168,12 +165,13 @@ function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
 }
 
 function useThemeState(authed) {
-  const [initialTheme, setInitialTheme] = useState("light");
+  const [initialTheme, setInitialTheme] = useState("flax");
+  const [initialMode, setInitialMode] = useState("light");
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
   useEffect(() => {
-    loadTheme(authed, setInitialTheme, setIsLoadingTheme);
+    loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme);
   }, [authed]);
-  return { initialTheme, isLoadingTheme };
+  return { initialTheme, initialMode, isLoadingTheme };
 }
 
 function readActiveNav() {
@@ -181,32 +179,28 @@ function readActiveNav() {
 }
 
 function useAppState() {
+  const { user, authenticated: authed, profile, loading: authLoading } = useAuth();
   const [activeNav, setActiveNavState] = useState(readActiveNav);
-  const [user, setUser] = useState(() => readUser());
-  const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
   const [isBanned, setIsBanned] = useState(() => isBannedFromStorage());
 
-  useSyncAuth(setAuthed, setUser, setIsBanned, setShowWelcome);
-  const { initialTheme, isLoadingTheme } = useThemeState(authed);
+  const { initialTheme, initialMode, isLoadingTheme } = useThemeState(authed);
 
   const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
   }, []);
 
-  useEffect(() => {
-    // Moved custom 'navigate' event listener to AppScreen where useNavigate is available
-  }, []);
-
   return {
     activeNav,
     setActiveNav,
     initialTheme,
-    isLoadingTheme,
+    initialMode,
+    isLoadingTheme: isLoadingTheme || authLoading,
     user,
+    profile,
     authed,
     showWelcome,
     setShowWelcome,
@@ -215,10 +209,15 @@ function useAppState() {
 }
 
 function useOnboardingCheck() {
+  const { profile, loading } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
   useEffect(() => {
-    checkOnboarding(setShowOnboarding);
-  }, []);
+    if (!loading && profile && (!profile.major || profile.major === "")) {
+      setShowOnboarding(true);
+    }
+  }, [profile, loading]);
+
   return [showOnboarding, setShowOnboarding];
 }
 
@@ -330,7 +329,8 @@ function renderProfileView(activeNav, setActiveNav, user, onNavChange) {
     <Profile
       user={user}
       viewedUserId={viewedUserId}
-      onBack={() => setActiveNav("home")}
+      onBack={() => setActiveNav("users")}
+      backLabel="Back to All Users"
       onNavigate={onNavChange}
     />
   );
@@ -523,11 +523,24 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
-  const state = useAppState();
-  if (state.isLoadingTheme) return null;
-  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (
-    <ThemeProvider initialTheme={state.initialTheme}>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
+  const state = useAppState();
+  console.log('[App] AppContent render - isLoadingTheme:', state.isLoadingTheme, 'authed:', state.authed);
+  if (state.isLoadingTheme) {
+    console.log('[App] rendering NULL (loading theme/auth)');
+    return null;
+  }
+  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
+  console.log('[App] rendering screen:', screen);
+  return (
+    <ThemeProvider initialTheme={state.initialTheme} initialMode={state.initialMode}>
       <div style={ROOT_STYLE}>
         <AnimatePresence>{renderScreen(screen, state)}</AnimatePresence>
       </div>

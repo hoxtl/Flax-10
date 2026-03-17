@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.core.mail import BadHeaderError
 from studyFlax.models import User
-from studyFlax.models.auth.resetPasswordTokenModel import ResetPasswordToken
+from studyFlax.models.auth.reset_password_token_model import ResetPasswordToken
 from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
 from studyFlax.utils.email_utils import send_reset_password_email
 from django.conf import settings

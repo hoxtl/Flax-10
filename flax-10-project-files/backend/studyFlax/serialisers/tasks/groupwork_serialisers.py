@@ -3,7 +3,7 @@ Serialisers for group projects and group memberships.
 """
 
 from rest_framework import serializers
-from studyFlax.models.groupwork.groupworkModel import (
+from studyFlax.models.groupwork.groupwork_model import (
     GroupProject,
     GroupMembership,
 )

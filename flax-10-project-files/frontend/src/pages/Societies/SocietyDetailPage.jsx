@@ -21,6 +21,7 @@ import { Flag } from "lucide-react";
 import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 
 import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
@@ -223,7 +224,7 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
 function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
     return (
         <div className={styles.topBar}>
-            <button className={styles.backBtn} onClick={onBack}>&larr; Back to All Societies</button>
+            <BackButton onClick={onBack} label="Back to All Societies" />
             <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', alignItems: 'center' }}>
                 <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
                 {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
@@ -237,7 +238,7 @@ function NotFound({ onBack }) {
     return (
         <div className={styles.notFound}>
             <p>Society not found.</p>
-            <button onClick={onBack}>Back to Societies</button>
+            <BackButton onClick={onBack} label="Back to Societies" />
         </div>
     );
 }

@@ -7,8 +7,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.utils import timezone
 from datetime import timedelta
-from studyFlax.models.timer.themeSessionModel import ThemeSession
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.timer.theme_session_model import ThemeSession
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.tests.helpers.factories import make_user, make_session, authed_client
 
 class AnalyticsSummaryViewTest(TestCase):

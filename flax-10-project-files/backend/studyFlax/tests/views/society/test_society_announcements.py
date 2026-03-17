@@ -10,10 +10,10 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
-from studyFlax.models.society.societyTagModel import SocietyTag
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_announcement_model import SocietyAnnouncement, SocietyAnnouncementImage
+from studyFlax.models.society.society_tag_model import SocietyTag
 from studyFlax.tests.helpers.factories import (
     make_announcement, make_society, make_society_admin, make_society_member,
 )
@@ -260,7 +260,7 @@ class SocietySerializerCoverageTest(TestCase):
         return SocietyAnnouncementSerialiser
 
     def test_announcement_serializer_event_id(self):
-        from studyFlax.models.society.societyEventModel import SocietyEvent
+        from studyFlax.models.society.society_event_model import SocietyEvent
         Serialiser = self._make_announcement_serialiser()
         announcement = SocietyAnnouncement.objects.create(society=self.society, title='Title', content='Content')
         event = SocietyEvent.objects.create(

@@ -7,9 +7,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
 from studyFlax.models import User
 from datetime import timedelta
 from django.utils import timezone

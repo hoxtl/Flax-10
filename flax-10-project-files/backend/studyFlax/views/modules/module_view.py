@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from studyFlax.models import Module, CalendarEvent, Enrollment
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.serialisers import ModuleSerialiser
 
 @api_view(['GET', 'POST'])

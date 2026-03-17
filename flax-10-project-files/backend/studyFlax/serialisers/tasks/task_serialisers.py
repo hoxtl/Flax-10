@@ -4,7 +4,7 @@ Serialisers for tasks and task lists.
 
 from rest_framework import serializers
 from django.utils import timezone
-from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.utils.reading_utils import update_reading_estimates
 
 def _sync_status_and_completed(validated_data, instance):

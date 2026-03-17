@@ -1,6 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./Discover.module.css";
 import { searchUsers } from "../../api/userService";
+import PageToolbar, { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
+import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
+import ErrorBoundary from "../../components/common/ErrorBoundary/ErrorBoundary";
+import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
+import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
+import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 import AppPage from "../../components/common/AppPage/AppPage";
 import GridCard from "../../components/common/Card/GridCard";
 import gridStyles from "../../components/common/Card/CardGrid.module.css";
@@ -8,11 +15,6 @@ import EmptyState from "../../components/common/EmptyState/EmptyState";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { FilterSection, useSearchInit, useFilterState, useClickOutside } from "../../components/Social/UserSearch";
-import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
-
-import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
-import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
-import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 
 function getDisplayName(user) {
     const serverName = (user?.name || "").trim();
@@ -85,7 +87,7 @@ function UserCard({ user, onNavChange }) {
 
 const USERS_PER_PAGE = 15;
 
-async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
+async function loadUsers(query, filters, page, setU, setTotalPages, setL, sortBy) {
     setL(true);
     const offset = (page - 1) * USERS_PER_PAGE;
     const d = await searchUsers(
@@ -95,7 +97,8 @@ async function loadUsers(query, filters, page, setU, setTotalPages, setL) {
         offset,
         USERS_PER_PAGE,
         filters.years.join(','),
-        filters.roles.join(',')
+        filters.roles.join(','),
+        sortBy
     ).catch(() => ({ results: [], total_count: 0 }));
     setU(d.results || []);
     setTotalPages(Math.ceil((d.total_count || 0) / USERS_PER_PAGE));
@@ -108,7 +111,7 @@ function usePaginationReset(query, filterCourses, filterSocs, filterYears, filte
     return { currentPage, setCurrentPage };
 }
 
-function useDiscoverFetch(query, filterState) {
+function useDiscoverFetch(query, filterState, sortBy) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -118,7 +121,7 @@ function useDiscoverFetch(query, filterState) {
     const filterYears = filterState.props.selectedYears.join(',');
     const filterRoles = (filterState.props.selectedRoles || []).join(',');
 
-    const { currentPage, setCurrentPage } = usePaginationReset(query, filterCourses, filterSocs, filterYears, filterRoles);
+    const { currentPage, setCurrentPage } = usePaginationReset(query, filterCourses, filterSocs, filterYears, filterRoles, sortBy);
 
     useEffect(() => {
         const filters = {
@@ -127,9 +130,20 @@ function useDiscoverFetch(query, filterState) {
             socs: filterState.props.selectedSocieties,
             roles: filterState.props.selectedRoles || [],
         };
-        const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading), 300);
+        const timer = setTimeout(() => {
+            loadUsers(query, filters, currentPage, (data) => {
+                const sortedData = [...data].sort((a, b) => {
+                    const nameA = getDisplayName(a).toLowerCase();
+                    const nameB = getDisplayName(b).toLowerCase();
+                    if (sortBy === 'name') return nameA.localeCompare(nameB);
+                    if (sortBy === 'name-desc') return nameB.localeCompare(nameA);
+                    return 0;
+                });
+                setUsers(sortedData);
+            }, setTotalPages, setLoading, sortBy);
+        }, 300);
         return () => clearTimeout(timer);
-    }, [query, filterCourses, filterSocs, filterYears, filterRoles, currentPage]);
+    }, [query, filterCourses, filterSocs, filterYears, filterRoles, currentPage, sortBy]);
 
     return { loading, users, currentPage, setCurrentPage, totalPages };
 }
@@ -145,20 +159,32 @@ function useDiscoverUIState(query) {
 
 function useDiscoverSearch() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [sortBy, setSortBy] = useState("name");
     const ui = useDiscoverUIState(searchQuery);
-    const fetch = useDiscoverFetch(searchQuery, ui.filterState);
-    return { ...fetch, searchQuery, setSearchQuery, ...ui };
+    const fetch = useDiscoverFetch(searchQuery, ui.filterState, sortBy);
+    return { ...fetch, searchQuery, setSearchQuery, sortBy, setSortBy, ...ui };
 }
 
-function DiscoverSearchBar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState }) {
+function DiscoverToolbar({ searchQuery, setSearchQuery, containerRef, filterRef, filterState, sortBy, setSortBy }) {
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }];
     const toggle = () => filterState.setIsFilterOpen(!filterState.isFilterOpen);
+    
     return (
-        <div className={styles.filterBar}>
-            <div className={styles.searchWrap} ref={containerRef}>
-                <SearchBar placeholder="Search by name or username..." value={searchQuery} onChange={setSearchQuery} />
-            </div>
-            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggle} props={filterState.props} />
-        </div>
+        <PageToolbar
+            searchSlot={
+                <div ref={containerRef} style={{ width: '100%' }}>
+                    <SearchBar placeholder="Search by name or username..." value={searchQuery} onChange={setSearchQuery} />
+                </div>
+            }
+            controlsSlot={
+                <>
+                    <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggle} props={filterState.props} />
+                    <ToolbarSortControl>
+                        <SegmentedControl value={sortBy} onChange={setSortBy} options={sortOptions} />
+                    </ToolbarSortControl>
+                </>
+            }
+        />
     );
 }
 
@@ -207,11 +233,22 @@ function DiscoverSkeleton() {
   );
 }
 
-export default function Discover({ onNavChange }) {
-    const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState } = useDiscoverSearch();
+export default function Discover({ onNavChange, onBack }) {
+    const { loading, users, currentPage, setCurrentPage, totalPages, searchQuery, setSearchQuery, containerRef, filterRef, filterState, sortBy, setSortBy } = useDiscoverSearch();
     const showLoader = loading && users.length === 0;
 
-    const srch = <DiscoverSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} containerRef={containerRef} filterRef={filterRef} filterState={filterState} />;
+    const toolbar = (
+        <DiscoverToolbar 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+            containerRef={containerRef} 
+            filterRef={filterRef} 
+            filterState={filterState}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+        />
+    );
+    
     const content = showLoader
         ? <DiscoverSkeleton />
         : <UsersGrid
@@ -226,9 +263,15 @@ export default function Discover({ onNavChange }) {
         />;
 
     return (
-        <AppPage className={styles.container} title="Discover" subtitle="Find course mates and study partners">
-            {srch}
-            {content}
-        </AppPage>
+        <ErrorBoundary>
+            <AppPage 
+                className={styles.container} 
+                title="Discover" 
+                subtitle="Find course mates and study partners"
+            >
+                {toolbar}
+                {content}
+            </AppPage>
+        </ErrorBoundary>
     );
 }

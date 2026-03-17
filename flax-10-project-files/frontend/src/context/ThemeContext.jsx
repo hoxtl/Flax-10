@@ -17,14 +17,12 @@ async function logThemeSession(theme, startedAt) {
       method: 'POST',
       body: JSON.stringify({ theme, started_at: startedAt, ended_at: endedAt }),
     });
-  } catch {
-    // silently fail
-  }
+  } catch { /* silently fail */ }
 }
 
-function getStoredTheme(fallback) {
-    const stored = localStorage.getItem('theme');
-    return stored === 'light' || stored === 'dark' ? stored : fallback;
+function getStored(key, valid, fallback) {
+  const stored = localStorage.getItem(key);
+  return valid.includes(stored) ? stored : fallback;
 }
 
 function useThemeSession(theme, setThemeState) {
@@ -47,20 +45,40 @@ function useThemeSession(theme, setThemeState) {
   return { applyThemeChange };
 }
 
-export function ThemeProvider({ children, initialTheme = 'light' }) {
-  const [theme, setThemeState] = useState(() => getStoredTheme(initialTheme));
+const VALID_MODES = ['light', 'dark'];
+const VALID_THEMES = ['flax', 'coral', 'rust', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'mint', 'sand'];
+
+export function ThemeProvider({ children, initialTheme, initialMode }) {
+  const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
+  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_THEMES, 'flax'));
   const { applyThemeChange } = useThemeSession(theme, setThemeState);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-mode', mode);
+    localStorage.setItem('mode', mode);
+  }, [mode]);
+
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('colorTheme', theme);
   }, [theme]);
 
-  const toggleTheme = () => applyThemeChange(theme === 'light' ? 'dark' : 'light');
-  const setTheme = (newTheme) => { if (newTheme !== theme) applyThemeChange(newTheme); };
+  function setMode(newMode) {
+    if (newMode !== mode && VALID_MODES.includes(newMode)) {
+        setModeState(newMode);
+    }
+  }
+
+  const toggleMode = () => setMode(mode === 'light' ? 'dark' : 'light');
+
+  function setTheme(newTheme) {
+    if (newTheme !== theme && VALID_THEMES.includes(newTheme)) {
+        applyThemeChange(newTheme);
+    }
+  }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ mode, setMode, toggleMode, theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

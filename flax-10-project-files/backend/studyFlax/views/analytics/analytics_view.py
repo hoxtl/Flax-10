@@ -9,8 +9,8 @@ from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
 
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from .session_analytics_service import compute_active_days, compute_streaks
 
 def _get_sessions(user, start_date, end_date):

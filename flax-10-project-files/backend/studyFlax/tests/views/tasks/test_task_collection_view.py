@@ -9,8 +9,8 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.tasks.taskModel import Task
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.factories import make_task, make_task_list, make_user
 
 
@@ -39,7 +39,7 @@ class TaskListViewTest(TestCase):
         self.assertEqual(response.data[0]['title'], 'In List')
 
     def test_get_tasks_filter_by_module(self):
-        from studyFlax.models.modules.moduleModel import Module
+        from studyFlax.models.modules.module_model import Module
         module = Module.objects.create(
             module_code='TST01', module_name='Test Module',
             created_by=self.user, start_time=timezone.now(), end_time=timezone.now()

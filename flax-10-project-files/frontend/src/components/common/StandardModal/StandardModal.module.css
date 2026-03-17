@@ -1,67 +1,149 @@
+/* ======================================================
+   StandardModal — Backdrop + Modal Panel
+   ====================================================== */
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 8, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: backdropIn 0.2s ease forwards;
 }
 
 .modal {
-    width: min(520px, 92vw);
-    max-height: 90vh;
-    overflow: hidden;
-    background: var(--surface-panel);
-    border-radius: var(--modal-radius);
-    box-shadow: var(--modal-shadow);
-    padding: var(--modal-padding);
-    display: flex;
-    flex-direction: column;
+  width: min(520px, 92vw);
+  max-height: 90vh;
+  overflow: hidden;
+  background: var(--surface-panel, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  border-radius: var(--modal-radius);
+  box-shadow:
+    var(--modal-shadow),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  padding: var(--modal-padding);
+  display: flex;
+  flex-direction: column;
+  animation: modalIn 0.25s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
-.sizeSm { width: min(420px, 92vw); }
-.sizeMd { width: min(520px, 92vw); }
-.sizeLg { width: min(720px, 94vw); }
-.sizeXl { width: min(920px, 96vw); }
+.sizeSm {
+  width: min(420px, 92vw);
+}
+
+.sizeMd {
+  width: min(520px, 92vw);
+}
+
+.sizeLg {
+  width: min(720px, 94vw);
+}
+
+.sizeXl {
+  width: min(920px, 96vw);
+}
 
 .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-4);
-    margin-bottom: var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  position: relative;
+}
+
+.headerCentered {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-right: 0;
+}
+
+.headerCentered .title,
+.headerCentered .sub {
+  text-align: center;
+}
+
+.headerCentered .close {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .title {
-    margin: 0;
-    font-size: var(--text-xl);
-    font-weight: var(--font-weight-title);
-    color: var(--text);
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-title);
+  color: var(--text);
+  font-family: var(--font-heading, var(--font-body));
+  letter-spacing: -0.01em;
 }
 
 .sub {
-    margin: var(--space-1) 0 0;
-    color: var(--text-secondary);
-    font-size: var(--text-base);
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: 1.5;
 }
 
+/* ─── Close button ─────────────────────────────────── */
 .close {
-    border: none;
-    background: transparent;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--muted);
-    padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  line-height: 1;
 }
 
 .close:hover {
-    color: var(--text);
+  background: var(--hover);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .content {
-    overflow-y: auto;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.contentCentered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }

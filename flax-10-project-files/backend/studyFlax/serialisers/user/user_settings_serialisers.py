@@ -3,7 +3,7 @@ Serialisers for user settings and preferences.
 """
 
 from rest_framework import serializers
-from studyFlax.models.auth.userSettingsModel import UserSettings
+from studyFlax.models.auth.user_settings_model import UserSettings
 
 class UserSettingsSerialiser(serializers.ModelSerializer):
     """Serialiser for user application settings."""
@@ -21,4 +21,4 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
 
     class Meta:
         model = UserSettings
-        fields = ['theme', 'timezone', 'year', 'major', 'sleep_time', 'wake_time', 'major_locked']
+        fields = ['theme', 'mode', 'timezone', 'year', 'major', 'major_locked', 'sleep_time', 'wake_time', 'homepage_widgets']

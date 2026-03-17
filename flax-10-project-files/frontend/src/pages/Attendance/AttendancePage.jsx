@@ -1,4 +1,6 @@
 import { useState } from "react";
+import AppPage from "../../components/common/AppPage/AppPage";
+import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
 import { useTimetableEvents } from "./hooks/useTimetableEvents";
 import { useAttendanceRecords } from "./hooks/useAttendanceRecords";
@@ -56,20 +58,19 @@ export default function AttendancePage() {
 
   if (loading) {
     return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Attendance</h1>
-        <p className={styles.subtitle}>Loading…</p>
-      </div>
+      <AppPage title="Attendance" subtitle="Loading…">
+        <div className={styles.loadingContainer}>
+          <p>Please wait while we fetch your stats...</p>
+        </div>
+      </AppPage>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Attendance</h1>
-        <p className={styles.subtitle}>Track your attendance for lectures, small groups, and labs.</p>
+      <AppPage title="Attendance" subtitle="Track your attendance for lectures, small groups, and labs.">
         <p className={styles.error}>{error}</p>
-      </div>
+      </AppPage>
     );
   }
 

@@ -10,9 +10,9 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 
-from studyFlax.models.timer.sessionModel import StudySession
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.timer.session_model import StudySession
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from .session_analytics_service import compute_peak_hour, compute_streaks, fmt_hour
 
 try:

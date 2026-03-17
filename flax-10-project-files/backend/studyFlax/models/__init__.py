@@ -1,38 +1,38 @@
 # Auth
-from .auth.userModel import *
-from .auth.userSettingsModel import *
-from .auth.resetPasswordTokenModel import ResetPasswordToken
-from .auth.courseChangeRequestModel import CourseChangeRequest
+from .auth.user_model import *
+from .auth.user_settings_model import *
+from .auth.reset_password_token_model import ResetPasswordToken
+from .auth.course_change_request_model import CourseChangeRequest
 
 # Calendar
-from .calendar.calendarEventModel import *
-from .calendar.categoryModel import *
-from .calendar.recurrenceRuleModel import *
-from .calendar.tagModel import *
-from .calendar.timetableSourceModel import *
-from .calendar.eventAttendanceModel import EventAttendance
+from .calendar.calendar_event_model import *
+from .calendar.category_model import *
+from .calendar.recurrence_rule_model import *
+from .calendar.tag_model import *
+from .calendar.timetable_source_model import *
+from .calendar.event_attendance_model import EventAttendance
 
 # Module
-from .modules.moduleModel import *
-from .modules.enrollmentModel import *
-from .modules.deadlineModel import *
-from .modules.readingModel import *
+from .modules.module_model import *
+from .modules.enrollment_model import *
+from .modules.deadline_model import *
+from .modules.reading_model import *
 
 # Notifications
-from .notifications.notificationModel import *
+from .notifications.notification_model import *
 
 # Society
 from .society import *
 
 # Timer
 from .timer import *
-from .timer.themeSessionModel import ThemeSession
+from .timer.theme_session_model import ThemeSession
 
-# Task 
-from studyFlax.models.tasks.taskModel import Task, TaskList
+# Task
+from studyFlax.models.tasks.task_model import Task, TaskList
 
 # Social
 from .social import *
 
 # Group work
-from .groupwork.groupworkModel import GroupProject, GroupMembership
+from .groupwork.groupwork_model import GroupProject, GroupMembership

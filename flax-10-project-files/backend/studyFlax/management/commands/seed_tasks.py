@@ -7,7 +7,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 from studyFlax.models import Enrollment
-from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.fixtures.data_fixtures import (
     module_task_templates, personal_task_fixtures, task_list_fixtures,
 )

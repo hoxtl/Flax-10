@@ -7,7 +7,7 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.tests.helpers.factories import make_user, make_task
 
 class SyncCalendarEventForTaskTest(TestCase):

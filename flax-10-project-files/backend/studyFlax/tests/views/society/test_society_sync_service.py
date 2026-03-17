@@ -6,9 +6,9 @@ from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta, datetime, timezone as dt_timezone
 
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyEventModel import SocietyEvent
-from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_event_model import SocietyEvent
+from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
 from studyFlax.tests.helpers.factories import make_user, make_society
 
 def make_event(society, title='Event', recurrence='none', start=None, end=None):
@@ -90,7 +90,7 @@ class SerializeEventTest(TestCase):
 
     def test_serialize_event_with_announcement(self):
         from studyFlax.views.calendar.society_sync_service import serialize_event
-        from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement
+        from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
         ann = SocietyAnnouncement.objects.create(
             society=self.society, title='Announcement', content='Content'
         )

@@ -115,7 +115,7 @@ async function savePassword(
 }
 
 async function tryUpdateSettings(data) {
-  const response = await updateUserSettings({ theme: data.theme });
+  const response = await updateUserSettings({ theme: data.theme, mode: data.mode });
   if (response?.user) saveUserToStorage(response.user);
   return response;
 }
@@ -220,15 +220,5 @@ export default function useSettingsHandlers() {
     return saveSleep(data, setSuccessMessage, setIsSaving);
   };
 
-  return {
-    isSaving,
-    successMessage,
-    passwordError,
-    homeAddressError,
-    handleAccountSave,
-    handlePasswordSave,
-    handlePreferencesSave,
-    handleHomeAddressSave,
-    handleSleepSave,
-  };
+  return { isSaving, successMessage, passwordError, homeAddressError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, handleSleepSave };
 }

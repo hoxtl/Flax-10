@@ -60,13 +60,13 @@ describe('AllSocieties', () => {
 
     it('renders the back button', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
-        expect(screen.getByText('← Back')).toBeTruthy();
+        expect(screen.getByRole('button', { name: /Back/i })).toBeTruthy();
     });
 
     it('calls onBack when back button is clicked', () => {
         const onBack = vi.fn();
         render(<AllSocieties onBack={onBack} onSelect={vi.fn()} societies={mockSocieties} />);
-        fireEvent.click(screen.getByText('← Back'));
+        fireEvent.click(screen.getByRole('button', { name: /Back/i }));
         expect(onBack).toHaveBeenCalledTimes(1);
     });
 

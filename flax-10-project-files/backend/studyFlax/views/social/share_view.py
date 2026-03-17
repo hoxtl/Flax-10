@@ -6,8 +6,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from studyFlax.models.social.shareModel import CalendarShare
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.social.share_model import CalendarShare
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareSerialiser,
     CalendarShareUserSerialiser,

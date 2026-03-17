@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from studyFlax.models.groupwork.groupworkModel import (
+from studyFlax.models.groupwork.groupwork_model import (
     GroupProject,
     GroupMembership,
 )
