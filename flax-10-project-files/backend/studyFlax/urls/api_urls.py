@@ -118,7 +118,11 @@ urlpatterns = [
     path("tags/<int:pk>/", tag_detail, name="tag-detail"),
     path("categories/", category_list, name="category-list"),
     path("timetable/import/", timetable_import, name="timetable-import"),
+    path("attendance/record/", record_attendance, name="attendance-record"),
+    path("attendance/stats/", attendance_stats, name="attendance-stats"),
+    path("attendance/records/", attendance_records, name="attendance-records"),
     path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
+
 
     # Modules
     path("modules/", module_list, name="module-list"),
@@ -170,11 +174,6 @@ urlpatterns = [
         delete_suggestion,
         name="group-suggestion-delete",
     ),
-
-    # Attendance
-    path("attendance/record/", record_attendance, name="attendance-record"),
-    path("attendance/stats/", attendance_stats, name="attendance-stats"),
-    path("attendance/records/", attendance_records, name="attendance-records"),
 
     # Notifications
     path("notifications/", notification_list, name="notification-list"),

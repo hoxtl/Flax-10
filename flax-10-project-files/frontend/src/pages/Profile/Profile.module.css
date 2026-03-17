@@ -744,6 +744,91 @@
   padding-bottom: 4px;
 }
 
+/* Attendance Widget Layout */
+.attendanceWidget {
+  min-height: 180px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.attendanceWidgetDetailed {
+  grid-column: span 1;
+}
+
+.attendanceCharts {
+  display: flex;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.attendanceChartsRow {
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.attendanceChartBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.attendanceChartLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.attendanceLoading {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.profileAttendanceDetail {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  width: 100%;
+  min-width: 0;
+  animation: slideUpFade 0.3s ease-out;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.attendanceWarning {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+  padding: 3px 12px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 12px rgba(239, 83, 80, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: warningPulse 2s infinite ease-in-out;
+}
+
+@keyframes warningPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(239, 83, 80, 0.25); transform: scale(1); }
+    50% { box-shadow: 0 0 15px rgba(239, 83, 80, 0.45); transform: scale(1.02); }
+}
+
 .goalSaveBtn {
   padding: 6px 14px;
   background: var(--primary);

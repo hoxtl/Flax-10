@@ -76,6 +76,16 @@
   color: var(--muted);
 }
 
+.legendAttended {
+  color: var(--muted) !important;
+  font-weight: 600;
+}
+
+.legendMissed {
+  color: var(--muted) !important;
+  font-weight: 600;
+}
+
 .listPanel {
   margin-top: 2rem;
   max-width: 560px;
@@ -130,7 +140,7 @@
 
 .eventList {
   list-style: none;
-  padding: 0;
+  padding: 32px 0 0 0;
   margin: 0;
 }
 
@@ -159,10 +169,12 @@
   color: var(--muted);
 }
 
-.eventActions {
+.eventAction {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  position: relative;
+  width: fit-content;
 }
 
 .btnAttended,
@@ -176,23 +188,29 @@
   transition: opacity 0.2s, transform 0.1s;
 }
 
-.btnAttended {
-  background: #2e7d32;
-  color: white;
+.btnAttended,
+.statusToggleBtn.btnAttended {
+  background: #2D8B5A !important; /* Premium Emerald */
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .btnAttended:hover:not(:disabled) {
-  opacity: 0.9;
+  background: #34A068 !important;
+  box-shadow: 0 4px 12px rgba(45, 139, 90, 0.25);
 }
 
-.btnMissed {
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
+.btnMissed,
+.statusToggleBtn.btnMissed {
+  background: #C0392B !important; /* Premium Crimson */
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease;
 }
 
 .btnMissed:hover:not(:disabled) {
-  opacity: 0.9;
+  background: #D94435 !important;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
 }
 
 .btnAttended:disabled,
@@ -233,20 +251,19 @@
 }
 
 .badgeAttended {
-  background: rgba(46, 125, 50, 0.14);
-  color: #2e7d32;
+  background: rgba(45, 139, 90, 0.12);
+  color: #2D8B5A;
 }
 
 .badgeMissed {
-  background: rgba(198, 40, 40, 0.1);
-  color: #c62828;
+  background: rgba(192, 57, 43, 0.1);
+  color: #C0392B;
 }
 
 /* Segment detail panel (right side) */
 .detailPanel {
   flex-shrink: 0;
-  width: 320px;
-  min-width: 280px;
+  width: 100%;
   padding: 1.25rem;
   border-radius: 12px;
   background: var(--panel);
@@ -262,11 +279,18 @@
   border-bottom: 1px solid var(--border);
 }
 
-.detailPanelTitle {
+.detailPanelTitle h3 {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   margin: 0;
+}
+
+.eventCount {
+  font-size: 0.875rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 0.25rem;
 }
 
 .detailPanelClose {
@@ -288,19 +312,30 @@
 
 .detailList {
   list-style: none;
-  padding: 0;
+  padding: 40px 12px 20px 0; /* Huge top padding for tooltips */
   margin: 0;
-  max-height: 380px;
+  height: 400px;
   overflow-y: auto;
+  overflow-x: visible; /* Allow tooltips to burst horizontally if needed */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
 }
 
 .detailRow {
   display: flex;
-  align-items: flex-start;
+  flex-direction: row; /* Split text and button */
+  align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
+  padding: 1.25rem 0;
   border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.detailRow:hover {
+  z-index: 100; /* Pop above siblings for tooltip visibility */
+  background: rgba(123, 103, 81, 0.03); /* Subtle theme tint */
 }
 
 .detailRow:last-child {
@@ -316,14 +351,86 @@
 }
 
 .detailRowMeta {
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.8125rem;
   color: var(--muted);
   white-space: nowrap;
+  margin-top: 4px;
+}
+
+.metaDivider {
+  opacity: 0.4;
+  margin: 0 4px;
 }
 
 .detailEmpty {
   color: var(--muted);
   font-size: 0.9375rem;
   padding: 0.75rem 0;
+}
+
+.statusToggleBtn {
+  min-width: 100px;
+  position: relative;
+  overflow: visible !important; /* Fix for clipping PrimaryButton overflow:hidden */
+}
+
+/* Remove the white sheen "faded" effect from PrimaryButton */
+.statusToggleBtn::before {
+  display: none !important;
+}
+
+/* Tooltip Base */
+.eventAction[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 115%;
+  right: 0; /* Align to right of button */
+  left: auto;
+  transform: translateY(8px);
+  padding: 8px 14px;
+  background: #2a201a;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(42, 32, 26, 0.4);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.eventAction[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Tooltip Arrow */
+.eventAction[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  right: 20px;
+  left: auto;
+  border: 5px solid transparent;
+  border-top-color: #2a201a;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.eventAction[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
 }
