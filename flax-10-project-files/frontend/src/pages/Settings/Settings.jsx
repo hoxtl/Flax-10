@@ -20,6 +20,8 @@ const PANEL_META = {
   home: { icon: MapPin, title: "Location", desc: "Set your home address for journey planning on UniMap." },
   security: { icon: Lock, title: "Security", desc: "Update your password anytime." },
   preferences: { icon: Palette, title: "Preferences", desc: "Customise your theme and daily sleep schedule." },
+  preferences_themes: { icon: Palette, title: "Appearance", desc: "Customise how StudyFlax looks." },
+  preferences_sleep: { icon: Palette, title: "Sleep Schedule", desc: "Manage your daily sleep and wake times." },
   course: { icon: BookOpen, title: "Teacher Access", desc: "Manage your teacher request and course changes." },
 };
 
@@ -28,6 +30,8 @@ const panelVariantClass = {
   home: "panelHome",
   security: "panelSecurity",
   preferences: "panelPreferences",
+  preferences_themes: "panelPreferences",
+  preferences_sleep: "panelPreferences",
   course: "panelCourse",
 };
 
@@ -70,8 +74,11 @@ function SettingsPanel({ activeTab, handlers, user }) {
         {activeTab === "security" && (
           <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />
         )}
-        {activeTab === "preferences" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} />
+        {(activeTab === "preferences" || activeTab === "preferences_themes") && (
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="themes" />
+        )}
+        {activeTab === "preferences_sleep" && (
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="sleep" />
         )}
         {activeTab === "home" && (
           <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />
