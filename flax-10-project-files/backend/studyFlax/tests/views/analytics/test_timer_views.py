@@ -72,7 +72,7 @@ class StudySessionSerializerTest(TestCase):
             self.assertIn(field, serializer.data)
 
 class StudySessionViewSetTest(TestCase):
-    """Tests for timerViews.py (StudySessionViewSet)."""
+    """Tests for timer_views.py (StudySessionViewSet)."""
 
     def setUp(self):
         self.user = make_user(username='timeruser')
@@ -188,4 +188,3 @@ class StudySessionViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         session.refresh_from_db()
         self.assertEqual(session.status, "Overtime")
-

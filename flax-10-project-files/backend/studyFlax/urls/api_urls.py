@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-from studyFlax.views.timerViews import StudySessionViewSet
+from studyFlax.views.timer.timer_views import StudySessionViewSet
 from studyFlax.views.social.share_views import CalendarShareViewSet
 
 def _register_router():
