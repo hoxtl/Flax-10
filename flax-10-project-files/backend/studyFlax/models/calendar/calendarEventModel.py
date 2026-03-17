@@ -14,7 +14,12 @@ class CalendarEvent(models.Model):
     description = models.TextField(blank=True, default="")
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
     location = models.CharField(max_length=255, blank=True, null=True)
+    location_latitude = models.FloatField(blank=True, null=True)
+    location_longitude = models.FloatField(blank=True, null=True)
+    location_validated = models.BooleanField(default=False)
+
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.CharField(
         max_length=10,

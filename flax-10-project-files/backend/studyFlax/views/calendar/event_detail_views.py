@@ -32,6 +32,7 @@ def update_event(event, data):
     serialiser = CalendarEventCreateSerialiser(event, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+
     serialiser.save()
     return Response(CalendarEventSerialiser(event).data)
 
