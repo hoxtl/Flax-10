@@ -266,14 +266,33 @@ function ModuleToolbar({ search, sorting, isTeacher }) {
 }
 
 function ModuleResults({ sorting, search, hook, isTeacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule }) {
+    const activeCourses = sorting.selectedCourses || [];
+    const hasActiveFilter = search.filter !== 'all' || activeCourses.length > 0;
     if (sorting.results.length === 0) {
         const hasSearch = String(search.query || "").trim().length > 0;
+        const handleClearSearchAndFilters = () => {
+            if (hasSearch) search.onQueryChange("");
+            if (search.filter !== 'all') search.onFilterChange('all');
+            sorting.clearFilters();
+        };
         if (hasSearch) {
             return (
                 <SearchEmptyState
                     query={search.query}
                     itemLabel="modules"
-                    onClear={() => search.onQueryChange("")}
+                    onClear={handleClearSearchAndFilters}
+                />
+            );
+        }
+        if (hasActiveFilter) {
+            return (
+                <SearchEmptyState
+                    itemLabel="modules"
+                    title="No modules matched your filters"
+                    hint="Try adjusting your filters or clear them to show more."
+                    onClear={handleClearSearchAndFilters}
+                    alwaysShowClear
+                    clearLabel="Clear filters"
                 />
             );
         }

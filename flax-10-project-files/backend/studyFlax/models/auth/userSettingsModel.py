@@ -1,3 +1,6 @@
+"""
+Model storing per-user application settings such as theme, timezone, and sleep schedule.
+"""
 from datetime import time
 
 from django.db import models

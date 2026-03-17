@@ -9,7 +9,6 @@ from studyFlax.models.auth.userModel import User
 from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.modules.deadlineModel import Deadline
 
-
 class DeadlineModelTests(TestCase):
     """Test suite for Deadline model."""
     def setUp(self):

@@ -10,7 +10,6 @@ from studyFlax.models.auth.userModel import User
 from studyFlax.models.modules.moduleModel import Module
 from studyFlax.models.modules.enrollmentModel import Enrollment
 
-
 class EnrollmentModelTests(TestCase):
     """ Test suite for Enrollment model."""
     def setUp(self):

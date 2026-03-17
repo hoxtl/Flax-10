@@ -74,11 +74,11 @@ function processNewNotifications(fresh, knownIds, setNotifications, refreshProfi
     setNotifications(fresh);
     if (needsSessionRefresh && refreshProfile) refreshProfile();
 }
-  
+
 async function pollNotifications(knownIds, setNotifications, refreshProfile) {
     const fresh = await api.fetchNotifications().catch(err => {
-      console.error('Failed to poll notifications:', err);
-      return null;
+        console.error('Failed to poll notifications:', err);
+        return null;
     });
     if (fresh) processNewNotifications(fresh, knownIds, setNotifications, refreshProfile);
 }
@@ -104,10 +104,14 @@ function useNotificationActions(set, knownIds) {
     return { addNotification, dismissNotification, markAllRead, clearAll };
 }
 
+function trackKnownId(knownIds, id) {
+    if (knownIds?.current) knownIds.current.add(id);
+}
+
 async function createNotify(notification, set, knownIds) {
     try {
         const created = await api.createNotification(notification);
-        if (knownIds?.current) knownIds.current.add(created.id);
+        trackKnownId(knownIds, created.id);
         set(prev => [created, ...prev]);
     } catch (err) { console.error('Failed to create notification:', err); }
 }

@@ -1,7 +1,9 @@
+"""
+Models for group projects, memberships, meeting suggestions, and responses.
+"""
 from django.db import models
 
 from studyFlax.models.auth.userModel import User
-
 
 class GroupProject(models.Model):
     name = models.CharField(max_length=255)
@@ -16,7 +18,6 @@ class GroupProject(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class GroupMembership(models.Model):
     ROLE_CHOICES = [
@@ -44,7 +45,6 @@ class GroupMembership(models.Model):
     class Meta:
         unique_together = ("project", "user")
 
-
 class MeetingSuggestion(models.Model):
     project = models.ForeignKey(
         GroupProject,
@@ -62,7 +62,6 @@ class MeetingSuggestion(models.Model):
 
     def __str__(self):
         return f"Suggestion for {self.project.name} at {self.start_time}"
-
 
 class MeetingResponse(models.Model):
     STATUS_CHOICES = [

@@ -1,3 +1,7 @@
+"""
+Views for listing, creating, updating, and deleting module deadlines.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -46,8 +50,7 @@ def update_deadline(request, deadline):
     updated = serialiser.save()
     sync_deadline_events(updated)
     return Response(DeadlineSerialiser(updated).data)
-                    
-                    
+
 def delete_deadline(request, deadline):
     delete_deadline_events(deadline)
     deadline.delete()

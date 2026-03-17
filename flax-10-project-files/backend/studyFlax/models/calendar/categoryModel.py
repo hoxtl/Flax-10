@@ -1,3 +1,6 @@
+"""
+Model for event categories with colour coding and default flag.
+"""
 from django.db import models
 
 from ..auth.userModel import User
@@ -13,4 +16,3 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    

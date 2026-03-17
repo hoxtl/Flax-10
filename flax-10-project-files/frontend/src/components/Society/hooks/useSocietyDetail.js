@@ -46,13 +46,13 @@ export const buildHandlers = (data, editMode, tracker) => ({
     ...buildTagHandlers(data),
 });
 
-export const useSocietyDetail = (id) => {
+export const useSocietyDetail = (id, onMembershipChange) => {
     const core = useSocietyCore(id);
     const tags = useSocietyTags(id, core.society, core.setSociety);
     const events = useSocietyEvents(id, core.setSociety, core.fetchSociety);
     const announcements = useSocietyAnnouncements(id, core.setSociety, events);
     const members = useSocietyMembers(id, core.setSociety);
-    const membership = useSocietyMembership(id, core.setSociety);
+    const membership = useSocietyMembership(id, core.setSociety, onMembershipChange);
 
     return {
         ...core, ...tags, ...events, ...announcements,

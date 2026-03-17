@@ -65,8 +65,8 @@ function useModalState() {
 
 
 /** Aggregates all data and action handlers for the page components. */
-function useSocietyPageData(societyId, initialTab) {
-    const hookData = useSocietyDetail(societyId);
+function useSocietyPageData(societyId, initialTab, onMembershipChange) {
+    const hookData = useSocietyDetail(societyId, onMembershipChange);
     const { society, updateSociety, updateLocalSociety } = hookData;
     const location = useLocation();
     const page = usePageState(initialTab, location);
@@ -78,14 +78,14 @@ function useSocietyPageData(societyId, initialTab) {
     return { ...handlers, page, modals, handleUnreport, subscription, tracker };
 }
 
-function usePageStateHandlers(data, onBack) {
+function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
     return {
         state: modals,
         setS: modals.setShowSettings, setR: modals.setShowReportModal, setG: modals.setGalleryOpen,
         setCE: modals.setShowCoverModal, setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
         updateS: updateSociety, updateLS: updateLocalSociety, fetchM: fetchMembers, removeM: removeMember,
-        onDelete: async () => { await deleteSociety(); onBack(); },
+        onDelete: async () => { await deleteSociety(); onDeleteCallback?.(); onBack(); },
         onReport: () => modals.setShowReportModal(true),
         onAnnounceSubmit: (d, conflict) => {
             if (conflict) data.updateAnnouncement(conflict.id, { ...conflict, pinned: false }, false);
@@ -141,9 +141,9 @@ const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
     </div>
 );
 
-export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
-    const data = useSocietyPageData(societyId, initialTab);
-    const handlers = usePageStateHandlers(data, onBack);
+export default function SocietyDetailPage({ societyId, onBack, initialTab, onMembershipChange, onDelete }) {
+    const data = useSocietyPageData(societyId, initialTab, onMembershipChange);
+    const handlers = usePageStateHandlers(data, onBack, onDelete);
     useSocietyInit(useLocation());
     if (data.loading) return <SocietyDetailSkeleton />;
     if (!data.society) return <NotFound onBack={onBack} />;

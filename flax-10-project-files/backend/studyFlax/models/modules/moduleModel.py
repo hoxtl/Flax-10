@@ -1,3 +1,6 @@
+"""
+Model representing a university module with schedule and recurrence details.
+"""
 from django.db import models
 from ..auth.userModel import User
 from ..calendar.recurrenceRuleModel import RecurrenceRule
@@ -17,6 +20,6 @@ class Module(models.Model):
     end_time = models.DateTimeField()
     location = models.CharField(max_length=255, blank=True, null=True)
     recurrence_rule = models.ForeignKey(RecurrenceRule, on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     def __str__(self):
         return self.module_code

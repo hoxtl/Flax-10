@@ -25,20 +25,33 @@ function getStored(key, valid, fallback) {
   return valid.includes(stored) ? stored : fallback;
 }
 
+function useThemeSession(theme, setThemeState) {
+  const sessionStart = useRef(new Date().toISOString());
+  const currentTheme = useRef(theme);
+
+  useEffect(() => {
+    const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  function applyThemeChange(newTheme) {
+    logThemeSession(currentTheme.current, sessionStart.current);
+    sessionStart.current = new Date().toISOString();
+    currentTheme.current = newTheme;
+    setThemeState(newTheme);
+  }
+
+  return { applyThemeChange };
+}
+
 const VALID_MODES = ['light', 'dark'];
 const VALID_THEMES = ['flax', 'coral', 'rust', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'mint', 'sand'];
 
 export function ThemeProvider({ children, initialTheme, initialMode }) {
   const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
   const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_THEMES, 'flax'));
-  const sessionStart = useRef(new Date().toISOString());
-  const currentTheme = useRef(theme);
-
-  // Sync state if props change (e.g. after backend fetch completes)
-  useEffect(() => {
-    if (initialMode && VALID_MODES.includes(initialMode)) setModeState(initialMode);
-    if (initialTheme && VALID_THEMES.includes(initialTheme)) setThemeState(initialTheme);
-  }, [initialMode, initialTheme]);
+  const { applyThemeChange } = useThemeSession(theme, setThemeState);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', mode);
@@ -50,27 +63,22 @@ export function ThemeProvider({ children, initialTheme, initialMode }) {
     localStorage.setItem('colorTheme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, []);
-
   function setMode(newMode) {
-    if (newMode === mode) return;
-    setModeState(newMode);
+    if (newMode !== mode && VALID_MODES.includes(newMode)) {
+        setModeState(newMode);
+    }
   }
 
+  const toggleMode = () => setMode(mode === 'light' ? 'dark' : 'light');
+
   function setTheme(newTheme) {
-    if (newTheme === theme) return;
-    logThemeSession(currentTheme.current, sessionStart.current);
-    sessionStart.current = new Date().toISOString();
-    currentTheme.current = newTheme;
-    setThemeState(newTheme);
+    if (newTheme !== theme && VALID_THEMES.includes(newTheme)) {
+        applyThemeChange(newTheme);
+    }
   }
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode, theme, setTheme }}>
+    <ThemeContext.Provider value={{ mode, setMode, toggleMode, theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

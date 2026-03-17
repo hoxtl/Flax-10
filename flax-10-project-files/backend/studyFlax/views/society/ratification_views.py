@@ -1,9 +1,12 @@
+"""
+Views for requesting and resolving society ratification status.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .helpers import get_society_or_404, is_society_admin, society_not_found_response
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -19,18 +22,15 @@ def request_ratification(request, society_id):
     society.save()
     return Response({'status': 'pending', 'message': 'Ratification requested'})
 
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def approve_ratification(request, society_id):
     return handle_ratification_decision(society_id, 'approved')
 
-
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def reject_ratification(request, society_id):
     return handle_ratification_decision(society_id, 'rejected')
-
 
 def handle_ratification_decision(society_id, decision):
     society = get_society_or_404(society_id)
@@ -41,7 +41,6 @@ def handle_ratification_decision(society_id, decision):
     society.ratification_status = decision
     society.save()
     return Response({'status': decision, 'message': f'Ratification {decision}'})
-
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
