@@ -14,6 +14,7 @@ import { getModules } from "../../api/moduleApi";
 import ProfileHeader from "./components/ProfileHeader";
 import {
   PersonaCard,
+  AttendanceWidget,
   StudyDNA,
   MiniHeatmap,
   ThisWeek,
@@ -126,6 +127,7 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
     <div className={styles.twoCol}>
       <div className={styles.leftCol}>
         <PersonaCard persona={summary?.persona} peakHour={peakHour} />
+        <AttendanceWidget />
         <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} onGoalSave={n => fetchApi('/profile/', { method: 'PATCH', body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
         <StudyDNA heatmap={analyticsData?.heatmap} />
         <MiniHeatmap heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />

@@ -57,13 +57,26 @@ def attendance_stats(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def attendance_records(request):
-    """Return list of { event_id, attended } for the current user."""
+    """Return list of attendance records with full event details for the current user."""
     try:
+        from .attendance_helpers import _event_type_from_record
         records = (
             EventAttendance.objects.filter(user=request.user)
-            .values_list("event_id", "attended")
+            .select_related("event", "event__tag")
+            .only("event_id", "attended", "event__title", "event__start_time", "event__description", "event__tag__name")
+            .order_by("-event__start_time")
         )
-        data = [{"event_id": eid, "attended": att} for eid, att in records]
+        data = [
+            {
+                "event_id": r.event_id,
+                "attended": r.attended,
+                "title": r.event.title,
+                "start_time": r.event.start_time,
+                "description": r.event.description,
+                "event_type": _event_type_from_record(r),
+            }
+            for r in records
+        ]
         return Response(data)
     except DatabaseError:
         return _internal_error("Attendance records unavailable.")

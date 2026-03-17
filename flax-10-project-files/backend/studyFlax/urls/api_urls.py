@@ -120,6 +120,8 @@ urlpatterns = [
     path("attendance/record/", record_attendance, name="attendance-record"),
     path("attendance/stats/", attendance_stats, name="attendance-stats"),
     path("attendance/records/", attendance_records, name="attendance-records"),
+    path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
+
 
     # Modules
     path("modules/", module_list, name="module-list"),

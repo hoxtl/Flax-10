@@ -130,7 +130,18 @@ function useDiscoverFetch(query, filterState, sortBy) {
             socs: filterState.props.selectedSocieties,
             roles: filterState.props.selectedRoles || [],
         };
-        const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading, sortBy), 300);
+        const timer = setTimeout(() => {
+            loadUsers(query, filters, currentPage, (data) => {
+                const sortedData = [...data].sort((a, b) => {
+                    const nameA = getDisplayName(a).toLowerCase();
+                    const nameB = getDisplayName(b).toLowerCase();
+                    if (sortBy === 'name') return nameA.localeCompare(nameB);
+                    if (sortBy === 'name-desc') return nameB.localeCompare(nameA);
+                    return 0;
+                });
+                setUsers(sortedData);
+            }, setTotalPages, setLoading, sortBy);
+        }, 300);
         return () => clearTimeout(timer);
     }, [query, filterCourses, filterSocs, filterYears, filterRoles, currentPage, sortBy]);
 

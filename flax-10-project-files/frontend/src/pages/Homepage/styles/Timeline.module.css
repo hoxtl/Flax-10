@@ -2,7 +2,7 @@
   .taskWidgetLink {
     font-size: 0.75rem;
     font-weight: 500;
-    color: #a8a29e;
+    color: var(--muted);
     text-decoration: none;
     background: none;
     border: none;
@@ -12,13 +12,13 @@
     transition: color 0.15s;
   }
   .taskWidgetLink:hover {
-    color: #57534e;
+    color: var(--text);
   }
   
   .taskWidgetEmptyIcon { font-size: 2.25rem; line-height: 1; opacity: 0.9; }
   .taskWidgetEmptyText {
     font-size: var(--home-text-body);
-    color: #6b7280;
+    color: var(--muted);
     margin: 0;
     max-width: 18rem;
     line-height: 1.45;
@@ -46,16 +46,16 @@
     transition: background 0.15s;
   }
   .twRow:last-child { border-bottom: none; }
-  .twRow:hover { background: rgba(0, 0, 0, 0.03); }
+  .twRow:hover { background: color-mix(in srgb, var(--primary) 5%, transparent); }
 
   .twRowActiveTimer {
     border-left: none;
-    background: color-mix(in srgb, var(--primary) 8%, #FFFFFF);
+    background: color-mix(in srgb, var(--primary) 8%, var(--panel));
     animation: twPulse 2s ease-in-out infinite;
   }
   @keyframes twPulse {
-    0%, 100% { background: color-mix(in srgb, var(--primary) 8%, #FFFFFF); }
-    50% { background: color-mix(in srgb, var(--primary) 12%, #FFFFFF); }
+    0%, 100% { background: color-mix(in srgb, var(--primary) 8%, var(--panel)); }
+    50% { background: color-mix(in srgb, var(--primary) 12%, var(--panel)); }
   }
 
   .twLeft { display: flex; align-items: flex-start; gap: 0.55rem; flex: 1; min-width: 0; }
@@ -92,20 +92,20 @@
   .twBubble:hover { filter: brightness(0.95); }
   
   .twBubbleModule {
-    background: #E8F5E9;
-    color: #2D4F32;
+    background: color-mix(in srgb, var(--study) 15%, var(--panel));
+    color: var(--study);
   }
   .twBubbleExam {
-    background: #FEE2E2;
-    color: #991B1B;
+    background: color-mix(in srgb, var(--urgent) 15%, var(--panel));
+    color: var(--urgent);
   }
   .twBubbleCoursework {
-    background: #FEF3C7;
-    color: #92400E;
+    background: color-mix(in srgb, var(--secondary, #92400E) 15%, var(--panel));
+    color: var(--secondary, #92400E);
   }
   .twBubbleOther {
-    background: #F3F4F6;
-    color: #4B5563;
+    background: color-mix(in srgb, var(--neutral) 15%, var(--panel));
+    color: var(--neutral);
   }
   
   .twTime { font-size: 13px; color: var(--neutral); }
@@ -129,9 +129,9 @@
   .timeline { display: flex; flex-direction: column; }
 
   .timelineBox {
-    border: 1px solid rgba(139, 115, 85, 0.12);
+    border: 1px solid var(--border);
     border-radius: 22px;
-    background: linear-gradient(180deg, rgba(255, 252, 248, 0.94) 0%, rgba(255, 255, 255, 0.9) 100%);
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
     padding: 0.95rem 1.05rem 1.08rem;
     overflow: visible;
     position: relative;
@@ -148,10 +148,10 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
   .daySummaryBarTight {
-    color: #B45309;
+    color: var(--urgent);
   }
   .daySummaryBarBalanced {
-    color: #15803d;
+    color: var(--study);
   }
 
   /* Night overlay: grey out slots between 23:00 and 06:00 */
@@ -162,7 +162,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(100, 116, 139, 0.08);
+    background: color-mix(in srgb, var(--neutral) 10%, transparent);
     pointer-events: none;
     border-radius: inherit;
     z-index: 1;
@@ -176,7 +176,7 @@
   .dayProgressTrack {
     height: 10px;
     border-radius: 9999px;
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--border);
     overflow: hidden;
     margin-bottom: 0.5rem;
   }
@@ -222,13 +222,13 @@
     width: 100%;
     padding: 16px 20px;
     margin: 0 auto 20px;
-    background: rgba(238, 220, 130, 0.18);
+    background: color-mix(in srgb, var(--color-highlight, #EEDC82) 18%, transparent);
     border: none;
     border-radius: 9999px;
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.72rem;
     font-weight: 500;
-    color: var(--home-text-meta, #6b7280);
+    color: var(--text-secondary, #6b7280);
     letter-spacing: 0.01em;
     max-width: fit-content;
   }
@@ -260,10 +260,10 @@
     margin-left: -1px;
     background: linear-gradient(
       to bottom,
-      rgba(107, 83, 68, 0.04) 0%,
-      rgba(107, 83, 68, 0.30) 10%,
-      rgba(107, 83, 68, 0.32) 90%,
-      rgba(107, 83, 68, 0.04) 100%
+      color-mix(in srgb, var(--primary) 4%, transparent) 0%,
+      color-mix(in srgb, var(--primary) 30%, transparent) 10%,
+      color-mix(in srgb, var(--primary) 32%, transparent) 90%,
+      color-mix(in srgb, var(--primary) 4%, transparent) 100%
     );
     border-radius: 1px;
     pointer-events: none;
@@ -304,7 +304,7 @@
     font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: #B8A890;
+    color: var(--muted);
     letter-spacing: 0;
   }
   .planTimelineSpineCell {
@@ -332,7 +332,7 @@
     font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: #B8A890;
+    color: var(--muted);
     letter-spacing: 0;
     text-align: right;
     line-height: 1;
@@ -341,9 +341,9 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(107, 83, 68, 0.38);
+    background: color-mix(in srgb, var(--primary) 38%, transparent);
     border: none;
-    box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px var(--bg);
     justify-self: center;
     z-index: 2;
     position: relative;
@@ -360,16 +360,16 @@
     min-width: 32px;
     min-height: 32px;
     border-radius: 50%;
-    background: rgba(132, 169, 140, 0.9);
-    color: #1e261e;
+    background: color-mix(in srgb, var(--study) 90%, transparent);
+    color: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
     line-height: 1;
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98);
-    border: 1px solid rgba(107, 83, 68, 0.2);
+    box-shadow: 0 0 0 2px var(--bg);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
     animation: planTimelineNodePop 0.35s ease-out;
   }
   @keyframes planTimelineNodePop {
@@ -397,8 +397,8 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(132, 169, 140, 0.4);
-    box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.95);
+    background: color-mix(in srgb, var(--study) 40%, transparent);
+    box-shadow: 0 0 0 2px var(--bg);
   }
   .planTimelineSpinePast::before {
     background: var(--primary-strong, #4A3421);
@@ -407,7 +407,7 @@
     background: var(--restoration-earth, #6B5344);
   }
   .planTimelineSpineFuture::before {
-    background: rgba(210, 180, 140, 0.9);
+    background: color-mix(in srgb, var(--color-highlight, #D2B48C) 90%, transparent);
   }
   .planTimelineSpineFuture {
     background: var(--restoration-earth, #6B5344);
@@ -416,8 +416,8 @@
     height: 1px;
     background: repeating-linear-gradient(
       to right,
-      rgba(210, 180, 140, 0.45) 0,
-      rgba(210, 180, 140, 0.45) 6px,
+      color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 0,
+      color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 6px,
       transparent 6px,
       transparent 12px
     );
@@ -432,7 +432,7 @@
   }
   .planTimelineTinyGapMicroBreak {
     font-size: 0.72rem;
-    color: #6f7f72;
+    color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -442,9 +442,9 @@
   .planTimelineNowLine {
     flex: 1;
     height: 1.5px;
-    background: #7BB38E;
+    background: var(--study);
     border-radius: 1px;
-    box-shadow: 0 0 6px rgba(123, 179, 142, 0.7), 0 0 14px rgba(123, 179, 142, 0.3);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--study) 70%, transparent), 0 0 14px color-mix(in srgb, var(--study) 30%, transparent);
   }
   .planTimelineNowWrap {
     display: flex;
@@ -456,8 +456,8 @@
     padding-left: 0;
   }
   @keyframes nowDotPulse {
-    0%, 100% { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 3px rgba(132, 169, 140, 0.35); }
-    50%       { box-shadow: 0 0 0 2px rgba(249, 248, 246, 0.98), 0 0 0 5px rgba(132, 169, 140, 0.15); }
+    0%, 100% { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px color-mix(in srgb, var(--study) 35%, transparent); }
+    50%       { box-shadow: 0 0 0 2px var(--bg), 0 0 0 5px color-mix(in srgb, var(--study) 15%, transparent); }
   }
   /* Small pulsing dot before "Now" label */
   .planTimelineNowDot {
@@ -466,7 +466,7 @@
     min-width: 8px;
     min-height: 8px;
     border-radius: 50%;
-    background: #7BB38E;
+    background: var(--study);
     flex-shrink: 0;
     animation: nowDotPulse 2s ease-in-out infinite;
   }
@@ -477,7 +477,7 @@
     font-weight: 700;
     letter-spacing: 0.02em;
     text-transform: none;
-    color: #4A7C5A;
+    color: var(--study);
     background: transparent;
     padding: 0;
     border-radius: 0;
@@ -496,8 +496,8 @@
     padding: 0 10px 0 12px;
     margin-left: 0;
     border-radius: 10px;
-    border: 1px solid #D0CEC9;
-    background: #FAF9F6;
+    border: 1px solid var(--border);
+    background: var(--panel);
     cursor: pointer;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     width: 100%;
@@ -516,7 +516,7 @@
     100% { opacity: 1; transform: scale(1); }
   }
   .planTimelineCard:hover {
-    border-color: #B8B6B0;
+    border-color: var(--primary);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
     cursor: pointer;
   }
@@ -600,12 +600,12 @@
     opacity: 0.6;
   }
   .planTimelineCardNow {
-    background: rgba(132, 169, 140, 0.08);
-    border-color: rgba(132, 169, 140, 0.25);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(132, 169, 140, 0.12);
+    background: color-mix(in srgb, var(--study) 8%, var(--panel));
+    border-color: color-mix(in srgb, var(--study) 25%, var(--border));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px color-mix(in srgb, var(--study) 12%, transparent);
   }
   .planTimelineCardNow:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(132, 169, 140, 0.18);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px color-mix(in srgb, var(--study) 18%, transparent);
   }
   .planTimelineCardPast {
     opacity: 1;
@@ -623,12 +623,12 @@
     filter: none;
   }
   .planTimelineRowPast .planTimelineCardTitle {
-    color: #2f2f2f;
+    color: var(--text);
   }
   .planTimelineRowPast .planTimelineCardTimeSlot,
   .planTimelineRowPast .planTimelineCardDurationPill,
   .planTimelineRowPast .planTimelineModulePill {
-    opacity: 0.78;
+    opacity: 0.7;
   }
   .planTimelineCardOverlap {
     border-color: #E5E4E2;
@@ -665,9 +665,9 @@
     letter-spacing: 0.03em;
     padding: 3px 8px;
     border-radius: 6px;
-    background: rgba(232, 150, 140, 0.2);
-    color: #c85a4a;
-    border: 1px solid rgba(232, 150, 140, 0.4);
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -683,16 +683,16 @@
     padding: 4px 8px;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--restoration-earth, #6B5344);
-    background: rgba(249, 248, 246, 0.95);
-    border: 1px solid rgba(107, 83, 68, 0.3);
+    color: var(--primary);
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
   .planTimelineRescheduleBtn:hover {
-    background: rgba(210, 180, 140, 0.2);
-    border-color: rgba(107, 83, 68, 0.5);
+    background: var(--hover);
+    border-color: var(--primary);
   }
   .planTimelineCardRoutine {
     transform: none;
@@ -735,8 +735,8 @@
     right: 0;
     margin-top: 6px;
     padding: 10px 12px;
-    background: #F9F8F6;
-    border: 1px solid rgba(210, 180, 140, 0.55);
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
     z-index: 20;
@@ -756,9 +756,9 @@
     gap: 8px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(93, 64, 55, 0.25);
-    background: #F9F8F6;
-    color: #5D4037;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -766,8 +766,8 @@
     transition: background 0.15s, border-color 0.15s;
   }
   .planTimelineConflictPopoverBtn:hover:not(:disabled) {
-    background: rgba(210, 180, 140, 0.2);
-    border-color: rgba(107, 83, 68, 0.4);
+    background: var(--hover);
+    border-color: var(--primary);
   }
   .planTimelineConflictPopoverBtn:disabled {
     opacity: 0.6;
@@ -788,15 +788,15 @@
     min-width: 28px;
     min-height: 28px;
     border-radius: 50%;
-    background: rgba(132, 169, 140, 0.35);
-    color: #2D2D2D;
+    background: color-mix(in srgb, var(--study) 30%, transparent);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.95rem;
     line-height: 1;
     flex-shrink: 0;
-    box-shadow: 0 0 0 1px rgba(132, 169, 140, 0.25);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--study) 20%, transparent);
     grid-row: 1 / -1;
   }
   .planTimelineCardIcon {
@@ -3328,4 +3328,35 @@
   color: #6f6a61;
   flex-shrink: 0;
   opacity: 1;
+}
+
+/* Dark Mode Overrides for MiniTimeline */
+[data-mode="dark"] .timelineBox {
+    background: linear-gradient(180deg, var(--color-card) 0%, var(--color-bg) 100%);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-mode="dark"] .planTimelineStatusBar {
+    background: color-mix(in srgb, var(--color-highlight) 12%, transparent);
+    color: var(--text);
+}
+
+[data-mode="dark"] .planTimelineCard {
+    background: color-mix(in srgb, var(--color-card) 60%, transparent);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-mode="dark"] .planTimelineCard:hover {
+    background: color-mix(in srgb, var(--color-card) 80%, transparent);
+    border-color: var(--color-primary);
+}
+
+[data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {
+    background: repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-highlight) 25%, transparent) 0,
+      color-mix(in srgb, var(--color-highlight) 25%, transparent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
 }
