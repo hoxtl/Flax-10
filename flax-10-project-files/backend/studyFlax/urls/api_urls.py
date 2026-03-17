@@ -37,7 +37,6 @@ from studyFlax.views.calendar.attendance_views import (
     attendance_stats,
     attendance_records,
 )
-from studyFlax.views.hello import hello
 
 # Modules
 from studyFlax.views.modules.module_views import module_list, module_detail
