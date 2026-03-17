@@ -546,3 +546,19 @@ button:disabled {
   font-size: 0.85rem;
   margin-bottom: 1rem;
 }
+
+@media (max-width: 1100px) {
+  .page {
+    padding: 1.6rem 1.25rem 2.5rem;
+  }
+
+  .tableRow {
+    grid-template-columns: 1.8fr 2fr 1fr 1fr 1.2fr;
+    font-size: 0.84rem;
+  }
+
+  .searchCompact {
+    width: 170px;
+    min-width: 170px;
+  }
+}

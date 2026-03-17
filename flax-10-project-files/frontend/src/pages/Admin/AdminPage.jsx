@@ -419,7 +419,7 @@ function UsersTab({ onNavigate }) {
                     variants={rowAnim}
                     layout
                   >
-                    <span className={styles.nameCell}>
+                    <span className={styles.nameCell} data-label="User">
                       <button
                         className={styles.nameBtn}
                         onClick={() => onNavigate?.(`profile_${u.id}`)}
@@ -428,14 +428,16 @@ function UsersTab({ onNavigate }) {
                         <span className={styles.username}>@{u.username}</span>
                       </button>
                     </span>
-                    <span className={styles.emailCell}>{u.email}</span>
-                    <span>
+                    <span className={styles.emailCell} data-label="Email">
+                      {u.email}
+                    </span>
+                    <span data-label="Role">
                       <RoleBadge role={u.role} />
                     </span>
-                    <span>
+                    <span data-label="Status">
                       <StatusBadge active={u.is_active} />
                     </span>
-                    <span className={styles.actionsCell}>
+                    <span className={styles.actionsCell} data-label="Actions">
                       {!u.is_staff &&
                         !u.is_superuser &&
                         (u.is_active ? (
@@ -970,7 +972,6 @@ function AdminPage({ onNavChange, onBack }) {
       onBack={onBack}
       width="xl"
     >
-
       <motion.div
         className={styles.tabBar}
         {...fadeUp}
