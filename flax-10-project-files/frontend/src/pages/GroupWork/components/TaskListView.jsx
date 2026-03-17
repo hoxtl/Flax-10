@@ -33,10 +33,16 @@ function TaskTitleField({ task, isEditing, editedTitle, setEditedTitle, onSave, 
     );
 }
 
+function filterAssignees(assignees, members) {
+  if (!Array.isArray(assignees) || !Array.isArray(members)) return assignees || [];
+  const memberIds = new Set(members.map(m => String(m.user)));
+  return assignees.filter(a => memberIds.has(String(a.id)));
+}
+
 function AssignCell({ task, members, onUpdate }) {
     const [showPopup, setShowPopup] = useState(false);
     const triggerRef = useRef(null);
-    const assignees = task.assignees_info || [];
+  const assignees = filterAssignees(task.assignees_info || [], members);
     const toggleAssignee = buildToggleAssignee(assignees, task.id, onUpdate);
     return (
         <div className={styles.assignCell}>
@@ -88,7 +94,8 @@ function useTaskRowEdit(task, onUpdate) {
 
 export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
     const edit = useTaskRowEdit(task, onUpdate);
-    const m = (task.assignees_info || [])[0];
+  const visibleAssignees = filterAssignees(task.assignees_info || [], members);
+  const m = visibleAssignees[0];
     const color = m ? getUserColor(m.id) : "#8d7355";
 
     return (
