@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from studyFlax.models.groupwork.groupwork_models import GroupProject, GroupMembership, MeetingSuggestion, MeetingResponse
+from studyFlax.models.groupwork.groupworkModel import GroupProject, GroupMembership, MeetingSuggestion, MeetingResponse
 from django.utils import timezone
 from datetime import timedelta
 

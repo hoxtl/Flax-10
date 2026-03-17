@@ -22,7 +22,7 @@ from studyFlax.models import (
     Society,
 )
 from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.groupwork.groupwork_models import GroupProject
+from studyFlax.models.groupwork.groupworkModel import GroupProject
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     MODULE_PILL_COLORS,
