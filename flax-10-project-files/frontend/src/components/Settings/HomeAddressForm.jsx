@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import EmptyState from "../common/EmptyState/EmptyState";
+import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import TextInput from "../common/TextInput/TextInput";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { SectionHeader, SubmitButton, FormField } from "./SettingsUI";
@@ -47,17 +49,29 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
         <div>
           <div className={styles.settingsTile}>
             <div className={styles.formGroup}>
-              <FormField label="Address" htmlFor="homeAddress">
-                <TextInput
-                  id="homeAddress"
-                  type="text"
-                  className={styles.input}
-                  value={homeAddress}
-                  onChange={e => setHomeAddress(e.target.value)}
-                  placeholder="e.g., 123 Example Street, London E1 B23"
-                  autoComplete="street-address"
+              <label htmlFor="homeAddress" className={styles.label}>
+                Address
+              </label>
+              <LocationAutocomplete
+                value={homeAddress}
+                onChange={setHomeAddress}
+                placeholder="e.g., 123 Example Street, London, E1 B23"
+              />
+              {error && (
+                <EmptyState
+                  icon="⚠️"
+                  title="Could not save address"
+                  description={error}
                 />
-              </FormField>
+              )}
+              <label htmlFor="homeAddress">Address</label>
+              <TextInput
+                id="homeAddress"
+                type="text"
+                value={homeAddress}
+                onChange={e => setHomeAddress(e.target.value)}
+                placeholder="e.g., 123 Example Street, London E1 B23"
+              />
             </div>
             <SubmitButton
               isSaving={isSaving}

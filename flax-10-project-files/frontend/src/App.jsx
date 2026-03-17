@@ -307,7 +307,7 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   );
 }
 
-function DashboardContent({ activeNav, setActiveNav, user }) {
+function DashboardContent({ activeNav, setActiveNav, user, onNavChange }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
   if (activeNav === "profile")
@@ -315,27 +315,27 @@ function DashboardContent({ activeNav, setActiveNav, user }) {
       <Profile
         user={user}
         onBack={() => setActiveNav("home")}
-        onNavigate={setActiveNav}
+        onNavigate={onNavChange}
       />
     );
   if (activeNav.startsWith("profile_"))
-    return renderProfileView(activeNav, setActiveNav, user);
+    return renderProfileView(activeNav, setActiveNav, user, onNavChange);
   return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
-function renderProfileView(activeNav, setActiveNav, user) {
+function renderProfileView(activeNav, setActiveNav, user, onNavChange) {
   const viewedUserId = activeNav.split("_")[1];
   return (
     <Profile
       user={user}
       viewedUserId={viewedUserId}
       onBack={() => setActiveNav("home")}
-      onNavigate={setActiveNav}
+      onNavigate={onNavChange}
     />
   );
 }
 
-function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
+function AnimatedDashboardContent({ activeNav, setActiveNav, user, onNavChange }) {
   return (
     <div style={DASH_WRAP_STYLE}>
       <AnimatePresence>
@@ -344,6 +344,7 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
             activeNav={activeNav}
             setActiveNav={setActiveNav}
             user={user}
+            onNavChange={onNavChange}
           />
         </motion.div>
       </AnimatePresence>
@@ -451,6 +452,7 @@ function AppScreen({ activeNav, setActiveNav, user }) {
             activeNav={activeNav}
             setActiveNav={setActiveNav}
             user={user}
+            onNavChange={handleNavChange}
           />
         </DashboardLayout>
         <OnboardingWrapper />
