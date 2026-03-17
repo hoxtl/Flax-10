@@ -5,6 +5,7 @@ Backend tests for profile view endpoints.
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -67,6 +68,14 @@ class ProfileViewTest(TestCase):
         response = self.client.patch('/api/profile/', {'remove_photo': 'true'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_patch_profile_upload_photo(self):
+        response = self.client.patch(
+            '/api/profile/',
+            {'profile_photo': SimpleUploadedFile('photo.png', b'abc', content_type='image/png')},
+            format='multipart',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_another_user_profile(self):
         other = User.objects.create_user(
             username='other', email='other@example.com', password='pass'
@@ -118,6 +127,22 @@ class ProfileViewTest(TestCase):
             module_code=code, module_name=name, created_by=created_by,
             start_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(hours=2),
         )
+
+
+class ProfileViewHelpersTest(TestCase):
+    """Direct helper coverage for profile updates."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='owner', email='owner@example.com', password='pass'
+        )
+
+    def test_update_username_rejects_taken_name(self):
+        User.objects.create_user(username='claimed', email='claimed@example.com', password='pass')
+        from studyFlax.views.user.profile_view import update_username
+
+        response = update_username(self.user, {'username': 'claimed'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class ProfileViewCoverageTest(TestCase):

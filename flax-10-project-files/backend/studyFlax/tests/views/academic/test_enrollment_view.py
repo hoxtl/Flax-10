@@ -146,3 +146,19 @@ class ModuleAndEnrollmentHelperCoverageTest(TestCase):
         mock_create.side_effect = OperationalError('db error')
         _safe_create_enrollment_events(self.student, self.module)
         mock_debug.assert_not_called()
+
+    @patch('studyFlax.views.modules.enrollment_logic._is_running_tests', return_value=False)
+    @patch('studyFlax.views.modules.enrollment_logic.create_enrollment_events')
+    @patch('studyFlax.views.modules.enrollment_logic.logger.debug')
+    def test_safe_create_enrollment_events_logs_in_non_test_context(
+        self,
+        mock_debug,
+        mock_create,
+        _mock_is_test,
+    ):
+        from django.db import OperationalError
+        from studyFlax.views.modules.enrollment_logic import _safe_create_enrollment_events
+
+        mock_create.side_effect = OperationalError('db error')
+        _safe_create_enrollment_events(self.student, self.module)
+        mock_debug.assert_called_once()

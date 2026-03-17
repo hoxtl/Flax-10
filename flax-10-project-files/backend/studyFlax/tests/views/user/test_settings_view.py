@@ -51,11 +51,28 @@ class UserSettingsViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['settings']['theme'], 'dark')
 
+    def test_get_or_create_user_settings_uses_default_timezone(self):
+        from studyFlax.views.user.settings_view import get_or_create_user_settings
+
+        settings = get_or_create_user_settings(self.user)
+        self.assertEqual(settings.timezone, 'Europe/London')
+
     def test_patch_valid_password_updates_password(self):
         response = self.client.patch('/api/settings/', {'password': 'newpassword123'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password('newpassword123'))
+
+    def test_patch_updates_name_fields(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'first_name': 'New', 'last_name': 'User'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, 'New')
+        self.assertEqual(self.user.last_name, 'User')
 
     def test_patch_short_password_returns_400(self):
         response = self.client.patch('/api/settings/', {'password': 'short'}, format='json')
@@ -216,6 +233,13 @@ class LegacyUserSettingsViewTests(TestCase):
     def test_patch_locked_major_returns_400(self):
         UserSettings.objects.create(user=self.user, major='Physics', theme='light', timezone='Europe/London')
         response = self.call_legacy_view('patch', '/api/user/settings/', {'major': 'Biochemistry'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_settings_view_rejects_locked_major(self):
+        UserSettings.objects.create(user=self.user, major='Physics', theme='light', timezone='Europe/London')
+        api_client = APIClient()
+        api_client.force_authenticate(user=self.user)
+        response = api_client.patch('/api/settings/', {'major': 'Biochemistry'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class UserSettingsSerializerTests(TestCase):

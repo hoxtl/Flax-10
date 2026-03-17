@@ -82,6 +82,33 @@ class ReadingSerialiserTests(BaseTestCase):
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
+    def test_validate_requires_teacher(self):
+        self.teacher.role = 'student'
+        self.teacher.save(update_fields=['role'])
+        self.client.force_authenticate(user=self.teacher)
+        payload = {
+            "title": "Blocked",
+            "start_page": 1,
+            "end_page": 2,
+            "deadline": (timezone.now() + timedelta(days=5)).isoformat(),
+        }
+        res = self.client.post(
+            f"/api/modules/{self.module.id}/readings/", payload, format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_validate_end_page_after_start(self):
+        payload = {
+            "title": "Bad Range",
+            "start_page": 10,
+            "end_page": 5,
+            "deadline": (timezone.now() + timedelta(days=5)).isoformat(),
+        }
+        res = self.client.post(
+            f"/api/modules/{self.module.id}/readings/", payload, format="json"
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class ReadingSummarySerialiserTest(BaseTestCase):
     def test_summary_page_count(self):

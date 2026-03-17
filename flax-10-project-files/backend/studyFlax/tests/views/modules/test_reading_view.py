@@ -155,3 +155,18 @@ class ReadingViewsTests(BaseTestCase):
             set(data.keys()),
             {'id', 'title', 'due_date', 'estimated_blocks', 'reading_id', 'task_list', 'page_count'},
         )
+
+    def test_update_reading_invalid_data(self):
+        reading = Reading.objects.create(
+            module=self.module,
+            title='Original',
+            start_page=1,
+            end_page=10,
+            deadline=timezone.now() + timedelta(days=1),
+        )
+        response = self.client.put(
+            f'/api/modules/{self.module.id}/readings/{reading.id}/',
+            {'title': '', 'start_page': 20, 'end_page': 10},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

@@ -28,6 +28,10 @@ class TaskDetailViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], 'Updated Task')
 
+    def test_patch_task_invalid_payload(self):
+        response = self.client.patch(f'/api/tasks/{self.task.id}/', {'title': ''})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_patch_task_not_found(self):
         response = self.client.patch('/api/tasks/99999/', {'title': 'X'})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
