@@ -1,8 +1,10 @@
+"""
+Models for society announcements and their associated images.
+"""
 from django.db import models
 
 from .societyModel import Society
 from .societyTagModel import SocietyTag
-
 
 class SocietyAnnouncement(models.Model):
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='announcements')
@@ -18,7 +20,6 @@ class SocietyAnnouncement(models.Model):
 
     def __str__(self):
         return f"{self.society.name} - {self.title}"
-
 
 class SocietyAnnouncementImage(models.Model):
     announcement = models.ForeignKey(

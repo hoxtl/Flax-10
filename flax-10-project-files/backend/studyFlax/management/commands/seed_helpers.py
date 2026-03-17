@@ -1,27 +1,23 @@
 """
-Helper factories for the seed management command.
-
-Each public function is a pure factory — it constructs model instances or
-performs targeted get_or_create calls without orchestrating the overall
-seeding flow. Orchestration lives in seed.Command.
+Factories for building User instances and Reading task history.
 """
 
 import random
-from datetime import date, datetime, time, timedelta, timezone as dt_timezone
+from datetime import time, timedelta
+
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from faker import Faker
-from studyFlax.models import CalendarEvent, UserSettings, Deadline
+
+from studyFlax.models import UserSettings
 from studyFlax.fixtures.data_fixtures import (
-    course_fixtures, event_title_fixtures, description_fixtures,
-    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
-    breakfast_fixtures, lunch_fixtures, dinner_fixtures,
-    module_deadline_fixtures, deadline_fixtures, reading_fixtures
+    course_fixtures, reading_fixtures,
 )
 
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
+
 STUDENT_INTRO_SNIPPETS = [
     "I thrive on turning busy uni weeks into a game plan that is actually realistic.",
     "I am most in my zone when my calendar is tidy, my goals are clear, and my notes are colour-coded.",
@@ -88,25 +84,12 @@ PRIOR_UNIVERSITIES = [
     "University of Sheffield",
 ]
 
-SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
-SEED_DAYS  = 365
-
-READING_WEEK_START = date(2026, 2, 23)
-READING_WEEK_END   = date(2026, 2, 27)
-
-
-def _in_reading_week(dt):
-    d = dt.date() if hasattr(dt, 'date') else dt
-    return READING_WEEK_START <= d <= READING_WEEK_END
-
-
 def is_name_taken(first, last, existing):
     """Return True if a user with this first and last name already exists."""
     return (
         User.objects.filter(first_name=first, last_name=last).exists()
         or any(u.first_name == first and u.last_name == last for u in existing)
     )
-
 
 def is_username_taken(username, existing):
     """Return True if the username exists in the database or the given list."""
@@ -115,14 +98,11 @@ def is_username_taken(username, existing):
         or any(u.username == username for u in existing)
     )
 
-
 def generate_unique_name(existing):
-    """Generate a first/last name pair not already used by any user."""
     first, last = faker.first_name(), faker.last_name()
     while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()
     return first, last
-
 
 def generate_unique_username(first, last, existing):
     """Derive a first.last username that is unique, appending a counter if needed."""
@@ -133,36 +113,37 @@ def generate_unique_username(first, last, existing):
         counter += 1
     return username
 
+def _teacher_bio(first, last):
+    specialism = random.choice(TEACHING_SPECIALISMS)
+    phd_uni = random.choice(PHD_UNIVERSITIES)
+    others = [u for u in PRIOR_UNIVERSITIES if u != phd_uni] or PRIOR_UNIVERSITIES
+    prior_uni = random.choice(others)
+    return (
+        f"Dr. {first} {last} specialises in {specialism}. "
+        f"They completed their PhD at {phd_uni} after earlier study at {prior_uni}. "
+        "Known for energetic, discussion-rich teaching, they combine academic rigour "
+        "with practical, career-ready skills and clear feedback students can use immediately."
+    )
+
+def _student_bio(first):
+    return (
+        f"I am {first}, and {random.choice(STUDENT_INTRO_SNIPPETS)} "
+        f"{random.choice(STUDENT_STUDY_SNIPPETS)} "
+        f"{random.choice(STUDENT_PERSONALITY_SNIPPETS)}"
+    )
 
 def build_user(first, last, existing, role='student'):
     """Construct an unsaved User with a KCL email address and hashed password."""
     username = generate_unique_username(first, last, existing)
-    if role == 'teacher':
-        specialism = random.choice(TEACHING_SPECIALISMS)
-        phd_uni = random.choice(PHD_UNIVERSITIES)
-        prior_uni = random.choice([u for u in PRIOR_UNIVERSITIES if u != phd_uni] or PRIOR_UNIVERSITIES)
-        bio = (
-            f"Dr. {first} {last} specialises in {specialism}. "
-            f"They completed their PhD at {phd_uni} after earlier study at {prior_uni}. "
-            "Known for energetic, discussion-rich teaching, they combine academic rigour with practical, career-ready skills and clear feedback students can use immediately."
-        )
-    else:
-        bio = (
-            f"I am {first}, and {random.choice(STUDENT_INTRO_SNIPPETS)} "
-            f"{random.choice(STUDENT_STUDY_SNIPPETS)} "
-            f"{random.choice(STUDENT_PERSONALITY_SNIPPETS)}"
-        )
+    bio = _teacher_bio(first, last) if role == 'teacher' else _student_bio(first)
     user = User(
         username=username,
         email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
-        first_name=first,
-        last_name=last,
-        bio=bio,
-        role=role,
+        first_name=first, last_name=last,
+        bio=bio, role=role,
     )
     user.set_password(DEFAULT_PASSWORD)
     return user
-
 
 def build_users_list(needed, role='student'):
     """Return a list of *needed* unsaved User instances with unique names and usernames."""
@@ -172,6 +153,19 @@ def build_users_list(needed, role='student'):
         users_to_create.append(build_user(first, last, users_to_create, role=role))
     return users_to_create
 
+def _build_single_settings(user):
+    is_teacher = getattr(user, 'role', None) == 'teacher'
+    return UserSettings(
+        user=user,
+        theme=random.choice(['light', 'dark']),
+        timezone='Europe/London',
+        year='' if is_teacher else random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
+        major='' if is_teacher else random.choice(course_fixtures),
+        sleep_time=time(23, 0),
+        wake_time=time(7, 0),
+        mode=random.choice(['light', 'dark']),
+        homepage_widgets=[],
+    )
 
 def build_settings_for_new_users():
     """Return a list of UserSettings instances for every user that has no settings row yet."""
@@ -613,23 +607,20 @@ def build_theme_sessions_for_user(user, profile='balanced'):
 
 def _build_readings(module, title, chapter, start, end, now):
     from studyFlax.models import Reading
-    deadline = now + timedelta(days=random.randint(7,28))
+    deadline = now + timedelta(days=random.randint(7, 28))
     if Reading.objects.filter(module=module, title=title).exists():
         return None
     return Reading(
-        module=module, title=title, chapter=chapter, start_page=start, end_page=end, deadline=deadline,
+        module=module, title=title, chapter=chapter,
+        start_page=start, end_page=end, deadline=deadline,
     )
 
 def build_readings_for_module(module):
-    from studyFlax.models import Reading
+    """Return unsaved Reading instances for *module*."""
     now = timezone.now()
-    reading_examples = random.sample(reading_fixtures, random.randint(1,2))
-    readings = []
-    for suffix, chapter, start, end in reading_examples:
-        read = _build_readings(module, f"{module.module_name}: {suffix}", chapter, start, end, now)
-        if read:
-            readings.append(read)
-    return readings
+    examples = random.sample(reading_fixtures, random.randint(1, 2))
+    results = [_build_readings(module, f"{module.module_name}: {s}", c, st, en, now) for s, c, st, en in examples]
+    return [r for r in results if r is not None]
 
 def _build_reading_task(user, reading, reading_list):
     from studyFlax.models import Task
@@ -647,17 +638,18 @@ def _build_reading_task(user, reading, reading_list):
         priority='medium', energy_level='medium', due_date=reading.deadline,
     )
 
-def build_reading_user_history_(user, modules, reading_list):
+def _reading_task_for_module(user, module, reading_list):
     from studyFlax.models import Reading
-    tasks = []
-    for module in random.sample(modules, min(2, len(modules))):
-        readings = list(Reading.objects.filter(module=module))
-        if not readings:
-            continue
-        task = _build_reading_task(user, random.choice(readings), reading_list)
-        if task: 
-            tasks.append(task)
-    return tasks
+    readings = list(Reading.objects.filter(module=module))
+    if not readings:
+        return None
+    return _build_reading_task(user, random.choice(readings), reading_list)
+
+def build_reading_user_history_(user, modules, reading_list):
+    """Return completed reading Task instances for a sample of the user's modules."""
+    sampled = random.sample(modules, min(2, len(modules)))
+    results = [_reading_task_for_module(user, m, reading_list) for m in sampled]
+    return [t for t in results if t is not None]
 
 
 def seed_attendance_for_user(user):

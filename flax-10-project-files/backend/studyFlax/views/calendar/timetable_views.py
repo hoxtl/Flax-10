@@ -1,9 +1,12 @@
+"""
+Views for importing a user's timetable from an external URL.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .timetable_service import sync_timetable
-
+from .timetable_service import sync_timetable, TimetableSyncError
 
 def validate_source_url(raw):
     url = (raw or "").strip().split()[0] if raw else ""
@@ -23,3 +26,5 @@ def timetable_import(request):
         return Response(sync_timetable(url, request.user))
     except ValueError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except TimetableSyncError:
+        return Response({"detail": "Unable to sync timetable right now."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)

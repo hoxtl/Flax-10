@@ -248,9 +248,10 @@ export function SocietiesSection({ societies, onNavigate }) {
         <ProfileWidget title="SOCIETIES JOINED">
             <div className={styles.societiesScroll}>
                 {societies.map(soc => {
+                    const societyId = soc.society_id ?? soc.id;
                     const imageUrl = soc.cover_image || soc.image;
                     return (
-                        <button key={soc.id} className={styles.societyCard} onClick={() => onNavigate(`societies_${soc.id}`)}>
+                        <button key={societyId || soc.name} className={styles.societyCard} onClick={() => societyId && onNavigate(`/societies?id=${societyId}`)}>
                             <div className={styles.socLogoWrap}>{imageUrl ? <img src={imageUrl} alt={soc.name} className={styles.socLogo} /> : <div className={styles.socInitial}>{soc.name[0]}</div>}</div>
                             <span className={styles.socName}>{soc.name}</span>
                         </button>

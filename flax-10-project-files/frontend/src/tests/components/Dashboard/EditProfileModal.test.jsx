@@ -105,8 +105,8 @@ describe('EditProfileModal', () => {
 
   it('calls onClose when backdrop is clicked', () => {
     const onClose = vi.fn();
-    const { container } = render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
-    const backdrop = container.querySelector('[class*="backdrop"]');
+    render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
+    const backdrop = document.querySelector('[class*="backdrop"]');
     fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });

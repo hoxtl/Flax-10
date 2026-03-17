@@ -77,11 +77,12 @@ export default function ProfileHeader({ user, profileData, taskCount, upcomingEv
     const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
     const mobileDescription = isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
     const roleLabel = isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student";
+    const resolvedUser = { ...user, ...profileData };
     const resolvedPhoto = getResolvedUserPhoto({
-        ...user,
-        ...profileData,
+        ...resolvedUser,
     }, {
         allowGeneric: true,
+        seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name,
     });
     return (
         <>

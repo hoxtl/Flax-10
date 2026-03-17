@@ -29,7 +29,7 @@ export default function SocietiesPage() {
     if (state.loading) return <SocietiesSkeleton />;
     const activeView = state.selectedSocietyId ? "detail" : state.view;
 
-    if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={() => { state.setView('all'); state.clearSelection(); }} />;
+    if (state.selectedSocietyId) return <SocietyDetailPage societyId={state.selectedSocietyId} onBack={() => { state.setView('my'); state.clearSelection(); }} onMembershipChange={state.refresh} onDelete={() => state.removeSociety(Number(state.selectedSocietyId))} />;
     if (state.view === "all") return (
         <>
             <AllSocieties onBack={() => state.setView("my")} onSelect={state.selectSociety} societies={state.societies} onReport={state.setReportingSociety} onUnreport={state.handleUnreport} />
@@ -41,7 +41,7 @@ export default function SocietiesPage() {
             <AnimatePresence mode="wait" initial={false}>
                 {activeView === "detail" ? (
                     <PageTransition key="society-detail">
-                        <SocietyDetailPage societyId={state.selectedSocietyId} onBack={state.clearSelection} />
+                        <SocietyDetailPage societyId={state.selectedSocietyId} onBack={state.clearSelection} onMembershipChange={state.refresh} onDelete={() => state.removeSociety(Number(state.selectedSocietyId))} />
                     </PageTransition>
                 ) : activeView === "all" ? (
                     <PageTransition key="society-all">

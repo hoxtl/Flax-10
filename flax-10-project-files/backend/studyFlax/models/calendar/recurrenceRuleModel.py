@@ -1,3 +1,6 @@
+"""
+Model defining recurrence rules for repeating calendar events.
+"""
 from django.db import models
 
 class RecurrenceRule(models.Model):

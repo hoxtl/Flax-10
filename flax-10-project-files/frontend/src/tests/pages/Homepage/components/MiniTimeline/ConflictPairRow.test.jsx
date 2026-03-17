@@ -120,7 +120,7 @@ describe('ConflictPairRow', () => {
   it('calls onEdit when card clicked and no onCardClick', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onEdit });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.click(card);
     expect(onEdit).toHaveBeenCalled();
   });
@@ -128,7 +128,7 @@ describe('ConflictPairRow', () => {
   it('calls onEdit when Edit button clicked', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onEdit });
-    fireEvent.click(screen.getAllByText('Lecture')[1]);
+    fireEvent.click(screen.getByTitle('Edit Study session'));
     expect(onEdit).toHaveBeenCalled();
   });
 
@@ -150,7 +150,7 @@ describe('ConflictPairRow', () => {
   it('calls onEventContextMenu on context menu', () => {
     const onEventContextMenu = vi.fn();
     renderConflictPairRow({ onEventContextMenu });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.contextMenu(card);
     expect(onEventContextMenu).toHaveBeenCalled();
   });
@@ -158,7 +158,7 @@ describe('ConflictPairRow', () => {
   it('responds to keyboard Enter on card', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onEdit });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.keyDown(card, { key: 'Enter' });
     expect(onEdit).toHaveBeenCalled();
   });
@@ -166,7 +166,7 @@ describe('ConflictPairRow', () => {
   it('responds to keyboard Space on card', () => {
     const onCardClick = vi.fn();
     renderConflictPairRow({ onCardClick });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.keyDown(card, { key: ' ' });
     expect(onCardClick).toHaveBeenCalled();
   });
@@ -174,7 +174,7 @@ describe('ConflictPairRow', () => {
   it('calls onCardClick when card is clicked and onCardClick is provided', () => {
     const onCardClick = vi.fn();
     renderConflictPairRow({ onCardClick });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.click(card);
     expect(onCardClick).toHaveBeenCalled();
   });
@@ -231,7 +231,7 @@ describe('ConflictPairRow', () => {
   it('falls back to onEdit when card clicked and no onCardClick, via keyboard Space', () => {
     const onEdit = vi.fn();
     renderConflictPairRow({ onCardClick: undefined, onEdit });
-    const card = screen.getAllByText('Lecture')[0].closest('[role="button"]');
+    const card = screen.getAllByText('Study session')[0].closest('[role="button"]');
     fireEvent.keyDown(card, { key: ' ' });
     expect(onEdit).toHaveBeenCalled();
   });

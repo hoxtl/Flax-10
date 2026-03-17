@@ -1,3 +1,6 @@
+"""
+Model for calendar sharing relationships between users.
+"""
 from django.db import models
 from django.conf import settings
 

@@ -109,10 +109,10 @@ export function ConflictPairRow({
               <div
                 key={r.id}
                 className={styles.planTimelineConflictPairCard}
-                style={{ "--card-accent": accent }}
                 role="button"
                 tabIndex={0}
                 onContextMenu={(e) => {
+                  if (isReadOnlyEvent(r.item)) return;
                   e.preventDefault();
                   e.stopPropagation();
                   onEventContextMenu?.(r.item, e.clientX, e.clientY);
@@ -132,7 +132,7 @@ export function ConflictPairRow({
                     else onEdit?.(r.item, r.item.tag);
                   }
                 }}
-                style={{ cursor: isReadOnlyEvent(r.item) ? "default" : undefined }}
+                style={{ "--card-accent": accent, cursor: isReadOnlyEvent(r.item) ? "default" : undefined }}
               >
                 <div className={styles.planTimelineConflictPairCardAccent} aria-hidden />
                 <span className={styles.planTimelineConflictPairCardTime}>

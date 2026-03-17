@@ -29,6 +29,10 @@ export function isReadOnlyEvent(event) {
 export function getEventType(event) {
     if (!event) return 'personal';
     if (event.source === 'society') return 'society';
+    if (typeof event.source === 'string' && event.source.startsWith('module_')) return 'module';
+    if (event.source === 'timetable') return 'timetable';
+    if ((event.tag_name || event.tag?.name || '').toLowerCase() === 'lecture') return 'module';
+    if (typeof event.title === 'string' && /^lecture:/i.test(event.title)) return 'module';
     if (event.module) return 'module';
     if (event.source && event.external_id) return 'timetable';
     return 'personal';

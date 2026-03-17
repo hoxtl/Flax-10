@@ -20,14 +20,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 18px;
-  padding: 26px 28px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px 20px;
   border: 1px solid rgba(123, 103, 81, 0.14);
-  border-radius: 28px;
+  border-radius: 18px;
   background:
     linear-gradient(135deg, rgba(255, 252, 248, 0.99) 0%, rgba(247, 241, 234, 0.96) 56%, rgba(243, 235, 226, 0.93) 100%);
-  box-shadow: 0 18px 36px rgba(74, 52, 33, 0.045);
+  box-shadow: 0 10px 24px rgba(74, 52, 33, 0.04);
   overflow: hidden;
 }
 
@@ -53,7 +53,7 @@
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   flex: 1 1 auto;
   min-width: 0;
   justify-content: center;
@@ -81,10 +81,10 @@
 
 .headerTitle {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: clamp(2.35rem, 3.9vw, 3.2rem);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.035em;
-  line-height: 0.98;
+  line-height: 1.1;
   color: #4a433d;
   margin: 0;
   max-width: none;

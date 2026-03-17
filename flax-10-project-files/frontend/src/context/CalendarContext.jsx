@@ -5,7 +5,7 @@ import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
-const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all' };
+const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all', reloadKey: 0 };
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);

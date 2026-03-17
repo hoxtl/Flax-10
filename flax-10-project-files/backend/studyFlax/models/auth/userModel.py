@@ -1,3 +1,6 @@
+"""
+Custom user model extending AbstractUser with role and profile fields.
+"""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
