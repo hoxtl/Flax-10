@@ -10,8 +10,7 @@ import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import PageTransition from "../../components/common/PageTransition/PageTransition";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
-import analyticsService from "../../api/analyticsService";
-import { getNearestMilestone } from "../../components/Timer/utils/milestoneUtils";
+import TodayBanner from "../../components/Timer/TodayBanner";
 import {
   MainSection,
   PopupSection,
@@ -33,20 +32,6 @@ const SHORTCUTS = [
 
 const FLAX_FOCUS_ACCENT = "#7a6a56";
 
-function getAccentFromTimerPreset(timer) {
-  void timer;
-  return FLAX_FOCUS_ACCENT;
-}
-
-function fmtHours(h) {
-    if (!h || h <= 0) return '0m';
-    const hrs = Math.floor(h);
-    const mins = Math.round((h - hrs) * 60);
-    if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`;
-    if (hrs > 0) return `${hrs}h`;
-    return `${mins}m`;
-}
-
 function ShortcutsModal({ onClose }) {
     return (
         <div className={styles.shortcutsOverlay} onClick={onClose}>
@@ -61,163 +46,6 @@ function ShortcutsModal({ onClose }) {
                     ))}
                 </div>
                 <button className={styles.shortcutsClose} onClick={onClose}>Close</button>
-            </div>
-        </div>
-    );
-}
-
-function TodayBanner({ onStreakData, isStudying = false }) {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [monthSummary, setMonthSummary] = useState(null);
-    const [goalHours, setGoalHours] = useState(() =>
-        parseFloat(localStorage.getItem('timerDailyGoalHours') || '4'));
-    const [editingGoal, setEditingGoal] = useState(false);
-    const [goalInput, setGoalInput] = useState('');
-    const [lastSessionCount, setLastSessionCount] = useState(null);
-    const [fillAnimating, setFillAnimating] = useState(false);
-    const [counterAnimating, setCounterAnimating] = useState(false);
-
-    const refresh = useCallback(() => {
-        analyticsService.getSummary(1)
-            .then(res => {
-                const summary = res?.summary ?? null;
-                setData(summary);
-                if (onStreakData) onStreakData(summary);
-            })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-        analyticsService.getSummary(30)
-            .then((res) => setMonthSummary(res?.summary ?? null))
-            .catch(() => setMonthSummary(null));
-    }, [onStreakData]);
-
-    useEffect(() => {
-        refresh();
-        window.addEventListener('timerHistoryUpdated', refresh);
-        window.addEventListener('historyCleared', refresh);
-        return () => {
-            window.removeEventListener('timerHistoryUpdated', refresh);
-            window.removeEventListener('historyCleared', refresh);
-        };
-    }, [refresh]);
-
-    const sessions = data?.total_sessions ?? 0;
-    const hours = data?.total_study_hours ?? 0;
-    const streak = data?.current_streak_days ?? 0;
-    const goalSessions = Math.max(1, Math.ceil((goalHours * 60) / 25));
-    const sessionPct = Math.min(100, Math.round((sessions / goalSessions) * 100));
-    const milestone = monthSummary
-        ? getNearestMilestone(
-            Number(monthSummary.total_sessions ?? 0),
-            Number(monthSummary.current_streak_days ?? 0),
-            Number(monthSummary.total_study_hours ?? 0)
-        )
-        : null;
-    const milestoneHint = milestone
-        ? `${milestone.remaining} away from ${milestone.label}`
-        : null;
-    const weeklyProgressDays = Math.max(0, Math.min(7, streak > 0 && streak % 7 === 0 ? 7 : streak % 7));
-    const weeklyGoalText = `🔥 ${weeklyProgressDays}/7 days towards your weekly goal`;
-    const streakTooltip = milestoneHint || weeklyGoalText;
-    const tickCount = Math.max(2, Math.min(goalSessions, 16));
-    const activePulseLeft = Math.min(
-        98,
-        Math.max(2, ((Math.min(sessions, goalSessions - 1) + 0.5) / goalSessions) * 100)
-    );
-
-    useEffect(() => {
-        if (lastSessionCount == null) {
-            setLastSessionCount(sessions);
-            return;
-        }
-        if (sessions !== lastSessionCount) {
-            setFillAnimating(true);
-            setCounterAnimating(true);
-            const fillTimer = setTimeout(() => setFillAnimating(false), 900);
-            const counterTimer = setTimeout(() => setCounterAnimating(false), 480);
-            setLastSessionCount(sessions);
-            return () => {
-                clearTimeout(fillTimer);
-                clearTimeout(counterTimer);
-            };
-        }
-    }, [sessions, lastSessionCount]);
-
-    const commitGoal = (val) => {
-        const n = parseFloat(val);
-        if (!isNaN(n) && n > 0) {
-            setGoalHours(n);
-            try { localStorage.setItem('timerDailyGoalHours', String(n)); } catch {}
-        }
-        setEditingGoal(false);
-    };
-
-    if (loading) return null;
-    return (
-        <div className={styles.todayRibbon}>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneLeft}`}>
-                <span className={styles.todayRibbonStreakWrap} data-tooltip={streakTooltip}>
-                    <span className={styles.todayRibbonStreakIcon}>🔥</span>
-                    <span className={styles.todayRibbonStreakValue}>{streak}d</span>
-                </span>
-            </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneCenter}`}>
-                <div className={styles.todayRibbonHeroRow}>
-                    <span className={styles.todayRibbonSessionsText}>
-                        <span className={styles.todayRibbonSessionDigitWrap}>
-                            <span key={sessions} className={`${styles.todayRibbonSessionDigit} ${counterAnimating ? styles.todayRibbonSessionDigitAnimate : ''}`}>{Math.min(sessions, goalSessions)}</span>
-                        </span>
-                        /{goalSessions} sessions today{sessions > goalSessions ? ` (+${sessions - goalSessions} extra)` : ''}
-                    </span>
-                    <span className={styles.todayRibbonMilestoneActive}>{weeklyGoalText}</span>
-                </div>
-                <div className={styles.todayRibbonScale}>
-                    <span>0</span>
-                    <span>{goalSessions}</span>
-                </div>
-                <div className={styles.todayRibbonBar}>
-                    <div
-                        className={`${styles.todayRibbonFill} ${fillAnimating ? styles.todayRibbonFillAnimate : ''} ${isStudying ? styles.todayRibbonFillLive : ''}`}
-                        style={{ width: `${sessionPct}%` }}
-                    >
-                        <span className={styles.todayRibbonFillShimmer} />
-                    </div>
-                    <div className={styles.todayRibbonTickLayer}>
-                        {Array.from({ length: tickCount + 1 }).map((_, idx) => (
-                            <span
-                                key={`tick-${idx}`}
-                                className={styles.todayRibbonTick}
-                                style={{ left: `${(idx / tickCount) * 100}%` }}
-                            />
-                        ))}
-                    </div>
-                    {isStudying && sessions < goalSessions ? (
-                        <span className={styles.todayRibbonActivePulse} style={{ left: `calc(${activePulseLeft}% - 4px)` }} />
-                    ) : null}
-                </div>
-            </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneRight}`}>
-                <span className={styles.todayRibbonFocusValue}>🕒 {fmtHours(hours)}</span>
-                <span className={styles.todayRibbonMeta}>
-                    Goal:{' '}
-                    {editingGoal ? (
-                        <input
-                            className={styles.todayGoalInput}
-                            type="number"
-                            min={0.5} max={24} step={0.5}
-                            value={goalInput}
-                            autoFocus
-                            onChange={e => setGoalInput(e.target.value)}
-                            onBlur={() => commitGoal(goalInput)}
-                            onKeyDown={e => { if (e.key === 'Enter') commitGoal(goalInput); if (e.key === 'Escape') setEditingGoal(false); }}
-                        />
-                    ) : (
-                        <button className={styles.todayGoalEditBtn} onClick={() => { setGoalInput(String(goalHours)); setEditingGoal(true); }}>
-                            {goalHours}h
-                        </button>
-                    )}
-                </span>
             </div>
         </div>
     );
@@ -276,14 +104,6 @@ function FocusPageSkeleton() {
   );
 }
 
-function HistoryButton({ onClick }) {
-  return (
-    <PrimaryButton onClick={onClick} pill>
-      History 📜
-    </PrimaryButton>
-  );
-}
-
 export default function TimerPage() {
   const t = useTimerContext();
   const location = useLocation();
@@ -298,7 +118,7 @@ export default function TimerPage() {
   const [dismissedWarning, setDismissedWarning] = useState(false);
   const { permission, request } = useNotificationPermission();
   const isMobile = useBreakpoint();
-  const focusAccent = getAccentFromTimerPreset(t);
+  const focusAccent = FLAX_FOCUS_ACCENT;
 
   const openFocusMode = useCallback(() => {
     setFocusMode(true);
