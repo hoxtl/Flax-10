@@ -2,10 +2,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { fadeInMotion, tabContentMotion } from "../motion/transitions";
 import styles from "./Tabs.module.css";
 
-export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator" }) {
+export default function Tabs({
+    tabs,
+    activeTab,
+    onTabChange,
+    layoutId = "tabIndicator",
+    compact = false,
+    className = "",
+    tabClassName = "",
+    tabVariant = "default",
+}) {
     if (!tabs?.length) return null;
+    const containerClass = `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();
     return (
-        <div className={styles.container}>
+        <div className={containerClass}>
             <motion.div
                 className={styles.tabBar}
                 {...fadeInMotion}
@@ -17,6 +27,8 @@ export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndi
                         isActive={activeTab === tab.id}
                         onClick={() => onTabChange(tab.id)}
                         layoutId={layoutId}
+                        tabClassName={tabClassName}
+                        tabVariant={tabVariant}
                     />
                 ))}
             </motion.div>
@@ -33,10 +45,12 @@ export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndi
     );
 }
 
-function TabButton({ tab, isActive, onClick, layoutId }) {
-    const cls = isActive ? `${styles.tab} ${styles.active}` : styles.tab;
+function TabButton({ tab, isActive, onClick, layoutId, tabClassName, tabVariant }) {
+    const base = isActive ? `${styles.tab} ${styles.active}` : styles.tab;
+    const variantClass = tabVariant === "heading" ? styles.headingTab : "";
+    const cls = `${base} ${variantClass} ${tabClassName || ''}`.trim();
     return (
-        <button className={cls} onClick={onClick}>
+        <button className={cls} onClick={onClick} data-active={isActive ? "true" : "false"}>
             {tab.icon && <span>{tab.icon}</span>}
             <span>{tab.label}</span>
             {isActive && (
