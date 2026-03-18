@@ -1,13 +1,17 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./TimerPage.module.css";
 import { useNotificationPermission } from "../../components/Timer/utils/timerUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import AppPage from "../../components/common/AppPage/AppPage";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import PageTransition from "../../components/common/PageTransition/PageTransition";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
+import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
 import analyticsService from "../../api/analyticsService";
+import { getNearestMilestone } from "../../components/Timer/utils/milestoneUtils";
 import {
   MainSection,
   PopupSection,
@@ -26,6 +30,13 @@ const SHORTCUTS = [
   { key: 'Esc', desc: 'Exit overlays' },
   { key: '?', desc: 'Show this help' },
 ];
+
+const FLAX_FOCUS_ACCENT = "#7a6a56";
+
+function getAccentFromTimerPreset(timer) {
+  void timer;
+  return FLAX_FOCUS_ACCENT;
+}
 
 function fmtHours(h) {
     if (!h || h <= 0) return '0m';
@@ -55,15 +66,19 @@ function ShortcutsModal({ onClose }) {
     );
 }
 
-function TodayBanner({ onStreakData }) {
+function TodayBanner({ onStreakData, isStudying = false }) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [monthSummary, setMonthSummary] = useState(null);
     const [goalHours, setGoalHours] = useState(() =>
         parseFloat(localStorage.getItem('timerDailyGoalHours') || '4'));
     const [editingGoal, setEditingGoal] = useState(false);
     const [goalInput, setGoalInput] = useState('');
+    const [lastSessionCount, setLastSessionCount] = useState(null);
+    const [fillAnimating, setFillAnimating] = useState(false);
+    const [counterAnimating, setCounterAnimating] = useState(false);
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
         analyticsService.getSummary(1)
             .then(res => {
                 const summary = res?.summary ?? null;
@@ -72,12 +87,62 @@ function TodayBanner({ onStreakData }) {
             })
             .catch(() => {})
             .finally(() => setLoading(false));
+        analyticsService.getSummary(30)
+            .then((res) => setMonthSummary(res?.summary ?? null))
+            .catch(() => setMonthSummary(null));
     }, [onStreakData]);
+
+    useEffect(() => {
+        refresh();
+        window.addEventListener('timerHistoryUpdated', refresh);
+        window.addEventListener('historyCleared', refresh);
+        return () => {
+            window.removeEventListener('timerHistoryUpdated', refresh);
+            window.removeEventListener('historyCleared', refresh);
+        };
+    }, [refresh]);
 
     const sessions = data?.total_sessions ?? 0;
     const hours = data?.total_study_hours ?? 0;
     const streak = data?.current_streak_days ?? 0;
-    const pct = Math.min(100, goalHours > 0 ? Math.round((hours / goalHours) * 100) : 0);
+    const goalSessions = Math.max(1, Math.ceil((goalHours * 60) / 25));
+    const sessionPct = Math.min(100, Math.round((sessions / goalSessions) * 100));
+    const milestone = monthSummary
+        ? getNearestMilestone(
+            Number(monthSummary.total_sessions ?? 0),
+            Number(monthSummary.current_streak_days ?? 0),
+            Number(monthSummary.total_study_hours ?? 0)
+        )
+        : null;
+    const milestoneHint = milestone
+        ? `${milestone.remaining} away from ${milestone.label}`
+        : null;
+    const weeklyProgressDays = Math.max(0, Math.min(7, streak > 0 && streak % 7 === 0 ? 7 : streak % 7));
+    const weeklyGoalText = `🔥 ${weeklyProgressDays}/7 days towards your weekly goal`;
+    const streakTooltip = milestoneHint || weeklyGoalText;
+    const tickCount = Math.max(2, Math.min(goalSessions, 16));
+    const activePulseLeft = Math.min(
+        98,
+        Math.max(2, ((Math.min(sessions, goalSessions - 1) + 0.5) / goalSessions) * 100)
+    );
+
+    useEffect(() => {
+        if (lastSessionCount == null) {
+            setLastSessionCount(sessions);
+            return;
+        }
+        if (sessions !== lastSessionCount) {
+            setFillAnimating(true);
+            setCounterAnimating(true);
+            const fillTimer = setTimeout(() => setFillAnimating(false), 900);
+            const counterTimer = setTimeout(() => setCounterAnimating(false), 480);
+            setLastSessionCount(sessions);
+            return () => {
+                clearTimeout(fillTimer);
+                clearTimeout(counterTimer);
+            };
+        }
+    }, [sessions, lastSessionCount]);
 
     const commitGoal = (val) => {
         const n = parseFloat(val);
@@ -89,37 +154,53 @@ function TodayBanner({ onStreakData }) {
     };
 
     if (loading) return null;
-
     return (
-        <div className={styles.todayBanner}>
-            <div className={styles.todayBannerLeft}>
-                {streak > 0 && (
-                    <div className={styles.todayStatChip}>
-                        <span className={styles.todayStatValue}>🔥 {streak}d</span>
-                        <span className={styles.todayStatLabel}>streak</span>
-                    </div>
-                )}
-                {sessions > 0 && (
-                    <>
-                        {streak > 0 && <div className={styles.todayBannerDivider} />}
-                        <div className={styles.todayStatChip}>
-                            <span className={styles.todayStatValue}>{sessions}</span>
-                            <span className={styles.todayStatLabel}>sessions</span>
-                        </div>
-                        <div className={styles.todayBannerDivider} />
-                        <div className={styles.todayStatChip}>
-                            <span className={styles.todayStatValue}>{fmtHours(hours)}</span>
-                            <span className={styles.todayStatLabel}>focused</span>
-                        </div>
-                    </>
-                )}
+        <div className={styles.todayRibbon}>
+            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneLeft}`}>
+                <span className={styles.todayRibbonStreakWrap} data-tooltip={streakTooltip}>
+                    <span className={styles.todayRibbonStreakIcon}>🔥</span>
+                    <span className={styles.todayRibbonStreakValue}>{streak}d</span>
+                </span>
             </div>
-            <div className={styles.todayBannerRight}>
-                <div className={styles.todayGoalInlineBar}>
-                    <div className={styles.todayGoalInlineFill} style={{ width: `${pct}%` }} />
+            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneCenter}`}>
+                <div className={styles.todayRibbonHeroRow}>
+                    <span className={styles.todayRibbonSessionsText}>
+                        <span className={styles.todayRibbonSessionDigitWrap}>
+                            <span key={sessions} className={`${styles.todayRibbonSessionDigit} ${counterAnimating ? styles.todayRibbonSessionDigitAnimate : ''}`}>{Math.min(sessions, goalSessions)}</span>
+                        </span>
+                        /{goalSessions} sessions today{sessions > goalSessions ? ` (+${sessions - goalSessions} extra)` : ''}
+                    </span>
+                    <span className={styles.todayRibbonMilestoneActive}>{weeklyGoalText}</span>
                 </div>
-                <span className={styles.todayGoalInlineMeta}>
-                    {pct}% of{' '}
+                <div className={styles.todayRibbonScale}>
+                    <span>0</span>
+                    <span>{goalSessions}</span>
+                </div>
+                <div className={styles.todayRibbonBar}>
+                    <div
+                        className={`${styles.todayRibbonFill} ${fillAnimating ? styles.todayRibbonFillAnimate : ''} ${isStudying ? styles.todayRibbonFillLive : ''}`}
+                        style={{ width: `${sessionPct}%` }}
+                    >
+                        <span className={styles.todayRibbonFillShimmer} />
+                    </div>
+                    <div className={styles.todayRibbonTickLayer}>
+                        {Array.from({ length: tickCount + 1 }).map((_, idx) => (
+                            <span
+                                key={`tick-${idx}`}
+                                className={styles.todayRibbonTick}
+                                style={{ left: `${(idx / tickCount) * 100}%` }}
+                            />
+                        ))}
+                    </div>
+                    {isStudying && sessions < goalSessions ? (
+                        <span className={styles.todayRibbonActivePulse} style={{ left: `calc(${activePulseLeft}% - 4px)` }} />
+                    ) : null}
+                </div>
+            </div>
+            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneRight}`}>
+                <span className={styles.todayRibbonFocusValue}>🕒 {fmtHours(hours)}</span>
+                <span className={styles.todayRibbonMeta}>
+                    Goal:{' '}
                     {editingGoal ? (
                         <input
                             className={styles.todayGoalInput}
@@ -133,7 +214,7 @@ function TodayBanner({ onStreakData }) {
                         />
                     ) : (
                         <button className={styles.todayGoalEditBtn} onClick={() => { setGoalInput(String(goalHours)); setEditingGoal(true); }}>
-                            {goalHours}h goal
+                            {goalHours}h
                         </button>
                     )}
                 </span>
@@ -160,32 +241,36 @@ function FocusPageSkeleton() {
         <SkeletonBlock className={styles.focusPageSkeletonTitle} />
         <SkeletonBlock className={styles.focusPageSkeletonAction} />
       </div>
-      <SkeletonBlock className={styles.focusPageSkeletonTask} />
-      <SkeletonBlock className={styles.focusPageSkeletonTree} />
-      <SkeletonBlock className={styles.focusPageSkeletonBadge} />
-      <SkeletonBlock className={styles.focusPageSkeletonTime} />
-      <div className={styles.focusPageSkeletonControls}>
-        <SkeletonBlock className={styles.focusPageSkeletonBtnPrimary} />
-        <SkeletonBlock className={styles.focusPageSkeletonBtnSecondary} />
-        <SkeletonBlock className={styles.focusPageSkeletonBtnSecondary} />
-      </div>
-      <div className={styles.focusPageSkeletonSettings}>
-        <div className={styles.focusPageSkeletonSetting}>
-          <SkeletonBlock className={styles.focusPageSkeletonLabel} />
-          <SkeletonBlock className={styles.focusPageSkeletonInput} />
+      <div className={styles.focusPageSkeletonCanvas}>
+        <div className={styles.focusPageSkeletonMainCol}>
+          <SkeletonBlock className={styles.focusPageSkeletonTask} />
+          <SkeletonBlock className={styles.focusPageSkeletonTree} />
+          <SkeletonBlock className={styles.focusPageSkeletonBadge} />
+          <SkeletonBlock className={styles.focusPageSkeletonTime} />
+          <div className={styles.focusPageSkeletonControls}>
+            <SkeletonBlock className={styles.focusPageSkeletonBtnPrimary} />
+            <SkeletonBlock className={styles.focusPageSkeletonBtnSecondary} />
+            <SkeletonBlock className={styles.focusPageSkeletonBtnSecondary} />
+          </div>
+          <div className={styles.focusPageSkeletonSettings}>
+            <div className={styles.focusPageSkeletonSetting}>
+              <SkeletonBlock className={styles.focusPageSkeletonLabel} />
+              <SkeletonBlock className={styles.focusPageSkeletonInput} />
+            </div>
+            <div className={styles.focusPageSkeletonSetting}>
+              <SkeletonBlock className={styles.focusPageSkeletonLabel} />
+              <SkeletonBlock className={styles.focusPageSkeletonInput} />
+            </div>
+            <div className={styles.focusPageSkeletonSetting}>
+              <SkeletonBlock className={styles.focusPageSkeletonLabel} />
+              <SkeletonBlock className={styles.focusPageSkeletonInput} />
+            </div>
+          </div>
         </div>
-        <div className={styles.focusPageSkeletonSetting}>
-          <SkeletonBlock className={styles.focusPageSkeletonLabel} />
-          <SkeletonBlock className={styles.focusPageSkeletonInput} />
+        <div className={styles.focusPageSkeletonRightCol}>
+          <SkeletonBlock className={styles.focusPageSkeletonRightCard} />
+          <SkeletonBlock className={styles.focusPageSkeletonRightCardTall} />
         </div>
-        <div className={styles.focusPageSkeletonSetting}>
-          <SkeletonBlock className={styles.focusPageSkeletonLabel} />
-          <SkeletonBlock className={styles.focusPageSkeletonInput} />
-        </div>
-      </div>
-      <div className={styles.focusPageSkeletonSound}>
-        <SkeletonBlock className={styles.focusPageSkeletonLabelWide} />
-        <SkeletonBlock className={styles.focusPageSkeletonSoundInput} />
       </div>
     </div>
   );
@@ -199,28 +284,33 @@ function HistoryButton({ onClick }) {
   );
 }
 
-function FocusModeButton({ onClick }) {
-  return (
-    <PrimaryButton onClick={onClick} pill variant="secondary">
-      Focus ⚡
-    </PrimaryButton>
-  );
-}
-
 export default function TimerPage() {
   const t = useTimerContext();
   const location = useLocation();
+  const navigate = useNavigate();
   const [showHistory, setShowHistory] = useState(false);
   const [showFocusTransition, setShowFocusTransition] = useState(() => Boolean(location.state?.fromTaskPlay));
   const [showPageSkeleton, setShowPageSkeleton] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [focusFullscreenPending, setFocusFullscreenPending] = useState(false);
   const [streakData, setStreakData] = useState(null);
   const [dismissedWarning, setDismissedWarning] = useState(false);
-  const [showBackBtn, setShowBackBtn] = useState(false);
-  const backBtnTimer = useRef(null);
   const { permission, request } = useNotificationPermission();
   const isMobile = useBreakpoint();
+  const focusAccent = getAccentFromTimerPreset(t);
+
+  const openFocusMode = useCallback(() => {
+    setFocusMode(true);
+    setFocusFullscreenPending(true);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--timer-focus-accent", focusAccent);
+    return () => {
+      document.documentElement.style.removeProperty("--timer-focus-accent");
+    };
+  }, [focusAccent]);
 
   // Tab title countdown
   useEffect(() => {
@@ -247,12 +337,16 @@ export default function TimerPage() {
     } else if (e.key === 'r' || e.key === 'R') {
       t.resetTimer();
     } else if (e.key === 'f' || e.key === 'F') {
-      setFocusMode(f => !f);
+      if (focusMode) {
+        setFocusMode(false);
+      } else {
+        openFocusMode();
+      }
     } else if (e.key === 'Escape') {
       setFocusMode(false);
       setShowShortcuts(false);
     }
-  }, [t]);
+  }, [t, focusMode, openFocusMode]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -265,24 +359,34 @@ export default function TimerPage() {
     return () => clearTimeout(id);
   }, [showFocusTransition]);
 
-  useEffect(() => {
-    if (!focusMode) { setShowBackBtn(false); return; }
-    const show = () => {
-      setShowBackBtn(true);
-      clearTimeout(backBtnTimer.current);
-      backBtnTimer.current = setTimeout(() => setShowBackBtn(false), 2000);
-    };
-    window.addEventListener('mousemove', show);
-    return () => {
-      window.removeEventListener('mousemove', show);
-      clearTimeout(backBtnTimer.current);
-    };
-  }, [focusMode]);
 
   useEffect(() => {
     const id = setTimeout(() => setShowPageSkeleton(false), MIN_FOCUS_SKELETON_MS);
     return () => clearTimeout(id);
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    let id;
+    if (focusMode && focusFullscreenPending) {
+      id = window.setTimeout(() => {
+        if (!document.fullscreenElement && root?.requestFullscreen) {
+          root.requestFullscreen().catch(() => {});
+        }
+        setFocusFullscreenPending(false);
+      }, 220);
+      return () => clearTimeout(id);
+    }
+    if (!focusMode) {
+      setFocusFullscreenPending(false);
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+    return () => {
+      if (id) clearTimeout(id);
+    };
+  }, [focusMode, focusFullscreenPending]);
 
   const fromTaskPlay = Boolean(location.state?.fromTaskPlay);
 
@@ -294,18 +398,19 @@ export default function TimerPage() {
     && (streakData.total_sessions ?? 0) === 0
     && hour >= 18;
 
+  const timerLayoutStyle = {
+    "--focus-accent": focusAccent,
+    ...(showPageSkeleton ? { visibility: "hidden" } : {}),
+  };
+
   return (
     <AppPage
       width="lg"
-      title="Study Timer"
-      action={!isMobile ? (
-        <div className={styles.pageActions}>
-          <FocusModeButton onClick={() => setFocusMode(true)} />
-          <HistoryButton onClick={() => setShowHistory(true)} />
-        </div>
-      ) : undefined}
+      title="Focus Timer"
+      action={null}
       className={fromTaskPlay && showFocusTransition ? styles.containerFocusEntering : ""}
     >
+      <ScrollToTop />
       {showPageSkeleton && <FocusPageSkeleton />}
       {showFocusTransition && (
         <div className={styles.focusModeTransition} aria-live="polite">
@@ -314,26 +419,39 @@ export default function TimerPage() {
       )}
 
       {/* Full-screen focus overlay */}
-      {focusMode && (
-        <div className={styles.focusOverlay}>
-          <button className={styles.focusOverlayClose} onClick={() => setFocusMode(false)}>✕ Exit focus</button>
-          <BackButton
-            className={`${styles.focusBackBtn} ${showBackBtn ? styles.focusBackBtnVisible : ''}`}
-            onClick={() => setFocusMode(false)}
-            label="Back"
-          />
-          <FocusOverlayContent t={t} />
-        </div>
-      )}
+      <AnimatePresence mode="wait" initial={false}>
+        {focusMode && (
+          <PageTransition
+            className={styles.focusOverlay}
+            style={{ "--focus-accent": focusAccent }}
+          >
+            <FocusOverlayContent
+              t={t}
+              streakData={streakData}
+              onExitFocus={() => {
+                setFocusMode(false);
+                navigate('/timer');
+              }}
+            />
+          </PageTransition>
+        )}
+      </AnimatePresence>
 
       {/* Keyboard shortcuts overlay */}
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
 
       <div
         className={`${styles.timerLayout} ${fromTaskPlay ? styles.focusModeContent : ""}`}
-        style={showPageSkeleton ? { visibility: "hidden" } : undefined}
+        style={timerLayoutStyle}
       >
         <NotificationPrompt permission={permission} request={request} />
+        {fromTaskPlay && !focusMode && (
+          <BackButton
+            className={styles.focusEntryBackBtn}
+            onClick={() => navigate(-1)}
+            label="Back"
+          />
+        )}
 
         {streakAtRisk && (
           <div className={styles.streakWarning}>
@@ -342,11 +460,19 @@ export default function TimerPage() {
           </div>
         )}
 
-        <TodayBanner onStreakData={setStreakData} />
+        <TodayBanner
+          onStreakData={setStreakData}
+          isStudying={Boolean(t.isActive && !t.isPaused)}
+        />
 
         <div className={styles.timerGrid}>
           <div className={styles.timerGridLeft}>
-            <MainSection t={t} onOpenHistory={() => setShowHistory(true)} isMobile={isMobile} />
+            <MainSection
+              t={t}
+              onOpenHistory={() => setShowHistory(true)}
+              onOpenFocus={openFocusMode}
+              isMobile={isMobile}
+            />
           </div>
           <RightPanel t={t} />
         </div>

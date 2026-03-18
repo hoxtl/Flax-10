@@ -43,7 +43,7 @@ export function TimerProvider({ children }) {
 
   const timerData = useTimerLogic(activeTaskId, setActiveTaskId, activeTaskMeta);
   return (
-    <TimerContext.Provider value={{ ...timerData, setActiveTaskId }}>
+    <TimerContext.Provider value={{ ...timerData, setActiveTaskId, activeTaskMeta }}>
       {children}
     </TimerContext.Provider>
   );
