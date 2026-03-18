@@ -106,7 +106,7 @@ export default function CalendarPage() {
         </main>
       </div>
 
-      <EventPopups />
+      <EventPopups allowModuleLeave={false} />
     </AppPage>
   );
 }

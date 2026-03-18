@@ -131,27 +131,22 @@ class Command(BaseCommand):
             )
         self.categories = list(Category.objects.all())
 
-    def _resolve_tag_user(self, category):
-        if category and category.user:
-            return category.user
-        if self.users and random.random() > 0.7:
-            return random.choice(self.users)
-        return None
-
     def _tag_color(self, name):
         from faker import Faker
-        if name in ('Routine', 'Wellness'):
+        if name in ('Routine', 'Wellness', 'Meals'):
             return '#94a3b8'
         return Faker('en_GB').hex_color()
 
-    def _tag_category(self):
-        if not self.categories or random.random() <= 0.3:
+    def _tag_category(self, user=None):
+        if not self.categories:
             return None
-        return random.choice(self.categories)
+        eligible = self.categories if user is None else [c for c in self.categories if c.user_id in (None, user.id)]
+        if not eligible or random.random() <= 0.3:
+            return None
+        return random.choice(eligible)
 
-    def _create_single_tag(self, name, duration):
-        category = self._tag_category()
-        user = self._resolve_tag_user(category)
+    def _create_single_tag(self, name, duration, user):
+        category = self._tag_category(user)
         Tag.objects.get_or_create(
             name=name, user=user,
             defaults={'category': category, 'default_duration': duration, 'color': self._tag_color(name)},
@@ -159,8 +154,9 @@ class Command(BaseCommand):
 
     def _create_tags(self):
         self.stdout.write("Seeding tags...")
-        for name, duration in tag_fixtures:
-            self._create_single_tag(name, duration)
+        for user in self.users:
+            for name, duration in tag_fixtures:
+                self._create_single_tag(name, duration, user)
         self._create_module_pill_tags()
 
     def _create_module_pill_tags(self):

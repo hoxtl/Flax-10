@@ -12,11 +12,11 @@ import { useConfirm } from '../../context/ConfirmContext';
 import { useNotify } from '../Notifications/hooks/useNotify';
 import { useToast } from '../../context/ToastContext';
 
-export function EventPopups() {
+export function EventPopups({ allowModuleLeave = true }) {
     return (
         <>
             <EventModalContainer />
-            <EventPopupContainer />
+            <EventPopupContainer allowModuleLeave={allowModuleLeave} />
         </>
     );
 }
@@ -59,7 +59,7 @@ function useEventDeletion() {
     return { handleDeleteRequest };
 }
 
-function EventPopupContainer() {
+function EventPopupContainer({ allowModuleLeave }) {
     const { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode } = useEventPopup();
     const { isModalOpen, openModal } = useEventModal();
     const { loadEvents } = useCalendarEvents();
@@ -84,7 +84,7 @@ function EventPopupContainer() {
         if (deleted) showToast("Event deleted", `"${ev.title}" deleted.`);
     };
     const handlers = { openModal, onDeleteRequest: onDeleteWrapped, closePopup, loadEvents, disenrollFromModule, refreshTags, showToast };
-    const actions = getCalendarPopupActions(popupEvent, handlers);
+    const actions = getCalendarPopupActions(popupEvent, handlers, { allowModuleLeave });
     return <EventPopover event={popupEvent} anchorRect={popupAnchorRect} onClose={closePopup} actions={actions} tag={tag} readOnly={readOnly} viewMode={viewMode} />;
 }
 
@@ -93,10 +93,10 @@ function getEventTag(event, getTag) {
     return (event.source === 'society' && event.tag_name) ? societyTag : getTag(event.tag);
 }
 
-function getCalendarPopupActions(event, handlers) {
+function getCalendarPopupActions(event, handlers, options = {}) {
     const type = getEventType(event);
     if (type === 'personal') return getPersonalActions(event, handlers);
-    if (type === 'module') return getModuleActions(event, handlers);
+    if (type === 'module') return getModuleActions(event, handlers, options);
     if (type === 'society') return getSocietyActions(event, handlers);
     return null;
 }
@@ -108,7 +108,8 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
     ];
 }
 
-function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }) {
+function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }, { allowModuleLeave = true } = {}) {
+    if (!allowModuleLeave) return null;
     const handleLeave = () => {
         closePopup();
         disenrollFromModule(event.module, loadEvents);

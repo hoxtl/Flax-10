@@ -25,6 +25,17 @@ const Grip = () => (
 
 const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
   const available = catalogue.filter((w) => !active.includes(w.id));
+  const sections = available.reduce((acc, widget) => {
+    const key = widget.section || "Homepage";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(widget);
+    return acc;
+  }, {});
+  const sectionOrder = ["Essentials", "Planning", "Progress", "Profile", "Analytics"];
+  const orderedSectionKeys = [
+    ...sectionOrder.filter((key) => sections[key]?.length),
+    ...Object.keys(sections).filter((key) => !sectionOrder.includes(key)),
+  ];
   if (!visible) return null;
   return (
     <div className={styles.addSheetBackdrop}>
@@ -39,20 +50,27 @@ const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
             All widgets are already on your dashboard!
           </div>
         ) : (
-          <div className={styles.addOptionsGrid}>
-            {available.map((w) => (
-              <div
-                key={w.id}
-                className={styles.addOptionCard}
-                onClick={() => {
-                  onAdd(w.id);
-                  onClose();
-                }}
-              >
-                <span className={styles.addOptionIcon}>{w.icon}</span>
-                <div className={styles.addOptionInfo}>
-                  <div className={styles.addOptionLabel}>{w.label}</div>
-                  <div className={styles.addOptionMeta}>{w.col}×{w.row} tile</div>
+          <div className={styles.addSections}>
+            {orderedSectionKeys.map((sectionKey) => (
+              <div key={sectionKey} className={styles.addSection}>
+                <div className={styles.addSectionTitle}>{sectionKey}</div>
+                <div className={styles.addOptionsGrid}>
+                  {sections[sectionKey].map((w) => (
+                    <div
+                      key={w.id}
+                      className={styles.addOptionCard}
+                      onClick={() => {
+                        onAdd(w.id);
+                        onClose();
+                      }}
+                    >
+                      <span className={styles.addOptionIcon}>{w.icon}</span>
+                      <div className={styles.addOptionInfo}>
+                        <div className={styles.addOptionLabel}>{w.label}</div>
+                        <div className={styles.addOptionMeta}>{w.col}×{w.row} tile</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -71,6 +89,7 @@ export default function IntelligenceGrid({
   widgetRenderer,
   showAdd,
   setShowAdd,
+  renderAfterHero,
 }) {
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
@@ -104,6 +123,26 @@ export default function IntelligenceGrid({
     onDragEnd();
   };
 
+  const handleAddWidget = (id) => {
+    setLayout((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev];
+      const widget = catalogue.find((item) => item.id === id);
+      // Keep wide widgets near the top so grid placement feels predictable.
+      if (widget?.col >= 2) {
+        const firstNonHeroIdx = next.findIndex((itemId) => itemId !== "hero");
+        if (firstNonHeroIdx === -1) {
+          next.push(id);
+          return next;
+        }
+        next.splice(firstNonHeroIdx, 0, id);
+        return next;
+      }
+      next.push(id);
+      return next;
+    });
+  };
+
   return (
     <div className={styles.gridContainer}>
 
@@ -119,6 +158,11 @@ export default function IntelligenceGrid({
                 {widgetRenderer("hero")}
               </div>
             </div>
+          </div>
+        )}
+        {renderAfterHero && (
+          <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
+            {renderAfterHero()}
           </div>
         )}
         {layout.filter(id => id !== "hero").map((id) => {
@@ -177,7 +221,7 @@ export default function IntelligenceGrid({
         visible={showAdd}
         active={layout}
         catalogue={catalogue}
-        onAdd={(id) => setLayout((prev) => [...prev, id])}
+        onAdd={handleAddWidget}
         onClose={() => setShowAdd(false)}
       />
     </div>

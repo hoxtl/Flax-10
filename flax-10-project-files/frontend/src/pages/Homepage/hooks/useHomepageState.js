@@ -21,10 +21,7 @@ export function useHomepageState() {
     return [
       { id: "rightNow", type: "system" },
       { id: "tasks", type: "system" },
-      { id: "quickActions", type: "system" },
-      { id: "studyPulse", type: "system" },
-      { id: "deadlines", type: "system" },
-      { id: "socialDiscover", type: "system" }
+      { id: "deadlines", type: "system" }
     ];
   };
 

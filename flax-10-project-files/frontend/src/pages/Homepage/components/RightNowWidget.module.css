@@ -304,23 +304,25 @@
 }
 
 .alertDismiss {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  border: 1px solid var(--widget-border);
-  background: var(--widget-surface-secondary);
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
+  border: none;
+  background: transparent;
   color: var(--widget-text-secondary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  padding: 0;
+  transition: color 0.15s, opacity 0.15s;
+  opacity: 0.8;
 }
 
 .alertDismiss:hover {
-  background: var(--hover);
-  color: var(--widget-text-secondary);
+  color: var(--widget-text-primary);
+  opacity: 1;
 }
 
 /* ── Commute context card ───────────────────────────────────── */
