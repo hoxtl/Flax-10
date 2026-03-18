@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
-import { getEventType } from './utils/eventUtils';
+import { getEventType, hasRecurrence } from './utils/eventUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
+import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { getEventTheme } from './utils/eventStyleUtils';
 import './DraggableEvent.css';
@@ -44,12 +46,23 @@ function getReadOnlyClassName(event) {
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
-    const { editEvent } = useEventActions();
+    const { editEvent, removeEvent, addException } = useEventActions();
     const { openPopup } = useEventPopup();
+    const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
     const theme = getEventTheme(event, useTags());
     const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
+    const [ctxMenu, setCtxMenu] = useState(null);
+    const ctxRef = useRef(null);
+
+    useEffect(() => {
+        if (!ctxMenu) return;
+        const handler = (e) => { if (ctxRef.current && !ctxRef.current.contains(e.target)) setCtxMenu(null); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [ctxMenu]);
 
     const onClick = (e) => {
         if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
@@ -58,21 +71,68 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         openPopup(event, rect);
     };
 
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCtxMenu({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleEdit = () => {
+        setCtxMenu(null);
+        openModal(event);
+    };
+
+    const handleDelete = async () => {
+        setCtxMenu(null);
+        const recurring = hasRecurrence(event);
+        if (recurring) {
+            const choice = await confirmFn({
+                title: "Delete Recurring Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice === true) await executeDelete(event, { removeEvent });
+            else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
+        } else {
+            const choice = await confirmFn({
+                title: "Delete Event",
+                message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice) await executeDelete(event, { removeEvent });
+        }
+    };
+
     return (
-        <EventCard event={event} style={style} theme={theme} refs={refs}
-            resize={resize} isDragging={isDragging} dragProps={dragProps}
-            onClick={onClick} minWidth={minWidthForDetails} />
+        <>
+            <EventCard event={event} style={style} theme={theme} refs={refs}
+                resize={resize} isDragging={isDragging} dragProps={dragProps}
+                onClick={onClick} minWidth={minWidthForDetails}
+                onContextMenu={handleContextMenu} />
+            {ctxMenu && (
+                <div ref={ctxRef} className="event-ctx-menu" style={{ position: 'fixed', top: ctxMenu.y, left: ctxMenu.x, zIndex: 99999 }}>
+                    <button className="event-ctx-item" onClick={handleEdit}>✏️ Edit</button>
+                    <div className="event-ctx-divider" />
+                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}>🗑 Delete</button>
+                </div>
+            )}
+        </>
     );
 }
 
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth }) {
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onContextMenu }) {
     const height = resize.resizePreview || parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, resize.isResizing);
     const renderStyle = buildStyle(style, theme, resize.resizePreview);
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} data-event-id={event.id} {...dragProps}>
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} data-event-id={event.id} {...dragProps}>
             <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>

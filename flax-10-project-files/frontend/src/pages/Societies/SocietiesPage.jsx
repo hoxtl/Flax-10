@@ -118,6 +118,7 @@ function MySocietiesView({ setView, onSelect, onCreateClick, societies, onReport
     return (
         <AppPage className={styles.container} title="Societies" subtitle="Your communities at King's College London">
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setTab}
+                tabVariant="heading"
                 rightAction={<MySocietiesSearch value={search} onChange={setSearch} />} />
             <BackToTop />
         </AppPage>

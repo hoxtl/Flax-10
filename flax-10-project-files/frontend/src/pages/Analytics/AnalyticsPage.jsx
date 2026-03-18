@@ -185,7 +185,7 @@ export default function AnalyticsPage({ onBack }) {
       {error && <div className={styles.errorBanner}>{error}</div>}
       {loading && <AnalyticsSkeleton />}
 
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
     </AppPage>
   );
 }

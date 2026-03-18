@@ -19,7 +19,7 @@ const StudyBlock = ({ block }) => {
     const date = <span className={styles.blockDate}>{formatDate(block.startTime)}</span>;
     const time = <span className={styles.blockTime}>{formatTimeRange(block.startTime, block.endTime)}</span>;
     const header = <div className={styles.blockHeader}>{date}{time}</div>;
-    const task = block.task ? <div style={{ marginBottom: '0.5rem', fontWeight: 600, color: '#4b5563' }}>🎯 {block.task}</div> : null;
+    const task = block.task ? <div className={styles.blockTask}>🎯 {block.task}</div> : null;
     const stats = <StatsRow block={block} />;
     return <div className={styles.studyBlockCard}>{header}{task}{stats}</div>;
 };
@@ -31,7 +31,7 @@ const HistoryList = ({ blocks }) => {
 
 const ClearButton = ({ onClear }) => {
     const btn = <button className={styles.clearButton} onClick={onClear}>Clear History</button>;
-    return <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>{btn}</div>;
+    return <div className={styles.clearButtonWrap}>{btn}</div>;
 };
 
 const useClearAction = (setHistory, confirm) => {

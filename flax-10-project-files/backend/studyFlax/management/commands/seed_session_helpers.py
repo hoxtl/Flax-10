@@ -24,24 +24,6 @@ TASK_LABELS = [
 
 STUDY_PROFILES = {
     'night_owl': {
-<<<<<<< Updated upstream
-        'preferred_hours': [20, 21, 22, 23],
-        'weekend_probability': 0.55,
-        'skip_day_prob': 0.25,
-        'work_choices': [30, 45, 60, 90, 120],
-    },
-    'consistent': {
-        'preferred_hours': [9, 10, 14, 15, 16],
-        'weekend_probability': 0.70,
-        'skip_day_prob': 0.10,
-        'work_choices': [45, 60, 75, 90, 105],
-    },
-    'balanced': {
-        'preferred_hours': [9, 10, 11, 14, 15, 16],
-        'weekend_probability': 0.40,
-        'skip_day_prob': 0.20,
-        'work_choices': [25, 35, 50, 60, 75],
-=======
         'preferred_hours': [19, 20, 21, 22, 23],
         'weekend_probability': 0.80,
         'skip_day_prob': 0.10,
@@ -58,7 +40,6 @@ STUDY_PROFILES = {
         'weekend_probability': 0.65,
         'skip_day_prob': 0.12,
         'work_choices': [75, 100, 125, 150],
->>>>>>> Stashed changes
     },
 }
 
