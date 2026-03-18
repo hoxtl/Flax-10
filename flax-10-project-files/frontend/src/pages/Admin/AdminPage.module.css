@@ -509,6 +509,25 @@ button:disabled {
   letter-spacing: 0.01em;
 }
 
+.nameHandle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text, #111);
+  letter-spacing: -0.2px;
+}
+.userHandle {
+  font-size: 0.8rem;
+  color: var(--muted, #6b7280);
+  font-weight: 400;
+}
+
 
 
 .modalBackdrop {
