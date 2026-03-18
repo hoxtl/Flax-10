@@ -582,7 +582,45 @@ button:disabled {
   flex-shrink: 0;
 }
 
-
+.banPillBtn,
+.unbanPillBtn,
+.staffPillBadge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    opacity 0.15s,
+    transform 0.12s,
+    box-shadow 0.15s;
+  letter-spacing: -0.1px;
+}
+.banPillBtn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.banPillBtn:hover {
+  background: #fecaca;
+}
+.unbanPillBtn {
+  background: #dcfce7;
+  color: #15803d;
+}
+.unbanPillBtn:hover {
+  background: #bbf7d0;
+}
+.staffPillBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted, #9ca3af);
+  background: var(--bg, #f3f4f6);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  cursor: default;
+}
 
 .modalBackdrop {
   position: fixed;
