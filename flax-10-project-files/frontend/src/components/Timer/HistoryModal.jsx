@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './HistoryModal.module.css';
-import { getHistory, clearHistory } from './utils/historyUtils';
+import * as historyUtils from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 import { useConfirm } from '../../context/ConfirmContext';
 import StandardModal from '../common/StandardModal/StandardModal';
@@ -42,7 +42,7 @@ const useClearAction = (setHistory, confirm) => {
             isDanger: true,
         });
         if (!confirmed) return;
-        await clearHistory();
+        await historyUtils.clearHistory();
         setHistory([]);
         window.dispatchEvent(new Event('historyCleared'));
     };
@@ -51,7 +51,7 @@ const useClearAction = (setHistory, confirm) => {
 
 const useHistoryData = (confirm) => {
     const [history, setHistory] = useState([]);
-    useEffect(() => { getHistory().then(setHistory); }, []);
+    useEffect(() => { historyUtils.getHistory().then(setHistory); }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
     const { triggerClear } = useClearAction(setHistory, confirm);
     return { history, blocks, triggerClear };
