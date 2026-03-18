@@ -43,8 +43,7 @@ describe('AddCollaboratorModal', () => {
     it('calls onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<AddCollaboratorModal onClose={onClose} onAdd={vi.fn()} />);
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
-        fireEvent.click(closeBtn);
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
