@@ -155,4 +155,10 @@ describe('QuickAddModal', () => {
         fireEvent.click(screen.getByText('Close'));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
+
+    it('opens directly in manual schedule mode when initialView is provided', () => {
+        renderModal({ initialView: 'schedule_manual' });
+        expect(screen.getByText('Manual Schedule')).toBeTruthy();
+        expect(screen.getByText(/Name it and pick existing events tagged as schedule/i)).toBeTruthy();
+    });
 });
