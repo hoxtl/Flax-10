@@ -899,8 +899,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 onSelectModule={(mod) => setSelectedModulePill(mod)}
               />
             }
-            studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
-            studyPulseNow={now}
             slot5Data={{
               now,
               isToday: isToday(selectedDate),

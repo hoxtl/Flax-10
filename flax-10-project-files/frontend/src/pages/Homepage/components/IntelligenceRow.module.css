@@ -51,6 +51,47 @@
   transform: translateY(-1px);
 }
 
+.analyticsWidgetShell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.analyticsWidgetTitle {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+  margin: 0;
+}
+
+.analyticsWidgetLoading,
+.analyticsWidgetEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--widget-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  min-height: 180px;
+}
+
+.analyticsScrollable {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.analyticsInsightsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
 .header {
   position: relative;
   display: flex;

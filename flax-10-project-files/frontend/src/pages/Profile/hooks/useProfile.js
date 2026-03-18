@@ -36,13 +36,13 @@ function useProfileData(userId) {
   useEffect(() => {
     if (isSelf) {
       if (!authLoading) {
-        setProfileData(authProfile);
-        setLoading(false);
+        // Pull a fresh server profile so share counters stay up-to-date
+        // even when sharing is toggled from other pages.
+        tryLoadProfile(setProfileData, setLoading, null, true);
       }
       return;
     }
 
-    setLoading(true);
     tryLoadProfile(setProfileData, setLoading, userId);
     const intervalId = setInterval(() => {
       tryLoadProfile(setProfileData, setLoading, userId, true);
@@ -54,6 +54,7 @@ function useProfileData(userId) {
   const reload = () => {
     if (isSelf) {
       refreshProfile();
+      tryLoadProfile(setProfileData, setLoading, null, true);
     } else {
       tryLoadProfile(setProfileData, setLoading, userId);
     }
@@ -65,12 +66,14 @@ function useProfileData(userId) {
       return {
         ...prev,
         is_sharing: isSharing,
-        shared_by_count: Math.max(0, (prev.shared_by_count || 0) + (isSharing ? 1 : -1))
       };
     });
   };
 
-  return { profileData, loading, reload, setOptimisticShare };
+  const isRemoteStale = !isSelf && userId && (!profileData || String(profileData.id) !== String(userId));
+  const resolvedProfileData = isSelf ? (profileData || authProfile) : profileData;
+  const resolvedLoading = isSelf ? authLoading : (loading || isRemoteStale);
+  return { profileData: resolvedProfileData, loading: resolvedLoading, reload, setOptimisticShare };
 }
 
 function useEventsData(userId) {
@@ -101,10 +104,7 @@ function useTaskCountData(userId) {
   const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
-    if (userId) {
-      setTaskCount(0);
-      return;
-    }
+    if (userId) return;
 
     fetchTasks()
       .then((data) => {
@@ -117,7 +117,7 @@ function useTaskCountData(userId) {
       });
   }, [userId]);
 
-  return { taskCount };
+  return { taskCount: userId ? 0 : taskCount };
 }
 
 export function useProfileState(userId) {

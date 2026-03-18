@@ -121,12 +121,12 @@
 .userRolePill {
     border: 1px solid var(--border);
     background: var(--panel);
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
 }
 
 .username {
     display: inline-flex;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 74%, var(--muted) 26%);
     font-size: 0.9rem;
     margin-bottom: 6px;
     max-width: 100%;
@@ -148,7 +148,7 @@
 .bio {
     margin: 6px 0 0;
     font-size: 0.82rem;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -185,7 +185,7 @@
     font-size: 0.68rem;
     font-weight: 600;
     background: var(--hover);
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 68%, var(--muted) 32%);
     border: 1px solid var(--border);
 }
 
