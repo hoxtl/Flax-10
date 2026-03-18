@@ -4,7 +4,7 @@
  */
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { User, Lock, Palette, MapPin, BookOpen, CheckCircle } from "lucide-react";
+import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
 import styles from "./Settings.module.css";
 import { SettingsSidebar } from "../../components/Settings/SettingsUI";
 import AccountForm from "../../components/Settings/AccountForm";
@@ -91,13 +91,13 @@ function SettingsPanel({ activeTab, handlers, user }) {
 
 const VALID_TABS = new Set(Object.keys(PANEL_META));
 
-export default function Settings({ user, onBack }) {
+export default function Settings({ user }) {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(
     VALID_TABS.has(tabFromUrl) ? tabFromUrl : "account",
   );
-  const { successMessage, ...handlers } = useSettingsHandlers();
+  const handlers = useSettingsHandlers();
 
   useEffect(() => {
     if (tabFromUrl && VALID_TABS.has(tabFromUrl)) setActiveTab(tabFromUrl);
@@ -106,17 +106,9 @@ export default function Settings({ user, onBack }) {
   return (
     <AppPage
       title="Settings"
-      onBack={onBack}
       width="lg"
       className={styles.pageWrapper}
     >
-      {successMessage && (
-        <div className={styles.successBanner}>
-          <CheckCircle size={18} />
-          <span>{successMessage}</span>
-        </div>
-      )}
-
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
         <div className={styles.contentMain}>

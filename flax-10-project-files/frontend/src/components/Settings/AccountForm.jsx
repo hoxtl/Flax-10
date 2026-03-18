@@ -145,9 +145,35 @@ function useAccountForm() {
 function PersonalInfoFields({ formData, onChange }) {
   return (
     <>
-      <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required autoComplete="given-name" />
-      <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required autoComplete="family-name" />
-      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required autoComplete="email" />
+      <div className={styles.formRow}>
+        <FormInput
+          id="firstName"
+          name="firstName"
+          label="First Name"
+          value={formData.firstName}
+          onChange={onChange}
+          required
+          autoComplete="given-name"
+        />
+        <FormInput
+          id="lastName"
+          name="lastName"
+          label="Last Name"
+          value={formData.lastName}
+          onChange={onChange}
+          required
+          autoComplete="family-name"
+        />
+      </div>
+      <FormInput
+        id="email"
+        label="Email Address"
+        type="email"
+        value={formData.email}
+        onChange={onChange}
+        required
+        autoComplete="email"
+      />
     </>
   );
 }
@@ -237,7 +263,7 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
     <div className={styles.formGroup}>
       <label>Course</label>
       <div className={styles.lockedCourse}>
-        {course ? course : <em>No course set</em>}
+        {course ? <em>{course}</em> : <em>No course set</em>}
       </div>
       {pendingRequest ? (
         <div style={{ marginTop: 8 }}>

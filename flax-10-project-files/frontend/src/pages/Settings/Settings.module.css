@@ -482,7 +482,7 @@
 
 .panelHeaderDesc {
   font-size: 11px;
-  color: color-mix(in srgb, var(--muted) 84%, transparent);
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
   margin: 2px 0 0;
 }
 
@@ -517,6 +517,23 @@
   border-radius: var(--radius-lg);
   padding: 10px 12px;
   margin-bottom: 8px;
+}
+
+/* Dark-mode tweaks: deepen panels/tiles and brighten text for contrast */
+::global(:root[data-mode="dark"]) .panel {
+  background:
+    linear-gradient(175deg,
+      color-mix(in srgb, var(--surface-inner) 70%, var(--surface) 30%),
+      color-mix(in srgb, var(--surface) 85%, #000000 15%));
+  border-color: color-mix(in srgb, var(--panelAccent) 30%, var(--border));
+}
+
+::global(:root[data-mode="dark"]) .settingsTile {
+  background:
+    linear-gradient(170deg,
+      color-mix(in srgb, var(--surface-inner) 78%, var(--surface) 22%),
+      color-mix(in srgb, var(--surface-inner) 68%, #000000 32%));
+  border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
 }
 
 /* Section within a panel */
@@ -584,6 +601,21 @@
   margin-bottom: 5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Boost text contrast in dark mode so labels/descriptions don't blend into brown */
+::global(:root[data-mode="dark"]) .sectionTitle,
+::global(:root[data-mode="dark"]) .panelHeaderTitle {
+  color: color-mix(in srgb, var(--text) 98%, #ffffff 2%);
+}
+
+::global(:root[data-mode="dark"]) .formDescription,
+::global(:root[data-mode="dark"]) .panelHeaderDesc {
+  color: color-mix(in srgb, var(--text) 90%, var(--muted) 10%);
+}
+
+::global(:root[data-mode="dark"]) .formGroup label {
+  color: color-mix(in srgb, var(--text) 92%, var(--primary) 8%);
 }
 
 .requiredAsterisk {
@@ -888,12 +920,20 @@
 }
 
 .lockedCourse {
-  padding: 9px 12px;
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--border);
-  background: color-mix(in srgb, var(--muted) 5%, transparent);
-  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px dashed var(--border);
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  /* Match text-input background so the pill blends with other fields */
+  background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+  color: var(--text);
   font-size: 13px;
+  font-style: italic;
+}
+
+.lockedCourse em {
   font-style: italic;
 }
 
@@ -1183,6 +1223,19 @@
   align-items: flex-start;
   gap: 5px;
   line-height: 1.5;
+}
+
+/* Dark-mode: make context copy clearly readable */
+::global(:root[data-mode="dark"]) .contextCardTitle {
+  color: color-mix(in srgb, var(--text) 94%, var(--primary) 6%);
+}
+
+::global(:root[data-mode="dark"]) .contextCardBody {
+  color: color-mix(in srgb, var(--text) 88%, var(--muted) 12%);
+}
+
+::global(:root[data-mode="dark"]) .contextCardList li {
+  color: color-mix(in srgb, var(--text) 86%, var(--primary) 14%);
 }
 
 .contextCardList li::before {

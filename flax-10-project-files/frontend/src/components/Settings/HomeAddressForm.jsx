@@ -64,14 +64,6 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
                   description={error}
                 />
               )}
-              <label htmlFor="homeAddress">Address</label>
-              <TextInput
-                id="homeAddress"
-                type="text"
-                value={homeAddress}
-                onChange={e => setHomeAddress(e.target.value)}
-                placeholder="e.g., 123 Example Street, London E1 B23"
-              />
             </div>
             <SubmitButton
               isSaving={isSaving}
