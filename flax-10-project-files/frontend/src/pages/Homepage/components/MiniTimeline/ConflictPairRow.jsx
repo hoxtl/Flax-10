@@ -86,7 +86,7 @@ export function ConflictPairRow({
     >
       {/* Gutter */}
       <div className={styles.planTimelineGutter}>
-        <span className={styles.planTimelineTime}>{timeStr}</span>
+        {!row.hideTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
       </div>
       <div className={styles.planTimelineSpineCell} aria-hidden />
       {/* Conflict group */}
