@@ -1,7 +1,7 @@
 from django.db import models
-from .calendarEventModel import CalendarEvent
-from ..modules.deadlineModel import Deadline
-from ..auth.userModel import User
+from .calendar_event_model import CalendarEvent
+from ..modules.deadline_model import Deadline
+from ..auth.user_model import User
 #from models.taskModel import Task
 
 WORKTIME_PREFERENCE_CHOICES = [
