@@ -128,7 +128,7 @@ def _meal_events_for_day(user, day_offset, tag):
 
 def _resolve_meal_tag(user, tags):
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    priorities = ('Meals', 'Routine', 'Wellness', 'Other')
+    priorities = ('Meals', 'Other')
     for name in priorities:
         match = next((t for t in user_tags if t.name == name), None)
         if match:

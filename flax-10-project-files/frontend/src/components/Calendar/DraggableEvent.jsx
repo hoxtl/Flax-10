@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
@@ -68,7 +69,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
         if (isDragging || resize.isResizing) return;
         const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
+        openPopup(event, rect, true);
     };
 
     const handleContextMenu = (e) => {
@@ -116,9 +117,9 @@ function EditableEvent({ event, style, minWidthForDetails }) {
                 onContextMenu={handleContextMenu} />
             {ctxMenu && (
                 <div ref={ctxRef} className="event-ctx-menu" style={{ position: 'fixed', top: ctxMenu.y, left: ctxMenu.x, zIndex: 99999 }}>
-                    <button className="event-ctx-item" onClick={handleEdit}>✏️ Edit</button>
+                    <button className="event-ctx-item" onClick={handleEdit}><Pencil size={14} strokeWidth={2} /> Edit</button>
                     <div className="event-ctx-divider" />
-                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}>🗑 Delete</button>
+                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
                 </div>
             )}
         </>
@@ -173,10 +174,17 @@ function TimeDisplay({ event }) {
     return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
+function hexToRgb(hex) {
+    const h = (hex || '#7B6751').replace('#', '');
+    const num = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
 function buildStyle(baseStyle, theme, resizePreview) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
     style.borderLeftColor = theme.color;
+    style.backgroundColor = `rgba(${hexToRgb(theme.color)}, 0.12)`;
     return style;
 }
 

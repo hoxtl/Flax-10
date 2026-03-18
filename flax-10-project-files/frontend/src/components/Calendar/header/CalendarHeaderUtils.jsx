@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X, FolderKanban } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X, FolderKanban, Filter } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DatePickerButton } from './DatePickerButton';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
@@ -9,9 +9,11 @@ import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
 
 import { deleteSchedule, getSchedules, renameSchedule } from '../../../api/scheduleApi';
-import { useNotifications } from '../../../context/NotificationContext';
+import { useToast } from '../../../context/ToastContext';
 import StandardModal from '../../common/StandardModal/StandardModal';
 import TextInput from '../../common/TextInput/TextInput';
+import { useTags } from '../../../context/TagContext';
+import TagManagerModal from '../../Tags/TagManagerModal';
 
 export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
     return (
@@ -31,7 +33,7 @@ function NavArrow({ direction, onClick }) {
 }
 
 export function ViewSwitcher({ modes, activeMode, onChange }) {
-    return <SegmentedControl options={modes} value={activeMode} onChange={onChange} />;
+    return <SegmentedControl options={modes} value={activeMode} onChange={onChange} variant="solid" />;
 }
 
 export function ActionMenu({ onAddEvent, onImport }) {
@@ -215,7 +217,7 @@ function ScheduleCard({
 }
 
 function ScheduleManagerDialog({ open, onClose }) {
-    const { addNotification } = useNotifications();
+    const showToast = useToast();
     const [schedules, setSchedules] = useState([]);
     const [loading, setLoading] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -235,7 +237,7 @@ function ScheduleManagerDialog({ open, onClose }) {
                 if (!ignore) setSchedules(Array.isArray(data) ? data : []);
             } catch (error) {
                 if (!ignore) {
-                    addNotification({ title: 'Schedules', message: error.message, notification_type: 'general' });
+                    showToast(error.message, { variant: 'error' });
                 }
             } finally {
                 if (!ignore) setLoading(false);
@@ -246,7 +248,7 @@ function ScheduleManagerDialog({ open, onClose }) {
         return () => {
             ignore = true;
         };
-    }, [open, addNotification]);
+    }, [open, showToast]);
 
     useEffect(() => {
         if (!open) {
@@ -272,7 +274,7 @@ function ScheduleManagerDialog({ open, onClose }) {
     const saveRename = async (scheduleId) => {
         const nextTitle = renameDraft.trim();
         if (!nextTitle) {
-            addNotification({ title: 'Rename failed', message: 'Please enter a schedule name.', notification_type: 'general' });
+            showToast('Please enter a schedule name.', { variant: 'error' });
             return;
         }
 
@@ -280,14 +282,14 @@ function ScheduleManagerDialog({ open, onClose }) {
         try {
             const data = await renameSchedule(scheduleId, nextTitle);
             if (data.overwritten) {
-                addNotification({ title: 'Schedule overwritten', message: 'Existing schedule with that name was replaced.', notification_type: 'general' });
+                showToast('Existing schedule with that name was replaced.', { variant: 'info' });
             }
             setSchedules((prev) => prev.map((schedule) => (
                 schedule.id === scheduleId ? { ...schedule, title: nextTitle, event_allocations: data.event_allocations ?? schedule.event_allocations } : schedule
             )));
             cancelRename();
         } catch (error) {
-            addNotification({ title: 'Rename failed', message: error.message, notification_type: 'general' });
+            showToast(error.message, { variant: 'error' });
         } finally {
             setIsSaving(false);
         }
@@ -300,7 +302,7 @@ function ScheduleManagerDialog({ open, onClose }) {
             setSchedules((prev) => prev.filter((schedule) => schedule.id !== scheduleId));
             setPendingDeleteId(null);
         } catch (error) {
-            addNotification({ title: 'Delete failed', message: error.message, notification_type: 'general' });
+            showToast(error.message, { variant: 'error' });
         } finally {
             setIsDeleting(false);
         }
@@ -356,6 +358,50 @@ export function ScheduleManagerButton() {
                 <FolderKanban size={18} />
             </button>
             <ScheduleManagerDialog open={open} onClose={() => setOpen(false)} />
+        </>
+    );
+}
+
+export function FilterDropdownButton({ active, onChange }) {
+    const { tags } = useTags();
+    const [showManager, setShowManager] = useState(false);
+
+    const options = useMemo(() => {
+        const uniqueTags = Array.from(
+            new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
+        );
+        return [
+            { value: "all", label: "All" },
+            ...uniqueTags.map(t => ({ value: t.label.toLowerCase(), label: t.label })),
+            { value: "__manage__", label: "Manage Tags..." },
+        ];
+    }, [tags]);
+
+    const handleChange = (val) => {
+        if (val === '__manage__') {
+            setShowManager(true);
+        } else {
+            onChange(val);
+        }
+    };
+
+    const trigger = (
+        <button className={styles.settingsBtn} title="Filter events" aria-label="Filter events" type="button">
+            <Filter size={18} />
+        </button>
+    );
+
+    return (
+        <>
+            <AnimatedDropdown
+                className={styles.actionMenu}
+                customTrigger={trigger}
+                options={options}
+                value={active}
+                onChange={handleChange}
+                align="right"
+            />
+            {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
         </>
     );
 }

@@ -1,13 +1,13 @@
 .month-view {
     background: var(--calendar-bg);
-    border-radius: 8px;
+    border-radius: 0;
 }
 
 .weekday-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     background: var(--calendar-bg);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--text);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -17,9 +17,10 @@
     padding: 0.75rem;
     text-align: center;
     font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--muted);
+    font-weight: 700;
+    color: var(--text);
     text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .month-grid {
@@ -31,11 +32,11 @@
 .week-row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    height: 120px;
+    min-height: 120px;
 }
 
 .day-cell {
-    border: 1px solid var(--border);
+    border: 1px solid var(--text);
     padding: 0.25rem 0.5rem;
     height: 100%;
     box-sizing: border-box;
@@ -48,7 +49,7 @@
 }
 
 .day-cell:hover {
-    background-color: var(--hover);
+    background-color: rgba(74, 52, 33, 0.04);
 }
 
 .day-cell:hover .month-add-btn {
@@ -58,50 +59,50 @@
 .month-add-btn {
     position: absolute;
     top: 2px;
-    right: 2px;
+    left: 2px;
     opacity: 0;
     transition: opacity 0.2s;
     background: none;
     border: none;
     font-size: 1.2rem;
-    color: var(--primary);
+    color: var(--text);
     cursor: pointer;
     line-height: 1;
     padding: 0 4px;
-    border-radius: 4px;
+    border-radius: 2px;
     z-index: 2;
 }
 
 .month-add-btn:hover {
-    color: var(--primary-strong);
-    background-color: var(--hover);
+    color: #5D4037;
+    background-color: rgba(74, 52, 33, 0.06);
 }
 
 .day-cell.other-month {
-    background-color: var(--bg);
-    opacity: 0.5;
+    background-color: rgba(74, 52, 33, 0.02);
+    opacity: 0.4;
 }
 
 .day-cell.other-month .day-number {
     color: var(--muted);
 }
 
+/* Today: 2px solid charcoal border instead of colored background */
+.day-cell.is-today {
+    border: 2px solid var(--text);
+}
+
 .day-cell.is-today .day-number {
-    background-color: var(--primary);
-    color: var(--c-white);
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--text);
+    font-weight: 800;
 }
 
 .day-number {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text);
     font-size: 0.8rem;
     margin-bottom: 2px;
+    text-align: right;
 }
 
 .day-events {
@@ -112,22 +113,39 @@
     overflow: hidden;
 }
 
+/* Ink-on-paper month event dots: text-first, no pill background */
 .month-event-dot {
-    font-size: 0.7rem;
-    padding: 2px 4px;
-    background-color: var(--pill-bg);
-    border-radius: 2px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 1px 2px;
+    background-color: transparent;
+    border-radius: 0;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Charcoal dot before each event name */
+.month-event-dot::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    min-width: 4px;
+    border-radius: 50%;
+    background: var(--text);
+    flex-shrink: 0;
 }
 
 .more-events {
-    font-size: 0.65rem;
-    color: var(--muted);
+    font-size: 0.6rem;
+    color: #5D4037;
+    font-style: italic;
     cursor: pointer;
 }
 
@@ -148,8 +166,8 @@
 }
 
 .day-cell.drop-over {
-    background-color: var(--active);
-    border: 2px dashed var(--primary);
+    background-color: rgba(74, 52, 33, 0.06);
+    border: 2px dashed var(--text);
 }
 
 @media (max-width: 768px) {
@@ -171,14 +189,8 @@
         font-size: 0.75rem;
     }
 
-    .day-cell.is-today .day-number {
-        width: 24px;
-        height: 24px;
-        font-size: 0.75rem;
-    }
-
     .month-event-dot {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
         padding: 1px 2px;
     }
 }

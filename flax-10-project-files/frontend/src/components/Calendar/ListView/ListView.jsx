@@ -183,20 +183,23 @@ function useListViewState(propDate, propEvents) {
 export function ListView({ selectedDate: propDate, events: propEvents }) {
     const state = useListViewState(propDate, propEvents);
     if (!state.sortedEvents.length) return <EmptyState />;
-    const showGrouped = state.viewMode !== 'day';
-    const body = showGrouped
-        ? <GroupedEventsList events={state.currentItems} />
-        : <FlatEventsList events={state.currentItems} />;
+    const isDay = state.viewMode === 'day';
+    const items = isDay ? state.sortedEvents : state.currentItems;
+    const body = isDay
+        ? <FlatEventsList events={items} />
+        : <GroupedEventsList events={items} />;
     return (
         <div data-list-view className={styles.container}>
             <div className={styles.listCard}>
                 {body}
             </div>
-            <Pagination
-                currentPage={state.currentPage}
-                totalPages={state.totalPages}
-                onPageChange={state.setPage}
-            />
+            {!isDay && (
+                <Pagination
+                    currentPage={state.currentPage}
+                    totalPages={state.totalPages}
+                    onPageChange={state.setPage}
+                />
+            )}
             <BackToTop containerSelector={SCROLL_SELECTOR} />
         </div>
     );

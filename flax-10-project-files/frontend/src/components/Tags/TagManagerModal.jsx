@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useTags } from '../../context/TagContext';
 import { useConfirm } from '../../context/ConfirmContext';
-import EmojiPicker from './EmojiPicker';
 import StandardModal from '../common/StandardModal/StandardModal';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import styles from './TagManagerModal.module.css';
 
 const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'];
@@ -11,11 +12,6 @@ function isProtectedTag(tagLabel) {
   return PROTECTED_TAGS.includes(tagLabel?.toLowerCase());
 }
 
-function isIconValid(icon) {
-  if (!icon) return false;
-  const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
-  return hasEmoji && !/^[a-zA-Z0-9]+$/.test(icon);
-}
 
 function useTagModal() {
   const [editingId, setEditingId] = useState(null);
@@ -72,7 +68,7 @@ function commitSave(data, editingId, updateTag, addTag, resetState) {
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
   if (editingId || isAdding) {
     const tag = editingId ? tags.find(t => t.id === editingId) : null;
-    const initialData = tag || { label: '', color: '#000000', icon: '' };
+    const initialData = tag || { label: '', color: '#000000' };
     return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isProtected={isProtectedTag(tag?.label)} />;
   }
   return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
@@ -97,7 +93,6 @@ function TagForm({ initialData, onSave, onCancel, isProtected = false }) {
     <div className={`${styles.content} ${styles.form}`}>
       <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isProtected} />
       <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
-      <EmojiInput value={form.icon} onChange={v => handleChange('icon', v)} />
       {error && <div className={styles.error}>{error}</div>}
       <FormActions onSave={handleSaveClick} onCancel={onCancel} />
     </div>
@@ -106,8 +101,6 @@ function TagForm({ initialData, onSave, onCancel, isProtected = false }) {
 
 function validateTagForm(form, isProtected) {
   if (!isProtected && !form.label.trim()) return "Name is required.";
-  if (!form.icon) return "Icon is required.";
-  if (!isIconValid(form.icon)) return "Only emojis allowed.";
   return '';
 }
 
@@ -117,7 +110,7 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
       <div className={styles.list}>
         {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
       </div>
-      <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
+      <PrimaryButton variant="secondary" onClick={onAdd} pill>+ Add New Tag</PrimaryButton>
     </div>
   );
 }
@@ -134,7 +127,7 @@ function TagItem({ tag, onEdit, onDelete }) {
 function TagPreview({ tag }) {
   return (
     <div className={styles.preview} style={{ '--color': tag.color }}>
-      <span>{tag.icon}</span>
+      <span className={styles.colorDot} style={{ backgroundColor: tag.color }} />
       <span>{tag.label}</span>
     </div>
   );
@@ -143,8 +136,8 @@ function TagPreview({ tag }) {
 function TagActions({ id, onEdit, onDelete, isDeletable }) {
   return (
     <div className={styles.actions}>
-      <button onClick={() => onEdit(id)}>✎</button>
-      {isDeletable && <button onClick={() => onDelete(id)} className={styles.delete}>🗑</button>}
+      <button onClick={() => onEdit(id)}><Pencil size={14} strokeWidth={2} /></button>
+      {isDeletable && <button onClick={() => onDelete(id)} className={styles.delete}><Trash2 size={14} strokeWidth={2} /></button>}
     </div>
   );
 }
@@ -169,21 +162,6 @@ function ColorInput({ value, onChange }) {
   );
 }
 
-function EmojiInput({ value, onChange }) {
-  const [showPicker, setShowPicker] = useState(false);
-  return (
-    <label className={styles.emojiInputWrapper}>
-      Icon (Emoji)
-      <div className={styles.emojiInputRow}>
-        <button type="button" className={styles.emojiPreviewBtn} onClick={() => setShowPicker(!showPicker)}>
-          {value || '😀'}
-        </button>
-        <span className={styles.emojiHint}>{value ? 'Click to change' : 'Click to select'}</span>
-      </div>
-      {showPicker && <EmojiPicker onSelect={onChange} onClose={() => setShowPicker(false)} />}
-    </label>
-  );
-}
 
 function FormActions({ onSave, onCancel }) {
   return (

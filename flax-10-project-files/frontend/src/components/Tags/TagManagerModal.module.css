@@ -44,8 +44,12 @@
     color: var(--text);
 }
 
-.preview span:first-child {
-    font-size: 1.2rem;
+.colorDot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .preview span:last-child {
@@ -187,43 +191,7 @@
     cursor: not-allowed;
 }
 
-/* Emoji Input */
-.emojiInputWrapper {
-    position: relative;
-}
-
-.emojiInputRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.emojiPreviewBtn {
-    width: 50px;
-    height: 50px;
-    font-size: 28px;
-    border: var(--input-border);
-    border-radius: var(--input-radius);
-    background: var(--surface-card);
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.emojiPreviewBtn:hover {
-    border-color: var(--primary);
-    background: var(--hover);
-}
-
 :global(:root[data-theme="dark"]) .modalShell {
     background: color-mix(in srgb, var(--surface-card) 90%, #000 10%);
     border-color: color-mix(in srgb, var(--border) 90%, transparent);
-}
-
-.emojiHint {
-    font-size: 0.85rem;
-    color: var(--muted, #64748b);
-    font-weight: 400;
 }

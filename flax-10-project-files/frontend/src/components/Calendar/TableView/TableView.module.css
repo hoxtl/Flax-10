@@ -1,8 +1,8 @@
-/* TableView Container */
+/* TableView — Ledger Style */
 .container {
     flex: 1;
     min-height: 0;
-    height: calc(100vh - 280px);
+    height: calc(100vh - 220px);
     overflow-y: auto;
     background: var(--bg);
 }
@@ -12,37 +12,56 @@
     width: 100%;
     border-spacing: 0;
     background: var(--bg);
-    border-radius: 12px;
+    border-radius: 0;
 }
 
-/* Header */
+/* Dark solid header */
 .header {
-    background: var(--panel);
+    background: var(--text);
 }
 
 .headerCell {
     position: sticky;
     top: 0;
     z-index: 10;
-    padding: 12px 16px;
+    padding: 14px 16px;
     text-align: left;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    background: var(--panel);
-    border-bottom: 2px solid var(--border);
+    letter-spacing: 0.06em;
+    color: #B89B7E;
+    background: var(--text);
+    border-bottom: 2px solid var(--text);
 }
 
-/* Row */
+:root[data-mode="dark"] .headerCell {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--primary);
+    border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Row — zebra striping */
 .row {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(74, 52, 33, 0.1);
     transition: background 0.15s;
+    height: 48px;
+}
+
+.row:nth-child(even) {
+    background: rgba(74, 52, 33, 0.03);
+}
+
+:root[data-mode="dark"] .row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .row:hover {
-    background: var(--hover);
+    background: rgba(93, 64, 55, 0.06);
+}
+
+:root[data-mode="dark"] .row:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .row.readOnly {
@@ -54,11 +73,8 @@
 }
 
 .todayRow {
-    background: linear-gradient(
-        to right,
-        rgba(184, 155, 126, 0.14),
-        rgba(184, 155, 126, 0.04)
-    );
+    background: rgba(74, 52, 33, 0.05);
+    border-left: 3px solid var(--text);
 }
 
 /* Cells */
@@ -67,15 +83,19 @@
 .dateCell,
 .locationCell,
 .descCell {
-    padding: 12px 16px;
-    vertical-align: top;
+    padding: 14px 16px;
+    vertical-align: middle;
 }
 
 .nameCell {
-    font-weight: 500;
+    font-weight: 700;
     color: var(--text);
     min-width: 150px;
     cursor: pointer;
+}
+
+:root[data-mode="dark"] .nameCell {
+    color: var(--text);
 }
 
 .nameCellContent {
@@ -90,7 +110,7 @@
     color: var(--danger, #dc2626);
     border: none;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: 2px;
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
@@ -109,7 +129,7 @@
 }
 
 .actionCell {
-    padding: 12px 16px;
+    padding: 14px 16px;
     vertical-align: middle;
     width: 48px;
     text-align: right;
@@ -120,7 +140,7 @@
     color: var(--muted);
     border: none;
     padding: 6px;
-    border-radius: 6px;
+    border-radius: 2px;
     cursor: pointer;
     opacity: 0;
     transition: all 0.15s;
@@ -146,8 +166,13 @@
 .dateCell {
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    color: var(--muted);
+    color: #5D4037;
+    font-style: italic;
     min-width: 160px;
+}
+
+:root[data-mode="dark"] .dateCell {
+    color: var(--muted);
 }
 
 .dateCellContent {
@@ -200,9 +225,9 @@
     font-size: 0.75rem;
     font-weight: 500;
     border: none;
-    border-radius: 6px;
-    background: var(--primary);
-    color: var(--c-white);
+    border-radius: 2px;
+    background: var(--text);
+    color: #FAF9F6;
     cursor: pointer;
     transition: opacity 0.15s;
 }
@@ -215,16 +240,16 @@
     padding: 4px 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    border: 1px solid var(--text);
+    border-radius: 2px;
     background: transparent;
-    color: var(--muted);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .dateEditBtnCancel:hover {
-    background: var(--hover);
+    background: rgba(74, 52, 33, 0.06);
 }
 
 .locationCell {
@@ -252,7 +277,7 @@
 }
 
 .row.expanded {
-    background: var(--hover);
+    background: rgba(74, 52, 33, 0.05);
 }
 
 /* Cell Text */
@@ -274,8 +299,8 @@
 .cellInput {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid var(--primary);
-    border-radius: 4px;
+    border: 1px solid var(--text);
+    border-radius: 2px;
     font-family: inherit;
     font-size: inherit;
     background: var(--bg);
@@ -284,7 +309,7 @@
 }
 
 .cellInput:focus {
-    box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.2);
+    box-shadow: 0 0 0 2px rgba(74, 52, 33, 0.15);
 }
 
 textarea.cellInput {
@@ -292,7 +317,7 @@ textarea.cellInput {
     min-height: 60px;
 }
 
-/* Tag Cell Content */
+/* Tag Cell — text-only, no background fill */
 .tagCellContent {
     display: inline-flex;
     align-items: center;
@@ -315,17 +340,24 @@ textarea.cellInput {
     opacity: 0.6;
 }
 
-/* Tag Badges */
+/* Tag — text only with thin vertical separator */
 .tagBadge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
-    font-size: 0.7rem;
+    padding: 0;
+    font-size: 0.75rem;
     font-weight: 500;
-    border-radius: 12px;
-    background: var(--pill-bg);
-    color: var(--text-primary);
+    border-radius: 0;
+    background: transparent;
+    color: #666666;
+    border-left: 2px solid rgba(74, 52, 33, 0.2);
+    padding-left: 8px;
     transition: opacity 0.15s;
+}
+
+:root[data-mode="dark"] .tagBadge {
+    color: var(--muted);
+    border-left-color: rgba(255, 255, 255, 0.15);
 }
 
 .tagCellContent:hover .tagBadge {
@@ -337,10 +369,10 @@ textarea.cellInput {
     padding: 2px 8px;
     margin-right: 4px;
     font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 12px;
-    background: var(--primary);
-    color: var(--c-white);
+    font-weight: 600;
+    border-radius: 2px;
+    background: var(--text);
+    color: #FAF9F6;
 }
 
 /* Cell Wrapper for edit icon */
@@ -364,7 +396,7 @@ textarea.cellInput {
 
 .row:hover .editIcon:hover {
     opacity: 1;
-    color: var(--primary);
+    color: var(--text);
 }
 
 /* Tag Edit Icon */
@@ -381,14 +413,14 @@ textarea.cellInput {
 
 .tagCellContent:hover .tagEditIcon {
     opacity: 1;
-    color: var(--primary);
+    color: var(--text);
 }
 
 /* Tag Select */
 .tagSelect {
     padding: 4px 8px;
-    border: 1px solid var(--primary);
-    border-radius: 6px;
+    border: 1px solid var(--text);
+    border-radius: 2px;
     background: var(--bg);
     color: var(--text);
     font-size: 0.8rem;
@@ -397,7 +429,7 @@ textarea.cellInput {
 }
 
 .tagSelect:focus {
-    box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.2);
+    box-shadow: 0 0 0 2px rgba(74, 52, 33, 0.15);
 }
 
 /* Empty State */

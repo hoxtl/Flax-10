@@ -1,31 +1,44 @@
-/* List view root */
+/* List view — Agenda style with timeline spine */
 .container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 280px);
+    height: calc(100vh - 220px);
     overflow-y: auto;
     background: var(--calendar-bg);
     padding: 0 12px;
 }
 
-/* Card shell */
+/* Remove card shell for cleaner look */
 .listCard {
-    background: var(--card-bg);
-    border-radius: 16px;
-    border: 1px solid var(--border);
+    background: transparent;
+    border-radius: 0;
+    border: none;
     overflow-y: auto;
 }
 
-/* Day group */
+/* Day group — timeline spine */
 .dayGroup {
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
+    position: relative;
+    padding-left: 24px;
+}
+
+/* Vertical charcoal timeline line */
+.dayGroup::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--text);
 }
 
 .dayGroup:last-of-type {
     border-bottom: none;
 }
 
-/* Sticky day header */
+/* Large bold day header */
 .dayHeader {
     position: sticky;
     top: 0;
@@ -33,29 +46,40 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 20px;
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 10px 0;
+    background: var(--calendar-bg);
+    border-bottom: none;
 }
 
 .dayHeaderToday {
-    background: var(--panel);
+    background: var(--calendar-bg);
 }
 
+/* Day number — large bold */
 .dayNumber {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-title);
+    font-size: 1.6rem;
+    font-weight: 800;
     color: var(--text);
     line-height: 1;
-    min-width: 28px;
+    min-width: 36px;
     text-align: center;
 }
 
+:root[data-mode="dark"] .dayNumber {
+    color: var(--text);
+}
+
 .dayHeaderToday .dayNumber {
-    background: var(--accent);
-    color: var(--card-bg);
-    border-radius: 999px;
-    padding: 4px 8px;
+    color: var(--text);
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border-bottom: 2px solid var(--text);
+}
+
+:root[data-mode="dark"] .dayHeaderToday .dayNumber {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
 }
 
 .dayMeta {
@@ -65,13 +89,23 @@
 }
 
 .dayName {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+:root[data-mode="dark"] .dayName {
     color: var(--text);
 }
 
 .dayHeaderToday .dayName {
-    color: var(--accent);
+    color: var(--text);
+}
+
+:root[data-mode="dark"] .dayHeaderToday .dayName {
+    color: var(--primary);
 }
 
 .daySubRow {
@@ -79,6 +113,11 @@
     align-items: center;
     gap: 8px;
     font-size: 0.7rem;
+    color: #5D4037;
+    font-style: italic;
+}
+
+:root[data-mode="dark"] .daySubRow {
     color: var(--muted);
 }
 
@@ -91,12 +130,17 @@
     font-size: 0.6rem;
     font-weight: 700;
     padding: 2px 6px;
-    border-radius: 999px;
+    border-radius: 2px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
 .todayBadge {
+    background: rgba(74, 52, 33, 0.08);
+    color: var(--text);
+}
+
+:root[data-mode="dark"] .todayBadge {
     background: var(--success-bg);
     color: var(--success-text);
 }
@@ -115,14 +159,42 @@
 .flatList {
     display: flex;
     flex-direction: column;
+    padding-left: 24px;
+    position: relative;
 }
 
-/* Event row */
+.flatList::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--text);
+}
+
+/* Event row — slim with dot anchor */
 .eventRow {
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
     cursor: pointer;
-    background: var(--bg);
+    background: transparent;
     transition: background 0.15s ease;
+    position: relative;
+    min-height: 40px;
+}
+
+/* Dot on the timeline */
+.eventRow::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text);
+    z-index: 1;
 }
 
 .eventRow:last-of-type {
@@ -131,7 +203,7 @@
 
 .eventRow:hover,
 .eventRow.expanded {
-    background: var(--hover-light);
+    background: rgba(74, 52, 33, 0.04);
 }
 
 .eventRow.readOnly {
@@ -141,35 +213,40 @@
 .eventMain {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 8px 16px 8px 0;
     gap: 0;
 }
 
+/* Replace color strip with nothing (dot handles it) */
 .eventStrip {
-    width: 3px;
-    border-radius: 2px;
-    align-self: stretch;
-    min-height: 28px;
-    margin-right: 14px;
-    flex-shrink: 0;
+    display: none;
 }
 
 .eventTime {
     font-size: 0.7rem;
-    color: var(--muted);
+    color: #5D4037;
+    font-style: italic;
     width: 72px;
     flex-shrink: 0;
     font-family: var(--font-mono);
 }
 
+:root[data-mode="dark"] .eventTime {
+    color: var(--muted);
+}
+
 .eventName {
     flex: 1;
     font-size: 0.82rem;
-    font-weight: var(--font-weight-task);
+    font-weight: 700;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+:root[data-mode="dark"] .eventName {
+    color: var(--text);
 }
 
 .badgesContainer {
@@ -186,9 +263,18 @@
     white-space: nowrap;
 }
 
+/* Tag — text only, no background */
 .tagBadge {
-    background: var(--pill-bg);
-    color: var(--text);
+    background: transparent;
+    color: #666666;
+    border-left: 2px solid rgba(74, 52, 33, 0.2);
+    padding-left: 8px;
+    border-radius: 0;
+}
+
+:root[data-mode="dark"] .tagBadge {
+    color: var(--muted);
+    border-left-color: rgba(255, 255, 255, 0.15);
 }
 
 .sourceBadge {
@@ -209,18 +295,23 @@
 
 /* Expanded detail panel */
 .eventDetail {
-    padding: 0 20px 16px 20px;
-    margin-left: 89px;
+    padding: 0 16px 12px 0;
+    margin-left: 0;
 }
 
 .detailGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px 24px;
-    padding: 14px 16px;
-    background: var(--panel);
-    border-radius: 10px;
-    border: 1px solid var(--border);
+    padding: 12px 14px;
+    background: rgba(74, 52, 33, 0.03);
+    border-radius: 4px;
+    border: 1px solid rgba(74, 52, 33, 0.1);
+}
+
+:root[data-mode="dark"] .detailGrid {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .detailItem {
@@ -234,11 +325,19 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: #5D4037;
+}
+
+:root[data-mode="dark"] .detailLabel {
     color: var(--text-muted);
 }
 
 .detailValue {
     font-size: 0.8rem;
+    color: var(--text);
+}
+
+:root[data-mode="dark"] .detailValue {
     color: var(--text);
 }
 
@@ -276,12 +375,24 @@
         padding: 0 8px;
     }
 
+    .dayGroup {
+        padding-left: 20px;
+    }
+
+    .dayGroup::before {
+        left: 9px;
+    }
+
+    .eventRow::before {
+        left: -13px;
+    }
+
     .eventMain {
-        padding-inline: 14px;
+        padding-inline: 0 10px;
     }
 
     .eventDetail {
-        margin-left: 83px;
+        margin-left: 0;
     }
 
     .badgesContainer {

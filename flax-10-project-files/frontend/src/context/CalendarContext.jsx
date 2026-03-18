@@ -100,7 +100,7 @@ export function useEventPopup() {
     }
 
     const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
-    const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
+    const openPopup = (event, anchorRect, readOnly = false) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
     return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
 }

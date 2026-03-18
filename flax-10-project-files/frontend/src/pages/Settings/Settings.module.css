@@ -163,9 +163,9 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--muted);
+  color: var(--text);
   padding: 10px 10px 3px;
-  opacity: 0.7;
+  opacity: 1;
   margin-top: 4px;
   position: relative;
   isolation: isolate;
@@ -1321,8 +1321,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .sidebarSectionLabel {
-  color: color-mix(in srgb, var(--primary) 45%, var(--text) 55%);
-  opacity: 0.78;
+  color: var(--text);
+  opacity: 1;
 }
 
 :global(:root:not([data-theme="dark"])) .navItem {
