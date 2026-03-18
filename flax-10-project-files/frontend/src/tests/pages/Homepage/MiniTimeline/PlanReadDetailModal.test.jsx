@@ -122,14 +122,17 @@ describe('PlanReadDetailModal', () => {
 
     it('calls onClose when overlay backdrop is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(
+        render(
             <PlanReadDetailModal
                 item={{ event: { title: 'E' } }}
                 styles={mockStyles}
                 onClose={onClose}
             />
         );
-        fireEvent.click(container.querySelector('.overlay'));
+        // Since it's a Portal, it's in document.body, not container
+        // And StandardModal uses onMouseDown
+        const backdrop = document.body.querySelector('[class*="backdrop"]');
+        if (backdrop) fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 

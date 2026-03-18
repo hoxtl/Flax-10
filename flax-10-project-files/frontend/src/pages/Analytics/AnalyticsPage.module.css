@@ -14,8 +14,15 @@
   gap: 0.6rem;
 }
 
-.skeletonTitle { width: min(220px, 42vw); height: 34px; }
-.skeletonSubtitle { width: min(320px, 60vw); height: 14px; }
+.skeletonTitle {
+  width: min(220px, 42vw);
+  height: 34px;
+}
+
+.skeletonSubtitle {
+  width: min(320px, 60vw);
+  height: 14px;
+}
 
 .skeletonPeriodToggle {
   display: flex;
@@ -26,9 +33,23 @@
   border: var(--card-border);
 }
 
-.skeletonPeriodBtn { width: 48px; height: 32px; border-radius: 10px; }
-.skeletonTabs { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; }
-.skeletonTab { width: 136px; height: 40px; border-radius: 999px; }
+.skeletonPeriodBtn {
+  width: 48px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+.skeletonTabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.skeletonTab {
+  width: 136px;
+  height: 40px;
+  border-radius: 999px;
+}
 
 .skeletonSummaryGrid {
   display: grid;
@@ -37,7 +58,9 @@
   margin-bottom: 1.25rem;
 }
 
-.skeletonSummaryCard { height: 92px; }
+.skeletonSummaryCard {
+  height: 92px;
+}
 
 .skeletonAnalyticsGrid {
   display: grid;
@@ -45,8 +68,14 @@
   gap: 1.25rem;
 }
 
-.skeletonAnalyticsCardTall { height: 240px; }
-.skeletonAnalyticsCardWide { grid-column: 1 / -1; height: 280px; }
+.skeletonAnalyticsCardTall {
+  height: 240px;
+}
+
+.skeletonAnalyticsCardWide {
+  grid-column: 1 / -1;
+  height: 280px;
+}
 
 
 .periodToggle {
@@ -91,7 +120,9 @@
   box-shadow: var(--card-shadow-rest);
 }
 
-.card:hover { box-shadow: var(--card-shadow-hover); }
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
 
 .cardLabel {
   font-size: 0.7rem;
@@ -132,7 +163,9 @@
   flex-direction: column;
 }
 
-.wide { grid-column: 1 / -1; }
+.wide {
+  grid-column: 1 / -1;
+}
 
 .errorBanner {
   background: var(--error-bg);
@@ -145,12 +178,32 @@
 }
 
 @media (max-width: 900px) {
-  .page { padding: 1.25rem 1rem; }
-  .twoCol { grid-template-columns: 1fr; }
-  .chartsGrid { grid-template-columns: 1fr; }
-  .wide { grid-column: auto; }
-  .skeletonHeader { flex-direction: column; }
+  .page {
+    padding: 1.25rem 1rem;
+  }
+
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .skeletonHeader {
+    flex-direction: column;
+  }
+
   .skeletonSummaryGrid,
-  .skeletonAnalyticsGrid { grid-template-columns: 1fr; }
-  .skeletonAnalyticsCardWide { grid-column: auto; }
+  .skeletonAnalyticsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeletonAnalyticsCardWide {
+    grid-column: auto;
+  }
 }

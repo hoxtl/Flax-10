@@ -6,7 +6,9 @@ import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { tflService } from "../../api/tflService";
 import { motion } from "framer-motion";
 import { getHomeAddress } from "../../api/userService";
+import { getCalendarEvents } from "../../api/calendarService";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
+import { UserJourneySection } from "../../components/CampusMap/UserJourneySection"
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -86,6 +88,13 @@ export default function CampusMap() {
   const [tflRouteError, setTflRouteError] = useState("");
   const [disruptions, setDisruptions] = useState([]);
   const [loadingDisruptions, setLoadingDisruptions] = useState(false);
+  const [showAllDisruptions, setShowAllDisruptions] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState([]);
+  const eventMarkers = useRef([]);
+  const [showAllEvents, setShowAllEvents] = useState(false);
+  const [customDestination, setCustomDestination] = useState(null);
+  const [manualStart, setManualStart] = useState("");
+  const [manualDestination, setManualDestination] = useState("");
   const [minSkeletonElapsed, setMinSkeletonElapsed] = useState(false);
 
   // Mobile detection hook (matches DashboardLayout breakpoint)
@@ -271,6 +280,10 @@ export default function CampusMap() {
     return () => {
       campusMarkers.current.forEach((marker) => marker.remove());
       campusMarkers.current = [];
+      eventMarkers.current.forEach(marker => marker.remove());
+      eventMarkers.current = [];
+      if (homePointer.current) homePointer.current.remove();
+      if (homePopup.current) homePopup.current.remove();
       map.current?.remove();
       map.current = null;
     };
@@ -376,6 +389,26 @@ export default function CampusMap() {
     }, 100);
   }, [userHome, mapLoaded, startLocation]);
 
+  // Add calendar events to the map
+  useEffect(() => {
+    const loadCalendarEvents = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const data = await getCalendarEvents();
+        setCalendarEvents(data.events || []);
+      } catch (error) {
+        console.log('Unable to load calendar events...');
+      }
+    };
+    loadCalendarEvents();
+    const handleRefresh = () => loadCalendarEvents();
+    window.addEventListener('calendar-event-updated', handleRefresh);
+    return () => {
+      window.removeEventListener('calendar-event-updated', handleRefresh);
+    };
+  }, []);
+
   // Update the marker on the map when user's start location changes
   useEffect(() => {
     if (!mapLoaded || !startLocation) return;
@@ -447,14 +480,19 @@ export default function CampusMap() {
 
   // Calculate walking time/distance from start location to selected campus
   const calculateRoute = useCallback(async () => {
-    if (!startLocation || !selectedCampus || !routeLayerAdded.current) return;
+    const destination = customDestination || (selectedCampus ? {
+      lng: selectedCampus.coords[0],
+      lat: selectedCampus.coords[1]
+    } : null);
+    if (!startLocation || !destination || !routeLayerAdded.current) return;
 
     setLoadingRoute(true);
     setRouteError("");
     setRouteInfo(null);
 
     const { lng, lat } = startLocation;
-    const [dstLng, dstLat] = selectedCampus.coords;
+    const dstLng = destination.lng;
+    const dstLat = destination.lat;
 
     try {
       const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${lng},${lat};${dstLng},${dstLat}?steps=true&geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
@@ -508,17 +546,22 @@ export default function CampusMap() {
     } finally {
       setLoadingRoute(false);
     }
-  }, [startLocation, selectedCampus]);
+  }, [startLocation, selectedCampus, customDestination]);
 
   const calculateTflRoute = useCallback(async () => {
-    if (!startLocation || !selectedCampus) return;
+    const destination = customDestination || (selectedCampus ? {
+      lng: selectedCampus.coords[0],
+      lat: selectedCampus.coords[1]
+    } : null);
+    if (!startLocation || !destination) return;
 
     setLoadingTflRoute(true);
     setTflRouteError("");
     setTflRouteInfo(null);
 
     const { lng, lat } = startLocation;
-    const [dstLng, dstLat] = selectedCampus.coords;
+    const dstLng = destination.lng;
+    const dstLat = destination.lat;
 
     try {
       const tflJourney = await tflService.journeyPlanner(
@@ -540,7 +583,7 @@ export default function CampusMap() {
     } finally {
       setLoadingTflRoute(false);
     }
-  }, [startLocation, selectedCampus]);
+  }, [startLocation, selectedCampus, customDestination]);
 
   const resetRoute = (routeID) => {
     const source = map.current?.getSource(routeID);
@@ -554,7 +597,7 @@ export default function CampusMap() {
   };
 
   useEffect(() => {
-    if (startLocation && selectedCampus) {
+    if (startLocation && (selectedCampus || customDestination)) {
       calculateRoute();
       calculateTflRoute();
     } else if (routeLayerAdded.current) {
@@ -562,7 +605,7 @@ export default function CampusMap() {
       setRouteInfo(null);
       setTflRouteInfo(null);
     }
-  }, [startLocation, selectedCampus, calculateRoute, calculateTflRoute]);
+  }, [startLocation, selectedCampus, customDestination, calculateRoute, calculateTflRoute]);
 
   // Use GPS of user's device
   const handleGeolocate = () => {
@@ -602,6 +645,7 @@ export default function CampusMap() {
 
   const handleClearCampus = () => {
     setSelectedCampus(null);
+    setCustomDestination(null);
     setRouteInfo(null);
     setTflRouteInfo(null);
     resetRoute("route");
@@ -617,6 +661,20 @@ export default function CampusMap() {
     });
   };
 
+  const handleUserJourneyCalculate = (startCoords, destCoords) => {
+    setStartLocation({lng: startCoords.longitude, lat: startCoords.latitude});
+    setCustomDestination({lng: destCoords.longitude, lat: destCoords.latitude, name: manualDestination, address: manualDestination});
+    setSelectedCampus(null);
+    const bounds = new mapboxgl.LngLatBounds()
+      .extend([startCoords.longitude, startCoords.latitude])
+      .extend([destCoords.longitude, destCoords.latitude]);
+    
+    map.current?.fitBounds(bounds, {
+      padding: {top: 100, bottom: 100, left: 100, right: 100},
+      duration: 1500
+    });
+  }
+  
   const showInitialSkeleton = !mapLoaded || !minSkeletonElapsed;
 
   return (
@@ -672,8 +730,9 @@ export default function CampusMap() {
               </div>
             </div>
           ) : (
+          <>
             <div className={styles.disruptionsList}>
-              {disruptions.map((disruption, i) => (
+              {(showAllDisruptions ? disruptions : disruptions.slice(0, 2)).map((disruption, i) => (
                 <div key={i} className={styles.disruptionCard}>
                   <div
                     className={styles.disruptionBadge}
@@ -692,7 +751,25 @@ export default function CampusMap() {
                 </div>
               ))}
             </div>
-          )}
+
+            {disruptions.length > 2 && (
+              <button
+                className={styles.showMoreBtn}
+                onClick={() => setShowAllDisruptions(!showAllDisruptions)}
+              >
+                {showAllDisruptions ? (
+                  <>
+                    Show Less <span>▲</span>
+                  </>
+                ) : (
+                  <>
+                    Show {disruptions.length - 2} More <span>▼</span>
+                  </>
+                )}
+              </button>
+            )}
+          </>
+        )}
 
           <div className={styles.lastUpdated}>
             Last Updated:{" "}
@@ -701,6 +778,133 @@ export default function CampusMap() {
               minute: "2-digit",
             })}
           </div>
+        </section>
+
+        {/* User Journey Planning */}
+        <UserJourneySection 
+          manualStart={manualStart}  
+          setManualStart={setManualStart}
+          manualDestination={manualDestination}
+          setManualDestination={setManualDestination}
+          onCalculate={handleUserJourneyCalculate}
+        />
+
+        {/* Calendar Events */}
+        <section className={styles.section}>
+          <div className={styles.sectionLabel}>
+            <span className={styles.calendarIcon}>📅</span>
+            Events Today
+          </div>
+
+          {calendarEvents.length === 0 ? (
+            <div className={styles.noEvents}>
+              <span className={styles.noEventsIcon}>✨</span>
+              <p>No events to show on UniMap...</p>
+            </div>
+          ) : (
+            <div>
+              <div className={styles.eventsList}>
+                {(showAllEvents ? calendarEvents : calendarEvents.slice(0, 3)).map((event) => {
+                  const startTime = new Date(event.start_time);
+                  const priorityColors = {
+                    'urgent': '#FF4444',
+                    'high': '#FF8800',
+                    'medium': '#4488FF',
+                    'low': '#888888',
+                  };
+                  const color = priorityColors[event.priority] || '#4488FF';
+
+                  return (
+                    <div 
+                      key={event.id} 
+                      className={styles.eventCard}
+                      onClick={() => {
+                        if (!startLocation && !selectedCampus) {
+                          setStartLocation({ lng: event.longitude, lat: event.latitude });
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
+                        } else if (selectedCampus && !startLocation) {
+                          setStartLocation({
+                            lng: selectedCampus.coords[0],
+                            lat: selectedCampus.coords[1]
+                          });
+                          setCustomDestination({
+                            lng: event.longitude,
+                            lat: event.latitude,
+                            name: event.title,
+                            address: event.location
+                          });
+                          setSelectedCampus(null);
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
+                        } else {
+                          setCustomDestination({
+                            lng: event.longitude,
+                            lat: event.latitude,
+                            name: event.title,
+                            address: event.location
+                          });
+                          setSelectedCampus(null);
+                          map.current?.flyTo({
+                            center: [event.longitude, event.latitude],
+                            zoom: 15,
+                            pitch: 55,
+                            duration: 1200
+                          });
+                        }
+                      }}
+                    >
+                      <div 
+                        className={styles.eventPriorityBar}
+                        style={{ backgroundColor: color }}
+                      />
+                      <div className={styles.eventCardContent}>
+                        <div className={styles.eventCardHeader}>
+                          <span className={styles.eventTime}>
+                            {startTime.toLocaleTimeString('en-GB', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                          <span
+                            className={styles.eventPriority}
+                            style={{ color: color }}>
+                              {event.priority}
+                            </span>
+                        </div>
+                        <div className={styles.eventTitle}>{event.title}</div>
+                        <div className={styles.eventLocation}>📍 {event.location}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {calendarEvents.length > 3 && (
+                <button
+                  className={styles.showMoreBtn}
+                  onClick={() => setShowAllEvents(!showAllEvents)}>
+                    {showAllEvents ? (
+                      <>
+                        Show Less <span>▲</span>
+                      </>
+                    ) : (
+                      <>
+                        Show {calendarEvents.length - 3} More <span>▼</span>
+                      </>
+                    )}
+                  </button>
+              )}
+            </div>
+          )}
         </section>
 
         <section className={styles.section}>
@@ -713,7 +917,7 @@ export default function CampusMap() {
             <div className={styles.locationChip}>
               <div
                 className={styles.locationChipDot}
-                style={{ background: "#4A3421" }}
+                style={{ background: "var(--primary)" }}
               />
               <div className={styles.locationChipText}>
                 <span className={styles.locationCoords}>
@@ -752,18 +956,39 @@ export default function CampusMap() {
           </button>
         </section>
 
-        {/* Step 2 — Campus Selection */}
         <section className={styles.section}>
           <div className={styles.sectionLabel}>
             <span className={styles.stepBadge}>2</span>
-            King's College London CAMPUSES
+            Destination
           </div>
 
-          {selectedCampus ? (
+          {customDestination ? (
             <div className={styles.locationChip}>
               <div
                 className={styles.locationChipDot}
-                style={{ background: selectedCampus.color }}
+                style={{ background: "#FF6B6B" }}
+              />
+              <div className={styles.locationChipText}>
+                <span className={styles.locationCoords}>
+                  {customDestination.name}
+                </span>
+                <span className={styles.locationHint}>
+                  {customDestination.address}
+                </span>
+              </div>
+              <button
+                className={styles.clearBtn}
+                onClick={() => setCustomDestination(null)}
+                title="Clear"
+              >
+                ✕
+              </button>
+            </div>
+          ) : selectedCampus ? (
+            <div className={styles.locationChip}>
+              <div
+                className={styles.locationChipDot}
+                style={{background: selectedCampus.color}}
               />
               <div className={styles.locationChipText}>
                 <span className={styles.locationCoords}>
@@ -783,7 +1008,7 @@ export default function CampusMap() {
             </div>
           ) : (
             <p className={styles.hintText}>
-              Select a campus from the map or from the options
+              Select a campus or event as destination
             </p>
           )}
 
@@ -814,7 +1039,7 @@ export default function CampusMap() {
             Transport Modes
           </div>
 
-          {!startLocation || !selectedCampus ? (
+          {!startLocation || (!selectedCampus && !customDestination) ? (
             <div className={styles.emptyState}>
               <span className={styles.emptyIcon}>🚶</span>
               <p>

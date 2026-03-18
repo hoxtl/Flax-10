@@ -1,1 +1,1 @@
-from studyFlax.models.tasks.taskModel import Task, TaskList
+from studyFlax.models.tasks.task_model import Task, TaskList

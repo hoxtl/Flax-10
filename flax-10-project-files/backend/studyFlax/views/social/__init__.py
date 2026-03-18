@@ -1,1 +1,1 @@
-from .share_views import CalendarShareViewSet
+from .share_view import CalendarShareViewSet

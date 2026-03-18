@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
-import { useEventModal } from '../../../context/CalendarContext';
+import { useEventModal, useCalendarDispatch } from '../../../context/CalendarContext';
+import { useConfirm } from '../../../context/ConfirmContext';
 import { useQuickActions } from '../hooks/useQuickActions';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
@@ -72,9 +73,9 @@ function DetailRow({ label, value, muted, full }) {
     );
 }
 
-function DetailButton({ variant = 'secondary', onClick, children }) {
+function DetailButton({ variant = 'secondary', onClick, children, className }) {
     return (
-        <PrimaryButton type="button" className={styles.detailButton} onClick={onClick} variant={variant === 'primary' ? 'primary' : 'ghost'} size="small" pill>
+        <PrimaryButton type="button" className={`${styles.detailButton} ${className || ''}`} onClick={onClick} variant={variant === 'primary' ? 'primary' : variant === 'danger' ? 'danger' : 'ghost'} size="small" pill>
             {children}
         </PrimaryButton>
     );
@@ -86,6 +87,8 @@ function DetailButton({ variant = 'secondary', onClick, children }) {
 export function EventRow({ event }) {
     const [expanded, setExpanded] = useState(false);
     const { openModal } = useEventModal();
+    const dispatch = useCalendarDispatch();
+    const confirm = useConfirm();
     const tagContext = useTags();
     const quickAction = useQuickActions(event);
     const accentColor = getEventTheme(event, tagContext).color;
@@ -93,6 +96,19 @@ export function EventRow({ event }) {
     const readOnly = isReadOnlyEvent(event);
     const onToggle = () => setExpanded(prev => !prev);
     const onEdit = (e) => { e.stopPropagation(); openModal(event); };
+    const onDelete = async (e) => {
+        e.stopPropagation();
+        const yes = await confirm({
+            title: "Delete Event",
+            message: `Are you sure you want to delete "${event.title}"?`,
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            isDanger: true
+        });
+        if (yes) {
+            dispatch({ type: 'DELETE_EVENT', payload: event.id });
+        }
+    };
     const onUnimap = (e) => {
         e.stopPropagation();
         window.open('/map', '_blank', 'noopener,noreferrer');
@@ -118,6 +134,7 @@ export function EventRow({ event }) {
                     readOnly={readOnly}
                     hasQuick={!!quickAction}
                     onEdit={onEdit}
+                    onDelete={onDelete}
                     onUnimap={onUnimap}
                     onQuick={onQuick}
                     quickLabel={quickAction?.label}
@@ -146,6 +163,7 @@ function EventRowDetail({
     readOnly,
     hasQuick,
     onEdit,
+    onDelete,
     onUnimap,
     onQuick,
     quickLabel
@@ -163,7 +181,12 @@ function EventRowDetail({
                 <DetailRow label="Description" value={description} muted={!event.description} full />
             </div>
             <div className={styles.detailActions}>
-                {!readOnly && <DetailButton variant="primary" onClick={onEdit}>Edit</DetailButton>}
+                {!readOnly && (
+                    <>
+                        <DetailButton variant="primary" onClick={onEdit}>Edit</DetailButton>
+                        <DetailButton variant="danger" onClick={onDelete}>Delete</DetailButton>
+                    </>
+                )}
                 <DetailButton onClick={onUnimap}>Get directions</DetailButton>
                 {readOnly && hasQuick && (
                     <DetailButton onClick={onQuick}>{quickLabel}</DetailButton>

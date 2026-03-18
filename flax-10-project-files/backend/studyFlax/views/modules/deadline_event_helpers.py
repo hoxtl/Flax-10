@@ -1,6 +1,9 @@
+"""
+Helpers for creating, syncing, and deleting deadline calendar events.
+"""
+
 from studyFlax.models import CalendarEvent, User
 
-#Data for deadline events created during enrollment and after
 def event_data(deadline, user):
     return dict(
         user=user,
@@ -15,7 +18,6 @@ def event_data(deadline, user):
         priority='high'
     )
 
-#Creates deadline events when deadline is added via Details Page
 def create_deadline_events(deadline):
     students = User.objects.filter(enrollments__module=deadline.module)
     for student in students:

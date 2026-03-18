@@ -46,7 +46,8 @@ describe('ModuleDetails', () => {
     it('should call onBack when back button is clicked', () => {
         const onBack = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={false} onBack={onBack} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        fireEvent.click(screen.getByText('← Back to all modules'));
+        // Use a more flexible selector for the back button
+        fireEvent.click(screen.getByRole('button', { name: /Back to all modules/i }));
         expect(onBack).toHaveBeenCalled();
     });
 

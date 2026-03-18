@@ -5,6 +5,19 @@ import Badge from "../../../components/common/Badge/Badge";
 import Card from "../../../components/common/Card/Card";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import SectionHeader from "../../../components/common/SectionHeader/SectionHeader";
+import { useAttendanceStats } from "../../Attendance/hooks/useAttendanceStats";
+import { useTimetableEvents } from "../../Attendance/hooks/useTimetableEvents";
+import { useAttendanceRecords } from "../../Attendance/hooks/useAttendanceRecords";
+import {
+  buildOverallChartData,
+  buildByTypeChartData,
+  withByTypeColors,
+  getEventTypeLabel,
+} from "../../Attendance/utils/attendanceChartData";
+import { recordAttendance } from "../../../api/attendanceApi";
+import OverallAttendanceChart from "../../Attendance/components/OverallAttendanceChart";
+import ByTypeAttendanceChart from "../../Attendance/components/ByTypeAttendanceChart";
+import SegmentDetailPanel from "../../Attendance/components/SegmentDetailPanel";
 
 function ProfileWidget({ title, subtitle, action, onClick, children, className = "" }) {
     return (
@@ -54,10 +67,10 @@ function computeDnaSegments(heatmap) {
     const [m, a, e, n] = sumByPeriod(heatmap);
     const t = m + a + e + n || 1;
     const segments = [
-        { label: "Morning", pct: m / t, color: "#F59E0B" },
-        { label: "Afternoon", pct: a / t, color: "#D97706" },
-        { label: "Evening", pct: e / t, color: "#7C3AED" },
-        { label: "Night", pct: n / t, color: "#1E3A5F" },
+        { label: "Morning", pct: m / t, color: "var(--color-primary-strong)" },
+        { label: "Afternoon", pct: a / t, color: "var(--color-primary)" },
+        { label: "Evening", pct: e / t, color: "var(--color-highlight)" },
+        { label: "Night", pct: n / t, color: "color-mix(in srgb, var(--color-primary) 20%, black)" },
     ];
     return segments.filter(s => s.pct > 0.01);
 }
@@ -117,7 +130,7 @@ function GoalRing({ percentage, hoursStudied, goalHours, editing, onToggle }) {
         <button className={`${styles.goalRingBtn} ${editing ? styles.goalRingActive : ''}`} onClick={onToggle}>
             <svg width="84" height="84" viewBox="0 0 84 84" className={styles.goalRingSvg}>
                 <circle cx="42" cy="42" r={radius} fill="none" stroke="var(--border)" strokeWidth="7" />
-                <circle cx="42" cy="42" r={radius} fill="none" stroke={percentage >= 100 ? "#4CAF50" : "var(--primary)"} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ * 0.25} style={{ transition: 'stroke-dasharray 0.8s ease' }} />
+                <circle cx="42" cy="42" r={radius} fill="none" stroke={percentage >= 100 ? "var(--success-text)" : "var(--primary)"} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ * 0.25} style={{ transition: 'stroke-dasharray 0.8s ease' }} />
             </svg>
             <div className={styles.ringInner}><span className={styles.ringValue}>{hoursStudied}h</span><span className={styles.ringGoal}>/{goalHours}h</span></div>
         </button>
@@ -235,9 +248,10 @@ export function SocietiesSection({ societies, onNavigate }) {
         <ProfileWidget title="SOCIETIES JOINED">
             <div className={styles.societiesScroll}>
                 {societies.map(soc => {
+                    const societyId = soc.society_id ?? soc.id;
                     const imageUrl = soc.cover_image || soc.image;
                     return (
-                        <button key={soc.id} className={styles.societyCard} onClick={() => onNavigate(`societies_${soc.id}`)}>
+                        <button key={societyId || soc.name} className={styles.societyCard} onClick={() => societyId && onNavigate(`/societies?id=${societyId}`)}>
                             <div className={styles.socLogoWrap}>{imageUrl ? <img src={imageUrl} alt={soc.name} className={styles.socLogo} /> : <div className={styles.socInitial}>{soc.name[0]}</div>}</div>
                             <span className={styles.socName}>{soc.name}</span>
                         </button>
@@ -246,4 +260,120 @@ export function SocietiesSection({ societies, onNavigate }) {
             </div>
         </ProfileWidget>
     );
+}
+
+export function AttendanceWidget() {
+  const [selectedSegment, setSelectedSegment] = useState(null);
+  const { stats, loading, error, refetch: refetchStats } = useAttendanceStats();
+  const { records, recordsByEventId, refetch: refetchRecords } = useAttendanceRecords();
+  const { events: timetableEvents } = useTimetableEvents();
+
+  if (loading) return (
+    <ProfileWidget title="ATTENDANCE">
+      <div className={styles.attendanceLoading}>Loading metrics...</div>
+    </ProfileWidget>
+  );
+
+  if (error || !stats) return null;
+
+  // Use records directly for marked events since the backend now returns metadata (title, start_time, event_type)
+  const markedEvents = records.map(r => ({
+    id: r.event_id,
+    title: r.title || "Untitled Event",
+    start_time: r.start_time,
+    attended: r.attended,
+    event_type: r.event_type
+  })).sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+  const attendedEvents = markedEvents.filter((e) => e.attended);
+  const missedEvents = markedEvents.filter((e) => !e.attended);
+
+  const overall = stats.overall || { attended: 0, missed: 0 };
+  const totalMarked = overall.attended + overall.missed;
+  const attendancePct = totalMarked > 0 ? (overall.attended / totalMarked) * 100 : 100;
+  const isLowAttendance = attendancePct < 50;
+
+  const by_type = stats.by_type || {};
+  const overallData = buildOverallChartData(overall);
+  const byTypeEntries = buildByTypeChartData(by_type);
+  const byTypeData = withByTypeColors(byTypeEntries);
+
+  function getEventsForSegment(segment) {
+    if (!segment) return [];
+    if (segment.chart === "overall") {
+      return segment.label === "Attended" ? attendedEvents : missedEvents;
+    }
+    if (segment.chart === "byType") {
+      return markedEvents.filter((e) => e.event_type === segment.label);
+    }
+    return [];
+  }
+
+  const detailPanelEvents = getEventsForSegment(selectedSegment);
+  const detailPanelLabel = selectedSegment
+    ? `${selectedSegment.chart === "overall" ? "Overall" : "By type"}: ${selectedSegment.label}`
+    : null;
+
+  const handleSegmentClick = (chart, label) => {
+    setSelectedSegment(label ? { chart, label } : null);
+  };
+
+  const handleToggleStatus = async (eventId, attended) => {
+    try {
+      await recordAttendance(eventId, attended);
+      await refetchStats();
+      await refetchRecords();
+    } catch (err) {
+      console.error("Failed to toggle attendance status", err);
+      throw err; // Re-throw so SegmentDetailPanel can revert
+    }
+  };
+
+  const attendanceLabel = isLowAttendance ? (
+            <div className={styles.attendanceWarning}>
+              <span className={styles.warningIcon}>⚡</span>
+              <span>Low Attendance ({Math.round(attendancePct)}%)</span>
+            </div>
+  ) : null;
+
+  return (
+    <ProfileWidget 
+        title="ATTENDANCE" 
+        subtitle={attendanceLabel}
+        className={`${styles.attendanceWidget} ${styles.attendanceWidgetDetailed}`}
+    >
+      <div 
+        className={`${styles.attendanceCharts} ${styles.attendanceChartsRow}`}
+        onClick={(e) => e.stopPropagation()} 
+      >
+        <div className={styles.attendanceChartBox}>
+          <div className={styles.attendanceChartLabel}>Overall</div>
+          <OverallAttendanceChart
+            data={overallData}
+            attended={overall.attended}
+            missed={overall.missed}
+            onSegmentClick={handleSegmentClick}
+          />
+        </div>
+        <div className={styles.attendanceChartBox}>
+          <div className={styles.attendanceChartLabel}>By Type</div>
+          <ByTypeAttendanceChart
+            data={byTypeData}
+            onSegmentClick={handleSegmentClick}
+          />
+        </div>
+      </div>
+      {selectedSegment && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <SegmentDetailPanel
+            segmentLabel={detailPanelLabel}
+            events={detailPanelEvents}
+            onToggleStatus={handleToggleStatus}
+            onClose={() => setSelectedSegment(null)}
+            className={styles.profileAttendanceDetail}
+          />
+        </div>
+      )}
+    </ProfileWidget>
+  );
 }

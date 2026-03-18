@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Pagination } from "../../components/Pagination/Pagination";
+import BasePill from "../../components/Tags/BasePill";
 import {
   fetchAdminUsers,
   banUser,
@@ -12,10 +14,10 @@ import {
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
-  fetchCourseChangeRequests,
   resolveCourseChangeRequest,
 } from "../../api/adminApi";
 import styles from "./AdminPage.module.css";
+import AppPage from "../../components/common/AppPage/AppPage";
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -42,6 +44,80 @@ const TABS = [
   { id: "reports", label: "🚩 Reported Societies" },
   { id: "course-changes", label: "📚 Course Change Requests" },
 ];
+
+const PAGE_SIZE = 20;
+
+const USER_FILTER_GROUPS = {
+  roles: [
+    { value: "student", label: "Student" },
+    { value: "teacher", label: "Teacher" },
+  ],
+  staff: [{ value: "staff", label: "Staff" }],
+  status: [
+    { value: "active", label: "Active" },
+    { value: "banned", label: "Banned" },
+  ],
+};
+
+function usePaginatedItems(items, pageSize = PAGE_SIZE) {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil((items?.length || 0) / pageSize)),
+    [items, pageSize],
+  );
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(1);
+  }, [currentPage, totalPages]);
+
+  const pageItems = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return (items || []).slice(start, start + pageSize);
+  }, [items, currentPage, pageSize]);
+
+  return { currentPage, setCurrentPage, totalPages, pageItems };
+}
+
+function toggleArrayValue(arr, value) {
+  return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
+}
+
+function matchesRoleFilter(user, selectedRoles) {
+  if (!selectedRoles.length) return true;
+  return selectedRoles.some((role) => {
+    if (role === "teacher") {
+      return user.role === "teacher" || user.role === "pending_teacher";
+    }
+    if (role === "student") {
+      return user.role === "student";
+    }
+    return false;
+  });
+}
+
+function matchesStaffFilter(user, selectedStaff) {
+  if (!selectedStaff.length) return true;
+  return selectedStaff.some(
+    (option) => option === "staff" && (!!user.is_staff || !!user.is_superuser),
+  );
+}
+
+function matchesStatusFilter(user, selectedStatus) {
+  if (!selectedStatus.length) return true;
+  return selectedStatus.some((status) => {
+    if (status === "active") return !!user.is_active;
+    if (status === "banned") return !user.is_active;
+    return false;
+  });
+}
+
+function matchesAllUserFilters(user, filters) {
+  if (!matchesRoleFilter(user, filters.roles)) return false;
+  if (!matchesStaffFilter(user, filters.staff)) return false;
+  if (!matchesStatusFilter(user, filters.status)) return false;
+  return true;
+}
 
 function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
@@ -88,14 +164,35 @@ function RoleBadge({ role }) {
   );
 }
 
-function SearchBar({ value, onChange, placeholder }) {
+function SearchBar({ value, onChange, placeholder, className = "" }) {
   return (
     <input
-      className={styles.search}
+      className={`${styles.search} ${className}`.trim()}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
     />
+  );
+}
+
+function FilterToggleGroup({ label, options, selected, onToggle }) {
+  return (
+    <div className={styles.filterGroup}>
+      <span className={styles.filterGroupLabel}>{label}</span>
+      <div className={styles.filterButtons}>
+        {options.map((opt) => {
+          const active = selected.includes(opt.value);
+          return (
+            <BasePill
+              key={opt.value}
+              label={opt.label}
+              isActive={active}
+              onClick={() => onToggle(opt.value)}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -147,6 +244,11 @@ function UsersTab({ onNavigate }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [userFilters, setUserFilters] = useState({
+    roles: [],
+    staff: [],
+    status: [],
+  });
   const [banTarget, setBanTarget] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -167,11 +269,42 @@ function UsersTab({ onNavigate }) {
     load();
   }, [load]);
 
-  const filtered = users.filter((u) =>
-    `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
-      .toLowerCase()
-      .includes(search.toLowerCase()),
+  const filtered = useMemo(
+    () =>
+      users.filter((u) => {
+        const q = `${u.username} ${u.email} ${u.first_name} ${u.last_name}`
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        return q && matchesAllUserFilters(u, userFilters);
+      }),
+    [users, search, userFilters],
   );
+
+  const hasActiveUserFilters = useMemo(
+    () =>
+      userFilters.roles.length > 0 ||
+      userFilters.staff.length > 0 ||
+      userFilters.status.length > 0,
+    [userFilters],
+  );
+
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(filtered);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, userFilters, setCurrentPage]);
+
+  const toggleGroup = (group, value) => {
+    setUserFilters((prev) => ({
+      ...prev,
+      [group]: toggleArrayValue(prev[group], value),
+    }));
+  };
+
+  const clearUserFilters = () => {
+    setUserFilters({ roles: [], staff: [], status: [] });
+  };
 
   const handleBanConfirm = async (reason) => {
     if (!banTarget) return;
@@ -213,14 +346,43 @@ function UsersTab({ onNavigate }) {
     <>
       <SectionCard>
         <div className={styles.cardHeader}>
-          <h2 className={styles.cardTitle}>
-            All Users <span className={styles.count}>({filtered.length})</span>
-          </h2>
-          <SearchBar
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by name"
-          />
+          <h2 className={styles.cardTitle}>All Users</h2>
+          <div className={styles.headerControls}>
+            <div className={styles.filterGroupsWrap}>
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.roles}
+                selected={userFilters.roles}
+                onToggle={(value) => toggleGroup("roles", value)}
+              />
+              <span className={styles.pillDivider} />
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.staff}
+                selected={userFilters.staff}
+                onToggle={(value) => toggleGroup("staff", value)}
+              />
+              <span className={styles.pillDivider} />
+              <FilterToggleGroup
+                options={USER_FILTER_GROUPS.status}
+                selected={userFilters.status}
+                onToggle={(value) => toggleGroup("status", value)}
+              />
+              {hasActiveUserFilters && (
+                <button
+                  type="button"
+                  className={styles.clearFiltersBtn}
+                  onClick={clearUserFilters}
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+            <SearchBar
+              className={styles.searchCompact}
+              value={search}
+              onChange={setSearch}
+              placeholder="Search"
+            />
+          </div>
         </div>
 
         {error && <p className={styles.errorMsg}>{error}</p>}
@@ -230,71 +392,78 @@ function UsersTab({ onNavigate }) {
         ) : filtered.length === 0 ? (
           <EmptyState message="No users found." />
         ) : (
-          <motion.div
-            className={styles.table}
-            variants={stagger}
-            initial="initial"
-            animate="animate"
-          >
-            <div className={`${styles.tableRow} ${styles.tableHead}`}>
-              <span>User</span>
-              <span>Email</span>
-              <span>Role</span>
-              <span>Status</span>
-              <span>Actions</span>
-            </div>
-            <AnimatePresence>
-              {filtered.map((u) => (
-                <motion.div
-                  key={u.id}
-                  className={styles.tableRow}
-                  variants={rowAnim}
-                  layout
-                >
-                  <span className={styles.nameCell}>
-                    <button
-                      className={styles.nameBtn}
-                      onClick={() => onNavigate?.(`profile_${u.id}`)}
-                    >
-                      {u.first_name} {u.last_name}
-                      <span className={styles.username}>@{u.username}</span>
-                    </button>
-                  </span>
-                  <span className={styles.emailCell}>{u.email}</span>
-                  <span>
-                    <RoleBadge role={u.role} />
-                  </span>
-                  <span>
-                    <StatusBadge active={u.is_active} />
-                  </span>
-                  <span className={styles.actionsCell}>
-                    {!u.is_staff &&
-                      !u.is_superuser &&
-                      (u.is_active ? (
-                        <button
-                          className={styles.banBtn}
-                          disabled={busy}
-                          onClick={() => setBanTarget(u)}
-                        >
-                          Ban
-                        </button>
-                      ) : (
-                        <button
-                          className={styles.unbanBtn}
-                          disabled={busy}
-                          onClick={() => handleUnban(u)}
-                        >
-                          Unban
-                        </button>
-                      ))}
-                    {(u.is_staff || u.is_superuser) && (
-                      <span className={styles.staffBadge}>Staff</span>
-                    )}
-                  </span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+          <>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+            <motion.div
+              className={styles.table}
+              variants={stagger}
+              initial="initial"
+              animate="animate"
+            >
+              <div className={`${styles.tableRow} ${styles.tableHead}`}>
+                <span>User</span>
+                <span>Email</span>
+                <span>Role</span>
+                <span>Status</span>
+                <span>Actions</span>
+              </div>
+              <AnimatePresence>
+                {pageItems.map((u) => (
+                  <motion.div
+                    key={u.id}
+                    className={styles.tableRow}
+                    variants={rowAnim}
+                    layout
+                  >
+                    <span className={styles.nameCell}>
+                      <button
+                        className={styles.nameBtn}
+                        onClick={() => onNavigate?.(`profile_${u.id}`)}
+                      >
+                        {u.first_name} {u.last_name}
+                        <span className={styles.username}>@{u.username}</span>
+                      </button>
+                    </span>
+                    <span className={styles.emailCell}>{u.email}</span>
+                    <span>
+                      <RoleBadge role={u.role} />
+                    </span>
+                    <span>
+                      <StatusBadge active={u.is_active} />
+                    </span>
+                    <span className={styles.actionsCell}>
+                      {!u.is_staff &&
+                        !u.is_superuser &&
+                        (u.is_active ? (
+                          <button
+                            className={styles.banBtn}
+                            disabled={busy}
+                            onClick={() => setBanTarget(u)}
+                          >
+                            Ban
+                          </button>
+                        ) : (
+                          <button
+                            className={styles.unbanBtn}
+                            disabled={busy}
+                            onClick={() => handleUnban(u)}
+                          >
+                            Unban
+                          </button>
+                        ))}
+                      {(u.is_staff || u.is_superuser) && (
+                        <span className={styles.staffBadge}>Staff</span>
+                      )}
+                    </span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          </>
         )}
       </SectionCard>
 
@@ -316,6 +485,14 @@ function RatificationsTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
+
+  const navigateToSociety = (societyId) => {
+    window.dispatchEvent(
+      new CustomEvent("navigate", { detail: `societies_${societyId}` }),
+    );
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -360,55 +537,72 @@ function RatificationsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No societies are awaiting ratification." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((s) => (
-            <motion.div
-              key={s.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>{s.name}</span>
-                <span className={styles.listMeta}>
-                  {s.member_count ?? 0} members
-                  {s.description ? ` · ${s.description.slice(0, 80)}…` : ""}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === s.id}
-                  onClick={() => decide(s.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === s.id}
-                  onClick={() => decide(s.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((s) => (
+              <motion.div
+                key={s.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+                onClick={() => navigateToSociety(s.society_id ?? s.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>{s.name}</span>
+                  <span className={styles.listMeta}>
+                    {s.member_count ?? 0} members
+                    {s.description ? ` · ${s.description.slice(0, 80)}…` : ""}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === s.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(s.id, "approve");
+                    }}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === s.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(s.id, "reject");
+                    }}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
 }
 
-function TeacherRequestsTab() {
+function TeacherRequestsTab({ onNavigate }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -452,46 +646,61 @@ function TeacherRequestsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No pending teacher role requests." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((u) => (
-            <motion.div
-              key={u.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>
-                  {u.first_name} {u.last_name}
-                </span>
-                <span className={styles.listMeta}>
-                  @{u.username} · {u.email}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === u.id}
-                  onClick={() => decide(u.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === u.id}
-                  onClick={() => decide(u.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((u) => (
+              <motion.div
+                key={u.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+                onClick={() => onNavigate?.(`profile_${u.id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>
+                    {u.first_name} {u.last_name}
+                  </span>
+                  <span className={styles.listMeta}>
+                    @{u.username} · {u.email}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === u.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(u.id, "approve");
+                    }}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === u.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(u.id, "reject");
+                    }}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
@@ -502,6 +711,8 @@ function ReportedSocietiesTab() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(reports);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -573,63 +784,72 @@ function ReportedSocietiesTab() {
       ) : reports.length === 0 ? (
         <EmptyState message="No reported societies — all clear! 🎉" />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {reports.map((r) => (
-            <motion.div
-              key={r.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-              onClick={() => navigateToSociety(r.society_id)}
-              style={{ cursor: "pointer" }}
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>{r.society_name}</span>
-                <span className={styles.listMeta}>
-                  Reported by <strong>@{r.reporter_username}</strong>
-                  {r.reason ? ` · "${r.reason}"` : ""}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.banBtn}
-                  disabled={busy === r.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    ban(r.id);
-                  }}
-                >
-                  Ban
-                </button>
-                <button
-                  className={styles.dismissBtn}
-                  disabled={busy === r.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dismiss(r.id);
-                  }}
-                >
-                  Dismiss
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((r) => (
+              <motion.div
+                key={r.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+                onClick={() => navigateToSociety(r.society_id)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>{r.society_name}</span>
+                  <span className={styles.listMeta}>
+                    Reported by <strong>@{r.reporter_username}</strong>
+                    {r.reason ? ` · "${r.reason}"` : ""}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.banBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      ban(r.id);
+                    }}
+                  >
+                    Ban
+                  </button>
+                  <button
+                    className={styles.dismissBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dismiss(r.id);
+                    }}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
 }
 
-function CourseChangeRequestsTab() {
+function CourseChangeRequestsTab({ onNavigate }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const { currentPage, setCurrentPage, totalPages, pageItems } =
+    usePaginatedItems(items);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -673,67 +893,83 @@ function CourseChangeRequestsTab() {
       ) : items.length === 0 ? (
         <EmptyState message="No pending course change requests." />
       ) : (
-        <motion.div
-          className={styles.list}
-          variants={stagger}
-          initial="initial"
-          animate="animate"
-        >
-          {items.map((r) => (
-            <motion.div
-              key={r.id}
-              className={styles.listRow}
-              variants={rowAnim}
-              layout
-            >
-              <div className={styles.listInfo}>
-                <span className={styles.listName}>
-                  {r.first_name} {r.last_name}
-                </span>
-                <span className={styles.listMeta}>
-                  @{r.username} · {r.email}
-                </span>
-                <span className={styles.listMeta}>
-                  {r.current_course
-                    ? `${r.current_course} → ${r.requested_course}`
-                    : `Requesting: ${r.requested_course}`}
-                </span>
-              </div>
-              <div className={styles.listActions}>
-                <button
-                  className={styles.approveBtn}
-                  disabled={busy === r.id}
-                  onClick={() => decide(r.id, "approve")}
-                >
-                  ✓ Approve
-                </button>
-                <button
-                  className={styles.rejectBtn}
-                  disabled={busy === r.id}
-                  onClick={() => decide(r.id, "reject")}
-                >
-                  ✗ Reject
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          <motion.div
+            className={styles.list}
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+          >
+            {pageItems.map((r) => (
+              <motion.div
+                key={r.id}
+                className={styles.listRow}
+                variants={rowAnim}
+                layout
+                onClick={() => {
+                  if (r.user_id) onNavigate?.(`profile_${r.user_id}`);
+                }}
+                style={{ cursor: r.user_id ? "pointer" : "default" }}
+              >
+                <div className={styles.listInfo}>
+                  <span className={styles.listName}>
+                    {r.first_name} {r.last_name}
+                  </span>
+                  <span className={styles.listMeta}>
+                    @{r.username} · {r.email}
+                  </span>
+                  <span className={styles.listMeta}>
+                    {r.current_course
+                      ? `${r.current_course} → ${r.requested_course}`
+                      : `Requesting: ${r.requested_course}`}
+                  </span>
+                </div>
+                <div className={styles.listActions}>
+                  <button
+                    className={styles.approveBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(r.id, "approve");
+                    }}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className={styles.rejectBtn}
+                    disabled={busy === r.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decide(r.id, "reject");
+                    }}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
     </SectionCard>
   );
 }
 
-function AdminPage({ onNavChange }) {
+function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
 
   return (
-    <div className={styles.page}>
-      <motion.div className={styles.header} {...fadeUp}>
-        <h1 className={styles.title}>Admin Dashboard</h1>
-        <p className={styles.subtitle}>
-          Manage users, societies and platform requests
-        </p>
-      </motion.div>
+    <AppPage
+      title="Admin Dashboard"
+      subtitle="Manage users, societies and platform requests"
+      onBack={onBack}
+      width="xl"
+    >
 
       <motion.div
         className={styles.tabBar}
@@ -761,12 +997,16 @@ function AdminPage({ onNavChange }) {
         <motion.div key={activeTab} {...fadeUp} className={styles.tabContent}>
           {activeTab === "users" && <UsersTab onNavigate={onNavChange} />}
           {activeTab === "ratifications" && <RatificationsTab />}
-          {activeTab === "teachers" && <TeacherRequestsTab />}
+          {activeTab === "teachers" && (
+            <TeacherRequestsTab onNavigate={onNavChange} />
+          )}
           {activeTab === "reports" && <ReportedSocietiesTab />}
-          {activeTab === "course-changes" && <CourseChangeRequestsTab />}
+          {activeTab === "course-changes" && (
+            <CourseChangeRequestsTab onNavigate={onNavChange} />
+          )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </AppPage>
   );
 }
 

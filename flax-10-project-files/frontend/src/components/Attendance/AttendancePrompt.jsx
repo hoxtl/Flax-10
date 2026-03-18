@@ -1,51 +1,28 @@
-import { useState, useEffect, useCallback } from "react";
-import { getEvents } from "../../api/eventApi";
-import { recordAttendance } from "../../api/attendanceApi";
-import { getPromptedIds, setPromptedId } from "./attendancePromptStorage";
-import { getDateRangeForPrompt, findCandidateEvent } from "./attendancePromptUtils";
-import AttendancePromptModal from "./AttendancePromptModal.jsx";
+import { useState } from 'react';
+import { recordAttendance } from '../../api/attendanceApi';
+import { setPromptedId } from './attendancePromptStorage';
+import { useCandidateEvent } from './hooks/useCandidateEvent';
+import AttendancePromptModal from './AttendancePromptModal.jsx';
 
-const CHECK_INTERVAL_MS = 60 * 1000;
-
-function useCandidateEvent() {
-  const [event, setEvent] = useState(null);
-
-  const checkForPrompt = useCallback(async () => {
-    const prompted = getPromptedIds();
-    const { start, end } = getDateRangeForPrompt();
-    try {
-      const events = await getEvents({ start, end });
-      const candidate = findCandidateEvent(events, prompted);
-      if (candidate) setEvent(candidate);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  useEffect(() => {
-    checkForPrompt();
-    const id = setInterval(checkForPrompt, CHECK_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [checkForPrompt]);
-
-  return [event, setEvent];
-}
+const submitAnswer = async (event, attended, setEvent, setSubmitting) => {
+  setSubmitting(true);
+  try {
+    await recordAttendance(event.id, attended);
+  } catch {
+    // still mark as prompted so we don't re-prompt
+  }
+  setPromptedId(event.id);
+  setEvent(null);
+  setSubmitting(false);
+};
 
 export default function AttendancePrompt() {
   const [event, setEvent] = useCandidateEvent();
   const [submitting, setSubmitting] = useState(false);
 
-  const handleAnswer = async (attended) => {
+  const handleAnswer = (attended) => {
     if (!event || submitting) return;
-    setSubmitting(true);
-    try {
-      await recordAttendance(event.id, attended);
-    } catch {
-      // still mark as prompted
-    }
-    setPromptedId(event.id);
-    setEvent(null);
-    setSubmitting(false);
+    submitAnswer(event, attended, setEvent, setSubmitting);
   };
 
   const handleDismiss = () => {
@@ -54,7 +31,6 @@ export default function AttendancePrompt() {
   };
 
   if (!event) return null;
-
   return (
     <AttendancePromptModal
       event={event}

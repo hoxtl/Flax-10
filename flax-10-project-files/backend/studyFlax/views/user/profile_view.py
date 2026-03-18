@@ -1,15 +1,18 @@
+"""
+Views for retrieving and updating user profile data.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.serialisers.auth_serialisers import UserSerialiser
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.modules.enrollmentModel import Enrollment
-from studyFlax.models.modules.moduleModel import Module
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.modules.enrollment_model import Enrollment
+from studyFlax.models.modules.module_model import Module
 from studyFlax.models import User
 from datetime import timedelta
 from django.utils import timezone
-
 
 def get_module_data(user):
     taught_modules = Module.objects.filter(created_by=user).only('module_code')
@@ -25,7 +28,6 @@ def get_module_data(user):
     module_codes = sorted([e.module.module_code for e in enrollments])
     return module_codes, len(module_codes)
 
-
 def get_event_counts(user):
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -38,7 +40,6 @@ def get_event_counts(user):
         'events_month': all_events.filter(start_time__gte=now, start_time__lt=today_start + timedelta(days=30)).count(),
     }
 
-
 def build_profile_response(user, request):
     module_codes, module_count = get_module_data(user)
     event_counts = get_event_counts(user)
@@ -49,7 +50,6 @@ def build_profile_response(user, request):
     user_data['modules'] = module_codes
     return user_data
 
-
 def update_username(user, data):
     new_username = data.get('username')
     if not new_username or new_username == user.username:
@@ -58,7 +58,6 @@ def update_username(user, data):
         return Response({'error': 'Username already taken'}, status=status.HTTP_400_BAD_REQUEST)
     user.username = new_username
     return None
-
 
 def update_photo(user, data, files):
     if 'profile_photo' in files:
@@ -79,7 +78,6 @@ def apply_profile_patch(user, data, files):
     user.save()
     return None
 
-
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def profile_view(request):
@@ -89,7 +87,6 @@ def profile_view(request):
     if error:
         return error
     return Response(build_profile_response(request.user, request))
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

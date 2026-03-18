@@ -1,9 +1,32 @@
-.container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 16px 14px;
-  position: relative;
+.successBanner {
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  animation: slide-down 0.3s ease-out;
 }
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pageWrapper {
+  min-height: 100%;
+}
+
+
 
 .header {
   display: flex;
@@ -59,8 +82,15 @@
 }
 
 @keyframes panel-entrance {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Sidebar */
@@ -75,7 +105,7 @@
   position: sticky;
   top: 12px;
   box-shadow: 0 10px 30px color-mix(in srgb, var(--primary) 8%, transparent),
-              0 1px 3px color-mix(in srgb, var(--primary) 6%, transparent);
+    0 1px 3px color-mix(in srgb, var(--primary) 6%, transparent);
   animation: rise-in 0.42s ease-out;
 }
 
@@ -84,6 +114,7 @@
     transform: translateY(4px);
     opacity: 0.9;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -151,12 +182,10 @@
   inset-inline: 10px 10px;
   bottom: -4px;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    color-mix(in srgb, var(--primary) 40%, transparent),
-    transparent
-  );
+  background: linear-gradient(to right,
+      transparent,
+      color-mix(in srgb, var(--primary) 40%, transparent),
+      transparent);
   opacity: 0.75;
 }
 
@@ -209,14 +238,103 @@
     0 0 0 1px color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
-.navItemActive:hover {
-  background: color-mix(in srgb, var(--primary) 15%, transparent);
+/* Dual-preview Theme Grid */
+.groupLabel {
+  font-size: 10px;
+  font-weight: 700;
   color: var(--primary);
-  box-shadow: inset 3px 0 0 var(--primary);
+  margin-bottom: 5px;
+  margin-top: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font-heading);
+}
+
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.themeCard {
+  background: var(--panel);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 10px 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.themeCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.themeCard.active {
+  border-color: var(--primary);
+  background: var(--hover-light);
+}
+
+.themeName {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: block;
+  font-family: var(--font-body);
+}
+
+.themePreviewContainer {
+  display: flex;
+  gap: 6px;
+}
+
+.themePreview {
+  flex: 1;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.swatchTitle {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.swatchGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.swatch {
+  height: 12px;
+  border-radius: 4px;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.section {
+  margin-bottom: 24px;
 }
 
 .navItemActive .navIcon {
-  transform: none; /* don't scale on active — accent bar is the indicator */
+  transform: none;
+  /* don't scale on active — accent bar is the indicator */
   opacity: 1;
 }
 
@@ -227,8 +345,7 @@
   opacity: 0.85;
   color: color-mix(in srgb, var(--primary) 54%, var(--muted));
   filter:
-    drop-shadow(0 1px 0 color-mix(in srgb, var(--text) 22%, transparent))
-    drop-shadow(0 -1px 0 color-mix(in srgb, var(--surface) 40%, transparent));
+    drop-shadow(0 1px 0 color-mix(in srgb, var(--text) 22%, transparent)) drop-shadow(0 -1px 0 color-mix(in srgb, var(--surface) 40%, transparent));
   transition: transform 0.14s ease, opacity 0.14s, color 0.14s ease, filter 0.14s ease;
 }
 
@@ -252,7 +369,7 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: 0 10px 30px color-mix(in srgb, var(--panelAccent) 10%, transparent),
-              0 1px 3px color-mix(in srgb, var(--panelAccent) 4%, transparent);
+    0 1px 3px color-mix(in srgb, var(--panelAccent) 4%, transparent);
   position: relative;
 }
 
@@ -310,21 +427,27 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    color-mix(in srgb, var(--panelAccent) 14%, transparent) 58%,
-    transparent 78%
-  );
+  background: linear-gradient(120deg,
+      transparent 30%,
+      color-mix(in srgb, var(--panelAccent) 14%, transparent) 58%,
+      transparent 78%);
   opacity: 0.75;
   transform: translateX(-110%);
   animation: sweep 6s ease-in-out infinite;
 }
 
 @keyframes sweep {
-  0% { transform: translateX(-110%); }
-  40% { transform: translateX(110%); }
-  100% { transform: translateX(110%); }
+  0% {
+    transform: translateX(-110%);
+  }
+
+  40% {
+    transform: translateX(110%);
+  }
+
+  100% {
+    transform: translateX(110%);
+  }
 }
 
 .panelHeaderIcon {
@@ -359,7 +482,7 @@
 
 .panelHeaderDesc {
   font-size: 11px;
-  color: color-mix(in srgb, var(--muted) 84%, transparent);
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
   margin: 2px 0 0;
 }
 
@@ -371,8 +494,15 @@
 }
 
 @keyframes panelFloatIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form {
@@ -389,6 +519,23 @@
   margin-bottom: 8px;
 }
 
+/* Dark-mode tweaks: deepen panels/tiles and brighten text for contrast */
+:global(:root[data-mode="dark"]) .panel {
+  background:
+    linear-gradient(175deg,
+      color-mix(in srgb, var(--surface-inner) 70%, var(--surface) 30%),
+      color-mix(in srgb, var(--surface) 85%, #000000 15%));
+  border-color: color-mix(in srgb, var(--panelAccent) 30%, var(--border));
+}
+
+:global(:root[data-mode="dark"]) .settingsTile {
+  background:
+    linear-gradient(170deg,
+      color-mix(in srgb, var(--surface-inner) 78%, var(--surface) 22%),
+      color-mix(in srgb, var(--surface-inner) 68%, #000000 32%));
+  border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
+}
+
 /* Section within a panel */
 .formSection {
   padding-bottom: 8px;
@@ -397,8 +544,15 @@
 }
 
 @keyframes bounceIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
 }
 
 .formSection:last-of-type {
@@ -447,6 +601,22 @@
   margin-bottom: 5px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Boost text contrast in dark mode so labels/descriptions don't blend into brown */
+:global(:root[data-mode="dark"]) .sectionTitle,
+:global(:root[data-mode="dark"]) .panelHeaderTitle,
+:global(:root[data-mode="dark"]) .groupLabel {
+  color: #ffffff;
+}
+
+:global(:root[data-mode="dark"]) .formDescription,
+:global(:root[data-mode="dark"]) .panelHeaderDesc {
+  color: color-mix(in srgb, var(--text) 95%, transparent);
+}
+
+:global(:root[data-mode="dark"]) .formGroup label {
+  color: color-mix(in srgb, var(--text) 92%, var(--primary) 8%);
 }
 
 .requiredAsterisk {
@@ -520,9 +690,15 @@
 }
 
 @keyframes savePulse {
+
   0%,
-  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 0%, transparent); }
-  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--warning) 18%, transparent); }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 0%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--warning) 18%, transparent);
+  }
 }
 
 .btnPrimarySaved {
@@ -649,8 +825,8 @@
   border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
   border-radius: calc(var(--radius-lg) - 4px);
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--primary) 8%, transparent),
-    color-mix(in srgb, var(--primary) 3%, transparent));
+      color-mix(in srgb, var(--primary) 8%, transparent),
+      color-mix(in srgb, var(--primary) 3%, transparent));
   padding: 14px 16px 26px;
   box-sizing: border-box;
   position: relative;
@@ -683,13 +859,19 @@
   right: 0;
   height: 10px;
   background: linear-gradient(90deg,
-    #f59e0b 0%,    /* warm amber  — very short sleep */
-    #eab308 20%,   /* yellow      — still short */
-    #16a34a 50%,   /* forest green — ideal ~7-8h */
-    #15803d 62%,   /* deep green  — peak */
-    #6d28d9 82%,   /* violet      — oversleeping */
-    #7c3aed 100%   /* soft purple — too much */
-  );
+      #f59e0b 0%,
+      /* warm amber  — very short sleep */
+      #eab308 20%,
+      /* yellow      — still short */
+      #16a34a 50%,
+      /* forest green — ideal ~7-8h */
+      #15803d 62%,
+      /* deep green  — peak */
+      #6d28d9 82%,
+      /* violet      — oversleeping */
+      #7c3aed 100%
+      /* soft purple — too much */
+    );
 }
 
 /* Dot indicator showing current position on the scale */
@@ -715,6 +897,15 @@
   letter-spacing: -0.02em;
 }
 
+.sleepDurationMainIdeal {
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--success-text, #16a34a);
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
 .sleepDurationMeta {
   font-size: 0.78rem;
   color: var(--muted);
@@ -730,12 +921,22 @@
 }
 
 .lockedCourse {
-  padding: 9px 12px;
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--border);
-  background: color-mix(in srgb, var(--muted) 5%, transparent);
-  color: var(--muted);
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px dashed var(--border);
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  /* Match text-input background so the pill blends with other fields */
+  background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+  color: var(--text);
   font-size: 13px;
+  font-style: italic;
+}
+
+.lockedCourse em {
   font-style: italic;
 }
 
@@ -846,8 +1047,15 @@
   padding: 0;
   transition: color 0.15s;
 }
-.cancelRequestBtn:hover { color: #b91c1c; }
-.cancelRequestBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.cancelRequestBtn:hover {
+  color: #b91c1c;
+}
+
+.cancelRequestBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 /* ── Academic tab redesign ─────────────────────────────────── */
 .academicSection {
@@ -1015,8 +1223,22 @@
   color: color-mix(in srgb, var(--primary) 70%, var(--muted));
   font-weight: 500;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 5px;
+  line-height: 1.5;
+}
+
+/* Dark-mode: make context copy clearly readable */
+:global(:root[data-mode="dark"]) .contextCardTitle {
+  color: #ffffff;
+}
+
+:global(:root[data-mode="dark"]) .contextCardBody {
+  color: color-mix(in srgb, var(--text) 95%, transparent);
+}
+
+:global(:root[data-mode="dark"]) .contextCardList li {
+  color: color-mix(in srgb, var(--text) 90%, var(--primary) 10%);
 }
 
 .contextCardList li::before {
@@ -1025,6 +1247,7 @@
   font-weight: 700;
   font-size: 10px;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .statusTag {
@@ -1068,8 +1291,15 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modalBlurBackdrop {
@@ -1081,11 +1311,9 @@
 /* Light-theme polish: increase contrast and warmth so it matches dark-mode quality */
 :global(:root:not([data-theme="dark"])) .sidebar {
   background:
-    linear-gradient(
-      165deg,
+    linear-gradient(165deg,
       color-mix(in srgb, var(--surface-raised) 94%, var(--primary) 6%),
-      color-mix(in srgb, var(--panel) 92%, var(--surface-warm) 8%)
-    );
+      color-mix(in srgb, var(--panel) 92%, var(--surface-warm) 8%));
   border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
   box-shadow:
     0 12px 30px color-mix(in srgb, var(--primary) 12%, transparent),
@@ -1113,11 +1341,9 @@
 
 :global(:root:not([data-theme="dark"])) .panel {
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       color-mix(in srgb, var(--panel) 96%, var(--surface-warm) 4%),
-      color-mix(in srgb, var(--panel) 98%, var(--surface-page) 2%)
-    );
+      color-mix(in srgb, var(--panel) 98%, var(--surface-page) 2%));
   border-color: color-mix(in srgb, var(--panelAccent) 22%, var(--border));
   box-shadow:
     0 14px 36px color-mix(in srgb, var(--panelAccent) 12%, transparent),
@@ -1135,21 +1361,17 @@
 
 :global(:root:not([data-theme="dark"])) .settingsTile {
   background:
-    linear-gradient(
-      165deg,
+    linear-gradient(165deg,
       color-mix(in srgb, var(--surface-raised) 95%, var(--primary) 5%),
-      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%)
-    );
+      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%));
   border-color: color-mix(in srgb, var(--primary) 14%, var(--border));
 }
 
 :global(:root:not([data-theme="dark"])) .contextCard {
   background:
-    linear-gradient(
-      165deg,
+    linear-gradient(165deg,
       color-mix(in srgb, var(--surface-raised) 92%, var(--primary) 8%),
-      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%)
-    );
+      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%));
   border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
 }
 
@@ -1169,17 +1391,79 @@
 }
 
 @media (max-width: 680px) {
-  .container { padding: 14px 12px; }
-  .content { grid-template-columns: 1fr; }
-  .contentMain { gap: 8px; }
-  .sidebar { position: static; }
-  .sidebarNav { flex-direction: row; flex-wrap: wrap; gap: 4px; }
-  .sidebarSectionLabel { display: none; }
-  .navItem { flex: 1; min-width: calc(50% - 4px); justify-content: center; font-size: 11.5px; padding: 8px 8px; }
-  .panelBody { padding: 18px 16px; }
-  .formRow { grid-template-columns: 1fr; gap: 0; }
-  .formActions { justify-content: stretch; }
-  .btnPrimary { width: 100%; text-align: center; }
-  .themeSelector { grid-template-columns: 1fr 1fr; }
-  .twoColLayout { grid-template-columns: 1fr; }
+  .container {
+    padding: 14px 12px;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  .contentMain {
+    gap: 8px;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .sidebarNav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .sidebarSectionLabel {
+    display: none;
+  }
+
+  .navItem {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    justify-content: center;
+    font-size: 11.5px;
+    padding: 8px 8px;
+  }
+
+  .panelBody {
+    padding: 18px 16px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .formActions {
+    justify-content: stretch;
+  }
+
+  .btnPrimary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .themeSelector {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .twoColLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.preferencesContent {
+  animation: tab-fade-in 0.3s ease-out;
+}
+
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

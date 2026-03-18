@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'Flax10.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_DB", "postgres"),
+        "NAME": os.environ.get("POSTGRES_DB", "b"),
         "USER": os.environ.get("POSTGRES_USER", "postgres"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "1234"),
         "HOST": os.environ.get("POSTGRES_HOST", "localhost"),

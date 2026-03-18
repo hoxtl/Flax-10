@@ -51,7 +51,7 @@ export default function SecurityForm({ onSave, isSaving, error }) {
         <div className={styles.contextCard}>
           <span className={styles.contextCardEmoji}>🔐</span>
           <h3 className={styles.contextCardTitle}>Password tips</h3>
-<ul className={styles.contextCardList}>
+          <ul className={styles.contextCardList}>
             <li>Use a unique passphrase with mixed characters</li>
             <li>Avoid birthdays, names, and common words</li>
             <li>Update it after suspicious activity</li>

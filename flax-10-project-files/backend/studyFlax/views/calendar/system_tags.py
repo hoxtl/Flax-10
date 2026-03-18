@@ -1,3 +1,7 @@
+"""
+Helpers for managing and retrieving system-level calendar tags.
+"""
+
 from studyFlax.models import Tag, CalendarEvent
 
 SYSTEM_TAG_CONFIG = {
@@ -8,13 +12,11 @@ SYSTEM_TAG_CONFIG = {
     'Schedule': {'color': '#F59E0B', 'duration': 60, 'icon': '🗓️'},
 }
 
-
 def get_system_tag(name):
     config = SYSTEM_TAG_CONFIG.get(name)
     if not config:
         return None
     return find_or_create_system_tag(name, config)
-
 
 def find_or_create_system_tag(name, config):
     tag = Tag.objects.filter(name=name, is_default=True).first()
@@ -22,13 +24,11 @@ def find_or_create_system_tag(name, config):
         return update_existing_system_tag(tag, config)
     return ensure_system_tag(name, config)
 
-
 def update_existing_system_tag(tag, config):
     changed = update_tag_fields(tag, config)
     if changed:
         tag.save()
     return tag
-
 
 def ensure_system_tag(name, config):
     existing_tags = list(Tag.objects.filter(name=name))
@@ -36,13 +36,11 @@ def ensure_system_tag(name, config):
         return create_system_tag(name, config)
     return consolidate_tags(existing_tags, config)
 
-
 def consolidate_tags(existing_tags, config):
     primary = existing_tags[0]
     merge_duplicate_tags(primary, existing_tags[1:])
     make_tag_system(primary, config)
     return primary
-
 
 def create_system_tag(name, config):
     return Tag.objects.create(
@@ -51,18 +49,15 @@ def create_system_tag(name, config):
         icon=config.get('icon', '🏷️')
     )
 
-
 def merge_duplicate_tags(primary, duplicates):
     for dup in duplicates:
         CalendarEvent.objects.filter(tag=dup).update(tag=primary)
         dup.delete()
 
-
 def make_tag_system(tag, config):
     changed = update_tag_fields(tag, config)
     if changed:
         tag.save()
-
 
 def update_tag_fields(tag, config):
     changed = False
@@ -74,18 +69,14 @@ def update_tag_fields(tag, config):
         tag.icon, changed = config.get('icon', '🏷️'), True
     return changed
 
-
 def get_lecture_tag():
     return get_system_tag('Lecture')
-
 
 def get_deadline_tag():
     return get_system_tag('Deadline')
 
-
 def get_exam_tag():
     return get_system_tag('Exam')
-
 
 def get_societies_tag():
     return get_system_tag('Societies')
@@ -100,12 +91,10 @@ def fix_untagged_deadline_events():
     fix_deadline_events(deadline_tag)
     fix_exam_events(exam_tag)
 
-
 def fix_deadline_events(deadline_tag):
     CalendarEvent.objects.filter(
         source='module_deadline', tag__isnull=True
     ).exclude(title__istartswith='Exam:').update(tag=deadline_tag)
-
 
 def fix_exam_events(exam_tag):
     CalendarEvent.objects.filter(

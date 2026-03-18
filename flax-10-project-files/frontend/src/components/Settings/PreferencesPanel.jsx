@@ -4,10 +4,10 @@
  */
 import { useState, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
-import { SectionHeader, SubmitButton, ThemeSelector } from "./SettingsUI";
-import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
-import DateTimePicker from "../../pages/Tasks/components/DateTimePicker";
 import { getUserSettings } from "../../api/userService";
+import DateTimePicker from "../../pages/Tasks/components/DateTimePicker";
+import { SectionHeader, SubmitButton, ThemeSelector, ThemeGridSelector } from "./SettingsUI";
+import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 
 function sleepDuration(sleepTime, wakeTime) {
@@ -47,7 +47,7 @@ function SleepCard({ totalMins, duration }) {
   );
 }
 
-function AppearanceSection({ theme, onChange }) {
+function AppearanceSection({ theme, onChange, isSaving }) {
   return (
     <div className={styles.twoColLayout}>
       <div>
@@ -56,17 +56,27 @@ function AppearanceSection({ theme, onChange }) {
             title="Appearance"
           />
           <div className={styles.formGroup}>
-            <ThemeSelector value={theme} onChange={onChange} />
+            <label>Interface Mode</label>
+            <ThemeSelector value={theme.mode} onChange={(m) => onChange({ ...theme, mode: m })} />
           </div>
+          <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+            <ThemeGridSelector value={theme.theme} onChange={(t) => onChange({ ...theme, theme: t })} />
+          </div>
+          <SubmitButton
+            isSaving={isSaving}
+            label="Save Appearance"
+            savingLabel="Saving..."
+          />
         </div>
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>🎨</span>
-        <h3 className={styles.contextCardTitle}>Theme preferences</h3>
+        <h3 className={styles.contextCardTitle}>Picking a theme</h3>
+        <p className={styles.contextCardBody}>Choose a palette that suits your study style:</p>
         <ul className={styles.contextCardList}>
-          <li>Consistent look across every page</li>
-          <li>Lower eye strain during long sessions</li>
-          <li>Personalised experience on login</li>
+          <li>🔥 Warm — cosy, earthy tones for long sessions</li>
+          <li>❄️ Cool — clean blues and greens for focus</li>
+          <li>🌸 Soft — gentle pastels, easy at night</li>
         </ul>
       </div>
     </div>
@@ -96,6 +106,7 @@ function SleepSection({
           <form onSubmit={onSubmit}>
             <SectionHeader
               title="Sleep Schedule"
+              description="We'll warn you if you try to add tasks during your sleep window."
             />
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
@@ -342,9 +353,10 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStud
       .finally(() => setLoading(false));
   }, []);
 
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    onSave({ theme: newTheme });
+  const handlePreferencesSubmit = (newData) => {
+    if (newData.mode) setMode(newData.mode);
+    if (newData.theme) setTheme(newData.theme);
+    onSave(newData);
   };
 
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;

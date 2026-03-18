@@ -31,7 +31,13 @@ function useTagModal() {
 
   const confirmDelete = async (id) => {
     const tag = tags.find(t => t.id === id);
-    const yes = await confirmFn({ title: "Delete Tag", message: `Are you sure you want to delete "${tag?.label}"?`, confirmText: "Delete", cancelText: "Cancel" });
+    const yes = await confirmFn({ 
+      title: "Delete Tag", 
+      message: `Are you sure you want to delete "${tag?.label}"?`, 
+      confirmText: "Delete", 
+      cancelText: "Cancel",
+      isDanger: true
+    });
     if (yes) deleteTag(id);
   };
 
@@ -45,7 +51,8 @@ async function checkDuplicate(data, tags, editingId, confirmFn, updateTag, reset
       title: "Duplicate Tag Name",
       message: "A tag with this name already exists. What would you like to do?",
       confirmText: "Replace Existing",
-      cancelText: "Cancel"
+      cancelText: "Cancel",
+      isDanger: true
     });
     if (doReplace) {
       updateTag(existing.id, data);

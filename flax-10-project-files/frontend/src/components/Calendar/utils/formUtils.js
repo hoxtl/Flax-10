@@ -1,6 +1,7 @@
 import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
+import { geocodeAddress } from '../../../api/userService';
 
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
@@ -56,13 +57,16 @@ function getDefaultForm(options) {
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
     const error = validateForm(form);
-    if (error) return setError(error);
+    if (error) {
+        setError(error);
+        return false;
+    }
 
-    const data = buildEventData(form);
+    const data = await buildEventData(form);
     const others = allEvents.filter(ev => ev.id !== (event?.id));
-    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return;
+    if (!forceSave && !(await checkOverlapWithConfirm({ ...data, id: event?.id }, others, confirmFn))) return false;
 
-    await submitEvent(event, data, actions, onClose, setError, confirmFn);
+    return await submitEvent(event, data, actions, onClose, setError, confirmFn);
 }
 
 function validateForm(form) {
@@ -74,8 +78,10 @@ async function submitEvent(event, data, actions, onClose, setError, confirmFn) {
     try {
         await saveEvent(event, data, actions, confirmFn);
         onClose();
+        return true;
     } catch (err) {
         setError(err.message);
+        return false;
     }
 }
 
@@ -128,8 +134,20 @@ export function isRecurringEvent(event) {
     return hasRecurrence(event);
 }
 
-function buildEventData(form) {
+async function buildEventData(form) {
     const data = buildBaseEventData(form);
+
+    if (form.location && form.location.trim()) {
+        const coords = await geocodeAddress(form.location);
+        if (coords) {
+            data.location_latitude = coords.latitude;
+            data.location_longitude = coords.longitude;
+            data.location_validated = true;
+        } else {
+            data.location_validated = false;
+        }
+    }
+
     const { frequency, interval, end_date } = form.recurrence || {};
     if (frequency && frequency !== 'none') {
         data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };

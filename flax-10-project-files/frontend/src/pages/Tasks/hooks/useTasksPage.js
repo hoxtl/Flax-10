@@ -39,6 +39,17 @@ function useTasksPageEffects(state, searchParams) {
     next.delete("due");
     state.setSearchParams(next, { replace: true });
   }, [openParam, searchParams, state]);
+
+  const filterParam = searchParams.get("filter");
+  useEffect(() => {
+    if (filterParam) {
+      state.setActiveFilter(filterParam);
+      // Clean up param so it doesn't stick around if user navigates away and back manually
+      const next = new URLSearchParams(searchParams);
+      next.delete("filter");
+      state.setSearchParams(next, { replace: true });
+    }
+  }, [filterParam, searchParams, state]);
 }
 
 export default function useTasksPage() {

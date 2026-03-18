@@ -40,21 +40,12 @@ vi.mock('../../../../components/common/AnimatedDropdown', () => ({
 
 describe('CalendarHeaderUtils', () => {
     describe('CalendarNav', () => {
-        it('renders prev, next, Today when showToday, date picker, and title', () => {
-            const onPrev = vi.fn();
-            const onNext = vi.fn();
-            const onToday = vi.fn();
-            const onDatePick = vi.fn();
-            const selectedDate = new Date(2026, 0, 15);
+        it('renders elements when showToday is true', () => {
             render(
                 <CalendarNav
-                    onPrev={onPrev}
-                    onNext={onNext}
-                    onToday={onToday}
-                    showToday={true}
-                    selectedDate={selectedDate}
-                    onDatePick={onDatePick}
-                    title="February 2026"
+                    onPrev={vi.fn()} onNext={vi.fn()} onToday={vi.fn()}
+                    showToday={true} selectedDate={new Date(2026, 0, 15)}
+                    onDatePick={vi.fn()} title="February 2026"
                 />
             );
             expect(screen.getByTestId('chevron-left')).toBeInTheDocument();
@@ -62,7 +53,18 @@ describe('CalendarHeaderUtils', () => {
             expect(screen.getByText('Today')).toBeInTheDocument();
             expect(screen.getByTestId('date-picker')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'February 2026' })).toBeInTheDocument();
+        });
 
+        it('nav buttons fire correct callbacks', () => {
+            const onPrev = vi.fn();
+            const onNext = vi.fn();
+            const onToday = vi.fn();
+            const onDatePick = vi.fn();
+            const selectedDate = new Date(2026, 0, 15);
+            render(
+                <CalendarNav onPrev={onPrev} onNext={onNext} onToday={onToday}
+                    showToday={true} selectedDate={selectedDate} onDatePick={onDatePick} />
+            );
             fireEvent.click(screen.getByText('Today'));
             expect(onToday).toHaveBeenCalled();
             fireEvent.click(screen.getByTestId('chevron-left'));

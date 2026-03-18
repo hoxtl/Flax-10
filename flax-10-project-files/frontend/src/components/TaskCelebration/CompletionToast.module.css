@@ -111,9 +111,9 @@
   inset: 0;
   background-image: radial-gradient(circle at 20% 30%, var(--sage) 0%, transparent 8%),
     radial-gradient(circle at 80% 70%, var(--sage) 0%, transparent 8%),
-    radial-gradient(circle at 50% 50%, #c4a35a 0%, transparent 12%),
+    radial-gradient(circle at 50% 50%, var(--color-highlight) 0%, transparent 12%),
     radial-gradient(circle at 70% 20%, var(--sage) 0%, transparent 6%),
-    radial-gradient(circle at 30% 80%, #c4a35a 0%, transparent 6%);
+    radial-gradient(circle at 30% 80%, var(--color-highlight) 0%, transparent 6%);
   background-size: 200% 200%;
   opacity: 0.4;
   animation: confettiPulse 2s ease-in-out;

@@ -97,19 +97,18 @@ function SlotRow({ slot, onClick }) {
     );
 }
 
+import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
+
 function SuggestionModal({ slot, onCancel, onConfirm }) {
     if (!slot) return null;
     return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-                <h4>Suggest {slot.label}?</h4>
-                <p>This will notify all members and allow them to vote.</p>
-                <div className={styles.modalButtons}>
-                    <button onClick={onCancel} className={styles.cancelBtn}>Cancel</button>
-                    <button onClick={() => onConfirm(slot)} className={styles.confirmBtn}>Suggest Time</button>
-                </div>
-            </div>
-        </div>
+        <ConfirmModal
+            title={`Suggest ${slot.label}?`}
+            message="This will notify all members and allow them to vote."
+            onConfirm={() => onConfirm(slot)}
+            onCancel={onCancel}
+            confirmText="Suggest Time"
+        />
     );
 }
 

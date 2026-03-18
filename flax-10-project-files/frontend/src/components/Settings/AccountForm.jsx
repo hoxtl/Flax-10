@@ -3,7 +3,7 @@
  * Teacher role management has moved to the Academic tab.
  */
 import { useState, useEffect } from "react";
-import { getUserProfile } from "../../api/userService";
+import { useAuth } from "../../context/AuthContext";
 import { getMyCourseChangeRequest, requestCourseChange, cancelCourseChangeRequest } from "../../api/adminApi";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import { FormInput, FormSelect, SectionHeader, SubmitButton } from "./SettingsUI";
@@ -78,32 +78,33 @@ function setCachedPendingRequest(requestedCourse) {
       COURSE_REQUEST_CACHE_KEY,
       JSON.stringify({ requested_course: requestedCourse, created_at: Date.now() }),
     );
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function clearCachedPendingRequest() {
   try {
     localStorage.removeItem(COURSE_REQUEST_CACHE_KEY);
-  } catch (_) {}
+  } catch (_) { }
 }
 
-function useAccountForm(user) {
-  const initialData = getInitialData(user);
+function useAccountForm() {
+  const { profile, loading: authLoading, refreshProfile } = useAuth();
+  const initialData = getInitialData(profile);
   const [formData, setFormData] = useState(initialData);
   const [initialFormData, setInitialFormData] = useState(initialData);
-  const [currentCourse, setCurrentCourse] = useState(user?.major || "");
+  const [currentCourse, setCurrentCourse] = useState(profile?.major || "");
   const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
-    getUserProfile()
-      .then((data) => {
-        const nextYear = data?.year || "";
-        setFormData((prev) => ({ ...prev, year: nextYear || prev.year }));
-        setInitialFormData((prev) => ({ ...prev, year: nextYear || prev.year }));
-        if (data?.major !== undefined) setCurrentCourse(data.major || "");
-      })
-      .catch(() => {});
+    if (!authLoading && profile) {
+      const nextData = getInitialData(profile);
+      setFormData(nextData);
+      setInitialFormData(nextData);
+      setCurrentCourse(profile.major || "");
+    }
+  }, [profile, authLoading]);
 
+  useEffect(() => {
     getMyCourseChangeRequest()
       .then((data) => {
         const req = normaliseCourseRequest(data);
@@ -137,6 +138,7 @@ function useAccountForm(user) {
     currentCourse,
     pendingRequest,
     setPendingRequest,
+    refreshProfile
   };
 }
 
@@ -144,10 +146,34 @@ function PersonalInfoFields({ formData, onChange }) {
   return (
     <>
       <div className={styles.formRow}>
-        <FormInput id="firstName" name="firstName" label="First Name" value={formData.firstName} onChange={onChange} required />
-        <FormInput id="lastName" name="lastName" label="Last Name" value={formData.lastName} onChange={onChange} required />
+        <FormInput
+          id="firstName"
+          name="firstName"
+          label="First Name"
+          value={formData.firstName}
+          onChange={onChange}
+          required
+          autoComplete="given-name"
+        />
+        <FormInput
+          id="lastName"
+          name="lastName"
+          label="Last Name"
+          value={formData.lastName}
+          onChange={onChange}
+          required
+          autoComplete="family-name"
+        />
       </div>
-      <FormInput id="email" label="Email Address" type="email" value={formData.email} onChange={onChange} required />
+      <FormInput
+        id="email"
+        label="Email Address"
+        type="email"
+        value={formData.email}
+        onChange={onChange}
+        required
+        autoComplete="email"
+      />
     </>
   );
 }
@@ -237,7 +263,7 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
     <div className={styles.formGroup}>
       <label>Course</label>
       <div className={styles.lockedCourse}>
-        {course ? course : <em>No course set</em>}
+        {course ? <em>{course}</em> : <em>No course set</em>}
       </div>
       {pendingRequest ? (
         <div style={{ marginTop: 8 }}>
@@ -270,7 +296,7 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
  * @param {Function} props.onSave
  * @param {boolean} props.isSaving
  */
-export default function AccountForm({ user, onSave, isSaving }) {
+export default function AccountForm({ onSave, isSaving }) {
   const {
     formData,
     initialFormData,
@@ -279,7 +305,8 @@ export default function AccountForm({ user, onSave, isSaving }) {
     currentCourse,
     pendingRequest,
     setPendingRequest,
-  } = useAccountForm(user);
+    refreshProfile
+  } = useAccountForm();
   const [showModal, setShowModal] = useState(false);
   const [cancellingRequest, setCancellingRequest] = useState(false);
   const [courseRequestNotice, setCourseRequestNotice] = useState(() =>
@@ -301,6 +328,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
     if (ok) {
       setInitialFormData(formData);
       setSaveSignal((s) => s + 1);
+      refreshProfile();
     }
   };
 
@@ -319,6 +347,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       } else {
         setPendingRequest(null);
         setCourseRequestNotice("Request cancelled.");
+        refreshProfile();
       }
     } catch (error) {
       const msg = String(error?.message || "");
@@ -345,6 +374,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
     setShowModal(false);
     setCourseRequestError("");
     setCourseRequestNotice("Request sent.");
+    refreshProfile();
   };
 
   return (
@@ -355,8 +385,7 @@ export default function AccountForm({ user, onSave, isSaving }) {
       />
       <div className={styles.twoColLayout}>
         <div>
-          <div className={styles.settingsTile}>
-            <PersonalInfoFields formData={formData} onChange={handleChange} />
+          <PersonalInfoFields formData={formData} onChange={handleChange} />
             <div className={styles.formRow}>
               <FormSelect
                 id="year"
@@ -382,7 +411,6 @@ export default function AccountForm({ user, onSave, isSaving }) {
               hasUnsaved={hasUnsaved}
               saveSignal={saveSignal}
             />
-          </div>
         </div>
         <div className={styles.contextCard}>
           <span className={styles.contextCardEmoji}>🧾</span>

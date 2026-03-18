@@ -9,33 +9,30 @@ import CreateTaskModal from "./components/CreateTaskModal";
 import CreateListModal from "./components/CreateListModal";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
+import AppToast from "../../components/common/AppToast/AppToast";
 import styles from "./TasksPage.module.css";
 
 function ToastUndo({ onUndo, onClose }) {
   return (
-    <div className={styles.toast}>
-      <span>Task added.</span>
-      <button type="button" className={styles.toastUndoBtn} onClick={onUndo}>Undo</button>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast
+      message="Task added."
+      actionLabel="Undo"
+      onAction={onUndo}
+      onClose={onClose}
+      variant="success"
+    />
   );
 }
 
 function ToastDelete({ onClose }) {
   return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>🗑 Task deleted.</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast message="Task deleted." onClose={onClose} variant="info" icon="🗑" />
   );
 }
 
 function ToastInfo({ message, onClose }) {
   return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>{message}</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast message={message} onClose={onClose} variant="info" />
   );
 }
 

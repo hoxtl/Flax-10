@@ -2,39 +2,41 @@ import { useState, useEffect } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import { getHomeAddress } from "../../api/userService";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import EmptyState from "../common/EmptyState/EmptyState";
+import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import TextInput from "../common/TextInput/TextInput";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
-import { SectionHeader, SubmitButton } from "./SettingsUI";
+import { SectionHeader, SubmitButton, FormField } from "./SettingsUI";
 
 export default function HomeAddressForm({ onSave, isSaving, error }) {
-    const [homeAddress, setHomeAddress] = useState("");
-    const [initialHomeAddress, setInitialHomeAddress] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [saveSignal, setSaveSignal] = useState(0);
+  const [homeAddress, setHomeAddress] = useState("");
+  const [initialHomeAddress, setInitialHomeAddress] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saveSignal, setSaveSignal] = useState(0);
 
-    useEffect(() => {
-        getHomeAddress()
-            .then((data) => {
-                const address = data.home_address || "";
-                setHomeAddress(address);
-                setInitialHomeAddress(address);
-            })
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    getHomeAddress()
+      .then((data) => {
+        const address = data.home_address || "";
+        setHomeAddress(address);
+        setInitialHomeAddress(address);
+      })
+      .catch(() => { })
+      .finally(() => setLoading(false));
+  }, []);
 
-    const hasUnsaved = homeAddress !== initialHomeAddress;
+  const hasUnsaved = homeAddress !== initialHomeAddress;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const ok = await onSave(homeAddress);
-        if (ok) {
-            setInitialHomeAddress(homeAddress);
-            setSaveSignal((s) => s + 1);
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const ok = await onSave(homeAddress);
+    if (ok) {
+      setInitialHomeAddress(homeAddress);
+      setSaveSignal((s) => s + 1);
+    }
+  };
 
-    if (loading) return <SectionSkeleton label="Loading home address" rows={1} />;
+  if (loading) return <SectionSkeleton label="Loading home address" rows={1} />;
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -45,16 +47,22 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
 
       <div className={styles.twoColLayout}>
         <div>
-          <div className={styles.settingsTile}>
-            <div className={styles.formGroup}>
-              <label htmlFor="homeAddress">Address</label>
-              <TextInput
-                id="homeAddress"
-                type="text"
+          <div className={styles.formGroup}>
+              <label htmlFor="homeAddress" className={styles.label}>
+                Address
+              </label>
+              <LocationAutocomplete
                 value={homeAddress}
-                onChange={e => setHomeAddress(e.target.value)}
-                placeholder="e.g., 123 Example Street, London E1 B23"
+                onChange={setHomeAddress}
+                placeholder="e.g., 123 Example Street, London, E1 B23"
               />
+              {error && (
+                <EmptyState
+                  icon="⚠️"
+                  title="Could not save address"
+                  description={error}
+                />
+              )}
             </div>
             <SubmitButton
               isSaving={isSaving}
@@ -63,7 +71,6 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
               hasUnsaved={hasUnsaved}
               saveSignal={saveSignal}
             />
-          </div>
           <InlineAlert message={error} variant="warning" />
         </div>
         <div className={styles.contextCard}>

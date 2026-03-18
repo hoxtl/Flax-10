@@ -372,6 +372,18 @@ describe('SocietiesSection', () => {
       />
     );
     fireEvent.click(screen.getByText('Soc'));
-    expect(onNavigate).toHaveBeenCalledWith('societies_1');
+    expect(onNavigate).toHaveBeenCalledWith('/societies?id=1');
+  });
+
+  it('uses society_id when id is not present', () => {
+    const onNavigate = vi.fn();
+    render(
+      <SocietiesSection
+        societies={[{ society_id: 42, name: 'Athletics Club' }]}
+        onNavigate={onNavigate}
+      />
+    );
+    fireEvent.click(screen.getByText('Athletics Club'));
+    expect(onNavigate).toHaveBeenCalledWith('/societies?id=42');
   });
 });

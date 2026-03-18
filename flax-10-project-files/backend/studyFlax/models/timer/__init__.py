@@ -1,1 +1,1 @@
-from .sessionModel import StudySession
+from .session_model import StudySession

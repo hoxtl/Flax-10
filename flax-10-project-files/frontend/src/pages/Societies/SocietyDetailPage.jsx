@@ -21,6 +21,7 @@ import { Flag } from "lucide-react";
 import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 
 import {
     getImageUrls, getAvailablePhotos, scrollContentToTop,
@@ -65,8 +66,8 @@ function useModalState() {
 
 
 /** Aggregates all data and action handlers for the page components. */
-function useSocietyPageData(societyId, initialTab) {
-    const hookData = useSocietyDetail(societyId);
+function useSocietyPageData(societyId, initialTab, onMembershipChange) {
+    const hookData = useSocietyDetail(societyId, onMembershipChange);
     const { society, updateSociety, updateLocalSociety } = hookData;
     const location = useLocation();
     const page = usePageState(initialTab, location);
@@ -78,14 +79,14 @@ function useSocietyPageData(societyId, initialTab) {
     return { ...handlers, page, modals, handleUnreport, subscription, tracker };
 }
 
-function usePageStateHandlers(data, onBack) {
+function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;
     return {
         state: modals,
         setS: modals.setShowSettings, setR: modals.setShowReportModal, setG: modals.setGalleryOpen,
         setCE: modals.setShowCoverModal, setM: modals.setShowMembersModal, setEA: modals.setEditingAnnouncement,
         updateS: updateSociety, updateLS: updateLocalSociety, fetchM: fetchMembers, removeM: removeMember,
-        onDelete: async () => { await deleteSociety(); onBack(); },
+        onDelete: async () => { await deleteSociety(); onDeleteCallback?.(); onBack(); },
         onReport: () => modals.setShowReportModal(true),
         onAnnounceSubmit: (d, conflict) => {
             if (conflict) data.updateAnnouncement(conflict.id, { ...conflict, pinned: false }, false);
@@ -141,9 +142,9 @@ const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
     </div>
 );
 
-export default function SocietyDetailPage({ societyId, onBack, initialTab }) {
-    const data = useSocietyPageData(societyId, initialTab);
-    const handlers = usePageStateHandlers(data, onBack);
+export default function SocietyDetailPage({ societyId, onBack, initialTab, onMembershipChange, onDelete }) {
+    const data = useSocietyPageData(societyId, initialTab, onMembershipChange);
+    const handlers = usePageStateHandlers(data, onBack, onDelete);
     useSocietyInit(useLocation());
     if (data.loading) return <SocietyDetailSkeleton />;
     if (!data.society) return <NotFound onBack={onBack} />;
@@ -223,7 +224,7 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
 function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
     return (
         <div className={styles.topBar}>
-            <button className={styles.backBtn} onClick={onBack}>&larr; Back to All Societies</button>
+            <BackButton onClick={onBack} label="Back to All Societies" />
             <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', alignItems: 'center' }}>
                 <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
                 {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
@@ -237,7 +238,7 @@ function NotFound({ onBack }) {
     return (
         <div className={styles.notFound}>
             <p>Society not found.</p>
-            <button onClick={onBack}>Back to Societies</button>
+            <BackButton onClick={onBack} label="Back to Societies" />
         </div>
     );
 }
