@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
+vi.mock("../../../context/AuthContext", () => ({
+  useAuth: vi.fn(),
+}));
+
 vi.mock("../../../api/adminApi", () => ({
-  getMyCourseChangeRequest: vi.fn(),
-  requestCourseChange: vi.fn(),
+  requestTeacherRole: vi.fn(),
+  cancelTeacherRoleRequest: vi.fn(),
 }));
 
 vi.mock("../../../lib/kclCourses", () => ({
@@ -13,113 +17,70 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-import {
-  getMyCourseChangeRequest,
-  requestCourseChange,
-} from "../../../api/adminApi";
+import { requestTeacherRole, cancelTeacherRoleRequest } from "../../../api/adminApi";
+import { useAuth } from "../../../context/AuthContext";
 import CourseChangePanel from "../../../components/Settings/CourseChangePanel";
 
 describe("CourseChangePanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   it("shows loading state initially", () => {
-    getMyCourseChangeRequest.mockReturnValue(new Promise(() => {}));
-    render(<CourseChangePanel user={{}} />);
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
-  });
-
-  it("shows the form when no existing request", async () => {
-    getMyCourseChangeRequest.mockResolvedValue(null);
-    render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/submit request/i)).toBeInTheDocument(),
-    );
-  });
-
-  it("shows pending badge when request is pending", async () => {
-    getMyCourseChangeRequest.mockResolvedValue({
-      status: "pending",
-      requested_course: "Physics",
-      current_course: "Chemistry",
+    vi.mocked(useAuth).mockReturnValue({
+      profile: null,
+      loading: true,
+      refreshProfile: vi.fn(),
     });
+
     render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/course change pending/i)).toBeInTheDocument(),
-    );
-    expect(screen.queryByText(/submit request/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Loading role info/i)).toBeInTheDocument();
   });
 
-  it("shows approved badge when request is approved", async () => {
-    getMyCourseChangeRequest.mockResolvedValue({
-      status: "approved",
-      requested_course: "Physics",
-      current_course: "Chemistry",
+  it("shows pending badge when role is pending_teacher", async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      profile: { role: "pending_teacher" },
+      loading: false,
+      refreshProfile: vi.fn(),
     });
+
     render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/course change approved/i)).toBeInTheDocument(),
-    );
+    expect(await screen.findByText("Teacher request pending")).toBeInTheDocument();
   });
 
-  it("shows rejected badge and form when request is rejected", async () => {
-    getMyCourseChangeRequest.mockResolvedValue({
-      status: "rejected",
-      requested_course: "Physics",
-      current_course: "Chemistry",
+  it("student can open apply modal and submit", async () => {
+    const refreshProfile = vi.fn();
+    vi.mocked(useAuth).mockReturnValue({
+      profile: { role: "student" },
+      loading: false,
+      refreshProfile,
     });
-    render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/course change rejected/i)).toBeInTheDocument(),
-    );
-    expect(screen.getByText(/submit request/i)).toBeInTheDocument();
-  });
+    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
 
-  it("shows error when submitting with no course selected", async () => {
-    getMyCourseChangeRequest.mockResolvedValue(null);
     render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/submit request/i)).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByText(/submit request/i));
-    await waitFor(() =>
-      expect(screen.getByText(/please select a course/i)).toBeInTheDocument(),
-    );
-  });
 
-  it("submits a request successfully", async () => {
-    getMyCourseChangeRequest.mockResolvedValue(null);
-    requestCourseChange.mockResolvedValue({
-      status: "pending",
-      requested_course: "Physics",
-      current_course: "",
-    });
-    render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/submit request/i)).toBeInTheDocument(),
-    );
-    const select = screen.getByRole("combobox");
-    fireEvent.change(select, { target: { value: "Physics" } });
-    fireEvent.click(screen.getByText(/submit request/i));
-    await waitFor(() =>
-      expect(screen.getByText(/submitted/i)).toBeInTheDocument(),
-    );
-    expect(requestCourseChange).toHaveBeenCalledWith("Physics");
-  });
+    fireEvent.click(screen.getByText("Apply"));
 
-  it("shows error when submission fails", async () => {
-    getMyCourseChangeRequest.mockResolvedValue(null);
-    requestCourseChange.mockRejectedValue(new Error("Already pending"));
-    render(<CourseChangePanel user={{}} />);
-    await waitFor(() =>
-      expect(screen.getByText(/submit request/i)).toBeInTheDocument(),
-    );
-    const select = screen.getByRole("combobox");
-    fireEvent.change(select, { target: { value: "Physics" } });
-    fireEvent.click(screen.getByText(/submit request/i));
-    await waitFor(() =>
-      expect(screen.getByText(/already pending/i)).toBeInTheDocument(),
-    );
+    expect(screen.getByText("Apply for Teacher Role")).toBeInTheDocument();
+
+    const textarea = screen.getByPlaceholderText(/teaching experience/i);
+
+    // Required fields may block fully-empty submissions in JSDOM; use whitespace
+    // so browser validation passes while our handler still treats it as "empty".
+    fireEvent.change(textarea, { target: { value: " " } });
+    fireEvent.click(screen.getByText("Submit Application"));
+    expect(
+      screen.getByText(/please tell us why you'd like to become a teacher/i),
+    ).toBeInTheDocument();
+
+    fireEvent.change(textarea, { target: { value: "Because I love teaching." } });
+
+    fireEvent.click(screen.getByText("Submit Application"));
+
+    expect(await screen.findByText("✓ Requested")).toBeInTheDocument();
+    expect(screen.queryByText("Apply for Teacher Role")).toBeNull();
+    expect(requestTeacherRole).toHaveBeenCalled();
+    expect(refreshProfile).toHaveBeenCalled();
   });
 });

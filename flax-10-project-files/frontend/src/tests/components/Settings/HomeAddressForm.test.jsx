@@ -43,7 +43,7 @@ describe('HomeAddressForm', () => {
     it('shows Saving address... when isSaving', async () => {
         render(<HomeAddressForm onSave={vi.fn()} isSaving={true} />);
         await waitFor(() => {
-            expect(screen.getByText('Saving address...')).toBeTruthy();
+            expect(screen.getByText('Saving...')).toBeTruthy();
         });
     });
 
@@ -74,7 +74,7 @@ describe('HomeAddressForm', () => {
         getHomeAddress.mockResolvedValueOnce({ home_address: null });
         render(<HomeAddressForm onSave={vi.fn()} isSaving={false} />);
         await waitFor(() => {
-            const input = screen.getByPlaceholderText('e.g., 123 Example Street, London E1 B23');
+            const input = screen.getByPlaceholderText('e.g., 123 Example Street, London, E1 B23');
             expect(input.value).toBe('');
         });
     });
