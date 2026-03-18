@@ -240,7 +240,7 @@ describe('CampusMap', () => {
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         fireEvent.click(screen.getAllByTitle('Clear')[1]);
-        await waitFor(() => expect(screen.getByText(/Select a campus from the map/)).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText(/Select a campus or event as destination/)).toBeInTheDocument());
     });
 
     it('shows TfL journey when journeyPlanner returns data', async () => {

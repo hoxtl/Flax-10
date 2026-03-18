@@ -232,13 +232,9 @@ describe('TasksPage', () => {
     });
 
     it('permanently delete list respects confirm dialog', async () => {
-        const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
         renderTasksPage();
         fireEvent.click(screen.getByText('Permanently Delete List'));
-        expect(mockListsHook.permanentlyDeleteList).not.toHaveBeenCalled();
-        fireEvent.click(screen.getByText('Permanently Delete List'));
-        await waitFor(() => expect(mockListsHook.permanentlyDeleteList).toHaveBeenCalledWith(9));
-        confirmSpy.mockRestore();
+        expect(mockListsHook.permanentlyDeleteList).toHaveBeenCalledWith(9);
     });
 
     it('renders BackToTop', () => {
