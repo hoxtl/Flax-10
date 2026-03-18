@@ -528,6 +528,32 @@ button:disabled {
   font-weight: 400;
 }
 
+.metaBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.statusBadge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  border: none;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+.banned {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
 
 
 .modalBackdrop {
