@@ -4586,20 +4586,19 @@
 }
 
 /* ───────────────────────────────────────────────────────────────
-   Full Focus overlay: integrated status rail (solid, non-glass)
+   Full Focus overlay: timer only, perfectly centred
    ─────────────────────────────────────────────────────────────── */
 .focusOverlay {
     position: fixed;
     inset: 0;
     z-index: 12000;
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 0.6rem 0.75rem 0.75rem;
     background: var(--surface-page) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    overflow-y: auto;
 }
 
 .focusOverlay::before {
