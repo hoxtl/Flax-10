@@ -5,13 +5,13 @@ from .auth.reset_password_token_model import ResetPasswordToken
 from .auth.course_change_request_model import CourseChangeRequest
 
 # Calendar
-from .calendar.calendarEventModel import *
-from .calendar.categoryModel import *
-from .calendar.recurrenceRuleModel import *
-from .calendar.tagModel import *
-from .calendar.timetableSourceModel import *
-from .calendar.scheduleModel import *
-from .calendar.eventAttendanceModel import *
+from .calendar.calendar_event_model import *
+from .calendar.category_model import *
+from .calendar.recurrence_rule_model import *
+from .calendar.tag_model import *
+from .calendar.timetable_source_model import *
+from .calendar.schedule_model import *
+from .calendar.event_attendance_model import *
 
 # Module
 from .modules.module_model import *

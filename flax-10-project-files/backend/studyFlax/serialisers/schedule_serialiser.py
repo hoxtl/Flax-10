@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from studyFlax.serialisers.event_serialisers import CalendarEventSerialiser
+from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerialiser
 from studyFlax.models import Deadline, Schedule, ScheduleEventAllocation
 
 class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
