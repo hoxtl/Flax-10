@@ -52,8 +52,6 @@ import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import { createSchedule } from "../../api/scheduleApi";
-import { buildScheduleAutoForm } from "./utils/ScheduleAutoForm";
 
 function HomepageSkeleton() {
   return (
@@ -538,7 +536,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(now);
     todayEnd.setHours(23, 59, 59, 999);
-    
+
     const filtered = (allTasks || []).filter((t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
       return d && d >= todayStart && d <= todayEnd;
@@ -616,7 +614,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         const due = t.due_date ? new Date(t.due_date) : null;
         let taskWidgetStatus = "upcoming";
         if (t.completed) taskWidgetStatus = "completed";
-        
+
         return {
           type: "task",
           id: `task-${t.id}`,
@@ -732,33 +730,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return null;
   }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
 
-  /** Auto Re-plan: build a schedule using upcoming deadlines (ScheduleAutoForm payload). */
-  const [replanLoading, setReplanLoading] = useState(false);
-  const handleReplanDay = useCallback(async () => {
-    const autoFormPayload = buildScheduleAutoForm({ deadlines: upcomingDeadlines });
-    if (!autoFormPayload) {
-      showToast("No upcoming deadlines to auto-schedule yet.");
-      return;
-    }
-    setReplanLoading(true);
-    try {
-      const result = await createSchedule(autoFormPayload);
-      await loadEvents();
-      const refreshedDeadlines = await getUpcomingDeadlines().catch(() => []);
-      setUpcomingDeadlines(Array.isArray(refreshedDeadlines) ? refreshedDeadlines : []);
-      refetchTasks();
-      const allocationCount = result?.event_allocations?.length || 0;
-      if (allocationCount === 0) {
-        showToast("Invalid study time window configurations. Please revise your preference settings.");
-      } else {
-        showToast(`Auto schedule created with ${allocationCount} study block${allocationCount === 1 ? "" : "s"}.`);
-      }
-    } catch {
-      showToast("Couldn't auto-schedule right now. Try again.");
-    } finally {
-      setReplanLoading(false);
-    }
-  }, [upcomingDeadlines, loadEvents, showToast, refetchTasks]);
+  const openQuickAddSchedule = useCallback((view) => {
+    window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+  }, []);
 
 
   const handleTaskToggle = useCallback(
@@ -1010,18 +984,29 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             <div className={styles.timelineHeaderRight}>
               <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
               {isToday(selectedDate) && (
-                <motion.button
-                  type="button"
-                  className={styles.replanBtn}
-                  onClick={handleReplanDay}
-                  disabled={replanLoading || !buildScheduleAutoForm({ deadlines: upcomingDeadlines })}
+                <motion.div
+                  className={styles.scheduleActionGroup}
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25 }}
-                  aria-label="Auto-generate a schedule from upcoming deadlines"
                 >
-                  {replanLoading ? "Generating…" : "✨ Re-plan"}
-                </motion.button>
+                <button
+                  type="button"
+                  className={styles.replanBtn}
+                  onClick={() => openQuickAddSchedule('schedule_manual')}
+                  aria-label="Open manual schedule quick add"
+                >
+                  🧩 Manual Schedule
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.replanBtn} ${styles.autoScheduleBtn}`}
+                  onClick={() => openQuickAddSchedule('schedule_auto')}
+                  aria-label="Open auto schedule quick add"
+                >
+                  ⚙️ Auto Schedule
+                </button>
+                </motion.div>
               )}
             </div>
           </div>

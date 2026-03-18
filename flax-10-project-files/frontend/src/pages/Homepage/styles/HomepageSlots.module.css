@@ -23,21 +23,6 @@
     background: var(--restoration-gold-soft) !important;
     border-radius: 8px;
   }
-  .replanBtn {
-    padding: 7px 16px;
-    border-radius: 9999px;
-    border: 1px solid var(--widget-border);
-    background: var(--widget-accent-soft);
-    color: var(--widget-text-primary);
-    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .replanBtn:hover { background: #fdf8ea; border-color: rgba(196, 164, 109, 0.68); }
-  .replanBtn:disabled { opacity: 0.5; cursor: not-allowed; }
   .bentoHero {
     grid-area: hero;
     min-width: 0;
@@ -2066,4 +2051,19 @@
   align-items: flex-start;
   flex-wrap: wrap;
   height: 100%;
+}
+
+.scheduleActionGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.autoScheduleBtn {
+  background: #eef7ff;
+  border-color: rgba(91, 153, 214, 0.36);
+  color: #3c648b;
+}
+.autoScheduleBtn:hover {
+  background: #f5faff;
+  border-color: rgba(91, 153, 214, 0.5);
 }

@@ -289,10 +289,6 @@ vi.mock('../../api/deadlineApi', () => ({
   getUpcomingDeadlines: mockGetUpcomingDeadlines,
 }));
 
-vi.mock('../../api/scheduleApi', () => ({
-  createSchedule: vi.fn().mockResolvedValue({ event_allocations: [{ id: 1 }] }),
-}));
-
 vi.mock('../../lib/completionMessages', () => ({
   getCompletionMessage: () => 'Nice',
   isRoutineTask: () => false,
@@ -652,48 +648,42 @@ describe('Homepage', () => {
     expect(mockRefetchTasks).toHaveBeenCalled();
   });
 
-  it('Re-plan button shows when today and triggers handleReplanDay', async () => {
+  it('shows manual and auto schedule actions for today', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
     isToday.mockReturnValue(true);
-    const { getNextFreeSlotToday, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    mockDayEvents = [{ id: 1, title: 'Past', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [{ id: 1, title: 'T', due_date: new Date().toISOString(), completed: false }];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
-    await waitFor(() => expect(replanButton).not.toBeDisabled());
-    fireEvent.click(replanButton);
-    await waitFor(() => expect(screen.getByText(/Auto schedule created|No upcoming deadlines to auto-schedule/)).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Open manual schedule quick add/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Open auto schedule quick add/i })).toBeInTheDocument();
   });
 
-  it('Re-plan button is disabled when there are no upcoming deadline', async () => {
+  it('manual schedule action opens quick add in manual mode', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { getUpcomingDeadlines } = await import('../../api/deadlineApi');
+    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
     isToday.mockReturnValue(true);
-    getUpcomingDeadlines.mockResolvedValue([]);
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i })).toBeDisabled());
+    fireEvent.click(screen.getByRole('button', { name: /Open manual schedule quick add/i }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_manual' } }));
   });
 
-  it('Re-plan shows no-deadline toast when no upcoming deadlines are available', async () => {
+  it('auto schedule action opens quick add in auto mode', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { getUpcomingDeadlines } = await import('../../api/deadlineApi');
+    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
     isToday.mockReturnValue(true);
-    getUpcomingDeadlines.mockResolvedValue([]);
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i })).toBeDisabled());
+    fireEvent.click(screen.getByRole('button', { name: /Open auto schedule quick add/i }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_auto' } }));
   });
 
   it('focus banner shows BREAK when timer mode is break', () => {
@@ -1111,39 +1101,6 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('reschedule'));
     await waitFor(() => expect(screen.getByText("Couldn't re-schedule. Try again.")).toBeInTheDocument());
-  });
-
-  it('Re-plan surfaces auto-scheduler error toast when API call fails', async () => {
-    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { createSchedule } = await import('../../api/scheduleApi');
-    isToday.mockReturnValue(true);
-    createSchedule.mockRejectedValueOnce(new Error('fail'));
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
-    await waitFor(() => expect(replanButton).not.toBeDisabled());
-    fireEvent.click(replanButton);
-    await waitFor(() => expect(screen.getByText("Couldn't auto-schedule right now. Try again.")).toBeInTheDocument());
-  });
-
-  it('Re-plan calls createSchedule with generated deadline preferences', async () => {
-    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { createSchedule } = await import('../../api/scheduleApi');
-    isToday.mockReturnValue(true);
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    const replanButton = screen.getByRole('button', { name: /Auto-generate a schedule from upcoming deadlines/i });
-    await waitFor(() => expect(replanButton).not.toBeDisabled());
-    fireEvent.click(replanButton);
-    await waitFor(() => expect(createSchedule).toHaveBeenCalledWith(expect.objectContaining({
-      deadline_preferences: expect.any(Array),
-    })));
   });
 
   it('deadline detail shows link to module by code when only module_code set', async () => {
