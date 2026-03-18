@@ -26,10 +26,6 @@ vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
     })),
 }));
 
-vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
-    SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
-}));
-
 vi.mock('../../../components/ui/bento-grid', () => ({
     BentoGrid: ({ children }) => <div data-testid="bento-grid">{children}</div>,
     BentoCard: ({ children, className }) => <div data-testid="bento-card" className={className}>{children}</div>,

@@ -16,6 +16,7 @@ from studyFlax.models.modules.module_model import Module
 from studyFlax.models.society.society_image_model import SocietyImage
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
+from studyFlax.models.social.share_model import CalendarShare
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.tests.helpers.factories import make_session
 
@@ -40,6 +41,8 @@ class ProfileSummaryEndpointTest(TestCase):
         self.assertIn('badges', response.data)
         self.assertIn('streaks', response.data)
         self.assertIn('weekly', response.data)
+        self.assertIn('activity_sparkline', response.data)
+        self.assertIn('mutual_connections', response.data)
 
     def test_summary_with_sessions(self):
         for index in range(5):
@@ -78,6 +81,29 @@ class ProfileSummaryEndpointTest(TestCase):
     def test_other_user_not_found_returns_404(self):
         response = self.client.get('/api/profile/summary/?user_id=99999')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_summary_includes_seven_day_activity_sparkline(self):
+        make_session(self.user, duration=30, hours_ago=5)
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        points = response.data['activity_sparkline']
+        self.assertEqual(len(points), 7)
+        self.assertTrue(all('level' in item and 'date' in item for item in points))
+
+    def test_summary_builds_mutual_connections_for_viewer(self):
+        viewed = User.objects.create_user(
+            username='viewed', email='viewed@example.com', password='pass'
+        )
+        mutual = User.objects.create_user(
+            username='mutual', email='mutual@example.com', password='pass'
+        )
+        CalendarShare.objects.create(owner=self.user, shared_with=mutual)
+        CalendarShare.objects.create(owner=viewed, shared_with=mutual)
+        response = self.client.get(f'/api/profile/summary/?user_id={viewed.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mutuals = response.data['mutual_connections']
+        self.assertEqual(mutuals['count'], 1)
+        self.assertEqual(mutuals['users'][0]['username'], 'mutual')
 
     def test_incomplete_sessions_not_counted_for_badges(self):
         self._make_session(status_val='Incomplete', duration=120)
