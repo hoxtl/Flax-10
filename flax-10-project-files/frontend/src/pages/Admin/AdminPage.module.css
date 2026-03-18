@@ -479,6 +479,20 @@ button:disabled {
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
 }
 
+.cardInfoMetaBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cardProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
 .modalBackdrop {
   position: fixed;
   inset: 0;
