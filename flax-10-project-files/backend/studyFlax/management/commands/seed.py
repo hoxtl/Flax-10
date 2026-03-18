@@ -21,9 +21,9 @@ from studyFlax.models import (
     Module, Enrollment, Deadline, Reading,
     Society,
 )
-from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.groupwork.groupworkModel import GroupProject
-from studyFlax.models.calendar.eventAttendanceModel import EventAttendance
+from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.groupwork.groupwork_model import GroupProject
+from studyFlax.models.calendar.event_attendance_model import EventAttendance
 from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     MODULE_PILL_COLORS,
