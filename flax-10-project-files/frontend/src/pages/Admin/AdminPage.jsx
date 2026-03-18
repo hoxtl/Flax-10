@@ -14,6 +14,7 @@ import {
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
+  fetchCourseChangeRequests,
   resolveCourseChangeRequest,
 } from "../../api/adminApi";
 import styles from "./AdminPage.module.css";

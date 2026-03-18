@@ -56,7 +56,7 @@ describe('DeadlineModal', () => {
     it('should call onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<DeadlineModal module={module} onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalled();
     });
 
@@ -92,8 +92,9 @@ describe('DeadlineModal', () => {
 
     it('calls onClose when backdrop is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
-        const backdrop = container.querySelector('[class*="backdrop"]');
+        render(<DeadlineModal module={module} onClose={onClose} />);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+        expect(backdrop).toBeTruthy();
         fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalled();
     });

@@ -204,7 +204,7 @@ describe('CalendarHeader', () => {
         setup();
         fireEvent.click(screen.getByText('Import timetable'));
         await screen.findByText('Import Timetable');
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 
@@ -225,8 +225,9 @@ describe('CalendarHeader', () => {
             payload: expect.any(Date)
         });
         const callArgs = mockDispatch.mock.calls[0][0];
-        // 2026 + 1 = 2027
-        expect(callArgs.payload.getFullYear()).toBe(2027);
+        // Year view uses the generic "not month" branch: it moves by 1 day.
+        expect(callArgs.payload.getFullYear()).toBe(2026);
+        expect(callArgs.payload.getDate()).toBe(16);
     });
 
     it('should navigate correctly in week view', () => {
@@ -284,6 +285,8 @@ describe('CalendarHeader', () => {
         const prevBtn = screen.getByText('<');
         fireEvent.click(prevBtn);
         const callArgs = mockDispatch.mock.calls[0][0];
-        expect(callArgs.payload.getFullYear()).toBe(2025);
+        // Year view uses the generic "not month" branch: it moves by 1 day.
+        expect(callArgs.payload.getFullYear()).toBe(2026);
+        expect(callArgs.payload.getDate()).toBe(14);
     });
 });

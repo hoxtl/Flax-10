@@ -4,7 +4,7 @@ import { GoalModal } from '../../../components/Timer/TimerPopups';
 
 const testRender = () => {
     render(<GoalModal sessions={4} workTime={1500} breakTime={300} onAction={() => { }} />);
-    expect(screen.getByText('🎉 Goal Reached!')).toBeInTheDocument();
+    expect(screen.getByText('Goal reached')).toBeInTheDocument();
     expect(screen.getByText('Start New Goal')).toBeInTheDocument();
     expect(screen.getByText('✅ Sessions')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();

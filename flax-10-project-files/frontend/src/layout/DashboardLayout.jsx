@@ -102,6 +102,7 @@ function MainArea({
         {!isMobile && (
           <TopBar
             user={user}
+            onAddClick={onQuickAdd}
             onSettingsClick={onSettingsClick}
             onLogoutClick={onLogoutClick}
             onProfileClick={onProfileClick}

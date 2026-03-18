@@ -87,10 +87,15 @@ describe('EventModal', () => {
         expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it('should call onClose when overlay clicked', () => {
-        const { container } = renderModal();
-        const overlay = container.firstChild;
-        fireEvent.mouseDown(overlay);
+    it('should call onClose when overlay clicked', async () => {
+        renderModal();
+        // EventModal renders its backdrop via a portal; wait until it exists.
+        let backdrop = null;
+        await waitFor(() => {
+            backdrop = document.body.querySelector('div[class*="_backdrop"]');
+            expect(backdrop).toBeTruthy();
+        });
+        fireEvent.mouseDown(backdrop);
         expect(mockOnClose).toHaveBeenCalled();
     });
 
@@ -113,9 +118,14 @@ describe('EventModal', () => {
         expect(mockFormLogic.setForm).toHaveBeenCalled();
     });
 
-    it('should call handleSubmit on submit', () => {
-        const { container } = renderModal();
-        const form = container.querySelector('form');
+    it('should call handleSubmit on submit', async () => {
+        renderModal();
+        // EventModal renders the form via a portal; wait until it exists.
+        let form = null;
+        await waitFor(() => {
+            form = document.body.querySelector('form');
+            expect(form).toBeTruthy();
+        });
         fireEvent.submit(form);
         expect(mockFormLogic.handleSubmit).toHaveBeenCalled();
     });

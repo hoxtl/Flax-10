@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
@@ -147,9 +147,9 @@ describe('TaskFeed', () => {
         expect(screen.getByText('Work')).toBeTruthy();
     });
 
-    it('renders EstTimeHelpBanner', () => {
+    it('does not render EstTimeHelpBanner', () => {
         renderFeed();
-        expect(screen.getByTestId('est-time-banner')).toBeTruthy();
+        expect(screen.queryByTestId('est-time-banner')).toBeNull();
     });
 
     it('renders CreateTaskBar when onAddTask provided', () => {
@@ -174,12 +174,12 @@ describe('TaskFeed', () => {
 
     it('shows search input', () => {
         renderFeed();
-        expect(screen.getByPlaceholderText('Search… ( / )')).toBeTruthy();
+        expect(screen.getByPlaceholderText(/search by list or task/i)).toBeTruthy();
     });
 
     it('searches tasks by title', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'Overdue' } });
         expect(screen.getByTestId('task-card-1')).toBeTruthy();
         expect(screen.queryByTestId('task-card-3')).toBeNull();
@@ -187,16 +187,17 @@ describe('TaskFeed', () => {
 
     it('shows no tasks message for no-match search', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'zzz_nonexistent_zzz' } });
         expect(screen.getByText(/No tasks match/)).toBeTruthy();
     });
 
     it('clears search when clear button clicked', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'test' } });
-        fireEvent.click(screen.getByLabelText('Clear search'));
+        // There are two "Clear search" controls; either is fine for clearing.
+        fireEvent.click(screen.getAllByLabelText('Clear search')[0]);
         expect(input.value).toBe('');
     });
 
@@ -320,23 +321,25 @@ describe('TaskFeed', () => {
         expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', () => {
+    it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', async () => {
         const quickInput = document.createElement('input');
         quickInput.setAttribute('aria-label', 'Task name');
         document.body.appendChild(quickInput);
+        Object.defineProperty(quickInput, 'offsetParent', { value: {}, configurable: true });
 
         renderFeed();
-        const search = screen.getByPlaceholderText('Search… ( / )');
+        const search = screen.getByPlaceholderText(/search by list or task/i);
+        Object.defineProperty(search, 'offsetParent', { value: {}, configurable: true });
 
-        fireEvent.keyDown(document, { key: '/' });
-        expect(document.activeElement).toBe(search);
+        fireEvent.keyDown(document, { key: '/', bubbles: true, cancelable: true });
+        await waitFor(() => expect(document.activeElement).toBe(search));
 
-        fireEvent.keyDown(document, { key: 'n' });
-        expect(document.activeElement).toBe(quickInput);
+        fireEvent.keyDown(document, { key: 'n', bubbles: true, cancelable: true });
+        await waitFor(() => expect(document.activeElement).toBe(quickInput));
 
         fireEvent.change(search, { target: { value: 'abc' } });
         fireEvent.keyDown(search, { key: 'Escape' });
-        expect(search.value).toBe('');
+        await waitFor(() => expect(search.value).toBe(''));
 
         document.body.removeChild(quickInput);
     });

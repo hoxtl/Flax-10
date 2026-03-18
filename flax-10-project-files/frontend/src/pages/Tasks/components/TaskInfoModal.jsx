@@ -110,7 +110,14 @@ export function TaskInfoModal({ task, listName, onClose }) {
   }, [pageCount]);
 
   return (
-      <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
+      <StandardModal
+        onClose={onClose}
+        hideHeader
+        size="md"
+        modalClassName={styles.infoModal}
+        contentClassName={styles.infoModalContent}
+        backdropClassName={styles.modalBackdrop}
+      >
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
         <InfoModalBody task={task} listName={listName} speedData={speedData} />

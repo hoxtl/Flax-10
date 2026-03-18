@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
 import styles from "./Settings.module.css";
-import { SettingsSidebar } from "../../components/Settings/SettingsUI";
+import { SettingsSidebar, SuccessBanner } from "../../components/Settings/SettingsUI";
 import AccountForm from "../../components/Settings/AccountForm";
 import SecurityForm from "../../components/Settings/SecurityForm";
 import PreferencesPanel from "../../components/Settings/PreferencesPanel";
@@ -62,6 +62,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
     handleHomeAddressSave,
     homeAddressError,
     handleSleepSave,
+    successMessage,
     handleStudyTimeSave,
     handleWeekPreferenceSave,
     handleWorktimePreferenceSave,
@@ -69,6 +70,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
 
   return (
     <div className={`${styles.panel} ${styles[panelVariantClass[activeTab] || "panelDefault"]}`}>
+      {successMessage && <SuccessBanner message={successMessage} />}
       <PanelHeader tabId={activeTab} />
       <div className={styles.panelBody}>
         {activeTab === "account" && (
@@ -98,7 +100,7 @@ function SettingsPanel({ activeTab, handlers, user }) {
 
 const VALID_TABS = new Set(Object.keys(PANEL_META));
 
-export default function Settings({ user }) {
+export default function Settings({ user, onBack }) {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(
@@ -115,6 +117,7 @@ export default function Settings({ user }) {
       title="Settings"
       width="lg"
       className={styles.pageWrapper}
+      onBack={onBack}
     >
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />

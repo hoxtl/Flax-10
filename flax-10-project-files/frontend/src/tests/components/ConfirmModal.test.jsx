@@ -45,7 +45,9 @@ describe('ConfirmModal', () => {
     it('calls onCancel when backdrop is clicked', () => {
         const onCancel = vi.fn();
         const { container } = render(<ConfirmModal {...defaultProps} onCancel={onCancel} />);
-        const backdrop = container.firstChild;
+        // ConfirmModal uses a portal; the backdrop won't live under the RTL container.
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+        expect(backdrop).toBeTruthy();
         fireEvent.mouseDown(backdrop);
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
