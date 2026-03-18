@@ -80,6 +80,9 @@ from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
 from studyFlax.views.authentication.home_address_view import home_address_view
 
+# Schedules
+from studyFlax.views.calendar.schedule_views import schedule_list, schedule_detail
+
 # Admin
 from studyFlax.views.admin.admin_view import (
     user_list, ban_user,
@@ -217,6 +220,10 @@ urlpatterns = [
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
     path("user/home-address/", home_address_view, name='home_address'),
+
+    # Schedules
+    path("schedules/", schedule_list, name='schedules'),
+    path("schedules/<int:schedule_id>/", schedule_detail, name='schedule-detail'),
 
     # Admin
     path("admin/users/", user_list, name='admin-user-list'),

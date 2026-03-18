@@ -281,3 +281,18 @@ class UserSettingsSerializerTests(TestCase):
         )
         locked_serializer = UserSettingsSerialiser(instance=locked_settings)
         self.assertTrue(locked_serializer.data['major_locked'])
+
+    def test_preferred_study_minutes_can_be_updated(self):
+        settings = UserSettings.objects.create(
+            user=self.user,
+            theme='light',
+            timezone='Europe/London'
+        )
+        serializer = UserSettingsSerialiser(
+            instance=settings,
+            data={'preferred_study_minutes_per_day': 180},
+            partial=True
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        updated = serializer.save()
+        self.assertEqual(updated.preferred_study_minutes_per_day, 180)
