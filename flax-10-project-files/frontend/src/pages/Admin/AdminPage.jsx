@@ -6,6 +6,7 @@ import {
   fetchAdminUsers,
   banUser,
   unbanUser,
+  fetchCourseChangeRequests,
   fetchTeacherRequests,
   resolveTeacherRequest,
   fetchReportedSocieties,
@@ -18,6 +19,8 @@ import {
 } from "../../api/adminApi";
 import styles from "./AdminPage.module.css";
 import AppPage from "../../components/common/AppPage/AppPage";
+
+const Motion = motion;
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -60,16 +63,18 @@ const USER_FILTER_GROUPS = {
 };
 
 function usePaginatedItems(items, pageSize = PAGE_SIZE) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil((items?.length || 0) / pageSize)),
     [items, pageSize],
   );
 
-  useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(1);
-  }, [currentPage, totalPages]);
+  const currentPage = Math.min(requestedPage, totalPages);
+
+  const setCurrentPage = useCallback((page) => {
+    setRequestedPage(page);
+  }, []);
 
   const pageItems = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -342,6 +347,13 @@ function UsersTab({ onNavigate }) {
     }
   };
 
+  const UserAvatar = ({ firstName, lastName }) => (
+    <div className={styles.userAvatar}>
+      {firstName?.[0]}
+      {lastName?.[0]}
+    </div>
+  );
+
   return (
     <>
       <SectionCard>
@@ -399,7 +411,7 @@ function UsersTab({ onNavigate }) {
               onPageChange={setCurrentPage}
             />
             <motion.div
-              className={styles.table}
+              className={`${styles.table} ${styles.desktopUsersView}`}
               variants={stagger}
               initial="initial"
               animate="animate"
@@ -414,12 +426,12 @@ function UsersTab({ onNavigate }) {
               <AnimatePresence>
                 {pageItems.map((u) => (
                   <motion.div
-                    key={u.id}
+                    key={`desktop-${u.id}`}
                     className={styles.tableRow}
                     variants={rowAnim}
                     layout
                   >
-                    <span className={styles.nameCell} data-label="User">
+                    <span className={styles.nameCell}>
                       <button
                         className={styles.nameBtn}
                         onClick={() => onNavigate?.(`profile_${u.id}`)}
@@ -428,16 +440,14 @@ function UsersTab({ onNavigate }) {
                         <span className={styles.username}>@{u.username}</span>
                       </button>
                     </span>
-                    <span className={styles.emailCell} data-label="Email">
-                      {u.email}
-                    </span>
-                    <span data-label="Role">
+                    <span className={styles.emailCell}>{u.email}</span>
+                    <span>
                       <RoleBadge role={u.role} />
                     </span>
-                    <span data-label="Status">
+                    <span>
                       <StatusBadge active={u.is_active} />
                     </span>
-                    <span className={styles.actionsCell} data-label="Actions">
+                    <span className={styles.actionsCell}>
                       {!u.is_staff &&
                         !u.is_superuser &&
                         (u.is_active ? (
@@ -465,6 +475,75 @@ function UsersTab({ onNavigate }) {
                 ))}
               </AnimatePresence>
             </motion.div>
+
+            <motion.div
+              className={`${styles.list} ${styles.mobileUsersView}`}
+              variants={stagger}
+              initial="initial"
+              animate="animate"
+            >
+              <AnimatePresence>
+                {pageItems.map((u) => (
+                  <motion.div
+                    key={`mobile-${u.id}`}
+                    className={styles.userCard}
+                    variants={rowAnim}
+                    layout
+                  >
+                    <div className={styles.cardInfoMetaBlock}>
+                      <div className={styles.cardProfile}>
+                        <UserAvatar
+                          firstName={u.first_name}
+                          lastName={u.last_name}
+                        />
+                        <div className={styles.nameHandle}>
+                          <span className={styles.userName}>
+                            {u.first_name} {u.last_name}
+                          </span>
+                          <span className={styles.userHandle}>
+                            @{u.username}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className={styles.metaBadges}>
+                        <span
+                          className={`${styles.statusBadge} ${u.is_active ? styles.active : styles.banned}`}
+                        >
+                          {u.is_active ? "Active" : "Banned"}
+                        </span>
+                        <MobileRoleBadge role={u.role} />
+                      </div>
+                    </div>
+
+                    <div className={styles.cardActions}>
+                      {!u.is_staff &&
+                        !u.is_superuser &&
+                        (u.is_active ? (
+                          <button
+                            className={styles.banPillBtn}
+                            disabled={busy}
+                            onClick={() => setBanTarget(u)}
+                          >
+                            Ban
+                          </button>
+                        ) : (
+                          <button
+                            className={styles.unbanPillBtn}
+                            disabled={busy}
+                            onClick={() => handleUnban(u)}
+                          >
+                            Unban
+                          </button>
+                        ))}
+                      {(u.is_staff || u.is_superuser) && (
+                        <span className={styles.staffPillBadge}>Staff</span>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           </>
         )}
       </SectionCard>
@@ -479,6 +558,19 @@ function UsersTab({ onNavigate }) {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function MobileRoleBadge({ role }) {
+  const map = {
+    teacher: styles.roleTeacher,
+    student: styles.roleStudent,
+    pending_teacher: styles.rolePending,
+  };
+  return (
+    <span className={`${styles.roleTag} ${map[role] || styles.roleStudent}`}>
+      {role.replace("_", " ")}
+    </span>
   );
 }
 
@@ -967,8 +1059,17 @@ function AdminPage({ onNavChange, onBack }) {
 
   return (
     <AppPage
-      title="Admin Dashboard"
-      subtitle="Manage users, societies and platform requests"
+      title={
+        <>
+          <span className={styles.adminWord}>Admin</span>
+          <span className={styles.dashboardWord}> Dashboard</span>
+        </>
+      }
+      subtitle={
+        <span className={styles.subtitleText}>
+          Manage users, societies and platform requests
+        </span>
+      }
       onBack={onBack}
       width="xl"
     >
