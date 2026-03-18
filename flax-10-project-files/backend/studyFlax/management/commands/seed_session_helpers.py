@@ -24,22 +24,22 @@ TASK_LABELS = [
 
 STUDY_PROFILES = {
     'night_owl': {
-        'preferred_hours': [20, 21, 22, 23],
-        'weekend_probability': 0.55,
-        'skip_day_prob': 0.25,
-        'work_choices': [25, 50, 75, 100],
+        'preferred_hours': [19, 20, 21, 22, 23],
+        'weekend_probability': 0.80,
+        'skip_day_prob': 0.10,
+        'work_choices': [75, 100, 125, 150],
     },
     'consistent': {
-        'preferred_hours': [9, 10, 14, 15, 16],
-        'weekend_probability': 0.70,
-        'skip_day_prob': 0.10,
-        'work_choices': [50, 75, 100, 125],
+        'preferred_hours': [9, 10, 11, 14, 15, 16],
+        'weekend_probability': 0.85,
+        'skip_day_prob': 0.05,
+        'work_choices': [100, 125, 150, 175],
     },
     'balanced': {
-        'preferred_hours': [9, 10, 11, 14, 15, 16],
-        'weekend_probability': 0.40,
-        'skip_day_prob': 0.20,
-        'work_choices': [25, 50, 75],
+        'preferred_hours': [9, 10, 11, 14, 15, 16, 19],
+        'weekend_probability': 0.65,
+        'skip_day_prob': 0.12,
+        'work_choices': [75, 100, 125, 150],
     },
 }
 
@@ -71,34 +71,38 @@ def _build_single_study_session(user, start, work_mins, break_mins, n_sessions):
     from studyFlax.models.timer.session_model import StudySession
     status = 'Overtime' if random.random() < 0.08 else 'Completed'
     end = start + timedelta(minutes=work_mins + break_mins)
+    pause_secs = random.randint(0, max(60, work_mins * 6))  # 0 to ~10% of work time
     return StudySession(
         user=user,
         study_block_id=int(start.timestamp() * 1000),
         start_time=start,
         end_time=end,
-        duration=work_mins,
-        break_duration=break_mins,
+        duration=work_mins * 60,
+        break_duration=break_mins * 60,
+        pause_duration=pause_secs,
         session_count=n_sessions,
         task=random.choice(TASK_LABELS),
         status=status,
     )
 
 def _build_day_study_sessions(user, session_date, config):
-    count = min(random.randint(1, 3), len(config['preferred_hours']))
+    count = min(random.randint(2, 4), len(config['preferred_hours']))
     hours = random.sample(config['preferred_hours'], count)
     sessions = []
     for hour in hours:
-        work_mins = random.choice(config['work_choices'])
+        base_mins = random.choice(config['work_choices'])
+        work_mins = max(15, base_mins + random.randint(-8, 8))
         break_mins = (work_mins // 25) * 5
-        start = session_date.replace(hour=hour, minute=0, second=0, microsecond=0)
-        sessions.append(_build_single_study_session(user, start, work_mins, break_mins, work_mins // 25))
+        start_min = random.randint(0, 3) * 5  # start on a 5-min boundary: 0, 5, 10, 15
+        start = session_date.replace(hour=hour, minute=start_min, second=0, microsecond=0)
+        sessions.append(_build_single_study_session(user, start, work_mins, break_mins, max(1, work_mins // 25)))
     return sessions
 
 def build_study_sessions_for_user(user, profile='balanced'):
     """Return StudySession instances across the past 90 days."""
     config = STUDY_PROFILES.get(profile, STUDY_PROFILES['balanced'])
     now = timezone.now()
-    dates = [now - timedelta(days=d) for d in range(90)]
+    dates = [now - timedelta(days=d) for d in range(120)]
     active_dates = [d for d in dates if not _should_skip_day(d, config)]
     sessions = []
     for session_date in active_dates:
@@ -128,6 +132,6 @@ def build_theme_sessions_for_user(user, profile='balanced'):
     slots = THEME_PROFILES.get(profile, THEME_PROFILES['balanced'])
     now = timezone.now()
     sessions = []
-    for day_offset in range(90):
+    for day_offset in range(120):
         sessions.extend(_theme_sessions_for_day(user, now - timedelta(days=day_offset), slots))
     return sessions

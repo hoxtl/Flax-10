@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp, MessageCircle, Sparkles, X } from "lucide-react";
+import { ArrowUp, CalendarPlus, Check, MessageCircle, Sparkles, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import analyticsService from "../api/analyticsService";
+import { createEvent } from "../api/eventApi";
+import { useCalendarDispatch } from "../context/CalendarContext";
 import styles from "./StudyCoachPanel.module.css";
 
 const SUGGESTIONS = [
@@ -31,6 +33,86 @@ function TypingIndicator() {
       <span className={styles.dot} style={{ animationDelay: "0ms" }} />
       <span className={styles.dot} style={{ animationDelay: "160ms" }} />
       <span className={styles.dot} style={{ animationDelay: "320ms" }} />
+    </div>
+  );
+}
+
+function formatEventTime(start, end) {
+  const fmt = (iso) =>
+    new Date(iso).toLocaleString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  return `${fmt(start)} – ${new Date(end).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+}
+
+function ScheduleImportPanel({ events }) {
+  const [statuses, setStatuses] = useState(() => events.map(() => "idle")); // idle | loading | done | error
+  const calendarDispatch = useCalendarDispatch();
+
+  useEffect(() => {
+    setStatuses(events.map(() => "idle"));
+  }, [events]);
+
+  const importOne = async (idx) => {
+    const ev = events[idx];
+    setStatuses((s) => s.map((v, i) => (i === idx ? "loading" : v)));
+    try {
+      await createEvent({
+        title: ev.title,
+        start_time: ev.start_time,
+        end_time: ev.end_time,
+        description: ev.description || "",
+      });
+      setStatuses((s) => s.map((v, i) => (i === idx ? "done" : v)));
+      calendarDispatch?.({ type: "TRIGGER_RELOAD" });
+    } catch {
+      setStatuses((s) => s.map((v, i) => (i === idx ? "error" : v)));
+    }
+  };
+
+  const importAll = async () => {
+    for (let i = 0; i < events.length; i++) {
+      if (statuses[i] !== "done") await importOne(i);
+    }
+  };
+
+  const allDone = statuses.every((s) => s === "done");
+  const anyPending = statuses.some((s) => s !== "done");
+
+  return (
+    <div className={styles.importPanel}>
+      {events.map((ev, idx) => (
+        <div key={idx} className={styles.importRow}>
+          <div className={styles.importEventInfo}>
+            <span className={styles.importEventTitle}>{ev.title}</span>
+            <span className={styles.importEventTime}>{formatEventTime(ev.start_time, ev.end_time)}</span>
+          </div>
+          <button
+            className={`${styles.importAddBtn} ${statuses[idx] === "done" ? styles.importAddBtnDone : ""}`}
+            onClick={() => importOne(idx)}
+            disabled={statuses[idx] === "loading" || statuses[idx] === "done"}
+            aria-label={`Add ${ev.title} to calendar`}
+          >
+            {statuses[idx] === "done" ? <Check size={13} /> : statuses[idx] === "loading" ? "…" : "+ Add"}
+          </button>
+          {statuses[idx] === "error" && <span className={styles.importStatus}>Failed</span>}
+        </div>
+      ))}
+      {!allDone && anyPending && (
+        <button className={styles.importAllBtn} onClick={importAll}>
+          <CalendarPlus size={14} />
+          Import All ({statuses.filter((s) => s !== "done").length} events)
+        </button>
+      )}
+      {allDone && (
+        <p className={styles.importAllDone}>
+          <Check size={13} /> All events added to your calendar
+        </p>
+      )}
     </div>
   );
 }
@@ -75,7 +157,10 @@ export default function StudyCoachPanel({
 
     try {
       const res = await analyticsService.aiChat(updated, period);
-      setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: res.reply, suggested_events: res.suggested_events || [] },
+      ]);
     } catch {
       setError("Could not get a response. Please try again.");
     } finally {
@@ -161,15 +246,23 @@ export default function StudyCoachPanel({
                   <MessageCircle size={14} />
                 </div>
               )}
-              <div className={`${styles.bubble} ${msg.role === "user" ? styles.bubbleUser : styles.bubbleAI}`}>
-                {msg.role === "user" ? (
-                  <p className={styles.bubbleLine}>{msg.content}</p>
-                ) : (
-                  <div className={styles.markdownBody}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
+              <div className={styles.bubbleGroup}>
+                <div className={`${styles.bubble} ${msg.role === "user" ? styles.bubbleUser : styles.bubbleAI}`}>
+                  {msg.role === "user" ? (
+                    <p className={styles.bubbleLine}>{msg.content}</p>
+                  ) : (
+                    <div className={styles.markdownBody}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+                </div>
+                {msg.role === "assistant" && msg.suggested_events?.length > 0 && (
+                  <ScheduleImportPanel
+                    key={msg.suggested_events.map((e) => e.start_time).join("|")}
+                    events={msg.suggested_events}
+                  />
                 )}
               </div>
             </motion.div>
