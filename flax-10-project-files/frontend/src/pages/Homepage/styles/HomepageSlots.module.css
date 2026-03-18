@@ -2058,37 +2058,29 @@
   align-items: center;
   gap: 8px;
 }
+
+.manualScheduleBtn {
+  background: var(--schedule-manual-bg);
+  border-color: var(--schedule-manual-border);
+  color: var(--schedule-manual-text);
+  box-shadow: var(--schedule-manual-shadow);
+}
+
+.manualScheduleBtn:hover:not(:disabled) {
+  background: var(--schedule-manual-bg-hover);
+  border-color: var(--schedule-manual-border-hover);
+  color: var(--schedule-manual-text);
+}
+
 .autoScheduleBtn {
-  background: #eef7ff;
-  border-color: rgba(91, 153, 214, 0.36);
-  color: #3c648b;
-}
-.autoScheduleBtn:hover {
-  background: #f5faff;
-  border-color: rgba(91, 153, 214, 0.5);
+  background: var(--schedule-auto-bg);
+  border-color: var(--schedule-auto-border);
+  color: var(--schedule-auto-text);
+  box-shadow: var(--schedule-auto-shadow);
 }
 
-[data-mode="dark"] .autoScheduleBtn {
-  background: linear-gradient(180deg, rgba(9, 56, 92, 0.88) 0%, rgba(10, 43, 69, 0.96) 100%);
-  border-color: rgba(56, 189, 248, 0.35);
-  color: #d8f0ff;
-}
-
-[data-mode="dark"] .autoScheduleBtn:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(11, 67, 109, 0.94) 0%, rgba(9, 49, 79, 1) 100%);
-  border-color: rgba(103, 232, 249, 0.48);
-  color: #f0fbff;
-}
-
-[data-mode="dark"] .manualScheduleBtn {
-  background: linear-gradient(180deg, rgba(34, 43, 58, 0.96) 0%, rgba(24, 31, 43, 0.98) 100%);
-  border-color: rgba(148, 163, 184, 0.22);
-  color: #e8edf5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
-}
-
-[data-mode="dark"] .manualScheduleBtn:hover:not(:disabled) {
-  background: linear-gradient(180deg, rgba(42, 54, 72, 0.98) 0%, rgba(28, 37, 52, 1) 100%);
-  border-color: rgba(125, 211, 252, 0.3);
-  color: #f8fbff;
+.autoScheduleBtn:hover:not(:disabled) {
+  background: var(--schedule-auto-bg-hover);
+  border-color: var(--schedule-auto-border-hover);
+  color: var(--schedule-auto-text);
 }
