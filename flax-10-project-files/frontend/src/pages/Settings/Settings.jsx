@@ -63,6 +63,9 @@ function SettingsPanel({ activeTab, handlers, user }) {
     homeAddressError,
     handleSleepSave,
     successMessage,
+    handleStudyTimeSave,
+    handleWeekPreferenceSave,
+    handleWorktimePreferenceSave,
   } = handlers;
 
   return (
@@ -76,11 +79,15 @@ function SettingsPanel({ activeTab, handlers, user }) {
         {activeTab === "security" && (
           <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />
         )}
-        {(activeTab === "preferences" || activeTab === "preferences_themes") && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="themes" />
-        )}
-        {activeTab === "preferences_sleep" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="sleep" />
+        {activeTab === "preferences" && (
+          <PreferencesPanel
+            onSave={handlePreferencesSave}
+            onSleepSave={handleSleepSave}
+            onStudyTimeSave={handleStudyTimeSave}
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
+            isSaving={isSaving}
+          />
         )}
         {activeTab === "home" && (
           <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />
@@ -121,4 +128,3 @@ export default function Settings({ user, onBack }) {
     </AppPage>
   );
 }
-

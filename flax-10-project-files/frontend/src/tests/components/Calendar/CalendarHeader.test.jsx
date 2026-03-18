@@ -52,6 +52,7 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     SearchButton: ({ value, onChange }) => (
         <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
     ),
+    ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -122,6 +123,11 @@ describe('CalendarHeader', () => {
         });
     });
 
+    it('renders manage schedules control', () => {
+        setup();
+        expect(screen.getByText('Manage schedules')).toBeInTheDocument();
+    });
+    
     it('should open modal on adding event', () => {
         setup();
         const addBtn = screen.getByText('+');
