@@ -15,9 +15,9 @@
     border-radius: 0;
 }
 
-/* Dark solid header */
+/* Airy transparent header — sandwiched by charcoal lines */
 .header {
-    background: var(--text);
+    background: transparent;
 }
 
 .headerCell {
@@ -26,26 +26,28 @@
     z-index: 10;
     padding: 14px 16px;
     text-align: left;
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #B89B7E;
-    background: var(--text);
-    border-bottom: 2px solid var(--text);
+    letter-spacing: 0.08em;
+    color: #333333;
+    background: var(--bg);
+    border-top: 1px solid #333333;
+    border-bottom: 1px solid #333333;
 }
 
 :root[data-mode="dark"] .headerCell {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--primary);
+    background: var(--bg);
+    color: var(--text);
+    border-top-color: rgba(255, 255, 255, 0.15);
     border-bottom-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Row — zebra striping */
+/* Row — soft zebra striping */
 .row {
-    border-bottom: 1px solid rgba(74, 52, 33, 0.1);
+    border-bottom: 0.5px solid rgba(51, 51, 51, 0.1);
     transition: background 0.15s;
-    height: 48px;
+    height: 52px;
 }
 
 .row:nth-child(even) {
@@ -169,6 +171,7 @@
     color: #5D4037;
     font-style: italic;
     min-width: 160px;
+    text-align: right;
 }
 
 :root[data-mode="dark"] .dateCell {
@@ -340,38 +343,41 @@ textarea.cellInput {
     opacity: 0.6;
 }
 
-/* Tag — text only with thin vertical separator */
+/* Tag — soft Flax pill */
 .tagBadge {
     display: inline-flex;
     align-items: center;
-    padding: 0;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 0;
-    background: transparent;
-    color: #666666;
-    border-left: 2px solid rgba(74, 52, 33, 0.2);
-    padding-left: 8px;
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: #F2F0E9;
+    color: #333333;
+    border: 0.5px solid rgba(51, 51, 51, 0.12);
     transition: opacity 0.15s;
 }
 
 :root[data-mode="dark"] .tagBadge {
-    color: var(--muted);
-    border-left-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
 .tagCellContent:hover .tagBadge {
     opacity: 0.85;
 }
 
+/* Source pill — solid charcoal */
 .sourceBadge {
-    display: inline-block;
-    padding: 2px 8px;
-    margin-right: 4px;
-    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
     font-weight: 600;
-    border-radius: 2px;
-    background: var(--text);
+    letter-spacing: 0.02em;
+    background: #333333;
     color: #FAF9F6;
 }
 

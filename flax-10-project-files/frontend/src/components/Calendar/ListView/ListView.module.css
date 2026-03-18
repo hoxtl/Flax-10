@@ -8,6 +8,12 @@
     padding: 0 12px;
 }
 
+/* Day mode — show all events, no internal scroll */
+.dayMode {
+    height: auto;
+    overflow-y: visible;
+}
+
 /* Remove card shell for cleaner look */
 .listCard {
     background: transparent;
@@ -173,14 +179,16 @@
     background: var(--text);
 }
 
-/* Event row — slim with dot anchor */
+/* Event row — slim with dot anchor + pastel accent tint */
 .eventRow {
     border-bottom: none;
     cursor: pointer;
-    background: transparent;
+    background: color-mix(in srgb, var(--accent, transparent) 8%, transparent);
     transition: background 0.15s ease;
     position: relative;
     min-height: 40px;
+    border-radius: 6px;
+    margin-bottom: 2px;
 }
 
 /* Dot on the timeline */
@@ -201,9 +209,8 @@
     border-bottom: none;
 }
 
-.eventRow:hover,
-.eventRow.expanded {
-    background: rgba(74, 52, 33, 0.04);
+.eventRow:hover {
+    background: color-mix(in srgb, var(--accent, transparent) 15%, transparent);
 }
 
 .eventRow.readOnly {
@@ -215,11 +222,6 @@
     align-items: center;
     padding: 8px 16px 8px 0;
     gap: 0;
-}
-
-/* Replace color strip with nothing (dot handles it) */
-.eventStrip {
-    display: none;
 }
 
 .eventTime {
@@ -235,14 +237,24 @@
     color: var(--muted);
 }
 
-.eventName {
+/* Groups event name + pills inline */
+.eventContent {
     flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.eventName {
     font-size: 0.82rem;
     font-weight: 700;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 :root[data-mode="dark"] .eventName {
@@ -253,112 +265,89 @@
     display: flex;
     gap: 6px;
     flex-shrink: 0;
-    margin-left: 12px;
 }
 
-.tagBadge,
-.sourceBadge {
-    font-size: 0.7rem;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-/* Tag — text only, no background */
+/* Soft pill — Flax tonal */
 .tagBadge {
-    background: transparent;
-    color: #666666;
-    border-left: 2px solid rgba(74, 52, 33, 0.2);
-    padding-left: 8px;
-    border-radius: 0;
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    background: #F2F0E9;
+    color: #333333;
+    border: 0.5px solid rgba(51, 51, 51, 0.12);
 }
 
 :root[data-mode="dark"] .tagBadge {
-    color: var(--muted);
-    border-left-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
+/* Source pill — solid charcoal */
 .sourceBadge {
-    color: var(--c-white);
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    background: #333333;
+    color: #FAF9F6;
 }
 
-.eventChevron {
-    margin-left: 10px;
-    font-size: 0.7rem;
-    color: var(--muted);
-    transform-origin: center;
-    transition: transform 0.18s ease;
+:root[data-mode="dark"] .sourceBadge {
+    background: var(--primary);
+    color: #FAF9F6;
 }
 
-.eventRow.expanded .eventChevron {
-    transform: rotate(180deg);
+
+/* Conflict row — two or more overlapping events side by side */
+.conflictRow {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    min-height: 40px;
 }
 
-/* Expanded detail panel */
-.eventDetail {
-    padding: 0 16px 12px 0;
+.conflictRow::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text);
+    z-index: 1;
+}
+
+/* Container for the side-by-side cells — time column matches eventTime width */
+.conflictCells {
+    flex: 1;
+    display: flex;
+    gap: 1px;
+    background: rgba(74, 52, 33, 0.12);
+    border-radius: 4px;
+    overflow: hidden;
     margin-left: 0;
 }
 
-.detailGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 24px;
-    padding: 12px 14px;
-    background: rgba(74, 52, 33, 0.03);
-    border-radius: 4px;
-    border: 1px solid rgba(74, 52, 33, 0.1);
+/* Each individual conflict cell — pastel accent tint */
+.conflictCell {
+    flex: 1;
+    background: color-mix(in srgb, var(--accent, transparent) 8%, var(--calendar-bg, #FAF9F6));
+    padding: 8px 12px 8px 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    min-width: 0;
 }
 
-:root[data-mode="dark"] .detailGrid {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
-.detailItem {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.detailLabel {
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #5D4037;
-}
-
-:root[data-mode="dark"] .detailLabel {
-    color: var(--text-muted);
-}
-
-.detailValue {
-    font-size: 0.8rem;
-    color: var(--text);
-}
-
-:root[data-mode="dark"] .detailValue {
-    color: var(--text);
-}
-
-.detailValueMuted {
-    color: var(--muted);
-    font-style: italic;
-}
-
-.detailFullRow {
-    grid-column: 1 / -1;
-}
-
-.detailActions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.detailButton {
-    font-size: var(--text-sm);
-    min-height: var(--btn-height-sm);
+.conflictCell:hover {
+    background: color-mix(in srgb, var(--accent, transparent) 15%, var(--calendar-bg, #FAF9F6));
 }
 
 /* Empty state */

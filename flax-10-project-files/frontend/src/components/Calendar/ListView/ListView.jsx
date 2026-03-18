@@ -1,7 +1,8 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
 import { usePagination } from '../../../hooks/usePagination';
-import { EventRow } from './EventRow';
+import { EventRow, ConflictRow } from './EventRow';
+import { isAllDay } from '../utils/eventUtils';
 import { Pagination, BackToTop } from '../../Pagination/Pagination';
 import { getEffectiveTagName, sortByStartTime } from '../utils/eventUtils';
 import styles from './ListView.module.css';
@@ -153,10 +154,46 @@ function GroupedEventsList({ events }) {
     return keys.map(key => <DateGroup key={key} dateKey={key} events={groups.get(key)} />);
 }
 
+/**
+ * Groups sorted events into buckets where overlapping timed events
+ * are in the same bucket (to be shown side by side).
+ * All-day events are always their own single-item bucket.
+ */
+function groupOverlappingEvents(events) {
+    const result = [];
+    let group = [];
+    let maxEnd = null;
+
+    for (const event of events) {
+        if (isAllDay(event)) {
+            if (group.length) { result.push(group); group = []; maxEnd = null; }
+            result.push([event]);
+            continue;
+        }
+        const start = new Date(event.start_time);
+        const end = new Date(event.end_time);
+        if (!maxEnd || start >= maxEnd) {
+            if (group.length) result.push(group);
+            group = [event];
+            maxEnd = end;
+        } else {
+            group.push(event);
+            if (end > maxEnd) maxEnd = end;
+        }
+    }
+    if (group.length) result.push(group);
+    return result;
+}
+
 function FlatEventsList({ events }) {
+    const groups = useMemo(() => groupOverlappingEvents(events), [events]);
     return (
         <div className={styles.flatList}>
-            {events.map(event => <EventRow key={event.id} event={event} />)}
+            {groups.map((group, i) =>
+                group.length > 1
+                    ? <ConflictRow key={i} events={group} />
+                    : <EventRow key={group[0].id} event={group[0]} />
+            )}
         </div>
     );
 }
@@ -189,7 +226,7 @@ export function ListView({ selectedDate: propDate, events: propEvents }) {
         ? <FlatEventsList events={items} />
         : <GroupedEventsList events={items} />;
     return (
-        <div data-list-view className={styles.container}>
+        <div data-list-view className={`${styles.container} ${isDay ? styles.dayMode : ''}`}>
             <div className={styles.listCard}>
                 {body}
             </div>

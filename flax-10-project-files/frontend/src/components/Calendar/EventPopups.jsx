@@ -110,6 +110,8 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
 
 function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }, { allowModuleLeave = true } = {}) {
     if (!allowModuleLeave) return null;
+    const tagName = (event.tag_name || event.tag?.name || '').toLowerCase();
+    if (tagName === 'lecture') return null;
     const handleLeave = () => {
         closePopup();
         disenrollFromModule(event.module, loadEvents);
