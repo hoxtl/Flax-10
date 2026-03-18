@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Check } from 'lucide-react';
 import styles from "../../pages/Timer/TimerPage.module.css";
+import SearchBar from '../common/SearchBar/SearchBar';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import SkeletonBlock from "../common/LoadingState/SkeletonBlock";
 import { noiseGenerator } from './utils/noiseUtils';
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../pages/Tasks/constants/focusBlockColours';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';
 import AnimatedDropdown from '../common/AnimatedDropdown';
+import TaskFeedFilterPanel from '../../pages/Tasks/components/TaskFeedFilterPanel';
+import { isEnrolledIn } from '../Modules/utils/moduleUtils';
 import {
     compareTaskPriority,
     compareTaskDue,
@@ -126,59 +129,25 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
     return <div className={styles.settingsContainer}>{inputs}{disc}</div>;
 };
 
-const SOUND_OPTIONS = [
-    { value: 'none', label: 'None 🔇' },
-    { value: 'white', label: 'White Noise 🌊' },
-    { value: 'pink', label: 'Pink Noise 🌧️' },
-    { value: 'brown', label: 'Brown Noise 🏔️' },
-];
-
-const SoundControls = ({ noiseType, setNoiseType, volume, setVolume }) => {
-    const lbl = <span className={styles.label}>Calming Sound:</span>;
-    const dropdown = (
-        <AnimatedDropdown
-            value={noiseType}
-            onChange={setNoiseType}
-            placeholder="Select sound"
-            options={SOUND_OPTIONS}
-            grouped={false}
-            className={styles.soundDropdown}
-        />
-    );
-    const slider = noiseType !== 'none' ? (
-        <input
-            type="range"
-            className={styles.volumeSlider}
-            min={0} max={1} step={0.05}
-            value={volume}
-            onChange={(e) => setVolume(parseFloat(e.target.value))}
-            aria-label="Volume"
-            title={`Volume: ${Math.round(volume * 100)}%`}
-        />
-    ) : null;
-    return <div className={styles.soundControls}>{lbl}{dropdown}{slider}</div>;
-};
-
 const applyNoise = (noiseType, volume) => {
     if (noiseType === 'none') return noiseGenerator.stop();
     noiseGenerator.play(noiseType);
     noiseGenerator.setVolume(volume);
 };
 
-const useNoiseEffect = (noiseType, volume) => {
+export const useAmbientSound = () => {
+    const [noiseType, setNoiseType] = useState('none');
+    const [volume, setVolume] = useState(0.5);
     useEffect(() => {
         applyNoise(noiseType, volume);
         return () => noiseGenerator.stop();
     }, [noiseType, volume]);
+    const toggle = (value) => setNoiseType((prev) => prev === value ? 'none' : value);
+    return { noiseType, toggle, volume, setVolume };
 };
 
-export const SoundSelector = () => {
-    const [noiseType, setNoiseType] = useState('none');
-    const [volume, setVolume] = useState(0.5);
-    useNoiseEffect(noiseType, volume);
-    const ctrl = <SoundControls noiseType={noiseType} setNoiseType={setNoiseType} volume={volume} setVolume={setVolume} />;
-    return <div className={styles.soundSelectorContainer}>{ctrl}</div>;
-};
+// Keep SoundSelector for backward compat but it's now unused in the timer
+export const SoundSelector = () => null;
 
 const handleTaskKey = (e) => {
     if (e.key === 'Enter') e.target.blur();
@@ -199,16 +168,59 @@ const SORT_OPTIONS = [
     { value: SORT_TIME, label: 'Estimated time' },
 ];
 
-export const TaskInput = ({ value, onChange, onTaskSelect }) => {
+const URGENCY_COLOURS = {
+    hot: '#d16a6a',
+    warm: '#c6a06a',
+    cool: '#8ea0b6',
+};
+
+const getTaskUrgencyTone = (task) => {
+    const raw = task?.due_date || task?.dueDate;
+    if (!raw) return 'cool';
+    const due = new Date(raw);
+    if (Number.isNaN(due.getTime())) return 'cool';
+
+    const now = new Date();
+    const endOfToday = new Date(now);
+    endOfToday.setHours(23, 59, 59, 999);
+
+    if (due.getTime() <= endOfToday.getTime()) return 'hot';
+    const diffHours = (due.getTime() - now.getTime()) / 3600000;
+    if (diffHours <= 48) return 'warm';
+    return 'cool';
+};
+
+const normalizeModuleCode = (code) => String(code || '').trim().toUpperCase();
+
+const urgencyRank = (task) => {
+    const tone = getTaskUrgencyTone(task);
+    if (tone === 'hot') return 0;
+    if (tone === 'warm') return 1;
+    return 2;
+};
+
+export const TaskInput = ({ value, onChange, onClearTask, onTaskSelect, onJustStart, isSessionActive = false, onOpenFocus }) => {
     const [open, setOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [lists, setLists] = useState([]);
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState(SORT_URGENCY);
     const [search, setSearch] = useState('');
-    const [filterListId, setFilterListId] = useState('');
-    const [filterModuleCode, setFilterModuleCode] = useState('');
+    const [recommendedTaskId, setRecommendedTaskId] = useState(null);
     const ref = useRef(null);
+
+    const [filterListIds, setFilterListIds] = useState([]);
+    const [filterModuleCodes, setFilterModuleCodes] = useState([]);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [activeFilterTab, setActiveFilterTab] = useState('lists');
+    const [filterQuery, setFilterQuery] = useState('');
+    const filterWrapRef = useRef(null);
+
+    const handleModalMouseDown = useCallback((e) => {
+        if (isFilterOpen && filterWrapRef.current && !filterWrapRef.current.contains(e.target)) {
+            setIsFilterOpen(false);
+        }
+    }, [isFilterOpen]);
 
     const loadTasks = useCallback((sort = sortBy) => {
         setLoading(true);
@@ -264,81 +276,215 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
         setOpen(false);
         onTaskSelect?.(task);
     };
+    const handleClearTask = () => {
+        onChange('');
+        onClearTask?.();
+        setRecommendedTaskId(null);
+    };
+    const isCompact = Boolean(isSessionActive && value);
+    const hasTaskValue = Boolean((value || '').trim());
 
     const searchLower = (search || '').toLowerCase().trim();
-    const listOptions = useMemo(() => [
-        { value: '', label: 'All lists' },
-        ...(lists || []).map((l) => ({ value: String(l.id), label: l.name || 'Other' })),
-    ], [lists]);
-    const moduleOptions = useMemo(() => {
-        const codes = [...new Set((tasks || []).map((t) => t.module_code).filter(Boolean))].sort();
-        return [{ value: '', label: 'All modules' }, ...codes.map((c) => ({ value: c, label: c }))];
-    }, [tasks]);
+
+    const moduleCodePrefix = (code = '') => code.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() || 'Other';
+
+    const [enrolledModules, setEnrolledModules] = useState([]);
+    useEffect(() => {
+        let active = true;
+        import('../../api/moduleApi').then(({ getModules, getEnrollments }) => {
+            Promise.all([getModules(), getEnrollments()])
+                .then(([allMods, enrollments]) => {
+                    if (!active) return;
+                    const enrolled = (allMods || []).filter((m) => isEnrolledIn(m.id, enrollments || []));
+                    const mapped = enrolled.map((m) => ({
+                        code: normalizeModuleCode(m.module_code),
+                        name: String(m.module_name || m.title || '').trim(),
+                    })).filter((m) => m.code);
+                    setEnrolledModules(mapped);
+                })
+                .catch(() => {});
+        });
+        return () => { active = false; };
+    }, []);
+
+    const listItems = useMemo(() => (lists || []).map((l) => ({ value: String(l.id), label: l.name || 'List' })), [lists]);
+
+    const moduleItems = useMemo(() => {
+        const byCode = new Map();
+        enrolledModules.forEach((m) => { if (m.code) byCode.set(m.code, m.name); });
+        tasks.forEach((t) => {
+            const code = normalizeModuleCode(t.module_code);
+            if (!code || byCode.has(code)) return;
+            const name = String(t.module_name || '').trim();
+            byCode.set(code, name);
+        });
+        return Array.from(byCode.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([code, name]) => ({
+            value: code,
+            label: name ? `${code} — ${name}` : code,
+        }));
+    }, [enrolledModules, tasks]);
+
+    const visibleListItems = useMemo(() => {
+        const q = filterQuery.trim().toLowerCase();
+        return !q ? listItems : listItems.filter((o) => o.label.toLowerCase().includes(q));
+    }, [listItems, filterQuery]);
+
+    const groupedModuleItems = useMemo(() => {
+        const q = filterQuery.trim().toLowerCase();
+        const base = !q ? moduleItems : moduleItems.filter((o) => o.label.toLowerCase().includes(q));
+        return base.reduce((acc, item) => {
+            const k = moduleCodePrefix(item.value);
+            if (!acc[k]) acc[k] = [];
+            acc[k].push(item);
+            return acc;
+        }, {});
+    }, [moduleItems, filterQuery]);
+
+    const moduleGroupKeys = useMemo(() => Object.keys(groupedModuleItems).sort(), [groupedModuleItems]);
+
+    const toggleList = (listId) => {
+        setFilterListIds((prev) => {
+            const str = String(listId);
+            return prev.includes(str) ? prev.filter((id) => id !== str) : [...prev, str];
+        });
+    };
+    const toggleModule = (code) => {
+        setFilterModuleCodes((prev) => prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]);
+    };
+    const clearAllFilters = () => { setFilterListIds([]); setFilterModuleCodes([]); setFilterQuery(''); };
+    const activeFilterCount = filterListIds.length + filterModuleCodes.length;
 
     let filteredTasks = searchLower
         ? tasks.filter((t) => (t.title || '').toLowerCase().includes(searchLower) || (t.list_name || '').toLowerCase().includes(searchLower) || ((t.module_code || '').toLowerCase().includes(searchLower)))
         : tasks;
-    if (filterListId) {
-        filteredTasks = filteredTasks.filter((t) => String(t.task_list) === String(filterListId));
+
+    if (filterListIds.length > 0) {
+        const set = new Set(filterListIds.map(String));
+        filteredTasks = filteredTasks.filter((t) => set.has(String(t.task_list)));
     }
-    if (filterModuleCode) {
-        filteredTasks = filteredTasks.filter((t) => String(t.module_code || '') === String(filterModuleCode));
+    if (filterModuleCodes.length > 0) {
+        const set = new Set(filterModuleCodes);
+        filteredTasks = filteredTasks.filter((t) => set.has(normalizeModuleCode(t.module_code)));
     }
+    const recommendedTask = useMemo(() => {
+        if (!filteredTasks.length) return null;
+        return [...filteredTasks].sort((a, b) => {
+            const rankDiff = urgencyRank(a) - urgencyRank(b);
+            if (rankDiff !== 0) return rankDiff;
+            return compareTaskDue(a, b);
+        })[0] || null;
+    }, [filteredTasks]);
+
+    const handlePickForMe = () => {
+        if (!recommendedTask) return;
+        setRecommendedTaskId(recommendedTask.id);
+        window.setTimeout(() => {
+            selectTask(recommendedTask);
+        }, 140);
+    };
 
     return (
         <div className={styles.taskInputWrap}>
-            {value && (
+            {value && !isCompact && (
                 <div className={styles.currentTaskLabel}>Currently focusing on:</div>
             )}
             <div className={styles.taskInputContainer} ref={ref}>
                 <input
                     type="text"
-                    className={`${styles.taskInput} ${value ? styles.taskInputHasValue : ''}`}
-                    placeholder="What are you working on? 🎯"
+                    className={`${styles.taskInput} ${value ? styles.taskInputHasValue : ''} ${isCompact ? styles.taskInputCompact : ''}`}
+                    placeholder={isCompact ? "Task in progress" : "What are you working on? 🎯"}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     onKeyDown={handleTaskKey}
                 />
-                <div className={styles.taskInputActions}>
-                    <span className={styles.taskInputHint}>Choose a task to start</span>
-                    <button
-                        type="button"
-                        className={styles.taskPickBtn}
-                        onClick={handleOpen}
-                        title="Select a task"
-                    >
-                        Select Task
-                    </button>
-                </div>
+                {!isCompact ? (
+                    <div className={styles.taskInputActions}>
+                        <div className={styles.taskInputActionsRow}>
+                            <PrimaryButton
+                                variant="primary"
+                                pill
+                                className={styles.taskPickBtn}
+                                onClick={handleOpen}
+                                title="Select a task"
+                            >
+                                Choose a task to focus
+                            </PrimaryButton>
+                            {typeof onOpenFocus === 'function' && (
+                                <PrimaryButton
+                                    variant="secondary"
+                                    pill
+                                    className={styles.fullFocusInlineBtn}
+                                    onClick={onOpenFocus}
+                                >
+                                    Full Focus Mode ⚡
+                                </PrimaryButton>
+                            )}
+                        </div>
+                        {hasTaskValue ? (
+                            <button
+                                type="button"
+                                className={styles.taskClearBtn}
+                                onClick={handleClearTask}
+                                title="Clear selected task"
+                            >
+                                Clear task
+                            </button>
+                        ) : null}
+                    </div>
+                ) : (
+                    <div className={`${styles.taskInputActions} ${styles.taskInputActionsCompact}`}>
+                        <button
+                            type="button"
+                            className={styles.taskPickBtn}
+                            onClick={handleOpen}
+                            title="Change task"
+                        >
+                            Change task
+                        </button>
+                        {hasTaskValue ? (
+                            <button
+                                type="button"
+                                className={styles.taskClearBtn}
+                                onClick={handleClearTask}
+                                title="Clear selected task"
+                            >
+                                Clear task
+                            </button>
+                        ) : null}
+                    </div>
+                )}
                 <StandardModal
-                    title="Select a Task"
-                    subtitle="Pick something concrete and jump straight into focus mode."
                     onClose={() => setOpen(false)}
                     size="md"
-                    hideHeader={!open}
-                    backdropClassName={!open ? styles.hidden : ""}
+                    hideHeader
+                    backdropClassName={!open ? styles.hidden : styles.taskPickBackdrop}
                     modalClassName={!open ? styles.hidden : styles.taskPickDropdown}
                     contentClassName={styles.taskPickContent}
                 >
                     {open && (
-                        <>
-                            <div className={styles.taskPickSearchRow}>
-                                <div className={styles.taskPickSearchInputWrap}>
-                                    <Search size={15} className={styles.taskPickSearchIcon} />
-                                    <input
-                                        type="text"
-                                        className={styles.taskPickSearchInput}
-                                        placeholder="Search tasks…"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        autoFocus
-                                    />
+                        <div onMouseDown={handleModalMouseDown}>
+                            <div className={styles.taskPickHeader}>
+                                <div className={styles.taskPickHeaderCopy}>
+                                    <h2 className={styles.taskPickHeaderTitle}>Select a Task</h2>
                                 </div>
+                                <button
+                                    type="button"
+                                    className={styles.taskPickCloseBtn}
+                                    onClick={() => setOpen(false)}
+                                    aria-label="Close task picker"
+                                >
+                                    ×
+                                </button>
                             </div>
                             <div className={styles.taskPickFiltersBar}>
-                                <div className={styles.taskPickFilterGrid}>
-                                    <div className={`${styles.taskPickField} ${styles.taskPickFilterRow}`}>
-                                        <span className={styles.taskPickSortLabel}>Sort</span>
+                                <div className={styles.taskPickToolbarRow}>
+                                    <SearchBar
+                                        value={search}
+                                        onChange={setSearch}
+                                        placeholder="Search tasks…"
+                                        className={styles.taskPickSearch}
+                                    />
+                                    <div className={styles.taskPickSortWrap}>
                                         <AnimatedDropdown
                                             value={sortBy}
                                             onChange={(v) => { setSortBy(v); loadTasks(v); }}
@@ -346,27 +492,29 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                                             className={styles.taskPickSortDropdown}
                                         />
                                     </div>
-                                    <div className={styles.taskPickField}>
-                                        <span className={styles.taskPickSortLabel}>List</span>
-                                        <AnimatedDropdown
-                                            value={filterListId}
-                                            onChange={setFilterListId}
-                                            options={listOptions}
-                                            placeholder="All lists"
-                                            className={styles.taskPickFilterHalf}
-                                        />
-                                    </div>
-                                    <div className={`${styles.taskPickField} ${styles.taskPickFieldCompact}`}>
-                                        <span className={styles.taskPickSortLabel}>Module</span>
-                                        <AnimatedDropdown
-                                            value={filterModuleCode}
-                                            onChange={setFilterModuleCode}
-                                            options={moduleOptions}
-                                            placeholder="All"
-                                            className={`${styles.taskPickFilterHalf} ${styles.taskPickModuleFilter}`}
+                                    <div ref={filterWrapRef}>
+                                        <TaskFeedFilterPanel
+                                            isOpen={isFilterOpen}
+                                            onToggle={() => setIsFilterOpen((o) => !o)}
+                                            activeFilterCount={activeFilterCount}
+                                            activeFilterTab={activeFilterTab}
+                                            onTabChange={setActiveFilterTab}
+                                            filterQuery={filterQuery}
+                                            onFilterQueryChange={setFilterQuery}
+                                            visibleListItems={visibleListItems}
+                                            filterListIds={filterListIds}
+                                            onToggleList={toggleList}
+                                            groupedVisibleModuleItems={groupedModuleItems}
+                                            moduleGroupKeys={moduleGroupKeys}
+                                            filterModuleCodes={filterModuleCodes}
+                                            onToggleModule={toggleModule}
+                                            onClearAll={clearAllFilters}
                                         />
                                     </div>
                                 </div>
+                                <PrimaryButton variant="primary" pill className={styles.taskPickSmartBtn} onClick={handlePickForMe}>
+                                    ✦ Smart Pick — choose a task for me
+                                </PrimaryButton>
                             </div>
                             {loading ? (
                                 <div className={styles.taskPickLoadingState}>
@@ -379,48 +527,58 @@ export const TaskInput = ({ value, onChange, onTaskSelect }) => {
                                     ))}
                                 </div>
                             ) : filteredTasks.length === 0 ? (
-                                <div className={styles.taskPickEmpty}>
-                                    <span className={styles.taskPickEmptyIcon}>{searchLower ? '🔍' : '📋'}</span>
-                                    <span>{searchLower ? 'No tasks match your search.' : 'No tasks yet. Add some on the Tasks page.'}</span>
-                                </div>
+                                <SearchEmptyState
+                                    query={search}
+                                    itemLabel="tasks"
+                                    hint={searchLower ? 'Try a different keyword.' : undefined}
+                                    onClear={searchLower ? () => setSearch('') : undefined}
+                                />
                             ) : (
                                 <div className={styles.taskPickList}>
                                     {filteredTasks.map((task) => {
-                                        const duration = `${getTaskDurationMinutes(task)}m`;
+                                        const durationMinutes = getTaskDurationMinutes(task);
                                         const listName = task.list_name || 'Other';
-                                        const listColor = task.list_color || '#94a3b8';
+                                        const urgencyTone = getTaskUrgencyTone(task);
                                         const isSelected = value === task.title;
+                                        const isRecommended = recommendedTaskId === task.id;
+                                        const urgencyClass = urgencyTone === 'hot'
+                                            ? styles.taskPickItemHot
+                                            : urgencyTone === 'warm'
+                                                ? styles.taskPickItemWarm
+                                                : styles.taskPickItemCool;
+                                        const taskMarker = urgencyTone === 'hot'
+                                            ? '🔥'
+                                            : task.module_code
+                                                ? '🦁'
+                                                : null;
+                                        const moduleOrList = task.module_code || listName;
                                         return (
                                             <button
                                                 key={task.id}
                                                 type="button"
-                                                className={`${styles.taskPickItem} ${isSelected ? styles.taskPickItemSelected : ''}`}
+                                                className={`${styles.taskPickItem} ${urgencyClass} ${isSelected ? styles.taskPickItemSelected : ''} ${isRecommended ? styles.taskPickItemRecommended : ''}`}
                                                 onClick={() => selectTask(task)}
                                                 title={task.title}
-                                                style={{ borderLeft: `3px solid ${listColor}` }}
                                             >
                                                 <div className={styles.taskPickItemContent}>
-                                                    <span className={styles.taskPickTitle}>{task.title}</span>
-                                                    <span className={styles.taskPickMetaRow}>
-                                                        <span
-                                                            className={styles.taskPickListPill}
-                                                            style={{ background: `${listColor}22`, color: listColor }}
-                                                        >
-                                                            {listName}
+                                                    <span className={styles.taskPickSingleLine}>
+                                                        <span className={styles.taskPickTitleRow}>
+                                                            {taskMarker ? <span className={styles.taskPickPriorityIcon}>{taskMarker}</span> : null}
+                                                            <span className={styles.taskPickTitle}>{task.title}</span>
                                                         </span>
-                                                        {task.module_code && (
-                                                            <span className={styles.taskPickModulePill}>{task.module_code}</span>
-                                                        )}
-                                                        <span className={styles.taskPickDuration}>{duration}</span>
+                                                        <span className={styles.taskPickInlineMeta}>
+                                                            <span className={styles.taskPickDurationInline}>{durationMinutes} mins</span>
+                                                            <span className={styles.taskPickMetaDivider}>•</span>
+                                                            <span className={styles.taskPickMetaLine}>{moduleOrList}</span>
+                                                        </span>
                                                     </span>
                                                 </div>
-                                                {isSelected && <Check size={14} className={styles.taskPickCheckmark} />}
                                             </button>
                                         );
                                     })}
                                 </div>
                             )}
-                        </>
+                        </div>
                     )}
                 </StandardModal>
             </div>
