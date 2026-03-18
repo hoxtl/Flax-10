@@ -319,12 +319,12 @@ function MilestoneCard() {
                     <span className={styles.milestoneNextText}>
                         {milestone.remaining === 1
                             ? `1 more to reach ${milestone.label}!`
-                            : `${milestone.remaining} away from ${milestone.label}`}
+                            : `${Math.round(milestone.remaining * 10) / 10} away from ${milestone.label}`}
                     </span>
                     <div className={styles.milestoneBar}>
                         <div className={styles.milestoneFill} style={{ width: `${pct}%` }} />
                     </div>
-                    <span className={styles.milestoneMeta}>{milestone.current} / {milestone.target}</span>
+                    <span className={styles.milestoneMeta}>{Math.round(milestone.current * 10) / 10} / {milestone.target}</span>
                 </>
             ) : (
                 <span className={styles.milestoneNextText}>All milestones reached! 🏆</span>
