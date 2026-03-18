@@ -28,7 +28,14 @@ describe('moduleHelpers', () => {
     });
 
     it('validateForm returns no errors for valid form', () => {
-        const form = { module_code: 'CS101', module_name: 'Test', start_time: '2026-03-01T09:00', end_time: '2026-03-01T10:00' };
+        const form = {
+            module_code: 'CS101',
+            module_name: 'Test',
+            department: 'Natural, Mathematical & Engineering Sciences',
+            course: 'Computer Science',
+            start_time: '2026-03-01T09:00',
+            end_time: '2026-03-01T10:00',
+        };
         const errors = validateForm(form);
         expect(Object.keys(errors)).toHaveLength(0);
     });
