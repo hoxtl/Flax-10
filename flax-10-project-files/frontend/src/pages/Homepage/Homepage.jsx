@@ -992,7 +992,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 >
                 <button
                   type="button"
-                  className={styles.replanBtn}
+                  className={styles.manualScheduleBtn}
                   onClick={() => openQuickAddSchedule('schedule_manual')}
                   aria-label="Open manual schedule quick add"
                 >
@@ -1000,7 +1000,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 </button>
                 <button
                   type="button"
-                  className={`${styles.replanBtn} ${styles.autoScheduleBtn}`}
+                  className={styles.autoScheduleBtn}
                   onClick={() => openQuickAddSchedule('schedule_auto')}
                   aria-label="Open auto schedule quick add"
                 >

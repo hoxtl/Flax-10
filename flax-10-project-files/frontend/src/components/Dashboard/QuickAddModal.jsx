@@ -89,9 +89,13 @@ function ModulePickerGrid({ onSelect }) {
   );
 }
 
-function useQuickAddLogic(onSelectType) {
+function useQuickAddLogic(onSelectType, initialView = 'type') {
   const { tags } = useTags();
-  const [view, setView] = useState('type');
+  const [view, setView] = useState(initialView);
+
+  useEffect(() => {
+    setView(initialView || 'type');
+  }, [initialView]);
   const handleType = (id) => {
     if (id === 'event') setView('tag');
     else if (id === 'module') setView('module');
@@ -114,8 +118,8 @@ function getHeader(view) {
   return { title: 'Quick Add', sub: 'What would you like to add?' };
 }
 
-export default function QuickAddModal({ onClose, onSelectType, isTeacher }) {
-  const { tags, view, handleType } = useQuickAddLogic(onSelectType);
+export default function QuickAddModal({ onClose, onSelectType, isTeacher, initialView = 'type' }) {
+  const { tags, view, handleType } = useQuickAddLogic(onSelectType, initialView);
   const { title, sub } = getHeader(view);
   const handlePickerSelect = (m) => onSelectType('add_deadline', m);
   const handleReadingPickerSelect = (m) => onSelectType('add_reading', m);
