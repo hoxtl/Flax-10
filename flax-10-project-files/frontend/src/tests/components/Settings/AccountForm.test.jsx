@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 vi.mock("../../../api/userService", () => ({
   getUserProfile: vi.fn(),
 }));
 
 vi.mock("../../../api/adminApi", () => ({
+  getMyCourseChangeRequest: vi.fn().mockResolvedValue(null),
+  requestCourseChange: vi.fn(),
+  cancelCourseChangeRequest: vi.fn().mockResolvedValue(null),
   requestTeacherRole: vi.fn(),
 }));
 
@@ -262,7 +264,7 @@ describe("AccountForm – request teacher role flow", () => {
     requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
     const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
+    fireEvent.click(btn);
     expect(requestTeacherRole).toHaveBeenCalled();
   });
 
@@ -270,7 +272,7 @@ describe("AccountForm – request teacher role flow", () => {
     requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
     const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
+    fireEvent.click(btn);
     await waitFor(() =>
       expect(screen.getByText("Request submitted!")).toBeTruthy(),
     );
@@ -284,7 +286,7 @@ describe("AccountForm – request teacher role flow", () => {
     requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
     const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
+    fireEvent.click(btn);
     await waitFor(() => {
       const stored = JSON.parse(localStorage.getItem("user"));
       expect(stored.role).toBe("pending_teacher");
@@ -295,7 +297,7 @@ describe("AccountForm – request teacher role flow", () => {
     requestTeacherRole.mockRejectedValue(new Error("Server error"));
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
     const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
+    fireEvent.click(btn);
     await waitFor(() => expect(screen.getByText("Server error")).toBeTruthy());
   });
 });

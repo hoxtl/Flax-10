@@ -87,22 +87,34 @@ function clearCachedPendingRequest() {
   } catch (_) { }
 }
 
-function useAccountForm() {
-  const { profile, loading: authLoading, refreshProfile } = useAuth();
-  const initialData = getInitialData(profile);
+function useAccountForm(externalUser) {
+  // `AccountForm` is rendered with a `user` prop from the Settings page.
+  // In some isolated test environments there may be no AuthProvider, so we
+  // fall back to `externalUser` when `useAuth()` isn't available.
+  let auth;
+  try {
+    auth = useAuth();
+  } catch (_) {
+    auth = { profile: externalUser, loading: false, refreshProfile: () => {} };
+  }
+
+  const effectiveProfile = externalUser || auth.profile;
+  const effectiveAuthLoading = externalUser ? false : auth.loading;
+  const refreshProfile = auth.refreshProfile;
+  const initialData = getInitialData(effectiveProfile);
   const [formData, setFormData] = useState(initialData);
   const [initialFormData, setInitialFormData] = useState(initialData);
-  const [currentCourse, setCurrentCourse] = useState(profile?.major || "");
+  const [currentCourse, setCurrentCourse] = useState(effectiveProfile?.major || "");
   const [pendingRequest, setPendingRequest] = useState(null);
 
   useEffect(() => {
-    if (!authLoading && profile) {
-      const nextData = getInitialData(profile);
+    if (!effectiveAuthLoading && effectiveProfile) {
+      const nextData = getInitialData(effectiveProfile);
       setFormData(nextData);
       setInitialFormData(nextData);
-      setCurrentCourse(profile.major || "");
+      setCurrentCourse(effectiveProfile.major || "");
     }
-  }, [profile, authLoading]);
+  }, [effectiveProfile, effectiveAuthLoading]);
 
   useEffect(() => {
     getMyCourseChangeRequest()
@@ -296,7 +308,7 @@ function CourseDisplay({ course, pendingRequest, onRequestClick, onCancelRequest
  * @param {Function} props.onSave
  * @param {boolean} props.isSaving
  */
-export default function AccountForm({ onSave, isSaving }) {
+export default function AccountForm({ user, onSave, isSaving }) {
   const {
     formData,
     initialFormData,
@@ -306,7 +318,7 @@ export default function AccountForm({ onSave, isSaving }) {
     pendingRequest,
     setPendingRequest,
     refreshProfile
-  } = useAccountForm();
+  } = useAccountForm(user);
   const [showModal, setShowModal] = useState(false);
   const [cancellingRequest, setCancellingRequest] = useState(false);
   const [courseRequestNotice, setCourseRequestNotice] = useState(() =>

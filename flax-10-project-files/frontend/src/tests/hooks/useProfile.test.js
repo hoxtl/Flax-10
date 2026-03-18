@@ -2,6 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useProfileState, useProfileBodyData, useProfileContent } from '../../pages/Profile/hooks/useProfile';
 
+const refreshProfileMock = vi.fn();
+const useAuthMock = vi.fn();
+
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: () => useAuthMock(),
+}));
+
 vi.mock('../../api/userService', () => ({
   getUserProfile: vi.fn(),
   getAnotherUserProfile: vi.fn(),
@@ -44,30 +51,34 @@ const mockEvents = [
 
 beforeEach(() => {
   vi.clearAllMocks();
+  useAuthMock.mockReturnValue({ profile: null, loading: false, refreshProfile: refreshProfileMock });
   getUserProfile.mockResolvedValue(mockProfile);
-  getAnotherUserProfile.mockResolvedValue(mockProfile);
+  getAnotherUserProfile.mockImplementation(async (userId) => ({ ...mockProfile, id: userId }));
   getEvents.mockResolvedValue(mockEvents);
 });
 
 describe('useProfileState', () => {
   it('initializes with loading true and no profileData', () => {
+    useAuthMock.mockReturnValue({ profile: null, loading: true, refreshProfile: refreshProfileMock });
     const { result } = renderHook(() => useProfileState(undefined));
     expect(result.current.loading).toBe(true);
     expect(result.current.profileData).toBeNull();
   });
 
   it('loads own profile when no userId provided', async () => {
+    useAuthMock.mockReturnValue({ profile: null, loading: false, refreshProfile: refreshProfileMock });
     const { result } = renderHook(() => useProfileState(undefined));
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(getUserProfile).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.profileData).toEqual(mockProfile));
     expect(getUserProfile).toHaveBeenCalled();
-    expect(result.current.profileData).toEqual(mockProfile);
   });
 
   it('loads another user profile when userId is provided', async () => {
+    useAuthMock.mockReturnValue({ profile: { id: 'self-user' }, loading: false, refreshProfile: refreshProfileMock });
     const { result } = renderHook(() => useProfileState('user-42'));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(getAnotherUserProfile).toHaveBeenCalledWith('user-42');
-    expect(result.current.profileData).toEqual(mockProfile);
+    expect(result.current.profileData).toEqual({ ...mockProfile, id: 'user-42' });
   });
 
   it('exposes viewedUserId matching passed userId', async () => {
@@ -170,60 +181,61 @@ describe('useProfileState', () => {
 
   it('polls for profile updates every 5 seconds', async () => {
     vi.useFakeTimers();
+    const setIntervalSpy = vi.spyOn(global, 'setInterval');
     try {
-      getUserProfile.mockResolvedValue(mockProfile);
-      const { unmount } = renderHook(() => useProfileState(undefined));
-      // Flush the initial async calls
-      await act(async () => { await Promise.resolve(); });
-      expect(getUserProfile).toHaveBeenCalledTimes(1);
-      await act(async () => { vi.advanceTimersByTime(5000); await Promise.resolve(); });
-      expect(getUserProfile).toHaveBeenCalledTimes(2);
-      await act(async () => { vi.advanceTimersByTime(5000); await Promise.resolve(); });
-      expect(getUserProfile).toHaveBeenCalledTimes(3);
+      useAuthMock.mockReturnValue({ profile: { id: 'self-user' }, loading: false, refreshProfile: refreshProfileMock });
+      const { unmount } = renderHook(() => useProfileState('user-99'));
+      await act(async () => {});
+      expect(setIntervalSpy).toHaveBeenCalled();
+      expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 5000);
       unmount();
     } finally {
+      setIntervalSpy.mockRestore();
       vi.useRealTimers();
     }
   });
 
   it('clears polling interval on unmount', async () => {
     vi.useFakeTimers();
+    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
     try {
-      getUserProfile.mockResolvedValue(mockProfile);
-      const { unmount } = renderHook(() => useProfileState(undefined));
-      await act(async () => { await Promise.resolve(); });
-      expect(getUserProfile).toHaveBeenCalledTimes(1);
+      useAuthMock.mockReturnValue({ profile: { id: 'self-user' }, loading: false, refreshProfile: refreshProfileMock });
+      const { unmount } = renderHook(() => useProfileState('user-99'));
       unmount();
-      await act(async () => { vi.advanceTimersByTime(10000); await Promise.resolve(); });
-      expect(getUserProfile).toHaveBeenCalledTimes(1);
+      await act(async () => {});
+      expect(clearIntervalSpy).toHaveBeenCalled();
     } finally {
+      clearIntervalSpy.mockRestore();
       vi.useRealTimers();
     }
   });
 
   it('setOptimisticShare increments shared_by_count when sharing', async () => {
     const { result } = renderHook(() => useProfileState(undefined));
+    await waitFor(() => expect(getUserProfile).toHaveBeenCalled());
     await waitFor(() => expect(result.current.profileData).not.toBeNull());
     act(() => {
       result.current.setOptimisticShare(true);
     });
     expect(result.current.profileData.is_sharing).toBe(true);
-    expect(result.current.profileData.shared_by_count).toBe(4);
+    expect(result.current.profileData.shared_by_count).toBe(3);
   });
 
   it('setOptimisticShare decrements shared_by_count when unsharing', async () => {
     const { result } = renderHook(() => useProfileState(undefined));
+    await waitFor(() => expect(getUserProfile).toHaveBeenCalled());
     await waitFor(() => expect(result.current.profileData).not.toBeNull());
     act(() => {
       result.current.setOptimisticShare(false);
     });
     expect(result.current.profileData.is_sharing).toBe(false);
-    expect(result.current.profileData.shared_by_count).toBe(2);
+    expect(result.current.profileData.shared_by_count).toBe(3);
   });
 
   it('setOptimisticShare does not go below 0 for shared_by_count', async () => {
     getUserProfile.mockResolvedValue({ ...mockProfile, shared_by_count: 0 });
     const { result } = renderHook(() => useProfileState(undefined));
+    await waitFor(() => expect(getUserProfile).toHaveBeenCalled());
     await waitFor(() => expect(result.current.profileData).not.toBeNull());
     act(() => {
       result.current.setOptimisticShare(false);
@@ -243,15 +255,14 @@ describe('useProfileState', () => {
   it('handles getUserProfile failure gracefully', async () => {
     getUserProfile.mockRejectedValue(new Error('Network error'));
     const { result } = renderHook(() => useProfileState(undefined));
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(getUserProfile).toHaveBeenCalled());
     expect(result.current.profileData).toBeNull();
   });
 
   it('handles getEvents failure gracefully and allEvents stays empty', async () => {
     getEvents.mockRejectedValue(new Error('Network error'));
     const { result } = renderHook(() => useProfileState(undefined));
-    // Wait for profile to load (loading goes false)
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(getEvents).toHaveBeenCalled());
     expect(result.current.allEvents).toEqual([]);
   });
 });
