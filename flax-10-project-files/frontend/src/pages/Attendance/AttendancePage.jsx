@@ -20,7 +20,6 @@ import styles from "./AttendancePage.module.css";
 const TAB_RECORD = "record";
 const TAB_MARKED = "marked";
 
-/** Single responsibility: compose attendance stats and charts. */
 export default function AttendancePage() {
   const [listTab, setListTab] = useState(TAB_RECORD);
   const [selectedSegment, setSelectedSegment] = useState(null);
@@ -80,29 +79,48 @@ export default function AttendancePage() {
   const overallData = buildOverallChartData(overall);
   const byTypeEntries = buildByTypeChartData(by_type);
   const byTypeData = withByTypeColors(byTypeEntries);
-  const hasAnyData = (overall.attended + overall.missed) > 0 || byTypeEntries.length > 0;
-
-  const tabOptions = [
-    { value: TAB_RECORD, label: `Record (${unmarkedEvents.length})` },
-    { value: TAB_MARKED, label: `Marked (${markedEvents.length})` },
-  ];
+  const totalMarked = overall.attended + overall.missed;
+  const pct = totalMarked > 0 ? Math.round((overall.attended / totalMarked) * 100) : null;
 
   return (
-    <AppPage
-      title="Attendance"
-      subtitle="Track your attendance for lectures, small groups, and labs."
-      width="xl"
-    >
-      {!hasAnyData && (
-        <p className={styles.empty}>
-          No attendance recorded yet. Use the list below to mark events, or you’ll get a prompt during or after class.
-        </p>
+    <div className={styles.page}>
+      <h1 className={styles.title}>Attendance</h1>
+      <p className={styles.subtitle}>Track your attendance for lectures, small groups, and labs.</p>
+
+      {pct !== null && (
+        <div className={styles.summaryBar}>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>{pct}%</span>
+            <span className={styles.summaryLabel}>Overall</span>
+          </div>
+          <div className={styles.summarySep} />
+          <div className={styles.summaryItem}>
+            <span className={`${styles.summaryValue} ${styles.summaryAttended}`}>{overall.attended}</span>
+            <span className={styles.summaryLabel}>Attended</span>
+          </div>
+          <div className={styles.summarySep} />
+          <div className={styles.summaryItem}>
+            <span className={`${styles.summaryValue} ${styles.summaryMissed}`}>{overall.missed}</span>
+            <span className={styles.summaryLabel}>Missed</span>
+          </div>
+          <div className={styles.summarySep} />
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryValue}>{unmarkedEvents.length}</span>
+            <span className={styles.summaryLabel}>To record</span>
+          </div>
+        </div>
       )}
 
-      <div className={styles.chartsRow}>
-        <div className={styles.charts}>
-          <section className={styles.chartSection}>
-            <h2 className={styles.chartTitle}>Overall</h2>
+      <div className={styles.mainGrid}>
+        {/* Left: charts */}
+        <div className={styles.chartsCol}>
+          {totalMarked === 0 && (
+            <p className={styles.empty}>
+              No attendance recorded yet. Use the list to mark events, or you'll get a prompt during or after class.
+            </p>
+          )}
+          <div className={styles.chartCard}>
+            <p className={styles.chartCardLabel}>Overall</p>
             <OverallAttendanceChart
               data={overallData}
               attended={overall.attended}
@@ -111,52 +129,72 @@ export default function AttendancePage() {
                 setSelectedSegment(label ? { chart, label } : null)
               }
             />
-          </section>
-          <section className={styles.chartSection}>
-            <h2 className={styles.chartTitle}>By type</h2>
+          </div>
+          <div className={styles.chartCard}>
+            <p className={styles.chartCardLabel}>By type</p>
             <ByTypeAttendanceChart
               data={byTypeData}
               onSegmentClick={(chart, label) =>
                 setSelectedSegment(label ? { chart, label } : null)
               }
             />
-          </section>
+          </div>
         </div>
-        {selectedSegment && (
-          <SegmentDetailPanel
-            segmentLabel={detailPanelLabel}
-            events={detailPanelEvents}
-            onClose={() => setSelectedSegment(null)}
-          />
+
+        {/* Right: list panel, height-capped to match left column */}
+        {!eventsLoading && (
+          <div className={styles.listCol}>
+            {selectedSegment ? (
+              <SegmentDetailPanel
+                segmentLabel={detailPanelLabel}
+                events={detailPanelEvents}
+                onClose={() => setSelectedSegment(null)}
+              />
+            ) : (
+              <div className={styles.listPanel}>
+                <div className={styles.attendanceTabs}>
+                  <button
+                    type="button"
+                    className={listTab === TAB_RECORD ? styles.attendanceTabActive : styles.attendanceTab}
+                    onClick={() => setListTab(TAB_RECORD)}
+                  >
+                    Record attendance
+                    {unmarkedEvents.length > 0 && (
+                      <span className={styles.tabBadge}>{unmarkedEvents.length}</span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className={listTab === TAB_MARKED ? styles.attendanceTabActive : styles.attendanceTab}
+                    onClick={() => setListTab(TAB_MARKED)}
+                  >
+                    Marked
+                    {markedEvents.length > 0 && (
+                      <span className={styles.tabBadge}>{markedEvents.length}</span>
+                    )}
+                  </button>
+                </div>
+                {listTab === TAB_RECORD && (
+                  <RecordAttendanceList events={unmarkedEvents} onRecorded={refetchAll} />
+                )}
+                {listTab === TAB_MARKED && (
+                  <MarkedAttendanceList markedEvents={markedEvents} onRecorded={refetchAll} />
+                )}
+                {listTab === TAB_RECORD && unmarkedEvents.length === 0 && (
+                  <div className={styles.recordSection}>
+                    <p className={styles.recordHint}>All caught up — no unrecorded events.</p>
+                  </div>
+                )}
+                {listTab === TAB_MARKED && markedEvents.length === 0 && (
+                  <div className={styles.recordSection}>
+                    <p className={styles.recordHint}>No marked events yet.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
-
-      {!eventsLoading && (
-        <div className={styles.listPanel}>
-          <div className={styles.attendanceTabs}>
-            <SegmentedControl
-              options={tabOptions}
-              value={listTab}
-              onChange={setListTab}
-              fill
-            />
-          </div>
-          <div className={styles.listContent}>
-            {listTab === TAB_RECORD && (
-              <RecordAttendanceList
-                events={unmarkedEvents}
-                onRecorded={refetchAll}
-              />
-            )}
-            {listTab === TAB_MARKED && (
-              <MarkedAttendanceList
-                markedEvents={markedEvents}
-                onRecorded={refetchAll}
-              />
-            )}
-          </div>
-        </div>
-      )}
-    </AppPage>
+    </div>
   );
 }

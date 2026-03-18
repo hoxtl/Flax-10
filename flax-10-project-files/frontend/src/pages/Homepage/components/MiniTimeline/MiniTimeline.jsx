@@ -55,6 +55,8 @@ export function MiniTimeline({
   const [eventCtxMenu, setEventCtxMenu] = useState(null);
   const [sleepWindow, setSleepWindow] = useState({ sleepTime: "23:00", wakeTime: "07:00" });
   const [skippedGapTasks, setSkippedGapTasks] = useState({}); // { [rowId]: Set<taskId> }
+  const [slottedTaskIds, setSlottedTaskIds] = useState(new Set()); // IDs of real tasks already slotted in
+  const [slottedTitles, setSlottedTitles] = useState(new Set()); // titles of all slotted tasks (incl. deadline-based)
   const conflictPopoverRef = useRef(null);
   const slotPopoverRef = useRef(null);
   const timelineScrollRef = useRef(null);
@@ -179,7 +181,7 @@ export function MiniTimeline({
     for (const row of freeRows) {
       const mins = row.minutes || 0;
       const skipped = skippedGapTasks[row.id];
-      const candidates = queue.filter((t) => !used.has(t.id) && !(skipped && skipped.has(t.id)) && getTasksThatFitGap([t], mins).suggested);
+      const candidates = queue.filter((t) => !used.has(t.id) && !slottedTaskIds.has(t.id) && !slottedTitles.has(t.title) && !(skipped && skipped.has(t.id)) && getTasksThatFitGap([t], mins).suggested);
       const pick = candidates
         .sort((a, b) => compareRank(rankForGap(a, mins), rankForGap(b, mins)))[0];
       if (!pick) continue;
@@ -195,12 +197,41 @@ export function MiniTimeline({
     }
 
     return { map, nextMap };
-  }, [rows, suggestableTasks, now, skippedGapTasks]);
+  }, [rows, suggestableTasks, now, skippedGapTasks, slottedTaskIds, slottedTitles]);
 
   const currentBlock = useMemo(
     () => (!hasTimerSession && isToday(selectedDate)) ? (sortedEvents || []).find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) : null,
     [hasTimerSession, selectedDate, sortedEvents]
   );
+
+  // Assign a unique deadline suggestion to each gap that has no real assigned task,
+  // filtered by already-slotted titles so they don't reappear in other gaps.
+  const gapDeadlineFallbacks = useMemo(() => {
+    const freeRows = rows
+      .filter((r) => r.type === "free")
+      .sort((a, b) => (a.gapStartMins ?? a.startMins ?? 0) - (b.gapStartMins ?? b.startMins ?? 0));
+    const available = (deadlineSuggestions || []).filter((d) => {
+      const syntheticTitle = `Revision: ${d.assessment_title || d.title}`;
+      return !slottedTitles.has(syntheticTitle);
+    });
+    const map = {};
+    let idx = 0;
+    for (const row of freeRows) {
+      if (assignedGapTasks.map[row.id]) continue; // has a real task, no fallback needed
+      if (idx < available.length) map[row.id] = available[idx++];
+    }
+    return map;
+  }, [rows, assignedGapTasks, deadlineSuggestions, slottedTitles]);
+
+  const handleQuickStart = useCallback((gapStartDate, gapMins, task, nextTask) => {
+    if (task?.id) {
+      setSlottedTaskIds((prev) => new Set([...prev, task.id]));
+    }
+    if (task?.title) {
+      setSlottedTitles((prev) => new Set([...prev, task.title]));
+    }
+    onQuickStart?.(gapStartDate, gapMins, task, nextTask);
+  }, [onQuickStart]);
 
   const onSkipGapTask = useCallback((rowId, taskId) => {
     setSkippedGapTasks((prev) => {
@@ -223,8 +254,8 @@ export function MiniTimeline({
             key={row.id}
             row={row}
             suggestableTasks={suggestableTasks}
-            deadlineSuggestions={deadlineSuggestions}
-            onQuickStart={onQuickStart}
+            deadlineSuggestions={gapDeadlineFallbacks[row.id] ? [gapDeadlineFallbacks[row.id]] : []}
+            onQuickStart={handleQuickStart}
             selectedDate={selectedDate}
             taskLists={taskLists}
             styles={styles}
@@ -283,7 +314,7 @@ export function MiniTimeline({
         />
       );
     },
-    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, deadlineSuggestions, onQuickStart, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef, sleepWindow, onSkipGapTask, assignedGapTasks]
+    [rows, conflictPopoverRowId, slotPopoverRowId, suggestableTasks, handleQuickStart, gapDeadlineFallbacks, onEdit, onCardClick, onTaskToggle, onToggleComplete, onReschedule, onConflictAutoMove, onPushTomorrow, onDelete, completedEventIds, taskLists, getTag, selectedDate, isToday, styles, nowRowRef, sleepWindow, onSkipGapTask, assignedGapTasks]
   );
 
   return (
