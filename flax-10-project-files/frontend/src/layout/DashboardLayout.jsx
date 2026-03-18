@@ -369,13 +369,33 @@ function LeaveTimerActions({ pendingNav, setPendingNav, t, setShowQuickAdd, onNa
     handlePendingAction(pendingNav, setShowQuickAdd, onNavChange);
     setPendingNav(null);
   };
+  const onTakeBreak = () => {
+    const breakSeconds = 5 * 60;
+    t.setMode('break');
+    t.setTimeLeft(breakSeconds);
+    t.setIsActive(true);
+    setPendingNav(null);
+  };
   const onExit = () => {
     t.setIsActive(false);
     t.resetTimer();
     handlePendingAction(pendingNav, setShowQuickAdd, onNavChange);
     setPendingNav(null);
   };
-  return <LeaveTimerModal onCancel={() => setPendingNav(null)} onPause={onPause} onExit={onExit} />;
+  const sessionTotalSeconds = Math.max(
+    60,
+    Number((t.mode === 'break' ? t.breakTime : t.workTime) || 25) * 60
+  );
+  return (
+    <LeaveTimerModal
+      onCancel={() => setPendingNav(null)}
+      onPause={onPause}
+      onExit={onExit}
+      onTakeBreak={onTakeBreak}
+      timeLeftSeconds={Math.max(0, Number(t.timeLeft || 0))}
+      sessionTotalSeconds={sessionTotalSeconds}
+    />
+  );
 }
 
 function shouldShowBackToTop(activeNav) {

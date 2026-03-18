@@ -42,7 +42,7 @@
   max-height: 90vh;
   overflow: hidden;
   background: var(--surface-panel, var(--panel));
-  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  border: 2px solid #000 !important;
   border-radius: var(--modal-radius);
   box-shadow:
     var(--modal-shadow),

@@ -72,13 +72,11 @@ async function handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta)
 }
 
 function handleDeleteListImpl(state, listsApi, listId) {
-  const listName = listsApi.lists.find((list) => String(list.id) === String(listId))?.name || "List";
   listsApi.removeList(listId);
   if (state.activeListId === listId) {
     state.setActiveListId(null);
     state.setActiveFilter("all");
   }
-  showInfoToast(state, `${listName} deleted.`);
 }
 
 export function buildTasksPageHandlers(state, listsApi, tasksApi) {
@@ -89,10 +87,7 @@ export function buildTasksPageHandlers(state, listsApi, tasksApi) {
     handleDeleteList: (listId) => handleDeleteListImpl(state, listsApi, listId),
     handleUnarchiveList: async (listId) => { await listsApi.restoreList(listId); tasksApi.reload(); },
     handlePermanentlyDeleteList: async (listId) => {
-      if (!window.confirm("Permanently delete this list? You won't be able to restore it.")) return;
-      const listName = listsApi.archivedLists.find((list) => String(list.id) === String(listId))?.name || "List";
       await listsApi.permanentlyDeleteList(listId);
-      showInfoToast(state, `${listName} permanently deleted.`);
     },
   };
 }

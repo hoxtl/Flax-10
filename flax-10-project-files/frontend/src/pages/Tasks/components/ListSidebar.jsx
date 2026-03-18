@@ -7,6 +7,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { getListColor } from "../utils/listColorUtils";
 import { computeListSidebarCounts } from "../utils/listSidebarUtils";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import styles from "./ListSidebar.module.css";
 
 function RenameInput({ value, onSave, onCancel }) {
@@ -84,19 +85,19 @@ function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, set
   );
 }
 
-function ArchiveListItems({ archivedLists, onUnarchiveList, onPermanentlyDeleteList }) {
+function ArchiveListItems({ archivedLists, onUnarchiveList, onRequestPermanentDelete }) {
   return archivedLists.map((list) => (
     <div key={list.id} className={styles.archiveItem}>
       <span className={styles.archiveName}>{list.name}</span>
       <div className={styles.archiveActions}>
         {onUnarchiveList && <button type="button" className={styles.restoreBtn} onClick={() => onUnarchiveList(list.id)}>Restore</button>}
-        {onPermanentlyDeleteList && <button type="button" className={styles.deletePermanentBtn} onClick={() => onPermanentlyDeleteList(list.id)} title="Permanently delete list">Delete</button>}
+        <button type="button" className={styles.deletePermanentBtn} onClick={() => onRequestPermanentDelete(list.id)} title="Permanently delete list">Delete</button>
       </div>
     </div>
   ));
 }
 
-function ListSidebarArchive({ archivedLists, showArchived, setShowArchived, onUnarchiveList, onPermanentlyDeleteList }) {
+function ListSidebarArchive({ archivedLists, showArchived, setShowArchived, onUnarchiveList, onRequestPermanentDelete }) {
   if (archivedLists.length === 0) return null;
   return (
     <div className={styles.archiveSection}>
@@ -106,7 +107,7 @@ function ListSidebarArchive({ archivedLists, showArchived, setShowArchived, onUn
       </button>
       {showArchived && (
         <div className={styles.archiveList}>
-          <ArchiveListItems archivedLists={archivedLists} onUnarchiveList={onUnarchiveList} onPermanentlyDeleteList={onPermanentlyDeleteList} />
+          <ArchiveListItems archivedLists={archivedLists} onUnarchiveList={onUnarchiveList} onRequestPermanentDelete={onRequestPermanentDelete} />
         </div>
       )}
     </div>
@@ -117,8 +118,12 @@ export default function ListSidebar(props) {
   const [ctxMenu, setCtxMenu] = useState(null);
   const [renamingId, setRenamingId] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [deleteListId, setDeleteListId] = useState(null);
+  const [permDeleteId, setPermDeleteId] = useState(null);
   const { listCounts, smartFilters } = computeListSidebarCounts(props.tasks, props.lists);
   const handleCtxMenu = (e, listId) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY, listId }); };
+  const deleteListName = deleteListId ? (props.lists.find(l => l.id === deleteListId)?.name || 'this list') : '';
+  const permDeleteName = permDeleteId ? (props.archivedLists.find(l => l.id === permDeleteId)?.name || 'this list') : '';
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sectionLabel}>VIEWS</div>
@@ -126,8 +131,28 @@ export default function ListSidebar(props) {
       <div className={styles.sectionLabel}>LISTS</div>
       <ListSidebarListItems lists={props.lists} listCounts={listCounts} activeListId={props.activeListId} renamingId={renamingId} setRenamingId={setRenamingId} onSelectList={props.onSelectList} onSelectFilter={props.onSelectFilter} onRenameList={props.onRenameList} onCtxMenu={handleCtxMenu} />
       <button className={styles.createListBtn} onClick={props.onNewList}>+ Add list</button>
-      <ListSidebarArchive archivedLists={props.archivedLists} showArchived={showArchived} setShowArchived={setShowArchived} onUnarchiveList={props.onUnarchiveList} onPermanentlyDeleteList={props.onPermanentlyDeleteList} />
-      {ctxMenu && <ListContextMenu x={ctxMenu.x} y={ctxMenu.y} onRename={() => setRenamingId(ctxMenu.listId)} onDelete={() => props.onDeleteList(ctxMenu.listId)} onClose={() => setCtxMenu(null)} />}
+      <ListSidebarArchive archivedLists={props.archivedLists} showArchived={showArchived} setShowArchived={setShowArchived} onUnarchiveList={props.onUnarchiveList} onRequestPermanentDelete={setPermDeleteId} />
+      {ctxMenu && <ListContextMenu x={ctxMenu.x} y={ctxMenu.y} onRename={() => setRenamingId(ctxMenu.listId)} onDelete={() => setDeleteListId(ctxMenu.listId)} onClose={() => setCtxMenu(null)} />}
+      {deleteListId && (
+        <HoldConfirmModal
+          title={`Delete "${deleteListName}"`}
+          warningText={`This will archive "${deleteListName}" and all its tasks. You can restore it later from the Archived section.`}
+          cancelLabel="Keep List"
+          holdLabel="Hold to Delete"
+          onConfirm={() => { props.onDeleteList(deleteListId); setDeleteListId(null); }}
+          onCancel={() => setDeleteListId(null)}
+        />
+      )}
+      {permDeleteId && (
+        <HoldConfirmModal
+          title={`Permanently Delete "${permDeleteName}"`}
+          warningText="This will permanently delete this list. You won't be able to restore it."
+          cancelLabel="Keep It"
+          holdLabel="Hold to Delete"
+          onConfirm={() => { props.onPermanentlyDeleteList(permDeleteId); setPermDeleteId(null); }}
+          onCancel={() => setPermDeleteId(null)}
+        />
+      )}
     </aside>
   );
 }
