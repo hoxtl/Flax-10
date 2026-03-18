@@ -132,6 +132,10 @@
     max-width: 100%;
 }
 
+:global([data-mode="dark"]) .username {
+    color: color-mix(in srgb, var(--text) 75%, var(--muted) 25%);
+}
+
 .courseInfo {
     font-size: 0.92rem;
     font-weight: 500;

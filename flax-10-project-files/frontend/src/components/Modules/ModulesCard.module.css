@@ -321,3 +321,8 @@
     color: var(--text);
     border-bottom-color: color-mix(in srgb, var(--text) 65%, transparent);
 }
+
+:global([data-mode="dark"]) .enrolledBadge {
+    background: color-mix(in srgb, var(--sage) 32%, var(--panel));
+    color: color-mix(in srgb, var(--sage) 85%, var(--text));
+}

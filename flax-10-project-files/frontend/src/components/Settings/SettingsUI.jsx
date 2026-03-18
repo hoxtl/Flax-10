@@ -154,25 +154,21 @@ export function SubmitButton({
 export function FormInput({ id, label, type = "text", value, onChange, required, name, maxLength, autoComplete }) {
   const remaining = maxLength ? maxLength - value.length : null;
   return (
-    <FormField
-      className={styles.formGroup}
-      htmlFor={id}
-      label={
-        <>
-          {label}
-          {maxLength && <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>({remaining} characters remaining)</span>}
-        </>
-      }
-    >
+    <div className={styles.formGroup}>
+      <label htmlFor={id}>
+        {label}
+        {maxLength && <span style={{ color: 'var(--muted)', fontSize: '0.9em', marginLeft: '5px' }}>({remaining} characters remaining)</span>}
+      </label>
       <TextInput type={type} id={id} name={name || id} value={value} onChange={onChange} required={required} maxLength={maxLength} autoComplete={autoComplete} />
-    </FormField>
+    </div>
   );
 }
 
 export function FormSelect({ id, label, value, onChange, options, grouped }) {
   const handleChange = (val) => onChange({ target: { value: val } });
   return (
-    <FormField className={styles.formGroup} htmlFor={id} label={label}>
+    <div className={styles.formGroup}>
+      <label htmlFor={id}>{label}</label>
       <AnimatedDropdown
         value={value}
         onChange={handleChange}
@@ -180,8 +176,9 @@ export function FormSelect({ id, label, value, onChange, options, grouped }) {
         grouped={grouped}
         placeholder="Select"
         searchable={grouped}
+        usePortal
       />
-    </FormField>
+    </div>
   );
 }
 

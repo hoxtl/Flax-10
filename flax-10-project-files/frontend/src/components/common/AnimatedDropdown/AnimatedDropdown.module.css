@@ -148,3 +148,13 @@
   color: var(--muted);
   opacity: 0.8;
 }
+
+/* Solid background in dark mode — prevents glass/see-through effect */
+:global([data-mode="dark"]) .dropdownMenu {
+  background: var(--panel);
+  border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
+}
+
+:global([data-mode="dark"]) .searchWrapper {
+  background: var(--panel);
+}

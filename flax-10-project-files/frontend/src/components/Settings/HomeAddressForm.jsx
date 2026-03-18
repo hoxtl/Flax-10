@@ -47,8 +47,7 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
 
       <div className={styles.twoColLayout}>
         <div>
-          <div className={styles.settingsTile}>
-            <div className={styles.formGroup}>
+          <div className={styles.formGroup}>
               <label htmlFor="homeAddress" className={styles.label}>
                 Address
               </label>
@@ -72,7 +71,6 @@ export default function HomeAddressForm({ onSave, isSaving, error }) {
               hasUnsaved={hasUnsaved}
               saveSignal={saveSignal}
             />
-          </div>
           <InlineAlert message={error} variant="warning" />
         </div>
         <div className={styles.contextCard}>

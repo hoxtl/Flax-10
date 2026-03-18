@@ -100,3 +100,15 @@
 .reportBtn.reported:hover {
     transform: scale(1.05);
 }
+
+:global([data-mode="dark"]) .nameChip {
+    background: rgba(15, 8, 4, 0.88);
+    border-color: rgba(184, 155, 126, 0.55);
+    color: #f1f5f9;
+}
+
+:global([data-mode="dark"]) .relatedChip {
+    background: rgba(15, 8, 4, 0.82);
+    border-color: rgba(184, 155, 126, 0.42);
+    color: #f1f5f9;
+}

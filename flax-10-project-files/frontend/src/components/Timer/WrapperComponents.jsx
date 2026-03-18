@@ -7,6 +7,7 @@ import { rankTasksForFocus } from '../../lib/focusPlanner';
 import { getHistory } from './utils/historyUtils';
 import { AUTOSTART_KEY, applyTaskToTimer } from './utils/presetUtils';
 import { formatSessionMinutes, extractTime, isToday } from './utils/timerFormatters';
+import { getNearestMilestone } from './utils/milestoneUtils';
 import SessionDots, { LiveStatsRow, ProgressStrip } from './SessionDots';
 import TimerCircle, { TimerRing } from './TimerCircle';
 import { TimerControls, ModeIndicator } from './TimerComponents';
@@ -14,6 +15,17 @@ import { PresetPanel, TimerConfigPanel } from './PresetPanel';
 import InlineSoundPanel from './InlineSoundPanel';
 import RightRailHistoryPanel from './RightRailHistoryPanel';
 import { TaskInput } from './TaskInput';
+
+function estimatedFinishTime(t) {
+    const remaining = t.targetSessions - t.completedSessions;
+    if (remaining <= 0) return null;
+    const sessionSec = t.workTime * 60 + t.breakTime * 60;
+    const totalSec = (t.isActive || t.isPaused)
+        ? Math.max(t.timeLeft, 0) + (remaining - 1) * sessionSec
+        : remaining * sessionSec;
+    const at = new Date(Date.now() + totalSec * 1000);
+    return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+}
 
 /** Format seconds → "45m" or "1h 20m" */
 function fmtDuration(sec) {
@@ -25,40 +37,6 @@ function fmtDuration(sec) {
     return `${m}m`;
 }
 
-/** Visual session progress dots */
-function SessionDots({ completedSessions, targetSessions, isActive, isPaused }) {
-    return (
-        <div className={styles.sessionDots} aria-label={`Session ${completedSessions + 1} of ${targetSessions}`}>
-            {Array.from({ length: targetSessions }).map((_, i) => {
-                const isDone = i < completedSessions;
-                const isCurrentActive = i === completedSessions && (isActive || isPaused);
-                const cls = isDone
-                    ? styles.sessionDotDone
-                    : isCurrentActive
-                        ? styles.sessionDotActive
-                        : styles.sessionDotPending;
-                return <span key={i} className={`${styles.sessionDot} ${cls}`} />;
-            })}
-        </div>
-    );
-}
-
-/** Accumulating focus/break stats row — shows placeholders once timer started */
-function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, distractions, isActive, isPaused, onDistract }) {
-    const everStarted = isActive || isPaused || blockTotalWork > 0 || blockTotalBreak > 0;
-    if (!everStarted) return null;
-    return (
-        <div className={styles.liveStatsRow}>
-            <span className={styles.liveStat}>🔥 <strong>{blockTotalWork > 0 ? fmtDuration(blockTotalWork) : '—'}</strong> focus</span>
-            <span className={styles.liveStat}>☕ <strong>{blockTotalBreak > 0 ? fmtDuration(blockTotalBreak) : '—'}</strong> break</span>
-            {totalPaused > 30 && <span className={styles.liveStat}>⏸ <strong>{fmtDuration(totalPaused)}</strong> paused</span>}
-            {distractions > 0 && <span className={styles.liveStat}>⚡ <strong>{distractions}</strong> distraction{distractions !== 1 ? 's' : ''}</span>}
-            {isActive && !isPaused && (
-                <button className={styles.distractChip} onClick={onDistract}>+ distracted</button>
-            )}
-        </div>
-    );
-}
 
 /** Block summary card with SVG progress ring — horizontal layout */
 function BlockStatsCard({ completedSessions, targetSessions, blockTotalWork, blockTotalBreak }) {
@@ -117,7 +95,6 @@ const BUILT_IN_PRESETS = [
 ];
 
 const CUSTOM_PRESETS_KEY = 'timerCustomPresets';
-const AUTOSTART_KEY = 'timerAutoStart';
 
 function loadCustomPresets() {
     try { return JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY) || '[]'); } catch { return []; }
@@ -238,69 +215,6 @@ function AutoStartToggle() {
     );
 }
 
-function PresetPanel({ t }) {
-    const [customPresets, setCustomPresets] = useState(() => loadCustomPresets());
-    const [saving, setSaving] = useState(false);
-    const [saveName, setSaveName] = useState('');
-
-    const handleSave = () => {
-        const name = saveName.trim();
-        if (!name) return;
-        const newPreset = {
-            id: `custom_${Date.now()}`,
-            label: name,
-            work: t.workTime,
-            brk: t.breakTime,
-            sessions: t.targetSessions,
-        };
-        const updated = [...customPresets, newPreset];
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-        setSaving(false);
-        setSaveName('');
-    };
-
-    const handleDelete = (id) => {
-        const updated = customPresets.filter(p => p.id !== id);
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-    };
-
-    return (
-        <div className={styles.presetPanelCard}>
-            <span className={styles.presetPanelLabel}>Quick Start</span>
-            <div className={styles.presetList}>
-                {BUILT_IN_PRESETS.map(p => <PresetCard key={p.id} preset={p} t={t} />)}
-                {customPresets.map(p => (
-                    <PresetCard key={p.id} preset={p} t={t} onDelete={() => handleDelete(p.id)} />
-                ))}
-            </div>
-            <div className={styles.presetSaveArea}>
-                {saving ? (
-                    <div className={styles.presetSaveForm}>
-                        <input
-                            className={styles.presetNameInput}
-                            placeholder="Preset name…"
-                            value={saveName}
-                            onChange={e => setSaveName(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setSaving(false); }}
-                            autoFocus
-                            maxLength={24}
-                        />
-                        <button className={styles.presetSaveConfirm} onClick={handleSave}>Save</button>
-                        <button className={styles.presetSaveCancel} onClick={() => setSaving(false)}>Cancel</button>
-                    </div>
-                ) : (
-                    <button className={styles.presetSaveBtn} onClick={() => { setSaving(true); setSaveName(''); }} disabled={t.isActive}>
-                        + Save current
-                    </button>
-                )}
-            </div>
-            <div className={styles.presetGoalDivider} />
-            <DailyGoalWidget />
-        </div>
-    );
-}
 
 /* ── Milestone Card ─────────────────────────────────────── */
 
@@ -341,38 +255,6 @@ function MilestoneCard() {
     );
 }
 
-/* ── Circular Timer Ring ────────────────────────────────── */
-
-function TimerRing({ t }) {
-    const radius = 90;
-    const circ = 2 * Math.PI * radius;
-    const total = (t.mode === 'work' ? t.workTime : t.breakTime) * 60;
-    const ratio = total > 0 ? Math.max(0, t.timeLeft / total) : 1;
-    const dash = ratio * circ;
-    const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const color = isOvertime ? '#f59e0b' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
-
-    return (
-        <div className={styles.timerRingWrap}>
-            <svg className={styles.timerRingSvg} viewBox="0 0 220 220" aria-hidden="true">
-                <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--border)" strokeWidth="5" />
-                <circle
-                    cx="110" cy="110" r={radius}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeDasharray={`${dash} ${circ - dash}`}
-                    strokeDashoffset={circ * 0.25}
-                    style={{ transition: 'stroke-dasharray 1s linear, stroke 0.3s ease' }}
-                />
-            </svg>
-            <div className={styles.timerRingContent}>
-                <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={isOvertime} />
-            </div>
-        </div>
-    );
-}
 
 /* ── Session Pace Indicator ─────────────────────────────── */
 

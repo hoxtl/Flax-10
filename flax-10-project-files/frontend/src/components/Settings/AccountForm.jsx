@@ -385,8 +385,7 @@ export default function AccountForm({ onSave, isSaving }) {
       />
       <div className={styles.twoColLayout}>
         <div>
-          <div className={styles.settingsTile}>
-            <PersonalInfoFields formData={formData} onChange={handleChange} />
+          <PersonalInfoFields formData={formData} onChange={handleChange} />
             <div className={styles.formRow}>
               <FormSelect
                 id="year"
@@ -412,7 +411,6 @@ export default function AccountForm({ onSave, isSaving }) {
               hasUnsaved={hasUnsaved}
               saveSignal={saveSignal}
             />
-          </div>
         </div>
         <div className={styles.contextCard}>
           <span className={styles.contextCardEmoji}>🧾</span>
