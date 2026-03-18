@@ -19,7 +19,11 @@ from studyFlax.views.authentication.password_reset_request_view import reset_pas
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
 
 # User
-from studyFlax.views.user.profile_view import profile_view, another_user_profile_view
+from studyFlax.views.user.profile_view import (
+    profile_view,
+    another_user_profile_view,
+    suggest_study_session_view,
+)
 from studyFlax.views.user.profile_summary_view import profile_summary_view
 from studyFlax.views.user.check_username_view import check_username
 from studyFlax.views.user.user_search_view import user_search
@@ -103,6 +107,7 @@ urlpatterns = [
     # User
     path("profile/", profile_view, name='user-profile'),
     path("users/<int:user_id>/profile/", another_user_profile_view, name='another-user-profile'),
+    path("profile/study-together/", suggest_study_session_view, name='profile-study-together'),
     path('profile/summary/', profile_summary_view, name='profile-summary'),
     path("check-username/", check_username, name='check-username'),
     path("users/search/", user_search, name='user-search'),

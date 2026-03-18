@@ -99,6 +99,7 @@ export default function AchievementsModal({ badges, onClose }) {
       onClose={onClose}
       hideHeader
       size="lg"
+      backdropClassName={styles.modalBackdrop}
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
@@ -128,7 +129,7 @@ export default function AchievementsModal({ badges, onClose }) {
             return (
               <div key={cat} className={styles.category}>
                 <div className={styles.catHeader}>
-                  <span className={styles.catName}>{cat}</span>
+                  <span className={`${styles.catName} ${cat === 'Hours' ? styles.catNameEmphasis : ''}`}>{cat}</span>
                   <span className={styles.catCount}>{catEarned}/{catBadges.length}</span>
                 </div>
                 <div className={styles.grid}>

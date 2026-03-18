@@ -2,15 +2,24 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+.modalBackdrop {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
 .modalShell {
-  width: min(640px, 94vw);
-  max-height: 82vh;
+  width: min(700px, 94vw);
+  max-height: 84vh;
+  background: var(--surface-card) !important;
+  border: 2px solid #000 !important;
+  box-shadow: var(--modal-shadow) !important;
   animation: slideUp 0.22s cubic-bezier(.4,0,.2,1);
   overflow: hidden;
 }
 
 .modalContent {
-  padding: 0;
+  padding: 0 !important;
 }
 
 @keyframes slideUp {
@@ -22,67 +31,86 @@
 .header {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 20px 24px 14px;
-  border-bottom: var(--stroke-soft);
+  gap: 14px;
+  padding: 1.15rem 1.2rem 0.95rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
   position: relative;
   flex-shrink: 0;
 }
 
 .title {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
   color: var(--text);
   margin: 0 0 2px;
 }
 
 .subtitle {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .progressWrap {
   flex: 1;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin-top: 10px;
+  height: 6px;
+  background: color-mix(in srgb, var(--border) 92%, transparent);
+  border-radius: 999px;
+  margin-top: 0.8rem;
   overflow: hidden;
 }
 
 .progressBar {
   height: 100%;
-  background: var(--primary);
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-strong) 100%);
+  border-radius: inherit;
   transition: width 0.6s cubic-bezier(.4,0,.2,1);
 }
 
 .closeBtn {
-  background: none;
-  border: none;
-  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  background: var(--surface-card);
   color: var(--muted);
+  font-size: 1.56rem;
+  line-height: 1;
   cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 6px;
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
   flex-shrink: 0;
-  margin-top: -2px;
+  margin-top: -0.2rem;
 }
-.closeBtn:hover { color: var(--text); background: var(--hover); }
+.closeBtn:hover {
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--hover) 80%, var(--surface-card));
+}
 
 /* Body */
 .body {
   overflow-y: auto;
-  padding: 16px 24px 24px;
+  padding: 1rem 1.2rem 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0.88rem;
 }
 
 /* Category */
-.category { display: flex; flex-direction: column; gap: 10px; }
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-card) 74%, var(--surface-page));
+  padding: 0.7rem 0.8rem 0.78rem;
+}
 
 .catHeader {
   display: flex;
@@ -91,23 +119,28 @@
 }
 
 .catName {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--text-secondary);
+}
+
+.catNameEmphasis {
+  color: var(--text);
 }
 
 .catCount {
-  font-size: 11px;
-  color: var(--muted);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 700;
 }
 
 /* Grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.55rem;
 }
 
 /* Tile */
@@ -133,9 +166,9 @@
 }
 
 .tileLocked {
-  background: var(--surface-card-muted);
-  border-color: var(--border);
-  opacity: 0.6;
+  background: color-mix(in srgb, var(--surface-card) 94%, var(--surface-page));
+  border-color: color-mix(in srgb, var(--border) 92%, transparent);
+  opacity: 0.74;
 }
 
 .tileEmoji {

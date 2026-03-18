@@ -120,7 +120,7 @@ export function PlanEventRow({
       style={{ marginTop: row.spacingBeforePx || 0, minHeight: propMinHeight }}
     >
       <div className={styles.planTimelineGutter}>
-        <span className={styles.planTimelineTime}>{startTimeStr}</span>
+        {!row.hideTimeLabel ? <span className={styles.planTimelineTime}>{startTimeStr}</span> : null}
       </div>
       <div className={styles.planTimelineSpineCell} aria-hidden />
       <div

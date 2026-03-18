@@ -11,7 +11,6 @@ import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 import { ConfirmModal } from "../../../components/common";
 import {
   getLiveContext,
-  getNextWindowMeta,
   getNextStep,
   getCurrentEvent,
   getUpcomingEvent
@@ -22,30 +21,44 @@ import { useAuth } from "../../../context/AuthContext";
 import IntelligenceGrid from "./IntelligenceGrid";
 import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";
-import { StudyPulseWidget } from "./StudyPulseWidget";
-import { QuickActionsWidget } from "./QuickActionsWidget";
-import { SocialDiscoverWidget } from "./SocialDiscoverWidget";
 import SemesterOverviewWidget from "./SemesterOverviewWidget";
 import StudyStreakWidget from "./StudyStreakWidget";
 import WeeklyGoalWidget from "./WeeklyGoalWidget";
 import PhotoWidget from "./PhotoWidget";
+import SummaryCards from "../../../components/Analytics/SummaryCards";
+import ProductivityCards from "../../../components/Analytics/ProductivityCards";
+import StudyHoursChart from "../../../components/Analytics/StudyHoursChart";
+import DailyBreakdownChart from "../../../components/Analytics/DailyBreakdownChart";
+import StudyHeatmap from "../../../components/Analytics/StudyHeatmap";
+import PlannedVsActualChart from "../../../components/Analytics/PlannedVsActualChart";
+import ThemeUsageChart from "../../../components/Analytics/ThemeUsageChart";
+import AttendanceChart from "../../../components/Analytics/AttendanceChart";
+import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
+import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
+import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 
 const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2 },
-  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2 },
-  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2 },
-  { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2 },
-  { id: "studyPulse", label: "Focus Windows", icon: "📊", col: 1, row: 2 },
-  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2 },
-  { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1 },
-  { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1 },
-  { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1 },
-  { id: "quickActions", label: "Quick Actions", icon: "⚡", col: 1, row: 1 },
-  { id: "socialDiscover", label: "Discovery", icon: "🌍", col: 1, row: 1 },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, section: "Essentials" },
+  { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2, section: "Planning" },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2, section: "Planning" },
+  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, section: "Planning" },
+  { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },
+  { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1, section: "Progress" },
+  { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1, section: "Profile" },
+  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsInsights", label: "Insights", icon: "💡", col: 1, row: 1, section: "Analytics" },
+  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsThemeUsage", label: "Theme Usage", icon: "🌓", col: 1, row: 1, section: "Analytics" },
 ];
 
 const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks"];
 const STORAGE_KEY = "homepage_widget_layout";
+const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 function useTflDelays() {
   const [delays, setDelays] = useState([]);
@@ -203,8 +216,6 @@ export default function IntelligenceRow({
   displayName,
   slot1TodayTasks,
   slot3Urgent,
-  studyPulseWindows,
-  studyPulseNow,
   slot5Data,
   recommendation,
 }) {
@@ -220,9 +231,10 @@ export default function IntelligenceRow({
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return DEFAULT_LAYOUT;
     let parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) return DEFAULT_LAYOUT;
 
     // Migration: If old IDs exist, replace them with 'hero'
-    const oldIds = ["greeting", "stats", "nextMove"];
+    const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
     const hasOld = parsed.some(id => oldIds.includes(id));
     if (hasOld) {
       // Remove old IDs and PREPEND 'hero' if not already there
@@ -230,10 +242,17 @@ export default function IntelligenceRow({
       if (!filtered.includes("hero")) {
         filtered.unshift("hero");
       }
-      return filtered;
+      return filtered.filter((id) => CATALOGUE_IDS.has(id));
     }
-    return parsed;
+    return parsed.filter((id) => CATALOGUE_IDS.has(id));
   });
+  const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
+  const {
+    data: analyticsData,
+    progressData: analyticsProgressData,
+    themeStats: analyticsThemeStats,
+    loading: analyticsLoading,
+  } = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(layout));
@@ -265,7 +284,7 @@ export default function IntelligenceRow({
   });
 
   const tasksCount = pendingTasks.length;
-  const nextWindowMeta = getNextWindowMeta(studyPulseWindows, studyPulseNow ?? new Date());
+  const nextWindowMeta = null;
   const nextStepTxt = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
   const nextStepMeta = recommendation?.meta || null;
 
@@ -296,18 +315,6 @@ export default function IntelligenceRow({
         return slot1TodayTasks;
       case "deadlines":
         return slot3Urgent;
-      case "studyPulse":
-        return (
-          <StudyPulseWidget
-            windows={studyPulseWindows}
-            now={studyPulseNow}
-            deadlines={slot5Data?.studyPulseDeadlines || []}
-          />
-        );
-      case "quickActions":
-        return <QuickActionsWidget />;
-      case "socialDiscover":
-        return <SocialDiscoverWidget />;
       case "semesterOverview":
         return <SemesterOverviewWidget />;
       case "studyStreak":
@@ -316,6 +323,126 @@ export default function IntelligenceRow({
         return <WeeklyGoalWidget />;
       case "photo":
         return <PhotoWidget editMode={edit} />;
+      case "analyticsSummary":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>SUMMARY CARDS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsScrollable}>
+                <SummaryCards data={analyticsData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No summary data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsProductivity":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>PRODUCTIVITY</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsScrollable}>
+                <ProductivityCards data={analyticsData} progressData={analyticsProgressData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No productivity data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsInsights":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>INSIGHTS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsInsightsRow}>
+                <ConsistencyScore data={analyticsData} />
+                <PeakHoursCard data={analyticsData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No insights data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsStudyHours":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>STUDY HOURS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <StudyHoursChart data={analyticsData.daily_breakdown} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No study-hours data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsDailyBreakdown":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>DAILY BREAKDOWN</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <DailyBreakdownChart data={analyticsData.daily_breakdown} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No daily-breakdown data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsPlannedActual":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>PLANNED VS ACTUAL</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsProgressData?.daily_progress) && analyticsProgressData.daily_progress.length > 0 ? (
+              <PlannedVsActualChart data={analyticsProgressData.daily_progress} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No planned-vs-actual data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsHeatmap":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>FOCUS HEATMAP</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.heatmap?.data?.length ? (
+              <StudyHeatmap heatmapData={analyticsData.heatmap} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No focus heatmap data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsVenio":
+        return <CompactAttendanceTile />;
+      case "analyticsThemeUsage":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>THEME USAGE</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsThemeStats?.summary ? (
+              <ThemeUsageChart themeStats={analyticsThemeStats} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No theme-usage data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsAttendance":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>ATTENDANCE</div>
+            <AttendanceChart />
+          </div>
+        );
       default:
         return null;
     }
@@ -323,23 +450,6 @@ export default function IntelligenceRow({
 
   return (
     <section className={styles.section}>
-      <div className={styles.editBar}>
-        {edit && (
-          <button onClick={handleReset} className={styles.editBtn} style={{ marginRight: 8 }}>
-            ↺ Reset Layout
-          </button>
-        )}
-        <button
-          onClick={() => {
-            setEdit(!edit);
-            if (edit) setShowAdd(false);
-          }}
-          className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
-        >
-          {edit ? "✓ Done" : "✏️ Edit Layout"}
-        </button>
-      </div>
-
       <IntelligenceGrid
         layout={layout}
         setLayout={setLayout}
@@ -348,6 +458,24 @@ export default function IntelligenceRow({
         widgetRenderer={renderWidget}
         showAdd={showAdd}
         setShowAdd={setShowAdd}
+        renderAfterHero={() => (
+          <div className={styles.editBar}>
+            {edit && (
+              <button onClick={handleReset} className={styles.editBtn} style={{ marginRight: 8 }}>
+                ↺ Reset Layout
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setEdit(!edit);
+                if (edit) setShowAdd(false);
+              }}
+              className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
+            >
+              {edit ? "✓ Done" : "✏️ Edit Layout"}
+            </button>
+          </div>
+        )}
       />
       {showResetConfirm && (
         <ConfirmModal

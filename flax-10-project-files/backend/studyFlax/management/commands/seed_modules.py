@@ -311,11 +311,14 @@ def _process_user_modules(user, modules, lecture_tag, enrollments):
     for module in extras:
         _process_module(user, module, lecture_tag, enrollments)
 
+def _lecture_tag_for_user(user, tags):
+    return next((t for t in tags if t.name == 'Lecture' and (t.user_id == user.id or t.is_default)), None)
+
 def create_enrollments(modules, tags, stdout):
     stdout.write("Seeding enrollments and lecture events...")
-    lecture_tag = next((t for t in tags if t.name == 'Lecture'), None)
     enrollments = []
     for user in User.objects.all().select_related('settings'):
+        lecture_tag = _lecture_tag_for_user(user, tags)
         _process_user_modules(user, modules, lecture_tag, enrollments)
     Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
     stdout.write(f"  Created {len(enrollments)} enrollments.")

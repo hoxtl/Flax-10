@@ -175,11 +175,11 @@ function buildEventEntry(item, inWindow, i, dayStart, dayEnd, now, dayTasks, tas
 }
 
 function insertNowMarker(sorted, nowMins) {
-  const endMinsOf = (r) => r.endMins ?? (r.gapStartMins ?? 0) + (r.minutes ?? 0);
+  const startMinsOf = (r) => r.startMins ?? r.gapStartMins ?? 0;
   let insertIndex = sorted.length;
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    if (endMinsOf(sorted[i]) <= nowMins) {
-      insertIndex = i + 1;
+  for (let i = 0; i < sorted.length; i++) {
+    if (startMinsOf(sorted[i]) > nowMins) {
+      insertIndex = i;
       break;
     }
   }
@@ -273,9 +273,11 @@ function injectHourMarks(sorted) {
   for (let i = 0; i < sorted.length; i++) {
     const r = sorted[i];
     const rStartMins = r.type !== "now" ? (r.startMins ?? r.gapStartMins ?? null) : null;
+    let hideTimeLabel = false;
 
     if (rStartMins != null) {
       const rowHour = DAY_START_HOUR + Math.floor(rStartMins / 60);
+      const startsOnHourBoundary = rStartMins % 60 === 0;
       // Don't inject an hour mark between two directly adjacent events (no gap between them).
       // e.g. Lunch ends 13:15 and next event starts 13:15 — the 13:00 mark would appear
       // as a visual bar even though there is zero gap.
@@ -284,9 +286,11 @@ function injectHourMarks(sorted) {
         finalRows.push({ type: "hourMark", id: `hour-${rowHour}`, hour: rowHour });
         lastInjectedHour = rowHour;
       }
+      // If an hour marker for this same hour is visible, suppress duplicate gutter time labels.
+      hideTimeLabel = startsOnHourBoundary && rowHour === lastInjectedHour;
     }
 
-    finalRows.push(r);
+    finalRows.push(hideTimeLabel ? { ...r, hideTimeLabel: true } : r);
 
     // Update adjacency tracker — now-markers don't break adjacency, gap rows do.
     if (r.type === "event") {

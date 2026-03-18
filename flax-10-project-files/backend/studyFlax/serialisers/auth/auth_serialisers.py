@@ -55,6 +55,7 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
+            'pinned_badge_id',
             'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
             'modules', 'study_hours_this_week', 'study_streak',
             'role',

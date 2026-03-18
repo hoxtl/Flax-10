@@ -44,7 +44,7 @@ def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
-    user_tags = [t for t in tags if t.user == user or t.user is None]
+    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
     tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
     return CalendarEvent(
         user=user,
@@ -109,7 +109,7 @@ def build_today_afternoon_events(user, tags):
     """Five mock events for today between 14:30 and 20:00."""
     now = timezone.now()
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    user_tags = [t for t in tags if t.user == user or t.user is None]
+    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
     tag = random.choice(user_tags) if user_tags else None
     return [_afternoon_event(user, today, h, m, d, t, tag) for h, m, d, t in AFTERNOON_SLOTS]
 
@@ -126,14 +126,18 @@ def _meal_events_for_day(user, day_offset, tag):
     base = SEED_START + timedelta(days=day_offset)
     return [_meal_event(user, base, day_offset, *spec, tag) for spec in MEAL_SPECS]
 
-def _resolve_meal_tag(tags):
-    routine = next((t for t in tags if t.name == 'Routine'), None)
-    wellness = next((t for t in tags if t.name == 'Wellness'), None)
-    return routine or wellness or (tags[0] if tags else None)
+def _resolve_meal_tag(user, tags):
+    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
+    priorities = ('Meals', 'Routine', 'Wellness', 'Other')
+    for name in priorities:
+        match = next((t for t in user_tags if t.name == name), None)
+        if match:
+            return match
+    return user_tags[0] if user_tags else None
 
 def build_meal_events(user, tags):
-    """Meals (Breakfast, Lunch, Dinner) use Routine or Wellness tag."""
-    meal_tag = _resolve_meal_tag(tags)
+    """Meals (Breakfast, Lunch, Dinner) use Meals/Routine/Wellness tags."""
+    meal_tag = _resolve_meal_tag(user, tags)
     events = []
     for day_offset in range(SEED_DAYS):
         events.extend(_meal_events_for_day(user, day_offset, meal_tag))

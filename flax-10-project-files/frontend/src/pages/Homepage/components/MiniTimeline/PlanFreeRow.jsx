@@ -55,6 +55,7 @@ export function PlanFreeRow({
     Math.floor(DAY_START_HOUR + row.gapStartMins / 60),
     row.gapStartMins % 60
   );
+  const showTimeLabel = !row.hideTimeLabel;
 
   function startTask(task) {
     if (onQuickStart) onQuickStart(gapStartDate, row.minutes, task, nextAssignedTask);
@@ -85,7 +86,7 @@ export function PlanFreeRow({
         style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
-          <span className={styles.planTimelineTime}>{timeStr}</span>
+          {showTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
         </div>
         <div className={styles.planTimelineSpineCell}>
           <span className={`${styles.planTimelineNode} ${styles.planTimelineNodeTransit}`} aria-hidden />
@@ -117,7 +118,7 @@ export function PlanFreeRow({
         style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
-          <span className={styles.planTimelineTime}>{timeStr}</span>
+          {showTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
         </div>
         <div className={styles.planTimelineSpineCell}>
           <span className={`${styles.planTimelineNode} ${styles.planTimelineNodeTransit}`} aria-hidden />
@@ -166,7 +167,7 @@ export function PlanFreeRow({
         style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
-          <span className={styles.planTimelineTime}>{timeStr}</span>
+          {showTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
         </div>
         <div className={styles.planTimelineSpineCell} aria-hidden />
         <div className={`${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`}>
@@ -191,7 +192,7 @@ export function PlanFreeRow({
         style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
       >
         <div className={styles.planTimelineGutter}>
-          <span className={styles.planTimelineTime}>{timeStr}</span>
+          {showTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
         </div>
         <div className={styles.planTimelineSpineCell} aria-hidden />
         <div className={`${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`}>
@@ -229,7 +230,7 @@ export function PlanFreeRow({
       style={{ marginTop: row.spacingBeforePx || 0, minHeight: gapMinHeight }}
     >
       <div className={styles.planTimelineGutter}>
-        <span className={styles.planTimelineTime}>{timeStr}</span>
+        {showTimeLabel ? <span className={styles.planTimelineTime}>{timeStr}</span> : null}
       </div>
       <div className={styles.planTimelineSpineCell} aria-hidden />
       <div
