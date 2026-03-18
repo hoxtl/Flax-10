@@ -5,6 +5,7 @@ import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
 import { useState, useEffect } from "react";
 import { getSharingWith, getSharedWithMe } from "../../api/socialService";
+import { getModules } from "../../api/moduleApi";
 import UserListModal from "../../components/Social/UserListModal";
 import GenericSummaryModal from "../../components/common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../components/common/GenericSummaryModal/SummaryItem";
@@ -41,6 +42,15 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
 }
 
 function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
+  const [nameMap, setNameMap] = useState({});
+  useEffect(() => {
+    if (!isOpen) return;
+    getModules().then(data => {
+      const list = Array.isArray(data) ? data : data?.results || [];
+      setNameMap(Object.fromEntries(list.filter(m => m.module_code).map(m => [m.module_code, m.module_name])));
+    }).catch(() => {});
+  }, [isOpen]);
+
   return (
     <GenericSummaryModal
       isOpen={isOpen}
@@ -52,11 +62,36 @@ function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
         <SummaryItem
           key={i}
           avatar="📚"
-          title={code}
-          subtitle="Module"
+          title={nameMap[code] ? `${code} – ${nameMap[code]}` : code}
+          subtitle={null}
           onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }}
         />
       )}
+    />
+  );
+}
+
+export function SocietiesModal({ isOpen, onClose, societies, onNavigate }) {
+  return (
+    <GenericSummaryModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Societies"
+      emptyMessage="No societies found"
+      items={societies || []}
+      renderItem={(soc, i) => {
+        const societyId = soc.society_id ?? soc.id;
+        const imageUrl = soc.cover_image || soc.image;
+        return (
+          <SummaryItem
+            key={societyId || i}
+            avatar={imageUrl ? <img src={imageUrl} alt={soc.name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} /> : '🏛️'}
+            title={soc.name}
+            subtitle={soc.description || null}
+            onClick={() => { if (societyId) { onClose?.(); onNavigate?.(`/societies?id=${societyId}`); } }}
+          />
+        );
+      }}
     />
   );
 }
