@@ -17,8 +17,16 @@ function buildRequestConfig(options) {
 async function handleResponse(response) {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `Request failed`);
+    const message =
+      error.detail ||
+      error.message ||
+      (Array.isArray(error.non_field_errors) ? error.non_field_errors[0] : null) ||
+      Object.values(error).flat()[0] ||
+      `Request failed (${response.status})`;
+    throw new Error(message);
   }
   if (response.status === 204) return null;
-  return response.json();
+  const text = await response.text();
+  if (!text.trim()) return null;
+  return JSON.parse(text);
 }

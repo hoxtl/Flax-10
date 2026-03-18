@@ -1,34 +1,74 @@
-import React from "react";
 import * as Components from "../Authentication/AuthComponents";
-
-const SIGNUP_FIELDS = [
-  { name: "first_name", type: "text", placeholder: "First Name" },
-  { name: "last_name", type: "text", placeholder: "Last Name" },
-  { name: "username", type: "text", placeholder: "Username" },
-  { name: "email", type: "email", placeholder: "Email" },
-  { name: "password", type: "password", placeholder: "Password", minLength: 8 },
-  { name: "password2", type: "password", placeholder: "Confirm Password", minLength: 8 },
-];
+import PasswordStrength from "../common/PasswordStrength";
 
 function SignUpFields({ formData, updateField, loading }) {
-  return SIGNUP_FIELDS.map((field) => (
-    <Components.Input
-      key={field.name}
-      type={field.type}
-      placeholder={field.placeholder}
-      value={formData[field.name]}
-      onChange={updateField(field.name)}
-      required
-      minLength={field.minLength}
-      disabled={loading}
-    />
-  ));
+  return (
+    <Components.FieldStack>
+      <Components.FieldRow>
+        <Components.Input
+          type="text"
+          placeholder="First Name"
+          value={formData.first_name}
+          onChange={updateField("first_name")}
+          required
+          disabled={loading}
+        />
+        <Components.Input
+          type="text"
+          placeholder="Last Name"
+          value={formData.last_name}
+          onChange={updateField("last_name")}
+          required
+          disabled={loading}
+        />
+      </Components.FieldRow>
+
+      <Components.Input
+        type="text"
+        placeholder="Username"
+        value={formData.username}
+        onChange={updateField("username")}
+        required
+        disabled={loading}
+      />
+      <Components.Input
+        type="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={updateField("email")}
+        required
+        disabled={loading}
+      />
+
+      <Components.Input
+        type="password"
+        placeholder="Password"
+        value={formData.password}
+        onChange={updateField("password")}
+        required
+        minLength={8}
+        disabled={loading}
+      />
+
+      <PasswordStrength password={formData.password} />
+
+      <Components.Input
+        type="password"
+        placeholder="Confirm Password"
+        value={formData.password2}
+        onChange={updateField("password2")}
+        required
+        minLength={8}
+        disabled={loading}
+      />
+    </Components.FieldStack>
+  );
 }
 
 function SignUpActions({ loading, onToggle }) {
   return (
     <>
-      <div style={{ height: "16px" }} />
+      <div style={{ height: "6px" }} />
       <Components.Button type="submit" disabled={loading}>
         {loading ? "Creating account..." : "Sign Up"}
       </Components.Button>
@@ -44,7 +84,6 @@ export const SignUpForm = ({ signIn, formData, updateField, onSubmit, loading, o
   <Components.SignUpContainer $signIn={signIn}>
     <Components.Form onSubmit={onSubmit}>
       <Components.Title>Create Account</Components.Title>
-      <div style={{ height: "12px" }} />
       <SignUpFields formData={formData} updateField={updateField} loading={loading} />
       <SignUpActions loading={loading} onToggle={onToggle} />
     </Components.Form>

@@ -1,9 +1,10 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import useOnboarding from "./hooks/useOnboarding";
 import OnboardingForm from "./OnboardingForm";
 import SuccessScreen from "./SuccessScreen";
 import styles from "./OnboardingModal.module.css";
+import StandardModal from "../common/StandardModal/StandardModal";
 
 function getCourseOptions() {
   return Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({
@@ -27,11 +28,13 @@ export default function OnboardingModal({ isOpen, onComplete }) {
   const state = useOnboarding();
   if (!isOpen) return null;
   return (
-    <div className={styles.overlay}>
-      <motion.div className={styles.modal}
-        initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <ModalContent state={state} onComplete={onComplete} />
-      </motion.div>
-    </div>
+    <StandardModal
+      onClose={onComplete} 
+      hideHeader
+      size="md"
+      contentClassName={styles.modal}
+    >
+      <ModalContent state={state} onComplete={onComplete} />
+    </StandardModal>
   );
 }

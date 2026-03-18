@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { requestPermission, sendBrowserNotification } from '../utils/browserNotification';
+import { createEventPopupAction } from '../utils/notificationAction';
 
 export function useReminderNotifications(events) {
     const { addNotification } = useNotifications();
@@ -54,13 +55,14 @@ function isReminderDue(event, minutes, now, lastCheck) {
 }
 
 function triggerNotification(event, minutes, addNotification, sentSet) {
+    markAsSent(event, minutes, sentSet);
     const title = `Reminder: ${event.title}`;
     const body = getNotificationBody(event, minutes);
     const tag = getReminderKey(event, minutes);
+    const action = createEventPopupAction(event.id);
 
-    sendBrowserNotification(title, body, tag);
-    addNotification({ title, message: body });
-    markAsSent(event, minutes, sentSet);
+    sendBrowserNotification(title, body, tag, action);
+    addNotification({ title, message: body, notification_type: 'reminder', action_url: 'calendar', scroll_to_id: String(event.id) });
 }
 
 function markAsSent(event, minutes, sentSet) {

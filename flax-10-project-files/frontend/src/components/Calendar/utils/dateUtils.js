@@ -33,14 +33,6 @@ export function getEndOfMonth(date) {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
-export function getStartOfYear(date) {
-    return new Date(date.getFullYear(), 0, 1);
-}
-
-export function getEndOfYear(date) {
-    return new Date(date.getFullYear(), 11, 31);
-}
-
 export function addDays(date, days) {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
@@ -83,9 +75,28 @@ export function formatDateWithYear(date) {
     return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 }
 
+export function formatDateRange(startTime, endTime, allDay) {
+    const start = new Date(startTime);
+    let end = new Date(endTime);
+    const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
+
+    if (allDay || (isMidnight(start) && isMidnight(end))) {
+        end = new Date(end.getTime() - 1);
+    }
+
+    if (isSameDay(start, end)) {
+        return formatDateWithYear(start);
+    }
+
+    return `${formatShortDate(start)} – ${formatDateWithYear(end)}`;
+}
+
 export function formatTimeRange(startTime, endTime, allDay) {
-    if (allDay) return "All day";
-    return `${formatTime(new Date(startTime))} to ${formatTime(new Date(endTime))}`;
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
+    if (allDay || (isMidnight(start) && isMidnight(end))) return "All day";
+    return `${formatTime(start)} - ${formatTime(end)}`;
 }
 
 export function addHourToTime(time) {
@@ -130,6 +141,31 @@ export function parseDateInput(v) {
     return x;
 }
 
+export function getMonthWeeks(date) {
+    const weeks = [];
+    const current = getMonthGridStartDate(date);
+    const last = getEndOfMonth(date);
+    while (current <= last || current.getDay() !== 0) {
+        weeks.push(generateMonthWeek(current));
+    }
+    return weeks;
+}
+
+function getMonthGridStartDate(date) {
+    const d = getStartOfMonth(date);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+}
+
+function generateMonthWeek(current) {
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+        week.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+    return week;
+}
+
 export function formatDayLabel(date, today = new Date()) {
     if (isSameDay(date, today)) return "Today";
     return date.toLocaleDateString(undefined, {
@@ -138,11 +174,4 @@ export function formatDayLabel(date, today = new Date()) {
         day: "2-digit",
         year: "numeric",
     });
-}
-
-export function isAllDayEvent(event) {
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
-    const duration = (end - start) / (1000 * 60 * 60);
-    return duration >= 24;
 }

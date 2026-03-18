@@ -1,204 +1,148 @@
-import { describe, it, expect } from 'vitest';
-import { createNewTask, normaliseItem, pinUrgentFirst } from '../../utils/tasks/taskUtils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {
+    taskDurationMins,
+    getTasksThatFitGap,
+    isRoutineOrEventTask,
+    calculateSeedsByCategory,
+    isAutoPassedTask,
+} from '../../pages/Homepage/utils/taskUtils';
 
-describe('taskUtils', () => {
-  describe('createNewTask', () => {
-    it('should create a new task with correct structure', () => {
-      const task = createNewTask('Watch FC2 Week 3 videos on KEATS');
-      
-      expect(task).toMatchObject({
-        title: 'Watch FC2 Week 3 videos on KEATS',
-        done: false,
-        urgent: false,
-        completedAt: null,
-      });
-      expect(task.id).toBeDefined();
+describe('taskDurationMins', () => {
+    it('returns estimated_blocks * 25', () => {
+        expect(taskDurationMins({ estimated_blocks: 2 })).toBe(50);
     });
 
-    it('should create task with empty title if not provided', () => {
-      const task = createNewTask('');
-      
-      expect(task.title).toBe('');
-      expect(task.done).toBe(false);
+    it('defaults to 1 block when estimated_blocks is missing', () => {
+        expect(taskDurationMins({})).toBe(25);
+    });
+});
+
+describe('getTasksThatFitGap', () => {
+    it('returns null and empty top3 when no tasks', () => {
+        expect(getTasksThatFitGap([], 60)).toEqual({ suggested: null, top3: [] });
     });
 
-    it('should generate unique id for each task', () => {
-      const task1 = createNewTask('Task 1');
-      const task2 = createNewTask('Task 2');
-      
-      expect(task1.id).not.toBe(task2.id);
-    });
-  });
-
-  describe('normaliseItem', () => {
-    it('should normalise valid task object', () => {
-      const input = {
-        id: 'test-123',
-        title: 'Test task',
-        done: true,
-        urgent: false,
-        completedAt: 1234567890,
-      };
-      
-      const result = normaliseItem(input);
-      expect(result).toEqual(input);
+    it('returns null when gap is too small', () => {
+        const tasks = [{ estimated_blocks: 1 }];
+        expect(getTasksThatFitGap(tasks, 20)).toEqual({ suggested: null, top3: [] });
     });
 
-    it('should add missing fields with defaults', () => {
-      const input = { id: 'test-1', title: 'Test' };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.done).toBe(false);
-      expect(result.urgent).toBe(false);
-      expect(result.completedAt).toBeNull();
+    it('returns task that fits gap', () => {
+        const task = { id: 1, estimated_blocks: 1 };
+        const result = getTasksThatFitGap([task], 60);
+        expect(result.suggested).toEqual(task);
+        expect(result.top3).toHaveLength(1);
     });
 
-    it('should preserve existing id when provided', () => {
-      const input = { id: 'existing-123' };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.id).toBe('existing-123');
+    it('excludes tasks that are too long', () => {
+        const shortTask = { id: 1, estimated_blocks: 1 }; // 25 min
+        const longTask = { id: 2, estimated_blocks: 4 }; // 100 min
+        const result = getTasksThatFitGap([shortTask, longTask], 50);
+        expect(result.top3).toHaveLength(1);
+        expect(result.suggested?.id).toBe(1);
     });
 
-    it('should generate new id when not provided', () => {
-      const input = { title: 'No ID task' };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.id).toBeDefined();
-      expect(typeof result.id).toBe('string');
+    it('prioritizes tasks due within 48h', () => {
+        const now = new Date();
+        const soon = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+        const later = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const taskSoon = { id: 1, estimated_blocks: 1, due_date: soon };
+        const taskLater = { id: 2, estimated_blocks: 1, due_date: later };
+        const result = getTasksThatFitGap([taskLater, taskSoon], 60);
+        expect(result.suggested?.id).toBe(1);
     });
 
-    it('should preserve string title when provided', () => {
-      const input = { title: 'My task title' };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.title).toBe('My task title');
+    it('sorts by due date when neither is in 48h', () => {
+        const now = new Date();
+        const day3 = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
+        const day5 = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString();
+        const task3 = { id: 1, estimated_blocks: 1, due_date: day3 };
+        const task5 = { id: 2, estimated_blocks: 1, due_date: day5 };
+        const result = getTasksThatFitGap([task5, task3], 60);
+        expect(result.suggested?.id).toBe(1);
     });
 
-    it('should use empty string for non-string title', () => {
-      const input = { title: 123 };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.title).toBe('');
+    it('sorts by priority when no due dates', () => {
+        const urgent = { id: 1, estimated_blocks: 1, priority: 'urgent' };
+        const low = { id: 2, estimated_blocks: 1, priority: 'low' };
+        const result = getTasksThatFitGap([low, urgent], 60);
+        expect(result.suggested?.id).toBe(1);
+    });
+});
+
+describe('isRoutineOrEventTask', () => {
+    it('returns false for null task', () => {
+        expect(isRoutineOrEventTask(null)).toBe(false);
     });
 
-    it('should preserve completedAt timestamp when it is a number', () => {
-      const timestamp = 1234567890;
-      const input = { completedAt: timestamp };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.completedAt).toBe(timestamp);
+    it('returns true for routine tag', () => {
+        expect(isRoutineOrEventTask({ title: 'Custom', tag_name: 'routine' })).toBe(true);
     });
 
-    it('should use null for non-number completedAt', () => {
-      const input = { completedAt: 'invalid' };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.completedAt).toBeNull();
+    it('returns true for breakfast in title', () => {
+        expect(isRoutineOrEventTask({ title: 'Morning breakfast' })).toBe(true);
     });
 
-    it('should handle all valid properties together', () => {
-      const input = {
-        id: 'test-id',
-        title: 'Test title',
-        done: true,
-        urgent: true,
-        completedAt: 999999,
-      };
-      
-      const result = normaliseItem(input);
-      
-      expect(result).toEqual({
-        id: 'test-id',
-        title: 'Test title',
-        done: true,
-        urgent: true,
-        completedAt: 999999,
-      });
+    it('returns true for lecture in title', () => {
+        expect(isRoutineOrEventTask({ title: 'CS Lecture 3' })).toBe(true);
     });
 
-    it('should convert truthy done to true', () => {
-      const input = { done: 1 };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.done).toBe(true);
+    it('returns false for regular task', () => {
+        expect(isRoutineOrEventTask({ title: 'Write report' })).toBe(false);
     });
 
-    it('should convert falsy done to false', () => {
-      const input = { done: 0 };
-      
-      const result = normaliseItem(input);
-      
-      expect(result.done).toBe(false);
+    it('uses getTag function to get tag label', () => {
+        const getTag = vi.fn().mockReturnValue({ label: 'wellness' });
+        expect(isRoutineOrEventTask({ title: 'Custom', tag: 1 }, getTag)).toBe(true);
+        expect(getTag).toHaveBeenCalledWith(1);
     });
-  });
+});
 
-  describe('pinUrgentFirst', () => {
-    it('should sort urgent tasks first', () => {
-      const tasks = [
-        { id: 1, urgent: false },
-        { id: 2, urgent: true },
-        { id: 3, urgent: false },
-      ];
-      
-      const result = pinUrgentFirst(tasks);
-      
-      expect(result[0].id).toBe(2);
+describe('calculateSeedsByCategory', () => {
+    it('returns 0 for both when no completed tasks', () => {
+        const tasks = [{ completed: false, title: 'Task' }];
+        const result = calculateSeedsByCategory(tasks);
+        expect(result).toEqual({ academic: 0, personal: 0 });
     });
 
-    it('should maintain order within urgent tasks', () => {
-      const tasks = [
-        { id: 1, urgent: true },
-        { id: 2, urgent: true },
-        { id: 3, urgent: false },
-      ];
-      
-      const result = pinUrgentFirst(tasks);
-      
-      expect(result[0].id).toBe(1);
-      expect(result[1].id).toBe(2);
-      expect(result[2].id).toBe(3);
+    it('counts academic tasks correctly', () => {
+        const tasks = [
+            { completed: true, tag_name: 'academic', title: 'Study', tag: null },
+            { completed: true, tag_name: 'personal', title: 'Exercise', tag: null },
+        ];
+        const result = calculateSeedsByCategory(tasks);
+        expect(result.academic).toBe(1);
+        expect(result.personal).toBe(1);
     });
 
-    it('should maintain order within non-urgent tasks', () => {
-      const tasks = [
-        { id: 1, urgent: false },
-        { id: 2, urgent: false },
-        { id: 3, urgent: false },
-      ];
-      
-      const result = pinUrgentFirst(tasks);
-      
-      expect(result[0].id).toBe(1);
-      expect(result[1].id).toBe(2);
-      expect(result[2].id).toBe(3);
+    it('excludes routine tasks', () => {
+        const tasks = [
+            { completed: true, title: 'Breakfast', tag_name: '' },
+        ];
+        const result = calculateSeedsByCategory(tasks);
+        expect(result.academic).toBe(0);
+        expect(result.personal).toBe(0);
+    });
+});
+
+describe('isAutoPassedTask', () => {
+    it('returns false for non-routine task', () => {
+        const task = { title: 'Study', due_date: '2020-01-01T00:00:00' };
+        expect(isAutoPassedTask(task, new Date())).toBe(false);
     });
 
-    it('should handle empty array', () => {
-      const result = pinUrgentFirst([]);
-      
-      expect(result).toEqual([]);
+    it('returns true for routine task with past due date', () => {
+        const task = { title: 'Breakfast', due_date: '2020-01-01T00:00:00' };
+        expect(isAutoPassedTask(task, new Date())).toBe(true);
     });
 
-    it('should handle all urgent tasks', () => {
-      const tasks = [
-        { id: 1, urgent: true },
-        { id: 2, urgent: true },
-      ];
-      
-      const result = pinUrgentFirst(tasks);
-      
-      expect(result).toHaveLength(2);
-      expect(result[0].urgent).toBe(true);
-      expect(result[1].urgent).toBe(true);
+    it('returns false for routine task with future due date', () => {
+        const task = { title: 'Breakfast', due_date: '2099-01-01T00:00:00' };
+        expect(isAutoPassedTask(task, new Date())).toBe(false);
     });
-  });
+
+    it('returns false for routine task without due_date', () => {
+        const task = { title: 'Breakfast' };
+        expect(isAutoPassedTask(task, new Date())).toBe(false);
+    });
 });

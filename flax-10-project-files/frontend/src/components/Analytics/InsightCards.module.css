@@ -6,13 +6,15 @@
   color: var(--muted);
   margin: 0 0 0.875rem;
 }
-
 .noData {
   font-size: 0.825rem;
   color: var(--muted);
   margin: 0;
 }
 
+.noDataWrap {
+  width: 100%;
+}
 .scoreCard {
   display: flex;
   flex-direction: column;
@@ -21,50 +23,58 @@
   flex: 1;
   min-width: 120px;
 }
-
 .scoreRing {
   position: relative;
   width: 96px;
   height: 96px;
 }
-
 .scoreCenter {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1px;
 }
-
 .scoreNum {
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
 }
-
+.scoreMax {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1;
+}
 .scoreLabel {
   font-size: 0.75rem;
   font-weight: 600;
 }
-
+.scoreExplain {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-align: center;
+  margin: 2px 0 0;
+  line-height: 1.5;
+  max-width: 160px;
+}
 .peakCard {
   flex: 1;
   min-width: 160px;
 }
-
 .peakList {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
 }
-
 .peakItem {
   display: flex;
   align-items: center;
   gap: 0.625rem;
 }
-
 .peakRank {
   font-size: 0.7rem;
   font-weight: 700;
@@ -72,27 +82,23 @@
   width: 20px;
   flex-shrink: 0;
 }
-
 .peakInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
-
 .peakTime {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text);
 }
-
 .peakBar {
   height: 4px;
   background: var(--border);
   border-radius: 4px;
   overflow: hidden;
 }
-
 .peakFill {
   height: 100%;
   background: var(--primary);

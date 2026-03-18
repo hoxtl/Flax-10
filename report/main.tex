@@ -1,0 +1,79 @@
+\documentclass[a4paper, 12pt]{report}
+
+%%%%%%%%%%%%
+% Packages %
+%%%%%%%%%%%%
+
+\usepackage[english]{babel}
+\usepackage[noheader]{packages/sleek}
+\usepackage{packages/sleek-title}
+\usepackage{packages/sleek-theorems}
+\usepackage{packages/sleek-listings}
+\usepackage{packages/seg-report-extra}
+\usepackage{longtable}
+
+\newcommand{\defaultInstructions}{
+}
+
+%%%%%%%%%%%%%%
+% Title-page %
+%%%%%%%%%%%%%%
+
+\logo{./resources/pdf/Kcl-logo.pdf}
+\faculty{Faculty of Natural, Mathematical, and Engineering Sciences}
+\department{Department of Informatics}
+\title{Software Engineering Group Project}
+\subtitle{StudyFlax: Time Management for Higher Education}
+\author{\textit{Flax-10}\\
+Hamed Latif\\
+Kausar Khan\\
+Eric Almeida\\
+Aishah Ahmed\\
+Cate Tay (Cate) Chew\\
+Zerun (Harry) Chen\\
+Dian Mahmood\\
+Indixora Jozal\\
+Binuli Nevanma Markawitage
+}
+\date{\today}
+
+%%%%%%%%%%%%%%%%
+% Bibliography %
+%%%%%%%%%%%%%%%%
+
+\addbibresource{./resources/bib/references.bib}
+
+%%%%%%%%%%
+% Others %
+%%%%%%%%%%
+
+\lstdefinestyle{latex}{
+    language=TeX,
+    style=default,
+    commentstyle=\ForestGreen,
+    keywordstyle=\TrueBlue,
+    stringstyle=\VeronicaPurple,
+    emphstyle=\TrueBlue,
+    emph={LaTeX, usepackage, textit, textbf, textsc}
+}
+
+\FrameTBStyle{latex}
+\def\tbs{\textbackslash}
+
+%%%%%%%%%%%%
+% Document %
+%%%%%%%%%%%%
+
+\begin{document}
+    \maketitle
+    \romantableofcontents
+
+    \input{chapter01--introduction}
+    \input{chapter02--product}
+    \input{chapter03--design}
+    \input{chapter04--testing}
+    \input{chapter05--project-management}
+
+    \appendix
+    % Can attach meeting minutes here as appendices
+\end{document}

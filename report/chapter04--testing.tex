@@ -1,0 +1,42 @@
+\chapter{Testing}
+\label{chap:testing}
+
+Testing was integrated throughout development to ensure the reliability and correctness of the system. The application consists of a backend implemented using Python and Django, and a frontend implemented using React with Vite. Automated tests were developed for both parts of the system and were complemented by manual testing of the deployed application. The team followed an \textbf{Agile development approach with continuous testing}, meaning tests were written alongside feature development.
+
+\section{Automated Testing}
+
+Backend tests were implemented using Django’s built-in testing framework together with the Python coverage library. These tests validate database models, helper functions, and API endpoints. For example, tests verify behaviour for models such as \textbf{test\_deadline\_model.py} and \textbf{test\_notification\_model.py}, as well as API endpoints such as \textbf{test\_auth\_views.py}, \textbf{test\_task\_views.py}, and \textbf{test\_society\_views.py}. A representative backend test verifying model behaviour is \textbf{[PLACEHOLDER: backend model test example]}.
+
+Frontend tests were written using \textbf{Vitest}, which integrates with the Vite development environment. These tests validate React components, hooks, context providers, and full page behaviour. Examples include component tests such as \textbf{TaskCard.test.jsx}, \textbf{NotificationToast.test.jsx}, and \textbf{UserSearch.test.jsx}, as well as hook tests such as \textbf{useTimerLogic.test.js} and \textbf{useCalendarEvents.test.js}. A representative frontend component test verifying user interaction is \textbf{[PLACEHOLDER: frontend component test example]}.
+
+The frontend test suite contains \textbf{359 automated test files across 45 directories}, while the backend suite contains \textbf{96 test files across 10 directories}. Together this results in \textbf{over 450 automated tests}. After implementing each feature, the developer responsible for that feature also wrote the corresponding automated tests, ensuring that new functionality was validated immediately and that each team member contributed automated tests (II.5).
+
+\section{Test Coverage}
+
+Code coverage tools were used to evaluate the completeness of the automated tests. During \textbf{week 6}, the team reviewed the entire test suite and improved it until coverage reached \textbf{100\%}. This ensured that all major components of the system were executed during automated testing and satisfied the coverage requirements in the marking criteria (III.5.1, III.5.2, IV.5.1, IV.5.2).
+
+Tests were designed to cover multiple input partitions, including \textbf{valid inputs, invalid inputs, and edge cases}. For example, tests validate behaviour when requests contain missing fields or invalid authentication tokens. An example input validation test can be found in \textbf{[PLACEHOLDER: input validation test example]} (V.5.1, V.5.2).
+
+\section{Test Code Quality}
+
+Test code quality was maintained through the use of reusable fixtures and mixins to avoid duplicated setup logic. Shared configuration is defined in \textbf{[PLACEHOLDER: fixture or mixin file]}. Additionally, a script was used to detect duplicated code across the repository, ensuring repeated test implementations were refactored or removed (V.3.6).
+
+Another script checked the structure of test functions to ensure they remained short and readable. Tests were typically limited to \textbf{fewer than 25 lines} and avoided deep control-flow nesting. A concise unit test verifying a single behaviour can be found in \textbf{[PLACEHOLDER: short unit test file]}. Tests also follow clear naming conventions such as \textbf{TaskCard.test.jsx} and \textbf{test\_task\_views.py} (V.3.5, V.3.7).
+
+\section{Manual Testing}
+
+Manual testing was performed during \textbf{weekly team meetings}. The team tested both the development and deployed versions of the system by performing common user workflows such as creating tasks, navigating the calendar, and interacting with social features.
+
+Manual testing was primarily used to verify \textbf{user interface behaviour and usability}, which are difficult to fully validate using automated tests. A detailed list of manual tests, including actions and expected results, is provided in \textbf{Appendix [PLACEHOLDER: appendix reference]}. This process also ensured the deployed application was regularly validated (III.4.2).
+
+\section{Limits of Testing}
+
+Automated testing provides advantages such as \textbf{speed, repeatability, and regression detection}. However, automated tests cannot easily detect issues related to layout or overall user experience. Manual testing helps identify such issues but cannot be executed as consistently as automated tests.
+
+\section{Threats to Validity}
+
+Although the project includes \textbf{over 450 automated tests} and achieves \textbf{100\% code coverage}, this does not guarantee that the system is completely free of defects. Code coverage indicates that code was executed during testing, but it does not ensure that every possible logical error or edge case has been detected.
+
+Some tests also rely on simulated inputs rather than real-world conditions. For example, \textbf{[PLACEHOLDER: mocked or simulated test example]} validates behaviour using controlled test data rather than external systems.
+
+Despite these limitations, the combination of extensive automated testing, full coverage analysis, and regular manual testing provides strong confidence in the reliability of the system.

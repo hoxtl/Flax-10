@@ -2,17 +2,26 @@ html,
 body,
 #root {
   height: 100%;
+  background: var(--surface-page);
+}
+
+html {
+  font-size: 14px;
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Design system: Lexend for all headers and task titles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
 }
 
 * {
@@ -34,7 +43,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--surface-page);
   color: var(--text);
   display: block;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -47,65 +56,70 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: var(--btn-radius);
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
+  padding: var(--btn-padding);
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-font-weight);
   font-family: inherit;
   cursor: pointer;
   transition: all 0.25s;
 }
 
+input,
+select,
+textarea {
+  font: inherit;
+}
 
 button:focus,
 button:focus-visible {
-  outline: 2px solid var(--primary);
   outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* Dark theme transitions */
-[data-theme="dark"] * {
+[data-mode="dark"] * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Light theme transitions */
-[data-theme="light"] * {
+[data-mode="light"] * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Input fields in dark mode */
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea {
+[data-mode="dark"] input,
+[data-mode="dark"] select,
+[data-mode="dark"] textarea {
   background: rgba(180, 164, 144, 0.07);
   border-color: var(--border);
   color: var(--text);
 }
 
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
+[data-mode="dark"] input::placeholder,
+[data-mode="dark"] textarea::placeholder {
   color: rgba(180, 164, 144, 0.55);
 }
 
-[data-theme="dark"] input:focus,
-[data-theme="dark"] select:focus,
-[data-theme="dark"] textarea:focus {
+[data-mode="dark"] input:focus,
+[data-mode="dark"] select:focus,
+[data-mode="dark"] textarea:focus {
   border-color: rgba(183, 146, 107, 0.55);
-  box-shadow: 0 0 0 3px rgba(183, 146, 107, 0.35);
+  box-shadow: var(--focus-ring);
 }
 
 /* Buttons in dark mode */
-[data-theme="dark"] button {
+[data-mode="dark"] button {
   color: var(--text);
 }
 
 /* Links in dark mode */
-[data-theme="dark"] a {
+[data-mode="dark"] a {
   color: var(--primary-strong);
 }
 
-[data-theme="dark"] a:hover {
+[data-mode="dark"] a:hover {
   color: var(--primary);
 }
 
@@ -116,4 +130,26 @@ button:focus-visible {
 
 .MuiChartsAxis-tickLabel tspan {
   fill: var(--muted) !important;
+}
+
+/* Viewport Focus Shield: when timer is active, global glow */
+body.focusShieldActive {
+  transition: box-shadow 0.4s ease;
+}
+body.focusShieldActive.focusShieldSage {
+  box-shadow: inset 0 0 120px 20px rgba(140, 154, 134, 0.16), inset 0 0 60px 10px rgba(140, 154, 134, 0.1);
+}
+body.focusShieldActive.focusShieldTerracotta {
+  box-shadow: inset 0 0 120px 20px rgba(192, 90, 62, 0.12), inset 0 0 60px 10px rgba(192, 90, 62, 0.06);
+}
+
+/* Notification highlight effect for scroll-to elements */
+.notification-highlight {
+  animation: notificationPulse 2s ease-out;
+}
+
+@keyframes notificationPulse {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 4px rgba(158, 126, 93, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(158, 126, 93, 0.6); }
 }

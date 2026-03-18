@@ -1,0 +1,15 @@
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary, #8b6e4e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--color-card);
+    text-transform: uppercase;
+    object-fit: cover;
+    flex-shrink: 0;
+    font-size: 1rem;
+}

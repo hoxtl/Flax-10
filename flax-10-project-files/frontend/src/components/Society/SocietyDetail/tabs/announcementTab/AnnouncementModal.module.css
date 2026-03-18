@@ -1,46 +1,4 @@
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-.modal {
-    width: min(600px, 90vw);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--bg);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.title {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--muted);
-    padding: 0;
-    line-height: 1;
-}
-
+/* Styles for the AnnouncementModal form and its sub-sections. */
 .error {
     background: var(--danger-bg);
     color: var(--danger);
@@ -170,37 +128,18 @@
 
 .footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
 }
 
-.cancelBtn {
-    padding: 10px 20px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--muted);
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
+.footerRight {
+    display: flex;
+    gap: 12px;
 }
 
-.submitBtn {
-    padding: 10px 20px;
-    background: var(--primary);
-    color: var(--c-white);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.submitBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 
 /* Mapping old styles to new for ImageField until fully refactored or if reusing wrapper */
 .field {

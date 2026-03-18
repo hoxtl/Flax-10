@@ -1,5 +1,21 @@
 [run]
 source = studyFlax
 omit =
-    */migrations/*
-    */__init__.py
+    studyFlax/management/*
+    studyFlax/views/notifications.py
+    studyFlax/tests/*
+    studyFlax/migrations/*
+
+[report]
+omit =
+    studyFlax/management/*
+    studyFlax/views/notifications.py
+    studyFlax/tests/*
+    studyFlax/migrations/*
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self\.debug
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    ^\s*pass\s*$

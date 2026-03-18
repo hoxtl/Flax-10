@@ -1,0 +1,163 @@
+/* AchievementsModal */
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modalShell {
+  width: min(640px, 94vw);
+  max-height: 82vh;
+  animation: slideUp 0.22s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+
+.modalContent {
+  padding: 0;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 24px 14px;
+  border-bottom: var(--stroke-soft);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.progressWrap {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  margin-top: -2px;
+}
+.closeBtn:hover { color: var(--text); background: var(--hover); }
+
+/* Body */
+.body {
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Category */
+.category { display: flex; flex-direction: column; gap: 10px; }
+
+.catHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.catName {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.catCount {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+/* Tile */
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tileEarned {
+  cursor: default;
+}
+
+.tileEarned:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.tileLocked {
+  background: var(--surface-card-muted);
+  border-color: var(--border);
+  opacity: 0.6;
+}
+
+.tileEmoji {
+  font-size: 24px;
+  line-height: 1;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.tileLabel {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.tileTier {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.tileLockHint {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.4;
+  opacity: 0.8;
+}

@@ -1,142 +1,243 @@
 .card {
-    background: var(--bg);
-    border-radius: 12px;
-    width: 380px;
-    box-shadow: 0 4px 12px rgba(20, 20, 20, 0.06);
-    border: 1px solid var(--border);
+    background: var(--surface-card);
+    flex-direction: column;
+    min-height: 214px;
     position: relative;
     overflow: hidden;
-    transition: transform 200ms cubic-bezier(.2, .9, .2, 1), box-shadow 160ms ease;
-    display: flex;
+    border: 1px solid color-mix(in srgb, var(--module-accent, var(--border)) 14%, var(--border));
+    transition: transform 0.24s cubic-bezier(.2, .9, .2, 1), box-shadow 0.24s cubic-bezier(.2, .9, .2, 1), border-color 0.24s ease;
 }
 
-.card:hover,
-.card:focus-within {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 6px 18px rgba(20, 20, 20, 0.08);
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--module-accent, var(--primary)), color-mix(in srgb, var(--module-accent, var(--primary)) 48%, transparent));
+    pointer-events: none;
 }
 
-.card:active {
-    transform: translateY(-1px) scale(1.005);
+.card.clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: color-mix(in srgb, var(--module-accent, var(--primary)) 32%, var(--border));
 }
 
 .card.enrolled {
-    background: linear-gradient(to bottom, var(--bg) 0%, var(--panel) 100%);
+    background: linear-gradient(to bottom, var(--surface-card) 0%, var(--surface-panel) 100%);
+}
+
+.card.enrolled::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: linear-gradient(to bottom,
+            color-mix(in srgb, var(--sage) 68%, var(--primary) 32%),
+            color-mix(in srgb, var(--sage) 44%, transparent));
+    box-shadow: 1px 0 0 color-mix(in srgb, var(--sage) 35%, transparent);
+    pointer-events: none;
 }
 
 .content {
     flex: 1;
-    padding: 1rem 1.25rem;
+    padding: var(--space-3) var(--space-3) var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-2);
+    overflow: hidden;
 }
 
 .cardHeader {
     display: flex;
+    flex-direction: column;
+    gap: 0.38rem;
+    min-width: 0;
+}
+
+.headerTopRow {
+    display: flex;
     align-items: center;
-    gap: 0.625rem;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.headerIdentity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.tutorAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+}
+
+.tutorAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tutorAvatarFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.6rem;
+    font-weight: 700;
 }
 
 .iconWrap {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--card-icon-radius);
     display: grid;
     place-items: center;
-    background: var(--hover);
+    background: var(--card-icon-surface);
     flex: 0 0 auto;
     font-size: 16px;
 }
 
-.moduleCode {
-    background: var(--pill-bg);
-    color: var(--primary);
-    padding: 0.25rem 0.625rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
+.enrolledBadge {
+    background: var(--success-bg);
+    color: var(--success-text);
+    padding: var(--chip-padding);
+    border-radius: var(--chip-radius);
+    font-size: var(--chip-font-size);
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
-.enrolledBadge {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 0.25rem 0.625rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
+.headerChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.departmentText {
+    font-size: 0.74rem;
+    padding: 0.22rem 0.52rem;
+    border-radius: var(--chip-radius);
+    background: color-mix(in srgb, var(--panel) 84%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    color: var(--muted);
     font-weight: 600;
-    margin-left: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.courseText {
+    font-size: 0.82rem;
+    padding: 0.22rem 0.52rem;
+    border-radius: var(--chip-radius);
+    background: color-mix(in srgb, var(--module-accent, var(--primary)) 92%, var(--surface-card) 8%);
+    border: 1px solid color-mix(in srgb, var(--module-accent, var(--primary)) 35%, transparent);
+    color: var(--c-white);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-white) 10%, transparent);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .moduleTitle {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.02rem;
     font-weight: 700;
     color: var(--text);
-    line-height: 1.4;
+    line-height: 1.25;
     letter-spacing: -0.01em;
-}
-
-.descriptionSection {
-    margin: 0;
+    white-space: normal;
+    overflow: visible;
 }
 
 .description {
-    font-size: 0.875rem;
-    color: var(--muted);
-    line-height: 1.6;
-    margin: 0 0 0.5rem 0;
+    font-size: 0.84rem;
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+    line-height: 1.35;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.expandButton {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
-    transition: opacity 0.2s;
-}
-
-.expandButton:hover {
-    opacity: 0.7;
-}
-
-.meta {
+.metaPills {
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    gap: var(--space-1);
+    flex-wrap: nowrap;
+    padding-top: var(--space-1);
+    border-top: var(--stroke-soft);
+    overflow: hidden;
 }
 
-.metaItem {
+.metaPill {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.8125rem;
-    color: var(--muted);
+    gap: 0.32rem;
+    font-size: 0.7rem;
+    color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
     font-weight: 500;
+    padding: 0.18rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.relatedRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+
+.relatedChip {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+    background: color-mix(in srgb, var(--surface-card) 78%, var(--module-accent, var(--primary)) 8%);
+    border-color: color-mix(in srgb, var(--module-accent, var(--primary)) 22%, var(--border));
 }
 
 .actions {
     display: flex;
-    gap: 0.625rem;
-    margin-top: 0.25rem;
+    justify-content: space-between;
+    gap: var(--space-2);
+    align-items: center;
+    margin-top: var(--space-1);
+    padding-top: 0;
 }
 
 .editButton,
 .deleteButton,
 .enrollButton,
 .unenrollButton {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    padding: var(--btn-padding-sm);
+    border-radius: var(--btn-radius);
+    font-size: var(--text-sm);
+    font-weight: var(--btn-font-weight);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(.2, .9, .2, 1);
     border: none;
@@ -165,14 +266,14 @@
 .enrollButton {
     background: var(--primary);
     color: var(--c-white);
-    width: 100%;
-    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.15);
+    flex: 1;
+    box-shadow: var(--shadow-sm);
 }
 
 .enrollButton:hover {
     background: var(--c-olive);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(158, 126, 93, 0.2);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .enrollButton:active {
@@ -182,15 +283,46 @@
 .unenrollButton {
     background: rgba(225, 29, 72, 0.1);
     color: var(--error-text);
-    width: 100%;
+    flex: 1;
 }
 
 .unenrollButton:hover {
     background: rgba(225, 29, 72, 0.15);
 }
 
-.department {
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 2px;
+.deadlineButton {
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--chip-radius);
+    border: var(--stroke-soft);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.deadlineButton:hover {
+    background: var(--hover);
+}
+
+.viewDetailsBtn {
+    border: none;
+    background: transparent;
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
+    font-size: 0.86rem;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, transparent);
+    line-height: 1.1;
+}
+
+.viewDetailsBtn:hover {
+    color: var(--text);
+    border-bottom-color: color-mix(in srgb, var(--text) 65%, transparent);
+}
+
+:global([data-mode="dark"]) .enrolledBadge {
+    background: color-mix(in srgb, var(--sage) 32%, var(--panel));
+    color: color-mix(in srgb, var(--sage) 85%, var(--text));
 }

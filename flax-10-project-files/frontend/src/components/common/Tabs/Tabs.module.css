@@ -1,0 +1,113 @@
+.container {
+    background: transparent;
+    width: 100%;
+}
+
+.tabBar {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+.tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.625rem 1.1rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted);
+    border-radius: 8px 8px 0 0;
+    transition: color 0.18s ease;
+}
+
+.tab:hover {
+    color: var(--text);
+}
+
+.tab.active {
+    color: var(--text);
+}
+
+.headingTab {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--muted);
+    padding-top: 0.62rem;
+    padding-bottom: 0.62rem;
+}
+
+.headingTab:hover {
+    color: var(--text-secondary);
+}
+
+.tabIndicator {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px 2px 0 0;
+}
+
+.compact .tabBar {
+    margin-bottom: 0.55rem;
+    border-bottom: none;
+    gap: 0.35rem;
+    padding: 0.16rem;
+    border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--hover) 64%, transparent);
+}
+
+.compact .tab {
+    padding: 0.42rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 9px;
+    flex: 1;
+    justify-content: center;
+    color: var(--muted);
+}
+
+.compact .tab.active {
+    color: color-mix(in srgb, var(--primary) 72%, #000);
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-card));
+}
+
+.compact .tabIndicator {
+    display: none;
+}
+
+.compact .content {
+    padding-top: 0.1rem;
+}
+
+@media (max-width: 640px) {
+    .tabBar {
+        flex-direction: column;
+        gap: 4px;
+        border-bottom: none;
+    }
+
+    .tab {
+        width: 100%;
+        text-align: left;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    .tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+}

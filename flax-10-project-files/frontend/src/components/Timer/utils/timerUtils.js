@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { requestPermission } from '../../Notifications/utils/browserNotification';
 
 export const getProgress = (t) => {
@@ -6,14 +6,18 @@ export const getProgress = (t) => {
     return ((t.workTime * 60 - t.timeLeft) / (t.workTime * 60)) * 100;
 };
 
-export const useCompletionCheck = (timer, startNext, notify) => {
+export const useCompletionCheck = (timer, startNext, notify, onWorkComplete) => {
+    const hasNotified = useRef(false);
     useEffect(() => { requestPermission(); }, []);
 
     useEffect(() => {
-        if (timer.timeLeft === 0 && timer.isActive) {
-            handleCompletion(timer, startNext, notify);
+        if (timer.timeLeft === 0 && timer.isActive && !hasNotified.current) {
+            hasNotified.current = true;
+            handleCompletion(timer, startNext, notify, onWorkComplete);
+        } else if (timer.timeLeft > 0) {
+            hasNotified.current = false;
         }
-    }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime, startNext, notify]);
+    }, [timer.timeLeft, timer.isActive, timer.mode, timer.breakTime, startNext, notify, onWorkComplete]);
 };
 
 export const useNotificationPermission = () => {
@@ -27,17 +31,19 @@ export const useNotificationPermission = () => {
     return { permission, request: () => Notification.requestPermission().then(setPermission) };
 };
 
-function handleCompletion(timer, startNext, notify) {
+function handleCompletion(timer, startNext, notify, onWorkComplete) {
     if (timer.mode === 'work') return handleWorkCompletion(timer, startNext, notify);
-    if (notify) notify("Break Over!", "Time to get back to work!");
+    if (notify) notify("Break Over!", "Time to get back to work!", { url: 'timer' });
 }
 
-function handleWorkCompletion(timer, startNext, notify) {
-    if (notify) notify("Time's Up!", "Work session complete. Take a break!");
+function handleWorkCompletion(timer, startNext, notify, onWorkComplete) {
+    if (notify) notify("Time's Up!", "Work session complete. Take a break!", { url: 'timer' });
     if (timer.breakTime === 0) {
         timer.setIsActive(false);
         startNext();
+        return;
     }
+    if (typeof onWorkComplete === 'function') onWorkComplete(timer);
 }
 
 function usePermissionPolling(permission, setPermission) {

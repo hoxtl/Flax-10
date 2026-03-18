@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
+import { useConfirm } from '../../../context/ConfirmContext';
 import { useResizeHighlight } from '../../../context/ResizeHighlightContext';
 import { createResizeSession } from '../utils/resizeUtils';
 import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from '../calendarConstants';
@@ -8,6 +9,7 @@ import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
 export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const { events } = useCalendar();
+    const confirmFn = useConfirm();
     const { setResizeHighlight } = useResizeHighlight();
     const [isResizing, setIsResizing] = useState(false);
     const [resizePreview, setResizePreview] = useState(null);
@@ -15,9 +17,9 @@ export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
         e.stopPropagation();
         setIsResizing(true);
         const onMove = createMoveHandler(event, setResizePreview, setResizeHighlight);
-        const onEnd = createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded);
+        const onEnd = createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded, confirmFn);
         createResizeSession(e.clientY, eventRef.current.offsetHeight, { onMove, onEnd });
-    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight]);
+    }, [event, eventRef, editEvent, resizeJustEnded, events, setResizeHighlight, confirmFn]);
     return { isResizing, resizePreview, handleResizeStart };
 }
 
@@ -29,9 +31,9 @@ function createMoveHandler(event, setResizePreview, setResizeHighlight) {
     };
 }
 
-function createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded) {
-    return (diff) => {
-        saveResizedEvent(event, diff, editEvent, events, resizeJustEnded);
+function createEndHandler(event, editEvent, events, setIsResizing, setResizePreview, setResizeHighlight, resizeJustEnded, confirmFn) {
+    return async (diff) => {
+        await saveResizedEvent(event, diff, editEvent, events, resizeJustEnded, confirmFn);
         setIsResizing(false);
         setResizePreview(null);
         setResizeHighlight(null);
@@ -59,31 +61,35 @@ function updateHighlight(event, newHeight, setResizeHighlight) {
 
 
 
-function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded) {
+async function saveResizedEvent(event, deltaY, editEvent, events, resizeJustEnded, confirmFn) {
     const isRecurring = hasRecurrence(event);
     if (isRecurring) {
-        handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded);
+        await handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded, confirmFn);
     } else {
-        executeResize(event, deltaY, editEvent, events, resizeJustEnded);
+        await executeResize(event, deltaY, editEvent, events, resizeJustEnded, confirmFn);
     }
 }
 
-function handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded) {
-    const choice = window.confirm(
-        'This is a recurring event.\n\nOK = Resize ALL occurrences\nCancel = Cancel resize'
-    );
+async function handleRecurringResize(event, deltaY, editEvent, events, resizeJustEnded, confirmFn) {
+    const choice = await confirmFn({
+        title: "Recurring Event",
+        message: "This is a recurring event. How would you like to resize it?",
+        confirmText: "Resize ALL occurrences",
+        cancelText: "Cancel resize",
+        isDanger: false
+    });
     if (choice) {
-        executeResize(event, deltaY, editEvent, events, resizeJustEnded);
+        await executeResize(event, deltaY, editEvent, events, resizeJustEnded, confirmFn);
     }
 }
 
-function executeResize(event, deltaY, editEvent, events, resizeJustEnded) {
+async function executeResize(event, deltaY, editEvent, events, resizeJustEnded, confirmFn) {
     const newEnd = calculateNewEndTime(event, deltaY);
     const baseEventId = extractBaseEventId(event.id);
     const updatedEvent = { ...event, end_time: newEnd.toISOString() };
     const others = events.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!checkOverlapWithConfirm(updatedEvent, others)) return;
-    editEvent(baseEventId, { end_time: newEnd.toISOString() });
+    if (!(await checkOverlapWithConfirm(updatedEvent, others, confirmFn))) return;
+    await editEvent(baseEventId, { end_time: newEnd.toISOString() });
     markResizeEnded(resizeJustEnded);
 }
 

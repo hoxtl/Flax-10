@@ -1,58 +1,4 @@
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(20, 18, 30, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 50;
-}
-
-.modal {
-    width: min(520px, 92vw);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: var(--panel, #fff);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    padding: 24px;
-}
-
-.header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.title {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text, #1f2937);
-}
-
-.sub {
-    margin: 4px 0 0;
-    color: var(--muted, #6b7280);
-    font-size: 0.9rem;
-}
-
-.close {
-    border: none;
-    background: transparent;
-    font-size: 28px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--muted, #6b7280);
-    padding: 0;
-}
-
-.close:hover {
-    color: var(--text, #1f2937);
-}
-
+/* Styles for the CreateSocietyModal multi-step form. */
 .form {
     display: flex;
     flex-direction: column;
@@ -77,12 +23,19 @@
     margin: 0;
 }
 
+.error {
+    color: #ff4d4f;
+    font-size: 0.8rem;
+    margin: 0;
+    font-weight: 500;
+}
+
 .input {
     padding: 12px 14px;
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     transition: border-color 0.2s;
 }
@@ -97,7 +50,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     resize: vertical;
     min-height: 80px;
@@ -188,7 +141,7 @@
 .cancelBtn {
     padding: 10px 20px;
     border: 1px solid var(--border, #e5e7eb);
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 500;
@@ -236,4 +189,22 @@
 .addCollabBtn:hover {
     border-color: var(--primary-color, #9E7E5D);
     color: var(--primary-color, #9E7E5D);
+}
+
+.photoSummary {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+
+.summaryCard {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border, #e5e7eb);
 }

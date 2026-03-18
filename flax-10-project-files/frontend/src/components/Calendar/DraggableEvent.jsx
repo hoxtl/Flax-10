@@ -1,26 +1,30 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
-import { getEventType } from './utils/eventUtils';
+import { getEventType, hasRecurrence } from './utils/eventUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
+import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
-import { EventMenuButton } from './EventMenu';
+import { getEventTheme } from './utils/eventStyleUtils';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const eventType = getEventType(event);
-    if (readOnly || eventType !== 'personal') return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    if (eventType !== 'personal' || readOnly) {
+        return <ReadOnlyEvent event={event} style={style} minWidth={minWidthForDetails} />;
+    }
     return <EditableEvent event={event} style={style} minWidthForDetails={minWidthForDetails} />;
 }
 
 function ReadOnlyEvent({ event, style, minWidth }) {
     const { openPopup } = useEventPopup();
+    const tags = useTags();
+    const theme = getEventTheme(event, tags);
     const height = parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
-    const eventStyle = buildReadOnlyStyle(style, event);
-    const className = getReadOnlyClassName(event);
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -28,8 +32,8 @@ function ReadOnlyEvent({ event, style, minWidth }) {
     };
 
     return (
-        <div className={className} style={eventStyle} onClick={handleClick}>
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={handleClick} data-event-id={event.id}>
+            <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
         </div>
     );
 }
@@ -42,46 +46,94 @@ function getReadOnlyClassName(event) {
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
+    const { editEvent, removeEvent, addException } = useEventActions();
+    const { openPopup } = useEventPopup();
     const { openModal } = useEventModal();
-    const { openPopup, closePopup } = useEventPopup();
-    const { removeEvent, editEvent } = useEventActions();
-    const theme = useTags().getTag(event.tag);
-    const refs = useEventRefs();
+    const confirmFn = useConfirm();
+    const theme = getEventTheme(event, useTags());
+    const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
-    const onClick = createPopupClickHandler(refs, isDragging, resize.isResizing, openPopup, event);
+    const [ctxMenu, setCtxMenu] = useState(null);
+    const ctxRef = useRef(null);
 
-    return (
-        <EventCard event={event} style={style} theme={theme} refs={refs}
-            resize={resize} isDragging={isDragging} dragProps={dragProps}
-            onClick={onClick} minWidth={minWidthForDetails}
-            onEdit={() => { closePopup(); openModal(event); }} onDelete={() => { closePopup(); removeEvent(event.id); }} />
-    );
-}
+    useEffect(() => {
+        if (!ctxMenu) return;
+        const handler = (e) => { if (ctxRef.current && !ctxRef.current.contains(e.target)) setCtxMenu(null); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [ctxMenu]);
 
-function useEventRefs() {
-    return { event: useRef(null), resizeEnded: useRef(false) };
-}
-
-function createPopupClickHandler(refs, isDragging, isResizing, openPopup, event) {
-    return (e) => {
+    const onClick = (e) => {
         if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
-        if (isDragging || isResizing) return;
+        if (isDragging || resize.isResizing) return;
         const rect = refs.event.current?.getBoundingClientRect();
         openPopup(event, rect);
     };
+
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCtxMenu({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleEdit = () => {
+        setCtxMenu(null);
+        openModal(event);
+    };
+
+    const handleDelete = async () => {
+        setCtxMenu(null);
+        const recurring = hasRecurrence(event);
+        if (recurring) {
+            const choice = await confirmFn({
+                title: "Delete Recurring Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice === true) await executeDelete(event, { removeEvent });
+            else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
+        } else {
+            const choice = await confirmFn({
+                title: "Delete Event",
+                message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice) await executeDelete(event, { removeEvent });
+        }
+    };
+
+    return (
+        <>
+            <EventCard event={event} style={style} theme={theme} refs={refs}
+                resize={resize} isDragging={isDragging} dragProps={dragProps}
+                onClick={onClick} minWidth={minWidthForDetails}
+                onContextMenu={handleContextMenu} />
+            {ctxMenu && (
+                <div ref={ctxRef} className="event-ctx-menu" style={{ position: 'fixed', top: ctxMenu.y, left: ctxMenu.x, zIndex: 99999 }}>
+                    <button className="event-ctx-item" onClick={handleEdit}>✏️ Edit</button>
+                    <div className="event-ctx-divider" />
+                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}>🗑 Delete</button>
+                </div>
+            )}
+        </>
+    );
 }
 
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onEdit, onDelete }) {
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onContextMenu }) {
     const height = resize.resizePreview || parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, resize.isResizing);
-    const renderStyle = buildStyle(style, resize.resizePreview, theme);
+    const renderStyle = buildStyle(style, theme, resize.resizePreview);
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} {...dragProps}>
-            {onEdit && onDelete && <EventMenuButton onEdit={onEdit} onDelete={onDelete} />}
-            <EventContent event={event} height={height} width={width} minWidth={minWidth} />
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} data-event-id={event.id} {...dragProps}>
+            <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>
     );
@@ -98,7 +150,7 @@ function ResizeHandle({ onStart }) {
     return <div className="resize-handle" draggable={false} onMouseDown={onMouseDown} />;
 }
 
-function EventContent({ event, height, width, minWidth }) {
+function EventContent({ event, theme, height, width, minWidth }) {
     const showTime = height >= 30 && width >= minWidth;
     const showDesc = height >= 60 && width >= minWidth;
     const isSociety = event.source === 'society';
@@ -106,7 +158,6 @@ function EventContent({ event, height, width, minWidth }) {
     return (
         <div className="event-content">
             <div className="event-title">
-                {isSociety && <span className="society-badge">●</span>}
                 {event.title}
             </div>
             {isSociety && showTime && <div className="society-name">{event.society_name}</div>}
@@ -122,18 +173,10 @@ function TimeDisplay({ event }) {
     return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
-function buildReadOnlyStyle(baseStyle, event) {
-    const style = { ...baseStyle };
-    if (event.source === 'society' && event.society_color) {
-        style.borderLeftColor = event.society_color;
-    }
-    return style;
-}
-
-function buildStyle(baseStyle, resizePreview, theme) {
+function buildStyle(baseStyle, theme, resizePreview) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
-    style.borderLeftColor = theme ? theme.color : '#8B7355';
+    style.borderLeftColor = theme.color;
     return style;
 }
 

@@ -1,3 +1,4 @@
+/* Styles for the society ratification status and toggle. */
 .section {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border, #e5e7eb);
@@ -21,13 +22,15 @@
     padding: 0.5rem 1rem;
     background: var(--primary-color, #9E7E5D);
     border: none;
-    color: #fff;
+    color: var(--color-card);
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.85rem;
 }
 
-.requestBtn:hover { filter: brightness(1.1); }
+.requestBtn:hover {
+    filter: brightness(1.1);
+}
 
 .statusApproved {
     display: inline-block;
@@ -60,7 +63,9 @@
     margin-right: 0.75rem;
 }
 
-.toggleSection { margin-top: 0.5rem; }
+.toggleSection {
+    margin-top: 0.5rem;
+}
 
 .toggleRow {
     display: flex;
@@ -90,7 +95,9 @@
     transition: background 0.2s;
 }
 
-.toggleOn { background: var(--primary-color, #9E7E5D); }
+.toggleOn {
+    background: var(--primary-color, #9E7E5D);
+}
 
 .toggleKnob {
     position: absolute;
@@ -99,11 +106,13 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--color-card);
     transition: transform 0.2s;
 }
 
-.toggleOn .toggleKnob { transform: translateX(20px); }
+.toggleOn .toggleKnob {
+    transform: translateX(20px);
+}
 
 .notice {
     display: flex;
@@ -125,7 +134,7 @@
     align-items: center;
     justify-content: center;
     background: #fbbf24;
-    color: #fff;
+    color: var(--color-card);
     border-radius: 50%;
     font-size: 0.7rem;
     font-weight: bold;

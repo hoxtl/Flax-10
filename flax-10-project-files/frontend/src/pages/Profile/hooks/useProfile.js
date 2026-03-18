@@ -1,31 +1,82 @@
 import { useState, useEffect } from "react";
-import { getUserProfile } from "../../../api/userService";
+import { fetchTasks } from "../../../api/taskService";
+import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
+import { useAuth } from "../../../context/AuthContext";
 
-async function tryLoadProfile(setProfileData, setLoading) {
-  try { const data = await getUserProfile(); setProfileData(data); }
-  catch (e) { console.error('Failed to load profile:', e); }
-  finally { setLoading(false); }
+async function tryLoadProfile(setProfileData, setLoading, userId, isPolling = false) {
+  try {
+    const data = userId ? await getAnotherUserProfile(userId) : await getUserProfile();
+    setProfileData(data);
+  } catch (e) {
+    console.error('Failed to load profile:', e);
+  } finally {
+    if (!isPolling) setLoading(false);
+  }
 }
 
-async function tryLoadEvents(setAllEvents) {
-  try { const data = await getEvents(); setAllEvents(data || []); }
-  catch (e) { console.error('Failed to load events:', e); }
+async function tryLoadEvents(setAllEvents, userId) {
+  try {
+    const params = userId ? { user_id: userId } : {};
+    const data = await getEvents(params);
+    setAllEvents(data || []);
+  } catch (e) {
+    console.error('Failed to load events:', e);
+  }
 }
 
-function useProfileData() {
+function useProfileData(userId) {
+  const { profile: authProfile, loading: authLoading, refreshProfile } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const reload = () => tryLoadProfile(setProfileData, setLoading);
-  useEffect(() => { reload(); }, []);
-  return { profileData, loading, reload };
+
+  const isSelf = !userId || (authProfile && String(authProfile.id) === String(userId));
+
+  useEffect(() => {
+    if (isSelf) {
+      if (!authLoading) {
+        setProfileData(authProfile);
+        setLoading(false);
+      }
+      return;
+    }
+
+    setLoading(true);
+    tryLoadProfile(setProfileData, setLoading, userId);
+    const intervalId = setInterval(() => {
+      tryLoadProfile(setProfileData, setLoading, userId, true);
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [userId, authProfile, authLoading, isSelf]);
+
+  const reload = () => {
+    if (isSelf) {
+      refreshProfile();
+    } else {
+      tryLoadProfile(setProfileData, setLoading, userId);
+    }
+  };
+
+  const setOptimisticShare = (isSharing) => {
+    setProfileData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        is_sharing: isSharing,
+        shared_by_count: Math.max(0, (prev.shared_by_count || 0) + (isSharing ? 1 : -1))
+      };
+    });
+  };
+
+  return { profileData, loading, reload, setOptimisticShare };
 }
 
-function useEventsData() {
+function useEventsData(userId) {
   const [allEvents, setAllEvents] = useState([]);
   const [eventRange, setEventRange] = useState('month');
-  useEffect(() => { tryLoadEvents(setAllEvents); }, []);
+  useEffect(() => { tryLoadEvents(setAllEvents, userId); }, [userId]);
   return { allEvents, eventRange, setEventRange };
 }
 
@@ -34,22 +85,50 @@ function useModalState() {
   const [showTasks, setShowTasks] = useState(false);
   const [showEvents, setShowEvents] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showSharedWith, setShowSharedWith] = useState(false);
+  const [showSharedBy, setShowSharedBy] = useState(false);
   return {
     showModules, setShowModules,
     showTasks, setShowTasks,
     showEvents, setShowEvents,
     showEditProfile, setShowEditProfile,
+    showSharedWith, setShowSharedWith,
+    showSharedBy, setShowSharedBy,
   };
 }
 
-export function useProfileState() {
-  const { profileData, loading, reload } = useProfileData();
-  const eventsState = useEventsData();
+function useTaskCountData(userId) {
+  const [taskCount, setTaskCount] = useState(0);
+
+  useEffect(() => {
+    if (userId) {
+      setTaskCount(0);
+      return;
+    }
+
+    fetchTasks()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        setTaskCount(list.filter((task) => !task.completed).length);
+      })
+      .catch((e) => {
+        console.error("Failed to load task count:", e);
+        setTaskCount(0);
+      });
+  }, [userId]);
+
+  return { taskCount };
+}
+
+export function useProfileState(userId) {
+  const { profileData, loading, reload, setOptimisticShare } = useProfileData(userId);
+  const eventsState = useEventsData(userId);
   const modalState = useModalState();
+  const taskState = useTaskCountData(userId);
   const handleSaveProfile = async () => {
     await reload();
   };
-  return { profileData, loading, handleSaveProfile, ...eventsState, ...modalState };
+  return { viewedUserId: userId, profileData, loading, handleSaveProfile, reload, setOptimisticShare, ...eventsState, ...modalState, ...taskState };
 }
 
 export function useProfileBodyData(state) {
@@ -61,12 +140,16 @@ export function useProfileBodyData(state) {
 }
 
 export function useProfileContent(state) {
-  const { profileData, setShowModules, setShowTasks, setShowEvents, setShowEditProfile } = state;
+  const { profileData, reload, setOptimisticShare, setShowModules, setShowTasks, setShowEvents, setShowEditProfile, setShowSharedWith, setShowSharedBy } = state;
   const handlers = {
+    reload,
+    setOptimisticShare,
     onModulesClick: () => setShowModules(true),
     onTasksClick: () => setShowTasks(true),
     onEventsClick: () => setShowEvents(true),
     onEditProfile: () => setShowEditProfile(true),
+    onSharedWithClick: () => setShowSharedWith(true),
+    onSharedByClick: () => setShowSharedBy(true),
   };
   return { profileData, handlers };
 }

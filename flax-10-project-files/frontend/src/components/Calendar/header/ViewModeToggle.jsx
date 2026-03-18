@@ -1,19 +1,16 @@
+import AnimatedDropdown from '../../common/AnimatedDropdown';
+
+const VIEW_MODE_OPTIONS = [
+  { value: 'day', label: 'Day' },
+  { value: 'week', label: 'Week' },
+  { value: 'month', label: 'Month' },
+];
+
 export function ViewModeToggle({ viewMode, dispatch }) {
-    const modes = ['day', 'week', 'month', 'year'];
-
-    return (
-        <div className="view-toggle">
-            <select
-                value={viewMode}
-                onChange={(e) => dispatch({ type: 'SET_VIEW_MODE', payload: e.target.value })}
-                className="view-select"
-            >
-                {modes.map(m => <option key={m} value={m}>{capitalize(m)}</option>)}
-            </select>
-        </div>
-    );
-}
-
-function capitalize(s) {
-    return s.charAt(0).toUpperCase() + s.slice(1);
+  const handleChange = (val) => dispatch({ type: 'SET_VIEW_MODE', payload: val });
+  return (
+    <div className="view-toggle">
+      <AnimatedDropdown value={viewMode} onChange={handleChange} options={VIEW_MODE_OPTIONS} placeholder="View" align="right" />
+    </div>
+  );
 }

@@ -1,0 +1,196 @@
+/**
+ * Layout and shell styles for CreateTaskModal (overlay, modal, header, footer).
+ * Form field styles live in CreateTaskModalForm.module.css.
+ */
+
+.modalBackdrop {
+  background: rgba(74, 52, 33, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalShell {
+  font-family: var(--font-body);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: min(560px, 95vw);
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  max-height: 92vh;
+  min-height: 0;
+  padding: 0;
+}
+
+.modalContent {
+  padding: 0;
+}
+
+.modalShell input,
+.modalShell select,
+.modalShell textarea,
+.modalShell button {
+  font-family: var(--font-body);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px 0;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: background 0.1s, color 0.1s;
+}
+
+.closeBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.body {
+  padding: 12px 22px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 1 auto;
+  overflow-y: auto;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 22px 14px;
+  flex-shrink: 0;
+}
+
+.deleteBtn {
+  margin-right: auto;
+  font-family: inherit;
+  background: transparent;
+  color: #b91c1c;
+  border: none;
+  padding: 6px 2px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.deleteBtn:hover {
+  color: #991b1b;
+  background: rgba(185, 28, 28, 0.06);
+}
+
+.cancelBtn {
+  font-family: inherit;
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid rgba(74, 52, 33, 0.12);
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.15s;
+}
+
+.cancelBtn:hover {
+  background: var(--hover);
+  border-color: rgba(74, 52, 33, 0.2);
+  color: var(--text);
+}
+
+.saveBtn {
+  font-family: inherit;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 9px 26px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(107, 83, 68, 0.2);
+}
+
+.saveBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: var(--primary-strong, #5c4d3e);
+  box-shadow: 0 4px 16px rgba(107, 83, 68, 0.25);
+}
+
+.saveBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.saveError {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+  font-family: var(--font-body);
+}
+
+@media (max-width: 900px) {
+  .modalShell {
+    width: min(95vw, 560px);
+    min-height: 0;
+  }
+  .header {
+    padding: 14px 16px 0;
+  }
+  .body {
+    padding: 10px 16px 10px;
+    gap: 10px;
+  }
+  .title {
+    font-size: 1.2rem;
+  }
+  .footer {
+    padding: 8px 16px 14px;
+  }
+}

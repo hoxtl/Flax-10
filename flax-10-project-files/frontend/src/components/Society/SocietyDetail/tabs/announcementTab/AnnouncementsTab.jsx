@@ -1,62 +1,60 @@
-import { useState } from "react";
+/**
+ * AnnouncementsTab displays a chronological list of society news and updates.
+ * Supports pinning, editing, and smooth-scrolling to focused announcements.
+ */
+import { useState, useEffect, useRef } from "react";
 import styles from "../tabs.module.css";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";
+import ImageGalleryModal from "../../imageHandlers/ImageGalleryModal";
+import { getImageList } from "./AnnouncementModalHelpers";
+
 export default function AnnouncementsTab({ announcements = [], editMode, tags, focusAnnouncementId, onEdit }) {
+    const [gallery, setGallery] = useState(null);
+    const openGallery = (imgs, idx) => setGallery({ images: imgs, index: idx });
     return (
-        <AnnouncementsList announcements={announcements} editMode={editMode} onEdit={onEdit} tags={tags} focusAnnouncementId={focusAnnouncementId} />
+        <>
+            <AnnouncementsList {...{ announcements, editMode, onEdit, tags, focusAnnouncementId }} onImageClick={openGallery} />
+            {gallery && <ImageGalleryModal images={gallery.images} initialIndex={gallery.index} onClose={() => setGallery(null)} />}
+        </>
     );
 }
 
-function saveAnnouncement(data, handlers, conflictingAnnouncement) {
-    if (conflictingAnnouncement) {
-        handlers?.onUpdate?.(conflictingAnnouncement.id, { ...conflictingAnnouncement, pinned: false });
-    }
-    if (data.id) return handlers?.onUpdate?.(data.id, data);
-    return handlers?.onAdd?.(data);
-}
-
-function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId }) {
+function AnnouncementsList({ announcements, editMode, onEdit, tags, focusAnnouncementId, onImageClick }) {
     if (announcements.length === 0) return <EmptyAnnouncements editMode={editMode} />;
-
     return (
         <div className={styles.announcementList}>
             {announcements.map(a => (
-                <AnnouncementCard
-                    key={a.id}
-                    announcement={a}
-                    editMode={editMode}
-                    onEdit={() => onEdit(a)}
-                    tag={tags?.find(t => t.id === a.tag)}
-                    isFocused={String(a.id) === String(focusAnnouncementId)}
-                />
+                <AnnouncementCard key={a.id} announcement={a} editMode={editMode} onEdit={() => onEdit(a)}
+                    tag={tags?.find(t => t.id === a.tag)} isFocused={String(a.id) === String(focusAnnouncementId)} onImageClick={onImageClick} />
             ))}
         </div>
     );
 }
 
 function EmptyAnnouncements({ editMode }) {
-    if (editMode) return <p className={styles.empty}>No announcements yet. Use the sidebar to add one.</p>;
-    return <p className={styles.empty}>No announcements yet.</p>;
+    const msg = editMode ? "No announcements yet. Use the sidebar to add one." : "No announcements yet.";
+    return <p className={styles.empty}>{msg}</p>;
 }
 
-import { useEffect, useRef } from "react";
-
-function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused }) {
-    const cardRef = useRef(null);
+function useFocusScroll(isFocused, ref) {
     useEffect(() => {
-        if (isFocused && cardRef.current) {
-            cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            cardRef.current.classList.add(styles.highlight);
-            setTimeout(() => cardRef.current?.classList.remove(styles.highlight), 2000);
-        }
-    }, [isFocused]);
+        if (!isFocused || !ref.current) return;
+        ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ref.current.classList.add(styles.highlight);
+        setTimeout(() => ref.current?.classList.remove(styles.highlight), 2000);
+    }, [isFocused, ref]);
+}
 
+function AnnouncementCard({ announcement, editMode, onEdit, tag, isFocused, onImageClick }) {
+    const cardRef = useRef(null);
+    useFocusScroll(isFocused, cardRef);
+    const cardClass = `${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`;
     return (
-        <div ref={cardRef} className={`${styles.announcementCard} ${announcement.pinned ? styles.pinned : ""}`}>
+        <div ref={cardRef} id={`announcement-${announcement.id}`} className={cardClass}>
             {editMode && <EditButton onClick={onEdit} />}
             <CardHeader announcement={announcement} tag={tag} />
             <p className={styles.announcementContent}>{announcement.content}</p>
-            <AnnouncementImages announcement={announcement} />
+            <AnnouncementImages announcement={announcement} onImageClick={onImageClick} />
         </div>
     );
 }
@@ -76,18 +74,26 @@ function CardHeader({ announcement, tag }) {
     );
 }
 
-function AnnouncementImages({ announcement }) {
-    const images = (announcement.images || []).map(i => i.url || i);
+function AnnouncementImages({ announcement, onImageClick }) {
+    const images = getImageList(announcement);
     if (images.length === 0) return null;
-    if (images.length === 1) return <img className={styles.announcementImage} src={images[0]} alt="Announcement" />;
-    return <ImageGallery images={images} />;
+    if (images.length === 1) return <SingleImage src={images[0]} onImageClick={onImageClick} images={images} />;
+    return <ImageGallery images={images} onImageClick={onImageClick} />;
 }
 
-function ImageGallery({ images }) {
+function SingleImage({ src, onImageClick, images }) {
     return (
-        <div className={styles.announcementGallery}>
-            {images.map((src, i) => <img key={i} className={styles.galleryImage} src={src} alt={`Image ${i + 1}`} />)}
-        </div>
+        <img className={styles.announcementImage} src={src} alt="Announcement"
+            onClick={() => onImageClick?.(images, 0)} style={{ cursor: 'pointer' }} />
     );
 }
 
+function ImageGallery({ images, onImageClick }) {
+    return (
+        <div className={styles.announcementGallery}>
+            {images.map((src, i) => (
+                <img key={i} className={styles.galleryImage} src={src} alt={`Image ${i + 1}`} onClick={() => onImageClick?.(images, i)} />
+            ))}
+        </div>
+    );
+}

@@ -1,0 +1,34 @@
+.modalShell {
+    width: min(520px, 92vw);
+}
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.addBtn {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: var(--btn-padding-sm);
+    border-radius: var(--btn-radius);
+    border: none;
+    background: var(--primary);
+    color: var(--c-white);
+    cursor: pointer;
+    align-self: flex-start;
+}
+.addBtn:hover { background: var(--primary-strong); }
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+.empty {
+    font-size: var(--text-base);
+    color: var(--muted);
+    text-align: center;
+    padding: var(--space-5) 0;
+    margin: 0;
+}

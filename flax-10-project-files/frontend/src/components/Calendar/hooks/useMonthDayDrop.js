@@ -1,56 +1,62 @@
 import { useCallback } from "react";
 import { useDrop } from './useDragDrop';
 import { useCalendar } from "../../../context/CalendarContext";
+import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
-import { extractBaseEventId, hasRecurrence } from "../utils/eventUtils";
+import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
 
 export function useMonthDayDrop(targetDate) {
     const { events } = useCalendar();
+    const confirmFn = useConfirm();
     const { editEvent, addEvent, addException } = useEventActions();
 
-    const handleDrop = useCallback((payload) => {
+    const handleDrop = useCallback(async (payload) => {
         if (payload.type === 'EVENT') {
-            moveEventToDate(payload.data, targetDate, editEvent, addEvent, addException, events);
+            await moveEventToDate(payload.data, targetDate, editEvent, addEvent, addException, events, confirmFn);
         }
-    }, [targetDate, editEvent, addEvent, addException, events]);
+    }, [targetDate, editEvent, addEvent, addException, events, confirmFn]);
 
     const { dropProps, isOver } = useDrop({ accept: ['EVENT'], onDrop: handleDrop });
     return { dropProps, isOver };
 }
 
-function moveEventToDate(event, targetDate, editEvent, addEvent, addException, allEvents) {
+async function moveEventToDate(event, targetDate, editEvent, addEvent, addException, allEvents, confirmFn) {
+    if (isReadOnlyEvent(event)) return;
     if (hasRecurrence(event)) {
-        handleRecurringMove(event, targetDate, editEvent, addEvent, addException, allEvents);
+        await handleRecurringMove(event, targetDate, editEvent, addEvent, addException, allEvents, confirmFn);
     } else {
-        executeMove(event, targetDate, editEvent, allEvents);
+        await executeMove(event, targetDate, editEvent, allEvents, confirmFn);
     }
 }
 
-function handleRecurringMove(event, targetDate, editEvent, addEvent, addException, allEvents) {
-    const choice = window.confirm(
-        'This is a recurring event.\\n\\nOK = Move ALL occurrences to new date\\nCancel = Move only this occurrence'
-    );
+async function handleRecurringMove(event, targetDate, editEvent, addEvent, addException, allEvents, confirmFn) {
+    const choice = await confirmFn({
+        title: "Recurring Event",
+        message: "This is a recurring event. How would you like to move it?",
+        confirmText: "Move ALL",
+        cancelText: "Move ONLY this"
+    });
     if (choice) {
-        executeMove(event, targetDate, editEvent, allEvents);
+        await executeMove(event, targetDate, editEvent, allEvents, confirmFn);
     } else {
-        moveSingleOccurrence(event, targetDate, addEvent, addException, allEvents);
+        await moveSingleOccurrence(event, targetDate, addEvent, addException, allEvents, confirmFn);
     }
 }
 
-function executeMove(event, targetDate, editEvent, allEvents) {
+async function executeMove(event, targetDate, editEvent, allEvents, confirmFn) {
     const { newStart, newEnd } = calculateNewTimes(event, targetDate);
     const baseEventId = extractBaseEventId(event.id);
     const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
     const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!checkOverlapWithConfirm({ ...event, ...updateData }, others)) return;
+    if (!(await checkOverlapWithConfirm({ ...event, ...updateData }, others, confirmFn))) return;
     editEvent(baseEventId, updateData);
 }
 
-async function moveSingleOccurrence(event, targetDate, addEvent, addException, allEvents) {
+async function moveSingleOccurrence(event, targetDate, addEvent, addException, allEvents, confirmFn) {
     const { newStart, newEnd } = calculateNewTimes(event, targetDate);
     const newEvent = buildNewEvent(event, newStart, newEnd);
-    if (!checkOverlapWithConfirm(newEvent, allEvents)) return;
+    if (!(await checkOverlapWithConfirm(newEvent, allEvents, confirmFn))) return;
 
     const baseEventId = extractBaseEventId(event.id);
     const originalDateStr = getDateString(event.start_time);

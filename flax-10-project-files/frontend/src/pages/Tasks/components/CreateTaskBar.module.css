@@ -1,0 +1,176 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 4px 0 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--panel, #FFFCFA);
+  border: 1px solid var(--border, rgba(74, 52, 33, 0.12));
+  border-radius: 10px;
+  outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.input::placeholder {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+.input:focus {
+  border-color: var(--primary, #7B6751);
+  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
+}
+
+.addBtn {
+  padding: var(--btn-padding, 8px 16px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-card);
+  background: var(--primary);
+  border: none;
+  border-radius: var(--btn-radius, var(--radius-md, 8px));
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+.addBtn:hover:not(:disabled) { opacity: 0.88; }
+.addBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.optionsRowWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.optionsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: max-height 0.25s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.optionsRowOpen {
+  max-height: 220px;
+  opacity: 1;
+  pointer-events: auto;
+  overflow: visible;
+  transform: translateY(0);
+  margin-top: 8px;
+}
+
+.optionsRowLabel {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.optionsRowDivider {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.dropdownWrap {
+  position: relative;
+  flex-shrink: 0;
+  min-width: 140px;
+  max-width: 200px;
+}
+.moduleDropdownWrap {
+  flex: 1;
+  min-width: 300px;
+  max-width: 460px;
+}
+.listDropdownWrap {
+  min-width: 170px;
+  max-width: 190px;
+}
+.dropdownWrap :global([class*="trigger"]) {
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  min-height: 36px;
+}
+.moduleListDropdown {
+  width: 100%;
+}
+.moduleDropdownWrap .moduleListDropdown :global([class*="trigger"] > span:first-child) {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Duration chips ── */
+.durationGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.durationBtn {
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 9999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.durationBtn:hover { background: var(--hover); color: var(--text); border-color: var(--border); }
+.durationBtnActive {
+  background: var(--primary, #7B6751);
+  color: var(--color-card);
+  border-color: var(--primary, #7B6751);
+  font-weight: 600;
+}
+
+.pageCountInput {
+  width: 70px;
+  padding: 4px 8px;
+}

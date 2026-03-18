@@ -1,4 +1,4 @@
-import { getStartOfWeek, getStartOfMonth, getEndOfMonth, getStartOfYear, getEndOfYear, addDays } from '../utils/dateUtils';
+import { getStartOfWeek, getStartOfMonth, getEndOfMonth, addDays } from '../utils/dateUtils';
 
 /**
  * Figures out what date range to fetch events for based on the current view
@@ -10,16 +10,9 @@ import { getStartOfWeek, getStartOfMonth, getEndOfMonth, getStartOfYear, getEndO
 export function getDateRangeForView(date, viewMode) {
     if (viewMode === 'day') return getDayRange(date);
     if (viewMode === 'week') return getWeekRange(date);
-    if (viewMode === 'year') return getYearRange(date);
     return getMonthRange(date);
 }
 
-function getYearRange(date) {
-    const start = getStartOfYear(date);
-    const end = getEndOfYear(date);
-    end.setHours(23, 59, 59, 999);
-    return { start: start.toISOString(), end: end.toISOString() };
-}
 
 // Returns start and end of a single day (midnight to 11:59:59 PM)
 function getDayRange(date) {

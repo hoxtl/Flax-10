@@ -1,0 +1,5 @@
+/*
+ * Compatibility layer only.
+ * Canonical design tokens now live in variables.css.
+ * Keep this import in place so older references do not break.
+ */

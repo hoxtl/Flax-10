@@ -1,53 +1,114 @@
+"""
+Factories for building User instances and UserSettings rows.
+
+Provides unique name generation, KCL email addresses, biographical
+text for students and teachers, and bulk user construction used by
+the seed management command.
+"""
+
 import random
-from datetime import date, datetime, timedelta, timezone as dt_timezone
-from django.utils import timezone
+from datetime import time
+
 from django.contrib.auth import get_user_model
 from faker import Faker
-from studyFlax.models import CalendarEvent, UserSettings
-from studyFlax.fixtures.data_fixtures import (
-    course_fixtures, event_title_fixtures, description_fixtures,
-    location_fixtures, lecture_theatre_fixtures, course_to_module_prefixes,
-    breakfast_fixtures, lunch_fixtures, dinner_fixtures,
-)
+
+from studyFlax.models import UserSettings
+from studyFlax.fixtures.data_fixtures import course_fixtures
 
 User = get_user_model()
 faker = Faker('en_GB')
 DEFAULT_PASSWORD = '1234'
 
-SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
-SEED_DAYS  = 365
+STUDENT_INTRO_SNIPPETS = [
+    "I thrive on turning busy uni weeks into a game plan that is actually realistic.",
+    "I am most in my zone when my calendar is tidy, my goals are clear, and my notes are colour-coded.",
+    "I love practical learning and finding smart ways to make heavy weeks feel lighter.",
+    "I am a momentum person - small daily wins keep me consistent and confident.",
+    "I am curious, collaborative, and always up for a focused study sprint with friends.",
+]
 
-READING_WEEK_START = date(2026, 2, 23)
-READING_WEEK_END   = date(2026, 2, 27)
+STUDENT_STUDY_SNIPPETS = [
+    "My weekly rhythm is active recall, short deep-work blocks, and a Sunday reset so deadlines never sneak up.",
+    "I split assignments into mini-milestones, track progress visually, and leave buffer time for edits.",
+    "I prefer focused sessions over marathon cramming, and I build in breaks so quality stays high.",
+    "I learn best by explaining concepts out loud, building summary sheets, and revisiting them through the week.",
+    "I keep a practical system: plan early, execute steadily, review often, and avoid panic mode.",
+]
 
+STUDENT_PERSONALITY_SNIPPETS = [
+    "Outside class, I recharge with long walks, good playlists, and trying new cafes around London.",
+    "When I am not studying, I am usually at a society event, working on side projects, or exploring new places in the city.",
+    "I enjoy meeting new people, sharing revision tricks, and making difficult topics feel approachable.",
+    "I care about great grades, but I care just as much about building healthy habits that last beyond uni.",
+    "I bring friendly energy to group work and I am usually the one turning chaos into a clear next step.",
+]
 
-def _in_reading_week(dt):
-    d = dt.date() if hasattr(dt, 'date') else dt
-    return READING_WEEK_START <= d <= READING_WEEK_END
+TEACHING_SPECIALISMS = [
+    "applied machine learning and responsible AI systems",
+    "clinical decision-making in acute and community care",
+    "behavioural economics and policy evaluation",
+    "distributed systems, cloud platforms, and software architecture",
+    "public health strategy, prevention science, and epidemiology",
+    "digital media, cultural analysis, and communication theory",
+    "biostatistics, research design, and health data interpretation",
+    "financial strategy, risk analysis, and corporate governance",
+    "educational psychology, learning science, and assessment design",
+    "human-centred product design and service innovation",
+    "international business strategy and cross-cultural leadership",
+]
+
+PHD_UNIVERSITIES = [
+    "University of Cambridge",
+    "University of Oxford",
+    "Imperial College London",
+    "University College London",
+    "The London School of Economics and Political Science",
+    "ETH Zurich",
+    "Stanford University",
+    "Massachusetts Institute of Technology",
+    "University of Toronto",
+    "National University of Singapore",
+    "University of Melbourne",
+    "University of Edinburgh",
+]
+
+PRIOR_UNIVERSITIES = [
+    "University of Manchester",
+    "University of Bristol",
+    "University of Warwick",
+    "University of Leeds",
+    "University of Glasgow",
+    "Durham University",
+    "King's College London",
+    "University of Birmingham",
+    "University of Nottingham",
+    "University of Sheffield",
+]
 
 
 def is_name_taken(first, last, existing):
+    """Return True if a user with this first and last name already exists."""
     return (
         User.objects.filter(first_name=first, last_name=last).exists()
         or any(u.first_name == first and u.last_name == last for u in existing)
     )
 
-
 def is_username_taken(username, existing):
+    """Return True if the username exists in the database or the given list."""
     return (
         User.objects.filter(username=username).exists()
         or any(u.username == username for u in existing)
     )
 
-
 def generate_unique_name(existing):
+    """Return a (first, last) pair not already present in *existing* or the database."""
     first, last = faker.first_name(), faker.last_name()
     while is_name_taken(first, last, existing):
         first, last = faker.first_name(), faker.last_name()
     return first, last
 
-
 def generate_unique_username(first, last, existing):
+    """Derive a first.last username that is unique, appending a counter if needed."""
     base = f"{first.lower()}.{last.lower()}"
     username, counter = base, 2
     while is_username_taken(username, existing):
@@ -55,243 +116,66 @@ def generate_unique_username(first, last, existing):
         counter += 1
     return username
 
+def _teacher_bio(first, last):
+    specialism = random.choice(TEACHING_SPECIALISMS)
+    phd_uni = random.choice(PHD_UNIVERSITIES)
+    others = [u for u in PRIOR_UNIVERSITIES if u != phd_uni] or PRIOR_UNIVERSITIES
+    prior_uni = random.choice(others)
+    return (
+        f"Dr. {first} {last} specialises in {specialism}. "
+        f"They completed their PhD at {phd_uni} after earlier study at {prior_uni}. "
+        "Known for energetic, discussion-rich teaching, they combine academic rigour "
+        "with practical, career-ready skills and clear feedback students can use immediately."
+    )
 
-def build_user(first, last, existing):
+def _student_bio(first):
+    return (
+        f"I am {first}, and {random.choice(STUDENT_INTRO_SNIPPETS)} "
+        f"{random.choice(STUDENT_STUDY_SNIPPETS)} "
+        f"{random.choice(STUDENT_PERSONALITY_SNIPPETS)}"
+    )
+
+def build_user(first, last, existing, role='student'):
+    """Construct an unsaved User with a KCL email address and hashed password."""
     username = generate_unique_username(first, last, existing)
+    bio = _teacher_bio(first, last) if role == 'teacher' else _student_bio(first)
     user = User(
         username=username,
         email=f"{first.lower()}.{last.lower()}@kcl.ac.uk",
-        first_name=first,
-        last_name=last,
+        first_name=first, last_name=last,
+        bio=bio, role=role,
     )
     user.set_password(DEFAULT_PASSWORD)
     return user
 
-
-def build_users_list(needed):
+def build_users_list(needed, role='student'):
+    """Return a list of *needed* unsaved User instances with unique names and usernames."""
     users_to_create = []
     for _ in range(needed):
         first, last = generate_unique_name(users_to_create)
-        users_to_create.append(build_user(first, last, users_to_create))
+        users_to_create.append(build_user(first, last, users_to_create, role=role))
     return users_to_create
 
+def _random_year():
+    return random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4'])
+
+def _random_theme():
+    return random.choice(['light', 'dark'])
+
+def _build_single_settings(user):
+    is_teacher = getattr(user, 'role', None) == 'teacher'
+    return UserSettings(
+        user=user,
+        theme=_random_theme(),
+        timezone='Europe/London',
+        year='' if is_teacher else _random_year(),
+        major='' if is_teacher else random.choice(course_fixtures),
+        sleep_time=time(23, 0),
+        wake_time=time(7, 0),
+        mode=_random_theme(),
+        homepage_widgets=[],
+    )
 
 def build_settings_for_new_users():
-    new_users = User.objects.filter(settings__isnull=True)
-    return [
-        UserSettings(
-            user=u,
-            theme=random.choice(['light', 'dark']),
-            timezone='Europe/London',
-            year=random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4']),
-            major=random.choice(course_fixtures),
-        )
-        for u in new_users
-    ]
-
-
-def build_event(user, title, tags, day_offset, hour):
-    start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
-    duration = random.choice([60, 90, 120])
-    user_tags = [t for t in tags if t.user == user or t.user is None]
-    tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
-    return CalendarEvent(
-        user=user,
-        title=title,
-        description=random.choice(description_fixtures) if random.random() > 0.3 else "",
-        start_time=start,
-        end_time=start + timedelta(minutes=duration),
-        location=random.choice(location_fixtures) if random.random() > 0.7 else None,
-        tag=tag,
-        priority=random.choice(['low', 'medium', 'high', 'urgent']),
-        recurrence_rule=None,
-    )
-
-
-def _fresh_week_titles():
-    titles = list(event_title_fixtures)
-    random.shuffle(titles)
-    return titles
-
-
-def build_events_for_user(user, tags, rules, count):
-    """
-    Seeds personal (non-meal) events for SEED_DAYS from SEED_START.
-    Titles reshuffle each week so no two weeks look alike, and the same
-    title never appears twice within the same week.
-    """
-    non_lecture_hours = [8, 13, 17, 19, 20]
-    events = []
-    week_titles  = []
-    current_week = -1
-
-    for day_offset in range(SEED_DAYS):
-        week = day_offset // 7
-        if week != current_week:
-            week_titles  = _fresh_week_titles()
-            current_week = week
-
-        daily_count = random.randint(1, 2)
-        day_hours = random.sample(non_lecture_hours, min(daily_count, len(non_lecture_hours)))
-
-        for hour in day_hours:
-            if not week_titles:
-                week_titles = _fresh_week_titles()
-            title = week_titles.pop()
-            events.append(build_event(user, title, tags, day_offset, hour))
-
-    return events
-
-
-def build_meal_events(user, tags):
-    """
-    Seeds Breakfast (08:00), Lunch (12:30) and Dinner (19:00) for every day
-    in the seeding range. Each fixture list rotates by day index so meals vary
-    daily without repeating the same combination two days running.
-
-    Title is the meal label; description is the specific food item so the
-    timeline card shows a clear heading and a readable subtitle.
-    """
-    meal_tag = next((t for t in tags if t.name == 'Personal'), tags[0] if tags else None)
-    events   = []
-
-    for day_offset in range(SEED_DAYS):
-        base = SEED_START + timedelta(days=day_offset)
-        meals = [
-            ("Breakfast", breakfast_fixtures, 8,  0,  8,  30),
-            ("Lunch",     lunch_fixtures,     12, 30, 13, 15),
-            ("Dinner",    dinner_fixtures,    19,  0, 19, 45),
-        ]
-        for label, fixture_list, sh, sm, eh, em in meals:
-            description = fixture_list[day_offset % len(fixture_list)]
-            events.append(CalendarEvent(
-                user=user,
-                title=label,
-                description=description,
-                start_time=base.replace(hour=sh, minute=sm, second=0, microsecond=0),
-                end_time=base.replace(hour=eh, minute=em, second=0, microsecond=0),
-                source="personal",
-                tag=meal_tag,
-                recurrence_rule=None,
-            ))
-
-    return events
-
-
-def _first_weekday_from(start_dt, weekday):
-    days_ahead = (weekday - start_dt.weekday()) % 7
-    return start_dt + timedelta(days=days_ahead)
-
-
-def build_module_event(code, name, description, admin, weekly_rule):
-    weekday = random.randint(0, 4)
-    hour    = random.choice([9, 10, 11, 14, 15, 16])
-    first_lecture = _first_weekday_from(SEED_START, weekday).replace(
-        hour=hour, minute=0, second=0
-    )
-    return dict(
-        module_code=code,
-        module_name=name,
-        description=description,
-        created_by=admin,
-        start_time=first_lecture,
-        end_time=first_lecture + timedelta(hours=2),
-        location=random.choice(lecture_theatre_fixtures),
-        recurrence_rule=weekly_rule,
-    )
-
-
-def get_user_modules(user, all_modules):
-    major    = getattr(getattr(user, 'settings', None), 'major', None)
-    prefixes = course_to_module_prefixes.get(major, [])
-    core     = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)][:3]
-    non_core = [m for m in all_modules if m not in core]
-    extras   = random.sample(non_core, min(1, len(non_core)))
-    return core, extras
-
-
-def create_lecture_event(user, module, start, end, lecture_tag):
-    CalendarEvent.objects.get_or_create(
-        user=user,
-        title=f"Lecture: {module.module_name}",
-        start_time=start,
-        defaults={
-            'end_time': end,
-            'location': module.location,
-            'description': module.module_name,
-            'tag': lecture_tag,
-            'priority': 'high',
-            'recurrence_rule': None,
-        },
-    )
-
-
-def build_lecture_events(user, module, lecture_tag):
-    """
-    Returns exactly 10 lecture instances spaced one week apart, skipping
-    reading week. Any slot that falls within reading week is deferred to the
-    following week so the module still delivers all 10 sessions.
-    """
-    sessions  = []
-    candidate = module.start_time
-    while len(sessions) < 10:
-        if not _in_reading_week(candidate):
-            sessions.append((
-                user,
-                module,
-                candidate,
-                candidate + timedelta(hours=2),
-                lecture_tag,
-            ))
-        candidate += timedelta(weeks=1)
-    return sessions
-
-
-def _get_random_offset(used_offsets):
-    while True:
-        day_offset = random.randint(7, 30)
-        if day_offset not in used_offsets:
-            used_offsets.add(day_offset)
-            return day_offset
-
-
-#def build_deadlines_for_module(module):
-   # prefix    = module.module_code[:2]
-   # templates = module_deadline_fixtures.get(prefix, list(deadline_fixtures[:3]))
-   # used_offsets = set()
-   # deadlines    = []
-   # now = timezone.now()
-
-   # for deadline_type, title, description in templates:
-       # day_offset = _get_random_offset(used_offsets)
-       # hour = 23 if deadline_type in ("coursework", "quiz") else random.choice([9, 11, 14, 16])
-      #  start_due  = now.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=day_offset)
-      #  end_due    = start_due + timedelta(hours=2) if deadline_type in ("exam", "presentation") else None
-      #  location   = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
-
-       # if not Deadline.objects.filter(module=module, title=title).exists():
-        #    deadlines.append(Deadline(
-          #      module=module,
-           #     title=title,
-           #     deadline_type=deadline_type,
-           #     description=description,
-            #    start_due_date=start_due,
-             #   end_due_date=end_due,
-            #    location=location,
-           # ))
-
-  #  return deadlines
-
-
-#def create_deadline_calendar_event(user, deadline):
-    #CalendarEvent.objects.get_or_create(
-      #  user=user,
-       # title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
-      #  start_time=deadline.start_due_date,
-      #  defaults={
-        #    'end_time': deadline.end_due_date or deadline.start_due_date,
-        #    'location': deadline.location,
-        #    'description': deadline.description,
-        #    'priority': 'high',
-       # },
-   # )
+    """Return UserSettings instances for every user that has no settings row yet."""
+    return [_build_single_settings(u) for u in User.objects.filter(settings__isnull=True)]

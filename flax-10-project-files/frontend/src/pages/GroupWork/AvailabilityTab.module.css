@@ -1,0 +1,245 @@
+.container {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.header {
+    padding: 20px 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.slotList {
+    background: var(--bg);
+}
+
+.slotRow {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+}
+
+.slotRow:last-child {
+    border-bottom: none;
+}
+
+.timeLabel {
+    width: 120px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bestTimeStar {
+    color: #e0b44b;
+}
+
+.memberList {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar {
+    width: 54px;
+    height: 32px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    gap: 4px;
+    position: relative;
+    border: 1.5px solid transparent;
+}
+
+.avatarName {
+    text-transform: uppercase;
+}
+
+.statusIcon {
+    font-size: 11px;
+}
+
+/* Specific Member Colors - consistent with GroupTasksTab logic if possible */
+.avatarBusy {
+    background: var(--hover-light);
+    color: var(--muted);
+}
+
+.avatarFree {
+    /* Background and border set dynamically via style prop */
+    color: #fff;
+}
+
+.scoreLabel {
+    width: 80px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.scoreLabelHighlight {
+    color: #4a6741;
+    /* Greenish for full/high availability */
+}
+
+.footer {
+    padding: 12px 24px;
+    background: var(--hover-light);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.starIcon {
+    color: #e0b44b;
+}
+
+.activeSection {
+    padding: 20px 24px;
+    background: var(--bg);
+    border-bottom: 2px solid var(--border);
+}
+
+.sectionTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 16px 0;
+}
+
+.suggestionCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.suggestionCard:last-child {
+    margin-bottom: 0;
+}
+
+.suggestionInfo {
+    flex: 1;
+}
+
+.suggestionTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.suggestionMeta {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.votes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.voteCount {
+    color: var(--text-secondary);
+}
+
+.voteSeparator {
+    color: var(--border);
+}
+
+.suggestionActions {
+    display: flex;
+    gap: 12px;
+}
+
+.acceptBtn,
+.rejectBtn,
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    padding: 6px;
+    opacity: 0.8;
+}
+
+.acceptBtn:hover,
+.rejectBtn:hover,
+.deleteBtn:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.acceptBtn {
+    color: #4a6741;
+}
+
+.rejectBtn {
+    color: #8b4513;
+}
+
+.deleteBtn {
+    color: #b04b4b;
+}
+
+@media (max-width: 600px) {
+    .slotRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .memberList {
+        margin: 4px 0;
+    }
+}
+
+.loading,
+.empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+}

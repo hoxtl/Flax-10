@@ -1,0 +1,62 @@
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.burst {
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin: -2px 0 0 -2px;
+  background: var(--sage);
+  opacity: 0;
+  transform: translate(0, 0) scale(0.5);
+}
+
+.particle:nth-child(odd) {
+  background: var(--color-highlight);
+}
+
+.wrap.active .particle {
+  animation: checkBurst 0.55s ease-out 0.1s forwards;
+  animation-delay: calc(var(--delay, 0s) + 0.1s);
+}
+
+/* Precomputed positions: 8 particles at 45° each (radius ~20px, subtler) */
+.particle:nth-child(1) { --tx: 20px; --ty: 0; }
+.particle:nth-child(2) { --tx: 14px; --ty: 14px; }
+.particle:nth-child(3) { --tx: 0; --ty: 20px; }
+.particle:nth-child(4) { --tx: -14px; --ty: 14px; }
+.particle:nth-child(5) { --tx: -20px; --ty: 0; }
+.particle:nth-child(6) { --tx: -14px; --ty: -14px; }
+.particle:nth-child(7) { --tx: 0; --ty: -20px; }
+.particle:nth-child(8) { --tx: 14px; --ty: -14px; }
+
+@keyframes checkBurst {
+  0% {
+    opacity: 0.8;
+    transform: translate(0, 0) scale(0.5);
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) scale(0.8);
+  }
+}

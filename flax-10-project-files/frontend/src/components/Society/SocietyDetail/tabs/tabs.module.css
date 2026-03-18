@@ -12,6 +12,58 @@
 .aboutText {
     color: var(--text);
     font-size: 1rem;
+    margin-bottom: 24px;
+    white-space: pre-wrap;
+}
+
+/* Base layouts for the different society detail tabs. */
+.aboutContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.emailSection {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.emailLabel {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.emailValue {
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.emailList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.emailLink {
+    color: var(--primary);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.emailLink:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.error {
+    color: #ff4d4f;
+    font-size: 0.85rem;
+    margin: 4px 0 0 0;
+    font-weight: 500;
 }
 
 .editorContainer {
@@ -36,6 +88,32 @@
 }
 
 .aboutInput:focus {
+    outline: 2px solid var(--primary);
+    border-color: transparent;
+}
+
+.emailInputSection {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.smallLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.emailInput {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+.emailInput:focus {
     outline: 2px solid var(--primary);
     border-color: transparent;
 }
@@ -203,56 +281,6 @@
     gap: 16px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
-}
-
-.navButtons {
-    display: flex;
-    gap: 4px;
-}
-
-.navButtons button {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.navButtons button:hover {
-    background: var(--hover);
-}
-
-.calendarTitle {
-    font-weight: 600;
-    font-size: 1.1rem;
-    flex: 1;
-}
-
-.viewSwitcher {
-    display: flex;
-    gap: 4px;
-}
-
-.viewBtn {
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-}
-
-.viewBtn:hover {
-    background: var(--hover);
-}
-
-
-.viewBtn.activeView {
-    background: var(--primary);
-    color: var(--c-white);
-    border-color: var(--primary);
 }
 
 .highlight {

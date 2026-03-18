@@ -1,103 +1,105 @@
+/**
+ * SettingsModal provides administrative controls for a society,
+ * including ratification, collaborator management, and deletion.
+ */
 import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
+import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import SectionHeader from "../../common/SectionHeader/SectionHeader";
+import StandardModal from "../../common/StandardModal/StandardModal";
 import { RatificationSection } from "./RatificationSection";
+import { useConfirm } from "../../../context/ConfirmContext";
 
-async function addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator) {
-  const existingMember = (members || []).find(m => m.username === user.username);
-  if (existingMember) return onUpdateRole?.(existingMember.user, "editor");
-  return onAddCollaborator?.(user.username, "editor");
+/** Common logic for collaborator management updates. */
+async function syncCollaborator(user, members, onUpdate, onAdd) {
+  const existing = (members || []).find(m => m.username === user.username);
+  if (existing) return onUpdate?.(existing.user, "editor");
+  return onAdd?.(user.username, "editor");
 }
 
-function useSettingsModal(props) {
+/** Hook to handle settings modal internal state. */
+function useSettings(props) {
   const { members, onFetchMembers, onUpdateRole, onAddCollaborator } = props;
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
   useEffect(() => { onFetchMembers?.(); }, [onFetchMembers]);
-  const handleAddCollaborators = async (users) => {
-    for (const user of users) await addOrPromoteCollaborator(user, members, onUpdateRole, onAddCollaborator);
+
+  const handleAdd = async (users) => {
+    for (const u of users) await syncCollaborator(u, members, onUpdateRole, onAddCollaborator);
     onFetchMembers?.();
   };
-  const collaborators = (members || []).filter(m => m.role !== 'member');
-  const collaboratorUsernames = collaborators.map(c => c.username);
-  return { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames };
+
+  const collabs = (members || []).filter(m => m.role !== 'member');
+  return { showAdd, setShowAdd, handleAdd, collabs };
 }
 
 function ModalHeader({ onClose }) {
   return (
-    <div className={styles.header}>
-      <h3 className={styles.title}>Society Settings</h3>
-      <button className={styles.closeBtn} onClick={onClose}>&times;</button>
-    </div>
+    <SectionHeader eyebrow="Society" title="Settings" action={<PrimaryButton className={styles.closeBtn} variant="ghost" onClick={onClose} pill>&times;</PrimaryButton>} />
   );
 }
 
-function AddCollaboratorSection({ onOpenModal }) {
+function AddCollaboratorSection({ onOpen }) {
   return (
     <div className={styles.section}>
       <h4 className={styles.sectionTitle}>Add Collaborator</h4>
-      <button className={styles.addBtn} onClick={onOpenModal}>+ Add Collaborators</button>
+      <PrimaryButton className={styles.addBtn} variant="secondary" onClick={onOpen} pill>+ Add Collaborators</PrimaryButton>
     </div>
   );
 }
 
-function CollaboratorsSection({ collaborators, onUpdateRole, onRemove }) {
-  const handleRoleChange = (userId, role) => onUpdateRole?.(userId, role);
-  const handleRemove = (userId) => onRemove?.(userId);
+function CollaboratorsSection({ collabs, onUpdate, onRemove }) {
   return (
     <div className={styles.section}>
       <h4 className={styles.sectionTitle}>Collaborators</h4>
-      <CollaboratorList collaborators={collaborators} onRoleChange={handleRoleChange} onRemove={handleRemove} />
-    </div>
-  );
-}
-
-function DeleteConfirm({ onConfirm, onCancel, onClose }) {
-  const handleDelete = () => { onConfirm?.(); onClose?.(); };
-  return (
-    <div className={styles.dangerSection}>
-      <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <p className={styles.confirmText}>Are you sure? This cannot be undone.</p>
-      <div className={styles.confirmBtns}>
-        <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-        <button className={styles.confirmDeleteBtn} onClick={handleDelete}>Delete</button>
-      </div>
+      <CollaboratorList collaborators={collabs}
+        onRoleChange={onUpdate} onRemove={onRemove} />
     </div>
   );
 }
 
 function DangerSection({ onDelete, onClose }) {
-  const [confirming, setConfirming] = useState(false);
-  if (confirming) return <DeleteConfirm onConfirm={onDelete} onCancel={() => setConfirming(false)} onClose={onClose} />;
+  const confirm = useConfirm();
+  const handleDelete = async () => {
+    const ok = await confirm({
+      title: "Delete Society", message: "Are you sure? This cannot be undone.",
+      confirmText: "Delete", cancelText: "Cancel", isDanger: true
+    });
+    if (ok) { onDelete?.(); onClose?.(); }
+  };
+
   return (
     <div className={styles.dangerSection}>
       <h4 className={styles.sectionTitle}>Danger Zone</h4>
-      <button className={styles.deleteBtn} onClick={() => setConfirming(true)}>Delete Society</button>
+      <PrimaryButton className={styles.deleteBtn} variant="danger" onClick={handleDelete} pill>Delete Society</PrimaryButton>
     </div>
   );
 }
 
-function ModalBackdrop({ onClose, children }) {
+function ModalLayout({ onClose, children }) {
   return (
-    <div className={styles.backdrop} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
+    <StandardModal title={null} hideHeader onClose={onClose} modalClassName={styles.modal}>
+      {children}
+    </StandardModal>
   );
 }
 
 export default function SettingsModal(props) {
   const { onClose, onDelete, onUpdateRole, onRemoveMember, ratificationStatus, isRatified, onRequestRatification } = props;
-  const { showAddModal, setShowAddModal, handleAddCollaborators, collaborators, collaboratorUsernames } = useSettingsModal(props);
+  const logic = useSettings(props);
+  const collabs = logic.collabs;
   return (
     <>
-      <ModalBackdrop onClose={onClose}>
+      <ModalLayout onClose={onClose}>
         <ModalHeader onClose={onClose} />
         <RatificationSection status={ratificationStatus} isRatified={isRatified} onRequest={onRequestRatification} />
-        <AddCollaboratorSection onOpenModal={() => setShowAddModal(true)} />
-        <CollaboratorsSection collaborators={collaborators} onUpdateRole={onUpdateRole} onRemove={onRemoveMember} />
+        <AddCollaboratorSection onOpen={() => logic.setShowAdd(true)} />
+        <CollaboratorsSection collabs={collabs} onUpdate={onUpdateRole} onRemove={onRemoveMember} />
         <DangerSection onDelete={onDelete} onClose={onClose} />
-      </ModalBackdrop>
-      {showAddModal && <AddCollaboratorModal onClose={() => setShowAddModal(false)} onAdd={handleAddCollaborators} existingUsernames={collaboratorUsernames} />}
-    </>);}
+      </ModalLayout>
+      {logic.showAdd && <AddCollaboratorModal onClose={() => logic.setShowAdd(false)}
+        onAdd={logic.handleAdd} existingUsernames={collabs.map(c => c.username)} />}
+    </>
+  );
+}

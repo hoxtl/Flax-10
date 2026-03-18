@@ -1,0 +1,94 @@
+.modal {
+    border: 2px solid #000 !important;
+    background: var(--surface-card) !important;
+}
+
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.message {
+    color: var(--text);
+    line-height: 1.55;
+    font-size: var(--text-base);
+    font-style: italic;
+    background: var(--hover);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.72rem 0.84rem;
+}
+
+.modalDanger {
+    border-color: #000 !important;
+}
+
+.modalBodyDanger {
+    gap: var(--space-3);
+}
+
+.dangerBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    width: fit-content;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
+    border-radius: 999px;
+    padding: 0.3rem 0.58rem;
+}
+
+.messageDanger {
+    color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 8%, #fff);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.dangerHint {
+    font-size: 0.79rem;
+    color: var(--muted);
+    margin-top: -0.2rem;
+}
+
+.infoHint {
+    font-size: 0.79rem;
+    color: var(--muted);
+    margin-top: -0.15rem;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+}
+
+.buttonsCentered {
+    justify-content: center;
+}
+
+.cancelBtn,
+.alternateBtn,
+.confirmBtn {
+    min-width: 120px;
+}
+
+@media (max-width: 560px) {
+    .buttons {
+        justify-content: stretch;
+    }
+
+    .cancelBtn,
+    .alternateBtn,
+    .confirmBtn {
+        flex: 1;
+        min-width: 0;
+    }
+}

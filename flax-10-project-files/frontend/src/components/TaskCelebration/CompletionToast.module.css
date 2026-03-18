@@ -1,0 +1,131 @@
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--restoration-earth, #6B5344);
+  color: #F8F5F2;
+  padding: 0.75rem 1.25rem 0.75rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(74, 52, 33, 0.2), 0 2px 6px rgba(0, 0, 0, 0.08);
+  z-index: 10000;
+  font-family: var(--font-body, "Inter", system-ui, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  max-width: calc(100vw - 2rem);
+  text-align: center;
+  animation: toastSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+             toastFadeOut 0.4s ease-in 1.6s forwards;
+}
+
+.toastPartyPopper {
+  flex-shrink: 0;
+  animation: partyPopperPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toastMessage {
+  text-align: left;
+}
+
+@keyframes partyPopperPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-20deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.98) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes toastSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(3px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes toastFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px) scale(0.97);
+  }
+}
+
+/* Level-up: full-screen low-opacity confetti burst — only when milestone triggered */
+.levelUpOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.08);
+  animation: levelUpOverlayFade 2.5s ease-out forwards;
+}
+
+.levelUpOverlayClose {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.levelUpOverlayClose:hover {
+  background: var(--hover);
+}
+
+.confettiBurst {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 30%, var(--sage) 0%, transparent 8%),
+    radial-gradient(circle at 80% 70%, var(--sage) 0%, transparent 8%),
+    radial-gradient(circle at 50% 50%, var(--color-highlight) 0%, transparent 12%),
+    radial-gradient(circle at 70% 20%, var(--sage) 0%, transparent 6%),
+    radial-gradient(circle at 30% 80%, var(--color-highlight) 0%, transparent 6%);
+  background-size: 200% 200%;
+  opacity: 0.4;
+  animation: confettiPulse 2s ease-in-out;
+}
+
+@keyframes levelUpOverlayFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes confettiPulse {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.02); }
+}

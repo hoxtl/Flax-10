@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import styles from "../../pages/Timer/TimerPage.module.css";
+import styles from '../../pages/Timer/TimerPage.module.css';
 import { noiseGenerator } from './utils/noiseUtils';
+
+// TaskInput lives in its own file; re-export for any existing imports
+export { TaskInput } from './TaskInput';
 
 /** Formats seconds to MM:SS */
 export const formatTime = (seconds) => {
@@ -30,15 +33,29 @@ export const SessionStatus = ({ current, total }) => (
     <div className={styles.sessionStatus}>Session {current + 1} of {total}</div>
 );
 
-/** Action buttons for timer */
-export const TimerControls = ({ isActive, onToggle, onReset }) => (
-    <div className={styles.controls}>
-        <button className={`${styles.button} ${styles.primary}`} onClick={onToggle}>{isActive ? 'Pause' : 'Start'}</button>
-        <button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button>
-    </div>
-);
+const PauseIndicator = ({ isPaused, totalPaused }) => {
+    if (!isPaused || totalPaused <= 0) return null;
+    return <div className={styles.pauseIndicator}>Paused: {formatTime(totalPaused)}</div>;
+};
 
-// Helpers for useBufferedInput
+const PrimaryTimerBtn = ({ isActive, isPaused, onToggle, onPause }) => {
+    const label = !isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause');
+    const action = !isActive ? onToggle : onPause;
+    return <button className={`${styles.button} ${styles.primary}`} onClick={action}>{label}</button>;
+};
+
+export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, onEndEarly, totalPaused }) => {
+    const actns = isActive || isPaused
+        ? <><PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} /><button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button><button className={`${styles.button} ${styles.danger} ${styles.outline}`} onClick={onEndEarly}>End Early</button></>
+        : <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
+    return (
+        <div className={styles.controls}>
+            <PauseIndicator isPaused={isPaused} totalPaused={totalPaused} />
+            <div className={styles.buttonGroup}>{actns}</div>
+        </div>
+    );
+};
+
 const handleInput = (e, min, setLocal, onError) => {
     const num = parseInt(e.target.value);
     const isMin = !isNaN(num) && num < min;
@@ -53,26 +70,24 @@ const commitInput = (local, value, min, setLocal, onUpdate, onError) => {
     if (onError) onError(false);
 };
 
-const handleArrowDown = (e, local, min, onError) => {
-    if (local !== '' && parseInt(local) > min) return;
-    e.preventDefault();
-    if (onError) onError(true);
-};
-
 const handleKey = (e, local, min, onError) => {
     if (e.key === 'Enter') e.target.blur();
-    if (e.key === 'ArrowDown') handleArrowDown(e, local, min, onError);
+    if (e.key === 'ArrowDown') {
+        if (local !== '' && parseInt(local) > min) return;
+        e.preventDefault();
+        if (onError) onError(true);
+    }
 };
 
 const useBufferedInput = (value, onUpdate, min, onError) => {
     const [local, setLocal] = useState(value);
     useEffect(() => setLocal(value), [value]);
-
-    const onChange = (e) => handleInput(e, min, setLocal, onError);
-    const onBlur = () => commitInput(local, value, min, setLocal, onUpdate, onError);
-    const onKeyDown = (e) => handleKey(e, local, min, onError);
-
-    return { local, onChange, onBlur, onKeyDown };
+    return {
+        local,
+        onChange: (e) => handleInput(e, min, setLocal, onError),
+        onBlur: () => commitInput(local, value, min, setLocal, onUpdate, onError),
+        onKeyDown: (e) => handleKey(e, local, min, onError),
+    };
 };
 
 const BufferedInput = ({ label, value, ...props }) => {
@@ -85,90 +100,35 @@ const BufferedInput = ({ label, value, ...props }) => {
     );
 };
 
-const Disclaimer = ({ show }) => {
-    if (!show) return null;
-    return (
-        <div className={styles.disclaimer} style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7, color: '#ef4444' }}>
-            * Minimum study time is 1 minute
-        </div>
-    );
-};
-
-// Refactored TimerSettings
-const SettingsInputs = ({ work, breakTime, sessions, onUpdate, setShowError }) => (
-    <div className={styles.settings}>
-        <BufferedInput label="Work (min)" value={work} min={1} onUpdate={(v) => onUpdate('work', v)} onError={setShowError} />
-        <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} />
-        <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} />
-    </div>
-);
-
 export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
     const [showError, setShowError] = useState(false);
     return (
         <div className={styles.settingsContainer}>
-            <SettingsInputs work={work} breakTime={breakTime} sessions={sessions} onUpdate={onUpdate} setShowError={setShowError} />
-            <Disclaimer show={showError} />
+            <div className={styles.settings}>
+                <BufferedInput label="Work (min)" value={work} min={1} onUpdate={(v) => onUpdate('work', v)} onError={setShowError} />
+                <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} />
+                <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} />
+            </div>
+            {showError && <div className={styles.disclaimer}>* Minimum study time is 1 minute</div>}
         </div>
     );
 };
 
-// Refactored SoundSelector
-const SoundOptions = () => (
-    <>
-        <option value="none">None 🔇</option>
-        <option value="white">White Noise 🌊</option>
-        <option value="pink">Pink Noise 🌧️</option>
-        <option value="brown">Brown Noise 🏔️</option>
-    </>
-);
-
-const SoundControls = ({ noiseType, setNoiseType }) => (
-    <div className={styles.soundControls}>
-        <span className={styles.label}>Calming Sound:</span>
-        <select className={styles.soundSelect} value={noiseType} onChange={(e) => setNoiseType(e.target.value)}>
-            <SoundOptions />
-        </select>
-    </div>
-);
-
-const applyNoise = (noiseType) => {
+const applyNoise = (noiseType, volume) => {
     if (noiseType === 'none') return noiseGenerator.stop();
     noiseGenerator.play(noiseType);
-    noiseGenerator.setVolume(0.5);
+    noiseGenerator.setVolume(volume);
 };
 
-const useNoiseEffect = (noiseType) => {
-    useEffect(() => {
-        applyNoise(noiseType);
-        return () => noiseGenerator.stop();
-    }, [noiseType]);
-};
-
-export const SoundSelector = () => {
+export const useAmbientSound = () => {
     const [noiseType, setNoiseType] = useState('none');
-    useNoiseEffect(noiseType);
-
-    return (
-        <div className={styles.soundSelectorContainer}>
-            <SoundControls noiseType={noiseType} setNoiseType={setNoiseType} />
-        </div>
-    );
+    const [volume, setVolume] = useState(0.5);
+    useEffect(() => {
+        applyNoise(noiseType, volume);
+        return () => noiseGenerator.stop();
+    }, [noiseType, volume]);
+    const toggle = (value) => setNoiseType((prev) => prev === value ? 'none' : value);
+    return { noiseType, toggle, volume, setVolume };
 };
 
-const handleTaskKey = (e) => {
-    if (e.key === 'Enter') e.target.blur();
-};
-
-export const TaskInput = ({ value, onChange }) => (
-    <div className={styles.taskInputContainer}>
-        <input
-            type="text"
-            className={styles.taskInput}
-            placeholder="What are you working on? 🎯"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={handleTaskKey}
-        />
-    </div>
-);
+export const SoundSelector = () => null;

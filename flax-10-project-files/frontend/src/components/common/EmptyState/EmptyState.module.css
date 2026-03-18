@@ -1,0 +1,61 @@
+@keyframes emptyIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-16) var(--space-8);
+  background: var(--surface-hero);
+  border-radius: var(--card-radius);
+  border: 1px dashed color-mix(in srgb, var(--primary) 22%, transparent);
+  box-shadow: var(--card-shadow-rest);
+  gap: var(--space-2);
+  animation: emptyIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--card-icon-surface, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  margin-bottom: var(--space-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+  font-family: var(--font-heading, var(--font-body));
+}
+
+.description {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.action {
+  margin-top: var(--space-5);
+}

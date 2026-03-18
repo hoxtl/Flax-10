@@ -16,7 +16,7 @@ describe('fetchApi', () => {
         global.fetch.mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => mockData,
+            text: async () => JSON.stringify(mockData),
         });
         const data = await fetchApi('/test');
         expect(data).toEqual(mockData);
@@ -36,7 +36,7 @@ describe('fetchApi', () => {
         global.fetch.mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({}),
+            text: async () => JSON.stringify({}),
         });
         await fetchApi('/test', { method: 'POST' });
         expect(global.fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
@@ -47,6 +47,18 @@ describe('fetchApi', () => {
         }));
     });
 
+    it('adds Authorization header when token is in localStorage', async () => {
+        localStorage.setItem('token', 'abc123');
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: async () => JSON.stringify({}),
+        });
+        await fetchApi('/test');
+        const callHeaders = global.fetch.mock.calls[0][1].headers;
+        expect(callHeaders['Authorization']).toBe('Token abc123');
+    });
+
     it('should throw error on non-ok response with detail', async () => {
         global.fetch.mockResolvedValue({
             ok: false,
@@ -54,6 +66,24 @@ describe('fetchApi', () => {
             json: async () => ({ detail: 'Validation failed' }),
         });
         await expect(fetchApi('/test')).rejects.toThrow('Validation failed');
+    });
+
+    it('should throw error on non-ok response with non_field_errors array', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ non_field_errors: ['Invalid credentials'] }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('Invalid credentials');
+    });
+
+    it('should throw error on non-ok response using Object.values fallback when no detail/message/non_field_errors', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ username: ['This field is required.'] }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('This field is required.');
     });
 
     it('should throw default error on non-ok response without detail', async () => {
@@ -72,7 +102,7 @@ describe('fetchApi', () => {
 
     it('does not set Authorization header when no token', async () => {
         localStorage.removeItem('token');
-        await expect(fetchApi('/test')).resolves.not.toThrow?.();
+        await expect(fetchApi('/test')).rejects.toThrow();
     });
 
     it('does not add Authorization header when no token in localStorage', async () => {
@@ -80,7 +110,7 @@ describe('fetchApi', () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             status: 200,
-            json: async () => ({ data: 'ok' }),
+            text: async () => JSON.stringify({ data: 'ok' }),
         });
         const result = await fetchApi('/test');
         const callHeaders = global.fetch.mock.calls[0][1].headers;

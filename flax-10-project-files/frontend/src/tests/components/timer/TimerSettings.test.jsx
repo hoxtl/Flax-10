@@ -66,10 +66,18 @@ const testDisclaimerArrow = () => {
     expect(screen.getByText(/Minimum study time/)).toBeInTheDocument();
 };
 
+const testArrowDownWhenValueAboveMin = () => {
+    helpers.renderTimerSettings({ work: 25, breakTime: 5, sessions: 4, isActive: false, onUpdate: () => { } });
+    const input = screen.getAllByRole('spinbutton')[0];
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(screen.queryByText(/Minimum study time/)).not.toBeInTheDocument();
+};
+
 describe('TimerSettings', () => {
     it('inputs call onUpdate', testUpdate);
     it('selects content on focus', testFocus);
     it('resets invalid values on blur', testBlur);
     it('shows disclaimer on invalid input', testDisclaimerInput);
     it('shows disclaimer on arrow down', testDisclaimerArrow);
+    it('does not show disclaimer on ArrowDown when value above min', testArrowDownWhenValueAboveMin);
 });

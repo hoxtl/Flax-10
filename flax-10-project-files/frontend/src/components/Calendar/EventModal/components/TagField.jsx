@@ -1,21 +1,24 @@
 import { useTags } from '../../../../context/TagContext';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 
 export function TagField({ value, onChange, customTags }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;
-    const selectedTag = tags?.find(t => t.id === value);
-    const hasColors = customTags && selectedTag?.color;
+    const uniqueTags = Array.from(
+        new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
+    );
+    const options = uniqueTags.map(tag => ({ value: tag.id, label: tag.label }));
 
     return (
         <div className="form-field">
             <label htmlFor="field-tag">Type</label>
-            <div className={hasColors ? "select-with-color" : ""}>
-                {hasColors && <span className="color-dot" style={{ backgroundColor: selectedTag.color }} />}
-                <select id="field-tag" value={value || ''} onChange={onChange}>
-                    <option value="">None</option>
-                    {(tags || []).map(tag => <option key={tag.id} value={tag.id}>{tag.label}</option>)}
-                </select>
-            </div>
+            <AnimatedDropdown
+                value={value || ''}
+                onChange={(val) => onChange({ target: { value: val } })}
+                options={options}
+                placeholder="Select type"
+                align="left"
+            />
         </div>
     );
 }

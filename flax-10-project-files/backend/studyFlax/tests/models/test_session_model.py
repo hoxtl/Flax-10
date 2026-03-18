@@ -1,9 +1,14 @@
+"""
+Backend tests for session model.
+"""
+
 from django.test import TestCase
 from django.utils import timezone
-from studyFlax.models.auth.userModel import User
-from studyFlax.models.timer.sessionModel import StudySession
+from studyFlax.models.auth.user_model import User
+from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionModelTest(TestCase):
+    """Tests for study session model."""
     def setUp(self):
         self.user = User.objects.create_user(
             username='testuser', email='test@example.com', password='password123',

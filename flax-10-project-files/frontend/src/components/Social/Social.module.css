@@ -1,0 +1,48 @@
+
+.userList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.userItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.userItem:hover {
+    background-color: var(--hover);
+}
+
+.shareButton {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    font-size: 0.9rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.shareButton.sharing {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(8px);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.shareButton:hover {
+    opacity: 0.9;
+    box-shadow: 0 2px 8px rgba(158, 126, 93, 0.25);
+}
+
+.shareButton.sharing:hover {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: var(--primary);
+    color: var(--primary);
+}

@@ -1,70 +1,79 @@
+/**
+ * ModalContent renders the main body of the event modal.
+ * Switches between the event form, overlap warning, and sleep warning views.
+ */
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
+import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
 
+/** Top-level modal content that selects the appropriate view and stops click propagation. */
 export function ModalContent(props) {
-    if (props.overlapWarning) {
-        return <OverlapWarningView warning={props.overlapWarning} onCancel={props.handleCancelSave} onConfirm={props.handleConfirmSave} />;
+    if (props.sleepWarning) {
+        return <SleepWarningView settings={props.sleepSettings} onCancel={props.handleCancelSleep} onConfirm={props.handleConfirmSleep} />;
     }
-    return <EventFormView {...props} />;
+    return (
+        <div onClick={(e) => e.stopPropagation()}>
+            {props.overlapWarning?.length
+                ? <OverlapWarningView overlapWarning={props.overlapWarning} onConfirm={props.handleConfirmSave} onCancel={props.handleCancelSave} />
+                : <EventFormView {...props} />}
+        </div>
+    );
 }
 
-function OverlapWarningView({ warning, onCancel, onConfirm }) {
+function OverlapWarningView({ overlapWarning, onConfirm, onCancel }) {
     return (
-        <div className="modal-content overlap-warning" onClick={e => e.stopPropagation()}>
-            <ModalHeaderWarning onClose={onCancel} />
-            <div className="modal-body">
-                <p>This event overlaps with existing events:</p>
-                <OverlapList events={warning} />
-                <p>Do you want to save it anyway?</p>
+        <div>
+            <div>
+                <h3>Scheduling Conflict</h3>
+                <button onClick={onCancel}>x</button>
             </div>
-            <ModalActions onCancel={onCancel} onConfirm={onConfirm} />
+            <div>
+                {overlapWarning.map(event => <p key={event.id}>{event.title}</p>)}
+            </div>
+            <div>
+                <button onClick={onConfirm}>Save Anyway</button>
+                <button onClick={onCancel}>Cancel</button>
+            </div>
         </div>
     );
 }
 
-function ModalHeaderWarning({ onClose }) {
+function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, onDelete, showReminder, tags }) {
     return (
-        <div className="modal-header">
-            <h3>⚠️ Scheduling Conflict</h3>
-            <button className="close-btn" onClick={onClose}>×</button>
-        </div>
-    );
-}
-
-function OverlapList({ events }) {
-    return (
-        <ul className="overlap-list">
-            {events.map(e => <OverlapItem key={e.id} event={e} />)}
-        </ul>
-    );
-}
-
-function OverlapItem({ event }) {
-    const timeStr = `${new Date(event.start_time).toLocaleTimeString()} - ${new Date(event.end_time).toLocaleTimeString()}`;
-    return (
-        <li>
-            <strong>{event.title}</strong>
-            <br />
-            {timeStr}
-        </li>
-    );
-}
-
-function ModalActions({ onCancel, onConfirm }) {
-    return (
-        <div className="modal-actions">
-            <button className="btn-secondary" onClick={onCancel}>Cancel</button>
-            <button className="btn-primary" onClick={onConfirm}>Save Anyway</button>
-        </div>
-    );
-}
-
-function EventFormView({ onClose, isEditing, form, setForm, error, handleSubmit, handleDelete, showReminder, tags }) {
-    return (
-        <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <>
             <ModalHeader isEditing={isEditing} onClose={onClose} />
             {error && <div className="form-error">{error}</div>}
-            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={handleDelete} showReminder={showReminder} tags={tags} />
+            <EventFormBody form={form} setForm={setForm} isEditing={isEditing} onSubmit={handleSubmit} onDelete={onDelete} showReminder={showReminder} tags={tags} />
+        </>
+    );
+}
+
+function formatTime(t) {
+    if (!t) return t;
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+}
+
+function SleepWarningBody({ settings }) {
+    return (
+        <div className="modal-body">
+            <p>Your sleep schedule is <strong>{formatTime(settings?.sleepTime)}</strong> to <strong>{formatTime(settings?.wakeTime)}</strong>. This event falls during your rest time.</p>
+            <p>Are you sure you want to schedule something at this hour?</p>
         </div>
+    );
+}
+
+function SleepWarningView({ settings, onCancel, onConfirm }) {
+    const sleepStr = formatTime(settings?.sleepTime);
+    const wakeStr = formatTime(settings?.wakeTime);
+    return (
+        <ConfirmModal
+            title="You should be resting!"
+            message={<>Your sleep schedule is <strong>{sleepStr}</strong> to <strong>{wakeStr}</strong>. This event falls during your rest time. Are you sure you want to schedule something at this hour?</>}
+            cancelText="Cancel — I'll rest"
+            confirmText="Add Anyway"
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+        />
     );
 }

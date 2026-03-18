@@ -1,10 +1,10 @@
 .calendar-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   padding: 0.5rem 1rem 1rem;
   box-sizing: border-box;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  height: auto;
 }
 
 .view-placeholder {
@@ -12,5 +12,53 @@
   text-align: center;
   background: var(--panel, #f6f4f1);
   border-radius: 8px;
-  color: var(--muted, #8B7355);
+  color: var(--muted, var(--color-primary));
+}
+
+.calendar-view-relative-wrapper {
+  position: relative;
+}
+
+/* Day and Week views need constrained height for internal scroll */
+.calendar-view-relative-wrapper:has(.day-view),
+.calendar-view-relative-wrapper:has(.week-view) {
+  height: calc(100vh - 280px);
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-view-relative-wrapper:has(.day-view) .day-view,
+.calendar-view-relative-wrapper:has(.week-view) .week-view {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+
+  .calendar-view-relative-wrapper:has(.day-view),
+  .calendar-view-relative-wrapper:has(.week-view) {
+    height: calc(100vh - 240px);
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
+
+  .calendar-grid {
+    min-width: 800px;
+    display: grid;
+  }
+
+  .current-time-dot {
+    left: 40px;
+    width: 10px;
+    height: 10px;
+  }
 }

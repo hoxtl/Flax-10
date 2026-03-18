@@ -39,23 +39,21 @@
   box-shadow: none;
 }
 
-/* Active */
+/* Active (fallback when no color prop is provided) */
 .active {
-  background: var(--primary);
-  box-shadow: 0 6px 18px rgba(158, 126, 93, 0.18);
-  color: #fff;
-  font-weight: 700;
+  background: var(--accent);
+  color: var(--c-white);
+  box-shadow: 0 6px 18px rgba(123, 103, 81, 0.18);
 }
 
-/* Count inside */
-.count {
-  font-weight: 800;
-}
-
-/* Color dot for custom tags */
+/* Tag color dot (inactive state) */
 .colorDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  display: inline-block;
+  flex-shrink: 0;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
 }

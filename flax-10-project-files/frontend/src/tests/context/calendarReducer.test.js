@@ -136,6 +136,33 @@ describe('calendarReducer', () => {
         expect(state.filter).toEqual(['all']);
     });
 
+    it('should handle OPEN_POPUP', () => {
+        const event = { id: 1, title: 'Pop' };
+        const rect = { top: 10, left: 20 };
+        const state = calendarReducer(initialState, { type: 'OPEN_POPUP', payload: { event, anchorRect: rect } });
+        expect(state.popupEvent).toEqual(event);
+        expect(state.popupAnchorRect).toEqual(rect);
+    });
+
+    it('should handle CLOSE_POPUP', () => {
+        const openState = { ...initialState, popupEvent: { id: 1 }, popupAnchorRect: {} };
+        const state = calendarReducer(openState, { type: 'CLOSE_POPUP' });
+        expect(state.popupEvent).toBeNull();
+        expect(state.popupAnchorRect).toBeNull();
+    });
+
+    it('should handle SET_READ_ONLY', () => {
+        const state = calendarReducer(initialState, { type: 'SET_READ_ONLY', payload: true });
+        expect(state.readOnly).toBe(true);
+    });
+
+    it('should handle TRIGGER_RELOAD', () => {
+        const state = calendarReducer(initialState, { type: 'TRIGGER_RELOAD' });
+        expect(state.reloadKey).toBe(1);
+        const state2 = calendarReducer(state, { type: 'TRIGGER_RELOAD' });
+        expect(state2.reloadKey).toBe(2);
+    });
+
     // Test openModalHandler edge cases
     it('should handle OPEN_MODAL with complex payload', () => {
         const event = { id: 1 };

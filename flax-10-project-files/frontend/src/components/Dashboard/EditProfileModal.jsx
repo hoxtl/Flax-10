@@ -1,19 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
 import { updateUserProfile } from '../../api/userService';
 import { getInitials } from '../Authentication/utils/userUtils';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
+import FormField from '../common/FormField/FormField';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../common/StandardModal/StandardModal';
+import TextInput from '../common/TextInput/TextInput';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
+function resolveProfilePhoto(user) {
+  return getResolvedUserPhoto(user, {
+    allowGeneric: false,
+    seed: user?.username || user?.id || user?.name,
+  });
+}
 
 function useProfileForm(user) {
   const [username, setUsername] = useState(user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(user?.profile_photo_url || null);
+  const [previewUrl, setPreviewUrl] = useState(resolveProfilePhoto(user));
   const [removePhoto, setRemovePhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  useEffect(() => {
+    setPreviewUrl(resolveProfilePhoto(user));
+    setRemovePhoto(false);
+  }, [user]);
   return { username, setUsername, bio, setBio, profilePhoto, setProfilePhoto, previewUrl, setPreviewUrl, removePhoto, setRemovePhoto, loading, setLoading, error, setError, success, setSuccess };
 }
 
@@ -99,55 +115,44 @@ function PhotoActions({ previewUrl, profilePhotoUrl, onChange, onRemove }) {
         Change Photo
       </label>
       {(previewUrl || profilePhotoUrl) && (
-        <button type="button" className={styles.photoRemove} onClick={onRemove}>Remove Photo</button>
+        <PrimaryButton type="button" className={styles.photoRemove} variant="danger" pill onClick={onRemove}>Remove Photo</PrimaryButton>
       )}
     </div>
   );
 }
 
-function PhotoSection({ previewUrl, initials, user, onPhotoChange, onRemovePhoto }) {
+function PhotoSection({ previewUrl, initials, canRemovePhoto, onPhotoChange, onRemovePhoto }) {
   return (
     <div className={styles.photoSection}>
       <div className={styles.photoPreview}>
         <PhotoPreview previewUrl={previewUrl} initials={initials} />
       </div>
-      <PhotoActions previewUrl={previewUrl} profilePhotoUrl={user?.profile_photo_url} onChange={onPhotoChange} onRemove={onRemovePhoto} />
+      <PhotoActions previewUrl={previewUrl} profilePhotoUrl={canRemovePhoto ? previewUrl : null} onChange={onPhotoChange} onRemove={onRemovePhoto} />
     </div>
   );
 }
 
 function UsernameField({ username, setUsername }) {
   return (
-    <div className={styles.field}>
-      <label>Username</label>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} placeholder="Choose a username" />
-    </div>
+    <FormField label="Username" htmlFor="edit-profile-username" className={styles.field}>
+      <TextInput id="edit-profile-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} placeholder="Choose a username" />
+    </FormField>
   );
 }
 
 function BioField({ bio, setBio }) {
   return (
-    <div className={styles.field}>
-      <label>Reminder Note</label>
-      <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Add a personal reminder note..." />
-    </div>
+    <FormField label="Reminder Note" htmlFor="edit-profile-bio" className={styles.field}>
+      <TextInput multiline id="edit-profile-bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Add a personal reminder note..." />
+    </FormField>
   );
 }
 
 function FormActions({ loading, onClose }) {
   return (
     <div className={styles.actions}>
-      <button type="button" onClick={onClose} className={styles.cancelBtn}>Cancel</button>
-      <button type="submit" disabled={loading} className={styles.saveBtn}>{loading ? 'Saving...' : 'Save Changes'}</button>
-    </div>
-  );
-}
-
-function ModalHeader({ onClose }) {
-  return (
-    <div className={styles.header}>
-      <h2>Edit Profile</h2>
-      <button className={styles.closeBtn} onClick={onClose}>✕</button>
+      <PrimaryButton type="button" onClick={onClose} className={styles.cancelBtn} variant="ghost" pill>Cancel</PrimaryButton>
+      <PrimaryButton type="submit" disabled={loading} className={styles.saveBtn} pill>{loading ? 'Saving...' : 'Save Changes'}</PrimaryButton>
     </div>
   );
 }
@@ -157,11 +162,12 @@ function ModalForm({ form, user, onClose, onSubmit }) {
   const initials = user?.name ? getInitials(user.name) : username.substring(0, 2).toUpperCase();
   const onPhotoChange = (e) => handlePhotoChange(e, setProfilePhoto, setPreviewUrl, setRemovePhoto);
   const onRemovePhoto = () => handleRemovePhoto(setProfilePhoto, setPreviewUrl, setRemovePhoto);
+  const canRemovePhoto = Boolean(previewUrl);
   return (
     <form onSubmit={onSubmit} className={styles.form}>
       {success && <div className={styles.success}>{success}</div>}
       {error && <div className={styles.error}>{error}</div>}
-      <PhotoSection previewUrl={previewUrl} initials={initials} user={user} onPhotoChange={onPhotoChange} onRemovePhoto={onRemovePhoto} />
+      <PhotoSection previewUrl={previewUrl} initials={initials} canRemovePhoto={canRemovePhoto} onPhotoChange={onPhotoChange} onRemovePhoto={onRemovePhoto} />
       <UsernameField username={username} setUsername={setUsername} />
       <BioField bio={bio} setBio={setBio} />
       <FormActions loading={loading} onClose={onClose} />
@@ -172,11 +178,14 @@ export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
   if (!isOpen) return null;
   const handleSubmit = buildSubmitHandler(form, user, onSave, onClose);
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <ModalHeader onClose={onClose} />
-        <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
-      </div>
-    </div>
+    <StandardModal
+      title="Edit Profile"
+      onClose={onClose}
+      size="md"
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+      <ModalForm form={form} user={user} onClose={onClose} onSubmit={handleSubmit} />
+    </StandardModal>
   );
 }

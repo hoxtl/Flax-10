@@ -1,8 +1,10 @@
-export function ActionButtons({ isEditing, onDelete }) {
+import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
+
+export function ActionButtons({ onDelete }) {
     return (
         <div className="modal-actions">
-            {isEditing && <button type="button" className="delete-btn" onClick={onDelete}>Delete</button>}
-            <button type="submit" className="submit-btn">Save</button>
+            {onDelete && <PrimaryButton type="button" variant="ghost" pill onClick={onDelete}>Delete</PrimaryButton>}
+            <PrimaryButton type="submit" variant="primary" pill>Save</PrimaryButton>
         </div>
     );
 }

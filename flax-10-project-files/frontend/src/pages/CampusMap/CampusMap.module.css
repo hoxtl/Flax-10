@@ -1,16 +1,36 @@
-:root {
-  --brown-col: 74, 52, 33;
-  --brown-text: 43, 30, 20;
-}
-
 .page {
   display: flex;
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--bg, #f0e9df);
+  background: var(--bg);
   font-family: inherit;
+  position: relative;
 }
+
+.skeletonOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  background: var(--bg);
+  pointer-events: none;
+}
+
+.skeletonSidebarTitle { width: 170px; height: 28px; }
+.skeletonSidebarSubtitle { width: 220px; height: 12px; margin-top: 8px; }
+.skeletonSectionLabel { width: 120px; height: 12px; border-radius: 999px; }
+.skeletonPanelCard { width: 100%; height: 44px; }
+.skeletonPanelCardTall { width: 100%; height: 110px; }
+.skeletonMapPane {
+  width: 100%;
+  height: 100%;
+  background: rgba(236, 240, 245, 0.96);
+  border-left: 1px solid rgba(173, 181, 193, 0.16);
+}
+.skeletonQuickNavBtn { width: 82px; height: 28px; border-radius: 999px; }
 
 .sidebar {
   width: 340px;
@@ -19,27 +39,27 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--panel, #faf7f4);
-  border-right: 1px solid var(--border, rgba(var(--brown-col), 0.12));
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--brown-col), 0.15) transparent;
+  scrollbar-color: var(--muted) transparent;
 }
 
 .sidebar::-webkit-scrollbar {
   width: 4px;
 }
 .sidebar::-webkit-scrollbar-thumb {
-  background: rgba(var(--brown-col), 0.15);
+  background: rgba(var(--c-cocoa), 0.15);
   border-radius: 2px;
 }
 
 .sidebarHeader {
   padding: 20px 20px 14px;
-  border-bottom: 1px solid var(--border, rgba(var(--brown-col), 0.10));
-  background: var(--panel, #faf7f4);
+  border-bottom: 1px solid var(--border);
+  background: var(--sidebar);
   position: sticky;
   top: 0;
   z-index: 5;
@@ -51,7 +71,7 @@
   gap: 8px;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--text, rgba(var(--brown-text), 0.92));
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
@@ -62,13 +82,14 @@
 .sidebarSubtitle {
   margin: 5px 0 0;
   font-size: 0.78rem;
-  color: var(--muted, rgba(var(--brown-text), 0.50));
+  color: var(--text);
+  opacity: 0.8;
   font-weight: 500;
 }
 
 .section {
   padding: 16px 18px;
-  border-bottom: 1px solid var(--border, rgba(var(--brown-col), 0.08));
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -82,7 +103,8 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted, rgba(var(--brown-text), 0.50));
+  color: var(--text);
+  opacity: 0.9;
 }
 
 .stepBadge {
@@ -92,8 +114,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(var(--brown-col), 0.12);
-  color: rgba(var(--brown-text), 0.70);
+  background: var(--primary-light);
+  color: var(--primary);
   font-size: 0.65rem;
   font-weight: 800;
 }
@@ -101,7 +123,8 @@
 .hintText {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--muted, rgba(var(--brown-text), 0.45));
+  color: var(--text);
+  opacity: 0.7;
   line-height: 1.5;
   font-style: italic;
 }
@@ -111,8 +134,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(var(--brown-col), 0.05);
-  border: 1px solid rgba(var(--brown-col), 0.12);
+  background: var(--surface-inner);
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 
@@ -121,7 +144,7 @@
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 0 3px rgba(var(--brown-col), 0.12);
+  box-shadow: 0 0 0 3px var(--border);
 }
 
 .locationChipText {
@@ -135,7 +158,7 @@
 .locationCoords {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text, rgba(var(--brown-text), 0.88));
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -143,7 +166,7 @@
 
 .locationHint {
   font-size: 0.7rem;
-  color: var(--muted, rgba(var(--brown-text), 0.45));
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -152,18 +175,20 @@
 .clearBtn {
   background: none;
   border: none;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
+  color: var(--muted);
   cursor: pointer;
   font-size: 0.75rem;
   padding: 2px 4px;
   border-radius: 4px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
   flex-shrink: 0;
 }
 
 .clearBtn:hover {
-  color: rgba(var(--brown-text), 0.80);
-  background: rgba(var(--brown-col), 0.08);
+  color: rgba(var(--brown-text), 0.8);
+  background: rgba(var(--c-cocoa), 0.08);
 }
 
 .geoBtn {
@@ -174,9 +199,9 @@
   width: 100%;
   padding: 9px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(var(--brown-col), 0.20);
-  background: rgba(255, 255, 255, 0.70);
-  color: rgba(var(--brown-text), 0.80);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -186,10 +211,10 @@
 }
 
 .geoBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.90);
-  border-color: rgba(var(--brown-col), 0.30);
+  background: var(--panel);
+  border-color: var(--primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(var(--brown-col), 0.10);
+  box-shadow: 0 4px 12px var(--shadow-sm);
 }
 
 .geoBtn:disabled {
@@ -215,20 +240,20 @@
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text, rgba(var(--brown-text), 0.80));
+  color: var(--text);
   text-align: left;
   transition: all 130ms ease;
 }
 
 .campusBtn:hover {
-  background: rgba(var(--brown-col), 0.06);
-  border-color: rgba(var(--brown-col), 0.10);
+  background: rgba(var(--c-cocoa), 0.06);
+  border-color: rgba(var(--c-cocoa), 0.1);
 }
 
 .campusBtnActive {
-  background: rgba(var(--brown-col), 0.09);
-  border-color: rgba(var(--brown-col), 0.20);
-  color: rgba(var(--brown-text), 0.95);
+  background: var(--surface-inner);
+  border-color: var(--primary);
+  color: var(--text);
 }
 
 .campusDot {
@@ -245,7 +270,7 @@
   gap: 8px;
   padding: 20px 10px;
   text-align: center;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
+  color: var(--muted);
   font-size: 0.8rem;
 }
 
@@ -260,13 +285,13 @@
   gap: 8px;
   padding: 12px;
   font-size: 0.82rem;
-  color: var(--muted, rgba(var(--brown-text), 0.55));
+  color: var(--muted);
 }
 
 .routeError {
   padding: 10px 12px;
   background: rgba(200, 50, 50, 0.08);
-  border: 1px solid rgba(200, 50, 50, 0.20);
+  border: 1px solid rgba(200, 50, 50, 0.2);
   border-radius: 8px;
   font-size: 0.8rem;
   color: #a33;
@@ -274,8 +299,8 @@
 
 .modeCard {
   padding: 13px 14px;
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(var(--brown-col), 0.12);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 12px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -283,7 +308,7 @@
 }
 
 .modeCard:not(.modeCardDisabled):hover {
-  box-shadow: 0 4px 16px rgba(var(--brown-col), 0.10);
+  box-shadow: 0 4px 16px rgba(var(--c-cocoa), 0.1);
 }
 
 .modeCardDisabled {
@@ -311,7 +336,7 @@
 .modeName {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text, rgba(var(--brown-text), 0.90));
+  color: var(--text);
 }
 
 .modeBadge {
@@ -320,15 +345,15 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #2a7a3a;
-  background: rgba(42, 122, 58, 0.10);
+  color: var(--c-green);
+  background: rgba(42, 122, 58, 0.1);
   padding: 1px 6px;
   border-radius: 4px;
 }
 
 .modeBadgeSoon {
-  color: rgba(var(--brown-text), 0.50);
-  background: rgba(var(--brown-col), 0.08);
+  color: rgba(var(--brown-text), 0.5);
+  background: rgba(var(--c-cocoa), 0.08);
 }
 
 .modeStats {
@@ -336,7 +361,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: rgba(var(--brown-col), 0.04);
+  background: var(--surface-inner);
   border-radius: 8px;
 }
 
@@ -351,13 +376,13 @@
 .modeStatValue {
   font-size: 1.05rem;
   font-weight: 700;
-  color: rgba(var(--brown-col), 0.92);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
 .modeStatLabel {
   font-size: 0.67rem;
-  color: var(--muted, rgba(var(--brown-text), 0.45));
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
@@ -366,15 +391,8 @@
 .modeStatDivider {
   width: 1px;
   height: 32px;
-  background: rgba(var(--brown-col), 0.12);
+  background: var(--border);
   flex-shrink: 0;
-}
-
-.modeComingSoonNote {
-  margin: 0;
-  font-size: 0.72rem;
-  color: var(--muted, rgba(var(--brown-text), 0.40));
-  font-style: italic;
 }
 
 .stepsToggle {
@@ -386,16 +404,16 @@
   padding: 6px 0;
   background: none;
   border: none;
-  border-top: 1px solid rgba(var(--brown-col), 0.10);
+  border-top: 1px solid var(--border);
   cursor: pointer;
   font-size: 0.75rem;
   font-weight: 600;
-  color: rgba(var(--brown-col), 0.65);
+  color: var(--text-secondary);
   transition: color 130ms;
 }
 
 .stepsToggle:hover {
-  color: rgba(var(--brown-col), 0.90);
+  color: rgba(var(--c-cocoa), 0.9);
 }
 
 .stepsList {
@@ -415,9 +433,9 @@
   align-items: flex-start;
   gap: 8px;
   padding: 7px 8px;
-  background: rgba(var(--brown-col), 0.03);
+  background: var(--surface-inner);
   border-radius: 6px;
-  border-left: 2px solid rgba(158, 126, 93, 0.35);
+  border-left: 2px solid var(--primary-light);
 }
 
 .stepIndex {
@@ -427,10 +445,10 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: rgba(var(--brown-col), 0.10);
+  background: var(--border);
   font-size: 0.6rem;
   font-weight: 800;
-  color: rgba(var(--brown-text), 0.65);
+  color: var(--text-secondary);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -444,22 +462,23 @@
 
 .stepInstruction {
   font-size: 0.75rem;
-  color: var(--text, rgba(var(--brown-text), 0.85));
+  color: var(--text);
   line-height: 1.4;
 }
 
 .stepMeta {
   font-size: 0.67rem;
-  color: var(--muted, rgba(var(--brown-text), 0.42));
+  color: var(--text);
+  opacity: 0.6;
 }
 
 .sidebarFooter {
   margin-top: auto;
   padding: 12px 18px;
   font-size: 0.7rem;
-  color: var(--muted, rgba(var(--brown-text), 0.35));
+  color: var(--muted);
   text-align: center;
-  border-top: 1px solid rgba(var(--brown-col), 0.06);
+  border-top: 1px solid var(--border);
 }
 
 .mapWrapper {
@@ -487,10 +506,10 @@
   background: var(--panel);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--brown-col), 0.14);
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 6px 10px;
-  box-shadow: 0 8px 28px rgba(var(--brown-col), 0.18);
+  box-shadow: var(--shadow-lg);
   z-index: 4;
   max-width: calc(100% - 40px);
   flex-wrap: wrap;
@@ -507,16 +526,16 @@
   background: transparent;
   font-size: 0.72rem;
   font-weight: 600;
-  color: rgba(var(--brown-text), 0.72);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 130ms;
   white-space: nowrap;
 }
 
 .quickNavBtn:hover {
-  background: rgba(var(--brown-col), 0.08);
-  border-color: rgba(var(--brown-col), 0.14);
-  color: rgba(var(--muted), 0.95);
+  background: var(--surface-inner);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .quickNavDot {
@@ -540,7 +559,9 @@
   border-radius: 50%;
   border: 3px solid white;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 :global(.campusMarker:hover .campusMarkerInner) {
@@ -551,15 +572,15 @@
 :global(.campusMarkerLabel) {
   font-size: 10px;
   font-weight: 700;
-  background: rgba(250, 247, 244, 0.92);
-  color: rgba(var(--brown-text), 0.88);
+  background: var(--panel);
+  color: var(--text);
   padding: 1px 5px;
   border-radius: 4px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(var(--brown-col), 0.12);
+  border: 1px solid var(--border);
   pointer-events: none;
 }
 
@@ -573,7 +594,7 @@
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  background: rgba(var(--brown-col), 0.15);
+  background: var(--primary-light);
   animation: pulse 1.8s ease-out infinite;
 }
 
@@ -581,36 +602,44 @@
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: #4A3421;
+  background: var(--primary);
   border: 2.5px solid white;
-  box-shadow: 0 2px 8px rgba(var(--brown-col), 0.40);
+  box-shadow: var(--shadow-sm);
 }
 
 @keyframes pulse {
-  0% { transform: scale(0.6); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .spinner {
   display: inline-block;
   width: 13px;
   height: 13px;
-  border: 2px solid rgba(var(--brown-col), 0.20);
-  border-top-color: rgba(var(--brown-col), 0.70);
+  border: 2px solid rgba(var(--c-cocoa), 0.2);
+  border-top-color: rgba(var(--c-cocoa), 0.7);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 :global(.mapboxgl-popup-content) {
-  background: rgba(250, 247, 244, 0.96) !important;
-  border: 1px solid rgba(var(--brown-col), 0.14) !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  box-shadow: 0 8px 24px rgba(var(--brown-col), 0.16) !important;
+  box-shadow: var(--shadow-md) !important;
   padding: 12px 14px !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -620,5 +649,396 @@
 .locPopup {
   font-size: 0.9rem;
   font-weight: 700;
-  color: rgba(var(--brown-text) 0.88);
+  color: var(--text);
+}
+
+.tflJourneySteps {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(74, 52, 33, 0.1);
+}
+
+.tflLeg {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--surface-inner);
+  border-radius: 8px;
+  border-left: 3px solid #0019a8;
+}
+
+.tflLegIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tflLegContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tflLegMode {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tflLegDetail {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.tflLegTime {
+  font-size: 0.68rem;
+  color: var(--c-grey);
+  opacity: 0.45;
+  font-style: italic;
+}
+
+/* TfL Delays Section */
+.statusIcon {
+  font-size: 1rem;
+}
+
+.loadingDisruptions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.goodService {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--success-bg);
+  border: 1px solid var(--success-bg);
+  border-radius: 10px;
+}
+
+.goodServiceIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.goodServiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.goodServiceText strong {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--success-text);
+}
+
+.goodServiceText span {
+  font-size: 0.75rem;
+  color: var(--success-text);
+  opacity: 0.8;
+}
+
+.disruptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.disruptionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 8px;
+}
+
+.disruptionBadge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.disruptionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.disruptionSeverity {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--c-red);
+}
+
+.disruptionReason {
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.75;
+  line-height: 1.4;
+}
+
+.lastUpdated {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.7;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Hide the drag handle on desktop*/
+@media (min-width: 901px) {
+  .dragHandle {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    position: relative;
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    max-width: none;
+    height: 85vh;
+    z-index: 100;
+    border-radius: 20px 20px 0 0;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+  }
+
+  .mapWrapper {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .dragHandle {
+    width: 40px;
+    height: 5px;
+    background: rgba(var(--c-cocoa), 0.2);
+    border-radius: 10px;
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+
+  .sidebarHeader {
+    padding-top: 5px;
+  }
+
+  .campusQuickNav {
+    bottom: 80px;
+    transition: bottom 0.3s ease;
+  }
+}
+
+:global(.homePointer) {
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 2px 4px rgba(black, 0.3));
+}
+
+:global(.homePointer:hover) {
+  transform: scale(1.15);
+}
+
+:global(.homePopupContent) {
+  padding: 8px;
+  text-align: center;
+}
+
+:global(.homePopupTitle) {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+:global(.homePopupAddress) {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  max-width: 200px;
+  line-height: 1.3;
+}
+
+:global(.homePopupButton) {
+  padding: 6px 12px;
+  background: var(--primary);
+  color: var(--c-white);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+:global(.eventMarker) {
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  filter: drop-shadow(0 2px 4px rgba(black, 0.3));
+}
+
+:global(.eventMarker:hover) {
+  transform: scale(1.2);
+}
+
+.calendarIcon {
+  font-size: 1rem;
+}
+
+.noEvents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  text-align: center;
+}
+
+.noEventsIcon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.noEvents p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.eventCard {
+  display: flex;
+  gap: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.eventCard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.eventCard:active {
+  transform: translateY(0);
+}
+
+.eventPriorityBar {
+  width: 4px;
+  flex-shrink: 0;
+}
+
+.eventCardContent {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eventCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.eventTime {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.eventPriority {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.eventTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.eventLocation {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.showMoreBtn {
+  width: 100%;
+  padding: 8px;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.showMoreBtn:hover {
+  background: var(--hover-light);
+  border-color: var(--primary);
+}
+
+.showMoreBtn span {
+  font-size: 0.7rem;
 }

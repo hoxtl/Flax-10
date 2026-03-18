@@ -1,0 +1,74 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+.input {
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.88rem;
+}
+.textarea {
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.88rem;
+    resize: vertical;
+}
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+}
+.cancelButton {
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+.cancelButton:hover {
+    background: var(--hover);
+}
+.submitButton {
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: none;
+    background: var(--primary);
+    color: var(--c-white);
+    cursor: pointer;
+}
+.submitButton:hover {
+    background: var(--primary-strong);
+}
+.error {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
+  border-radius: 10px;
+  padding: 0.75rem 1.125rem;
+  font-size: 0.825rem;
+}

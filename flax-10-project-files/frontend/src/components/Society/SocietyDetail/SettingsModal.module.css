@@ -1,3 +1,4 @@
+/* Styles for the society settings administrative modal. */
 .backdrop {
     position: fixed;
     inset: 0;
@@ -97,7 +98,7 @@
 
 .deleteBtn:hover {
     background: #ff6b6b;
-    color: #fff;
+    color: var(--color-card);
 }
 
 .confirmBtns {
@@ -119,7 +120,7 @@
     padding: 0.5rem 1rem;
     background: #ff6b6b;
     border: none;
-    color: #fff;
+    color: var(--color-card);
     border-radius: 6px;
     cursor: pointer;
 }

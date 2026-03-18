@@ -1,26 +1,28 @@
+/* Styles for the individual SocietyCard component. */
 .card {
     height: 220px;
-    border-radius: 12px;
+    min-height: 220px;
     background-size: cover;
     background-position: center;
-    overflow: hidden;
-    cursor: pointer;
-    display: flex;
+    background-color: var(--primary);
     align-items: flex-end;
     padding: 20px;
-    transition: transform 0.2s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-
-.card:hover {
-    transform: translateY(-4px);
 }
 
 .name {
     color: white;
     margin: 0;
     font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.nameChip {
+    color: white;
+    background: rgba(0, 0, 0, 0.16);
+    border-color: rgba(255, 255, 255, 0.28);
+    font-size: 1rem;
+    padding: 4px 10px;
 }
 
 .count {
@@ -29,9 +31,27 @@
     font-size: 0.9rem;
 }
 
-.badge {
-    margin-left: 8px;
-    font-size: 1rem;
+.relatedRow {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.relatedChip {
+    color: white;
+    background: rgba(0, 0, 0, 0.22);
+    border-color: rgba(255, 255, 255, 0.28);
+    font-size: 0.74rem;
+    padding: 2px 8px;
+}
+
+.verifiedIcon {
+    margin-left: 6px;
+    color: #22c55e;
+    flex-shrink: 0;
+    vertical-align: middle;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .overlay {
@@ -41,5 +61,54 @@
     align-items: flex-end;
     justify-content: flex-start;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--surface-overlay-strong);
+}
+
+.reportBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--surface-report-icon);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 2;
+    filter: var(--shadow-report-icon);
+}
+
+.card:hover .reportBtn,
+.reportBtn.reported {
+    opacity: 1;
+}
+
+.reportBtn:hover:not(.reported) {
+    color: var(--primary);
+    transform: scale(1.05);
+}
+
+.reportBtn.reported {
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.reportBtn.reported:hover {
+    transform: scale(1.05);
+}
+
+:global([data-mode="dark"]) .nameChip {
+    background: rgba(15, 8, 4, 0.88);
+    border-color: rgba(184, 155, 126, 0.55);
+    color: #f1f5f9;
+}
+
+:global([data-mode="dark"]) .relatedChip {
+    background: rgba(15, 8, 4, 0.82);
+    border-color: rgba(184, 155, 126, 0.42);
+    color: #f1f5f9;
 }

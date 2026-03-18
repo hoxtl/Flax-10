@@ -23,6 +23,7 @@ function generateOccurrences(event, recurrence, viewStart, viewEnd) {
     const baseEnd = new Date(event.end_time);
     const duration = baseEnd - baseStart;
     const endDate = getEndDate(event);
+    const exceptions = getExceptions(event);
     const occurrences = [];
 
     for (let i = 0; i < 100; i++) {
@@ -30,12 +31,21 @@ function generateOccurrences(event, recurrence, viewStart, viewEnd) {
         if (start > viewEnd) break;
         if (endDate && start > endDate) break;
 
+        const dateStr = start.toISOString().slice(0, 10);
+        if (exceptions.includes(dateStr)) continue;
+
         const end = new Date(start.getTime() + duration);
         if (overlapsRange(start, end, viewStart, viewEnd)) {
             occurrences.push(createOccurrence(event, start, end, i));
         }
     }
     return occurrences;
+}
+
+function getExceptions(event) {
+    if (event.exception_dates) return event.exception_dates;
+    if (event.recurrence_rule?.exception_dates) return event.recurrence_rule.exception_dates;
+    return [];
 }
 
 function getEndDate(event) {

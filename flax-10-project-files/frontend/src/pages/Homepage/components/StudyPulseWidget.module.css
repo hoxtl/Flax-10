@@ -1,0 +1,376 @@
+/* Study Pulse — combined weekly progress + focus windows */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ─── Header ─────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  color: var(--widget-accent);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.headerSource {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--widget-text-secondary);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.headerLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--widget-text-tertiary);
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.headerLink:hover {
+  color: var(--widget-accent);
+  transform: translateX(1px);
+}
+
+/* ─── Body: two columns ────────────────────────── */
+.body {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  width: 55%;
+  flex-shrink: 0;
+  padding-left: 4px;
+  padding-right: 16px;
+}
+
+.divider {
+  width: 1px;
+  background: var(--widget-border);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-left: 16px;
+  min-width: 0;
+}
+
+/* ─── Ring row ───────────────────────────────── */
+.ringRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.ringWrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ring {
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--surface-inner);
+}
+
+.ringFill {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringPct {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--widget-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ringMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ringHours {
+  font-size: 11px;
+  color: var(--widget-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.streakChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--widget-accent);
+}
+
+/* ─── Daily bars ──────────────────────────────── */
+.dailyBars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dailyRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dailyDay {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--widget-text-secondary);
+  width: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.dailyDayToday {
+  color: var(--widget-text-primary);
+  font-weight: 800;
+}
+
+.dailyTrack {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-inner);
+  overflow: hidden;
+  position: relative;
+}
+
+.dailyFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 2px;
+  transform-origin: left;
+}
+
+.dailyHours {
+  font-size: 9px;
+  color: var(--widget-text-secondary);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.dailyHoursToday {
+  color: var(--widget-text-primary);
+  font-weight: 700;
+}
+
+/* ─── Insight rows ────────────────────────────── */
+.insightList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.insightRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 7px;
+}
+
+.insightIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.insightText {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ─── Window block ────────────────────────────── */
+.windowBlock {
+  margin-bottom: auto;
+  padding: 10px 11px;
+  border-radius: 12px;
+  border: 1px solid var(--widget-border);
+  background: var(--surface-inner);
+}
+
+/* ─── Right column ────────────────────────────── */
+.windowLabel {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--widget-text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.windowTimeRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.windowTime {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--widget-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.windowDurPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--surface-raised);
+  color: var(--widget-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.windowNext {
+  font-size: 10px;
+  color: var(--widget-text-secondary);
+  margin: 5px 0 0;
+  line-height: 1.4;
+}
+
+.windowEmpty {
+  font-size: 12px;
+  color: var(--widget-text-secondary);
+  margin: 4px 0 0;
+}
+
+/* Peak insight card */
+.peakCard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
+}
+
+.peakIcon {
+  color: var(--widget-accent);
+  flex-shrink: 0;
+}
+
+.peakText {
+  font-size: 10px;
+  color: var(--widget-text-secondary);
+  font-weight: 500;
+}
+
+/* Start focus button */
+.startBtn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--color-primary-solid);
+  color: var(--color-on-primary);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--color-primary-strong);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.startBtn:hover {
+  background: var(--color-primary-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}

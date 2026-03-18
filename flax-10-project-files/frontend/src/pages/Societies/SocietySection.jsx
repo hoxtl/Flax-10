@@ -1,47 +1,50 @@
+/**
+ * SocietySection renders a categorized group of society cards (e.g., "My Memberships"),
+ * potentially including a specific "Browse" or "Create" action card.
+ */
 import styles from "./SocietiesPage.module.css";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import SocietyCard from "../../components/Society/SocietyCard";
 import BrowseCard from "../../components/Society/BrowseCard";
+import CreateCard from "../../components/Society/CreateCard";
+import { Pagination } from "../../components/Pagination/Pagination";
 
-export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect }) {
-    const isMember = type === "member";
-
+/** Displays a titled collection of societies with optional pagination. */
+export default function SocietySection({ title, items, type, onAction, allSocieties = [], onSelect, onReport, onUnreport, hideTitle, pagination }) {
     return (
         <section className={styles.section}>
-            <SectionHeader title={title} type={type} onAction={onAction} />
-            <SectionContent items={items} isMember={isMember} onAction={onAction} allSocieties={allSocieties} onSelect={onSelect} />
+            {!hideTitle && <SectionHeader title={title} type={type} onAction={onAction} />}
+            {pagination && <Pagination {...pagination} />}
+            <SectionGrid items={items} type={type} onAction={onAction}
+                allSocieties={allSocieties} onSelect={onSelect}
+                onReport={onReport} onUnreport={onUnreport} />
+            {pagination && <Pagination {...pagination} />}
         </section>
     );
 }
 
+/** Renders the section title and an optional (+) action button. */
 function SectionHeader({ title, type, onAction }) {
-    const showPlus = type === "admin";
-
     return (
         <div className={styles.sectionHeader}>
-            <h3>{title}</h3>
-            {showPlus && <button className={styles.miniAddBtn} onClick={onAction}>+</button>}
+            <h3 className={styles.sectionTitle}>{title}</h3>
+            {type === "admin" &&
+                <button className={styles.miniAddBtn} onClick={onAction}>+</button>
+            }
         </div>
     );
 }
 
-function SectionContent({ items, isMember, onAction, allSocieties, onSelect }) {
-    if (items.length === 0 && !isMember) {
-        return <EmptyAdminState onAction={onAction} />;
-    }
-
+/** Renders the grid of societies along with type-specific action cards. */
+function SectionGrid({ items, type, onAction, allSocieties, onSelect, onReport, onUnreport }) {
     return (
-        <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} />)}
-            {isMember && <BrowseCard onClick={onAction} societies={allSocieties} />}
-        </div>
-    );
-}
-
-function EmptyAdminState({ onAction }) {
-    return (
-        <div className={styles.miniEmptyState}>
-            <p>You don't manage any societies yet.</p>
-            <button className={styles.actionBtn} onClick={onAction}>Create a Society</button>
+        <div className={gridStyles.grid}>
+            {type === "admin" && <CreateCard onClick={onAction} />}
+            {type === "member" && <BrowseCard onClick={onAction} societies={allSocieties} />}
+            {items.map(s => (
+                <SocietyCard key={s.id} society={s} onClick={onSelect}
+                    onReport={onReport} onUnreport={onUnreport} />
+            ))}
         </div>
     );
 }
