@@ -109,7 +109,7 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
                 <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} />
                 <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} />
             </div>
-            {showError && <div className={styles.disclaimer} style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7, color: '#ef4444' }}>* Minimum study time is 1 minute</div>}
+            {showError && <div className={styles.disclaimer}>* Minimum study time is 1 minute</div>}
         </div>
     );
 };

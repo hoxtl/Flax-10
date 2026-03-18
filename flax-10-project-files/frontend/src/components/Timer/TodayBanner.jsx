@@ -59,7 +59,7 @@ function ProgressBar({ sessions, goalSessions, sessionPct, fillAnimating, isStud
                 ))}
             </div>
             {isStudying && sessions < goalSessions && (
-                <span className={styles.todayRibbonActivePulse} style={{ left: `calc(${activePulseLeft}% - 4px)` }} />
+                <span className={styles.todayRibbonActivePulse} style={{ left: `${activePulseLeft}%` }} />
             )}
         </div>
     );

@@ -46,7 +46,7 @@ function PresetCard({ preset, t, onApply, onDelete }) {
                 <button className={styles.presetDeleteBtn} onClick={onDelete} title="Delete preset" aria-label="Delete preset">✕</button>
             )}
             {ctxMenu && onDelete && (
-                <div ref={ctxRef} className={styles.presetCtxMenu} style={{ top: ctxMenu.y, left: ctxMenu.x, position: 'fixed' }}>
+                <div ref={ctxRef} className={styles.presetCtxMenu} style={{ top: ctxMenu.y, left: ctxMenu.x }}>
                     <button className={styles.presetCtxDeleteBtn} onClick={() => { onDelete(); setCtxMenu(null); }}>
                         🗑 Delete preset
                     </button>

@@ -115,3 +115,14 @@
     font-style: italic;
     padding: 2rem;
 }
+
+.blockTask {
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.clearButtonWrap {
+    margin-top: var(--space-6);
+    text-align: right;
+}

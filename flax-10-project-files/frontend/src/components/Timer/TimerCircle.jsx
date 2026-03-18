@@ -9,7 +9,7 @@ export default function TimerCircle({ t, onPrimaryStart }) {
     const ratio = total > 0 ? Math.max(0, t.timeLeft / total) : 1;
     const dash = ratio * circ;
     const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const color = isOvertime ? '#f59e0b' : t.mode === 'break' ? 'var(--sage)' : 'var(--focus-accent, var(--primary))';
+    const color = isOvertime ? 'var(--warning)' : t.mode === 'break' ? 'var(--sage)' : 'var(--focus-accent, var(--primary))';
     const label = !t.isActive ? 'Start' : (t.isPaused ? 'Resume' : 'Pause');
     const isRunning = t.isActive && !t.isPaused;
     const icon = !t.isActive ? '▶' : (t.isPaused ? '▶' : '❚❚');
@@ -39,8 +39,7 @@ export default function TimerCircle({ t, onPrimaryStart }) {
                     strokeLinecap="round"
                     strokeDasharray={`${dash} ${circ - dash}`}
                     strokeDashoffset={circ * 0.25}
-                    className={activeClass}
-                    style={{ transition: 'stroke-dasharray 1s linear, stroke 0.3s ease' }}
+                    className={`${activeClass} ${styles.timerProgressRing}`}
                 />
             </svg>
             <div className={styles.timerCircleContent}>
@@ -73,7 +72,7 @@ export function TimerRing({ t }) {
     const ratio = total > 0 ? Math.max(0, t.timeLeft / total) : 1;
     const dash = ratio * circ;
     const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const color = isOvertime ? '#f59e0b' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
+    const color = isOvertime ? 'var(--warning)' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
     const activeClass = t.isActive && !t.isPaused ? styles.timerProgressActive : '';
 
     return (
@@ -88,8 +87,7 @@ export function TimerRing({ t }) {
                     strokeLinecap="round"
                     strokeDasharray={`${dash} ${circ - dash}`}
                     strokeDashoffset={circ * 0.25}
-                    className={activeClass}
-                    style={{ transition: 'stroke-dasharray 1s linear, stroke 0.3s ease' }}
+                    className={`${activeClass} ${styles.timerProgressRing}`}
                 />
             </svg>
             <div className={styles.timerRingContent}>
