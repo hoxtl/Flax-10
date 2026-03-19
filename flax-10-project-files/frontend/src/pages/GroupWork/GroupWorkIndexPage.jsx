@@ -90,10 +90,40 @@ function CreateProjectForm({ onCreated }) {
 }
 
 function ProjectRow({ project, onClick }) {
+  const dateObj = project.deadline ? new Date(project.deadline) : null;
+  const dateString = dateObj ? dateObj.toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }) : "--";
+  const diffTime = dateObj ? (dateObj - new Date()) : 0;
+  const daysLeft = dateObj ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : null;
+
   return (
     <div className={styles.projectRow} onClick={onClick}>
-      <span className={styles.projectName}>{project.name}</span>
-      <span className={styles.projectDeadline}>{getDeadlineLabel(project.deadline)}</span>
+      <div className={styles.projectInfoArea}>
+        <div className={styles.projectIcon}>
+          {project.name ? project.name.charAt(0).toUpperCase() : "P"}
+        </div>
+        <div className={styles.projectText}>
+          <div className={styles.projectName}>{project.name}</div>
+          <div className={styles.projectSub}>
+            <span className={styles.moduleName}>{project.course_code || "No module"}</span>
+            {!!project.member_count && (
+               <span className={styles.memberPill}>+{project.member_count}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.projectMetaArea}>
+        <div className={styles.deadlineInfo}>
+           <div className={styles.deadlineDate}>{dateString}</div>
+           {daysLeft !== null && (
+               <div className={`${styles.daysPill} ${daysLeft < 0 ? styles.daysRed : daysLeft < 7 ? styles.daysYellow : styles.daysGreen}`}>
+                 {daysLeft < 0 ? 'Past due' : `${daysLeft} days`}
+               </div>
+           )}
+        </div>
+        <div className={styles.progressCircle}></div>
+        <div className={styles.arrowIcon}>↓</div>
+      </div>
     </div>
   );
 }
