@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -21,7 +21,11 @@ def group_project_list(request):
     if request.method == "GET":
         qs = (
             GroupProject.objects.filter(memberships__user=request.user)
-            .annotate(member_count=Count("memberships"))
+            .annotate(
+                member_count=Count("memberships", distinct=True),
+                task_count=Count("tasks", distinct=True),
+                completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+            )
             .order_by("-created_at")
         )
         serialiser = GroupProjectSerialiser(qs, many=True)
@@ -39,7 +43,11 @@ def group_project_list(request):
     )
     with_members = (
         GroupProject.objects.filter(id=project.id)
-        .annotate(member_count=Count("memberships"))
+        .annotate(
+            member_count=Count("memberships", distinct=True),
+            task_count=Count("tasks", distinct=True),
+            completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+        )
         .first()
     )
     data = GroupProjectSerialiser(with_members).data
@@ -97,7 +105,11 @@ def group_project_detail(request, project_id):
     serialiser.save()
     with_members = (
         GroupProject.objects.filter(id=project.id)
-        .annotate(member_count=Count("memberships"))
+        .annotate(
+            member_count=Count("memberships", distinct=True),
+            task_count=Count("tasks", distinct=True),
+            completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+        )
         .first()
     )
     data = GroupProjectSerialiser(with_members).data

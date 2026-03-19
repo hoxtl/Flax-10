@@ -8,6 +8,8 @@ from studyFlax.models.groupwork.groupwork_models import (
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
+    task_count = serializers.IntegerField(read_only=True, default=0)
+    completed_task_count = serializers.IntegerField(read_only=True, default=0)
 
     class Meta:
         model = GroupProject
@@ -17,6 +19,8 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "course_code",
             "deadline",
             "member_count",
+            "task_count",
+            "completed_task_count",
             "created_at",
         ]
 
