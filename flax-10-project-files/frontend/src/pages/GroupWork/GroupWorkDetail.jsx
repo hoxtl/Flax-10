@@ -6,6 +6,8 @@ import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown/AnimatedDropdown";
+import { ALL_KCL_COURSES } from "../../lib/kclCourses";
 import styles from "./GroupWorkDetail.module.css";
 
 function GroupWorkDetailSkeleton({ onBack }) {
@@ -133,13 +135,25 @@ function ProjectProgress({ taskStats }) {
 
 function ProjectHeader({ project, members, onPatch, taskStats }) {
     const onName = e => { const v = e.target.value.trim(); if (v && v !== project.name) onPatch({ name: v }); };
-    const onCourse = e => onPatch({ course_code: e.target.value.trim() });
+    const onCourse = val => onPatch({ course_code: val });
     const onDeadline = e => onPatch({ deadline: e.target.value ? new Date(e.target.value).toISOString() : null });
     return (
         <section className={styles.headerSection}>
             <div className={styles.headerInfo}>
                 <input defaultValue={project.name} onBlur={onName} className={styles.nameInput} />
-                <p className={styles.metaRow}><input defaultValue={project.course_code || ""} placeholder="Course code" onBlur={onCourse} className={styles.courseInput} /> · {project.member_count ?? members.length} members</p>
+                <div className={styles.metaRow}>
+                    <div className={styles.courseDropdownWrapper}>
+                        <AnimatedDropdown
+                            value={project.course_code || ""}
+                            onChange={onCourse}
+                            options={ALL_KCL_COURSES}
+                            searchable={true}
+                            placeholder="Course code"
+                            className={styles.detailCourseDropdown}
+                        />
+                    </div>
+                    <span> · {project.member_count ?? members.length} members</span>
+                </div>
                 <ProjectProgress taskStats={taskStats} />
             </div>
             <div className={styles.deadlinePill}>
