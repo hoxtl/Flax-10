@@ -1,0 +1,347 @@
+/*
+ * Settings panel, form, and shared button styles.
+ */
+/* Panel */
+.panel {
+  --panelAccent: var(--primary);
+  background: var(--panel, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--panelAccent) 18%, var(--border));
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--panelAccent) 10%, transparent),
+    0 1px 3px color-mix(in srgb, var(--panelAccent) 4%, transparent);
+  position: relative;
+}
+
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(18px);
+  opacity: 0.15;
+}
+
+.panel::before {
+  top: -110px;
+  right: -100px;
+  background: color-mix(in srgb, var(--panelAccent) 65%, transparent);
+}
+
+.panel::after {
+  bottom: -120px;
+  left: -120px;
+  background: color-mix(in srgb, var(--panelAccent) 40%, transparent);
+}
+
+.panelDefault {
+  --panelAccent: var(--primary);
+}
+
+.panelAccount,
+.panelHome,
+.panelSecurity,
+.panelPreferences,
+.panelCourse {
+  --panelAccent: color-mix(in srgb, var(--primary) 75%, var(--warning) 25%);
+}
+
+/* Section header strip at top of panel */
+.panelHeader {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panelAccent) 18%, var(--border));
+  background: color-mix(in srgb, var(--panelAccent) 9%, var(--panel));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.panelHeader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg,
+      transparent 30%,
+      color-mix(in srgb, var(--panelAccent) 14%, transparent) 58%,
+      transparent 78%);
+  opacity: 0.75;
+  transform: translateX(-110%);
+  animation: sweep 6s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  40% {
+    transform: translateX(110%);
+  }
+
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+.panelHeaderIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--panelAccent);
+  border: 1px solid color-mix(in srgb, var(--panelAccent) 30%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--panelAccent) 22%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: bounceIcon 1.6s ease-in-out infinite;
+}
+
+.panelHeaderText {
+  min-width: 0;
+}
+
+.panelHeaderTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 85%, transparent);
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.panelHeaderDesc {
+  font-size: 11px;
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+  margin: 2px 0 0;
+}
+
+.panelBody {
+  padding: 12px 12px 10px;
+  position: relative;
+  z-index: 1;
+  animation: panelFloatIn 0.4s ease-out;
+}
+
+@keyframes panelFloatIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.settingsTile {
+  background: color-mix(in srgb, var(--primary) 3%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+/* Dark-mode tweaks: deepen panels/tiles and brighten text for contrast */
+:global(:root[data-mode="dark"]) .panel {
+  background:
+    linear-gradient(175deg,
+      color-mix(in srgb, var(--surface-inner) 70%, var(--surface) 30%),
+      color-mix(in srgb, var(--surface) 85%, #000000 15%));
+  border-color: color-mix(in srgb, var(--panelAccent) 30%, var(--border));
+}
+
+:global(:root[data-mode="dark"]) .settingsTile {
+  background:
+    linear-gradient(170deg,
+      color-mix(in srgb, var(--surface-inner) 78%, var(--surface) 22%),
+      color-mix(in srgb, var(--surface-inner) 68%, #000000 32%));
+  border-color: color-mix(in srgb, var(--primary) 26%, var(--border));
+}
+
+/* Section within a panel */
+.formSection {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  animation: fade-in 0.35s ease;
+}
+
+@keyframes bounceIcon {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.formSection:last-of-type {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-family: var(--font-heading);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.formDescription {
+  color: color-mix(in srgb, var(--primary) 60%, var(--muted));
+  font-size: 11px;
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  margin-bottom: 6px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--primary) 65%, var(--muted));
+  margin-bottom: 5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Boost text contrast in dark mode so labels/descriptions don't blend into brown */
+:global(:root[data-mode="dark"]) .sectionTitle,
+:global(:root[data-mode="dark"]) .panelHeaderTitle,
+:global(:root[data-mode="dark"]) .groupLabel {
+  color: #ffffff;
+}
+
+:global(:root[data-mode="dark"]) .formDescription,
+:global(:root[data-mode="dark"]) .panelHeaderDesc {
+  color: color-mix(in srgb, var(--text) 95%, transparent);
+}
+
+:global(:root[data-mode="dark"]) .formGroup label {
+  color: color-mix(in srgb, var(--text) 92%, var(--primary) 8%);
+}
+
+.requiredAsterisk {
+  color: var(--danger);
+  font-weight: 800;
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+  color: var(--text);
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+  background: var(--bg);
+}
+
+.formActions {
+  padding-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.btnPrimary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.12s, box-shadow 0.18s;
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.btnPrimary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimaryNeedsSave {
+  animation: savePulse 1.3s ease-in-out infinite;
+}
+
+@keyframes savePulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warning) 0%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--warning) 18%, transparent);
+  }
+}
+
+.btnPrimarySaved {
+  background: color-mix(in srgb, var(--success-text) 84%, var(--primary));
+  border-color: color-mix(in srgb, var(--success-text) 42%, transparent);
+}
