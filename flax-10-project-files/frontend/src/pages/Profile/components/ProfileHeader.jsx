@@ -154,6 +154,11 @@ function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pi
             </div>
             {description && <div className={styles.headerSubline}>{description}</div>}
             <LastActivePulse lastSessionEnd={profileData?.last_session_end || user?.last_session_end} />
+            {profileData?.bio && (
+                <div className={styles.bio}>
+                    <div className={styles.reminder}>{profileData.bio}</div>
+                </div>
+            )}
             <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
             {(badges?.length > 0 || persona) && (
                 <div className={styles.headerBadgesPersonaRow}>
@@ -161,14 +166,9 @@ function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pi
                     {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
                 </div>
             )}
-            {(isTeacher && profileData?.email || profileData?.bio) && (
-                <div className={styles.bio}>
-                    {isTeacher && profileData?.email && (
-                        <div className={styles.teacherEmail}>
-                            <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
-                        </div>
-                    )}
-                    {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
+            {isTeacher && profileData?.email && (
+                <div className={styles.teacherEmail}>
+                    <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
                 </div>
             )}
         </div>
