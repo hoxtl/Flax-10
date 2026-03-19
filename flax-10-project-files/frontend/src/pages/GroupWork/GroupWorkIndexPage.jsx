@@ -10,6 +10,7 @@ import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import TextInput from "../../components/common/TextInput/TextInput";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
+import GroupWorkStats from "./components/GroupWorkStats";
 import styles from "./GroupWorkIndexPage.module.css";
 
 function GroupWorkIndexSkeleton() {
@@ -112,6 +113,7 @@ export default function GroupWorkIndexPage() {
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
     <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
+      <GroupWorkStats projects={projects} />
       <CreateProjectForm onCreated={onCreated} />
       <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
     </AppPage>
