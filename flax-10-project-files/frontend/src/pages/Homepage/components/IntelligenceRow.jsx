@@ -44,8 +44,8 @@ import { updateUserSettings } from "../../../api/userService";
 const CATALOGUE = [
   { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, section: "Essentials" },
   { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
-  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2, section: "Planning" },
-  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2, section: "Planning" },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, section: "Planning" },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, section: "Planning" },
   { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, section: "Planning" },
   { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minRow: 2, section: "Planning" },
   { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
