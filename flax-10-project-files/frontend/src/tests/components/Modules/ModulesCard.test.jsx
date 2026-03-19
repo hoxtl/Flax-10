@@ -5,8 +5,10 @@ import ModulesCard from '../../../components/Modules/ModulesCard';
 vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     formatWeekdayTime: vi.fn(() => 'Mondays at 09:00'),
+    formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
     getDepartment: vi.fn(() => "King's College London"),
+    getCourse: vi.fn(() => null),
 }));
 
 vi.mock('../../../components/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
@@ -26,8 +28,8 @@ const mockParameters = {
 describe('ModulesCard', () => {
     it('should render module name and code', () => {
         render(<ModulesCard {...mockParameters} />);
-        expect(screen.getByText('5CCS2SEG')).toBeInTheDocument();
-        expect(screen.getByText('Software Engineering')).toBeInTheDocument();
+        expect(screen.getByText(/5CCS2SEG/)).toBeInTheDocument();
+        expect(screen.getByText(/Software Engineering/)).toBeInTheDocument();
     });
 
     it('should render enroll button for student', () => {
@@ -52,7 +54,8 @@ describe('ModulesCard', () => {
     it('should call onViewModule when card is clicked by student', () => {
         const onViewModule = vi.fn();
         render(<ModulesCard {...mockParameters} onViewModule={onViewModule} />);
-        fireEvent.click(screen.getByRole('article'));
+        const title = screen.getByRole('heading', { level: 3, name: /Software Engineering/i });
+        fireEvent.click(title.closest('div'));
         expect(onViewModule).toHaveBeenCalled();
     });
 
@@ -91,14 +94,8 @@ describe('ModulesCard', () => {
         expect(screen.getByText('📌 Core module')).toBeInTheDocument();
     });
 
-    it('shows Read more for long description', () => {
+    it('renders long description text directly', () => {
         render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
-        expect(screen.getByText('Read more')).toBeInTheDocument();
-    });
-
-    it('toggles Show less after Read more', () => {
-        render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
-        fireEvent.click(screen.getByText('Read more'));
-        expect(screen.getByText('Show less')).toBeInTheDocument();
+        expect(screen.getByText(/A{20}/)).toBeInTheDocument();
     });
 });

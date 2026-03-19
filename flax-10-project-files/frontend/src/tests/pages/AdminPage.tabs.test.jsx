@@ -215,7 +215,7 @@ describe("AdminPage – Reported Societies tab", () => {
     render(<AdminPage />);
     fireEvent.click(screen.getByText(/Reported Societies/));
     await waitFor(() => screen.getAllByText("Bad Club"));
-    fireEvent.click(screen.getByText("Ban"));
+    fireEvent.click(screen.getAllByText("Ban")[0]);
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
     window.prompt.mockRestore();
   });

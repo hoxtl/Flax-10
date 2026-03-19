@@ -22,6 +22,7 @@ vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...arg
 vi.mock('../../components/Calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
 vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+  isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
 }));

@@ -145,7 +145,7 @@ describe('ProfileModals', () => {
     it('closes events modal when close button is clicked', () => {
         const setShowEvents = vi.fn();
         renderModals({ state: { showEvents: true, setShowEvents } });
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        const closeBtn = screen.getByRole('button', { name: /close/i });
         fireEvent.click(closeBtn);
         expect(setShowEvents).toHaveBeenCalledWith(false);
     });
@@ -220,7 +220,7 @@ describe('ProfileModals', () => {
     it('closes tasks modal when close button clicked', () => {
         const setShowTasks = vi.fn();
         renderModals({ state: { showTasks: true, setShowTasks } });
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+        const closeBtn = screen.getByRole('button', { name: /close/i });
         fireEvent.click(closeBtn);
         expect(setShowTasks).toHaveBeenCalledWith(false);
     });

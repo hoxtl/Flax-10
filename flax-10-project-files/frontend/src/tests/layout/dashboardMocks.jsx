@@ -22,8 +22,9 @@ export const TopbarMock = ({ onLogoutClick, onAddClick, onSettingsClick, onProfi
   </div>
 );
 
-export const QuickAddMock = ({ onClose, onSelectType }) => (
+export const QuickAddMock = ({ onClose, onSelectType, initialView }) => (
   <div data-testid="quick-add-modal">
+    <span data-testid="quick-add-initial-view">{initialView}</span>
     <button onClick={onClose}>Close Quick Add</button>
     <button onClick={() => onSelectType("event", null)}>Add Event</button>
     <button onClick={() => onSelectType("society", null)}>Add Society</button>

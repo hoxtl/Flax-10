@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 
 const mockOpenModal = vi.fn();
 
@@ -369,6 +369,15 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("deadline-modal")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Close Deadline Modal"));
     expect(screen.queryByTestId("deadline-modal")).toBeNull();
+  });
+
+  it("opens QuickAdd modal directly in scheduler mode from the quick-add event", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    act(() => {
+      window.dispatchEvent(new CustomEvent("quick-add:open", { detail: { view: "schedule_auto" } }));
+    });
+    expect(screen.getByTestId("quick-add-modal")).toBeTruthy();
+    expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("schedule_auto");
   });
 });
 

@@ -55,10 +55,11 @@ describe('ImageGalleryModal', () => {
     const onClose = vi.fn();
     render(<ImageGalleryModal images={images} onClose={onClose} initialIndex={1} />);
 
-    const overlay = document.querySelector('div.overlay');
+    const overlay = document.body.querySelector('div[class*="_backdrop"]');
     expect(screen.getByAltText('Gallery')).toBeInTheDocument();
 
-    fireEvent.click(overlay);
+    expect(overlay).toBeTruthy();
+    fireEvent.mouseDown(overlay);
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -68,11 +69,12 @@ describe('ImageGalleryModal', () => {
       <ImageGalleryModal images={images} onClose={onClose} initialIndex={0} />,
     );
 
-    const modal = container.querySelector('div.modal');
+    const modal = document.body.querySelector('div.modal');
+    expect(modal).toBeTruthy();
     fireEvent.click(modal);
     expect(onClose).not.toHaveBeenCalled();
 
-    const navButtons = container.querySelectorAll('button.navBtn');
+    const navButtons = document.body.querySelectorAll('button.navBtn');
     expect(navButtons.length).toBe(2);
     const [prev, next] = navButtons;
 
@@ -80,15 +82,12 @@ describe('ImageGalleryModal', () => {
     fireEvent.click(next);
     fireEvent.click(prev);
     expect(onClose).not.toHaveBeenCalled();
-    expect(container.querySelectorAll('.dot').length).toBe(images.length);
+    expect(document.body.querySelectorAll('.dot').length).toBe(images.length);
   });
 
   it('does not render navigation when there is a single image', () => {
-    const { container } = render(
-      <ImageGalleryModal images={['only.jpg']} onClose={vi.fn()} initialIndex={0} />,
-    );
-
-    expect(container.querySelector('.nav')).toBeNull();
+    render(<ImageGalleryModal images={['only.jpg']} onClose={vi.fn()} initialIndex={0} />);
+    expect(document.body.querySelector('.nav')).toBeNull();
   });
 });
 

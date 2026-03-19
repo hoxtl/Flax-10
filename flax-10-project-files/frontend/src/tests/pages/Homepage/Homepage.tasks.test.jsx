@@ -160,7 +160,8 @@ describe('Homepage – tasks, re-plan & misc', () => {
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
     const mod = await import('../../../api/taskService');
     mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
-    render(<MemoryRouter><Homepage /></MemoryRouter>);
+    // Homepage only fetches task lists when the create task modal is enabled.
+    render(<MemoryRouter><Homepage defaultShowCreateTaskModal={true} /></MemoryRouter>);
     await waitFor(() => expect(screen.getByTestId('pill').textContent).toContain('University'), { timeout: 2000 });
   });
 

@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-vi.mock('../../../api/userService', () => ({
-    getUserProfile: vi.fn().mockResolvedValue({
-        year: 'Year 2',
-        major: 'Computer Science',
-        profile_photo_url: null,
+const mockRefreshProfile = vi.fn();
+let mockProfileData = {
+    year: 'Year 2',
+    major: 'Computer Science',
+    profile_photo_url: null,
+};
+
+vi.mock('../../../context/AuthContext', () => ({
+    useAuth: () => ({
+        profile: mockProfileData,
+        refreshProfile: mockRefreshProfile,
     }),
 }));
 
@@ -28,6 +34,11 @@ function renderDropdown(props = {}) {
 describe('ProfileDropdown', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockProfileData = {
+            year: 'Year 2',
+            major: 'Computer Science',
+            profile_photo_url: null,
+        };
     });
 
     it('renders avatar button', () => {
@@ -83,7 +94,7 @@ describe('ProfileDropdown', () => {
     it('loads profile data and displays user info', async () => {
         renderDropdown();
         fireEvent.click(screen.getByLabelText('User menu'));
-        await waitFor(() => expect(screen.getByText(/Year 2/)).toBeTruthy());
+        await waitFor(() => expect(screen.getByText('Computer Science')).toBeTruthy());
     });
 
     it('shows displayName fallback when user has no name or first/last', () => {
@@ -92,17 +103,15 @@ describe('ProfileDropdown', () => {
         expect(screen.getByText('User')).toBeTruthy();
     });
 
-    it('shows profile photo in dropdown when getUserProfile returns photo url', async () => {
-        const { getUserProfile } = await import('../../../api/userService');
-        getUserProfile.mockResolvedValueOnce({ profile_photo_url: 'https://example.com/me.jpg', year: 'Year 1', major: 'Math' });
+    it('shows profile photo in dropdown when profile_photo_url exists', async () => {
+        mockProfileData = { ...mockProfileData, profile_photo_url: 'https://example.com/me.jpg', year: 'Year 1', major: 'Math' };
         renderDropdown();
         fireEvent.click(screen.getByLabelText('User menu'));
         await waitFor(() => expect(screen.getAllByAltText('Profile').length).toBeGreaterThan(0));
     });
 
-    it('handles getUserProfile failure gracefully', async () => {
-        const { getUserProfile } = await import('../../../api/userService');
-        getUserProfile.mockRejectedValueOnce(new Error('network'));
+    it('handles missing profile photo gracefully', async () => {
+        mockProfileData = { ...mockProfileData, profile_photo_url: null };
         renderDropdown();
         fireEvent.click(screen.getByLabelText('User menu'));
         await waitFor(() => expect(screen.getByText('Profile')).toBeTruthy());

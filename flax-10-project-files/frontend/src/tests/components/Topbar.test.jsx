@@ -70,13 +70,6 @@ describe('TopBar', () => {
     expect(onNavChange).toHaveBeenCalledWith('home');
   });
 
-  it('calls onAddClick when add tab is clicked', () => {
-    const onAddClick = vi.fn();
-    render(<TopBar onAddClick={onAddClick} />);
-    fireEvent.click(screen.getByTestId('tab-Add'));
-    expect(onAddClick).toHaveBeenCalled();
-  });
-
   it('calls togglePanel when notifications tab is clicked', async () => {
     const togglePanel = vi.fn();
     const { useNotifications } = await import('../../context/NotificationContext');

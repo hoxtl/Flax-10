@@ -11,12 +11,12 @@ def _register_router():
 
 _register_router()
 
-# Authentication
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
+from studyFlax.views.authentication.home_address_view import home_address_view
 
 # User
 from studyFlax.views.user.profile_view import (
@@ -41,6 +41,7 @@ from studyFlax.views.calendar.attendance_view import (
     attendance_stats,
     attendance_records,
 )
+
 # Modules
 from studyFlax.views.modules.module_view import module_list, module_detail
 from studyFlax.views.modules.enrollment_view import enrollment_list, enrollment_detail
@@ -54,6 +55,8 @@ from studyFlax.views.modules.deadline_view import deadline_list, deadline_detail
 from studyFlax.views.tasks.task_view import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
 )
+
+# Group work
 from studyFlax.views.groupwork.groupwork_view import (
     group_project_list,
     group_project_members,
@@ -72,13 +75,18 @@ from studyFlax.views.society import (
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
     add_society_event_exception, publish_changes, report_society, toggle_subscription
 )
+
 # Notifications
-from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
+from studyFlax.views.notifications import (
+    notification_list, notification_detail, mark_all_read, clear_all
+)
 
 # Analytics
 from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
-from studyFlax.views.authentication.home_address_view import home_address_view
+
+# Schedules
+from studyFlax.views.calendar.schedule_views import schedule_list, schedule_detail
 
 # Admin
 from studyFlax.views.admin.admin_view import (
@@ -126,7 +134,6 @@ urlpatterns = [
     path("attendance/stats/", attendance_stats, name="attendance-stats"),
     path("attendance/records/", attendance_records, name="attendance-records"),
     path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
-
 
     # Modules
     path("modules/", module_list, name="module-list"),
@@ -217,6 +224,10 @@ urlpatterns = [
     path('analytics/ai-insights/', get_ai_insights, name='analytics-ai-insights'),
     path('analytics/ai-chat/', ai_chat, name='analytics-ai-chat'),
     path("user/home-address/", home_address_view, name='home_address'),
+
+    # Schedules
+    path("schedules/", schedule_list, name='schedules'),
+    path("schedules/<int:schedule_id>/", schedule_detail, name='schedule-detail'),
 
     # Admin
     path("admin/users/", user_list, name='admin-user-list'),
