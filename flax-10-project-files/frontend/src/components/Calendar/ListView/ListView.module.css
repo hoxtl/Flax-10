@@ -2,16 +2,8 @@
 .container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 220px);
-    overflow-y: auto;
     background: var(--calendar-bg);
     padding: 0 12px;
-}
-
-/* Day mode — show all events, no internal scroll */
-.dayMode {
-    height: auto;
-    overflow-y: visible;
 }
 
 /* Remove card shell for cleaner look */

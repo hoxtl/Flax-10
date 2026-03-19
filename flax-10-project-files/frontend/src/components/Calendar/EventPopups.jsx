@@ -71,7 +71,6 @@ function EventPopupContainer({ allowModuleLeave }) {
         if (typeof toast === "function") {
             toast(message === undefined ? title : `${title}: ${message}`, { variant: "info" });
         }
-        if (typeof notify === "function" && message !== undefined) notify(title, message);
     };
     const { handleDeleteRequest } = useEventDeletion();
 

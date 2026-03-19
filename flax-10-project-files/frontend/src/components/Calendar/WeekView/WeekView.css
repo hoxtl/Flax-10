@@ -42,7 +42,9 @@
 /* Day header — Apple-style clean typography */
 .day-header {
   flex: 1;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 8px 4px 6px;
   background: transparent;
 }
@@ -51,11 +53,6 @@
   background-color: var(--primary);
   color: white;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   font-weight: 700;
 }
 
@@ -74,13 +71,17 @@
 }
 
 .day-number {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
   transition: color 0.2s ease;
   margin-top: 2px;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .day-number:hover {
