@@ -2,7 +2,6 @@
  * EventPopups - Container for event modal and popover components.
  * Manages event editing, deletion, and quick actions.
  */
-import { useState } from 'react';
 import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';
