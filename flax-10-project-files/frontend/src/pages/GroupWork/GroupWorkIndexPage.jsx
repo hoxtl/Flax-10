@@ -13,7 +13,7 @@ function GroupWorkIndexSkeleton() {
   return (
     <div className={styles.skeletonContainer}>
       <div className={styles.skeletonStats}>
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4].map((i) => (
           <SkeletonBlock key={i} className={styles.skeletonStatCard} height="100px" />
         ))}
       </div>
