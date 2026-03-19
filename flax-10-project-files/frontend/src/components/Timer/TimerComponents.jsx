@@ -19,9 +19,10 @@ export const TimerDisplay = ({ timeLeft, mode, isOvertime }) => {
 };
 
 const getModeText = (mode, isOvertime, isBreakOvertime) => {
-    if (mode === 'work') return isOvertime ? '🚀 Overtime' : '🔥 Focus Time';
-    return isBreakOvertime ? '⏳ Break Overtime' : '☕ Break Time';
+    if (mode === 'work') return isOvertime ? 'Overtime' : 'Focus';
+    return isBreakOvertime ? 'Break Overtime' : 'Break';
 };
+
 
 export const ModeIndicator = ({ mode, isOvertime, isBreakOvertime }) => (
     <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
