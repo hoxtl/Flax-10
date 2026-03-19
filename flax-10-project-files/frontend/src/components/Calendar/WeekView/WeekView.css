@@ -16,7 +16,7 @@
   top: 0;
   z-index: 90;
   background: var(--panel);
-  border-bottom: 0.5px solid rgba(74, 52, 33, 0.12);
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12));
 }
 
 .week-header {
@@ -98,7 +98,7 @@
   padding: 0 8px 0 0;
   text-align: right;
   font-size: 0.7rem;
-  color: #5D4037;
+  color: var(--muted, #5D4037);
   font-weight: 500;
   font-style: italic;
   display: flex;
@@ -112,14 +112,14 @@
 .day-column {
   display: flex;
   flex-direction: column;
-  border-left: 0.5px solid rgba(74, 52, 33, 0.10);
+  border-left: 0.5px solid var(--border, rgba(74, 52, 33, 0.10));
   position: relative;
   flex: 1;
 }
 
 /* Hour cells — ultra-thin lines for clean Apple feel */
 .hour-cell {
-  border-bottom: 0.5px solid rgba(74, 52, 33, 0.08) !important;
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.08)) !important;
   box-sizing: border-box;
   position: relative;
   background-image: none;
@@ -152,11 +152,11 @@
 }
 
 .hour-cell:hover {
-  background-color: rgba(74, 52, 33, 0.02);
+  background-color: var(--hover, rgba(74, 52, 33, 0.02));
 }
 
 .hour-cell:nth-last-child(1) {
-  border-bottom: 0.5px solid rgba(74, 52, 33, 0.12) !important;
+  border-bottom: 0.5px solid var(--border, rgba(74, 52, 33, 0.12)) !important;
 }
 
 /* Event cards — floating with 2px gap on each side */

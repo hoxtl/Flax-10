@@ -61,30 +61,30 @@ function ConflictEventCell({ event }) {
             onClick={onClick}
             style={accentColor ? { '--accent': accentColor } : undefined}
         >
-            <div className={styles.eventContent}>
-                <div className={styles.eventName}>{event.title}</div>
-                {badges.length > 0 && (
-                    <div className={styles.badgesContainer}>
-                        {badges.map((badge, i) => <TagBadge key={i} badge={badge} />)}
-                    </div>
-                )}
+            <div className={styles.eventMain}>
+                <div className={styles.eventTime}>{formatEventTime(event)}</div>
+                <div className={styles.eventContent}>
+                    <div className={styles.eventName}>{event.title}</div>
+                    {badges.length > 0 && (
+                        <div className={styles.badgesContainer}>
+                            {badges.map((badge, i) => <TagBadge key={i} badge={badge} />)}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
 
 /**
- * Renders 2+ overlapping events side by side with a shared time label.
+ * Renders 2+ overlapping events stacked vertically.
  */
 export function ConflictRow({ events }) {
     return (
         <div className={styles.conflictRow}>
-            <div className={styles.eventTime}>{formatEventTime(events[0])}</div>
-            <div className={styles.conflictCells}>
-                {events.map(event => (
-                    <ConflictEventCell key={event.id} event={event} />
-                ))}
-            </div>
+            {events.map(event => (
+                <ConflictEventCell key={event.id} event={event} />
+            ))}
         </div>
     );
 }

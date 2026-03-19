@@ -11,14 +11,9 @@
     border-spacing: 0 0;
     background: var(--bg);
     border-radius: 20px;
-    border: 0.5px solid rgba(51, 51, 51, 0.12);
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
     box-shadow: 0 2px 12px rgba(93, 64, 55, 0.08);
     overflow: hidden;
-}
-
-:root[data-mode="dark"] .table {
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Airy transparent header */
@@ -36,15 +31,9 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #5D4037;
-    background: #FAF9F6;
-    border-bottom: 0.5px solid rgba(51, 51, 51, 0.12);
-}
-
-:root[data-mode="dark"] .headerCell {
-    background: var(--bg);
-    color: var(--muted);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    color: var(--muted, #5D4037);
+    background: var(--bg, #FAF9F6);
+    border-bottom: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
 }
 
 /* Row — clean with subtle separator + accent tint */
@@ -63,10 +52,6 @@
     background: color-mix(in srgb, var(--accent, transparent) 12%, transparent);
 }
 
-:root[data-mode="dark"] .row:hover {
-    background: color-mix(in srgb, var(--accent, transparent) 15%, rgba(255, 255, 255, 0.03));
-}
-
 .row.readOnly {
     opacity: 0.85;
 }
@@ -76,7 +61,7 @@
 }
 
 .todayRow {
-    background: rgba(74, 52, 33, 0.04);
+    background: var(--hover, rgba(74, 52, 33, 0.04));
     border-left: 3px solid var(--primary, var(--text));
 }
 
@@ -92,13 +77,9 @@
 
 .nameCell {
     font-weight: 700;
-    color: #333333;
+    color: var(--text);
     min-width: 150px;
     cursor: pointer;
-}
-
-:root[data-mode="dark"] .nameCell {
-    color: var(--text);
 }
 
 .nameCellContent {
@@ -169,15 +150,11 @@
 
 .dateCell {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: #5D4037;
+    font-size: 0.78rem;
+    color: var(--muted, #5D4037);
     font-style: italic;
-    min-width: 160px;
-    text-align: right;
-}
-
-:root[data-mode="dark"] .dateCell {
-    color: var(--muted);
+    min-width: 200px;
+    white-space: nowrap;
 }
 
 .dateCellContent {
@@ -232,63 +209,46 @@
     font-weight: 600;
     border: none;
     border-radius: 999px;
-    background: #333333;
-    color: #FAF9F6;
+    background: var(--text);
+    color: var(--bg, #FAF9F6);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .dateEditBtn:hover {
-    background: #1a1a1a;
+    opacity: 0.85;
     transform: scale(1.02);
 }
 
-/* Secondary action button — Charcoal border pill */
+/* Secondary action button — border pill */
 .dateEditBtnCancel {
     padding: 5px 16px;
     font-size: 0.75rem;
     font-weight: 600;
-    border: 1px solid #333333;
+    border: 1px solid var(--text);
     border-radius: 999px;
     background: transparent;
-    color: #333333;
+    color: var(--text);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-:root[data-mode="dark"] .dateEditBtnCancel {
-    border-color: var(--text);
-    color: var(--text);
-}
-
 .dateEditBtnCancel:hover {
-    background: #E0DED7;
-}
-
-:root[data-mode="dark"] .dateEditBtnCancel:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--hover, #E0DED7);
 }
 
 .locationCell {
-    color: #333333;
+    color: var(--text);
     min-width: 100px;
     cursor: pointer;
 }
 
-:root[data-mode="dark"] .locationCell {
-    color: var(--text);
-}
-
 .descCell {
-    color: #5D4037;
+    color: var(--muted, #5D4037);
     font-style: italic;
     min-width: 200px;
     max-width: 300px;
     cursor: pointer;
-}
-
-:root[data-mode="dark"] .descCell {
-    color: var(--muted);
 }
 
 .descCell.descExpanded {
@@ -303,7 +263,7 @@
 }
 
 .row.expanded {
-    background: rgba(74, 52, 33, 0.04);
+    background: var(--hover, rgba(74, 52, 33, 0.04));
 }
 
 /* Cell Text */
@@ -336,13 +296,8 @@
 }
 
 .cellInput:focus {
-    border-color: #333333;
-    box-shadow: 0 0 0 3px rgba(74, 52, 33, 0.1);
-}
-
-:root[data-mode="dark"] .cellInput:focus {
     border-color: var(--text);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
 }
 
 textarea.cellInput {
@@ -382,24 +337,14 @@ textarea.cellInput {
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    background: #F2F0E9;
-    color: #333333;
-    border: 0.5px solid rgba(51, 51, 51, 0.1);
+    background: var(--surface-card, #F2F0E9);
+    color: var(--text);
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.1));
     transition: all 0.2s ease;
 }
 
-:root[data-mode="dark"] .tagBadge {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
 .tagCellContent:hover .tagBadge {
-    background: #E0DED7;
-}
-
-:root[data-mode="dark"] .tagCellContent:hover .tagBadge {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--hover, #E0DED7);
 }
 
 /* Source pill — solid charcoal */
@@ -411,8 +356,8 @@ textarea.cellInput {
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    background: #333333;
-    color: #FAF9F6;
+    background: var(--text);
+    color: var(--bg, #FAF9F6);
     margin-left: 6px;
 }
 
@@ -471,8 +416,8 @@ textarea.cellInput {
 }
 
 .tagSelect:focus {
-    border-color: #333333;
-    box-shadow: 0 0 0 3px rgba(74, 52, 33, 0.1);
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
 }
 
 /* Empty State */
