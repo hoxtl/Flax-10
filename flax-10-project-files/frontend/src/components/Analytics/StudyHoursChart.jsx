@@ -8,10 +8,14 @@ const toStudyHour = (d) => (d.work / 60).toFixed(1);
 const toBreakHour = (d) => (d.break / 60).toFixed(1);
 const formatDate = (date) => date.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' });
 
-const StudyHoursChart = ({ data }) => {
+const StudyHoursChart = ({ data, row = 2 }) => {
   const { mode: theme } = useTheme();
   const { textColor, gridColor } = getChartColors(theme);
   const tickStyle = { fill: textColor, fontSize: 11 };
+
+  // 1H is 9rem (~144px), 2H is 19.4rem (~310px) given gap 16px
+  const calculatedHeight = Math.max(160, row * 160 + (row - 1) * 16 - 40);
+
   return (
     <LineChart
       xAxis={[{ data: data.map(toDate), scaleType: 'time', valueFormatter: formatDate, tickLabelStyle: tickStyle }]}
@@ -20,7 +24,7 @@ const StudyHoursChart = ({ data }) => {
         { data: data.map(toStudyHour), label: 'Study Hours', color: '#4CAF50', curve: 'natural' },
         { data: data.map(toBreakHour), label: 'Break Hours', color: '#FF9800', curve: 'natural' },
       ]}
-      height={300}
+      height={calculatedHeight}
       margin={CHART_MARGIN}
       grid={{ horizontal: true }}
       sx={{
