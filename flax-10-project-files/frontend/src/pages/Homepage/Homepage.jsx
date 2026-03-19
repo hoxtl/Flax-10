@@ -30,6 +30,7 @@ import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import CreateListModal from "../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "./components/IntelligenceRow";
+import baseStyles from "./styles/WidgetBase.module.css";
 import styles from "./Homepage.module.css";
 
 import {
@@ -42,7 +43,7 @@ import {
   isRoutineOrEventTask,
 } from "./utils/index";
 import { useHomeData } from "./hooks/useHomeData";
-import { MiniTimeline } from "./components";
+import { MiniTimeline, HomepageTimelineSection } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
@@ -143,6 +144,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
+  const [completedEventIds, setCompletedEventIds] = useState(new Set());
 
   useEffect(() => () => {
     if (toastTimeoutRef.current) {
@@ -848,7 +850,39 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                   tomorrowFirstEvent,
                   taskWidgetItemsOnly,
                 }}
-                slot6Timeline={null}
+                slot6Timeline={
+                  <HomepageTimelineSection
+                    selectedDate={selectedDate}
+                    handleReplanDay={null} // Placeholder if not defined
+                    replanLoading={false}
+                    missedItems={missedItems}
+                    overdueTasksForNow={overdueTasksForNow}
+                    sortedEvents={sortedEvents}
+                    now={now}
+                    dayTasks={dayTasks}
+                    tasksDueToday={tasksDueToday}
+                    suggestableTasks={suggestableTasks}
+                    deadlineSuggestions={deadlineSuggestions}
+                    taskLists={taskLists}
+                    handleQuickStartGap={handleQuickStartGap}
+                    handleTaskToggle={handleTaskToggle}
+                    openTimelinePopup={openTimelinePopup}
+                    openModal={openModal}
+                    handleConflictAutoMove={handleConflictAutoMove}
+                    handleConflictPushTomorrow={handleConflictPushTomorrow}
+                    handleTimelineDelete={handleTimelineDelete}
+                    handleReschedule={handleReschedule}
+                    getTag={getTag}
+                    completedEventIds={completedEventIds}
+                    setCompletedEventIds={setCompletedEventIds}
+                    onOpenQuickAddSchedule={openQuickAddSchedule}
+                    hasTimerSession={hasTimerSession}
+                    timerTask={timerTask}
+                    timeLeft={timeLeft}
+                    timerMode={timerMode}
+                    styles={styles}
+                  />
+                }
               />
             </div>
 
@@ -964,84 +998,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             )}
           </div>
 
-          <motion.div
-            className={styles.bentoSpine}
-            id="timeline-section"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          >
-            <div className={styles.timelineBox}>
-              <div className={styles.timelineHeader}>
-                <div className={styles.timelineHeaderLeft}>
-                  <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                    <CalendarIcon size={17} strokeWidth={1.75} />
-                  </div>
-                  <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
-                </div>
-                <div className={styles.timelineHeaderRight}>
-                  <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
-                    <motion.div
-                      className={styles.scheduleActionGroup}
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      <button
-                        type="button"
-                        className={styles.manualScheduleBtn}
-                        onClick={() => openQuickAddSchedule('schedule_manual')}
-                        aria-label="Open manual schedule quick add"
-                      >
-                        🧩 Manual Schedule
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.autoScheduleBtn}
-                        onClick={() => openQuickAddSchedule('schedule_auto')}
-                        aria-label="Open auto schedule quick add"
-                      >
-                        ⚙️ Auto Schedule
-                      </button>
-                    </motion.div>
-                </div>
-              </div>
-              <div className={styles.timelineTrack}>
-                <motion.div
-                  className={styles.timelineTrackContent}
-                  layout
-                  initial={false}
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                >
-                  <MiniTimeline
-                    sortedEvents={sortedEvents}
-                    selectedDate={selectedDate}
-                    now={now}
-                    dayTasks={dayTasks}
-                    tasksDueToday={tasksDueToday}
-                    suggestableTasks={suggestableTasks}
-                    deadlineSuggestions={deadlineSuggestions}
-                    taskLists={taskLists}
-                    onQuickStart={handleQuickStartGap}
-                    onTaskToggle={handleTaskToggle}
-                    onCardClick={openTimelinePopup}
-                    onEdit={(ev) => openModal(ev, ev.tag)}
-                    onConflictAutoMove={handleConflictAutoMove}
-                    onPushTomorrow={handleConflictPushTomorrow}
-                    onDelete={handleTimelineDelete}
-                    onReschedule={handleReschedule}
-                    getTag={getTag}
-                    hasTimerSession={hasTimerSession}
-                    timerTask={timerTask}
-                    timeLeft={timeLeft}
-                    timerMode={timerMode}
-                    styles={styles}
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
           <BackToTop containerSelector="[data-dashboard-main]" />
         </>
 
