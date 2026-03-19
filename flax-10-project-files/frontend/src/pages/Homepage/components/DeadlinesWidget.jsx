@@ -58,7 +58,8 @@ const rowVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
 };
 
-export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModule }) {
+export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModule, row = 1 }) {
+  const maxShown = row === 1 ? 3 : 6;
   const { sorted, totalCount } = useMemo(() => {
     const list = [...(deadlines || [])].filter((d) => d.start_due_date);
     list.sort((a, b) => {
@@ -67,8 +68,8 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
       if (aOver !== bOver) return aOver ? -1 : 1;
       return new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime();
     });
-    return { sorted: list.slice(0, MAX_SHOWN), totalCount: list.length };
-  }, [deadlines]);
+    return { sorted: list.slice(0, maxShown), totalCount: list.length };
+  }, [deadlines, maxShown]);
 
   if (!Array.isArray(deadlines)) return null;
 
