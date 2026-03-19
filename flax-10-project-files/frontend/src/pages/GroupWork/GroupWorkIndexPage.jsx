@@ -98,17 +98,44 @@ function ProjectRow({ project, onClick }) {
   );
 }
 
-function GroupWorkContent({ projects, projectListProps }) {
-  if (projects.length === 0) return <p className={styles.emptyMessage}>You do not have any group projects yet. Use the form above to create one.</p>;
+function GroupWorkContent({ projects, projectListProps, filter, setFilter }) {
+  const filteredProjects = projects.filter(p => {
+    if (filter === "all") return true;
+    if (filter === "due_soon") {
+      const days = p.deadline ? Math.ceil((new Date(p.deadline) - Date.now()) / (1000 * 60 * 60 * 24)) : Infinity;
+      return days > 0 && days <= 30;
+    }
+    if (filter === "later") {
+      const days = p.deadline ? Math.ceil((new Date(p.deadline) - Date.now()) / (1000 * 60 * 60 * 24)) : Infinity;
+      return days > 30 || days === Infinity;
+    }
+    return true;
+  });
+
   return (
-    <Card className={styles.projectList} padding="sm">
-      {projects.map((p) => <ProjectRow key={p.id} project={p} {...projectListProps(p)} />)}
-    </Card>
+    <div className={styles.projectsSection}>
+      <div className={styles.projectsHeader}>
+        <h3 className={styles.sectionTitle}>PROJECTS</h3>
+        <div className={styles.filterTabs}>
+          <button className={`${styles.filterTab} ${filter === "all" ? styles.filterTabActive : ""}`} onClick={() => setFilter("all")}>All</button>
+          <button className={`${styles.filterTab} ${filter === "due_soon" ? styles.filterTabActive : ""}`} onClick={() => setFilter("due_soon")}>Due soon</button>
+          <button className={`${styles.filterTab} ${filter === "later" ? styles.filterTabActive : ""}`} onClick={() => setFilter("later")}>Later</button>
+        </div>
+      </div>
+      {filteredProjects.length === 0 ? (
+        <p className={styles.emptyMessage}>No projects match this filter.</p>
+      ) : (
+        <div className={styles.projectList}>
+          {filteredProjects.map((p) => <ProjectRow key={p.id} project={p} {...projectListProps(p)} />)}
+        </div>
+      )}
+    </div>
   );
 }
 
 export default function GroupWorkIndexPage() {
   const { projects, setProjects, loading } = useGroupProjects();
+  const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
   if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))} />;
@@ -118,7 +145,12 @@ export default function GroupWorkIndexPage() {
     <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
       <GroupWorkStats projects={projects} />
       <CreateProjectForm onCreated={onCreated} />
-      <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
+      <GroupWorkContent 
+        projects={projects} 
+        projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} 
+        filter={filter}
+        setFilter={setFilter}
+      />
     </AppPage>
   );
 }
