@@ -1,0 +1,240 @@
+/* ── Common Ground ── */
+.commonGroundTitle {
+  font-size: 12px;
+  font-style: italic;
+  color: #5D4037;
+  margin: 6px 0 10px;
+  line-height: 1.4;
+}
+
+.commonGroundPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 2px;
+}
+
+.commonSubGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.commonSubGroup:last-child {
+  margin-bottom: 0;
+}
+
+.commonSubHeader {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding-top: 4px;
+}
+
+.sharedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #212121;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #212121;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+  font-family: inherit;
+}
+
+.sharedPill:hover {
+  transform: translateY(-1px);
+  opacity: 0.82;
+}
+
+.otherPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid #212121;
+  color: #212121;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+  font-family: inherit;
+}
+
+.otherPill:hover {
+  transform: translateY(-1px);
+  background: rgba(33,33,33,0.06);
+}
+
+/* ── Compatibility Score ── */
+.compatCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 18px 22px;
+  background: var(--surface-glass-card, var(--panel));
+  border: 1px solid var(--surface-glass-card-border, var(--border));
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.compatTopRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.compatRing {
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.compatInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.compatPct {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.compatLabel {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-primary);
+  line-height: 1.3;
+}
+
+.compatDetail {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.studyTogetherBtn {
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.studyTogetherBtn:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.studyTogetherBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* ── Mutual Connections ── */
+.mutualRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mutualAvatars {
+  display: flex;
+  align-items: center;
+}
+
+.mutualAvatarWrap {
+  margin-left: -8px;
+}
+
+.mutualAvatarWrap:first-child {
+  margin-left: 0;
+}
+
+.mutualAvatar,
+.mutualAvatarFallback {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--color-card, #fff);
+}
+
+.mutualAvatar {
+  object-fit: cover;
+  display: block;
+}
+
+.mutualAvatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-primary) 18%, var(--panel));
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mutualText {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Activity Sparkline ── */
+.sparklineWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sparklineLabel {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sparklineDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sparkDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.sparkDot0 { opacity: 0.35; }
+.sparkDot1 { background: color-mix(in srgb, var(--color-primary) 22%, transparent); }
+.sparkDot2 { background: color-mix(in srgb, var(--color-primary) 40%, transparent); }
+.sparkDot3 { background: color-mix(in srgb, var(--color-primary) 62%, transparent); }
+
+.sparkDot4 {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
