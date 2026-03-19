@@ -35,7 +35,14 @@ export function useSearchState(skip) {
 
 function useUserSearchEffects(query, selectedCourses, selectedSocieties, selectedYears, selectedRoles, setUserResults, setLoading) {
     useEffect(() => {
-        const timer = setTimeout(() => fetchUserResults(query, selectedCourses.join(','), selectedSocieties.join(','), selectedYears.join(','), selectedRoles.join(','), setUserResults, setLoading), 300);
+        const args = [query, selectedCourses.join(','), selectedSocieties.join(','), selectedYears.join(','), selectedRoles.join(',')];
+        const hasFilters = args.some((value) => value.trim());
+        if (!hasFilters) {
+            setLoading(false);
+            setUserResults([]);
+            return;
+        }
+        const timer = setTimeout(() => fetchUserResults(...args, setUserResults, setLoading), 300);
         return () => clearTimeout(timer);
     }, [query, selectedCourses, selectedSocieties, selectedYears, selectedRoles, setUserResults, setLoading]);
 }

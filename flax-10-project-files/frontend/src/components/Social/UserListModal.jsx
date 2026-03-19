@@ -4,6 +4,7 @@
 
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
 
@@ -46,5 +47,20 @@ export default function UserListModal({ title, users, onClose, onUserClick, onUs
     const currentUser = getCurrentUser();
     const items = sortUsers(users, currentUser);
     const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate);
-    return <GenericSummaryModal isOpen={true} onClose={onClose} title={title} emptyMessage="No users found." emptyIcon="👥" emptyDescription="No one is sharing with you yet" items={items} renderItem={renderItem} />;
+    return (
+        <GenericSummaryModal
+            isOpen={true}
+            onClose={onClose}
+            title={title}
+            emptyContent={
+                <SearchEmptyState
+                    itemLabel="users"
+                    title="No users found"
+                    hint="No one is sharing with you yet."
+                />
+            }
+            items={items}
+            renderItem={renderItem}
+        />
+    );
 }

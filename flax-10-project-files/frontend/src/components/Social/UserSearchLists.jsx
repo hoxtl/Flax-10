@@ -134,13 +134,17 @@ function SocietyList({ societies, filterQuery, querySelected, onToggle, expanded
     return <GroupedSocietyList societies={societies} querySelected={querySelected} onToggle={onToggle} expanded={expanded} toggleSection={toggleSection} />;
 }
 
-export function SearchDropdown({ loading, query, userResults, onUserSelect, compact }) {
+export function SearchDropdown({ loading, query, setQuery, userResults, onUserSelect, compact, renderEmptyState }) {
     const showEmpty = !loading && userResults.length === 0;
+    const customEmptyState = renderEmptyState?.({
+        query,
+        clear: () => setQuery(""),
+    });
     if (compact && showEmpty && !query) return null;
     return (
         <div className={`${styles.searchDropdownContainer} ${compact ? styles.compactDropdown : ''}`}>
             {loading && <EmptySearchText {...SEARCH_EMPTY_CONFIG.loading} />}
-            {showEmpty && query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.users} />}
+            {showEmpty && query && (customEmptyState || <EmptySearchText {...SEARCH_EMPTY_CONFIG.users} />)}
             {showEmpty && !query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.start} />}
             {!loading && userResults.length > 0 && <SearchResultsList results={userResults} onSelect={onUserSelect} compact={compact} />}
         </div>

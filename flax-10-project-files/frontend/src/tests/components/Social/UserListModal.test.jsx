@@ -28,7 +28,8 @@ describe('UserListModal', () => {
 
   it('renders empty state when users array is empty', () => {
     render(<UserListModal title="People" users={[]} onClose={vi.fn()} />);
-    expect(screen.getByText('No users found.')).toBeInTheDocument();
+    expect(screen.getByText('No users found')).toBeInTheDocument();
+    expect(screen.getByText('No one is sharing with you yet.')).toBeInTheDocument();
   });
 
   it('sorts current user first, then sharing users', () => {

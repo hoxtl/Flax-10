@@ -221,6 +221,20 @@ describe('UserSearch', () => {
         await waitFor(() => expect(screen.getByText('No users found')).toBeTruthy());
     });
 
+    it('renders custom empty state when provided', async () => {
+        searchUsers.mockResolvedValueOnce([]);
+        render(
+            <UserSearch
+                onUserSelect={vi.fn()}
+                renderEmptyState={() => <div>Custom collaborator empty state</div>}
+            />
+        );
+        fireEvent.focus(screen.getByTestId('search-bar'));
+        fireEvent.change(screen.getByTestId('search-bar'), { target: { value: 'nobody' } });
+        await waitFor(() => expect(searchUsers).toHaveBeenCalled());
+        await waitFor(() => expect(screen.getByText('Custom collaborator empty state')).toBeTruthy());
+    });
+
     it('handles searchUsers rejection', async () => {
         searchUsers.mockRejectedValueOnce(new Error('search failed'));
         render(<UserSearch onUserSelect={vi.fn()} />);
