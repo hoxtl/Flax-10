@@ -123,33 +123,69 @@ export default function TodayBanner({ onStreakData, isStudying = false }) {
 
     if (loading) return null;
     return (
-        <div className={styles.todayRibbon}>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneLeft}`}>
-                <span className={styles.todayRibbonStreakWrap} data-tooltip={streakTooltip}>
-                    <span className={styles.todayRibbonStreakIcon}>🔥</span>
-                    <span className={styles.todayRibbonStreakValue}>{streak}d</span>
-                </span>
-            </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneCenter}`}>
-                <div className={styles.todayRibbonHeroRow}>
-                    <span className={styles.todayRibbonSessionsText}>
-                        <span className={styles.todayRibbonSessionDigitWrap}>
-                            <span key={sessions} className={`${styles.todayRibbonSessionDigit} ${counterAnimating ? styles.todayRibbonSessionDigitAnimate : ''}`}>{Math.min(sessions, goalSessions)}</span>
-                        </span>
-                        /{goalSessions} sessions today{sessions > goalSessions ? ` (+${sessions - goalSessions} extra)` : ''}
-                    </span>
-                    <span className={styles.todayRibbonMilestoneActive}>{weeklyGoalText}</span>
+        <div className={styles.statsBanner}>
+            <div className={styles.statsSection}>
+                <div className={styles.statsIconWrap} style={{ background: '#EF6C0018', color: '#EF6C00' }}>
+                    <span className={styles.statsEmoji}>🔥</span>
                 </div>
-                <div className={styles.todayRibbonScale}><span>0</span><span>{goalSessions}</span></div>
-                <ProgressBar sessions={sessions} goalSessions={goalSessions} sessionPct={sessionPct} fillAnimating={fillAnimating} isStudying={isStudying} activePulseLeft={activePulseLeft} tickCount={tickCount} />
+                <div className={styles.statsContent}>
+                    <span className={styles.statsLabel}>STREAK</span>
+                    <div className={styles.statsValueRow}>
+                        <span className={styles.statsValue}>{streak} day{streak !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
             </div>
-            <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneRight}`}>
-                <span className={styles.todayRibbonFocusValue}>🕒 {fmtHours(hours)}</span>
-                <span className={styles.todayRibbonMeta}>
-                    Goal:{' '}
-                    <GoalEditor goalHours={goalHours} editingGoal={editingGoal} goalInput={goalInput} setGoalInput={setGoalInput} setEditingGoal={setEditingGoal} setGoalHours={setGoalHours} />
-                </span>
+            
+            <div className={styles.statsSection}>
+                <div className={styles.statsIconWrap} style={{ background: '#5C6BC018', color: '#5C6BC0' }}>
+                    <span className={styles.statsEmoji}>🎯</span>
+                </div>
+                <div className={styles.statsContent}>
+                    <span className={styles.statsLabel}>SESSIONS</span>
+                    <div className={styles.statsValueRow}>
+                        <span className={styles.statsValue}>
+                            {sessions} <span className={styles.statsDenom}>/ {goalSessions}</span>
+                        </span>
+                    </div>
+                    <div className={styles.statsMiniProgress}>
+                        <div className={styles.statsMiniFill} style={{ width: `${sessionPct}%` }} />
+                    </div>
+                </div>
+            </div>
+
+            <div className={styles.statsSection}>
+                <div className={styles.statsIconWrap} style={{ background: '#388E3C18', color: '#388E3C' }}>
+                    <span className={styles.statsEmoji}>🏆</span>
+                </div>
+                <div className={styles.statsContent}>
+                    <span className={styles.statsLabel}>WEEKLY GOAL</span>
+                    <div className={styles.statsValueRow}>
+                        <span className={styles.statsValue}>
+                            {weeklyProgressDays} <span className={styles.statsDenom}>/ 7 days</span>
+                        </span>
+                    </div>
+                    <div className={styles.statsMiniProgress}>
+                        <div className={styles.statsMiniFill} style={{ width: `${(weeklyProgressDays / 7) * 100}%` }} />
+                    </div>
+                </div>
+            </div>
+
+            <div className={styles.statsSection}>
+                <div className={styles.statsIconWrap} style={{ background: '#9E7E5D18', color: '#9E7E5D' }}>
+                    <span className={styles.statsEmoji}>⏱</span>
+                </div>
+                <div className={styles.statsContent}>
+                    <span className={styles.statsLabel}>FOCUS TIME</span>
+                    <div className={styles.statsValueRow}>
+                        <span className={styles.statsValue}>{fmtHours(hours)}</span>
+                    </div>
+                    <div className={styles.statsSubLabel}>
+                        of {goalHours}h · {Math.round((hours / goalHours) * 100)}%
+                    </div>
+                </div>
             </div>
         </div>
     );
 }
+
+
