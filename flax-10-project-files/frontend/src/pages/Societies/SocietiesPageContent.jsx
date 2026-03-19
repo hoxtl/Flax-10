@@ -17,6 +17,9 @@ import SocietySection from "./SocietySection";
 import SocietyDetailPage from "./SocietyDetailPage";
 import { SocietiesSkeleton } from "./SocietySkeletons";
 import styles from "./SocietiesPage.module.css";
+import extraStyles from "./SocietiesPageExtras.module.css";
+
+const pageStyles = { ...styles, ...extraStyles };
 
 const PAGE_SIZE = 15;
 
@@ -98,7 +101,7 @@ function MySocietiesView({ state }) {
     const filtered = filterSocieties(state.societies, search);
     const tabs = buildTabs(filtered, state.societies, state);
     return (
-        <AppPage className={styles.container} title="Societies" subtitle="Your communities at King's College London">
+        <AppPage className={pageStyles.container} title="Societies" subtitle="Your communities at King's College London">
             <Tabs
                 tabs={tabs}
                 activeTab={activeTab}
@@ -170,7 +173,7 @@ function MySocietiesSearch({ value, onChange }) {
             value={value}
             onChange={onChange}
             placeholder="Search my societies..."
-            className={styles.smallSearch}
+            className={pageStyles.smallSearch}
         />
     );
 }
