@@ -101,6 +101,12 @@
 .compactAttAnalysisBtn {
   pointer-events: auto;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.heatmapLinkBtn.compactAttAnalysisBtn {
+  pointer-events: auto;
 }
 
 .compactAttendanceDonut {
