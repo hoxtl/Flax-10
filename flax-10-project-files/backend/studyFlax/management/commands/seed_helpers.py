@@ -164,6 +164,31 @@ def _random_theme():
 
 def _build_single_settings(user):
     is_teacher = getattr(user, 'role', None) == 'teacher'
+    
+    # Available widgets for seeding
+    all_widgets = [
+        "rightNow", "deadlines", "todayTasks", "tinyTimeline", "bigTimeline", 
+        "semesterOverview", "studyStreak", "weeklyGoal", "photo", 
+        "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown", 
+        "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual", 
+        "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
+    ]
+    
+    # Pick 4-8 random widgets, always including 'hero' at the start
+    shuffled = all_widgets[:]
+    random.shuffle(shuffled)
+    selected = ["hero"] + shuffled[:random.randint(4, 7)]
+    
+    # Randomize sizes for chosen widgets
+    sizes = {}
+    for widget_id in selected:
+        if widget_id == "hero":
+            continue
+        sizes[widget_id] = {
+            "col": 2 if random.random() > 0.6 else 1,
+            "row": 2 if random.random() > 0.7 else 1
+        }
+
     return UserSettings(
         user=user,
         theme=_random_theme(),
@@ -173,7 +198,8 @@ def _build_single_settings(user):
         sleep_time=time(23, 0),
         wake_time=time(7, 0),
         mode=_random_theme(),
-        homepage_widgets=[],
+        homepage_widgets=selected,
+        homepage_widget_sizes=sizes,
     )
 
 def build_settings_for_new_users():
