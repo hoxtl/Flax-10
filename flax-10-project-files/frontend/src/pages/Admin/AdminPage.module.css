@@ -678,6 +678,24 @@ button:disabled {
 :global(:root[data-mode="dark"]) .unbanPillBtn:hover {
   background: #166534;
 }
+
+:global(:root[data-mode="dark"]) .approveBtn {
+  background: #14532d;
+  color: #dcfce7;
+}
+
+:global(:root[data-mode="dark"]) .approveBtn:hover {
+  background: #166534;
+}
+
+:global(:root[data-mode="dark"]) .rejectBtn {
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+:global(:root[data-mode="dark"]) .rejectBtn:hover {
+  background: #991b1b;
+}
 .staffPillBadge {
   font-size: 0.72rem;
   font-weight: 600;
