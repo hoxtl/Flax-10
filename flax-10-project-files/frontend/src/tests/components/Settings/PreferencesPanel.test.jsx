@@ -115,10 +115,22 @@ describe('PreferencesPanel', () => {
     });
 
     it('submits study-time preference', async () => {
-        render(<PreferencesPanel onSave={vi.fn()} onSleepSave={onSleepSave} onStudyTimeSave={onStudyTimeSave} isSaving={false} />);
-        const input = await screen.findByLabelText('Preferred study time per day (minutes)');
-        fireEvent.change(input, { target: { value: '180' } });
-        fireEvent.click(screen.getByRole('button', { name: 'Save Study Time' }));
-        expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 });
+      const onSleepSave = vi.fn();
+      const onStudyTimeSave = vi.fn().mockResolvedValue(true);
+      render(
+          <PreferencesPanel
+              onSave={vi.fn()}
+              onSleepSave={onSleepSave}
+              onStudyTimeSave={onStudyTimeSave}
+              isSaving={false}
+              activeSubTab="studytime"
+          />
+      );
+      const input = await screen.findByLabelText('Preferred study time per day (minutes)');
+      fireEvent.change(input, { target: { value: '180' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Save Study Time' }));
+      await waitFor(() => {
+          expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 });
+      });
     });
 });

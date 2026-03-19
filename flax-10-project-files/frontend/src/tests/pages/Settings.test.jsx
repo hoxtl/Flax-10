@@ -12,6 +12,10 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("course")}>Course Change</button>
+      <button onClick={() => onChange("preferences_studytime")}>Study Time</button>
+      <button onClick={() => onChange("preferences_week")}>Week Time</button>
+      <button onClick={() => onChange("preferences_daynight")}>Work Time</button>
+      <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -23,6 +27,9 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("course")}>Course Change</button>
+      <button onClick={() => onChange("preferences_studytime")}>Study Time</button>
+      <button onClick={() => onChange("preferences_week")}>Week Time</button>
+      <button onClick={() => onChange("preferences_daynight")}>Work Time</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -43,12 +50,20 @@ vi.mock("../../components/Settings/SecurityForm", () => ({
 }));
 
 vi.mock("../../components/Settings/PreferencesPanel", () => ({
-  default: ({ activeSubTab }) =>
-    activeSubTab === "sleep" ? (
-      <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
+  default: ({ activeSubTab }) => {
+    const labels = {
+      sleep: "sleep-schedule-panel",
+      studytime: "study-time-panel",
+      week: "week-preference-panel",
+      daynight: "worktime-preference-panel",
+    };
+
+    return activeSubTab && labels[activeSubTab] ? (
+      <div data-testid={labels[activeSubTab]}>{activeSubTab}</div>
     ) : (
       <div data-testid="preferences-panel">PreferencesPanel</div>
-    ),
+    );
+  },
 }));
 
 vi.mock("../../components/Settings/HomeAddressForm", () => ({
@@ -165,5 +180,23 @@ describe("Settings", () => {
   it("renders SettingsTabs", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     expect(screen.getByTestId("settings-tabs")).toBeTruthy();
+  });
+
+  it("switches to Worktime panel when work time tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Work Time"));
+    expect(screen.getByTestId("worktime-preference-panel")).toBeTruthy();
+  });
+
+  it("switches to CourseChangePanel when course tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Course Change"));
+    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
+  });
+
+  it("switches to Week preference panel when week time tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Week Time"));
+    expect(screen.getByTestId("week-preference-panel")).toBeTruthy();
   });
 });
