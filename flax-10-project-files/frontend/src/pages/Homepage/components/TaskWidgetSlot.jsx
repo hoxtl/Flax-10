@@ -174,15 +174,18 @@ export function TaskWidgetSlot({
   onEditTask,
   onDeleteTask,
   onInlineTaskEdit,
+  row = 1,
 }) {
   const navigate = useNavigate();
   const [ctxMenu, setCtxMenu] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
   const completedTasks = taskWidgetList.filter((t) => t.completed);
-  const visibleIncomplete = incompleteTasks.slice(0, VISIBLE_COUNT);
+
+  const visibleLimit = row === 1 ? 3 : 6;
+  const visibleIncomplete = incompleteTasks.slice(0, visibleLimit);
   const visibleCompleted = completedTasks.slice(0, 3);
-  const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
+  const hiddenCount = Math.max(0, incompleteTasks.length - visibleLimit);
 
   const allTasksDone = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
   const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
