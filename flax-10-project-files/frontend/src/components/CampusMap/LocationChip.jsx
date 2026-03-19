@@ -1,4 +1,4 @@
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import styles from '../../pages/CampusMap/sidebar.module.css';
 
 export function LocationChip({ dotColor, title, subtitle, onClear }) {
   return (

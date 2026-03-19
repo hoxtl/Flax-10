@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
+import statusStyles from '../../pages/CampusMap/status.module.css';
+const styles = { ...baseStyles, ...statusStyles };
 
 function DisruptionCard({ disruption }) {
   return (
@@ -46,6 +48,17 @@ function DisruptionsList({ disruptions }) {
   );
 }
 
+function StatusContent({ disruptions, loading }) {
+  if (loading) return (
+    <div className={styles.loadingDisruptions}>
+      <span className={styles.spinner} />
+      <span>Checking TfL Line status...</span>
+    </div>
+  );
+  if (disruptions.length === 0) return <GoodService />;
+  return <DisruptionsList disruptions={disruptions} />;
+}
+
 export function TflStatusSection({ disruptions, loading }) {
   const lastUpdated = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   return (
@@ -54,16 +67,7 @@ export function TflStatusSection({ disruptions, loading }) {
         <span className={styles.statusIcon}>⚠️</span>
         TfL Line Status
       </div>
-      {loading ? (
-        <div className={styles.loadingDisruptions}>
-          <span className={styles.spinner} />
-          <span>Checking TfL Line status...</span>
-        </div>
-      ) : disruptions.length === 0 ? (
-        <GoodService />
-      ) : (
-        <DisruptionsList disruptions={disruptions} />
-      )}
+      <StatusContent disruptions={disruptions} loading={loading} />
       <div className={styles.lastUpdated}>Last Updated: {lastUpdated}</div>
     </section>
   );

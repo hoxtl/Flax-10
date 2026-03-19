@@ -1,24 +1,25 @@
 import { useState, useEffect } from 'react';
 import { getCalendarEvents } from '../../../api/calendarService';
 
+async function loadCalendarEvents(setEvents) {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const data = await getCalendarEvents();
+    setEvents(data.events || []);
+  } catch {
+    console.log('Unable to load calendar events...');
+  }
+}
+
 export function useCalendarEvents() {
   const [events, setEvents] = useState([]);
-
-  const loadEvents = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const data = await getCalendarEvents();
-      setEvents(data.events || []);
-    } catch {
-      console.log('Unable to load calendar events...');
-    }
-  };
+  const load = () => loadCalendarEvents(setEvents);
 
   useEffect(() => {
-    loadEvents();
-    window.addEventListener('calendar-event-updated', loadEvents);
-    return () => window.removeEventListener('calendar-event-updated', loadEvents);
+    load();
+    window.addEventListener('calendar-event-updated', load);
+    return () => window.removeEventListener('calendar-event-updated', load);
   }, []);
 
   return { events };

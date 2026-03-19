@@ -1,4 +1,4 @@
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import styles from '../../pages/CampusMap/routes.module.css';
 import { travelTime, travelDistance } from './mapUtils';
 
 function StepsList({ steps }) {

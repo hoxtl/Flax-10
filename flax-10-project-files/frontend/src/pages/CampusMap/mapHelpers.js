@@ -131,14 +131,40 @@ export function homePopupHTML(userHome) {
   </div>`;
 }
 
+function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation) {
+  setStartLocation({ lng: userHome.lng, lat: userHome.lat });
+  if (homePointerRef.current?.getPopup().isOpen()) homePointerRef.current.togglePopup();
+  mapRef.current?.flyTo({ center: [userHome.lng, userHome.lat], zoom: 15, pitch: 55, duration: 1200 });
+}
+
 export function wireHomeButton(userHome, homePointerRef, mapRef, setStartLocation) {
   const btn = document.getElementById('setHomeAsStart');
   if (!btn) return;
-  btn.addEventListener('click', () => {
-    setStartLocation({ lng: userHome.lng, lat: userHome.lat });
-    if (homePointerRef.current?.getPopup().isOpen()) homePointerRef.current.togglePopup();
-    mapRef.current?.flyTo({ center: [userHome.lng, userHome.lat], zoom: 15, pitch: 55, duration: 1200 });
+  btn.addEventListener('click', () => handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation));
+}
+
+export function createStartMarkerEl(stylesModule) {
+  const el = document.createElement('div');
+  el.className = stylesModule.startMarker;
+  const pulse = document.createElement('div');
+  pulse.className = stylesModule.startMarkerPulse;
+  const dot = document.createElement('div');
+  dot.className = stylesModule.startMarkerDot;
+  el.appendChild(pulse);
+  el.appendChild(dot);
+  return el;
+}
+
+export function displayRoute(map, route) {
+  map.getSource('route').setData({
+    type: 'FeatureCollection',
+    features: [{ type: 'Feature', geometry: route.geometry }],
   });
+  fitMapToRoute(map, route.geometry.coordinates);
+}
+
+export function clearRouteSource(map) {
+  map.getSource('route')?.setData({ type: 'FeatureCollection', features: [] });
 }
 
 export async function fetchWalkingRoute(start, destination) {

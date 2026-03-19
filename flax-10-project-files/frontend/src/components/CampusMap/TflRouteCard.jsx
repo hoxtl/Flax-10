@@ -1,4 +1,6 @@
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
+import routeStyles from '../../pages/CampusMap/routes.module.css';
+const styles = { ...baseStyles, ...routeStyles };
 import { getLegIcon, getLegLabel } from './mapUtils';
 
 function TflLegItem({ leg }) {

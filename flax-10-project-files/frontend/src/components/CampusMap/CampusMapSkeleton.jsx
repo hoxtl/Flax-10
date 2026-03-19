@@ -1,5 +1,7 @@
 import SkeletonBlock from '../common/LoadingState/SkeletonBlock';
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
+import sidebarStyles from '../../pages/CampusMap/sidebar.module.css';
+const styles = { ...baseStyles, ...sidebarStyles };
 
 function SkeletonSectionList() {
   return Array.from({ length: 4 }).map((_, i) => (

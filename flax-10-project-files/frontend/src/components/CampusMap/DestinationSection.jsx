@@ -1,4 +1,6 @@
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
+import sidebarStyles from '../../pages/CampusMap/sidebar.module.css';
+const styles = { ...baseStyles, ...sidebarStyles };
 import { LocationChip } from './LocationChip';
 import { KCL_CAMPUSES } from '../../lib/kclCampuses';
 

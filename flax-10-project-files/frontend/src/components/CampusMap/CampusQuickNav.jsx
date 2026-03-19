@@ -1,4 +1,4 @@
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import styles from '../../pages/CampusMap/sidebar.module.css';
 import { KCL_CAMPUSES } from '../../lib/kclCampuses';
 
 export function CampusQuickNav({ onFly }) {

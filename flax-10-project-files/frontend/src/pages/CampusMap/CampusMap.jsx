@@ -20,10 +20,24 @@ import { tflService } from '../../api/tflService';
 import {
   initMapInstance, handleMapLoad, cleanupMap,
   createHomeMarkerEl, homePopupHTML, wireHomeButton,
-  fetchWalkingRoute, getEffectiveDestination, parseRouteInfo, fitMapToRoute,
+  fetchWalkingRoute, getEffectiveDestination, parseRouteInfo,
+  createStartMarkerEl, displayRoute, clearRouteSource,
 } from './mapHelpers';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+async function applyWalkingRoute(start, destination, map, setRouteInfo, setRouteError) {
+  const route = await fetchWalkingRoute(start, destination);
+  if (!route) { setRouteError('No walking route found between these locations.'); clearRouteSource(map); return; }
+  displayRoute(map, route);
+  setRouteInfo(parseRouteInfo(route));
+}
+
+async function applyTflRoute(startLocation, destination, setTflRouteInfo, setTflRouteError) {
+  const journey = await tflService.journeyPlanner(startLocation.lat, startLocation.lng, destination.lat, destination.lng);
+  if (!journey) { setTflRouteError('No TfL journey found between the two selected locations...'); return; }
+  setTflRouteInfo(journey);
+}
 
 const MIN_MAP_SKELETON_MS = 900;
 
@@ -113,14 +127,7 @@ export default function CampusMap() {
   useEffect(() => {
     if (!mapLoaded || !startLocation) return;
     startMarker.current?.remove();
-    const el = document.createElement('div');
-    el.className = styles.startMarker;
-    const pulse = document.createElement('div');
-    pulse.className = styles.startMarkerPulse;
-    const dot = document.createElement('div');
-    dot.className = styles.startMarkerDot;
-    el.appendChild(pulse);
-    el.appendChild(dot);
+    const el = createStartMarkerEl(styles);
     startPopup.current?.remove();
     startPopup.current = new mapboxgl.Popup({ offset: 20, closeButton: false, closeOnClick: false })
       .setLngLat([startLocation.lng, startLocation.lat])
@@ -148,15 +155,7 @@ export default function CampusMap() {
     setRouteError('');
     setRouteInfo(null);
     try {
-      const route = await fetchWalkingRoute(startLocation, destination);
-      if (!route) {
-        setRouteError('No walking route found between these locations.');
-        map.current.getSource('route').setData({ type: 'FeatureCollection', features: [] });
-        return;
-      }
-      map.current.getSource('route').setData({ type: 'FeatureCollection', features: [{ type: 'Feature', geometry: route.geometry }] });
-      setRouteInfo(parseRouteInfo(route));
-      fitMapToRoute(map.current, route.geometry.coordinates);
+      await applyWalkingRoute(startLocation, destination, map.current, setRouteInfo, setRouteError);
     } catch {
       setRouteError('Could not calculate the route, please try again...');
     } finally {
@@ -171,9 +170,7 @@ export default function CampusMap() {
     setTflRouteError('');
     setTflRouteInfo(null);
     try {
-      const journey = await tflService.journeyPlanner(startLocation.lat, startLocation.lng, destination.lat, destination.lng);
-      if (!journey) { setTflRouteError('No TfL journey found between the two selected locations...'); return; }
-      setTflRouteInfo(journey);
+      await applyTflRoute(startLocation, destination, setTflRouteInfo, setTflRouteError);
     } catch (error) {
       console.error('Calculate TFL route error: ', error);
       setTflRouteError('Failed to calculate TfL route, please try again...');
@@ -182,9 +179,7 @@ export default function CampusMap() {
     }
   }, [startLocation, selectedCampus, customDestination]);
 
-  const resetRoute = () => {
-    map.current?.getSource('route')?.setData({ type: 'FeatureCollection', features: [] });
-  };
+  const resetRoute = () => clearRouteSource(map.current);
 
   useEffect(() => {
     if (startLocation && (selectedCampus || customDestination)) {
@@ -203,19 +198,17 @@ export default function CampusMap() {
     if (!clickedMarker.getPopup().isOpen()) clickedMarker.togglePopup();
   };
 
+  const onGeoSuccess = ({ coords }) => {
+    const loc = { lng: coords.longitude, lat: coords.latitude };
+    setStartLocation(loc);
+    map.current?.flyTo({ center: [loc.lng, loc.lat], zoom: 15, pitch: 55, duration: 1200 });
+    setLocating(false);
+  };
+
   const handleGeolocate = () => {
     if (!navigator.geolocation) return;
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const loc = { lng: coords.longitude, lat: coords.latitude };
-        setStartLocation(loc);
-        map.current?.flyTo({ center: [loc.lng, loc.lat], zoom: 15, pitch: 55, duration: 1200 });
-        setLocating(false);
-      },
-      () => setLocating(false),
-      { enableHighAccuracy: true, timeout: 8000 },
-    );
+    navigator.geolocation.getCurrentPosition(onGeoSuccess, () => setLocating(false), { enableHighAccuracy: true, timeout: 8000 });
   };
 
   const handleClearStart = () => {

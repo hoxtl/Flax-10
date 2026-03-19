@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import styles from '../../pages/CampusMap/CampusMap.module.css';
+import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
+import statusStyles from '../../pages/CampusMap/status.module.css';
+const styles = { ...baseStyles, ...statusStyles };
 import { getPriorityColor } from './mapUtils';
 
 function EventCard({ event, onClick }) {
