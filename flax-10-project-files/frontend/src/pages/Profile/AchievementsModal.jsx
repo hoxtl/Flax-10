@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
 import StandardModal from "../../components/common/StandardModal/StandardModal";
-
 // ---------------------------------------------------------------------------
 // Full badge catalogue — must match backend IDs exactly
 // ---------------------------------------------------------------------------
@@ -129,7 +128,7 @@ export default function AchievementsModal({ badges, onClose }) {
             return (
               <div key={cat} className={styles.category}>
                 <div className={styles.catHeader}>
-                  <span className={`${styles.catName} ${cat === 'Hours' ? styles.catNameEmphasis : ''}`}>{cat}</span>
+                  <span className={`${styles.catName} ${styles.catNameEmphasis}`}>{cat}</span>
                   <span className={styles.catCount}>{catEarned}/{catBadges.length}</span>
                 </div>
                 <div className={styles.grid}>
