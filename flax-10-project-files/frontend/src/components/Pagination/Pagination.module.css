@@ -113,8 +113,8 @@
 
 @media (max-width: 900px) {
   .backToTop {
-    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px + 52px + 12px);
-    right: 24px;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px + 48px + 14px);
+    right: 16px;
     z-index: 2601;
   }
 }
