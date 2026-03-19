@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { AlertCircle, ArrowRight } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./DeadlinesWidget.module.css";
 import EmptyStateCard from "./EmptyStateCard";
 
@@ -76,15 +77,11 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
   return (
     <div className={styles.root}>
       {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <div className={styles.headerIconWrap}>
-            <AlertCircle className={styles.headerIcon} size={17} strokeWidth={1.85} aria-hidden />
-          </div>
-          <div className={styles.headerTitleBlock}>
-            <span className={styles.headerTitle}>Deadlines</span>
-          </div>
+      <div className={baseStyles.widgetHeader}>
+        <div className={baseStyles.headerIconWrap}>
+          <AlertCircle className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
         </div>
+        <span className={baseStyles.headerTitle}>Deadlines</span>
       </div>
 
       {sorted.length === 0 ? (
