@@ -1,23 +1,27 @@
 /*
  * Presentational layout for the home-address form.
  */
-import EmptyState from "../common/EmptyState/EmptyState";
-import InlineAlert from "../common/InlineAlert/InlineAlert";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
 import styles from "../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "./SettingsContextCard";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 
+function isLookupMiss(error) {
+  return String(error || "").toLowerCase().startsWith("address not found");
+}
+
 function AddressField({ homeAddress, setHomeAddress, error, isSaving, hasUnsaved, saveSignal }) {
+  const showInlineError = error && !isLookupMiss(error);
+
   return (
     <div>
       <div className={styles.formGroup}>
         <label htmlFor="homeAddress" className={styles.label}>Address</label>
         <LocationAutocomplete value={homeAddress} onChange={setHomeAddress} placeholder="e.g., 123 Example Street, London, E1 B23" />
-        {error ? <EmptyState icon="⚠️" title="Could not save address" description={error} /> : null}
+        {showInlineError ? <InlineAlert message={error} variant="warning" /> : null}
       </div>
       <SubmitButton isSaving={isSaving} label="Save Home Address" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
-      <InlineAlert message={error} variant="warning" />
     </div>
   );
 }

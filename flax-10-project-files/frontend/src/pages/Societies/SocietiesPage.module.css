@@ -65,7 +65,7 @@
 
 .browseToolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 250px;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
@@ -75,14 +75,123 @@
   min-width: 0;
 }
 
+.browseControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .browseSortControl {
   flex-shrink: 0;
-  width: 100%;
 }
 
 .sortDropdown {
   flex: 1;
   min-width: 0;
+}
+
+/* ── Category filter button ─────────────────────────────── */
+.categoryFilterWrap {
+  position: relative;
+}
+
+.categoryFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.categoryFilterBtn:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.categoryFilterBtnActive {
+  border-color: color-mix(in srgb, var(--primary) 72%, var(--border));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.categoryFilterBadge {
+  background: var(--primary);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.categoryFilterPopup {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 9999;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+  min-width: 240px;
+  max-width: 300px;
+}
+
+.categoryFilterTitle {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  margin-top: 12px;
+}
+
+.categoryFilterTitle:first-child {
+  margin-top: 0;
+}
+
+.ratificationOptions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ratificationPill {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.ratificationPill:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+
+.ratificationPillActive {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 .grid {

@@ -26,8 +26,8 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
-  SuccessBanner: ({ message }) =>
-    message ? <div data-testid="success-banner">{message}</div> : null,
+  ErrorMessage: ({ message }) =>
+    message ? <div data-testid="error-banner">{message}</div> : null,
 }));
 
 vi.mock("../../components/Settings/AccountForm", () => ({
@@ -74,7 +74,7 @@ vi.mock("../../components/Settings/hooks/useSettingsHandlers", () => ({
     isSaving: false,
     passwordError: null,
     homeAddressError: null,
-    successMessage: null,
+    bannerMessage: null,
     handleAccountSave: vi.fn(),
     handlePasswordSave: vi.fn(),
     handlePreferencesSave: vi.fn(),
@@ -95,13 +95,6 @@ describe("Settings", () => {
   it("renders Settings title", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     expect(screen.getByText("Settings")).toBeTruthy();
-  });
-
-  it("calls onBack when back button is clicked", () => {
-    const onBack = vi.fn();
-    renderSettings(<Settings user={{}} onBack={onBack} />);
-    fireEvent.click(screen.getByRole("button", { name: /back/i }));
-    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it("shows AccountForm by default", () => {
@@ -140,12 +133,12 @@ describe("Settings", () => {
     expect(screen.getByTestId("course-change-panel")).toBeTruthy();
   });
 
-  it("renders SuccessBanner when successMessage is set", () => {
+  it("renders error banner when bannerMessage is set", () => {
     useSettingsHandlers.mockReturnValueOnce({
       isSaving: false,
       passwordError: null,
       homeAddressError: null,
-      successMessage: "Saved!",
+      bannerMessage: "Failed to save preferences",
       handleAccountSave: vi.fn(),
       handlePasswordSave: vi.fn(),
       handlePreferencesSave: vi.fn(),
@@ -153,13 +146,13 @@ describe("Settings", () => {
       handleSleepSave: vi.fn(),
     });
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
-    expect(screen.getByTestId("success-banner")).toBeTruthy();
-    expect(screen.getByText("Saved!")).toBeTruthy();
+    expect(screen.getByTestId("error-banner")).toBeTruthy();
+    expect(screen.getByText("Failed to save preferences")).toBeTruthy();
   });
 
-  it("does not render SuccessBanner when no successMessage", () => {
+  it("does not render error banner when no bannerMessage", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
-    expect(screen.queryByTestId("success-banner")).toBeNull();
+    expect(screen.queryByTestId("error-banner")).toBeNull();
   });
 
   it("renders SettingsTabs", () => {

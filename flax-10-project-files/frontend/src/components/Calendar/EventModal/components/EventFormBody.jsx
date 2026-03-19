@@ -38,8 +38,8 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
     const setPrivacy = (val) => setForm(f => ({ ...f, is_private: val }));
     return (
         <form onSubmit={onSubmit}>
-            <FormField label="Title" value={form.title} onChange={update('title')} required />
-            <FormField label="Description" type="textarea" value={form.description} onChange={update('description')} />
+            <FormField label="Title" value={form.title} onChange={update('title')} required placeholder="e.g. Team Meeting" />
+            <FormField label="Description (optional)" type="textarea" value={form.description} onChange={update('description')} placeholder="Add a description…" />
             <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
             <PrivacyToggle value={form.is_private} onChange={setPrivacy} />
             
@@ -52,8 +52,8 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
                 />
             </div>
 
-            <TimeRow form={form} update={update} setForm={setForm} />
-            <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
+            <TimeRow form={form} update={update} setForm={setForm} recurrenceValue={form.recurrence} onRecurrenceChange={setRecurrence} />
+            <RecurrenceField value={form.recurrence} onChange={setRecurrence} hideFrequency />
             {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}
             <ActionButtons onDelete={onDelete} />
         </form>

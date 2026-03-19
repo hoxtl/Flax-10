@@ -252,9 +252,23 @@
 }
 
 .compactDropdown {
-    max-height: 200px;
+    position: static;
+    max-height: 220px;
+    margin-top: 0;
+    padding: 6px;
+    gap: 2px;
+    border-radius: 10px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+}
+
+.compactDropdown .emptyStateWrap {
+    padding: 0;
 }
 
 .searchContainer .compactUserItem {
     justify-content: flex-start;
+    padding: 6px 8px;
+    gap: 10px;
+    border-radius: 8px;
 }
