@@ -70,18 +70,12 @@ def _should_skip_day(session_date, config):
 def _build_single_study_session(user, start, work_mins, break_mins, n_sessions):
     from studyFlax.models.timer.session_model import StudySession
     status = 'Overtime' if random.random() < 0.08 else 'Completed'
-    end = start + timedelta(minutes=work_mins + break_mins)
-    pause_secs = random.randint(0, max(60, work_mins * 6))  # 0 to ~10% of work time
     return StudySession(
-        user=user,
-        study_block_id=int(start.timestamp() * 1000),
-        start_time=start,
-        end_time=end,
-        duration=work_mins * 60,
-        break_duration=break_mins * 60,
-        pause_duration=pause_secs,
-        session_count=n_sessions,
-        task=random.choice(TASK_LABELS),
+        user=user, study_block_id=int(start.timestamp() * 1000),
+        start_time=start, end_time=start + timedelta(minutes=work_mins + break_mins),
+        duration=work_mins * 60, break_duration=break_mins * 60,
+        pause_duration=random.randint(0, max(60, work_mins * 6)),
+        session_count=n_sessions, task=random.choice(TASK_LABELS),
         status=status,
     )
 

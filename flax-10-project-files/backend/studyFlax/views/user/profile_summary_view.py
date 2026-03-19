@@ -244,75 +244,60 @@ def _build_connection_ids(user):
     incoming = CalendarShare.objects.filter(shared_with=user).values_list('owner_id', flat=True)
     return set(outgoing).union(incoming)
 
+def _map_mutual_user(user, request):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'profile_photo_url': build_profile_photo_url(user.profile_photo, request),
+    }
+
 def _build_mutual_connections(viewed_user, viewer, request):
     if not viewer or viewed_user.id == viewer.id:
         return {'count': 0, 'users': []}
-
-    viewer_connections = _build_connection_ids(viewer)
-    viewed_connections = _build_connection_ids(viewed_user)
-    mutual_ids = sorted((viewer_connections & viewed_connections) - {viewer.id, viewed_user.id})
+    v_ids = _build_connection_ids(viewer)
+    vd_ids = _build_connection_ids(viewed_user)
+    mutual_ids = sorted((v_ids & vd_ids) - {viewer.id, viewed_user.id})
     if not mutual_ids:
         return {'count': 0, 'users': []}
-
-    users = list(
-        User.objects.filter(id__in=mutual_ids)
-        .only('id', 'username', 'profile_photo')
-        .order_by('username')
-    )
+    users = list(User.objects.filter(id__in=mutual_ids).only('id', 'username', 'profile_photo').order_by('username'))
     return {
         'count': len(mutual_ids),
-        'users': [
-            {
-                'id': user.id,
-                'username': user.username,
-                'profile_photo_url': build_profile_photo_url(user.profile_photo, request),
-            }
-            for user in users[:5]
-        ],
+        'users': [_map_mutual_user(u, request) for u in users[:5]],
     }
+
+def _calc_activity_level(minutes, max_minutes):
+    if max_minutes <= 0 or minutes <= 0:
+        return 0
+    return min(4, max(1, math.ceil((minutes / max_minutes) * 4)))
+
+def _add_to_totals(session, totals):
+    day = timezone.localtime(session.end_time).date() if session.end_time else None
+    if day in totals:
+        totals[day] += session.duration
 
 def _build_activity_sparkline(sessions):
     days = [timezone.localdate() - timedelta(days=offset) for offset in range(6, -1, -1)]
-    totals_by_day = {day: 0 for day in days}
-    for session in sessions:
-        if not session.end_time:
-            continue
-        day = timezone.localtime(session.end_time).date()
-        if day in totals_by_day:
-            totals_by_day[day] += session.duration
-
-    max_minutes = max(totals_by_day.values()) if totals_by_day else 0
-    points = []
-    for day in days:
-        minutes = totals_by_day[day]
-        if max_minutes <= 0 or minutes <= 0:
-            level = 0
-        else:
-            level = min(4, max(1, math.ceil((minutes / max_minutes) * 4)))
-        points.append({'date': day.isoformat(), 'level': level})
-    return points
+    totals = {day: 0 for day in days}
+    for s in sessions:
+        _add_to_totals(s, totals)
+    max_mins = max(totals.values()) if totals else 0
+    return [{'date': d.isoformat(), 'level': _calc_activity_level(totals[d], max_mins)} for d in days]
 
 def _build_profile_response(user, sessions_all, sessions_90, request):
-    """Build the profile summary response dict."""
-    current_streak, longest_streak = compute_streaks(sessions_all)
-    badges = compute_badges(sessions_all, sessions_90, current_streak, longest_streak, _get_module_count(user), user)
-    weekly_hours = get_weekly_study_hours(sessions_all)
-    weekly_goal = user.weekly_goal_hours or 20
-    complete_sessions = _filter_complete(sessions_all)
-    _, total_hours, session_count = _session_totals(complete_sessions)
+    c_s, l_s = compute_streaks(sessions_all)
+    badges = compute_badges(sessions_all, sessions_90, c_s, l_s, _get_module_count(user), user)
+    w_hrs, w_goal = get_weekly_study_hours(sessions_all), user.weekly_goal_hours or 20
+    comp_s = _filter_complete(sessions_all)
+    _, total_h, s_count = _session_totals(comp_s)
     return {
         'persona': derive_persona(sessions_90),
-        'streaks': {'current': current_streak, 'longest': longest_streak},
-        'badges': badges,
+        'streaks': {'current': c_s, 'longest': l_s}, 'badges': badges,
         'weekly': {
-            'hours_studied': weekly_hours,
-            'goal_hours': weekly_goal,
-            'percentage': min(round((weekly_hours / weekly_goal) * 100), 100) if weekly_goal else 0,
+            'hours_studied': w_hrs, 'goal_hours': w_goal,
+            'percentage': min(round((w_hrs / w_goal) * 100), 100) if w_goal else 0,
         },
-        'societies': _build_societies_list(user),
-        'total_hours': round(total_hours, 1),
-        'session_count': session_count,
-        'activity_sparkline': _build_activity_sparkline(complete_sessions),
+        'societies': _build_societies_list(user), 'total_hours': round(total_h, 1),
+        'session_count': s_count, 'activity_sparkline': _build_activity_sparkline(comp_s),
         'mutual_connections': _build_mutual_connections(user, request.user, request),
     }
 

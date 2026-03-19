@@ -182,32 +182,34 @@ INSIGHT_PROMPT_TEMPLATE = (
     "Student data:\n{context}"
 )
 
-def _extract_schedule_events(api_key, reply_text, today_str):
-    """Extract structured calendar events from an AI reply. Returns [] on any failure."""
+def _strip_markdown(raw):
+    if not raw.startswith('```'):
+        return raw
+    content = raw.split('```')[1]
+    return content[4:] if content.startswith('json') else content
+
+def _parse_json_reply(reply):
     try:
-        messages = [
-            {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
-            {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
-        ]
-        response, err = _openai_response_or_error(api_key, messages, max_tokens=400, model='gpt-4o-mini')
-        if err:
-            return []
-        content, err = _content_or_error(response)
-        if err:
-            return []
         import json
-        raw = content.strip()
-        # Strip markdown code fences if present
-        if raw.startswith('```'):
-            raw = raw.split('```')[1]
-            if raw.startswith('json'):
-                raw = raw[4:]
+        raw = _strip_markdown(reply.strip())
         events = json.loads(raw)
-        if not isinstance(events, list):
-            return []
-        return events
+        return events if isinstance(events, list) else []
     except Exception:
         return []
+
+def _extract_schedule_events(api_key, reply_text, today_str):
+    """Extract structured calendar events from an AI reply. Returns [] on any failure."""
+    messages = [
+        {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
+        {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
+    ]
+    response, err = _openai_response_or_error(api_key, messages, max_tokens=400, model='gpt-4o-mini')
+    if err:
+        return []
+    content, err = _content_or_error(response)
+    if err:
+        return []
+    return _parse_json_reply(content)
 
 def _call_openai(api_key, messages, max_tokens=800, model='gpt-4o'):
     """Make a chat completion request to OpenAI."""

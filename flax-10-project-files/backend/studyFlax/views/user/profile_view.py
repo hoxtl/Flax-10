@@ -54,47 +54,20 @@ def get_last_session_end(user):
     return last_session.end_time if last_session else None
 
 def build_profile_completion(user):
-    checkpoints = [
-        {
-            'id': 'photo_uploaded',
-            'label': 'Photo uploaded',
-            'complete': bool(user.profile_photo),
-            'next_action': 'add a profile photo',
-        },
-        {
-            'id': 'bio_written',
-            'label': 'Bio written',
-            'complete': bool((user.bio or '').strip()),
-            'next_action': 'add a bio to stand out',
-        },
-        {
-            'id': 'weekly_goal_set',
-            'label': 'Weekly goal set',
-            'complete': bool(user.weekly_goal_hours and user.weekly_goal_hours > 0),
-            'next_action': 'set a weekly goal',
-        },
-        {
-            'id': 'joined_three_societies',
-            'label': '3+ societies joined',
-            'complete': SocietyMembership.objects.filter(user=user).count() >= 3,
-            'next_action': 'join 3 societies',
-        },
-        {
-            'id': 'calendar_shared',
-            'label': 'Calendar shared',
-            'complete': CalendarShare.objects.filter(owner=user).exists(),
-            'next_action': 'share your calendar',
-        },
+    checks = [
+        ('photo_uploaded', 'Photo uploaded', bool(user.profile_photo), 'add a profile photo'),
+        ('bio_written', 'Bio written', bool((user.bio or '').strip()), 'add a bio to stand out'),
+        ('weekly_goal_set', 'Weekly goal set', bool(user.weekly_goal_hours and user.weekly_goal_hours > 0), 'set a weekly goal'),
+        ('joined_three_societies', '3+ societies joined', SocietyMembership.objects.filter(user=user).count() >= 3, 'join 3 societies'),
+        ('calendar_shared', 'Calendar shared', CalendarShare.objects.filter(owner=user).exists(), 'share your calendar'),
     ]
-    completed = sum(1 for checkpoint in checkpoints if checkpoint['complete'])
-    total = len(checkpoints)
-    next_checkpoint = next((checkpoint for checkpoint in checkpoints if not checkpoint['complete']), None)
+    cps = [{'id': i, 'label': l, 'complete': c, 'next_action': n} for i, l, c, n in checks]
+    comp = sum(1 for cp in cps if cp['complete'])
+    nxt = next((cp for cp in cps if not cp['complete']), None)
     return {
-        'percentage': round((completed / total) * 100) if total else 100,
-        'completed': completed,
-        'total': total,
-        'next_action': next_checkpoint['next_action'] if next_checkpoint else 'profile complete',
-        'checkpoints': checkpoints,
+        'percentage': round((comp / len(checks)) * 100) if checks else 100,
+        'completed': comp, 'total': len(checks), 'checkpoints': cps,
+        'next_action': nxt['next_action'] if nxt else 'profile complete',
     }
 
 def build_profile_response(user, request):
@@ -159,40 +132,29 @@ def another_user_profile_view(request, user_id):
         
     return Response(build_profile_response(user, request))
 
+def _get_suggestion_message(user, data):
+    start, end = data.get('slot_start', '').strip(), data.get('slot_end', '').strip()
+    custom = data.get('message', '').strip()
+    if custom:
+        return custom
+    if start and end:
+        return f"{user.username} suggested a study session from {start} to {end}."
+    return f"{user.username} suggested studying together this week."
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def suggest_study_session_view(request):
-    target_user_id = request.data.get('target_user_id')
-    if not target_user_id:
-        return Response({'error': 'target_user_id is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+    target_id = request.data.get('target_user_id')
+    if not target_id: return Response({'error': 'target_user_id is required'}, status=400)
     try:
-        target_user = User.objects.get(id=int(target_user_id))
+        target_user = User.objects.get(id=int(target_id))
     except (ValueError, TypeError, User.DoesNotExist):
-        return Response({'error': 'Target user not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        return Response({'error': 'Target user not found'}, status=404)
     if target_user == request.user:
-        return Response({'error': 'Cannot suggest a session to yourself'}, status=status.HTTP_400_BAD_REQUEST)
-
-    slot_start = (request.data.get('slot_start') or '').strip()
-    slot_end = (request.data.get('slot_end') or '').strip()
-    custom_message = (request.data.get('message') or '').strip()
-
-    if custom_message:
-        message = custom_message
-    elif slot_start and slot_end:
-        message = (
-            f"{request.user.username} suggested a study session from "
-            f"{slot_start} to {slot_end}."
-        )
-    else:
-        message = f"{request.user.username} suggested studying together this week."
-
+        return Response({'error': 'Cannot suggest to yourself'}, status=400)
     Notification.objects.create(
-        user=target_user,
-        title=f"Study session suggestion from {request.user.username}",
-        message=message,
-        notification_type='meeting_suggestion',
-        action_url='calendar',
+        user=target_user, title=f"Study session suggestion from {request.user.username}",
+        message=_get_suggestion_message(request.user, request.data),
+        notification_type='meeting_suggestion', action_url='calendar',
     )
-    return Response({'message': 'Study session suggestion sent'}, status=status.HTTP_201_CREATED)
+    return Response({'message': 'Study session suggestion sent'}, status=201)
