@@ -1,0 +1,9 @@
+.filterCheckbox {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border-radius: 4px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}

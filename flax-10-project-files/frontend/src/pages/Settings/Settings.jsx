@@ -1,19 +1,14 @@
-/**
- * Settings page — two-column layout with a sticky sidebar nav and a content panel.
- * Each tab renders a header strip with icon + description, then the form body.
+/*
+ * Settings page shell and tab state.
  */
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { User, Lock, Palette, MapPin, BookOpen } from "lucide-react";
 import styles from "./Settings.module.css";
-import { SettingsSidebar } from "../../components/Settings/SettingsUI";
-import AccountForm from "../../components/Settings/AccountForm";
-import SecurityForm from "../../components/Settings/SecurityForm";
-import PreferencesPanel from "../../components/Settings/PreferencesPanel";
-import HomeAddressForm from "../../components/Settings/HomeAddressForm";
-import CourseChangePanel from "../../components/Settings/CourseChangePanel";
+import { SettingsSidebar, SuccessBanner } from "../../components/Settings/SettingsUI";
 import AppPage from "../../components/common/AppPage/AppPage";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
+import SettingsPanelContent from "./SettingsPanelContent";
+import { VALID_TABS } from "./settingsPageConfig";
 
 const PANEL_META = {
   account: { icon: User, title: "Account", desc: "Manage your personal information and year of study." },
@@ -152,25 +147,26 @@ const VALID_TABS = new Set(Object.keys(PANEL_META));
 export default function Settings({ user }) {
   const [searchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState(
-    VALID_TABS.has(tabFromUrl) ? tabFromUrl : "account",
-  );
-  const handlers = useSettingsHandlers();
+  const [activeTab, setActiveTab] = useState(VALID_TABS.has(tabFromUrl) ? tabFromUrl : "account");
 
   useEffect(() => {
     if (tabFromUrl && VALID_TABS.has(tabFromUrl)) setActiveTab(tabFromUrl);
   }, [tabFromUrl]);
 
+  return { activeTab, setActiveTab };
+}
+
+export default function Settings({ user }) {
+  const { activeTab, setActiveTab } = useActiveTab();
+  const handlers = useSettingsHandlers();
+
   return (
-    <AppPage
-      title="Settings"
-      width="lg"
-      className={styles.pageWrapper}
-    >
+    <AppPage title="Settings" width="lg" className={styles.pageWrapper}>
+      <SuccessBanner message={handlers.successMessage} />
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
         <div className={styles.contentMain}>
-          <SettingsPanel activeTab={activeTab} handlers={handlers} user={user} />
+          <SettingsPanelContent activeTab={activeTab} handlers={handlers} user={user} />
         </div>
       </div>
     </AppPage>

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
 import { motion } from "framer-motion";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -762,7 +763,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect, false, 'day');
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {
@@ -998,22 +999,24 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25 }}
                 >
-                <button
-                  type="button"
-                  className={styles.manualScheduleBtn}
+                <PrimaryButton
+                  variant="primary"
+                  size="small"
+                  pill
                   onClick={() => openQuickAddSchedule('schedule_manual')}
                   aria-label="Open manual schedule quick add"
                 >
                   🧩 Manual Schedule
-                </button>
-                <button
-                  type="button"
-                  className={styles.autoScheduleBtn}
+                </PrimaryButton>
+                <PrimaryButton
+                  variant="ghost"
+                  size="small"
+                  pill
                   onClick={() => openQuickAddSchedule('schedule_auto')}
                   aria-label="Open auto schedule quick add"
                 >
                   ⚙️ Auto Schedule
-                </button>
+                </PrimaryButton>
                 </motion.div>
               )}
             </div>

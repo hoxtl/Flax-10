@@ -1,19 +1,21 @@
+/* Apple-style Event Cards — tag-colored background tint */
 .draggable-event {
     position: absolute;
     left: 4px;
     right: 4px;
-    background: var(--event-card-bg);
-    border-left: 4px solid var(--primary);
-    border-radius: 0 4px 4px 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary, #7B6751);
+    border-radius: 6px;
+    box-shadow: none;
     cursor: grab;
     overflow: hidden;
     min-height: 20px;
-    transition: box-shadow 0.2s, transform 0.1s;
+    transition: filter 0.15s, transform 0.1s;
+    display: flex;
+    align-items: flex-start;
 }
 
 .draggable-event:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(0.95);
     z-index: 10;
 }
 
@@ -21,42 +23,45 @@
 .draggable-event.dragging {
     opacity: 0.7;
     cursor: grabbing;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background: rgba(74, 52, 33, 0.06);
     transform: scale(1.02);
     z-index: 100;
 }
 
 /* Highlight while resizing */
 .draggable-event.resizing {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(74, 52, 33, 0.04);
     z-index: 100;
 }
 
 .event-content {
-    padding: 4px;
+    padding: 4px 6px 4px 6px;
+    flex: 1;
+    min-width: 0;
 }
 
 .event-title {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.625rem;
-    line-height: 1.2;
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.65rem;
+    line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .event-time {
-    font-size: 0.625rem;
-    color: var(--text-primary);
-    margin-top: 2px;
+    font-size: 0.6rem;
+    color: var(--text);
+    font-style: italic;
+    margin-top: 1px;
     line-height: 1.2;
 }
 
 .event-description {
-    font-size: 0.625rem;
-    color: var(--muted);
-    margin-top: 4px;
+    font-size: 0.6rem;
+    color: var(--text);
+    margin-top: 2px;
     line-height: 1.3;
     overflow: hidden;
     word-wrap: break-word;
@@ -67,7 +72,7 @@
     -webkit-box-orient: vertical;
 }
 
-/* The resize handle at the bottom - invisible but grabbable */
+/* The resize handle at the bottom */
 .resize-handle {
     position: absolute;
     bottom: 0;
@@ -75,25 +80,21 @@
     right: 0;
     height: 8px;
     cursor: ns-resize;
-    /* Up/down arrows cursor */
     background: transparent;
 }
 
-/* Show a visual indicator on hover */
 .resize-handle:hover {
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.1));
+    background: linear-gradient(transparent, rgba(74, 52, 33, 0.1));
 }
 
-/* More visible indicator while actively resizing */
 .draggable-event.resizing .resize-handle {
-    background: linear-gradient(transparent, rgba(139, 115, 85, 0.3));
+    background: linear-gradient(transparent, rgba(93, 64, 55, 0.25));
 }
 
-/* Read-only events - shared styling */
+/* Read-only events — still clickable to view details */
 .draggable-event.society-event,
 .draggable-event.timetable-event {
-    cursor: default;
-    background: var(--event-card-bg);
+    cursor: pointer;
 }
 
 .draggable-event.society-event:hover,
@@ -108,7 +109,8 @@
 
 .society-name {
     font-size: 0.55rem;
-    color: var(--muted);
+    color: var(--text);
+    font-style: italic;
     font-weight: 500;
     margin-top: 1px;
     overflow: hidden;
@@ -116,11 +118,11 @@
     white-space: nowrap;
 }
 
-/* Right-click context menu for calendar events */
+/* Right-click context menu */
 .event-ctx-menu {
     background: var(--surface-card);
-    border: 2px solid var(--border);
-    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     padding: 4px;
     min-width: 140px;
@@ -138,7 +140,7 @@
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 6px;
     transition: background 0.12s;
 }
 
@@ -156,6 +158,7 @@
 
 .event-ctx-divider {
     height: 1px;
-    background: var(--border);
+    background: var(--text);
+    opacity: 0.15;
     margin: 2px 8px;
 }

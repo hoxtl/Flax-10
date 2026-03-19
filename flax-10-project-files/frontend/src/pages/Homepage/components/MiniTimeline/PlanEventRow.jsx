@@ -138,8 +138,7 @@ export function PlanEventRow({
             onEventContextMenu?.(item, e.clientX, e.clientY);
           }}
           onClick={(e) => {
-            if (isReadOnly) return;
-            if (isOverlap) {
+            if (isOverlap && !isReadOnly) {
               handleConflictCardClick();
               return;
             }
@@ -147,16 +146,20 @@ export function PlanEventRow({
               onCardClick(item, matchTask, e.currentTarget.getBoundingClientRect());
               return;
             }
+            if (isReadOnly) return;
             onEdit?.(item, item.tag, e.currentTarget.getBoundingClientRect());
           }}
           onKeyDown={(e) => {
-            if (isReadOnly) return;
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              handleConflictCardClick();
+              if (onCardClick) {
+                onCardClick(item, matchTask, e.currentTarget.getBoundingClientRect());
+              } else if (!isReadOnly) {
+                handleConflictCardClick();
+              }
             }
           }}
-          style={{ "--card-accent": accentColor, cursor: isReadOnly ? "default" : undefined }}
+          style={{ "--card-accent": accentColor, cursor: isReadOnly ? "pointer" : undefined }}
         >
           {/* Coloured left-border accent */}
           <div className={styles.planTimelineCardAccent} aria-hidden />

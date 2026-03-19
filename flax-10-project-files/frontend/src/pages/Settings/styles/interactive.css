@@ -1,0 +1,353 @@
+/*
+ * Settings selectors, request cards, and modal interaction styles.
+ */
+/* Theme selector — card-style */
+.themeSelector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.themeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.18s;
+  overflow: hidden;
+  color: var(--muted);
+}
+
+.themeOption:hover {
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+}
+
+.themeOption.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.themePreview {
+  width: 100%;
+  height: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+.themePreviewLight {
+  background: #f8f5f2;
+}
+
+.themePreviewDark {
+  background: #1a1310;
+}
+
+.themePreviewBar {
+  height: 10px;
+  margin: 10px 10px 6px;
+  border-radius: 3px;
+}
+
+.themePreviewLight .themePreviewBar {
+  background: #c9b9a8;
+}
+
+.themePreviewDark .themePreviewBar {
+  background: #3d2e24;
+}
+
+.themePreviewLine {
+  height: 6px;
+  border-radius: 3px;
+  margin: 0 10px 5px;
+}
+
+.themePreviewLight .themePreviewLine {
+  background: #e2d8d0;
+}
+
+.themePreviewDark .themePreviewLine {
+  background: #2e2018;
+}
+
+.themePreviewLineShort {
+  width: 55%;
+}
+
+.themeOptionFooter {
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+}
+
+.themeLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.themeCheckmark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  font-size: 9px;
+}
+
+.themeOption.active .themeCheckmark {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* Sleep duration stat card */
+.sleepDurationCard {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  border-radius: calc(var(--radius-lg) - 4px);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--primary) 8%, transparent),
+      color-mix(in srgb, var(--primary) 3%, transparent));
+  padding: 14px 16px 26px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.sleepCardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Watermark moon — bottom-right corner at 10% opacity */
+.sleepMoonWatermark {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  font-size: 52px;
+  opacity: 0.10;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Full-width color-scale gradient bar: short → ideal → oversleep */
+.sleepGradientTrack {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(90deg,
+      #f59e0b 0%,
+      /* warm amber  — very short sleep */
+      #eab308 20%,
+      /* yellow      — still short */
+      #16a34a 50%,
+      /* forest green — ideal ~7-8h */
+      #15803d 62%,
+      /* deep green  — peak */
+      #6d28d9 82%,
+      /* violet      — oversleeping */
+      #7c3aed 100%
+      /* soft purple — too much */
+    );
+}
+
+/* Dot indicator showing current position on the scale */
+.sleepGradientIndicator {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  transition: left 0.4s ease;
+}
+
+.sleepDurationMain {
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+.sleepDurationMainIdeal {
+  font-size: 1.6rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--success-text, #16a34a);
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+.sleepDurationMeta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.sleepBatteryLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sleepLabelColor, var(--primary));
+}
+
+.lockedCourse {
+  padding: 9px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px dashed var(--border);
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 36px;
+  /* Match text-input background so the pill blends with other fields */
+  background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+  color: var(--text);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.lockedCourse em {
+  font-style: italic;
+}
+
+.courseChangeLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  margin-top: 5px;
+  display: inline-block;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.courseChangeLink:hover {
+  opacity: 0.75;
+}
+
+.courseRequestCard {
+  margin-top: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary) 5%, var(--panel));
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.courseRequestCardBody {
+  min-width: 0;
+}
+
+.courseRequestCardTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.courseRequestCardSub {
+  margin: 3px 0 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.courseRequestCard .cancelRequestBtn {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+.modalTextarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  background: color-mix(in srgb, var(--bg) 60%, var(--panel));
+  color: var(--text);
+  resize: vertical;
+  font-family: var(--font-body);
+  transition: border-color 0.18s, box-shadow 0.18s;
+  box-sizing: border-box;
+  min-height: 70px;
+}
+
+.modalTextarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+  background: var(--bg);
+}
+
+.modalWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+.modalWarningIcon {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.cancelRequestBtn {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font-body);
+  color: color-mix(in srgb, var(--primary) 60%, var(--muted));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.cancelRequestBtn:hover {
+  color: #b91c1c;
+}
+
+.cancelRequestBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

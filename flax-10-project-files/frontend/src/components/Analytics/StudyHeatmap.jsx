@@ -1,3 +1,7 @@
+/*
+ * Study heatmap chart.
+ */
+
 import styles from './Charts.module.css';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -14,6 +18,19 @@ const getLegendColor = (intensity, theme) => intensity === 0
 
 const formatHour = (h) => h === 0 ? '12am' : h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h - 12}pm`;
 const getDisplayHours = (hours) => hours.filter((_, i) => i % 3 === 0).map(formatHour);
+const getMaxValue = (data) => Math.max(...data.flat());
+
+const renderDayLabel = (day) => <div key={day} className={styles.dayLabel}>{day}</div>;
+
+const renderHourLabel = (hour, index) => <div key={index} className={styles.hourLabel}>{hour}</div>;
+
+function DayLabels({ days }) {
+  return <div className={styles.dayLabels}>{days.map(renderDayLabel)}</div>;
+}
+
+function HourLabels({ displayHours }) {
+  return <div className={styles.hourLabels}>{displayHours.map(renderHourLabel)}</div>;
+}
 
 function HeatmapCell({ value, maxValue, day, hour, theme }) {
   const color = getHeatmapColor(value, maxValue, theme);
@@ -59,26 +76,24 @@ function HeatmapLegend({ theme }) {
   );
 }
 
+function HeatmapRows({ data, days, hours, maxValue, theme }) {
+  return data.map((dayData, dayIndex) => (
+    <HeatmapRow key={dayIndex} dayData={dayData} dayIndex={dayIndex} days={days} hours={hours} maxValue={maxValue} theme={theme} />
+  ));
+}
+
 const StudyHeatmap = ({ heatmapData }) => {
   const { mode: theme } = useTheme();
   const { data, days, hours } = heatmapData;
-  const maxValue = Math.max(...data.flat());
+  const maxValue = getMaxValue(data);
   const displayHours = getDisplayHours(hours);
   return (
     <div className={styles.heatmapContainer}>
       <div className={styles.heatmapGrid}>
-        <div className={styles.dayLabels}>
-          {days.map(day => <div key={day} className={styles.dayLabel}>{day}</div>)}
-        </div>
+        <DayLabels days={days} />
         <div className={styles.gridContainer}>
-          <div className={styles.hourLabels}>
-            {displayHours.map((hour, i) => <div key={i} className={styles.hourLabel}>{hour}</div>)}
-          </div>
-          <div className={styles.grid}>
-            {data.map((dayData, dayIndex) => (
-              <HeatmapRow key={dayIndex} dayData={dayData} dayIndex={dayIndex} days={days} hours={hours} maxValue={maxValue} theme={theme} />
-            ))}
-          </div>
+          <HourLabels displayHours={displayHours} />
+          <div className={styles.grid}><HeatmapRows data={data} days={days} hours={hours} maxValue={maxValue} theme={theme} /></div>
         </div>
       </div>
       <HeatmapLegend theme={theme} />

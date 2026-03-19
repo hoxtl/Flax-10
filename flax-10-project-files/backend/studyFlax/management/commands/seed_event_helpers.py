@@ -40,12 +40,15 @@ def _in_reading_week(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
     return READING_WEEK_START <= d <= READING_WEEK_END
 
+ACADEMIC_TAG_NAMES = {'Lecture', 'Exam'}
+
 def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
+    personal_tags = [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
+    tag = random.choice(personal_tags) if personal_tags and random.random() > 0.2 else None
     return CalendarEvent(
         user=user,
         title=title,
@@ -128,7 +131,7 @@ def _meal_events_for_day(user, day_offset, tag):
 
 def _resolve_meal_tag(user, tags):
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    priorities = ('Meals', 'Routine', 'Wellness', 'Other')
+    priorities = ('Meals', 'Other')
     for name in priorities:
         match = next((t for t in user_tags if t.name == name), None)
         if match:
