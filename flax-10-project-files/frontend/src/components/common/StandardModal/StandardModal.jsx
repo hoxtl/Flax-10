@@ -2,13 +2,14 @@ import { X } from "lucide-react";
 import { createPortal } from "react-dom";
 import styles from "./StandardModal.module.css";
 
-export function ModalHeader({ title, subtitle, onClose, centerText }) {
+export function ModalHeader({ title, subtitle, onClose, centerText, subtitleClassName = "" }) {
     const headerClasses = centerText ? `${styles.header} ${styles.headerCentered}` : styles.header;
+    const subtitleClasses = [styles.sub, subtitleClassName].filter(Boolean).join(" ");
     return (
         <div className={headerClasses}>
             <div>
                 <h2 className={styles.title}>{title}</h2>
-                {subtitle && <p className={styles.sub}>{subtitle}</p>}
+                {subtitle && <p className={subtitleClasses}>{subtitle}</p>}
             </div>
             <button className={styles.close} onClick={onClose} type="button" aria-label="Close">
                 <X size={16} strokeWidth={2.2} />
@@ -20,6 +21,7 @@ export function ModalHeader({ title, subtitle, onClose, centerText }) {
 export default function StandardModal({
     title,
     subtitle,
+    subtitleClassName = "",
     onClose,
     children,
     size = "md",
@@ -46,6 +48,7 @@ export default function StandardModal({
                     <ModalHeader
                         title={title}
                         subtitle={subtitle}
+                        subtitleClassName={subtitleClassName}
                         onClose={onClose}
                         centerText={centerText}
                     />

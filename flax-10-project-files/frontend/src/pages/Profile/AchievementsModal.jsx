@@ -96,11 +96,52 @@ export default function AchievementsModal({ badges, onClose }) {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
   return (
-    <StandardModal onClose={onClose} hideHeader size="lg" backdropClassName={styles.modalBackdrop} modalClassName={styles.modalShell} contentClassName={styles.modalContent}>
-      <AchievementsHeader totalEarned={earnedIds.size} totalBadges={ALL_BADGES.length} onClose={onClose} />
-      <div className={styles.body}>
-        {CATEGORIES.map(cat => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}
-      </div>
+    <StandardModal
+      onClose={onClose}
+      hideHeader
+      size="lg"
+      backdropClassName={styles.modalBackdrop}
+      modalClassName={styles.modalShell}
+      contentClassName={styles.modalContent}
+    >
+        {/* Header */}
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.title}>Achievements</h2>
+            <p className={styles.subtitle}>
+              {totalEarned} / {totalBadges} unlocked
+            </p>
+          </div>
+          {/* Progress bar */}
+          <div className={styles.progressWrap}>
+            <div
+              className={styles.progressBar}
+              style={{ width: `${(totalEarned / totalBadges) * 100}%` }}
+            />
+          </div>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+        </div>
+
+        {/* Body */}
+        <div className={styles.body}>
+          {CATEGORIES.map(cat => {
+            const catBadges = ALL_BADGES.filter(b => b.category === cat);
+            const catEarned = catBadges.filter(b => earnedIds.has(b.id)).length;
+            return (
+              <div key={cat} className={styles.category}>
+                <div className={styles.catHeader}>
+                  <span className={`${styles.catName} ${styles.catNameEmphasis}`}>{cat}</span>
+                  <span className={styles.catCount}>{catEarned}/{catBadges.length}</span>
+                </div>
+                <div className={styles.grid}>
+                  {catBadges.map(b => (
+                    <BadgeTile key={b.id} badge={b} earned={earnedIds.has(b.id)} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
     </StandardModal>
   );
 }

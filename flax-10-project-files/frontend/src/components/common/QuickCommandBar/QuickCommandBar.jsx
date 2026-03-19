@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 import styles from "./QuickCommandBar.module.css";
-import EmptyState from "../EmptyState/EmptyState";
+import SearchEmptyState from "../SearchEmptyState/SearchEmptyState";
 
 function isEditableTarget(target) {
   const tag = target?.tagName;
@@ -206,10 +206,10 @@ export default function QuickCommandBar({ onNavChange, onOpenTask }) {
                 );
               })}
               {!visible.length && (
-                <EmptyState
-                  icon="🔍"
-                  title="No matching action"
-                  description="Try a different search term"
+                <SearchEmptyState
+                  query={query}
+                  itemLabel="actions"
+                  onClear={() => setQuery("")}
                 />
               )}
             </div>

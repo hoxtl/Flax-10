@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
@@ -9,6 +10,7 @@ import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { getEventTheme } from './utils/eventStyleUtils';
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
@@ -28,7 +30,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        openPopup(event, rect);
+        openPopup(event, rect, true);
     };
 
     return (
@@ -55,6 +57,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
     const [ctxMenu, setCtxMenu] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const ctxRef = useRef(null);
 
     useEffect(() => {
@@ -68,7 +71,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
         if (isDragging || resize.isResizing) return;
         const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect);
+        openPopup(event, rect, false);
     };
 
     const handleContextMenu = (e) => {
@@ -97,14 +100,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
             if (choice === true) await executeDelete(event, { removeEvent });
             else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
         } else {
-            const choice = await confirmFn({
-                title: "Delete Event",
-                message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
-                confirmText: "Delete",
-                cancelText: "Cancel",
-                isDanger: true
-            });
-            if (choice) await executeDelete(event, { removeEvent });
+            setDeleteTarget(event);
         }
     };
 
@@ -116,10 +112,23 @@ function EditableEvent({ event, style, minWidthForDetails }) {
                 onContextMenu={handleContextMenu} />
             {ctxMenu && (
                 <div ref={ctxRef} className="event-ctx-menu" style={{ position: 'fixed', top: ctxMenu.y, left: ctxMenu.x, zIndex: 99999 }}>
-                    <button className="event-ctx-item" onClick={handleEdit}>✏️ Edit</button>
+                    <button className="event-ctx-item" onClick={handleEdit}><Pencil size={14} strokeWidth={2} /> Edit</button>
                     <div className="event-ctx-divider" />
-                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}>🗑 Delete</button>
+                    <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
                 </div>
+            )}
+            {deleteTarget && (
+                <HoldConfirmModal
+                    title="Delete Event"
+                    warningText={`"${deleteTarget.title}" will be permanently deleted. This action cannot be undone.`}
+                    cancelLabel="Keep Event"
+                    holdLabel="Hold to Delete"
+                    onConfirm={async () => {
+                        await executeDelete(deleteTarget, { removeEvent });
+                        setDeleteTarget(null);
+                    }}
+                    onCancel={() => setDeleteTarget(null)}
+                />
             )}
         </>
     );
@@ -173,10 +182,17 @@ function TimeDisplay({ event }) {
     return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
+function hexToRgb(hex) {
+    const h = (hex || '#7B6751').replace('#', '');
+    const num = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
 function buildStyle(baseStyle, theme, resizePreview) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
     style.borderLeftColor = theme.color;
+    style.backgroundColor = `rgba(${hexToRgb(theme.color)}, 0.12)`;
     return style;
 }
 

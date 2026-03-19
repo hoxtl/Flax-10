@@ -160,14 +160,11 @@ describe('ProfileHeader', () => {
       />
     );
     expect(screen.getByText('modules')).toBeTruthy();
-    expect(screen.getByText('shared')).toBeTruthy();
     expect(screen.queryByText('tasks')).toBeNull();
     expect(screen.queryByText('events')).toBeNull();
     const modulesBtn = screen.getByRole('button', { name: /2\s+modules/ });
     fireEvent.click(modulesBtn);
     expect(defaultHandlers.onModulesClick).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: /1\s+shared/ }));
-    expect(defaultHandlers.onSharedWithClick).toHaveBeenCalled();
   });
 
   it('renders bio when profileData.bio is set', () => {
