@@ -6,7 +6,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0004_usersettings_homepage_widget_sizes'),
         ('studyFlax', '0016_merge_20260304_0920'),
     ]
 
