@@ -2,13 +2,15 @@
 AI-powered study insights and chat views using OpenAI.
 """
 
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+import json
+from datetime import timedelta
+
 from django.conf import settings
 from django.utils import timezone
-from datetime import timedelta
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
@@ -26,6 +28,7 @@ except ImportError:
     openai_available = False
 
 OPENAI_API_ERROR_TYPES = (OpenAIError, IndexError, TypeError, KeyError, AttributeError)
+
 
 def _check_openai():
     """Return (api_key, error_response) with None error when available."""
@@ -185,29 +188,46 @@ INSIGHT_PROMPT_TEMPLATE = (
 def _extract_schedule_events(api_key, reply_text, today_str):
     """Extract structured calendar events from an AI reply. Returns [] on any failure."""
     try:
-        messages = [
-            {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
-            {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
-        ]
-        response, err = _openai_response_or_error(api_key, messages, max_tokens=400, model='gpt-4o-mini')
-        if err:
-            return []
-        content, err = _content_or_error(response)
-        if err:
-            return []
-        import json
-        raw = content.strip()
-        # Strip markdown code fences if present
-        if raw.startswith('```'):
-            raw = raw.split('```')[1]
-            if raw.startswith('json'):
-                raw = raw[4:]
-        events = json.loads(raw)
-        if not isinstance(events, list):
-            return []
-        return events
+        return _parse_schedule_events(api_key, reply_text, today_str)
     except Exception:
         return []
+
+
+def _fetch_schedule_response(api_key, reply_text, today_str):
+    messages = [
+        {'role': 'system', 'content': SCHEDULE_EXTRACTION_PROMPT},
+        {'role': 'user', 'content': f"Today is {today_str}.\n\n{reply_text}"},
+    ]
+    return _openai_response_or_error(api_key, messages, max_tokens=400, model='gpt-4o-mini')
+
+
+def _strip_code_fence(content):
+    raw = content.strip()
+    if not raw.startswith('```'):
+        return raw
+    fenced = raw.split('```')[1]
+    return fenced[4:] if fenced.startswith('json') else fenced
+
+
+def _parse_schedule_events(api_key, reply_text, today_str):
+    response = _schedule_response_or_none(api_key, reply_text, today_str)
+    if response is None:
+        return []
+    content = _schedule_content_or_none(response)
+    if content is None:
+        return []
+    events = json.loads(_strip_code_fence(content))
+    return events if isinstance(events, list) else []
+
+
+def _schedule_response_or_none(api_key, reply_text, today_str):
+    response, err = _fetch_schedule_response(api_key, reply_text, today_str)
+    return None if err else response
+
+
+def _schedule_content_or_none(response):
+    content, err = _content_or_error(response)
+    return None if err else content
 
 def _call_openai(api_key, messages, max_tokens=800, model='gpt-4o'):
     """Make a chat completion request to OpenAI."""

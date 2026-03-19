@@ -1,4 +1,4 @@
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../../common/AnimatedDropdown";
 
 export default function ModuleDropdown({ value, onChange, options, className = "" }) {
     return (

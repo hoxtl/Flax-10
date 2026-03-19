@@ -1,0 +1,70 @@
+/** Styles for module schedule section with day/time, duration, and location. */
+.scheduleRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.scheduleItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 140px;
+}
+
+.scheduleIcon {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.scheduleDivider {
+    width: 1px;
+    align-self: stretch;
+    min-height: 2.4rem;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+.scheduleLabel {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.15rem;
+}
+
+.scheduleValue {
+    font-size: 0.88rem;
+    color: var(--text);
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.recurringBadge {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    padding: 0.7rem 0.8rem;
+    border-radius: var(--radius-md);
+    font-size: 0.86rem;
+    color: var(--warning-text);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .scheduleRow {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .scheduleDivider {
+        display: none;
+    }
+}

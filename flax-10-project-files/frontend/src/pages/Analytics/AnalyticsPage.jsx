@@ -9,6 +9,7 @@ import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import AnalyticsOverview from './components/AnalyticsOverview';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
+import { BackToTop } from '../../components/Pagination/Pagination';
 import { PERIODS, TABS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';
@@ -46,6 +47,7 @@ export default function AnalyticsPage() {
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <BackToTop />
     </AppPage>
   );
 }

@@ -1,13 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModuleDetails from '../../../components/Modules/ModuleDetails';
+import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
 
 vi.mock('../../../utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
 }));
 
-vi.mock('../ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
 
 const module = { //values for mock module
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',

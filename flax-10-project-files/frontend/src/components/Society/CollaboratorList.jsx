@@ -1,3 +1,6 @@
+/*
+ * CollaboratorList renders selected collaborators and role controls.
+ */
 import styles from "./CollaboratorList.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 

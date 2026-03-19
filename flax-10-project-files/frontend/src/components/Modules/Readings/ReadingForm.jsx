@@ -1,6 +1,7 @@
+/** Form for creating and editing module readings with validation. */
 import {useState} from 'react';
-import styles from './DeadlineForm.module.css';
-import DateTimePicker from '../common/inputs/DateTimePicker';
+import styles from '../Deadlines/DeadlineForm.module.css';
+import DateTimePicker from '../../common/inputs/DateTimePicker';
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 
@@ -87,6 +88,10 @@ function FormActions({ onCancel, isEditing }) {
 function useReadingFormValidation() {
     const [error, setError] = useState('');
     const validate = (form) => {
+        if (!form.deadline) {
+            setError("Due date cannot be empty.");
+            return false;
+        }
         if (form.chapter && form.chapter.trim().startsWith('-')) {
             setError("Chapter cannot be negative."); 
             return false

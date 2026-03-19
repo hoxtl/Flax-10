@@ -77,13 +77,13 @@ function setHandlerError(setter, message, setIsSaving) {
 }
 
 export async function saveAccount(data, actions) {
-  const { setPasswordError, setSuccessMessage, setIsSaving } = actions;
+  const { setPasswordError, setBannerMessage, setIsSaving } = actions;
   if (!hasToken()) return setHandlerError(setPasswordError, "You are not logged in, please try again...", setIsSaving);
   const response = await patchSettingsSafe(getAccountPayload(data), { ok: false, data: {} });
   if (!response.ok) return setHandlerError(setPasswordError, response.data.error || "The account update has failed...", setIsSaving);
   const incoming = response.data.user || response.data;
   saveAuthUser(mergeAccountSettingsToUser(getStoredUser(), incoming));
-  showTemporaryMessage(setSuccessMessage, "The account has been updated!");
+  setBannerMessage("");
   setIsSaving(false);
   return true;
 }
@@ -96,35 +96,35 @@ function validatePassword(data, setPasswordError) {
 }
 
 export async function savePassword(data, actions) {
-  const { setPasswordError, setSuccessMessage, setIsSaving } = actions;
+  const { setPasswordError, setBannerMessage, setIsSaving } = actions;
   if (!validatePassword(data, setPasswordError)) return false;
   if (!hasToken()) return setHandlerError(setPasswordError, "You are not logged in");
   setIsSaving(true);
   const response = await patchSettingsSafe({ password: data.newPassword }, { ok: false, data: { error: "Failed to change password" } });
   if (!response.ok) return setHandlerError(setPasswordError, response.data.error || "Failed to change password", setIsSaving);
-  showTemporaryMessage(setSuccessMessage, "Password changed! Please log in again.");
+  setBannerMessage("");
   setTimeout(clearAuthAndRedirect, 2000);
   setIsSaving(false);
   return true;
 }
 
 export async function savePreferences(data, actions) {
-  const { setSuccessMessage, setIsSaving } = actions;
+  const { setBannerMessage, setIsSaving } = actions;
   const response = await updateUserSettings({ theme: data.theme, mode: data.mode }).catch(() => null);
   if (response?.user) saveUserToStorage(response.user);
-  showTemporaryMessage(setSuccessMessage, response ? "Preferences saved successfully!" : "Failed to save preferences");
+  if (!response) showTemporaryMessage(setBannerMessage, "Failed to save preferences");
   setIsSaving(false);
   return Boolean(response);
 }
 
-function createPatchSaveHandler(key, successMessage, errorMessage) {
+function createPatchSaveHandler(key, errorMessage) {
   return async (data, actions) => {
-    const { setSuccessMessage, setIsSaving } = actions;
+    const { setBannerMessage, setIsSaving } = actions;
     if (!hasToken()) return false;
     setIsSaving(true);
     const payload = { [key]: data[key] };
     const response = await patchSettingsSafe(payload, { ok: false });
-    showTemporaryMessage(setSuccessMessage, response.ok ? successMessage : errorMessage);
+    if (!response.ok) showTemporaryMessage(setBannerMessage, errorMessage);
     setIsSaving(false);
     return response.ok;
   };
@@ -132,35 +132,31 @@ function createPatchSaveHandler(key, successMessage, errorMessage) {
 
 export const saveSleep = createPatchSaveHandler(
   "sleep_time",
-  "Sleep schedule saved!",
   "Failed to save sleep schedule",
 );
 
 export const saveStudyTime = createPatchSaveHandler(
   "preferred_study_minutes_per_day",
-  "Study time preference saved!",
   "Failed to save study time preference",
 );
 
 export const saveWeekPreference = createPatchSaveHandler(
   "week_preference",
-  "Week preference saved!",
   "Failed to save week preference",
 );
 
 export const saveWorktimePreference = createPatchSaveHandler(
   "worktime_preference",
-  "Worktime preference saved!",
   "Failed to save worktime preference",
 );
 
 export async function saveSleepWindow(data, actions) {
-  const { setSuccessMessage, setIsSaving } = actions;
+  const { setBannerMessage, setIsSaving } = actions;
   if (!hasToken()) return false;
   setIsSaving(true);
   const payload = { sleep_time: data.sleep_time, wake_time: data.wake_time };
   const response = await patchSettingsSafe(payload, { ok: false });
-  showTemporaryMessage(setSuccessMessage, response.ok ? "Sleep schedule saved!" : "Failed to save sleep schedule");
+  if (!response.ok) showTemporaryMessage(setBannerMessage, "Failed to save sleep schedule");
   setIsSaving(false);
   return response.ok;
 }
@@ -170,17 +166,15 @@ function notifyHomeAddressUpdated() {
 }
 
 export async function saveAddress(address, actions) {
-  const { setHomeAddressError, setSuccessMessage, setIsSaving } = actions;
+  const { setHomeAddressError, setBannerMessage, setIsSaving } = actions;
   if (!address.trim()) return setHandlerError(setHomeAddressError, "Please enter a valid home address");
   setIsSaving(true);
   setHomeAddressError("");
-  setSuccessMessage("");
-  const coords = await geocodeAddress(address).catch(() => null);
-  if (!coords) return setHandlerError(setHomeAddressError, "Address not found, please try again...", setIsSaving);
+  setBannerMessage("");
   try {
-    await saveHomeAddress(address, coords.latitude, coords.longitude);
+    const coords = await geocodeAddress(address).catch(() => null);
+    await saveHomeAddress(address, coords?.latitude ?? null, coords?.longitude ?? null);
     notifyHomeAddressUpdated();
-    showTemporaryMessage(setSuccessMessage, "Home address has been saved!");
     return true;
   } catch {
     return setHandlerError(setHomeAddressError, "Home address could not be saved, please try again...");

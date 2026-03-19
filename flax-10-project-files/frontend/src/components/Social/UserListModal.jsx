@@ -1,3 +1,7 @@
+/*
+ * Modal for showing and interacting with a list of users.
+ */
+
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
 import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
@@ -12,15 +16,14 @@ function isCurrentUser(user, currentUser) {
 }
 
 function sortUsers(users, currentUser) {
-    return [...users].sort((a, b) => {
-        if (isCurrentUser(a, currentUser)) return -1;
-        if (isCurrentUser(b, currentUser)) return 1;
-        if (a.is_sharing && !b.is_sharing) return -1;
-        if (!a.is_sharing && b.is_sharing) return 1;
+    return [...users].sort((left, right) => {
+        if (isCurrentUser(left, currentUser)) return -1;
+        if (isCurrentUser(right, currentUser)) return 1;
+        if (left.is_sharing && !right.is_sharing) return -1;
+        if (!left.is_sharing && right.is_sharing) return 1;
         return 0;
     });
 }
-
 
 function formatName(user) {
     const fn = user.first_name || '';
@@ -28,33 +31,20 @@ function formatName(user) {
     return (fn || ln) ? `${fn} ${ln}`.trim() : user.username;
 }
 
+function buildRenderItem(currentUser, onUserClick, onUserUpdate) {
+    return (user, index) => <UserListItem key={user.id || user.username || index} user={user} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />;
+}
+
+function UserListItem({ user, currentUser, onUserClick, onUserUpdate }) {
+    const isSelf = isCurrentUser(user, currentUser);
+    const rightAction = isSelf ? null : <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />;
+    return <SummaryItem avatar={<UserAvatar user={user} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
+}
+
 export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
-    const sortedUsers = sortUsers(users, currentUser);
-
-    return (
-        <GenericSummaryModal
-            isOpen={true}
-            onClose={onClose}
-            title={title}
-            emptyMessage="No users found"
-            emptyIcon="👥"
-            emptyDescription="No one is sharing with you yet"
-            items={sortedUsers}
-            renderItem={(u, i) => {
-                const isSelf = isCurrentUser(u, currentUser);
-                return (
-                    <SummaryItem
-                        key={u.id || u.username || i}
-                        avatar={<UserAvatar user={u} avatarOnly />}
-                        title={formatName(u)}
-                        subtitle={`@${u.username}`}
-                        onClick={() => onUserClick?.(u)}
-                        rightAction={!isSelf ? <ShareButton userId={u.id} initialIsSharing={u.is_sharing} onToggle={onUserUpdate} /> : null}
-                    />
-                );
-            }}
-        />
-    );
+    const items = sortUsers(users, currentUser);
+    const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate);
+    return <GenericSummaryModal isOpen={true} onClose={onClose} title={title} emptyMessage="No users found." emptyIcon="👥" emptyDescription="No one is sharing with you yet" items={items} renderItem={renderItem} />;
 }

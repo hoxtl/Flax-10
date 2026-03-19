@@ -1,8 +1,9 @@
-import { useReadingModal } from "./hooks/useReadingModal";
+/** Modal for managing module readings with create, edit, and delete functionality. */
+import { useReadingModal } from "../hooks/useReadingModal";
 import ReadingForm from "./ReadingForm";
 import ReadingCard from "./ReadingCard";
-import styles from './DeadlineModal.module.css';
-import StandardModal from "../common/StandardModal/StandardModal";
+import styles from '../Deadlines/DeadlineModal.module.css';
+import StandardModal from "../../common/StandardModal/StandardModal";
 
 export default function ReadingModal({ module, onClose}) {
     const modal = useReadingModal(module.id);

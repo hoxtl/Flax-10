@@ -1,3 +1,4 @@
+/** Helper functions for module form data initialization and validation. */
 import { formatForInput } from './moduleUtils.js';
 
 export function getFormData() {

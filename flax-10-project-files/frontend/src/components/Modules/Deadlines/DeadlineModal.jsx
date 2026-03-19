@@ -1,7 +1,8 @@
-import { useDeadlineModal } from './hooks/useDeadlineModal';
+/** Modal for managing module deadlines with create, edit, and delete functionality. */
+import { useDeadlineModal } from '../hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
-import StandardModal from '../common/StandardModal/StandardModal';
+import StandardModal from '../../common/StandardModal/StandardModal';
 import styles from './DeadlineModal.module.css';
 
 export default function DeadlineModal({ module, onClose, startCreating }) {

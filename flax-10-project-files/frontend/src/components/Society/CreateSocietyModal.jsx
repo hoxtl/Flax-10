@@ -8,11 +8,13 @@ import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
-import CategorySelector from "./CategorySelector";
-import FormField from "../common/FormField/FormField";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
+import { TagsSelector } from "../common/TagsSelector/TagsSelector";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../common/StandardModal/StandardModal";
 import TextInput from "../common/TextInput/TextInput";
+
+const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 
 const isValidEmail = (email) => {
     const trimmed = email.trim();
@@ -20,11 +22,11 @@ const isValidEmail = (email) => {
 };
 
 export default function CreateSocietyModal({ onClose, onCreate }) {
-    const logic = useCreateSocietyForm(onCreate, onClose);
+    const logic = useCreateSocietyForm(onCreate);
     const { collab, photo } = logic.modals;
     return (
         <>
-            <StandardModal title="Create Society" subtitle="Start your own society" onClose={onClose}>
+            <StandardModal title="Create Society" onClose={onClose}>
                 <FormFields form={logic.form} update={logic.update} setModals={logic.setModals} />
                 <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
             </StandardModal>
@@ -35,7 +37,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 /** Custom hook to manage the creation form state and modal logic. */
-function useCreateSocietyForm(onCreate, onClose) {
+function useCreateSocietyForm(onCreate) {
     const [form, setForm] = useState(initialForm());
     const [modals, setModals] = useState({ collab: false, photo: false });
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));
@@ -88,9 +90,9 @@ function FormFields({ form, update, setModals }) {
         <div className={styles.form}>
             <NameField value={form.name} onChange={hs.name} />
             <BioField value={form.bio} onChange={hs.bio} />
-            <CategorySelector value={form.categories} onChange={hs.categories} label="Categories" multiple />
-            <AdminEmailsField value={form.adminEmails} onChange={hs.adminEmails} invalid={inval} />
+            <CategoriesField value={form.categories} onChange={hs.categories} />
             <PhotosField images={form.images} onOpen={() => setModals(m => ({ ...m, photo: true }))} />
+            <AdminEmailsField value={form.adminEmails} onChange={hs.adminEmails} invalid={inval} />
             <CollaboratorsField collaborators={form.collaborators} onOpen={() => setModals(m => ({ ...m, collab: true }))}
                 onRoleChange={hs.role} onRemove={hs.remove} />
             <RatificationToggle requested={form.requestRatification} onToggle={hs.ratification} />
@@ -110,30 +112,53 @@ function getFieldHandlers(form, update) {
     };
 }
 
+function CategoriesField({ value = [], onChange }) {
+    const selected = Array.isArray(value) ? value : [];
+    const selectedTagObjects = CATEGORY_TAGS.filter(t => selected.includes(t.id));
+    const handleSelectionChange = (newSelected) => onChange(newSelected.map(t => t.id));
+    return (
+        <div className={styles.field}>
+            <label className={styles.label}>Categories</label>
+            <TagsSelector
+                tags={CATEGORY_TAGS}
+                selectedTags={selectedTagObjects}
+                onSelectionChange={handleSelectionChange}
+                emptyHint="Select society categories…"
+            />
+        </div>
+    );
+}
+
 function NameField({ value, onChange }) {
     return (
-        <FormField label="Society Name *" className={styles.field}>
-            <TextInput className={styles.input} value={value} onChange={e => onChange(e.target.value)}
-                placeholder="e.g. Photography Club" />
-        </FormField>
+        <div className={styles.field}>
+            <label className={styles.label}>Society Name <span className={styles.required}>*</span></label>
+            <TextInput value={value} onChange={e => onChange(e.target.value)} placeholder="e.g. Photography Club" />
+        </div>
     );
 }
 
 function BioField({ value, onChange }) {
     return (
-        <FormField label="Bio / Description" className={styles.field}>
-            <TextInput multiline className={styles.textarea} value={value} onChange={e => onChange(e.target.value)}
+        <div className={styles.field}>
+            <label className={styles.label}>Bio / Description</label>
+            <TextInput multiline value={value} onChange={e => onChange(e.target.value)}
                 placeholder="What is your society about?" rows={3} />
-        </FormField>
+        </div>
     );
 }
 
 function AdminEmailsField({ value, onChange, invalid }) {
     return (
-        <FormField label="Admin Emails (optional)" error={invalid ? "Please check all emails are valid" : ""} hint="Comma separated. Defaults to your email if empty." className={styles.field}>
-            <TextInput className={styles.input} value={value} onChange={e => onChange(e.target.value)}
+        <div className={styles.field}>
+            <label className={styles.label}>Admin Emails <span className={styles.optional}>(optional)</span></label>
+            <TextInput value={value} onChange={e => onChange(e.target.value)}
                 placeholder="e.g. contact@society.com, admin@society.com" />
-        </FormField>
+            {invalid
+                ? <p className={styles.error}>Please check all emails are valid</p>
+                : <p className={styles.hint}>Comma separated. Defaults to your email if empty.</p>
+            }
+        </div>
     );
 }
 
@@ -141,7 +166,7 @@ function PhotosField({ images, onOpen }) {
     const hasPhotos = images.length > 0;
     return (
         <div className={styles.field}>
-            <label className={styles.label}>Photos ({images.length}/5)</label>
+            <label className={styles.label}>Photos <span className={styles.optional}>({images.length}/5)</span></label>
             {hasPhotos && <div className={styles.photoSummary}>
                 {images.map((img, i) => <div key={i} className={styles.summaryCard} style={{ backgroundImage: `url("${img}")` }} />)}
             </div>}
@@ -156,9 +181,9 @@ function PhotosField({ images, onOpen }) {
 function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
     return (
         <div className={styles.field}>
-            <label className={styles.label}>Collaborators</label>
-            <CollaboratorList collaborators={collaborators} onRoleChange={onRoleChange}
-                onRemove={onRemove} emptyMessage="No collaborators added yet." />
+            <label className={styles.label}>Collaborators <span className={styles.optional}>(optional)</span></label>
+            {collaborators.length > 0 && <CollaboratorList collaborators={collaborators} onRoleChange={onRoleChange}
+                onRemove={onRemove} />}
             <PrimaryButton type="button" className={styles.addCollabBtn} variant="secondary" pill onClick={onOpen}>+ Add Collaborators</PrimaryButton>
             <p className={styles.hint}>Collaborators can edit society details and manage events</p>
         </div>

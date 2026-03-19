@@ -1,11 +1,12 @@
+/** Form for creating and editing modules with department/course selection. */
 import { useState, useEffect, useMemo } from 'react';
-import { createModule, updateModule } from '../../api/moduleApi';
-import { serialiseModule } from './utils/moduleUtils';
-import { validateForm, getFormData, updateForm } from './utils/moduleHelpers';
-import { KCL_DEPARTMENTS } from '../../lib/kclCourses';
-import AnimatedDropdown from '../common/AnimatedDropdown/AnimatedDropdown';
+import { createModule, updateModule } from '../../../api/moduleApi';
+import { serialiseModule } from '../utils/moduleUtils';
+import { validateForm, getFormData, updateForm } from '../utils/moduleHelpers';
+import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+import AnimatedDropdown from '../../common/AnimatedDropdown/AnimatedDropdown';
 import styles from './ModuleForm.module.css'
-import DateTimePicker from '../common/inputs/DateTimePicker';
+import DateTimePicker from '../../common/inputs/DateTimePicker';
 
 
 async function saveModule(is_editing, module, form_data) {
@@ -53,44 +54,34 @@ function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmi
 }
 const DEPARTMENT_OPTIONS = Object.keys(KCL_DEPARTMENTS).map(d => ({ value: d, label: d }));
 
-function DepartmentCourseFields({ form_data, errors, onChange }) {
-    const courseOptions = useMemo(() => {
-        if (!form_data.department) return [];
-        const courses = KCL_DEPARTMENTS[form_data.department] || [];
-        return courses.map(c => ({ value: c, label: c }));
-    }, [form_data.department]);
+function useCourseOptions(department) {
+    return useMemo(() => {
+        if (!department) return [];
+        return (KCL_DEPARTMENTS[department] || []).map(c => ({ value: c, label: c }));
+    }, [department]);
+}
 
-    const handleDepartmentChange = (dept) => {
-        onChange('department', dept);
-        onChange('course', '');
-    };
-
+function DepartmentDropdown({ value, error, onChange }) {
+    const handleChange = (dept) => { onChange('department', dept); onChange('course', ''); };
     return (
-        <>
-            <FormGroup label="Department" error={errors.department} required>
-                <AnimatedDropdown
-                    value={form_data.department}
-                    onChange={handleDepartmentChange}
-                    options={DEPARTMENT_OPTIONS}
-                    searchable
-                    placeholder="Select a department..."
-                    searchPlaceholder="Search departments"
-                    emptyMessage="No departments found"
-                />
-            </FormGroup>
-            <FormGroup label="Course" error={errors.course} required>
-                <AnimatedDropdown
-                    value={form_data.course}
-                    onChange={(v) => onChange('course', v)}
-                    options={courseOptions}
-                    searchable
-                    placeholder={form_data.department ? "Select a course..." : "Select a department first"}
-                    searchPlaceholder="Search courses"
-                    emptyMessage="No courses found"
-                />
-            </FormGroup>
-        </>
+        <FormGroup label="Department" error={error} required>
+            <AnimatedDropdown value={value} onChange={handleChange} options={DEPARTMENT_OPTIONS} searchable placeholder="Select a department..." searchPlaceholder="Search departments" emptyMessage="No departments found" />
+        </FormGroup>
     );
+}
+
+function CourseDropdown({ value, error, department, onChange }) {
+    const courseOptions = useCourseOptions(department);
+    const placeholder = department ? "Select a course..." : "Select a department first";
+    return (
+        <FormGroup label="Course" error={error} required>
+            <AnimatedDropdown value={value} onChange={(v) => onChange('course', v)} options={courseOptions} searchable placeholder={placeholder} searchPlaceholder="Search courses" emptyMessage="No courses found" />
+        </FormGroup>
+    );
+}
+
+function DepartmentCourseFields({ form_data, errors, onChange }) {
+    return (<><DepartmentDropdown value={form_data.department} error={errors.department} onChange={onChange} /><CourseDropdown value={form_data.course} error={errors.course} department={form_data.department} onChange={onChange} /></>);
 }
 
 function NameFields({ form_data, errors, is_editing, onChange }) {

@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import FilterCheckbox from '../../../common/FilterCheckbox/FilterCheckbox';
+import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
 import './ReminderField.css';
 
 const PRESET_OPTIONS = [
@@ -21,8 +24,22 @@ export function ReminderField({ value, onChange }) {
     return (
         <div className="form-field reminder-field" ref={dropdownRef}>
             <label>Reminders</label>
-            <DropdownButton selected={selected} onClick={() => setIsOpen(!isOpen)} />
-            {isOpen && <DropdownPanel selected={selected} onChange={onChange} />}
+            <DropdownButton selected={selected} onClick={() => setIsOpen(!isOpen)} isOpen={isOpen} />
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        className="reminder-dropdown-panel"
+                        initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                    >
+                        <PermissionStatus />
+                        <ReminderOptions options={getAllOptions(selected)} selected={selected} onChange={onChange} />
+                        <CustomReminderInput selected={selected} onChange={onChange} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -35,12 +52,11 @@ function useClickOutside(ref, onClickOutside) {
     }, [ref, onClickOutside]);
 }
 
-function DropdownButton({ selected, onClick }) {
+function DropdownButton({ selected, onClick, isOpen }) {
     const label = getButtonLabel(selected);
     return (
-        <button type="button" className="reminder-dropdown-btn" onClick={onClick}>
+        <button type="button" className={`reminder-dropdown-btn${isOpen ? ' open' : ''}`} onClick={onClick}>
             <span>{label}</span>
-            <span className="dropdown-arrow">&#9662;</span>
         </button>
     );
 }
@@ -49,17 +65,6 @@ function getButtonLabel(selected) {
     if (selected.length === 0) return 'No reminders';
     if (selected.length === 1) return formatMinutes(selected[0]);
     return `${selected.length} reminders`;
-}
-
-function DropdownPanel({ selected, onChange }) {
-    const options = getAllOptions(selected);
-    return (
-        <div className="reminder-dropdown-panel">
-            <PermissionStatus />
-            <ReminderOptions options={options} selected={selected} onChange={onChange} />
-            <CustomReminderInput selected={selected} onChange={onChange} />
-        </div>
-    );
 }
 
 function getAllOptions(selected) {
@@ -96,10 +101,10 @@ function ReminderOptions({ options, selected, onChange }) {
 
 function ReminderCheckbox({ label, checked, onToggle }) {
     return (
-        <label className="reminder-option">
-            <input type="checkbox" checked={checked} onChange={onToggle} />
+        <div className={`reminder-option${checked ? ' active' : ''}`} onClick={onToggle}>
+            <FilterCheckbox checked={checked} onChange={onToggle} onClick={e => e.stopPropagation()} />
             <span>{label}</span>
-        </label>
+        </div>
     );
 }
 
@@ -107,11 +112,21 @@ function CustomReminderInput({ selected, onChange }) {
     const [customValue, setCustomValue] = useState('');
     const onAdd = () => addCustom(customValue, selected, onChange, setCustomValue);
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); onAdd(); }
+    };
+
     return (
         <div className="custom-reminder">
-            <input type="number" min="0" placeholder="Custom (minutes)"
-                value={customValue} onChange={(e) => setCustomValue(e.target.value)} />
-            <button type="button" onClick={onAdd}>Add</button>
+            <input
+                type="number"
+                min="0"
+                placeholder="Custom (minutes)"
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+            />
+            <PrimaryButton type="button" variant="primary" size="small" pill onClick={onAdd}>Add</PrimaryButton>
         </div>
     );
 }
