@@ -80,10 +80,21 @@ describe('ModuleDetails', () => {
         expect(screen.getByText('No assignments yet.')).toBeInTheDocument();
     });
 
+    it('shows No readings message when readings is empty', () => {
+        render(<ModuleDetails module={{ ...module, readings: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('No readings assigned yet.')).toBeInTheDocument();
+    });
+
     it('renders deadlines list when deadlines exist', () => {
         const modWithDeadlines = { ...module, deadlines: [{ id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2026-04-01' }] };
         render(<ModuleDetails module={modWithDeadlines} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
         expect(screen.getByText('CW1')).toBeInTheDocument();
+    });
+
+    it('renders readings list when readings exist', () => {
+        const modWithReadings = { ...module, readings: [{ id: 1, title: 'Module Handbook', start_page: 13, end_page: 63, 'deadline': '2026-04-01T00:00:00' }] };
+        render(<ModuleDetails module={modWithReadings} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Module Handbook')).toBeInTheDocument();
     });
 
     it('shows created_by_email link when present', () => {
