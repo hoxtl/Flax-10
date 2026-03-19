@@ -1,3 +1,4 @@
+/** Utility functions for module filtering, sorting, formatting, and data transformations. */
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
@@ -207,34 +208,24 @@ export function sortModules(modules, sort_by) {
     });
 }
 
+function filterByDepartment(modules, department) {
+    if (department === 'all') return modules;
+    return modules.filter(m => getDepartment(m.module_code, m.department) === department);
+}
+
+function filterByCourses(modules, courses) {
+    if (courses.length === 0) return modules;
+    return modules.filter(m => courses.includes(getCourse(m.module_code, m.course)));
+}
+
 export function applyFiltersAndSort(modules, selectedCoursesOrDepartment, sort_by) {
     if (!selectedCoursesOrDepartment) return sortModules(modules, sort_by);
-
-    // Legacy mode: `selectedCoursesOrDepartment` is a department string (e.g. 'all').
     if (typeof selectedCoursesOrDepartment === 'string') {
-        if (selectedCoursesOrDepartment === 'all') return sortModules(modules, sort_by);
-        const department = selectedCoursesOrDepartment;
-        const filtered = modules.filter(m => getDepartment(m.module_code, m.department) === department);
-        return sortModules(filtered, sort_by);
+        return sortModules(filterByDepartment(modules, selectedCoursesOrDepartment), sort_by);
     }
-
-    // Current mode: `selectedCoursesOrDepartment` is an array of course names.
     if (Array.isArray(selectedCoursesOrDepartment)) {
-        if (selectedCoursesOrDepartment.length === 0) return sortModules(modules, sort_by);
-        const filtered = modules.filter(m => {
-            const course = getCourse(m.module_code, m.course);
-            return course && selectedCoursesOrDepartment.includes(course);
-        });
-        return sortModules(filtered, sort_by);
+        return sortModules(filterByCourses(modules, selectedCoursesOrDepartment), sort_by);
     }
-
-    // Fallback for unexpected types.
     return sortModules(modules, sort_by);
 }
 
-function getDepartmentForCourse(courseName) {
-    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
-        if (courses.includes(courseName)) return dept;
-    }
-    return null;
-}
