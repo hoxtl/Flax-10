@@ -62,6 +62,9 @@ function SettingsPanel({ activeTab, handlers, user }) {
     handleHomeAddressSave,
     homeAddressError,
     handleSleepSave,
+    handleStudyTimeSave,
+    handleWeekPreferenceSave,
+    handleWorktimePreferenceSave,
   } = handlers;
 
   return (
@@ -79,6 +82,15 @@ function SettingsPanel({ activeTab, handlers, user }) {
         )}
         {activeTab === "preferences_sleep" && (
           <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="sleep" />
+        )}
+        {activeTab === "preferences_week" && (
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="week" />
+        )}
+        {activeTab === "preferences_daynight" && (
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="daynight" />
+        )}
+        {activeTab === "preferences_studytime" && (
+          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="studytime" />
         )}
         {activeTab === "home" && (
           <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />
