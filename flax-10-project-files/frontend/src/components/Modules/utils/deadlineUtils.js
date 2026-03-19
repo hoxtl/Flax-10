@@ -1,3 +1,4 @@
+/** Utility functions for deadline formatting, countdown calculations, and urgency labels. */
 export const DEADLINE_LABELS = {
     exam: 'Exam' ,
     coursework: 'Coursework',
