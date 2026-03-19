@@ -5,6 +5,7 @@
   gap: var(--space-4);
   margin-top: var(--space-8);
   padding-bottom: var(--space-8);
+  min-width: 0;
 }
 
 .pageButton {
@@ -17,6 +18,13 @@
   cursor: pointer;
   font-size: var(--text-base);
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  min-width: 44px;
+  flex-shrink: 1;
   transition: all 0.2s;
 }
 .pageButton:hover:not(:disabled) {
@@ -28,10 +36,19 @@
   cursor: not-allowed;
 }
 
+.pageButtonText {
+  line-height: 1;
+}
+
+.arrow {
+  line-height: 1;
+}
+
 .pageNumbers {
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  min-width: 0;
 }
 
 .pageNum {
@@ -99,5 +116,15 @@
     bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px + 52px + 12px);
     right: 24px;
     z-index: 2601;
+  }
+}
+
+@media (max-width: 760px) {
+  .pagination {
+    gap: var(--space-2);
+  }
+
+  .pageButton {
+    padding: 0.45rem 0.6rem;
   }
 }
