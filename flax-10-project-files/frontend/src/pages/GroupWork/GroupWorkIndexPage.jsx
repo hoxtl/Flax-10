@@ -9,8 +9,7 @@ import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import TextInput from "../../components/common/TextInput/TextInput";
-import AnimatedDropdown from "../../components/common/AnimatedDropdown/AnimatedDropdown";
-import { ALL_KCL_COURSES } from "../../lib/kclCourses";
+import CourseDropdown from "../../components/Modules/CourseDropdown";
 import styles from "./GroupWorkIndexPage.module.css";
 
 function GroupWorkIndexSkeleton() {
@@ -45,12 +44,9 @@ function CreateProjectInputs({ data, onChange }) {
         <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Group project name" required />
       </FormField>
       <FormField label="Course" hint="Optional" className={styles.inputField}>
-        <AnimatedDropdown
+        <CourseDropdown
           value={data.courseCode}
           onChange={(val) => onChange('courseCode', val)}
-          options={ALL_KCL_COURSES}
-          searchable={true}
-          placeholder="Select a course..."
         />
       </FormField>
       <FormField label="Deadline" className={styles.inputField}>

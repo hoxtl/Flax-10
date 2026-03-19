@@ -6,8 +6,7 @@ import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import AnimatedDropdown from "../../components/common/AnimatedDropdown/AnimatedDropdown";
-import { ALL_KCL_COURSES } from "../../lib/kclCourses";
+import CourseDropdown from "../../components/Modules/CourseDropdown";
 import styles from "./GroupWorkDetail.module.css";
 
 function GroupWorkDetailSkeleton({ onBack }) {
@@ -143,11 +142,9 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                 <input defaultValue={project.name} onBlur={onName} className={styles.nameInput} />
                 <div className={styles.metaRow}>
                     <div className={styles.courseDropdownWrapper}>
-                        <AnimatedDropdown
+                        <CourseDropdown
                             value={project.course_code || ""}
                             onChange={onCourse}
-                            options={ALL_KCL_COURSES}
-                            searchable={true}
                             placeholder="Course code"
                             className={styles.detailCourseDropdown}
                         />
