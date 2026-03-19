@@ -2,6 +2,7 @@
   padding: 8px 16px 24px;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
 }
 
 .bentoGrid {
@@ -273,4 +274,119 @@
   font-size: 9px;
   color: var(--text-muted-sage);
   margin-top: 1px;
+}
+
+/* ── Floating Actions ── */
+.gridActions {
+  position: absolute;
+  top: 320px;
+  right: -70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.iconActionBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border-base);
+  background: var(--color-card);
+  color: var(--text-muted-sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.iconActionBtn:hover {
+  background: var(--color-highlight-soft);
+  color: var(--text-charcoal);
+  border-color: var(--text-muted-sage);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.editBtnActive {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
+}
+.resizeControls {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: var(--color-card);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border-base);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  gap: 4px;
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.editMode:hover .resizeControls {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.resizeGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.resizeBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: transparent !important;
+  color: var(--text-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.resizeBtn:hover:not(:disabled) {
+  color: var(--color-primary);
+  transform: scale(1.15);
+}
+
+.resizeBtn:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+
+.resizeVal {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-charcoal);
+  min-width: 24px;
+  text-align: center;
+  letter-spacing: -0.01em;
+  opacity: 0.9;
+}
+
+.resizeDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--color-border-base);
+  margin: 0 2px;
 }
