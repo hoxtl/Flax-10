@@ -354,11 +354,10 @@
   flex-direction: column;
   gap: 12px;
   min-width: 0;
-  height: 100%;
 }
 
 .leftTopSideCol .dnaCard {
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 .rightCol {
@@ -804,11 +803,11 @@
 }
 
 .goalEditorPanel {
-  padding: 8px 16px 4px;
+  padding: 10px 16px 8px;
   border-top: 1px dashed var(--border);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .goalEditorLabel {
@@ -877,8 +876,9 @@
 .goalEditorActions {
   display: flex;
   gap: 6px;
-  justify-content: flex-end;
-  padding-bottom: 2px;
+  justify-content: center;
+  padding-top: 4px;
+  padding-bottom: 0;
 }
 
 /* Attendance Widget Layout */
@@ -1222,38 +1222,21 @@
 }
 
 .goalSaveBtn {
-  padding: 6px 14px;
-  background: var(--color-primary-solid);
-  border: none;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  cursor: pointer;
-  font-family: inherit;
-  transition: opacity 0.15s;
-}
-
-.goalSaveBtn:hover {
-  opacity: 0.88;
+  padding: 4px 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
 }
 
 .goalCancelBtn {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid var(--widget-border);
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  font-family: inherit;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.goalCancelBtn:hover {
-  color: var(--text);
-  border-color: var(--text);
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
 }
 
 .badgesViewAll {

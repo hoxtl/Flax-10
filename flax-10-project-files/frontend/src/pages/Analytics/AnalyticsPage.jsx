@@ -16,6 +16,7 @@ import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/Insi
 import Tabs from '../../components/common/Tabs/Tabs';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
+import { BackToTop } from '../../components/Pagination/Pagination';
 import styles from './AnalyticsPage.module.css';
 
 const PERIODS = [
@@ -186,6 +187,7 @@ export default function AnalyticsPage({ onBack }) {
       {loading && <AnalyticsSkeleton />}
 
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <BackToTop />
     </AppPage>
   );
 }

@@ -492,7 +492,7 @@
 
 /* Zoom-in transition when navigating from task Play */
 .focusModeTransition {
-    position: absolute;
+    position: fixed;
     inset: 0;
     display: flex;
     flex-direction: column;
@@ -500,14 +500,14 @@
     justify-content: center;
     background: var(--bg);
     z-index: 10;
-    animation: focusOverlayZoomInHoldZoomOut 5s ease-in-out forwards;
+    animation: focusOverlayZoomInHoldZoomOut 4.5s ease-in-out forwards;
 }
 
 .focusModeTransitionText {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-sage-primary, #52796f);
-    letter-spacing: 0.08em;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--color-primary, #7B6751);
+    letter-spacing: 0.04em;
     text-transform: lowercase;
     position: relative;
 }
@@ -536,7 +536,7 @@
 }
 
 .containerFocusEntering .focusModeContent {
-    animation: focusContentZoomIn 0.9s 4.1s ease-out forwards;
+    animation: focusContentZoomIn 0.9s 3.6s ease-out forwards;
     opacity: 0;
     transform: scale(0.94);
 }
