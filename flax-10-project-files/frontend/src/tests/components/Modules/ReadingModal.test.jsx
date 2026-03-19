@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ReadingModal from '../../../components/Modules/ReadingModal';
+import ReadingModal from '../../../components/Modules/Readings/ReadingModal';
 import { useReadingModal } from '../../../components/Modules/hooks/useReadingModal';
 
 vi.mock('../../../components/Modules/hooks/useReadingModal', () => ({

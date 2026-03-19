@@ -1,14 +1,22 @@
-import { formatFullDateTime } from './utils/moduleUtils';
-import { getDeadlineCountdown, DEADLINE_LABELS } from "./utils/deadlineUtils.js";
+import { useState } from 'react';
+import { formatFullDateTime } from '../utils/moduleUtils';
+import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
+import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {
-    const countdown = getDeadlineCountdown(deadline.start_due_date );
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const countdown = getDeadlineCountdown(deadline.start_due_date);
     return (
         <div className={`${styles.card} ${countdown === 'Past due' ? styles.past : ''}`}>
             <DeadlineCardHeader deadline={deadline} countdown={countdown} />
             <DeadlineCardBody deadline={deadline} />
-            {is_teacher && <DeadlineCardActions onEdit={onEdit} onDelete={onDelete} />}
+            {is_teacher && <DeadlineCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} />}
+            {showDeleteConfirm && (
+                <ConfirmModal title="Delete Deadline" message={`Are you sure you want to delete "${deadline.title}"? This action cannot be undone.`}
+                    onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)}
+                    confirmText="Delete" isDanger={true} />
+            )}
         </div>
     );
 }

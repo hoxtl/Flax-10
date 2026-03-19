@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DeadlineModal from '../../../components/Modules/DeadlineModal';
+import DeadlineModal from '../../../components/Modules/Deadlines/DeadlineModal';
 
 // Const values for the test Modal
 const mockModal = {

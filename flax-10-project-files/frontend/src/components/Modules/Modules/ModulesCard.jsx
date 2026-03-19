@@ -1,8 +1,8 @@
-import { isEnrolledIn } from './utils/moduleUtils.js';
-import { formatDuration, formatTime, getDepartment, getCourse } from './utils/moduleUtils.js';
-import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback.js';
-import GridCard from '../common/Card/GridCard';
-import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
+/** Module card component displaying module info, enrollment status, and actions. */
+import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
+import GridCard from '../../common/Card/GridCard';
+import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -50,30 +50,35 @@ function resolveClassmatesCount(module) {
     );
 }
 
-export default function ModulesCard({ module, enrollments, isTeacher, onViewModule, onEnrollmentToggle, onEdit, onDelete, onManageDeadlines, onManageReadings, taskCountsByModule = {} }) {
+function useCardData(module, enrollments, taskCountsByModule) {
     const enrolled = isEnrolledIn(module.id, enrollments);
     const enrollment = enrollments?.find(e => e.module === module.id);
-    const isCore = enrollment?.is_core || false;
     const department = getDepartment(module.module_code, module.department);
-    const accent = DEPARTMENT_ACCENTS[department] || "var(--primary)";
-    const upcomingTasksCount = taskCountsByModule[normalizeModuleCode(module.module_code)] || 0;
-    const classmatesCount = resolveClassmatesCount(module);
+    return {
+        enrolled, isCore: enrollment?.is_core || false,
+        accent: DEPARTMENT_ACCENTS[department] || "var(--primary)",
+        upcomingTasksCount: taskCountsByModule[normalizeModuleCode(module.module_code)] || 0,
+        classmatesCount: resolveClassmatesCount(module),
+    };
+}
+
+function buildCardHandlers(module, handlers) {
     const stop = (e, fn) => { e.stopPropagation(); fn(module); };
+    return {
+        onView: (e) => stop(e, handlers.onViewModule), onEdit: (e) => stop(e, handlers.onEdit),
+        onDelete: (e) => stop(e, handlers.onDelete), onToggle: (e) => stop(e, handlers.onEnrollmentToggle),
+        onManageDeadlines: (e) => stop(e, handlers.onManageDeadlines), onManageReadings: (e) => stop(e, handlers.onManageReadings),
+    };
+}
+
+export default function ModulesCard(props) {
+    const { module, enrollments, isTeacher, onViewModule, taskCountsByModule = {} } = props;
+    const data = useCardData(module, enrollments, taskCountsByModule);
+    const handlers = buildCardHandlers(module, props);
     return (
-        <GridCard
-            className={getCardClass(enrolled, isTeacher)}
-            style={{ "--module-accent": accent }}
-            onClick={() => !isTeacher && onViewModule(module)}
-        >
-            <CardBody module={module} enrolled={enrolled} isCore={isCore} isTeacher={isTeacher}
-                upcomingTasksCount={upcomingTasksCount}
-                classmatesCount={classmatesCount}
-                onView={(e) => stop(e, onViewModule)}
-                onEdit={(e) => stop(e, onEdit)}
-                onDelete={(e) => stop(e, onDelete)}
-                onToggle={(e) => stop(e, onEnrollmentToggle)}
-                onManageDeadlines={(e) => stop(e, onManageDeadlines)} 
-                onManageReadings={(e) => stop(e, onManageReadings)}/> 
+        <GridCard className={getCardClass(data.enrolled, isTeacher)} style={{ "--module-accent": data.accent }}
+            onClick={() => !isTeacher && onViewModule(module)}>
+            <CardBody module={module} {...data} isTeacher={isTeacher} {...handlers} />
         </GridCard>
     );
 }
@@ -106,25 +111,37 @@ function getTutorImage(moduleData) {
     }, { allowGeneric: true });
 }
 
+function getInitials(name) {
+    return (name || 'T').split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function handleImageError(e) {
+    e.currentTarget.style.display = 'none';
+    e.currentTarget.nextElementSibling.style.display = 'flex';
+}
+
 function TutorAvatar({ module }) {
     const src = getTutorImage(module);
-    const initials = (module.created_by_name || 'T')
-        .split(/\s+/).filter(Boolean)
-        .map(p => p[0]).join('').slice(0, 2).toUpperCase();
+    const initials = getInitials(module.created_by_name);
+    const tutorName = module.created_by_name || 'Tutor';
     return (
-        <div className={styles.tutorAvatar} title={module.created_by_name || 'Tutor'}>
-            {src && (
-                <img
-                    src={src}
-                    alt={module.created_by_name || 'Tutor'}
-                    className={styles.tutorAvatarImg}
-                    onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling.style.display = 'flex';
-                    }}
-                />
-            )}
+        <div className={styles.tutorAvatar} title={tutorName}>
+            {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={handleImageError} />}
             <span className={styles.tutorAvatarFallback} style={src ? { display: 'none' } : undefined}>{initials}</span>
+        </div>
+    );
+}
+
+function EnrolledBadge({ enrolled, isCore }) {
+    if (!enrolled) return null;
+    return <span className={styles.enrolledBadge}>{isCore ? '📌 Core' : '✓ Enrolled'}</span>;
+}
+
+function HeaderChips({ course, department }) {
+    return (
+        <div className={styles.headerChips}>
+            {course && <span className={styles.courseText}>{course}</span>}
+            <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
         </div>
     );
 }
@@ -135,22 +152,10 @@ function CardHeader({ module, enrolled, isCore }) {
     return (
         <div className={styles.cardHeader}>
             <div className={styles.headerTopRow}>
-                <div className={styles.headerIdentity}>
-                    <div className={styles.iconWrap}>📚</div>
-                </div>
-                <div className={styles.headerRight}>
-                    {enrolled && (
-                        <span className={styles.enrolledBadge}>
-                            {isCore ? '📌 Core' : '✓ Enrolled'}
-                        </span>
-                    )}
-                    <TutorAvatar module={module} />
-                </div>
+                <div className={styles.headerIdentity}><div className={styles.iconWrap}>📚</div></div>
+                <div className={styles.headerRight}><EnrolledBadge enrolled={enrolled} isCore={isCore} /><TutorAvatar module={module} /></div>
             </div>
-            <div className={styles.headerChips}>
-                {course && <span className={styles.courseText}>{course}</span>}
-                <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
-            </div>
+            <HeaderChips course={course} department={department} />
         </div>
     );
 }
@@ -184,32 +189,37 @@ function MetaPill({ icon, text }) {
     return <span className={styles.metaPill}>{icon} {text}</span>;
 }
 
+function hasValidCount(count) {
+    return Number.isFinite(Number(count)) && Number(count) > 0;
+}
+
+function TasksChip({ moduleCode, count }) {
+    if (!hasValidCount(count)) return null;
+    const plural = count === 1 ? "" : "s";
+    return (
+        <EntityLinkChip to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`}
+            className={styles.relatedChip} title="Open tasks linked to this module">
+            ✅ {count} upcoming task{plural}
+        </EntityLinkChip>
+    );
+}
+
+function ClassmatesChip({ moduleCode, count }) {
+    if (!hasValidCount(count)) return null;
+    return (
+        <EntityLinkChip to={`/users?module=${encodeURIComponent(moduleCode || "")}`}
+            className={styles.relatedChip} title="Find classmates in this module">
+            👥 {count} classmate{count === 1 ? "" : "s"}
+        </EntityLinkChip>
+    );
+}
+
 function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
-    const hasClassmates = Number.isFinite(Number(classmatesCount)) && Number(classmatesCount) > 0;
-    const hasTasks = Number.isFinite(Number(upcomingTasksCount)) && Number(upcomingTasksCount) > 0;
-
-    if (!hasTasks && !hasClassmates) return null;
-
+    if (!hasValidCount(upcomingTasksCount) && !hasValidCount(classmatesCount)) return null;
     return (
         <div className={styles.relatedRow}>
-            {hasTasks && (
-                <EntityLinkChip
-                    to={`/tasks?module=${encodeURIComponent(module.module_code || "")}`}
-                    className={styles.relatedChip}
-                    title="Open tasks linked to this module"
-                >
-                    ✅ {upcomingTasksCount} upcoming task{upcomingTasksCount === 1 ? "" : "s"}
-                </EntityLinkChip>
-            )}
-            {hasClassmates && (
-                <EntityLinkChip
-                    to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
-                    className={styles.relatedChip}
-                    title="Find classmates in this module"
-                >
-                    👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
-                </EntityLinkChip>
-            )}
+            <TasksChip moduleCode={module.module_code} count={upcomingTasksCount} />
+            <ClassmatesChip moduleCode={module.module_code} count={classmatesCount} />
         </div>
     );
 }

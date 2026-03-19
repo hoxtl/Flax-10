@@ -1,5 +1,7 @@
-import styles from './DeadlineCard.module.css';
-import {formatDate} from '../Calendar/utils/dateUtils';
+import { useState } from 'react';
+import styles from '../Deadlines/DeadlineCard.module.css';
+import {formatDate} from '../../Calendar/utils/dateUtils';
+import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
 
 function ReadingCardHeader({ reading }) {
     return (
@@ -34,11 +36,17 @@ function ReadingCardActions({ onEdit, onDelete}) {
 }
 
 export default function ReadingCard({ reading, isTeacher, onEdit, onDelete}) {
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     return (
         <div className={styles.card}>
             <ReadingCardHeader reading={reading}/>
             <ReadingCardBody reading={reading}/>
-            {isTeacher && <ReadingCardActions onEdit={onEdit} onDelete={onDelete}/>}
+            {isTeacher && <ReadingCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} />}
+            {showDeleteConfirm && (
+                <ConfirmModal title="Delete Reading" message={`Are you sure you want to delete "${reading.title}"? This action cannot be undone.`}
+                    onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)}
+                    confirmText="Delete" isDanger={true} />
+            )}
         </div>
     );
 }
