@@ -50,7 +50,7 @@
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .leftTopSideCol {
@@ -58,10 +58,27 @@
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+  height: 100%;
+  justify-content: flex-start;
 }
 
-.leftTopSideCol .dnaCard {
+.leftTopStreakCard {
   flex: 0 0 auto;
+}
+
+.leftTopWeekCard {
+  flex: 0 0 auto;
+  min-height: 178px;
+  display: flex;
+}
+
+.leftTopWeekCard > * {
+  width: 100%;
+}
+
+.leftTopStudyDnaCard {
+  flex: 1 1 0;
+  min-height: 156px;
 }
 
 .rightCol {

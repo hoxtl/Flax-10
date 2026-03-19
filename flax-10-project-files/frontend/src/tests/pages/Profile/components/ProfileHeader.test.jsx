@@ -271,6 +271,19 @@ describe('ProfileHeader', () => {
     expect(screen.queryByText('Active just now')).toBeNull();
   });
 
+  it('does not render old active-status text for older sessions either', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ last_session_end: '2026-03-18T12:00:00.000Z' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.queryByText(/Active .* ago/)).toBeNull();
+  });
+
   it('does not render completion nudge text', () => {
     render(
       <ProfileHeader
