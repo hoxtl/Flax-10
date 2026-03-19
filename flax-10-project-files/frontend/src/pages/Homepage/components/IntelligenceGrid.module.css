@@ -184,8 +184,13 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .addSheetHandle {
@@ -319,74 +324,78 @@
   border-color: var(--color-primary);
   box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
 }
+
+/* ── Resize Controls ── */
 .resizeControls {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: var(--color-card);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--color-border-base);
-  border-radius: 10px;
+  background: #ffffff;
+  border: 1.5px solid var(--color-border-base);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   padding: 4px;
-  gap: 4px;
+  gap: 3px;
   z-index: 30;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.editMode:hover .resizeControls {
-  opacity: 1;
-  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .resizeGroup {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 .resizeBtn {
   width: 22px;
   height: 22px;
-  border-radius: 50%;
-  border: none;
+  border-radius: 5px;
+  border: none !important;
   background: transparent !important;
-  color: var(--text-charcoal);
+  color: var(--text-charcoal) !important;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  padding: 0;
+  padding: 0 !important;
 }
 
 .resizeBtn:hover:not(:disabled) {
-  color: var(--color-primary);
-  transform: scale(1.15);
+  background: var(--color-highlight-soft) !important;
+  color: var(--color-primary) !important;
 }
 
 .resizeBtn:disabled {
-  opacity: 0.15;
+  opacity: 0.2;
   cursor: not-allowed;
 }
 
 .resizeVal {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   color: var(--text-charcoal);
-  min-width: 24px;
+  min-width: 22px;
   text-align: center;
-  letter-spacing: -0.01em;
-  opacity: 0.9;
 }
 
 .resizeDivider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   background: var(--color-border-base);
   margin: 0 2px;
+}
+
+.widgetWrapper .resizeControls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.widgetWrapper.editMode:hover .resizeControls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
