@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckSquare, ArrowRight, Target, Clock3, ChevronDown } from "lucide-react";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { getCategoryStyle, getUrgencyMeta } from "./TaskWidgetUtils";
 import styles from "../styles/TaskWidget.module.css";
 
@@ -25,9 +26,9 @@ const HeaderLeft = () => (
 );
 
 const FocusButton = ({ onClick }) => (
-  <button type="button" className={styles.taskWidgetFocusBtn} onClick={onClick}>
+  <PrimaryButton type="button" className={styles.taskWidgetFocusBtn} onClick={onClick} variant="primary" size="small" pill>
     Focus now <ArrowRight size={12} strokeWidth={1.8} aria-hidden />
-  </button>
+  </PrimaryButton>
 );
 
 export const TaskSummaryRow = ({ dueCount, incompleteCount, estimatedLeft }) => (
