@@ -1,3 +1,6 @@
+/*
+ * useSocietyCore manages the core society detail fetch and update flow.
+ */
 import { useState, useEffect, useCallback } from 'react';
 import * as api from '../../../api/societyApi';
 

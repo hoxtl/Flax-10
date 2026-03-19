@@ -68,7 +68,7 @@ function useModalState() {
 /** Aggregates all data and action handlers for the page components. */
 function useSocietyPageData(societyId, initialTab, onMembershipChange) {
     const hookData = useSocietyDetail(societyId, onMembershipChange);
-    const { society, updateSociety, updateLocalSociety } = hookData;
+    const { society, updateLocalSociety } = hookData;
     const location = useLocation();
     const page = usePageState(initialTab, location);
     const modals = useModalState();
@@ -145,7 +145,8 @@ const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
 export default function SocietyDetailPage({ societyId, onBack, initialTab, onMembershipChange, onDelete }) {
     const data = useSocietyPageData(societyId, initialTab, onMembershipChange);
     const handlers = usePageStateHandlers(data, onBack, onDelete);
-    useSocietyInit(useLocation());
+    const activeTabState = useLocation().state?.activeTab;
+    useSocietyInit(activeTabState);
     if (data.loading) return <SocietyDetailSkeleton />;
     if (!data.society) return <NotFound onBack={onBack} />;
     const isAdmin = ['admin', 'editor'].includes(data.society.role);
@@ -159,11 +160,11 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab, onMem
 }
 
 /** Handles one-time initialization effects like scrolling to top. */
-function useSocietyInit(location) {
+function useSocietyInit(activeTabState) {
     useEffect(() => {
         scrollContentToTop();
-        if (location.state?.activeTab) window.history.replaceState({}, document.title);
-    }, []);
+        if (activeTabState) window.history.replaceState({}, document.title);
+    }, [activeTabState]);
 }
 
 /** Manages the transition between view and edit modes. */

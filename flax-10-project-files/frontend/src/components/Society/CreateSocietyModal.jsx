@@ -22,7 +22,7 @@ const isValidEmail = (email) => {
 };
 
 export default function CreateSocietyModal({ onClose, onCreate }) {
-    const logic = useCreateSocietyForm(onCreate, onClose);
+    const logic = useCreateSocietyForm(onCreate);
     const { collab, photo } = logic.modals;
     return (
         <>
@@ -37,7 +37,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 /** Custom hook to manage the creation form state and modal logic. */
-function useCreateSocietyForm(onCreate, onClose) {
+function useCreateSocietyForm(onCreate) {
     const [form, setForm] = useState(initialForm());
     const [modals, setModals] = useState({ collab: false, photo: false });
     const update = (field, value) => setForm(p => ({ ...p, [field]: value }));

@@ -1,12 +1,7 @@
-/**
- * CoverImageModal provides an interface for pinning, deleting, and adding cover photos.
- * Limits images to a maximum of 5.
+/*
+ * CoverImageModal manages reordering, deleting, and adding society images.
  */
-/**
- * ImageGalleryModal provides a fullscreen carousel for viewing society photos.
- * Supports keyboard and gesture navigation.
- */
-import { useState, useRef } from "react";
+import { useState } from "react";
 import styles from "./ImageManagerComponents.module.css";
 import { ImageGrid, AddImageView } from "./ImageManagerComponents";
 import StandardModal from "../../../common/StandardModal/StandardModal";

@@ -1,15 +1,11 @@
-/**
- * AllSocieties provides an exploration view for all available societies.
- * Features comprehensive filtering by category, ratification status, and search.
+/*
+ * AllSocieties renders the browse view for exploring the full societies directory.
  */
 import { useState, useMemo, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter } from "lucide-react";
 import SocietyCard from "../../components/Society/SocietyCard";
 import styles from "./SocietiesPage.module.css";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/common/AnimatedDropdown";
@@ -18,19 +14,21 @@ import { TagsSelector } from "../../components/common/TagsSelector/TagsSelector"
 import { SOCIETY_CATEGORIES, matchesCategory } from "./societyFilters";
 import { usePagination } from "../../hooks/usePagination";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
-
-const PAGE_SIZE = 15;
+import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, countByCategory } from "./societyFilters";
+import { SocietyBrowseResults } from "./SocietyBrowseResults";
+import { useSocietyBrowseFilters } from "./useSocietyBrowseFilters";
+import { countForFilter, filterAndSort } from "./societyBrowseUtils";
 
 /** Exploratory view for the full directory of societies. */
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
-    const filterState = useFilters();
-    const { search, filters, sortBy, setSearch, setSortBy } = filterState;
+    const filterState = useSocietyBrowseFilters();
+    const { search, filters, sortBy } = filterState;
+    const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
+    return <BrowseLayout filterState={filterState} filtered={filtered} societies={societies} onBack={onBack} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />;
+}
 
-    const filtered = useMemo(() =>
-        filterAndSort(societies, search, filters, sortBy),
-        [societies, search, filters, sortBy]
-    );
-
+function BrowseLayout({ filterState, filtered, societies, onBack, onSelect, onReport, onUnreport }) {
+    const { search, sortBy, setSearch, setSortBy } = filterState;
     return (
         <div className={styles.container}>
             <Header onBack={onBack} search={search} setSearch={setSearch}
