@@ -1,11 +1,13 @@
 .container {
-  max-width: 935px;
-  margin: 0 auto;
-  padding: 30px 20px;
+  width: 100%;
+  padding: 30px 40px;
   background: transparent;
+  position: relative;
 }
 
 .content {
+  max-width: 935px;
+  margin: 0 auto;
   background: transparent;
 }
 
@@ -184,6 +186,7 @@
 }
 
 @keyframes activeDotPulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 2px rgba(53, 182, 111, 0.15);
@@ -249,9 +252,7 @@
 }
 
 .bio {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  margin-top: 24px;
 }
 
 .fullNameRow {
@@ -300,14 +301,22 @@
 }
 
 .reminder {
-  margin-top: 8px;
-  padding: 10px 14px;
-  background: var(--panel);
-  border-left: 3px solid var(--color-primary);
-  border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.6;
   color: var(--text);
   font-style: italic;
+  font-weight: 500;
+  padding: 10px 18px;
+  background: var(--color-card);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 4px 10px 10px 4px;
+  max-width: 650px;
+  margin-top: 8px;
+}
+
+[data-mode="dark"] .reminder {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-left-color: var(--color-primary);
 }
 
 .profileHome {
@@ -326,7 +335,7 @@
 .twoCol {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 258px;
-  gap: 18px;
+  gap: 20px;
   align-items: start;
 }
 
@@ -345,14 +354,14 @@
 .leftTopMetricsRow {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 12px;
+  gap: 20px;
   align-items: stretch;
 }
 
 .leftTopSideCol {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
   min-width: 0;
   height: 100%;
 }
@@ -364,20 +373,18 @@
 .rightCol {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
   position: sticky;
   top: 20px;
 }
 
 .glassCard {
   position: relative;
-  background: var(--surface-glass-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--surface-glass-card-border);
+  background: #ffffff;
+  border: 1px solid var(--color-border-base);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: var(--surface-glass-card-shadow);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -421,7 +428,7 @@
 }
 
 .cardLabel {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -448,6 +455,19 @@
 
 [data-mode="dark"] .widgetHeader {
   border-bottom-color: var(--color-border-base);
+}
+
+.widgetHeader h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #212121;
+  margin: 0;
+}
+
+[data-mode="dark"] .widgetHeader h2 {
+  color: var(--text);
 }
 
 .widgetTitleArea {
@@ -1206,8 +1226,15 @@
 }
 
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .attendanceWarning {
@@ -1228,8 +1255,17 @@
 }
 
 @keyframes warningPulse {
-    0%, 100% { box-shadow: 0 0 8px rgba(239, 83, 80, 0.25); transform: scale(1); }
-    50% { box-shadow: 0 0 15px rgba(239, 83, 80, 0.45); transform: scale(1.02); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(239, 83, 80, 0.25);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(239, 83, 80, 0.45);
+    transform: scale(1.02);
+  }
 }
 
 .goalSaveBtn {
@@ -1992,38 +2028,57 @@
 
 /* ── Quick Stats Rail ── */
 .quickStatsRail {
-  display: flex;
-  align-items: center;
-  background: var(--surface-glass-card, var(--panel));
-  border: 1px solid var(--surface-glass-card-border, var(--border));
-  border-radius: 14px;
-  padding: 14px 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .quickStatItem {
-  flex: 1;
+  background: #ffffff;
+  padding: 20px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border-base);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  text-align: center;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .quickStatValue {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text);
-  line-height: 1;
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 .quickStatLabel {
   font-size: 10px;
-  font-weight: 600;
-  color: var(--text);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: var(--text-muted-sage);
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+[data-mode="dark"] .quickStatItem {
+  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  border-color: var(--color-border-base);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-mode="dark"] .quickStatValue {
+  color: var(--text);
+}
+
+[data-mode="dark"] .quickStatLabel {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.quickStatDivider {
+  display: none;
 }
 
 .quickStatDivider {
@@ -2086,6 +2141,12 @@
   font-family: inherit;
 }
 
+[data-mode="dark"] .sharedPill {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
 .sharedPill:hover {
   transform: translateY(-1px);
   opacity: 0.82;
@@ -2106,9 +2167,18 @@
   font-family: inherit;
 }
 
+[data-mode="dark"] .otherPill {
+  border-color: var(--color-border-base);
+  color: var(--text-secondary);
+}
+
 .otherPill:hover {
   transform: translateY(-1px);
   background: rgba(33, 33, 33, 0.06);
+}
+
+[data-mode="dark"] .otherPill:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* ── View All Link in Header Badges ── */
@@ -2133,34 +2203,108 @@
 
 /* ── Study Compatibility Score ── */
 .compatCard {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid var(--color-border-base);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
-  padding: 18px 22px;
-  background: var(--surface-glass-card, var(--panel));
-  border: 1px solid var(--surface-glass-card-border, var(--border));
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.compatMainLayout {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.compatRightContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
 }
 
 .compatTopRow {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 24px;
 }
 
-.compatRing {
+.compatRingWrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  transform: rotate(-90deg);
+}
+
+.compatRingValue {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.compatRingForeground {
+  stroke: var(--color-primary);
+}
+
+[data-mode="dark"] .compatRingForeground {
+  stroke: var(--color-primary);
 }
 
 .compatInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  gap: 4px;
+}
+
+.compatPct {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+[data-mode="dark"] .compatCard {
+  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  border-color: var(--color-border-base);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.compatTopRow {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.compatRingWrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compatRingSvg {
+  transform: rotate(-90deg);
+}
+
+.compatRingValue {
+  position: absolute;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.compatInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .compatPct {
@@ -2258,50 +2402,88 @@
 
 .sparklineWrap {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px;
+  margin-top: 6px;
 }
 
 .sparklineLabel {
-  font-size: 11px;
-  color: var(--text);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: var(--text-muted-sage);
   font-weight: 600;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
 .sparklineDots {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
+  max-width: 280px;
 }
 
 .sparkDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--border) 80%, transparent);
+  flex: 0 0 24px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .sparkDot0 {
-  opacity: 0.35;
+  background: color-mix(in srgb, var(--color-primary) 10%, rgba(0, 0, 0, 0.08));
+  opacity: 1;
 }
 
 .sparkDot1 {
-  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 30%, rgba(0, 0, 0, 0.08));
 }
 
 .sparkDot2 {
-  background: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 50%, rgba(0, 0, 0, 0.08));
 }
 
 .sparkDot3 {
-  background: color-mix(in srgb, var(--color-primary) 62%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 75%, rgba(0, 0, 0, 0.08));
 }
 
 .sparkDot4 {
   background: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.momentumContext {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+[data-mode="dark"] .sparkDot {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-mode="dark"] .sparkDot0 {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-mode="dark"] .sparkDot1 {
+  background: color-mix(in srgb, var(--color-primary) 25%, rgba(255, 255, 255, 0.12));
+}
+
+[data-mode="dark"] .sparkDot2 {
+  background: color-mix(in srgb, var(--color-primary) 45%, rgba(255, 255, 255, 0.12));
+}
+
+[data-mode="dark"] .sparkDot3 {
+  background: color-mix(in srgb, var(--color-primary) 75%, rgba(255, 255, 255, 0.12));
+}
+
+[data-mode="dark"] .sparkDot4 {
+  background: var(--color-primary);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
 
 /* ── Header Badges + Persona Row ── */
