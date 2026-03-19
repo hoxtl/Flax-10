@@ -11,7 +11,8 @@ import { isNow } from "../utils/eventUtils";
 export function TinyTimelineWidget({
   now = new Date(),
   sortedEvents = [],
-  navigatorContext = {}
+  navigatorContext = {},
+  row = 1
 }) {
   const safeNow = (now instanceof Date && !isNaN(now)) ? now : new Date();
   
@@ -21,11 +22,12 @@ export function TinyTimelineWidget({
 
   const upcomingEvents = useMemo(() => {
     const nowMs = safeNow.getTime();
+    const upcomingLimit = row === 1 ? 1 : 5; 
     return sortedEvents
       .filter((e) => e.start_time && new Date(e.start_time).getTime() > nowMs)
       .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
-      .slice(0, 3);
-  }, [sortedEvents, safeNow]);
+      .slice(0, upcomingLimit);
+  }, [sortedEvents, safeNow, row]);
 
   const hasEvents = currentBlock || upcomingEvents.length > 0;
 
