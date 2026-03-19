@@ -5,15 +5,15 @@ import { useState } from "react";
 
 export default function useSettingsState() {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const [bannerMessage, setBannerMessage] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [homeAddressError, setHomeAddressError] = useState("");
 
   return {
     isSaving,
     setIsSaving,
-    successMessage,
-    setSuccessMessage,
+    bannerMessage,
+    setBannerMessage,
     passwordError,
     setPasswordError,
     homeAddressError,

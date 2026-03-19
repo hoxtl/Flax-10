@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Settings.module.css";
-import { SettingsSidebar, SuccessBanner } from "../../components/Settings/SettingsUI";
+import { ErrorMessage, SettingsSidebar } from "../../components/Settings/SettingsUI";
 import AppPage from "../../components/common/AppPage/AppPage";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
 import SettingsPanelContent from "./SettingsPanelContent";
@@ -28,7 +28,7 @@ export default function Settings({ user }) {
 
   return (
     <AppPage title="Settings" width="lg" className={styles.pageWrapper}>
-      <SuccessBanner message={handlers.successMessage} />
+      <ErrorMessage message={handlers.bannerMessage} />
       <div className={styles.content}>
         <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
         <div className={styles.contentMain}>

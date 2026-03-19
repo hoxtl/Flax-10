@@ -18,14 +18,14 @@ function createActions(state) {
     setHomeAddressError,
     setIsSaving,
     setPasswordError,
-    setSuccessMessage,
+    setBannerMessage,
   } = state;
 
   return {
     setHomeAddressError,
     setIsSaving,
     setPasswordError,
-    setSuccessMessage,
+    setBannerMessage,
   };
 }
 
@@ -36,6 +36,7 @@ function useHandlerFactory(state) {
 
 function createHandlerBinder(actions) {
   return (handler, beforeSave) => async (payload) => {
+    actions.setBannerMessage("");
     if (beforeSave) beforeSave();
     return handler(payload, actions);
   };
@@ -61,7 +62,7 @@ export default function useSettingsHandlers() {
 
   return {
     isSaving: state.isSaving,
-    successMessage: state.successMessage,
+    bannerMessage: state.bannerMessage,
     passwordError: state.passwordError,
     homeAddressError: state.homeAddressError,
     ...handlers,
