@@ -1,3 +1,6 @@
+/*
+ * CollaboratorList.module.css styles the collaborator list UI.
+ */
 .list {
     display: flex;
     flex-direction: column;
