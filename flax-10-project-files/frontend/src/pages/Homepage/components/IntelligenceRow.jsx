@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap } from "lucide-react";
+import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
@@ -36,27 +37,33 @@ import AttendanceChart from "../../../components/Analytics/AttendanceChart";
 import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
+import { TinyTimelineWidget } from "./TinyTimelineWidget";
+
 
 const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, section: "Essentials" },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, section: "Essentials" },
   { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
   { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2, section: "Planning" },
   { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2, section: "Planning" },
-  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, section: "Planning" },
+  { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, section: "Planning" },
+  { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minRow: 2, section: "Planning" },
+  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
+
   { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },
   { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1, section: "Progress" },
   { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1, section: "Profile" },
-  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, minRow: 2, section: "Analytics" },
   { id: "analyticsInsights", label: "Insights", icon: "💡", col: 1, row: 1, section: "Analytics" },
-  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsPlannedActual", label: "Planned vs Actual", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, minRow: 2, section: "Analytics" },
   { id: "analyticsThemeUsage", label: "Theme Usage", icon: "🌓", col: 1, row: 1, section: "Analytics" },
 ];
 
-const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks"];
+const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 const STORAGE_KEY = "homepage_widget_layout";
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
@@ -217,6 +224,7 @@ export default function IntelligenceRow({
   slot1TodayTasks,
   slot3Urgent,
   slot5Data,
+  slot6Timeline,
   recommendation,
 }) {
   const tflDelays = useTflDelays();
@@ -246,6 +254,12 @@ export default function IntelligenceRow({
     }
     return parsed.filter((id) => CATALOGUE_IDS.has(id));
   });
+
+  const [widgetSizes, setWidgetSizes] = useState(() => {
+    const saved = localStorage.getItem("homepage_widget_sizes");
+    return saved ? JSON.parse(saved) : {};
+  });
+
   const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
   const {
     data: analyticsData,
@@ -257,6 +271,17 @@ export default function IntelligenceRow({
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(layout));
   }, [layout]);
+
+  useEffect(() => {
+    localStorage.setItem("homepage_widget_sizes", JSON.stringify(widgetSizes));
+  }, [widgetSizes]);
+
+  const setWidgetSize = (id, size) => {
+    setWidgetSizes((prev) => ({
+      ...prev,
+      [id]: size,
+    }));
+  };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -315,7 +340,12 @@ export default function IntelligenceRow({
         return slot1TodayTasks;
       case "deadlines":
         return slot3Urgent;
+      case "tinyTimeline":
+        return <TinyTimelineWidget {...slot5Data} />;
+      case "bigTimeline":
+        return slot6Timeline;
       case "semesterOverview":
+
         return <SemesterOverviewWidget />;
       case "studyStreak":
         return <StudyStreakWidget />;
@@ -326,7 +356,12 @@ export default function IntelligenceRow({
       case "analyticsSummary":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>SUMMARY CARDS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>SUMMARY</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -341,7 +376,12 @@ export default function IntelligenceRow({
       case "analyticsProductivity":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>PRODUCTIVITY</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>PRODUCTIVITY</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -356,7 +396,12 @@ export default function IntelligenceRow({
       case "analyticsInsights":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>INSIGHTS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Zap size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>INSIGHTS</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -372,7 +417,12 @@ export default function IntelligenceRow({
       case "analyticsStudyHours":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>STUDY HOURS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Clock3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>STUDY HOURS</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
@@ -385,7 +435,12 @@ export default function IntelligenceRow({
       case "analyticsDailyBreakdown":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>DAILY BREAKDOWN</div>
+             <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <BarChart3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>DAILY BREAKDOWN</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
@@ -398,7 +453,12 @@ export default function IntelligenceRow({
       case "analyticsPlannedActual":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>PLANNED VS ACTUAL</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>PLANNED VS ACTUAL</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsProgressData?.daily_progress) && analyticsProgressData.daily_progress.length > 0 ? (
@@ -411,7 +471,12 @@ export default function IntelligenceRow({
       case "analyticsHeatmap":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>FOCUS HEATMAP</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>FOCUS HEATMAP</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.heatmap?.data?.length ? (
@@ -426,7 +491,12 @@ export default function IntelligenceRow({
       case "analyticsThemeUsage":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>THEME USAGE</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>THEME USAGE</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsThemeStats?.summary ? (
@@ -439,7 +509,12 @@ export default function IntelligenceRow({
       case "analyticsAttendance":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>ATTENDANCE</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Presentation size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>ATTENDANCE</span>
+            </div>
             <AttendanceChart />
           </div>
         );
@@ -453,29 +528,15 @@ export default function IntelligenceRow({
       <IntelligenceGrid
         layout={layout}
         setLayout={setLayout}
+        widgetSizes={widgetSizes}
+        setWidgetSize={setWidgetSize}
         edit={edit}
+        setEdit={setEdit}
+        onReset={handleReset}
         catalogue={CATALOGUE}
         widgetRenderer={renderWidget}
         showAdd={showAdd}
         setShowAdd={setShowAdd}
-        renderAfterHero={() => (
-          <div className={styles.editBar}>
-            {edit && (
-              <button onClick={handleReset} className={styles.editBtn} style={{ marginRight: 8 }}>
-                ↺ Reset Layout
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setEdit(!edit);
-                if (edit) setShowAdd(false);
-              }}
-              className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
-            >
-              {edit ? "✓ Done" : "✏️ Edit Layout"}
-            </button>
-          </div>
-        )}
       />
       {showResetConfirm && (
         <ConfirmModal
