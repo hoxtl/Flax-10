@@ -111,7 +111,7 @@ export default function GroupWorkIndexPage() {
   const { projects, setProjects, loading } = useGroupProjects();
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
-  if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} />;
+  if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))} />;
   if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (

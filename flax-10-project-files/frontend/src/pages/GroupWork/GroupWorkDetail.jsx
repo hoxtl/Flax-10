@@ -179,7 +179,7 @@ function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdat
   );
 }
 
-function useProjectActions(projectId, setProject, setMembers, onBack) {
+function useProjectActions(projectId, setProject, setMembers, onBack, onDelete) {
   const patchProject = async p => {
     const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "PATCH", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify(p) });
     if (res.ok) setProject(await res.json());
@@ -190,24 +190,27 @@ function useProjectActions(projectId, setProject, setMembers, onBack) {
   };
   const handleDeleteProject = async () => {
     const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (res.ok) window?.location ? window.location.assign("/group-work") : onBack();
+    if (res.ok) {
+        if (onDelete) onDelete(projectId);
+        onBack();
+    }
   };
   return { patchProject, handleRemoveMember, handleDeleteProject };
 }
 
-function useProjectDetail(projectId, onBack) {
+function useProjectDetail(projectId, onBack, onDelete) {
   const { project, setProject, loading } = useProject(projectId);
   const { members, setMembers } = useProjectMembers(projectId);
   const initialTab = useSelectedTab();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
-  const { patchProject, handleRemoveMember, handleDeleteProject } = useProjectActions(projectId, setProject, setMembers, onBack);
+  const { patchProject, handleRemoveMember, handleDeleteProject } = useProjectActions(projectId, setProject, setMembers, onBack, onDelete);
   const onAdded = m => setMembers(p => p.some(i => i.id === m.id) ? p : [...p, m]);
   return { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, onAdded, patchProject, handleRemoveMember, handleDeleteProject };
 }
 
-export default function GroupProjectDetail({ projectId, onBack }) {
-  const d = useProjectDetail(projectId, onBack);
+export default function GroupProjectDetail({ projectId, onBack, onDelete }) {
+  const d = useProjectDetail(projectId, onBack, onDelete);
   if (d.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
   if (!d.project) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.empty}>Project not found.</p></div>;
 
