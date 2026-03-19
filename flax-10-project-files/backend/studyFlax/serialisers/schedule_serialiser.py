@@ -1,6 +1,4 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-<<<<<<< HEAD
 from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerialiser
 from studyFlax.models import Deadline, Schedule, ScheduleEventAllocation
 
@@ -54,9 +52,7 @@ class AutoScheduleRequestSerialiser(serializers.Serializer):
         if len(ids) != len(set(ids)):
             raise serializers.ValidationError('Each deadline must appear only once.')
         return value
-=======
-=======
->>>>>>> 04331906 (Add Schedule model fields, serializer, views, urls)
+
 from studyFlax.models.calendar import Schedule
 from studyFlax.serialiser import CalendarEventSerialiser
 
@@ -65,9 +61,3 @@ class ScheduleSerialiser(serializers.ModelSerializer):
         model = Schedule
         fields = ['title', 'user', 'event', 'deadline']
         
-<<<<<<< HEAD
-    
->>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
-=======
-    
->>>>>>> 04331906 (Add Schedule model fields, serializer, views, urls)
