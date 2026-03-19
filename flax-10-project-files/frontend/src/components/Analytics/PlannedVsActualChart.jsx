@@ -1,3 +1,7 @@
+/*
+ * Planned versus actual study chart.
+ */
+
 import { BarChart } from '@mui/x-charts/BarChart';
 import { useTheme } from '../../context/ThemeContext';
 import { getChartColors, getChartSx } from './utils/chartColors';
@@ -13,15 +17,28 @@ const WARM_COLORS = { textColor: 'rgba(123, 103, 81, 0.7)', gridColor: 'rgba(123
 const toDate = (d) => new Date(d.date).toLocaleDateString('en-GB', DATE_FORMAT);
 const toPlanned = (d) => parseFloat(d.planned_hours) || 0;
 const toActual = (d) => parseFloat(d.actual_hours) || 0;
+const getLast14 = (data) => (Array.isArray(data) ? data : []).slice(-14);
+const getMaxValue = (data) => Math.max(0.5, ...data.map(toPlanned), ...data.map(toActual));
+const getTickStyle = (textColor) => ({ fill: textColor, fontSize: 11, fontFamily: FONT_MONO });
+
+function getChartPalette(theme, variant) {
+  const isWarm = variant === 'warm';
+  const base = isWarm ? WARM_COLORS : getChartColors(theme);
+  return { ...base, isWarm };
+}
+
+function getChartSxConfig(textColor, gridColor) {
+  return {
+    ...getChartSx(textColor, gridColor),
+    '& .MuiChartsLegend-label': { fill: `${textColor} !important`, fontFamily: FONT_HEADING },
+  };
+}
 
 const PlannedVsActualChart = ({ data = [], variant }) => {
-  const { mode: theme } = useTheme();
-  const isWarm = variant === 'warm';
-  const { textColor, gridColor } = isWarm ? WARM_COLORS : getChartColors(theme);
-  const last14 = (Array.isArray(data) ? data : []).slice(-14);
-  const maxVal = Math.max(0.5, ...last14.map(toPlanned), ...last14.map(toActual));
-  const tickStyle = { fill: textColor, fontSize: 11, fontFamily: FONT_MONO };
-  const sx = { ...getChartSx(textColor, gridColor), '& .MuiChartsLegend-label': { fill: `${textColor} !important`, fontFamily: FONT_HEADING } };
+  const { gridColor, isWarm, textColor } = getChartPalette(useTheme().mode, variant);
+  const last14 = getLast14(data);
+  const maxVal = getMaxValue(last14), tickStyle = getTickStyle(textColor);
+  const sx = getChartSxConfig(textColor, gridColor);
   return (
     <BarChart
       xAxis={[{ scaleType: 'band', data: last14.map(toDate), tickLabelStyle: tickStyle }]}
