@@ -23,6 +23,7 @@ const fmt = (h) => {
 };
 
 const BAR_TRANSITION = (rank) => ({ duration: 0.8, delay: rank * 0.1, ease: [0.22, 1, 0.36, 1] });
+const PEAK_HOURS_TOOLTIP = 'Hours when you study most. Schedule demanding tasks here.';
 
 function PeakItem({ hour, value, max, rank }) {
   return (
@@ -58,14 +59,11 @@ function NoPeakData() {
 
 function PeakList({ topHours, max }) {
   return (
-    <>
-      <div className={styles.peakList}>
-        {topHours.map(({ h, v }, i) => (
-          <PeakItem key={`peak-${i}`} hour={h} value={v} max={max} rank={i + 1} />
-        ))}
-      </div>
-      <p className={styles.scoreExplain}>Hours when you study most. Schedule demanding tasks here.</p>
-    </>
+    <div className={styles.peakList}>
+      {topHours.map(({ h, v }, i) => (
+        <PeakItem key={`peak-${i}`} hour={h} value={v} max={max} rank={i + 1} />
+      ))}
+    </div>
   );
 }
 
@@ -77,7 +75,7 @@ export function PeakHoursCard({ data }) {
   const max = Math.max(...hourTotals, 1);
   const topHours = getTopHours(hourTotals, hours);
   return (
-    <div className={styles.peakCard}>
+    <div className={styles.peakCard} data-tooltip={topHours.length > 0 ? PEAK_HOURS_TOOLTIP : undefined}>
       <p className={styles.cardLabel}>Peak Hours</p>
       {topHours.length === 0 ? <NoPeakData /> : <PeakList topHours={topHours} max={max} />}
     </div>
