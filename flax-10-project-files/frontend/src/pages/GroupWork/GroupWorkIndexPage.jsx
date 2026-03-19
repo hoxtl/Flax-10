@@ -8,6 +8,7 @@ import Card from "../../components/common/Card/Card";
 import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
+import GroupWorkStats from "./components/GroupWorkStats";
 
 function GroupWorkIndexSkeleton() {
   return (
