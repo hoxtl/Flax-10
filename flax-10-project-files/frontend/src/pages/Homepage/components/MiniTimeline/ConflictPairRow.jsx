@@ -5,7 +5,7 @@
 
 import { AlertTriangle, RotateCw } from "lucide-react";
 import { formatTime, formatHour12h } from "../../utils/dateFormatUtils";
-import { stripEmojiFromTitle } from "../../utils/eventUtils";
+import { isLecture, stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { DAY_START_HOUR } from "../../utils/timelineUtils";
 import { CAMPUS_DISPLAY } from "../../utils/planTimelineRows";
@@ -22,6 +22,13 @@ const EVENT_ACCENTS = {
   meeting:  "#A08B72",
   admin:    "#C4A46D",
   default:  "#A08B72",
+};
+
+const PRIORITY_ORDER = {
+  urgent: 3,
+  high: 2,
+  medium: 1,
+  low: 0,
 };
 
 function getAccent(title, tagName) {
@@ -57,26 +64,12 @@ export function ConflictPairRow({
     row.startMins % 60
   );
 
-  // Prefer an event that can be auto-moved today; fallback to first movable (non-read-only) event.
-  const movableWithGap = items.find((r) => {
-    if (isReadOnlyEvent(r.item)) return false;
-    const freeRow = rows.find(
-      (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= r.durationMins,
-    );
-    return !!freeRow;
-  });
-  const movable = movableWithGap || items.find((r) => !isReadOnlyEvent(r.item)) || null;
-  const freeRow = movableWithGap
-    ? rows.find(
-        (fr) => fr.type === "free" && fr.gapStartMins >= row.endMins && fr.minutes >= movableWithGap.durationMins,
-      )
-    : null;
+  const resolutionPlan = getConflictResolutionPlan({ row, rows, selectedDate });
+  const hasAutoArrange = resolutionPlan?.type === "auto-arrange";
 
   const handleAutoMove = () => {
-    if (!freeRow || !movable || !onConflictAutoMove) return;
-    const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
-    const end = new Date(start.getTime() + movable.durationMins * 60000);
-    onConflictAutoMove(movable.item, start, end);
+    if (!hasAutoArrange || !onConflictAutoMove) return;
+    onConflictAutoMove(resolutionPlan.event, resolutionPlan.start, resolutionPlan.end);
   };
 
   return (
@@ -152,7 +145,7 @@ export function ConflictPairRow({
                     </span>
                   )}
                 </div>
-                {!freeRow && onPushTomorrow && !isReadOnlyEvent(r.item) && (
+                {!hasAutoArrange && onPushTomorrow && !isReadOnlyEvent(r.item) && (
                   <button
                     type="button"
                     className={styles.planTimelineConflictCardMoveBtn}
@@ -180,15 +173,15 @@ export function ConflictPairRow({
               type="button"
               className={styles.planTimelineConflictAutoBtn}
               onClick={handleAutoMove}
-              disabled={!freeRow}
+              disabled={!hasAutoArrange}
               title={
-                freeRow
-                  ? `Move "${movable?.item?.title}" to next free window`
+                hasAutoArrange
+                  ? `Move "${resolutionPlan?.item?.title}" to next free window`
                   : "No free window available right now"
               }
             >
               <RotateCw size={12} strokeWidth={2.1} aria-hidden />
-              {freeRow ? "Auto-arrange" : "No free window"}
+              {hasAutoArrange ? "Auto-arrange" : "No free window"}
             </button>
             {items.filter((r) => !isReadOnlyEvent(r.item)).map((r) => (
               <button
@@ -207,4 +200,57 @@ export function ConflictPairRow({
       </div>
     </div>
   );
+}
+
+export function getConflictPriorityRank(item) {
+  return PRIORITY_ORDER[(item?.priority || "low").toLowerCase()] ?? 0;
+}
+
+function isLectureTaggedEvent(item) {
+  const tagName = (item?.tag_name ?? item?.tag?.name ?? "").toString().toLowerCase();
+  return tagName === "lecture" || isLecture(item);
+}
+
+export function getConflictResolutionPlan({ row, rows, selectedDate }) {
+  const orderedItems = [...(row?.items || [])].sort((a, b) => {
+    const priorityDiff = getConflictPriorityRank(b.item) - getConflictPriorityRank(a.item);
+    if (priorityDiff !== 0) return priorityDiff;
+    return new Date(a.item.start_time) - new Date(b.item.start_time);
+  });
+
+  const movableCandidates = [...orderedItems]
+    .reverse()
+    .filter((entry) => !isReadOnlyEvent(entry.item))
+    .filter((entry) => !isLectureTaggedEvent(entry.item));
+
+  if (!movableCandidates.length) return null;
+
+  const candidateWithGap = movableCandidates.find((entry) => {
+    const freeRow = rows.find(
+      (freeEntry) => freeEntry.type === "free" && freeEntry.gapStartMins >= row.endMins && freeEntry.minutes >= entry.durationMins,
+    );
+    return !!freeRow;
+  });
+
+  if (candidateWithGap) {
+    const freeRow = rows.find(
+      (freeEntry) => freeEntry.type === "free" && freeEntry.gapStartMins >= row.endMins && freeEntry.minutes >= candidateWithGap.durationMins,
+    );
+    const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
+    const end = new Date(start.getTime() + candidateWithGap.durationMins * 60000);
+    return {
+      type: "auto-arrange",
+      event: candidateWithGap.item,
+      start,
+      end,
+      freeRow,
+      movable: candidateWithGap,
+    };
+  }
+
+  return {
+    type: "move-tomorrow",
+    event: movableCandidates[0].item,
+    movable: movableCandidates[0],
+  };
 }

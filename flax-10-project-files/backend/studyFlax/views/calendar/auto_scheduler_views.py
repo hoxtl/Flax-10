@@ -58,7 +58,7 @@ def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
             window_end = min(window_end, work_window_end)
         else:
             window_start, window_end = work_window_start, work_window_end
-            
+
     elif worktime_preference == 'night':
         work_window_start = datetime.combine(current_day, time(18, 0))
         work_window_end = datetime.combine(current_day + timedelta(days=1), time(2, 0))
@@ -198,6 +198,7 @@ def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferenc
                     end_time=block_end,
                     source='auto_scheduler',
                     tag=schedule_tag,
+                    priority="low",
                 )
                 ScheduleEventAllocation.objects.create(
                     schedule=schedule,

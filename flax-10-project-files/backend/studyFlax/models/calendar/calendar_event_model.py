@@ -24,7 +24,7 @@ class CalendarEvent(models.Model):
     priority = models.CharField(
         max_length=10,
         choices=PRIORITY_CHOICES,
-        default='medium'
+        default='low'
     )
     recurrence_rule = models.ForeignKey(RecurrenceRule, on_delete=models.SET_NULL, null=True, blank=True)
     reminder_minutes = models.JSONField(default=list, blank=True)

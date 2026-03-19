@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { getUpcomingDeadlines } from '../../api/deadlineApi';
-import { getEvents } from '../../api/eventApi';
+import { getEvents, updateEvent } from '../../api/eventApi';
 import { createSchedule } from '../../api/scheduleApi';
 import { useNotifications } from '../../context/NotificationContext';
 import styles from '../Dashboard/QuickAddModal.module.css';
+import { resolveConflictPlansBeforeScheduling } from '../../pages/Homepage/components/useAutoResolveScheduleConflicts';
 
 export function ScheduleManualForm({ onDone }) {
   const { addNotification } = useNotifications();
@@ -116,6 +117,26 @@ export function ScheduleAutoForm({ onDone }) {
     };
 
     try {
+      const moveEvent = async (event, startTime, endTime) => updateEvent(event.id, {
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+      });
+
+      await resolveConflictPlansBeforeScheduling({
+        getFreshEvents: () => getEvents(),
+        selectedDate: new Date(),
+        onConflictAutoMove: (event, startTime, endTime) => moveEvent(event, startTime, endTime),
+        onPushTomorrow: (event) => {
+          const start = new Date(event.start_time);
+          const end = event.end_time ? new Date(event.end_time) : new Date(start.getTime() + 25 * 60000);
+          const durationMins = Math.max(25, Math.round((end - start) / 60000) || 25);
+          const nextDay = new Date(start);
+          nextDay.setDate(nextDay.getDate() + 1);
+          const movedEnd = new Date(nextDay.getTime() + durationMins * 60000);
+          return moveEvent(event, nextDay, movedEnd);
+        },
+      });
+
       const data = await createSchedule(payload);
       if (data.overwritten) {
         addNotification({ title: 'Schedule overwritten', message: 'A schedule with this name existed and was replaced.', notification_type: 'general' });
