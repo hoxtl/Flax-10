@@ -82,9 +82,6 @@ function CreateProjectForm({ onCreated }) {
       <form onSubmit={submit} className={styles.createProjectForm}>
         <CreateProjectInputs data={form} onChange={change} />
         <div className={styles.formFooter}>
-          <div className={styles.enterHint}>
-            Press <kbd className={styles.kbd}>↵</kbd> to create quickly
-          </div>
           <PrimaryButton type="submit" className={styles.submitBtn} pill>+ Create project</PrimaryButton>
         </div>
       </form>
