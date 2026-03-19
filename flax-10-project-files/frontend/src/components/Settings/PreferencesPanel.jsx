@@ -47,7 +47,7 @@ function SleepCard({ totalMins, duration }) {
   );
 }
 
-function AppearanceSection({ theme, onChange, isSaving }) {
+function AppearanceSection({ theme, onChange, isSaving, saveSignal }) {
   return (
     <div className={styles.twoColLayout}>
       <div>
@@ -66,6 +66,7 @@ function AppearanceSection({ theme, onChange, isSaving }) {
             isSaving={isSaving}
             label="Save Appearance"
             savingLabel="Saving..."
+            saveSignal={saveSignal}
           />
         </div>
       </div>
@@ -166,6 +167,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, active
   const [initialWakeTime, setInitialWakeTime] = useState("07:00");
   const [loadingSleep, setLoadingSleep] = useState(true);
   const [sleepSaveSignal, setSleepSaveSignal] = useState(0);
+  const [appearanceSaveSignal, setAppearanceSaveSignal] = useState(0);
 
   useEffect(() => {
     getUserSettings()
@@ -184,10 +186,11 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, active
       .finally(() => setLoadingSleep(false));
   }, []);
 
-  const handlePreferencesSubmit = (newData) => {
+  const handlePreferencesSubmit = async (newData) => {
     if (newData.mode) setMode(newData.mode);
     if (newData.theme) setTheme(newData.theme);
-    onSave(newData);
+    await onSave(newData);
+    setAppearanceSaveSignal((s) => s + 1);
   };
 
   const hasUnsavedSleep = sleepTime !== initialSleepTime || wakeTime !== initialWakeTime;
@@ -206,6 +209,7 @@ export default function PreferencesPanel({ onSave, onSleepSave, isSaving, active
                 if (newData.theme) setTheme(newData.theme);
               }}
               isSaving={isSaving}
+              saveSignal={appearanceSaveSignal}
             />
           </form>
         )}
