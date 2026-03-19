@@ -50,6 +50,24 @@ from studyFlax.utils.reading_utils import update_reading_estimates
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
+SOFT_TAG_COLORS = {
+    "Lecture": "#C98C56",
+    "Deadline": "#7F5B63",
+    "Exam": "#6B78B8",
+    "Schedule": "#CBBE74",
+    "Meals": "#8FA1BC",
+    "Other": "#8D837A",
+    "Routine": "#A5B1A2",
+    "Wellness": "#8EB6A8",
+}
+SOFT_FALLBACK_TAG_COLORS = (
+    "#B58F78",
+    "#8FA1BC",
+    "#A59ABF",
+    "#AEB88A",
+    "#C39A86",
+    "#8FB6B0",
+)
 
 
 def _seed_user_pool():
@@ -207,10 +225,9 @@ class Command(BaseCommand):
         self.categories = list(Category.objects.all())
 
     def _tag_color(self, name):
-        from faker import Faker
-        if name in ('Routine', 'Wellness', 'Meals'):
-            return '#94a3b8'
-        return Faker('en_GB').hex_color()
+        if name in SOFT_TAG_COLORS:
+            return SOFT_TAG_COLORS[name]
+        return SOFT_FALLBACK_TAG_COLORS[sum(ord(char) for char in name) % len(SOFT_FALLBACK_TAG_COLORS)]
 
     def _tag_category(self, user=None):
         if not self.categories:
