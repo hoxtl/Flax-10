@@ -1,4 +1,4 @@
-/* List view — Agenda style with timeline spine */
+/* List view — Clean agenda style */
 .container {
     display: flex;
     flex-direction: column;
@@ -6,30 +6,20 @@
     padding: 0 12px;
 }
 
-/* Remove card shell for cleaner look */
+/* Remove card shell for cleaner look — overflow on this element so sticky headers work */
 .listCard {
     background: transparent;
     border-radius: 0;
     border: none;
     overflow-y: auto;
+    max-height: calc(100vh - 200px);
 }
 
-/* Day group — timeline spine */
+/* Day group */
 .dayGroup {
     border-bottom: none;
     position: relative;
-    padding-left: 24px;
-}
-
-/* Vertical charcoal timeline line */
-.dayGroup::before {
-    content: '';
-    position: absolute;
-    left: 11px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--text);
+    padding-left: 8px;
 }
 
 .dayGroup:last-of-type {
@@ -63,21 +53,12 @@
     text-align: center;
 }
 
-:root[data-mode="dark"] .dayNumber {
-    color: var(--text);
-}
-
 .dayHeaderToday .dayNumber {
     color: var(--text);
     background: transparent;
     border-radius: 0;
     padding: 0;
     border-bottom: 2px solid var(--text);
-}
-
-:root[data-mode="dark"] .dayHeaderToday .dayNumber {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
 }
 
 .dayMeta {
@@ -94,29 +75,13 @@
     letter-spacing: 0.04em;
 }
 
-:root[data-mode="dark"] .dayName {
-    color: var(--text);
-}
-
-.dayHeaderToday .dayName {
-    color: var(--text);
-}
-
-:root[data-mode="dark"] .dayHeaderToday .dayName {
-    color: var(--primary);
-}
-
 .daySubRow {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 0.7rem;
-    color: #5D4037;
+    color: var(--muted, #5D4037);
     font-style: italic;
-}
-
-:root[data-mode="dark"] .daySubRow {
-    color: var(--muted);
 }
 
 .dayBadges {
@@ -134,13 +99,8 @@
 }
 
 .todayBadge {
-    background: rgba(74, 52, 33, 0.08);
+    background: var(--hover, rgba(74, 52, 33, 0.08));
     color: var(--text);
-}
-
-:root[data-mode="dark"] .todayBadge {
-    background: var(--success-bg);
-    color: var(--success-text);
 }
 
 .deadlineBadge {
@@ -157,21 +117,11 @@
 .flatList {
     display: flex;
     flex-direction: column;
-    padding-left: 24px;
+    padding-left: 8px;
     position: relative;
 }
 
-.flatList::before {
-    content: '';
-    position: absolute;
-    left: 11px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--text);
-}
-
-/* Event row — slim with dot anchor + pastel accent tint */
+/* Event row — slim with pastel accent tint */
 .eventRow {
     border-bottom: none;
     cursor: pointer;
@@ -183,19 +133,6 @@
     margin-bottom: 2px;
 }
 
-/* Dot on the timeline */
-.eventRow::before {
-    content: '';
-    position: absolute;
-    left: -17px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--text);
-    z-index: 1;
-}
 
 .eventRow:last-of-type {
     border-bottom: none;
@@ -212,21 +149,17 @@
 .eventMain {
     display: flex;
     align-items: center;
-    padding: 8px 16px 8px 0;
+    padding: 8px 16px 8px 8px;
     gap: 0;
 }
 
 .eventTime {
     font-size: 0.7rem;
-    color: #5D4037;
+    color: var(--muted, #5D4037);
     font-style: italic;
     width: 72px;
     flex-shrink: 0;
     font-family: var(--font-mono);
-}
-
-:root[data-mode="dark"] .eventTime {
-    color: var(--muted);
 }
 
 /* Groups event name + pills inline */
@@ -249,10 +182,6 @@
     min-width: 0;
 }
 
-:root[data-mode="dark"] .eventName {
-    color: var(--text);
-}
-
 .badgesContainer {
     display: flex;
     gap: 6px;
@@ -267,15 +196,9 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    background: #F2F0E9;
-    color: #333333;
-    border: 0.5px solid rgba(51, 51, 51, 0.12);
-}
-
-:root[data-mode="dark"] .tagBadge {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-card, #F2F0E9);
     color: var(--text);
-    border-color: rgba(255, 255, 255, 0.12);
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
 }
 
 /* Source pill — solid charcoal */
@@ -286,56 +209,38 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     white-space: nowrap;
-    background: #333333;
-    color: #FAF9F6;
-}
-
-:root[data-mode="dark"] .sourceBadge {
-    background: var(--primary);
-    color: #FAF9F6;
+    background: var(--text);
+    color: var(--calendar-bg, #FAF9F6);
 }
 
 
-/* Conflict row — two or more overlapping events side by side */
+/* Conflict row — overlapping events stacked vertically */
 .conflictRow {
     display: flex;
-    align-items: stretch;
+    flex-direction: column;
     position: relative;
     min-height: 40px;
 }
 
-.conflictRow::before {
-    content: '';
-    position: absolute;
-    left: -17px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--text);
-    z-index: 1;
-}
 
-/* Container for the side-by-side cells — time column matches eventTime width */
+/* Container for stacked conflict cells */
 .conflictCells {
-    flex: 1;
     display: flex;
-    gap: 1px;
-    background: rgba(74, 52, 33, 0.12);
+    flex-direction: column;
+    gap: 2px;
     border-radius: 4px;
     overflow: hidden;
-    margin-left: 0;
 }
 
 /* Each individual conflict cell — pastel accent tint */
 .conflictCell {
-    flex: 1;
     background: color-mix(in srgb, var(--accent, transparent) 8%, var(--calendar-bg, #FAF9F6));
     padding: 8px 12px 8px 8px;
     cursor: pointer;
     transition: background 0.15s ease;
     min-width: 0;
+    border-radius: 6px;
+    margin-bottom: 2px;
 }
 
 .conflictCell:hover {
@@ -357,15 +262,7 @@
     }
 
     .dayGroup {
-        padding-left: 20px;
-    }
-
-    .dayGroup::before {
-        left: 9px;
-    }
-
-    .eventRow::before {
-        left: -13px;
+        padding-left: 4px;
     }
 
     .eventMain {

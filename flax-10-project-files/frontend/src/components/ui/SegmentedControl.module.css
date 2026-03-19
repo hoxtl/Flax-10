@@ -108,11 +108,11 @@
 }
 
 :root[data-mode="dark"] .solid .button {
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.55);
 }
 
 :root[data-mode="dark"] .solid .button svg {
-    stroke: var(--muted);
+    stroke: rgba(255, 255, 255, 0.55);
 }
 
 .solid .button:hover {
@@ -144,10 +144,10 @@
 }
 
 :root[data-mode="dark"] .solid .active {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--primary);
+    background: rgba(255, 255, 255, 0.22);
+    color: #E8D5B5;
 }
 
 :root[data-mode="dark"] .solid .active svg {
-    stroke: var(--primary);
+    stroke: #E8D5B5;
 }

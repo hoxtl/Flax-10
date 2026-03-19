@@ -7,7 +7,7 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     background: var(--calendar-bg);
-    border-bottom: 1px solid var(--text);
+    border-bottom: 0.5px solid var(--border, rgba(123, 103, 81, 0.25));
     position: sticky;
     top: 0;
     z-index: 10;
@@ -36,7 +36,7 @@
 }
 
 .day-cell {
-    border: 1px solid var(--text);
+    border: 0.5px solid var(--border, rgba(123, 103, 81, 0.25));
     padding: 0.25rem 0.5rem;
     height: 100%;
     box-sizing: border-box;
@@ -49,7 +49,7 @@
 }
 
 .day-cell:hover {
-    background-color: rgba(74, 52, 33, 0.04);
+    background-color: var(--hover, rgba(74, 52, 33, 0.04));
 }
 
 .day-cell:hover .month-add-btn {
@@ -74,12 +74,12 @@
 }
 
 .month-add-btn:hover {
-    color: #5D4037;
-    background-color: rgba(74, 52, 33, 0.06);
+    color: var(--text);
+    background-color: var(--hover, rgba(74, 52, 33, 0.06));
 }
 
 .day-cell.other-month {
-    background-color: rgba(74, 52, 33, 0.02);
+    background-color: var(--hover, rgba(74, 52, 33, 0.02));
     opacity: 0.4;
 }
 
@@ -87,9 +87,9 @@
     color: var(--muted);
 }
 
-/* Today: 2px solid charcoal border instead of colored background */
+/* Today: 2px solid flax/brown border */
 .day-cell.is-today {
-    border: 2px solid var(--text);
+    border: 2px solid #7B6751;
 }
 
 .day-cell.is-today .day-number {
@@ -130,21 +130,14 @@
     gap: 4px;
 }
 
-/* Charcoal dot before each event name */
+/* Dot removed per design review */
 .month-event-dot::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 4px;
-    min-width: 4px;
-    border-radius: 50%;
-    background: var(--text);
-    flex-shrink: 0;
+    display: none;
 }
 
 .more-events {
     font-size: 0.6rem;
-    color: #5D4037;
+    color: var(--text);
     font-style: italic;
     cursor: pointer;
 }
@@ -166,8 +159,8 @@
 }
 
 .day-cell.drop-over {
-    background-color: rgba(74, 52, 33, 0.06);
-    border: 2px dashed var(--text);
+    background-color: var(--hover, rgba(74, 52, 33, 0.06));
+    border: 2px dashed var(--border, rgba(123, 103, 81, 0.25));
 }
 
 @media (max-width: 768px) {
