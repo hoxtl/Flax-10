@@ -1,12 +1,22 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
 import './TimeRow.css';
 
-export function TimeRow({ form, update, setForm }) {
+const FREQUENCY_OPTIONS = [
+    { value: 'none', label: 'None' },
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'biweekly', label: 'Biweekly' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' },
+];
+
+export function TimeRow({ form, update, setForm, recurrenceValue, onRecurrenceChange }) {
     return (
         <div className="time-row-container">
             <AllDayToggle form={form} setForm={setForm} />
-            <TimeFields form={form} update={update} />
+            <TimeFields form={form} update={update} recurrenceValue={recurrenceValue} onRecurrenceChange={onRecurrenceChange} />
         </div>
     );
 }
@@ -23,12 +33,18 @@ function AllDayToggle({ form, setForm }) {
     );
 }
 
-function TimeFields({ form, update }) {
+function TimeFields({ form, update, recurrenceValue, onRecurrenceChange }) {
     const isAllDay = form.all_day || false;
+    const frequency = recurrenceValue?.frequency || 'none';
+    const handleFrequencyChange = (val) => onRecurrenceChange?.({ ...recurrenceValue, frequency: val });
     return (
-        <div className="form-row">
+        <div className="form-row-3">
             <TimeInput label="Start" value={form.start_time} field="start_time" update={update} isAllDay={isAllDay} />
             <TimeInput label="End" value={form.end_time} field="end_time" update={update} isAllDay={isAllDay} />
+            <div className="form-field">
+                <label>Repeat</label>
+                <AnimatedDropdown value={frequency} onChange={handleFrequencyChange} options={FREQUENCY_OPTIONS} placeholder="None" />
+            </div>
         </div>
     );
 }

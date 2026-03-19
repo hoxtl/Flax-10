@@ -1,3 +1,5 @@
+"""Society views package."""
+
 from .society_view import society_list, publish_changes
 from .society_detail_view import society_detail, report_society
 from .membership_view import membership_list, membership_detail, toggle_subscription

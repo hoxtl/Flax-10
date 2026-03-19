@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     background: var(--panel);
-    border-radius: 8px;
+    border-radius: 0;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
@@ -20,10 +20,11 @@
     flex: 1;
 }
 
+/* Time labels — charcoal vertical line */
 .time-labels-column {
     width: 60px;
     flex-shrink: 0;
-    border-right: 1px solid var(--border);
+    border-right: 1px solid var(--border, rgba(74, 52, 33, 0.2));
 }
 
 .time-label-row {
@@ -37,8 +38,9 @@
 
 .time-label-text {
     font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-weight: var(--font-weight-task);
+    color: var(--muted, #5D4037);
+    font-weight: 600;
+    font-style: italic;
     transform: translateY(-50%);
     line-height: 1;
 }
@@ -55,7 +57,7 @@
 
 .time-slot {
     height: 60px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border, rgba(74, 52, 33, 0.12));
     box-sizing: border-box;
     position: relative;
     background-image: none;
@@ -66,27 +68,27 @@
 .day-view:has(.draggable-event.resizing) .time-slot {
     background-image: linear-gradient(to bottom,
             transparent 24%,
-            var(--divider) 25%,
-            var(--divider) 26%,
+            var(--border, rgba(74, 52, 33, 0.06)) 25%,
+            var(--border, rgba(74, 52, 33, 0.06)) 26%,
             transparent 27%,
             transparent 49%,
-            var(--divider) 50%,
-            var(--divider) 51%,
+            var(--border, rgba(74, 52, 33, 0.06)) 50%,
+            var(--border, rgba(74, 52, 33, 0.06)) 51%,
             transparent 52%,
             transparent 74%,
-            var(--divider) 75%,
-            var(--divider) 76%,
+            var(--border, rgba(74, 52, 33, 0.06)) 75%,
+            var(--border, rgba(74, 52, 33, 0.06)) 76%,
             transparent 77%);
 }
 
 .time-slot:hover {
-    background-color: var(--hover);
+    background-color: var(--hover, rgba(74, 52, 33, 0.03));
 }
 
 .time-slot.drop-target {
-    background-color: var(--active);
+    background-color: var(--hover, rgba(74, 52, 33, 0.06));
     background-image: none;
-    box-shadow: inset 0 0 0 2px var(--primary);
+    box-shadow: inset 0 0 0 2px var(--text);
 }
 
 .quarter-highlight {
@@ -94,11 +96,11 @@
     left: 0;
     right: 0;
     height: 25%;
-    background-color: var(--active);
-    border: 2px solid var(--primary);
+    background-color: var(--hover, rgba(74, 52, 33, 0.06));
+    border: 2px solid var(--text);
     box-sizing: border-box;
     pointer-events: none;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 .resize-line-highlight {
@@ -106,7 +108,7 @@
     left: 0;
     right: 0;
     height: 0;
-    border-bottom: 3px solid var(--primary);
+    border-bottom: 3px solid var(--muted, #5D4037);
     pointer-events: none;
     z-index: 15;
 }

@@ -1,3 +1,6 @@
+/*
+ * societyApi exposes frontend API helpers for society-related requests.
+ */
 import { fetchApi } from './client';
 
 const BASE = '/societies';

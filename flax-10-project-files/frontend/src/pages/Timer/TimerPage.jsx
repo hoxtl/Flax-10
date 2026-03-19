@@ -60,7 +60,7 @@ function NotificationPrompt({ permission, request }) {
   );
 }
 
-const FOCUS_WORDS = ["focus", "deep work", "lock in", "you've got this"];
+const FOCUS_WORDS = ["focus", "lock in", "you've got this"];
 
 function FocusPageSkeleton() {
   return (

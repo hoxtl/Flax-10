@@ -1,3 +1,7 @@
+/*
+ * Analytics API service.
+ */
+
 import { fetchApi } from './client';
 
 const analyticsService = {

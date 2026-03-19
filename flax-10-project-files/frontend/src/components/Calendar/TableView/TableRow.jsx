@@ -4,7 +4,7 @@ import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
 import { TagEditCell } from './cells/TagEditCell';
 import { DateTimeCell } from './cells/DateTimeCell';
-import { useQuickActions } from '../hooks/useQuickActions';
+
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
 import { isSameDay } from '../utils/dateUtils';
@@ -123,12 +123,12 @@ export function TableRow({ event, rowIndex, editState, navState, onCellClick, vi
     const state = useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode);
     const { tags } = useTags();
     const theme = getEventTheme(event, { tags });
-    const quickAction = useQuickActions(event);
+    const accentColor = theme.color;
 
     return (
-        <tr className={state.rowClass} onClick={() => state.isReadOnly && state.setIsExpanded(p => !p)}>
+        <tr className={state.rowClass} style={accentColor ? { '--accent': accentColor } : undefined} onClick={() => state.isReadOnly && state.setIsExpanded(p => !p)}>
             <NameCell event={event} isEditing={state.isEditing('title')} cellValue={editState.cellValue} updateValue={editState.updateValue}
-                onKeyDown={e => navState.handleKeyDown(e, rowIndex, 0)} onEdit={e => state.onEdit(e, 'title')} isReadOnly={state.isReadOnly} quickAction={quickAction} />
+                onKeyDown={e => navState.handleKeyDown(e, rowIndex, 0)} onEdit={e => state.onEdit(e, 'title')} isReadOnly={state.isReadOnly} quickAction={null} />
             <TagCell event={event} tags={tags} theme={theme} isReadOnly={state.isReadOnly} isEditing={state.isEditing('tag')}
                 cellValue={editState.cellValue} onEdit={e => state.onEdit(e, 'tag')} onSave={editState.saveWithValue} onCancel={editState.cancelEdit} badge={getSourceBadge(event)} />
             <td className={styles.dateCell} onClick={e => !state.isReadOnly && e.stopPropagation()}>

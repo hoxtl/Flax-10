@@ -2,10 +2,12 @@
 Shared base classes and assertion helpers for backend tests.
 """
 
-from studyFlax.models import CalendarEvent, RecurrenceRule, Tag
-from .fixtures import get_sample_tags
-from rest_framework.test import APIClient
 from django.test import TestCase
+from rest_framework.test import APIClient
+
+from studyFlax.models import CalendarEvent, RecurrenceRule, Tag
+
+from .fixtures import get_sample_tags
 
 class BaseTestCase(TestCase):
     """Base test case with common setup."""
@@ -61,21 +63,35 @@ class BaseEventTestCase(BaseTestCase):
     def _create_recurrence(self, data):
         if not data:
             return None
-        if isinstance(data, str):
-            import json
-
-            try:
-                data = json.loads(data)
-            except json.JSONDecodeError:
-                pass
-        return RecurrenceRule.objects.create(**data)
+        recurrence_data = parse_recurrence_data(data)
+        return RecurrenceRule.objects.create(**recurrence_data)
 
     def _parse_event_dates(self, data):
-        from datetime import datetime
+        for field, value in get_datetime_fields(data):
+            data[field] = parse_iso_datetime(value)
 
-        for field in ["start_time", "end_time"]:
-            if isinstance(data.get(field), str):
-                data[field] = datetime.fromisoformat(
-                    data[field].replace("Z", "+00:00")
-                )
 
+def parse_recurrence_data(data):
+    if not isinstance(data, str):
+        return data
+    return load_recurrence_json(data)
+
+
+def load_recurrence_json(data):
+    import json
+
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
+        return data
+
+
+def parse_iso_datetime(value):
+    from datetime import datetime
+
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def get_datetime_fields(data):
+    fields = ["start_time", "end_time"]
+    return [(field, data.get(field)) for field in fields if isinstance(data.get(field), str)]

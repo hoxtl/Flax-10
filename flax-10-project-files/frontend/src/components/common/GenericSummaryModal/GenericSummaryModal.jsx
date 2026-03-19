@@ -1,4 +1,5 @@
 import StandardModal from "../StandardModal/StandardModal";
+import EmptyState from "../EmptyState/EmptyState";
 import styles from "./GenericSummaryModal.module.css";
 
 function LoadingRows() {
@@ -17,7 +18,7 @@ function LoadingRows() {
     );
 }
 
-export default function GenericSummaryModal({ isOpen, onClose, title, subtitle, emptyMessage, items, renderItem, topContent, children, loading = false }) {
+export default function GenericSummaryModal({ isOpen, onClose, title, subtitle, emptyMessage, emptyIcon, emptyDescription, items, renderItem, topContent, children, loading = false }) {
     if (!isOpen) return null;
 
     const hasItems = items && items.length > 0;
@@ -30,7 +31,7 @@ export default function GenericSummaryModal({ isOpen, onClose, title, subtitle, 
                 {loading ? (
                     <LoadingRows />
                 ) : !hasItems ? (
-                    <div className={styles.empty}>{emptyMessage || 'No items found.'}</div>
+                    <EmptyState icon={emptyIcon} title={emptyMessage || 'No items found.'} description={emptyDescription} />
                 ) : (
                     <div className={styles.list}>{listContent}</div>
                 )}
