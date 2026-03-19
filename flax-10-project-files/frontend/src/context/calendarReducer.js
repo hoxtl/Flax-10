@@ -44,18 +44,35 @@ const handlers = {
     TRIGGER_RELOAD: (state) => ({ ...state, reloadKey: (state.reloadKey || 0) + 1 }),
 };
 
+function normalizeFilterValues(value) {
+    const source = Array.isArray(value) ? value.flat(Infinity) : [value];
+    const normalized = source
+        .filter((item) => typeof item === 'string')
+        .map((item) => item.trim().toLowerCase())
+        .filter((item) => item && item !== '__manage__');
+    const unique = Array.from(new Set(normalized));
+    if (unique.length === 0 || unique.includes('all')) return ['all'];
+    return unique;
+}
+
 /**
  * Toggles the filter state based on the selected payload.
  * Handles switching between 'all' and specific tags, and multi-select logic.
  */
 function toggleFilter(filter, payload) {
-    if (payload === 'all') return ['all'];
-    const items = new Set(filter);
+    if (Array.isArray(payload)) {
+        return normalizeFilterValues(payload);
+    }
+
+    const nextValue = typeof payload === 'string' ? payload.toLowerCase() : payload;
+    if (nextValue === 'all') return ['all'];
+
+    const items = new Set(normalizeFilterValues(filter));
     items.delete('all');
-    if (items.has(payload)) {
-        items.delete(payload);
+    if (items.has(nextValue)) {
+        items.delete(nextValue);
     } else {
-        items.add(payload);
+        items.add(nextValue);
     }
     const result = Array.from(items);
     return result.length > 0 ? result : ['all'];

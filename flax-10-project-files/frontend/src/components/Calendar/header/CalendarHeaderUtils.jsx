@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { DatePickerButton } from './DatePickerButton';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import { SegmentedControl } from '../../ui/SegmentedControl';
+import MultiSelectDropdown from '../../ui/MultiSelectDropdown';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
@@ -11,6 +12,7 @@ import styles from './CalendarHeaderUtils.module.css';
 import { deleteSchedule, getSchedules, renameSchedule } from '../../../api/scheduleApi';
 import { useToast } from '../../../context/ToastContext';
 import StandardModal from '../../common/StandardModal/StandardModal';
+import HoldConfirmModal from '../../common/HoldConfirmModal/HoldConfirmModal';
 import TextInput from '../../common/TextInput/TextInput';
 import { useTags } from '../../../context/TagContext';
 import TagManagerModal from '../../Tags/TagManagerModal';
@@ -49,6 +51,7 @@ export function ActionMenu({ onAddEvent, onImport }) {
             hideCheckmark={true}
             onChange={(val) => val === 'add' ? onAddEvent() : onImport()}
             align="right"
+            openOnHover
         />
     );
 }
@@ -69,6 +72,7 @@ export function ViewModeButton({ modes, activeMode, onChange }) {
             value={activeMode}
             onChange={onChange}
             align="right"
+            openOnHover
         />
     );
 }
@@ -86,6 +90,7 @@ export function ViewSettingsMenu({ activeMode, onViewChange, isMobile }) {
             value={activeMode}
             onChange={onViewChange}
             align="right"
+            openOnHover
         />
     );
 }
@@ -152,18 +157,15 @@ function ScheduleCard({
     schedule,
     editingId,
     renameDraft,
-    pendingDeleteId,
     isSaving,
-    isDeleting,
+    isRemoving,
     onRenameStart,
     onRenameCancel,
     onRenameDraftChange,
     onRenameSave,
-    onDeleteToggle,
-    onDeleteConfirm,
+    onRemoveRequest,
 }) {
     const isEditing = editingId === schedule.id;
-    const isPendingDelete = pendingDeleteId === schedule.id;
 
     return (
         <article className={styles.scheduleCard}>
@@ -199,18 +201,13 @@ function ScheduleCard({
 
                 <PrimaryButton
                     type="button"
-                    variant={isPendingDelete ? 'ghost' : 'danger'}
+                    variant="danger"
                     pill
-                    disabled={isDeleting}
-                    onClick={() => (isPendingDelete ? onDeleteConfirm(schedule.id) : onDeleteToggle(schedule.id))}
+                    disabled={isRemoving}
+                    onClick={() => onRemoveRequest(schedule.id)}
                 >
-                    {isPendingDelete ? 'Confirm remove' : 'Remove'}
+                    Remove
                 </PrimaryButton>
-                {isPendingDelete && (
-                    <PrimaryButton type="button" variant="ghost" pill onClick={() => onDeleteToggle(null)}>
-                        Keep
-                    </PrimaryButton>
-                )}
             </div>
         </article>
     );
@@ -222,7 +219,7 @@ function ScheduleManagerDialog({ open, onClose }) {
     const [loading, setLoading] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [renameDraft, setRenameDraft] = useState('');
-    const [pendingDeleteId, setPendingDeleteId] = useState(null);
+    const [removeTargetId, setRemoveTargetId] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -254,14 +251,14 @@ function ScheduleManagerDialog({ open, onClose }) {
         if (!open) {
             setEditingId(null);
             setRenameDraft('');
-            setPendingDeleteId(null);
+            setRemoveTargetId(null);
             setIsSaving(false);
             setIsDeleting(false);
         }
     }, [open]);
 
     const startRename = (schedule) => {
-        setPendingDeleteId(null);
+        setRemoveTargetId(null);
         setEditingId(schedule.id);
         setRenameDraft(schedule.title);
     };
@@ -296,11 +293,12 @@ function ScheduleManagerDialog({ open, onClose }) {
     };
 
     const confirmDelete = async (scheduleId) => {
+        if (!scheduleId) return;
         setIsDeleting(true);
         try {
             await deleteSchedule(scheduleId);
             setSchedules((prev) => prev.filter((schedule) => schedule.id !== scheduleId));
-            setPendingDeleteId(null);
+            setRemoveTargetId(null);
         } catch (error) {
             showToast(error.message, { variant: 'error' });
         } finally {
@@ -308,14 +306,43 @@ function ScheduleManagerDialog({ open, onClose }) {
         }
     };
 
+    const openQuickAddSchedule = (view) => {
+        window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+        onClose?.();
+    };
+
     if (!open) return null;
 
     return (
-        <StandardModal title="Schedules" subtitle="Rename or remove saved manual and auto-generated schedules." onClose={onClose}>
+        <StandardModal
+            title="Schedules"
+            subtitle="Rename or remove saved manual and auto-generated schedules."
+            subtitleClassName={styles.scheduleDialogSubtitle}
+            onClose={onClose}
+        >
             <div className={styles.scheduleDialogBody}>
                 {loading && <p className={styles.scheduleDialogEmpty}>Loading schedules…</p>}
                 {!loading && schedules.length === 0 && (
-                    <p className={styles.scheduleDialogEmpty}>No schedules yet. Use Quick Add to create a manual or auto schedule.</p>
+                    <div className={styles.scheduleEmptyActions}>
+                        <PrimaryButton
+                            variant="primary"
+                            size="small"
+                            pill
+                            onClick={() => openQuickAddSchedule('schedule_manual')}
+                            aria-label="Open manual schedule quick add"
+                        >
+                            🧩 Manual Schedule
+                        </PrimaryButton>
+                        <PrimaryButton
+                            variant="ghost"
+                            size="small"
+                            pill
+                            onClick={() => openQuickAddSchedule('schedule_auto')}
+                            aria-label="Open auto schedule quick add"
+                        >
+                            ⚙️ Auto Schedule
+                        </PrimaryButton>
+                    </div>
                 )}
                 {!loading && schedules.length > 0 && (
                     <div className={styles.scheduleList}>
@@ -325,20 +352,28 @@ function ScheduleManagerDialog({ open, onClose }) {
                                 schedule={schedule}
                                 editingId={editingId}
                                 renameDraft={renameDraft}
-                                pendingDeleteId={pendingDeleteId}
                                 isSaving={isSaving && editingId === schedule.id}
-                                isDeleting={isDeleting && pendingDeleteId === schedule.id}
+                                isRemoving={isDeleting && removeTargetId === schedule.id}
                                 onRenameStart={startRename}
                                 onRenameCancel={cancelRename}
                                 onRenameDraftChange={setRenameDraft}
                                 onRenameSave={saveRename}
-                                onDeleteToggle={setPendingDeleteId}
-                                onDeleteConfirm={confirmDelete}
+                                onRemoveRequest={setRemoveTargetId}
                             />
                         ))}
                     </div>
                 )}
             </div>
+            {removeTargetId && (
+                <HoldConfirmModal
+                    title="Remove Schedule"
+                    warningText="This removes the saved schedule and its allocations. This cannot be undone."
+                    cancelLabel="Keep Schedule"
+                    holdLabel="Hold to Clear"
+                    onConfirm={() => confirmDelete(removeTargetId)}
+                    onCancel={() => setRemoveTargetId(null)}
+                />
+            )}
         </StandardModal>
     );
 }
@@ -365,6 +400,19 @@ export function ScheduleManagerButton() {
 export function FilterDropdownButton({ active, onChange }) {
     const { tags } = useTags();
     const [showManager, setShowManager] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const selectedValues = useMemo(() => {
+        const source = Array.isArray(active) ? active.flat(Infinity) : [active];
+        const normalized = Array.from(
+            new Set(
+                source
+                    .filter((value) => typeof value === 'string')
+                    .map((value) => value.trim().toLowerCase())
+                    .filter(Boolean)
+            )
+        );
+        return normalized.length === 0 || normalized.includes('all') ? ['all'] : normalized;
+    }, [active]);
 
     const options = useMemo(() => {
         const uniqueTags = Array.from(
@@ -377,29 +425,57 @@ export function FilterDropdownButton({ active, onChange }) {
         ];
     }, [tags]);
 
-    const handleChange = (val) => {
-        if (val === '__manage__') {
+    const handleChange = (nextValues) => {
+        const currentHasAll = selectedValues.includes('all');
+        let next = Array.isArray(nextValues) ? nextValues : [];
+
+        if (next.includes('__manage__')) {
             setShowManager(true);
-        } else {
-            onChange(val);
+            setIsOpen(false);
+            next = next.filter((value) => value !== '__manage__');
         }
+
+        const nextHasAll = next.includes('all');
+        if (nextHasAll && next.length > 1) {
+            next = currentHasAll ? next.filter((value) => value !== 'all') : ['all'];
+        }
+
+        if (next.length === 0 || (next.length === 1 && next[0] === 'all')) {
+            onChange('all');
+            return;
+        }
+
+        onChange(next.filter((value) => value !== 'all'));
     };
 
+    const activeCount = selectedValues.includes('all') ? 0 : selectedValues.length;
     const trigger = (
-        <button className={styles.settingsBtn} title="Filter events" aria-label="Filter events" type="button">
+        <button
+            className={`${styles.filterTriggerBtn} ${(isOpen || activeCount > 0) ? styles.filterTriggerBtnActive : ''}`}
+            aria-label="Filter events"
+            type="button"
+        >
             <Filter size={18} />
+            {activeCount > 0 && <span className={styles.filterBadge}>{activeCount}</span>}
         </button>
     );
 
     return (
         <>
-            <AnimatedDropdown
+            <MultiSelectDropdown
                 className={styles.actionMenu}
                 customTrigger={trigger}
                 options={options}
-                value={active}
+                value={selectedValues}
                 onChange={handleChange}
+                placeholder="All"
                 align="right"
+                openOnHover
+                isOpen={isOpen}
+                onOpenChange={setIsOpen}
+                variant="modules"
+                showCheckboxes
+                hideCheckboxForValues={['__manage__']}
             />
             {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
         </>

@@ -43,7 +43,10 @@ function applyFilters(events, filter, searchQuery) {
 }
 
 function filterEventsByTag(events, filter) {
-    const currentFilter = Array.isArray(filter) ? filter : [filter];
+    const currentFilter = (Array.isArray(filter) ? filter.flat(Infinity) : [filter])
+        .filter((value) => typeof value === 'string')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
     if (currentFilter.includes('all')) return events;
     return events.filter(e => currentFilter.includes(getEffectiveTagName(e)));
 }
