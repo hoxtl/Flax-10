@@ -110,7 +110,7 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
       <div className={styles.list}>
         {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
       </div>
-      <PrimaryButton variant="secondary" onClick={onAdd} pill>+ Add New Tag</PrimaryButton>
+      <PrimaryButton className={styles.addTagButton} variant="primary" onClick={onAdd} pill>+ Add New Tag</PrimaryButton>
     </div>
   );
 }
@@ -119,7 +119,7 @@ function TagItem({ tag, onEdit, onDelete }) {
   return (
     <div className={styles.item}>
       <TagPreview tag={tag} />
-      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isProtectedTag(tag.label)} />
+      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isProtected={isProtectedTag(tag.label)} />
     </div>
   );
 }
@@ -133,11 +133,20 @@ function TagPreview({ tag }) {
   );
 }
 
-function TagActions({ id, onEdit, onDelete, isDeletable }) {
+function TagActions({ id, onEdit, onDelete, isProtected }) {
   return (
     <div className={styles.actions}>
-      <button onClick={() => onEdit(id)}><Pencil size={14} strokeWidth={2} /></button>
-      {isDeletable && <button onClick={() => onDelete(id)} className={styles.delete}><Trash2 size={14} strokeWidth={2} /></button>}
+      <button type="button" onClick={() => onEdit(id)} aria-label="Edit tag"><Pencil size={14} strokeWidth={2} /></button>
+      <button
+        type="button"
+        onClick={() => !isProtected && onDelete(id)}
+        className={`${styles.delete} ${isProtected ? styles.deleteDisabled : ''}`}
+        disabled={isProtected}
+        aria-label="Delete tag"
+        title={isProtected ? 'Default tags cannot be deleted' : 'Delete tag'}
+      >
+        <Trash2 size={14} strokeWidth={2} />
+      </button>
     </div>
   );
 }
@@ -166,8 +175,12 @@ function ColorInput({ value, onChange }) {
 function FormActions({ onSave, onCancel }) {
   return (
     <div className={styles.formActions}>
-      <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-      <button className={styles.saveBtn} onClick={onSave}>Save</button>
+      <PrimaryButton type="button" variant="ghost" className={styles.formActionBtn} onClick={onCancel}>
+        Cancel
+      </PrimaryButton>
+      <PrimaryButton type="button" variant="primary" className={styles.formActionBtn} onClick={onSave}>
+        Save
+      </PrimaryButton>
     </div>
   );
 }

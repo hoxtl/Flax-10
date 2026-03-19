@@ -4,11 +4,12 @@
 }
 
 .modalShell {
-    width: 90%;
-    max-width: 400px;
+    --modal-padding: 18px;
+    width: 88%;
+    max-width: 372px;
     display: flex;
     flex-direction: column;
-    max-height: 80vh;
+    max-height: 74vh;
     overflow: visible;
 }
 
@@ -23,24 +24,25 @@
 .list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
 }
 
 .item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 11px;
+    padding: 6px 10px;
     background: color-mix(in srgb, var(--surface-card) 90%, var(--surface-raised) 10%);
-    border-radius: 10px;
+    border-radius: 9px;
     border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
 }
 
 .preview {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
     font-weight: 600;
+    font-size: 0.9rem;
     color: var(--text);
 }
 
@@ -58,18 +60,23 @@
 
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .actions button {
     background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
     border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-    padding: 6px 10px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     color: var(--text);
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
 }
 
 .actions button:hover {
@@ -88,10 +95,23 @@
     border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
 }
 
+.actions .deleteDisabled,
+.actions .deleteDisabled:hover {
+    opacity: 0.45;
+    cursor: not-allowed;
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+    background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+}
+
+.addTagButton {
+    margin-top: 16px;
+}
+
 .addBtn {
     width: 100%;
-    margin-top: 16px;
-    padding: 12px;
+    margin-top: 10px;
+    padding: 10px;
     background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
     color: color-mix(in srgb, var(--text) 96%, transparent);
     border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
@@ -110,14 +130,14 @@
 .form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .form label {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -161,34 +181,13 @@
 
 .formActions {
     display: flex;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 10px;
+    margin-top: 4px;
 }
 
-.formActions button {
+.formActionBtn {
     flex: 1;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-}
-
-.cancelBtn {
-    background: color-mix(in srgb, var(--surface-card) 78%, var(--surface-raised));
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-}
-
-.saveBtn {
-    background: color-mix(in srgb, var(--primary) 90%, var(--surface-raised));
-    color: var(--text);
-    border: 1px solid color-mix(in srgb, var(--primary) 58%, var(--border));
-}
-
-.saveBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    min-height: 44px;
 }
 
 :global(:root[data-theme="dark"]) .modalShell {
