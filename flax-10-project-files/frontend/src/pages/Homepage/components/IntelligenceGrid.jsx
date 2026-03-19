@@ -24,11 +24,11 @@ const Grip = () => (
   </div>
 );
 
-const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, onResize }) => {
+const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxRow = 4, onResize }) => {
   const isHero = id === "hero";
-  const canGrowWidth = !isHero && col < 2;
+  const canGrowWidth = !isHero && col < maxCol;
   const canShrinkWidth = !isHero && col > minCol;
-  const canGrowHeight = row < 4;
+  const canGrowHeight = row < maxRow;
   const canShrinkHeight = row > minRow;
 
   return (
@@ -183,20 +183,7 @@ export default function IntelligenceGrid({
   const handleAddWidget = (id) => {
     setLayout((prev) => {
       if (prev.includes(id)) return prev;
-      const next = [...prev];
-      const widget = catalogue.find((item) => item.id === id);
-      // Keep wide widgets near the top so grid placement feels predictable.
-      if (widget?.col >= 2) {
-        const firstNonHeroIdx = next.findIndex((itemId) => itemId !== "hero");
-        if (firstNonHeroIdx === -1) {
-          next.push(id);
-          return next;
-        }
-        next.splice(firstNonHeroIdx, 0, id);
-        return next;
-      }
-      next.push(id);
-      return next;
+      return [...prev, id];
     });
   };
 
@@ -255,13 +242,15 @@ export default function IntelligenceGrid({
                     row={row} 
                     minCol={w?.minCol}
                     minRow={w?.minRow}
+                    maxCol={w?.maxCol}
+                    maxRow={w?.maxRow}
                     onResize={setWidgetSize} 
                   />
                 </div>
               )}
               <div className={styles.widgetClip}>
                 <div className={styles.widgetContent}>
-                  {widgetRenderer("hero")}
+                  {widgetRenderer("hero", { col: 2, row })}
                 </div>
               </div>
             </div>
@@ -272,12 +261,12 @@ export default function IntelligenceGrid({
           const w = catalogue.find((item) => item.id === id);
           if (!w) return null;
           
-          const content = widgetRenderer(id);
-          if (content === null) return null;
-          
           const customSize = widgetSizes[id] || {};
           const col = customSize.col || w.col;
           const row = customSize.row || w.row;
+
+          const content = widgetRenderer(id, { col, row });
+          if (content === null) return null;
 
           const isDragSrc = dragging === id;
           const isDragTgt = dragOver === id;
@@ -314,12 +303,14 @@ export default function IntelligenceGrid({
                   row={row} 
                   minCol={w.minCol}
                   minRow={w.minRow}
+                  maxCol={w.maxCol}
+                  maxRow={w.maxRow}
                   onResize={setWidgetSize} 
                 />
               )}
               <div className={styles.widgetClip}>
                 <div className={styles.widgetContent}>
-                  <BentoCard>{widgetRenderer(id)}</BentoCard>
+                  <BentoCard>{widgetRenderer(id, { col, row })}</BentoCard>
                 </div>
               </div>
             </div>
