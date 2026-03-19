@@ -6,6 +6,7 @@
  */
 import { useRef, useState, useEffect, useCallback } from "react";
 import { ImageIcon, Upload } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/PhotoWidget.module.css";
 
 const PHOTO_KEY   = "homepage_photo_src";
@@ -48,6 +49,16 @@ export default function PhotoWidget({ editMode = false }) {
       className={`${styles.root} ${!src && editMode ? styles.clickable : ""}`}
       onClick={() => { if (!src && editMode) fileRef.current?.click(); }}
     >
+      {/* Standard Header (only visible if no photo or in edit mode? No, let's keep it consistent) */}
+      {!src && (
+        <div className={baseStyles.widgetHeader} style={{ position: 'absolute', top: 16, left: 16, zIndex: 5 }}>
+          <div className={baseStyles.headerIconWrap}>
+            <ImageIcon size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+          </div>
+          <span className={baseStyles.headerTitle}>Photos</span>
+        </div>
+      )}
+
       {/* hidden file input */}
       <input
         ref={fileRef}
