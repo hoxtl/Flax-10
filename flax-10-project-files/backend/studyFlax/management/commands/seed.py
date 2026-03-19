@@ -15,11 +15,12 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.db import connection
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    Module, Enrollment, Deadline, Reading,
-    Society,
+    Module, Enrollment, Deadline, Reading, UserSettings,
+    Society, CalendarShare,
 )
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.models.groupwork.groupwork_model import GroupProject
@@ -48,10 +49,17 @@ from .seed_attendance import seed_attendance
 from studyFlax.utils.reading_utils import update_reading_estimates
 
 User = get_user_model()
+LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
 
 
 def _seed_user_pool():
     return list(User.objects.filter(role__in=['student', 'teacher']))
+
+
+def _table_columns(table_name):
+    with connection.cursor() as cursor:
+        return {column.name for column in connection.introspection.get_table_description(cursor, table_name)}
+
 
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
@@ -71,11 +79,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.teacher_count = options.get('teacher_count', 14) or 14
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
+        self._ensure_usersettings_seed_compatibility()
         self._seed_users()
         self._seed_catalogue()
         self._load_shared_data()
         self._seed_content()
         self.print_stats()
+
+    def _ensure_usersettings_seed_compatibility(self):
+        table_name = UserSettings._meta.db_table
+        if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
+            return
+        self.stdout.write(
+            f"Detected legacy {LEGACY_WIDGET_SIZES_COLUMN} column; enabling seed compatibility..."
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f'ALTER TABLE "{table_name}" '
+                f'ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
+            )
+            cursor.execute(
+                f'UPDATE "{table_name}" '
+                f'SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb '
+                f'WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
+            )
 
     def _load_shared_data(self):
         self.users = _seed_user_pool()
@@ -103,6 +130,7 @@ class Command(BaseCommand):
         create_enrollments(self.modules, self.tags, self.stdout)
         create_tasks(self.users, self.stdout)
         self._seed_societies_and_groups()
+        self._seed_calendar_shares()
         create_study_sessions(self.stdout)
         self._seed_readings()
         seed_attendance(self.stdout)
@@ -115,6 +143,53 @@ class Command(BaseCommand):
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
+
+    def _seed_calendar_shares(self):
+        self.stdout.write("Seeding calendar shares...")
+        users = sorted(
+            User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"),
+            key=lambda user: user.username,
+        )
+        rng = random.Random("studyflax-calendar-shares")
+        if len(users) < 2:
+            self.stdout.write("  Skipped calendar shares: need at least two non-admin users.")
+            return
+        user_by_id = {user.id: user for user in users}
+        shuffled = users[:]
+        rng.shuffle(shuffled)
+        planned_pairs = {
+            (owner.id, shuffled[(index + 1) % len(shuffled)].id)
+            for index, owner in enumerate(shuffled)
+        }
+        for owner in users:
+            candidates = [target for target in users if target.id != owner.id]
+            rng.shuffle(candidates)
+            extra_share_target = rng.randint(0, min(3, len(candidates) - 1))
+            extra_created = 0
+            for target in candidates:
+                pair = (owner.id, target.id)
+                if pair in planned_pairs:
+                    continue
+                planned_pairs.add(pair)
+                extra_created += 1
+                if extra_created >= extra_share_target:
+                    break
+        created = 0
+        for owner_id, target_id in sorted(planned_pairs):
+            owner = user_by_id.get(owner_id)
+            target = user_by_id.get(target_id)
+            if not owner or not target:
+                continue
+            _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
+            created += int(was_created)
+        share_counts = {
+            user.username: sum(1 for owner_id, _ in planned_pairs if owner_id == user.id)
+            for user in users
+        }
+        self.stdout.write(
+            f"  {CalendarShare.objects.count()} total shares ({created} new this run, "
+            f"{min(share_counts.values())}-{max(share_counts.values())} per user)."
+        )
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")
