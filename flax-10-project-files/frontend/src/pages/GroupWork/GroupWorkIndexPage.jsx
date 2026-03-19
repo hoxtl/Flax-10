@@ -42,13 +42,13 @@ function CreateProjectInputs({ data, onChange }) {
   return (
     <>
       <FormField label="Project name" className={styles.inputName}>
-        <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Group project name" required />
+        <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="e.g. Machine Learning Research..." required />
       </FormField>
-      <FormField label="Module" hint="Optional" className={styles.inputField}>
+      <FormField label={<>Module <span className={styles.optionalText}>optional</span></>} className={styles.inputField}>
         <UserModuleDropdown
           value={data.courseCode}
           onChange={(val) => onChange('courseCode', val)}
-          placeholder="Select a module..."
+          placeholder="Select..."
         />
       </FormField>
       <FormField label="Deadline" className={styles.inputField}>
@@ -74,14 +74,20 @@ function useCreateProject(onCreated) {
 function CreateProjectForm({ onCreated }) {
   const { form, change, submit } = useCreateProject(onCreated);
   return (
-    <Card as="form" onSubmit={submit} className={styles.createProjectForm} padding="lg">
-      <CreateProjectInputs data={form} onChange={change} />
-      <div className={styles.submitField}>
-        <span className={styles.submitLabel} aria-hidden>Create project</span>
-        <div className={styles.submitWrap}>
-          <PrimaryButton type="submit" className={styles.submitBtn} pill>Create</PrimaryButton>
-        </div>
+    <Card className={styles.createProjectCard} padding="lg">
+      <div className={styles.sectionHeader}>
+        <h3 className={styles.sectionTitle}>NEW PROJECT</h3>
+        <div className={styles.sectionLine} />
       </div>
+      <form onSubmit={submit} className={styles.createProjectForm}>
+        <CreateProjectInputs data={form} onChange={change} />
+        <div className={styles.formFooter}>
+          <div className={styles.enterHint}>
+            Press <kbd className={styles.kbd}>↵</kbd> to create quickly
+          </div>
+          <PrimaryButton type="submit" className={styles.submitBtn} pill>+ Create project</PrimaryButton>
+        </div>
+      </form>
     </Card>
   );
 }
