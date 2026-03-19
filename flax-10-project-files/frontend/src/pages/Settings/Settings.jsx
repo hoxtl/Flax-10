@@ -23,6 +23,9 @@ const PANEL_META = {
   preferences_themes: { icon: Palette, title: "Appearance", desc: "Customise how StudyFlax looks." },
   preferences_sleep: { icon: Palette, title: "Sleep Schedule", desc: "Manage your daily sleep and wake times." },
   course: { icon: BookOpen, title: "Teacher Access", desc: "Manage your teacher request and course changes." },
+  preferences_studytime: { icon: Palette, title: "Study Time Budget", desc: "Set how much study time the scheduler should plan for each day." },
+  preferences_week: { icon: Palette, title: "Preferred Week Period", desc: "Choose whether StudyFlax should prioritise weekdays, weekends, or both." },
+  preferences_daynight: { icon: Palette, title: "Preferred Worktime", desc: "Pick whether your schedule should favour daytime, nighttime, or either." },
 };
 
 const panelVariantClass = {
@@ -33,6 +36,9 @@ const panelVariantClass = {
   preferences_themes: "panelPreferences",
   preferences_sleep: "panelPreferences",
   course: "panelCourse",
+  preferences_studytime: "panelPreferences",
+  preferences_week: "panelPreferences",
+  preferences_daynight: "panelPreferences",
 };
 
 function PanelHeader({ tabId }) {
@@ -78,19 +84,59 @@ function SettingsPanel({ activeTab, handlers, user }) {
           <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />
         )}
         {(activeTab === "preferences" || activeTab === "preferences_themes") && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="themes" />
+          <PreferencesPanel
+           onSave={handlePreferencesSave}
+           onSleepSave={handleSleepSave}
+           onStudyTimeSave={handleStudyTimeSave}
+           onWeekPreferenceSave={handleWeekPreferenceSave}
+           onWorktimePreferenceSave={handleWorktimePreferenceSave}
+           isSaving={isSaving}
+           activeSubTab="themes"
+          />
         )}
         {activeTab === "preferences_sleep" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="sleep" />
+          <PreferencesPanel
+            onSave={handlePreferencesSave}
+            onSleepSave={handleSleepSave}
+            onStudyTimeSave={handleStudyTimeSave}
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
+            isSaving={isSaving}
+            activeSubTab="sleep"
+          />
         )}
         {activeTab === "preferences_week" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="week" />
+          <PreferencesPanel
+            onSave={handlePreferencesSave}
+            onSleepSave={handleSleepSave}
+            onStudyTimeSave={handleStudyTimeSave}
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
+            isSaving={isSaving}
+            activeSubTab="week"
+          />
         )}
         {activeTab === "preferences_daynight" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="daynight" />
+          <PreferencesPanel
+            onSave={handlePreferencesSave}
+            onSleepSave={handleSleepSave}
+            onStudyTimeSave={handleStudyTimeSave}
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
+            isSaving={isSaving}
+            activeSubTab="daynight"
+          />
         )}
         {activeTab === "preferences_studytime" && (
-          <PreferencesPanel onSave={handlePreferencesSave} onSleepSave={handleSleepSave} isSaving={isSaving} activeSubTab="studytime" />
+          <PreferencesPanel
+            onSave={handlePreferencesSave}
+            onSleepSave={handleSleepSave}
+            onStudyTimeSave={handleStudyTimeSave}
+            onWeekPreferenceSave={handleWeekPreferenceSave}
+            onWorktimePreferenceSave={handleWorktimePreferenceSave}
+            isSaving={isSaving}
+            activeSubTab="studytime"
+          />
         )}
         {activeTab === "home" && (
           <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />

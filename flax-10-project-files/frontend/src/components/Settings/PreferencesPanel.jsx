@@ -305,8 +305,16 @@ function WorktimePreferenceSection({
  * @param {Function} props.onSleepSave - Saves sleep schedule
  * @param {boolean} props.isSaving
  */
-export default function PreferencesPanel({ onSave, onSleepSave, isSaving, onStudyTimeSave, onWeekPreferenceSave, onWorktimePreferenceSave}) {
-  const { theme, setTheme } = useTheme();
+ export default function PreferencesPanel({
+   onSave,
+   onSleepSave,
+   isSaving,
+   onStudyTimeSave,
+   onWeekPreferenceSave,
+   onWorktimePreferenceSave,
+   activeSubTab = "themes",
+ }) {
+  const { mode, setMode, theme, setTheme } = useTheme();
   const [sleepTime, setSleepTime] = useState("23:00");
   const [wakeTime, setWakeTime] = useState("07:00");
   const [initialSleepTime, setInitialSleepTime] = useState("23:00");

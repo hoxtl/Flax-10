@@ -19,6 +19,9 @@ const TAB_CONFIG = [
   { id: "preferences_themes", label: "Themes", icon: Paintbrush, group: "Preferences" },
   { id: "preferences_sleep", label: "Sleep Time", icon: Moon, group: "Preferences" },
   { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
+  { id: "preferences_studytime", label: "Study Time", icon: BookOpen, group: "Preferences" },
+  { id: "preferences_week", label: "Week Time", icon: BookOpen, group: "Preferences" },
+  { id: "preferences_daynight", label: "Work Time", icon: BookOpen, group: "Preferences" },
 ];
 
 function getProfileCompletion(user) {
