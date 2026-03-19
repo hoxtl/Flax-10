@@ -43,11 +43,12 @@ const TIER_LABEL = { gold: "🥇 Gold", silver: "🥈 Silver", bronze: "🥉 Bro
 
 function BadgeTile({ badge, earned }) {
   const t = TIER_COLOR[badge.tier];
+  const tooltip = earned ? badge.description : `Locked: ${badge.description}`;
   return (
     <div
       className={`${styles.tile} ${earned ? styles.tileEarned : styles.tileLocked}`}
       style={earned ? { background: t.bg, borderColor: t.border } : {}}
-      title={earned ? badge.description : `🔒 ${badge.description}`}
+      data-tooltip={tooltip}
     >
       <span className={styles.tileEmoji} style={{ opacity: earned ? 1 : 0.25 }}>{earned ? badge.emoji : "🔒"}</span>
       <span className={styles.tileLabel} style={{ color: earned ? "var(--text)" : "var(--muted)" }}>{badge.label}</span>
