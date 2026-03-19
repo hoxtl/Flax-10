@@ -34,10 +34,10 @@ function syncProfileState(profile, setFormData, setInitialFormData, setCurrentCo
   setCurrentCourse(profile.major || "");
 }
 
-function useProfileSync(profile, loading, handlers) {
+function useProfileSync(profile, loading, setFormData, setInitialFormData, setCurrentCourse) {
   useEffect(() => {
-    if (!loading && profile) syncProfileState(profile, ...handlers);
-  }, [profile, loading, handlers]);
+    if (!loading && profile) syncProfileState(profile, setFormData, setInitialFormData, setCurrentCourse);
+  }, [profile, loading, setFormData, setInitialFormData, setCurrentCourse]);
 }
 
 function usePendingRequest(setPendingRequest) {
@@ -66,7 +66,13 @@ export default function useAccountFormState(externalUser) {
   const initialData = getInitialAccountData(profile);
   const state = useAccountState(initialData, profile?.major || "");
 
-  useProfileSync(profile, loading, [state.setFormData, state.setInitialFormData, state.setCurrentCourse]);
+  useProfileSync(
+    profile,
+    loading,
+    state.setFormData,
+    state.setInitialFormData,
+    state.setCurrentCourse,
+  );
   usePendingRequest(state.setPendingRequest);
   return buildAccountFormState(state, refreshProfile);
 }

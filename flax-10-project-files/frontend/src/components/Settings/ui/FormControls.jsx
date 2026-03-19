@@ -42,7 +42,7 @@ export function FormInput(props) {
 }
 
 export function FormSelect({ id, label, value, onChange, options, grouped }) {
-  const handleChange = (nextValue) => onChange({ target: { value: nextValue } });
+  const handleChange = (nextValue) => onChange({ target: { name: id, value: nextValue } });
 
   return (
     <div className={styles.formGroup}>
