@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Image as ImageIcon, Upload, GripVertical } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/TaskWidget.module.css"; // Reuse card base styles
 
 export function ImageWidget({ widgetData, onUpdateImage, onUpdateSpan, isEditing }) {
@@ -73,18 +74,31 @@ export function ImageWidget({ widgetData, onUpdateImage, onUpdateSpan, isEditing
 
     return (
         <div
-            className={`flex flex-col w-full relative rounded-[24px] overflow-hidden group shadow-sm transition-all ${isResizing ? 'ring-4 ring-black/10 scale-[1.02]' : 'hover:shadow-md'}`}
+            className={`flex flex-col w-full relative overflow-hidden group shadow-sm transition-all ${isResizing ? 'ring-4 ring-black/10 scale-[1.02]' : 'hover:shadow-md'}`}
             style={{
                 backgroundColor: 'var(--color-card)',
-                border: '1px solid rgba(139, 115, 85, 0.06)',
+                borderRadius: '32px',
+                border: '1px solid var(--home-border-subtle)',
                 aspectRatio: getAspectRatio()
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            {/* Header (only show when no image or when hovered/editing) */}
+            {(!hasImage || isEditing) && (
+                <div className={baseStyles.widgetHeader} style={{ position: 'absolute', top: 16, left: 16, zIndex: 10, pointerEvents: 'none' }}>
+                    <div className={baseStyles.headerIconWrap}>
+                        <ImageIcon size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                    </div>
+                    <span className={baseStyles.headerTitle} style={{ color: hasImage ? 'white' : 'inherit', textShadow: hasImage ? '0 1px 4px rgba(0,0,0,0.4)' : 'none' }}>
+                        Photo Frame
+                    </span>
+                </div>
+            )}
+
             {hasImage ? (
                 <div className="absolute inset-0 w-full h-full p-[2px]">
-                    <div className="relative w-full h-full rounded-[20px] overflow-hidden">
+                    <div className="relative w-full h-full rounded-[30px] overflow-hidden">
                         <img
                             src={widgetData.url}
                             alt="Custom user widget"
