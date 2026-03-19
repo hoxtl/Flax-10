@@ -9,9 +9,20 @@ def _register_router():
     router.register(r'timer/history', StudySessionViewSet, basename='study-session')
     router.register(r'social', CalendarShareViewSet, basename='social')
 
+<<<<<<< HEAD
 _register_router()
 
 # Authentication
+=======
+from studyFlax.views.calendar.event_views import event_list
+from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
+from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
+from studyFlax.views.calendar.timetable_views import timetable_import
+from studyFlax.views.calendar.schedule_views import *
+from studyFlax.views.hello import hello
+from studyFlax.views.modules.module_views import module_list, module_detail
+from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
+>>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
@@ -187,8 +198,13 @@ urlpatterns = [
     path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
+<<<<<<< HEAD
 
     # Societies
+=======
+    path("settings/", user_settings_view, name='user-settings'),
+    path("schedules/", schedule_list, name='schedules'),
+>>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
     path("societies/", society_list, name="society-list"),
     path("societies/<int:society_id>/", society_detail, name="society-detail"),
     path("societies/<int:society_id>/members/", membership_list, name="society-members"),

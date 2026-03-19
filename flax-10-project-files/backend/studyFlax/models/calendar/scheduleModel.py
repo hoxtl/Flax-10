@@ -6,6 +6,10 @@ from models.deadlineModel import Deadline
 # A wrapper class for all time-management relate instances manifested through calendar.
 
 class Schedule(models.Model):
+    title = models.CharField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     event = models.ManyToManyField(CalendarEvent, related_name="schedules")
     deadline = models.ManyToManyField(Deadline, related_name="schedules")
+    
+    def __str__(self):
+        return f"{self.user.email}'s schedule {self.title}"

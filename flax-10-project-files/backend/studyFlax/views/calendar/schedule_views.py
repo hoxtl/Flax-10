@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from studyFlax.models import CalendarEvent, Notification, Schedule, ScheduleEventAllocation
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -83,10 +84,15 @@ def _build_manual_schedule(request):
     serialised = ScheduleSerialiser(schedule).data
     serialised['overwritten'] = overwritten
     return Response(serialised, status=status.HTTP_201_CREATED)
+=======
+from stufyFlax.models.calendar.scheduleModel import Schedule
+from studyFlax.serialisers import ScheduleSerialiser
+>>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def schedule_list(request):
+<<<<<<< HEAD
     if request.method == 'GET':
         schedules = _schedule_queryset(request.user)
         return Response(ScheduleSerialiser(schedules, many=True).data)
@@ -123,3 +129,6 @@ def schedule_detail(request, schedule_id):
 
     schedule.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+=======
+    return JsonResponse(ScheduleSerialiser.data)
+>>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
