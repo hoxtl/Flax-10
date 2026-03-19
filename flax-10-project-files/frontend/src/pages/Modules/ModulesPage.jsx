@@ -220,7 +220,15 @@ function CreateModuleButton({ setEditingModule, setShowForm }) {
 function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
     const { sorting, search } = useMainView(state);
-    const subtitle = is_teacher ? 'Manage your course modules and lectures' : 'Browse and enroll into available modules';
+    const subtitle = is_teacher ? (
+        <>
+            Manage <em>King's modules</em> and keep your <em>teaching schedule</em> organised.
+        </>
+    ) : (
+        <>
+            Browse <em>King's modules</em> and keep your <em>term choices</em> organised.
+        </>
+    );
     return (
         <AppPage width="xl" className={styles.container} title="Modules" subtitle={subtitle} action={is_teacher && <CreateModuleButton setEditingModule={setEditingModule} setShowForm={setShowForm} />}>
             <ModuleToolbar search={search} sorting={sorting} isTeacher={is_teacher} />

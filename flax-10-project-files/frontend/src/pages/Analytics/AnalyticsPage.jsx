@@ -14,6 +14,12 @@ import { PERIODS, TABS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';
 
+const analyticsSubtitle = (
+  <>
+    See your <em>study patterns</em>, <em>focus habits</em>, and <em>performance trends</em>.
+  </>
+);
+
 const getOverviewContent = (loading, data, progressData, themeStats) =>
   (!loading && data ? <AnalyticsOverview data={data} progressData={progressData} themeStats={themeStats} /> : null);
 
@@ -41,7 +47,7 @@ export default function AnalyticsPage() {
       width="xl"
       className={styles.page}
       title="Analytics"
-      subtitle="Your study patterns & performance"
+      subtitle={analyticsSubtitle}
       action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}
     >
       <ErrorBanner error={error} />

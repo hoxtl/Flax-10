@@ -215,8 +215,9 @@ describe('ModulesPage', () => {
 
     it('shows student subtitle and hides create button when user is not teacher', () => {
         localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
-        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        const { container } = render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.queryByText('+ Create Module')).not.toBeInTheDocument();
-        expect(screen.getByText(/browse and enroll into available modules/i)).toBeInTheDocument();
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("Browse King's modules and keep your term choices organised.");
     });
 });

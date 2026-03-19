@@ -12,6 +12,12 @@ import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
 
+const calendarSubtitle = (
+  <>
+    Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em> organised across your week.
+  </>
+);
+
 function CalendarPageSkeleton() {
   return (
     <div className={styles.page} data-testid="calendar-skeleton" aria-busy="true">
@@ -51,7 +57,7 @@ export default function CalendarPage() {
 
   if (isLoading && allEvents.length === 0) {
     return (
-      <AppPage title="Calendar" subtitle="Schedule & events" width="full">
+      <AppPage title="Calendar" subtitle={calendarSubtitle} width="full">
         <CalendarPageSkeleton />
       </AppPage>
     );
@@ -60,7 +66,7 @@ export default function CalendarPage() {
   return (
     <AppPage
       title="Calendar"
-      subtitle="Your scheduled events and study sessions"
+      subtitle={calendarSubtitle}
       width="full"
       className={styles.page}
     >

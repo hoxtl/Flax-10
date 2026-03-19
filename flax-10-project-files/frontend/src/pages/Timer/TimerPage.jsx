@@ -31,6 +31,11 @@ const SHORTCUTS = [
 ];
 
 const FLAX_FOCUS_ACCENT = "#7a6a56";
+const timerSubtitle = (
+  <>
+    Build <em>deep focus</em>, <em>study sprints</em>, and <em>calm revision blocks</em>.
+  </>
+);
 
 function ShortcutsModal({ onClose }) {
     return (
@@ -227,6 +232,7 @@ export default function TimerPage() {
     <AppPage
       width="lg"
       title="Focus Timer"
+      subtitle={timerSubtitle}
       action={null}
       className={fromTaskPlay && showFocusTransition ? styles.containerFocusEntering : ""}
     >

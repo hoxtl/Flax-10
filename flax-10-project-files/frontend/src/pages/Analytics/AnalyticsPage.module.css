@@ -129,7 +129,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
   margin: 0 0 1rem;
 }
 

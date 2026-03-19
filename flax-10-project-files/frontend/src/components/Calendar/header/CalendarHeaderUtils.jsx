@@ -403,6 +403,7 @@ export function FilterDropdownButton({ active, onChange }) {
     const [showManager, setShowManager] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const wrapRef = useRef(null);
+    const hoverTimeoutRef = useRef(null);
 
     const selectedValues = useMemo(() => {
         const source = Array.isArray(active) ? active.flat(Infinity) : [active];
@@ -443,11 +444,28 @@ export function FilterDropdownButton({ active, onChange }) {
         return () => document.removeEventListener('mousedown', handler);
     }, [isOpen]);
 
+    useEffect(() => () => clearTimeout(hoverTimeoutRef.current), []);
+
+    const handleMouseEnter = () => {
+        clearTimeout(hoverTimeoutRef.current);
+        setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+    };
+
     const activeCount = selectedValues.length;
 
     return (
         <>
-            <div className={styles.filterWrap} ref={wrapRef}>
+            <div
+                className={styles.filterWrap}
+                ref={wrapRef}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
                 <button
                     className={`${styles.filterTriggerBtn} ${(isOpen || activeCount > 0) ? styles.filterTriggerBtnActive : ''}`}
                     aria-label="Filter events"

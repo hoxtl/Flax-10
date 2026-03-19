@@ -92,8 +92,8 @@
 
 .label {
   font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 78%, var(--muted) 22%);
   margin: 0 0 0.2rem;
   white-space: nowrap;
   overflow: hidden;

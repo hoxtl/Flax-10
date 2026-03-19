@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { getAttendanceStats } from '../../api/attendanceApi';
 import { Link } from 'react-router-dom';
 import { getChartColors, getChartSx } from './utils/chartColors';
+import buttonStyles from '../common/PrimaryButton/PrimaryButton.module.css';
 
 const ATTENDED_COLOR = '#5a9e74';
 const MISSED_COLOR = '#c07060';
@@ -14,8 +15,14 @@ const LEFT_GROUP_STYLE = { display: 'flex', gap: '1.25rem', flexWrap: 'wrap' };
 const PCT_STYLE = { fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1 };
 const PCT_LABEL_STYLE = { fontSize: '0.7rem', fontWeight: 600, color: 'var(--muted)', marginLeft: '0.4rem', letterSpacing: '0.04em', textTransform: 'uppercase' };
 const COUNTS_STYLE = { display: 'flex', gap: '0.75rem', alignItems: 'center' };
-const VIEW_ALL_STYLE = { fontSize: '0.68rem', fontWeight: 700, color: 'var(--muted)', textDecoration: 'none', letterSpacing: '0.04em', textTransform: 'uppercase' };
 const CHART_MARGIN = { left: 40, right: 20, top: 10, bottom: 40 };
+
+const viewAllClassName = [
+  buttonStyles.btn,
+  buttonStyles.small,
+  buttonStyles.primary,
+  buttonStyles.pill,
+].join(' ');
 
 function useAttendanceStats() {
   const [stats, setStats] = useState(null);
@@ -44,7 +51,9 @@ const AttendanceSummary = ({ pct, overall, textColor }) => (
         </span>
       </div>
     </div>
-    <Link to="/attendance" style={VIEW_ALL_STYLE}>View all →</Link>
+    <Link to="/attendance" className={viewAllClassName} style={{ textDecoration: 'none', fontSize: '0.72rem' }}>
+      View all →
+    </Link>
   </div>
 );
 
