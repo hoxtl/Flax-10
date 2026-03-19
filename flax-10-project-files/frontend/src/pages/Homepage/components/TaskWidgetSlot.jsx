@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo, useState, useRef, useCallback } from "react";
 import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
@@ -222,15 +223,12 @@ export function TaskWidgetSlot({
           {taskWidgetItemsOnly.length > 0 ? (
             <>
               {/* Header */}
-              <div className={styles.taskWidgetSlotHeader}>
-                <div className={styles.taskWidgetSlotHeaderLeft}>
-                  <div className={styles.taskWidgetSlotIconWrap}>
-                    <CheckSquare className={styles.taskWidgetSlotIcon} size={17} strokeWidth={1.75} aria-hidden />
-                  </div>
-                  <div className={styles.taskWidgetSlotTitleBlock}>
-                    <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
-                  </div>
+              <div className={baseStyles.widgetHeader}>
+                <div className={baseStyles.headerIconWrap}>
+                  <CheckSquare className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
                 </div>
+                <h3 className={baseStyles.headerTitle}>Today&apos;s Tasks</h3>
+                
                 {!hasTimerSession && incompleteCount > 0 && (
                   <button
                     type="button"
