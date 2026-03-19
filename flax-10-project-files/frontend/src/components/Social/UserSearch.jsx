@@ -7,7 +7,7 @@ import socialStyles from './Social.module.css';
 import searchStyles from './UserSearch.module.css';
 import SearchBar from '../common/SearchBar/SearchBar';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
-import EmptyState from '../common/EmptyState/EmptyState';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 const styles = { ...socialStyles, ...searchStyles };
 const YEAR_OPTIONS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"];
 const ROLE_OPTIONS = [
@@ -114,7 +114,7 @@ const SEARCH_EMPTY_CONFIG = {
 
 const EmptySearchText = ({ icon, title, description }) => (
     <div className={styles.emptyStateWrap}>
-        <EmptyState icon={icon} title={title} description={description} />
+        <SearchEmptyState title={title} hint={description} />
     </div>
 );
 
@@ -341,24 +341,32 @@ const useUserSearchEffects = (query, selectedCourses, selectedSocieties, selecte
     }, [query, selectedCourses, selectedSocieties, selectedYears, selectedRoles]);
 };
 
-export const FilterSection = ({ fRef, isOpen, setOpen, props }) => (
-    <div ref={fRef} className={styles.relativeContainer}>
-        <button onClick={setOpen} className={styles.filterBtn}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter</button>
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ originY: 0, originX: 1, position: 'relative', zIndex: 10000 }}
-                >
-                    <FilterDropdown {...props} />
-                </motion.div>
-            )}
-        </AnimatePresence>
-    </div>
-);
+export function FilterSection({ fRef, isOpen, setOpen, props }) {
+    const hoverTimer = useRef(null);
+    const handleMouseEnter = () => { clearTimeout(hoverTimer.current); if (!isOpen) setOpen(); };
+    const handleMouseLeave = () => { hoverTimer.current = setTimeout(() => { if (isOpen) setOpen(); }, 200); };
+    useEffect(() => () => clearTimeout(hoverTimer.current), []);
+
+    return (
+        <div ref={fRef} className={styles.relativeContainer}
+            onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            <button onClick={setOpen} className={styles.filterBtn}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg> Filter</button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ originY: 0, originX: 1, position: 'relative', zIndex: 10000 }}
+                    >
+                        <FilterDropdown {...props} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
 export const useFilterState = (allCourses, allSocieties, query, isSearchFocused, userResults, setUserResults, setLoading) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);

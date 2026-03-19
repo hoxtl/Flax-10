@@ -61,7 +61,7 @@
 }
 
 .leftTopSideCol .dnaCard {
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 .rightCol {
@@ -89,6 +89,925 @@
 
 [data-mode="dark"] .cardLabel {
   color: var(--text);
+}
+
+/* Standardized Widget Styling */
+.widgetBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--widget-border);
+}
+
+[data-mode="dark"] .widgetHeader {
+  border-bottom-color: var(--color-border-base);
+}
+
+.widgetTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.widgetSubtitle {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.widgetAction {
+  display: flex;
+  align-items: center;
+}
+
+.widgetContent {
+  padding: 0 14px 14px;
+}
+
+.modulesWidget .widgetContent {
+  padding: 10px 14px 14px;
+}
+
+.personaCard {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.personaLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 18px 22px;
+  border-right: 1px solid var(--widget-border);
+  min-width: 120px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+[data-mode="dark"] .personaLeft {
+  border-right-color: var(--color-border-base);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+.personaEmoji {
+  font-size: 30px;
+  line-height: 1;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.personaLabel {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+}
+
+.personaPeak {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.personaDesc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  padding: 16px 22px;
+  margin: 0;
+}
+
+.dnaCard {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dnaBar {
+  display: flex;
+  height: 12px;
+  padding: 1px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  gap: 2px;
+}
+
+.dnaSegment {
+  height: 100%;
+  min-width: 6px;
+  transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+}
+
+.dnaLegend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dnaLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dnaDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dnaLegendLabel {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dnaLegendLabelDark {
+  color: #212121;
+  font-weight: 600;
+}
+
+[data-mode="dark"] .dnaLegendLabelDark {
+  color: var(--text);
+}
+
+.dnaLegendPct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.heatmapCard {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.heatmapCard:hover {
+  border-color: var(--color-primary) !important;
+}
+
+.heatmapCard:active {
+  transform: translateY(0) !important;
+}
+
+.heatmapHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heatmapLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+  border-radius: 100px;
+  padding: 3px 8px 3px 10px;
+  pointer-events: none;
+}
+
+.miniHeatmap {
+  display: flex;
+  gap: 8px;
+}
+
+.heatmapCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.heatmapCell {
+  width: 100%;
+  height: 36px;
+  background: var(--color-primary);
+  border-radius: 6px;
+  transition: opacity 0.3s ease;
+}
+
+.heatmapDayLabel {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.weekCard {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.weekCardTop {
+  display: flex;
+  align-items: center;
+}
+
+.weekRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.weekRowSolo {
+  justify-content: center;
+}
+
+.goalRingWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.goalRingBtn {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: filter 0.2s ease;
+  outline: none;
+}
+
+.goalRingBtn:hover {
+  filter: brightness(1.07);
+}
+
+.goalRingBtn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+.goalRingActive .goalRingSvg {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-primary) 50%, transparent));
+}
+
+.goalRingSvg {
+  display: block;
+  transform: rotate(-90deg);
+  transition: filter 0.25s ease;
+}
+
+.ringInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ringValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.ringGoal {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.ringCaption {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.ringProgress {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.weekDivider {
+  width: 1px;
+  height: 60px;
+  background: var(--widget-border);
+  flex-shrink: 0;
+}
+
+[data-mode="dark"] .weekDivider {
+  background: var(--color-border-base);
+}
+
+.streakRow {
+  display: flex;
+  gap: 28px;
+}
+
+.streakItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.streakNum {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.streakMeta {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.streakNudge {
+  font-size: 10.5px;
+  color: var(--color-primary);
+  margin-top: 2px;
+}
+
+.goalEditorWrap {
+  overflow: hidden;
+}
+
+.goalEditorPanel {
+  padding: 10px 16px 8px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goalEditorLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.goalEditorHrs {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.goalSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(to right,
+      var(--color-primary) var(--slider-pct, 0%),
+      var(--border) var(--slider-pct, 0%));
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.goalSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.goalSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.goalSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.goalSliderMarks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: -4px;
+  padding: 0 2px;
+}
+
+.goalEditorActions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding-top: 4px;
+  padding-bottom: 0;
+}
+
+/* Attendance Widget Layout */
+.attendanceWidget {
+  min-height: 180px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.attendanceWidgetDetailed {
+  grid-column: span 1;
+}
+
+/* ── Compact Attendance + Streak tiles ── */
+.compactMetricsRow {
+  display: flex;
+  gap: 12px;
+}
+
+.compactAttCard {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.compactAttHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.compactAttLink {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.compactAttLink:hover {
+  text-decoration: underline;
+}
+
+.compactAttAnalysisBtn {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.compactChartsRow {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.compactChartBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.compactChartLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+
+.compactTile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  min-height: 104px;
+}
+
+/* ── Focus Heatmap widget ── */
+.focusHeatmapCard {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-x: auto;
+  cursor: default;
+}
+
+.focusHeatmapCardInteractive {
+  cursor: pointer;
+  outline: none;
+}
+
+.focusHeatmapCardInteractive:hover {
+  border-color: var(--color-primary) !important;
+}
+
+.focusHeatmapCardInteractive:hover .heatmapLinkBtn {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.focusHeatmapCardInteractive:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+.compactRingWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  margin: 4px auto 0;
+}
+
+.compactRingPct {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 800;
+  color: #212121;
+}
+
+.compactTileStats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compactTileStat {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.compactStreakBody {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  flex: 1;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.compactStreakItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.compactStreakNum {
+  font-size: 22px;
+  font-weight: 800;
+  color: #212121;
+  line-height: 1;
+}
+
+[data-mode="dark"] .compactStreakNum {
+  color: var(--text);
+}
+
+.compactStreakMeta {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.compactAttChartRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 2px 0 6px;
+}
+
+.compactAttendanceDonut {
+  flex-shrink: 0;
+}
+
+.compactAttLegendCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.compactAttendanceEmpty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 10px 0;
+}
+
+.compactByTypeSection {
+  margin-top: 2px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.compactByTypeTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.compactByTypeDonut {
+  flex-shrink: 0;
+}
+
+.compactByTypeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.compactByTypeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.compactByTypeCount {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Contribution Heatmap ── */
+.contributionCard {
+  cursor: pointer;
+}
+
+.contributionGrid {
+  display: flex;
+  gap: 3px;
+  padding-top: 4px;
+  overflow-x: auto;
+}
+
+.contributionWeek {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contributionCell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.attendanceCharts {
+  display: flex;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.attendanceChartsRow {
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.attendanceChartBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.attendanceChartLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.attendanceLoading {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.profileAttendanceDetail {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  width: 100%;
+  min-width: 0;
+  animation: slideUpFade 0.3s ease-out;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.attendanceWarning {
+  background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+  color: white;
+  padding: 3px 12px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 0 12px rgba(239, 83, 80, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: warningPulse 2s infinite ease-in-out;
+}
+
+@keyframes warningPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(239, 83, 80, 0.25); transform: scale(1); }
+    50% { box-shadow: 0 0 15px rgba(239, 83, 80, 0.45); transform: scale(1.02); }
+}
+
+.goalSaveBtn {
+  padding: 4px 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+
+.goalCancelBtn {
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+
+.badgesViewAll {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.badgesSummary {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.badgesCount {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-highlight));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.badgesCountLabel {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.badgesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.badge {
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text);
+  cursor: default;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  backdrop-filter: blur(8px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.badgeGold {
+  background: color-mix(in srgb, var(--home-urgency-warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--home-urgency-warning) 30%, transparent);
+}
+
+.badgeSilver {
+  background: color-mix(in srgb, var(--text-secondary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--text-secondary) 28%, transparent);
+}
+
+.badgeBronze {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 24%, transparent);
+}
+
+.badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.badgeEmoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.badgesMore {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.emptyBadges {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tierGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.tierGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tierDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tierGroupLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }
 
 /* ── Skeleton Animation ── */

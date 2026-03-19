@@ -5,7 +5,7 @@ import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton, ThemeGridSelector, ThemeSelector } from "../SettingsUI";
 
-function AppearanceForm({ theme, onChange, isSaving }) {
+function AppearanceForm({ theme, onChange, isSaving, hasUnsaved, saveSignal }) {
   return (
     <div className={styles.settingsTile}>
       <SectionHeader title="Appearance" />
@@ -16,15 +16,21 @@ function AppearanceForm({ theme, onChange, isSaving }) {
       <div className={styles.formGroup} style={{ marginTop: "16px" }}>
         <ThemeGridSelector value={theme.theme} onChange={(nextTheme) => onChange({ ...theme, theme: nextTheme })} />
       </div>
-      <SubmitButton isSaving={isSaving} label="Save Appearance" savingLabel="Saving..." />
+      <SubmitButton
+        isSaving={isSaving}
+        label="Save Appearance"
+        savingLabel="Saving..."
+        hasUnsaved={hasUnsaved}
+        saveSignal={saveSignal}
+      />
     </div>
   );
 }
 
-export default function AppearanceSection({ theme, onChange, isSaving }) {
+export default function AppearanceSection({ theme, onChange, isSaving, hasUnsaved, saveSignal }) {
   return (
     <div className={styles.twoColLayout}>
-      <div><AppearanceForm theme={theme} onChange={onChange} isSaving={isSaving} /></div>
+      <div><AppearanceForm theme={theme} onChange={onChange} isSaving={isSaving} hasUnsaved={hasUnsaved} saveSignal={saveSignal} /></div>
       <SettingsContextCard
         emoji="🎨"
         title="Picking a theme"
