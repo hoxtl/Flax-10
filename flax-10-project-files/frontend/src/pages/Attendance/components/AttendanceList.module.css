@@ -1,0 +1,143 @@
+/*
+ * Attendance list styles.
+ */
+
+.recordSection {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.875rem 1.25rem;
+  overflow: hidden;
+}
+
+.recordHint {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+
+.eventList {
+  flex: 1;
+  min-height: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.eventRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.eventRow:last-child {
+  border-bottom: none;
+}
+
+.eventInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.eventInfo strong {
+  font-size: 0.875rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventMeta {
+  font-size: 0.775rem;
+  color: var(--muted);
+}
+
+.eventActions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.btnAttended,
+.btnMissed {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s;
+}
+
+.btnAttended {
+  background: #2D8B5A !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.btnAttended:hover:not(:disabled) {
+  background: #34A068 !important;
+}
+
+.btnMissed {
+  background: #C0392B !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.btnMissed:hover:not(:disabled) {
+  background: #D94435 !important;
+}
+
+.btnAttended:disabled,
+.btnMissed:disabled,
+.btnChange:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btnChange {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.btnChange:hover:not(:disabled) {
+  background: var(--hover, rgba(0, 0, 0, 0.04));
+  color: var(--text);
+}
+
+.badgeAttended,
+.badgeMissed {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.badgeAttended {
+  background: rgba(45, 139, 90, 0.12);
+  color: #2D8B5A;
+}
+
+.badgeMissed {
+  background: rgba(192, 57, 43, 0.1);
+  color: #C0392B;
+}

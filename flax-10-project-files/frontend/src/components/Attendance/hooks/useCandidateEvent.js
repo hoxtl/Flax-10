@@ -1,34 +1,36 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getEvents } from '../../../api/eventApi';
-import { getPromptedIds } from '../attendancePromptStorage';
-import { getDateRangeForPrompt, findCandidateEvent } from '../attendancePromptUtils';
+/*
+ * Candidate attendance prompt hook.
+ */
+
+import { useCallback, useEffect, useState } from "react";
+import { getEvents } from "../../../api/eventApi";
+import { getPromptedIds } from "../attendancePromptStorage";
+import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
 
 const CHECK_INTERVAL_MS = 60 * 1000;
 
-const fetchCandidateEvent = async () => {
-  const prompted = getPromptedIds();
-  const { start, end } = getDateRangeForPrompt();
-  const events = await getEvents({ start, end });
-  return findCandidateEvent(events, prompted);
-};
+async function loadCandidateEvent() {
+  const events = await getEvents(getDateRangeForPrompt());
+  return findCandidateEvent(events, getPromptedIds());
+}
+
+async function refreshCandidateEvent(setEvent) {
+  try {
+    setEvent(await loadCandidateEvent());
+  } catch {
+    return null;
+  }
+}
+
+function startCandidatePolling(refresh) {
+  refresh();
+  const intervalId = setInterval(refresh, CHECK_INTERVAL_MS);
+  return () => clearInterval(intervalId);
+}
 
 export function useCandidateEvent() {
   const [event, setEvent] = useState(null);
-
-  const checkForPrompt = useCallback(async () => {
-    try {
-      const candidate = await fetchCandidateEvent();
-      if (candidate) setEvent(candidate);
-    } catch {
-      // ignore network errors
-    }
-  }, []);
-
-  useEffect(() => {
-    checkForPrompt();
-    const id = setInterval(checkForPrompt, CHECK_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [checkForPrompt]);
-
+  const refresh = useCallback(() => refreshCandidateEvent(setEvent), []);
+  useEffect(() => startCandidatePolling(refresh), [refresh]);
   return [event, setEvent];
 }
