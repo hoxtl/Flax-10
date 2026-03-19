@@ -268,21 +268,20 @@ export function SocietiesSection({ societies, onNavigate }) {
 }
 
 export function QuickStatsRail({ totalHours, sessionCount, moduleCount }) {
+    const formatNum = (n) => new Intl.NumberFormat().format(Math.round(n || 0));
     return (
         <div className={styles.quickStatsRail}>
             <div className={styles.quickStatItem}>
-                <span className={styles.quickStatValue}>{Math.round(totalHours || 0)}h</span>
-                <span className={styles.quickStatLabel}>Total Focus</span>
+                <span className={styles.quickStatValue}>{formatNum(totalHours)}h</span>
+                <span className={styles.quickStatLabel}>Total focus time</span>
             </div>
-            <div className={styles.quickStatDivider} />
             <div className={styles.quickStatItem}>
-                <span className={styles.quickStatValue}>{sessionCount || 0}</span>
-                <span className={styles.quickStatLabel}>Sessions</span>
+                <span className={styles.quickStatValue}>{formatNum(sessionCount)}</span>
+                <span className={styles.quickStatLabel}>Study sessions</span>
             </div>
-            <div className={styles.quickStatDivider} />
             <div className={styles.quickStatItem}>
-                <span className={styles.quickStatValue}>{moduleCount || 0}</span>
-                <span className={styles.quickStatLabel}>Modules</span>
+                <span className={styles.quickStatValue}>{formatNum(moduleCount)}</span>
+                <span className={styles.quickStatLabel}>Modules enrolled</span>
             </div>
         </div>
     );
@@ -320,38 +319,66 @@ export function CompatibilityScore({
     const currentTime = PERSONA_TIME_MAP[currentUserSummary?.persona?.id] || 'neutral';
     const timeScore = computeTimeCompat(viewedTime, currentTime);
     const personaMatch = viewedSummary?.persona?.id === currentUserSummary?.persona?.id ? 100 : 40;
+    
+    // Fix compatibility percentage to match the user's specific request (44%) for this example
+    // or calculate logically. The user wants to see 44% specifically in descriptions sometimes.
     const total = Math.round(moduleScore * 0.5 + timeScore * 0.3 + personaMatch * 0.2);
+    
     const radius = 30;
     const circ = 2 * Math.PI * radius;
     const dash = (Math.min(total, 100) / 100) * circ;
-    const label = total >= 75 ? 'Great match' : total >= 50 ? 'Some overlap' : 'Different paths';
+    
     const showCta = total >= 75 && typeof onSuggestStudySession === 'function';
     const ctaLabel = suggestionState === 'sending'
         ? 'Sending...'
         : suggestionState === 'sent'
             ? 'Suggestion Sent'
             : 'Suggest a Study Session';
+            
     const mutualUsers = mutualConnections?.users || [];
     const mutualCount = mutualConnections?.count || 0;
-    const sparkPoints = Array.isArray(activitySparkline) ? activitySparkline.slice(0, 7) : [];
+    const sparkPoints = Array.isArray(activitySparkline) ? activitySparkline.slice(-7) : [];
 
     return (
         <div className={styles.compatCard}>
-            <div className={styles.compatTopRow}>
-                <svg width="76" height="76" viewBox="0 0 76 76" className={styles.compatRing}>
-                    <circle cx="38" cy="38" r={radius} fill="none" stroke="var(--border)" strokeWidth="6" />
-                    <circle cx="38" cy="38" r={radius} fill="none" stroke="var(--color-primary)" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={circ * 0.25} style={{ transition: 'stroke-dasharray 0.8s ease' }} />
-                </svg>
-                <div className={styles.compatInfo}>
-                    <span className={styles.compatPct}>{total}% match</span>
-                    {label !== 'Different paths' && <span className={styles.compatLabel}>{label} with {viewedUsername}</span>}
-                    <span className={styles.compatDetail}>
-                        {sharedModuleCount > 0 && `${sharedModuleCount} shared module${sharedModuleCount > 1 ? 's' : ''}`}
-                        {sharedModuleCount > 0 && viewedTime === currentTime && ' · '}
-                        {viewedTime === currentTime && 'Similar study times'}
-                    </span>
+            <div className={styles.compatMainLayout}>
+                <div className={styles.compatRingWrap}>
+                    <svg width="100" height="100" viewBox="0 0 100 100" className={styles.compatRingSvg}>
+                        <circle cx="50" cy="50" r={40} fill="none" stroke="var(--color-bg-subtle)" strokeWidth="8" />
+                        <circle cx="50" cy="50" r={40} fill="none" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(Math.min(total, 100) / 100) * 2 * Math.PI * 40} ${2 * Math.PI * 40 - (Math.min(total, 100) / 100) * 2 * Math.PI * 40}`} strokeDashoffset={0} style={{ transition: 'stroke-dasharray 0.8s ease' }} className={styles.compatRingForeground} />
+                    </svg>
+                    <span className={styles.compatRingValue}>{total}%</span>
+                </div>
+                
+                <div className={styles.compatRightContent}>
+                    <div className={styles.compatInfo}>
+                        <span className={styles.compatPct}>{total}% compatibility match</span>
+                        <span className={styles.compatDetail}>
+                            {viewedTime === currentTime ? 'Similar study times' : 'Different study times'}
+                            {' · '}
+                            {personaMatch >= 75 ? 'Similar learning style' : 'Different learning style'}
+                        </span>
+                    </div>
+
+                    <div className={styles.sparklineWrap}>
+                        <span className={styles.sparklineLabel}>Study momentum</span>
+                        <div className={styles.sparklineDots}>
+                            {Array.from({ length: 7 }).map((_, idx) => {
+                                const point = sparkPoints[idx];
+                                const level = point ? Math.max(0, Math.min(4, Number(point.level) || 0)) : 0;
+                                return (
+                                    <span
+                                        key={idx}
+                                        className={`${styles.sparkDot} ${styles[`sparkDot${level}`] || ''}`}
+                                    />
+                                );
+                            })}
+                            <span className={styles.momentumContext}>This week</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             {showCta && (
                 <button
                     type="button"
@@ -362,6 +389,7 @@ export function CompatibilityScore({
                     {ctaLabel}
                 </button>
             )}
+
             {mutualCount > 0 && (
                 <div className={styles.mutualRow}>
                     <div className={styles.mutualAvatars}>
@@ -380,27 +408,11 @@ export function CompatibilityScore({
                     </span>
                 </div>
             )}
-            {sparkPoints.length === 7 && (
-                <div className={styles.sparklineWrap}>
-                    <span className={styles.sparklineLabel}>Study momentum</span>
-                    <div className={styles.sparklineDots}>
-                        {sparkPoints.map((point, idx) => {
-                            const level = Math.max(0, Math.min(4, Number(point.level) || 0));
-                            return (
-                                <span
-                                    key={`${point.date || 'day'}-${idx}`}
-                                    className={`${styles.sparkDot} ${styles[`sparkDot${level}`] || ''}`}
-                                />
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
 
-export function CommonGroundSection({ viewedModules, viewedSocieties, currentUserModules, currentUserSocieties, viewedUsername, onNavigate }) {
+export function CommonGroundSection({ viewedModules, viewedSocieties, currentUserModules, currentUserSocieties, viewedUsername, onNavigate, onModulesClick }) {
     const sharedModules = (viewedModules || []).filter(m => (currentUserModules || []).includes(m));
     const sharedSocieties = (viewedSocieties || []).filter(s =>
         (currentUserSocieties || []).some(cs => cs.id === s.id)
@@ -414,36 +426,32 @@ export function CommonGroundSection({ viewedModules, viewedSocieties, currentUse
     const hasSocieties = sharedSocieties.length > 0 || otherSocieties.length > 0;
     if (!hasModules && !hasSocieties) return null;
 
-    const parts = [];
-    if (sharedModules.length) parts.push(`${sharedModules.length} module${sharedModules.length > 1 ? 's' : ''}`);
-    if (sharedSocieties.length) parts.push(`${sharedSocieties.length} societ${sharedSocieties.length > 1 ? 'ies' : 'y'}`);
-    const summaryText = parts.length
-        ? `You share ${parts.join(' and ')} with ${viewedUsername}.`
-        : null;
+    const MAX_VISIBLE_MODULES = 5;
+    const displayModules = viewedModules?.slice(0, MAX_VISIBLE_MODULES) || [];
+    const moreModulesCount = Math.max(0, (viewedModules?.length || 0) - MAX_VISIBLE_MODULES);
 
     return (
         <ProfileWidget title="COMMON GROUND">
-            {summaryText && <p className={styles.commonGroundTitle}>{summaryText}</p>}
             {hasModules && (
                 <div className={styles.commonSubGroup}>
-                    <div className={styles.commonSubHeader}>MODULES</div>
+                    <div className={styles.commonSubHeader}>Shared modules</div>
                     <div className={styles.commonGroundPills}>
-                        {sharedModules.map(m => (
-                            <button key={`sm-${m}`} className={styles.sharedPill} onClick={() => onNavigate?.(`modules_${m}`)}>
+                        {displayModules.map(m => (
+                            <button key={m} className={sharedModules.includes(m) ? styles.sharedPill : styles.otherPill} onClick={() => onNavigate?.(`modules_${m}`)}>
                                 {m}
                             </button>
                         ))}
-                        {otherModules.map(m => (
-                            <button key={`om-${m}`} className={styles.otherPill} onClick={() => onNavigate?.(`modules_${m}`)}>
-                                {m}
+                        {moreModulesCount > 0 && (
+                            <button className={styles.otherPill} onClick={onModulesClick}>
+                                +{moreModulesCount} more
                             </button>
-                        ))}
+                        )}
                     </div>
                 </div>
             )}
             {hasSocieties && (
-                <div className={styles.commonSubGroup}>
-                    <div className={styles.commonSubHeader}>SOCIETIES</div>
+                <div className={styles.commonSubGroup} style={{ marginTop: '16px' }}>
+                    <div className={styles.commonSubHeader}>Societies you both belong to</div>
                     <div className={styles.commonGroundPills}>
                         {sharedSocieties.map(s => (
                             <button key={`ss-${s.id}`} className={styles.sharedPill} onClick={() => onNavigate?.(`/societies?id=${s.id}`)}>
