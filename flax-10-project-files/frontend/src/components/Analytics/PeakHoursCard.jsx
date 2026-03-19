@@ -1,6 +1,12 @@
+/*
+ * Peak hours insight card.
+ */
+
 import { motion } from 'framer-motion';
 import styles from './InsightCards.module.css';
 import EmptyState from '../common/EmptyState/EmptyState';
+
+const MotionDiv = motion.div;
 
 const sumColumn = (grid, hi) => grid.reduce((sum, row) => sum + (row[hi] || 0), 0);
 const computeHourTotals = (grid, hours) => hours.map((_, hi) => sumColumn(grid, hi));
@@ -25,7 +31,7 @@ function PeakItem({ hour, value, max, rank }) {
       <div className={styles.peakInfo}>
         <span className={styles.peakTime}>{fmt(hour)}</span>
         <div className={styles.peakBar}>
-          <motion.div
+          <MotionDiv
             className={styles.peakFill}
             initial={{ width: 0 }}
             animate={{ width: `${(value / max) * 100}%` }}
