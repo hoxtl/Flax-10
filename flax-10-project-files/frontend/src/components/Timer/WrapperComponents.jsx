@@ -10,8 +10,9 @@ import { formatSessionMinutes, extractTime, isToday } from './utils/timerFormatt
 import { getNearestMilestone } from './utils/milestoneUtils';
 import SessionDots, { LiveStatsRow, ProgressStrip } from './SessionDots';
 import TimerCircle, { TimerRing } from './TimerCircle';
-import { TimerControls, ModeIndicator } from './TimerComponents';
+import { TimerControls, ModeIndicator, SessionStatus } from './TimerComponents';
 import { PresetPanel, TimerConfigPanel } from './PresetPanel';
+
 import InlineSoundPanel from './InlineSoundPanel';
 import RightRailHistoryPanel from './RightRailHistoryPanel';
 import { TaskInput } from './TaskInput';
@@ -24,8 +25,9 @@ function estimatedFinishTime(t) {
         ? Math.max(t.timeLeft, 0) + (remaining - 1) * sessionSec
         : remaining * sessionSec;
     const at = new Date(Date.now() + totalSec * 1000);
-    return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+    return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
 }
+
 
 /** Format seconds → "45m" or "1h 20m" */
 function fmtDuration(sec) {
@@ -86,12 +88,12 @@ function BlockStatsCard({ completedSessions, targetSessions, blockTotalWork, blo
 /* ── Technique Presets ─────────────────────────────────── */
 
 const BUILT_IN_PRESETS = [
-    { id: 'pomodoro',  label: '🍅 Pomodoro',  work: 25, brk: 5,  sessions: 4 },
-    { id: '5217',      label: '⚡ 52/17',      work: 52, brk: 17, sessions: 3 },
-    { id: 'ultradian', label: '🧠 Ultradian',  work: 90, brk: 20, sessions: 2 },
-    { id: 'deepwork',  label: '🎯 Deep Work',  work: 60, brk: 10, sessions: 3 },
-    { id: 'sprint',    label: '🏃 Sprint',     work: 15, brk: 3,  sessions: 4 },
-    { id: 'evening',   label: '🌙 Evening',    work: 45, brk: 15, sessions: 2 },
+    { id: 'pomodoro', label: '🍅 Pomodoro', work: 25, brk: 5, sessions: 4 },
+    { id: '5217', label: '⚡ 52/17', work: 52, brk: 17, sessions: 3 },
+    { id: 'ultradian', label: '🧠 Ultradian', work: 90, brk: 20, sessions: 2 },
+    { id: 'deepwork', label: '🎯 Deep Work', work: 60, brk: 10, sessions: 3 },
+    { id: 'sprint', label: '🏃 Sprint', work: 15, brk: 3, sessions: 4 },
+    { id: 'evening', label: '🌙 Evening', work: 45, brk: 15, sessions: 2 },
 ];
 
 const CUSTOM_PRESETS_KEY = 'timerCustomPresets';
@@ -101,7 +103,7 @@ function loadCustomPresets() {
 }
 
 function saveCustomPresets(presets) {
-    try { localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets)); } catch {}
+    try { localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets)); } catch { }
 }
 
 function isPresetActive(preset, t) {
@@ -158,7 +160,7 @@ function DailyGoalWidget() {
         const n = parseFloat(val);
         if (!isNaN(n) && n > 0) {
             setGoalHours(n);
-            try { localStorage.setItem('timerDailyGoalHours', String(n)); } catch {}
+            try { localStorage.setItem('timerDailyGoalHours', String(n)); } catch { }
         }
         setEditingGoal(false);
     };
@@ -207,7 +209,7 @@ function AutoStartToggle() {
                 checked={autoStart}
                 onChange={e => {
                     setAutoStart(e.target.checked);
-                    try { localStorage.setItem(AUTOSTART_KEY, String(e.target.checked)); } catch {}
+                    try { localStorage.setItem(AUTOSTART_KEY, String(e.target.checked)); } catch { }
                 }}
             />
             Auto-start next session
@@ -222,7 +224,7 @@ function MilestoneCard() {
     const [summary, setSummary] = useState(null);
     useEffect(() => {
         import('../../api/analyticsService').then(m =>
-            m.default.getSummary(30).then(r => setSummary(r?.summary)).catch(() => {})
+            m.default.getSummary(30).then(r => setSummary(r?.summary)).catch(() => { })
         );
     }, []);
 
@@ -280,7 +282,7 @@ const TimerTopSection = ({ t, onOpenFocus }) => {
                 t.setTask(suggested);
                 sessionStorage.removeItem('timerSuggestedTask');
             }
-        } catch {}
+        } catch { }
     }, [t]);
 
     const handleJustStart = useCallback(async () => {
@@ -292,7 +294,7 @@ const TimerTopSection = ({ t, onOpenFocus }) => {
             const open = Array.isArray(tasks) ? tasks.filter(task => !task.completed && !task.archived) : [];
             const ranked = rankTasksForFocus(open);
             if (ranked.length > 0) { applyTaskToTimer(ranked[0], t); return; }
-        } catch {}
+        } catch { }
         t.setIsActive(true);
     }, [t]);
 
@@ -312,21 +314,30 @@ const TimerTopSection = ({ t, onOpenFocus }) => {
 const TimerInfoSection = ({ t, onPrimaryStart }) => {
     const finishAt = estimatedFinishTime(t);
     return (
-        <>
-            <ProgressStrip value={t.progress} />
+        <div className={styles.timerInfoSection}>
             <SessionDots completedSessions={t.completedSessions} targetSessions={t.targetSessions} isActive={t.isActive} isPaused={t.isPaused} />
-            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-            {finishAt && <div className={styles.estimatedFinish}>~Done by {finishAt}</div>}
+            <div className={styles.sessionStatusWrap}>
+                <SessionStatus current={t.completedSessions} total={t.targetSessions} />
+            </div>
+
             <TimerRing t={t} />
+
+            <div className={styles.timerMetaRow}>
+                <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
+                {finishAt && <div className={styles.estimatedFinish}>Done by ~{finishAt}</div>}
+            </div>
+
             <TimerControls
                 isActive={t.isActive} isPaused={t.isPaused}
                 onToggle={onPrimaryStart} onPause={t.togglePause}
                 onReset={t.resetTimer} onEndEarly={() => t.setModal('endEarly')}
                 totalPaused={t.totalPaused}
             />
-        </>
+        </div>
     );
 };
+
+
 
 export const MainSection = ({ t, onOpenHistory, onOpenFocus, isMobile }) => {
     const startManualTask = useCallback(() => {
@@ -363,9 +374,9 @@ export const MainSection = ({ t, onOpenHistory, onOpenFocus, isMobile }) => {
 function RightRailTabs({ t }) {
     const [tab, setTab] = useState('presets');
     const tabs = [
-        { id: 'presets',  label: 'Presets',        content: <PresetPanel t={t} embedded /> },
-        { id: 'config',   label: 'Configuration',  content: <TimerConfigPanel t={t} embedded /> },
-        { id: 'history',  label: 'History',         content: <RightRailHistoryPanel /> },
+        { id: 'presets', label: 'Presets', content: <PresetPanel t={t} embedded /> },
+        { id: 'config', label: 'Configuration', content: <TimerConfigPanel t={t} embedded /> },
+        { id: 'history', label: 'History', content: <RightRailHistoryPanel /> },
     ];
     return (
         <div className={styles.presetPanelCard}>
