@@ -203,9 +203,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin: 0.5rem 0 0.25rem;
+    gap: 10px;
+    margin: 1.5rem 0 0.5rem;
 }
+
 
 .sessionDot {
     width: 10px;
@@ -241,9 +242,17 @@
 }
 
 @keyframes dotPulse {
-    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
-    60%  { box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 0%, transparent); }
-    100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent); }
+    0% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+    }
+
+    60% {
+        box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 0%, transparent);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent);
+    }
 }
 
 /* === Live Stats Row === */
@@ -387,20 +396,23 @@
 
 .timerMainCard {
     width: 100%;
-    max-width: 900px;
-    margin-inline: auto;
+    margin: 0;
+    max-width: none;
     background: var(--surface-card);
     border: var(--card-border);
     border-radius: var(--card-radius-token);
     box-shadow: var(--card-shadow-rest);
-    padding: 0.85rem 1rem;
+    padding: 1.75rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.45rem;
+    gap: 1rem;
     transition: box-shadow 0.2s ease;
     background-image: linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 94%, var(--primary) 6%), var(--surface-card));
 }
+
+
+
 
 .timerMainCard:hover {
     box-shadow: var(--card-shadow-hover);
@@ -560,27 +572,55 @@
 
 
 .sessionStatus {
-    font-size: 1rem;
+    font-size: 1.15rem;
     color: var(--muted);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+}
+
+.sessionStatusWrap {
+    margin-bottom: 2.5rem;
 }
 
 .timerDisplay {
     font-size: 3.5rem;
-    font-weight: 800;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
-    font-family: "JetBrains Mono", "Roboto Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    letter-spacing: 0.01em;
-    color: var(--primary);
-    margin: 0.5rem 0;
+    font-family: inherit;
+    letter-spacing: -0.04em;
+    color: var(--focus-accent, var(--primary));
+    margin: 0;
     line-height: 1;
     transition: color 0.3s ease;
 }
 
+[data-mode="dark"] .timerDisplay {
+    color: var(--focus-accent, var(--primary));
+}
+
+
 .timerDisplay.break {
     color: var(--sage);
 }
+
+
+.timerMetaRow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.timerInfoSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+
 
 .controls {
     display: flex;
@@ -768,20 +808,19 @@
 }
 
 .modeIndicator {
-    font-size: 1rem;
+    font-size: 1.35rem;
     font-weight: 600;
-    padding: 0.4rem 1.2rem;
-    border-radius: 99px;
-    background: var(--hover);
     color: var(--text);
-    margin-bottom: 0.5rem;
-    border: var(--card-border);
+    margin: 0;
+    border: none;
+    background: transparent;
+    padding: 0;
 }
 
 .modeIndicator.break {
-    background: color-mix(in srgb, var(--sage) 15%, transparent);
     color: var(--sage);
 }
+
 
 .modeIndicator.paused {
     background: var(--hover);
@@ -945,114 +984,117 @@
     color: #166534;
 }
 
-/* === Today's Focus Banner === */
-
-.todayBanner {
+.statsBanner {
     width: 100%;
+    margin: 0;
+    max-width: none;
     background: var(--surface-card);
     border: var(--card-border);
-    border-radius: var(--card-radius-token);
-    box-shadow: var(--card-shadow-rest);
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    flex-wrap: wrap;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    overflow: hidden;
+    background-image: none;
 }
 
-.todayBannerStats {
+
+
+.statsSection {
+    padding: 0.65rem 1.25rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.todayBannerDivider {
-    width: 1px;
-    height: 24px;
-    background: var(--border);
-    flex-shrink: 0;
-}
-
-.todayStatChip {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.875rem;
+    position: relative;
+    flex: 1;
     min-width: 0;
 }
 
-.todayStatValue {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.15;
+.statsIconWrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.todayStatLabel {
-    font-size: 0.65rem;
-    color: var(--muted);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
+.statsEmoji {
+    font-size: 1rem;
 }
 
-.todayGoalSection {
+.statsContent {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-    min-width: 120px;
+    min-width: 0;
 }
 
-.todayGoalBar {
-    height: 5px;
+.statsSection:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0.65rem;
+    bottom: 0.65rem;
+    width: 1px;
+    background: var(--border);
+}
+
+.statsLabel {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.1rem;
+}
+
+.statsValueRow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+.statsValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+
+
+
+
+.statsDenom {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.statsMiniProgress {
+    width: 100%;
+    height: 4px;
     background: var(--border);
     border-radius: 999px;
+    margin-top: 0.25rem;
     overflow: hidden;
 }
 
-.todayGoalFill {
+.statsMiniFill {
     height: 100%;
     background: var(--primary);
-    border-radius: 999px;
-    transition: width 0.6s ease;
+    border-radius: inherit;
 }
 
-.todayGoalMeta {
-    font-size: 0.72rem;
+.statsSubLabel {
+    font-size: 0.85rem;
     color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    white-space: nowrap;
+    font-weight: 500;
 }
 
-.todayGoalEditBtn {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--primary);
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    text-decoration: underline dotted;
-    text-underline-offset: 2px;
-}
 
-.todayGoalInput {
-    width: 44px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 0.1rem 0.3rem;
-    border: 1px solid var(--primary);
-    border-radius: 4px;
-    color: var(--text);
-    background: var(--surface-card);
-    outline: none;
-    text-align: center;
-}
+
 
 /* === Preset Panel (right sidebar card) === */
 
@@ -1412,18 +1454,13 @@
 }
 
 .estimatedFinish {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.88rem;
-    color: var(--text);
-    font-weight: 700;
-    background: var(--hover);
-    padding: 0.3rem 0.85rem;
-    border-radius: 999px;
-    border: var(--card-border);
-    margin: 0.25rem 0 0.15rem;
-    font-variant-numeric: tabular-nums;
+    font-size: 1.15rem;
+    color: var(--muted);
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
 }
+
 
 .breakSuggestion {
     font-size: 0.88rem;
@@ -2089,7 +2126,7 @@
     outline: none;
 }
 
-.taskPickItem + .taskPickItem {
+.taskPickItem+.taskPickItem {
     margin-top: 2px;
 }
 
@@ -3147,6 +3184,7 @@
 }
 
 @keyframes ringPulse {
+
     0%,
     100% {
         filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary) 28%, transparent));
@@ -3158,6 +3196,7 @@
 }
 
 @keyframes breathPulse {
+
     0%,
     100% {
         transform: scale(0.96);
@@ -3172,13 +3211,18 @@
 
 .timerRingWrap {
     position: relative;
-    width: 220px;
-    height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin: 1rem auto 0;
+    transition: width 0.3s ease, height 0.3s ease;
 }
+
+
+
+
+
 
 .timerRingSvg {
     position: absolute;
@@ -3583,12 +3627,14 @@
 }
 
 .moodBtnLabel {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
 }
+
+
 
 /* === Timer UI enhancement overrides === */
 
@@ -4142,6 +4188,7 @@
         transform: translateY(110%);
         opacity: 0;
     }
+
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -4190,9 +4237,11 @@
         opacity: 0;
         transform: translateX(-55%);
     }
+
     15% {
         opacity: 1;
     }
+
     100% {
         opacity: 0;
         transform: translateX(55%);
@@ -4204,9 +4253,12 @@
 }
 
 @keyframes todayBarLivePulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.7;
     }
+
     50% {
         opacity: 1;
     }
@@ -4243,6 +4295,7 @@
     0% {
         box-shadow: 0 0 0 0 color-mix(in srgb, var(--focus-accent) 36%, transparent);
     }
+
     100% {
         box-shadow: 0 0 0 10px color-mix(in srgb, var(--focus-accent) 0%, transparent);
     }
@@ -4473,7 +4526,20 @@
     display: flex;
     flex-direction: column;
     gap: 0.62rem;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
+
+.rightHistorySections::-webkit-scrollbar {
+    width: 5px;
+}
+
+.rightHistorySections::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
 
 .rightHistorySection {
     display: flex;
@@ -5513,9 +5579,17 @@
 }
 
 @keyframes presetSelectPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* ── Clear History Modal ─────────────────────────── */
@@ -5633,7 +5707,7 @@
     transition: background 0.12s ease, border-color 0.12s ease !important;
 }
 
-.taskPickItem + .taskPickItem {
+.taskPickItem+.taskPickItem {
     margin-top: 4px !important;
 }
 
@@ -5774,9 +5848,16 @@
     border-color: var(--primary-strong) !important;
 }
 
+[data-mode="dark"] .taskPickBtn {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #000 !important;
+}
+
 .taskPickBtn:hover {
     filter: brightness(1.06) !important;
 }
+
 
 /* ── Task actions row: clear task right-aligned ── */
 .taskInputActions {
@@ -5807,7 +5888,7 @@
     min-width: 0 !important;
 }
 
-.taskPickToolbarRow .taskPickSearch > div {
+.taskPickToolbarRow .taskPickSearch>div {
     height: 100% !important;
 }
 
@@ -5824,7 +5905,7 @@
     min-width: 120px !important;
 }
 
-.taskPickSortWrap > div > button {
+.taskPickSortWrap>div>button {
     height: 36px !important;
     padding: 0 0.6rem !important;
     font-size: 0.82rem !important;
@@ -6000,7 +6081,7 @@
     box-shadow: none !important;
 }
 
-.taskPickItem + .taskPickItem {
+.taskPickItem+.taskPickItem {
     margin-top: 0 !important;
 }
 
