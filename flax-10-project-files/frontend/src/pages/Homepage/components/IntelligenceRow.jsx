@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -42,11 +42,11 @@ import { updateUserSettings } from "../../../api/userService";
 
 
 const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, section: "Essentials" },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, maxRow: 2, section: "Essentials" },
   { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
-  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, section: "Planning" },
-  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, section: "Planning" },
-  { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, section: "Planning" },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, maxRow: 2, section: "Planning" },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, maxRow: 1, section: "Planning" },
+  { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, maxRow: 2, section: "Planning" },
   { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minRow: 2, section: "Planning" },
   { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
 
@@ -329,24 +329,16 @@ export default function IntelligenceRow({
   };
 
   const handleRandomize = () => {
-    const allIds = CATALOGUE.map((w) => w.id).filter((id) => id !== "hero");
-    const count = Math.floor(Math.random() * 6) + 4; // 4 to 10 widgets
-    const shuffled = [...allIds].sort(() => 0.5 - Math.random());
-    const randomLayout = ["hero", ...shuffled.slice(0, count)];
+    // Only shuffle the widgets that are currently on the dashboard
+    const hasHero = layout.includes("hero");
+    const others = layout.filter((id) => id !== "hero");
     
-    const newSizes = { ...widgetSizes };
-    randomLayout.forEach((id) => {
-      if (id === "hero") return;
-      const w = CATALOGUE.find((c) => c.id === id);
-      const canBe2W = w.col >= 2 || !w.minCol || w.minCol <= 1; // Simplify logic
-      newSizes[id] = {
-        col: Math.random() > 0.6 ? 2 : 1,
-        row: Math.random() > 0.7 ? 2 : 1,
-      };
-    });
+    if (others.length <= 1) return; // Nothing much to shuffle
     
-    setWidgetSizes(newSizes);
-    setLayout(randomLayout);
+    const shuffled = [...others].sort(() => 0.5 - Math.random());
+    const newLayout = hasHero ? ["hero", ...shuffled] : shuffled;
+    
+    setLayout(newLayout);
   };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -384,7 +376,7 @@ export default function IntelligenceRow({
   const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
   const currentStreak = Number.isFinite(streaks?.current) && streaks.current > 0 ? `${streaks.current}-day streak` : null;
 
-  const renderWidget = (id) => {
+  const renderWidget = (id, { col, row } = {}) => {
     switch (id) {
       case "hero":
         return (
@@ -403,16 +395,15 @@ export default function IntelligenceRow({
       case "rightNow":
         return <RightNowWidget {...slot5Data} tflDelays={tflDelays} />;
       case "todayTasks":
-        return slot1TodayTasks;
+        return React.isValidElement(slot1TodayTasks) ? React.cloneElement(slot1TodayTasks, { row }) : slot1TodayTasks;
       case "deadlines":
-        return slot3Urgent;
+        return React.isValidElement(slot3Urgent) ? React.cloneElement(slot3Urgent, { row }) : slot3Urgent;
       case "tinyTimeline":
-        return <TinyTimelineWidget {...slot5Data} />;
+        return <TinyTimelineWidget {...slot5Data} row={row} />;
       case "bigTimeline":
-        return slot6Timeline;
+        return React.isValidElement(slot6Timeline) ? React.cloneElement(slot6Timeline, { row, isWidget: true }) : slot6Timeline;
       case "semesterOverview":
-
-        return <SemesterOverviewWidget />;
+        return <SemesterOverviewWidget row={row} />;
       case "studyStreak":
         return <StudyStreakWidget />;
       case "weeklyGoal":
@@ -492,7 +483,7 @@ export default function IntelligenceRow({
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
-              <StudyHoursChart data={analyticsData.daily_breakdown} />
+              <StudyHoursChart data={analyticsData.daily_breakdown} row={row} />
             ) : (
               <div className={styles.analyticsWidgetEmpty}>No study-hours data yet.</div>
             )}
