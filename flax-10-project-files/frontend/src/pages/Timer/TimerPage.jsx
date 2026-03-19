@@ -33,22 +33,22 @@ const SHORTCUTS = [
 const FLAX_FOCUS_ACCENT = "#7a6a56";
 
 function ShortcutsModal({ onClose }) {
-    return (
-        <div className={styles.shortcutsOverlay} onClick={onClose}>
-            <div className={styles.shortcutsModal} onClick={e => e.stopPropagation()}>
-                <span className={styles.shortcutsTitle}>Keyboard Shortcuts</span>
-                <div className={styles.shortcutsList}>
-                    {SHORTCUTS.map(s => (
-                        <div key={s.key} className={styles.shortcutRow}>
-                            <kbd className={styles.shortcutKey}>{s.key}</kbd>
-                            <span className={styles.shortcutDesc}>{s.desc}</span>
-                        </div>
-                    ))}
-                </div>
-                <button className={styles.shortcutsClose} onClick={onClose}>Close</button>
+  return (
+    <div className={styles.shortcutsOverlay} onClick={onClose}>
+      <div className={styles.shortcutsModal} onClick={e => e.stopPropagation()}>
+        <span className={styles.shortcutsTitle}>Keyboard Shortcuts</span>
+        <div className={styles.shortcutsList}>
+          {SHORTCUTS.map(s => (
+            <div key={s.key} className={styles.shortcutRow}>
+              <kbd className={styles.shortcutKey}>{s.key}</kbd>
+              <span className={styles.shortcutDesc}>{s.desc}</span>
             </div>
+          ))}
         </div>
-    );
+        <button className={styles.shortcutsClose} onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
 }
 
 function NotificationPrompt({ permission, request }) {
@@ -118,7 +118,8 @@ export default function TimerPage() {
   const [dismissedWarning, setDismissedWarning] = useState(false);
   const { permission, request } = useNotificationPermission();
   const isMobile = useBreakpoint();
-  const focusAccent = FLAX_FOCUS_ACCENT;
+  const focusAccent = 'var(--primary)';
+
 
   const openFocusMode = useCallback(() => {
     setFocusMode(true);
@@ -191,7 +192,7 @@ export default function TimerPage() {
     if (focusMode && focusFullscreenPending) {
       id = window.setTimeout(() => {
         if (!document.fullscreenElement && root?.requestFullscreen) {
-          root.requestFullscreen().catch(() => {});
+          root.requestFullscreen().catch(() => { });
         }
         setFocusFullscreenPending(false);
       }, 220);
@@ -200,7 +201,7 @@ export default function TimerPage() {
     if (!focusMode) {
       setFocusFullscreenPending(false);
       if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
     }
     return () => {
@@ -225,11 +226,13 @@ export default function TimerPage() {
 
   return (
     <AppPage
-      width="lg"
+      width="xl"
       title="Focus Timer"
+      subtitle="Deep work, pomodoro sessions and productivity tracking"
       action={null}
       className={fromTaskPlay && showFocusTransition ? styles.containerFocusEntering : ""}
     >
+
       <ScrollToTop />
       {showPageSkeleton && <FocusPageSkeleton />}
       {showFocusTransition && (
@@ -280,13 +283,12 @@ export default function TimerPage() {
           </div>
         )}
 
-        <TodayBanner
-          onStreakData={setStreakData}
-          isStudying={Boolean(t.isActive && !t.isPaused)}
-        />
-
         <div className={styles.timerGrid}>
           <div className={styles.timerGridLeft}>
+            <TodayBanner
+              onStreakData={setStreakData}
+              isStudying={Boolean(t.isActive && !t.isPaused)}
+            />
             <MainSection
               t={t}
               onOpenHistory={() => setShowHistory(true)}
@@ -296,6 +298,7 @@ export default function TimerPage() {
           </div>
           <RightPanel t={t} />
         </div>
+
         <PopupSection t={t} showHistory={showHistory} onCloseHistory={() => setShowHistory(false)} />
       </div>
     </AppPage>
