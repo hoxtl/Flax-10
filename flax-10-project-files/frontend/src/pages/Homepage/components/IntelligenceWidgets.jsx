@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Calendar, Clock3, Train, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
 import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
 
@@ -29,9 +30,11 @@ export function IntelligenceHero({
       <header className={styles.header}>
         {/* Left Col: Greeting & Date */}
         <div className={styles.headerLeft}>
-          <div className={styles.headerDateRow}>
-            <Calendar className={styles.headerDateIcon} size={14} strokeWidth={2.2} aria-hidden />
-            <span className={styles.headerLabel}>{getTodayLabel()}</span>
+          <div className={baseStyles.widgetHeader} style={{ marginBottom: 12 }}>
+            <div className={baseStyles.headerIconWrap}>
+              <Calendar className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+            </div>
+            <span className={baseStyles.headerMeta}>{getTodayLabel()}</span>
           </div>
           <h1 className={styles.headerTitle}>{getGreeting(displayName)}</h1>
 
