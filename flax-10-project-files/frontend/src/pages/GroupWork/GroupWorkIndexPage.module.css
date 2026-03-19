@@ -75,12 +75,38 @@
     border-radius: 8px;
 }
 
+.createProjectCard {
+    margin-bottom: 32px;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sectionTitle {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.sectionLine {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    opacity: 0.5;
+}
+
 .createProjectForm {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
-    gap: 12px;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
     align-items: start;
-    margin-top: 4px;
 }
 
 .inputName {
@@ -91,27 +117,43 @@
     min-width: 0;
 }
 
-.submitField {
-    display: grid;
-    gap: var(--space-2);
-    min-width: fit-content;
+.formFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    grid-column: 1 / -1;
+    margin-top: 12px;
 }
 
-.submitLabel {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    visibility: hidden;
+.enterHint {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kbd {
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0 4px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--text);
+}
+
+.optionalText {
+    color: var(--primary);
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 6px;
 }
 
 .submitBtn {
     white-space: nowrap;
-    min-height: var(--input-height);
-}
-
-.submitWrap {
-    display: flex;
-    justify-content: flex-end;
-    align-self: end;
+    padding-left: 24px;
+    padding-right: 24px;
 }
 
 .loading {
@@ -188,8 +230,10 @@
         grid-template-columns: 1fr;
     }
 
-    .submitWrap {
-        justify-content: stretch;
+    .formFooter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
     }
 
     .submitBtn {
