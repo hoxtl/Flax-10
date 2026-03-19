@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./IntelligenceGrid.module.css";
 import { BentoCard } from "../../../components/ui/bento-grid";
-import { Pencil, Check, RotateCcw, Plus, Minus } from "lucide-react";
+import { Pencil, Check, RotateCcw, Plus, Minus, Shuffle } from "lucide-react";
 
 // Helper for drag animations/logic
 const DelBtn = ({ onClick }) => (
@@ -146,6 +146,7 @@ export default function IntelligenceGrid({
   widgetRenderer,
   showAdd,
   setShowAdd,
+  onRandomize,
 }) {
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
@@ -215,13 +216,22 @@ export default function IntelligenceGrid({
           {edit ? <Check size={26} /> : <Pencil size={24} />}
         </button>
         {edit && (
-          <button 
-            onClick={onReset} 
-            className={styles.iconActionBtn}
-            title="Reset Layout"
-          >
-            <RotateCcw size={16} />
-          </button>
+          <>
+            <button 
+              onClick={onRandomize} 
+              className={styles.iconActionBtn}
+              title="Shuffle Layout"
+            >
+              <Shuffle size={16} />
+            </button>
+            <button 
+              onClick={onReset} 
+              className={styles.iconActionBtn}
+              title="Reset Layout"
+            >
+              <RotateCcw size={16} />
+            </button>
+          </>
         )}
       </div>
 
@@ -261,6 +271,9 @@ export default function IntelligenceGrid({
         {layout.filter(id => id !== "hero").map((id) => {
           const w = catalogue.find((item) => item.id === id);
           if (!w) return null;
+          
+          const content = widgetRenderer(id);
+          if (content === null) return null;
           
           const customSize = widgetSizes[id] || {};
           const col = customSize.col || w.col;

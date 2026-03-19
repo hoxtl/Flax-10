@@ -23,7 +23,10 @@ const StudyHoursChart = ({ data }) => {
       height={300}
       margin={CHART_MARGIN}
       grid={{ horizontal: true }}
-      sx={getChartSx(textColor, gridColor)}
+      sx={{
+        ...getChartSx(textColor, gridColor),
+        touchAction: 'none',
+      }}
     />
   );
 };

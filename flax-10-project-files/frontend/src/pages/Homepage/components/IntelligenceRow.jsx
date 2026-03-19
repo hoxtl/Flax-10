@@ -38,6 +38,7 @@ import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/I
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
+import { updateUserSettings } from "../../../api/userService";
 
 
 const CATALOGUE = [
@@ -64,7 +65,10 @@ const CATALOGUE = [
 ];
 
 const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
-const STORAGE_KEY = "homepage_widget_layout";
+const getStorageKeys = (userId) => ({
+  layout: userId ? `homepage_widget_layout_${userId}` : "homepage_widget_layout",
+  sizes: userId ? `homepage_widget_sizes_${userId}` : "homepage_widget_sizes",
+});
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 function useTflDelays() {
@@ -235,30 +239,59 @@ export default function IntelligenceRow({
   const { profile, loading: profileLoading } = useAuth();
   const [edit, setEdit] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const keys = getStorageKeys(profile?.id);
   const [layout, setLayout] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return DEFAULT_LAYOUT;
-    let parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) return DEFAULT_LAYOUT;
-
-    // Migration: If old IDs exist, replace them with 'hero'
-    const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
-    const hasOld = parsed.some(id => oldIds.includes(id));
-    if (hasOld) {
-      // Remove old IDs and PREPEND 'hero' if not already there
-      const filtered = parsed.filter(id => !oldIds.includes(id));
-      if (!filtered.includes("hero")) {
-        filtered.unshift("hero");
-      }
-      return filtered.filter((id) => CATALOGUE_IDS.has(id));
+    const saved = localStorage.getItem(keys.layout);
+    if (saved) {
+      try {
+        let parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Migration: If old IDs exist, replace them with 'hero'
+          const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
+          const hasOld = parsed.some(id => oldIds.includes(id));
+          if (hasOld) {
+            const filtered = parsed.filter(id => !oldIds.includes(id));
+            if (!filtered.includes("hero")) filtered.unshift("hero");
+            return filtered.filter((id) => CATALOGUE_IDS.has(id));
+          }
+          return parsed.filter((id) => CATALOGUE_IDS.has(id));
+        }
+      } catch (e) { console.error("Failed to parse layout from localStorage", e); }
     }
-    return parsed.filter((id) => CATALOGUE_IDS.has(id));
+    // Fallback to backend settings ONLY if we have them immediately
+    if (profile?.settings?.homepage_widgets?.length) {
+      return profile.settings.homepage_widgets;
+    }
+    return DEFAULT_LAYOUT;
   });
 
   const [widgetSizes, setWidgetSizes] = useState(() => {
-    const saved = localStorage.getItem("homepage_widget_sizes");
-    return saved ? JSON.parse(saved) : {};
+    const saved = localStorage.getItem(keys.sizes);
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { }
+    }
+    // Fallback to backend settings
+    if (profile?.settings?.homepage_widget_sizes && Object.keys(profile.settings.homepage_widget_sizes).length > 0) {
+      return profile.settings.homepage_widget_sizes;
+    }
+    return {};
   });
+
+  // Effect to sync state from backend when profile loads if localStorage is empty for this user
+  useEffect(() => {
+    if (profileLoading || !profile?.settings) return;
+    
+    // If we don't have a layout in localStorage for this specific user, use backend layout
+    const userKeys = getStorageKeys(profile.id);
+    const savedLayout = localStorage.getItem(userKeys.layout);
+    
+    if (!savedLayout && profile.settings.homepage_widgets?.length) {
+      setLayout(profile.settings.homepage_widgets);
+      if (profile.settings.homepage_widget_sizes) {
+        setWidgetSizes(profile.settings.homepage_widget_sizes);
+      }
+    }
+  }, [profile, profileLoading]);
 
   const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
   const {
@@ -269,18 +302,51 @@ export default function IntelligenceRow({
   } = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(layout));
-  }, [layout]);
+    localStorage.setItem(keys.layout, JSON.stringify(layout));
+  }, [layout, keys.layout]);
 
   useEffect(() => {
-    localStorage.setItem("homepage_widget_sizes", JSON.stringify(widgetSizes));
-  }, [widgetSizes]);
+    localStorage.setItem(keys.sizes, JSON.stringify(widgetSizes));
+  }, [widgetSizes, keys.sizes]);
+
+  // Sync to Cloud after 2s of inactivity to debounce
+  useEffect(() => {
+    if (profileLoading || !profile) return;
+    const timer = setTimeout(() => {
+      updateUserSettings({
+        homepage_widgets: layout,
+        homepage_widget_sizes: widgetSizes
+      }).catch(err => console.error("Failed to sync layout to cloud:", err));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [layout, widgetSizes, profile, profileLoading]);
 
   const setWidgetSize = (id, size) => {
     setWidgetSizes((prev) => ({
       ...prev,
       [id]: size,
     }));
+  };
+
+  const handleRandomize = () => {
+    const allIds = CATALOGUE.map((w) => w.id).filter((id) => id !== "hero");
+    const count = Math.floor(Math.random() * 6) + 4; // 4 to 10 widgets
+    const shuffled = [...allIds].sort(() => 0.5 - Math.random());
+    const randomLayout = ["hero", ...shuffled.slice(0, count)];
+    
+    const newSizes = { ...widgetSizes };
+    randomLayout.forEach((id) => {
+      if (id === "hero") return;
+      const w = CATALOGUE.find((c) => c.id === id);
+      const canBe2W = w.col >= 2 || !w.minCol || w.minCol <= 1; // Simplify logic
+      newSizes[id] = {
+        col: Math.random() > 0.6 ? 2 : 1,
+        row: Math.random() > 0.7 ? 2 : 1,
+      };
+    });
+    
+    setWidgetSizes(newSizes);
+    setLayout(randomLayout);
   };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -533,6 +599,7 @@ export default function IntelligenceRow({
         edit={edit}
         setEdit={setEdit}
         onReset={handleReset}
+        onRandomize={handleRandomize}
         catalogue={CATALOGUE}
         widgetRenderer={renderWidget}
         showAdd={showAdd}
