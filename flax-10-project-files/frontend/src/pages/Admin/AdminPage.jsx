@@ -20,7 +20,7 @@ import {
 import styles from "./AdminPage.module.css";
 import AppPage from "../../components/common/AppPage/AppPage";
 
-const Motion = motion;
+const _ = motion;
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
