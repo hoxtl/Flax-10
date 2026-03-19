@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
 import StandardModal from "../../components/common/StandardModal/StandardModal";
+import Tooltip from "../../components/common/Tooltip/Tooltip";
 
 // ---------------------------------------------------------------------------
 // Full badge catalogue — must match backend IDs exactly
@@ -58,10 +59,10 @@ const TIER_LABEL = { gold: '🥇 Gold', silver: '🥈 Silver', bronze: '🥉 Bro
 function BadgeTile({ badge, earned }) {
   const t = TIER_COLOR[badge.tier];
   return (
+    <Tooltip content={earned ? badge.description : `🔒 ${badge.description}`} position="top">
     <div
       className={`${styles.tile} ${earned ? styles.tileEarned : styles.tileLocked}`}
       style={earned ? { background: t.bg, borderColor: t.border } : {}}
-      title={earned ? badge.description : `🔒 ${badge.description}`}
     >
       <span className={styles.tileEmoji} style={{ opacity: earned ? 1 : 0.25 }}>
         {earned ? badge.emoji : '🔒'}
@@ -78,6 +79,7 @@ function BadgeTile({ badge, earned }) {
         <span className={styles.tileLockHint}>{badge.description}</span>
       )}
     </div>
+    </Tooltip>
   );
 }
 

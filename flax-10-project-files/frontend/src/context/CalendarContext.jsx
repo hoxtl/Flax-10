@@ -43,7 +43,10 @@ function applyFilters(events, filter, searchQuery) {
 }
 
 function filterEventsByTag(events, filter) {
-    const currentFilter = Array.isArray(filter) ? filter : [filter];
+    const currentFilter = (Array.isArray(filter) ? filter.flat(Infinity) : [filter])
+        .filter((value) => typeof value === 'string')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
     if (currentFilter.includes('all')) return events;
     return events.filter(e => currentFilter.includes(getEffectiveTagName(e)));
 }
@@ -100,7 +103,7 @@ export function useEventPopup() {
     }
 
     const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
-    const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
+    const openPopup = (event, anchorRect, readOnly = false) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
     return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
 }

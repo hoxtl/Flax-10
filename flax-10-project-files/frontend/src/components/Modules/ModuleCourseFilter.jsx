@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../lib/kclCourses';
 import SearchBar from '../common/SearchBar/SearchBar';
 import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
+import FilterCheckbox from '../common/FilterCheckbox/FilterCheckbox';
 import styles from './ModuleCourseFilter.module.css';
 
 const TABS = [
@@ -31,7 +32,7 @@ function filterCourseGroups(groups, query) {
 function CourseItem({ course, isChecked, onToggle }) {
     return (
         <div className={styles.item} onClick={() => onToggle(course)}>
-            <input type="checkbox" checked={isChecked} onChange={() => onToggle(course)} className={styles.checkbox} onClick={e => e.stopPropagation()} />
+            <FilterCheckbox checked={isChecked} onChange={() => onToggle(course)} className={styles.checkbox} onClick={e => e.stopPropagation()} />
             <span className={styles.itemLabel}>{course}</span>
         </div>
     );

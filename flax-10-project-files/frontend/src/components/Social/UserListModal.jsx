@@ -38,7 +38,9 @@ export default function UserListModal({ title, users, onClose, onUserClick, onUs
             isOpen={true}
             onClose={onClose}
             title={title}
-            emptyMessage="No users found."
+            emptyMessage="No users found"
+            emptyIcon="👥"
+            emptyDescription="No one is sharing with you yet"
             items={sortedUsers}
             renderItem={(u, i) => {
                 const isSelf = isCurrentUser(u, currentUser);

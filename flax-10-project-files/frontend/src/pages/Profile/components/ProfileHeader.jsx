@@ -4,34 +4,6 @@ import { buildInitials, buildFullName } from "../utils/profileHelpers";
 import ShareButton from "../../../components/Social/ShareButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 
-function formatLastActive(lastSessionEnd) {
-    if (!lastSessionEnd) return null;
-    const endTime = new Date(lastSessionEnd);
-    if (Number.isNaN(endTime.getTime())) return null;
-
-    const diffMs = Date.now() - endTime.getTime();
-    const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
-
-    if (diffMinutes <= 20) return null;
-    if (diffMinutes < 60) return `Active ${diffMinutes}m ago`;
-
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `Active ${diffHours}h ago`;
-
-    const diffDays = Math.floor(diffHours / 24);
-    return `Active ${diffDays}d ago`;
-}
-
-function LastActivePulse({ lastSessionEnd }) {
-    const text = formatLastActive(lastSessionEnd);
-    if (!text) return null;
-    return (
-        <div className={styles.lastActivePulse}>
-            <span className={styles.lastActiveDot} />
-            <span>{text}</span>
-        </div>
-    );
-}
 
 function ProfileBadges({ badges, onViewAll, canPin, pinnedBadgeId, onPinBadge }) {
     const [activeTooltip, setActiveTooltip] = useState(null);
@@ -91,12 +63,11 @@ function StatItem({ value, label, onClick }) {
 }
 
 function ProfileStats({ profileData, handlers, visibility, societyCount, onSocietiesClick }) {
-    const { onModulesClick: om, onSharedWithClick: os } = handlers;
+    const { onModulesClick: om } = handlers;
     return (
         <div className={styles.stats}>
             {visibility.canViewModules && visibility.canEditProfile && <StatItem value={profileData?.module_count || 0} label="modules" onClick={om} />}
             {visibility.canEditProfile && societyCount > 0 && <StatItem value={societyCount} label="societies" onClick={onSocietiesClick} />}
-            {visibility.canViewSharedWith && <StatItem value={profileData?.shared_with_count || 0} label="shared" onClick={os} />}
         </div>
     );
 }
@@ -153,7 +124,6 @@ function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pi
                 {visibility.canEditProfile ? <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
             </div>
             {description && <div className={styles.headerSubline}>{description}</div>}
-            <LastActivePulse lastSessionEnd={profileData?.last_session_end || user?.last_session_end} />
             <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
             {(badges?.length > 0 || persona) && (
                 <div className={styles.headerBadgesPersonaRow}>
@@ -192,7 +162,6 @@ export default function ProfileHeader({ user, profileData, handlers, visibility,
     const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
     const mobileDescription = isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
     const roleLabel = isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student";
-    const lastActiveText = formatLastActive(profileData?.last_session_end || user?.last_session_end);
     const resolvedUser = { ...user, ...profileData };
     const resolvedPhoto = getResolvedUserPhoto({
         ...resolvedUser,
@@ -210,12 +179,6 @@ export default function ProfileHeader({ user, profileData, handlers, visibility,
                 <div className={styles.mobileHero}>
                     <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
                     <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1><p className={styles.mobileBio}>{mobileDescription}</p>
-                    {lastActiveText && (
-                        <div className={styles.mobileActivePulse}>
-                            <span className={styles.lastActiveDot} />
-                            <span>{lastActiveText}</span>
-                        </div>
-                    )}
                     <span className={styles.mobileRolePill}>{roleLabel}</span>
                     {isTeacher && profileData?.email && (
                         <div className={styles.teacherEmail}>
