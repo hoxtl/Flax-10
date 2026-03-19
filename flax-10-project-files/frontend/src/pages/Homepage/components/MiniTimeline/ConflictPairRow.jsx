@@ -206,12 +206,28 @@ export function getConflictPriorityRank(item) {
   return PRIORITY_ORDER[(item?.priority || "low").toLowerCase()] ?? 0;
 }
 
+function getEventDurationMins(item) {
+  const start = new Date(item?.start_time);
+  const rawEnd = item?.end_time ? new Date(item.end_time) : new Date(start.getTime() + 25 * 60000);
+  const durationMins = Math.round((rawEnd - start) / 60000);
+  return Math.max(25, durationMins || 25);
+}
+
+export function getMoveTomorrowWindow(item) {
+  const start = new Date(item.start_time);
+  const durationMins = getEventDurationMins(item);
+  const nextDay = new Date(start);
+  nextDay.setDate(nextDay.getDate() + 1);
+  const end = new Date(nextDay.getTime() + durationMins * 60000);
+  return { start: nextDay, end };
+}
+
 function isLectureTaggedEvent(item) {
   const tagName = (item?.tag_name ?? item?.tag?.name ?? "").toString().toLowerCase();
   return tagName === "lecture" || isLecture(item);
 }
 
-export function getConflictResolutionPlan({ row, rows, selectedDate }) {
+export function getConflictResolutionPlan({ row, rows, selectedDate, canRelocateEvent = () => true }) {
   const orderedItems = [...(row?.items || [])].sort((a, b) => {
     const priorityDiff = getConflictPriorityRank(b.item) - getConflictPriorityRank(a.item);
     if (priorityDiff !== 0) return priorityDiff;
@@ -229,7 +245,10 @@ export function getConflictResolutionPlan({ row, rows, selectedDate }) {
     const freeRow = rows.find(
       (freeEntry) => freeEntry.type === "free" && freeEntry.gapStartMins >= row.endMins && freeEntry.minutes >= entry.durationMins,
     );
-    return !!freeRow;
+    if (!freeRow) return false;
+    const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
+    const end = new Date(start.getTime() + entry.durationMins * 60000);
+    return canRelocateEvent(entry.item, start, end);
   });
 
   if (candidateWithGap) {
@@ -248,9 +267,15 @@ export function getConflictResolutionPlan({ row, rows, selectedDate }) {
     };
   }
 
+  const tomorrowCandidate = movableCandidates.find((entry) => {
+    const { start, end } = getMoveTomorrowWindow(entry.item);
+    return canRelocateEvent(entry.item, start, end);
+  });
+
+  if (!tomorrowCandidate) return null;
   return {
-    type: "move-tomorrow",
-    event: movableCandidates[0].item,
-    movable: movableCandidates[0],
+    event: tomorrowCandidate.item,
+    movable: tomorrowCandidate,
+    ...getMoveTomorrowWindow(tomorrowCandidate.item),
   };
 }

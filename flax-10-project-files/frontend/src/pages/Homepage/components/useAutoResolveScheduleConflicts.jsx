@@ -4,6 +4,8 @@ import { DAY_START_HOUR, DAY_END_HOUR } from "../utils/timelineUtils";
 import { computePlanTimelineRows } from "../utils/planTimelineRows";
 import { getConflictResolutionPlan } from "../components/MiniTimeline/ConflictPairRow";
 
+const MAX_RELOCATE_OVERLAPS = 3;
+
 export function buildDailyConflictPlans(allEvents, selectedDate, now = new Date()) {
   if (!selectedDate || !(allEvents || []).length) return [];
 
@@ -32,7 +34,13 @@ export function buildDailyConflictPlans(allEvents, selectedDate, now = new Date(
     const conflictRow = rows.find((row) => row.type === "eventGroup");
     if (!conflictRow) continue;
 
-    const plan = getConflictResolutionPlan({ row: conflictRow, rows, selectedDate: day });
+    const plan = getConflictResolutionPlan({
+      row: conflictRow,
+      rows,
+      selectedDate: day,
+      canRelocateEvent: (event, start, end) =>
+        canRelocateEventWithoutHittingOverlapLimit(sorted, event, start, end),
+    });
     if (plan) plans.push({ ...plan, day: new Date(day) });
   }
 
@@ -92,4 +100,19 @@ export function useAutoResolveScheduleConflicts({
       runningRef.current = false;
     });
   }, [enabled, plans, onConflictAutoMove, onPushTomorrow]);
+}
+
+function eventsOverlapWindow(event, start, end) {
+  const eventStart = new Date(event.start_time).getTime();
+  const eventEnd = new Date(event.end_time || event.start_time).getTime();
+  return eventStart < end.getTime() && eventEnd > start.getTime();
+}
+
+export function canRelocateEventWithoutHittingOverlapLimit(allEvents, eventToMove, start, end) {
+  const overlapCount = (allEvents || []).filter((event) => {
+    if (event?.id === eventToMove?.id) return false;
+    return eventsOverlapWindow(event, start, end);
+  }).length;
+
+  return overlapCount < MAX_RELOCATE_OVERLAPS;
 }
