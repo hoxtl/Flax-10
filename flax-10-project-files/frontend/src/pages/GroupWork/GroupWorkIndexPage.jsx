@@ -9,6 +9,8 @@ import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import GroupWorkStats from "./components/GroupWorkStats";
+import TextInput from "../../components/common/TextInput/TextInput";
+import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 
 function GroupWorkIndexSkeleton() {
   return (
@@ -30,35 +32,30 @@ function GroupWorkIndexSkeleton() {
 
 function CreateProjectInputs({ data, onChange }) {
   return (
-    <div className={styles.formGrid}>
-      <FormField label="Project Name">
-        <input 
-          type="text" 
-          placeholder="e.g. Dissertation Research" 
+    <>
+      <FormField label="Project name" className={styles.inputName}>
+        <TextInput 
           value={data.name} 
-          onChange={(e) => onChange("name", e.target.value)} 
-          className={styles.input}
-          required
+          onChange={(e) => onChange('name', e.target.value)} 
+          placeholder="e.g. Machine Learning Research..." 
+          required 
         />
       </FormField>
-      <FormField label={<span>Module <span className={styles.optionalLabel}>(Optional)</span></span>}>
-        <input 
-          type="text" 
-          placeholder="e.g. CS101" 
-          value={data.course_code} 
-          onChange={(e) => onChange("course_code", e.target.value)} 
-          className={styles.input}
+      <FormField label={<>Module <span className={styles.optionalText}>optional</span></>} className={styles.inputField}>
+        <UserModuleDropdown
+          value={data.course_code}
+          onChange={(val) => onChange('course_code', val)}
+          placeholder="Select..."
         />
       </FormField>
-      <FormField label="Deadline">
-        <input 
+      <FormField label="Deadline" className={styles.inputField}>
+        <TextInput 
           type="date" 
           value={data.deadline} 
-          onChange={(e) => onChange("deadline", e.target.value)} 
-          className={styles.input}
+          onChange={(e) => onChange('deadline', e.target.value)} 
         />
       </FormField>
-    </div>
+    </>
   );
 }
 
