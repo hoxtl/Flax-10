@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X, FolderKanban, Filter } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X, FolderKanban, Tag } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DatePickerButton } from './DatePickerButton';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
@@ -7,6 +7,7 @@ import { SegmentedControl } from '../../ui/SegmentedControl';
 import MultiSelectDropdown from '../../ui/MultiSelectDropdown';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
+import { TagsSelector } from '../../common/TagsSelector/TagsSelector';
 import styles from './CalendarHeaderUtils.module.css';
 
 import { deleteSchedule, getSchedules, renameSchedule } from '../../../api/scheduleApi';
@@ -401,6 +402,8 @@ export function FilterDropdownButton({ active, onChange }) {
     const { tags } = useTags();
     const [showManager, setShowManager] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const wrapRef = useRef(null);
+
     const selectedValues = useMemo(() => {
         const source = Array.isArray(active) ? active.flat(Infinity) : [active];
         const normalized = Array.from(
@@ -411,72 +414,73 @@ export function FilterDropdownButton({ active, onChange }) {
                     .filter(Boolean)
             )
         );
-        return normalized.length === 0 || normalized.includes('all') ? ['all'] : normalized;
+        return normalized.length === 0 || normalized.includes('all') ? [] : normalized;
     }, [active]);
 
-    const options = useMemo(() => {
+    const tagObjects = useMemo(() => {
         const uniqueTags = Array.from(
             new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
         );
-        return [
-            { value: "all", label: "All" },
-            ...uniqueTags.map(t => ({ value: t.label.toLowerCase(), label: t.label })),
-            { value: "__manage__", label: "Manage Tags..." },
-        ];
+        return uniqueTags.map(t => ({ id: t.label.toLowerCase(), label: t.label }));
     }, [tags]);
 
-    const handleChange = (nextValues) => {
-        const currentHasAll = selectedValues.includes('all');
-        let next = Array.isArray(nextValues) ? nextValues : [];
+    const selectedTagObjects = tagObjects.filter(t => selectedValues.includes(t.id));
 
-        if (next.includes('__manage__')) {
-            setShowManager(true);
-            setIsOpen(false);
-            next = next.filter((value) => value !== '__manage__');
-        }
-
-        const nextHasAll = next.includes('all');
-        if (nextHasAll && next.length > 1) {
-            next = currentHasAll ? next.filter((value) => value !== 'all') : ['all'];
-        }
-
-        if (next.length === 0 || (next.length === 1 && next[0] === 'all')) {
+    const handleSelectionChange = (newSelected) => {
+        if (newSelected.length === 0) {
             onChange('all');
-            return;
+        } else {
+            onChange(newSelected.map(t => t.id));
         }
-
-        onChange(next.filter((value) => value !== 'all'));
     };
 
-    const activeCount = selectedValues.includes('all') ? 0 : selectedValues.length;
-    const trigger = (
-        <button
-            className={`${styles.filterTriggerBtn} ${(isOpen || activeCount > 0) ? styles.filterTriggerBtnActive : ''}`}
-            aria-label="Filter events"
-            type="button"
-        >
-            <Filter size={18} />
-            {activeCount > 0 && <span className={styles.filterBadge}>{activeCount}</span>}
-        </button>
-    );
+    useEffect(() => {
+        if (!isOpen) return;
+        const handler = (e) => {
+            if (wrapRef.current && !wrapRef.current.contains(e.target)) setIsOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [isOpen]);
+
+    const activeCount = selectedValues.length;
 
     return (
         <>
-            <MultiSelectDropdown
-                className={styles.actionMenu}
-                customTrigger={trigger}
-                options={options}
-                value={selectedValues}
-                onChange={handleChange}
-                placeholder="All"
-                align="right"
-                openOnHover
-                isOpen={isOpen}
-                onOpenChange={setIsOpen}
-                variant="modules"
-                showCheckboxes
-                hideCheckboxForValues={['__manage__']}
-            />
+            <div className={styles.filterWrap} ref={wrapRef}>
+                <button
+                    className={`${styles.filterTriggerBtn} ${(isOpen || activeCount > 0) ? styles.filterTriggerBtnActive : ''}`}
+                    aria-label="Filter events"
+                    type="button"
+                    onClick={() => setIsOpen(p => !p)}
+                >
+                    <Tag size={18} />
+                    {activeCount > 0 && <span className={styles.filterBadge}>{activeCount}</span>}
+                </button>
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            className={styles.filterPopup}
+                            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                            transition={{ duration: 0.15, ease: 'easeOut' }}
+                        >
+                            <div className={styles.filterPopupHeader}>
+                                <span className={styles.filterPopupTitle}>Filter by tag</span>
+                                <button type="button" className={styles.filterManageBtn} onClick={() => { setIsOpen(false); setShowManager(true); }}>
+                                    Manage tags…
+                                </button>
+                            </div>
+                            <TagsSelector
+                                tags={tagObjects}
+                                selectedTags={selectedTagObjects}
+                                onSelectionChange={handleSelectionChange}
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
             {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
         </>
     );

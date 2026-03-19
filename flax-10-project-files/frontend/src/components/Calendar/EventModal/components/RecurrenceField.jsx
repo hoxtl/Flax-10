@@ -16,16 +16,19 @@ const END_TYPE_OPTIONS = [
     { value: 'on_date', label: 'On date' },
 ];
 
-export function RecurrenceField({ value, onChange }) {
+export function RecurrenceField({ value, onChange, hideFrequency = false }) {
     const { frequency = 'none', interval = 1, end_date = null } = value || {};
     const hasRecurrence = frequency !== 'none';
 
     const updateField = (field, val) => onChange({ ...value, frequency, interval, end_date, [field]: val });
 
+    if (hideFrequency && !hasRecurrence) return null;
+
     return (
         <div className="form-field recurrence-field">
-            <label>Repeat</label>
-            <RecurrenceOptions frequency={frequency} interval={interval} onChange={updateField} />
+            {!hideFrequency && <label>Repeat</label>}
+            {!hideFrequency && <RecurrenceOptions frequency={frequency} interval={interval} onChange={updateField} />}
+            {hasRecurrence && <IntervalInput interval={interval} onChange={updateField} />}
             {hasRecurrence && <EndRepeatField endDate={end_date} onChange={updateField} />}
         </div>
     );

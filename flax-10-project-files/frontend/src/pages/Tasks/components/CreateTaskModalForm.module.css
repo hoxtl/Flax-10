@@ -20,6 +20,14 @@
   font-size: 1.02em;
 }
 
+.labelOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85em;
+  color: var(--muted, #9a8778);
+}
+
 .canvas {
   display: flex;
   flex-direction: column;

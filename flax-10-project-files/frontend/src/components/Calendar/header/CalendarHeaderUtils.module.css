@@ -251,6 +251,56 @@
     line-height: 1;
 }
 
+.filterWrap {
+    position: relative;
+}
+
+.filterPopup {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 500;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    padding: 12px;
+    min-width: 240px;
+    max-width: 300px;
+}
+
+.filterPopupHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.filterPopupTitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+}
+
+.filterManageBtn {
+    background: none;
+    border: none;
+    font-size: 0.72rem;
+    color: var(--primary);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    padding: 0;
+    transition: opacity 0.12s;
+}
+
+.filterManageBtn:hover {
+    opacity: 0.7;
+}
+
 @media (max-width: 640px) {
     .scheduleCard {
         flex-direction: column;
