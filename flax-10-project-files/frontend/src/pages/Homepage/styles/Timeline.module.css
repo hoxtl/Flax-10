@@ -11,11 +11,17 @@
     border-radius: 5px;
     transition: color 0.15s;
   }
+
   .taskWidgetLink:hover {
     color: var(--text);
   }
-  
-  .taskWidgetEmptyIcon { font-size: 2.25rem; line-height: 1; opacity: 0.9; }
+
+  .taskWidgetEmptyIcon {
+    font-size: 2.25rem;
+    line-height: 1;
+    opacity: 0.9;
+  }
+
   .taskWidgetEmptyText {
     font-size: var(--home-text-body);
     color: var(--muted);
@@ -23,6 +29,7 @@
     max-width: 18rem;
     line-height: 1.45;
   }
+
   .taskWidgetEmptyBtn {
     margin-top: 0.25rem;
     font-size: 0.9rem;
@@ -35,8 +42,11 @@
     cursor: pointer;
     transition: filter 0.15s;
   }
-  .taskWidgetEmptyBtn:hover { filter: brightness(1.08); }
-  
+
+  .taskWidgetEmptyBtn:hover {
+    filter: brightness(1.08);
+  }
+
   .twRow {
     display: flex;
     align-items: center;
@@ -45,28 +55,74 @@
     gap: var(--home-space-sm);
     transition: background 0.15s;
   }
-  .twRow:last-child { border-bottom: none; }
-  .twRow:hover { background: color-mix(in srgb, var(--primary) 5%, transparent); }
+
+  .twRow:last-child {
+    border-bottom: none;
+  }
+
+  .twRow:hover {
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+  }
 
   .twRowActiveTimer {
     border-left: none;
     background: color-mix(in srgb, var(--primary) 8%, var(--panel));
     animation: twPulse 2s ease-in-out infinite;
   }
+
   @keyframes twPulse {
-    0%, 100% { background: color-mix(in srgb, var(--primary) 8%, var(--panel)); }
-    50% { background: color-mix(in srgb, var(--primary) 12%, var(--panel)); }
+
+    0%,
+    100% {
+      background: color-mix(in srgb, var(--primary) 8%, var(--panel));
+    }
+
+    50% {
+      background: color-mix(in srgb, var(--primary) 12%, var(--panel));
+    }
   }
 
-  .twLeft { display: flex; align-items: flex-start; gap: 0.55rem; flex: 1; min-width: 0; }
-  
-  .twDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 0.28rem; transition: transform 0.15s, box-shadow 0.15s; }
-  .twDotUrgent { width: 10px; height: 10px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--urgent) 25%, transparent); }
-  .twDotHigh   { width: 9px; height: 9px; }
-  .twDotLow    { width: 6px; height: 6px; opacity: 0.5; }
-  
-  .twBody { display: flex; flex-direction: column; gap: var(--home-space-xs); min-width: 0; }
-  
+  .twLeft {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .twDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.28rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .twDotUrgent {
+    width: 10px;
+    height: 10px;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--urgent) 25%, transparent);
+  }
+
+  .twDotHigh {
+    width: 9px;
+    height: 9px;
+  }
+
+  .twDotLow {
+    width: 6px;
+    height: 6px;
+    opacity: 0.5;
+  }
+
+  .twBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--home-space-xs);
+    min-width: 0;
+  }
+
   .twTitle {
     font-size: 15px;
     font-weight: 600;
@@ -75,9 +131,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
-  .twMeta { display: flex; gap: 0.35rem 0.5rem; align-items: center; flex-wrap: wrap; }
-  
+
+  .twMeta {
+    display: flex;
+    gap: 0.35rem 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
   .twBubble {
     display: inline-flex;
     align-items: center;
@@ -89,26 +150,35 @@
     text-decoration: none;
     transition: filter 0.15s ease;
   }
-  .twBubble:hover { filter: brightness(0.95); }
-  
+
+  .twBubble:hover {
+    filter: brightness(0.95);
+  }
+
   .twBubbleModule {
     background: color-mix(in srgb, var(--study) 15%, var(--panel));
     color: var(--study);
   }
+
   .twBubbleExam {
     background: color-mix(in srgb, var(--urgent) 15%, var(--panel));
     color: var(--urgent);
   }
+
   .twBubbleCoursework {
     background: color-mix(in srgb, var(--secondary, #92400E) 15%, var(--panel));
     color: var(--secondary, #92400E);
   }
+
   .twBubbleOther {
     background: color-mix(in srgb, var(--neutral) 15%, var(--panel));
     color: var(--neutral);
   }
-  
-  .twTime { font-size: 13px; color: var(--neutral); }
+
+  .twTime {
+    font-size: 13px;
+    color: var(--neutral);
+  }
 
   .twPlay {
     width: 28px;
@@ -124,8 +194,11 @@
     flex-shrink: 0;
     transition: filter 0.15s, background 0.15s;
   }
-  .twPlay:hover { filter: brightness(1.1); }
-  
+
+  .twPlay:hover {
+    filter: brightness(1.1);
+  }
+
   .timelineSection {
     max-width: 1200px;
     margin: 0 auto;
@@ -133,7 +206,10 @@
     width: 100%;
   }
 
-  .timeline { display: flex; flex-direction: column; }
+  .timeline {
+    display: flex;
+    flex-direction: column;
+  }
 
   .timelineBox {
     border: 1px solid var(--border);
@@ -144,6 +220,7 @@
     position: relative;
     flex: 1 1 auto;
   }
+
   .timelineBoxWidget {
     background: transparent;
     border: none;
@@ -152,9 +229,11 @@
     position: relative;
     flex: 1 1 auto;
   }
+
   .timelineBox:hover {
     /* No shadow — match other widget cards */
   }
+
   .daySummaryBar {
     font-size: var(--home-font-meta);
     font-weight: 600;
@@ -162,9 +241,11 @@
     margin: 0 32px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
+
   .daySummaryBarTight {
     color: var(--urgent);
   }
+
   .daySummaryBarBalanced {
     color: var(--study);
   }
@@ -173,6 +254,7 @@
   .nightSlot {
     position: relative;
   }
+
   .nightSlot::after {
     content: "";
     position: absolute;
@@ -211,11 +293,25 @@
     line-height: 1.4;
   }
 
-  .heatmapEmpty { background: var(--heatmap-empty); }
-  .heatmapLow { background: var(--heatmap-low); }
-  .heatmapMid { background: var(--heatmap-mid); }
-  .heatmapHigh { background: var(--heatmap-high); }
-  .heatmapFull { background: var(--heatmap-full); }
+  .heatmapEmpty {
+    background: var(--heatmap-empty);
+  }
+
+  .heatmapLow {
+    background: var(--heatmap-low);
+  }
+
+  .heatmapMid {
+    background: var(--heatmap-mid);
+  }
+
+  .heatmapHigh {
+    background: var(--heatmap-high);
+  }
+
+  .heatmapFull {
+    background: var(--heatmap-full);
+  }
 
   /* Plan for the Day: compact list-style timeline (Structured-style) */
   .planTimelineWrap {
@@ -228,6 +324,7 @@
     border: none;
     box-shadow: none;
   }
+
   /* High-impact status bar: headline of the day — flax-gold, centered, pulsing ⚡ */
   .planTimelineStatusBar {
     display: flex;
@@ -247,16 +344,19 @@
     letter-spacing: 0.01em;
     max-width: fit-content;
   }
+
   .planTimelineStatusBarEmoji {
     display: inline-block;
     opacity: 0.9;
   }
+
   .planTimelineDailySummary {
     font-size: 0.68rem;
     color: var(--home-text-meta);
     margin: 0.2rem 0 0;
     font-weight: 500;
   }
+
   .planTimelineList {
     display: flex;
     flex-direction: column;
@@ -264,6 +364,7 @@
     padding: 8px 0 10px;
     position: relative;
   }
+
   /* Full-height subtle spine; emoji nodes are the only pop of color */
   .planTimelineList::before {
     content: "";
@@ -273,17 +374,16 @@
     bottom: 0;
     width: 2px;
     margin-left: -1px;
-    background: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--primary) 4%, transparent) 0%,
-      color-mix(in srgb, var(--primary) 30%, transparent) 10%,
-      color-mix(in srgb, var(--primary) 32%, transparent) 90%,
-      color-mix(in srgb, var(--primary) 4%, transparent) 100%
-    );
+    background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--primary) 4%, transparent) 0%,
+        color-mix(in srgb, var(--primary) 30%, transparent) 10%,
+        color-mix(in srgb, var(--primary) 32%, transparent) 90%,
+        color-mix(in srgb, var(--primary) 4%, transparent) 100%);
     border-radius: 1px;
     pointer-events: none;
     z-index: 0;
   }
+
   .planTimelineRow {
     display: grid;
     grid-template-columns: 56px 26px 1fr;
@@ -294,26 +394,37 @@
     position: relative;
     z-index: 1;
   }
-  .planTimelineRow > *:nth-child(3) {
+
+  .planTimelineRow>*:nth-child(3) {
     min-width: 0;
     display: flex;
     align-items: stretch;
     width: 100%;
   }
-  .planTimelineRow:first-of-type { margin-top: 0; }
-  .planTimelineRow:last-of-type { padding-bottom: 4px; }
+
+  .planTimelineRow:first-of-type {
+    margin-top: 0;
+  }
+
+  .planTimelineRow:last-of-type {
+    padding-bottom: 4px;
+  }
+
   .planTimelineRowGap {
     min-height: 40px;
   }
-  .planTimelineRowGap > *:nth-child(3) {
+
+  .planTimelineRowGap>*:nth-child(3) {
     align-items: stretch;
   }
+
   .planTimelineGutter {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     min-height: 20px;
   }
+
   .planTimelineTime {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 12px;
@@ -322,6 +433,7 @@
     color: var(--muted);
     letter-spacing: 0;
   }
+
   .planTimelineSpineCell {
     display: flex;
     flex-direction: column;
@@ -331,6 +443,7 @@
     min-height: 20px;
     flex-shrink: 0;
   }
+
   /* ── Hour Rail Markers ── */
   .planTimelineHourMark {
     display: grid;
@@ -342,6 +455,7 @@
     position: relative;
     z-index: 1;
   }
+
   .planTimelineHourMarkLabel {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 12px;
@@ -352,6 +466,7 @@
     text-align: right;
     line-height: 1;
   }
+
   .planTimelineHourMarkDot {
     width: 10px;
     height: 10px;
@@ -364,6 +479,7 @@
     position: relative;
     flex-shrink: 0;
   }
+
   .planTimelineHourMarkLine {
     display: none;
   }
@@ -387,11 +503,24 @@
     border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
     animation: planTimelineNodePop 0.35s ease-out;
   }
+
   @keyframes planTimelineNodePop {
-    0% { transform: scale(0); opacity: 0.6; }
-    60% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+      transform: scale(0);
+      opacity: 0.6;
+    }
+
+    60% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
+
   /* Railroad spine: solid Flax-Brown vertical line through entire section */
   .planTimelineSpine {
     width: 4px;
@@ -403,6 +532,7 @@
     justify-self: center;
     background: var(--restoration-earth, #6B5344);
   }
+
   .planTimelineSpine::before {
     content: "";
     position: absolute;
@@ -415,29 +545,33 @@
     background: color-mix(in srgb, var(--study) 40%, transparent);
     box-shadow: 0 0 0 2px var(--bg);
   }
+
   .planTimelineSpinePast::before {
     background: var(--primary-strong, #4A3421);
   }
+
   .planTimelineSpinePast {
     background: var(--restoration-earth, #6B5344);
   }
+
   .planTimelineSpineFuture::before {
     background: color-mix(in srgb, var(--color-highlight, #D2B48C) 90%, transparent);
   }
+
   .planTimelineSpineFuture {
     background: var(--restoration-earth, #6B5344);
   }
+
   .planTimelineTinyGapLine {
     height: 1px;
-    background: repeating-linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 0,
-      color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 6px,
-      transparent 6px,
-      transparent 12px
-    );
+    background: repeating-linear-gradient(to right,
+        color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 0,
+        color-mix(in srgb, var(--color-highlight, #D2B48C) 45%, transparent) 6px,
+        transparent 6px,
+        transparent 12px);
     margin: 8px 0;
   }
+
   .planTimelineTinyGapLineWrap {
     display: flex;
     align-items: center;
@@ -445,6 +579,7 @@
     width: 100%;
     min-width: 0;
   }
+
   .planTimelineTinyGapMicroBreak {
     font-size: 0.72rem;
     color: var(--muted);
@@ -453,6 +588,7 @@
     text-overflow: ellipsis;
     padding-left: 2px;
   }
+
   /* Live Compass: glowing green line */
   .planTimelineNowLine {
     flex: 1;
@@ -461,6 +597,7 @@
     border-radius: 1px;
     box-shadow: 0 0 6px color-mix(in srgb, var(--study) 70%, transparent), 0 0 14px color-mix(in srgb, var(--study) 30%, transparent);
   }
+
   .planTimelineNowWrap {
     display: flex;
     align-items: center;
@@ -470,10 +607,19 @@
     margin-left: 0;
     padding-left: 0;
   }
+
   @keyframes nowDotPulse {
-    0%, 100% { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px color-mix(in srgb, var(--study) 35%, transparent); }
-    50%       { box-shadow: 0 0 0 2px var(--bg), 0 0 0 5px color-mix(in srgb, var(--study) 15%, transparent); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px color-mix(in srgb, var(--study) 35%, transparent);
+    }
+
+    50% {
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 5px color-mix(in srgb, var(--study) 15%, transparent);
+    }
   }
+
   /* Small pulsing dot before "Now" label */
   .planTimelineNowDot {
     width: 8px;
@@ -498,6 +644,7 @@
     border-radius: 0;
     flex-shrink: 0;
   }
+
   .planTimelineCard {
     position: relative;
     display: grid;
@@ -526,15 +673,25 @@
     user-select: none;
     -webkit-user-select: none;
   }
+
   @keyframes planTimelineCardPop {
-    0% { opacity: 0.7; transform: scale(0.98); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+      opacity: 0.7;
+      transform: scale(0.98);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
+
   .planTimelineCard:hover {
     border-color: var(--primary);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
     cursor: pointer;
   }
+
   .planTimelineCardBody {
     min-width: 0;
     display: flex;
@@ -544,6 +701,7 @@
     grid-column: 1;
     grid-row: 1;
   }
+
   .planTimelineCardTimeStack {
     display: flex;
     flex-direction: column;
@@ -551,6 +709,7 @@
     gap: 2px;
     min-width: 0;
   }
+
   .planTimelineCardTimeRow {
     display: flex;
     align-items: center;
@@ -558,6 +717,7 @@
     flex-wrap: wrap;
     min-width: 0;
   }
+
   .planTimelineCardTimeSlot {
     font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
     font-size: 0.68rem;
@@ -568,6 +728,7 @@
     flex-shrink: 0;
     opacity: 0.6;
   }
+
   .planTimelineCardTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.9rem;
@@ -580,12 +741,14 @@
     min-width: 0;
     max-width: 100%;
   }
+
   .planTimelineCardTitleRow {
     display: flex;
     align-items: center;
     gap: 6px;
     min-width: 0;
   }
+
   .planTimelineSleepBadge {
     display: inline-flex;
     align-items: center;
@@ -595,6 +758,7 @@
     opacity: 0.9;
     flex-shrink: 0;
   }
+
   .planTimelineCardDurationPill {
     display: inline-flex;
     align-items: center;
@@ -614,14 +778,17 @@
     flex-shrink: 0;
     opacity: 0.6;
   }
+
   .planTimelineCardNow {
     background: color-mix(in srgb, var(--study) 8%, var(--panel));
     border-color: color-mix(in srgb, var(--study) 25%, var(--border));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px color-mix(in srgb, var(--study) 12%, transparent);
   }
+
   .planTimelineCardNow:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px color-mix(in srgb, var(--study) 18%, transparent);
   }
+
   .planTimelineCardPast {
     opacity: 1;
     filter: none;
@@ -633,31 +800,38 @@
     filter: none;
     transition: opacity 0.3s ease, filter 0.3s ease;
   }
+
   .planTimelineRowPast:hover {
     opacity: 1;
     filter: none;
   }
+
   .planTimelineRowPast .planTimelineCardTitle {
     color: var(--text);
   }
+
   .planTimelineRowPast .planTimelineCardTimeSlot,
   .planTimelineRowPast .planTimelineCardDurationPill,
   .planTimelineRowPast .planTimelineModulePill {
     opacity: 0.7;
   }
+
   .planTimelineCardOverlap {
     border-color: #E5E4E2;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   }
+
   .planTimelineCardConflict {
     border: 1px solid #E5E4E2;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     width: 100%;
     min-width: 0;
   }
+
   .planTimelineCardConflict:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
+
   .planTimelineConflictGroup {
     display: flex;
     flex-direction: row;
@@ -666,6 +840,7 @@
     min-width: 0;
     overflow: hidden;
   }
+
   .planTimelineConflictCardWrap {
     flex: 1 1 0;
     min-width: 0;
@@ -673,6 +848,7 @@
     overflow: hidden;
     position: relative;
   }
+
   .planTimelineTimeConflictBadge {
     font-size: 0.65rem;
     font-weight: 600;
@@ -687,10 +863,12 @@
     align-items: center;
     gap: 4px;
   }
+
   .planTimelineConflictIcon {
     font-size: 0.75rem;
     line-height: 1;
   }
+
   .planTimelineRescheduleBtn {
     display: inline-flex;
     align-items: center;
@@ -705,10 +883,12 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .planTimelineRescheduleBtn:hover {
     background: var(--hover);
     border-color: var(--primary);
   }
+
   .planTimelineCardRoutine {
     transform: none;
     transform-origin: left center;
@@ -717,8 +897,12 @@
     width: 100%;
     min-width: 0;
   }
+
   .planTimelineCardOverlap .planTimelineModulePill,
-  .planTimelineCardOverlap .planTimelineModulePillLink { right: auto; }
+  .planTimelineCardOverlap .planTimelineModulePillLink {
+    right: auto;
+  }
+
   .planTimelineCardTagsSlot {
     display: flex;
     flex-wrap: wrap;
@@ -728,11 +912,13 @@
     flex-shrink: 0;
     min-width: 0;
   }
+
   .planTimelineModulePillLink {
     flex-shrink: 0;
     text-decoration: none;
     color: inherit;
   }
+
   .planTimelineModulePill {
     display: inline-block;
     font-size: 0.58rem;
@@ -743,6 +929,7 @@
     color: var(--home-text-meta, #9ca3af);
     opacity: 0.6;
   }
+
   .planTimelineConflictPopover {
     position: absolute;
     top: 100%;
@@ -759,12 +946,14 @@
     flex-direction: column;
     gap: 8px;
   }
+
   .planTimelineConflictPopoverTitle {
     font-size: 0.72rem;
     font-weight: 700;
     color: #2D2D2D;
     margin: 0 0 2px;
   }
+
   .planTimelineConflictPopoverBtn {
     display: inline-flex;
     align-items: center;
@@ -780,14 +969,17 @@
     text-align: left;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .planTimelineConflictPopoverBtn:hover:not(:disabled) {
     background: var(--hover);
     border-color: var(--primary);
   }
+
   .planTimelineConflictPopoverBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
+
   .planTimelineCardWrap {
     position: relative;
     min-width: 0;
@@ -797,6 +989,7 @@
     display: flex;
     align-items: stretch;
   }
+
   .planTimelineCardIconCircle {
     width: 28px;
     height: 28px;
@@ -814,6 +1007,7 @@
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--study) 20%, transparent);
     grid-row: 1 / -1;
   }
+
   .planTimelineCardIcon {
     display: flex;
     align-items: center;
@@ -821,6 +1015,7 @@
     color: var(--restoration-charcoal, #2d352d);
     opacity: 0.85;
   }
+
   .planTimelineCardMeta {
     font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
     font-size: 0.6rem;
@@ -830,6 +1025,7 @@
     letter-spacing: 0.02em;
     align-self: flex-end;
   }
+
   .planTimelineCardDuration {
     display: inline-block;
     padding: 3px 8px;
@@ -841,6 +1037,7 @@
     font-size: inherit;
     color: var(--restoration-earth, #6B5344);
   }
+
   .planTimelineCardCheck {
     grid-column: 3;
     grid-row: 1;
@@ -860,12 +1057,15 @@
     flex-shrink: 0;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .planTimelineCard:not(.planTimelineCardWithDuration) .planTimelineCardCheck {
     grid-column: 2;
   }
+
   .planTimelineCardCheck:hover {
     background: rgba(135, 169, 107, 0.12);
   }
+
   .planTimelineCardCheck[aria-pressed="true"] {
     background: var(--restoration-sage);
     border-color: var(--restoration-sage);
@@ -893,15 +1093,18 @@
     transition: background 0.15s, border-color 0.15s;
     opacity: 0;
   }
+
   .planTimelineCard:hover .planTimelineEventCheck {
     opacity: 1;
   }
+
   .planTimelineEventCheck.planTimelineEventCheckDone {
     opacity: 1;
     background: rgba(132, 169, 140, 0.2);
     border-color: var(--restoration-sage, #84A98C);
     color: var(--restoration-sage, #84A98C);
   }
+
   .planTimelineEventCheck:hover {
     background: rgba(132, 169, 140, 0.1);
     border-color: var(--restoration-sage, #84A98C);
@@ -926,10 +1129,12 @@
     transition: background 0.15s;
     opacity: 0;
   }
+
   .planTimelineCard:hover .planTimelineMissedBtn,
   .planTimelineCardPast .planTimelineMissedBtn {
     opacity: 1;
   }
+
   .planTimelineMissedBtn:hover {
     background: rgba(255, 159, 103, 0.22);
   }
@@ -952,24 +1157,36 @@
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     position: relative;
   }
+
   .planTimelineFreeWindowDashed {
     border: 1.5px dashed rgba(132, 169, 140, 0.45);
     border-radius: 8px;
     background: rgba(132, 169, 140, 0.04);
     box-shadow: none;
   }
+
   .planTimelineFreeWindowDashed:hover {
     background: rgba(132, 169, 140, 0.08);
     border-color: rgba(132, 169, 140, 0.65);
     animation: planTimelineGapPulse 2s ease-in-out infinite;
   }
+
   @keyframes planTimelineGapPulse {
-    0%, 100% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.25); }
-    50% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.5), 0 0 8px rgba(132, 169, 140, 0.15); }
+
+    0%,
+    100% {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.25);
+    }
+
+    50% {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 0 0 1px rgba(132, 169, 140, 0.5), 0 0 8px rgba(132, 169, 140, 0.15);
+    }
   }
+
   .planTimelineFreeWindowEmoji {
     display: none;
   }
+
   .planTimelineFreeWindowDuration {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.65rem;
@@ -980,6 +1197,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   /* Contextual activity suggestion chip */
   .planTimelineGapContextChip {
     display: inline-flex;
@@ -996,6 +1214,7 @@
     flex-shrink: 0;
     white-space: nowrap;
   }
+
   /* "Slot in: Task Name" call-to-action inside gaps */
   .planTimelineGapSlotCta {
     font-size: 0.72rem;
@@ -1007,10 +1226,12 @@
     white-space: nowrap;
     flex: 1;
   }
+
   .planTimelineGapSlotCta strong {
     color: var(--restoration-sage, #84A98C);
     font-weight: 700;
   }
+
   .planTimelineGapRecommendation {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.78rem;
@@ -1021,19 +1242,23 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   .planTimelineGapRecommendation strong {
     color: var(--restoration-sage, #84A98C);
     font-weight: 700;
   }
+
   .planTimelineFreeWindowActions {
     flex-shrink: 0;
     margin-left: auto;
     opacity: 0;
     transition: opacity 0.2s ease;
   }
+
   .planTimelineFreeWindow:hover .planTimelineFreeWindowActions {
     opacity: 1;
   }
+
   .planTimelineSlotPopover {
     position: absolute;
     top: 100%;
@@ -1050,6 +1275,7 @@
     flex-direction: column;
     gap: 4px;
   }
+
   .planTimelineSlotPopoverTitle {
     font-size: 0.7rem;
     font-weight: 700;
@@ -1058,6 +1284,7 @@
     color: var(--home-text-meta, #6b7280);
     margin: 0 0 6px;
   }
+
   .planTimelineSlotPopoverItem {
     display: flex;
     flex-direction: column;
@@ -1072,9 +1299,11 @@
     width: 100%;
     transition: background 0.15s;
   }
+
   .planTimelineSlotPopoverItem:hover {
     background: rgba(135, 169, 107, 0.12);
   }
+
   .planTimelineSlotPopoverItemTitle {
     font-size: 0.78rem;
     font-weight: 600;
@@ -1084,20 +1313,24 @@
     white-space: nowrap;
     max-width: 100%;
   }
+
   .planTimelineSlotPopoverItemMeta {
     font-size: 0.65rem;
     font-variant-numeric: tabular-nums;
     color: var(--home-text-meta, #6b7280);
     opacity: 0.8;
   }
+
   .planTimelineSlotPopoverEmpty {
     font-size: 0.72rem;
     color: var(--home-text-meta, #6b7280);
     padding: 6px 0;
   }
+
   .planTimelineFreeBtn {
     display: none;
   }
+
   .planTimelineFreeBtnQuickSlot {
     width: 24px;
     height: 24px;
@@ -1118,11 +1351,13 @@
     transition: background 0.2s, transform 0.15s;
     margin-left: 6px;
   }
+
   .planTimelineFreeBtnQuickSlot:hover {
     background: var(--restoration-sage, #87A96B);
     color: #fff;
     transform: scale(1.08);
   }
+
   .planTimelineCta {
     display: block;
     padding: 10px 16px;
@@ -1134,13 +1369,16 @@
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     transition: color 0.2s ease;
   }
+
   .planTimelineCta:hover {
     color: var(--restoration-charcoal);
   }
+
   .planTimelineEmpty {
     padding: 24px 16px;
     text-align: center;
   }
+
   .planTimelineEmptyText {
     font-family: var(--font-body);
     font-size: 0.9rem;
@@ -1162,12 +1400,14 @@
     border: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: var(--home-card-shadow);
   }
+
   .miniTimelineBody {
     display: flex;
     flex-direction: row;
     align-items: stretch;
     min-height: 320px;
   }
+
   .miniTimelineGutter {
     width: 80px;
     min-width: 80px;
@@ -1177,6 +1417,7 @@
     background: var(--bg);
     border-right: 3px solid var(--cocoa, var(--primary-strong));
   }
+
   .miniTimelineHour {
     position: absolute;
     left: 0;
@@ -1190,6 +1431,7 @@
     box-sizing: border-box;
     max-width: 80px;
   }
+
   .miniTimelineStrip {
     flex: 1;
     position: relative;
@@ -1197,6 +1439,7 @@
     min-width: 0;
     background: var(--panel);
   }
+
   .miniTimelineLiveLine {
     position: absolute;
     left: 0;
@@ -1207,6 +1450,7 @@
     pointer-events: none;
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--timeline-now-line) 40%, transparent);
   }
+
   .miniTimelineLiveLine::after {
     content: "";
     position: absolute;
@@ -1219,6 +1463,7 @@
     background: var(--timeline-now-line);
     box-shadow: 0 0 0 2px var(--panel);
   }
+
   .miniTimelineGap {
     position: absolute;
     left: 8px;
@@ -1234,9 +1479,11 @@
     opacity: 0.22;
     transition: opacity 0.25s ease;
   }
+
   .miniTimelineGap:hover {
     opacity: 0.5;
   }
+
   .miniTimelineGapInner {
     display: flex;
     flex-direction: row;
@@ -1250,14 +1497,17 @@
     max-height: 100%;
     min-height: 0;
   }
+
   .miniTimelineGapLabel {
     font-size: var(--home-font-meta);
     font-weight: 500;
     color: rgba(0, 0, 0, 0.35);
   }
+
   .miniTimelineGapSuggestion {
     display: none;
   }
+
   .miniTimelineGapQuickStart {
     padding: 0.2rem 0.5rem;
     border-radius: 6px;
@@ -1269,14 +1519,17 @@
     cursor: pointer;
     transition: background 0.2s, color 0.2s, opacity 0.2s;
   }
+
   .miniTimelineGapQuickStart:hover {
     background: rgba(0, 0, 0, 0.04);
     color: rgba(0, 0, 0, 0.55);
   }
+
   .miniTimelineGapText {
     font-size: var(--home-font-meta);
     color: var(--home-text-meta);
   }
+
   .miniTimelinePill {
     position: absolute;
     left: 8px;
@@ -1298,6 +1551,7 @@
     background: var(--home-card-bg);
     box-shadow: var(--home-card-shadow);
   }
+
   .miniTimelinePillCheck {
     position: absolute;
     top: 0.5rem;
@@ -1317,36 +1571,45 @@
     transition: background 0.15s, border-color 0.15s;
     flex-shrink: 0;
   }
+
   .miniTimelinePillCheck:hover {
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 12%, var(--panel));
   }
+
   .miniTimelinePillCheck[aria-pressed="true"] {
     background: var(--primary);
     border-color: var(--primary);
     color: #fff;
   }
+
   .miniTimelinePillCompleted {
     opacity: 0.5;
   }
+
   .miniTimelinePillPast {
     opacity: 0.5;
   }
+
   .miniTimelinePill:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   }
+
   /* Events (routine/wellness): grey left border */
   .miniTimelinePillRoutine {
     border-left-color: #6B7280 !important;
   }
+
   .miniTimelinePillActive {
     box-shadow: 0 0 0 2px var(--flax-sage), 0 2px 8px rgba(0, 0, 0, 0.08);
   }
+
   .miniTimelinePillIcon {
     font-size: var(--home-font-meta);
     flex-shrink: 0;
     line-height: 1;
   }
+
   .miniTimelinePillTitle {
     font-size: var(--home-font-task);
     font-weight: 700;
@@ -1358,11 +1621,13 @@
     overflow: hidden;
     padding-right: 28px;
   }
+
   .miniTimelinePillMeta {
     font-size: var(--home-font-meta);
     color: var(--home-text-meta);
     margin-top: auto;
   }
+
   .miniTimelinePillDuration {
     position: absolute;
     bottom: 0.5rem;
@@ -1374,6 +1639,7 @@
     padding: 0.12rem 0.35rem;
     border-radius: 6px;
   }
+
   .miniTimelineCta {
     display: block;
     margin-top: 0;
@@ -1386,6 +1652,7 @@
     border-top: 1px solid var(--color-border-light);
     text-align: center;
   }
+
   .miniTimelineCta:hover {
     color: var(--primary-strong);
   }
@@ -1398,6 +1665,7 @@
     min-width: 0;
     align-items: stretch;
   }
+
   .timelineTrackLine {
     position: absolute;
     left: 0;
@@ -1409,6 +1677,7 @@
     pointer-events: none;
     box-sizing: border-box;
   }
+
   .timelineTrackLine::after {
     content: "";
     position: absolute;
@@ -1420,6 +1689,7 @@
     opacity: 0.9;
     border-radius: 1px;
   }
+
   .timelineNowLine {
     position: absolute;
     left: 0;
@@ -1430,6 +1700,7 @@
     pointer-events: none;
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--timeline-now-line) 40%, transparent);
   }
+
   .timelineNowLine::after {
     content: "";
     position: absolute;
@@ -1442,6 +1713,7 @@
     background: var(--timeline-now-line);
     box-shadow: 0 0 0 2px var(--panel);
   }
+
   .timelineTrackContent {
     position: relative;
     z-index: 10;
@@ -1503,6 +1775,7 @@
     white-space: nowrap;
     margin-top: 4px;
   }
+
   .timelineHeaderCta:hover {
     background: rgba(139, 115, 85, 0.11);
     color: #5a4a3a;
@@ -1532,6 +1805,7 @@
     white-space: nowrap;
     transition: color 0.15s ease;
   }
+
   .timelineHeaderActionLink:hover {
     color: #3e3328;
   }
@@ -1547,6 +1821,7 @@
     margin-top: 2px;
     transition: color 0.15s ease;
   }
+
   .timelineHeaderSub:hover {
     color: #8B7355;
   }
@@ -1571,11 +1846,16 @@
     flex-shrink: 0;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .headerGenerateBtn:hover:not(:disabled) {
     background: color-mix(in srgb, var(--primary) 18%, transparent);
     border-color: var(--primary);
   }
-  .headerGenerateBtn:disabled { opacity: 0.6; cursor: default; }
+
+  .headerGenerateBtn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 
   .mustDoSection {
     padding: var(--home-space-sm) var(--home-space-lg);
@@ -1634,7 +1914,9 @@
     z-index: 10;
   }
 
-  .rowThinBar { align-items: stretch; }
+  .rowThinBar {
+    align-items: stretch;
+  }
 
   .gapRow {
     display: grid;
@@ -1644,6 +1926,7 @@
     position: relative;
     z-index: 10;
   }
+
   .freeWindowRow {
     display: grid;
     grid-template-columns: 80px 1fr;
@@ -1653,12 +1936,14 @@
     z-index: 10;
     min-height: 28px;
   }
+
   .freeWindowRow .gutter {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0;
   }
+
   .freeWindowLabel {
     font-size: 0.6rem;
     font-weight: 500;
@@ -1666,11 +1951,13 @@
     opacity: 0.5;
     margin-top: 2px;
   }
+
   .freeWindowContent {
     display: flex;
     align-items: center;
     min-height: 28px;
   }
+
   .timelineGapAutofillBtn {
     appearance: none;
     border: 1px dashed var(--border);
@@ -1683,19 +1970,23 @@
     cursor: pointer;
     transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
+
   .timelineGapAutofillBtn:hover:not(:disabled) {
     border-color: var(--sage);
     color: var(--sage);
     background: color-mix(in srgb, var(--sage) 0.08, transparent);
   }
+
   .timelineGapAutofillBtn:focus-visible {
     outline: 2px solid var(--sage);
     outline-offset: 2px;
   }
+
   .timelineGapAutofillBtn:disabled {
     cursor: default;
     opacity: 0.6;
   }
+
   .gapRow .gutter::after {
     width: 6px;
     height: 6px;
@@ -1713,6 +2004,7 @@
     min-height: 36px;
     z-index: 10;
   }
+
   .gapDividerRow .gapAddBlockBox {
     margin-left: 0;
     min-height: 32px;
@@ -1725,12 +2017,14 @@
     transition: border-color 0.15s, background 0.15s, color 0.15s;
     background: transparent;
   }
+
   .gapDividerRow .gapAddBlockBox:hover,
   .gapDividerRow .gapAddBlockBox:focus {
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 6%, transparent);
     color: var(--primary);
   }
+
   .gapAddBlockLabel {
     font-size: 0.75rem;
     font-weight: 500;
@@ -1738,11 +2032,13 @@
     opacity: 0;
     transition: opacity 0.15s;
   }
+
   .gapDividerRow .gapAddBlockBox:hover .gapAddBlockLabel,
   .gapDividerRow .gapAddBlockBox:focus .gapAddBlockLabel {
     opacity: 1;
     color: var(--primary);
   }
+
   .gapRow .gapAddBlockBox {
     margin-left: 0;
     min-height: 32px;
@@ -1755,31 +2051,37 @@
     transition: border-color 0.15s, background 0.15s, color 0.15s;
     background: transparent;
   }
+
   .gapRow .gapAddBlockBox:hover,
   .gapRow .gapAddBlockBox:focus {
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 6%, transparent);
     color: var(--primary);
   }
+
   .gapRow .gapAddBlockBox:hover .gapAddBlockLabel,
   .gapRow .gapAddBlockBox:focus .gapAddBlockLabel {
     opacity: 1;
     color: var(--primary);
   }
+
   .gapAddBlockWrap {
     position: relative;
     min-height: 32px;
   }
+
   .gapAddBlockWrap .quickAddMenu {
     left: 0;
     right: 0;
   }
+
   .gapDividerLine {
     flex: 1;
     height: 0;
     border-bottom: 1px dotted rgba(148, 163, 184, 0.25);
     min-width: 1rem;
   }
+
   .gapDividerLabel {
     font-size: 0.6rem;
     font-weight: 500;
@@ -1790,6 +2092,7 @@
     flex-shrink: 0;
     white-space: nowrap;
   }
+
   .gapDividerDuration {
     font-size: 0.6rem;
     font-weight: 500;
@@ -1797,6 +2100,7 @@
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
+
   .gapDividerPlus {
     width: 18px;
     height: 18px;
@@ -1814,15 +2118,18 @@
     display: grid;
     place-items: center;
   }
+
   .gapDividerRow:hover .gapDividerPlus,
   .gapDividerPlus:focus {
     opacity: 1;
   }
+
   .gapDividerPlus:hover {
     color: var(--primary);
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 10%, transparent);
   }
+
   .gapDividerRow .quickAddMenu {
     position: absolute;
     left: 100px;
@@ -1845,6 +2152,7 @@
     position: relative;
     z-index: 10;
   }
+
   .quickWinRow .gutter::after {
     width: 6px;
     height: 6px;
@@ -1852,6 +2160,7 @@
     border: 1px dashed var(--border);
     box-shadow: none;
   }
+
   .quickWinCard {
     margin: 2px 8px 2px 0;
     padding: 0.6rem 0.75rem;
@@ -1864,6 +2173,7 @@
     gap: 0.75rem;
     flex-wrap: wrap;
   }
+
   .quickWinText {
     margin: 0;
     font-size: var(--home-text-body-sm);
@@ -1872,10 +2182,12 @@
     flex: 1;
     min-width: 0;
   }
+
   .quickWinText strong {
     font-weight: 600;
     color: var(--neutral);
   }
+
   .quickWinBtn {
     flex-shrink: 0;
     padding: 0.35rem 0.65rem;
@@ -1888,10 +2200,12 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
+
   .quickWinBtn:hover:not(:disabled) {
     background: color-mix(in srgb, var(--primary) 20%, transparent);
     border-color: var(--primary);
   }
+
   .quickWinBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1911,6 +2225,7 @@
     position: relative;
     overflow: hidden;
   }
+
   .gutter::after {
     content: "";
     position: absolute;
@@ -1954,10 +2269,24 @@
     cursor: pointer;
     transition: opacity 0.15s;
   }
-  .pastBar:hover { opacity: 0.9; }
 
-  .spine { display: flex; flex-shrink: 0; width: 56px; }
-  .spineTime, .spineTrack, .spineLine, .spineNode, .spineNodeDash { display: none; }
+  .pastBar:hover {
+    opacity: 0.9;
+  }
+
+  .spine {
+    display: flex;
+    flex-shrink: 0;
+    width: 56px;
+  }
+
+  .spineTime,
+  .spineTrack,
+  .spineLine,
+  .spineNode,
+  .spineNodeDash {
+    display: none;
+  }
 
   .card {
     margin: 2px 8px 12px 0;
@@ -1975,23 +2304,28 @@
     overflow: hidden;
     min-height: 32px;
   }
+
   .card.cardCategoryAcademic {
     background: color-mix(in srgb, var(--color-sage-primary) 12%, var(--card-bg));
     border-color: color-mix(in srgb, var(--color-sage-primary) 25%, transparent);
   }
+
   .card.cardCategoryPersonal {
     background: color-mix(in srgb, var(--color-terracotta) 10%, var(--card-bg));
     border-color: color-mix(in srgb, var(--color-terracotta) 22%, transparent);
   }
+
   .card.cardCategoryAdmin {
     background: color-mix(in srgb, var(--color-slate-400) 10%, var(--card-bg));
     border-color: color-mix(in srgb, var(--color-slate-400) 20%, transparent);
   }
+
   .card:hover {
     transform: translateX(5px);
     background: color-mix(in srgb, var(--card-accent, var(--primary)) 6%, transparent);
     box-shadow: none;
   }
+
   .card::after {
     content: "";
     position: absolute;
@@ -2002,14 +2336,20 @@
     z-index: 0;
     pointer-events: none;
   }
+
   .card.timeOfDayMorning::after {
     background: linear-gradient(180deg, rgba(255, 230, 150, 0.45), rgba(255, 245, 220, 0.25));
   }
+
   .card.timeOfDayEvening::after {
     background: linear-gradient(180deg, rgba(210, 195, 255, 0.4), rgba(230, 220, 255, 0.2));
   }
+
   .timeOfDayMorning,
-  .timeOfDayEvening { /* hook for ::after time-of-day wash */ }
+  .timeOfDayEvening {
+    /* hook for ::after time-of-day wash */
+  }
+
   .card::before {
     content: "";
     position: absolute;
@@ -2028,33 +2368,59 @@
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent);
     animation: focusPulse 2.5s ease-in-out infinite;
   }
+
   @keyframes focusPulse {
-    0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent), 0 0 12px color-mix(in srgb, var(--sage) 25%, transparent); }
-    50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent), 0 0 20px var(--color-sage-glow); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent), 0 0 12px color-mix(in srgb, var(--sage) 25%, transparent);
+    }
+
+    50% {
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 14%, transparent), 0 0 20px var(--color-sage-glow);
+    }
   }
+
   .cardActive::before {
     opacity: 1;
   }
+
   .card:hover::before,
   .cardActive::before {
     width: 4px;
   }
 
-  .rowPast { opacity: 0.5; }
-  .rowPastRoutine { opacity: 0.55; }
-  .rowOverdue { opacity: 1; }
-  .cardPast { background: transparent !important; }
-  .cardPast::before { opacity: 0.45; }
+  .rowPast {
+    opacity: 0.5;
+  }
+
+  .rowPastRoutine {
+    opacity: 0.55;
+  }
+
+  .rowOverdue {
+    opacity: 1;
+  }
+
+  .cardPast {
+    background: transparent !important;
+  }
+
+  .cardPast::before {
+    opacity: 0.45;
+  }
 
   .cardOverdue {
     border: 1px solid rgba(196, 119, 80, 0.5);
     box-shadow: 0 0 0 1px rgba(196, 119, 80, 0.25);
     background: rgba(255, 247, 237, 0.6);
   }
+
   .cardOverdue::before {
     background: #c47750;
     opacity: 0.9;
   }
+
   .overdueBadge {
     display: inline-block;
     font-size: 0.65rem;
@@ -2067,6 +2433,7 @@
     border-radius: 4px;
     margin-right: 0.35rem;
   }
+
   .cardRescheduleBtn {
     display: inline-flex;
     align-items: center;
@@ -2082,12 +2449,15 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .cardRescheduleBtn:hover {
     background: rgba(196, 119, 80, 0.18);
     border-color: rgba(196, 119, 80, 0.4);
   }
 
-  .cardWithNowLine { position: relative; }
+  .cardWithNowLine {
+    position: relative;
+  }
 
   .nowIndicatorLine {
     position: absolute;
@@ -2110,15 +2480,20 @@
     font-size: 12px;
     flex-shrink: 0;
   }
+
   .cardIconEmoji {
     filter: grayscale(1) opacity(0.75);
     transition: filter 0.2s ease;
   }
+
   .card:hover .cardIconEmoji,
   .cardActive .cardIconEmoji {
     filter: none;
   }
-  .cardPast .cardIconEmoji { filter: grayscale(1) opacity(0.5); }
+
+  .cardPast .cardIconEmoji {
+    filter: grayscale(1) opacity(0.5);
+  }
 
   .cardBody {
     flex: 1;
@@ -2128,7 +2503,12 @@
     gap: var(--home-space-xs);
   }
 
-  .cardMeta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .cardMeta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
 
   .cardTime {
     font-size: var(--home-text-caption);
@@ -2181,7 +2561,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   /* Empty slot */
   .emptySlotCard {
     margin: 0 8px 0 2px;
@@ -2219,10 +2599,12 @@
     opacity: 0;
     transition: opacity 0.15s, color 0.15s, border-color 0.15s, background 0.15s;
   }
+
   .emptySlotCard:hover .emptySlotPlus,
   .emptySlotPlus:focus {
     opacity: 1;
   }
+
   .emptySlotPlus:hover {
     color: var(--primary);
     border-color: var(--primary);
@@ -2258,16 +2640,22 @@
     border-radius: 0;
     transition: background 0.1s;
   }
+
   .quickAddItem:hover:not(:disabled) {
     background: var(--hover);
   }
-  .quickAddItem:disabled { opacity: 0.6; cursor: default; }
+
+  .quickAddItem:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 
   .quickAddEmpty {
     font-size: var(--home-text-body-sm);
     color: var(--muted);
     padding: var(--home-space-sm) var(--home-space-md);
   }
+
   .quickAddEmptyIcon {
     display: block;
     font-size: 1.5rem;
@@ -2285,21 +2673,29 @@
     color: var(--muted);
     padding: var(--home-space-xl) 0;
   }
-  .emptyIcon { font-size: 1.5rem; }
-  .empty p   { font-size: var(--home-text-body); margin: 0; }
+
+  .emptyIcon {
+    font-size: 1.5rem;
+  }
+
+  .empty p {
+    font-size: var(--home-text-body);
+    margin: 0;
+  }
+
   .emptySub {
     font-size: var(--home-text-meta);
     color: var(--muted);
     opacity: 0.9;
     margin: 0;
   }
-  
+
   /* Past events */
   .pastDetails {
     border-bottom: none;
-    background: #FFFFFF;
+    background: var(--color-card);
   }
-  
+
   .pastSummary {
     width: 100%;
     display: flex;
@@ -2317,19 +2713,27 @@
     border-radius: 0;
     transition: background 0.12s, color 0.12s;
   }
+
   .pastSummary:hover {
     background: var(--hover);
     color: var(--text);
   }
-  
-  .pastCount { opacity: 0.7; font-weight: 500; }
+
+  .pastCount {
+    opacity: 0.7;
+    font-weight: 500;
+  }
+
   .pastChevron {
     margin-left: auto;
     font-size: 0.6rem;
     opacity: 0.8;
     transition: transform 0.2s;
   }
-  .pastBody  { padding: var(--home-space-xs) 0 0.4rem; }
+
+  .pastBody {
+    padding: var(--home-space-xs) 0 0.4rem;
+  }
 
   /* Missed section: past items that weren't done — re-schedule for tomorrow */
   .missedSection {
@@ -2337,17 +2741,20 @@
     border-bottom: none;
     background: color-mix(in srgb, var(--danger) 6%, #FFFFFF);
   }
+
   .missedSectionHeader {
     font-size: var(--home-text-heading);
     font-weight: 700;
     color: var(--text);
     margin: 0 0 0.15rem;
   }
+
   .missedSectionSub {
     font-size: var(--home-text-meta);
     color: var(--muted);
     margin: 0 0 var(--home-space-md);
   }
+
   .missedList {
     list-style: none;
     margin: 0;
@@ -2356,6 +2763,7 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+
   .missedItem {
     display: flex;
     align-items: center;
@@ -2366,6 +2774,7 @@
     border: none;
     box-shadow: var(--home-card-shadow);
   }
+
   .missedItemIcon {
     width: 32px;
     height: 32px;
@@ -2375,6 +2784,7 @@
     font-size: 0.9rem;
     flex-shrink: 0;
   }
+
   .missedItemBody {
     flex: 1;
     min-width: 0;
@@ -2382,6 +2792,7 @@
     flex-direction: column;
     gap: 0.1rem;
   }
+
   .missedItemTitle {
     font-size: var(--home-text-body);
     font-weight: 600;
@@ -2390,11 +2801,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .missedItemTime {
     font-size: var(--home-text-caption);
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
+
   .missedRescheduleBtn {
     flex-shrink: 0;
     padding: 0.4rem 0.75rem;
@@ -2407,6 +2820,7 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .missedRescheduleBtn:hover {
     background: color-mix(in srgb, var(--primary) 20%, transparent);
     border-color: var(--primary);
@@ -2440,13 +2854,14 @@
     min-height: 52px;
     border-radius: 8px;
     border: 1px solid rgba(192, 113, 78, 0.2);
-    background: #FFFFFF;
+    background: var(--color-card);
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     overflow: hidden;
     min-width: 0;
     justify-content: flex-start;
   }
+
   .planTimelineConflictPairCard:hover {
     border-color: rgba(192, 113, 78, 0.4);
     box-shadow: 0 1px 4px rgba(192, 113, 78, 0.08);
@@ -2482,12 +2897,14 @@
     min-width: 0;
     max-width: 100%;
   }
+
   .planTimelineConflictPairCardTitleRow {
     display: flex;
     align-items: center;
     gap: 6px;
     min-width: 0;
   }
+
   .planTimelineConflictSleepBadge {
     display: inline-flex;
     align-items: center;
@@ -2515,6 +2932,7 @@
     line-height: 1.4;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .planTimelineConflictCardMoveBtn:hover {
     background: rgba(192, 113, 78, 0.16);
     border-color: rgba(192, 113, 78, 0.55);
@@ -2560,11 +2978,13 @@
     margin-left: 4px;
     flex-shrink: 0;
   }
+
   .planTimelineConflictAutoBtn:hover:not(:disabled) {
     background: rgba(192, 113, 78, 0.16);
     border-color: rgba(192, 113, 78, 0.58);
     color: #7a4d31;
   }
+
   .planTimelineConflictAutoBtn:disabled {
     opacity: 0.55;
     cursor: not-allowed;
@@ -2577,8 +2997,8 @@
     padding: 4px 10px;
     border-radius: 9999px;
     border: 1px solid rgba(107, 83, 68, 0.25);
-    background: #fff;
-    color: #5f4b39;
+    background: var(--color-card);
+    color: var(--text);
     font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
@@ -2588,6 +3008,7 @@
     text-overflow: ellipsis;
     transition: background 0.15s, border-color 0.15s;
   }
+
   .planTimelineConflictItemBtn:hover {
     background: #fbf8f4;
     border-color: rgba(107, 83, 68, 0.45);
@@ -2650,10 +3071,12 @@
     transition: background 0.15s, border-color 0.15s;
     white-space: nowrap;
   }
+
   .planTimelineConflictPairBtn:hover:not(:disabled) {
     background: rgba(107, 83, 68, 0.08);
     border-color: rgba(107, 83, 68, 0.5);
   }
+
   .planTimelineConflictPairBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -2663,6 +3086,7 @@
     border-color: rgba(192, 113, 78, 0.5);
     color: #8B4E35;
   }
+
   .planTimelineConflictPairBtnPrimary:hover:not(:disabled) {
     background: rgba(192, 113, 78, 0.08);
     border-color: rgba(192, 113, 78, 0.6);
@@ -2672,6 +3096,7 @@
     display: inline-flex;
     align-items: center;
   }
+
   .planTimelineConflictPairLabelBtn {
     display: inline-flex;
     align-items: center;
@@ -2691,6 +3116,7 @@
     text-overflow: ellipsis;
     max-width: 120px;
   }
+
   .planTimelineConflictPairLabelBtn:hover {
     color: #2d2d2d;
     text-decoration: underline;
@@ -3008,6 +3434,7 @@
     border: 1px solid rgba(192, 113, 78, 0.2);
     border-left: 3px solid #C0714E;
   }
+
   .planTimelineGapDeadlineInfo {
     display: flex;
     flex-direction: column;
@@ -3015,6 +3442,7 @@
     min-width: 0;
     flex: 1;
   }
+
   .planTimelineGapDeadlineChip {
     display: inline-block;
     font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
@@ -3028,6 +3456,7 @@
     border-radius: 99px;
     width: fit-content;
   }
+
   .planTimelineGapDeadlineTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.75rem;
@@ -3037,12 +3466,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .planTimelineGapDeadlineMeta {
     font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
     font-size: 0.57rem;
     color: rgba(192, 113, 78, 0.65);
     letter-spacing: 0.02em;
   }
+
   .planTimelineGapDeadlineBtn {
     display: inline-flex;
     align-items: center;
@@ -3061,6 +3492,7 @@
     white-space: nowrap;
     margin-top: 2px;
   }
+
   .planTimelineGapDeadlineBtn:hover {
     background: rgba(192, 113, 78, 0.15);
     border-color: rgba(192, 113, 78, 0.55);
@@ -3085,6 +3517,7 @@
     flex-shrink: 0;
     white-space: nowrap;
   }
+
   .planTimelineGapStartBtn:hover {
     background: rgba(132, 169, 140, 0.2);
     border-color: rgba(132, 169, 140, 0.7);
@@ -3107,6 +3540,7 @@
     white-space: nowrap;
     margin-left: auto;
   }
+
   .planTimelineGapStartBtnSm:hover {
     background: rgba(132, 169, 140, 0.18);
   }
@@ -3169,17 +3603,20 @@
     align-items: center;
     gap: 16px;
   }
+
   .headerRightStack {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 8px;
   }
+
   .timelineHeaderActionsGroup {
     display: flex;
     align-items: center;
     gap: 8px;
   }
+
   .planTimelineGapTransit {
     display: flex;
     align-items: center;
@@ -3308,86 +3745,118 @@
     opacity: 0.85;
   }
 
-/* ── Now / Timer Strip (MiniTimeline top bar) ─────────────────────────────── */
-.planTimelineNowStrip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  margin: 0 2px 10px;
-  border-radius: 8px;
-  background: #eef4ed;
-  border: 1px solid rgba(132, 169, 140, 0.3);
-  overflow: hidden;
-}
+  /* ── Now / Timer Strip (MiniTimeline top bar) ─────────────────────────────── */
+  .planTimelineNowStrip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin: 0 2px 10px;
+    border-radius: 8px;
+    background: var(--color-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
 
-.planTimelineNowStripDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #84A98C;
-  flex-shrink: 0;
-  animation: nowDotPulse 2s ease-in-out infinite;
-}
+  .planTimelineNowStripDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #84A98C;
+    flex-shrink: 0;
+    animation: nowDotPulse 2s ease-in-out infinite;
+  }
 
-.planTimelineNowStripLabel {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #5f7c67;
-  flex-shrink: 0;
-}
+  .planTimelineNowStripLabel {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--study);
+    flex-shrink: 0;
+  }
 
-.planTimelineNowStripTask {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #2d352d;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  .planTimelineNowStripTask {
+    font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2d352d;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-.planTimelineNowStripTimer {
-  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #6f6a61;
-  flex-shrink: 0;
-  opacity: 1;
-}
+  .planTimelineNowStripTimer {
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #6f6a61;
+    flex-shrink: 0;
+    opacity: 1;
+  }
 
-/* Dark Mode Overrides for MiniTimeline */
-[data-mode="dark"] .timelineBox {
+  /* Dark Mode Overrides for MiniTimeline */
+  [data-mode="dark"] .timelineBox {
     background: linear-gradient(180deg, var(--color-card) 0%, var(--color-bg) 100%);
     border-color: rgba(255, 255, 255, 0.05);
-}
+  }
 
-[data-mode="dark"] .planTimelineStatusBar {
+  [data-mode="dark"] .planTimelineStatusBar {
     background: color-mix(in srgb, var(--color-highlight) 12%, transparent);
     color: var(--text);
-}
+  }
 
-[data-mode="dark"] .planTimelineCard {
+  [data-mode="dark"] .planTimelineCard {
     background: color-mix(in srgb, var(--color-card) 60%, transparent);
     border-color: rgba(255, 255, 255, 0.08);
-}
+  }
 
-[data-mode="dark"] .planTimelineCard:hover {
+  [data-mode="dark"] .planTimelineCard:hover {
     background: color-mix(in srgb, var(--color-card) 80%, transparent);
     border-color: var(--color-primary);
-}
+  }
 
-[data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {
-    background: repeating-linear-gradient(
-      to right,
-      color-mix(in srgb, var(--color-highlight) 25%, transparent) 0,
-      color-mix(in srgb, var(--color-highlight) 25%, transparent) 6px,
-      transparent 6px,
-      transparent 12px
-    );
-}
+  [data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {
+    background: repeating-linear-gradient(to right,
+        color-mix(in srgb, var(--color-highlight) 25%, transparent) 0,
+        color-mix(in srgb, var(--color-highlight) 25%, transparent) 6px,
+        transparent 6px,
+        transparent 12px);
+  }
+
+  [data-mode="dark"] .planTimelineNowStrip {
+    background: color-mix(in srgb, var(--study) 12%, var(--color-bg));
+    border-color: color-mix(in srgb, var(--study) 25%, transparent);
+  }
+
+  [data-mode="dark"] .planTimelineNowStripLabel {
+    color: var(--study);
+  }
+
+  [data-mode="dark"] .planTimelineNowStripTask {
+    color: var(--text);
+  }
+
+  [data-mode="dark"] .planTimelineNowStripTimer {
+    color: var(--text-secondary);
+  }
+
+  [data-mode="dark"] .planTimelineConflictPairCard {
+    background: color-mix(in srgb, var(--color-card) 60%, transparent);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  [data-mode="dark"] .planTimelineConflictItemBtn {
+    background: var(--color-card);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  [data-mode="dark"] .planTimelineConflictAutoBtn {
+    background: rgba(45, 30, 24, 0.4);
+    color: #f1f5f9;
+    border-color: rgba(192, 113, 78, 0.6);
+  }
