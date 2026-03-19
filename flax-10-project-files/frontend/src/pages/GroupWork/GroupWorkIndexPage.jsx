@@ -1,72 +1,72 @@
-```javascript
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import styles from "./GroupWorkIndexPage.module.css";
+import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
-import { getAuthHeaders, useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
-import { getDeadlineLabel } from "./utils/taskUtils";
 import AppPage from "../../components/Layout/AppPage/AppPage";
 import Card from "../../components/common/Card/Card";
 import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
-import TextInput from "../../components/common/TextInput/TextInput";
-import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
-import GroupWorkStats from "./components/GroupWorkStats";
-import styles from "./GroupWorkIndexPage.module.css";
+import PrimaryButton from "../../components/common/Button/PrimaryButton";
 
 function GroupWorkIndexSkeleton() {
   return (
-    <AppPage className={styles.container} data-testid="groupwork-skeleton" aria-busy="true" title="Group work" subtitle="Create shared projects and link them to your modules.">
-      <div className={styles.skeletonHeader}>
-        <SkeletonBlock className={styles.skeletonTitle} />
-        <SkeletonBlock className={styles.skeletonSubtitle} />
-      </div>
-      <div className={styles.skeletonForm}>
-        <SkeletonBlock className={`${styles.skeletonInput} ${styles.skeletonInputName}`} />
-        <SkeletonBlock className={styles.skeletonInput} />
-        <SkeletonBlock className={styles.skeletonInput} />
-        <SkeletonBlock className={styles.skeletonButton} />
-      </div>
-      <div className={styles.skeletonList}>
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className={styles.skeletonRow}>
-            <SkeletonBlock className={styles.skeletonRowName} />
-            <SkeletonBlock className={styles.skeletonRowMeta} />
-          </div>
+    <div className={styles.skeletonContainer}>
+      <div className={styles.skeletonStats}>
+        {[1, 2, 3].map((i) => (
+          <SkeletonBlock key={i} className={styles.skeletonStatCard} height="100px" />
         ))}
       </div>
-    </AppPage>
+      <SkeletonBlock className={styles.skeletonForm} height="200px" />
+      <div className={styles.skeletonList}>
+        {[1, 2, 3, 4].map((i) => (
+          <SkeletonBlock key={i} className={styles.skeletonRow} height="80px" />
+        ))}
+      </div>
+    </div>
   );
 }
 
 function CreateProjectInputs({ data, onChange }) {
   return (
-    <>
-      <FormField label="Project name" className={styles.inputName}>
-        <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="e.g. Machine Learning Research..." required />
-      </FormField>
-      <FormField label={<>Module <span className={styles.optionalText}>optional</span></>} className={styles.inputField}>
-        <UserModuleDropdown
-          value={data.courseCode}
-          onChange={(val) => onChange('courseCode', val)}
-          placeholder="Select..."
+    <div className={styles.formGrid}>
+      <FormField label="Project Name">
+        <input 
+          type="text" 
+          placeholder="e.g. Dissertation Research" 
+          value={data.name} 
+          onChange={(e) => onChange("name", e.target.value)} 
+          className={styles.input}
+          required
         />
       </FormField>
-      <FormField label="Deadline" className={styles.inputField}>
-        <TextInput type="date" value={data.deadline} onChange={(e) => onChange('deadline', e.target.value)} />
+      <FormField label={<span>Module <span className={styles.optionalLabel}>(Optional)</span></span>}>
+        <input 
+          type="text" 
+          placeholder="e.g. CS101" 
+          value={data.course_code} 
+          onChange={(e) => onChange("course_code", e.target.value)} 
+          className={styles.input}
+        />
       </FormField>
-    </>
+      <FormField label="Deadline">
+        <input 
+          type="date" 
+          value={data.deadline} 
+          onChange={(e) => onChange("deadline", e.target.value)} 
+          className={styles.input}
+        />
+      </FormField>
+    </div>
   );
 }
 
-function useCreateProject(onCreated) {
-  const [form, setForm] = useState({ name: "", courseCode: "", deadline: "" });
-  const change = (f, v) => setForm(p => ({ ...p, [f]: v }));
+function CreateProjectForm({ onCreated }) {
+  const [form, setForm] = useState({ name: "", course_code: "", deadline: "" });
+  const change = (k, v) => setForm((p) => ({ ...p, [k]: v }));
+  
   const submit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) return;
-    const body = JSON.stringify({ name: form.name.trim(), course_code: form.courseCode.trim() || "", deadline: form.deadline ? new Date(form.deadline).toISOString() : null });
-    const res = await fetch("/api/group-work/projects/", { method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body });
     const token = localStorage.getItem("token");
     const res = await fetch("/api/group-work/projects/", {
       method: "POST",
@@ -248,7 +248,6 @@ export default function GroupWorkIndexPage() {
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
     <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
-      {/* <GroupWorkStats projects={projects} /> */}
       <CreateProjectForm onCreated={onCreated} />
       <GroupWorkContent 
         projects={projects} 
@@ -259,4 +258,3 @@ export default function GroupWorkIndexPage() {
     </AppPage>
   );
 }
-```
