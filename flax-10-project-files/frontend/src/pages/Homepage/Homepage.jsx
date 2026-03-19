@@ -753,7 +753,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect, false, 'day');
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {

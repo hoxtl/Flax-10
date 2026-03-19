@@ -38,8 +38,8 @@ const handlers = {
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false }),
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
     SET_SEARCH_QUERY: (state, payload) => ({ ...state, searchQuery: payload }),
-    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, readOnly: payload.readOnly ?? false }),
-    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null }),
+    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, readOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
+    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null }),
     SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
     TRIGGER_RELOAD: (state) => ({ ...state, reloadKey: (state.reloadKey || 0) + 1 }),
 };

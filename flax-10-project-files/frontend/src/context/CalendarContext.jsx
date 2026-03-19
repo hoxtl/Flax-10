@@ -102,8 +102,8 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
-    const openPopup = (event, anchorRect, readOnly = false) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly } });
+    const { popupEvent, popupAnchorRect, readOnly, viewMode, popupViewMode } = context;
+    const openPopup = (event, anchorRect, readOnly = false, viewModeOverride = null) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
 }
