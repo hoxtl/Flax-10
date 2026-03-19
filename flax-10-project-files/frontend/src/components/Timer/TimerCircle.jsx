@@ -66,24 +66,30 @@ export default function TimerCircle({ t, onPrimaryStart }) {
 }
 
 export function TimerRing({ t }) {
-    const radius = 90;
+    const minutes = Math.floor(Math.abs(t.timeLeft) / 60);
+    const isOvertime = t.timeLeft < 0;
+    
+    // Dynamic sizing to prevent text overlap: 100+ min needs more room
+    const size = minutes >= 100 ? 260 : 220;
+    const radius = minutes >= 100 ? 115 : 95;
+    const center = size / 2;
+    
     const circ = 2 * Math.PI * radius;
     const total = (t.mode === 'work' ? t.workTime : t.breakTime) * 60;
     const ratio = total > 0 ? Math.max(0, t.timeLeft / total) : 1;
     const dash = ratio * circ;
-    const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const color = isOvertime ? 'var(--warning)' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
+    const color = (t.isOvertime || t.isBreakOvertime) ? 'var(--warning)' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
     const activeClass = t.isActive && !t.isPaused ? styles.timerProgressActive : '';
 
     return (
-        <div className={styles.timerRingWrap}>
-            <svg className={styles.timerRingSvg} viewBox="0 0 220 220" aria-hidden="true">
-                <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--border)" strokeWidth="3" />
+        <div className={styles.timerRingWrap} style={{ width: size, height: size }}>
+            <svg className={styles.timerRingSvg} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+                <circle cx={center} cy={center} r={radius} fill="none" stroke="var(--border)" strokeWidth="5" />
                 <circle
-                    cx="110" cy="110" r={radius}
+                    cx={center} cy={center} r={radius}
                     fill="none"
                     stroke={color}
-                    strokeWidth="3"
+                    strokeWidth="5"
                     strokeLinecap="round"
                     strokeDasharray={`${dash} ${circ - dash}`}
                     strokeDashoffset={circ * 0.25}
@@ -96,3 +102,4 @@ export function TimerRing({ t }) {
         </div>
     );
 }
+
