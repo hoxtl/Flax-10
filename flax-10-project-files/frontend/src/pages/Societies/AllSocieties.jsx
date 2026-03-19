@@ -1,61 +1,37 @@
-/**
- * AllSocieties provides an exploration view for all available societies.
- * Features comprehensive filtering by category, ratification status, and search.
+/*
+ * AllSocieties renders the browse view for exploring the full societies directory.
  */
-import { useState, useMemo } from "react";
-import SocietyCard from "../../components/Society/SocietyCard";
+import { useMemo } from "react";
 import styles from "./SocietiesPage.module.css";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import BasePill from "../../components/Tags/BasePill";
 import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/common/AnimatedDropdown";
-import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
-import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
-import { usePagination } from "../../hooks/usePagination";
+import { BackToTop } from "../../components/Pagination/Pagination";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
-
-const PAGE_SIZE = 15;
+import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, countByCategory } from "./societyFilters";
+import { SocietyBrowseResults } from "./SocietyBrowseResults";
+import { useSocietyBrowseFilters } from "./useSocietyBrowseFilters";
+import { countForFilter, filterAndSort } from "./societyBrowseUtils";
 
 /** Exploratory view for the full directory of societies. */
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
-    const filterState = useFilters();
-    const { search, filters, sortBy, setSearch, setSortBy } = filterState;
+    const filterState = useSocietyBrowseFilters();
+    const { search, filters, sortBy } = filterState;
+    const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
+    return <BrowseLayout filterState={filterState} filtered={filtered} societies={societies} onBack={onBack} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />;
+}
 
-    const filtered = useMemo(() =>
-        filterAndSort(societies, search, filters, sortBy),
-        [societies, search, filters, sortBy]
-    );
-
+function BrowseLayout({ filterState, filtered, societies, onBack, onSelect, onReport, onUnreport }) {
+    const { search, sortBy, setSearch, setSortBy } = filterState;
     return (
         <div className={styles.container}>
-            <Header onBack={onBack} search={search} setSearch={setSearch}
-                sortBy={sortBy} setSortBy={setSortBy} />
+            <Header onBack={onBack} search={search} setSearch={setSearch} sortBy={sortBy} setSortBy={setSortBy} />
             <FilterPills {...filterState} societies={societies} />
-            <PaginatedGrid items={filtered} search={search} setSearch={setSearch} onSelect={onSelect}
-                onReport={onReport} onUnreport={onUnreport} />
+            <SocietyBrowseResults items={filtered} search={search} setSearch={setSearch} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <BackToTop />
         </div>
     );
-}
-
-/** State manager for all-societies filtering and sorting. */
-function useFilters() {
-    const [search, setSearch] = useState("");
-    const [filters, setFilters] = useState({ ratified: "all", category: "all" });
-    const [sortBy, setSortBy] = useState("name");
-
-    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
-    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
-
-    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
-}
-
-function toggleFilterValue(prev, type, value) {
-    const newValue = prev[type] === value ? "all" : value;
-    return { ...prev, [type]: newValue };
 }
 
 /** Header section for the all-societies view. */
@@ -115,68 +91,4 @@ function CategoryPills({ current, onChange, societies }) {
         <BasePill key={cat.id} label={cat.label} count={countByCategory(societies, cat.id)}
             isActive={current === cat.id} onClick={() => onChange(cat.id)} />
     ));
-}
-
-/** Renders the results grid with integrated pagination. */
-function PaginatedGrid({ items, search, setSearch, onSelect, onReport, onUnreport }) {
-    const { currentItems, totalPages, currentPage, setPage } = usePagination(items, PAGE_SIZE);
-    if (items.length === 0) {
-        if (String(search || "").trim()) {
-            return (
-                <SearchEmptyState
-                    query={search}
-                    itemLabel="societies"
-                    emoji="🔎"
-                    hint="Try a different keyword or check your spelling"
-                    onClear={() => setSearch("")}
-                />
-            );
-        }
-        return <EmptyState icon="🎭" title="No societies found"
-            description="Try adjusting your search or filters." />;
-    }
-    return (
-        <>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-            <div className={gridStyles.grid}>
-                {currentItems.map(s => (
-                    <SocietyCard key={s.id} society={s} onClick={onSelect}
-                        onReport={onReport} onUnreport={onUnreport} />
-                ))}
-            </div>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-        </>
-    );
-}
-
-function countForFilter(societies, filterId) {
-    if (filterId === "all") return societies.length;
-    if (filterId === "ratified") return societies.filter(s => s.is_ratified).length;
-    return societies.filter(s => !s.is_ratified).length;
-}
-
-function filterAndSort(list, search, filters, sortBy) {
-    const filtered = list.filter(s => matchesAllFilters(s, search, filters));
-    return sortSocieties(filtered, sortBy);
-}
-
-function matchesAllFilters(society, search, filters) {
-    const matchesSearch = society.name.toLowerCase().includes(search.toLowerCase());
-    const matchesRatified = matchesRatification(society, filters.ratified);
-    const categoryMatch = matchesCategory(society, filters.category);
-    return matchesSearch && matchesRatified && categoryMatch;
-}
-
-function matchesRatification(society, filter) {
-    if (filter === "all") return true;
-    return filter === "ratified" ? society.is_ratified : !society.is_ratified;
-}
-
-function sortSocieties(list, sortBy) {
-    const sorted = [...list];
-    if (sortBy === "name") return sorted.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortBy === "name-desc") return sorted.sort((a, b) => b.name.localeCompare(a.name));
-    if (sortBy === "newest") return sorted.sort((a, b) => b.id - a.id);
-    if (sortBy === "members") return sorted.sort((a, b) => (b.member_count || 0) - (a.member_count || 0));
-    return sorted;
 }
