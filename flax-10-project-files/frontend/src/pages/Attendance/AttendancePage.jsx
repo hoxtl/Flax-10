@@ -1,6 +1,9 @@
+/*
+ * Attendance page.
+ */
+
 import { useState } from "react";
 import AppPage from "../../components/common/AppPage/AppPage";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
 import { useAttendanceStats } from "./hooks/useAttendanceStats";
 import { useTimetableEvents } from "./hooks/useTimetableEvents";
 import { useAttendanceRecords } from "./hooks/useAttendanceRecords";
@@ -83,10 +86,12 @@ export default function AttendancePage() {
   const pct = totalMarked > 0 ? Math.round((overall.attended / totalMarked) * 100) : null;
 
   return (
-    <div className={styles.page}>
-      <h1 className={styles.title}>Attendance</h1>
-      <p className={styles.subtitle}>Track your attendance for lectures, small groups, and labs.</p>
-
+    <AppPage
+      title="Attendance"
+      subtitle="Track your attendance for lectures, small groups, and labs."
+      width="full"
+      contentClassName={styles.page}
+    >
       {pct !== null && (
         <div className={styles.summaryBar}>
           <div className={styles.summaryItem}>
@@ -195,6 +200,6 @@ export default function AttendancePage() {
           </div>
         )}
       </div>
-    </div>
+    </AppPage>
   );
 }

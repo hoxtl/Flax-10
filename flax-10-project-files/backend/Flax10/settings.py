@@ -1,6 +1,10 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*_args, **_kwargs):
+        return False
 
 load_dotenv()
 
