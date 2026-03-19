@@ -204,7 +204,10 @@ urlpatterns = [
 =======
     path("settings/", user_settings_view, name='user-settings'),
     path("schedules/", schedule_list, name='schedules'),
+<<<<<<< HEAD
 >>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
+=======
+>>>>>>> 04331906 (Add Schedule model fields, serializer, views, urls)
     path("societies/", society_list, name="society-list"),
     path("societies/<int:society_id>/", society_detail, name="society-detail"),
     path("societies/<int:society_id>/members/", membership_list, name="society-members"),
