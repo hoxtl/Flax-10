@@ -6,8 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('studyFlax', '0012_schedule_scheduleeventallocation_schedule_event'),
-        ('studyFlax', '0015_merge_20260303_2327'),
+        ('studyFlax', '0011_merge_20260301_1753'),
     ]
 
     operations = [
