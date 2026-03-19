@@ -16,6 +16,7 @@
   box-shadow: var(--modal-shadow) !important;
   animation: slideUp 0.22s cubic-bezier(.4,0,.2,1);
   overflow: hidden;
+  padding: 0 !important;
 }
 
 .modalContent {
