@@ -10,6 +10,7 @@ import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { getEventTheme } from './utils/eventStyleUtils';
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 import './DraggableEvent.css';
 
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
@@ -29,7 +30,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        openPopup(event, rect);
+        openPopup(event, rect, true);
     };
 
     return (
@@ -56,6 +57,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
     const [ctxMenu, setCtxMenu] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
     const ctxRef = useRef(null);
 
     useEffect(() => {
@@ -69,7 +71,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         if (refs.resizeEnded.current) { refs.resizeEnded.current = false; return; }
         if (isDragging || resize.isResizing) return;
         const rect = refs.event.current?.getBoundingClientRect();
-        openPopup(event, rect, true);
+        openPopup(event, rect, false);
     };
 
     const handleContextMenu = (e) => {
@@ -98,14 +100,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
             if (choice === true) await executeDelete(event, { removeEvent });
             else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
         } else {
-            const choice = await confirmFn({
-                title: "Delete Event",
-                message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
-                confirmText: "Delete",
-                cancelText: "Cancel",
-                isDanger: true
-            });
-            if (choice) await executeDelete(event, { removeEvent });
+            setDeleteTarget(event);
         }
     };
 
@@ -121,6 +116,19 @@ function EditableEvent({ event, style, minWidthForDetails }) {
                     <div className="event-ctx-divider" />
                     <button className="event-ctx-item event-ctx-delete" onClick={handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
                 </div>
+            )}
+            {deleteTarget && (
+                <HoldConfirmModal
+                    title="Delete Event"
+                    warningText={`"${deleteTarget.title}" will be permanently deleted. This action cannot be undone.`}
+                    cancelLabel="Keep Event"
+                    holdLabel="Hold to Delete"
+                    onConfirm={async () => {
+                        await executeDelete(deleteTarget, { removeEvent });
+                        setDeleteTarget(null);
+                    }}
+                    onCancel={() => setDeleteTarget(null)}
+                />
             )}
         </>
     );
