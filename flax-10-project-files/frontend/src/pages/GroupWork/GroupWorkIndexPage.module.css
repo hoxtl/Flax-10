@@ -229,14 +229,119 @@
     border-color: color-mix(in srgb, var(--primary) 40%, transparent);
 }
 
+.projectInfoArea {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.projectIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--surface-raised);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 16px;
+    border: 1px solid var(--border);
+}
+
+.projectText {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .projectName {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
     color: var(--text);
 }
 
-.projectDeadline {
+.projectSub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.moduleName {
     font-size: 12px;
     color: var(--text-secondary);
+}
+
+.memberPill {
+    background: var(--surface-raised);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 12px;
+    letter-spacing: 0.02em;
+}
+
+.projectMetaArea {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.deadlineInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.deadlineDate {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.daysPill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.daysGreen {
+    background: rgba(34, 197, 94, 0.1);
+    color: rgb(34, 197, 94);
+}
+
+.daysYellow {
+    background: rgba(234, 179, 8, 0.1);
+    color: rgb(234, 179, 8);
+}
+
+.daysRed {
+    background: rgba(239, 68, 68, 0.1);
+    color: rgb(239, 68, 68);
+}
+
+.progressCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    opacity: 0.8;
+}
+
+.arrowIcon {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-left: -8px; 
+    transition: transform 0.2s ease;
+}
+
+.projectRow:hover .arrowIcon {
+    transform: translateY(2px);
+    color: var(--text);
 }
 
 @media (max-width: 760px) {
