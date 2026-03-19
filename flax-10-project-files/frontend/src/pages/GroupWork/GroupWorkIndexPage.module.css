@@ -127,7 +127,12 @@
 
 .projectList {
     margin-top: 16px;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 
 .projectRow {
