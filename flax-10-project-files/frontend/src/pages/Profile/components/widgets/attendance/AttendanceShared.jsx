@@ -96,12 +96,25 @@ export function CompactAttHeader({ onNavigate }) {
       <button
         type="button"
         className={`${styles.heatmapLinkBtn} ${styles.compactAttAnalysisBtn}`}
-        onClick={onNavigate}
+        onClick={(event) => {
+          event.stopPropagation();
+          triggerAnalyticsNavigation(onNavigate);
+        }}
+        style={{ pointerEvents: "auto", position: "relative", zIndex: 1 }}
       >
         View full analytics
       </button>
     </div>
   );
+}
+
+function triggerAnalyticsNavigation(onNavigate) {
+  if (typeof onNavigate === "function") {
+    onNavigate();
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent("navigate", { detail: "analytics" }));
 }
 
 export function SegmentDetailPanelWrapper({ selectedSegment, events, onToggleStatus, onClose }) {

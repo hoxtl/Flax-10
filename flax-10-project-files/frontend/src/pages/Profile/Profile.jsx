@@ -154,7 +154,7 @@ function SelfView({ summary, analyticsData, onNavigate, refetch }) {
   return (
     <div className={styles.leftCol}>
       <div className={styles.leftTopMetricsRow}>
-        <CompactAttendanceTile />
+        <CompactAttendanceTile onNavigate={onNavigate} />
         <div className={styles.leftTopSideCol}>
           <CompactStreakTile streaks={summary?.streaks} />
           <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} showStreak={false} onGoalSave={n => fetchApi("/profile/", { method: "PATCH", body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
