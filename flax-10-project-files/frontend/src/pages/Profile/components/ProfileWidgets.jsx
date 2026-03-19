@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "../Profile.module.css";
 import { getModules } from "../../../api/moduleApi";
 import Badge from "../../../components/common/Badge/Badge";
@@ -184,7 +185,19 @@ function WeekContent({ weekly, streaks, showStreak, editing, setEditing, tempGoa
                 </div>
                 {showStreak && <StreakDisplay streaks={streaks} />}
             </div>
-            {editing && <div className={styles.goalEditorOpen}><GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} /></div>}
+            <AnimatePresence>
+                {editing && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        style={{ overflow: 'hidden' }}
+                    >
+                        <GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 }
@@ -603,26 +616,37 @@ export function CompactAttendanceTile() {
         </button>
       </div>
       {overallData.length > 0 ? (
-        <div className={styles.compactAttendanceDonut} onClick={e => e.stopPropagation()}>
-          <PieChart
-            series={[
-              {
-                data: overallData,
-                innerRadius: 38,
-                outerRadius: 84,
-                paddingAngle: 2,
-                cornerRadius: 4,
-              },
-            ]}
-            height={210}
-            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            slotProps={{ legend: { hidden: true } }}
-            sx={{ "& .MuiChartsLegend-label": { fill: "var(--text) !important" } }}
-            onItemClick={(ev, identifier, item) => {
-              const label = item?.label ?? overallData[identifier?.dataIndex]?.label;
-              if (label) setSelectedSegment({ chart: "overall", label });
-            }}
-          />
+        <div className={styles.compactAttChartRow} onClick={e => e.stopPropagation()}>
+          <div className={styles.compactAttendanceDonut}>
+            <PieChart
+              series={[
+                {
+                  data: overallData,
+                  innerRadius: 38,
+                  outerRadius: 84,
+                  paddingAngle: 2,
+                  cornerRadius: 4,
+                },
+              ]}
+              height={210}
+              width={210}
+              margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              slotProps={{ legend: { hidden: true } }}
+              sx={{ "& .MuiChartsLegend-root": { display: "none !important" } }}
+              onItemClick={(ev, identifier, item) => {
+                const label = item?.label ?? overallData[identifier?.dataIndex]?.label;
+                if (label) setSelectedSegment({ chart: "overall", label });
+              }}
+            />
+          </div>
+          <div className={styles.compactAttLegendCol}>
+            {overallData.map((entry) => (
+              <div key={entry.label} className={styles.compactByTypeRow}>
+                <span className={styles.compactByTypeDot} style={{ background: entry.color }} />
+                <span>{entry.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>
@@ -630,37 +654,37 @@ export function CompactAttendanceTile() {
       {byTypeData.length > 0 && (
         <div className={styles.compactByTypeSection} onClick={(e) => e.stopPropagation()}>
           <div className={styles.compactByTypeTitle}>By Type</div>
-          <div className={styles.compactByTypeDonut}>
-            <PieChart
-              series={[
-                {
-                  data: byTypeData,
-                  innerRadius: 24,
-                  outerRadius: 54,
-                  paddingAngle: 2,
-                  cornerRadius: 3,
-                },
-              ]}
-              height={132}
-              margin={{ top: 8, bottom: 4, left: 8, right: 8 }}
-              slotProps={{ legend: { hidden: true } }}
-              sx={{ "& .MuiChartsLegend-label": { fill: "var(--text) !important" } }}
-              onItemClick={(ev, identifier, item) => {
-                const label = item?.label ?? byTypeData[identifier?.dataIndex]?.label;
-                if (label) setSelectedSegment({ chart: "byType", label });
-              }}
-            />
-          </div>
-          <div className={styles.compactByTypeLegend}>
-            {byTypeData.map((entry) => (
-              <div key={entry.label} className={styles.compactByTypeRow}>
-                <span className={styles.compactByTypeLabel}>
+          <div className={styles.compactAttChartRow}>
+            <div className={styles.compactByTypeDonut}>
+              <PieChart
+                series={[
+                  {
+                    data: byTypeData,
+                    innerRadius: 24,
+                    outerRadius: 54,
+                    paddingAngle: 2,
+                    cornerRadius: 3,
+                  },
+                ]}
+                height={132}
+                width={132}
+                margin={{ top: 8, bottom: 4, left: 8, right: 8 }}
+                slotProps={{ legend: { hidden: true } }}
+                sx={{ "& .MuiChartsLegend-root": { display: "none !important" } }}
+                onItemClick={(ev, identifier, item) => {
+                  const label = item?.label ?? byTypeData[identifier?.dataIndex]?.label;
+                  if (label) setSelectedSegment({ chart: "byType", label });
+                }}
+              />
+            </div>
+            <div className={styles.compactAttLegendCol}>
+              {byTypeData.map((entry) => (
+                <div key={entry.label} className={styles.compactByTypeRow}>
                   <span className={styles.compactByTypeDot} style={{ background: entry.color }} />
-                  <span>{entry.label}</span>
-                </span>
-                <span className={styles.compactByTypeCount}>{entry.value}</span>
-              </div>
-            ))}
+                  <span>{entry.label} <span className={styles.compactByTypeCount}>({entry.value})</span></span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
