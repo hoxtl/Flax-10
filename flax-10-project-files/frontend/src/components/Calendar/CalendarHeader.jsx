@@ -8,7 +8,7 @@ import { formatDate, getWeekDays, formatMonthYear, isSameDay, getStartOfWeek, ad
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton } from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton, ScheduleManagerButton} from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import "./CalendarHeader.css";
@@ -67,6 +67,7 @@ function HeaderActions({ isMobile, searchQuery, setSearchQuery, modes, viewMode,
       <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
       {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
       <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
+      <ScheduleManagerButton />
       <ActionMenu onAddEvent={() => openForView(openModal, viewMode, selectedDate)} onImport={() => setShowImportModal(true)} />
     </div>
   );

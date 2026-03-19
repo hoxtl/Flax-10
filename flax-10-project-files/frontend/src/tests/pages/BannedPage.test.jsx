@@ -37,7 +37,9 @@ beforeEach(() => {
 describe("BannedPage", () => {
   it("renders the suspended heading", () => {
     render(<BannedPage />);
-    expect(screen.getByText(/your account has been suspended/i)).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: /your account has been suspended/i }),
+    ).toBeTruthy();
   });
 
   it("renders the 🚫 icon", () => {

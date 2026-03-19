@@ -19,5 +19,5 @@ export function useAttendanceRecords() {
   }, [refetch]);
 
   const recordsByEventId = new Map(records.map((r) => [r.event_id, r.attended]));
-  return { recordsByEventId, refetch };
+  return { records, recordsByEventId, refetch };
 }

@@ -1,3 +1,6 @@
+"""
+Django admin registrations for society and user models.
+"""
 from django.contrib import admin
 from studyFlax.models.society import (
     Society, SocietyMembership, SocietyTag, SocietyImage,
@@ -5,7 +8,6 @@ from studyFlax.models.society import (
 )
 from django.contrib.auth import get_user_model
 
-# Register your models here.
 User = get_user_model()
 admin.site.register(User)
 admin.site.register(Society)
@@ -31,11 +33,11 @@ class ReportedSociety(Society):
 class ReportedSocietyAdmin(admin.ModelAdmin):
     inlines = [SocietyReportInline]
     list_display = ('name', 'is_ratified', 'report_count')
-    
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.filter(reports__isnull=False).distinct()
-        
+
     def report_count(self, obj):
         return obj.reports.count()
     report_count.short_description = 'Total Reports'

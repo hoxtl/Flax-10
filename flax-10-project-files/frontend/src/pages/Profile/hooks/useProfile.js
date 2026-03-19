@@ -3,6 +3,7 @@ import { fetchTasks } from "../../../api/taskService";
 import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
+import { useAuth } from "../../../context/AuthContext";
 
 async function tryLoadProfile(setProfileData, setLoading, userId, isPolling = false) {
   try {
@@ -26,19 +27,38 @@ async function tryLoadEvents(setAllEvents, userId) {
 }
 
 function useProfileData(userId) {
+  const { profile: authProfile, loading: authLoading, refreshProfile } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const isSelf = !userId || (authProfile && String(authProfile.id) === String(userId));
+
   useEffect(() => {
+    if (isSelf) {
+      if (!authLoading) {
+        // Pull a fresh server profile so share counters stay up-to-date
+        // even when sharing is toggled from other pages.
+        tryLoadProfile(setProfileData, setLoading, null, true);
+      }
+      return;
+    }
+
     tryLoadProfile(setProfileData, setLoading, userId);
     const intervalId = setInterval(() => {
       tryLoadProfile(setProfileData, setLoading, userId, true);
-    }, 5000); // Poll every 5 seconds for real-time cross-device sync
+    }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [userId]);
+  }, [userId, authProfile, authLoading, isSelf]);
 
-  const reload = () => tryLoadProfile(setProfileData, setLoading, userId);
+  const reload = () => {
+    if (isSelf) {
+      refreshProfile();
+      tryLoadProfile(setProfileData, setLoading, null, true);
+    } else {
+      tryLoadProfile(setProfileData, setLoading, userId);
+    }
+  };
 
   const setOptimisticShare = (isSharing) => {
     setProfileData(prev => {
@@ -46,12 +66,14 @@ function useProfileData(userId) {
       return {
         ...prev,
         is_sharing: isSharing,
-        shared_by_count: Math.max(0, (prev.shared_by_count || 0) + (isSharing ? 1 : -1))
       };
     });
   };
 
-  return { profileData, loading, reload, setOptimisticShare };
+  const isRemoteStale = !isSelf && userId && (!profileData || String(profileData.id) !== String(userId));
+  const resolvedProfileData = isSelf ? (profileData || authProfile) : profileData;
+  const resolvedLoading = isSelf ? authLoading : (loading || isRemoteStale);
+  return { profileData: resolvedProfileData, loading: resolvedLoading, reload, setOptimisticShare };
 }
 
 function useEventsData(userId) {
@@ -82,10 +104,7 @@ function useTaskCountData(userId) {
   const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
-    if (userId) {
-      setTaskCount(0);
-      return;
-    }
+    if (userId) return;
 
     fetchTasks()
       .then((data) => {
@@ -98,7 +117,7 @@ function useTaskCountData(userId) {
       });
   }, [userId]);
 
-  return { taskCount };
+  return { taskCount: userId ? 0 : taskCount };
 }
 
 export function useProfileState(userId) {

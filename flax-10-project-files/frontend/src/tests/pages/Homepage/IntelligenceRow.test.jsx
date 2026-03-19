@@ -16,6 +16,23 @@ vi.mock('../../../api/tflService', () => ({
     tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
 }));
 
+vi.mock('../../../context/AuthContext', () => ({
+    useAuth: () => ({
+        profile: {
+            role: 'student',
+            summary: {
+                weekly: { percentage: 72 },
+                streaks: { current: 3 },
+            },
+        },
+        loading: false,
+        // Provide the shape other code might read
+        authenticated: true,
+        user: { role: 'student' },
+        refreshProfile: vi.fn(),
+    }),
+}));
+
 vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
     useProfileSummary: vi.fn(() => ({
         summary: {
@@ -24,10 +41,6 @@ vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
         },
         loading: false,
     })),
-}));
-
-vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
-    SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
 }));
 
 vi.mock('../../../components/ui/bento-grid', () => ({
@@ -107,25 +120,11 @@ describe('IntelligenceRow', () => {
         tflService.getTfLDelays.mockResolvedValueOnce([
             { lineName: 'Northern', severityDescription: 'Minor delays' },
         ]);
-
         const start = new Date(Date.now() + 60 * 60 * 1000);
         const end = new Date(Date.now() + 2 * 60 * 60 * 1000);
-
-        renderRow({
-            slot5Data: {
-                now: new Date(),
-                sortedEvents: [
-                    {
-                        id: 1,
-                        title: 'Algorithms Lecture',
-                        location: 'Strand Campus',
-                        start_time: start.toISOString(),
-                        end_time: end.toISOString(),
-                    },
-                ],
-            },
-        });
-
+        const kclEvent = { id: 1, title: 'Algorithms Lecture', location: 'Strand Campus',
+            start_time: start.toISOString(), end_time: end.toISOString() };
+        renderRow({ slot5Data: { now: new Date(), sortedEvents: [kclEvent] } });
         await waitFor(() => {
             expect(screen.getByText(/you may be late for your/i)).toBeTruthy();
             expect(screen.getByText(/Algorithms Lecture/)).toBeTruthy();

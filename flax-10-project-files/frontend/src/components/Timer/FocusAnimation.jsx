@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import styles from '../../pages/Timer/TimerPage.module.css';
 import treeStyles from './TreeAnimation.module.css';
 
@@ -68,6 +68,30 @@ export default function FocusAnimation({ progress, mode, isActive }) {
     const activeRef = useRef(isActive);
     const progressRef = useRef(progress);
 
+    const ANIM_TYPES = [
+        { key: 'tree', title: 'Tree' },
+        { key: 'orb', title: 'Orb' },
+        { key: 'fire', title: 'Fire' },
+        { key: 'ripple', title: 'Ripple' },
+        { key: 'galaxy', title: 'Galaxy' },
+    ];
+    const [animationType, setAnimationType] = useState(() => {
+        try {
+            return localStorage.getItem('focusAnimationType') || 'tree';
+        } catch {
+            return 'tree';
+        }
+    });
+
+    const setType = (nextType) => {
+        setAnimationType(nextType);
+        try {
+            localStorage.setItem('focusAnimationType', nextType);
+        } catch {
+            // ignore in non-browser environments
+        }
+    };
+
     useEffect(() => { modeRef.current = mode; }, [mode]);
     useEffect(() => { activeRef.current = isActive; }, [isActive]);
     useEffect(() => { progressRef.current = progress; }, [progress]);
@@ -97,14 +121,22 @@ export default function FocusAnimation({ progress, mode, isActive }) {
             const glowColor = m === 'break'
                 ? `rgba(52,211,153,${glowOpacity})`
                 : `rgba(100,220,80,${glowOpacity})`;
-            const grad = ctx.createRadialGradient(90, 110, 0, 90, 110, 72);
-            grad.addColorStop(0, glowColor);
-            grad.addColorStop(1, 'transparent');
-            ctx.save();
-            ctx.globalCompositeOperation = 'lighter';
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 180, 180);
-            ctx.restore();
+            // JSDOM canvas mocks don't implement createRadialGradient; fall back to a flat fill.
+            if (typeof ctx.createRadialGradient === 'function') {
+                const grad = ctx.createRadialGradient(90, 110, 0, 90, 110, 72);
+                grad.addColorStop(0, glowColor);
+                grad.addColorStop(1, 'transparent');
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 180, 180);
+                ctx.restore();
+            } else {
+                ctx.fillStyle = glowColor;
+                if (typeof ctx.fillRect === 'function') {
+                    ctx.fillRect(0, 0, 180, 180);
+                }
+            }
 
             // Leaf particles
             for (const leaf of leaves) {
@@ -131,28 +163,37 @@ export default function FocusAnimation({ progress, mode, isActive }) {
             }
 
             // Sparkles
-            for (const sp of sparkles) {
-                sp.phase += 0.045 * mult;
-                const scale = Math.abs(Math.sin(sp.phase));
-                if (scale < 0.05) continue;
-                const sz = 3.5 * scale;
-                const alpha = scale * (a ? 0.9 : 0.3);
-                const hue = m === 'break' ? 140 : 75;
-                ctx.save();
-                ctx.translate(sp.x, sp.y);
-                ctx.strokeStyle = `hsla(${hue},90%,80%,${alpha})`;
-                ctx.lineWidth = 1.2;
-                ctx.beginPath();
-                ctx.moveTo(0, -sz); ctx.lineTo(0, sz);
-                ctx.moveTo(-sz, 0); ctx.lineTo(sz, 0);
-                ctx.stroke();
-                ctx.rotate(Math.PI / 4);
-                ctx.globalAlpha = alpha * 0.6;
-                ctx.beginPath();
-                ctx.moveTo(0, -sz * 0.7); ctx.lineTo(0, sz * 0.7);
-                ctx.moveTo(-sz * 0.7, 0); ctx.lineTo(sz * 0.7, 0);
-                ctx.stroke();
-                ctx.restore();
+            const canDrawSparkles =
+                typeof ctx.save === 'function' &&
+                typeof ctx.translate === 'function' &&
+                typeof ctx.rotate === 'function' &&
+                typeof ctx.moveTo === 'function' &&
+                typeof ctx.lineTo === 'function' &&
+                typeof ctx.stroke === 'function';
+            if (canDrawSparkles) {
+                for (const sp of sparkles) {
+                    sp.phase += 0.045 * mult;
+                    const scale = Math.abs(Math.sin(sp.phase));
+                    if (scale < 0.05) continue;
+                    const sz = 3.5 * scale;
+                    const alpha = scale * (a ? 0.9 : 0.3);
+                    const hue = m === 'break' ? 140 : 75;
+                    ctx.save();
+                    ctx.translate(sp.x, sp.y);
+                    ctx.strokeStyle = `hsla(${hue},90%,80%,${alpha})`;
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -sz); ctx.lineTo(0, sz);
+                    ctx.moveTo(-sz, 0); ctx.lineTo(sz, 0);
+                    ctx.stroke();
+                    ctx.rotate(Math.PI / 4);
+                    ctx.globalAlpha = alpha * 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -sz * 0.7); ctx.lineTo(0, sz * 0.7);
+                    ctx.moveTo(-sz * 0.7, 0); ctx.lineTo(sz * 0.7, 0);
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
 
             rafId = requestAnimationFrame(draw);
@@ -169,6 +210,22 @@ export default function FocusAnimation({ progress, mode, isActive }) {
 
     return (
         <div className={styles.focusAnimWrapper}>
+            <div className={styles.animPicker}>
+                {ANIM_TYPES.map((t) => (
+                    <button
+                        key={t.key}
+                        type="button"
+                        title={t.title}
+                        className={[
+                            styles.animPickerBtn,
+                            animationType === t.key ? styles.animPickerBtnActive : '',
+                        ]
+                            .filter(Boolean)
+                            .join(' ')}
+                        onClick={() => setType(t.key)}
+                    />
+                ))}
+            </div>
             <div className={styles.focusAnimArea}>
                 <div className={styles.treeAnimContainer}>
                     <svg viewBox="0 0 20 24" className={`${treeStyles.svg} ${styles.treeGhostLayer}`} shapeRendering="crispEdges">

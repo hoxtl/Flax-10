@@ -1,3 +1,4 @@
+import { SegmentedControl } from '../../components/ui/SegmentedControl';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -10,6 +11,7 @@ import StudyHeatmap from '../../components/Analytics/StudyHeatmap';
 import PlannedVsActualChart from '../../components/Analytics/PlannedVsActualChart';
 import ThemeUsageChart from '../../components/Analytics/ThemeUsageChart';
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
+import AttendanceChart from '../../components/Analytics/AttendanceChart';
 import { ConsistencyScore, PeakHoursCard } from '../../components/Analytics/InsightCards';
 import Tabs from '../../components/common/Tabs/Tabs';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
@@ -69,7 +71,7 @@ function AnalyticsSkeleton() {
   );
 }
 
-export default function AnalyticsPage() {
+export default function AnalyticsPage({ onBack }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedPeriod = Number(searchParams.get('period'));
   const requestedTab = searchParams.get('tab');
@@ -142,6 +144,7 @@ export default function AnalyticsPage() {
           },
           { title: 'Focus Heatmap', el: <StudyHeatmap heatmapData={data.heatmap} />, i: 5, wide: true },
           themeStats && { title: 'Theme Usage', el: <ThemeUsageChart themeStats={themeStats} />, i: 6 },
+          { title: 'Attendance', el: <AttendanceChart />, i: 7 },
         ].filter(Boolean).map(({ title, el, i, wide }) => (
           <motion.div
             key={title}
@@ -171,24 +174,18 @@ export default function AnalyticsPage() {
       title="Analytics"
       subtitle="Your study patterns & performance"
       action={
-        <div className={styles.periodToggle}>
-          {PERIODS.map(p => (
-            <button
-              key={p.value}
-              className={`${styles.periodBtn} ${period === p.value ? styles.periodActive : ''}`}
-              onClick={() => handlePeriodChange(p.value)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={PERIODS}
+          value={period}
+          onChange={handlePeriodChange}
+        />
       }
     >
 
       {error && <div className={styles.errorBanner}>{error}</div>}
       {loading && <AnalyticsSkeleton />}
 
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" />
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
     </AppPage>
   );
 }

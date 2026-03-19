@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, Search, X, FolderKanban } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DatePickerButton } from './DatePickerButton';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
@@ -7,6 +7,11 @@ import { SegmentedControl } from '../../ui/SegmentedControl';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
+
+import { deleteSchedule, getSchedules, renameSchedule } from '../../../api/scheduleApi';
+import { useNotifications } from '../../../context/NotificationContext';
+import StandardModal from '../../common/StandardModal/StandardModal';
+import TextInput from '../../common/TextInput/TextInput';
 
 export function CalendarNav({ onPrev, onNext, onToday, showToday, selectedDate, onDatePick, title }) {
     return (
@@ -138,5 +143,219 @@ export function SearchButton({ value, onChange }) {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+function ScheduleCard({
+    schedule,
+    editingId,
+    renameDraft,
+    pendingDeleteId,
+    isSaving,
+    isDeleting,
+    onRenameStart,
+    onRenameCancel,
+    onRenameDraftChange,
+    onRenameSave,
+    onDeleteToggle,
+    onDeleteConfirm,
+}) {
+    const isEditing = editingId === schedule.id;
+    const isPendingDelete = pendingDeleteId === schedule.id;
+
+    return (
+        <article className={styles.scheduleCard}>
+            <div className={styles.scheduleInfo}>
+                {isEditing ? (
+                    <TextInput
+                        value={renameDraft}
+                        onChange={(event) => onRenameDraftChange(event.target.value)}
+                        placeholder="Schedule name"
+                        aria-label={`Rename ${schedule.title}`}
+                    />
+                ) : (
+                    <h3 className={styles.scheduleCardTitle}>{schedule.title}</h3>
+                )}
+                <p className={styles.scheduleMeta}>{schedule.event_allocations?.length || 0} allocated events</p>
+            </div>
+
+            <div className={styles.scheduleActions}>
+                {isEditing ? (
+                    <>
+                        <PrimaryButton type="button" variant="primary" pill disabled={isSaving} onClick={() => onRenameSave(schedule.id)}>
+                            Save
+                        </PrimaryButton>
+                        <PrimaryButton type="button" variant="ghost" pill onClick={onRenameCancel}>
+                            Cancel
+                        </PrimaryButton>
+                    </>
+                ) : (
+                    <PrimaryButton type="button" variant="ghost" pill onClick={() => onRenameStart(schedule)}>
+                        Rename
+                    </PrimaryButton>
+                )}
+
+                <PrimaryButton
+                    type="button"
+                    variant={isPendingDelete ? 'ghost' : 'danger'}
+                    pill
+                    disabled={isDeleting}
+                    onClick={() => (isPendingDelete ? onDeleteConfirm(schedule.id) : onDeleteToggle(schedule.id))}
+                >
+                    {isPendingDelete ? 'Confirm remove' : 'Remove'}
+                </PrimaryButton>
+                {isPendingDelete && (
+                    <PrimaryButton type="button" variant="ghost" pill onClick={() => onDeleteToggle(null)}>
+                        Keep
+                    </PrimaryButton>
+                )}
+            </div>
+        </article>
+    );
+}
+
+function ScheduleManagerDialog({ open, onClose }) {
+    const { addNotification } = useNotifications();
+    const [schedules, setSchedules] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [renameDraft, setRenameDraft] = useState('');
+    const [pendingDeleteId, setPendingDeleteId] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        if (!open) return;
+        let ignore = false;
+
+        const loadSchedules = async () => {
+            setLoading(true);
+            try {
+                const data = await getSchedules();
+                if (!ignore) setSchedules(Array.isArray(data) ? data : []);
+            } catch (error) {
+                if (!ignore) {
+                    addNotification({ title: 'Schedules', message: error.message, notification_type: 'general' });
+                }
+            } finally {
+                if (!ignore) setLoading(false);
+            }
+        };
+
+        loadSchedules();
+        return () => {
+            ignore = true;
+        };
+    }, [open, addNotification]);
+
+    useEffect(() => {
+        if (!open) {
+            setEditingId(null);
+            setRenameDraft('');
+            setPendingDeleteId(null);
+            setIsSaving(false);
+            setIsDeleting(false);
+        }
+    }, [open]);
+
+    const startRename = (schedule) => {
+        setPendingDeleteId(null);
+        setEditingId(schedule.id);
+        setRenameDraft(schedule.title);
+    };
+
+    const cancelRename = () => {
+        setEditingId(null);
+        setRenameDraft('');
+    };
+
+    const saveRename = async (scheduleId) => {
+        const nextTitle = renameDraft.trim();
+        if (!nextTitle) {
+            addNotification({ title: 'Rename failed', message: 'Please enter a schedule name.', notification_type: 'general' });
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const data = await renameSchedule(scheduleId, nextTitle);
+            if (data.overwritten) {
+                addNotification({ title: 'Schedule overwritten', message: 'Existing schedule with that name was replaced.', notification_type: 'general' });
+            }
+            setSchedules((prev) => prev.map((schedule) => (
+                schedule.id === scheduleId ? { ...schedule, title: nextTitle, event_allocations: data.event_allocations ?? schedule.event_allocations } : schedule
+            )));
+            cancelRename();
+        } catch (error) {
+            addNotification({ title: 'Rename failed', message: error.message, notification_type: 'general' });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const confirmDelete = async (scheduleId) => {
+        setIsDeleting(true);
+        try {
+            await deleteSchedule(scheduleId);
+            setSchedules((prev) => prev.filter((schedule) => schedule.id !== scheduleId));
+            setPendingDeleteId(null);
+        } catch (error) {
+            addNotification({ title: 'Delete failed', message: error.message, notification_type: 'general' });
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    if (!open) return null;
+
+    return (
+        <StandardModal title="Schedules" subtitle="Rename or remove saved manual and auto-generated schedules." onClose={onClose}>
+            <div className={styles.scheduleDialogBody}>
+                {loading && <p className={styles.scheduleDialogEmpty}>Loading schedules…</p>}
+                {!loading && schedules.length === 0 && (
+                    <p className={styles.scheduleDialogEmpty}>No schedules yet. Use Quick Add to create a manual or auto schedule.</p>
+                )}
+                {!loading && schedules.length > 0 && (
+                    <div className={styles.scheduleList}>
+                        {schedules.map((schedule) => (
+                            <ScheduleCard
+                                key={schedule.id}
+                                schedule={schedule}
+                                editingId={editingId}
+                                renameDraft={renameDraft}
+                                pendingDeleteId={pendingDeleteId}
+                                isSaving={isSaving && editingId === schedule.id}
+                                isDeleting={isDeleting && pendingDeleteId === schedule.id}
+                                onRenameStart={startRename}
+                                onRenameCancel={cancelRename}
+                                onRenameDraftChange={setRenameDraft}
+                                onRenameSave={saveRename}
+                                onDeleteToggle={setPendingDeleteId}
+                                onDeleteConfirm={confirmDelete}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        </StandardModal>
+    );
+}
+
+export function ScheduleManagerButton() {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <>
+            <button
+                className={styles.settingsBtn}
+                onClick={() => setOpen(true)}
+                title="Manage schedules"
+                aria-label="Manage schedules"
+                type="button"
+            >
+                <FolderKanban size={18} />
+            </button>
+            <ScheduleManagerDialog open={open} onClose={() => setOpen(false)} />
+        </>
     );
 }

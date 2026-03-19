@@ -29,7 +29,7 @@
 }
 
 .particle:nth-child(odd) {
-  background: #c4a35a;
+  background: var(--color-highlight);
 }
 
 .wrap.active .particle {

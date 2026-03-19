@@ -175,11 +175,11 @@ function buildEventEntry(item, inWindow, i, dayStart, dayEnd, now, dayTasks, tas
 }
 
 function insertNowMarker(sorted, nowMins) {
-  const endMinsOf = (r) => r.endMins ?? (r.gapStartMins ?? 0) + (r.minutes ?? 0);
+  const startMinsOf = (r) => r.startMins ?? r.gapStartMins ?? 0;
   let insertIndex = sorted.length;
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    if (endMinsOf(sorted[i]) <= nowMins) {
-      insertIndex = i + 1;
+  for (let i = 0; i < sorted.length; i++) {
+    if (startMinsOf(sorted[i]) > nowMins) {
+      insertIndex = i;
       break;
     }
   }
@@ -219,6 +219,23 @@ function addSpacing(sorted) {
 }
 
 /** Merge consecutive overlapping event rows into eventGroup rows. */
+function _push_chunked_group(result, group, base_row) {
+  const chunkSize = 3;
+  for (let i = 0; i < group.length; i += chunkSize) {
+    const items = group.slice(i, i + chunkSize);
+    const start = Math.min(...items.map((item) => item.startMins));
+    const end = Math.max(...items.map((item) => item.endMins));
+    result.push({
+      type: "eventGroup",
+      id: `group-${base_row.id}-${Math.floor(i / chunkSize)}`,
+      items,
+      startMins: start,
+      endMins: end,
+      spacingBeforePx: i === 0 ? base_row.spacingBeforePx : 0,
+    });
+  }
+}
+
 function groupOverlappingEvents(sorted) {
   const result = [];
   let i = 0;
@@ -239,14 +256,7 @@ function groupOverlappingEvents(sorted) {
       j++;
     }
     if (group.length > 1) {
-      result.push({
-        type: "eventGroup",
-        id: `group-${r.id}`,
-        items: group,
-        startMins: r.startMins,
-        endMins: groupEndMins,
-        spacingBeforePx: r.spacingBeforePx,
-      });
+      _push_chunked_group(result, group, r);
     } else {
       result.push(r);
     }
@@ -263,9 +273,11 @@ function injectHourMarks(sorted) {
   for (let i = 0; i < sorted.length; i++) {
     const r = sorted[i];
     const rStartMins = r.type !== "now" ? (r.startMins ?? r.gapStartMins ?? null) : null;
+    let hideTimeLabel = false;
 
     if (rStartMins != null) {
       const rowHour = DAY_START_HOUR + Math.floor(rStartMins / 60);
+      const startsOnHourBoundary = rStartMins % 60 === 0;
       // Don't inject an hour mark between two directly adjacent events (no gap between them).
       // e.g. Lunch ends 13:15 and next event starts 13:15 — the 13:00 mark would appear
       // as a visual bar even though there is zero gap.
@@ -274,9 +286,11 @@ function injectHourMarks(sorted) {
         finalRows.push({ type: "hourMark", id: `hour-${rowHour}`, hour: rowHour });
         lastInjectedHour = rowHour;
       }
+      // If an hour marker for this same hour is visible, suppress duplicate gutter time labels.
+      hideTimeLabel = startsOnHourBoundary && rowHour === lastInjectedHour;
     }
 
-    finalRows.push(r);
+    finalRows.push(hideTimeLabel ? { ...r, hideTimeLabel: true } : r);
 
     // Update adjacency tracker — now-markers don't break adjacency, gap rows do.
     if (r.type === "event") {

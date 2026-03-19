@@ -6,6 +6,19 @@ vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00', '#0000ff'],
 }));
 
+vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal', () => ({
+    default: ({ holdLabel = 'Hold to Delete', onConfirm, onCancel }) => (
+        <div>
+            <button type="button" onMouseDown={onConfirm}>
+                {holdLabel}
+            </button>
+            <button type="button" onClick={onCancel}>
+                Cancel
+            </button>
+        </div>
+    ),
+}));
+
 const defaultProps = {
     lists: [],
     tasks: [],
@@ -160,6 +173,8 @@ describe('ListSidebar', () => {
         render(<ListSidebar {...defaultProps} lists={lists} onDeleteList={onDeleteList} />);
         fireEvent.contextMenu(screen.getByText('Work'));
         fireEvent.click(screen.getByText('Delete list'));
+        const holdBtn = screen.getByRole('button', { name: /Hold to Delete/i });
+        fireEvent.mouseDown(holdBtn);
         expect(onDeleteList).toHaveBeenCalledWith(1);
     });
 
@@ -170,6 +185,8 @@ describe('ListSidebar', () => {
         fireEvent.click(screen.getByText(/Archived/));
         const deleteBtns = screen.getAllByText('Delete');
         fireEvent.click(deleteBtns[deleteBtns.length - 1]);
+        const holdBtn = screen.getByRole('button', { name: /Hold to Delete/i });
+        fireEvent.mouseDown(holdBtn);
         expect(onPermanentlyDeleteList).toHaveBeenCalledWith(99);
     });
 });

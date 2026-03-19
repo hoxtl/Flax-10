@@ -2,7 +2,8 @@ import { formatDuration, formatTime, getDepartment, getCourse } from './utils/mo
 import { DEADLINE_LABELS, formatDeadlineDateTime } from './utils/deadlineUtils.js';
 import { formatDate } from '../Calendar/utils/dateUtils.js';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getTutorPhotoFallback } from '../../utils/tutorPhotoFallback.js';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback.js';
+import BackButton from '../common/BackButton/BackButton.jsx';
 import styles from './ModuleDetails.module.css';
 
 function getSortedDeadlines(deadlines = []) {
@@ -57,12 +58,15 @@ function getInitials(name) {
     return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
-function getTutorImage(moduleCode, tutorName) {
-    return getTutorPhotoFallback({
-        fullName: tutorName,
-        seed: moduleCode,
-        allowGeneric: true,
-    });
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        username: moduleData?.created_by_username,
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
+    }, { allowGeneric: true });
 }
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
@@ -72,10 +76,13 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     const nextDeadline = getNextDeadline(sortedDeadlines);
     const timelineProgress = getTimelineProgress(sortedDeadlines);
     const nextClass = getNextClassText(module.start_time, module.end_time);
+    const moduleTutorPhoto = getTutorImage(module);
 
     return (
         <div className={styles.container}>
-            <button className={styles.backButton} onClick={onBack}>← Back to all modules</button>
+            <div className={styles.backButtonHeader}>
+                <BackButton onClick={onBack} label="Back to All Modules" />
+            </div>
 
             <section className={styles.hero}>
                 <div className={styles.heroTop}>
@@ -93,17 +100,19 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                     <div className={styles.heroMetaItem}>
                         <span className={styles.heroMetaLabel}>Tutor</span>
                         <div className={styles.tutorInline}>
-                            <img
-                                className={styles.tutorPhoto}
-                                src={getTutorImage(module.module_code, module.created_by_name)}
-                                alt={`${module.created_by_name || "Tutor"} profile`}
-                                onError={(e) => {
-                                    e.currentTarget.style.display = "none";
-                                    const fallback = e.currentTarget.nextElementSibling;
-                                    if (fallback) fallback.style.display = "inline-flex";
-                                }}
-                            />
-                            <span className={styles.tutorAvatarFallback}>{getInitials(module.created_by_name || "Tutor")}</span>
+                            {moduleTutorPhoto && (
+                                <img
+                                    className={styles.tutorPhoto}
+                                    src={moduleTutorPhoto}
+                                    alt={`${module.created_by_name || "Tutor"} profile`}
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = "none";
+                                        const fallback = e.currentTarget.nextElementSibling;
+                                        if (fallback) fallback.style.display = "inline-flex";
+                                    }}
+                                />
+                            )}
+                            <span className={styles.tutorAvatarFallback} style={moduleTutorPhoto ? { display: "none" } : undefined}>{getInitials(module.created_by_name || "Tutor")}</span>
                             {module.created_by
                                 ? (
                                     <EntityLinkChip to={`/profile/${module.created_by}`} className={styles.heroMetaValue}>

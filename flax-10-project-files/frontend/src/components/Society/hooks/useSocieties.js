@@ -29,12 +29,16 @@ const makeHandleCreate = (setSocieties) =>
         const newSociety = await createSociety(toSnakeCase(rest));
         await addCollaboratorsToSociety(newSociety.id, collaborators);
         if (shouldRequest) await requestRatification(newSociety.id);
-        setSocieties(prev => [...prev, newSociety]);
-        return newSociety;
+        const societyWithAdminFlag = { ...newSociety, is_admin: true, role: 'admin' };
+        setSocieties(prev => [...prev, societyWithAdminFlag]);
+        return societyWithAdminFlag;
     };
 
 const updateSocietyLocally = (setSocieties, id, updates) =>
     setSocieties(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+
+const removeSocietyFromList = (setSocieties, id) =>
+    setSocieties(prev => prev.filter(s => s.id !== id));
 
 export function useSocieties() {
     const [societies, setSocieties] = useState([]);
@@ -45,5 +49,6 @@ export function useSocieties() {
         societies, ...state, refresh: load,
         handleCreate: makeHandleCreate(setSocieties),
         updateSocietyLocally: (id, u) => updateSocietyLocally(setSocieties, id, u),
+        removeSociety: (id) => removeSocietyFromList(setSocieties, id),
     };
 }

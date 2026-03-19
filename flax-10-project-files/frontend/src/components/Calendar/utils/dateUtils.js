@@ -39,6 +39,14 @@ export function getEndOfMonth(date) {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
+export function getStartOfYear(date) {
+    return new Date(date.getFullYear(), 0, 1);
+}
+
+export function getEndOfYear(date) {
+    return new Date(date.getFullYear(), 11, 31);
+}
+
 export function addDays(date, days) {
     const result = new Date(date);
     result.setDate(result.getDate() + days);

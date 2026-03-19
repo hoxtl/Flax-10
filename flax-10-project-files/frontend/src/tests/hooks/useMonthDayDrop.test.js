@@ -18,6 +18,7 @@ vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWit
 const isReadOnlyEventMock = vi.fn(() => false);
 
 vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+  isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
   isReadOnlyEvent: (...args) => isReadOnlyEventMock(...args),

@@ -27,9 +27,9 @@
     flex-shrink: 0;
 }
 
-:root[data-theme="dark"] .arrowBtn,
-:root[data-theme="dark"] .actionBtn,
-:root[data-theme="dark"] .settingsBtn {
+:root[data-mode="dark"] .arrowBtn,
+:root[data-mode="dark"] .actionBtn,
+:root[data-mode="dark"] .settingsBtn {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -60,7 +60,7 @@
     transition: all 0.15s;
 }
 
-:root[data-theme="dark"] .todayBtn {
+:root[data-mode="dark"] .todayBtn {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -130,4 +130,76 @@
 .searchClose:hover {
     background: var(--hover);
     color: var(--text);
+}
+
+.scheduleDialogBody {
+    min-width: min(100%, 620px);
+}
+
+.scheduleDialogEmpty {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scheduleCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+:root[data-theme="dark"] .scheduleCard {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(17, 24, 39, 0.72);
+}
+
+.scheduleInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.scheduleCardTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.scheduleMeta {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+}
+
+.scheduleActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+    .scheduleCard {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .scheduleActions {
+        justify-content: stretch;
+    }
 }

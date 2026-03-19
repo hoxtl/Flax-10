@@ -68,15 +68,16 @@ describe('UserListModal', () => {
     const onClose = vi.fn();
     const { container } = render(<UserListModal title="People" users={users} onClose={onClose} />);
 
-    const backdrop = container.querySelector('[class*="backdrop"]');
-    if (backdrop) fireEvent.mouseDown(backdrop);
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
 
-    const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+    const closeBtn = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeBtn);
     expect(onClose).toHaveBeenCalledTimes(2);
 
-    const modalContent = container.querySelector('[class*="modal"]');
+    const modalContent = document.body.querySelector('div[class*="_modal"]') || container.querySelector('[class*="modal"]');
     if (modalContent) fireEvent.click(modalContent);
     expect(onClose).toHaveBeenCalledTimes(2);
   });

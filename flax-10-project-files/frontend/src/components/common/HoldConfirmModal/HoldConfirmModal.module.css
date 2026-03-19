@@ -1,0 +1,64 @@
+.modal {
+    border: 2px solid #000 !important;
+    background: #ffffff !important;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.warning {
+    font-style: italic;
+    color: var(--primary-strong);
+    font-size: var(--text-base);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.buttons {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(51, 51, 51, 0.1);
+}
+
+.holdBtn {
+    position: relative;
+    overflow: hidden;
+    padding: var(--btn-padding);
+    border-radius: 999px;
+    border: 1.5px solid #333333;
+    background: #ffffff;
+    color: #333333;
+    font: inherit;
+    font-weight: 600;
+    font-size: var(--btn-font-size);
+    cursor: pointer;
+    min-width: 120px;
+    user-select: none;
+    transition: border-color 0.15s ease;
+}
+
+.holdBtn:hover {
+    border-color: #1a1a1a;
+    background: rgba(51, 51, 51, 0.04);
+}
+
+.holdBtnBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: rgba(51, 51, 51, 0.14);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.holdBtnLabel {
+    position: relative;
+    z-index: 1;
+}

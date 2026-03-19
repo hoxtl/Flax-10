@@ -82,7 +82,7 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify) {
     const enrollment_id = getEnrollmentId(module.id, enrollments);
     await disenrolFromModule(enrollment_id);
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
-    notify(`Disenrolled from ${module.module_name}!`, 'success');
+    notify(`Unenrolled from ${module.module_name}!`, 'success');
   } catch (err) {
     notify(err.message, 'error');
   }

@@ -11,6 +11,7 @@ import {
   BadgesSection,
   ModulesSection,
   SocietiesSection,
+  CompatibilityScore,
 } from '../../../../pages/Profile/components/ProfileWidgets';
 
 vi.mock('../../../../api/moduleApi', () => ({
@@ -91,7 +92,7 @@ describe('StudyDNA', () => {
   it('renders segments and legend with mixed period data', () => {
     // Data that yields morning (5-12), afternoon (12-17), evening (17-21), night (21-5) totals
     const heatmap = {
-      data: Array.from({ length: 7 }, (_, day) =>
+      data: Array.from({ length: 7 }, () =>
         Array.from({ length: 24 }, (_, h) => {
           if (h >= 5 && h < 12) return 60;
           if (h >= 12 && h < 17) return 30;
@@ -215,7 +216,7 @@ describe('ThisWeek', () => {
         onGoalSave={vi.fn()}
       />
     );
-    const ring = document.querySelector('circle[stroke="#4CAF50"]');
+    const ring = document.querySelector('circle[stroke="var(--success-text)"]');
     expect(ring).toBeTruthy();
   });
 });
@@ -372,6 +373,66 @@ describe('SocietiesSection', () => {
       />
     );
     fireEvent.click(screen.getByText('Soc'));
-    expect(onNavigate).toHaveBeenCalledWith('societies_1');
+    expect(onNavigate).toHaveBeenCalledWith('/societies?id=1');
+  });
+
+  it('uses society_id when id is not present', () => {
+    const onNavigate = vi.fn();
+    render(
+      <SocietiesSection
+        societies={[{ society_id: 42, name: 'Athletics Club' }]}
+        onNavigate={onNavigate}
+      />
+    );
+    fireEvent.click(screen.getByText('Athletics Club'));
+    expect(onNavigate).toHaveBeenCalledWith('/societies?id=42');
+  });
+});
+
+describe('CompatibilityScore', () => {
+  const viewedSummary = { persona: { id: 'night_owl' } };
+  const currentUserSummary = { persona: { id: 'night_owl' } };
+
+  it('shows study together CTA for high compatibility and triggers callback', () => {
+    const onSuggestStudySession = vi.fn();
+    render(
+      <CompatibilityScore
+        viewedSummary={viewedSummary}
+        currentUserSummary={currentUserSummary}
+        sharedModuleCount={2}
+        totalModuleCount={2}
+        viewedUsername="bob"
+        onSuggestStudySession={onSuggestStudySession}
+        suggestionState="idle"
+      />
+    );
+    const cta = screen.getByRole('button', { name: 'Suggest a Study Session' });
+    fireEvent.click(cta);
+    expect(onSuggestStudySession).toHaveBeenCalled();
+  });
+
+  it('renders mutual connections text and activity sparkline dots', () => {
+    render(
+      <CompatibilityScore
+        viewedSummary={viewedSummary}
+        currentUserSummary={currentUserSummary}
+        sharedModuleCount={1}
+        totalModuleCount={2}
+        viewedUsername="bob"
+        mutualConnections={{ count: 3, users: [{ id: 1, username: 'ann' }] }}
+        activitySparkline={[
+          { date: '2026-03-12', level: 0 },
+          { date: '2026-03-13', level: 1 },
+          { date: '2026-03-14', level: 2 },
+          { date: '2026-03-15', level: 3 },
+          { date: '2026-03-16', level: 4 },
+          { date: '2026-03-17', level: 2 },
+          { date: '2026-03-18', level: 1 },
+        ]}
+      />
+    );
+    expect(screen.getByText('3 people you both know')).toBeTruthy();
+    expect(screen.getByText('Study momentum')).toBeTruthy();
+    expect(document.querySelectorAll('[class*="sparkDot"]').length).toBeGreaterThan(0);
   });
 });

@@ -17,11 +17,11 @@ import { useNotify } from '../Notifications/hooks/useNotify';
 import { useToast } from '../../context/ToastContext';
 
 /** Main container rendering both modal and popover. */
-export function EventPopups() {
+export function EventPopups({ allowModuleLeave = true }) {
   return (
     <>
       <EventModalContainer />
-      <EventPopupContainer />
+      <EventPopupContainer allowModuleLeave={allowModuleLeave} />
     </>
   );
 }
@@ -36,8 +36,10 @@ function useToastNotify() {
   const toast = useToast();
   const notify = useNotify();
   return (title, message) => {
-    if (typeof notify === "function" && message !== undefined) return notify(title, message);
-    if (typeof toast === "function") toast(message === undefined ? title : `${title}: ${message}`);
+    if (typeof toast === "function") {
+      toast(message === undefined ? title : `${title}: ${message}`, { variant: "info" });
+    }
+    if (typeof notify === "function" && message !== undefined) notify(title, message);
   };
 }
 
@@ -83,7 +85,8 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
   ];
 }
 
-function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }) {
+function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }, { allowModuleLeave = true } = {}) {
+  if (!allowModuleLeave) return null;
   return [{ label: 'Leave Module', variant: 'danger', onClick: () => { closePopup(); disenrollFromModule(event.module, loadEvents); } }];
 }
 
@@ -98,10 +101,10 @@ function getSocietyActions(event, { closePopup, loadEvents, refreshTags, showToa
   return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }
 
-function getCalendarPopupActions(event, handlers) {
+function getCalendarPopupActions(event, handlers, options = {}) {
   const type = getEventType(event);
   if (type === 'personal') return getPersonalActions(event, handlers);
-  if (type === 'module') return getModuleActions(event, handlers);
+  if (type === 'module') return getModuleActions(event, handlers, options);
   if (type === 'society') return getSocietyActions(event, handlers);
   return null;
 }
@@ -117,7 +120,7 @@ function usePopupState() {
   return { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode, isModalOpen, openModal, loadEvents, disenrollFromModule, getTag, refreshTags, showToast, handleDeleteRequest };
 }
 
-function EventPopupContainer() {
+function EventPopupContainer({ allowModuleLeave }) {
   const state = usePopupState();
   if (state.isModalOpen || !state.popupEvent) return null;
 
@@ -126,7 +129,7 @@ function EventPopupContainer() {
     if (await state.handleDeleteRequest(ev)) state.showToast("Event deleted", `"${ev.title}" deleted.`);
   };
   const handlers = { openModal: state.openModal, onDeleteRequest: onDeleteWrapped, closePopup: state.closePopup, loadEvents: state.loadEvents, disenrollFromModule: state.disenrollFromModule, refreshTags: state.refreshTags, showToast: state.showToast };
-  const actions = getCalendarPopupActions(state.popupEvent, handlers);
+  const actions = getCalendarPopupActions(state.popupEvent, handlers, { allowModuleLeave });
 
   return <EventPopover event={state.popupEvent} anchorRect={state.popupAnchorRect} onClose={state.closePopup} actions={actions} tag={getEventTag(state.popupEvent, state.getTag)} readOnly={state.readOnly} viewMode={state.viewMode} />;
 }

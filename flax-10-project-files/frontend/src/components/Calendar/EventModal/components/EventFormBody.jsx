@@ -8,6 +8,7 @@ import { RecurrenceField } from './RecurrenceField';
 import { TimeRow } from './TimeRow';
 import { ActionButtons } from './ActionButtons';
 import { ReminderField } from './ReminderField';
+import { LocationAutocomplete } from './LocationAutoComplete';
 
 function PrivacyButton({ isActive, label, onClick }) {
     return (
@@ -42,7 +43,16 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
             <FormField label="Description" type="textarea" value={form.description} onChange={update('description')} />
             <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
             <PrivacyToggle value={form.is_private} onChange={setPrivacy} />
-            <FormField label="Location" value={form.location} onChange={update('location')} placeholder="e.g. Room 214" />
+            
+            <div className="form-field">
+                <label>Location</label>
+                <LocationAutocomplete
+                    value={form.location || ''}
+                    onChange={(value) => setForm(f => ({...f, location: value}))}
+                    placeholder='e.g. Strand Campus, London'
+                />
+            </div>
+
             <TimeRow form={form} update={update} setForm={setForm} />
             <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
             {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}

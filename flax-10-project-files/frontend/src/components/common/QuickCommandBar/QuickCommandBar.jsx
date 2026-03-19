@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarPlus2, GraduationCap, Timer, Users, Sparkles } from "lucide-react";
+import {
+  CalendarPlus2, GraduationCap, Timer, Users, Sparkles,
+  Home, Calendar, CheckSquare, MapPin, BarChart2, ClipboardCheck, UserCheck,
+} from "lucide-react";
 
 import styles from "./QuickCommandBar.module.css";
+import EmptyState from "../EmptyState/EmptyState";
 
 function isEditableTarget(target) {
   const tag = target?.tagName;
@@ -19,9 +23,37 @@ function actionDefs({ onNavChange, onOpenTask }) {
       run: () => onOpenTask?.(),
     },
     {
-      id: "jump-module",
+      id: "go-home",
+      title: "Go to Home",
+      hint: "Navigate to home dashboard",
+      Icon: Home,
+      run: () => onNavChange?.("home"),
+    },
+    {
+      id: "go-calendar",
+      title: "Open Calendar",
+      hint: "View and manage your calendar events",
+      Icon: Calendar,
+      run: () => onNavChange?.("calendar"),
+    },
+    {
+      id: "go-timer",
+      title: "Start timer",
+      hint: "Jump into focus mode timer",
+      Icon: Timer,
+      run: () => onNavChange?.("timer"),
+    },
+    {
+      id: "go-tasks",
+      title: "View tasks",
+      hint: "Open your task list",
+      Icon: CheckSquare,
+      run: () => onNavChange?.("tasks"),
+    },
+    {
+      id: "go-modules",
       title: "Jump to module",
-      hint: "Open modules (or search by typed code)",
+      hint: "Open modules or search by module code",
       Icon: GraduationCap,
       run: (query) => {
         if (String(query || "").trim()) {
@@ -32,25 +64,46 @@ function actionDefs({ onNavChange, onOpenTask }) {
       },
     },
     {
-      id: "invite-user",
-      title: "Invite user",
-      hint: "Open Discover users",
-      Icon: Users,
-      run: () => onNavChange?.("users"),
+      id: "go-map",
+      title: "Open campus map",
+      hint: "Navigate the campus map and plan your journey",
+      Icon: MapPin,
+      run: () => onNavChange?.("map"),
     },
     {
-      id: "open-society",
-      title: "Open societies",
-      hint: "Browse all societies",
+      id: "go-societies",
+      title: "Browse societies",
+      hint: "Explore and join student societies",
       Icon: Sparkles,
       run: () => onNavChange?.("/societies?tab=all"),
     },
     {
-      id: "start-timer",
-      title: "Start timer",
-      hint: "Jump into focus mode",
-      Icon: Timer,
-      run: () => onNavChange?.("timer"),
+      id: "go-users",
+      title: "Discover users",
+      hint: "Find and connect with other students",
+      Icon: Users,
+      run: () => onNavChange?.("users"),
+    },
+    {
+      id: "go-group-work",
+      title: "Group work",
+      hint: "Collaborate with your group",
+      Icon: UserCheck,
+      run: () => onNavChange?.("group-work"),
+    },
+    {
+      id: "go-analytics",
+      title: "View analytics",
+      hint: "See your study statistics and insights",
+      Icon: BarChart2,
+      run: () => onNavChange?.("analytics"),
+    },
+    {
+      id: "go-attendance",
+      title: "Attendance",
+      hint: "Check your lecture attendance",
+      Icon: ClipboardCheck,
+      run: () => onNavChange?.("attendance"),
     },
   ];
 }
@@ -66,7 +119,8 @@ export default function QuickCommandBar({ onNavChange, onOpenTask }) {
   const [query, setQuery] = useState("");
   const actions = useMemo(() => actionDefs({ onNavChange, onOpenTask }), [onNavChange, onOpenTask]);
   const filtered = useMemo(() => actions.filter((action) => matches(action, query)), [actions, query]);
-  const primary = filtered[0] || null;
+  const visible = query ? filtered : filtered.slice(0, 6);
+  const primary = visible[0] || null;
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -139,7 +193,7 @@ export default function QuickCommandBar({ onNavChange, onOpenTask }) {
               placeholder="Type to filter actions…"
             />
             <div className={styles.list}>
-              {filtered.map((action) => {
+              {visible.map((action) => {
                 const Icon = action.Icon;
                 return (
                   <button key={action.id} type="button" className={styles.item} onClick={() => trigger(action)}>
@@ -151,7 +205,13 @@ export default function QuickCommandBar({ onNavChange, onOpenTask }) {
                   </button>
                 );
               })}
-              {!filtered.length && <p className={styles.empty}>No matching action</p>}
+              {!visible.length && (
+                <EmptyState
+                  icon="🔍"
+                  title="No matching action"
+                  description="Try a different search term"
+                />
+              )}
             </div>
           </motion.div>
         </motion.div>

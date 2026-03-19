@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
+import StandardModal from "../../../common/StandardModal/StandardModal";
 import styles from "./ImageGalleryModal.module.css";
 import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../../hooks/useCarouselNavigation";
 
@@ -12,9 +13,15 @@ export default function ImageGalleryModal({ images, onClose, initialIndex = 0 })
     if (!images.length) return null;
 
     return (
-        <div className={styles.overlay} onClick={onClose} ref={overlayRef}>
+        <StandardModal
+            onClose={onClose}
+            hideHeader
+            size="xl"
+            modalClassName={styles.modal}
+            backdropRef={overlayRef}
+        >
             <ModalContent images={images} index={index} prev={prev} next={next} onClose={onClose} />
-        </div>
+        </StandardModal>
     );
 }
 

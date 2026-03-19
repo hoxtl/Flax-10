@@ -13,6 +13,7 @@ import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import AppPage from "../../components/common/AppPage/AppPage";
 
 function SkeletonHeader() {
   return (
@@ -86,17 +87,23 @@ function useCalendarPageState() {
 }
 
 function CalendarPageContent({ state }) {
+  const showFilters = state.displayMode !== "list" && state.displayMode !== "table";
+
   return (
-    <div className={styles.page}>
-      <div className={styles.stickyHeader}>
-        <CalendarHeader />
-        <div className={styles.filters}>
-          <PillFilters active={state.filter} onChange={(key) => state.dispatch({ type: "SET_FILTER", payload: key })} items={state.visibleItems} />
+    <AppPage title="Calendar" subtitle="Your scheduled events and study sessions" width="full" className={styles.page}>
+      <div className={styles.calendarContainer}>
+        <div className={styles.stickyHeader}>
+          <CalendarHeader />
+          {showFilters && (
+            <div className={styles.filters}>
+              <PillFilters active={state.filter} onChange={(key) => state.dispatch({ type: "SET_FILTER", payload: key })} items={state.visibleItems} />
+            </div>
+          )}
         </div>
+        <main className={styles.mainContent}><Calendar /></main>
       </div>
-      <main className={styles.mainContent}><Calendar /></main>
-      <EventPopups />
-    </div>
+      <EventPopups allowModuleLeave={false} />
+    </AppPage>
   );
 }
 

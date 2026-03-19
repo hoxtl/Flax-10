@@ -18,6 +18,7 @@ export const initialState = {
     popupEvent: null,
     popupAnchorRect: null,
     readOnly: false,
+    reloadKey: 0,
 };
 
 /*
@@ -40,6 +41,7 @@ const handlers = {
     OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect }),
     CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null }),
     SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
+    TRIGGER_RELOAD: (state) => ({ ...state, reloadKey: (state.reloadKey || 0) + 1 }),
 };
 
 /**

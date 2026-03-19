@@ -1,11 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../pages/Timer/TimerPage.module.css";
-import FocusAnimation from './FocusAnimation';
-import { getNearestMilestone } from './utils/milestoneUtils';
-import { TimerDisplay, ModeIndicator, SessionStatus, TimerControls, TimerSettings, SoundSelector, TaskInput } from './TimerComponents';
-import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal } from './TimerPopups';
+import { OvertimePopup, GoalModal, BreakModal, EndEarlyModal, BreakStartedPopup } from './TimerPopups';
 import HistoryModal from './HistoryModal';
-import { splitEstimatedBlocks } from '../../lib/focusPlanner';
+import Tabs from '../common/Tabs/Tabs';
+import { rankTasksForFocus } from '../../lib/focusPlanner';
+import { getHistory } from './utils/historyUtils';
+import { AUTOSTART_KEY, applyTaskToTimer } from './utils/presetUtils';
+import { formatSessionMinutes, extractTime, isToday } from './utils/timerFormatters';
+import { getNearestMilestone } from './utils/milestoneUtils';
+import SessionDots, { LiveStatsRow, ProgressStrip } from './SessionDots';
+import TimerCircle, { TimerRing } from './TimerCircle';
+import { TimerControls, ModeIndicator } from './TimerComponents';
+import { PresetPanel, TimerConfigPanel } from './PresetPanel';
+import InlineSoundPanel from './InlineSoundPanel';
+import RightRailHistoryPanel from './RightRailHistoryPanel';
+import { TaskInput } from './TaskInput';
+
+function estimatedFinishTime(t) {
+    const remaining = t.targetSessions - t.completedSessions;
+    if (remaining <= 0) return null;
+    const sessionSec = t.workTime * 60 + t.breakTime * 60;
+    const totalSec = (t.isActive || t.isPaused)
+        ? Math.max(t.timeLeft, 0) + (remaining - 1) * sessionSec
+        : remaining * sessionSec;
+    const at = new Date(Date.now() + totalSec * 1000);
+    return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+}
 
 /** Format seconds → "45m" or "1h 20m" */
 function fmtDuration(sec) {
@@ -17,40 +37,6 @@ function fmtDuration(sec) {
     return `${m}m`;
 }
 
-/** Visual session progress dots */
-function SessionDots({ completedSessions, targetSessions, isActive, isPaused }) {
-    return (
-        <div className={styles.sessionDots} aria-label={`Session ${completedSessions + 1} of ${targetSessions}`}>
-            {Array.from({ length: targetSessions }).map((_, i) => {
-                const isDone = i < completedSessions;
-                const isCurrentActive = i === completedSessions && (isActive || isPaused);
-                const cls = isDone
-                    ? styles.sessionDotDone
-                    : isCurrentActive
-                        ? styles.sessionDotActive
-                        : styles.sessionDotPending;
-                return <span key={i} className={`${styles.sessionDot} ${cls}`} />;
-            })}
-        </div>
-    );
-}
-
-/** Accumulating focus/break stats row — shows placeholders once timer started */
-function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, distractions, isActive, isPaused, onDistract }) {
-    const everStarted = isActive || isPaused || blockTotalWork > 0 || blockTotalBreak > 0;
-    if (!everStarted) return null;
-    return (
-        <div className={styles.liveStatsRow}>
-            <span className={styles.liveStat}>🔥 <strong>{blockTotalWork > 0 ? fmtDuration(blockTotalWork) : '—'}</strong> focus</span>
-            <span className={styles.liveStat}>☕ <strong>{blockTotalBreak > 0 ? fmtDuration(blockTotalBreak) : '—'}</strong> break</span>
-            {totalPaused > 30 && <span className={styles.liveStat}>⏸ <strong>{fmtDuration(totalPaused)}</strong> paused</span>}
-            {distractions > 0 && <span className={styles.liveStat}>⚡ <strong>{distractions}</strong> distraction{distractions !== 1 ? 's' : ''}</span>}
-            {isActive && !isPaused && (
-                <button className={styles.distractChip} onClick={onDistract}>+ distracted</button>
-            )}
-        </div>
-    );
-}
 
 /** Block summary card with SVG progress ring — horizontal layout */
 function BlockStatsCard({ completedSessions, targetSessions, blockTotalWork, blockTotalBreak }) {
@@ -109,7 +95,6 @@ const BUILT_IN_PRESETS = [
 ];
 
 const CUSTOM_PRESETS_KEY = 'timerCustomPresets';
-const AUTOSTART_KEY = 'timerAutoStart';
 
 function loadCustomPresets() {
     try { return JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY) || '[]'); } catch { return []; }
@@ -230,69 +215,6 @@ function AutoStartToggle() {
     );
 }
 
-function PresetPanel({ t }) {
-    const [customPresets, setCustomPresets] = useState(() => loadCustomPresets());
-    const [saving, setSaving] = useState(false);
-    const [saveName, setSaveName] = useState('');
-
-    const handleSave = () => {
-        const name = saveName.trim();
-        if (!name) return;
-        const newPreset = {
-            id: `custom_${Date.now()}`,
-            label: name,
-            work: t.workTime,
-            brk: t.breakTime,
-            sessions: t.targetSessions,
-        };
-        const updated = [...customPresets, newPreset];
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-        setSaving(false);
-        setSaveName('');
-    };
-
-    const handleDelete = (id) => {
-        const updated = customPresets.filter(p => p.id !== id);
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-    };
-
-    return (
-        <div className={styles.presetPanelCard}>
-            <span className={styles.presetPanelLabel}>Quick Start</span>
-            <div className={styles.presetList}>
-                {BUILT_IN_PRESETS.map(p => <PresetCard key={p.id} preset={p} t={t} />)}
-                {customPresets.map(p => (
-                    <PresetCard key={p.id} preset={p} t={t} onDelete={() => handleDelete(p.id)} />
-                ))}
-            </div>
-            <div className={styles.presetSaveArea}>
-                {saving ? (
-                    <div className={styles.presetSaveForm}>
-                        <input
-                            className={styles.presetNameInput}
-                            placeholder="Preset name…"
-                            value={saveName}
-                            onChange={e => setSaveName(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setSaving(false); }}
-                            autoFocus
-                            maxLength={24}
-                        />
-                        <button className={styles.presetSaveConfirm} onClick={handleSave}>Save</button>
-                        <button className={styles.presetSaveCancel} onClick={() => setSaving(false)}>Cancel</button>
-                    </div>
-                ) : (
-                    <button className={styles.presetSaveBtn} onClick={() => { setSaving(true); setSaveName(''); }} disabled={t.isActive}>
-                        + Save current
-                    </button>
-                )}
-            </div>
-            <div className={styles.presetGoalDivider} />
-            <DailyGoalWidget />
-        </div>
-    );
-}
 
 /* ── Milestone Card ─────────────────────────────────────── */
 
@@ -319,12 +241,12 @@ function MilestoneCard() {
                     <span className={styles.milestoneNextText}>
                         {milestone.remaining === 1
                             ? `1 more to reach ${milestone.label}!`
-                            : `${milestone.remaining} away from ${milestone.label}`}
+                            : `${Math.round(milestone.remaining * 10) / 10} away from ${milestone.label}`}
                     </span>
                     <div className={styles.milestoneBar}>
                         <div className={styles.milestoneFill} style={{ width: `${pct}%` }} />
                     </div>
-                    <span className={styles.milestoneMeta}>{milestone.current} / {milestone.target}</span>
+                    <span className={styles.milestoneMeta}>{Math.round(milestone.current * 10) / 10} / {milestone.target}</span>
                 </>
             ) : (
                 <span className={styles.milestoneNextText}>All milestones reached! 🏆</span>
@@ -333,38 +255,6 @@ function MilestoneCard() {
     );
 }
 
-/* ── Circular Timer Ring ────────────────────────────────── */
-
-function TimerRing({ t }) {
-    const radius = 90;
-    const circ = 2 * Math.PI * radius;
-    const total = (t.mode === 'work' ? t.workTime : t.breakTime) * 60;
-    const ratio = total > 0 ? Math.max(0, t.timeLeft / total) : 1;
-    const dash = ratio * circ;
-    const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const color = isOvertime ? '#f59e0b' : t.mode === 'break' ? 'var(--sage)' : 'var(--primary)';
-
-    return (
-        <div className={styles.timerRingWrap}>
-            <svg className={styles.timerRingSvg} viewBox="0 0 220 220" aria-hidden="true">
-                <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--border)" strokeWidth="5" />
-                <circle
-                    cx="110" cy="110" r={radius}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeDasharray={`${dash} ${circ - dash}`}
-                    strokeDashoffset={circ * 0.25}
-                    style={{ transition: 'stroke-dasharray 1s linear, stroke 0.3s ease' }}
-                />
-            </svg>
-            <div className={styles.timerRingContent}>
-                <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={isOvertime} />
-            </div>
-        </div>
-    );
-}
 
 /* ── Session Pace Indicator ─────────────────────────────── */
 
@@ -382,28 +272,7 @@ function PaceIndicator({ completedSessions, targetSessions }) {
     return <div className={`${styles.paceIndicator} ${cls}`}>{text}</div>;
 }
 
-/* ── Composed sections ──────────────────────────────────── */
-
-const TimerTopSection = ({ t }) => {
-    const handleTaskSelect = useCallback((task) => {
-        t.setTask(task.title);
-        const split = splitEstimatedBlocks(task.estimated_blocks || 1);
-        t.updateTime('work', split.workMinutes);
-        t.updateTime('sessions', split.sessionCount);
-        t.setTimeLeft(split.workMinutes * 60);
-        t.setIsActive(true);
-        if (t.setActiveTaskId) {
-            t.setActiveTaskId(task.id, {
-                title: task.title,
-                categoryColor: task.list_color,
-                estimatedBlocks: Number(task.estimated_blocks || 1),
-                estimatedSessionCount: split.sessionCount,
-                estimatedWorkMinutes: split.workMinutes,
-            });
-        }
-        try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch (_) {}
-    }, [t]);
-
+const TimerTopSection = ({ t, onOpenFocus }) => {
     useEffect(() => {
         try {
             const suggested = sessionStorage.getItem('timerSuggestedTask');
@@ -411,105 +280,108 @@ const TimerTopSection = ({ t }) => {
                 t.setTask(suggested);
                 sessionStorage.removeItem('timerSuggestedTask');
             }
-        } catch (_) {}
+        } catch {}
     }, [t]);
 
-    const input = <TaskInput value={t.task} onChange={t.setTask} onTaskSelect={handleTaskSelect} />;
-    const anim = <FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} />;
-    return <>{input}{anim}</>;
+    const handleJustStart = useCallback(async () => {
+        const title = (t.task || '').trim();
+        if (title) { t.setIsActive(true); return; }
+        try {
+            const { fetchTasks } = await import('../../api/taskService');
+            const tasks = await fetchTasks({ completed: false });
+            const open = Array.isArray(tasks) ? tasks.filter(task => !task.completed && !task.archived) : [];
+            const ranked = rankTasksForFocus(open);
+            if (ranked.length > 0) { applyTaskToTimer(ranked[0], t); return; }
+        } catch {}
+        t.setIsActive(true);
+    }, [t]);
+
+    return (
+        <TaskInput
+            value={t.task}
+            onChange={t.setTask}
+            onClearTask={() => { if (typeof t.setActiveTaskId === 'function') t.setActiveTaskId(null); }}
+            onTaskSelect={(task) => applyTaskToTimer(task, t)}
+            onJustStart={handleJustStart}
+            isSessionActive={Boolean(t.isActive || t.isPaused)}
+            onOpenFocus={onOpenFocus}
+        />
+    );
 };
 
-function estimatedFinishTime(t) {
-    const remaining = t.targetSessions - t.completedSessions;
-    if (remaining <= 0) return null;
-    const sessionSec = t.workTime * 60 + t.breakTime * 60;
-    const totalSec = (t.isActive || t.isPaused)
-        ? Math.max(t.timeLeft, 0) + (remaining - 1) * sessionSec
-        : remaining * sessionSec;
-    const at = new Date(Date.now() + totalSec * 1000);
-    return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-}
-
-const TimerInfoSection = ({ t }) => {
-    const isOvertime = t.isOvertime || t.isBreakOvertime;
+const TimerInfoSection = ({ t, onPrimaryStart }) => {
     const finishAt = estimatedFinishTime(t);
     return (
         <>
-            <SessionDots
-                completedSessions={t.completedSessions}
-                targetSessions={t.targetSessions}
-                isActive={t.isActive}
-                isPaused={t.isPaused}
-            />
+            <ProgressStrip value={t.progress} />
+            <SessionDots completedSessions={t.completedSessions} targetSessions={t.targetSessions} isActive={t.isActive} isPaused={t.isPaused} />
             <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
             {finishAt && <div className={styles.estimatedFinish}>~Done by {finishAt}</div>}
             <TimerRing t={t} />
+            <TimerControls
+                isActive={t.isActive} isPaused={t.isPaused}
+                onToggle={onPrimaryStart} onPause={t.togglePause}
+                onReset={t.resetTimer} onEndEarly={() => t.setModal('endEarly')}
+                totalPaused={t.totalPaused}
+            />
         </>
     );
 };
 
-export const MainSection = ({ t, onOpenHistory, isMobile }) => {
-    const [distractions, setDistractions] = useState([]);
-
-    useEffect(() => {
-        if (!t.isActive && !t.isPaused) setDistractions([]);
-    }, [t.isActive, t.isPaused]);
-
-    useEffect(() => {
-        setDistractions([]);
-    }, [t.completedSessions]);
-
-    const controls = <TimerControls isActive={t.isActive} isPaused={t.isPaused} onToggle={() => t.setIsActive(true)} onPause={t.togglePause} onReset={t.resetTimer} totalPaused={t.totalPaused} onEndEarly={() => t.setModal('endEarly')} />;
+export const MainSection = ({ t, onOpenHistory, onOpenFocus, isMobile }) => {
+    const startManualTask = useCallback(() => {
+        const title = (t.task || '').trim();
+        if (!title) { t.setIsActive(true); return; }
+        if (t.setActiveTaskId) {
+            t.setActiveTaskId(null, {
+                title,
+                moduleCode: t.activeTaskMeta?.moduleCode || null,
+                dueDate: t.activeTaskMeta?.dueDate || null,
+                listName: t.activeTaskMeta?.listName || 'Quick task',
+                estimatedBlocks: Number(t.activeTaskMeta?.estimatedBlocks || 1),
+                estimatedSessionCount: Number(t.targetSessions || 1),
+                estimatedWorkMinutes: Number(t.workTime || 25),
+            });
+        }
+        t.setIsActive(true);
+    }, [t]);
 
     return (
         <div className={styles.timerMainCard}>
-            <TimerTopSection t={t} />
-            <TimerInfoSection t={t} />
-            {controls}
+            <TimerTopSection t={t} onOpenFocus={onOpenFocus} />
+            <TimerInfoSection t={t} onPrimaryStart={startManualTask} />
             <LiveStatsRow
-                blockTotalWork={t.blockTotalWork}
-                blockTotalBreak={t.blockTotalBreak}
-                totalPaused={t.totalPaused}
-                distractions={distractions.length}
-                isActive={t.isActive}
-                isPaused={t.isPaused}
-                onDistract={() => setDistractions(prev => [...prev, Date.now()])}
+                blockTotalWork={t.blockTotalWork} blockTotalBreak={t.blockTotalBreak}
+                totalPaused={t.totalPaused} distractions={t.distractionCount}
+                isActive={t.isActive} isPaused={t.isPaused} onDistract={t.addDistraction}
             />
-            <PaceIndicator completedSessions={t.completedSessions} targetSessions={t.targetSessions} />
-            {isMobile && (
-                <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>View History 📜</button>
-            )}
+            {isMobile && <button className={styles.mobileHistoryBtn} onClick={onOpenHistory}>View History 📜</button>}
         </div>
     );
 };
 
+function RightRailTabs({ t }) {
+    const [tab, setTab] = useState('presets');
+    const tabs = [
+        { id: 'presets',  label: 'Presets',        content: <PresetPanel t={t} embedded /> },
+        { id: 'config',   label: 'Configuration',  content: <TimerConfigPanel t={t} embedded /> },
+        { id: 'history',  label: 'History',         content: <RightRailHistoryPanel /> },
+    ];
+    return (
+        <div className={styles.presetPanelCard}>
+            <Tabs tabs={tabs} activeTab={tab} onTabChange={setTab} layoutId="timerRightRailTab" tabVariant="heading" />
+        </div>
+    );
+}
+
 export const RightPanel = ({ t }) => (
     <div className={styles.timerRightPanel}>
-        <PresetPanel t={t} />
-        <div className={styles.timerSettingsCard}>
-            <span className={styles.rightCardLabel}>Timer Settings</span>
-            <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} isActive={t.isActive} />
-            <AutoStartToggle />
-        </div>
-        <BlockStatsCard
-            completedSessions={t.completedSessions}
-            targetSessions={t.targetSessions}
-            blockTotalWork={t.blockTotalWork}
-            blockTotalBreak={t.blockTotalBreak}
-        />
-        <div className={styles.timerSoundCard}>
-            <SoundSelector />
-            <div className={styles.musicLinks}>
-                <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" className={styles.musicLink}>🎵 Spotify</a>
-                <a href="https://music.youtube.com" target="_blank" rel="noopener noreferrer" className={styles.musicLink}>🎵 YT Music</a>
-            </div>
-        </div>
-        <MilestoneCard />
+        <RightRailTabs t={t} />
+        <InlineSoundPanel />
     </div>
 );
 
 export const PopupSection = ({ t, showHistory, onCloseHistory }) => {
-    // Auto-start break when toggle is on
     useEffect(() => {
         if (t.modal !== 'break') return;
         if (localStorage.getItem(AUTOSTART_KEY) !== 'true') return;
@@ -517,58 +389,88 @@ export const PopupSection = ({ t, showHistory, onCloseHistory }) => {
         return () => clearTimeout(id);
     }, [t.modal, t.handlers]);
 
-    const h = showHistory ? <HistoryModal onClose={onCloseHistory} /> : null;
-    const oWork = t.isOvertime ? <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} /> : null;
-    const oBreak = t.isBreakOvertime ? <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} /> : null;
-    // When auto-start is on, skip the BreakModal (handled by useEffect above)
-    const autoStart = typeof localStorage !== 'undefined' && localStorage.getItem(AUTOSTART_KEY) === 'true';
-    const bModal = t.modal === 'break' && !autoStart ? <BreakModal onAction={t.handlers.break} isLastSession={(t.completedSessions + 1) >= t.targetSessions} /> : null;
-    const gModal = t.modal === 'goal' ? <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} /> : null;
-    const eModal = t.modal === 'endEarly' ? <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} /> : null;
-    return <>{h}{oWork}{oBreak}{bModal}{gModal}{eModal}</>;
-};
-
-/** Minimal content for full-screen focus overlay */
-export const FocusOverlayContent = ({ t }) => {
-    const [distractions, setDistractions] = useState([]);
-    const isOvertime = t.isOvertime || t.isBreakOvertime;
-    const finishAt = estimatedFinishTime(t);
-
     useEffect(() => {
-        if (!t.isActive && !t.isPaused) setDistractions([]);
-    }, [t.isActive, t.isPaused]);
+        if (t.modal !== 'autoBreak' || !t.isActive || t.timeLeft > 0) return;
+        const id = setTimeout(() => t.handlers.autoBreakDone(), 250);
+        return () => clearTimeout(id);
+    }, [t.modal, t.isActive, t.timeLeft, t.handlers]);
+
+    const autoStart = typeof localStorage !== 'undefined' && localStorage.getItem(AUTOSTART_KEY) === 'true';
+    const isLastSession = (t.completedSessions + 1) >= t.targetSessions;
+    const currentGoalSec = Math.max(60, Number((t.mode === 'break' ? t.breakTime : t.workTime) || 25) * 60);
+    const currentElapsedSec = Math.max(0, currentGoalSec - Math.max(0, Number(t.timeLeft || 0)));
 
     return (
         <>
-            {t.task && <p className={styles.focusOverlayTask}>{t.task}</p>}
-            <FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} />
-            <SessionDots
-                completedSessions={t.completedSessions}
-                targetSessions={t.targetSessions}
-                isActive={t.isActive}
-                isPaused={t.isPaused}
-            />
-            <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-            {finishAt && <div className={styles.estimatedFinish}>~Done by {finishAt}</div>}
-            <TimerRing t={t} />
-            <TimerControls
-                isActive={t.isActive}
-                isPaused={t.isPaused}
-                onToggle={() => t.setIsActive(true)}
-                onPause={t.togglePause}
-                onReset={t.resetTimer}
-                totalPaused={t.totalPaused}
-                onEndEarly={() => t.setModal('endEarly')}
-            />
-            <LiveStatsRow
-                blockTotalWork={t.blockTotalWork}
-                blockTotalBreak={t.blockTotalBreak}
-                totalPaused={t.totalPaused}
-                distractions={distractions.length}
-                isActive={t.isActive}
-                isPaused={t.isPaused}
-                onDistract={() => setDistractions(prev => [...prev, Date.now()])}
-            />
+            {showHistory && <HistoryModal onClose={onCloseHistory} />}
+            {t.modal === 'autoBreak' && <BreakStartedPopup time={t.timeLeft} onAction={t.handlers.autoBreakDone} />}
+            {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={isLastSession} />}
+            {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
+            {t.modal === 'break' && !autoStart && <BreakModal onAction={t.handlers.break} isLastSession={isLastSession} />}
+            {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} distractionCount={t.distractionCount} />}
+            {t.modal === 'endEarly' && <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} elapsedSeconds={currentElapsedSec} goalSeconds={currentGoalSec} />}
         </>
+    );
+};
+
+export const FocusOverlayContent = ({ t, onExitFocus }) => (
+    <>
+        <button className={styles.focusOverlayClose} onClick={onExitFocus}>✕ Exit focus</button>
+        <TimerCircle t={t} />
+    </>
+);
+
+export const SessionLogTable = () => {
+    const [rows, setRows] = useState([]);
+
+    const refreshHistory = async () => {
+        try {
+            const data = await getHistory();
+            const today = Array.isArray(data) ? data.filter(r => isToday(r.start_time || r.startTime || r.date || r.end_time || r.endTime)) : [];
+            setRows(today.sort((a, b) => {
+                const aT = extractTime(a.start_time || a.startTime || a.date);
+                const bT = extractTime(b.start_time || b.startTime || b.date);
+                if (!aT || !bT) return 0;
+                return bT - aT;
+            }));
+        } catch { setRows([]); }
+    };
+
+    useEffect(() => {
+        refreshHistory();
+        window.addEventListener('timerHistoryUpdated', refreshHistory);
+        window.addEventListener('historyCleared', refreshHistory);
+        return () => {
+            window.removeEventListener('timerHistoryUpdated', refreshHistory);
+            window.removeEventListener('historyCleared', refreshHistory);
+        };
+    }, []);
+
+    return (
+        <div className={styles.sessionLogCard}>
+            <div className={styles.sessionLogHeader}>Today's Sessions</div>
+            {rows.length > 0 ? (
+                <table className={styles.sessionLogTable}>
+                    <thead><tr><th>Time</th><th>Duration</th><th>Module / Task</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {rows.map((r, idx) => {
+                            const start = extractTime(r.start_time || r.startTime || r.date);
+                            const task = r.task || 'Break';
+                            const moduleName = r.module || r.module_code || r.moduleCode;
+                            return (
+                                <tr key={r.id ?? `${task}-${idx}`}>
+                                    <td>{start ? start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                                    <td>{formatSessionMinutes(r.duration ?? 0)}</td>
+                                    <td>{moduleName ? `${task} · ${moduleName}` : task}</td>
+                                    <td>{r.status || 'Completed'}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            ) : (
+                <div className={styles.sessionLogEmpty}>No completed sessions yet today.</div>
+            )}
+        </div>
     );
 };

@@ -66,7 +66,7 @@
   font-family: var(--font-body);
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--text, #292524);
+  color: var(--text, var(--text));
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
@@ -86,7 +86,7 @@
   border-radius: 10px;
   background: transparent;
   border: none;
-  color: var(--muted, #78716c);
+  color: var(--muted, var(--color-primary));
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -94,7 +94,7 @@
 }
 .infoModalClose:hover {
   background: color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
-  color: var(--text, #292524);
+  color: var(--text, var(--text));
 }
 
 .infoModalBody {
@@ -118,7 +118,7 @@
   font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text, #292524);
+  color: var(--text, var(--text));
   line-height: 1.4;
 }
 
@@ -175,7 +175,7 @@
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text, #292524);
+  color: var(--text, var(--text));
 }
 .infoRowFull .infoVal { font-weight: 500; }
 
@@ -227,7 +227,7 @@
   border-radius: 10px;
   background: var(--primary, #7B6751);
   border: none;
-  color: #fff;
+  color: var(--color-card);
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
@@ -241,20 +241,20 @@
 }
 
 /* Dark mode overrides */
-:root[data-theme="dark"] .infoModal {
+:root[data-mode="dark"] .infoModal {
   background: var(--card-bg);
   border-color: var(--border-color);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
-:root[data-theme="dark"] .infoModalHeader { background: var(--card-bg); border-bottom-color: var(--border-color); }
-:root[data-theme="dark"] .infoModalBody   { background: var(--card-bg); }
-:root[data-theme="dark"] .infoHero        { background: rgba(255,255,255,0.04); border-color: var(--border-color); }
-:root[data-theme="dark"] .infoRow,
-:root[data-theme="dark"] .infoRowFull     { background: rgba(255,255,255,0.04); border-color: var(--border-color); }
-:root[data-theme="dark"] .infoValPill     { background: rgba(255,255,255,0.08); border-color: var(--border-color); color: var(--text-primary); }
-:root[data-theme="dark"] .infoModalFooter { background: rgba(255,255,255,0.03); border-top-color: var(--border-color); }
-:root[data-theme="dark"] .infoCloseBtn    { background: var(--primary); color: var(--card-bg); }
-:root[data-theme="dark"] .infoCloseBtn:hover { background: var(--primary); filter: brightness(1.1); }
+:root[data-mode="dark"] .infoModalHeader { background: var(--card-bg); border-bottom-color: var(--border-color); }
+:root[data-mode="dark"] .infoModalBody   { background: var(--card-bg); }
+:root[data-mode="dark"] .infoHero        { background: rgba(255,255,255,0.04); border-color: var(--border-color); }
+:root[data-mode="dark"] .infoRow,
+:root[data-mode="dark"] .infoRowFull     { background: rgba(255,255,255,0.04); border-color: var(--border-color); }
+:root[data-mode="dark"] .infoValPill     { background: rgba(255,255,255,0.08); border-color: var(--border-color); color: var(--text-primary); }
+:root[data-mode="dark"] .infoModalFooter { background: rgba(255,255,255,0.03); border-top-color: var(--border-color); }
+:root[data-mode="dark"] .infoCloseBtn    { background: var(--primary); color: var(--card-bg); }
+:root[data-mode="dark"] .infoCloseBtn:hover { background: var(--primary); filter: brightness(1.1); }
 
 /* ── Context menu ── */
 @keyframes menuPop {

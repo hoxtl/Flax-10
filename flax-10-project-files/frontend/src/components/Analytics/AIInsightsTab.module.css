@@ -96,8 +96,15 @@
   height: 34px;
 }
 
-.generateBtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-.generateBtn:disabled { opacity: 0.65; cursor: not-allowed; }
+.generateBtn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.generateBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
 
 .btnSpinner {
   width: 14px;
@@ -108,7 +115,11 @@
   animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 .loadingState {
   flex: 1;
@@ -131,8 +142,17 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.5;
+  }
 }
 
 .emptyState {
@@ -205,8 +225,16 @@
 }
 
 @media (max-width: 900px) {
-  .aiGrid { grid-template-columns: 1fr; }
-  .panel, .chatPanel { min-height: 420px; max-height: 520px; border-radius: var(--ai-panel-radius-mobile); }
+  .aiGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel,
+  .chatPanel {
+    min-height: 420px;
+    max-height: 520px;
+    border-radius: var(--ai-panel-radius-mobile);
+  }
 }
 
 /* ── Panel body ── */
@@ -234,7 +262,8 @@
   padding: 1rem 0 0.25rem;
   color: var(--ai-empty-text);
   font-size: 0.875rem;
-  min-height: 0;           /* was 300px — removed so Home card stays compact */
+  min-height: 0;
+  /* was 300px — removed so Home card stays compact */
 }
 
 .insightItem {
@@ -309,7 +338,8 @@
   color: var(--text);
 }
 
-.mdUl, .mdOl {
+.mdUl,
+.mdOl {
   margin: 0.2rem 0;
   padding-left: 1.2rem;
   display: flex;

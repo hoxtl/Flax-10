@@ -139,7 +139,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
-  const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
@@ -167,9 +166,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return () => clearTimeout(id);
   }, [selectedDate, allCalEvents, loadEvents]);
 
-  /* Live Compass: recalc every 60s so the NOW line moves without refresh */
+  /* Live Compass: recalc every 10s so the NOW line moves without refresh */
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60000);
+    const id = setInterval(() => setNow(new Date()), 10000);
     return () => clearInterval(id);
   }, []);
 
@@ -198,11 +197,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
     }
   }, [showCreateTaskModal]);
-
-  /* Fetch task lists on mount so Action Hub can show list names (e.g. University, SEG) and link to /tasks?list= */
-  useEffect(() => {
-    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
-  }, []);
 
 
 
@@ -538,17 +532,17 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
   const tasksDueToday = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
-    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     const filtered = (allTasks || []).filter((t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= dayStart && d <= dayEnd;
+      return d && d >= todayStart && d <= todayEnd;
     });
-    const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < now;
+
+    const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < todayStart;
     return [...filtered].sort((a, b) => {
       const aOver = isOverdue(a);
       const bOver = isOverdue(b);
@@ -556,7 +550,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       if (!aOver && bOver) return 1;
       return 0;
     });
-  }, [selectedDate, allTasks]);
+  }, [allTasks, now]);
 
   /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps, conflictAt. */
   const navigatorContext = useMemo(
@@ -589,7 +583,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
   const overdueTasksForNow = useMemo(() => {
-    const now = new Date();
     return (tasksDueToday || [])
       .filter(
         (t) =>
@@ -599,59 +592,50 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           new Date(t.due_date) < now
       )
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-  }, [tasksDueToday, getTag]);
+  }, [tasksDueToday, getTag, now]);
 
-  /** task-only. Include due-today tasks and incomplete overdue tasks. */
+  /** task-only. Include ONLY due-today tasks. Overdue tasks are shown on the 'Overdue' page. */
   const taskWidgetList = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const now = new Date();
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
+    // We always define "Today" relative to the actual current time (now)
+    // so this widget remains stable as "Today's Tasks" even if selectedDate changes.
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     const isDueToday = (t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= dayStart && d <= dayEnd;
-    };
-    const isOverdueTask = (t) => {
-      const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d < now && !t.completed;
+      return d && d >= todayStart && d <= todayEnd;
     };
 
     const tasks = (allTasks || [])
-      .filter(
-        (t) =>
-          (isDueToday(t) || isOverdueTask(t))
-      )
+      .filter((t) => isDueToday(t)) // Strictly Today
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
-        const isOverdue = due && due < now && !t.completed;
         let taskWidgetStatus = "upcoming";
         if (t.completed) taskWidgetStatus = "completed";
-        else if (isOverdue) taskWidgetStatus = "overdue";
+
         return {
           type: "task",
           id: `task-${t.id}`,
-          sortTime: due || dayEnd,
-          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : dayEnd,
-          isOverdue,
+          sortTime: due || todayEnd,
+          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : todayEnd,
           taskWidgetStatus,
           ...t,
         };
       });
 
-    const futureTasks = tasks.filter((t) => !t.completed && t.sortTime >= now && t.sortTime <= dayEnd);
-    const nowTask = futureTasks.sort(
-      (a, b) => new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime()
-    )[0];
-    if (nowTask) nowTask.taskWidgetStatus = "now";
+    // Mark the very next upcoming task as "now"
+    const incomplete = tasks.filter(t => !t.completed).sort((a,b) => a.sortTime - b.sortTime);
+    const nextTask = incomplete.find(t => t.sortTime >= now);
+    if (nextTask) nextTask.taskWidgetStatus = "now";
 
     const order = (a, b) => {
-      const statusOrder = { overdue: 0, now: 1, upcoming: 2, completed: 3 };
-      return (statusOrder[a.taskWidgetStatus] ?? 2) - (statusOrder[b.taskWidgetStatus] ?? 2);
+      const statusOrder = { now: 0, upcoming: 1, completed: 2 };
+      return (statusOrder[a.taskWidgetStatus] ?? 1) - (statusOrder[b.taskWidgetStatus] ?? 1);
     };
     return [...tasks].sort(order);
-  }, [selectedDate, allTasks, getTag]);
+  }, [allTasks, now]);
 
   /** Task-only: no events. */
   const taskWidgetItemsOnly = useMemo(
@@ -659,17 +643,17 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     [taskWidgetList]
   );
   const taskWidgetDueTodayCount = useMemo(() => {
-    if (!isToday(selectedDate)) return 0;
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     return (taskWidgetItemsOnly || []).filter((t) => {
       if (t.completed || !t.due_date) return false;
       const due = new Date(t.due_date);
-      return due >= dayStart && due <= dayEnd;
+      return due >= todayStart && due <= todayEnd;
     }).length;
-  }, [selectedDate, taskWidgetItemsOnly, isToday]);
+  }, [taskWidgetItemsOnly, now]);
   const taskWidgetCompletedCount = useMemo(
     () => taskWidgetItemsOnly.filter((i) => i.completed).length,
     [taskWidgetItemsOnly]
@@ -746,74 +730,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return null;
   }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
 
-  /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
-  const [replanLoading, setReplanLoading] = useState(false);
-  const handleReplanDay = useCallback(async () => {
-    const missedTasksOnly = missedItems.filter((item) => !isRoutineEvent(item));
-    const overdueTasks = overdueTasksForNow || [];
-    const hasMissed = missedTasksOnly.length > 0;
-    const hasOverdueTasks = overdueTasks.length > 0;
-    if (!hasMissed && !hasOverdueTasks) {
-      showToast("Nothing to re-plan.");
-      return;
-    }
-    const windows = getAllFreeWindowsToday(sortedEvents, selectedDate);
-    if (windows.length === 0) {
-      showToast("No free windows left today. Try re-scheduling for tomorrow.");
-      return;
-    }
-    setReplanLoading(true);
-    try {
-      const windowCopies = windows.map((w) => ({
-        start: new Date(w.start.getTime()),
-        end: new Date(w.end.getTime()),
-        minutes: w.minutes,
-      }));
-      let assignedCount = 0;
-      for (const item of [...missedTasksOnly].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))) {
-        const end = item.end_time ? new Date(item.end_time) : new Date(item.start_time);
-        const durationMins = Math.round((end - new Date(item.start_time)) / 60000) || 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await editEvent(extractBaseEventId(item.id), {
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      for (const task of overdueTasks) {
-        const durationMins = (task.estimated_blocks || 1) * 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await addEvent({
-          title: task.title,
-          description: task.description || "",
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      await loadEvents();
-      refetchTasks();
-      showToast(
-        assignedCount > 0
-          ? `Re-planned ${assignedCount} item${assignedCount === 1 ? "" : "s"} into your day.`
-          : "No items could fit in remaining windows."
-      );
-    } catch {
-      showToast("Couldn't re-plan. Try again.");
-    } finally {
-      setReplanLoading(false);
-    }
-  }, [missedItems, overdueTasksForNow, sortedEvents, selectedDate, editEvent, addEvent, loadEvents, showToast, refetchTasks]);
+  const openQuickAddSchedule = useCallback((view) => {
+    window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+  }, []);
 
 
   const handleTaskToggle = useCallback(
@@ -874,14 +793,11 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
 
-        {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
         <div className={styles.intelligenceRowWrap}>
           <IntelligenceRow
             displayName={displayName}
             recommendation={homepageRecommendation}
-
             slot1TodayTasks={
-              // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
               <TaskWidgetSlot
                 styles={taskWidgetStyles}
                 displayName={displayName}
@@ -912,19 +828,12 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
               />
             }
             slot3Urgent={
-              // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
               <DeadlinesWidget
                 deadlines={upcomingDeadlines || []}
                 onSelectDeadline={setSelectedDeadline}
                 onSelectModule={(mod) => setSelectedModulePill(mod)}
               />
             }
-            // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
-            studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
-            studyPulseNow={now}
-            studyPulseOnStartFocus={() => navigate("/timer")}
-            studyPulseDeadlines={upcomingDeadlines || []}
-            // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
             slot5Data={{
               now,
               isToday: isToday(selectedDate),
@@ -1053,7 +962,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           </div>
         )}
       </div>
-      
+
       <motion.div
         className={styles.bentoSpine}
         id="timeline-section"
@@ -1073,18 +982,29 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             <div className={styles.timelineHeaderRight}>
               <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
               {isToday(selectedDate) && (
-                <motion.button
-                  type="button"
-                  className={styles.replanBtn}
-                  onClick={handleReplanDay}
-                  disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
+                <motion.div
+                  className={styles.scheduleActionGroup}
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25 }}
-                  aria-label="Re-plan overdue and missed items into free windows"
                 >
-                  {replanLoading ? "Re-planning…" : "✨ Re-plan"}
-                </motion.button>
+                <button
+                  type="button"
+                  className={styles.manualScheduleBtn}
+                  onClick={() => openQuickAddSchedule('schedule_manual')}
+                  aria-label="Open manual schedule quick add"
+                >
+                  🧩 Manual Schedule
+                </button>
+                <button
+                  type="button"
+                  className={styles.autoScheduleBtn}
+                  onClick={() => openQuickAddSchedule('schedule_auto')}
+                  aria-label="Open auto schedule quick add"
+                >
+                  ⚙️ Auto Schedule
+                </button>
+                </motion.div>
               )}
             </div>
           </div>
@@ -1113,13 +1033,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 onDelete={handleTimelineDelete}
                 onReschedule={handleReschedule}
                 getTag={getTag}
-                completedEventIds={completedEventIds}
-                onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
-                  const next = new Set(prev);
-                  if (next.has(eventId)) next.delete(eventId);
-                  else next.add(eventId);
-                  return next;
-                })}
                 hasTimerSession={hasTimerSession}
                 timerTask={timerTask}
                 timeLeft={timeLeft}

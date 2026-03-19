@@ -14,6 +14,7 @@ const {
   mockUseCalendarEvents,
   mockNavigate,
   mockGetTag,
+  mockGetUpcomingDeadlines,
 } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
   mockOpenModal: vi.fn(),
@@ -25,6 +26,7 @@ const {
   mockUseCalendarEvents: vi.fn(),
   mockNavigate: vi.fn(),
   mockGetTag: vi.fn(() => ({ label: 'Academic' })),
+  mockGetUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]),
 }));
 
 const TODAY = new Date();
@@ -284,7 +286,7 @@ vi.mock('../../api/moduleApi', () => ({
 }));
 
 vi.mock('../../api/deadlineApi', () => ({
-  getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]),
+  getUpcomingDeadlines: mockGetUpcomingDeadlines,
 }));
 
 vi.mock('../../lib/completionMessages', () => ({
@@ -319,6 +321,7 @@ beforeEach(() => {
   mockRemoveEvent.mockResolvedValue(undefined);
   mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
+  mockGetUpcomingDeadlines.mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]);
   global.IntersectionObserver = class {
     constructor() { }
     observe() { }
@@ -645,50 +648,42 @@ describe('Homepage', () => {
     expect(mockRefetchTasks).toHaveBeenCalled();
   });
 
-  it('Re-plan button shows when today and triggers handleReplanDay', async () => {
+  it('shows manual and auto schedule actions for today', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
     isToday.mockReturnValue(true);
-    const { getNextFreeSlotToday, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    mockDayEvents = [{ id: 1, title: 'Past', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [{ id: 1, title: 'T', due_date: new Date().toISOString(), completed: false }];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/Re-planned|No items could fit|Nothing to re-plan|No free windows/)).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Open manual schedule quick add/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Open auto schedule quick add/i })).toBeInTheDocument();
   });
 
-  it('Re-plan button is disabled when no missed or overdue items', async () => {
+  it('manual schedule action opens quick add in manual mode', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
     isToday.mockReturnValue(true);
-    mockDayEvents = [];
-    mockAllTasks = [];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    expect(screen.getByRole('button', { name: /Re-plan/ })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /Open manual schedule quick add/i }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_manual' } }));
   });
 
-  it('Re-plan shows "No free windows" when getAllFreeWindowsToday returns empty', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
+  it('auto schedule action opens quick add in auto mode', async () => {
+    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
     isToday.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([]);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/No free windows left today/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Open auto schedule quick add/i }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_auto' } }));
   });
 
   it('focus banner shows BREAK when timer mode is break', () => {
@@ -1106,44 +1101,6 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('reschedule'));
     await waitFor(() => expect(screen.getByText("Couldn't re-schedule. Try again.")).toBeInTheDocument());
-  });
-
-  it('Re-plan shows "Nothing to re-plan" when missed items are all routine', async () => {
-    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { isRoutineEvent, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Routine', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText('Nothing to re-plan.')).toBeInTheDocument());
-  });
-
-  it('Re-plan shows error toast when editEvent fails', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday, isRoutineEvent } = await import('../../pages/Homepage/utils/index');
-    isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(false);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
-    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText("Couldn't re-plan. Try again.")).toBeInTheDocument());
   });
 
   it('deadline detail shows link to module by code when only module_code set', async () => {

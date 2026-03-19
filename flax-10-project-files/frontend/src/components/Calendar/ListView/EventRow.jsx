@@ -4,7 +4,9 @@
  */
 import { useState } from 'react';
 import { getEventType, isReadOnlyEvent, isAllDay } from '../utils/eventUtils';
-import { useEventModal } from '../../../context/CalendarContext';
+import { useEventModal, useCalendarDispatch } from '../../../context/CalendarContext';
+import { useConfirm } from '../../../context/ConfirmContext';
+
 import { useQuickActions } from '../hooks/useQuickActions';
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
@@ -60,10 +62,24 @@ function DetailRow({ label, value, muted, full }) {
   );
 }
 
-function DetailButton({ variant = 'secondary', onClick, children }) {
+function DetailButton({ variant = 'secondary', onClick, children, className }) {
+  const btnVariant = variant === 'primary' ? 'primary' : variant === 'danger' ? 'danger' : 'ghost';
   return (
-    <PrimaryButton type="button" className={styles.detailButton} onClick={onClick}
-      variant={variant === 'primary' ? 'primary' : 'ghost'} size="small" pill>{children}</PrimaryButton>
+    <PrimaryButton type="button" className={`${styles.detailButton} ${className || ''}`} onClick={onClick}
+      variant={btnVariant} size="small" pill>{children}</PrimaryButton>
+  );
+}
+
+/** Renders a single row in the calendar list view with expandable details. */
+export function EventRow({ event }) {
+  const state = useEventRowState(event);
+  const rowClass = `${styles.eventRow} ${state.expanded ? styles.expanded : ''} ${state.readOnly ? styles.readOnly : ''}`;
+  return (
+    <div className={rowClass} onClick={() => state.setExpanded(p => !p)}>
+      <EventRowMain event={event} themeColor={state.accentColor} badges={state.badges} expanded={state.expanded} />
+      {state.expanded && <EventRowDetail event={event} readOnly={state.readOnly} hasQuick={!!state.quickAction}
+        onEdit={state.handlers.onEdit} onDelete={state.handlers.onDelete} onUnimap={state.handlers.onUnimap} onQuick={state.handlers.onQuick} quickLabel={state.quickAction?.label} />}
+    </div>
   );
 }
 
@@ -79,7 +95,7 @@ function EventRowMain({ event, themeColor, badges, expanded }) {
   );
 }
 
-function EventRowDetail({ event, readOnly, hasQuick, onEdit, onUnimap, onQuick, quickLabel }) {
+function EventRowDetail({ event, readOnly, hasQuick, onEdit, onDelete, onUnimap, onQuick, quickLabel }) {
   const typeLabel = event.tag_name || event.tag?.name || getEventType(event);
   const timeLabel = `${formatTimeRange(event)} · ${getDurationLabel(event)}`;
   return (
@@ -91,7 +107,12 @@ function EventRowDetail({ event, readOnly, hasQuick, onEdit, onUnimap, onQuick, 
         <DetailRow label="Description" value={event.description || '-'} muted={!event.description} full />
       </div>
       <div className={styles.detailActions}>
-        {!readOnly && <DetailButton variant="primary" onClick={onEdit}>Edit</DetailButton>}
+        {!readOnly && (
+          <>
+            <DetailButton variant="primary" onClick={onEdit}>Edit</DetailButton>
+            <DetailButton variant="danger" onClick={onDelete}>Delete</DetailButton>
+          </>
+        )}
         <DetailButton onClick={onUnimap}>Get directions</DetailButton>
         {readOnly && hasQuick && <DetailButton onClick={onQuick}>{quickLabel}</DetailButton>}
       </div>
@@ -102,28 +123,28 @@ function EventRowDetail({ event, readOnly, hasQuick, onEdit, onUnimap, onQuick, 
 function useEventRowState(event) {
   const [expanded, setExpanded] = useState(false);
   const { openModal } = useEventModal();
+  const dispatch = useCalendarDispatch();
+  const confirm = useConfirm();
   const tagContext = useTags();
   const quickAction = useQuickActions(event);
   const accentColor = getEventTheme(event, tagContext).color;
   const badges = getTagBadges(event, accentColor);
   const readOnly = isReadOnlyEvent(event);
+
+  const onDelete = async (e) => {
+    e.stopPropagation();
+    const yes = await confirm({
+      title: "Delete Event", message: `Are you sure you want to delete "${event.title}"?`,
+      confirmText: "Delete", cancelText: "Cancel", isDanger: true
+    });
+    if (yes) dispatch({ type: 'DELETE_EVENT', payload: event.id });
+  };
+
   const handlers = {
     onEdit: (e) => { e.stopPropagation(); openModal(event); },
+    onDelete,
     onUnimap: (e) => { e.stopPropagation(); window.open('/map', '_blank', 'noopener,noreferrer'); },
     onQuick: (e) => { e.stopPropagation(); quickAction?.onClick(); }
   };
   return { expanded, setExpanded, accentColor, badges, readOnly, quickAction, handlers };
-}
-
-/** Renders a single row in the calendar list view with expandable details. */
-export function EventRow({ event }) {
-  const state = useEventRowState(event);
-  const rowClass = `${styles.eventRow} ${state.expanded ? styles.expanded : ''} ${state.readOnly ? styles.readOnly : ''}`;
-  return (
-    <div className={rowClass} onClick={() => state.setExpanded(p => !p)}>
-      <EventRowMain event={event} themeColor={state.accentColor} badges={state.badges} expanded={state.expanded} />
-      {state.expanded && <EventRowDetail event={event} readOnly={state.readOnly} hasQuick={!!state.quickAction}
-        onEdit={state.handlers.onEdit} onUnimap={state.handlers.onUnimap} onQuick={state.handlers.onQuick} quickLabel={state.quickAction?.label} />}
-    </div>
-  );
 }

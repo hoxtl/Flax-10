@@ -116,6 +116,23 @@ describe('computePlanTimelineRows', () => {
         expect(hourMarks.length).toBeGreaterThan(0);
     });
 
+    it('suppresses duplicate gutter time when an hour mark already shows the same exact hour', () => {
+        const events = [
+            {
+                id: 1,
+                title: 'Late lecture',
+                start_time: '2026-03-07T18:00:00',
+                end_time: '2026-03-07T18:45:00',
+                location: null,
+            },
+            makeEvent(2, 19, 20),
+        ];
+        const rows = computePlanTimelineRows(events, selectedDate, dayStart, dayEnd, now, [], [], notToday);
+        const eventAtSevenPm = rows.find((r) => r.type === 'event' && r.id === 2);
+        expect(eventAtSevenPm).toBeTruthy();
+        expect(eventAtSevenPm.hideTimeLabel).toBe(true);
+    });
+
     it('filters out events outside the day window', () => {
         const pastEvent = { id: 99, title: 'Yesterday', start_time: '2026-03-06T09:00:00', end_time: '2026-03-06T10:00:00', location: null };
         const rows = computePlanTimelineRows([pastEvent], selectedDate, dayStart, dayEnd, now, [], [], notToday);

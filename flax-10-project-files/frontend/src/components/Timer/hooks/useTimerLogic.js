@@ -9,7 +9,8 @@ export function useTimerLogic(activeTaskId, setActiveTaskId, activeTaskMeta) {
   const t = useTimer();
   const [task, setTask] = useState('');
   const notify = useNotify();
-  const { modal, setModal, startNext, resetBlockId, endEarly } = useTimerFlow({ ...t, task, activeTaskId}, notify);
+  const flow = useTimerFlow({ ...t, task, activeTaskId, activeTaskMeta }, notify);
+  const { modal, setModal, startNext, endEarly, resetBlockId, resetTimer } = flow;
   const handlers = useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly);
   const ot = t.timeLeft <= 0;
 
@@ -39,7 +40,7 @@ export function useTimerLogic(activeTaskId, setActiveTaskId, activeTaskMeta) {
   }, [activeTaskId, activeTaskMeta?.estimatedBlocks, activeTaskMeta?.estimatedSessionCount, activeTaskMeta?.estimatedWorkMinutes]);
 
   return {
-    ...t, task, setTask, modal, setModal, handlers, progress: getProgress(t),
+    ...t, ...flow, task, setTask, handlers, progress: getProgress(t), activeTaskMeta,
     isOvertime: t.mode === 'work' && ot, isBreakOvertime: t.mode === 'break' && ot
   };
 }

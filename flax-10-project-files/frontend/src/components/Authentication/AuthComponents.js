@@ -372,6 +372,14 @@ export const PasswordResetLink = styled(Link)`
     color: #4a3421;
     text-decoration: underline;
   }
+
+  [data-mode="dark"] & {
+    color: rgba(220, 190, 155, 0.85);
+
+    &:hover {
+      color: rgba(240, 215, 185, 1);
+    }
+  }
 `;
 
 export const MobileToggleButton = styled.div`

@@ -120,7 +120,7 @@ export function PlanEventRow({
       style={{ marginTop: row.spacingBeforePx || 0, minHeight: propMinHeight }}
     >
       <div className={styles.planTimelineGutter}>
-        <span className={styles.planTimelineTime}>{startTimeStr}</span>
+        {!row.hideTimeLabel ? <span className={styles.planTimelineTime}>{startTimeStr}</span> : null}
       </div>
       <div className={styles.planTimelineSpineCell} aria-hidden />
       <div
@@ -132,6 +132,7 @@ export function PlanEventRow({
           tabIndex={0}
           className={`${styles.planTimelineCard} ${active ? styles.planTimelineCardNow : ""} ${isPast ? styles.planTimelineCardPast : ""} ${isOverlap ? styles.planTimelineCardOverlap : ""} ${isRoutine ? styles.planTimelineCardRoutine : ""} ${durationMins > 0 ? styles.planTimelineCardWithDuration : ""}`}
           onContextMenu={(e) => {
+            if (isReadOnly) return;
             e.preventDefault();
             e.stopPropagation();
             onEventContextMenu?.(item, e.clientX, e.clientY);

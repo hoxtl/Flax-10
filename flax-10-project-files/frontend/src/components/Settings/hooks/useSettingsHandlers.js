@@ -115,7 +115,7 @@ async function savePassword(
 }
 
 async function tryUpdateSettings(data) {
-  const response = await updateUserSettings({ theme: data.theme });
+  const response = await updateUserSettings({ theme: data.theme, mode: data.mode });
   if (response?.user) saveUserToStorage(response.user);
   return response;
 }
@@ -220,6 +220,18 @@ export default function useSettingsHandlers() {
     return saveSleep(data, setSuccessMessage, setIsSaving);
   };
 
+  const handleStudyTimeSave = async (data) => {
+    return saveStudyTime(data, setSuccessMessage, setIsSaving);
+  };
+
+  const handleWeekPreferenceSave = async (data) => {
+    return saveWeekPreference(data, setSuccessMessage, setIsSaving);
+  };
+
+  const handleWorktimePreferenceSave = async (data) => {
+    return saveWorktimePreference(data, setSuccessMessage, setIsSaving);
+  };
+
   return {
     isSaving,
     successMessage,
@@ -230,5 +242,44 @@ export default function useSettingsHandlers() {
     handlePreferencesSave,
     handleHomeAddressSave,
     handleSleepSave,
+    handleStudyTimeSave,
+    handleWeekPreferenceSave,
+    handleWorktimePreferenceSave,
   };
+}
+
+async function saveStudyTime(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return false;
+  setIsSaving(true);
+  const { ok } = await patchSettings({
+    preferred_study_minutes_per_day: data.preferred_study_minutes_per_day,
+  }).catch(() => ({ ok: false }));
+  const msg = ok ? "Study time preference saved!" : "Failed to save study time preference";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+  return ok;
+}
+
+async function saveWeekPreference(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return false;
+  setIsSaving(true);
+  const { ok } = await patchSettings({
+    week_preference: data.week_preference,
+  }).catch(() => ({ ok: false }));
+  const msg = ok ? "Week preference saved!" : "Failed to save week preference";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+  return ok;
+}
+
+async function saveWorktimePreference(data, setSuccessMessage, setIsSaving) {
+  if (!hasToken()) return false;
+  setIsSaving(true);
+  const { ok } = await patchSettings({
+    worktime_preference: data.worktime_preference,
+  }).catch(() => ({ ok: false }));
+  const msg = ok ? "Worktime preference saved!" : "Failed to save worktime preference";
+  showTemporaryMessage(setSuccessMessage, msg);
+  setIsSaving(false);
+  return ok;
 }

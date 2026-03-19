@@ -11,6 +11,17 @@ export default function useAnalyticsOverview(period) {
   useEffect(() => {
     let cancelled = false;
 
+    if (!period) {
+      setData(null);
+      setProgressData(null);
+      setThemeStats(null);
+      setError(null);
+      setLoading(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     async function fetchAll() {
       setLoading(true);
       setError(null);

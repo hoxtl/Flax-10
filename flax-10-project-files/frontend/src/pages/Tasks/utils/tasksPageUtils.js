@@ -15,6 +15,11 @@ export function getTomorrowEndISO() {
   return d.toISOString();
 }
 
+function showInfoToast(state, message, duration = 3000) {
+  state.setToastInfo(message);
+  setTimeout(() => state.setToastInfo(null), duration);
+}
+
 function getDateBounds() {
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
@@ -56,13 +61,11 @@ async function handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta)
   const updated = await tasksApi.editTask(taskId, data);
   if (meta?.source === "context-menu" && meta?.action === "move-list") {
     const toListName = meta?.listName || listsApi.lists.find((l) => String(l.id) === String(updated?.task_list ?? data?.task_list))?.name || "new list";
-    state.setToastInfo(`Task moved to ${toListName}.`);
-    setTimeout(() => state.setToastInfo(null), 3000);
+    showInfoToast(state, `Task moved to ${toListName}.`);
     return updated;
   }
   if (meta?.source === "context-menu" && meta?.action === "set-due-date") {
-    state.setToastInfo(data?.due_date ? "Task due date updated." : "Task due date removed.");
-    setTimeout(() => state.setToastInfo(null), 3000);
+    showInfoToast(state, data?.due_date ? "Task due date updated." : "Task due date removed.");
     return updated;
   }
   return updated;
@@ -83,7 +86,9 @@ export function buildTasksPageHandlers(state, listsApi, tasksApi) {
     handleEditTask: (taskId, data, meta) => handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta),
     handleDeleteList: (listId) => handleDeleteListImpl(state, listsApi, listId),
     handleUnarchiveList: async (listId) => { await listsApi.restoreList(listId); tasksApi.reload(); },
-    handlePermanentlyDeleteList: async (listId) => { if (!window.confirm("Permanently delete this list? You won't be able to restore it.")) return; await listsApi.permanentlyDeleteList(listId); },
+    handlePermanentlyDeleteList: async (listId) => {
+      await listsApi.permanentlyDeleteList(listId);
+    },
   };
 }
 

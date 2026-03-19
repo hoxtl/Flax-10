@@ -2,13 +2,15 @@
  * DraggableEvent - Event block with drag, resize, and click interactions.
  * Renders personal events as draggable/resizable, others as read-only.
  */
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
-import { getEventType } from './utils/eventUtils';
+import { getEventType, hasRecurrence } from './utils/eventUtils';
+import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
+import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { getEventTheme } from './utils/eventStyleUtils';
 import './DraggableEvent.css';
@@ -24,8 +26,7 @@ export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly
 
 function ReadOnlyEvent({ event, style, minWidth }) {
     const { openPopup } = useEventPopup();
-    const tags = useTags();
-    const theme = getEventTheme(event, tags);
+    const theme = getEventTheme(event, useTags());
     const height = parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
 
@@ -48,14 +49,51 @@ function getReadOnlyClassName(event) {
     return 'draggable-event';
 }
 
+function useEventContextMenu(event, setCtxMenu) {
+    const { removeEvent, addException } = useEventActions();
+    const { openModal } = useEventModal();
+    const confirmFn = useConfirm();
+
+    const handleDelete = async () => {
+        setCtxMenu(null);
+        const recurring = hasRecurrence(event);
+        const choice = await confirmFn({
+            title: recurring ? "Delete Recurring Event" : "Delete Event",
+            message: recurring ? "This is a recurring event. How would you like to delete it?" : `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
+            confirmText: recurring ? "Delete ALL occurrences" : "Delete",
+            alternateText: recurring ? "Delete ONLY this one" : undefined,
+            cancelText: "Cancel",
+            isDanger: true
+        });
+        if (choice === true) await executeDelete(event, { removeEvent });
+        else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
+    };
+
+    const handleEdit = () => { setCtxMenu(null); openModal(event); };
+
+    return { handleEdit, handleDelete };
+}
+
 function useEditableEventState(event) {
     const { editEvent } = useEventActions();
     const { openPopup } = useEventPopup();
+    const { openModal } = useEventModal();
     const theme = getEventTheme(event, useTags());
-    const refs = { event: useRef(null), resizeEnded: useRef(false) };
+    const refs = { event: useRef(null), resizeEnded: useRef(false), ctxRef: useRef(null) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
-    return { openPopup, theme, refs, dragProps, isDragging, resize };
+    const [ctxMenu, setCtxMenu] = useState(null);
+
+    const menuHandlers = useEventContextMenu(event, setCtxMenu);
+
+    useEffect(() => {
+        if (!ctxMenu) return;
+        const handler = (e) => { if (refs.ctxRef.current && !refs.ctxRef.current.contains(e.target)) setCtxMenu(null); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [ctxMenu]);
+
+    return { openPopup, theme, refs, dragProps, isDragging, resize, ctxMenu, setCtxMenu, menuHandlers };
 }
 
 function EditableEvent({ event, style, minWidthForDetails }) {
@@ -65,21 +103,36 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         if (state.isDragging || state.resize.isResizing) return;
         state.openPopup(event, state.refs.event.current?.getBoundingClientRect());
     };
+    const onContextMenu = (e) => { e.preventDefault(); e.stopPropagation(); state.setCtxMenu({ x: e.clientX, y: e.clientY }); };
+
     return (
-        <EventCard event={event} style={style} theme={state.theme} refs={state.refs}
-            resize={state.resize} isDragging={state.isDragging} dragProps={state.dragProps}
-            onClick={onClick} minWidth={minWidthForDetails} />
+        <>
+            <EventCard event={event} style={style} theme={state.theme} refs={state.refs}
+                resize={state.resize} isDragging={state.isDragging} dragProps={state.dragProps}
+                onClick={onClick} onContextMenu={onContextMenu} minWidth={minWidthForDetails} />
+            {state.ctxMenu && <EventContextMenu menu={state.ctxMenu} handlers={state.menuHandlers} innerRef={state.refs.ctxRef} />}
+        </>
     );
 }
 
-function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth }) {
+function EventContextMenu({ menu, handlers, innerRef }) {
+    return (
+        <div ref={innerRef} className="event-ctx-menu" style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 99999 }}>
+            <button className="event-ctx-item" onClick={handlers.handleEdit}>✏️ Edit</button>
+            <div className="event-ctx-divider" />
+            <button className="event-ctx-item event-ctx-delete" onClick={handlers.handleDelete}>🗑 Delete</button>
+        </div>
+    );
+}
+
+function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, onClick, minWidth, onContextMenu }) {
     const height = resize.resizePreview || parseFloat(style?.height) || 0;
     const width = parseWidthPercent(style?.width);
     const className = buildClassName(isDragging, resize.isResizing);
     const renderStyle = buildStyle(style, theme, resize.resizePreview);
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} data-event-id={event.id} {...dragProps}>
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} data-event-id={event.id} {...dragProps}>
             <EventContent event={event} theme={theme} height={height} width={width} minWidth={minWidth} />
             <ResizeHandle onStart={resize.handleResizeStart} />
         </div>

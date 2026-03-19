@@ -41,7 +41,7 @@ const testClearHistory = async () => {
 
 const testClose = async () => {
     renderModal();
-    fireEvent.click(await screen.findByText('×'));
+    fireEvent.click(await screen.findByRole('button', { name: /close/i }));
     expect(onClose).toHaveBeenCalled();
 };
 
@@ -49,7 +49,7 @@ const testEmptyState = async () => {
     renderModal();
     expect(await screen.findByText('History')).toBeInTheDocument();
     expect(screen.getByText('No recent sessions.')).toBeInTheDocument();
-    expect(screen.getByText('×')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
 };
 
 const testCancelClear = async () => {

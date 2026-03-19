@@ -213,4 +213,23 @@ describe('useSettingsHandlers', () => {
             expect(result.current.successMessage).toContain('Failed');
         });
     });
+
+    describe('handleStudyTimeSave', () => {
+        it('saves study time when logged in', async () => {
+            const { result } = renderHook(() => useSettingsHandlers());
+            await act(async () => {
+                await result.current.handleStudyTimeSave({ preferred_study_minutes_per_day: 150 });
+            });
+            expect(patchSettings).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 150 });
+        });
+
+        it('returns early when not logged in', async () => {
+            hasToken.mockReturnValueOnce(false);
+            const { result } = renderHook(() => useSettingsHandlers());
+            await act(async () => {
+                await result.current.handleStudyTimeSave({ preferred_study_minutes_per_day: 150 });
+            });
+            expect(patchSettings).not.toHaveBeenCalled();
+        });
+    });
 });

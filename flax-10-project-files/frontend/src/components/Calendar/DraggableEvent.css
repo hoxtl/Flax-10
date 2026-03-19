@@ -115,3 +115,47 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* Right-click context menu for calendar events */
+.event-ctx-menu {
+    background: var(--surface-card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 4px;
+    min-width: 140px;
+}
+
+.event-ctx-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.12s;
+}
+
+.event-ctx-item:hover {
+    background: var(--hover);
+}
+
+.event-ctx-delete {
+    color: var(--danger);
+}
+
+.event-ctx-delete:hover {
+    background: var(--danger-bg);
+}
+
+.event-ctx-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2px 8px;
+}

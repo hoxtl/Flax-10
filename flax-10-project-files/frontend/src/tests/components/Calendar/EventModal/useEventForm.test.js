@@ -109,7 +109,7 @@ describe('useEventForm', () => {
         FormUtilsModule.getInitialForm.mockReturnValue(formWithTime);
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(true);
         const { result } = renderHook(() => useEventForm(event, vi.fn()));
-        await act(async () => {}); // Wait for sleepSettings to load
+        await act(async () => { }); // Wait for sleepSettings to load
         act(() => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(result.current.sleepWarning).toBe(true);
         FormUtilsModule.getInitialForm.mockReturnValue(mockInitialForm);
@@ -149,16 +149,11 @@ describe('useEventForm', () => {
         expect(result.current.sleepWarning).toBe(false);
     });
 
-    it('handleConfirmSave and handleCancelSave manage overlapWarning', async () => {
+    it('handleConfirmSave calls validateAndSubmit with forceSave=true', async () => {
         const onClose = vi.fn();
         const event = { id: 1 };
-
         const { result } = renderHook(() => useEventForm(event, onClose));
-
-        await act(async () => {
-            result.current.handleConfirmSave();
-        });
-
+        await act(async () => { result.current.handleConfirmSave(); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
             null,
             result.current.form,
@@ -170,40 +165,22 @@ describe('useEventForm', () => {
             mockEvents,
             true
         );
+    });
 
-        act(() => {
-            result.current.setForm({ ...result.current.form, title: 'Overlap' });
-        });
-
-        act(() => {
-            result.current.setForm({ ...result.current.form, title: 'Overlap' });
-        });
-
-        // manually set overlapWarning via returned state setter
-        act(() => {
-            result.current.setForm(result.current.form); // noop to satisfy act
-        });
-        act(() => {
-            // @ts-ignore accessing internal setter exposed via hook return
-            result.current.setForm(result.current.form);
-        });
-
-        act(() => {
-            // directly simulate overlap warning state
-            result.current.handleCancelSave();
-        });
-
-        act(() => {
-            result.current.handleCancelSave();
-        });
-
+    it('handleCancelSave clears overlapWarning', async () => {
+        const onClose = vi.fn();
+        const event = { id: 1 };
+        const { result } = renderHook(() => useEventForm(event, onClose));
+        act(() => { result.current.setForm({ ...result.current.form, title: 'Overlap' }); });
+        act(() => { result.current.handleCancelSave(); });
+        act(() => { result.current.handleCancelSave(); });
         expect(result.current.overlapWarning).toBeNull();
     });
 
     it('falls back to default sleep settings when getUserSettings fails', async () => {
         UserServiceModule.getUserSettings.mockRejectedValueOnce(new Error('fail'));
         const { result } = renderHook(() => useEventForm(null, vi.fn()));
-        await act(async () => {});
+        await act(async () => { });
         expect(result.current.sleepSettings).toEqual({ sleepTime: '23:00', wakeTime: '07:00' });
     });
 
@@ -214,7 +191,7 @@ describe('useEventForm', () => {
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        await act(async () => {});
+        await act(async () => { });
         act(() => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
@@ -231,7 +208,7 @@ describe('useEventForm', () => {
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        await act(async () => {});
+        await act(async () => { });
         act(() => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
@@ -242,7 +219,7 @@ describe('useEventForm', () => {
     it('uses default sleep/wake when getUserSettings returns empty or missing times', async () => {
         UserServiceModule.getUserSettings.mockResolvedValueOnce({});
         const { result } = renderHook(() => useEventForm(null, vi.fn()));
-        await act(async () => {});
+        await act(async () => { });
         expect(result.current.sleepSettings).toEqual({ sleepTime: '23:00', wakeTime: '07:00' });
     });
 
@@ -252,7 +229,7 @@ describe('useEventForm', () => {
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, start_time: '2026-03-10T14:00:00' });
         SleepWarningModule.isDuringSleepWindow.mockReturnValue(false);
         const { result } = renderHook(() => useEventForm(event, onClose));
-        await act(async () => {});
+        await act(async () => { });
         act(() => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });

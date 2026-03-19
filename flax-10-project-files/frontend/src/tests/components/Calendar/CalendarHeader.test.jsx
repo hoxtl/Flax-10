@@ -52,6 +52,7 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     SearchButton: ({ value, onChange }) => (
         <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
     ),
+    ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -120,6 +121,11 @@ describe('CalendarHeader', () => {
             type: 'SET_VIEW_MODE',
             payload: 'week',
         });
+    });
+
+    it('renders manage schedules control', () => {
+        setup();
+        expect(screen.getByText('Manage schedules')).toBeInTheDocument();
     });
 
     it('should open modal on adding event', () => {
@@ -198,7 +204,7 @@ describe('CalendarHeader', () => {
         setup();
         fireEvent.click(screen.getByText('Import timetable'));
         await screen.findByText('Import Timetable');
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 

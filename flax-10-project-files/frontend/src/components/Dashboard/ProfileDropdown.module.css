@@ -134,9 +134,9 @@
 }
 
 .menuItemDanger {
-  color: #dc2626;
+  color: var(--danger, #dc2626);
 }
 
 .menuItemDanger:hover {
-  background: #fef2f2;
+  background: rgba(220, 38, 38, 0.12);
 }

@@ -35,38 +35,39 @@ describe('ModuleDetails', () => {
 
     it('should render enroll button when not enrolled', () => {
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('Enroll in Module')).toBeInTheDocument();
+        expect(screen.getByText('Enroll in module')).toBeInTheDocument();
     });
 
     it('should render leave button when enrolled', () => {
         render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('Leave Module')).toBeInTheDocument();
+        expect(screen.getByText('Leave module')).toBeInTheDocument();
     });
 
     it('should call onBack when back button is clicked', () => {
         const onBack = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={false} onBack={onBack} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        fireEvent.click(screen.getByText('← Back to all modules'));
+        // Use a more flexible selector for the back button
+        fireEvent.click(screen.getByRole('button', { name: /Back to all modules/i }));
         expect(onBack).toHaveBeenCalled();
     });
 
     it('should call onEnroll when enroll button is clicked', () => {
         const onEnroll = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={onEnroll} onUnenroll={vi.fn()} />);
-        fireEvent.click(screen.getByText('Enroll in Module'));
+        fireEvent.click(screen.getByText('Enroll in module'));
         expect(onEnroll).toHaveBeenCalled();
     });
 
     it('should call onUnenroll when leave button is clicked', () => {
         const onUnenroll = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={onUnenroll} />);
-        fireEvent.click(screen.getByText('Leave Module'));
+        fireEvent.click(screen.getByText('Leave module'));
         expect(onUnenroll).toHaveBeenCalled();
     });
 
     it('shows No description provided when description is null', () => {
         render(<ModuleDetails module={{ ...module, description: null }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('No description provided.')).toBeInTheDocument();
+        expect(screen.getByText('No module summary available yet.')).toBeInTheDocument();
     });
 
     it('shows Unknown when created_by_name is missing', () => {
@@ -76,7 +77,7 @@ describe('ModuleDetails', () => {
 
     it('shows No deadlines assigned yet when deadlines empty', () => {
         render(<ModuleDetails module={{ ...module, deadlines: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('No deadlines assigned yet.')).toBeInTheDocument();
+        expect(screen.getByText('No assignments yet.')).toBeInTheDocument();
     });
 
     it('renders deadlines list when deadlines exist', () => {

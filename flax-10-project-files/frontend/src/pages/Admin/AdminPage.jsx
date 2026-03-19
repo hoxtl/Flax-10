@@ -18,6 +18,7 @@ import {
   resolveCourseChangeRequest,
 } from "../../api/adminApi";
 import styles from "./AdminPage.module.css";
+import AppPage from "../../components/common/AppPage/AppPage";
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -960,17 +961,16 @@ function CourseChangeRequestsTab({ onNavigate }) {
   );
 }
 
-function AdminPage({ onNavChange }) {
+function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
 
   return (
-    <div className={styles.page}>
-      <motion.div className={styles.header} {...fadeUp}>
-        <h1 className={styles.title}>Admin Dashboard</h1>
-        <p className={styles.subtitle}>
-          Manage users, societies and platform requests
-        </p>
-      </motion.div>
+    <AppPage
+      title="Admin Dashboard"
+      subtitle="Manage users, societies and platform requests"
+      onBack={onBack}
+      width="xl"
+    >
 
       <motion.div
         className={styles.tabBar}
@@ -1007,7 +1007,7 @@ function AdminPage({ onNavChange }) {
           )}
         </motion.div>
       </AnimatePresence>
-    </div>
+    </AppPage>
   );
 }
 

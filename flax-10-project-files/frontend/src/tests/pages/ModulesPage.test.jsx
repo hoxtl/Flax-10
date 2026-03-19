@@ -91,12 +91,12 @@ describe('ModulesPage', () => {
     it('should render the loading state', () => {
         mockHook.loading = true;
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
-        expect(screen.getByText(/loading modules/i)).toBeInTheDocument();
+        expect(screen.getByTestId('modules-skeleton')).toBeInTheDocument();
     });
 
     it('should render the empty state when no modules', () => {
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
-        expect(screen.getByText(/no modules found/i)).toBeInTheDocument();
+        expect(screen.getByText(/no modules yet/i)).toBeInTheDocument();
     });
 
     it('should render module grid when modules exist', async () => {
@@ -165,17 +165,19 @@ describe('ModulesPage', () => {
 
     it('uses filter from URL and allows changing filters and sort', () => {
         mockHook.modules = [{ id: 1, module_code: '5CCS2SEG', module_name: 'Intro' }];
+        localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
         render(
             <MemoryRouter initialEntries={['/modules?filter=enrolled']}>
                 <ModulesPage />
             </MemoryRouter>
         );
-        const selects = screen.getAllByTestId('animated-dd');
-        // first select corresponds to filter (All / Enrolled)
-        fireEvent.change(selects[0], { target: { value: 'enrolled' } });
-        // change department and sort
-        fireEvent.change(selects[1], { target: { value: 'all' } });
-        fireEvent.change(selects[2], { target: { value: 'deadlines' } });
+        // Student view shows the Filter dropdown
+        fireEvent.click(screen.getByText('Filter'));
+        fireEvent.click(screen.getByText('Enrollment'));
+        expect(screen.getByText('My Enrollments')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('All Modules'));
+        // Change sort (segmented control)
+        fireEvent.click(screen.getByText('Deadlines'));
     });
 
     it('renders DetailsView when moduleId is present and returns to main view on back', () => {

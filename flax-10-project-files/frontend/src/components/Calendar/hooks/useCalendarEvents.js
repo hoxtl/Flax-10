@@ -24,6 +24,33 @@ function getWeekNumber(d) {
 
 const fetchingRef = { current: false, key: null };
 
+/** Hook for loading calendar events based on current view. */
+export function useCalendarEvents() {
+  const { events, selectedDate, viewMode, reloadKey } = useCalendar();
+  const dispatch = useCalendarDispatch();
+  const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
+  const stateRef = useRef({ selectedDate, viewMode });
+  stateRef.current = { selectedDate, viewMode };
+
+  const loadEvents = useCallback(() => {
+    fetchingRef.key = null;
+    fetchEvents(stateRef.current, dispatch);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (fetchingRef.key === dateKey || fetchingRef.current) return;
+    fetchingRef.key = dateKey;
+    fetchEvents(stateRef.current, dispatch);
+  }, [dateKey, dispatch]);
+
+  useEffect(() => {
+    if (!reloadKey) return;
+    loadEvents();
+  }, [reloadKey, loadEvents]);
+
+  return { events, loadEvents };
+}
+
 async function fetchEvents(state, dispatch) {
   if (fetchingRef.current) return;
   fetchingRef.current = true;
@@ -35,28 +62,6 @@ async function fetchEvents(state, dispatch) {
   } finally {
     fetchingRef.current = false;
   }
-}
-
-/** Hook for loading calendar events based on current view. */
-export function useCalendarEvents() {
-  const { events, selectedDate, viewMode } = useCalendar();
-  const dispatch = useCalendarDispatch();
-  const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
-  const stateRef = useRef({ selectedDate, viewMode });
-  stateRef.current = { selectedDate, viewMode };
-
-  useEffect(() => {
-    if (fetchingRef.key === dateKey || fetchingRef.current) return;
-    fetchingRef.key = dateKey;
-    fetchEvents(stateRef.current, dispatch);
-  }, [dateKey, dispatch]);
-
-  const loadEvents = useCallback(() => {
-    fetchingRef.key = null;
-    fetchEvents(stateRef.current, dispatch);
-  }, [dispatch]);
-
-  return { events, loadEvents };
 }
 
 /** Hook providing event CRUD operations with auto-reload. */
