@@ -9,7 +9,7 @@ import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import TextInput from "../../components/common/TextInput/TextInput";
-import CourseDropdown from "../../components/Modules/CourseDropdown";
+import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 import styles from "./GroupWorkIndexPage.module.css";
 
 function GroupWorkIndexSkeleton() {
@@ -43,10 +43,11 @@ function CreateProjectInputs({ data, onChange }) {
       <FormField label="Project name" className={styles.inputName}>
         <TextInput value={data.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Group project name" required />
       </FormField>
-      <FormField label="Course" hint="Optional" className={styles.inputField}>
-        <CourseDropdown
+      <FormField label="Module" hint="Optional" className={styles.inputField}>
+        <UserModuleDropdown
           value={data.courseCode}
           onChange={(val) => onChange('courseCode', val)}
+          placeholder="Select a module..."
         />
       </FormField>
       <FormField label="Deadline" className={styles.inputField}>

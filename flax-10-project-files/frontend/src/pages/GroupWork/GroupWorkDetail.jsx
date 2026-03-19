@@ -6,7 +6,7 @@ import GroupTasksTab from "./GroupTasksTab";
 import AvailabilityTab from "./AvailabilityTab";
 import MemberAvatar from "./components/MemberAvatar";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import CourseDropdown from "../../components/Modules/CourseDropdown";
+import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 import styles from "./GroupWorkDetail.module.css";
 
 function GroupWorkDetailSkeleton({ onBack }) {
@@ -142,10 +142,10 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                 <input defaultValue={project.name} onBlur={onName} className={styles.nameInput} />
                 <div className={styles.metaRow}>
                     <div className={styles.courseDropdownWrapper}>
-                        <CourseDropdown
+                        <UserModuleDropdown
                             value={project.course_code || ""}
                             onChange={onCourse}
-                            placeholder="Course code"
+                            placeholder="Module code"
                             className={styles.detailCourseDropdown}
                         />
                     </div>
