@@ -81,7 +81,7 @@ function useProfileAnalytics(isSelf) {
   return data;
 }
 
-function ProfileHome({ onNavigate, visibility, viewedUserId, modules, role, onBadgesReady, viewedUsername, onPersonaReady, onSocietiesReady }) {
+function ProfileHome({ onNavigate, visibility, viewedUserId, modules, role, onBadgesReady, viewedUsername, onPersonaReady, onSocietiesReady, onModulesClick }) {
   const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const analyticsData = useProfileAnalytics(visibility.canViewAnalytics);
   const peakHour = useMemo(() => computePeakHour(analyticsData?.heatmap?.data), [analyticsData]);
@@ -126,6 +126,8 @@ function ProfileHome({ onNavigate, visibility, viewedUserId, modules, role, onBa
             currentUserModules={currentUserModules}
             currentUserSummary={currentUserSummary}
             viewedUserId={viewedUserId}
+            onSocietiesReady={onSocietiesReady}
+            onModulesClick={onModulesClick}
         />
     </div>
   );
@@ -137,7 +139,7 @@ function computePeakHour(grid) {
   return Math.max(...totals) > 0 ? totals.indexOf(Math.max(...totals)) : null;
 }
 
-function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, modules, role, viewedUsername, currentUserModules, currentUserSummary, viewedUserId }) {
+function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetch, modules, role, viewedUsername, currentUserModules, currentUserSummary, viewedUserId, onModulesClick }) {
   const [suggestionState, setSuggestionState] = useState('idle');
 
   const handleSuggestStudySession = async () => {
@@ -157,6 +159,11 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
   if (!visibility.isSelf) {
     return (
       <div className={styles.singleCol}>
+        <QuickStatsRail
+          totalHours={summary?.total_hours}
+          sessionCount={summary?.session_count}
+          moduleCount={modules?.length || 0}
+        />
         <CompatibilityScore
           viewedSummary={summary}
           currentUserSummary={currentUserSummary}
@@ -168,11 +175,6 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
           onSuggestStudySession={handleSuggestStudySession}
           suggestionState={suggestionState}
         />
-        <QuickStatsRail
-          totalHours={summary?.total_hours}
-          sessionCount={summary?.session_count}
-          moduleCount={modules?.length || 0}
-        />
         {role === 'teacher' ? (
           <ModulesSection modules={modules} onNavigate={onNavigate} role="teacher" />
         ) : (
@@ -183,6 +185,7 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
             currentUserSocieties={currentUserSummary?.societies}
             viewedUsername={viewedUsername}
             onNavigate={onNavigate}
+            onModulesClick={onModulesClick}
           />
         )}
       </div>
@@ -239,7 +242,7 @@ function ProfileContent({ user, state, visibility, onNavigate }) {
   return (
     <div className={styles.content}>
       <ProfileHeader user={profileData || user} profileData={profileData} taskCount={state.taskCount} upcomingEventCount={upcomingEventCount} handlers={handlers} visibility={visibility} badges={headerBadges} pinnedBadgeId={pinnedBadgeId} onPinBadge={handlePinBadge} onViewAllBadges={() => setShowAchievements(true)} persona={headerPersona} peakHour={headerPeakHour} societies={headerSocieties} onNavigate={onNavigate} onSocietiesClick={() => setShowSocieties(true)} />
-      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} role={profileData?.role || user?.role} onBadgesReady={setHeaderBadges} onPersonaReady={(p, ph) => { setHeaderPersona(p); setHeaderPeakHour(ph); }} onSocietiesReady={setHeaderSocieties} viewedUsername={profileData?.username || user?.username} />
+      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={modules} role={profileData?.role || user?.role} onBadgesReady={setHeaderBadges} onPersonaReady={(p, ph) => { setHeaderPersona(p); setHeaderPeakHour(ph); }} onSocietiesReady={setHeaderSocieties} viewedUsername={profileData?.username || user?.username} onModulesClick={handlers.onModulesClick} />
       {visibility.canViewCalendar && <SharedCalendarSection events={filteredEvents} />}
       {showAchievements && <AchievementsModal badges={headerBadges} onClose={() => setShowAchievements(false)} />}
       {showSocieties && <SocietiesModal isOpen societies={headerSocieties} onClose={() => setShowSocieties(false)} onNavigate={onNavigate} />}
