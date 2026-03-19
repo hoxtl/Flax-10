@@ -9,25 +9,14 @@ def _register_router():
     router.register(r'timer/history', StudySessionViewSet, basename='study-session')
     router.register(r'social', CalendarShareViewSet, basename='social')
 
-<<<<<<< HEAD
 _register_router()
 
-# Authentication
-=======
-from studyFlax.views.calendar.event_views import event_list
-from studyFlax.views.calendar.event_detail_views import event_detail, add_exception_date
-from studyFlax.views.calendar.tag_views import tag_list, tag_detail, category_list
-from studyFlax.views.calendar.timetable_views import timetable_import
-from studyFlax.views.calendar.schedule_views import *
-from studyFlax.views.hello import hello
-from studyFlax.views.modules.module_views import module_list, module_detail
-from studyFlax.views.modules.enrollment_views import enrollment_list, enrollment_detail
->>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
 from studyFlax.views.authentication.register_view import register_view
 from studyFlax.views.authentication.login_view import login_view
 from studyFlax.views.authentication.logout_view import logout_view
 from studyFlax.views.authentication.password_reset_request_view import reset_password_view
 from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
+from studyFlax.views.authentication.home_address_view import home_address_view
 
 # User
 from studyFlax.views.user.profile_view import (
@@ -52,6 +41,7 @@ from studyFlax.views.calendar.attendance_view import (
     attendance_stats,
     attendance_records,
 )
+
 # Modules
 from studyFlax.views.modules.module_view import module_list, module_detail
 from studyFlax.views.modules.enrollment_view import enrollment_list, enrollment_detail
@@ -65,6 +55,8 @@ from studyFlax.views.modules.deadline_view import deadline_list, deadline_detail
 from studyFlax.views.tasks.task_view import (
     task_list_list, task_list_detail, task_list, task_detail, log_task_time
 )
+
+# Group work
 from studyFlax.views.groupwork.groupwork_view import (
     group_project_list,
     group_project_members,
@@ -83,13 +75,15 @@ from studyFlax.views.society import (
     request_ratification, approve_ratification, reject_ratification, pending_ratifications,
     add_society_event_exception, publish_changes, report_society, toggle_subscription
 )
+
 # Notifications
-from studyFlax.views.notifications import notification_list, notification_detail, mark_all_read, clear_all
+from studyFlax.views.notifications import (
+    notification_list, notification_detail, mark_all_read, clear_all
+)
 
 # Analytics
 from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_progress_data
 from studyFlax.views.analytics import log_theme_session, get_theme_stats, get_ai_insights, ai_chat
-from studyFlax.views.authentication.home_address_view import home_address_view
 
 # Schedules
 from studyFlax.views.calendar.schedule_views import schedule_list, schedule_detail
@@ -140,7 +134,6 @@ urlpatterns = [
     path("attendance/stats/", attendance_stats, name="attendance-stats"),
     path("attendance/records/", attendance_records, name="attendance-records"),
     path("calendar/events/map/", calendar_events_map_view, name='calendar_events_map'),
-
 
     # Modules
     path("modules/", module_list, name="module-list"),
@@ -198,16 +191,8 @@ urlpatterns = [
     path("notifications/<int:pk>/", notification_detail, name="notification-detail"),
     path("notifications/mark-all-read/", mark_all_read, name="notification-mark-all-read"),
     path("notifications/clear-all/", clear_all, name="notification-clear-all"),
-<<<<<<< HEAD
 
     # Societies
-=======
-    path("settings/", user_settings_view, name='user-settings'),
-    path("schedules/", schedule_list, name='schedules'),
-<<<<<<< HEAD
->>>>>>> 5db52abb (Add Schedule model fields, serializer, views, urls)
-=======
->>>>>>> 04331906 (Add Schedule model fields, serializer, views, urls)
     path("societies/", society_list, name="society-list"),
     path("societies/<int:society_id>/", society_detail, name="society-detail"),
     path("societies/<int:society_id>/members/", membership_list, name="society-members"),
