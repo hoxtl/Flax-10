@@ -84,6 +84,7 @@ def _build_manual_schedule(request):
     serialised['overwritten'] = overwritten
     return Response(serialised, status=status.HTTP_201_CREATED)
 
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def schedule_list(request):

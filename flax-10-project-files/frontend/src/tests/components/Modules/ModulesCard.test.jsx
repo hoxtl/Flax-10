@@ -98,4 +98,17 @@ describe('ModulesCard', () => {
         render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
         expect(screen.getByText(/A{20}/)).toBeInTheDocument();
     });
+
+    it('should render readings button for teacher', () => {
+        render(<ModulesCard {...mockParameters} isTeacher={true} />);
+        expect(screen.getByText('Readings')).toBeInTheDocument();
+    });
+
+    it('should call onDelete when delete is clicked', () => {
+        const onManageReadings = vi.fn();
+        render(<ModulesCard {...mockParameters} isTeacher={true} onManageReadings={onManageReadings} />);
+        fireEvent.click(screen.getByText('Readings'));
+        expect(onManageReadings).toHaveBeenCalled();
+    });
+
 });
