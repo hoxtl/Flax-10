@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerialiser
+
 from studyFlax.models import Deadline, Schedule, ScheduleEventAllocation
+from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerialiser
+
 
 class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
     event = CalendarEventSerialiser(read_only=True)
@@ -10,8 +12,9 @@ class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
         model = ScheduleEventAllocation
         fields = ['id', 'event', 'deadline', 'deadline_title', 'allocated_minutes']
 
+
 class ScheduleSerialiser(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only = True)
+    id = serializers.IntegerField(read_only=True)
     event_allocations = ScheduleEventAllocationSerialiser(many=True, read_only=True)
     deadline = serializers.PrimaryKeyRelatedField(queryset=Deadline.objects.all(), many=True)
 
@@ -32,6 +35,7 @@ class ScheduleSerialiser(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = ['user', 'created_at', 'updated_at', 'event_allocations']
+
 
 class DeadlinePlanningPreferenceSerialiser(serializers.Serializer):
     deadline_id = serializers.IntegerField()
