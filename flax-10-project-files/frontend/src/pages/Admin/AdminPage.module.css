@@ -378,12 +378,26 @@
   letter-spacing: 0.01em;
 }
 .badgeActive {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
   background: #dcfce7;
-  color: #15803d;
+  color: #14532d;
 }
 .badgeBanned {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
   background: #fee2e2;
-  color: #b91c1c;
+  color: #7f1d1d;
 }
 .badgeTeacher {
   background: #ede9fe;
@@ -573,11 +587,15 @@ button:disabled {
 }
 .active {
   background: #dcfce7;
-  color: #15803d;
+  color: #14532d;
+  border-radius: 20px;
+  font-weight: 700;
 }
 .banned {
   background: #fee2e2;
-  color: #b91c1c;
+  color: #7f1d1d;
+  border-radius: 20px;
+  font-weight: 700;
 }
 
 .roleTag {
@@ -637,6 +655,28 @@ button:disabled {
 }
 .unbanPillBtn:hover {
   background: #bbf7d0;
+}
+
+:global(:root[data-mode="dark"]) .banBtn,
+:global(:root[data-mode="dark"]) .banPillBtn {
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+:global(:root[data-mode="dark"]) .banBtn:hover,
+:global(:root[data-mode="dark"]) .banPillBtn:hover {
+  background: #991b1b;
+}
+
+:global(:root[data-mode="dark"]) .unbanBtn,
+:global(:root[data-mode="dark"]) .unbanPillBtn {
+  background: #14532d;
+  color: #dcfce7;
+}
+
+:global(:root[data-mode="dark"]) .unbanBtn:hover,
+:global(:root[data-mode="dark"]) .unbanPillBtn:hover {
+  background: #166534;
 }
 .staffPillBadge {
   font-size: 0.72rem;

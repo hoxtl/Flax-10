@@ -150,7 +150,9 @@ function LoadingSpinner() {
 
 function StatusBadge({ active }) {
   return (
-    <span className={active ? styles.badgeActive : styles.badgeBanned}>
+    <span
+      className={`${styles.badge} ${active ? styles.badgeActive : styles.badgeBanned}`}
+    >
       {active ? "Active" : "Banned"}
     </span>
   );
