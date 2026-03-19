@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import styles from "./GroupWorkIndexPage.module.css";
 import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
-import AppPage from "../../components/Layout/AppPage/AppPage";
+import AppPage from "../../components/common/AppPage/AppPage";
 import Card from "../../components/common/Card/Card";
 import FormField from "../../components/common/FormField/FormField";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import PrimaryButton from "../../components/common/Button/PrimaryButton";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 
 function GroupWorkIndexSkeleton() {
   return (

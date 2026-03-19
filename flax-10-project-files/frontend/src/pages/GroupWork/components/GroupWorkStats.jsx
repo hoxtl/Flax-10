@@ -30,6 +30,11 @@ export default function GroupWorkStats({ projects }) {
   // 3. Collaborators
   const totalCollaborators = projects.reduce((sum, p) => sum + (p.member_count || 1), 0);
 
+  // 4. Overall Progress
+  const totalTasks = projects.reduce((sum, p) => sum + (p.task_count || 0), 0);
+  const completedTasks = projects.reduce((sum, p) => sum + (p.completed_task_count || 0), 0);
+  const totalPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
   return (
     <div className={styles.statsGrid}>
       <div className={styles.statCard}>
@@ -50,6 +55,12 @@ export default function GroupWorkStats({ projects }) {
         <div className={styles.statHeader}>COLLABORATORS</div>
         <div className={styles.statValue}>{totalCollaborators}</div>
         <div className={styles.statSub}>across all projects</div>
+      </div>
+
+      <div className={styles.statCard}>
+        <div className={styles.statHeader}>OVERALL PROGRESS</div>
+        <div className={styles.statValue}>{totalPercent}%</div>
+        <div className={styles.statSub}>{completedTasks} / {totalTasks} tasks done</div>
       </div>
     </div>
   );
