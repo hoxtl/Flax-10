@@ -1,0 +1,99 @@
+/** Styles for module deadlines and readings list items. */
+.deadlinesList {
+    display: flex;
+    flex-direction: column;
+}
+
+.deadlineItem {
+    display: flex;
+    align-items: center;
+    gap: 0.72rem;
+    padding: 0.66rem 0.1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.deadlineItem:last-child {
+    border-bottom: none;
+}
+
+.deadlineIndex {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    width: 1.1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.deadlineBody {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.deadlineTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    min-width: 0;
+}
+
+.deadlinesType {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--primary) 18%, var(--panel));
+    color: var(--flax-brown-strong);
+    padding: 0.12rem 0.48rem;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.deadlineTitle {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.urgencyTag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.1rem 0.46rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.due-soon {
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+}
+
+.this-week {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--panel));
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.later {
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+}
+
+.deadlineDate {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.emptyText,
+.descriptionText {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.94rem;
+}
