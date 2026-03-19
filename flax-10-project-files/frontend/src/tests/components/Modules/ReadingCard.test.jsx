@@ -34,4 +34,30 @@ describe('ReadingCard', () => {
         render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()}  />);
         expect(screen.getByText(/60 mins/)).toBeInTheDocument();
     });
+
+    it('should display edit and delete buttons for teacher', async () => {
+        render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={vi.fn()}  />);
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('should not display edit and delete buttons for teacher', async () => {
+        render(<ReadingCard reading={reading} isTeacher={false} onEdit={vi.fn()} onDelete={vi.fn()}  />);
+        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    });
+
+    it('should call onEdit when edit is clicked', () => {
+        const onEdit = vi.fn();
+        render(<ReadingCard reading={reading} isTeacher={true} onEdit={onEdit} onDelete={vi.fn()}  />);
+        fireEvent.click(screen.getByText('Edit'));
+        expect(onEdit).toHaveBeenCalled();
+    });
+
+    it('calls onDelete when delete button is clicked', () => {
+        const onDelete = vi.fn();
+        render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={onDelete}  />);
+        fireEvent.click(screen.getByText('Delete'));
+        expect(onDelete).toHaveBeenCalled();
+    });
 });
