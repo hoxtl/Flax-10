@@ -33,7 +33,7 @@ function GroupWorkIndexSkeleton() {
 function CreateProjectInputs({ data, onChange }) {
   return (
     <>
-      <FormField label="Project name" className={styles.inputName}>
+      <FormField label="Project Name" className={styles.inputName}>
         <TextInput 
           value={data.name} 
           onChange={(e) => onChange('name', e.target.value)} 
@@ -41,7 +41,7 @@ function CreateProjectInputs({ data, onChange }) {
           required 
         />
       </FormField>
-      <FormField label={<>Module <span className={styles.optionalText}>optional</span></>} className={styles.inputField}>
+      <FormField label={<>Module <span className={styles.optionalText}>(Optional)</span></>} className={styles.inputField}>
         <UserModuleDropdown
           value={data.course_code}
           onChange={(val) => onChange('course_code', val)}
