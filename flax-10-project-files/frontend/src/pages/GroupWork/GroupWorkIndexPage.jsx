@@ -249,6 +249,7 @@ export default function GroupWorkIndexPage() {
   return (
     <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
       <CreateProjectForm onCreated={onCreated} />
+      <GroupWorkStats projects={projects} />
       <GroupWorkContent 
         projects={projects} 
         projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} 
