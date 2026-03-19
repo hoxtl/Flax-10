@@ -126,13 +126,28 @@
   }
   .twPlay:hover { filter: brightness(1.1); }
   
+  .timelineSection {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    width: 100%;
+  }
+
   .timeline { display: flex; flex-direction: column; }
 
   .timelineBox {
     border: 1px solid var(--border);
-    border-radius: 22px;
+    border-radius: 24px;
     background: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
-    padding: 0.95rem 1.05rem 1.08rem;
+    padding: 18px 20px 20px;
+    overflow: visible;
+    position: relative;
+    flex: 1 1 auto;
+  }
+  .timelineBoxWidget {
+    background: transparent;
+    border: none;
+    padding: 0;
     overflow: visible;
     position: relative;
     flex: 1 1 auto;
@@ -3149,6 +3164,22 @@
     border: none;
   }
 
+  .timelineHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .headerRightStack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .timelineHeaderActionsGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
   .planTimelineGapTransit {
     display: flex;
     align-items: center;
