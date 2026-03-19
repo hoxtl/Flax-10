@@ -108,6 +108,7 @@ export default function SemesterOverviewWidget({
   numWeeks        = 12,
   readingWeekIndices = [],  // 0-based, e.g. [4] = week 5
   semesterLabel   = "Semester · 2025/26",
+  row             = 2,
 }) {
   const now = new Date();
 
@@ -182,7 +183,7 @@ export default function SemesterOverviewWidget({
   }
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root} ${row === 1 ? styles.h1 : styles.h2}`}>
       {/* Header */}
       <div className={baseStyles.widgetHeader}>
         <div className={baseStyles.headerIconWrap}>
@@ -207,9 +208,10 @@ export default function SemesterOverviewWidget({
       {/* Week columns */}
       <div className={styles.grid}>
         {weeks.map((w) => {
-          const lh = toHeight(w.lectureCount,  maxLecture);
-          const dh = toHeight(w.deadlineCount, maxDeadline);
-          const eh = toHeight(w.examCount,     maxExam);
+          const maxBarH = row === 1 ? 36 : 84;
+          const lh = toHeight(w.lectureCount,  maxLecture,  maxBarH);
+          const dh = toHeight(w.deadlineCount, maxDeadline, maxBarH);
+          const eh = toHeight(w.examCount,     maxExam,     maxBarH);
 
           return (
             <div
