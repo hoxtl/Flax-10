@@ -1,20 +1,49 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Tooltip.module.css';
 
+function getFixedStyle(position, rect) {
+    const gap = 8;
+    switch (position) {
+        case 'bottom':
+            return { top: rect.bottom + gap, left: rect.left + rect.width / 2 };
+        case 'left':
+            return { top: rect.top + rect.height / 2, left: rect.left - gap, transform: 'translate(-100%, -50%)' };
+        case 'right':
+            return { top: rect.top + rect.height / 2, left: rect.right + gap, transform: 'translateY(-50%)' };
+        case 'top':
+        default:
+            return { bottom: window.innerHeight - rect.top + gap, left: rect.left + rect.width / 2 };
+    }
+}
+
 export default function Tooltip({ content, children, position = 'top' }) {
-    const [visible, setVisible] = useState(false);
+    const [rect, setRect] = useState(null);
+    const wrapperRef = useRef(null);
+
+    const handleMouseEnter = () => {
+        if (wrapperRef.current) {
+            setRect(wrapperRef.current.getBoundingClientRect());
+        }
+    };
 
     return (
         <div
+            ref={wrapperRef}
             className={styles.wrapper}
-            onMouseEnter={() => setVisible(true)}
-            onMouseLeave={() => setVisible(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={() => setRect(null)}
         >
             {children}
-            {visible && content && (
-                <div className={`${styles.tooltip} ${styles[position]}`} role="tooltip">
+            {rect && content && createPortal(
+                <div
+                    className={`${styles.tooltip} ${styles[position]}`}
+                    role="tooltip"
+                    style={{ position: 'fixed', ...getFixedStyle(position, rect) }}
+                >
                     {content}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
