@@ -10,6 +10,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
     completed_task_count = serializers.IntegerField(read_only=True, default=0)
+    module_name = serializers.CharField(read_only=True, required=False)
     members = serializers.SerializerMethodField()
 
     class Meta:
@@ -18,6 +19,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "id",
             "name",
             "course_code",
+            "module_name",
             "deadline",
             "member_count",
             "task_count",

@@ -47,6 +47,7 @@ function CreateProjectInputs({ data, onChange }) {
           value={data.course_code}
           onChange={(val) => onChange('course_code', val)}
           placeholder="Select..."
+          usePortal={true}
         />
       </FormField>
       <FormField label="Deadline" className={styles.inputField}>
@@ -141,6 +142,9 @@ function ProjectRow({ project, onClick }) {
             </div>
             <div className={styles.projectText}>
                 <div className={styles.projectName}>{project.name}</div>
+                {project.module_name && (
+                    <div className={styles.projectModule}>{project.module_name}</div>
+                )}
                 <div className={styles.projectSub}>
                     <div className={styles.avatarStack}>
                         {avatarsToShow.map((member, i) => (

@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Subquery, OuterRef
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -13,6 +13,7 @@ from studyFlax.serialisers.groupwork_serialisers import (
     GroupProjectSerialiser,
     GroupMembershipSerialiser,
 )
+from studyFlax.models.modules.moduleModel import Module
 
 
 @api_view(["GET", "POST"])
@@ -25,6 +26,9 @@ def group_project_list(request):
                 member_count=Count("memberships", distinct=True),
                 task_count=Count("tasks", distinct=True),
                 completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+                module_name=Subquery(
+                    Module.objects.filter(module_code=OuterRef("course_code")).values("module_name")[:1]
+                )
             )
             .prefetch_related("memberships", "memberships__user")
             .order_by("-created_at")
@@ -48,6 +52,9 @@ def group_project_list(request):
             member_count=Count("memberships", distinct=True),
             task_count=Count("tasks", distinct=True),
             completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+            module_name=Subquery(
+                Module.objects.filter(module_code=OuterRef("course_code")).values("module_name")[:1]
+            )
         )
         .first()
     )
@@ -110,6 +117,9 @@ def group_project_detail(request, project_id):
             member_count=Count("memberships", distinct=True),
             task_count=Count("tasks", distinct=True),
             completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
+            module_name=Subquery(
+                Module.objects.filter(module_code=OuterRef("course_code")).values("module_name")[:1]
+            )
         )
         .first()
     )
