@@ -67,6 +67,7 @@ function HoldDeleteContainer() {
   return <HoldConfirmModal title={`Delete "${evt.title}"`} warningText={type === 'all' ? "Delete ALL occurrences?" : "Confirm deletion."} onConfirm={onC} onCancel={closeDelete} />;
 }
 function getPopupActions(evt, s, opts) {
+    if (s.readOnly) return null;
     const type = getEventType(evt);
     const h = {
         edit: () => { s.closePopup(); s.openModal(evt); }, delete: () => { s.closePopup(); s.handleDeleteRequest(evt); },
