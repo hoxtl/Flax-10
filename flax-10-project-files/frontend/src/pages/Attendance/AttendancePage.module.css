@@ -1,19 +1,51 @@
+/*
+ * Attendance page layout styles.
+ */
+
 .page {
-  padding: 1.5rem 2rem;
-  max-width: 1200px;
+  height: calc(100vh - 72px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 0 0.35rem 0;
+.loadingContainer {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 420px;
 }
 
-.subtitle {
-  font-size: 0.9375rem;
-  color: var(--muted);
-  margin: 0 0 1.5rem 0;
+.loadingSkeleton {
+  width: 100%;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.loadingTopCard {
+  height: 82px;
+  border-radius: 18px;
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.loadingCharts {
+  display: grid;
+  gap: 1rem;
+}
+
+.loadingChartCard {
+  height: 320px;
+  border-radius: 18px;
+}
+
+.loadingListCard {
+  min-height: 660px;
+  border-radius: 18px;
 }
 
 .error {
@@ -21,94 +53,81 @@
   font-size: 0.9375rem;
 }
 
-.empty,
-.noData {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  margin: 0;
-}
-
-.chartsRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-.charts {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1.5rem;
-  align-items: flex-start;
+.mainGrid {
   flex: 1;
-  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
 }
 
-.chartSection {
-  min-width: 260px;
+.chartsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.chartCard {
   padding: 1.25rem;
   border-radius: 12px;
   background: var(--panel);
   border: 1px solid var(--border);
 }
 
-.chartTitle {
-  font-size: 1rem;
+.chartCardLabel {
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--text);
-  margin: 0 0 0.75rem 0;
-}
-
-.percentLine {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0 0 0.5rem 0;
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  justify-content: center;
-  margin-top: 0.5rem;
-  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--muted);
+  margin: 0 0 0.75rem;
 }
 
-.legendAttended {
-  color: var(--muted) !important;
-  font-weight: 600;
-}
-
-.legendMissed {
-  color: var(--muted) !important;
-  font-weight: 600;
+.listCol {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .listPanel {
-  margin-top: 2rem;
-  max-width: 560px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  overflow: hidden;
 }
 
 .attendanceTabs {
   display: flex;
-  gap: 0.25rem;
-  margin-bottom: 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .attendanceTab,
 .attendanceTabActive {
-  padding: 0.6rem 1.1rem;
-  border-radius: 10px 10px 0 0;
-  font-size: 0.9375rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  background: var(--panel);
+  border: none;
+  background: transparent;
   color: var(--muted);
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
 }
 
 .attendanceTab:hover {
@@ -117,320 +136,47 @@
 }
 
 .attendanceTabActive {
-  background: var(--card-bg);
   color: var(--text);
-  border-bottom: 1px solid var(--card-bg);
-  margin-bottom: -1px;
+  box-shadow: inset 0 -2px 0 var(--primary);
   cursor: default;
 }
 
-.recordSection {
-  padding: 1.25rem;
-  border-radius: 0 12px 12px 12px;
-  border: 1px solid var(--border);
-  border-top: none;
-  background: var(--card-bg);
-}
-
-.recordHint {
-  font-size: 0.8125rem;
-  color: var(--muted);
-  margin: 0 0 0.75rem 0;
-}
-
-.eventList {
-  list-style: none;
-  padding: 32px 0 0 0;
-  margin: 0;
-}
-
-.eventRow {
-  display: flex;
+.tabBadge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.eventRow:last-child {
-  border-bottom: none;
-}
-
-.eventInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.eventMeta {
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.eventAction {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  position: relative;
-  width: fit-content;
-}
-
-.btnAttended,
-.btnMissed {
-  padding: 0.4rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: opacity 0.2s, transform 0.1s;
-}
-
-.btnAttended,
-.statusToggleBtn.btnAttended {
-  background: #2D8B5A !important; /* Premium Emerald */
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.btnAttended:hover:not(:disabled) {
-  background: #34A068 !important;
-  box-shadow: 0 4px 12px rgba(45, 139, 90, 0.25);
-}
-
-.btnMissed,
-.statusToggleBtn.btnMissed {
-  background: #C0392B !important; /* Premium Crimson */
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  transition: all 0.2s ease;
-}
-
-.btnMissed:hover:not(:disabled) {
-  background: #D94435 !important;
-  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
-}
-
-.btnAttended:disabled,
-.btnMissed:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.btnChange {
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
-  transition: background 0.2s, color 0.2s;
-}
-
-.btnChange:hover:not(:disabled) {
-  background: var(--hover, rgba(0, 0, 0, 0.04));
-  color: var(--text);
-}
-
-.btnChange:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.badgeAttended,
-.badgeMissed {
-  padding: 0.28rem 0.55rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.badgeAttended {
-  background: rgba(45, 139, 90, 0.12);
-  color: #2D8B5A;
-}
-
-.badgeMissed {
-  background: rgba(192, 57, 43, 0.1);
-  color: #C0392B;
-}
-
-/* Segment detail panel (right side) */
-.detailPanel {
-  flex-shrink: 0;
-  width: 100%;
-  padding: 1.25rem;
-  border-radius: 12px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-}
-
-.detailPanelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.85rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.detailPanelTitle h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text);
-  margin: 0;
-}
-
-.eventCount {
-  font-size: 0.875rem;
-  color: var(--muted);
-  display: block;
-  margin-top: 0.25rem;
-}
-
-.detailPanelClose {
-  padding: 0.3rem 0.5rem;
-  font-size: 1.25rem;
-  line-height: 1;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.detailPanelClose:hover {
-  background: var(--hover, rgba(0, 0, 0, 0.06));
-  color: var(--text);
-}
-
-.detailList {
-  list-style: none;
-  padding: 40px 12px 20px 0; /* Huge top padding for tooltips */
-  margin: 0;
-  height: 400px;
-  overflow-y: auto;
-  overflow-x: visible; /* Allow tooltips to burst horizontally if needed */
-  scrollbar-width: thin;
-  scrollbar-color: var(--primary) transparent;
-}
-
-.detailRow {
-  display: flex;
-  flex-direction: row; /* Split text and button */
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--border);
-  gap: 1rem;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.detailRow:hover {
-  z-index: 100; /* Pop above siblings for tooltip visibility */
-  background: rgba(123, 103, 81, 0.03); /* Subtle theme tint */
-}
-
-.detailRow:last-child {
-  border-bottom: none;
-}
-
-.detailRowTitle {
-  flex: 1;
-  min-width: 0;
-  color: var(--text);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.detailRowMeta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  color: var(--muted);
-  white-space: nowrap;
-  margin-top: 4px;
-}
-
-.metaDivider {
-  opacity: 0.4;
-  margin: 0 4px;
-}
-
-.detailEmpty {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  padding: 0.75rem 0;
-}
-
-.statusToggleBtn {
-  min-width: 100px;
-  position: relative;
-  overflow: visible !important; /* Fix for clipping PrimaryButton overflow:hidden */
-}
-
-/* Remove the white sheen "faded" effect from PrimaryButton */
-.statusToggleBtn::before {
-  display: none !important;
-}
-
-/* Tooltip Base */
-.eventAction[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 115%;
-  right: 0; /* Align to right of button */
-  left: auto;
-  transform: translateY(8px);
-  padding: 8px 14px;
-  background: #2a201a;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--primary);
   color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 32px rgba(42, 32, 26, 0.4);
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 9999;
-  pointer-events: none;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.eventAction[data-tooltip]:hover::after {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
+@media (max-width: 860px) {
+  .page {
+    height: auto;
+    overflow: visible;
+  }
 
-/* Tooltip Arrow */
-.eventAction[data-tooltip]::before {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  right: 20px;
-  left: auto;
-  border: 5px solid transparent;
-  border-top-color: #2a201a;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.2s ease;
-  z-index: 9999;
-  pointer-events: none;
-}
+  .mainGrid {
+    grid-template-columns: 1fr;
+    align-items: start;
+    flex: none;
+  }
 
-.eventAction[data-tooltip]:hover::before {
-  opacity: 1;
-  visibility: visible;
+  .loadingGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsCol {
+    overflow-y: visible;
+  }
+
+  .listCol {
+    min-height: 400px;
+  }
 }

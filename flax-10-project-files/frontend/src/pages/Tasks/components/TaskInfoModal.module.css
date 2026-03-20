@@ -63,7 +63,7 @@
     font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--text, #292524);
+    color: var(--text, var(--text));
     letter-spacing: -0.02em;
     line-height: 1.25;
 }
@@ -83,7 +83,7 @@
     border-radius: 10px;
     background: transparent;
     border: none;
-    color: var(--muted, #78716c);
+    color: var(--muted, var(--color-primary));
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -91,7 +91,7 @@
 }
 .infoModalClose:hover {
     background: color-mix(in srgb, var(--primary, #7B6751) 10%, transparent);
-    color: var(--text, #292524);
+    color: var(--text, var(--text));
 }
 
 .infoModalBody {
@@ -115,7 +115,7 @@
     font-family: var(--font-body);
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text, #292524);
+    color: var(--text, var(--text));
     line-height: 1.4;
 }
 
@@ -126,6 +126,40 @@
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.readingPillRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0 0 1rem;
+}
+
+.readingDetailPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 100%;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary, #7B6751) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
+}
+
+.readingDetailLabel {
+    font-size: 0.64rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.readingDetailValue {
+    font-size: 0.82rem;
+    font-weight: 650;
+    color: var(--text);
+    white-space: nowrap;
 }
 
 .infoGrid {
@@ -172,7 +206,7 @@
     font-family: var(--font-body);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text, #292524);
+    color: var(--text, var(--text));
 }
 .infoRowFull .infoVal {
     font-weight: 500;
@@ -229,7 +263,7 @@
     border-radius: 10px;
     background: var(--primary, #7B6751);
     border: none;
-    color: #fff;
+    color: var(--color-card);
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 600;
@@ -242,41 +276,41 @@
     box-shadow: 0 4px 12px rgba(123, 103, 81, 0.25);
 }
 
-:root[data-theme="dark"] .infoModal {
+:root[data-mode="dark"] .infoModal {
     background: var(--card-bg);
     border-color: var(--border-color);
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
-:root[data-theme="dark"] .infoModalHeader {
+:root[data-mode="dark"] .infoModalHeader {
     background: var(--card-bg);
     border-bottom-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoModalBody {
+:root[data-mode="dark"] .infoModalBody {
     background: var(--card-bg);
 }
-:root[data-theme="dark"] .infoHero {
+:root[data-mode="dark"] .infoHero {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoRow,
-:root[data-theme="dark"] .infoRowFull {
+:root[data-mode="dark"] .infoRow,
+:root[data-mode="dark"] .infoRowFull {
     background: rgba(255, 255, 255, 0.04);
     border-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoValPill {
+:root[data-mode="dark"] .infoValPill {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--border-color);
     color: var(--text-primary);
 }
-:root[data-theme="dark"] .infoModalFooter {
+:root[data-mode="dark"] .infoModalFooter {
     background: rgba(255, 255, 255, 0.03);
     border-top-color: var(--border-color);
 }
-:root[data-theme="dark"] .infoCloseBtn {
+:root[data-mode="dark"] .infoCloseBtn {
     background: var(--primary);
     color: var(--card-bg);
 }
-:root[data-theme="dark"] .infoCloseBtn:hover {
+:root[data-mode="dark"] .infoCloseBtn:hover {
     background: var(--primary);
     filter: brightness(1.1);
 }

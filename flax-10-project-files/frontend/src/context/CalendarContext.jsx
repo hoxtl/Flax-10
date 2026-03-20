@@ -5,7 +5,7 @@ import { getEffectiveTagName } from "../components/Calendar/utils/eventUtils";
 
 const CalendarContext = createContext(null);
 const CalendarDispatchContext = createContext(null);
-const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all' };
+const DEFAULT_CONTEXT = { events: [], allEvents: [], selectedDate: new Date(), viewMode: 'month', displayMode: 'grid', filter: 'all', reloadKey: 0 };
 
 export function CalendarProvider({ children }) {
     const [state, dispatch] = useReducer(calendarReducer, initialState);
@@ -43,7 +43,10 @@ function applyFilters(events, filter, searchQuery) {
 }
 
 function filterEventsByTag(events, filter) {
-    const currentFilter = Array.isArray(filter) ? filter : [filter];
+    const currentFilter = (Array.isArray(filter) ? filter.flat(Infinity) : [filter])
+        .filter((value) => typeof value === 'string')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
     if (currentFilter.includes('all')) return events;
     return events.filter(e => currentFilter.includes(getEffectiveTagName(e)));
 }
@@ -99,8 +102,8 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly, viewMode } = context;
-    const openPopup = (event, anchorRect) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect } });
+    const { popupEvent, popupAnchorRect, readOnly, viewMode, popupViewMode } = context;
+    const openPopup = (event, anchorRect, readOnly = false, viewModeOverride = null) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly, viewMode, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
 }

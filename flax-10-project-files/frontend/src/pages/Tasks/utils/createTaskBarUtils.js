@@ -27,7 +27,7 @@ export async function runQuickAdd(state, onAddTask, taskTitle) {
     await onAddTask(buildQuickAddPayload(state, taskTitle));
     state.setTitle("");
     state.setModuleId(null);
-    state.setPageCount(null);
+    if (typeof state.setPageCount === 'function') state.setPageCount(null);
   } finally {
     if (typeof state.setSaving === 'function') state.setSaving(false);
   }

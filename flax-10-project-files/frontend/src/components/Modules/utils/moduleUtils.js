@@ -1,3 +1,4 @@
+/** Utility functions for module filtering, sorting, formatting, and data transformations. */
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
@@ -109,14 +110,21 @@ export function getEnrollmentId(module_id, enrollments) {
 }
 
 export function serialiseModule(form_data) {
+    const safeIsoOrOriginal = (value) => {
+        if (!value) return '';
+        // `new Date('10:00')` is invalid because it lacks a full date.
+        // In that case, preserve the original value.
+        const d = new Date(value);
+        return Number.isNaN(d.getTime()) ? value : d.toISOString();
+    };
     return {
         module_code: form_data.module_code,
         module_name: form_data.module_name,
         description: form_data.description,
         department: form_data.department,
         course: form_data.course,
-        start_time: form_data.start_time ? new Date(form_data.start_time).toISOString() : '',
-        end_time: form_data.end_time ? new Date(form_data.end_time).toISOString() : '',
+        start_time: form_data.start_time ? safeIsoOrOriginal(form_data.start_time) : '',
+        end_time: form_data.end_time ? safeIsoOrOriginal(form_data.end_time) : '',
         location: form_data.location,
         is_recurring: form_data.is_recurring !== false
     };
@@ -168,10 +176,10 @@ export function formatForInput(d) {
     return localDate.toISOString().slice(0, 16);
 }
 
-export function filterModules(modules, enrollments, search_query, filter_mode) {
+export function filterModules(modules, enrollments, search_query, filter_mode, options = {}) {
     return modules.filter(module => {
         const search_result = checkSearch(module, search_query)
-        const filter_result = checkFilter(module, enrollments, filter_mode);
+        const filter_result = checkFilter(module, enrollments, filter_mode, options);
         return search_result && filter_result;
     })
 }
@@ -182,8 +190,11 @@ function checkSearch(module, search_query) {
         || module.module_code.toLowerCase().includes(query_lower);
 }
 
-function checkFilter(module, enrollments, filter_mode) {
-    if (filter_mode === 'all') return true;
+function checkFilter(module, enrollments, filter_mode, options = {}) {
+    if (filter_mode === 'all') {
+        if (options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
+        return true;
+    }
     return isEnrolledIn(module.id, enrollments);
 }
 
@@ -200,18 +211,23 @@ export function sortModules(modules, sort_by) {
     });
 }
 
-export function applyFiltersAndSort(modules, selectedCourses, sort_by) {
-    if (!selectedCourses || selectedCourses.length === 0) return sortModules(modules, sort_by);
-    const filtered = modules.filter(m => {
-        const course = getCourse(m.module_code, m.course);
-        return course && selectedCourses.includes(course);
-    });
-    return sortModules(filtered, sort_by);
+function filterByDepartment(modules, department) {
+    if (department === 'all') return modules;
+    return modules.filter(m => getDepartment(m.module_code, m.department) === department);
 }
 
-function getDepartmentForCourse(courseName) {
-    for (const [dept, courses] of Object.entries(KCL_DEPARTMENTS)) {
-        if (courses.includes(courseName)) return dept;
+function filterByCourses(modules, courses) {
+    if (courses.length === 0) return modules;
+    return modules.filter(m => courses.includes(getCourse(m.module_code, m.course)));
+}
+
+export function applyFiltersAndSort(modules, selectedCoursesOrDepartment, sort_by) {
+    if (!selectedCoursesOrDepartment) return sortModules(modules, sort_by);
+    if (typeof selectedCoursesOrDepartment === 'string') {
+        return sortModules(filterByDepartment(modules, selectedCoursesOrDepartment), sort_by);
     }
-    return null;
+    if (Array.isArray(selectedCoursesOrDepartment)) {
+        return sortModules(filterByCourses(modules, selectedCoursesOrDepartment), sort_by);
+    }
+    return sortModules(modules, sort_by);
 }

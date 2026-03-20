@@ -1,78 +1,34 @@
+/*
+ * Attendance segment detail panel.
+ */
+
 import { useState } from "react";
-import styles from "../AttendancePage.module.css";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import SegmentDetailHeader from "./SegmentDetailHeader";
+import SegmentDetailList from "./SegmentDetailList";
+import styles from "./AttendanceDetailPanel.module.css";
 
-export default function SegmentDetailPanel({
-  segmentLabel,
-  events,
-  onToggleStatus,
-  onClose,
-  className = "",
-  isDetailed = true,
-}) {
+export default function SegmentDetailPanel({ segmentLabel, events, onToggleStatus, onClose, className = "" }) {
   const [toggling, setToggling] = useState({});
+  return <SegmentDetailPanelContent className={className} segmentLabel={segmentLabel} events={events} toggling={toggling} setToggling={setToggling} onToggleStatus={onToggleStatus} onClose={onClose} />;
+}
 
-  const handleToggle = async (eventId, currentAttended) => {
-    setToggling((prev) => ({ ...prev, [eventId]: true }));
-    try {
-      await onToggleStatus(eventId, !currentAttended);
-    } catch (err) {
-      console.error("Toggle failed", err);
-    } finally {
-      setToggling((prev) => ({ ...prev, [eventId]: false }));
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+function SegmentDetailPanelContent({ className, segmentLabel, events, toggling, setToggling, onToggleStatus, onClose }) {
+  const panelClassName = className ? `${styles.detailPanel} ${className}` : styles.detailPanel;
+  const handleToggleStatus = (eventId, attended) => toggleDetailStatus(eventId, attended, onToggleStatus, setToggling);
 
   return (
-    <div className={`${styles.detailPanel} ${className}`}>
-      <div className={styles.detailPanelHeader}>
-        <div className={styles.detailPanelTitle}>
-          <h3>{segmentLabel}</h3>
-          <span className={styles.eventCount}>{events.length} events</span>
-        </div>
-        <button className={styles.detailPanelClose} onClick={onClose}>
-          ✕
-        </button>
-      </div>
-
-      <ul className={styles.detailList}>
-        {events.map((event) => (
-          <li key={event.id} className={styles.detailRow}>
-            <div className={styles.detailRowTitle}>
-              {event.title}
-            </div>
-            <div className={styles.detailRowMeta}>
-              <span>{formatDate(event.start_time)}</span>
-              <span className={styles.metaDivider}> • </span>
-              <span>{event.event_type}</span>
-            </div>
-            <div className={styles.eventAction} data-tooltip={event.attended ? "Mark as missed" : "Mark as attended"}>
-              <PrimaryButton
-                pill
-                className={`${styles.statusToggleBtn} ${event.attended ? styles.btnAttended : styles.btnMissed}`}
-                onClick={() => handleToggle(event.id, event.attended)}
-                loading={toggling[event.id]}
-              >
-                {event.attended ? "Attended" : "Missed"}
-              </PrimaryButton>
-            </div>
-          </li>
-        ))}
-        {events.length === 0 && (
-          <li className={styles.detailEmpty}>No records found for this segment.</li>
-        )}
-      </ul>
+    <div className={panelClassName}>
+      <SegmentDetailHeader segmentLabel={segmentLabel} count={events.length} onClose={onClose} />
+      <ul className={styles.detailList}><SegmentDetailList events={events} toggling={toggling} onToggleStatus={handleToggleStatus} /></ul>
     </div>
   );
+}
+
+async function toggleDetailStatus(eventId, attended, onToggleStatus, setToggling) {
+  setToggling((current) => ({ ...current, [eventId]: true }));
+  try {
+    await onToggleStatus?.(eventId, !attended);
+  } finally {
+    setToggling((current) => ({ ...current, [eventId]: false }));
+  }
 }

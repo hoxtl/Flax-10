@@ -18,20 +18,8 @@
 }
 
 .emoji {
-  font-size: 2.4rem;
-  line-height: 1;
+  --celebration-size: 2.4rem;
   margin-bottom: 0.75rem;
-  animation: clearEmojiWiggle 2s ease-in-out infinite;
-  transform-origin: 70% 80%;
-}
-
-@keyframes clearEmojiWiggle {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  15%      { transform: rotate(14deg) scale(1.1); }
-  30%      { transform: rotate(-10deg) scale(1.08); }
-  45%      { transform: rotate(8deg) scale(1.05); }
-  60%      { transform: rotate(-4deg) scale(1.02); }
-  75%      { transform: rotate(0deg) scale(1); }
 }
 
 .message {
@@ -66,7 +54,7 @@
   background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
   border: 1px solid rgba(74, 52, 33, 0.38);
   border-radius: 999px;
-  color: #fff;
+  color: var(--color-card);
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 650;

@@ -1,21 +1,27 @@
+/*
+ * ImageGalleryModal renders the fullscreen carousel for society images.
+ */
 import { useRef } from "react";
+import StandardModal from "../../../common/StandardModal/StandardModal";
 import styles from "./ImageGalleryModal.module.css";
 import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../../hooks/useCarouselNavigation";
 
 export default function ImageGalleryModal({ images, onClose, initialIndex = 0 }) {
-    const overlayRef = useRef(null);
-    const { index, prev, next } = useCarouselNavigation(images.length, initialIndex);
-
-    useCarouselGestures(overlayRef, { prev, next });
-    useCarouselKeyboard(prev, next, onClose);
-
+    const { overlayRef, index, prev, next } = useGalleryControls(images.length, initialIndex, onClose);
     if (!images.length) return null;
-
     return (
-        <div className={styles.overlay} onClick={onClose} ref={overlayRef}>
+        <StandardModal onClose={onClose} hideHeader size="xl" modalClassName={styles.modal} backdropRef={overlayRef}>
             <ModalContent images={images} index={index} prev={prev} next={next} onClose={onClose} />
-        </div>
+        </StandardModal>
     );
+}
+
+function useGalleryControls(length, initialIndex, onClose) {
+    const overlayRef = useRef(null);
+    const controls = useCarouselNavigation(length, initialIndex);
+    useCarouselGestures(overlayRef, controls);
+    useCarouselKeyboard(controls.prev, controls.next, onClose);
+    return { overlayRef, ...controls };
 }
 
 function ModalContent({ images, index, prev, next, onClose }) {

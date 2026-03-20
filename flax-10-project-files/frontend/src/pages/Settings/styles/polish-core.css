@@ -1,0 +1,338 @@
+/*
+ * Settings academic, context-card, and responsive polish styles.
+ */
+/*
+ * Settings academic and visual polish styles.
+ */
+/* ── Academic tab redesign ─────────────────────────────────── */
+.academicSection {
+  margin-bottom: 20px;
+}
+
+.academicSectionInner {
+  background: color-mix(in srgb, var(--primary) 4%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin-top: 12px;
+}
+
+.currentCourseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.currentCourseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.currentCourseLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--primary) 60%, var(--muted));
+}
+
+.currentCourseName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.changeRequestArea {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
+}
+
+.changeRequestLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.teacherCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.teacherCardIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.teacherCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacherCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+}
+
+.teacherCardSub {
+  font-size: 11.5px;
+  color: color-mix(in srgb, var(--primary) 50%, var(--muted));
+  margin: 0;
+  line-height: 1.4;
+}
+
+.teacherCardAction {
+  flex-shrink: 0;
+}
+
+/* ── Two-column layout shared by Academic + Location ──────── */
+.twoColLayout {
+  display: grid;
+  grid-template-columns: 1fr 186px;
+  gap: 12px;
+  align-items: start;
+}
+
+/* "Why we need this" context card */
+.contextCard {
+  background: color-mix(in srgb, var(--primary) 5%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 5%, transparent);
+  position: relative;
+}
+
+.contextCard::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed color-mix(in srgb, var(--primary) 28%, transparent);
+  border-radius: calc(var(--radius-lg) - 6px);
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.contextCardEmoji {
+  font-size: 18px;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+
+.contextCardTitle {
+  font-size: 9.8px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 7px;
+}
+
+.contextCardBody {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+.contextCardList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.contextCardList li {
+  font-size: 10.5px;
+  color: color-mix(in srgb, var(--primary) 70%, var(--muted));
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.5;
+}
+
+/* Dark-mode: make context copy clearly readable */
+:global(:root[data-mode="dark"]) .contextCardTitle {
+  color: #ffffff;
+}
+
+:global(:root[data-mode="dark"]) .contextCardBody {
+  color: color-mix(in srgb, var(--text) 95%, transparent);
+}
+
+:global(:root[data-mode="dark"]) .contextCardList li {
+  color: color-mix(in srgb, var(--text) 90%, var(--primary) 10%);
+}
+
+.contextCardList li::before {
+  content: "✓";
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 10px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.statusTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.statusTagPending {
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+}
+
+.statusTagSuccess {
+  color: #15803d;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+}
+
+.statusTagActionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.formActionsPadded {
+  padding-top: 10px;
+}
+
+.fieldMeta {
+  color: var(--muted);
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalBlurBackdrop {
+  background: rgba(74, 52, 33, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Light-theme polish: increase contrast and warmth so it matches dark-mode quality */
+:global(:root:not([data-theme="dark"])) .sidebar {
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--surface-raised) 94%, var(--primary) 6%),
+      color-mix(in srgb, var(--panel) 92%, var(--surface-warm) 8%));
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
+  box-shadow:
+    0 12px 30px color-mix(in srgb, var(--primary) 12%, transparent),
+    0 2px 8px color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
+:global(:root:not([data-theme="dark"])) .sidebarSectionLabel {
+  color: color-mix(in srgb, var(--primary) 45%, var(--text) 55%);
+  opacity: 0.78;
+}
+
+:global(:root:not([data-theme="dark"])) .navItem {
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+}
+
+:global(:root:not([data-theme="dark"])) .navItem:hover {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--text);
+}
+
+:global(:root:not([data-theme="dark"])) .navItemActive {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+  color: color-mix(in srgb, var(--primary) 88%, var(--text) 12%);
+}
+
+:global(:root:not([data-theme="dark"])) .panel {
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--panel) 96%, var(--surface-warm) 4%),
+      color-mix(in srgb, var(--panel) 98%, var(--surface-page) 2%));
+  border-color: color-mix(in srgb, var(--panelAccent) 22%, var(--border));
+  box-shadow:
+    0 14px 36px color-mix(in srgb, var(--panelAccent) 12%, transparent),
+    0 2px 10px color-mix(in srgb, var(--panelAccent) 6%, transparent);
+}
+
+:global(:root:not([data-theme="dark"])) .panelHeader {
+  background: color-mix(in srgb, var(--panelAccent) 12%, var(--surface-warm));
+  border-bottom-color: color-mix(in srgb, var(--panelAccent) 24%, var(--border));
+}
+
+:global(:root:not([data-theme="dark"])) .panelHeaderDesc {
+  color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
+}
+
+:global(:root:not([data-theme="dark"])) .settingsTile {
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--surface-raised) 95%, var(--primary) 5%),
+      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%));
+  border-color: color-mix(in srgb, var(--primary) 14%, var(--border));
+}
+
+:global(:root:not([data-theme="dark"])) .contextCard {
+  background:
+    linear-gradient(165deg,
+      color-mix(in srgb, var(--surface-raised) 92%, var(--primary) 8%),
+      color-mix(in srgb, var(--surface-raised) 90%, var(--surface-warm) 10%));
+  border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
+}
+
+:global(:root:not([data-theme="dark"])) .contextCardBody {
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+}
+
+:global(:root:not([data-theme="dark"])) .formGroup input,
+:global(:root:not([data-theme="dark"])) .formGroup select {
+  background: color-mix(in srgb, var(--surface-raised) 96%, var(--surface-warm) 4%);
+  border-color: color-mix(in srgb, var(--primary) 14%, var(--border));
+}
+
+:global(:root:not([data-theme="dark"])) .lockedCourse {
+  background: color-mix(in srgb, var(--surface-raised) 92%, var(--surface-warm) 8%);
+  border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
+}

@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 vi.mock("../../../api/userService", () => ({
   getUserProfile: vi.fn(),
 }));
 
 vi.mock("../../../api/adminApi", () => ({
-  requestTeacherRole: vi.fn(),
+  getMyCourseChangeRequest: vi.fn(),
+  requestCourseChange: vi.fn(),
+  cancelCourseChangeRequest: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("../../../lib/kclCourses", () => ({
@@ -51,16 +52,20 @@ vi.mock("../../../components/Settings/SettingsUI", () => ({
       </select>
     </div>
   ),
-  SectionHeader: ({ title }) => <h3>{title}</h3>,
-  SubmitButton: ({ label, isSaving, savingLabel }) => (
-    <button type="submit">{isSaving ? savingLabel : label}</button>
+  SectionHeader: ({ title, description }) => (
+    <div>
+      <h3>{title}</h3>
+      {description ? <p>{description}</p> : null}
+    </div>
+  ),
+  SubmitButton: ({ label, isSaving, savingLabel, saveSignal = 0, savedLabel = "Saved!" }) => (
+    <button type="submit">{isSaving ? savingLabel : saveSignal ? `✓ ${savedLabel}` : label}</button>
   ),
 }));
 
 vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
 
-import { getUserProfile } from "../../../api/userService";
-import { requestTeacherRole } from "../../../api/adminApi";
+import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import AccountForm from "../../../components/Settings/AccountForm";
 
 const baseUser = {
@@ -75,39 +80,36 @@ const baseUser = {
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
-  getUserProfile.mockResolvedValue({ ...baseUser });
+  getMyCourseChangeRequest.mockResolvedValue(null);
 });
 
-describe("AccountForm – basic rendering", () => {
-  it("renders first and last name fields", async () => {
+describe("AccountForm - basic rendering", () => {
+  it("renders first/last name and email fields", async () => {
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+
     await waitFor(() => {
       expect(screen.getByDisplayValue("Alice")).toBeTruthy();
       expect(screen.getByDisplayValue("Smith")).toBeTruthy();
+      expect(screen.getByDisplayValue("alice@example.com")).toBeTruthy();
     });
-  });
-
-  it("renders email field", async () => {
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() =>
-      expect(screen.getByDisplayValue("alice@example.com")).toBeTruthy(),
-    );
   });
 
   it("renders Save Changes button", async () => {
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Save Changes" })).toBeTruthy(),
-    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Save Changes" })).toBeTruthy();
+    });
   });
 
   it("shows Saving... when isSaving is true", () => {
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={true} />);
     expect(screen.getByText("Saving...")).toBeTruthy();
   });
+});
 
-  it("shows locked course when user has a major", async () => {
-    getUserProfile.mockResolvedValue({ ...baseUser, major: "Physics" });
+describe("AccountForm - course display", () => {
+  it("shows locked course display and request button when user has a major", async () => {
     render(
       <AccountForm
         user={{ ...baseUser, major: "Physics" }}
@@ -115,187 +117,65 @@ describe("AccountForm – basic rendering", () => {
         isSaving={false}
       />,
     );
+
     await waitFor(() => {
       expect(screen.getByText("Physics")).toBeTruthy();
-      expect(screen.getByText(/cannot be changed after/i)).toBeTruthy();
+      expect(
+        screen.getByRole("button", { name: /request a course change/i }),
+      ).toBeTruthy();
     });
   });
 
-  it("shows editable course field when user has no major", async () => {
+  it("shows 'No course set' when user has no major", async () => {
     render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() =>
-      expect(screen.getByText(/choose carefully/i)).toBeTruthy(),
-    );
-  });
 
-  it("handles getUserProfile error gracefully", async () => {
-    getUserProfile.mockRejectedValue(new Error("Network error"));
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() => expect(screen.getByDisplayValue("Alice")).toBeTruthy());
+    await waitFor(() => {
+      expect(screen.getByText(/No course set/i)).toBeTruthy();
+    });
   });
 });
 
-describe("AccountForm – submission", () => {
-  it("calls onSave with correct form data", async () => {
-    const onSave = vi.fn();
+describe("AccountForm - submission", () => {
+  it("calls onSave with changed form data", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
     const { container } = render(
       <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
     );
+
     await waitFor(() => screen.getByDisplayValue("Alice"));
+
+    fireEvent.change(screen.getByLabelText("First Name"), {
+      target: { value: "Bob" },
+    });
+
     fireEvent.submit(container.querySelector("form"));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
-        firstName: "Alice",
+        firstName: "Bob",
         lastName: "Smith",
         email: "alice@example.com",
+        year: "Year 2",
       }),
     );
   });
-});
 
-describe("AccountForm – teacher role section (student)", () => {
-  it('shows "Become a Teacher" for students', async () => {
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() =>
-      expect(screen.getByText(/Become a Teacher/i)).toBeTruthy(),
+  it("shows saved tick after a successful account save", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
+    const { container } = render(
+      <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
     );
-  });
 
-  it("shows the request button for students", async () => {
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() =>
-      expect(screen.getByText(/Request Teacher Role/i)).toBeTruthy(),
-    );
-  });
-});
+    await waitFor(() => screen.getByDisplayValue("Alice"));
 
-describe("AccountForm – teacher role section (teacher)", () => {
-  it("shows teacher badge when API returns teacher role", async () => {
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
-    render(
-      <AccountForm
-        user={{ ...baseUser, role: "teacher" }}
-        onSave={vi.fn()}
-        isSaving={false}
-      />,
-    );
-    await waitFor(() =>
-      expect(screen.getByText(/You are a Teacher/i)).toBeTruthy(),
-    );
-  });
-
-  it("does not show request button for teachers", async () => {
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
-    render(
-      <AccountForm
-        user={{ ...baseUser, role: "teacher" }}
-        onSave={vi.fn()}
-        isSaving={false}
-      />,
-    );
-    await waitFor(() =>
-      expect(screen.queryByText(/Request Teacher Role/i)).toBeNull(),
-    );
-  });
-});
-
-describe("AccountForm – teacher role section (pending_teacher)", () => {
-  it("shows pending message when API returns pending_teacher", async () => {
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "pending_teacher" });
-    render(
-      <AccountForm
-        user={{ ...baseUser, role: "pending_teacher" }}
-        onSave={vi.fn()}
-        isSaving={false}
-      />,
-    );
-    await waitFor(() =>
-      expect(screen.getByText(/Teacher Request Pending/i)).toBeTruthy(),
-    );
-  });
-});
-
-describe("AccountForm – role sync", () => {
-  it("updates localStorage when API role differs from stored role", async () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...baseUser, role: "student" }),
-    );
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() => {
-      const stored = JSON.parse(localStorage.getItem("user"));
-      expect(stored.role).toBe("teacher");
+    fireEvent.change(screen.getByLabelText("First Name"), {
+      target: { value: "Bob" },
     });
-  });
+    fireEvent.submit(container.querySelector("form"));
 
-  it("dispatches auth-changed when role is stale in localStorage", async () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...baseUser, role: "pending_teacher" }),
-    );
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "teacher" });
-    const listener = vi.fn();
-    window.addEventListener("auth-changed", listener);
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await waitFor(() => expect(listener).toHaveBeenCalled());
-    window.removeEventListener("auth-changed", listener);
-  });
-
-  it("does not dispatch auth-changed when role is already correct", async () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...baseUser, role: "student" }),
-    );
-    getUserProfile.mockResolvedValue({ ...baseUser, role: "student" });
-    const listener = vi.fn();
-    window.addEventListener("auth-changed", listener);
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    await new Promise((r) => setTimeout(r, 60));
-    expect(listener).not.toHaveBeenCalled();
-    window.removeEventListener("auth-changed", listener);
-  });
-});
-
-describe("AccountForm – request teacher role flow", () => {
-  it("calls requestTeacherRole API on button click", async () => {
-    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
-    expect(requestTeacherRole).toHaveBeenCalled();
-  });
-
-  it("shows success message after submission", async () => {
-    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
-    await waitFor(() =>
-      expect(screen.getByText("Request submitted!")).toBeTruthy(),
-    );
-  });
-
-  it("sets localStorage role to pending_teacher after request", async () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...baseUser, role: "student" }),
-    );
-    requestTeacherRole.mockResolvedValue({ message: "Request submitted!" });
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
     await waitFor(() => {
-      const stored = JSON.parse(localStorage.getItem("user"));
-      expect(stored.role).toBe("pending_teacher");
+      expect(screen.getByRole("button", { name: /saved!/i })).toBeTruthy();
     });
-  });
-
-  it("shows error message when request fails", async () => {
-    requestTeacherRole.mockRejectedValue(new Error("Server error"));
-    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
-    const btn = await screen.findByText(/Request Teacher Role/i);
-    await userEvent.click(btn);
-    await waitFor(() => expect(screen.getByText("Server error")).toBeTruthy());
   });
 });

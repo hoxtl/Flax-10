@@ -5,156 +5,69 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
-import { getUserProfile } from "../../../api/userService";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
-import { useProfileSummary } from "../../Profile/hooks/useProfileSummary";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
+import { ConfirmModal } from "../../../components/common";
+import {
+  getLiveContext,
+  getNextStep,
+  getCurrentEvent,
+  getUpcomingEvent
+} from "./IntelligenceUtils";
 
-function getGreeting(name) {
-  const h = new Date().getHours();
-  const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-  return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
-}
+import { useAuth } from "../../../context/AuthContext";
 
-function getTodayLabel() {
-  const now = new Date();
-  const day = now.toLocaleDateString("en-GB", { weekday: "long" }).toUpperCase();
-  const date = now.toLocaleDateString("en-GB", { day: "numeric", month: "short" }).toUpperCase();
-  return `${day} · ${date}`;
-}
+import IntelligenceGrid from "./IntelligenceGrid";
+import { IntelligenceHero } from "./IntelligenceWidgets";
+import { RightNowWidget } from "./RightNowWidget";
+import SemesterOverviewWidget from "./SemesterOverviewWidget";
+import StudyStreakWidget from "./StudyStreakWidget";
+import WeeklyGoalWidget from "./WeeklyGoalWidget";
+import PhotoWidget from "./PhotoWidget";
+import SummaryCards from "../../../components/Analytics/SummaryCards";
+import ProductivityCards from "../../../components/Analytics/ProductivityCards";
+import StudyHoursChart from "../../../components/Analytics/StudyHoursChart";
+import DailyBreakdownChart from "../../../components/Analytics/DailyBreakdownChart";
+import StudyHeatmap from "../../../components/Analytics/StudyHeatmap";
+import PlannedVsActualChart from "../../../components/Analytics/PlannedVsActualChart";
+import ThemeUsageChart from "../../../components/Analytics/ThemeUsageChart";
+import AttendanceChart from "../../../components/Analytics/AttendanceChart";
+import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
+import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
+import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 
-function formatWindowDuration(minutes) {
-  if (!Number.isFinite(minutes) || minutes <= 0) return null;
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
-}
+const CATALOGUE = [
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, section: "Essentials" },
+  { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2, section: "Planning" },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2, section: "Planning" },
+  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, section: "Planning" },
+  { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },
+  { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1, section: "Progress" },
+  { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1, section: "Profile" },
+  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsInsights", label: "Insights", icon: "💡", col: 1, row: 1, section: "Analytics" },
+  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsThemeUsage", label: "Theme Usage", icon: "🌓", col: 1, row: 1, section: "Analytics" },
+];
 
-function getNextWindowMeta(windows = [], now = new Date()) {
-  const upcoming = windows
-    .filter((window) => window?.end && window.end.getTime() > now.getTime())
-    .sort((a, b) => a.start.getTime() - b.start.getTime())[0];
-  if (!upcoming) return null;
-  const start = upcoming.start?.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  const minutes = Math.max(0, Math.round((upcoming.end.getTime() - upcoming.start.getTime()) / 60000));
-  return {
-    label: start ? `Next focus window ${start}` : "Next focus window",
-    duration: formatWindowDuration(minutes),
-  };
-}
-
-function getNextStep({ tasksCount, nextWindowMeta }) {
-  if (tasksCount > 0 && nextWindowMeta?.duration) {
-    return `Use the ${nextWindowMeta.duration} window to move one priority task forward.`;
-  }
-  if (tasksCount > 0) {
-    return "Clear one meaningful task before the day fragments.";
-  }
-  if (nextWindowMeta?.duration) {
-    return `Your next open block gives you ${nextWindowMeta.duration} to focus.`;
-  }
-  return "Keep the timeline as the source of truth for the rest of today.";
-}
-
-function getCurrentEvent(sortedEvents = [], now = new Date()) {
-  const nowMs = now.getTime();
-  return sortedEvents.find((event) => {
-    if (!event?.start_time || !event?.end_time) return false;
-    const startMs = new Date(event.start_time).getTime();
-    const endMs = new Date(event.end_time).getTime();
-    return startMs <= nowMs && endMs >= nowMs;
-  }) || null;
-}
-
-function getUpcomingEvent(sortedEvents = [], now = new Date()) {
-  const nowMs = now.getTime();
-  return [...sortedEvents]
-    .filter((event) => event?.start_time && new Date(event.start_time).getTime() > nowMs)
-    .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))[0] || null;
-}
-
-function formatEventTime(dateLike) {
-  if (!dateLike) return null;
-  return new Date(dateLike).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-}
-
-function getTravelContext({ upcomingEvent, tflDelays, now = new Date() }) {
-  if (!upcomingEvent?.start_time || !Array.isArray(tflDelays) || tflDelays.length === 0) return null;
-
-  const startMs = new Date(upcomingEvent.start_time).getTime();
-  const minsUntilStart = Math.round((startMs - now.getTime()) / 60000);
-  if (minsUntilStart <= 0 || minsUntilStart > 120) return null;
-
-  const relevantDelays = getRelevantDelays(upcomingEvent, tflDelays);
-  if (!relevantDelays.length) return null;
-
-  const primaryDelay = relevantDelays[0];
-  const lineName = primaryDelay?.lineName || "TfL";
-  const severity = primaryDelay?.severityDescription || "Delays";
-  const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
-  const eventTime = formatEventTime(upcomingEvent.start_time);
-  const eventTitle = upcomingEvent.title || "your next class";
-  const locationMeta = upcomingEvent.location ? ` · ${upcomingEvent.location}` : "";
-
-  return {
-    label: "Travel",
-    text: `${lineName} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${eventTitle}.`,
-    meta: `${severity}${locationMeta}`,
-    tone: "warning",
-    Icon: Train,
-  };
-}
-
-function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now }) {
-  if (currentEvent) {
-    return {
-      label: "On now",
-      text: `${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
-      meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
-      tone: "neutral",
-      Icon: Clock3,
-    };
-  }
-  if (overlaps?.length) {
-    const first = overlaps[0]?.a?.start_time;
-    return {
-      label: "Attention",
-      text: "You have an overlap in today’s plan.",
-      meta: first ? `Conflict at ${formatEventTime(first)}` : null,
-      tone: "warning",
-      Icon: AlertTriangle,
-    };
-  }
-  const travelContext = getTravelContext({ upcomingEvent, tflDelays, now });
-  if (travelContext) {
-    return travelContext;
-  }
-  if (upcomingEvent) {
-    return {
-      label: "Up next",
-      text: `${upcomingEvent.title}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
-      meta: upcomingEvent.start_time ? `Starts ${formatEventTime(upcomingEvent.start_time)}` : null,
-      tone: "neutral",
-      Icon: Clock3,
-    };
-  }
-  return {
-    label: "Right now",
-    text: "You have breathing room before the next thing starts.",
-    meta: "Use the banner to decide what to move forward next.",
-    tone: "neutral",
-    Icon: Clock3,
-  };
-}
+const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks"];
+const STORAGE_KEY = "homepage_widget_layout";
+const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 function useTflDelays() {
-  const [delays, setDelays] = useState(undefined);
+  const [delays, setDelays] = useState([]);
   useEffect(() => {
+    let cancelled = false;
     tflService.getTfLDelays()
-      .then(data => setDelays(Array.isArray(data) ? data : []))
-      .catch(() => setDelays([]));
+      .then(data => { if (!cancelled) setDelays(Array.isArray(data) ? data : []); })
+      .catch(() => { if (!cancelled) setDelays([]); });
+    return () => { cancelled = true; };
   }, []);
   return delays;
 }
@@ -169,20 +82,21 @@ function useCourseChangePending() {
           setRequest(data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
   return request;
 }
 
 function useTeacherRequestPending() {
+  const { profile, loading } = useAuth();
   const [pending, setPending] = useState(false);
   useEffect(() => {
-    getUserProfile()
-      .then((data) => {
-        if (data?.role === "pending_teacher") setPending(true);
-      })
-      .catch(() => {});
-  }, []);
+    if (!loading && profile?.role === "pending_teacher") {
+      setPending(true);
+    } else if (!loading) {
+      setPending(false);
+    }
+  }, [profile, loading]);
   return pending;
 }
 
@@ -302,10 +216,6 @@ export default function IntelligenceRow({
   displayName,
   slot1TodayTasks,
   slot3Urgent,
-  studyPulseWindows,
-  studyPulseNow,
-  studyPulseOnStartFocus,
-  studyPulseDeadlines,
   slot5Data,
   recommendation,
 }) {
@@ -314,142 +224,270 @@ export default function IntelligenceRow({
   const teacherRequestPending = useTeacherRequestPending();
   const [showCourseChange, setShowCourseChange] = useState(true);
   const [showTeacherRequest, setShowTeacherRequest] = useState(true);
-  const { summary, loading: profileLoading } = useProfileSummary();
+  const { profile, loading: profileLoading } = useAuth();
+  const [edit, setEdit] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [layout, setLayout] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return DEFAULT_LAYOUT;
+    let parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) return DEFAULT_LAYOUT;
+
+    // Migration: If old IDs exist, replace them with 'hero'
+    const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
+    const hasOld = parsed.some(id => oldIds.includes(id));
+    if (hasOld) {
+      // Remove old IDs and PREPEND 'hero' if not already there
+      const filtered = parsed.filter(id => !oldIds.includes(id));
+      if (!filtered.includes("hero")) {
+        filtered.unshift("hero");
+      }
+      return filtered.filter((id) => CATALOGUE_IDS.has(id));
+    }
+    return parsed.filter((id) => CATALOGUE_IDS.has(id));
+  });
+  const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
+  const {
+    data: analyticsData,
+    progressData: analyticsProgressData,
+    themeStats: analyticsThemeStats,
+    loading: analyticsLoading,
+  } = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(layout));
+  }, [layout]);
+
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleReset = () => setShowResetConfirm(true);
+
+  // Data Processing
   const eventsCount = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents.length : 0;
   const pendingTasks = Array.isArray(slot5Data?.taskWidgetItemsOnly)
     ? slot5Data.taskWidgetItemsOnly.filter((task) => !task.completed)
     : [];
   const sortedEvents = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents : [];
   const bannerNow = slot5Data?.now ?? new Date();
+
   const currentEvent = getCurrentEvent(sortedEvents, bannerNow);
   const upcomingEvent = getUpcomingEvent(sortedEvents, bannerNow);
+
   const liveContext = getLiveContext({
     currentEvent,
     upcomingEvent,
     overlaps: slot5Data?.navigatorContext?.overlaps,
     tflDelays,
     now: bannerNow,
+    getRelevantDelays,
+    isSevereDisruption
   });
-  const LiveContextIcon = liveContext.Icon;
+
   const tasksCount = pendingTasks.length;
-  const nextWindowMeta = getNextWindowMeta(studyPulseWindows, studyPulseNow ?? new Date());
-  const nextStep = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
+  const nextWindowMeta = null;
+  const nextStepTxt = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
   const nextStepMeta = recommendation?.meta || null;
-  const weekly = !profileLoading ? summary?.weekly : null;
-  const streaks = !profileLoading ? summary?.streaks : null;
+
+  const weekly = !profileLoading ? profile?.summary?.weekly : null;
+  const streaks = !profileLoading ? profile?.summary?.streaks : null;
   const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
   const currentStreak = Number.isFinite(streaks?.current) && streaks.current > 0 ? `${streaks.current}-day streak` : null;
 
+  const renderWidget = (id) => {
+    switch (id) {
+      case "hero":
+        return (
+          <IntelligenceHero
+            displayName={displayName}
+            liveContext={liveContext}
+            eventsCount={eventsCount}
+            tasksCount={tasksCount}
+            nextWindowMeta={nextWindowMeta}
+            nextStep={nextStepTxt}
+            nextStepMeta={nextStepMeta}
+            weeklyProgress={weeklyProgress}
+            currentStreak={currentStreak}
+          />
+        );
+      case "rightNow":
+        return <RightNowWidget {...slot5Data} tflDelays={tflDelays} />;
+      case "todayTasks":
+        return slot1TodayTasks;
+      case "deadlines":
+        return slot3Urgent;
+      case "semesterOverview":
+        return <SemesterOverviewWidget />;
+      case "studyStreak":
+        return <StudyStreakWidget />;
+      case "weeklyGoal":
+        return <WeeklyGoalWidget />;
+      case "photo":
+        return <PhotoWidget editMode={edit} />;
+      case "analyticsSummary":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>SUMMARY CARDS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsScrollable}>
+                <SummaryCards data={analyticsData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No summary data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsProductivity":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>PRODUCTIVITY</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsScrollable}>
+                <ProductivityCards data={analyticsData} progressData={analyticsProgressData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No productivity data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsInsights":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>INSIGHTS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.summary ? (
+              <div className={styles.analyticsInsightsRow}>
+                <ConsistencyScore data={analyticsData} />
+                <PeakHoursCard data={analyticsData} />
+              </div>
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No insights data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsStudyHours":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>STUDY HOURS</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <StudyHoursChart data={analyticsData.daily_breakdown} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No study-hours data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsDailyBreakdown":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>DAILY BREAKDOWN</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <DailyBreakdownChart data={analyticsData.daily_breakdown} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No daily-breakdown data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsPlannedActual":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>PLANNED VS ACTUAL</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : Array.isArray(analyticsProgressData?.daily_progress) && analyticsProgressData.daily_progress.length > 0 ? (
+              <PlannedVsActualChart data={analyticsProgressData.daily_progress} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No planned-vs-actual data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsHeatmap":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>FOCUS HEATMAP</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsData?.heatmap?.data?.length ? (
+              <StudyHeatmap heatmapData={analyticsData.heatmap} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No focus heatmap data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsVenio":
+        return <CompactAttendanceTile />;
+      case "analyticsThemeUsage":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>THEME USAGE</div>
+            {analyticsLoading ? (
+              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+            ) : analyticsThemeStats?.summary ? (
+              <ThemeUsageChart themeStats={analyticsThemeStats} />
+            ) : (
+              <div className={styles.analyticsWidgetEmpty}>No theme-usage data yet.</div>
+            )}
+          </div>
+        );
+      case "analyticsAttendance":
+        return (
+          <div className={styles.analyticsWidgetShell}>
+            <div className={styles.analyticsWidgetTitle}>ATTENDANCE</div>
+            <AttendanceChart />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <section className={styles.section}>
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <motion.span
-            className={styles.headerDateRow}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Calendar className={styles.headerDateIcon} size={14} strokeWidth={2} aria-hidden />
-            <span className={styles.headerLabel}>{getTodayLabel()}</span>
-          </motion.span>
-          <motion.h2
-            className={styles.headerTitle}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
-          >
-            {getGreeting(displayName)}
-          </motion.h2>
-          <div className={styles.liveContextStack}>
-            <div className={`${styles.liveContextCard} ${liveContext.tone === "warning" ? styles.liveContextInlineAlert : ""}`}>
-              <div className={styles.liveContextTop}>
-                {liveContext.tone === "warning" ? (
-                  <span className={styles.liveContextDot} aria-hidden />
-                ) : (
-                  <>
-                    <span className={styles.liveContextLabel}>{liveContext.label}</span>
-                    <LiveContextIcon size={14} strokeWidth={1.9} className={styles.liveContextIcon} aria-hidden />
-                  </>
-                )}
-              </div>
-              <div className={styles.liveContextBody}>
-                <p className={styles.liveContextText}>{liveContext.text}</p>
-                {liveContext.meta && <span className={styles.liveContextMeta}>{liveContext.meta}</span>}
-              </div>
-            </div>
-            <AnimatePresence>
-              {teacherRequestPending && showTeacherRequest && (
-                <TeacherRequestCard
-                  key="teacher-request"
-                  onDismiss={() => setShowTeacherRequest(false)}
-                />
-              )}
-              {courseChangeRequest && showCourseChange && (
-                <CourseChangeCard
-                  key="course-change"
-                  request={courseChangeRequest}
-                  onDismiss={() => setShowCourseChange(false)}
-                />
-              )}
-            </AnimatePresence>
+      <IntelligenceGrid
+        layout={layout}
+        setLayout={setLayout}
+        edit={edit}
+        catalogue={CATALOGUE}
+        widgetRenderer={renderWidget}
+        showAdd={showAdd}
+        setShowAdd={setShowAdd}
+        renderAfterHero={() => (
+          <div className={styles.editBar}>
+            {edit && (
+              <button onClick={handleReset} className={styles.editBtn} style={{ marginRight: 8 }}>
+                ↺ Reset Layout
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setEdit(!edit);
+                if (edit) setShowAdd(false);
+              }}
+              className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
+            >
+              {edit ? "✓ Done" : "✏️ Edit Layout"}
+            </button>
           </div>
-        </div>
-
-        <motion.div
-          className={styles.headerRight}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-          >
-          <div className={styles.headerPlannerPanel}>
-            <SemesterProgressWidget />
-            <div className={styles.metricRail}>
-              <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>On today</span>
-                <span className={styles.metricValue}>{eventsCount}</span>
-              </div>
-              <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>To do today</span>
-                <span className={styles.metricValue}>{tasksCount}</span>
-              </div>
-              <div className={styles.metricChip}>
-                <span className={styles.metricLabel}>Free to study</span>
-                <span className={styles.metricValue}>
-                  {nextWindowMeta?.duration || "No gap yet"}
-                </span>
-              </div>
-            </div>
-            <div className={styles.nextStepCard}>
-              <span className={styles.nextStepLabel}>Best next move</span>
-              <p className={styles.nextStepText}>{nextStep}</p>
-              {nextStepMeta && <span className={styles.nextStepMeta}>{nextStepMeta}</span>}
-              <div className={styles.nextStepFooter}>
-                <div className={styles.analyticsInline}>
-                  {weeklyProgress && <span className={styles.analyticsPill}>{weeklyProgress}</span>}
-                  {currentStreak && <span className={styles.analyticsPill}>{currentStreak}</span>}
-                  {!weeklyProgress && !currentStreak && nextWindowMeta?.label && (
-                    <span className={styles.analyticsPill}>{nextWindowMeta.label}</span>
-                  )}
-                </div>
-                <Link to="/analytics?period=7&tab=Overview&from=homepage-banner" className={styles.analyticsLink}>
-                  Review my analytics
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </header>
-
-      <BentoGrid className={styles.primaryGrid}>
-        <BentoCard className={styles.posDeadlines}>
-          {slot3Urgent}
-        </BentoCard>
-
-        <BentoCard className={styles.posTodaysTasks}>
-          {slot1TodayTasks}
-        </BentoCard>
-      </BentoGrid>
+        )}
+      />
+      {showResetConfirm && (
+        <ConfirmModal
+          title="Reset Layout"
+          message="This will restore the default widget layout. Any customisation will be lost."
+          confirmText="Reset"
+          cancelText="Cancel"
+          isDanger
+          onConfirm={() => { setLayout(DEFAULT_LAYOUT); setShowResetConfirm(false); }}
+          onCancel={() => setShowResetConfirm(false)}
+        />
+      )}
     </section>
   );
 }

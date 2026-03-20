@@ -1,3 +1,6 @@
+/*
+ * useSocietyMembership handles joining and leaving societies.
+ */
 import * as api from '../../../api/societyApi';
 import { useTags } from '../../../context/TagContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -20,21 +23,23 @@ const promptSubscription = async (confirm, id, setSociety) => {
     setSociety(prev => ({ ...prev, is_subscribed: true }));
 };
 
-const makeJoinSociety = (id, setSociety, confirm) =>
+const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
     async () => {
         try {
             await api.joinSociety(id);
             updateMemberState(setSociety, true, 1);
             await promptSubscription(confirm, id, setSociety);
+            onMembershipChange?.();
         } catch (e) { console.error('Join failed:', e); }
     };
 
-const makeLeaveSociety = (id, setSociety, refreshTags) =>
+const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
     async () => {
         try {
             await api.leaveSociety(id, 'me');
             updateMemberState(setSociety, false, -1);
             refreshTags();
+            onMembershipChange?.();
         } catch (e) { console.error('Leave failed:', e); }
     };
 
@@ -44,12 +49,12 @@ const makeRequestRatification = (id, setSociety) =>
         setSociety(prev => ({ ...prev, ratification_status: 'pending' }));
     };
 
-export const useSocietyMembership = (id, setSociety) => {
+export const useSocietyMembership = (id, setSociety, onMembershipChange) => {
     const { refreshTags } = useTags();
     const confirm = useConfirm();
     return {
-        joinSociety: makeJoinSociety(id, setSociety, confirm),
-        leaveSociety: makeLeaveSociety(id, setSociety, refreshTags),
+        joinSociety: makeJoinSociety(id, setSociety, confirm, onMembershipChange),
+        leaveSociety: makeLeaveSociety(id, setSociety, refreshTags, onMembershipChange),
         requestRatification: makeRequestRatification(id, setSociety),
         publishChanges: async (changes) => api.publishChanges(id, changes),
     };

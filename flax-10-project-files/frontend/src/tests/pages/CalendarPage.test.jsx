@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import CalendarPage from '../../pages/Calendar/CalendarPage';
 
+const { mockEventPopups } = vi.hoisted(() => ({
+    mockEventPopups: vi.fn(),
+}));
+
 const mockDispatch = vi.fn();
 const mockCalendarState = {
     filter: 'all',
@@ -34,7 +38,10 @@ vi.mock('../../components/Calendar/CalendarHeader', () => ({
 }));
 
 vi.mock('../../components/Calendar/EventPopups', () => ({
-    EventPopups: () => <div data-testid="event-popups" />,
+    EventPopups: (props) => {
+        mockEventPopups(props);
+        return <div data-testid="event-popups" />;
+    },
 }));
 
 vi.mock('../../components/Calendar/hooks/useEventPopupListener', () => ({
@@ -72,6 +79,7 @@ describe('CalendarPage', () => {
     it('renders event popups', () => {
         render(<CalendarPage />);
         expect(screen.getByTestId('event-popups')).toBeTruthy();
+        expect(mockEventPopups).toHaveBeenCalledWith(expect.objectContaining({ allowModuleLeave: false }));
     });
 
     it('shows active filter', () => {

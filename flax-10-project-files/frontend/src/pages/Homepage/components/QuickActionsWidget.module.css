@@ -16,10 +16,11 @@
 }
 
 .headerIconWrap {
-  width: 27px;
-  height: 27px;
-  border-radius: 9px;
-  background: rgba(139, 115, 85, 0.07);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,15 +29,15 @@
 
 .headerIcon {
   flex-shrink: 0;
-  color: #C4A46D;
+  color: var(--widget-accent);
 }
 
 .headerLabel {
   font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
   font-size: 12px;
-  font-weight: 700;
-  color: #2c1810;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -54,38 +55,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 15px;
+  padding: 12px 15px;
   border-radius: 12px;
-  background: linear-gradient(180deg, #4a2f22 0%, #3e261b 100%);
-  border: none;
+  background: var(--color-primary-solid);
+  border: 1px solid var(--color-primary-strong);
   cursor: pointer;
   text-align: left;
   width: 100%;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
   overflow: hidden;
-  box-shadow:
-    0 10px 24px rgba(44, 24, 16, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.primaryCard::before {
-  content: "";
-  position: absolute;
-  inset: -45% -70%;
-  background: linear-gradient(
-    120deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.28) 50%,
-    transparent 65%
-  );
-  transform: translateX(-60%) rotate(8deg);
-  opacity: 0;
-  pointer-events: none;
-}
+/* [Sheen gradient removed] */
 
 .primaryCard:hover {
-  background: linear-gradient(180deg, #523427 0%, #452b1f 100%);
-  box-shadow: 0 4px 16px rgba(44, 24, 16, 0.2);
+  background: var(--color-primary-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .primaryCard:hover::before {
@@ -110,13 +97,15 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #c4a46d;
+  background: var(--color-on-primary);
   flex-shrink: 0;
+  box-shadow: 0 0 8px var(--color-on-primary);
 }
 
 .primaryIcon {
   flex-shrink: 0;
-  color: #c4a46d;
+  color: var(--color-on-primary);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 .primaryTextBlock {
@@ -129,19 +118,21 @@
 .primaryLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #fffcf8;
+  color: var(--color-on-primary);
   line-height: 1.2;
 }
 
 .primarySub {
   font-size: 10px;
-  color: rgba(255, 252, 248, 0.5);
+  color: var(--color-on-primary);
+  opacity: 0.7;
   line-height: 1.2;
 }
 
 .primaryArrow {
   flex-shrink: 0;
-  color: rgba(255, 252, 248, 0.5);
+  color: var(--color-on-primary);
+  opacity: 0.8;
   display: flex;
   align-items: center;
 }
@@ -152,10 +143,10 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 9px 12px;
+  padding: 10px 12px;
   border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid rgba(139, 115, 85, 0.1);
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
   cursor: pointer;
   text-align: left;
   width: 100%;
@@ -164,25 +155,12 @@
 }
 
 .secondaryCard:hover {
-  background: #fffcf8;
-  border-color: rgba(139, 115, 85, 0.18);
-  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.04);
+  background: var(--surface-raised);
+  border-color: var(--widget-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.secondaryCard::before {
-  content: "";
-  position: absolute;
-  inset: -45% -70%;
-  background: linear-gradient(
-    120deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.45) 50%,
-    transparent 65%
-  );
-  transform: translateX(-60%) rotate(8deg);
-  opacity: 0;
-  pointer-events: none;
-}
+/* [Sheen gradient removed] */
 
 .secondaryCard:hover::before {
   opacity: 1;
@@ -202,7 +180,7 @@
 .secondaryLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #2c1810;
+  color: var(--widget-text-primary);
   flex: 1;
   text-align: left;
   display: flex;
@@ -212,7 +190,7 @@
 
 .secondaryArrow {
   flex-shrink: 0;
-  color: #d4c4a8;
+  color: var(--widget-text-tertiary);
   display: flex;
   align-items: center;
 }
@@ -222,9 +200,10 @@
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  background: #f3f0ff;
-  color: #5b4a8a;
-  padding: 1px 5px;
-  border-radius: 3px;
+  background: var(--color-primary);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

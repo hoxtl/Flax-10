@@ -40,15 +40,13 @@ describe('EventsSummaryModal', () => {
 
     it('renders close button', () => {
         renderModal();
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
-        expect(closeBtn).toBeTruthy();
+        expect(screen.getByRole('button', { name: /close/i })).toBeTruthy();
     });
 
     it('calls onClose when close button is clicked', () => {
         const onClose = vi.fn();
         renderModal({ onClose });
-        const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
-        fireEvent.click(closeBtn);
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 

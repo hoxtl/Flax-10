@@ -5,6 +5,7 @@ import { useEventActions } from '../hooks/useCalendarEvents';
 import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
 import { getUserSettings } from '../../../api/userService';
 import { isDuringSleepWindow } from '../../Settings/hooks/useSleepWarning';
+import { useToast } from '../../../context/ToastContext';
 
 async function fetchSleepSettings() {
     try {
@@ -19,6 +20,7 @@ export function useEventForm(event, onClose, options = {}) {
     const calendarContext = useCalendar();
     const confirmFn = useConfirm();
     const actions = useEventActions();
+    const toast = useToast();
     const [form, setForm] = useState(() => getInitialForm(event, options));
     const [error, setError] = useState('');
     const [sleepWarning, setSleepWarning] = useState(false);
@@ -29,8 +31,23 @@ export function useEventForm(event, onClose, options = {}) {
     useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
     useEffect(() => { fetchSleepSettings().then(setSleepSettings); }, []);
 
-    const doSubmit = async (e, skipOverlap = false) =>
-        await validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, calendarContext?.events || [], skipOverlap);
+    const doSubmit = async (e, skipOverlap = false) => {
+        const saved = await validateAndSubmit(
+            e,
+            form,
+            event,
+            actions,
+            onClose,
+            setError,
+            confirmFn,
+            calendarContext?.events || [],
+            skipOverlap,
+        );
+        if (saved && typeof toast === 'function') {
+            toast(event?.id ? 'Event updated' : 'Event saved', { variant: 'success' });
+        }
+        return saved;
+    };
 
     const handleSubmit = options.customSubmit
         ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)

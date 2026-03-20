@@ -8,16 +8,19 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 from studyFlax.models import Tag, Category, RecurrenceRule
-from studyFlax.models.society.societyModel import Society
-from studyFlax.models.society.societyReportModel import SocietyReport
-from studyFlax.models.society.societyAnnouncementModel import SocietyAnnouncement, SocietyAnnouncementImage
-from studyFlax.models.society.societyCalendarSyncModel import SocietyCalendarSync
-from studyFlax.models.society.societyEventModel import SocietyEvent
-from studyFlax.models.society.societyImageModel import SocietyImage
-from studyFlax.models.society.societyMembershipModel import SocietyMembership
-from studyFlax.models.society.societyTagModel import SocietyTag
-from studyFlax.models.tasks.taskModel import Task, TaskList
-from studyFlax.models.timer.themeSessionModel import ThemeSession
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.calendar.event_attendance_model import EventAttendance
+from studyFlax.models.society.society_model import Society
+from studyFlax.models.society.society_report_model import SocietyReport
+from studyFlax.models.society.society_announcement_model import SocietyAnnouncement, SocietyAnnouncementImage
+from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
+from studyFlax.models.society.society_event_model import SocietyEvent
+from studyFlax.models.society.society_image_model import SocietyImage
+from studyFlax.models.society.society_membership_model import SocietyMembership
+from studyFlax.models.society.society_tag_model import SocietyTag
+from studyFlax.models.tasks.task_model import Task, TaskList
+from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.admin import ReportedSociety, ReportedSocietyAdmin
 
 User = get_user_model()
@@ -46,6 +49,41 @@ class ModelStringTests(TestCase):
     def test_user_is_student(self):
         user = User.objects.create_user(username='stud', email='stud@test.com', password='pass')
         self.assertTrue(user.is_student())
+
+    def test_user_is_teacher(self):
+        user = User.objects.create_user(username='tchr', email='tchr@test.com', password='pass', role='teacher')
+        self.assertTrue(user.is_teacher())
+
+    def test_user_is_pending_teacher(self):
+        user = User.objects.create_user(username='pend', email='pend@test.com', password='pass', role='pending_teacher')
+        self.assertTrue(user.is_pending_teacher())
+
+    def test_event_attendance_str_attended(self):
+        user = User.objects.create_user(username='att_user', email='att@test.com', password='pass')
+        event = CalendarEvent.objects.create(
+            user=user, title='Lecture',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
+        )
+        att = EventAttendance.objects.create(user=user, event=event, attended=True)
+        self.assertIn('attended', str(att))
+
+    def test_event_attendance_str_missed(self):
+        user = User.objects.create_user(username='miss_user', email='miss@test.com', password='pass')
+        event = CalendarEvent.objects.create(
+            user=user, title='Lab',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
+        )
+        att = EventAttendance.objects.create(user=user, event=event, attended=False)
+        self.assertIn('missed', str(att))
+
+    def test_course_change_request_str(self):
+        user = User.objects.create_user(username='cc_str', email='cc_str@test.com', password='pass')
+        req = CourseChangeRequest.objects.create(
+            user=user, requested_course='Math', current_course='Physics',
+        )
+        self.assertIn('cc_str', str(req))
+        self.assertIn('Physics', str(req))
+        self.assertIn('Math', str(req))
 
     def test_society_str(self):
         society = Society.objects.create(name='TestSoc', bio='bio', admin_emails='a@b.com')
@@ -110,7 +148,6 @@ class ModelStringTests(TestCase):
             duration_minutes=60,
         )
         self.assertIn('dark', str(session))
-
 
 class ReportedSocietyAdminTest(TestCase):
     """Tests for reported society admin."""

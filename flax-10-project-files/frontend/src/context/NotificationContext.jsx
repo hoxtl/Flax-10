@@ -1,20 +1,21 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useState, useEffect, useCallback, useRef, useContext } from 'react';
 import * as api from '../api/notificationApi';
+import { useAuth } from './AuthContext';
 import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
 import { playNotificationSound } from '../components/Notifications/utils/notificationSound';
 import { parseNotificationAction } from '../components/Notifications/utils/notificationAction';
-import { getUserProfile } from '../api/userService';
 
 const NotificationContext = createContext(null);
 const POLL_INTERVAL = 30000;
 
 export function NotificationProvider({ children }) {
+    const { refreshProfile } = useAuth();
     const { notifications, setNotifications, loading } = useNotificationLoader();
     const [isOpen, setIsOpen] = useState(false);
     const knownIds = useRef(new Set());
     const actions = useNotificationActions(setNotifications, knownIds);
 
-    useNotificationPolling(notifications, setNotifications, knownIds);
+    useNotificationPolling(notifications, setNotifications, knownIds, refreshProfile);
 
     const value = {
         notifications, isOpen, hasUnread: notifications.some(n => !n.read), loading, ...actions,
@@ -39,15 +40,15 @@ function useNotificationLoader() {
     return { notifications, setNotifications, loading };
 }
 
-function useNotificationPolling(notifications, setNotifications, knownIds) {
+function useNotificationPolling(notifications, setNotifications, knownIds, refreshProfile) {
     useEffect(() => {
         notifications.forEach(n => knownIds.current.add(n.id));
     }, [notifications, knownIds]);
 
     useEffect(() => {
-        const interval = setInterval(() => pollNotifications(knownIds.current, setNotifications), POLL_INTERVAL);
+        const interval = setInterval(() => pollNotifications(knownIds.current, setNotifications, refreshProfile), POLL_INTERVAL);
         return () => clearInterval(interval);
-    }, [setNotifications, knownIds]);
+    }, [setNotifications, knownIds, refreshProfile]);
 }
 
 const ROLE_CHANGE_TITLES = new Set([
@@ -61,32 +62,7 @@ function isRoleChangeNotification(notification) {
     return ROLE_CHANGE_TITLES.has((notification.title || '').toLowerCase());
 }
 
-async function refreshUserSession() {
-    try {
-        const profile = await getUserProfile();
-        if (!profile) return;
-        const stored = JSON.parse(localStorage.getItem('user') || '{}');
-        const oldRole = stored.role;
-        const updated = {
-            ...stored,
-            role: profile.role,
-            name: profile.name,
-            major: profile.major,
-            year: profile.year,
-            bio: profile.bio,
-        };
-        localStorage.setItem('user', JSON.stringify(updated));
-        window.dispatchEvent(new Event('auth-changed'));
-        // If the role actually changed, reload so every component picks up the new role
-        if (oldRole !== profile.role) {
-            setTimeout(() => window.location.reload(), 1500);
-        }
-    } catch (err) {
-        console.error('Failed to refresh user session after role change:', err);
-    }
-}
-
-function processNewNotifications(fresh, knownIds, setNotifications) {
+function processNewNotifications(fresh, knownIds, setNotifications, refreshProfile) {
     const newOnes = fresh.filter(n => !knownIds.has(n.id));
     if (newOnes.length === 0) return;
     let needsSessionRefresh = false;
@@ -96,15 +72,15 @@ function processNewNotifications(fresh, knownIds, setNotifications) {
         if (isRoleChangeNotification(n)) needsSessionRefresh = true;
     });
     setNotifications(fresh);
-    if (needsSessionRefresh) refreshUserSession();
+    if (needsSessionRefresh && refreshProfile) refreshProfile();
 }
-  
-async function pollNotifications(knownIds, setNotifications) {
+
+async function pollNotifications(knownIds, setNotifications, refreshProfile) {
     const fresh = await api.fetchNotifications().catch(err => {
-      console.error('Failed to poll notifications:', err);
-      return null;
+        console.error('Failed to poll notifications:', err);
+        return null;
     });
-    if (fresh) processNewNotifications(fresh, knownIds, setNotifications);
+    if (fresh) processNewNotifications(fresh, knownIds, setNotifications, refreshProfile);
 }
 
 function notifyUser(notification) {
@@ -128,10 +104,14 @@ function useNotificationActions(set, knownIds) {
     return { addNotification, dismissNotification, markAllRead, clearAll };
 }
 
+function trackKnownId(knownIds, id) {
+    if (knownIds?.current) knownIds.current.add(id);
+}
+
 async function createNotify(notification, set, knownIds) {
     try {
         const created = await api.createNotification(notification);
-        if (knownIds?.current) knownIds.current.add(created.id);
+        trackKnownId(knownIds, created.id);
         set(prev => [created, ...prev]);
     } catch (err) { console.error('Failed to create notification:', err); }
 }

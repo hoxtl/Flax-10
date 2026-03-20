@@ -1,29 +1,32 @@
 .calendar-container {
-  padding: 0.5rem 1rem 1rem;
+  padding: 0.5rem 0.5rem 1rem;
   box-sizing: border-box;
   background: var(--bg);
   display: flex;
   flex-direction: column;
   height: auto;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .view-placeholder {
   padding: 2rem;
   text-align: center;
   background: var(--panel, #f6f4f1);
-  border-radius: 8px;
-  color: var(--muted, #8b7355);
+  border-radius: 4px;
+  color: var(--muted, var(--color-primary));
 }
 
 .calendar-view-relative-wrapper {
   position: relative;
 }
 
-/* Day and Week views need constrained height for internal scroll */
+/* Day and Week views — expanded height */
 .calendar-view-relative-wrapper:has(.day-view),
 .calendar-view-relative-wrapper:has(.week-view) {
-  height: calc(100vh - 280px);
-  min-height: 400px;
+  height: calc(100vh - 200px);
+  min-height: 500px;
   display: flex;
   flex-direction: column;
 }
@@ -39,7 +42,7 @@
 
   .calendar-view-relative-wrapper:has(.day-view),
   .calendar-view-relative-wrapper:has(.week-view) {
-    height: calc(100vh - 240px);
+    height: calc(100vh - 180px);
   }
 }
 

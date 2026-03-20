@@ -1,3 +1,6 @@
+/*
+ * ImageManagerComponents.module.css styles the society image manager UI.
+ */
 .modalShell {
     width: min(520px, 92vw);
 }

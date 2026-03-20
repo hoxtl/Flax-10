@@ -1,3 +1,6 @@
+/*
+ * societyHookUtils contains small data mappers shared across society hooks.
+ */
 export const normalizeIsoTime = (time) => {
     if (!time || time.length > 16) return time;
     return `${time}:00`;
@@ -48,7 +51,7 @@ export const transformEventData = (data) => {
     };
 };
 
-export const transformAnnouncementData = (data, society, eventOps) => {
+export const transformAnnouncementData = (data) => {
     const ann = { title: data.title, content: data.content, tag: data.tag || null };
     const evData = { ...data, description: data.content, tag: data.tag || null, announcement: ann.id };
     return { ann, evData };

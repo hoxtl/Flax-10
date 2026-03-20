@@ -2,7 +2,7 @@
  * Tests for Timer WrapperComponents (MainSection, PopupSection).
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MainSection, PopupSection } from '../../../components/Timer/WrapperComponents';
 
 vi.mock('../../../components/Timer/TreeAnimation', () => ({ default: () => <div data-testid="tree" /> }));
@@ -13,8 +13,13 @@ vi.mock('../../../components/Timer/TimerComponents', () => ({
   TimerControls: () => <div data-testid="timer-controls" />,
   TimerSettings: () => <div data-testid="timer-settings" />,
   SoundSelector: () => <div data-testid="sound-selector" />,
+}));
+vi.mock('../../../components/Timer/TaskInput', () => ({
   TaskInput: ({ onTaskSelect }) => (
-    <button data-testid="task-select-btn" onClick={() => onTaskSelect?.({ id: 1, title: 'Task', estimated_blocks: 4, list_color: '#ccc' })}>
+    <button
+      data-testid="task-select-btn"
+      onClick={() => onTaskSelect?.({ id: 1, title: 'Task', estimated_blocks: 4, list_color: '#ccc' })}
+    >
       Select task
     </button>
   ),
@@ -65,13 +70,11 @@ describe('MainSection', () => {
     vi.clearAllMocks();
   });
 
-  it('renders desktop header with History button when not mobile', () => {
+  it('does not render History button when not mobile', () => {
     const onOpenHistory = vi.fn();
     render(<MainSection t={baseT} onOpenHistory={onOpenHistory} isMobile={false} />);
-    const btn = screen.getByRole('button', { name: 'History' });
-    expect(btn).toBeInTheDocument();
-    fireEvent.click(btn);
-    expect(onOpenHistory).toHaveBeenCalled();
+    expect(screen.queryByText('View History 📜')).not.toBeInTheDocument();
+    expect(onOpenHistory).not.toHaveBeenCalled();
   });
 
   it('renders mobile View History button when isMobile', () => {
@@ -81,15 +84,14 @@ describe('MainSection', () => {
     expect(screen.queryByRole('button', { name: 'History' })).not.toBeInTheDocument();
   });
 
-  it('calls setTask from sessionStorage timerSuggestedTask on mount', () => {
+  it('calls setTask from sessionStorage timerSuggestedTask on mount', async () => {
     const t = { ...baseT, setTask: vi.fn() };
-    const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation((k) => (k === 'timerSuggestedTask' ? 'Suggested task' : null));
-    const removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {});
+    sessionStorage.setItem('timerSuggestedTask', 'Suggested task');
     render(<MainSection t={t} onOpenHistory={vi.fn()} isMobile={false} />);
-    expect(t.setTask).toHaveBeenCalledWith('Suggested task');
-    expect(removeItemSpy).toHaveBeenCalledWith('timerSuggestedTask');
-    getItemSpy.mockRestore();
-    removeItemSpy.mockRestore();
+    await waitFor(() => {
+      expect(t.setTask).toHaveBeenCalledWith('Suggested task');
+    });
+    expect(sessionStorage.getItem('timerSuggestedTask')).toBeNull();
   });
 
   it('on task select updates time and calls setActiveTaskId when present', () => {

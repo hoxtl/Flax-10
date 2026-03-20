@@ -355,6 +355,44 @@
     flex-wrap: wrap;
 }
 
+.readingMetaGroup {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.readingMetaPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100%;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
+    line-height: 1.35;
+}
+
+.readingMetaLabel {
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--muted) 80%, var(--text) 20%);
+    white-space: nowrap;
+}
+
+.readingMetaValue {
+    font-size: 0.72rem;
+    font-weight: 650;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .metaDone {
     opacity: 0.45;
     filter: saturate(0.3);

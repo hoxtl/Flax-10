@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Check, Trash2 } from "lucide-react";
+import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import { getUserColor } from "../utils/priorityUtils";
@@ -14,22 +15,6 @@ function TaskCheckbox({ isDone, color, onToggle }) {
             style={{ "--cb-bg": color, "--cb-border": isDone ? color : "var(--border)" }}>
             {isDone && <Check size={14} strokeWidth={3} />}
         </button>
-    );
-}
-
-function TaskTitleField({ task, isEditing, editedTitle, setEditedTitle, onSave, onCancel, onStartEdit }) {
-    if (!isEditing) {
-        return <span onClick={onStartEdit} className={`${styles.titleSpan} ${task.completed ? styles.titleDone : ""}`} title="Click to edit">{task.title}</span>;
-    }
-    const color = getUserColor((task.assignees_info || [])[0]?.id);
-    return (
-        <textarea autoFocus value={editedTitle} className={styles.titleEditArea} style={{ "--cb-bg": color }}
-            onChange={e => { setEditedTitle(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
-            ref={el => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
-            onBlur={onSave}
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSave(); } if (e.key === "Escape") onCancel(); }}
-            rows={1}
-        />
     );
 }
 
@@ -83,19 +68,10 @@ function ActionCell({ taskId, onDelete }) {
     );
 }
 
-function useTaskRowEdit(task, onUpdate) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedTitle, setEditedTitle] = useState(task.title);
-    const save = () => { if (editedTitle.trim() && editedTitle !== task.title) onUpdate(task.id, { title: editedTitle.trim() }); setIsEditing(false); };
-    const cancel = () => { setEditedTitle(task.title); setIsEditing(false); };
-    const start = () => { setEditedTitle(task.title); setIsEditing(true); };
-    return { isEditing, editedTitle, setEditedTitle, save, cancel, start };
-}
-
 export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
-    const edit = useTaskRowEdit(task, onUpdate);
-  const visibleAssignees = filterAssignees(task.assignees_info || [], members);
-  const m = visibleAssignees[0];
+    const edit = useInlineEdit(task.title, (newTitle) => onUpdate(task.id, { title: newTitle }));
+    const visibleAssignees = filterAssignees(task.assignees_info || [], members);
+    const m = visibleAssignees[0];
     const color = m ? getUserColor(m.id) : "#8d7355";
 
     return (
@@ -103,7 +79,19 @@ export function TaskRow({ task, members, onToggle, onUpdate, onDelete }) {
             <div className={styles.taskMainCell}>
                 <TaskCheckbox isDone={task.completed} color={color} onToggle={() => onToggle(task.id, !task.completed)} />
                 <div className={styles.titleArea}>
-                    <TaskTitleField task={task} {...edit} onStartEdit={edit.start} onSave={edit.save} onCancel={edit.cancel} />
+                    <InlineTitleField
+                        value={task.title}
+                        isEditing={edit.isEditing}
+                        draft={edit.draft}
+                        setDraft={edit.setDraft}
+                        onStart={edit.start}
+                        onSave={edit.save}
+                        onCancel={edit.cancel}
+                        readOnlyStyles={{
+                            textDecoration: task.completed ? "line-through" : "none",
+                            color: task.completed ? "var(--muted)" : "var(--text)",
+                        }}
+                    />
                 </div>
             </div>
             <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />

@@ -15,6 +15,15 @@ export function getTomorrowEndISO() {
   return d.toISOString();
 }
 
+function showInfoToast(state, message, duration = 3000) {
+  state.setToastInfo(message);
+  setTimeout(() => state.setToastInfo(null), duration);
+}
+
+function showDeleteToast(state, message, duration = 3500) {
+  showInfoToast(state, message, duration);
+}
+
 function getDateBounds() {
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
@@ -56,20 +65,20 @@ async function handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta)
   const updated = await tasksApi.editTask(taskId, data);
   if (meta?.source === "context-menu" && meta?.action === "move-list") {
     const toListName = meta?.listName || listsApi.lists.find((l) => String(l.id) === String(updated?.task_list ?? data?.task_list))?.name || "new list";
-    state.setToastInfo(`Task moved to ${toListName}.`);
-    setTimeout(() => state.setToastInfo(null), 3000);
+    showInfoToast(state, `Task moved to ${toListName}.`);
     return updated;
   }
   if (meta?.source === "context-menu" && meta?.action === "set-due-date") {
-    state.setToastInfo(data?.due_date ? "Task due date updated." : "Task due date removed.");
-    setTimeout(() => state.setToastInfo(null), 3000);
+    showInfoToast(state, data?.due_date ? "Task due date updated." : "Task due date removed.");
     return updated;
   }
   return updated;
 }
 
-function handleDeleteListImpl(state, listsApi, listId) {
-  listsApi.removeList(listId);
+async function handleDeleteListImpl(state, listsApi, listId) {
+  const listName = listsApi.lists.find((list) => String(list.id) === String(listId))?.name || "List";
+  await listsApi.removeList(listId);
+  showDeleteToast(state, `"${listName}" deleted.`);
   if (state.activeListId === listId) {
     state.setActiveListId(null);
     state.setActiveFilter("all");
@@ -79,18 +88,26 @@ function handleDeleteListImpl(state, listsApi, listId) {
 export function buildTasksPageHandlers(state, listsApi, tasksApi) {
   return {
     handleUndoAddTask: () => handleUndoAddTask(state, tasksApi),
-    handleDeleteTask: (taskId) => { tasksApi.removeTask(taskId); state.setToastDelete(true); setTimeout(() => state.setToastDelete(false), 3500); },
+    handleDeleteTask: async (taskId) => {
+      await tasksApi.removeTask(taskId);
+      state.setToastDelete(true);
+      setTimeout(() => state.setToastDelete(false), 3500);
+    },
     handleEditTask: (taskId, data, meta) => handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta),
     handleDeleteList: (listId) => handleDeleteListImpl(state, listsApi, listId),
     handleUnarchiveList: async (listId) => { await listsApi.restoreList(listId); tasksApi.reload(); },
-    handlePermanentlyDeleteList: async (listId) => { if (!window.confirm("Permanently delete this list? You won't be able to restore it.")) return; await listsApi.permanentlyDeleteList(listId); },
+    handlePermanentlyDeleteList: async (listId) => {
+      const listName = listsApi.archivedLists.find((list) => String(list.id) === String(listId))?.name || "List";
+      await listsApi.permanentlyDeleteList(listId);
+      showDeleteToast(state, `"${listName}" permanently deleted.`);
+    },
   };
 }
 
 export function buildTasksPageViewProps(state, listsApi, tasksApi, handlers, filteredTasks, defaultDueDateForNewTask, activeModuleCode) {
   const loading = listsApi.loading || tasksApi.initialLoading;
   const sidebarProps = { lists: listsApi.lists, tasks: tasksApi.tasks, activeListId: state.activeListId, activeFilter: state.activeFilter, onSelectList: (id) => { state.setActiveListId(id); state.setFilterListIds([]); }, onSelectFilter: state.setActiveFilter, onNewList: () => state.setShowListModal(true), onDeleteList: handlers.handleDeleteList, onRenameList: listsApi.renameList, onUnarchiveList: handlers.handleUnarchiveList, onPermanentlyDeleteList: handlers.handlePermanentlyDeleteList, archivedLists: listsApi.archivedLists };
-  const feedProps = { tasks: filteredTasks, lists: listsApi.lists, activeFilter: state.activeFilter, activeListId: state.activeListId, activeModuleCode, defaultDueDateForNewTask, onPlanTomorrow: () => { state.setTaskModalDueDate(getTomorrowEndISO()); state.setShowTaskModal(true); }, filterListIds: state.filterListIds, onToggleComplete: tasksApi.toggleComplete, onDeleteTask: handlers.handleDeleteTask, onEditTask: handlers.handleEditTask, onCreateTask: () => { state.setTaskModalDueDate(null); state.setShowTaskModal(true); }, onAddTask: async (data) => { const created = await tasksApi.addTask(data); if (created) { state.setToastUndo({ taskId: created.id, title: created.title }); setTimeout(() => state.setToastUndo(null), 5000); } }, onFilterByList: state.setFilterListIds, onReloadTasks: tasksApi.reload, };
+  const feedProps = { tasks: filteredTasks, allTasks: tasksApi.tasks, lists: listsApi.lists, activeFilter: state.activeFilter, activeListId: state.activeListId, activeModuleCode, defaultDueDateForNewTask, onPlanTomorrow: () => { state.setTaskModalDueDate(getTomorrowEndISO()); state.setShowTaskModal(true); }, filterListIds: state.filterListIds, onToggleComplete: tasksApi.toggleComplete, onDeleteTask: handlers.handleDeleteTask, onEditTask: handlers.handleEditTask, onCreateTask: () => { state.setTaskModalDueDate(null); state.setShowTaskModal(true); }, onAddTask: async (data) => { const created = await tasksApi.addTask(data); if (created) { state.setToastUndo({ taskId: created.id, title: created.title }); setTimeout(() => state.setToastUndo(null), 5000); } }, onFilterByList: state.setFilterListIds, onReloadTasks: tasksApi.reload, };
   const taskModalProps = { lists: listsApi.lists, defaultListId: state.activeListId, defaultDueDate: state.taskModalDueDate ?? defaultDueDateForNewTask, onOpenCreateList: () => state.setShowCreateListFromTask(true), newListIdCreated: state.lastCreatedListId, onSave: async (data) => { const created = await tasksApi.addTask(data); state.setToastUndo(created ? { taskId: created.id, title: created.title } : null); if (created) setTimeout(() => state.setToastUndo(null), 5000); }, onClose: () => { state.setShowTaskModal(false); state.setLastCreatedListId(null); state.setTaskModalDueDate(null); } };
   const listModalProps = { onSave: listsApi.addList, onClose: () => state.setShowListModal(false) };
   const createListFromTaskProps = { onSave: async (data) => { const created = await listsApi.addList(data); if (created?.id) state.setLastCreatedListId(created.id); state.setShowCreateListFromTask(false); }, onClose: () => state.setShowCreateListFromTask(false) };

@@ -26,14 +26,16 @@ describe('StandardModal', () => {
     it('calls onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<StandardModal title="Modal" onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('calls onClose when backdrop is clicked', () => {
         const onClose = vi.fn();
         const { container } = render(<StandardModal title="Modal" onClose={onClose} />);
-        fireEvent.mouseDown(container.firstChild);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+        expect(backdrop).toBeTruthy();
+        fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
@@ -69,7 +71,7 @@ describe('ModalHeader', () => {
     it('calls onClose when × button is clicked', () => {
         const onClose = vi.fn();
         render(<ModalHeader title="Title" onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

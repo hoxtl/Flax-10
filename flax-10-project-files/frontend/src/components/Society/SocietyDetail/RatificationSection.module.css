@@ -22,7 +22,7 @@
     padding: 0.5rem 1rem;
     background: var(--primary-color, #9E7E5D);
     border: none;
-    color: #fff;
+    color: var(--color-card);
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.85rem;
@@ -79,8 +79,10 @@
 }
 
 .toggleHint {
-    font-size: 0.8rem;
-    color: var(--muted, #6b7280);
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--primary, #7B6751);
+    opacity: 0.85;
     margin: 0.25rem 0 0 0;
 }
 
@@ -106,7 +108,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--color-card);
     transition: transform 0.2s;
 }
 
@@ -134,7 +136,7 @@
     align-items: center;
     justify-content: center;
     background: #fbbf24;
-    color: #fff;
+    color: var(--color-card);
     border-radius: 50%;
     font-size: 0.7rem;
     font-weight: bold;

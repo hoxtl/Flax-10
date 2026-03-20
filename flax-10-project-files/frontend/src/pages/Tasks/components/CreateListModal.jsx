@@ -3,9 +3,10 @@
  */
 
 import { useState } from "react";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
 
 function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
   return (
@@ -31,8 +32,8 @@ function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
 function CreateListModalFooter({ onClose, onSave, saving, canSave }) {
   return (
     <div className={styles.footer}>
-      <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-      <button className={styles.saveBtn} onClick={onSave} disabled={saving || !canSave}>{saving ? "Creating…" : "Create list"}</button>
+      <PrimaryButton variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
+      <PrimaryButton onClick={onSave} disabled={saving || !canSave} pill>{saving ? "Creating…" : "Create list"}</PrimaryButton>
     </div>
   );
 }
@@ -48,7 +49,7 @@ export default function CreateListModal({ onSave, onClose }) {
     setSaving(false); onClose();
   };
   return (
-      <StandardModal title="New list" onClose={onClose} size="sm" modalClassName={styles.modalShell} contentClassName={styles.modalContent}>
+      <StandardModal title="New list" onClose={onClose} size="sm" contentClassName={styles.modalContent}>
         <CreateListModalBody name={name} setName={setName} color={color} setColor={setColor} onEnter={handleSave} />
         <CreateListModalFooter onClose={onClose} onSave={handleSave} saving={saving} canSave={!!name.trim()} />
       </StandardModal>

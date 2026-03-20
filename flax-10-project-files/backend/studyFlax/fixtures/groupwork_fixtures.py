@@ -1,3 +1,6 @@
+"""
+Fixture data for seeding group projects and shared task templates.
+"""
 GROUP_PROJECT_FIXTURES = [
     ("Group Presentation: Agile Methodologies", "CS", "Prepare a 15-minute presentation on Agile values and principles."),
     ("Database Design Sprint", "CS", "Design and normalize a database schema for a complex e-commerce platform."),

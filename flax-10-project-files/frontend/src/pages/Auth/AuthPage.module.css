@@ -53,6 +53,15 @@
   color: var(--kcl-accent);
 }
 
+:global([data-mode="dark"]) .pageWrap {
+  --auth-card-bg: var(--panel);
+  --auth-form-bg: color-mix(in srgb, var(--panel) 98%, var(--surface-page));
+}
+
+:global([data-mode="dark"]) .kclAccent {
+  color: #e8455a;
+}
+
 @media (max-width: 768px) {
   .authFormCard {
     width: 100%;

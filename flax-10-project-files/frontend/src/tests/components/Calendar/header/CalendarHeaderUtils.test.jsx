@@ -1,12 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+
+vi.mock('framer-motion', () => ({
+    AnimatePresence: ({ children }) => <>{children}</>,
+    motion: {
+        div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    },
+}));
 
 vi.mock('lucide-react', () => ({
     ChevronLeft: () => <span data-testid="chevron-left" />,
     ChevronRight: () => <span data-testid="chevron-right" />,
     Settings2: () => <span data-testid="settings-icon" />,
     Plus: () => <span data-testid="plus-icon" />,
+    Tag: () => <span data-testid="tag-icon" />,
 }));
 
 vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
@@ -38,23 +46,35 @@ vi.mock('../../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
+vi.mock('../../../../context/TagContext', () => ({
+    useTags: () => ({
+        tags: [
+            { id: 1, label: 'Lecture' },
+            { id: 2, label: 'Other' },
+        ],
+    }),
+}));
+
+vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+    TagsSelector: ({ tags }) => (
+        <div data-testid="tags-selector">
+            {tags.map((tag) => <span key={tag.id}>{tag.label}</span>)}
+        </div>
+    ),
+}));
+
+vi.mock('../../../../components/Tags/TagManagerModal', () => ({
+    default: () => <div data-testid="tag-manager-modal" />,
+}));
+
 describe('CalendarHeaderUtils', () => {
     describe('CalendarNav', () => {
-        it('renders prev, next, Today when showToday, date picker, and title', () => {
-            const onPrev = vi.fn();
-            const onNext = vi.fn();
-            const onToday = vi.fn();
-            const onDatePick = vi.fn();
-            const selectedDate = new Date(2026, 0, 15);
+        it('renders elements when showToday is true', () => {
             render(
                 <CalendarNav
-                    onPrev={onPrev}
-                    onNext={onNext}
-                    onToday={onToday}
-                    showToday={true}
-                    selectedDate={selectedDate}
-                    onDatePick={onDatePick}
-                    title="February 2026"
+                    onPrev={vi.fn()} onNext={vi.fn()} onToday={vi.fn()}
+                    showToday={true} selectedDate={new Date(2026, 0, 15)}
+                    onDatePick={vi.fn()} title="February 2026"
                 />
             );
             expect(screen.getByTestId('chevron-left')).toBeInTheDocument();
@@ -62,7 +82,18 @@ describe('CalendarHeaderUtils', () => {
             expect(screen.getByText('Today')).toBeInTheDocument();
             expect(screen.getByTestId('date-picker')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'February 2026' })).toBeInTheDocument();
+        });
 
+        it('nav buttons fire correct callbacks', () => {
+            const onPrev = vi.fn();
+            const onNext = vi.fn();
+            const onToday = vi.fn();
+            const onDatePick = vi.fn();
+            const selectedDate = new Date(2026, 0, 15);
+            render(
+                <CalendarNav onPrev={onPrev} onNext={onNext} onToday={onToday}
+                    showToday={true} selectedDate={selectedDate} onDatePick={onDatePick} />
+            );
             fireEvent.click(screen.getByText('Today'));
             expect(onToday).toHaveBeenCalled();
             fireEvent.click(screen.getByTestId('chevron-left'));
@@ -148,6 +179,15 @@ describe('CalendarHeaderUtils', () => {
             expect(screen.getByTitle('Display Mode')).toBeInTheDocument();
             fireEvent.click(screen.getByText('List View'));
             expect(onViewChange).toHaveBeenCalledWith('list');
+        });
+    });
+
+    describe('FilterDropdownButton', () => {
+        it('opens the tag popup on hover', () => {
+            render(<FilterDropdownButton active="all" onChange={vi.fn()} />);
+            fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
+            expect(screen.getByText('Filter by tag')).toBeInTheDocument();
+            expect(screen.getByTestId('tags-selector')).toBeInTheDocument();
         });
     });
 });

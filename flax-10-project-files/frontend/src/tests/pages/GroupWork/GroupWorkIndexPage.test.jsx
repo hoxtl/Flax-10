@@ -32,6 +32,7 @@ describe('GroupWorkIndexPage', () => {
     useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
     render(<GroupWorkIndexPage />);
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
-    expect(screen.queryByText('Group work')).toBeNull();
+    // Skeleton uses AppPage and renders the title even while loading.
+    expect(screen.getByText('Group work')).toBeTruthy();
   });
 });

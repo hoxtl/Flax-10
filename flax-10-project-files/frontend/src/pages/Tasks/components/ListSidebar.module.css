@@ -1,10 +1,19 @@
 .sidebar {
-    width: 220px;
-    min-width: 220px;
-    max-width: 220px;
+    width: 272px;
+    min-width: 272px;
+    max-width: 272px;
     flex-shrink: 0;
-    border-right: 1px solid var(--frame-border);
-    background: var(--sidebar);
+    border-right: 1px solid var(--widget-border);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-card) 86%, var(--sidebar) 14%) 0%,
+            color-mix(in srgb, var(--surface-card) 78%, var(--panel) 22%) 52%,
+            color-mix(in srgb, var(--surface-card) 72%, var(--sidebar) 28%) 100%
+        );
+    box-shadow:
+        inset -1px 0 0 color-mix(in srgb, var(--widget-border) 86%, transparent),
+        inset 0 1px 0 color-mix(in srgb, var(--surface-card) 86%, transparent);
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
@@ -19,10 +28,10 @@
     justify-content: space-between;
     font-family: var(--font-body);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
     padding: 8px 8px 4px;
     margin-top: 8px;
 }
@@ -47,24 +56,29 @@
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     color: var(--text);
+    border: 1px solid transparent;
 }
 .navItem:hover {
-    background: var(--hover);
+    background: color-mix(in srgb, var(--surface-card) 72%, var(--hover-light) 28%);
     transform: translateX(2px);
+    box-shadow: 0 10px 18px color-mix(in srgb, var(--primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 14%, transparent);
 }
 .navItem:active { transform: scale(0.98); }
 
 .navActive {
-    background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
+    background: color-mix(in srgb, var(--surface-card) 62%, var(--sidebar-active) 38%) !important;
     color: var(--primary);
     transform: translateX(2px);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--primary) 10%, transparent);
 }
 .navActive .navLabel { color: var(--primary); font-weight: 600; }
 .navActive .navEmoji { filter: none; }
 
-.navDanger .navLabel { color: #ef4444; }
+.navDanger .navLabel { color: var(--danger); }
 .navDanger .navEmoji { filter: none; }
 
 .navEmoji {
@@ -91,12 +105,13 @@
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    background: var(--border);
-    color: var(--muted);
+    background: color-mix(in srgb, var(--surface-card) 72%, var(--border) 28%);
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
     border-radius: 9999px;
     padding: 0.08rem 0.42rem;
     min-width: 18px;
     text-align: center;
+    border: 1px solid color-mix(in srgb, var(--widget-border) 70%, transparent);
 }
 .navCountDanger {
     background: var(--danger-bg);
@@ -110,21 +125,27 @@
     min-width: 0;
     border-radius: 8px;
     border-left: 3px solid transparent;
-    transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease;
+    border: 1px solid transparent;
+    transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 .listItem:hover {
-    background: var(--hover-light);
+    background: color-mix(in srgb, var(--surface-card) 70%, var(--hover-light) 30%);
     transform: translateX(2px);
+    border-color: color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 10px 18px color-mix(in srgb, var(--primary) 7%, transparent);
 }
 
 .listActive {
-    background: var(--hover) !important;
+    background: color-mix(in srgb, var(--surface-card) 58%, var(--hover) 42%) !important;
     font-weight: 500;
     border-left-color: var(--primary);
     padding-left: 9px;
     transform: translateX(2px);
+    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--primary) 9%, transparent);
 }
 .listActive .listName { color: var(--text); font-weight: 600; }
+.listActive .readingListLabel { color: var(--text); font-weight: 650; }
 
 .listBtn {
     flex: 1;
@@ -151,7 +172,7 @@
     flex: 1;
     min-width: 0;
     font-family: var(--font-body);
-    font-size: 0.97rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text);
     overflow: hidden;
@@ -160,17 +181,33 @@
     letter-spacing: 0.01em;
 }
 
+.readingListLabel {
+    flex: 1;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.32;
+    letter-spacing: 0.01em;
+}
+
 .listCount {
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--muted);
-    background: var(--pill-bg);
-    border-radius: 8px;
-    padding: 1px 6px;
+    color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
+    background: color-mix(in srgb, var(--surface-card) 72%, var(--border) 28%);
+    border-radius: 9999px;
+    padding: 0.08rem 0.42rem;
     min-width: 18px;
     text-align: center;
     flex-shrink: 0;
+    border: 1px solid color-mix(in srgb, var(--widget-border) 70%, transparent);
 }
 
 .emptyLists {
@@ -186,10 +223,10 @@
     width: 100%;
     margin-top: 8px;
     padding: 8px 12px;
-    background: none;
-    border: 1.5px dashed var(--muted);
+    background: color-mix(in srgb, var(--surface-card) 82%, transparent);
+    border: 1.5px dashed color-mix(in srgb, var(--primary) 18%, var(--muted));
     border-radius: 6px;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 68%, var(--muted) 32%);
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 500;
@@ -200,7 +237,7 @@
 .createListBtn:hover {
     color: var(--text);
     border-color: var(--primary);
-    background: var(--hover-light);
+    background: color-mix(in srgb, var(--surface-card) 64%, var(--hover-light) 36%);
 }
 
 .renameInput {

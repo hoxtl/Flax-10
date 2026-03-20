@@ -10,10 +10,12 @@ export default function SearchEmptyState({
   itemLabel = "items",
   onClear,
   title,
+  alwaysShowClear = false,
   hint = "Try a different keyword or check your spelling",
   clearLabel = "Clear search",
 }) {
   const queryActive = hasQuery(query);
+  const shouldShowClear = Boolean(onClear) && (queryActive || alwaysShowClear);
   const resolvedTitle = title || (queryActive
     ? `No ${itemLabel} match "${query}"`
     : `No ${itemLabel} found`);
@@ -23,7 +25,7 @@ export default function SearchEmptyState({
       <span className={styles.emoji} aria-hidden="true">🔍</span>
       <p className={styles.title}>{resolvedTitle}</p>
       <p className={styles.hint}>{hint}</p>
-      {queryActive && onClear && (
+      {shouldShowClear && (
         <PrimaryButton
           type="button"
           className={styles.clearBtn}

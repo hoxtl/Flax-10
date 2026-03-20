@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModuleGrid from '../../../components/Modules/ModuleGrid';
+import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
 
-vi.mock('../ModulesCard', () => ({
+vi.mock('../../../components/Modules/ModulesCard', () => ({
     default: ({ module }) => <div>{module.module_name}</div>,
 }));
 

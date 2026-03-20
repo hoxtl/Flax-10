@@ -1,0 +1,156 @@
+.portal {
+  position: fixed;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  min-width: min(84vw, 320px);
+  max-width: min(90vw, 560px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px 11px 15px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 94%, white 6%);
+  color: var(--text);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.16),
+    0 4px 14px rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.message {
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text-secondary);
+}
+
+.action {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary) 60%, var(--border));
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  color: var(--text);
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.action:hover {
+  background: color-mix(in srgb, var(--primary) 34%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 78%, var(--border));
+}
+
+.action:focus-visible,
+.close:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring-strong);
+}
+
+.close {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.35rem;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.close:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.success .icon {
+  background: rgba(34, 197, 94, 0.16);
+  color: #22c55e;
+}
+
+.info .icon {
+  background: color-mix(in srgb, var(--primary) 18%, white);
+  color: color-mix(in srgb, var(--text) 78%, var(--primary) 22%);
+}
+
+.error .icon {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ef4444;
+}
+
+@media (max-width: 640px) {
+  .portal {
+    bottom: 18px;
+    padding: 0 10px;
+  }
+
+  .toast {
+    min-width: min(94vw, 400px);
+    padding: 10px 12px 10px 13px;
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.84rem;
+  }
+
+  .message {
+    font-size: 0.9rem;
+  }
+}

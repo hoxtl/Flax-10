@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from studyFlax.models.groupwork.groupwork_models import GroupMembership
-from studyFlax.models.notifications.notificationModel import Notification
+from studyFlax.models.groupwork.groupwork_model import GroupMembership
+from studyFlax.models.notifications.notification_model import Notification
 
 @receiver(post_save, sender=GroupMembership)
 def notify_on_added_to_project(sender, instance, created, **kwargs):

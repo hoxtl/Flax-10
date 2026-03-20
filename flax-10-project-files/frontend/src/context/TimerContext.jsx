@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { createContext, useContext, useState } from 'react';
 import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
 
@@ -9,6 +13,11 @@ export function useTimerContext() {
   return context;
 }
 
+function persistTimerMeta(meta, storage) {
+  if (meta?.title != null) storage.setItem('timerTaskTitle', String(meta.title));
+  if (meta?.categoryColor != null) storage.setItem('timerTaskCategoryColor', String(meta.categoryColor));
+}
+
 export function persistTimerTask(id, meta, options = {}) {
   const hasWindow = options.hasWindow ?? (typeof window !== 'undefined');
   const storage = options.storage ?? (typeof sessionStorage !== 'undefined' ? sessionStorage : null);
@@ -16,8 +25,7 @@ export function persistTimerTask(id, meta, options = {}) {
 
   if (id != null) {
     storage.setItem('timerTaskId', String(id));
-    if (meta?.title != null) storage.setItem('timerTaskTitle', String(meta.title));
-    if (meta?.categoryColor != null) storage.setItem('timerTaskCategoryColor', String(meta.categoryColor));
+    persistTimerMeta(meta, storage);
   } else {
     storage.removeItem('timerTaskId');
     storage.removeItem('timerTaskTitle');
@@ -39,7 +47,7 @@ export function TimerProvider({ children }) {
 
   const timerData = useTimerLogic(activeTaskId, setActiveTaskId, activeTaskMeta);
   return (
-    <TimerContext.Provider value={{ ...timerData, setActiveTaskId }}>
+    <TimerContext.Provider value={{ ...timerData, setActiveTaskId, activeTaskMeta }}>
       {children}
     </TimerContext.Provider>
   );

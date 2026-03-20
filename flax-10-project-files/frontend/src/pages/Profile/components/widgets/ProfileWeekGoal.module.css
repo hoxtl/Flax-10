@@ -1,0 +1,235 @@
+/* ── This Week / Goal Ring ── */
+.weekCard {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.weekRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.weekRowSolo {
+  justify-content: center;
+}
+
+.goalRingWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.goalRingBtn {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: filter 0.2s ease;
+  outline: none;
+}
+
+.goalRingBtn:hover {
+  filter: brightness(1.07);
+}
+
+.goalRingBtn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+.goalRingActive .goalRingSvg {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-primary) 50%, transparent));
+}
+
+.goalRingSvg {
+  display: block;
+  transform: rotate(-90deg);
+  transition: filter 0.25s ease;
+}
+
+.ringInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ringValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.ringGoal {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.ringCaption {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.weekDivider {
+  width: 1px;
+  height: 60px;
+  background: var(--widget-border);
+  flex-shrink: 0;
+}
+
+[data-mode="dark"] .weekDivider {
+  background: var(--color-border-base);
+}
+
+/* ── Streaks ── */
+.streakRow {
+  display: flex;
+  gap: 28px;
+}
+
+.streakItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.streakNum {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.streakMeta {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── Goal Editor ── */
+.goalEditorWrap {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(.4,0,.2,1), opacity 0.3s ease;
+}
+
+.goalEditorOpen {
+  overflow: hidden;
+}
+
+.goalEditorPanel {
+  padding: 14px 16px 4px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goalEditorLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text);
+  gap: 12px;
+}
+
+.goalEditorTitle {
+  color: #212121;
+  font-weight: 700;
+}
+
+[data-mode="dark"] .goalEditorTitle {
+  color: var(--text);
+}
+
+.goalEditorHrs {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.goalSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(to right,
+    var(--color-primary) var(--slider-pct, 0%),
+    var(--border) var(--slider-pct, 0%));
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.goalSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.goalSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.goalSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.goalEditorActions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding-bottom: 4px;
+}
+
+.goalSaveBtn {
+  min-width: 108px;
+}
+
+.goalCancelBtn {
+  min-width: 96px;
+}
+
+@media (max-width: 768px) {
+  .weekRow { gap: 14px; }
+  .streakRow { gap: 16px; }
+}

@@ -58,55 +58,58 @@ describe('TaskInput', () => {
 
   it('opens task picker and loads tasks/lists', async () => {
     renderTaskInput();
-    fireEvent.click(screen.getByText('Select Task'));
+    fireEvent.click(screen.getByText('Choose a task to focus'));
 
     await waitFor(() => {
       expect(fetchApi).toHaveBeenCalled();
     });
 
-    expect(screen.getByRole('dialog', { name: 'Select task' })).toBeTruthy();
+    expect(screen.getByText('Select a Task')).toBeTruthy();
     expect(screen.getByText('Urgent task')).toBeTruthy();
     expect(screen.getByText('High task')).toBeTruthy();
   });
 
   it('search filters tasks by title', async () => {
     renderTaskInput();
-    fireEvent.click(screen.getByText('Select Task'));
+    fireEvent.click(screen.getByText('Choose a task to focus'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByPlaceholderText('Search tasks…'), { target: { value: 'urgent' } });
+    fireEvent.change(screen.getByPlaceholderText(/Search tasks/i), { target: { value: 'urgent' } });
     expect(screen.getByText('Urgent task')).toBeTruthy();
     expect(screen.queryByText('Low task')).toBeNull();
   });
 
   it('sort by due date prioritizes tasks with due_date', async () => {
     renderTaskInput();
-    fireEvent.click(screen.getByText('Select Task'));
+    fireEvent.click(screen.getByText('Choose a task to focus'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
-    const dropdowns = screen.getAllByRole('combobox');
-    fireEvent.change(dropdowns[0], { target: { value: 'due' } });
+    const sortSelect = screen.getAllByRole('combobox')[0];
+    fireEvent.change(sortSelect, { target: { value: 'due' } });
     await waitFor(() => expect(fetchApi).toHaveBeenCalledTimes(4));
-    const dialog = screen.getByRole('dialog', { name: 'Select task' });
-    const list = dialog.querySelector('[class*="taskPickList"]');
+    const list = document.querySelector('[class*="taskPickList"]');
     const items = Array.from(list.querySelectorAll('button')).map((b) => b.textContent);
     expect(items[0]).toContain('High task');
   });
 
   it('filters by list and module', async () => {
     renderTaskInput();
-    fireEvent.click(screen.getByText('Select Task'));
+    fireEvent.click(screen.getByText('Choose a task to focus'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
-    const dropdowns = screen.getAllByRole('combobox');
+    // Open filter panel
+    fireEvent.click(screen.getByText('Filter'));
+    await waitFor(() => expect(screen.getByRole('dialog', { name: 'Task filters' })).toBeTruthy());
+
     // Filter list: Work (id 1)
-    fireEvent.change(dropdowns[1], { target: { value: '1' } });
-    expect(screen.queryByText('Low task')).toBeNull();
+    fireEvent.click(screen.getByLabelText('Work'));
+    await waitFor(() => expect(screen.queryByText('Low task')).toBeNull());
     expect(screen.getByText('Urgent task')).toBeTruthy();
 
     // Filter module: CS101
-    fireEvent.change(dropdowns[2], { target: { value: 'CS101' } });
-    expect(screen.queryByText('Low task')).toBeNull();
+    fireEvent.click(screen.getByText('Modules'));
+    fireEvent.click(screen.getByLabelText('CS101'));
+    await waitFor(() => expect(screen.queryByText('Low task')).toBeNull());
     expect(screen.getByText('Urgent task')).toBeTruthy();
   });
 
@@ -114,7 +117,7 @@ describe('TaskInput', () => {
     const onChange = vi.fn();
     const onTaskSelect = vi.fn();
     renderTaskInput({ onChange, onTaskSelect });
-    fireEvent.click(screen.getByText('Select Task'));
+    fireEvent.click(screen.getByText('Choose a task to focus'));
     await waitFor(() => expect(fetchApi).toHaveBeenCalled());
 
     fireEvent.click(screen.getByText('Urgent task'));

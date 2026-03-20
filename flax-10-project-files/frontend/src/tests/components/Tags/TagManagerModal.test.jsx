@@ -57,7 +57,7 @@ describe('TagManagerModal', () => {
     it('calls onClose when close button clicked', () => {
         const onClose = vi.fn();
         render(<TagManagerModal onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 

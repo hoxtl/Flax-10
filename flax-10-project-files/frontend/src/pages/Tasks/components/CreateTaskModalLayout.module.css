@@ -103,21 +103,7 @@
 
 .deleteBtn {
   margin-right: auto;
-  font-family: inherit;
-  background: transparent;
-  color: #b91c1c;
-  border: none;
-  padding: 6px 2px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
-}
-
-.deleteBtn:hover {
-  color: #991b1b;
-  background: rgba(185, 28, 28, 0.06);
+  white-space: nowrap;
 }
 
 .cancelBtn {

@@ -1,23 +1,17 @@
-import { useEffect, useState, useCallback } from "react";
+/*
+ * Attendance records hook.
+ */
+
 import { getAttendanceRecords } from "../../../api/attendanceApi";
+import { buildRecordsByEventId } from "../utils/attendanceRecords";
+import { useAttendanceResource } from "./useAttendanceResource";
 
-/** Single responsibility: fetch attendance records (event_id -> attended) and expose refetch. */
 export function useAttendanceRecords() {
-  const [records, setRecords] = useState([]);
+  const { data, refetch } = useAttendanceResource(loadAttendanceRecords, []);
+  return { records: data, recordsByEventId: buildRecordsByEventId(data), refetch };
+}
 
-  const refetch = useCallback(async () => {
-    try {
-      const data = await getAttendanceRecords();
-      setRecords(Array.isArray(data) ? data : []);
-    } catch {
-      setRecords([]);
-    }
-  }, []);
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-
-  const recordsByEventId = new Map(records.map((r) => [r.event_id, r.attended]));
-  return { records, recordsByEventId, refetch };
+async function loadAttendanceRecords() {
+  const data = await getAttendanceRecords();
+  return Array.isArray(data) ? data : [];
 }

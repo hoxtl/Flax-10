@@ -4,6 +4,7 @@ import { RecurrenceField } from './RecurrenceField';
 import { TimeRow } from './TimeRow';
 import { ActionButtons } from './ActionButtons';
 import { ReminderField } from './ReminderField';
+import { LocationAutocomplete } from './LocationAutoComplete';
 
 function PrivacyToggle({ value, onChange }) {
     const isPrivate = value === true;
@@ -37,13 +38,22 @@ export function EventFormBody({ isEditing, form, setForm, onSubmit, onDelete, sh
     const setPrivacy = (val) => setForm(f => ({ ...f, is_private: val }));
     return (
         <form onSubmit={onSubmit}>
-            <FormField label="Title" value={form.title} onChange={update('title')} required />
-            <FormField label="Description" type="textarea" value={form.description} onChange={update('description')} />
+            <FormField label="Title" value={form.title} onChange={update('title')} required placeholder="e.g. Team Meeting" />
+            <FormField label="Description (optional)" type="textarea" value={form.description} onChange={update('description')} placeholder="Add a description…" />
             <TagField value={form.tag} onChange={update('tag')} customTags={tags} />
             <PrivacyToggle value={form.is_private} onChange={setPrivacy} />
-            <FormField label="Location" value={form.location} onChange={update('location')} placeholder="e.g. Room 214" />
-            <TimeRow form={form} update={update} setForm={setForm} />
-            <RecurrenceField value={form.recurrence} onChange={setRecurrence} />
+            
+            <div className="form-field">
+                <label>Location</label>
+                <LocationAutocomplete
+                    value={form.location || ''}
+                    onChange={(value) => setForm(f => ({...f, location: value}))}
+                    placeholder='e.g. Strand Campus, London'
+                />
+            </div>
+
+            <TimeRow form={form} update={update} setForm={setForm} recurrenceValue={form.recurrence} onRecurrenceChange={setRecurrence} />
+            <RecurrenceField value={form.recurrence} onChange={setRecurrence} hideFrequency />
             {showReminder && <ReminderField value={form.reminder} onChange={setReminder} />}
             <ActionButtons onDelete={onDelete} />
         </form>

@@ -1,3 +1,6 @@
+/*
+ * useCarouselNavigation provides carousel state plus gesture and keyboard helpers.
+ */
 import { useState, useCallback, useEffect, useRef } from "react";
 
 export function useCarouselNavigation(length, initialIndex = 0) {

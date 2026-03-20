@@ -7,45 +7,46 @@ import TaskFeed from "./components/TaskFeed";
 import ListSidebar from "./components/ListSidebar";
 import CreateTaskModal from "./components/CreateTaskModal";
 import CreateListModal from "./components/CreateListModal";
+import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
+import AppToast from "../../components/common/AppToast/AppToast";
 import styles from "./TasksPage.module.css";
 
 function ToastUndo({ onUndo, onClose }) {
   return (
-    <div className={styles.toast}>
-      <span>Task added.</span>
-      <button type="button" className={styles.toastUndoBtn} onClick={onUndo}>Undo</button>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast
+      message="Task added."
+      actionLabel="Undo"
+      onAction={onUndo}
+      onClose={onClose}
+      variant="success"
+    />
   );
 }
 
 function ToastDelete({ onClose }) {
   return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>🗑 Task deleted.</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast message="Task deleted." onClose={onClose} variant="success" />
   );
 }
 
 function ToastInfo({ message, onClose }) {
+  const variant = typeof message === "string" && message.toLowerCase().includes("deleted")
+    ? "success"
+    : "info";
   return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>{message}</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast message={message} onClose={onClose} variant={variant} />
   );
 }
 
 function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask, setToastUndo, setToastDelete, setToastInfo }) {
   return (
-    <>
+    <AnimatePresence initial={false}>
       {toastUndo && <ToastUndo onUndo={handleUndoAddTask} onClose={() => setToastUndo(null)} />}
       {toastDelete && <ToastDelete onClose={() => setToastDelete(false)} />}
       {toastInfo && <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />}
-    </>
+    </AnimatePresence>
   );
 }
 

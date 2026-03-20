@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
@@ -40,6 +40,10 @@ vi.mock('../../../pages/Tasks/components/TaskCard', () => ({
 
 vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
     default: () => <div data-testid="create-task-bar" />,
+}));
+
+vi.mock('../../../pages/Tasks/components/SuggestedReadingsSection', () => ({
+    default: () => <div data-testid="suggested-readings-section" />,
 }));
 
 vi.mock('../../../components/common/AnimatedDropdown', () => ({
@@ -94,6 +98,7 @@ function renderFeed(props = {}) {
     return render(
         <TaskFeed
             tasks={baseTasks}
+            allTasks={baseTasks}
             lists={baseLists}
             activeFilter="all"
             activeListId={null}
@@ -147,9 +152,9 @@ describe('TaskFeed', () => {
         expect(screen.getByText('Work')).toBeTruthy();
     });
 
-    it('renders EstTimeHelpBanner', () => {
+    it('does not render EstTimeHelpBanner', () => {
         renderFeed();
-        expect(screen.getByTestId('est-time-banner')).toBeTruthy();
+        expect(screen.queryByTestId('est-time-banner')).toBeNull();
     });
 
     it('renders CreateTaskBar when onAddTask provided', () => {
@@ -174,12 +179,12 @@ describe('TaskFeed', () => {
 
     it('shows search input', () => {
         renderFeed();
-        expect(screen.getByPlaceholderText('Search… ( / )')).toBeTruthy();
+        expect(screen.getByPlaceholderText(/search by list or task/i)).toBeTruthy();
     });
 
     it('searches tasks by title', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'Overdue' } });
         expect(screen.getByTestId('task-card-1')).toBeTruthy();
         expect(screen.queryByTestId('task-card-3')).toBeNull();
@@ -187,16 +192,39 @@ describe('TaskFeed', () => {
 
     it('shows no tasks message for no-match search', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'zzz_nonexistent_zzz' } });
         expect(screen.getByText(/No tasks match/)).toBeTruthy();
+        expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
+    });
+
+    it('searches across all tasks even when a reading list is selected', () => {
+        renderFeed({
+            activeListId: '1',
+            tasks: [{ ...baseTasks[0], title: 'Criminal Law seminar prep', task_list: 1 }],
+            allTasks: [
+                { ...baseTasks[0], title: 'Criminal Law seminar prep', task_list: 1 },
+                { id: 99, title: 'Module Handbook', completed: false, due_date: tomorrow.toISOString(), priority: 'medium', task_list: 2, module_code: 'LW4404', module_name: 'Tort Law' },
+            ],
+            lists: [
+                { id: 1, name: 'LW4303 - Criminal Law', color: '#ef4444' },
+                { id: 2, name: 'LW4404 - Tort Law', color: '#22c55e' },
+            ],
+        });
+
+        const input = screen.getByPlaceholderText(/search by list or task/i);
+        fireEvent.change(input, { target: { value: 'tort' } });
+
+        expect(screen.getByTestId('task-card-99')).toBeTruthy();
+        expect(screen.queryByText(/No tasks match/)).toBeNull();
     });
 
     it('clears search when clear button clicked', () => {
         renderFeed();
-        const input = screen.getByPlaceholderText('Search… ( / )');
+        const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'test' } });
-        fireEvent.click(screen.getByLabelText('Clear search'));
+        // There are two "Clear search" controls; either is fine for clearing.
+        fireEvent.click(screen.getAllByLabelText('Clear search')[0]);
         expect(input.value).toBe('');
     });
 
@@ -255,6 +283,24 @@ describe('TaskFeed', () => {
         ];
         renderFeed({ tasks: noTodayTasks, activeFilter: 'today' });
         expect(screen.getByTestId('all-complete-card')).toBeTruthy();
+    });
+
+    it('shows reading completion celebration instead of generic empty state for completed reading lists', () => {
+        renderFeed({
+            activeListId: '1',
+            tasks: [
+                { id: 10, title: 'Read: EU Law handbook', completed: true, due_date: yesterday.toISOString(), priority: 'medium', task_list: 1, module_code: 'LW4505', module_name: 'EU Law' },
+            ],
+            allTasks: [
+                { id: 10, title: 'Read: EU Law handbook', completed: true, due_date: yesterday.toISOString(), priority: 'medium', task_list: 1, module_code: 'LW4505', module_name: 'EU Law' },
+            ],
+            lists: [{ id: 1, name: 'LW4505 - EU Law', color: '#3b82f6' }],
+        });
+
+        expect(screen.getByTestId('all-complete-card')).toBeTruthy();
+        expect(screen.getByText('All caught up on readings!')).toBeTruthy();
+        expect(screen.getByText('No suggested readings left for LW4505 EU Law right now.')).toBeTruthy();
+        expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
     });
 
     it('shows list name in header when activeListId and list found', () => {
@@ -320,23 +366,25 @@ describe('TaskFeed', () => {
         expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', () => {
+    it('supports keyboard shortcuts for search focus, quick add focus, and escape clear', async () => {
         const quickInput = document.createElement('input');
         quickInput.setAttribute('aria-label', 'Task name');
         document.body.appendChild(quickInput);
+        Object.defineProperty(quickInput, 'offsetParent', { value: {}, configurable: true });
 
         renderFeed();
-        const search = screen.getByPlaceholderText('Search… ( / )');
+        const search = screen.getByPlaceholderText(/search by list or task/i);
+        Object.defineProperty(search, 'offsetParent', { value: {}, configurable: true });
 
-        fireEvent.keyDown(document, { key: '/' });
-        expect(document.activeElement).toBe(search);
+        fireEvent.keyDown(document, { key: '/', bubbles: true, cancelable: true });
+        await waitFor(() => expect(document.activeElement).toBe(search));
 
-        fireEvent.keyDown(document, { key: 'n' });
-        expect(document.activeElement).toBe(quickInput);
+        fireEvent.keyDown(document, { key: 'n', bubbles: true, cancelable: true });
+        await waitFor(() => expect(document.activeElement).toBe(quickInput));
 
         fireEvent.change(search, { target: { value: 'abc' } });
         fireEvent.keyDown(search, { key: 'Escape' });
-        expect(search.value).toBe('');
+        await waitFor(() => expect(search.value).toBe(''));
 
         document.body.removeChild(quickInput);
     });

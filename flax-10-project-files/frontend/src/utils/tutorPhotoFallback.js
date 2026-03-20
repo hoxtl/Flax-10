@@ -64,6 +64,17 @@ function buildNonHumanAvatar(seedKey = "") {
   return `https://picsum.photos/seed/${encodeURIComponent(seedKey)}/96/96`;
 }
 
+function buildStudentFallback(seedKey = "") {
+  const hash = getHash(seedKey);
+  if (hash % 10 === 0) {
+    return null;
+  }
+  if (hash % 4 === 0) {
+    return buildNonHumanAvatar(seedKey);
+  }
+  return buildGenderAvatar(seedKey, "unknown");
+}
+
 const FIXED_PROFILE_PHOTOS = {
   // Core fixed accounts
   johndoe: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=96&h=96&q=80",
@@ -122,16 +133,10 @@ export function getTutorPhotoFallback({ fullName = "", username = "", role = "",
 
   if (!allowGeneric) return null;
 
-  const roleKey = normalise(role);
-  const baseKey = `${normalise(fullName)}-${normalise(username)}-${seed || "profile"}`;
-  const hash = getHash(baseKey);
-  const gender = inferGender({ fullName, username });
-
-  // Mostly human for students, fully human for teachers.
-  if (roleKey === "teacher") return buildGenderAvatar(`teacher-${baseKey}`, gender);
-  if (roleKey === "student" && gender !== "unknown") return buildGenderAvatar(`student-${baseKey}`, gender);
-  if (roleKey === "student" && hash % 5 === 0) return buildNonHumanAvatar(`student-${baseKey}`);
-  return buildGenderAvatar(`student-${baseKey}`, gender);
+  const normalisedRole = normalise(role);
+  const seedKey = seed || username || fullName;
+  if (normalisedRole === "teacher") return buildGenderAvatar(seedKey, inferGender({ fullName, username }));
+  return buildStudentFallback(seedKey);
 }
 
 export function getResolvedUserPhoto(user, options = {}) {

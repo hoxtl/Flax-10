@@ -1,7 +1,12 @@
-import {useState} from 'react';
+/** Hook for managing module list sorting, filtering by course, and pagination. */
+import { useState } from 'react';
 import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 
 const PAGE_SIZE = 15;
+
+function paginate(items, page) {
+    return items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+}
 
 export default function useModuleSorting(modules) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -12,12 +17,12 @@ export default function useModuleSorting(modules) {
         setSelectedCourses(prev => prev.includes(course) ? prev.filter(c => c !== course) : [...prev, course]);
         setCurrentPage(1);
     };
+    const handleNewSort = (sort) => { setSortBy(sort); setCurrentPage(1); };
+    const clearFilters = () => { setSelectedCourses([]); setCurrentPage(1); };
 
     const results = applyFiltersAndSort(modules, selectedCourses, sortBy);
-    const pageModules = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    const pageModules = paginate(results, currentPage);
     const totalPages = Math.ceil(results.length / PAGE_SIZE);
 
-    const handleNewSort = (sort) => { setSortBy(sort); setCurrentPage(1); };
-
-    return { pageModules, results, selectedCourses, toggleCourse, sortBy, currentPage, totalPages, handleNewSort, setCurrentPage };
+    return { pageModules, results, selectedCourses, toggleCourse, sortBy, currentPage, totalPages, handleNewSort, setCurrentPage, clearFilters };
 }
