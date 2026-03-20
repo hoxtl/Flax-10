@@ -1,0 +1,31 @@
+.tabsSection {
+    margin-top: 24px;
+}
+
+.tabsRow {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+}
+
+.tab {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.tabActive {
+    background: var(--primary);
+    color: white;
+}
+
+.tabContent {
+    margin-top: 0;
+}
