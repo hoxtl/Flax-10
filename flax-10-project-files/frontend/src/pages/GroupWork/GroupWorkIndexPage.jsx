@@ -12,6 +12,7 @@ import GroupWorkStats from "./components/GroupWorkStats";
 import TextInput from "../../components/common/TextInput/TextInput";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 import MemberAvatar from "./components/MemberAvatar";
+import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 
 function GroupWorkIndexSkeleton() {
   return (
@@ -51,10 +52,14 @@ function CreateProjectInputs({ data, onChange }) {
         />
       </FormField>
       <FormField label="Deadline" className={styles.inputField}>
-        <TextInput 
-          type="date" 
-          value={data.deadline} 
-          onChange={(e) => onChange('deadline', e.target.value)} 
+        <DateTimePicker
+          value={data.deadline}
+          onChange={(val) => onChange('deadline', val)}
+          placeholder="dd / mm / yyyy"
+          dateOnly={true}
+          hideIcon={true}
+          triggerClassName={styles.datePickerTrigger}
+          wrapperClassName={styles.datePickerWrap}
         />
       </FormField>
     </>

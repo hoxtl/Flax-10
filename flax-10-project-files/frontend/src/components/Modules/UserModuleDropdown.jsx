@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 import useModules from "./hooks/useModules";
 
-export default function UserModuleDropdown({ value, onChange, placeholder = "Select a module...", className }) {
+export default function UserModuleDropdown({ value, onChange, placeholder = "Select a module...", className, ...props }) {
   const { enrollments, loading } = useModules();
 
   const moduleOptions = useMemo(() => {
@@ -21,6 +21,7 @@ export default function UserModuleDropdown({ value, onChange, placeholder = "Sel
       searchable={true}
       placeholder={loading ? "Loading modules..." : placeholder}
       className={className}
+      {...props}
     />
   );
 }

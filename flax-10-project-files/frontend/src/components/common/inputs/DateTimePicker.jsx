@@ -33,13 +33,18 @@ const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({ value: String(i),
 
 function formatDisplay(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    + "  " + pad(date.getHours()) + ":" + pad(date.getMinutes());
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}  ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function formatDateOnly(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}`;
 }
 
 function getDisplayValue(date, timeOnly, dateOnly) {
@@ -72,7 +77,7 @@ function parseIncomingValue(value, timeOnly, dateOnly) {
   return new Date(value);
 }
 
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, hideIcon }) {
+export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, wrapperClassName, hideIcon }) {
   const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
 
   const [open, setOpen] = useState(false);
@@ -103,7 +108,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
   const isSel = (d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
 
   return (
-    <div className={styles.wrap} ref={ref}>
+    <div className={`${styles.wrap} ${wrapperClassName || ""}`} ref={ref}>
       {
         customTrigger ? (
           <div onClick={() => setOpen(p => !p)} style={{ cursor: "pointer" }}>

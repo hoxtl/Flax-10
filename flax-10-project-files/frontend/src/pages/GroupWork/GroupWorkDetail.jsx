@@ -8,6 +8,7 @@ import MemberAvatar from "./components/MemberAvatar";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 import styles from "./GroupWorkDetail.module.css";
+import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 
 function GroupWorkDetailSkeleton({ onBack }) {
   return (
@@ -154,8 +155,14 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                 <ProjectProgress taskStats={taskStats} />
             </div>
             <div className={styles.deadlinePill}>
-                <span>🗓</span>
-                <input type="date" defaultValue={project.deadline?.slice(0, 10) ?? ""} onBlur={onDeadline} className={styles.dateInput} />
+                <DateTimePicker
+                    value={project.deadline}
+                    onChange={val => onPatch({ deadline: val })}
+                    dateOnly={true}
+                    placeholder="dd / mm / yyyy"
+                    hideIcon={true}
+                    triggerClassName={styles.detailDateTrigger}
+                />
             </div>
         </section>
     );
