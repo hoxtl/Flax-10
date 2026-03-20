@@ -18,7 +18,12 @@
   width: 100%;
 }
 
-
+.controlsRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
 
 .searchWrap {
   position: relative;
