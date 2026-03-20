@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import AppToast from '../components/common/AppToast/AppToast';
 
 const ToastContext = createContext(null);
@@ -33,16 +34,18 @@ export function ToastProvider({ children }) {
     return (
         <ToastContext.Provider value={showToast}>
             {children}
-            {toast && (
-                <AppToast
-                    message={toast.message}
-                    actionLabel={toast.actionLabel}
-                    onAction={toast.onAction}
-                    variant={toast.variant}
-                    icon={toast.icon}
-                    onClose={closeToast}
-                />
-            )}
+            <AnimatePresence initial={false}>
+                {toast && (
+                    <AppToast
+                        message={toast.message}
+                        actionLabel={toast.actionLabel}
+                        onAction={toast.onAction}
+                        variant={toast.variant}
+                        icon={toast.icon}
+                        onClose={closeToast}
+                    />
+                )}
+            </AnimatePresence>
         </ToastContext.Provider>
     );
 }

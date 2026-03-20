@@ -9,6 +9,7 @@ import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
+import { useToast } from '../../context/ToastContext';
 import { getEventTheme } from './utils/eventStyleUtils';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 import './DraggableEvent.css';
@@ -52,6 +53,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
     const { openPopup } = useEventPopup();
     const { openModal } = useEventModal();
     const confirmFn = useConfirm();
+    const toast = useToast();
     const theme = getEventTheme(event, useTags());
     const refs = { event: useRef(null), resizeEnded: useRef(false) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
@@ -97,8 +99,13 @@ function EditableEvent({ event, style, minWidthForDetails }) {
                 cancelText: "Cancel",
                 isDanger: true
             });
-            if (choice === true) await executeDelete(event, { removeEvent });
-            else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
+            if (choice === true) {
+                await executeDelete(event, { removeEvent });
+                toast?.(`"${event.title}" deleted.`);
+            } else if (choice === 'ALTERNATE') {
+                await deleteRecurrenceOccurrence(event, { addException });
+                toast?.(`"${event.title}" occurrence deleted.`);
+            }
         } else {
             setDeleteTarget(event);
         }
@@ -125,6 +132,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
                     holdLabel="Hold to Delete"
                     onConfirm={async () => {
                         await executeDelete(deleteTarget, { removeEvent });
+                        toast?.(`"${deleteTarget.title}" deleted.`);
                         setDeleteTarget(null);
                     }}
                     onCancel={() => setDeleteTarget(null)}

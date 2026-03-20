@@ -1,0 +1,24 @@
+.emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--celebration-size, 2.4rem);
+  line-height: 1;
+  transform-origin: 70% 80%;
+  animation: celebrationEmojiWiggle 2.15s ease-in-out 0.75s infinite;
+}
+
+@keyframes celebrationEmojiWiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(14deg) scale(1.08); }
+  30% { transform: rotate(-10deg) scale(1.06); }
+  45% { transform: rotate(8deg) scale(1.04); }
+  60% { transform: rotate(-4deg) scale(1.02); }
+  75% { transform: rotate(0deg) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji {
+    animation: none;
+  }
+}

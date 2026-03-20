@@ -16,20 +16,30 @@ import styles from './ModulesPage.module.css';
 import DeadlineModal from '../../components/Modules/Deadlines/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
 import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import Tabs from '../../components/common/Tabs/Tabs';
 import ModuleCourseFilter from '../../components/Modules/Modules/ModuleCourseFilter';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 import SearchBar from '../../components/common/SearchBar/SearchBar.jsx';
 import ReadingModal from '../../components/Modules/Readings/ReadingModal.jsx';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 import SearchEmptyState from '../../components/common/SearchEmptyState/SearchEmptyState.jsx';
+import MyModulesDashboard from './MyModulesDashboard.jsx';
 
 function usePageState(initialSearch, initialCreate, searchParams) {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const filterFromUrl = searchParams.get('filter');
+    const is_teacher = user.role === 'teacher';
+    const initialFilter = filterFromUrl === 'enrolled'
+        ? 'enrolled'
+        : filterFromUrl === 'all'
+            ? 'all'
+            : is_teacher
+                ? 'all'
+                : 'enrolled';
     return {
-        is_teacher: user.role === 'teacher',
+        is_teacher,
         search: useState(initialSearch || ''),
-        filter: useState(filterFromUrl === 'enrolled' ? 'enrolled' : 'all'),
+        filter: useState(initialFilter),
         form: useState(!!initialCreate),
         editing: useState(null),
         viewing: useState(null),
@@ -217,37 +227,125 @@ function CreateModuleButton({ setEditingModule, setShowForm }) {
     return <PrimaryButton className={styles.createButton} pill onClick={() => { setEditingModule(null); setShowForm(true); }}>+ Create Module</PrimaryButton>;
 }
 
+function StudentModulesTabs({ filterMode, onChange }) {
+    const options = [
+        { value: 'enrolled', label: 'My Modules' },
+        { value: 'all', label: 'Browse Modules' },
+    ];
+    return (
+        <SegmentedControl
+            className={styles.studentTabs}
+            value={filterMode}
+            onChange={onChange}
+            options={options}
+            variant="solid"
+        />
+    );
+}
+
+function MyModulesTabContent({ state }) {
+    const { hook } = state;
+    return (
+        <>
+            <MyModulesDashboard modules={hook.modules} enrollments={hook.enrollments} />
+            <BackToTop />
+        </>
+    );
+}
+
+function MyEnrollmentsTabContent({ state }) {
+    const { hook, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
+    const [enrollSearch, setEnrollSearch] = useState('');
+    const enrolledModules = filterModules(hook.modules, hook.enrollments, enrollSearch, 'enrolled');
+    const enrolledSorting = useModuleSorting(enrolledModules);
+    const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }, { value: 'deadlines', label: 'Deadlines' }];
+    return (
+        <>
+            <PageToolbar
+                searchSlot={<SearchBar value={enrollSearch} onChange={(q) => { setEnrollSearch(q); enrolledSorting.setCurrentPage(1); }} placeholder="Search your enrolled modules..." />}
+                controlsSlot={
+                    <ToolbarSortControl>
+                        <SegmentedControl value={enrolledSorting.sortBy} onChange={enrolledSorting.handleNewSort} options={sortOptions} />
+                    </ToolbarSortControl>
+                }
+            />
+            {enrolledSorting.results.length === 0 ? (
+                <SearchEmptyState query={enrollSearch} itemLabel="your modules" onClear={() => setEnrollSearch('')} />
+            ) : (
+                <ModuleGrid modules={enrolledSorting.results} enrollments={hook.enrollments} isTeacher={false}
+                    onViewModule={setViewingModule} onEnrollmentToggle={hook.toggleEnrollment}
+                    onEdit={(m) => { setEditingModule(m); setShowForm(true); }} onDelete={(m) => hook.handleDeleteModule(m, () => setViewingModule(null))}
+                    onManageDeadlines={setDeadlineModule} onManageReadings={setReadingModule} taskCountsByModule={hook.taskCountsByModule} />
+            )}
+            <BackToTop />
+        </>
+    );
+}
+
+function MyModulesWithTabs({ state, sorting, search }) {
+    const [innerTab, setInnerTab] = useState('overview');
+    const tabs = [
+        {
+            id: 'overview',
+            icon: '📊',
+            label: 'Overview',
+            content: <MyModulesTabContent state={state} />,
+        },
+        {
+            id: 'enrollments',
+            icon: '📚',
+            label: 'My Enrollments',
+            content: <MyEnrollmentsTabContent state={state} />,
+        },
+    ];
+    return (
+        <Tabs tabs={tabs} activeTab={innerTab} onTabChange={setInnerTab} layoutId="myModulesTabIndicator" tabVariant="heading" />
+    );
+}
+
 function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
     const { sorting, search } = useMainView(state);
+    const isStudentMyModules = !is_teacher && search.filter === 'enrolled';
+    const title = is_teacher ? 'Modules' : (isStudentMyModules ? 'My Modules' : 'Browse Modules');
     const subtitle = is_teacher ? (
-        <>
-            Manage <em>King's modules</em> and keep your <em>teaching schedule</em> organised.
-        </>
+        <>Manage <em>King's modules</em> and keep your <em>teaching schedule</em> organised.</>
     ) : (
-        <>
-            Browse <em>King's modules</em> and keep your <em>term choices</em> organised.
-        </>
+        isStudentMyModules
+            ? <>See your <em>enrolled modules</em>, <em>readings</em>, and <em>deadlines</em> in one place.</>
+            : <>Browse <em>King's modules</em> and add more options for your <em>term choices</em>.</>
     );
+    const action = is_teacher
+        ? <CreateModuleButton setEditingModule={setEditingModule} setShowForm={setShowForm} />
+        : <StudentModulesTabs filterMode={search.filter} onChange={search.onFilterChange} />;
     return (
-        <AppPage width="xl" className={styles.container} title="Modules" subtitle={subtitle} action={is_teacher && <CreateModuleButton setEditingModule={setEditingModule} setShowForm={setShowForm} />}>
-            <ModuleToolbar search={search} sorting={sorting} isTeacher={is_teacher} />
-            <ModuleResults sorting={sorting} search={search} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule} setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} setReadingModule={setReadingModule} />
+        <AppPage width="xl" className={styles.container} title={title} subtitle={subtitle} action={action}>
+            {isStudentMyModules ? (
+                <MyModulesWithTabs state={state} sorting={sorting} search={search} />
+            ) : (
+                <>
+                    <ModuleToolbar search={search} sorting={sorting} isTeacher={is_teacher} isMyModules={isStudentMyModules} />
+                    <ModuleResults sorting={sorting} search={search} hook={hook} isTeacher={is_teacher} setViewingModule={setViewingModule} setEditingModule={setEditingModule} setShowForm={setShowForm} setDeadlineModule={setDeadlineModule} setReadingModule={setReadingModule} />
+                </>
+            )}
         </AppPage>
     );
 }
 
-function ModuleToolbar({ search, sorting, isTeacher }) {
+function ModuleToolbar({ search, sorting, isTeacher, isMyModules }) {
     const sortOptions = [{ value: 'name', label: 'A → Z' }, { value: 'name-desc', label: 'Z → A' }, { value: 'deadlines', label: 'Deadlines' }];
     const selectedCourses = sorting.selectedCourses || [];
     const onToggleCourse = sorting.toggleCourse || (() => { });
+    const searchPlaceholder = isMyModules
+        ? 'Search your modules by name or code...'
+        : "Search King's modules by name or code...";
     return (
         <PageToolbar
-            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder="Search by module name or code..." />}
+            searchSlot={<SearchBar value={search.query} onChange={search.onQueryChange} placeholder={searchPlaceholder} />}
             controlsSlot={
                 <>
-                    {!isTeacher && (
-                        <ModuleCourseFilter selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} filterMode={search.filter} onFilterModeChange={search.onFilterChange} />
+                    {!isTeacher && !isMyModules && (
+                        <ModuleCourseFilter selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} />
                     )}
                     <ToolbarSortControl>
                         <SegmentedControl value={sorting.sortBy} onChange={sorting.handleNewSort} options={sortOptions} />
@@ -259,20 +357,35 @@ function ModuleToolbar({ search, sorting, isTeacher }) {
 }
 
 function createClearHandler(search, sorting) {
-    return () => {
+    return ({ preserveView = false } = {}) => () => {
         if (String(search.query || "").trim()) search.onQueryChange("");
-        if (search.filter !== 'all') search.onFilterChange('all');
+        if (!preserveView && search.filter !== 'all') search.onFilterChange('all');
         sorting.clearFilters();
     };
 }
 
 function EmptyResults({ search, sorting, isTeacher }) {
+    const isStudentMyModules = !isTeacher && search.filter === 'enrolled';
     const hasSearch = String(search.query || "").trim().length > 0;
     const hasActiveFilter = search.filter !== 'all' || (sorting.selectedCourses || []).length > 0;
     const handleClear = createClearHandler(search, sorting);
-    if (hasSearch) return <SearchEmptyState query={search.query} itemLabel="modules" onClear={handleClear} />;
-    if (hasActiveFilter) return <SearchEmptyState itemLabel="modules" title="No modules matched your filters" hint="Try adjusting your filters or clear them to show more." onClear={handleClear} alwaysShowClear clearLabel="Clear filters" />;
+    if (hasSearch) {
+        return <SearchEmptyState query={search.query} itemLabel={isStudentMyModules ? "your modules" : "modules"} onClear={handleClear({ preserveView: isStudentMyModules })} />;
+    }
+    if (hasActiveFilter && !isStudentMyModules) {
+        return <SearchEmptyState itemLabel="modules" title="No modules matched your filters" hint="Try adjusting your filters or clear them to show more." onClear={handleClear()} alwaysShowClear clearLabel="Clear filters" />;
+    }
     if (isTeacher) return <EmptyState icon="📚" title="No modules yet" description="Create your first module for students to browse and enrol in." />;
+    if (isStudentMyModules) {
+        return (
+            <EmptyState
+                icon="📚"
+                title="You're not enrolled in any modules yet"
+                description="Browse modules to add your first King's module."
+                action={<PrimaryButton pill onClick={() => search.onFilterChange('all')}>Browse modules</PrimaryButton>}
+            />
+        );
+    }
     return <EmptyState icon="📚" title="No modules found" description="Try adjusting your search or filters." />;
 }
 

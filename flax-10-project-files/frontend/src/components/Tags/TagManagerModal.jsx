@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useTags } from '../../context/TagContext';
 import { useConfirm } from '../../context/ConfirmContext';
+import { useToast } from '../../context/ToastContext';
 import StandardModal from '../common/StandardModal/StandardModal';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import styles from './TagManagerModal.module.css';
@@ -17,6 +18,7 @@ function useTagModal() {
   const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const confirmFn = useConfirm();
+  const toast = useToast();
   const { tags, addTag, updateTag, deleteTag } = useTags();
 
   const resetState = () => { setEditingId(null); setIsAdding(false); };
@@ -34,7 +36,13 @@ function useTagModal() {
       cancelText: "Cancel",
       isDanger: true
     });
-    if (yes) deleteTag(id);
+    if (!yes) return;
+    const deleted = await deleteTag(id);
+    if (deleted === false) {
+      toast?.("Couldn't delete tag.", { variant: "error" });
+      return;
+    }
+    toast?.(`"${tag?.label || "Tag"}" deleted.`);
   };
 
   return { tags, deleteTag: confirmDelete, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };

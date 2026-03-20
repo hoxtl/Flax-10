@@ -40,6 +40,16 @@
 .createButton {
     white-space: nowrap;
 }
+
+.studentTabs {
+    min-width: 0;
+    width: fit-content;
+    height: 36px;
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card)) !important;
+    border-color: color-mix(in srgb, var(--primary) 22%, var(--border)) !important;
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+
 .toolbarDropdown {
     flex: 1;
     min-width: 150px;
@@ -70,6 +80,11 @@
         min-width: 0;
     }
     .createButton {
+        width: 100%;
+    }
+
+    .studentTabs {
+        min-width: 0;
         width: 100%;
     }
 }

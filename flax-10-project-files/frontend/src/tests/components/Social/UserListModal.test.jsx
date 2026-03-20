@@ -143,4 +143,12 @@ describe('UserListModal', () => {
     render(<UserListModal title="People" users={usersNoId} onClose={vi.fn()} />);
     expect(screen.getByText('No Id')).toBeInTheDocument();
   });
+
+  it('renders a profile photo when a shared user has one resolved', () => {
+    const photoUsers = [
+      { id: 99, username: 'ricky.curtis', first_name: 'Ricky', last_name: 'Curtis', is_sharing: true, profile_photo_url: 'https://example.com/avatar.jpg' },
+    ];
+    const { container } = render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
+    expect(container.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
+  });
 });

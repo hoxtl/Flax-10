@@ -77,8 +77,10 @@ async function deleteTagAction(id, setTags) {
     try {
         await apiDeleteTag(id);
         setTags((prev) => prev.filter((t) => t.id !== id));
+        return true;
     } catch (err) {
         console.error('Failed to delete tag:', err);
+        return false;
     }
 }
 

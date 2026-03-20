@@ -42,6 +42,10 @@ vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
     default: () => <div data-testid="create-task-bar" />,
 }));
 
+vi.mock('../../../pages/Tasks/components/SuggestedReadingsSection', () => ({
+    default: () => <div data-testid="suggested-readings-section" />,
+}));
+
 vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={e => onChange(e.target.value)} data-testid="sort-dropdown">
@@ -94,6 +98,7 @@ function renderFeed(props = {}) {
     return render(
         <TaskFeed
             tasks={baseTasks}
+            allTasks={baseTasks}
             lists={baseLists}
             activeFilter="all"
             activeListId={null}
@@ -190,6 +195,28 @@ describe('TaskFeed', () => {
         const input = screen.getByPlaceholderText(/search by list or task/i);
         fireEvent.change(input, { target: { value: 'zzz_nonexistent_zzz' } });
         expect(screen.getByText(/No tasks match/)).toBeTruthy();
+        expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
+    });
+
+    it('searches across all tasks even when a reading list is selected', () => {
+        renderFeed({
+            activeListId: '1',
+            tasks: [{ ...baseTasks[0], title: 'Criminal Law seminar prep', task_list: 1 }],
+            allTasks: [
+                { ...baseTasks[0], title: 'Criminal Law seminar prep', task_list: 1 },
+                { id: 99, title: 'Module Handbook', completed: false, due_date: tomorrow.toISOString(), priority: 'medium', task_list: 2, module_code: 'LW4404', module_name: 'Tort Law' },
+            ],
+            lists: [
+                { id: 1, name: 'LW4303 - Criminal Law', color: '#ef4444' },
+                { id: 2, name: 'LW4404 - Tort Law', color: '#22c55e' },
+            ],
+        });
+
+        const input = screen.getByPlaceholderText(/search by list or task/i);
+        fireEvent.change(input, { target: { value: 'tort' } });
+
+        expect(screen.getByTestId('task-card-99')).toBeTruthy();
+        expect(screen.queryByText(/No tasks match/)).toBeNull();
     });
 
     it('clears search when clear button clicked', () => {
@@ -256,6 +283,24 @@ describe('TaskFeed', () => {
         ];
         renderFeed({ tasks: noTodayTasks, activeFilter: 'today' });
         expect(screen.getByTestId('all-complete-card')).toBeTruthy();
+    });
+
+    it('shows reading completion celebration instead of generic empty state for completed reading lists', () => {
+        renderFeed({
+            activeListId: '1',
+            tasks: [
+                { id: 10, title: 'Read: EU Law handbook', completed: true, due_date: yesterday.toISOString(), priority: 'medium', task_list: 1, module_code: 'LW4505', module_name: 'EU Law' },
+            ],
+            allTasks: [
+                { id: 10, title: 'Read: EU Law handbook', completed: true, due_date: yesterday.toISOString(), priority: 'medium', task_list: 1, module_code: 'LW4505', module_name: 'EU Law' },
+            ],
+            lists: [{ id: 1, name: 'LW4505 - EU Law', color: '#3b82f6' }],
+        });
+
+        expect(screen.getByTestId('all-complete-card')).toBeTruthy();
+        expect(screen.getByText('All caught up on readings!')).toBeTruthy();
+        expect(screen.getByText('No suggested readings left for LW4505 EU Law right now.')).toBeTruthy();
+        expect(screen.queryByText('No tasks yet. Add one above or use Full Planning.')).toBeNull();
     });
 
     it('shows list name in header when activeListId and list found', () => {

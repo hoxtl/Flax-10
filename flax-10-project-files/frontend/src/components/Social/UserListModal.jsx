@@ -7,6 +7,7 @@ import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryMod
 import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 
 function getCurrentUser() {
     return JSON.parse(localStorage.getItem('user')) || {};
@@ -39,7 +40,8 @@ function buildRenderItem(currentUser, onUserClick, onUserUpdate) {
 function UserListItem({ user, currentUser, onUserClick, onUserUpdate }) {
     const isSelf = isCurrentUser(user, currentUser);
     const rightAction = isSelf ? null : <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />;
-    return <SummaryItem avatar={<UserAvatar user={user} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
+    const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
+    return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
 }
 
 export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {

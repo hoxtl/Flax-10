@@ -54,3 +54,4 @@ node_modules/
 report/main.pdf
 .claude/
 flax-10-project-files/.vite/
+.agents/skills/ui-ux-pro-max/

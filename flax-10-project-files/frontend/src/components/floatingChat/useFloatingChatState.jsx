@@ -9,21 +9,39 @@ import StudyCoachPanel from "../StudyCoachPanel";
 import styles from "../FloatingChat.module.css";
 
 const TASK_PROMPT_MESSAGE = "Hey! I have a task I need to plan. Can you help me figure out how long it might take? Ask me what the task is and I'll describe it.";
+const MODULE_PROMPT_MESSAGE = "Hey! I'm not sure which modules to pick next semester. I don't really know what I'm into yet — can you ask me some questions about my interests, schedule, and what kind of learning style I prefer to help me figure it out?";
 const MotionDiv = motion.div;
+
+function getPromptContext(pathname) {
+  if (pathname.startsWith("/tasks")) return { show: true, message: TASK_PROMPT_MESSAGE, text: "Not sure how long a task will take? Ask me!" };
+  if (pathname.startsWith("/modules")) return { show: true, message: MODULE_PROMPT_MESSAGE, text: "Curious about new modules? Let Flax help you pick!" };
+  return { show: false, message: "", text: "" };
+}
 
 export function useFloatingChatState() {
   const state = useFloatingChatStore();
   const location = useLocation();
   useOpenEvent(state.setInitialMessage, state.setOpen);
+  useRoutePromptReset(location.pathname, state.open, state.setInitialMessage);
+  const promptCtx = getPromptContext(location.pathname);
   return {
     minimized: state.minimized,
     open: state.open,
-    showPrompt: location.pathname.startsWith("/tasks") && !state.open && !state.minimized,
+    showPrompt: promptCtx.show && !state.open && !state.minimized,
+    promptText: promptCtx.text,
+    promptMessage: promptCtx.message,
     minimizePrompt: () => state.setMinimized(true),
-    openTaskPrompt: () => openTaskPrompt(state),
+    openTaskPrompt: () => { state.setInitialMessage(promptCtx.message); state.setOpen(true); state.setMinimized(false); },
     renderWindow: () => renderFloatingWindow(state.initialMessage, () => closeChat(state)),
     toggleFab: () => toggleFloatingChat(state),
   };
+}
+
+function useRoutePromptReset(pathname, open, setInitialMessage) {
+  useEffect(() => {
+    if (open) return;
+    setInitialMessage("");
+  }, [open, pathname, setInitialMessage]);
 }
 
 function useOpenEvent(setInitialMessage, setOpen) {

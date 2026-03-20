@@ -1,7 +1,7 @@
 .sidebar {
-    width: 220px;
-    min-width: 220px;
-    max-width: 220px;
+    width: 272px;
+    min-width: 272px;
+    max-width: 272px;
     flex-shrink: 0;
     border-right: 1px solid var(--widget-border);
     background: var(--sidebar);
@@ -125,6 +125,7 @@
     transform: translateX(2px);
 }
 .listActive .listName { color: var(--text); font-weight: 600; }
+.listActive .readingListLabel { color: var(--text); font-weight: 650; }
 
 .listBtn {
     flex: 1;
@@ -151,12 +152,27 @@
     flex: 1;
     min-width: 0;
     font-family: var(--font-body);
-    font-size: 0.97rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.readingListLabel {
+    flex: 1;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.32;
     letter-spacing: 0.01em;
 }
 

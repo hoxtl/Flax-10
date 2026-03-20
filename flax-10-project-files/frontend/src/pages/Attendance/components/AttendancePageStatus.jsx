@@ -2,6 +2,7 @@
  * Attendance page loading and error states.
  */
 
+import SkeletonBlock from '../../../components/common/LoadingState/SkeletonBlock';
 import styles from "../AttendancePage.module.css";
 
 export default function AttendancePageStatus({ loading, error }) {
@@ -13,7 +14,16 @@ export default function AttendancePageStatus({ loading, error }) {
 function AttendanceLoadingState() {
   return (
     <div className={styles.loadingContainer}>
-      <p>Please wait while we fetch your stats...</p>
+      <div className={styles.loadingSkeleton} aria-hidden="true">
+        <SkeletonBlock className={styles.loadingTopCard} />
+        <div className={styles.loadingGrid}>
+          <div className={styles.loadingCharts}>
+            <SkeletonBlock className={styles.loadingChartCard} />
+            <SkeletonBlock className={styles.loadingChartCard} />
+          </div>
+          <SkeletonBlock className={styles.loadingListCard} />
+        </div>
+      </div>
     </div>
   );
 }

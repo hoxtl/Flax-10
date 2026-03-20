@@ -209,7 +209,7 @@ describe('ModulesPage', () => {
                 <ModulesPage />
             </MemoryRouter>
         );
-        const input = screen.getByPlaceholderText(/search by module name or code/i);
+        const input = screen.getByPlaceholderText(/search king's modules by name or code/i);
         expect(input.value).toBe('UNKNOWN');
     });
 
@@ -217,7 +217,15 @@ describe('ModulesPage', () => {
         localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
         const { container } = render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.queryByText('+ Create Module')).not.toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
         const subtitle = container.querySelector('p[class*="subtitle"]');
-        expect(subtitle?.textContent).toContain("Browse King's modules and keep your term choices organised.");
+        expect(subtitle?.textContent).toContain("See your enrolled modules, readings, and deadlines in one place.");
+    });
+
+    it('shows browse action in student empty state by default', () => {
+        localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        expect(screen.getByText("You're not enrolled in any modules yet")).toBeInTheDocument();
+        expect(screen.getByText('Browse modules')).toBeInTheDocument();
     });
 });
