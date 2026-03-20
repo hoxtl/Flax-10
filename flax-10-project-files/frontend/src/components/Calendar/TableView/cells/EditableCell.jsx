@@ -3,7 +3,7 @@
  * Renders text display or input field based on editing state.
  */
 import { useRef, useEffect } from 'react';
-import styles from '../TableView.module.css';
+import styles from './EditableCell.module.css';
 
 function useAutoFocus(isEditing) {
     const inputRef = useRef(null);

@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
 import { validateEventTimes } from '../../utils/dateValidation';
-import styles from '../TableView.module.css';
+import styles from './DateTimeCell.module.css';
+import commonStyles from '../TableView.module.css';
 import { isAllDay } from '../../utils/eventUtils';
 
 function formatTimeRange(event) {
@@ -63,11 +64,12 @@ function useDateTimeEditState(event) {
     return { isEditing, setIsEditing, startValue, setStartValue, endValue, setEndValue, error, setError };
 }
 
-function DateDisplayView({ event, isReadOnly, onClick }) {
+function DateDisplayView({ event, isReadOnly, onClick, isRowHovered }) {
+    const cls = `${commonStyles.editIcon} ${isRowHovered ? commonStyles.editIconVisible : ''}`;
     return (
         <div className={styles.dateCellContent} onClick={onClick}>
-            <span className={styles.cellText}>{formatTimeRange(event)}</span>
-            {!isReadOnly && <Pencil size={14} className={styles.editIcon} />}
+            <span className={commonStyles.cellText}>{formatTimeRange(event)}</span>
+            {!isReadOnly && <Pencil size={14} className={cls} />}
         </div>
     );
 }
@@ -92,7 +94,7 @@ function createSaveHandler(state, onSave) {
 }
 
 /** Table cell for viewing and editing event date/time with validation. */
-export function DateTimeCell({ event, isReadOnly, onSave }) {
+export function DateTimeCell({ event, isReadOnly, onSave, isRowHovered }) {
     const state = useDateTimeEditState(event);
     const handleClick = createClickHandler(event, isReadOnly, state);
     const handleSave = createSaveHandler(state, onSave);
@@ -100,7 +102,7 @@ export function DateTimeCell({ event, isReadOnly, onSave }) {
         return <DateEditForm startValue={state.startValue} endValue={state.endValue} onStartChange={state.setStartValue}
             onEndChange={state.setEndValue} error={state.error} onSave={handleSave} onCancel={() => state.setIsEditing(false)} />;
     }
-    return <DateDisplayView event={event} isReadOnly={isReadOnly} onClick={handleClick} />;
+    return <DateDisplayView event={event} isReadOnly={isReadOnly} onClick={handleClick} isRowHovered={isRowHovered} />;
 }
 
 export { isAllDay, formatTimeRange };

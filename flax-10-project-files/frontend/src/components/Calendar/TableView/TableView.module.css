@@ -2,14 +2,13 @@
 .container {
     flex: 1;
     min-height: 0;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 280px);
     overflow-y: auto;
     overflow-x: auto;
     background: var(--bg);
-    padding: 16px;
+    padding: 0 16px 16px 16px;
 }
 
-/* Table — wrapped in a soft card */
 .table {
     width: 100%;
     border-spacing: 0 0;
@@ -17,10 +16,9 @@
     border-radius: 20px;
     border: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
     box-shadow: 0 2px 12px rgba(93, 64, 55, 0.08);
-    overflow: hidden;
+    margin-top: 16px;
 }
 
-/* Airy transparent header */
 .header {
     background: transparent;
 }
@@ -36,11 +34,10 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text);
-    background: var(--bg, #FAF9F6);
+    background: #FAF9F6;
     border-bottom: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
 }
 
-/* Row — clean with subtle separator + accent tint */
 .row {
     border-bottom: 0.5px solid rgba(51, 51, 51, 0.06);
     transition: background 0.2s ease;
@@ -69,7 +66,6 @@
     border-left: 3px solid var(--primary, var(--text));
 }
 
-/* Cells */
 .nameCell,
 .tagCell,
 .dateCell,
@@ -117,6 +113,118 @@
     transform: scale(1.02);
 }
 
+.tagCell {
+    min-width: 120px;
+}
+
+.dateCell {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text);
+    min-width: 200px;
+    white-space: nowrap;
+}
+
+.locationCell {
+    color: var(--text);
+    min-width: 100px;
+    cursor: pointer;
+}
+
+.descCell {
+    color: var(--text);
+    min-width: 200px;
+    max-width: 300px;
+    cursor: pointer;
+}
+
+.descCell.descExpanded {
+    max-width: none;
+}
+
+.descExpanded .cellText {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    white-space: pre-wrap;
+}
+
+.cellText {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.descCell .cellText {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+}
+
+.cellInput {
+    width: 100%;
+    padding: 8px 12px;
+    border: 0.5px solid rgba(51, 51, 51, 0.2);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: inherit;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.cellInput:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
+}
+
+textarea.cellInput {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.sourceBadge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--text);
+    color: var(--bg, #FAF9F6);
+    margin-left: 6px;
+}
+
+.cellWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.editIcon {
+    opacity: 0;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+
+.editIconVisible {
+    opacity: 0.5;
+}
+
+.editIcon:hover {
+    opacity: 1 !important;
+    color: var(--text) !important;
+}
+
+.emptyState {
+    padding: 48px; text-align: center; color: var(--muted); font-style: italic;
+}
+
 .actionCell {
     padding: 14px 16px;
     vertical-align: middle;
@@ -148,285 +256,6 @@
     opacity: 1 !important;
 }
 
-.tagCell {
-    min-width: 120px;
-}
-
-.dateCell {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text);
-    min-width: 200px;
-    white-space: nowrap;
-}
-
-.dateCellContent {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.dateCellContent .editIcon {
-    opacity: 0;
-}
-
-.row:hover .dateCellContent .editIcon {
-    opacity: 0.6;
-}
-
-.dateEditContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 4px 0;
-}
-
-.dateEditRow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dateEditLabel {
-    font-size: 0.75rem;
-    color: var(--muted);
-    min-width: 36px;
-}
-
-.dateEditError {
-    font-size: 0.75rem;
-    color: var(--danger, #dc2626);
-}
-
-.dateEditActions {
-    display: flex;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-/* Primary action button — Charcoal pill */
-.dateEditBtn {
-    padding: 5px 16px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 999px;
-    background: var(--text);
-    color: var(--bg, #FAF9F6);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.dateEditBtn:hover {
-    opacity: 0.85;
-    transform: scale(1.02);
-}
-
-/* Secondary action button — border pill */
-.dateEditBtnCancel {
-    padding: 5px 16px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1px solid var(--text);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.dateEditBtnCancel:hover {
-    background: var(--hover, #E0DED7);
-}
-
-.locationCell {
-    color: var(--text);
-    min-width: 100px;
-    cursor: pointer;
-}
-
-.descCell {
-    color: var(--text);
-    min-width: 200px;
-    max-width: 300px;
-    cursor: pointer;
-}
-
-.descCell.descExpanded {
-    max-width: none;
-}
-
-.descCell.descExpanded .cellText {
-    display: block;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-    white-space: pre-wrap;
-}
-
 .row.expanded {
     background: var(--hover, rgba(74, 52, 33, 0.04));
 }
-
-/* Cell Text */
-.cellText {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.descCell .cellText {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    white-space: normal;
-}
-
-/* Cell Input */
-.cellInput {
-    width: 100%;
-    padding: 8px 12px;
-    border: 0.5px solid rgba(51, 51, 51, 0.2);
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: inherit;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.cellInput:focus {
-    border-color: var(--text);
-    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
-}
-
-textarea.cellInput {
-    resize: vertical;
-    min-height: 60px;
-}
-
-/* Tag Cell */
-.tagCellContent {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.emptyTagCell {
-    display: inline-flex;
-    align-items: center;
-    min-height: 24px;
-    cursor: pointer;
-}
-
-.emptyTagCell .editIcon {
-    opacity: 0;
-}
-
-.row:hover .emptyTagCell .editIcon {
-    opacity: 0.6;
-}
-
-/* Tag — soft Flax pill */
-.tagBadge {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    padding: 4px 14px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    background: var(--surface-card, #F2F0E9);
-    color: var(--text);
-    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.1));
-    transition: all 0.2s ease;
-}
-
-.tagCellContent:hover .tagBadge {
-    background: var(--hover, #E0DED7);
-}
-
-/* Source pill — solid charcoal */
-.sourceBadge {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 999px;
-    padding: 4px 14px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    background: var(--text);
-    color: var(--bg, #FAF9F6);
-    margin-left: 6px;
-}
-
-/* Cell Wrapper for edit icon */
-.cellWrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Edit Icon */
-.editIcon {
-    opacity: 0;
-    color: var(--muted);
-    flex-shrink: 0;
-    transition: opacity 0.2s ease;
-}
-
-.row:hover .editIcon {
-    opacity: 0.5;
-}
-
-.row:hover .editIcon:hover {
-    opacity: 1;
-    color: var(--text);
-}
-
-/* Tag Edit Icon */
-.tagEditIcon {
-    opacity: 0;
-    color: var(--muted);
-    flex-shrink: 0;
-    transition: opacity 0.2s ease;
-}
-
-.row:hover .tagCellContent .tagEditIcon {
-    opacity: 0.5;
-}
-
-.tagCellContent:hover .tagEditIcon {
-    opacity: 1;
-    color: var(--text);
-}
-
-/* Tag Select */
-.tagSelect {
-    padding: 6px 12px;
-    border: 0.5px solid rgba(51, 51, 51, 0.2);
-    border-radius: 12px;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 0.8rem;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.tagSelect:focus {
-    border-color: var(--text);
-    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
-}
-
-/* Empty State */
-.emptyState {
-    padding: 48px;
-    text-align: center;
-    color: var(--muted);
-    font-style: italic;
-}
-
