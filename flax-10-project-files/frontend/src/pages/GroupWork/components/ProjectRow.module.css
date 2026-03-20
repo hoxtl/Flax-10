@@ -1,0 +1,198 @@
+.projectRowContainer {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    margin-bottom: 12px;
+}
+
+.projectRowContainer:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.projectRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+}
+
+.projectInfoArea {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.projectIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.projectName {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.projectModule {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.avatarStack {
+    display: flex;
+    align-items: center;
+}
+
+.avatarWrapper {
+    margin-right: -8px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-panel);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatarWrapper:hover {
+    transform: scale(1.25) translateY(-2px);
+    z-index: 20 !important;
+    margin-right: -4px;
+    margin-left: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.avatarPill {
+    padding: 2px 8px;
+    background: var(--hover);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-left: 12px;
+}
+
+.projectMetaArea {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.deadlineInfo {
+    text-align: right;
+}
+
+.deadlineDate {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.daysPill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.daysRed { background: #fee2e2; color: #ef4444; }
+.daysOrange { background: #ffedd5; color: #f97316; }
+.daysYellow { background: #fef9c3; color: #eab308; }
+.daysGreen { background: #dcfce7; color: #22c55e; }
+.daysBlue { background: #dbeafe; color: #3b82f6; }
+
+.progressCircleContainer {
+    display: flex;
+    align-items: center;
+}
+
+.arrowIcon, .arrowIconUp {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hover);
+    color: var(--text-secondary);
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.arrowIconUp {
+    transform: rotate(180deg);
+}
+
+.projectAccordion {
+    border-top: 1px solid var(--border);
+    padding: 20px;
+    background: rgba(var(--primary-rgb), 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.accordionStats {
+    display: flex;
+    gap: 48px;
+}
+
+.statBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    font-family: var(--font-display, serif);
+}
+
+.btnOpen {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnOpen:hover {
+    background: var(--primary);
+    color: white;
+}
