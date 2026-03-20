@@ -318,4 +318,28 @@
   }
 }
 
+@media (max-width: 768px) {
+  .sectionHeader {
+    padding: 8px 0;
+    gap: 6px;
+  }
 
+  .sectionTitle {
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+  }
+
+  .sectionCountWrap {
+    gap: 6px;
+  }
+
+  .sectionStatsChip {
+    gap: 6px;
+    padding: 2px 4px 2px 6px;
+  }
+
+  .taskRow {
+    padding: 4px 2px;
+    border-radius: 8px;
+  }
+}
