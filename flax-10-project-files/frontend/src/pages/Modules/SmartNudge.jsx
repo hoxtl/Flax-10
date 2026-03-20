@@ -1,13 +1,14 @@
 /* Smart nudge banner — surfaces the most urgent deadline or reading due within 7 days. */
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { getDayCount } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
+import { getDayCount, getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
 import { createTask } from '../../api/taskService';
-import { getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 import { AddToTaskButton } from './ReadingsPanel';
-import styles from './MyModulesDashboard.module.css';
+import dashStyles from './MyModulesDashboard.module.css';
+import rowStyles from './DashboardRows.module.css';
+const styles = { ...dashStyles, ...rowStyles };
 
 function deadlineToTask(deadline) {
     const tier = deadline?.start_due_date ? getUrgencyTier(deadline.start_due_date) : 'upcoming';
@@ -25,23 +26,26 @@ function deadlineToTask(deadline) {
     };
 }
 
+async function submitDeadlineAsTask(deadline, setState, onAdded, toast) {
+    setState('loading');
+    try {
+        await createTask(deadlineToTask(deadline));
+        setState('added');
+        onAdded?.(deadline?.id);
+        toast?.('Deadline added to tasks!');
+    } catch {
+        setState('idle');
+        toast?.('Failed to add deadline.', { variant: 'error' });
+    }
+}
+
 function AddDeadlineToTaskButton({ deadline, onAdded, className = '', variant = 'secondary' }) {
     const [state, setState] = useState('idle');
     const toast = useToast();
 
-    const handleAdd = async (e) => {
+    const handleAdd = (e) => {
         e.stopPropagation();
-        if (state !== 'idle') return;
-        setState('loading');
-        try {
-            await createTask(deadlineToTask(deadline));
-            setState('added');
-            onAdded?.(deadline?.id);
-            toast?.('Deadline added to tasks!');
-        } catch {
-            setState('idle');
-            toast?.('Failed to add deadline.', { variant: 'error' });
-        }
+        if (state === 'idle') submitDeadlineAsTask(deadline, setState, onAdded, toast);
     };
 
     if (state === 'added') return <span className={styles.addedLabel}>✓ Added</span>;

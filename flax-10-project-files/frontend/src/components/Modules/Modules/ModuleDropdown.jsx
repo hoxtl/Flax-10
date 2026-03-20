@@ -1,3 +1,4 @@
+/* Thin wrapper around AnimatedDropdown for module-specific select fields. */
 import AnimatedDropdown from "../../common/AnimatedDropdown";
 
 export default function ModuleDropdown({ value, onChange, options, className = "" }) {
