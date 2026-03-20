@@ -165,3 +165,16 @@
   border-radius: 10px;
 }
 
+@media (max-width: 900px) {
+  .page {
+    display: block;
+  }
+
+  .skelSidebar {
+    display: none;
+  }
+
+  .skelFeed {
+    padding: 16px;
+  }
+}
