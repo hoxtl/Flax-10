@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
+import { Calendar, Clock3, Train, AlertTriangle, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
@@ -156,70 +156,6 @@ function SemesterProgressWidget() {
       </div>
       <span className={styles.semesterWidgetMeta}>{label}</span>
     </div>
-  );
-}
-
-function CourseChangeCard({ request, onDismiss }) {
-  const navigate = useNavigate();
-  return (
-    <motion.div
-      className={styles.courseChangeCard}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
-    >
-      <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
-      <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Course change status: pending</span>
-        <span className={styles.courseChangeSub}>
-          Your request to switch
-          {request.requested_course ? <> to <strong>{request.requested_course}</strong></> : null}
-          {" "}is under admin review.
-        </span>
-      </div>
-      <button
-        type="button"
-        className={styles.courseChangeViewBtn}
-        onClick={() => navigate("/settings?tab=account")}
-      >
-        View
-      </button>
-      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
-        &times;
-      </button>
-    </motion.div>
-  );
-}
-
-function TeacherRequestCard({ onDismiss }) {
-  const navigate = useNavigate();
-  return (
-    <motion.div
-      className={styles.courseChangeCard}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
-    >
-      <GraduationCap size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
-      <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Teacher access status: pending</span>
-        <span className={styles.courseChangeSub}>
-          Your teacher application is under admin review.
-        </span>
-      </div>
-      <button
-        type="button"
-        className={styles.courseChangeViewBtn}
-        onClick={() => navigate("/settings?tab=course")}
-      >
-        View
-      </button>
-      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
-        &times;
-      </button>
-    </motion.div>
   );
 }
 
@@ -390,6 +326,10 @@ export default function IntelligenceRow({
             nextStepMeta={nextStepMeta}
             weeklyProgress={weeklyProgress}
             currentStreak={currentStreak}
+            courseChangeRequest={showCourseChange ? courseChangeRequest : null}
+            teacherRequestPending={showTeacherRequest ? teacherRequestPending : null}
+            onDismissCourseChange={() => setShowCourseChange(false)}
+            onDismissTeacherRequest={() => setShowTeacherRequest(false)}
           />
         );
       case "rightNow":
