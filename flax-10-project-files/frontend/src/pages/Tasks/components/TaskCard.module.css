@@ -521,3 +521,38 @@
   filter: brightness(0.98);
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .titleRow {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .titleMetaRight {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .title {
+    font-size: 0.9rem;
+  }
+
+  .meta {
+    gap: 5px;
+  }
+
+  .actionBar {
+    opacity: 1;
+  }
+
+  .actionBarBtn {
+    width: 30px;
+    height: 30px;
+  }
+}
