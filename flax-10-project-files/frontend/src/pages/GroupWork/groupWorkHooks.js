@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MIN_SKELETON_MS = 450;
 
@@ -71,4 +71,53 @@ export function useProjectMembers(projectId) {
   }, [projectId]);
 
   return { members, setMembers };
+}
+export function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate) {
+  const patchProject = async p => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/`, { 
+        method: "PATCH", 
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() }, 
+        body: JSON.stringify(p) 
+    });
+    if (res.ok) {
+        const updated = await res.json();
+        setProject(updated);
+        if (onUpdate) onUpdate(updated);
+    }
+  };
+  const handleRemoveMember = async mid => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/members/${mid}/`, { 
+        method: "DELETE", 
+        headers: getAuthHeaders() 
+    });
+    if (res.ok) setMembers(prev => prev.filter(i => i.id !== mid));
+  };
+  const handleDeleteProject = async () => {
+    const res = await fetch(`/api/group-work/projects/${projectId}/`, { 
+        method: "DELETE", 
+        headers: getAuthHeaders() 
+    });
+    if (res.ok) {
+        if (onDelete) onDelete(projectId);
+        onBack();
+    }
+  };
+  return { patchProject, handleRemoveMember, handleDeleteProject };
+}
+
+export function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
+  const { project, setProject, loading } = useProject(projectId);
+  const { members, setMembers } = useProjectMembers(projectId);
+  const initialTab = useSelectedTab();
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
+  
+  const actions = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
+
+  const onAdded = m => setMembers(p => p.some(i => i.id === m.id) ? p : [...p, m]);
+
+  return { 
+      project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, 
+      onAdded, ...actions 
+  };
 }
