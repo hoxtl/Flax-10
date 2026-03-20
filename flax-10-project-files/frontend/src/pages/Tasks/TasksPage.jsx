@@ -26,22 +26,40 @@ function ToastUndo({ onUndo, onClose }) {
 
 function ToastDelete({ onClose }) {
   return (
-    <AppToast message="Task deleted." onClose={onClose} variant="info" icon="🗑" />
+    <AppToast
+      message="Task deleted."
+      onClose={onClose}
+      variant="info"
+      icon="🗑"
+    />
   );
 }
 
 function ToastInfo({ message, onClose }) {
-  return (
-    <AppToast message={message} onClose={onClose} variant="info" />
-  );
+  return <AppToast message={message} onClose={onClose} variant="info" />;
 }
 
-function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask, setToastUndo, setToastDelete, setToastInfo }) {
+function TasksPageToasts({
+  toastUndo,
+  toastDelete,
+  toastInfo,
+  handleUndoAddTask,
+  setToastUndo,
+  setToastDelete,
+  setToastInfo,
+}) {
   return (
     <>
-      {toastUndo && <ToastUndo onUndo={handleUndoAddTask} onClose={() => setToastUndo(null)} />}
+      {toastUndo && (
+        <ToastUndo
+          onUndo={handleUndoAddTask}
+          onClose={() => setToastUndo(null)}
+        />
+      )}
       {toastDelete && <ToastDelete onClose={() => setToastDelete(false)} />}
-      {toastInfo && <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />}
+      {toastInfo && (
+        <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />
+      )}
     </>
   );
 }
@@ -52,17 +70,29 @@ function TasksSkeleton() {
       <div className={styles.skelSidebar}>
         <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
         {[...Array(3)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelSidebarRow}`}
+            style={{ animationDelay: `${i * 0.08}s` }}
+          />
         ))}
         <div className={styles.skelDivider} />
         {[...Array(4)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelSidebarRow}`}
+            style={{ animationDelay: `${i * 0.08}s` }}
+          />
         ))}
       </div>
       <div className={styles.skelFeed}>
         <div className={`${styles.skel} ${styles.skelFeedHeader}`} />
         {[...Array(5)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelTaskRow}`} style={{ animationDelay: `${i * 0.06}s` }} />
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelTaskRow}`}
+            style={{ animationDelay: `${i * 0.06}s` }}
+          />
         ))}
       </div>
     </div>
@@ -75,11 +105,21 @@ export default function TasksPage() {
   return (
     <div className={styles.page}>
       <ListSidebar {...p.sidebarProps} />
-      <TaskFeed {...p.feedProps} />
+      <TaskFeed {...p.feedProps} sidebarProps={p.sidebarProps} />
       {p.showTaskModal && <CreateTaskModal {...p.taskModalProps} />}
-      <TasksPageToasts toastUndo={p.toastUndo} toastDelete={p.toastDelete} toastInfo={p.toastInfo} handleUndoAddTask={p.handleUndoAddTask} setToastUndo={p.setToastUndo} setToastDelete={p.setToastDelete} setToastInfo={p.setToastInfo} />
+      <TasksPageToasts
+        toastUndo={p.toastUndo}
+        toastDelete={p.toastDelete}
+        toastInfo={p.toastInfo}
+        handleUndoAddTask={p.handleUndoAddTask}
+        setToastUndo={p.setToastUndo}
+        setToastDelete={p.setToastDelete}
+        setToastInfo={p.setToastInfo}
+      />
       {p.showListModal && <CreateListModal {...p.listModalProps} />}
-      {p.showCreateListFromTask && <CreateListModal {...p.createListFromTaskProps} />}
+      {p.showCreateListFromTask && (
+        <CreateListModal {...p.createListFromTaskProps} />
+      )}
       <BackToTop />
     </div>
   );
