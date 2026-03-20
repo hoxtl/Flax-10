@@ -11,3 +11,11 @@
   text-transform: uppercase;
   color: var(--muted);
 }
+
+.listWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 52vh;
+  overflow-y: auto;
+}
