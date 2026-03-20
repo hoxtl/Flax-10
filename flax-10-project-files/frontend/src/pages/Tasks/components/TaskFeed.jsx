@@ -82,7 +82,24 @@ function TaskFeedSubHeader({
   };
   return (
     <div className={styles.subHeader}>
-
+      {isMobile && (
+        <div className={styles.mobileViewRow}>
+          <label className={styles.mobileViewSelectWrap}>
+            <span className={styles.mobileViewLabel}>View</span>
+            <select
+              className={styles.mobileViewSelect}
+              value={activeFilter}
+              onChange={(e) => handleMobileFilterChange(e.target.value)}
+            >
+              {MOBILE_VIEW_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
       <div className={styles.createRow}>
         {onAddTask ? (
           <div className={styles.createBarWrap}>
