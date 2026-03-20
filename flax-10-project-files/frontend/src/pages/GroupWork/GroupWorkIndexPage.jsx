@@ -93,17 +93,19 @@ function CreateProjectForm({ onCreated }) {
   );
 }
 
-const THEMES = [
-  { pill: styles.daysGreen, ring: "#22c55e" },
-  { pill: styles.daysYellow, ring: "#eab308" },
-  { pill: styles.daysBlue, ring: "#3b82f6" },
-  { pill: styles.daysPurple, ring: "#a855f7" },
-  { pill: styles.daysOrange, ring: "#f97316" },
-];
+const THEMES = {
+  red: { pill: styles.daysRed, ring: "#ef4444" },
+  yellow: { pill: styles.daysYellow, ring: "#eab308" },
+  green: { pill: styles.daysGreen, ring: "#22c55e" },
+  blue: { pill: styles.daysBlue, ring: "#3b82f6" },
+  grey: { pill: styles.daysGrey || "", ring: "#94a3b8" },
+};
 
-function getProjectTheme(id) {
-  const hash = id ? String(id).split("").reduce((a, b) => a + b.charCodeAt(0), 0) : 0;
-  return THEMES[hash % THEMES.length];
+function getProjectTheme(daysLeft) {
+  if (daysLeft === null) return THEMES.blue;
+  if (daysLeft <= 7) return THEMES.red;
+  if (daysLeft <= 14) return THEMES.yellow;
+  return THEMES.green;
 }
 
 function getMockAvatars(projectId, memberCount) {
@@ -123,7 +125,7 @@ function ProjectRow({ project, onClick }) {
   const diffTime = dateObj ? (dateObj - new Date()) : 0;
   const daysLeft = dateObj ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : null;
 
-  const theme = getProjectTheme(project.id);
+  const theme = getProjectTheme(daysLeft);
   const totalTasks = project.task_count || 0;
   const completedTasks = project.completed_task_count || 0;
   const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
