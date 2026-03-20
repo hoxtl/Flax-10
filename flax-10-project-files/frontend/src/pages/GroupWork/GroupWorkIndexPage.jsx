@@ -95,6 +95,7 @@ function CreateProjectForm({ onCreated }) {
 
 const THEMES = {
   red: { pill: styles.daysRed, ring: "#ef4444" },
+  orange: { pill: styles.daysOrange, ring: "#f97316" },
   yellow: { pill: styles.daysYellow, ring: "#eab308" },
   green: { pill: styles.daysGreen, ring: "#22c55e" },
   blue: { pill: styles.daysBlue, ring: "#3b82f6" },
@@ -104,7 +105,8 @@ const THEMES = {
 function getProjectTheme(daysLeft) {
   if (daysLeft === null) return THEMES.blue;
   if (daysLeft <= 7) return THEMES.red;
-  if (daysLeft <= 14) return THEMES.yellow;
+  if (daysLeft <= 14) return THEMES.orange;
+  if (daysLeft <= 30) return THEMES.yellow;
   return THEMES.green;
 }
 
