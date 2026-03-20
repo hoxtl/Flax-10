@@ -71,7 +71,7 @@
     align-items: center;
 }
 
-.detailCourseDropdown button {
+.detailCourseDropdown > button {
     padding: 2px 0;
     font-size: 13px;
     background: transparent;
