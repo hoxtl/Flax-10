@@ -165,20 +165,23 @@ def _random_theme():
 def _build_single_settings(user):
     is_teacher = getattr(user, 'role', None) == 'teacher'
     
-    # Available widgets for seeding
-    all_widgets = [
-        "rightNow", "deadlines", "todayTasks", "tinyTimeline", "bigTimeline", 
-        "semesterOverview", "studyStreak", "weeklyGoal", "photo", 
-        "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown", 
-        "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual", 
+    # Pinned widgets — always present, always at the top
+    PINNED = ["deadlines", "todayTasks"]
+
+    # Remaining optional widgets (exclude pinned ones)
+    optional_widgets = [
+        "rightNow", "tinyTimeline", "bigTimeline",
+        "semesterOverview", "studyStreak", "weeklyGoal", "photo",
+        "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
+        "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",
         "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
     ]
-    
-    # Pick 4-8 random widgets, always including 'hero' at the start
-    shuffled = all_widgets[:]
+
+    # Pick 2-5 additional random widgets
+    shuffled = optional_widgets[:]
     random.shuffle(shuffled)
-    selected = ["hero"] + shuffled[:random.randint(4, 7)]
-    
+    selected = ["hero"] + PINNED + shuffled[:random.randint(2, 5)]
+
     # Randomize sizes for chosen widgets
     sizes = {}
     for widget_id in selected:
