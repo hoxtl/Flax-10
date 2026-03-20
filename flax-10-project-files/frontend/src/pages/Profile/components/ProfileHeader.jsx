@@ -1,26 +1,25 @@
 import { useState } from "react";
-import widgetStyles from "./widgets/ProfileWidgets.module.css";
-import headerStyles from "./ProfileHeader.module.css";
-import badgeStyles from "./ProfileHeaderBadges.module.css";
+import styles from "../Profile.module.css";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
 import ShareButton from "../../../components/Social/ShareButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
-const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
 
 function formatLastActive(lastSessionEnd) {
   if (!lastSessionEnd) return null;
   const endTime = new Date(lastSessionEnd);
   if (Number.isNaN(endTime.getTime())) return null;
-  const diffMinutes = Math.max(0, Math.floor((Date.now() - endTime.getTime()) / 60000));
+
+  const diffMs = Date.now() - endTime.getTime();
+  const diffMinutes = Math.max(0, Math.floor(diffMs / 60000));
+
   if (diffMinutes <= 20) return null;
   if (diffMinutes < 60) return `Active ${diffMinutes}m ago`;
+
   const diffHours = Math.floor(diffMinutes / 60);
   if (diffHours < 24) return `Active ${diffHours}h ago`;
-  return `Active ${Math.floor(diffHours / 24)}d ago`;
-}
 
-function buildHeaderDescription(isTeacher, major, year) {
-  return isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `Active ${diffDays}d ago`;
 }
 
 function LastActivePulse({ lastSessionEnd }) {
@@ -34,13 +33,23 @@ function LastActivePulse({ lastSessionEnd }) {
   );
 }
 
-function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
-  return (
+function ProfileBadges({ badges, onViewAll, canPin, pinnedBadgeId, onPinBadge }) {
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const allBadges = badges || [];
+  const pinnedBadge = allBadges.find(badge => String(badge.id) === String(pinnedBadgeId));
+  const topBadges = pinnedBadge
+    ? allBadges.filter(badge => String(badge.id) !== String(pinnedBadgeId)).slice(0, 3)
+    : allBadges.slice(0, 4);
+
+  if (!allBadges.length) return null;
+
+  const renderBadge = (badge, { pinned = false } = {}) => (
     <button
+      key={badge.id}
       type="button"
       className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`}
-      onMouseEnter={() => onEnter(badge.id)}
-      onMouseLeave={onLeave}
+      onMouseEnter={() => setActiveTooltip(badge.id)}
+      onMouseLeave={() => setActiveTooltip(null)}
       onClick={() => canPin && onPinBadge?.(badge.id)}
       title={canPin ? "Tap to pin this badge" : badge.label}
     >
@@ -53,22 +62,22 @@ function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeav
       )}
     </button>
   );
-}
 
-function ProfileBadges({ badges, onViewAll, canPin, pinnedBadgeId, onPinBadge }) {
-  const [activeTooltip, setActiveTooltip] = useState(null);
-  const allBadges = badges || [];
-  const pinnedBadge = allBadges.find(b => String(b.id) === String(pinnedBadgeId));
-  const topBadges = pinnedBadge
-    ? allBadges.filter(b => String(b.id) !== String(pinnedBadgeId)).slice(0, 3)
-    : allBadges.slice(0, 4);
-  if (!allBadges.length) return null;
-  const props = { canPin, onPinBadge, activeTooltip, onEnter: setActiveTooltip, onLeave: () => setActiveTooltip(null) };
   return (
     <div className={styles.headerBadges}>
-      {pinnedBadge && <div className={styles.pinnedBadgeWrap}><BadgeButton badge={pinnedBadge} pinned {...props} /></div>}
-      <div className={styles.headerBadgesMain}>{topBadges.map(b => <BadgeButton key={b.id} badge={b} {...props} />)}</div>
-      {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
+      {pinnedBadge && (
+        <div className={styles.pinnedBadgeWrap}>
+          {renderBadge(pinnedBadge, { pinned: true })}
+        </div>
+      )}
+      <div className={styles.headerBadgesMain}>
+        {topBadges.map(badge => renderBadge(badge))}
+      </div>
+      {onViewAll && (
+        <button className={styles.badgesViewAllLink} onClick={onViewAll}>
+          View All &rarr;
+        </button>
+      )}
     </div>
   );
 }
@@ -114,7 +123,7 @@ function HeaderSocieties({ societies, onNavigate }) {
 
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
-  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak` : null;
+  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? 'pm' : 'am'} peak` : null;
   return (
     <div className={styles.headerPersonaCard}>
       <div className={styles.headerPersonaLeft}>
@@ -127,45 +136,41 @@ function PersonaInlineChip({ persona, peakHour }) {
   );
 }
 
-function ProfileBioSection({ isTeacher, email, bio }) {
-  if (!((isTeacher && email) || bio)) return null;
-  return (
-    <div className={styles.bio}>
-      {isTeacher && email && <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>}
-      {bio && <div className={styles.reminder}>{bio}</div>}
-    </div>
-  );
-}
-
-function HeaderTopRow({ user, roleLabel, handlers, visibility }) {
-  return (
-    <div className={styles.headerTop}>
-      <h1 className={styles.username}>{user?.username || "guest"}</h1>
-      <span className={styles.rolePill}>{roleLabel}</span>
-      {visibility.canEditProfile
-        ? <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button>
-        : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
-    </div>
-  );
-}
-
-function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick }) {
+function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick }) {
   const role = profileData?.role || user?.role || "student";
   const fullName = buildFullName(user);
   const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
   const isStudent = !isTeacher && role === "student";
   const year = isStudent ? (profileData?.year || user?.year || "") : "";
   const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
-  const description = buildHeaderDescription(isTeacher, major, year);
+  const description = isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
   const roleLabel = isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student";
   return (
     <div className={styles.headerInfo}>
-      <HeaderTopRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} />
+      <div className={styles.headerTop}>
+        <h1 className={styles.username}>{user?.username || "guest"}</h1>
+        <span className={styles.rolePill}>{roleLabel}</span>
+        {visibility.canEditProfile ? <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
+      </div>
       {description && <div className={styles.headerSubline}>{description}</div>}
       <LastActivePulse lastSessionEnd={profileData?.last_session_end || user?.last_session_end} />
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
-      {(badges?.length > 0 || persona) && <div className={styles.headerBadgesPersonaRow}>{badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}{persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}</div>}
-      <ProfileBioSection isTeacher={isTeacher} email={profileData?.email} bio={profileData?.bio} />
+      {(isTeacher && profileData?.email || profileData?.bio) && (
+        <div className={styles.bio}>
+          {isTeacher && profileData?.email && (
+            <div className={styles.teacherEmail}>
+              <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+            </div>
+          )}
+          {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
+        </div>
+      )}
+      {(badges?.length > 0 || persona) && (
+        <div className={styles.headerBadgesPersonaRow}>
+          {badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
+          {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
+        </div>
+      )}
     </div>
   );
 }
@@ -178,35 +183,23 @@ function MobileStats({ profileData, handlers, visibility }) {
   );
 }
 
-function buildHeaderVars(user, profileData) {
+export default function ProfileHeader({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick }) {
   const role = profileData?.role || user?.role || "student";
   const fullName = buildFullName(profileData || user);
   const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
   const isStudent = !isTeacher && role === "student";
   const year = isStudent ? (profileData?.year || user?.year || "") : "";
   const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
-  return { role, isTeacher, description: buildHeaderDescription(isTeacher, major, year), roleLabel: isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student" };
-}
-
-function MobileHeroSection({ user, profileData, resolvedPhoto, description, roleLabel, lastActiveText, isTeacher, visibility, handlers }) {
-  return (
-    <div className={styles.mobileHero}>
-      <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
-      <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1>
-      <p className={styles.mobileBio}>{description}</p>
-      {lastActiveText && <div className={styles.mobileActivePulse}><span className={styles.lastActiveDot} /><span>{lastActiveText}</span></div>}
-      <span className={styles.mobileRolePill}>{roleLabel}</span>
-      {isTeacher && profileData?.email && <div className={styles.teacherEmail}><a href={`mailto:${profileData.email}`}>{profileData.email}</a></div>}
-      <div className={styles.mobileActions}>{visibility.canEditProfile ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}</div>
-    </div>
-  );
-}
-
-export default function ProfileHeader({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick }) {
-  const { description, roleLabel, isTeacher } = buildHeaderVars(user, profileData);
+  const mobileDescription = isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
+  const roleLabel = isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student";
   const lastActiveText = formatLastActive(profileData?.last_session_end || user?.last_session_end);
   const resolvedUser = { ...user, ...profileData };
-  const resolvedPhoto = getResolvedUserPhoto({ ...resolvedUser }, { allowGeneric: true, seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name });
+  const resolvedPhoto = getResolvedUserPhoto({
+    ...resolvedUser,
+  }, {
+    allowGeneric: true,
+    seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name,
+  });
   return (
     <>
       <div className={`${styles.header} ${styles.desktopOnly}`}>
@@ -214,7 +207,23 @@ export default function ProfileHeader({ user, profileData, handlers, visibility,
         <ProfileHeaderInfo user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }} profileData={profileData} handlers={handlers} visibility={visibility} badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} onViewAllBadges={onViewAllBadges} persona={persona} peakHour={peakHour} societies={societies} onNavigate={onNavigate} onSocietiesClick={onSocietiesClick} />
       </div>
       <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
-        <MobileHeroSection user={user} profileData={profileData} resolvedPhoto={resolvedPhoto} description={description} roleLabel={roleLabel} lastActiveText={lastActiveText} isTeacher={isTeacher} visibility={visibility} handlers={handlers} />
+        <div className={styles.mobileHero}>
+          <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
+          <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1><p className={styles.mobileBio}>{mobileDescription}</p>
+          {lastActiveText && (
+            <div className={styles.mobileActivePulse}>
+              <span className={styles.lastActiveDot} />
+              <span>{lastActiveText}</span>
+            </div>
+          )}
+          <span className={styles.mobileRolePill}>{roleLabel}</span>
+          {isTeacher && profileData?.email && (
+            <div className={styles.teacherEmail}>
+              <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+            </div>
+          )}
+          <div className={styles.mobileActions}>{visibility.canEditProfile ? <button className={styles.mobileBtnEdit} onClick={handlers.onEditProfile}>Edit Profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}</div>
+        </div>
         <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
       </div>
     </>
