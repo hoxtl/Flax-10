@@ -196,8 +196,8 @@ function ProjectRow({ project, onClick }) {
               </div>
               <div className={styles.accordionActions}>
                   <button className={styles.btnOpen} onClick={(e) => { e.stopPropagation(); onClick(); }}>Open project →</button>
-                  <button className={styles.btnSecondary} onClick={(e) => { e.stopPropagation(); }}>Invite member</button>
-                  <button className={styles.btnSecondary} onClick={(e) => { e.stopPropagation(); }}>Edit details</button>
+                  <button className={styles.btnSecondary} onClick={(e) => { e.stopPropagation(); onClick(); }}>Invite member</button>
+                  <button className={styles.btnSecondary} onClick={(e) => { e.stopPropagation(); onClick(); }}>Edit details</button>
               </div>
           </div>
       )}
