@@ -36,3 +36,12 @@
     border-color 0.15s ease;
 }
 
+.listRow:hover {
+  background: var(--hover);
+}
+
+.listRowActive {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
