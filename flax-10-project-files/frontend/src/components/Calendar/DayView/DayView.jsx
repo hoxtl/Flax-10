@@ -9,26 +9,17 @@ import { shouldShowInTimeGrid } from "../utils/eventDisplayUtils";
 import { TimeSlot } from "./TimeSlot";
 import { AllDayRow } from "../WeekView/components/AllDayRow";
 import { DraggableEvent } from "../DraggableEvent";
-import { getHoursOfDay, calculateEventStyle } from "./dayViewHelpers";
-import { SLOT_HEIGHT } from "../calendarConstants";
+import { getHoursOfDay, calculateEventStyle, formatHour } from "./dayViewHelpers";
 import { useAutoScroll } from "../hooks/useAutoScroll";
+import { SLOT_HEIGHT } from "../calendarConstants";
+import { CurrentTimeLine } from "../components/CurrentTimeLine";
 import "./DayView.css";
-
-function filterEventsForDay(events, date) {
-  return events.filter((e) => overlapsDay(new Date(e.start_time), new Date(e.end_time), date));
-}
-
-function formatHour(hour) {
-  const period = hour < 12 ? "AM" : "PM";
-  return `${hour % 12 || 12} ${period}`;
-}
 
 function useDayViewData(selectedDate, events) {
   const scrollRef = useRef(null);
-  const allEvents = filterEventsForDay(events, selectedDate);
-  const timedEvents = allEvents.filter((e) => shouldShowInTimeGrid(e, selectedDate));
-  useAutoScroll(scrollRef, timedEvents, selectedDate.toISOString());
-  return { selectedDate, timedEvents, allEvents, scrollRef };
+  const timed = events.filter((e) => overlapsDay(new Date(e.start_time), new Date(e.end_time), selectedDate) && shouldShowInTimeGrid(e, selectedDate));
+  useAutoScroll(scrollRef, timed, selectedDate.toISOString());
+  return { selectedDate, timedEvents: timed, allEvents: events, scrollRef };
 }
 
 function TimeLabelsColumn({ hours }) {
@@ -39,25 +30,6 @@ function TimeLabelsColumn({ hours }) {
           <span className="time-label-text">{formatHour(hour)}</span>
         </div>
       ))}
-    </div>
-  );
-}
-
-function useCurrentTime() {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(t);
-  }, []);
-  return now;
-}
-
-function CurrentTimeLine() {
-  const now = useCurrentTime();
-  const top = (now.getHours() * 60 + now.getMinutes()) * (SLOT_HEIGHT / 60);
-  return (
-    <div style={{ position: "absolute", top: `${top}px`, left: 0, right: 0, height: "2px", background: "#ea4335", zIndex: 15, pointerEvents: "none" }}>
-      <div style={{ position: "absolute", left: "-6px", top: "50%", transform: "translateY(-50%)", width: "12px", height: "12px", background: "#ea4335", borderRadius: "50%" }} />
     </div>
   );
 }

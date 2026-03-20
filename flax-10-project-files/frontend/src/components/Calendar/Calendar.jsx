@@ -1,7 +1,8 @@
-/**
- * Calendar - Main calendar component with animated view switching.
- * Renders day, week, month, list, or table views based on context.
+/*
+ * Calendar.jsx
+ * Main calendar component with animated view switching.
  */
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useCalendar } from "../../context/CalendarContext";
 import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";

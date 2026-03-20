@@ -1,11 +1,11 @@
-/**
- * EventPopups - Container for event modal and popover components.
- * Manages event editing, deletion, and quick actions.
+/*
+ * EventPopups.jsx
+ * Container for event modal, popover, and deletion confirmation.
  */
+
 import { useConfirm } from '../../context/ConfirmContext';
-import { useNotify } from '../Notifications/hooks/useNotify';
 import { useToast } from '../../context/ToastContext';
-import { useCalendarDispatch, useEventModal, useEventPopup, useEventDelete } from '../../context/CalendarContext';
+import { useEventModal, useEventPopup, useEventDelete } from '../../context/CalendarContext';
 import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';
 import { useTags } from '../../context/TagContext';
@@ -16,7 +16,7 @@ import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 
-/** Main container rendering both modal and popover. */
+/** Main entry point for calendar popups. */
 export function EventPopups({ allowModuleLeave = true }) {
   return (
     <>
@@ -33,108 +33,53 @@ function EventModalContainer() {
   return <EventModal event={modalEvent} onClose={closeModal} initialType={modalType} initialDate={modalInitialDate} />;
 }
 
-function useToastNotify() {
-  const toast = useToast();
-  const notify = useNotify();
-  return (title, message) => {
-    if (typeof toast === "function") {
-      toast(message === undefined ? title : `${title}: ${message}`, { variant: "info" });
-    }
-    if (typeof notify === "function" && message !== undefined) notify(title, message);
-  };
-}
-
 function useEventDeletion() {
-  const { removeEvent, addException } = useEventActions();
   const { openDelete } = useEventDelete();
   const confirmFn = useConfirm();
-
-  const getRecurringChoice = async (event) => {
-    return await confirmFn({
+  const handleRecurring = async (evt) => {
+    const c = await confirmFn({
       title: "Delete Recurring Event",
-      message: "This is a recurring event. How would you like to delete it?",
-      confirmText: "Delete ALL occurrences",
-      alternateText: "Delete ONLY this one",
-      cancelText: "Cancel",
-      isDanger: true
+      message: "How would you like to delete this recurring event?",
+      confirmText: "Delete ALL", alternateText: "Delete ONLY this", isDanger: true
     });
+    if (c === true) openDelete(evt, 'all');
+    else if (c === 'ALTERNATE') openDelete(evt, 'occurrence');
   };
-
-  const handleDeleteRequest = async (event) => {
-    if (hasRecurrence(event)) {
-      const choice = await getRecurringChoice(event);
-      if (choice === true) openDelete(event, 'all');
-      else if (choice === 'ALTERNATE') openDelete(event, 'occurrence');
-      return false; // Handled by hold modal
+  return {
+    handleDeleteRequest: async (evt) => {
+      if (hasRecurrence(evt)) await handleRecurring(evt);
+      else openDelete(evt);
     }
-    openDelete(event);
-    return false; // Handled by hold modal
   };
-  return { handleDeleteRequest, removeEvent, addException };
 }
 
 function HoldDeleteContainer() {
-  const { isDeleteOpen, deleteEvent, deleteType, closeDelete } = useEventDelete();
+  const { isDeleteOpen, deleteEvent: evt, deleteType: type, closeDelete } = useEventDelete();
   const { removeEvent, addException } = useEventActions();
-  const showToast = useToastNotify();
-
-  if (!isDeleteOpen || !deleteEvent) return null;
-
-  const onConfirm = async () => {
-    if (deleteType === 'all') await executeDelete(deleteEvent, { removeEvent });
-    else if (deleteType === 'occurrence') await deleteRecurrenceOccurrence(deleteEvent, { addException });
-    else await executeDelete(deleteEvent, { removeEvent });
-
-    closeDelete();
-    showToast(`"${deleteEvent.title}" has been deleted`);
+  const toast = useToast();
+  if (!isDeleteOpen || !evt) return null;
+  const onC = async () => {
+    const act = { removeEvent, addException };
+    if (type === 'occurrence') await deleteRecurrenceOccurrence(evt, act);
+    else await executeDelete(evt, act);
+    closeDelete(); toast(`"${evt.title}" deleted.`);
   };
-
-  return (
-    <HoldConfirmModal
-      title={`Delete "${deleteEvent.title}"`}
-      warningText={deleteType === 'all' ? "This will delete ALL occurrences of this recurring event." : "This will permanently delete this event."}
-      onConfirm={onConfirm}
-      onCancel={closeDelete}
-    />
-  );
+  return <HoldConfirmModal title={`Delete "${evt.title}"`} warningText={type === 'all' ? "Delete ALL occurrences?" : "Confirm deletion."} onConfirm={onC} onCancel={closeDelete} />;
 }
-
-function getEventTag(event, getTag) {
-  const societyTag = { label: event.tag_name, color: event.tag_color || event.society_color || '#9E7E5D' };
-  return (event.source === 'society' && event.tag_name) ? societyTag : getTag(event.tag);
-}
-
-function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
-  return [
-    { label: 'Edit', onClick: () => { closePopup(); openModal(event); } },
-    { label: 'Delete', variant: 'danger', onClick: () => onDeleteRequest(event) }
-  ];
-}
-
-function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }, { allowModuleLeave = true } = {}) {
-  if (!allowModuleLeave) return null;
-  const tagName = (event.tag_name || event.tag?.name || '').toLowerCase();
-  if (tagName === 'lecture') return null;
-  return [{ label: 'Leave Module', variant: 'danger', onClick: () => { closePopup(); disenrollFromModule(event.module, loadEvents); } }];
-}
-
-function getSocietyActions(event, { closePopup, loadEvents, refreshTags, showToast }) {
-  const handleUnsync = async () => {
-    closePopup();
-    await unsyncCalendar(event.society_id);
-    await refreshTags();
-    loadEvents();
-    showToast(`Calendar for ${event.society_name || 'this society'} has been unsynced`);
-  };
-  return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
-}
-
-function getCalendarPopupActions(event, handlers, options = {}) {
-  const type = getEventType(event);
-  if (type === 'personal') return getPersonalActions(event, handlers);
-  if (type === 'module') return getModuleActions(event, handlers, options);
-  if (type === 'society') return getSocietyActions(event, handlers);
-  return null;
+function getPopupActions(evt, s, opts) {
+    const type = getEventType(evt);
+    const h = {
+        edit: () => { s.closePopup(); s.openModal(evt); }, delete: () => { s.closePopup(); s.handleDeleteRequest(evt); },
+        leave: () => { s.closePopup(); s.disenrollFromModule(evt.module, s.loadEvents); },
+        unsync: async () => {
+            s.closePopup(); await unsyncCalendar(evt.society_id); await s.refreshTags();
+            s.loadEvents(); s.toast(`Unsynced ${evt.society_name || 'society'}`);
+        }
+    };
+    if (type === 'personal') return [{ label: 'Edit', onClick: h.edit }, { label: 'Delete', variant: 'danger', onClick: h.delete }];
+    if (type === 'module' && opts.allowModuleLeave && (evt.tag_name || '').toLowerCase() !== 'lecture') return [{ label: 'Leave Module', variant: 'danger', onClick: h.leave }];
+    if (type === 'society') return [{ label: 'Unsync', variant: 'danger', onClick: h.unsync }];
+    return null;
 }
 
 function usePopupState() {
@@ -143,22 +88,26 @@ function usePopupState() {
   const { loadEvents } = useCalendarEvents();
   const { disenrollFromModule } = useModuleDisenrollment();
   const { getTag, refreshTags } = useTags();
-  const showToast = useToastNotify();
+  const toast = useToast();
   const { handleDeleteRequest } = useEventDeletion();
-  return { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode, isModalOpen, openModal, loadEvents, disenrollFromModule, getTag, refreshTags, showToast, handleDeleteRequest };
+  
+  return { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode, isModalOpen, openModal, loadEvents, disenrollFromModule, getTag, refreshTags, toast, handleDeleteRequest };
 }
 
 function EventPopupContainer({ allowModuleLeave }) {
   const state = usePopupState();
   if (state.isModalOpen || !state.popupEvent) return null;
 
-  const onDeleteWrapped = async (ev) => {
-    state.closePopup();
-    state.handleDeleteRequest(ev);
-  };
-  const handlers = { openModal: state.openModal, onDeleteRequest: onDeleteWrapped, closePopup: state.closePopup, loadEvents: state.loadEvents, disenrollFromModule: state.disenrollFromModule, refreshTags: state.refreshTags, showToast: state.showToast };
-  const actions = getCalendarPopupActions(state.popupEvent, handlers, { allowModuleLeave });
+  const actions = getPopupActions(state.popupEvent, state, { allowModuleLeave });
+  const tag = (state.popupEvent.source === 'society' && state.popupEvent.tag_name) 
+    ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || '#9E7E5D' }
+    : state.getTag(state.popupEvent.tag);
 
-  return <EventPopover event={state.popupEvent} anchorRect={state.popupAnchorRect} onClose={state.closePopup} actions={actions} tag={getEventTag(state.popupEvent, state.getTag)} readOnly={state.readOnly} viewMode={state.viewMode} />;
+  return (
+    <EventPopover 
+      event={state.popupEvent} anchorRect={state.popupAnchorRect} onClose={state.closePopup} 
+      actions={actions} tag={tag} readOnly={state.readOnly} viewMode={state.viewMode} 
+    />
+  );
 }
 

@@ -401,7 +401,7 @@ export default function AnimatedDropdown({
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
   isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false,
-  allowFlipUpward = false
+  allowFlipUpward = true
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange

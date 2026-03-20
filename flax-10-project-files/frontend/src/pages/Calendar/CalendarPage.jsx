@@ -1,8 +1,9 @@
-/**
- * CalendarPage - Main calendar page with header, filters, and calendar views.
- * Handles view mode switching and filter state management.
+/*
+ * CalendarPage.jsx
+ * Main entry point for the calendar page.
  */
-import { useMemo, useEffect } from "react";
+
+import { useEffect } from "react";
 import AppPage from "../../components/common/AppPage/AppPage";
 import { Calendar } from "../../components/Calendar/Calendar";
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
@@ -23,15 +24,20 @@ function SkeletonHeader() {
   );
 }
 
+function SkeletonRow({ row }) {
+  return (
+    <div key={row} className={styles.skeletonCalendarRow}>
+      <SkeletonBlock className={styles.skeletonTimeCol} />
+      <SkeletonBlock className={styles.skeletonEventLane} />
+    </div>
+  );
+}
+
 function SkeletonGrid() {
+  const rows = Array.from({ length: 5 });
   return (
     <div className={styles.skeletonCalendarGrid}>
-      {Array.from({ length: 5 }).map((_, row) => (
-        <div key={row} className={styles.skeletonCalendarRow}>
-          <SkeletonBlock className={styles.skeletonTimeCol} />
-          <SkeletonBlock className={styles.skeletonEventLane} />
-        </div>
-      ))}
+      {rows.map((_, row) => <SkeletonRow key={row} row={row} />)}
     </div>
   );
 }
@@ -57,24 +63,23 @@ function CalendarPageSkeleton() {
 
 function useMobileViewRedirect(isMobile, viewMode, dispatch) {
   useEffect(() => {
-    if (isMobile && viewMode === "week") {
-      dispatch({ type: "SET_VIEW_MODE", payload: "day" });
-    }
+    const isWeekOnMobile = isMobile && viewMode === "week";
+    if (isWeekOnMobile) dispatch({ type: "SET_VIEW_MODE", payload: "day" });
   }, [isMobile, viewMode, dispatch]);
 }
 
 function useCalendarPageState() {
-  const { allEvents, isLoading, displayMode, viewMode } = useCalendar();
+  const { allEvents, isLoading, viewMode } = useCalendar();
   const dispatch = useCalendarDispatch();
   const isMobile = useBreakpoint();
 
   useEventPopupListener();
   useMobileViewRedirect(isMobile, viewMode, dispatch);
 
-  return { allEvents, isLoading, displayMode, dispatch };
+  return { allEvents, isLoading };
 }
 
-function CalendarPageContent({ state }) {
+function CalendarPageContent() {
   return (
     <AppPage title="Calendar" subtitle={calendarSubtitle} width="full" className={styles.page}>
       <div className={styles.calendarContainer}>
@@ -90,7 +95,8 @@ function CalendarPageContent({ state }) {
 
 export default function CalendarPage() {
   const state = useCalendarPageState();
-  if (state.isLoading && state.allEvents.length === 0) return <CalendarPageSkeleton />;
-  return <CalendarPageContent state={state} />;
+  const showSkeleton = state.isLoading && state.allEvents.length === 0;
+  if (showSkeleton) return <CalendarPageSkeleton />;
+  return <CalendarPageContent />;
 }
 

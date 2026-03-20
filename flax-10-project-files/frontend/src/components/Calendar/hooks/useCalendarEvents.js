@@ -31,24 +31,14 @@ export function useCalendarEvents() {
   const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
   const stateRef = useRef({ selectedDate, viewMode });
   stateRef.current = { selectedDate, viewMode };
-
-  const loadEvents = useCallback(() => {
-    fetchingRef.key = null;
-    fetchEvents(stateRef.current, dispatch);
-  }, [dispatch]);
-
+  const load = useCallback(() => { fetchingRef.key = null; fetchEvents(stateRef.current, dispatch); }, [dispatch]);
   useEffect(() => {
     if (fetchingRef.key === dateKey || fetchingRef.current) return;
     fetchingRef.key = dateKey;
     fetchEvents(stateRef.current, dispatch);
   }, [dateKey, dispatch]);
-
-  useEffect(() => {
-    if (!reloadKey) return;
-    loadEvents();
-  }, [reloadKey, loadEvents]);
-
-  return { events, loadEvents };
+  useEffect(() => { if (reloadKey) load(); }, [reloadKey, load]);
+  return { events, loadEvents: load };
 }
 
 async function fetchEvents(state, dispatch) {
