@@ -2,7 +2,10 @@
  * EventPopups - Container for event modal and popover components.
  * Manages event editing, deletion, and quick actions.
  */
-import { useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
+import { useConfirm } from '../../context/ConfirmContext';
+import { useNotify } from '../Notifications/hooks/useNotify';
+import { useToast } from '../../context/ToastContext';
+import { useCalendarDispatch, useEventModal, useEventPopup, useEventDelete } from '../../context/CalendarContext';
 import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';
 import { useTags } from '../../context/TagContext';
@@ -11,9 +14,6 @@ import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment'
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
-import { useConfirm } from '../../context/ConfirmContext';
-import { useNotify } from '../Notifications/hooks/useNotify';
-import { useToast } from '../../context/ToastContext';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 
 /** Main container rendering both modal and popover. */
@@ -22,6 +22,7 @@ export function EventPopups({ allowModuleLeave = true }) {
     <>
       <EventModalContainer />
       <EventPopupContainer allowModuleLeave={allowModuleLeave} />
+      <HoldDeleteContainer />
     </>
   );
 }
@@ -43,33 +44,59 @@ function useToastNotify() {
   };
 }
 
-async function confirmRecurringDelete(event, confirmFn, removeEvent, addException) {
-  const choice = await confirmFn({
-    title: "Delete Recurring Event", message: "This is a recurring event. How would you like to delete it?",
-    confirmText: "Delete ALL occurrences", alternateText: "Delete ONLY this one", cancelText: "Cancel", isDanger: true
-  });
-  if (choice === true) { await executeDelete(event, { removeEvent }); return true; }
-  if (choice === 'ALTERNATE') { await deleteRecurrenceOccurrence(event, { addException }); return true; }
-  return false;
-}
-
-async function confirmSingleDelete(event, confirmFn, removeEvent) {
-  const choice = await confirmFn({
-    title: "Delete Event", message: `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
-    confirmText: "Delete", cancelText: "Cancel", isDanger: true
-  });
-  if (choice) { await executeDelete(event, { removeEvent }); return true; }
-  return false;
-}
 function useEventDeletion() {
   const { removeEvent, addException } = useEventActions();
+  const { openDelete } = useEventDelete();
   const confirmFn = useConfirm();
-  const handleDeleteRequest = async (event) => {
-    return hasRecurrence(event)
-      ? confirmRecurringDelete(event, confirmFn, removeEvent, addException)
-      : confirmSingleDelete(event, confirmFn, removeEvent);
+
+  const getRecurringChoice = async (event) => {
+    return await confirmFn({
+      title: "Delete Recurring Event",
+      message: "This is a recurring event. How would you like to delete it?",
+      confirmText: "Delete ALL occurrences",
+      alternateText: "Delete ONLY this one",
+      cancelText: "Cancel",
+      isDanger: true
+    });
   };
-  return { handleDeleteRequest };
+
+  const handleDeleteRequest = async (event) => {
+    if (hasRecurrence(event)) {
+      const choice = await getRecurringChoice(event);
+      if (choice === true) openDelete(event, 'all');
+      else if (choice === 'ALTERNATE') openDelete(event, 'occurrence');
+      return false; // Handled by hold modal
+    }
+    openDelete(event);
+    return false; // Handled by hold modal
+  };
+  return { handleDeleteRequest, removeEvent, addException };
+}
+
+function HoldDeleteContainer() {
+  const { isDeleteOpen, deleteEvent, deleteType, closeDelete } = useEventDelete();
+  const { removeEvent, addException } = useEventActions();
+  const showToast = useToastNotify();
+
+  if (!isDeleteOpen || !deleteEvent) return null;
+
+  const onConfirm = async () => {
+    if (deleteType === 'all') await executeDelete(deleteEvent, { removeEvent });
+    else if (deleteType === 'occurrence') await deleteRecurrenceOccurrence(deleteEvent, { addException });
+    else await executeDelete(deleteEvent, { removeEvent });
+
+    closeDelete();
+    showToast(`"${deleteEvent.title}" has been deleted`);
+  };
+
+  return (
+    <HoldConfirmModal
+      title={`Delete "${deleteEvent.title}"`}
+      warningText={deleteType === 'all' ? "This will delete ALL occurrences of this recurring event." : "This will permanently delete this event."}
+      onConfirm={onConfirm}
+      onCancel={closeDelete}
+    />
+  );
 }
 
 function getEventTag(event, getTag) {
@@ -127,7 +154,7 @@ function EventPopupContainer({ allowModuleLeave }) {
 
   const onDeleteWrapped = async (ev) => {
     state.closePopup();
-    if (await state.handleDeleteRequest(ev)) state.showToast(`"${ev.title}" has been deleted`);
+    state.handleDeleteRequest(ev);
   };
   const handlers = { openModal: state.openModal, onDeleteRequest: onDeleteWrapped, closePopup: state.closePopup, loadEvents: state.loadEvents, disenrollFromModule: state.disenrollFromModule, refreshTags: state.refreshTags, showToast: state.showToast };
   const actions = getCalendarPopupActions(state.popupEvent, handlers, { allowModuleLeave });

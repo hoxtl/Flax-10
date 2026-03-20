@@ -6,14 +6,13 @@ import { useRef, useState, useEffect } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
-import { useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { useEventResize } from './hooks/useEventResize';
 import { formatTime } from './utils/dateUtils';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
-import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { useToast } from '../../context/ToastContext';
+import { useEventDelete, useCalendarDispatch, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { getEventTheme } from './utils/eventStyleUtils';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 import './DraggableEvent.css';
@@ -52,22 +51,27 @@ function getReadOnlyClassName(event) {
     return 'draggable-event';
 }
 
-function useDeleteHandler(event, setCtxMenu, removeEvent, addException) {
-    const confirm = useConfirm();
-    const toast = useToast();
+function useDeleteHandler(event, setCtxMenu) {
+    const { openDelete } = useEventDelete();
+    const confirmFn = useConfirm();
     const recurring = hasRecurrence(event);
 
     return async () => {
         setCtxMenu(null);
-        const choice = await confirm({
-            title: recurring ? "Delete Recurring Event" : "Delete Event",
-            message: recurring ? "This is a recurring event. How would you like to delete it?" : `Are you sure you want to delete "${event.title}"?`,
-            confirmText: recurring ? "Delete ALL occurrences" : "Delete",
-            alternateText: recurring ? "Delete ONLY this one" : undefined,
-            isDanger: true
-        });
-        if (choice === true) { await executeDelete(event, { removeEvent }); toast?.(`"${event.title}" deleted.`); }
-        else if (choice === 'ALTERNATE') { await deleteRecurrenceOccurrence(event, { addException }); toast?.(`"${event.title}" occurrence deleted.`); }
+        if (recurring) {
+            const choice = await confirmFn({
+                title: "Delete Recurring Event",
+                message: "This is a recurring event. How would you like to delete it?",
+                confirmText: "Delete ALL occurrences",
+                alternateText: "Delete ONLY this one",
+                cancelText: "Cancel",
+                isDanger: true
+            });
+            if (choice === true) openDelete(event, 'all');
+            else if (choice === 'ALTERNATE') openDelete(event, 'occurrence');
+        } else {
+            openDelete(event);
+        }
     };
 }
 
@@ -75,7 +79,7 @@ function useEventContextMenu(event, setCtxMenu) {
     const { removeEvent, addException } = useEventActions();
     const { openModal } = useEventModal();
     const handleEdit = () => { setCtxMenu(null); openModal(event); };
-    const handleDelete = useDeleteHandler(event, setCtxMenu, removeEvent, addException);
+    const handleDelete = useDeleteHandler(event, setCtxMenu);
     return { handleEdit, handleDelete };
 }
 

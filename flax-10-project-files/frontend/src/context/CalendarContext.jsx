@@ -107,3 +107,13 @@ export function useEventPopup() {
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
     return { popupEvent, popupAnchorRect, readOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
 }
+
+export function useEventDelete() {
+    const context = useContext(CalendarContext);
+    const dispatch = useContext(CalendarDispatchContext);
+    if (!context || !dispatch) return { isDeleteOpen: false, deleteEvent: null, deleteType: null, openDelete: () => { }, closeDelete: () => { } };
+    const { isDeleteConfirmOpen, deleteConfirmEvent, deleteConfirmType } = context;
+    const openDelete = (event, type = null) => dispatch({ type: 'OPEN_DELETE_CONFIRM', payload: { event, type } });
+    const closeDelete = () => dispatch({ type: 'CLOSE_DELETE_CONFIRM' });
+    return { isDeleteOpen: isDeleteConfirmOpen, deleteEvent: deleteConfirmEvent, deleteType: deleteConfirmType, openDelete, closeDelete };
+}

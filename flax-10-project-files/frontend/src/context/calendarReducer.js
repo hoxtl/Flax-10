@@ -18,6 +18,9 @@ export const initialState = {
     popupEvent: null,
     popupAnchorRect: null,
     readOnly: false,
+    isDeleteConfirmOpen: false,
+    deleteConfirmEvent: null,
+    deleteConfirmType: null, // 'occurrence' or 'all' for recurring
     reloadKey: 0,
 };
 
@@ -41,6 +44,8 @@ const handlers = {
     OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, readOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
     CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null }),
     SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
+    OPEN_DELETE_CONFIRM: (state, payload) => ({ ...state, isDeleteConfirmOpen: true, deleteConfirmEvent: payload.event, deleteConfirmType: payload.type || null }),
+    CLOSE_DELETE_CONFIRM: (state) => ({ ...state, isDeleteConfirmOpen: false, deleteConfirmEvent: null, deleteConfirmType: null }),
     TRIGGER_RELOAD: (state) => ({ ...state, reloadKey: (state.reloadKey || 0) + 1 }),
 };
 
