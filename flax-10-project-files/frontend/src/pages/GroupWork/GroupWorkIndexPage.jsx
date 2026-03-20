@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import styles from "./GroupWorkIndexPage.module.css";
@@ -183,7 +184,16 @@ function ProjectRow({ project, onClick }) {
             <div className={styles.progressCircleContainer}>
                 <svg width="24" height="24" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r={radius} stroke="var(--border)" strokeWidth="3" fill="none" />
-                  <circle cx="12" cy="12" r={radius} stroke={theme.ring} strokeWidth="3" fill="none" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" transform="rotate(-90 12 12)" />
+                  <motion.circle 
+                    cx="12" cy="12" r={radius} 
+                    stroke={theme.ring} strokeWidth="3" fill="none" 
+                    strokeDasharray={circumference} 
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset: circumference - (percent / 100) * circumference }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    strokeLinecap="round" 
+                    transform="rotate(-90 12 12)" 
+                  />
                 </svg>
             </div>
             <div className={isExpanded ? styles.arrowIconUp : styles.arrowIcon}>↑</div>
