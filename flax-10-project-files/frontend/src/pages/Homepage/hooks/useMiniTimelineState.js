@@ -1,38 +1,42 @@
-/*
- * UI state for the homepage mini timeline.
- */
+/* UI state for the homepage mini timeline. */
 
 import { useCallback, useRef, useState } from "react";
 import { usePopoverDismiss } from "./miniTimeline/usePopoverDismiss";
 import { useSleepWindow } from "./miniTimeline/useSleepWindow";
 
-export function useMiniTimelineState() {
-  const [conflictPopoverRowId, setConflictPopoverRowId] = useState(null);
-  const [slotPopoverRowId, setSlotPopoverRowId] = useState(null);
-  const [eventCtxMenu, setEventCtxMenu] = useState(null);
-  const conflictPopoverRef = useRef(null);
-  const slotPopoverRef = useRef(null);
-  const nowRowElementRef = useRef(null);
-  const sleepWindow = useSleepWindow();
-  const closeConflictPopover = useCallback(() => setConflictPopoverRowId(null), []);
-  const closeSlotPopover = useCallback(() => setSlotPopoverRowId(null), []);
-  const attachNowRow = useCallback((element) => {
-    nowRowElementRef.current = element;
-  }, []);
+function useConflictPopover() {
+  const [rowId, setRowId] = useState(null);
+  const ref = useRef(null);
+  const close = useCallback(() => setRowId(null), []);
+  usePopoverDismiss(rowId, ref, close);
+  return { rowId, setRowId, ref };
+}
 
-  usePopoverDismiss(conflictPopoverRowId, conflictPopoverRef, closeConflictPopover);
-  usePopoverDismiss(slotPopoverRowId, slotPopoverRef, closeSlotPopover);
+function useSlotPopover() {
+  const [rowId, setRowId] = useState(null);
+  const ref = useRef(null);
+  const close = useCallback(() => setRowId(null), []);
+  usePopoverDismiss(rowId, ref, close);
+  return { rowId, setRowId, ref };
+}
+
+export function useMiniTimelineState() {
+  const conflict = useConflictPopover();
+  const slot = useSlotPopover();
+  const [eventCtxMenu, setEventCtxMenu] = useState(null);
+  const nowRowElementRef = useRef(null);
+  const attachNowRow = useCallback((el) => { nowRowElementRef.current = el; }, []);
 
   return {
-    conflictPopoverRowId,
-    setConflictPopoverRowId,
-    conflictPopoverRef,
-    slotPopoverRowId,
-    setSlotPopoverRowId,
-    slotPopoverRef,
+    conflictPopoverRowId: conflict.rowId,
+    setConflictPopoverRowId: conflict.setRowId,
+    conflictPopoverRef: conflict.ref,
+    slotPopoverRowId: slot.rowId,
+    setSlotPopoverRowId: slot.setRowId,
+    slotPopoverRef: slot.ref,
     eventCtxMenu,
     setEventCtxMenu,
     attachNowRow,
-    sleepWindow,
+    sleepWindow: useSleepWindow(),
   };
 }

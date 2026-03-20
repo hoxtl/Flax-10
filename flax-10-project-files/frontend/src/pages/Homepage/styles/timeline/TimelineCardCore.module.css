@@ -169,20 +169,19 @@
     min-width: 0;
   }
   .planTimelineCardTimeSlot {
-    font-family: var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
-    font-size: 0.68rem;
-    font-weight: 500;
+    font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: var(--home-text-meta, #9ca3af);
-    letter-spacing: 0.02em;
+    color: #C0714E;
+    letter-spacing: 0.04em;
     flex-shrink: 0;
-    opacity: 0.6;
   }
   .planTimelineCardTitle {
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--flax-charcoal-heading, #1e261e);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2d2d2d;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;

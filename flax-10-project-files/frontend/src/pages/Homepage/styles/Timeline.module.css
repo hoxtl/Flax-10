@@ -1,13 +1,11 @@
-/*
- * Timeline stylesheet split into imported chunks to satisfy file-size limits.
- */
+/* Timeline styles — barrel file importing all timeline sub-stylesheets. */
 
-@import "./timeline/Timeline.chunk01.module.css";
-@import "./timeline/Timeline.chunk02.module.css";
-@import "./timeline/Timeline.chunk03.module.css";
-@import "./timeline/Timeline.chunk04.module.css";
-@import "./timeline/Timeline.chunk05.module.css";
-@import "./timeline/Timeline.chunk06.module.css";
-@import "./timeline/Timeline.chunk07.module.css";
-@import "./timeline/Timeline.chunk08.module.css";
-@import "./timeline/Timeline.chunk09.module.css";
+@import "./timeline/TimelineTaskWidget.module.css";
+@import "./timeline/TimelineCardCore.module.css";
+@import "./timeline/TimelineEventInteraction.module.css";
+@import "./timeline/TimelineMiniView.module.css";
+@import "./timeline/TimelineStructure.module.css";
+@import "./timeline/TimelineCardStyles.module.css";
+@import "./timeline/TimelinePastAndMissed.module.css";
+@import "./timeline/TimelineGapWindows.module.css";
+@import "./timeline/TimelineGapActions.module.css";
