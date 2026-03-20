@@ -19,3 +19,62 @@ function ListRow({ list, index, count, active, onClick }) {
   );
 }
 
+export default function MobileTaskListsModal({
+  lists = [],
+  tasks = [],
+  activeListId,
+  onSelectList,
+  onSelectFilter,
+  onNewList,
+  onClose,
+}) {
+  const { listCounts } = computeListSidebarCounts(tasks, lists);
+
+  const handleSelectList = (listId) => {
+    onSelectList?.(listId);
+    onSelectFilter?.("all");
+    onClose?.();
+  };
+
+  return (
+    <StandardModal
+      title="View lists"
+      subtitle="Choose a list to focus your task feed"
+      onClose={onClose}
+      size="sm"
+      contentClassName={styles.content}
+    >
+      <div className={styles.sectionLabel}>LISTS</div>
+      <div className={styles.listWrap}>
+        {lists.length === 0 ? (
+          <EmptyState
+            icon="🗂️"
+            title="No lists yet"
+            description="Create a list to organize your tasks."
+          />
+        ) : (
+          lists.map((list, index) => (
+            <ListRow
+              key={list.id}
+              list={list}
+              index={index}
+              count={listCounts[list.id] || 0}
+              active={String(activeListId) === String(list.id)}
+              onClick={() => handleSelectList(list.id)}
+            />
+          ))
+        )}
+      </div>
+      <button
+        type="button"
+        className={styles.addListBtn}
+        onClick={() => {
+          onClose?.();
+          onNewList?.();
+        }}
+      >
+        + Add list
+      </button>
+    </StandardModal>
+  );
+}
