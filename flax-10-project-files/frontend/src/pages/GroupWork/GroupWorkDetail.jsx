@@ -149,7 +149,7 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                             className={styles.detailCourseDropdown}
                         />
                     </div>
-                    <span> · {project.member_count ?? members.length} members</span>
+                    <span> · {members.length} members</span>
                 </div>
                 <ProjectProgress taskStats={taskStats} />
             </div>

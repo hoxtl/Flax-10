@@ -66,8 +66,8 @@
 }
 
 .courseDropdownWrapper {
-    display: inline-block;
-    min-width: 140px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .detailCourseDropdown button {
@@ -77,6 +77,8 @@
     color: var(--text-secondary);
     border: none;
     box-shadow: none;
+    width: auto;
+    gap: 4px;
 }
 
 .dateInput {
