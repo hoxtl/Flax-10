@@ -79,8 +79,10 @@
 }
 
 .toggleHint {
-    font-size: 0.8rem;
-    color: var(--muted, #6b7280);
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--primary, #7B6751);
+    opacity: 0.85;
     margin: 0.25rem 0 0 0;
 }
 

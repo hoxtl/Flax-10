@@ -1,6 +1,12 @@
+/*
+ * Analytics summary cards.
+ */
+
 import { motion } from 'framer-motion';
 import { useCountUp } from './hooks/useCountUp';
 import styles from './SummaryCards.module.css';
+
+const MotionDiv = motion.div;
 
 const CARD_TRANSITION = (delay) => ({ delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] });
 
@@ -13,27 +19,39 @@ const buildCardsConfig = (summary, activeDays) => [
   { icon: '📅', label: 'Active Days', value: activeDays, unit: null, color: '#388E3C', delay: 0.15, tooltip: 'Days in this period where you studied at least once' },
 ];
 
+function CardIcon({ color, icon }) {
+  return (
+    <div className={styles.iconWrap} style={{ background: color + '18', color }}>
+      <span className={styles.icon}>{icon}</span>
+    </div>
+  );
+}
+
+function CardValue({ countRef, unit }) {
+  return (
+    <div className={styles.valueRow}>
+      <span className={styles.value} ref={countRef}>0</span>
+      {unit && <span className={styles.unit}>{unit}</span>}
+    </div>
+  );
+}
+
 function StatCard({ icon, label, value, unit, color, delay, tooltip }) {
   const countRef = useCountUp(parseFloat(value) || 0);
   return (
-    <motion.div
+    <MotionDiv
       className={styles.card}
       data-tooltip={tooltip || undefined}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={CARD_TRANSITION(delay)}
     >
-      <div className={styles.iconWrap} style={{ background: color + '18', color }}>
-        <span className={styles.icon}>{icon}</span>
-      </div>
+      <CardIcon color={color} icon={icon} />
       <div className={styles.content}>
         <p className={styles.label}>{label}</p>
-        <div className={styles.valueRow}>
-          <span className={styles.value} ref={countRef}>0</span>
-          {unit && <span className={styles.unit}>{unit}</span>}
-        </div>
+        <CardValue countRef={countRef} unit={unit} />
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 }
 

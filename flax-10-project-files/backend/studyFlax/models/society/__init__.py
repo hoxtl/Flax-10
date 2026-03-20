@@ -1,3 +1,5 @@
+"""Society models package."""
+
 from .society_model import Society
 from .society_membership_model import SocietyMembership, ROLE_CHOICES
 from .society_tag_model import SocietyTag

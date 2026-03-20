@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import DeadlineForm from '../../../components/Modules/DeadlineForm';
+import DeadlineForm from '../../../components/Modules/Deadlines/DeadlineForm';
 
 vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     DEADLINE_TYPES: [
@@ -27,7 +27,7 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/DeadlineForm.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: {} }));
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {

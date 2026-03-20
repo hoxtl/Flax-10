@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -53,6 +54,7 @@ import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import AppToast from "../../components/common/AppToast/AppToast";
 
 function HomepageSkeleton() {
   return (
@@ -754,7 +756,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect, false, 'day');
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {
@@ -998,9 +1000,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             )}
           </div>
 
+
           <BackToTop containerSelector="[data-dashboard-main]" />
         </>
-
       )}
 
       {showCreateTaskModal && (
@@ -1100,27 +1102,16 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         />
       )}
 
-      {!toastApi && fallbackToast && (
-        <div className={styles.toast} role="status" aria-live="polite">
-          <div>
-            <span className={styles.toastCheck}>✓</span>
-            <span>{fallbackToast.message}</span>
-          </div>
-          {fallbackToast.actionLabel && fallbackToast.onAction && (
-            <button
-              type="button"
-              onClick={async () => {
-                const action = fallbackToast.onAction;
-                setFallbackToast(null);
-                await action();
-              }}
-            >
-              {fallbackToast.actionLabel}
-            </button>
-          )}
-          <button type="button" onClick={() => setFallbackToast(null)}>✕</button>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {!toastApi && fallbackToast && (
+          <AppToast
+            message={fallbackToast.message}
+            actionLabel={fallbackToast.actionLabel}
+            onAction={fallbackToast.onAction}
+            onClose={() => setFallbackToast(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

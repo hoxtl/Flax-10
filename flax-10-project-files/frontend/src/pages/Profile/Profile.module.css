@@ -9,8 +9,17 @@
   background: transparent;
 }
 
+.backButtonWrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: flex-start;
+}
+
 .backButton {
-  margin-bottom: 20px;
+  margin: 20px 0;
 }
 
 
@@ -184,6 +193,7 @@
 }
 
 @keyframes activeDotPulse {
+
   0%,
   100% {
     box-shadow: 0 0 0 2px rgba(53, 182, 111, 0.15);
@@ -251,7 +261,13 @@
 .bio {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--widget-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 12px;
+  padding: 18px 22px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .fullNameRow {
@@ -300,14 +316,10 @@
 }
 
 .reminder {
-  margin-top: 8px;
-  padding: 10px 14px;
-  background: var(--panel);
-  border-left: 3px solid var(--color-primary);
-  border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text);
   font-style: italic;
+  line-height: 1.5;
 }
 
 .profileHome {
@@ -355,10 +367,26 @@
   gap: 12px;
   min-width: 0;
   height: 100%;
+  justify-content: flex-start;
 }
 
-.leftTopSideCol .dnaCard {
-  flex: 1;
+.leftTopStreakCard {
+  flex: 0 0 auto;
+}
+
+.leftTopWeekCard {
+  flex: 0 0 auto;
+  min-height: 178px;
+  display: flex;
+}
+
+.leftTopWeekCard>* {
+  width: 100%;
+}
+
+.leftTopStudyDnaCard {
+  flex: 1 1 0;
+  min-height: 156px;
 }
 
 .rightCol {
@@ -377,7 +405,7 @@
   border: 1px solid var(--surface-glass-card-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -432,7 +460,7 @@
   color: var(--text);
 }
 
-/* Standarized Widget Styling */
+/* Standardized Widget Styling */
 .widgetBox {
   display: flex;
   flex-direction: column;
@@ -1206,8 +1234,15 @@
 }
 
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .attendanceWarning {
@@ -1228,8 +1263,17 @@
 }
 
 @keyframes warningPulse {
-    0%, 100% { box-shadow: 0 0 8px rgba(239, 83, 80, 0.25); transform: scale(1); }
-    50% { box-shadow: 0 0 15px rgba(239, 83, 80, 0.45); transform: scale(1.02); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(239, 83, 80, 0.25);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 15px rgba(239, 83, 80, 0.45);
+    transform: scale(1.02);
+  }
 }
 
 .goalSaveBtn {
@@ -1378,6 +1422,7 @@
   letter-spacing: 0.07em;
 }
 
+/* ── Skeleton Animation ── */
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
@@ -1998,14 +2043,14 @@
 }
 
 .quickStatCard {
-  background: #ffffff;
-  border: 1px solid var(--surface-glass-card-border, var(--border));
+  background: var(--panel);
+  border: 1px solid var(--widget-border);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .quickStatItem {
@@ -2044,9 +2089,13 @@
 .commonGroundTitle {
   font-size: 12px;
   font-style: italic;
-  color: #5D4037;
+  color: var(--muted);
   margin: 6px 0 10px;
   line-height: 1.4;
+}
+
+:global([data-mode="light"]) .commonGroundTitle {
+  color: #5D4037;
 }
 
 .commonGroundPills {
@@ -2082,14 +2131,19 @@
   gap: 4px;
   padding: 5px 12px;
   border-radius: 999px;
-  background: #212121;
-  color: #fff;
+  background: var(--primary);
+  color: var(--color-on-primary, #fff);
   font-size: 11px;
   font-weight: 600;
-  border: 1px solid #212121;
+  border: 1px solid var(--primary);
   cursor: pointer;
   transition: transform 0.12s ease, opacity 0.12s ease;
   font-family: inherit;
+}
+
+:global([data-mode="light"]) .sharedPill {
+  background: #212121;
+  border-color: #212121;
 }
 
 .sharedPill:hover {
@@ -2103,13 +2157,18 @@
   padding: 5px 12px;
   border-radius: 999px;
   background: transparent;
-  border: 1px solid #212121;
-  color: #212121;
+  border: 1px solid var(--border);
+  color: var(--text);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
   font-family: inherit;
+}
+
+:global([data-mode="light"]) .otherPill {
+  border-color: #212121;
+  color: #212121;
 }
 
 .otherPill:hover {
@@ -2124,13 +2183,17 @@
   font-size: 11px;
   font-style: italic;
   font-weight: 600;
-  color: #5D4037;
+  color: var(--muted);
   cursor: pointer;
   font-family: inherit;
   padding: 2px 4px;
   margin-left: 4px;
   transition: opacity 0.15s;
   white-space: nowrap;
+}
+
+:global([data-mode="light"]) .badgesViewAllLink {
+  color: #5D4037;
 }
 
 .badgesViewAllLink:hover {
@@ -2144,10 +2207,10 @@
   align-items: stretch;
   gap: 12px;
   padding: 18px 22px;
-  background: #ffffff;
-  border: 1px solid var(--surface-glass-card-border, var(--border));
+  background: var(--panel);
+  border: 1px solid var(--widget-border);
   border-radius: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .compatTopRow {
@@ -2264,11 +2327,25 @@
   transition: background 0.3s ease;
 }
 
-.momentumSeg[data-level="0"] { background: color-mix(in srgb, var(--color-primary) 10%, var(--border)); }
-.momentumSeg[data-level="1"] { background: color-mix(in srgb, var(--color-primary) 30%, transparent); }
-.momentumSeg[data-level="2"] { background: color-mix(in srgb, var(--color-primary) 55%, transparent); }
-.momentumSeg[data-level="3"] { background: color-mix(in srgb, var(--color-primary) 78%, transparent); }
-.momentumSeg[data-level="4"] { background: var(--color-primary); }
+.momentumSeg[data-level="0"] {
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--border));
+}
+
+.momentumSeg[data-level="1"] {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.momentumSeg[data-level="2"] {
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+
+.momentumSeg[data-level="3"] {
+  background: color-mix(in srgb, var(--color-primary) 78%, transparent);
+}
+
+.momentumSeg[data-level="4"] {
+  background: var(--color-primary);
+}
 
 /* Common Ground enhancements */
 .commonSubHint {
@@ -2316,8 +2393,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .commonMoreModal {
@@ -2332,8 +2414,15 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(12px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .commonMoreHeader {

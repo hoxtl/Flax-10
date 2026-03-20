@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Card from "../../../../components/common/Card/Card";
 import ProfileWidget from "./ProfileWidget";
 import AttendanceCharts from "./attendance/AttendanceCharts";
@@ -33,15 +32,14 @@ function AttendanceDetails({ selectedSegment, segmentEvents, handleToggleStatus,
   );
 }
 
-export function CompactAttendanceTile() {
-  const navigate = useNavigate();
+export function CompactAttendanceTile({ onNavigate }) {
   const { selectedSegment, setSelectedSegment, closeSegment } = useSegmentState();
   const data = useAttendanceWidgetData(selectedSegment);
   if (data.loading || data.error || !data.stats) return null;
   return (
     <Card className={`${styles.glassCard} ${styles.compactAttCard}`} variant="glass">
       {data.attendancePct < 50 && <AttendanceWarningBadge attendancePct={data.attendancePct} />}
-      <CompactAttHeader onNavigate={() => navigate("/attendance")} />
+      <CompactAttHeader onNavigate={() => onNavigate?.("analytics")} />
       <CompactOverallDonut overallData={data.overallData} onSegmentClick={setSelectedSegment} />
       <CompactByTypeDonut byTypeData={data.byTypeData} onSegmentClick={setSelectedSegment} />
       <AttendanceDetails

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useTags } from '../../context/TagContext';
 import { useConfirm } from '../../context/ConfirmContext';
-import EmojiPicker from './EmojiPicker';
+import { useToast } from '../../context/ToastContext';
 import StandardModal from '../common/StandardModal/StandardModal';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import styles from './TagManagerModal.module.css';
 
 const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'];
@@ -11,16 +13,12 @@ function isProtectedTag(tagLabel) {
   return PROTECTED_TAGS.includes(tagLabel?.toLowerCase());
 }
 
-function isIconValid(icon) {
-  if (!icon) return false;
-  const hasEmoji = /\p{Extended_Pictographic}/u.test(icon);
-  return hasEmoji && !/^[a-zA-Z0-9]+$/.test(icon);
-}
 
 function useTagModal() {
   const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const confirmFn = useConfirm();
+  const toast = useToast();
   const { tags, addTag, updateTag, deleteTag } = useTags();
 
   const resetState = () => { setEditingId(null); setIsAdding(false); };
@@ -38,7 +36,13 @@ function useTagModal() {
       cancelText: "Cancel",
       isDanger: true
     });
-    if (yes) deleteTag(id);
+    if (!yes) return;
+    const deleted = await deleteTag(id);
+    if (deleted === false) {
+      toast?.("Couldn't delete tag.", { variant: "error" });
+      return;
+    }
+    toast?.(`"${tag?.label || "Tag"}" deleted.`);
   };
 
   return { tags, deleteTag: confirmDelete, editingId, setEditingId, isAdding, setIsAdding, handleSave, resetState };
@@ -72,7 +76,7 @@ function commitSave(data, editingId, updateTag, addTag, resetState) {
 function ModalContent({ tags, editingId, isAdding, setEditingId, setIsAdding, onSave, onDelete, onCancel }) {
   if (editingId || isAdding) {
     const tag = editingId ? tags.find(t => t.id === editingId) : null;
-    const initialData = tag || { label: '', color: '#000000', icon: '' };
+    const initialData = tag || { label: '', color: '#000000' };
     return <TagForm initialData={initialData} onSave={onSave} onCancel={onCancel} isProtected={isProtectedTag(tag?.label)} />;
   }
   return <TagList tags={tags} onEdit={setEditingId} onDelete={onDelete} onAdd={() => setIsAdding(true)} />;
@@ -97,7 +101,6 @@ function TagForm({ initialData, onSave, onCancel, isProtected = false }) {
     <div className={`${styles.content} ${styles.form}`}>
       <TextInput label="Name" value={form.label} onChange={v => handleChange('label', v)} placeholder="e.g. Gym" disabled={isProtected} />
       <ColorInput value={form.color} onChange={v => handleChange('color', v)} />
-      <EmojiInput value={form.icon} onChange={v => handleChange('icon', v)} />
       {error && <div className={styles.error}>{error}</div>}
       <FormActions onSave={handleSaveClick} onCancel={onCancel} />
     </div>
@@ -106,8 +109,6 @@ function TagForm({ initialData, onSave, onCancel, isProtected = false }) {
 
 function validateTagForm(form, isProtected) {
   if (!isProtected && !form.label.trim()) return "Name is required.";
-  if (!form.icon) return "Icon is required.";
-  if (!isIconValid(form.icon)) return "Only emojis allowed.";
   return '';
 }
 
@@ -117,7 +118,7 @@ function TagList({ tags, onEdit, onDelete, onAdd }) {
       <div className={styles.list}>
         {tags.map(tag => <TagItem key={tag.id} tag={tag} onEdit={onEdit} onDelete={onDelete} />)}
       </div>
-      <button className={styles.addBtn} onClick={onAdd}>+ Add New Tag</button>
+      <PrimaryButton className={styles.addTagButton} variant="primary" onClick={onAdd} pill>+ Add New Tag</PrimaryButton>
     </div>
   );
 }
@@ -126,7 +127,7 @@ function TagItem({ tag, onEdit, onDelete }) {
   return (
     <div className={styles.item}>
       <TagPreview tag={tag} />
-      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isDeletable={!isProtectedTag(tag.label)} />
+      <TagActions id={tag.id} onEdit={onEdit} onDelete={onDelete} isProtected={isProtectedTag(tag.label)} />
     </div>
   );
 }
@@ -134,17 +135,26 @@ function TagItem({ tag, onEdit, onDelete }) {
 function TagPreview({ tag }) {
   return (
     <div className={styles.preview} style={{ '--color': tag.color }}>
-      <span>{tag.icon}</span>
+      <span className={styles.colorDot} style={{ backgroundColor: tag.color }} />
       <span>{tag.label}</span>
     </div>
   );
 }
 
-function TagActions({ id, onEdit, onDelete, isDeletable }) {
+function TagActions({ id, onEdit, onDelete, isProtected }) {
   return (
     <div className={styles.actions}>
-      <button onClick={() => onEdit(id)}>✎</button>
-      {isDeletable && <button onClick={() => onDelete(id)} className={styles.delete}>🗑</button>}
+      <button type="button" onClick={() => onEdit(id)} aria-label="Edit tag"><Pencil size={14} strokeWidth={2} /></button>
+      <button
+        type="button"
+        onClick={() => !isProtected && onDelete(id)}
+        className={`${styles.delete} ${isProtected ? styles.deleteDisabled : ''}`}
+        disabled={isProtected}
+        aria-label="Delete tag"
+        title={isProtected ? 'Default tags cannot be deleted' : 'Delete tag'}
+      >
+        <Trash2 size={14} strokeWidth={2} />
+      </button>
     </div>
   );
 }
@@ -169,27 +179,16 @@ function ColorInput({ value, onChange }) {
   );
 }
 
-function EmojiInput({ value, onChange }) {
-  const [showPicker, setShowPicker] = useState(false);
-  return (
-    <label className={styles.emojiInputWrapper}>
-      Icon (Emoji)
-      <div className={styles.emojiInputRow}>
-        <button type="button" className={styles.emojiPreviewBtn} onClick={() => setShowPicker(!showPicker)}>
-          {value || '😀'}
-        </button>
-        <span className={styles.emojiHint}>{value ? 'Click to change' : 'Click to select'}</span>
-      </div>
-      {showPicker && <EmojiPicker onSelect={onChange} onClose={() => setShowPicker(false)} />}
-    </label>
-  );
-}
 
 function FormActions({ onSave, onCancel }) {
   return (
     <div className={styles.formActions}>
-      <button className={styles.cancelBtn} onClick={onCancel}>Cancel</button>
-      <button className={styles.saveBtn} onClick={onSave}>Save</button>
+      <PrimaryButton type="button" variant="ghost" className={styles.formActionBtn} onClick={onCancel}>
+        Cancel
+      </PrimaryButton>
+      <PrimaryButton type="button" variant="primary" className={styles.formActionBtn} onClick={onSave}>
+        Save
+      </PrimaryButton>
     </div>
   );
 }

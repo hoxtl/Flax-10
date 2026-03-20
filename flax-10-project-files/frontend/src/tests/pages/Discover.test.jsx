@@ -38,8 +38,9 @@ describe('Discover', () => {
     });
 
     it('renders subtitle', () => {
-        render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText(/Find course mates/)).toBeTruthy();
+        const { container } = render(<Discover onNavChange={vi.fn()} />);
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("Find King's students, course mates, and professors across your subjects.");
     });
 
     it('renders search input', () => {

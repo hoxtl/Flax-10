@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { createContext, useContext, useState } from 'react';
 import { useTimerLogic } from '../components/Timer/hooks/useTimerLogic';
 

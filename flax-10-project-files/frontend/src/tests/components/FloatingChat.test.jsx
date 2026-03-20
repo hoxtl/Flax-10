@@ -34,9 +34,9 @@ describe('FloatingChat', () => {
         vi.clearAllMocks();
     });
 
-    function renderChat() {
+    function renderChat(entry = '/tasks') {
         return render(
-            <MemoryRouter initialEntries={['/tasks']}>
+            <MemoryRouter initialEntries={[entry]}>
                 <FloatingChat />
             </MemoryRouter>
         );
@@ -45,6 +45,16 @@ describe('FloatingChat', () => {
     it('renders the FAB button', () => {
         renderChat();
         expect(screen.getByRole('button', { name: 'Open chat' })).toBeTruthy();
+    });
+
+    it('shows the task planning prompt on the tasks route', () => {
+        renderChat('/tasks');
+        expect(screen.getByText(/Not sure how long a task will take/i)).toBeTruthy();
+    });
+
+    it('shows the module selection prompt on the modules route', () => {
+        renderChat('/modules');
+        expect(screen.getByText(/Curious about new modules/i)).toBeTruthy();
     });
 
     it('opens chat window when FAB clicked', () => {

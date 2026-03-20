@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { PartyPopper } from "lucide-react";
-import styles from "../components/TaskCelebration/CompletionToast.module.css";
+import AppToast from "../components/common/AppToast/AppToast";
 
 const TaskCompletionContext = createContext(null);
 
@@ -26,6 +27,13 @@ function playVictorySound(volume = 0.4) {
 function useCompletionToast() {
   const [toast, setToast] = useState({ show: false, message: "", id: 0 });
   const timeoutRef = useRef(null);
+  const closeToast = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setToast((prev) => ({ ...prev, show: false }));
+  }, []);
   const showCompletionToast = useCallback((message, options = {}) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     const { isRoutine } = options;
@@ -37,25 +45,31 @@ function useCompletionToast() {
     }, 2000);
   }, []);
   useEffect(() => () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); }, []);
-  return { showCompletionToast, toast };
+  return { showCompletionToast, toast, closeToast };
 }
 
-function CompletionToastView({ toast }) {
-  if (!toast.show) return null;
+function CompletionToastView({ toast, onClose }) {
   return (
-    <div key={toast.id} className={styles.toast} role="status" aria-live="polite">
-      <PartyPopper size={20} className={styles.toastPartyPopper} aria-hidden />
-      <span className={styles.toastMessage}>{toast.message}</span>
-    </div>
+    <AnimatePresence initial={false}>
+      {toast.show && (
+        <AppToast
+          key={toast.id}
+          message={toast.message}
+          onClose={onClose}
+          variant="success"
+          icon={<PartyPopper size={16} aria-hidden />}
+        />
+      )}
+    </AnimatePresence>
   );
 }
 
 export function TaskCompletionProvider({ children }) {
-  const { showCompletionToast, toast } = useCompletionToast();
+  const { showCompletionToast, toast, closeToast } = useCompletionToast();
   return (
     <TaskCompletionContext.Provider value={{ showCompletionToast }}>
       {children}
-      <CompletionToastView toast={toast} />
+      <CompletionToastView toast={toast} onClose={closeToast} />
     </TaskCompletionContext.Provider>
   );
 }

@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { splitEstimatedBlocks } from '../../../lib/focusPlanner';
 
 export function inferTaskType(title = '') {
@@ -60,25 +64,35 @@ export function getPresetIcon(preset) {
 
 export const getPresetDurationTag = (preset) => `${preset.work}/${preset.brk}`;
 
-export function applyTaskToTimer(task, t) {
+function buildTimerTaskMeta(task, split) {
+    return {
+        title: task.title,
+        categoryColor: task.list_color,
+        moduleCode: task.module_code || null,
+        dueDate: task.due_date || null,
+        listName: task.list_name || null,
+        taskType: inferTaskType(task.title),
+        estimatedBlocks: Number(task.estimated_blocks || 1),
+        estimatedSessionCount: split.sessionCount,
+        estimatedWorkMinutes: split.workMinutes,
+    };
+}
+
+function applyTaskTiming(task, t, split) {
     t.setTask(task.title);
-    const split = splitEstimatedBlocks(task.estimated_blocks || 1);
     t.updateTime('work', split.workMinutes);
     t.updateTime('sessions', split.sessionCount);
     t.setTimeLeft(split.workMinutes * 60);
     t.setIsActive(true);
-    if (t.setActiveTaskId) {
-        t.setActiveTaskId(task.id, {
-            title: task.title,
-            categoryColor: task.list_color,
-            moduleCode: task.module_code || null,
-            dueDate: task.due_date || null,
-            listName: task.list_name || null,
-            taskType: inferTaskType(task.title),
-            estimatedBlocks: Number(task.estimated_blocks || 1),
-            estimatedSessionCount: split.sessionCount,
-            estimatedWorkMinutes: split.workMinutes,
-        });
-    }
-    try { sessionStorage.setItem('timerTaskId', String(task.id)); } catch {}
+}
+
+function persistTaskSelection(taskId) {
+    try { sessionStorage.setItem('timerTaskId', String(taskId)); } catch {}
+}
+
+export function applyTaskToTimer(task, t) {
+    const split = splitEstimatedBlocks(task.estimated_blocks || 1);
+    applyTaskTiming(task, t, split);
+    if (t.setActiveTaskId) t.setActiveTaskId(task.id, buildTimerTaskMeta(task, split));
+    persistTaskSelection(task.id);
 }

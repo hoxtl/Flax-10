@@ -1,3 +1,7 @@
+/*
+ * Analytics wrapper for the study coach panel.
+ */
+
 import StudyCoachPanel from '../StudyCoachPanel';
 import styles from './AIInsightsTab.module.css';
 

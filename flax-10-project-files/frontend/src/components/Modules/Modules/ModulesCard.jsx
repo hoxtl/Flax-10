@@ -1,0 +1,253 @@
+/** Module card component displaying module info, enrollment status, and actions. */
+import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
+import GridCard from '../../common/Card/GridCard';
+import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import styles from './ModulesCard.module.css';
+
+const DEPARTMENT_ACCENTS = {
+    "Natural, Mathematical & Engineering Sciences": "var(--study)",
+    "Life Sciences & Medicine": "var(--health)",
+    "Law": "var(--kcl-accent)",
+    "Psychiatry, Psychology & Neuroscience": "var(--personal)",
+    "Business": "var(--primary)",
+    "Arts & Humanities": "var(--flax-gold)",
+    "Social Science & Public Policy": "var(--c-caramel)",
+    "Nursing, Midwifery & Palliative Care": "var(--sage)",
+    "Dentistry, Oral & Craniofacial Sciences": "var(--danger)",
+};
+
+const DEPARTMENT_SHORT_NAMES = {
+    "Natural, Mathematical & Engineering Sciences": "Natural, Mathematical & Engineering Sciences",
+    "Life Sciences & Medicine": "Life Sciences & Medicine",
+    "Law": "Law",
+    "Psychiatry, Psychology & Neuroscience": "Psychiatry, Psychology & Neuroscience",
+    "Business": "Business",
+    "Arts & Humanities": "Arts & Humanities",
+    "Social Science & Public Policy": "Social Science & Public Policy",
+    "Nursing, Midwifery & Palliative Care": "Nursing, Midwifery & Palliative Care",
+    "Dentistry, Oral & Craniofacial Sciences": "Dentistry, Oral & Craniofacial Sciences",
+};
+
+function getCardClass(enrolled, is_teacher) {
+    let cls = styles.card;
+    if (enrolled) cls += ` ${styles.enrolled}`;
+    if (!is_teacher) cls += ` ${styles.clickable}`;
+    return cls;
+}
+
+function normalizeModuleCode(code) {
+    return String(code || "").toUpperCase().replace(/\s+/g, "");
+}
+
+function resolveClassmatesCount(module) {
+    return (
+        module?.classmates_count ??
+        module?.enrollment_count ??
+        module?.enrolled_count ??
+        module?.class_size ??
+        null
+    );
+}
+
+function useCardData(module, enrollments, taskCountsByModule) {
+    const enrolled = isEnrolledIn(module.id, enrollments);
+    const enrollment = enrollments?.find(e => e.module === module.id);
+    const department = getDepartment(module.module_code, module.department);
+    return {
+        enrolled, isCore: enrollment?.is_core || false,
+        accent: DEPARTMENT_ACCENTS[department] || "var(--primary)",
+        upcomingTasksCount: taskCountsByModule[normalizeModuleCode(module.module_code)] || 0,
+        classmatesCount: resolveClassmatesCount(module),
+    };
+}
+
+function buildCardHandlers(module, handlers) {
+    const stop = (e, fn) => { e.stopPropagation(); fn(module); };
+    return {
+        onView: (e) => stop(e, handlers.onViewModule), onEdit: (e) => stop(e, handlers.onEdit),
+        onDelete: (e) => stop(e, handlers.onDelete), onToggle: (e) => stop(e, handlers.onEnrollmentToggle),
+        onManageDeadlines: (e) => stop(e, handlers.onManageDeadlines), onManageReadings: (e) => stop(e, handlers.onManageReadings),
+    };
+}
+
+export default function ModulesCard(props) {
+    const { module, enrollments, isTeacher, onViewModule, taskCountsByModule = {} } = props;
+    const data = useCardData(module, enrollments, taskCountsByModule);
+    const handlers = buildCardHandlers(module, props);
+    return (
+        <GridCard className={getCardClass(data.enrolled, isTeacher)} style={{ "--module-accent": data.accent }}
+            onClick={() => !isTeacher && onViewModule(module)}>
+            <CardBody module={module} {...data} isTeacher={isTeacher} {...handlers} />
+        </GridCard>
+    );
+}
+
+function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings, upcomingTasksCount, classmatesCount }) {
+    const moduleTitle = module.module_code
+        ? `${module.module_name} (${module.module_code})`
+        : module.module_name;
+    return (
+        <div className={styles.content}>
+            {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
+            <h3 className={styles.moduleTitle}>{moduleTitle}</h3>
+            {module.description && <Description text={module.description} />}
+            <QuickMetaRow module={module} upcomingTasksCount={upcomingTasksCount} />
+            <ClassmatesLink module={module} classmatesCount={classmatesCount} />
+            <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
+                onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines}  onManageReadings={onManageReadings}/>
+        </div>
+    );
+}
+
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        username: moduleData?.created_by_username,
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
+    }, { allowGeneric: true });
+}
+
+function getInitials(name) {
+    return (name || 'T').split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function handleImageError(e) {
+    e.currentTarget.style.display = 'none';
+    e.currentTarget.nextElementSibling.style.display = 'flex';
+}
+
+function TutorAvatar({ module }) {
+    const src = getTutorImage(module);
+    const initials = getInitials(module.created_by_name);
+    const tutorName = module.created_by_name || 'Tutor';
+    return (
+        <div className={styles.tutorAvatar} title={tutorName}>
+            {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={handleImageError} />}
+            <span className={styles.tutorAvatarFallback} style={src ? { display: 'none' } : undefined}>{initials}</span>
+        </div>
+    );
+}
+
+function EnrolledBadge({ enrolled, isCore }) {
+    if (!enrolled) return null;
+    return <span className={styles.enrolledBadge}>{isCore ? '📌 Core' : '✓ Enrolled'}</span>;
+}
+
+function HeaderChips({ course, department }) {
+    return (
+        <div className={styles.headerChips}>
+            {course && <span className={styles.courseText}>{course}</span>}
+            <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+        </div>
+    );
+}
+
+function CardHeader({ module, enrolled, isCore }) {
+    const department = getDepartment(module.module_code, module.department);
+    const course = getCourse(module.module_code, module.course);
+    return (
+        <div className={styles.cardHeader}>
+            {enrolled && <EnrolledBadge enrolled={enrolled} isCore={isCore} />}
+            <div className={styles.headerChipsRow}>
+                <HeaderChips course={course} department={department} />
+                <TutorAvatar module={module} />
+            </div>
+        </div>
+    );
+}
+
+function Description({ text }) {
+    return <p className={styles.description}>{text}</p>;
+}
+
+function getScheduleBits(start_time) {
+    if (!start_time) return { day: "TBA", time: "TBA" };
+    const date = new Date(start_time);
+    const day = date.toLocaleDateString("en-GB", { weekday: "short" });
+    const time = formatTime(start_time);
+    return { day, time };
+}
+
+function QuickMetaRow({ module, upcomingTasksCount }) {
+    const { day, time } = getScheduleBits(module.start_time);
+    const duration = module.start_time && module.end_time ? formatDuration(module.start_time, module.end_time) : "TBA";
+    return (
+        <div className={styles.metaPills}>
+            <MetaPill icon="📅" text={`${day} ${time}`} />
+            <MetaPill icon="⏱️" text={duration} />
+            {hasValidCount(upcomingTasksCount) && (
+                <span className={styles.taskChipInline}>
+                    📋 {upcomingTasksCount} assignment{upcomingTasksCount === 1 ? "" : "s"}
+                </span>
+            )}
+        </div>
+    );
+}
+
+function MetaPill({ icon, text }) {
+    return <span className={styles.metaPill}>{icon} {text}</span>;
+}
+
+function hasValidCount(count) {
+    return Number.isFinite(Number(count)) && Number(count) > 0;
+}
+
+function ClassmatesLink({ module, classmatesCount }) {
+    if (!hasValidCount(classmatesCount)) return null;
+    return (
+        <div className={styles.relatedRow}>
+            <EntityLinkChip to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
+                className={styles.relatedChip} title="Find classmates in this module">
+                👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
+            </EntityLinkChip>
+        </div>
+    );
+}
+
+function CardActions({ isTeacher, enrolled, isCore, onView, onEdit, onDelete, onToggle, onManageDeadlines, onManageReadings }) {
+    return (
+        <div className={styles.actions}>
+            {isTeacher
+                ? <TeacherActions onEdit={onEdit} onDelete={onDelete} onManageDeadlines={onManageDeadlines} onManageReadings={onManageReadings}/>
+                : <StudentActions enrolled={enrolled} isCore={isCore} onToggle={onToggle} onView={onView} />}
+        </div>
+    );
+}
+
+function TeacherActions({ onEdit, onDelete, onManageDeadlines, onManageReadings }) {
+    return (
+        <>
+            <button className={styles.deadlineButton} onClick={onManageDeadlines}>Assignments</button>
+            <button className={styles.deadlineButton} onClick={onManageReadings}>Readings</button>
+            <button className={styles.editButton} onClick={onEdit}>✎ Edit</button>
+            <button className={styles.deleteButton} onClick={onDelete}>× Delete</button>
+        </>
+    );
+}
+
+function StudentActions({ enrolled, isCore, onToggle, onView }) {
+    return (
+        <>
+            <button type="button" className={styles.viewDetailsBtn} onClick={onView}>View details</button>
+            <StudentAction enrolled={enrolled} isCore={isCore} onToggle={onToggle} />
+        </>
+    );
+}
+
+function StudentAction({ enrolled, isCore, onToggle }) {
+    if (enrolled && isCore) {
+        return <span className={styles.coreTag}>📌 Core module</span>;
+    }
+    return (
+        <button
+            className={enrolled ? styles.unenrollButton : styles.enrollButton}
+            onClick={onToggle}
+        >
+            {enrolled ? '× Leave Module' : '+ Enroll'}
+        </button>
+    );
+}

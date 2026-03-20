@@ -40,12 +40,15 @@ def _in_reading_week(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
     return READING_WEEK_START <= d <= READING_WEEK_END
 
+ACADEMIC_TAG_NAMES = {'Lecture', 'Exam'}
+
 def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    tag = random.choice(user_tags) if user_tags and random.random() > 0.2 else None
+    personal_tags = [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
+    tag = random.choice(personal_tags) if personal_tags and random.random() > 0.2 else None
     return CalendarEvent(
         user=user,
         title=title,
@@ -128,9 +131,12 @@ def _meal_events_for_day(user, day_offset, tag):
 
 def _resolve_meal_tag(user, tags):
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    priorities = ('Meals', 'Routine', 'Wellness', 'Other')
-    match = next((t for p in priorities for t in user_tags if t.name == p), None)
-    return match or (user_tags[0] if user_tags else None)
+    priorities = ('Meals', 'Other')
+    for name in priorities:
+        match = next((t for t in user_tags if t.name == name), None)
+        if match:
+            return match
+    return user_tags[0] if user_tags else None
 
 def build_meal_events(user, tags):
     """Meals (Breakfast, Lunch, Dinner) use Meals/Routine/Wellness tags."""
@@ -160,11 +166,23 @@ def build_module_event(code, name, description, admin, weekly_rule):
     )
 
 def get_user_modules(user, all_modules):
-    """Return (core_modules, extra_modules) matched to the user's declared major."""
+    """Return (core_modules, extra_modules) matched to the user's declared major.
+
+    Each student is enrolled in 5-7 modules: primarily from their major,
+    with a couple of electives from other departments for variety.
+    """
     major = getattr(getattr(user, 'settings', None), 'major', None)
     prefixes = get_course_prefixes(major)
-    core = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)]
-    extras = []
+    matched = [m for m in all_modules if any(m.module_code.startswith(p) for p in prefixes)]
+    others = [m for m in all_modules if m not in matched]
+    rng = random.Random(hash(user.username))
+    target = rng.randint(5, 7)
+    rng.shuffle(matched)
+    core_count = min(len(matched), max(4, target - 1))
+    core = matched[:core_count]
+    extra_count = target - len(core)
+    rng.shuffle(others)
+    extras = others[:extra_count] if extra_count > 0 else []
     return core, extras
 
 def create_lecture_event(user, module, start, end, lecture_tag):
@@ -194,8 +212,14 @@ def build_lecture_events(user, module, lecture_tag):
     valid = [c for c in candidates if not _in_reading_week(c)][:10]
     return [(user, module, c, c + timedelta(hours=2), lecture_tag) for c in valid]
 
-def _get_random_offset(used_offsets):
-    available = [d for d in range(7, 31) if d not in used_offsets]
+PRIORITY_DEADLINE_OFFSETS = [-5, 3, 7]
+
+def _get_random_offset(used_offsets, index=None):
+    if index is not None and index < len(PRIORITY_DEADLINE_OFFSETS):
+        chosen = PRIORITY_DEADLINE_OFFSETS[index]
+        used_offsets.add(chosen)
+        return chosen
+    available = [d for d in range(-3, 31) if d != 0 and d not in used_offsets]
     chosen = random.choice(available)
     used_offsets.add(chosen)
     return chosen
@@ -207,10 +231,10 @@ def _deadline_timing(deadline_type, now, day_offset):
     location = random.choice(lecture_theatre_fixtures) if deadline_type in ("exam", "presentation") else None
     return start, end, location
 
-def _build_single_deadline(module, deadline_type, title, description, now, used_offsets):
+def _build_single_deadline(module, deadline_type, title, description, now, used_offsets, index=None):
     if Deadline.objects.filter(module=module, title=title).exists():
         return None
-    day_offset = _get_random_offset(used_offsets)
+    day_offset = _get_random_offset(used_offsets, index=index)
     start, end, location = _deadline_timing(deadline_type, now, day_offset)
     return Deadline(
         module=module, title=title, deadline_type=deadline_type,
@@ -231,7 +255,7 @@ def build_deadlines_for_module(module):
     templates = _get_deadline_templates(module)
     used_offsets = set()
     now = timezone.now()
-    results = [_build_single_deadline(module, *t, now, used_offsets) for t in templates]
+    results = [_build_single_deadline(module, *t, now, used_offsets, index=i) for i, t in enumerate(templates)]
     return [d for d in results if d is not None]
 
 def create_deadline_calendar_event(user, deadline):

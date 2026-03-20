@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Card from "../../../../components/common/Card/Card";
 import PrimaryButton from "../../../../components/common/PrimaryButton/PrimaryButton";
 import widgetStyles from "./ProfileWidgets.module.css";
 import weekStyles from "./ProfileWeekGoal.module.css";
 const styles = { ...widgetStyles, ...weekStyles };
+
+function buildSliderPct(value) {
+  const normalizedValue = Math.min(Math.max(value, 1), 40);
+  return `${((normalizedValue - 1) / 39) * 100}%`;
+}
+
+function buildDisplayedWeekly(weekly, goalHoursOverride) {
+  if (!weekly) return null;
+  if (!goalHoursOverride) return weekly;
+  const hoursStudied = Number(weekly.hours_studied || 0);
+  const nextPercentage = goalHoursOverride > 0 ? Math.round((hoursStudied / goalHoursOverride) * 100) : weekly.percentage;
+  return { ...weekly, goal_hours: goalHoursOverride, percentage: nextPercentage };
+}
 
 function GoalRingSvg({ percentage, radius }) {
   const circ = 2 * Math.PI * radius;
@@ -25,7 +39,11 @@ function GoalRingSvg({ percentage, radius }) {
 
 function GoalRing({ percentage, hoursStudied, goalHours, editing, onToggle }) {
   return (
-    <button className={`${styles.goalRingBtn} ${editing ? styles.goalRingActive : ""}`} onClick={onToggle}>
+    <button
+      type="button"
+      className={`${styles.goalRingBtn} ${editing ? styles.goalRingActive : ""}`}
+      onClick={onToggle}
+    >
       <GoalRingSvg percentage={percentage} radius={34} />
       <div className={styles.ringInner}>
         <span className={styles.ringValue}>{hoursStudied}h</span>
@@ -35,11 +53,11 @@ function GoalRing({ percentage, hoursStudied, goalHours, editing, onToggle }) {
   );
 }
 
-function GoalEditor({ val, onSave, onCancel, onChange }) {
+function GoalEditor({ val, onSave, onCancel, onChange, isSaving }) {
   return (
     <div className={styles.goalEditorPanel}>
       <div className={styles.goalEditorLabel}>
-        <span>Weekly target</span>
+        <span className={styles.goalEditorTitle}>Weekly target</span>
         <span className={styles.goalEditorHrs}>{val}h / week</span>
       </div>
       <input
@@ -47,10 +65,12 @@ function GoalEditor({ val, onSave, onCancel, onChange }) {
         value={Math.min(val, 40)}
         onChange={e => onChange(parseInt(e.target.value))}
         className={styles.goalSlider}
+        style={{ "--slider-pct": buildSliderPct(val) }}
+        disabled={isSaving}
       />
       <div className={styles.goalEditorActions}>
-        <PrimaryButton className={styles.goalCancelBtn} variant="ghost" pill onClick={onCancel}>Cancel</PrimaryButton>
-        <PrimaryButton className={styles.goalSaveBtn} pill onClick={() => onSave(val)}>Save goal</PrimaryButton>
+        <PrimaryButton className={styles.goalCancelBtn} variant="ghost" size="small" pill onClick={onCancel} disabled={isSaving}>Cancel</PrimaryButton>
+        <PrimaryButton className={styles.goalSaveBtn} size="small" pill onClick={() => onSave(val)} disabled={isSaving}>{isSaving ? "Saving..." : "Save goal"}</PrimaryButton>
       </div>
     </div>
   );
@@ -89,25 +109,62 @@ function WeekRow({ weekly, showStreak, streaks, editing, setEditing }) {
   );
 }
 
-function WeekEditor({ editing, tempGoal, setTempGoal, setEditing, onSave }) {
-  if (!editing) return null;
+function WeekEditor({ editing, tempGoal, setTempGoal, setEditing, onSave, isSaving }) {
   return (
-    <div className={styles.goalEditorOpen}>
-      <GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} />
-    </div>
+    <AnimatePresence initial={false}>
+      {editing && (
+        <motion.div
+          className={styles.goalEditorOpen}
+          initial={{ height: 0, opacity: 0, y: -8 }}
+          animate={{ height: "auto", opacity: 1, y: 0 }}
+          exit={{ height: 0, opacity: 0, y: -8 }}
+          transition={{
+            height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+            opacity: { duration: 0.18, ease: "easeOut" },
+            y: { duration: 0.18, ease: "easeOut" },
+          }}
+          style={{ overflow: "hidden" }}
+        >
+          <GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} isSaving={isSaving} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 export function ThisWeek({ weekly, streaks, onGoalSave, showStreak = true }) {
   const [editing, setEditing] = useState(false);
-  const [tempGoal, setTempGoal] = useState(weekly?.goal_hours || 20);
+  const resolvedGoal = weekly?.goal_hours || 20;
+  const [tempGoal, setTempGoal] = useState(resolvedGoal);
+  const [optimisticGoal, setOptimisticGoal] = useState(resolvedGoal);
+  const [isSaving, setIsSaving] = useState(false);
   if (!weekly) return null;
-  const handleSave = (n) => { onGoalSave(n); setEditing(false); };
+  useEffect(() => {
+    setTempGoal(resolvedGoal);
+    setOptimisticGoal(resolvedGoal);
+  }, [resolvedGoal]);
+
+  const displayedWeekly = buildDisplayedWeekly(weekly, optimisticGoal);
+
+  const handleSave = async (n) => {
+    const previousGoal = optimisticGoal;
+    setIsSaving(true);
+    setOptimisticGoal(n);
+    try {
+      await onGoalSave?.(n);
+      setEditing(false);
+    } catch {
+      setOptimisticGoal(previousGoal);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <Card className={`${styles.glassCard} ${styles.weekCard}`} variant="glass">
       <div className={styles.cardLabel}>THIS WEEK</div>
-      <WeekRow weekly={weekly} streaks={streaks} showStreak={showStreak} editing={editing} setEditing={setEditing} />
-      <WeekEditor editing={editing} tempGoal={tempGoal} setTempGoal={setTempGoal} setEditing={setEditing} onSave={handleSave} />
+      <WeekRow weekly={displayedWeekly} streaks={streaks} showStreak={showStreak} editing={editing} setEditing={setEditing} />
+      <WeekEditor editing={editing} tempGoal={tempGoal} setTempGoal={setTempGoal} setEditing={setEditing} onSave={handleSave} isSaving={isSaving} />
     </Card>
   );
 }

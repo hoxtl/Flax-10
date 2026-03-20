@@ -192,16 +192,15 @@ function ProfileColumns({ summary, analyticsData, visibility, onNavigate, refetc
   return (
     <div className={styles.leftCol}>
       <div className={styles.leftTopMetricsRow}>
-        <CompactAttendanceTile />
+        <CompactAttendanceTile onNavigate={onNavigate} />
         <div className={styles.leftTopSideCol}>
-          <CompactStreakTile streaks={summary?.streaks} />
-          <ThisWeek
-            weekly={summary?.weekly}
-            streaks={summary?.streaks}
-            showStreak={false}
-            onGoalSave={n => fetchApi('/profile/', { method: 'PATCH', body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)}
-          />
-          <StudyDNA heatmap={analyticsData?.heatmap} />
+          <div className={styles.leftTopStreakCard}>
+            <CompactStreakTile streaks={summary?.streaks} />
+          </div>
+          <div className={styles.leftTopWeekCard}>
+            <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} showStreak={false} onGoalSave={n => fetchApi("/profile/", { method: "PATCH", body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
+          </div>
+          <StudyDNA heatmap={analyticsData?.heatmap} className={styles.leftTopStudyDnaCard} />
         </div>
       </div>
       <FocusHeatmapWidget heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
@@ -278,11 +277,17 @@ export default function Profile({ user, viewedUserId, onNavigate, onNavChange, o
   }
 
   return (
-    <div className={styles.container}>
-      {onBack && <BackButton onClick={onBack} label={backLabel} className={styles.backButton} />}
-      <ProfileContent user={user} state={state} visibility={visibility} onNavigate={navFn} />
+    <>
+      {onBack && (
+        <div className={styles.backButtonWrapper}>
+          <BackButton onClick={onBack} label={backLabel} className={styles.backButton} />
+        </div>
+      )}
+      <div className={styles.container}>
+        <ProfileContent user={user} state={state} visibility={visibility} onNavigate={navFn} />
+      </div>
       <ProfileModals user={user} state={state} modules={modules} filteredEvents={filteredEvents} visibility={visibility} onNavChange={navFn} />
       <ScrollToTop containerSelector="[data-dashboard-main]" />
-    </div>
+    </>
   );
 }

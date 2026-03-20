@@ -166,11 +166,11 @@ def _build_single_settings(user):
     is_teacher = getattr(user, 'role', None) == 'teacher'
     
     # Pinned widgets — always present, always at the top
-    PINNED = ["deadlines", "todayTasks"]
+    PINNED = ["deadlines", "todayTasks", "bigTimeline"]
 
     # Remaining optional widgets (exclude pinned ones)
     optional_widgets = [
-        "rightNow", "tinyTimeline", "bigTimeline",
+        "rightNow", "tinyTimeline",
         "semesterOverview", "studyStreak", "weeklyGoal", "photo",
         "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
         "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",

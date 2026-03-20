@@ -1,3 +1,6 @@
+/*
+ * useSocietyAnnouncements manages announcement CRUD for a society.
+ */
 import * as api from '../../../api/societyApi';
 
 /** Helper to update local society state when an announcement's linked event changes. */

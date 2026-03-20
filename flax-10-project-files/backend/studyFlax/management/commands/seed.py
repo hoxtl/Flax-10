@@ -15,11 +15,12 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.db import connection
 
 from studyFlax.models import (
     Category, Tag, RecurrenceRule, CalendarEvent,
-    Module, Enrollment, Deadline, Reading,
-    Society,
+    Module, Enrollment, Deadline, Reading, UserSettings,
+    Society, CalendarShare,
 )
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.models.groupwork.groupwork_model import GroupProject
@@ -34,7 +35,7 @@ from .seed_users import (
 )
 from .seed_events import create_events_for_users
 from .seed_modules import create_modules, create_deadlines, create_enrollments
-from .seed_tasks import create_tasks
+from .seed_tasks import create_tasks, create_module_reading_lists
 from .seed_groups import (
     create_group_projects, create_group_memberships, create_group_tasks,
 )
@@ -48,10 +49,35 @@ from .seed_attendance import seed_attendance
 from studyFlax.utils.reading_utils import update_reading_estimates
 
 User = get_user_model()
+LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
+SOFT_TAG_COLORS = {
+    "Lecture": "#C98C56",
+    "Deadline": "#7F5B63",
+    "Exam": "#6B78B8",
+    "Schedule": "#CBBE74",
+    "Meals": "#8FA1BC",
+    "Other": "#8D837A",
+    "Routine": "#A5B1A2",
+    "Wellness": "#8EB6A8",
+}
+SOFT_FALLBACK_TAG_COLORS = (
+    "#B58F78",
+    "#8FA1BC",
+    "#A59ABF",
+    "#AEB88A",
+    "#C39A86",
+    "#8FB6B0",
+)
 
 
 def _seed_user_pool():
     return list(User.objects.filter(role__in=['student', 'teacher']))
+
+
+def _table_columns(table_name):
+    with connection.cursor() as cursor:
+        return {column.name for column in connection.introspection.get_table_description(cursor, table_name)}
+
 
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
@@ -71,11 +97,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.teacher_count = options.get('teacher_count', 14) or 14
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
+        self._ensure_usersettings_seed_compatibility()
         self._seed_users()
         self._seed_catalogue()
         self._load_shared_data()
         self._seed_content()
         self.print_stats()
+
+    def _ensure_usersettings_seed_compatibility(self):
+        table_name = UserSettings._meta.db_table
+        if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
+            return
+        self.stdout.write(
+            f"Detected legacy {LEGACY_WIDGET_SIZES_COLUMN} column; enabling seed compatibility..."
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f'ALTER TABLE "{table_name}" '
+                f'ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
+            )
+            cursor.execute(
+                f'UPDATE "{table_name}" '
+                f'SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb '
+                f'WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
+            )
 
     def _load_shared_data(self):
         self.users = _seed_user_pool()
@@ -103,6 +148,7 @@ class Command(BaseCommand):
         create_enrollments(self.modules, self.tags, self.stdout)
         create_tasks(self.users, self.stdout)
         self._seed_societies_and_groups()
+        self._seed_calendar_shares()
         create_study_sessions(self.stdout)
         self._seed_readings()
         seed_attendance(self.stdout)
@@ -115,6 +161,53 @@ class Command(BaseCommand):
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
+
+    def _seed_calendar_shares(self):
+        self.stdout.write("Seeding calendar shares...")
+        users = sorted(
+            User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"),
+            key=lambda user: user.username,
+        )
+        rng = random.Random("studyflax-calendar-shares")
+        if len(users) < 2:
+            self.stdout.write("  Skipped calendar shares: need at least two non-admin users.")
+            return
+        user_by_id = {user.id: user for user in users}
+        shuffled = users[:]
+        rng.shuffle(shuffled)
+        planned_pairs = {
+            (owner.id, shuffled[(index + 1) % len(shuffled)].id)
+            for index, owner in enumerate(shuffled)
+        }
+        for owner in users:
+            candidates = [target for target in users if target.id != owner.id]
+            rng.shuffle(candidates)
+            extra_share_target = rng.randint(0, min(3, len(candidates) - 1))
+            extra_created = 0
+            for target in candidates:
+                pair = (owner.id, target.id)
+                if pair in planned_pairs:
+                    continue
+                planned_pairs.add(pair)
+                extra_created += 1
+                if extra_created >= extra_share_target:
+                    break
+        created = 0
+        for owner_id, target_id in sorted(planned_pairs):
+            owner = user_by_id.get(owner_id)
+            target = user_by_id.get(target_id)
+            if not owner or not target:
+                continue
+            _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
+            created += int(was_created)
+        share_counts = {
+            user.username: sum(1 for owner_id, _ in planned_pairs if owner_id == user.id)
+            for user in users
+        }
+        self.stdout.write(
+            f"  {CalendarShare.objects.count()} total shares ({created} new this run, "
+            f"{min(share_counts.values())}-{max(share_counts.values())} per user)."
+        )
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")
@@ -132,10 +225,9 @@ class Command(BaseCommand):
         self.categories = list(Category.objects.all())
 
     def _tag_color(self, name):
-        from faker import Faker
-        if name in ('Routine', 'Wellness', 'Meals'):
-            return '#94a3b8'
-        return Faker('en_GB').hex_color()
+        if name in SOFT_TAG_COLORS:
+            return SOFT_TAG_COLORS[name]
+        return SOFT_FALLBACK_TAG_COLORS[sum(ord(char) for char in name) % len(SOFT_FALLBACK_TAG_COLORS)]
 
     def _tag_category(self, user=None):
         if not self.categories:
@@ -169,8 +261,7 @@ class Command(BaseCommand):
     def _seed_readings(self):
         self.stdout.write("Seeding readings...")
         self._seed_readings_for_modules()
-        self._seed_reading_history_janedoe()
-        self._seed_reading_history_sample()
+        self._seed_reading_history_all_students()
         self.stdout.write(f"  {Reading.objects.count()} total readings in database.")
 
     def _seed_readings_for_modules(self):
@@ -181,7 +272,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  Created {len(readings)} readings across {len(self.modules)} modules.")
 
     def _reading_list_for(self, user):
-        return TaskList.objects.filter(user=user, name="Reading List").first()
+        return TaskList.objects.filter(user=user, name="Personal").first()
 
     def _seed_reading_history_for(self, user):
         reading_list = self._reading_list_for(user)
@@ -189,25 +280,17 @@ class Command(BaseCommand):
             return 0
         module_ids = set(Enrollment.objects.filter(student=user).values_list('module', flat=True))
         modules = [m for m in self.modules if m.id in module_ids]
-        tasks = build_reading_user_history(user, modules, reading_list)
+        module_reading_lists = create_module_reading_lists(user, modules)
+        tasks = build_reading_user_history(user, modules, reading_list, module_reading_lists)
         Task.objects.bulk_create(tasks, ignore_conflicts=True)
         if tasks:
             update_reading_estimates(user)
         return len(tasks)
 
-    def _seed_reading_history_janedoe(self):
-        try:
-            jane = User.objects.get(username='janedoe')
-        except User.DoesNotExist:
-            return
-        count = self._seed_reading_history_for(jane)
-        self.stdout.write(f"  janedoe: {count} completed reading tasks and speed is personalised")
-
-    def _seed_reading_history_sample(self):
-        students = list(User.objects.filter(role='student').exclude(username__in=['janedoe', 'charlie']))
-        sample = random.sample(students, min(3, len(students)))
-        count = sum(1 for s in sample if self._seed_reading_history_for(s) > 0)
-        self.stdout.write(f"  {count} random students seeded with reading history.")
+    def _seed_reading_history_all_students(self):
+        students = list(User.objects.filter(role='student'))
+        total = sum(self._seed_reading_history_for(s) for s in students)
+        self.stdout.write(f"  {total} reading tasks seeded across {len(students)} students.")
 
     def _build_stats(self):
         return [

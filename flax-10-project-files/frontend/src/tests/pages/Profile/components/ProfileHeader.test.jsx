@@ -160,14 +160,11 @@ describe('ProfileHeader', () => {
       />
     );
     expect(screen.getByText('modules')).toBeTruthy();
-    expect(screen.getByText('shared')).toBeTruthy();
     expect(screen.queryByText('tasks')).toBeNull();
     expect(screen.queryByText('events')).toBeNull();
     const modulesBtn = screen.getByRole('button', { name: /2\s+modules/ });
     fireEvent.click(modulesBtn);
     expect(defaultHandlers.onModulesClick).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: /1\s+shared/ }));
-    expect(defaultHandlers.onSharedWithClick).toHaveBeenCalled();
   });
 
   it('renders bio when profileData.bio is set', () => {
@@ -272,6 +269,19 @@ describe('ProfileHeader', () => {
       />
     );
     expect(screen.queryByText('Active just now')).toBeNull();
+  });
+
+  it('does not render old active-status text for older sessions either', () => {
+    render(
+      <ProfileHeader
+        user={{ username: 'alice' }}
+        profileData={{ last_session_end: '2026-03-18T12:00:00.000Z' }}
+        upcomingEventCount={0}
+        handlers={defaultHandlers}
+        visibility={defaultVisibility}
+      />
+    );
+    expect(screen.queryByText(/Active .* ago/)).toBeNull();
   });
 
   it('does not render completion nudge text', () => {

@@ -8,16 +8,37 @@ import {
   StudyDNA,
   MiniHeatmap,
   ThisWeek,
+  CompactAttendanceTile,
   BadgesSection,
   ModulesSection,
   SocietiesSection,
 } from '../../../../pages/Profile/components/ProfileWidgets';
+import { useAttendanceWidgetData } from '../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData';
+
+vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+  },
+}));
 
 vi.mock('../../../../api/moduleApi', () => ({
   getModules: vi.fn().mockResolvedValue([
     { module_code: 'CS101', module_name: 'Intro to CS' },
     { module_code: 'MA102', module_name: 'Calculus' },
   ]),
+}));
+
+vi.mock('../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData', () => ({
+  useAttendanceWidgetData: vi.fn(),
+}));
+
+vi.mock('@mui/x-charts/PieChart', () => ({
+  PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? 'true' : 'false'} />,
+}));
+
+vi.mock('../../../../pages/Attendance/components/SegmentDetailPanel', () => ({
+  default: () => <div data-testid="segment-detail-panel" />,
 }));
 
 describe('PersonaCard', () => {
@@ -217,6 +238,53 @@ describe('ThisWeek', () => {
     );
     const ring = document.querySelector('circle[stroke="var(--success-text)"]');
     expect(ring).toBeTruthy();
+  });
+});
+
+describe('CompactAttendanceTile', () => {
+  beforeEach(() => {
+    useAttendanceWidgetData.mockReturnValue({
+      loading: false,
+      error: null,
+      stats: { overall: { attended: 110, missed: 8 } },
+      attendancePct: 93,
+      overallData: [
+        { id: 0, label: 'Attended', value: 110, color: '#2D8B5A' },
+        { id: 1, label: 'Missed', value: 8, color: '#C0392B' },
+      ],
+      byTypeData: [
+        { id: 0, label: 'Lecture', value: 55, color: '#D4AF37' },
+        { id: 1, label: 'Small group', value: 25, color: '#148C7D' },
+        { id: 2, label: 'Other', value: 28, color: '#E67E22' },
+        { id: 3, label: 'Practical/lab', value: 18, color: '#2E5BFF' },
+      ],
+      segmentEvents: [],
+      handleToggleStatus: vi.fn(),
+    });
+  });
+
+  it('shows clean by-type labels in the right-hand legend without duplicate loose numbers', () => {
+    render(<CompactAttendanceTile onNavigate={vi.fn()} />);
+
+    expect(screen.getByText('Lecture')).toBeTruthy();
+    expect(screen.getByText('Small group')).toBeTruthy();
+    expect(screen.getByText('Other')).toBeTruthy();
+    expect(screen.getByText('Practical/lab')).toBeTruthy();
+    expect(screen.queryByText('Lecture (55)')).toBeNull();
+    expect(screen.queryByText('Small group (25)')).toBeNull();
+    expect(screen.queryByText('Other (28)')).toBeNull();
+    expect(screen.queryByText('Practical/lab (18)')).toBeNull();
+    expect(screen.queryByText(/^55$/)).toBeNull();
+    expect(screen.queryByText(/^25$/)).toBeNull();
+    expect(screen.queryByText(/^28$/)).toBeNull();
+    expect(screen.queryByText(/^18$/)).toBeNull();
+  });
+
+  it('hides the built-in pie chart legends so only the custom right legend remains', () => {
+    render(<CompactAttendanceTile onNavigate={vi.fn()} />);
+    screen.getAllByTestId('pie-chart').forEach((chart) => {
+      expect(chart.getAttribute('data-hide-legend')).toBe('true');
+    });
   });
 });
 

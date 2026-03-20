@@ -1,3 +1,6 @@
+/*
+ * useSocietyDetail composes the society detail hooks into a single interface.
+ */
 import { useSocietyCore } from './useSocietyCore';
 import { useSocietyTags } from './useSocietyTags';
 import { useSocietyEvents } from './useSocietyEvents';
