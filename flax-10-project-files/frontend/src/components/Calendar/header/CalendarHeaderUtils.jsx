@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Settings2, Plus, LayoutList, FolderKanban } from 'lucide-react';
 import { DatePickerButton } from './DatePickerButton';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import { SegmentedControl } from '../../ui/SegmentedControl';
+import { SegmentedControl } from '../../common';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
 import { ScheduleManagerDialog } from './ScheduleManager/ScheduleManagerDialog';
 import { FilterDropdownButton } from './FilterDropdownButton';
