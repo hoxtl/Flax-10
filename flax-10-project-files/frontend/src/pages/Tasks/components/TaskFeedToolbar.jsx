@@ -107,7 +107,15 @@ function ToolbarFilterPanel({
   );
 }
 
-
+function ToolbarViewLists({ onOpenLists }) {
+  if (!onOpenLists) return null;
+  return (
+    <button type="button" className={styles.viewListsBtn} onClick={onOpenLists}>
+      <List size={14} />
+      <span>View lists</span>
+    </button>
+  );
+}
 
 export default function TaskFeedToolbar(props) {
   const panelProps = {
