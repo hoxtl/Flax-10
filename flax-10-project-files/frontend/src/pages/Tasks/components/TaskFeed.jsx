@@ -18,8 +18,8 @@ import toolbarStyles from "./TaskFeedToolbar.module.css";
 import sectionStyles from "./TaskFeedSections.module.css";
 
 import useTaskFeedData from "../hooks/useTaskFeedData";
-import { isReadingList } from "../hooks/useCreateTaskBar";
 import SuggestedReadingsSection from "./SuggestedReadingsSection";
+import { isReadingList } from "../utils/readingListUtils";
 
 const styles = { ...layoutStyles, ...toolbarStyles, ...sectionStyles };
 const SECTION_SHOW_LIMIT = 8;
@@ -86,7 +86,19 @@ function LaterSection({ data, activeFilter, sectionPropsWithHandlers }) {
 
 function AllTasksSection({ data, activeFilter, sectionPropsWithHandlers }) {
   if (["today", "overdue", "this_week", "later"].includes(activeFilter)) return null;
-  return <TaskSection title="All tasks" emoji="📋" tasks={data.allTasksCombined} sectionType="all" completedCount={data.completed.length} applyLimit={data.allTasksCombined.length > SECTION_SHOW_LIMIT} emptyMessage="No tasks yet. Add one above or use Full Planning." {...sectionPropsWithHandlers} />;
+  return (
+    <TaskSection
+      title="All tasks"
+      emoji="📋"
+      tasks={data.allTasksCombined}
+      sectionType="all"
+      completedCount={data.completed.length}
+      applyLimit={data.allTasksCombined.length > SECTION_SHOW_LIMIT}
+      emptyCardProps={data.allTasksEmptyCardProps}
+      emptyMessage={data.allTasksEmptyCardProps ? null : "No tasks yet. Add one above or use Full Planning."}
+      {...sectionPropsWithHandlers}
+    />
+  );
 }
 
 function CompletedBlock({ data, lists, onToggleComplete, onDeleteTask, onEditTask }) {
@@ -94,23 +106,33 @@ function CompletedBlock({ data, lists, onToggleComplete, onDeleteTask, onEditTas
   return <CompletedTasksSection tasks={data.filteredCompleted} sortBy={data.sortBy} listMap={data.listMap} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />;
 }
 
-function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask, readingList, onTaskAdded, taskCount }) {
+function TaskFeedSections({ data, sectionPropsWithHandlers, activeFilter, activeListId, lists, onToggleComplete, onDeleteTask, onEditTask, readingList, activeList, onTaskAdded, taskCount }) {
   return (
     <div className={styles.sectionsWrap}>
       <div className={styles.sections} key={`sections-${activeListId ?? "all"}`}>
         <SearchEmptyBlock data={data} />
-        <OverdueTodaySection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <TodaySection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <OverdueFilterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <ThisWeekSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <LaterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        <AllTasksSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
-        {readingList && (
-        <SuggestedReadingsSection key={activeListId} onTaskAdded={onTaskAdded} taskCount={taskCount} />
-      )}
-        <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
+        {data.showSearchEmptyState ? null : (
+          <>
+            <OverdueTodaySection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            <TodaySection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            <OverdueFilterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            <ThisWeekSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            <LaterSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            <AllTasksSection data={data} activeFilter={activeFilter} sectionPropsWithHandlers={sectionPropsWithHandlers} />
+            {readingList && !data.search.trim() && (
+              <SuggestedReadingsSection
+                key={activeListId}
+                activeList={activeList}
+                onTaskAdded={onTaskAdded}
+                taskCount={taskCount}
+                pendingTasks={data.pending}
+                completedTasks={data.completed}
+              />
+            )}
+            <CompletedBlock data={data} lists={lists} onToggleComplete={onToggleComplete} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
+          </>
+        )}
       </div>
-      
     </div>
   );
 }
@@ -131,8 +153,8 @@ export default function TaskFeed(props) {
         compact
       />
       <TaskFeedSubHeader data={data} lists={props.lists} activeListId={props.activeListId} defaultDueDateForNewTask={props.defaultDueDateForNewTask} onAddTask={props.onAddTask} onCreateTask={props.onCreateTask} />
-      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask} 
-      readingList={readingList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
+      <TaskFeedSections data={data} sectionPropsWithHandlers={sectionPropsWithHandlers} activeFilter={props.activeFilter} activeListId={props.activeListId} lists={props.lists} onToggleComplete={props.onToggleComplete} onDeleteTask={props.onDeleteTask} onEditTask={props.onEditTask}
+      readingList={readingList} activeList={activeList} onTaskAdded={props.onReloadTasks} taskCount={props.tasks?.length}
       />
     </div>
   );

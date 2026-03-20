@@ -128,6 +128,40 @@
     word-break: break-word;
 }
 
+.readingPillRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0 0 1rem;
+}
+
+.readingDetailPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 100%;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary, #7B6751) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
+}
+
+.readingDetailLabel {
+    font-size: 0.64rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.readingDetailValue {
+    font-size: 0.82rem;
+    font-weight: 650;
+    color: var(--text);
+    white-space: nowrap;
+}
+
 .infoGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
