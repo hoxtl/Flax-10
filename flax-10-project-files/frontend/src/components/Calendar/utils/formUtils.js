@@ -142,26 +142,21 @@ export function isRecurringEvent(event) {
     return hasRecurrence(event);
 }
 
+async function fetchLocationCoords(location) {
+    if (!location || !location.trim()) return null;
+    const coords = await geocodeAddress(location);
+    return coords ? { lat: coords.latitude, lon: coords.longitude, valid: true } : { valid: false };
+}
 async function buildEventData(form) {
     const data = buildBaseEventData(form);
-
-    if (form.location && form.location.trim()) {
-        const coords = await geocodeAddress(form.location);
-        if (coords) {
-            data.location_latitude = coords.latitude;
-            data.location_longitude = coords.longitude;
-            data.location_validated = true;
-        } else {
-            data.location_validated = false;
-        }
+    const loc = await fetchLocationCoords(form.location);
+    if (loc) {
+        data.location_latitude = loc.lat;
+        data.location_longitude = loc.lon;
+        data.location_validated = loc.valid;
     }
-
-    const { frequency, interval, end_date } = form.recurrence || {};
-    if (frequency && frequency !== 'none') {
-        data.recurrence_rule = { frequency, interval: parseInt(interval) || 1, end_date: end_date || null };
-    } else {
-        data.recurrence_rule = null;
-    }
+    const { frequency: f, interval: i, end_date: e } = form.recurrence || {};
+    data.recurrence_rule = (f && f !== 'none') ? { frequency: f, interval: parseInt(i) || 1, end_date: e || null } : null;
     return data;
 }
 
