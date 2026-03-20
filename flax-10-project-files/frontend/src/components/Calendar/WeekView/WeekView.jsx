@@ -1,8 +1,4 @@
-/**
- * WeekView - Seven-day calendar view with hourly time grid.
- * Shows all-day events in sticky header and timed events in columns.
- */
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { useCalendarData, useCalendarDispatch } from "../../../context/CalendarContext";
 import { getWeekDays, isSameDay, overlapsDay } from "../utils/dateUtils";
 import { shouldShowInTimeGrid } from "../utils/eventDisplayUtils";
@@ -10,7 +6,7 @@ import { DayColumn } from "./DayColumn";
 import { AllDayRow } from "./components/AllDayRow";
 import { TimeLabels } from "./TimeLabels";
 import { useAutoScroll } from "../hooks/useAutoScroll";
-import { SLOT_HEIGHT } from "../calendarConstants";
+import { CurrentTimeLine } from "../components/CurrentTimeLine";
 import "./WeekView.css";
 
 function getEventsForWeek(events, weekDays) {
@@ -30,28 +26,10 @@ function getTimedEventsForDay(events, day) {
 function useWeekScroll(events, weekDays) {
   const scrollRef = useRef(null);
   const timed = events.filter((e) => shouldShowInTimeGrid(e, new Date(e.start_time)));
-  useAutoScroll(scrollRef, timed, weekDays[0].toISOString());
+  useAutoScroll(scrollRef, timed, weekDays[0]?.toISOString());
   return scrollRef;
 }
 
-function useCurrentTime() {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(t);
-  }, []);
-  return now;
-}
-
-function CurrentTimeLine() {
-  const now = useCurrentTime();
-  const top = (now.getHours() * 60 + now.getMinutes()) * (SLOT_HEIGHT / 60);
-  return (
-    <div className="now-line" style={{ top: `${top}px` }}>
-      <div className="now-line-dot" />
-    </div>
-  );
-}
 
 
 function WeekGrid({ days, events, readOnly }) {
