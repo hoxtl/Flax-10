@@ -4,8 +4,7 @@
 
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import AppPage from '../../components/common/AppPage/AppPage';
-import Tabs from '../../components/common/Tabs/Tabs';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { TabBar, TabContent, SegmentedControl } from '../../components/common';
 import AnalyticsOverview from './components/AnalyticsOverview';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
@@ -52,7 +51,10 @@ export default function AnalyticsPage() {
     >
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <TabBar tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" variant="heading" />
+      <TabContent activeTab={activeTab}>
+        {tabs.find(t => t.id === activeTab)?.content}
+      </TabContent>
       <BackToTop />
     </AppPage>
   );

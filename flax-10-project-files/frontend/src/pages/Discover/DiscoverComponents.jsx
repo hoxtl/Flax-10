@@ -3,7 +3,7 @@
  */
 
 import PageToolbar, { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../components/common";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
 import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";

@@ -33,24 +33,26 @@ function AttendanceTabbedList({ model }) {
   );
 }
 
+import { TabBar } from "../../../components/common";
+
+const TABS = [
+  { id: "record", label: "Record attendance" },
+  { id: "marked", label: "Marked" }
+];
+
 function AttendanceTabs({ model }) {
-  return (
-    <div className={styles.attendanceTabs}>
-      <AttendanceTabButton active={model.listTab === "record"} badge={model.unmarkedEvents.length} onClick={model.showRecordTab}>Record attendance</AttendanceTabButton>
-      <AttendanceTabButton active={model.listTab === "marked"} badge={model.markedEvents.length} onClick={model.showMarkedTab}>Marked</AttendanceTabButton>
-    </div>
-  );
-}
+  const tabs = TABS.map(t => ({
+    ...t,
+    label: (
+      <div className={styles.tabLabelWithBadge}>
+        {t.label}
+        {t.id === "record" && model.unmarkedEvents.length > 0 && <span className={styles.tabBadge}>{model.unmarkedEvents.length}</span>}
+        {t.id === "marked" && model.markedEvents.length > 0 && <span className={styles.tabBadge}>{model.markedEvents.length}</span>}
+      </div>
+    )
+  }));
 
-function AttendanceTabButton({ active, badge, onClick, children }) {
-  const className = active ? styles.attendanceTabActive : styles.attendanceTab;
-
-  return (
-    <button type="button" className={className} onClick={onClick}>
-      {children}
-      {badge > 0 && <span className={styles.tabBadge}>{badge}</span>}
-    </button>
-  );
+  return <TabBar tabs={tabs} activeTab={model.listTab} onTabChange={(id) => id === "record" ? model.showRecordTab() : model.showMarkedTab()} layoutId="attendance-tab-underline" />;
 }
 
 function AttendanceListContent({ model }) {
