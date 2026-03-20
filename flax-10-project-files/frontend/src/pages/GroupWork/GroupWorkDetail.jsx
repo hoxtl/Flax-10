@@ -145,7 +145,7 @@ function ProjectHeader({ project, members, onPatch, taskStats }) {
                         <UserModuleDropdown
                             value={project.course_code || ""}
                             onChange={onCourse}
-                            placeholder="Module code"
+                            placeholder="Module"
                             className={styles.detailCourseDropdown}
                         />
                     </div>
