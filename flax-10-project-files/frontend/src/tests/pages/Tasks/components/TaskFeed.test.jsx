@@ -121,4 +121,20 @@ describe("TaskFeed", () => {
     );
     expect(screen.getByTestId("suggested-readings-section")).toBeInTheDocument();
   });
+
+  it("uses module-focused subtitle copy for reading lists", () => {
+    useTaskFeedDataMock.mockReturnValue(data({ headerTitle: "AI4404 - Reinforcement Learning" }));
+    render(
+      <TaskFeed
+        activeFilter="all"
+        activeListId="7"
+        lists={[{ id: 7, name: "AI4404 - Reinforcement Learning" }]}
+        onToggleComplete={vi.fn()}
+        onDeleteTask={vi.fn()}
+        onEditTask={vi.fn()}
+      />
+    );
+    expect(screen.getByText(/Keep your/i)).toBeInTheDocument();
+    expect(screen.getByText(/Reinforcement Learning \(AI4404\)/i)).toBeInTheDocument();
+  });
 });

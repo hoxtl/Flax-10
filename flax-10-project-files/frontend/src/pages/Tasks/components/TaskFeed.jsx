@@ -19,15 +19,32 @@ import sectionStyles from "./TaskFeedSections.module.css";
 
 import useTaskFeedData from "../hooks/useTaskFeedData";
 import SuggestedReadingsSection from "./SuggestedReadingsSection";
-import { isReadingList } from "../utils/readingListUtils";
+import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
 
 const styles = { ...layoutStyles, ...toolbarStyles, ...sectionStyles };
 const SECTION_SHOW_LIMIT = 8;
-const taskFeedSubtitle = (
+const genericTaskFeedSubtitle = (
   <>
     Plan and track your <em>urgent tasks</em>, <em>coursework</em>, <em>admin</em>, and <em>life</em>.
   </>
 );
+
+function getTaskFeedSubtitle(activeList, readingList) {
+  if (!readingList || !activeList) {
+    return genericTaskFeedSubtitle;
+  }
+
+  const parsed = parseReadingListName(activeList.name);
+  const moduleLabel = parsed.moduleName && parsed.moduleCode
+    ? `${parsed.moduleName} (${parsed.moduleCode})`
+    : parsed.moduleName || parsed.moduleCode || "this module";
+
+  return (
+    <>
+      Keep your <em>{moduleLabel}</em> readings, <em>lecture notes</em>, <em>past papers</em>, and <em>revision prep</em> in one place.
+    </>
+  );
+}
 
 function TaskFeedSubHeader({ data, lists, activeListId, defaultDueDateForNewTask, onAddTask, onCreateTask }) {
   const toolbarProps = { search: data.search, onSearchChange: data.setSearch, searchInputRef: data.searchInputRef, sortBy: data.sortBy, onSortChange: data.setSortBy, filterRef: data.filterRef, isFilterOpen: data.isFilterOpen, onFilterOpenChange: data.setIsFilterOpen, activeFilterCount: data.activeFilterCount, activeFilterTab: data.activeFilterTab, onFilterTabChange: data.setActiveFilterTab, filterQuery: data.filterQuery, onFilterQueryChange: data.setFilterQuery, visibleListItems: data.visibleListItems, filterListIds: data.filterListIds, onToggleList: data.toggleListFilter, moduleGroupKeys: data.moduleGroupKeys, groupedVisibleModuleItems: data.groupedVisibleModuleItems, filterModuleCodes: data.filterModuleCodes, onToggleModule: data.toggleModuleFilter, onClearAllFilters: data.clearAllFilters };
@@ -145,6 +162,7 @@ export default function TaskFeed(props) {
   const sectionPropsWithHandlers = { ...data.sectionProps, onToggleComplete: props.onToggleComplete, onDeleteTask: props.onDeleteTask, onEditTask: props.onEditTask };
   const activeList = (props.lists || []).find(l => String(l.id) === String(props.activeListId));
   const readingList = isReadingList(activeList);
+  const taskFeedSubtitle = getTaskFeedSubtitle(activeList, readingList);
   return (
     <div className={styles.feed}>
       <PageHeader
