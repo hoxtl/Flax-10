@@ -10,18 +10,17 @@ import { EventModal } from './EventModal/EventModal';
 import { EventPopover } from './EventPopover/EventPopover';
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
-import { useModuleDisenrollment } from '../Modules/hooks/useModuleDisenrollment';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 
 /** Main entry point for calendar popups. */
-export function EventPopups({ allowModuleLeave = true }) {
+export function EventPopups() {
   return (
     <>
       <EventModalContainer />
-      <EventPopupContainer allowModuleLeave={allowModuleLeave} />
+      <EventPopupContainer />
       <HoldDeleteContainer />
     </>
   );
@@ -66,19 +65,17 @@ function HoldDeleteContainer() {
   };
   return <HoldConfirmModal title={`Delete "${evt.title}"`} warningText={type === 'all' ? "Delete ALL occurrences?" : "Confirm deletion."} onConfirm={onC} onCancel={closeDelete} />;
 }
-function getPopupActions(evt, s, opts) {
+function getPopupActions(evt, s) {
     if (s.readOnly) return null;
     const type = getEventType(evt);
     const h = {
         edit: () => { s.closePopup(); s.openModal(evt); }, delete: () => { s.closePopup(); s.handleDeleteRequest(evt); },
-        leave: () => { s.closePopup(); s.disenrollFromModule(evt.module, s.loadEvents); },
         unsync: async () => {
             s.closePopup(); await unsyncCalendar(evt.society_id); await s.refreshTags();
             s.loadEvents(); s.toast(`Unsynced ${evt.society_name || 'society'}`);
         }
     };
     if (type === 'personal') return [{ label: 'Edit', onClick: h.edit }, { label: 'Delete', variant: 'danger', onClick: h.delete }];
-    if (type === 'module' && opts.allowModuleLeave && (evt.tag_name || '').toLowerCase() !== 'lecture') return [{ label: 'Leave Module', variant: 'danger', onClick: h.leave }];
     if (type === 'society') return [{ label: 'Unsync', variant: 'danger', onClick: h.unsync }];
     return null;
 }
@@ -87,19 +84,18 @@ function usePopupState() {
   const { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode } = useEventPopup();
   const { isModalOpen, openModal } = useEventModal();
   const { loadEvents } = useCalendarEvents();
-  const { disenrollFromModule } = useModuleDisenrollment();
   const { getTag, refreshTags } = useTags();
   const toast = useToast();
   const { handleDeleteRequest } = useEventDeletion();
   
-  return { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode, isModalOpen, openModal, loadEvents, disenrollFromModule, getTag, refreshTags, toast, handleDeleteRequest };
+  return { popupEvent, popupAnchorRect, closePopup, readOnly, viewMode, isModalOpen, openModal, loadEvents, getTag, refreshTags, toast, handleDeleteRequest };
 }
 
-function EventPopupContainer({ allowModuleLeave }) {
+function EventPopupContainer() {
   const state = usePopupState();
   if (state.isModalOpen || !state.popupEvent) return null;
 
-  const actions = getPopupActions(state.popupEvent, state, { allowModuleLeave });
+  const actions = getPopupActions(state.popupEvent, state);
   const tag = (state.popupEvent.source === 'society' && state.popupEvent.tag_name) 
     ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || '#9E7E5D' }
     : state.getTag(state.popupEvent.tag);

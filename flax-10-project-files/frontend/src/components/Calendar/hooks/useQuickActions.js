@@ -9,10 +9,6 @@ import { useModuleDisenrollment } from '../../Modules/hooks/useModuleDisenrollme
 import { getEventType } from '../utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
 
-function handleModuleAction(event, disenrollFromModule, loadEvents) {
-    disenrollFromModule(event.module, loadEvents);
-}
-
 async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
     await unsyncCalendar(event.society_id);
     await refreshTags();
@@ -23,18 +19,15 @@ async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
 /** Hook returning quick action config for module/society events. */
 export function useQuickActions(event) {
     const { loadEvents } = useCalendarEvents();
-    const { disenrollFromModule } = useModuleDisenrollment();
     const { refreshTags } = useTags();
     const notify = useNotify();
     const type = getEventType(event);
 
     const handleAction = async (e) => {
         if (e) e.stopPropagation();
-        if (type === 'module') handleModuleAction(event, disenrollFromModule, loadEvents);
-        else if (type === 'society') await handleSocietyAction(event, refreshTags, loadEvents, notify);
+        if (type === 'society') await handleSocietyAction(event, refreshTags, loadEvents, notify);
     };
 
-    if (type === 'module') return { label: 'Leave', onClick: handleAction };
     if (type === 'society') return { label: 'Unsync', onClick: handleAction };
     return null;
 }

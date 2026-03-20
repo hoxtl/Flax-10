@@ -18,7 +18,7 @@ vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/hooks/useQuickActions', () => ({
-    useQuickActions: (event) => event.module ? mockQuickAction : null,
+    useQuickActions: (event) => event.society_name ? mockQuickAction : null,
 }));
 
 vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
@@ -119,16 +119,6 @@ describe('TableRow', () => {
         expect(onCellClick).toHaveBeenCalledWith(1, 'title', 'Test');
     });
 
-    it('shows quick action button for module events', () => {
-        render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        expect(screen.getByText('Join')).toBeInTheDocument();
-    });
-
-    it('calls quick action onClick when clicked', () => {
-        render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        fireEvent.click(screen.getByText('Join'));
-        expect(mockQuickAction.onClick).toHaveBeenCalled();
-    });
 
     it('renders source badge for module events', () => {
         render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS101' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
