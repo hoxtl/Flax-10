@@ -4,7 +4,6 @@
 
 import { X, Filter, List } from "lucide-react";
 import { useRef, useEffect, useCallback } from "react";
-import { X, Filter, List } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import SearchBar from "../../../components/common/SearchBar";
