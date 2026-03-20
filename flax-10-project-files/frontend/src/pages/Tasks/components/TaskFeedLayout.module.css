@@ -4,105 +4,108 @@
  */
 
 .feed {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: visible;
-    padding: clamp(var(--space-5), 2vw, var(--space-8)) clamp(var(--space-4), 2.5vw, var(--space-8)) var(--space-10);
-    position: relative;
-    background: var(--bg);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: visible;
+  padding: clamp(var(--space-5), 2vw, var(--space-8))
+    clamp(var(--space-4), 2.5vw, var(--space-8)) var(--space-10);
+  position: relative;
+  background: var(--bg);
 }
 
 .listHeader {
-    flex-shrink: 0;
-    padding: 24px 0 0;
-    margin-bottom: 12px;
-    animation: taskFeedHeaderFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+  padding: 24px 0 0;
+  margin-bottom: 12px;
+  animation: taskFeedHeaderFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .listHeaderTitleWrap {
-    min-width: 0;
+  min-width: 0;
 }
 
 .listHeaderTitle {
-    font-family: var(--font-heading);
-    font-size: var(--type-page);
-    font-weight: var(--font-weight-title);
-    color: var(--text);
-    margin: 0;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: var(--type-page);
+  font-weight: var(--font-weight-title);
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .listHeaderDivider {
-    height: 1px;
-    background: var(--border, rgba(74, 52, 33, 0.12));
-    border: none;
-    margin: 10px 0 0;
+  height: 1px;
+  background: var(--border, rgba(74, 52, 33, 0.12));
+  border: none;
+  margin: 10px 0 0;
 }
 
 @keyframes taskFeedHeaderFade {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .subHeader {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex-shrink: 0;
-    background: var(--bg);
-    position: relative;
-    z-index: 2;
-    margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+  margin-bottom: 10px;
 }
 
+
+
 .bannerRow {
-    width: 100%;
-    margin-bottom: 10px;
-    flex-shrink: 0;
+  width: 100%;
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .inlineBanner {
-    flex-shrink: 1;
-    min-width: 0;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .createRow {
-    position: relative;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    margin-bottom: 2px;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-bottom: 2px;
 }
 
 .createRow .createBarWrap {
-    flex: 1;
-    min-width: 0;
-    overflow: visible;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
 }
 
 .subHeader .createBarWrap {
-    width: 100%;
+  width: 100%;
 }
 
 .subHeaderSpacer {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .fullPlanBtn {
@@ -111,89 +114,127 @@
 }
 
 .createBarWrap {
-    width: 100%;
-    min-width: 0;
+  width: 100%;
+  min-width: 0;
 }
 
 .subHeader .toolbar {
-    border-bottom: none;
-    padding: 4px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  border-bottom: none;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .quickAddDivider {
-    display: none;
+  display: none;
 }
 
 .toolbarStrip {
-    background: transparent;
-    border-radius: 0 0 10px 10px;
-    padding: 4px 0 0;
-    margin: 0 -2px;
-    flex-shrink: 0;
+  background: transparent;
+  border-radius: 0 0 10px 10px;
+  padding: 4px 0 0;
+  margin: 0 -2px;
+  flex-shrink: 0;
 }
 
 .toolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
 @media (max-width: 980px) {
-    .toolbar {
-        grid-template-columns: minmax(0, 1fr);
-    }
+  .feed {
+    padding: var(--space-5) var(--space-4) var(--space-8);
+  }
 
-    .toolbar .searchWrap {
-        min-width: 0;
-    }
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-    .sortWrap,
-    .filterPanelWrap {
-        justify-self: start;
-    }
+  .toolbar .searchWrap {
+    min-width: 0;
+  }
+
+  .sortWrap,
+  .filterPanelWrap {
+    justify-self: start;
+  }
 }
 
 /* Layout-only — button appearance comes from PrimaryButton */
 .addBtn {
-    flex-shrink: 0;
-    white-space: nowrap;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .sectionsWrap {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 0;
-    margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 0;
+  margin-top: 14px;
 }
 
 .sections {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    animation: sectionsFadeIn 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: sectionsFadeIn 0.35s ease;
 }
 
 @keyframes sectionsFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
-    .feed {
-        padding-top: var(--space-5);
-        padding-bottom: var(--space-8);
-    }
+  .feed {
+    padding: var(--space-4) var(--space-3) var(--space-7);
+  }
+
+  .mobileViewRow {
+    display: flex;
+    margin-bottom: 8px;
+  }
+
+  .mobileViewSelectWrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mobileViewSelect {
+    flex: 1;
+    min-width: 0;
+    max-width: 220px;
+  }
+
+  .createRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .fullPlanBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sectionsWrap {
+    margin-top: 10px;
+  }
+
+  .sections {
+    gap: 10px;
+  }
 }
