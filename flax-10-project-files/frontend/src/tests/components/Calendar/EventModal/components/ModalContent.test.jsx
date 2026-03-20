@@ -44,9 +44,11 @@ describe('ModalContent', () => {
     it('should render sleep warning view when sleepWarning is true', () => {
         render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        expect(screen.getByText('Sleep Hours')).toBeInTheDocument();
+        expect(screen.getByText('You should be resting!')).toBeInTheDocument();
         expect(screen.getByText('Add Anyway')).toBeInTheDocument();
-        expect(screen.getByText('Cancel')).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: /cancel — i['’]ll rest/i }),
+        ).toBeInTheDocument();
     });
 
     it('should call handleConfirmSleep when confirmed', () => {
@@ -59,14 +61,14 @@ describe('ModalContent', () => {
     it('should call handleCancelSleep when cancelled', () => {
         render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        fireEvent.click(screen.getByText('Cancel'));
+        fireEvent.click(screen.getByRole('button', { name: /cancel — i['’]ll rest/i }));
         expect(defaultProps.handleCancelSleep).toHaveBeenCalled();
     });
 
     it('should close sleep warning view via header close button', () => {
         render(<ModalContent {...defaultProps} sleepWarning={true} />);
 
-        fireEvent.click(screen.getByText('x'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(defaultProps.handleCancelSleep).toHaveBeenCalled();
     });
 
@@ -78,7 +80,8 @@ describe('ModalContent', () => {
 
     it('renders sleep warning and does not call handleConfirmSleep on header click', () => {
         render(<ModalContent {...defaultProps} sleepWarning={true} />);
-        fireEvent.click(screen.getByText('Sleep Hours'));
+        // Clicking the modal header (title) should not confirm the sleep warning.
+        fireEvent.click(screen.getByText('You should be resting!'));
         expect(defaultProps.handleConfirmSleep).not.toHaveBeenCalled();
     });
 

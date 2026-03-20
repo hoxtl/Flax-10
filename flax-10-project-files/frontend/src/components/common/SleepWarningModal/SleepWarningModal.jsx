@@ -1,6 +1,4 @@
-import StandardModal from "../StandardModal/StandardModal";
-import PrimaryButton from "../PrimaryButton/PrimaryButton";
-import styles from "./SleepWarningModal.module.css";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 export function SleepWarningModal({ sleepTime, wakeTime, onConfirm, onCancel }) {
   const formatTime = (t) => {
@@ -12,27 +10,13 @@ export function SleepWarningModal({ sleepTime, wakeTime, onConfirm, onCancel }) 
   };
 
   return (
-    <StandardModal
+    <ConfirmModal
       title="You should be resting!"
-      onClose={onCancel}
-      size="sm"
-      modalClassName={styles.sleepWarningModal}
-    >
-      <div className={styles.body} data-testid="sleep-warning">
-        <p className={styles.message}>
-          Your sleep schedule is set from <strong>{formatTime(sleepTime)}</strong> to{" "}
-          <strong>{formatTime(wakeTime)}</strong>. Working at this hour can affect your focus and wellbeing the next day.
-        </p>
-        <p className={styles.question}>Are you sure you want to work at this hour?</p>
-        <div className={styles.actions}>
-          <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onCancel} autoFocus>
-            Cancel — I&apos;ll rest
-          </PrimaryButton>
-          <PrimaryButton className={styles.confirmBtn} pill onClick={onConfirm}>
-            Add anyway
-          </PrimaryButton>
-        </div>
-      </div>
-    </StandardModal>
+      message={<>Your sleep schedule is set from <strong>{formatTime(sleepTime)}</strong> to <strong>{formatTime(wakeTime)}</strong>. Working at this hour can affect your focus and wellbeing the next day. Are you sure you want to work at this hour?</>}
+      cancelText="Cancel — I'll rest"
+      confirmText="Add anyway"
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+    />
   );
 }

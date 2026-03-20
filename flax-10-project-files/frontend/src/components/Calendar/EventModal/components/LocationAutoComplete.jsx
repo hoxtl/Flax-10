@@ -8,8 +8,18 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
     const inputRef = useRef(null);
     const wrapperRef = useRef(null);
     const justSelectedRef = useRef(false);
+    const isInitialMount = useRef(true);
 
     useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        if (!userHasTyped.current) {
+            return;
+        }
+
         if (justSelectedRef.current) {
             return;
         }
@@ -77,7 +87,10 @@ export function LocationAutocomplete({ value, onChange, placeholder = "Enter loc
         }, 200);
     };
 
+    const userHasTyped = useRef(false);
+
     const handleInputChange = (e) => {
+        userHasTyped.current = true;
         onChange(e.target.value);
         if (e.target.value.length >= 3) {
             setShowSuggestions(true);

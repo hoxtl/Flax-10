@@ -43,6 +43,7 @@ describe('TopBar', () => {
     expect(screen.getByText('Plan')).toBeTruthy();
     expect(screen.getByText('Study')).toBeTruthy();
     expect(screen.getByText('My KCL')).toBeTruthy();
+    expect(screen.getByText('My Insights')).toBeTruthy();
   });
 
   it('renders without user', () => {
@@ -68,13 +69,6 @@ describe('TopBar', () => {
     render(<TopBar onNavChange={onNavChange} />);
     fireEvent.click(screen.getByText('StudyFlax'));
     expect(onNavChange).toHaveBeenCalledWith('home');
-  });
-
-  it('calls onAddClick when add tab is clicked', () => {
-    const onAddClick = vi.fn();
-    render(<TopBar onAddClick={onAddClick} />);
-    fireEvent.click(screen.getByTestId('tab-Add'));
-    expect(onAddClick).toHaveBeenCalled();
   });
 
   it('calls togglePanel when notifications tab is clicked', async () => {

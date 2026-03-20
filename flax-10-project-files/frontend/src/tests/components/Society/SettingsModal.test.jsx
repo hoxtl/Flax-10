@@ -103,7 +103,10 @@ describe('SocietyDetail/SettingsModal', () => {
     fireEvent.click(screen.getByRole('button', { name: '×' }));
     expect(props.onClose).toHaveBeenCalledTimes(1);
 
-    fireEvent.mouseDown(container.firstChild);
+    // Modal backdrop is portal-rendered into document.body.
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(props.onClose).toHaveBeenCalledTimes(2);
 
     fireEvent.click(screen.getByText('Delete Society'));

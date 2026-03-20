@@ -16,6 +16,7 @@ vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventAc
 vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
 vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+  isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),
 }));

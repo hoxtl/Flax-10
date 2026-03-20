@@ -43,7 +43,7 @@ describe('HomeAddressForm', () => {
     it('shows Saving address... when isSaving', async () => {
         render(<HomeAddressForm onSave={vi.fn()} isSaving={true} />);
         await waitFor(() => {
-            expect(screen.getByText('Saving address...')).toBeTruthy();
+            expect(screen.getByText('Saving...')).toBeTruthy();
         });
     });
 
@@ -55,10 +55,21 @@ describe('HomeAddressForm', () => {
         expect(onSave).toHaveBeenCalledWith('123 Main St, London');
     });
 
-    it('renders error message when error prop is provided', async () => {
-        render(<HomeAddressForm onSave={vi.fn()} isSaving={false} error="Address not found" />);
+    it('shows saved tick after a successful home address save', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        const { container } = render(<HomeAddressForm onSave={onSave} isSaving={false} />);
+        const input = await screen.findByPlaceholderText('e.g., 123 Example Street, London, E1 B23');
+        fireEvent.change(input, { target: { value: 'lkjhgv' } });
+        fireEvent.submit(container.querySelector('form'));
         await waitFor(() => {
-            expect(screen.getByText('Address not found')).toBeTruthy();
+            expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
+        });
+    });
+
+    it('renders inline warning for non-lookup save errors', async () => {
+        render(<HomeAddressForm onSave={vi.fn()} isSaving={false} error="Please enter a valid home address" />);
+        await waitFor(() => {
+            expect(screen.getByText('Please enter a valid home address')).toBeTruthy();
         });
     });
 
@@ -74,7 +85,7 @@ describe('HomeAddressForm', () => {
         getHomeAddress.mockResolvedValueOnce({ home_address: null });
         render(<HomeAddressForm onSave={vi.fn()} isSaving={false} />);
         await waitFor(() => {
-            const input = screen.getByPlaceholderText('e.g., 123 Example Street, London E1 B23');
+            const input = screen.getByPlaceholderText('e.g., 123 Example Street, London, E1 B23');
             expect(input.value).toBe('');
         });
     });

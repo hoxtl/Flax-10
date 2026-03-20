@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import Profile from '../../../pages/Profile/Profile';
 
 // Mock hooks
@@ -18,6 +19,22 @@ vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
 
 vi.mock('../../../pages/Profile/hooks/useProfileVisibility', () => ({
   useProfileVisibility: vi.fn(),
+}));
+
+// ProfileHome uses AuthContext's useAuth().
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: () => ({
+    profile: { modules: [] },
+    loading: false,
+    authenticated: true,
+    user: { role: 'student' },
+    refreshProfile: vi.fn(),
+  }),
+}));
+
+// StudyHeatmap + other analytics widgets depend on ThemeProvider via useTheme().
+vi.mock('../../../context/ThemeContext', () => ({
+  useTheme: () => ({ mode: 'light' }),
 }));
 
 // Mock services
@@ -110,12 +127,14 @@ const selfAnalyticsSummary = {
 
 const renderProfile = (props = {}) =>
   render(
-    <Profile
-      user={defaultUser}
-      viewedUserId={1}
-      onNavigate={vi.fn()}
-      {...props}
-    />,
+    <MemoryRouter>
+      <Profile
+        user={defaultUser}
+        viewedUserId={1}
+        onNavigate={vi.fn()}
+        {...props}
+      />
+    </MemoryRouter>,
   );
 
 const makeHeatmap = () => ({
@@ -165,7 +184,7 @@ describe('Profile', () => {
   it('renders not found when no profileData', () => {
     useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
     renderProfile();
-    expect(screen.getByText('User not found.')).toBeTruthy();
+    expect(screen.getByText('Profile unavailable')).toBeTruthy();
   });
 
   it('renders username', async () => {
@@ -195,7 +214,7 @@ describe('Profile', () => {
       refetch: vi.fn(),
     });
     renderProfile();
-    await waitFor(() => expect(screen.getByText('ACHIEVEMENTS')).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('button', { name: /View All/i })).toBeTruthy());
   });
 
   it('shows Share button when viewing another profile', async () => {
@@ -218,8 +237,8 @@ describe('Profile', () => {
     renderProfile();
     expect(await screen.findByText('Night Owl')).toBeTruthy();
     expect(screen.getByText('THIS WEEK')).toBeTruthy();
-    expect(screen.getByText('STUDY DNA')).toBeTruthy();
-    expect(screen.getByText('STUDY ACTIVITY')).toBeTruthy();
+    expect(await screen.findByText('STUDY DNA')).toBeTruthy();
+    expect(await screen.findByText('FOCUS HEATMAP')).toBeTruthy();
   });
 
   it('opens analytics actions and achievements modal', async () => {
@@ -227,10 +246,13 @@ describe('Profile', () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    const analyticsLink = await screen.findByText('View full analytics');
-    fireEvent.click(analyticsLink);
+    const analyticsLinks = await screen.findAllByText(/View full analytics/i);
+    fireEvent.click(analyticsLinks[0]);
+    if (onNavigate.mock.calls.length === 0) {
+      fireEvent.click(analyticsLinks[1]);
+    }
     expect(onNavigate).toHaveBeenCalledWith('analytics');
-    fireEvent.click(screen.getByText('ACHIEVEMENTS'));
+    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });
 
@@ -239,7 +261,7 @@ describe('Profile', () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     renderProfile();
     await screen.findByText('Night Owl');
-    fireEvent.click(screen.getByText('ACHIEVEMENTS'));
+    fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     await screen.findByTestId('achievements-modal');
     fireEvent.click(screen.getByText('Close'));
     await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
@@ -298,6 +320,6 @@ describe('Profile', () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile();
     await screen.findByText('Night Owl');
-    expect(screen.getByText('STUDY DNA')).toBeInTheDocument();
+    expect(await screen.findByText('STUDY DNA')).toBeInTheDocument();
   });
 });

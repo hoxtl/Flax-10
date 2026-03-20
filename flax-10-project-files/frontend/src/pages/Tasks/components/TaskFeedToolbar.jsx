@@ -3,6 +3,8 @@
  */
 
 import { X, Filter, List } from "lucide-react";
+import { useRef, useEffect, useCallback } from "react";
+import { X, Filter, List } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import SearchBar from "../../../components/common/SearchBar";
@@ -71,8 +73,26 @@ function ToolbarFilterPanel({
   activeFilterCount,
   panelProps,
 }) {
+  const hoverTimer = useRef(null);
+
+  const handleMouseEnter = useCallback(() => {
+    clearTimeout(hoverTimer.current);
+    if (!isFilterOpen) onFilterOpenChange(true);
+  }, [isFilterOpen, onFilterOpenChange]);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimer.current = setTimeout(() => onFilterOpenChange(false), 200);
+  }, [onFilterOpenChange]);
+
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+
   return (
-    <div className={styles.filterPanelWrap} ref={filterRef}>
+    <div
+      className={styles.filterPanelWrap}
+      ref={filterRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
         type="button"
         className={styles.filterBtn}

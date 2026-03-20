@@ -51,6 +51,10 @@ vi.mock('../../components/Analytics/StudyHeatmap', () => ({
     default: () => <div data-testid="study-heatmap" />,
 }));
 
+vi.mock('../../components/Analytics/AttendanceChart', () => ({
+    default: () => <div data-testid="attendance-chart" />,
+}));
+
 vi.mock('../../components/Analytics/PlannedVsActualChart', () => ({
     default: () => <div data-testid="planned-vs-actual-chart" />,
 }));

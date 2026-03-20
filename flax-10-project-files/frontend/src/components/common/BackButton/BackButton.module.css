@@ -1,11 +1,11 @@
 .backButton {
     padding: 8px 14px;
     border-radius: 999px;
-    border: none;
-    background: var(--hover);
-    color: var(--text);
+    border: 1.5px solid var(--primary-strong);
+    background: var(--primary-strong);
+    color: #fff;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -15,7 +15,8 @@
 }
 
 .backButton:hover {
-    background: var(--border);
+    background: color-mix(in srgb, var(--primary-strong) 88%, #000);
+    border-color: color-mix(in srgb, var(--primary-strong) 88%, #000);
     transform: translateX(-2px);
 }
 

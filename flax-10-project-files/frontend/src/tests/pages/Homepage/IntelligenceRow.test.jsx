@@ -16,6 +16,23 @@ vi.mock('../../../api/tflService', () => ({
     tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
 }));
 
+vi.mock('../../../context/AuthContext', () => ({
+    useAuth: () => ({
+        profile: {
+            role: 'student',
+            summary: {
+                weekly: { percentage: 72 },
+                streaks: { current: 3 },
+            },
+        },
+        loading: false,
+        // Provide the shape other code might read
+        authenticated: true,
+        user: { role: 'student' },
+        refreshProfile: vi.fn(),
+    }),
+}));
+
 vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
     useProfileSummary: vi.fn(() => ({
         summary: {
@@ -24,10 +41,6 @@ vi.mock('../../../pages/Profile/hooks/useProfileSummary', () => ({
         },
         loading: false,
     })),
-}));
-
-vi.mock('../../../pages/Homepage/components/SocialDiscoverWidget', () => ({
-    SocialDiscoverWidget: () => <div data-testid="social-discover-widget" />,
 }));
 
 vi.mock('../../../components/ui/bento-grid', () => ({

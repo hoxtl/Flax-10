@@ -7,6 +7,7 @@ import TaskFeed from "./components/TaskFeed";
 import ListSidebar from "./components/ListSidebar";
 import CreateTaskModal from "./components/CreateTaskModal";
 import CreateListModal from "./components/CreateListModal";
+import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
 import AppToast from "../../components/common/AppToast/AppToast";
@@ -26,17 +27,16 @@ function ToastUndo({ onUndo, onClose }) {
 
 function ToastDelete({ onClose }) {
   return (
-    <AppToast
-      message="Task deleted."
-      onClose={onClose}
-      variant="info"
-      icon="🗑"
-    />
+    <AppToast message="Task deleted." onClose={onClose} variant="success" />
   );
 }
 
 function ToastInfo({ message, onClose }) {
-  return <AppToast message={message} onClose={onClose} variant="info" />;
+  const variant =
+    typeof message === "string" && message.toLowerCase().includes("deleted")
+      ? "success"
+      : "info";
+  return <AppToast message={message} onClose={onClose} variant={variant} />;
 }
 
 function TasksPageToasts({
@@ -49,7 +49,7 @@ function TasksPageToasts({
   setToastInfo,
 }) {
   return (
-    <>
+    <AnimatePresence initial={false}>
       {toastUndo && (
         <ToastUndo
           onUndo={handleUndoAddTask}
@@ -60,7 +60,7 @@ function TasksPageToasts({
       {toastInfo && (
         <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />
       )}
-    </>
+    </AnimatePresence>
   );
 }
 

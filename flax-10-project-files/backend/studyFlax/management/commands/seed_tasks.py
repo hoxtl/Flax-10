@@ -22,6 +22,18 @@ def _create_task_lists(user):
         lists_by_name[list_name] = tl
     return lists_by_name
 
+def create_module_reading_lists(user, enrolled_modules):
+    """Create a '{module_code} - {module_name}' reading TaskList for each enrolled module."""
+    lists_by_module = {}
+    for module in enrolled_modules:
+        name = f"{module.module_code} - {module.module_name}"
+        tl, _ = TaskList.objects.get_or_create(
+            user=user, name=name,
+            defaults={"category": "uni"},
+        )
+        lists_by_module[module.id] = tl
+    return lists_by_module
+
 def _get_templates_for_module(mod):
     prefix = mod.module_code[:2]
     return module_task_templates.get(
@@ -51,27 +63,32 @@ def _build_due_date(now, days_from_now):
         hour=23, minute=59, second=0, microsecond=0,
     )
 
-def _create_module_task(user, uni_list, mod, title_tmpl, description,
+def _create_module_task(user, task_list, mod, title_tmpl, description,
                         priority, estimated_blocks, days_from_now, index, now):
     days = _adjust_days(mod, index, days_from_now)
     blocks = _adjust_blocks(mod, title_tmpl, estimated_blocks)
     title = title_tmpl.format(module=mod.module_code, module_name=mod.module_name)
     Task.objects.create(
-        user=user, task_list=uni_list, module=mod,
+        user=user, task_list=task_list, module=mod,
         title=title, description=description, priority=priority,
         due_date=_build_due_date(now, days),
         estimated_blocks=blocks, completed=False,
     )
 
-def _seed_enrollment_tasks(user, uni_list, module, now):
+def _seed_enrollment_tasks(user, task_list, module, now):
     templates = _get_templates_for_module(module)
     for i, (title_tmpl, desc, priority, blocks, days) in enumerate(templates):
-        _create_module_task(user, uni_list, module, title_tmpl, desc, priority, blocks, days, i, now)
+        _create_module_task(user, task_list, module, title_tmpl, desc, priority, blocks, days, i, now)
     return len(templates)
 
-def _seed_module_tasks(user, uni_list, now):
+def _seed_module_tasks(user, lists_by_module, now):
     enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
-    return sum(_seed_enrollment_tasks(user, uni_list, e.module, now) for e in enrolled)
+    total = 0
+    for e in enrolled:
+        task_list = lists_by_module.get(e.module.id)
+        if task_list:
+            total += _seed_enrollment_tasks(user, task_list, e.module, now)
+    return total
 
 def _seed_personal_tasks(user, lists_by_name, personal_list, now):
     count = 0
@@ -90,9 +107,11 @@ def _seed_tasks_for_user(user, now):
     if Task.objects.filter(user=user).exists():
         return 0
     lists_by_name = _create_task_lists(user)
-    uni_list = lists_by_name.get("University")
     personal_list = lists_by_name.get("Personal")
-    total = _seed_module_tasks(user, uni_list, now)
+    enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
+    modules = [e.module for e in enrolled]
+    lists_by_module = create_module_reading_lists(user, modules)
+    total = _seed_module_tasks(user, lists_by_module, now)
     total += _seed_personal_tasks(user, lists_by_name, personal_list, now)
     return total
 

@@ -1,13 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModuleDetails from '../../../components/Modules/ModuleDetails';
+import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
 
 vi.mock('../../../utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
 }));
 
-vi.mock('../ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
 
 const module = { //values for mock module
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -35,12 +38,12 @@ describe('ModuleDetails', () => {
 
     it('should render enroll button when not enrolled', () => {
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('Enroll in Module')).toBeInTheDocument();
+        expect(screen.getByText('Enroll in module')).toBeInTheDocument();
     });
 
     it('should render leave button when enrolled', () => {
         render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('Leave Module')).toBeInTheDocument();
+        expect(screen.getByText('Leave module')).toBeInTheDocument();
     });
 
     it('should call onBack when back button is clicked', () => {
@@ -54,20 +57,20 @@ describe('ModuleDetails', () => {
     it('should call onEnroll when enroll button is clicked', () => {
         const onEnroll = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={onEnroll} onUnenroll={vi.fn()} />);
-        fireEvent.click(screen.getByText('Enroll in Module'));
+        fireEvent.click(screen.getByText('Enroll in module'));
         expect(onEnroll).toHaveBeenCalled();
     });
 
     it('should call onUnenroll when leave button is clicked', () => {
         const onUnenroll = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={onUnenroll} />);
-        fireEvent.click(screen.getByText('Leave Module'));
+        fireEvent.click(screen.getByText('Leave module'));
         expect(onUnenroll).toHaveBeenCalled();
     });
 
     it('shows No description provided when description is null', () => {
         render(<ModuleDetails module={{ ...module, description: null }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('No description provided.')).toBeInTheDocument();
+        expect(screen.getByText('No module summary available yet.')).toBeInTheDocument();
     });
 
     it('shows Unknown when created_by_name is missing', () => {
@@ -77,13 +80,24 @@ describe('ModuleDetails', () => {
 
     it('shows No deadlines assigned yet when deadlines empty', () => {
         render(<ModuleDetails module={{ ...module, deadlines: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('No deadlines assigned yet.')).toBeInTheDocument();
+        expect(screen.getByText('No assignments yet.')).toBeInTheDocument();
+    });
+
+    it('shows No readings message when readings is empty', () => {
+        render(<ModuleDetails module={{ ...module, readings: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('No readings assigned yet.')).toBeInTheDocument();
     });
 
     it('renders deadlines list when deadlines exist', () => {
         const modWithDeadlines = { ...module, deadlines: [{ id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2026-04-01' }] };
         render(<ModuleDetails module={modWithDeadlines} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
         expect(screen.getByText('CW1')).toBeInTheDocument();
+    });
+
+    it('renders readings list when readings exist', () => {
+        const modWithReadings = { ...module, readings: [{ id: 1, title: 'Module Handbook', start_page: 13, end_page: 63, 'deadline': '2026-04-01T00:00:00' }] };
+        render(<ModuleDetails module={modWithReadings} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Module Handbook')).toBeInTheDocument();
     });
 
     it('shows created_by_email link when present', () => {

@@ -131,3 +131,183 @@
     background: var(--hover);
     color: var(--text);
 }
+
+.scheduleDialogBody {
+    min-width: min(100%, 620px);
+}
+
+.scheduleDialogSubtitle {
+    color: var(--text);
+}
+
+.scheduleDialogEmpty {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.scheduleEmptyActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.scheduleList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scheduleCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(74, 52, 33, 0.12);
+    border-radius: 16px;
+    background: #faf9f7;
+}
+
+:root[data-mode="dark"] .scheduleCard {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.scheduleInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.scheduleCardTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.scheduleMeta {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text);
+}
+
+.scheduleActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filterTriggerBtn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.filterTriggerBtn:hover {
+    border-color: var(--primary);
+    background: var(--hover);
+}
+
+.filterTriggerBtnActive {
+    border-color: color-mix(in srgb, var(--primary) 72%, var(--border));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+/* Filter badge count */
+.filterBadge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: #5D4037;
+    color: #FAF9F6;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+}
+
+.filterWrap {
+    position: relative;
+}
+
+.filterPopup {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 500;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+    padding: 12px;
+    min-width: 240px;
+    max-width: 300px;
+}
+
+.filterPopupHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.filterPopupTitle {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+}
+
+.filterManageBtn {
+    background: none;
+    border: none;
+    font-size: 0.72rem;
+    color: var(--primary);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    padding: 0;
+    transition: opacity 0.12s;
+}
+
+.filterManageBtn:hover {
+    opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+    .scheduleCard {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .scheduleActions {
+        justify-content: stretch;
+    }
+}

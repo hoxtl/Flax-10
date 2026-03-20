@@ -1,6 +1,10 @@
+/*
+ * AddCollaboratorModal lets society admins add collaborators to a society.
+ */
 import { useState } from "react";
 import Badge from "../common/Badge/Badge";
 import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../common/SearchEmptyState/SearchEmptyState";
 import StandardModal from "../common/StandardModal/StandardModal";
 import UserSearch from "../Social/UserSearch";
 import styles from "./AddCollaboratorModal.module.css";
@@ -20,12 +24,30 @@ const useCollabState = (onAdd, onClose, existing) => {
 
 export default function AddCollaboratorModal({ onClose, onAdd, existingUsernames = [] }) {
     const { selected, handleAdd, filter, onSelect, onRemove } = useCollabState(onAdd, onClose, existingUsernames);
+    const renderEmptyState = ({ query, clear }) => (
+        <div className={styles.dropdownEmptyState}>
+            <SearchEmptyState
+                query={query}
+                itemLabel="users"
+                title="No users found"
+                hint="Try a different name or filter."
+                onClear={clear}
+            />
+        </div>
+    );
 
     return (
         <StandardModal title="Add Collaborators" onClose={onClose} size="sm" modalClassName={styles.modalShell}
             contentClassName={styles.modalContent}>
             <div className={styles.searchContainer}>
-                <UserSearch onUserSelect={onSelect} filterUsers={filter} fullWidth hideFilter compact />
+                <UserSearch
+                    onUserSelect={onSelect}
+                    filterUsers={filter}
+                    fullWidth
+                    hideFilter
+                    compact
+                    renderEmptyState={renderEmptyState}
+                />
                 <SelectedUsers users={selected} onRemove={onRemove} />
             </div>
             <ModalFooter onC={onClose} onA={handleAdd} dis={selected.length === 0} />
@@ -54,8 +76,8 @@ function UserChip({ user, onRemove }) {
 function ModalFooter({ onC, onA, dis }) {
     return (
         <div className={styles.footer}>
-            <PrimaryButton className={styles.cancelBtn} variant="ghost" pill onClick={onC}>Cancel</PrimaryButton>
-            <PrimaryButton className={styles.addBtn} pill onClick={onA} disabled={dis}>Add</PrimaryButton>
+            <PrimaryButton className={styles.footerBtn} variant="ghost" size="small" pill onClick={onC}>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.footerBtn} size="small" pill onClick={onA} disabled={dis}>Add</PrimaryButton>
         </div>
     );
 }

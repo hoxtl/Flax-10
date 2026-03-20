@@ -1,12 +1,12 @@
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
-import { usePagination } from '../../../hooks/usePagination';
-import { EventRow } from './EventRow';
+import { EventRow, ConflictRow } from './EventRow';
+import { isAllDay } from '../utils/eventUtils';
 import { Pagination, BackToTop } from '../../Pagination/Pagination';
 import { getEffectiveTagName, sortByStartTime } from '../utils/eventUtils';
 import styles from './ListView.module.css';
 
-const PAGE_SIZE = 10;
+const DAYS_PER_PAGE = 5;
 const SCROLL_SELECTOR = '[data-list-view]';
 
 function getDateKey(event) {
@@ -43,12 +43,12 @@ function getTodayKey() {
     return new Date().toISOString().split('T')[0];
 }
 
-function getInitialPage(events, viewMode) {
-    if (!events.length || viewMode === 'day') return 1;
+function getInitialDayPage(dateKeys) {
+    if (!dateKeys.length) return 1;
     const todayKey = getTodayKey();
-    const index = events.findIndex(e => getDateKey(e) === todayKey);
-    if (index === -1) return 1;
-    return Math.floor(index / PAGE_SIZE) + 1;
+    const dayIndex = dateKeys.indexOf(todayKey);
+    if (dayIndex === -1) return 1;
+    return Math.floor(dayIndex / DAYS_PER_PAGE) + 1;
 }
 
 function shouldScrollToToday(viewMode, events) {
@@ -57,15 +57,15 @@ function shouldScrollToToday(viewMode, events) {
     return events.some(e => getDateKey(e) === todayKey);
 }
 
-function useInitialPageForToday(viewMode, events, setPage) {
+function useInitialPageForToday(viewMode, dateKeys, setPage) {
     const lastModeRef = useRef(null);
     useEffect(() => {
-        if (viewMode === 'day' || !events.length) return;
+        if (viewMode === 'day' || viewMode === 'week' || !dateKeys.length) return;
         const previous = lastModeRef.current;
         lastModeRef.current = viewMode;
         if (previous === viewMode) return;
-        setPage(getInitialPage(events, viewMode));
-    }, [viewMode, events, setPage]);
+        setPage(getInitialDayPage(dateKeys));
+    }, [viewMode, dateKeys, setPage]);
 }
 
 function useAutoScrollToToday(viewMode, currentPage, events) {
@@ -153,10 +153,46 @@ function GroupedEventsList({ events }) {
     return keys.map(key => <DateGroup key={key} dateKey={key} events={groups.get(key)} />);
 }
 
+/**
+ * Groups sorted events into buckets where overlapping timed events
+ * are in the same bucket (to be shown side by side).
+ * All-day events are always their own single-item bucket.
+ */
+function groupOverlappingEvents(events) {
+    const result = [];
+    let group = [];
+    let maxEnd = null;
+
+    for (const event of events) {
+        if (isAllDay(event)) {
+            if (group.length) { result.push(group); group = []; maxEnd = null; }
+            result.push([event]);
+            continue;
+        }
+        const start = new Date(event.start_time);
+        const end = new Date(event.end_time);
+        if (!maxEnd || start >= maxEnd) {
+            if (group.length) result.push(group);
+            group = [event];
+            maxEnd = end;
+        } else {
+            group.push(event);
+            if (end > maxEnd) maxEnd = end;
+        }
+    }
+    if (group.length) result.push(group);
+    return result;
+}
+
 function FlatEventsList({ events }) {
+    const groups = useMemo(() => groupOverlappingEvents(events), [events]);
     return (
         <div className={styles.flatList}>
-            {events.map(event => <EventRow key={event.id} event={event} />)}
+            {groups.map((group, i) =>
+                group.length > 1
+                    ? <ConflictRow key={i} events={group} />
+                    : <EventRow key={group[0].id} event={group[0]} />
+            )}
         </div>
     );
 }
@@ -165,14 +201,37 @@ function EmptyState() {
     return <div className={styles.emptyState}><p>No events to display</p></div>;
 }
 
+function useDayPagination(sortedEvents, daysPerPage) {
+    const [currentPage, setPageInternal] = useState(1);
+    const { groups, keys } = useMemo(() => groupEventsByDate(sortedEvents), [sortedEvents]);
+    const totalPages = Math.max(1, Math.ceil(keys.length / daysPerPage));
+    const safePage = Math.min(currentPage, totalPages);
+
+    const currentItems = useMemo(() => {
+        const startDay = (safePage - 1) * daysPerPage;
+        const pageKeys = keys.slice(startDay, startDay + daysPerPage);
+        return pageKeys.flatMap(key => groups.get(key));
+    }, [groups, keys, safePage, daysPerPage]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) setPageInternal(1);
+    }, [totalPages, currentPage]);
+
+    const setPage = useCallback((page) => {
+        setPageInternal(Math.max(1, Math.min(page, totalPages)));
+    }, [totalPages]);
+
+    return { currentItems, totalPages, currentPage: safePage, setPage, dateKeys: keys };
+}
+
 function useListViewState(propDate, propEvents) {
     const data = useCalendarData({ selectedDate: propDate, events: propEvents });
     const sortedEvents = useMemo(
         () => sortByStartTime(data.events || []),
         [data.events]
     );
-    const pagination = usePagination(sortedEvents, PAGE_SIZE);
-    useInitialPageForToday(data.viewMode, sortedEvents, pagination.setPage);
+    const pagination = useDayPagination(sortedEvents, DAYS_PER_PAGE);
+    useInitialPageForToday(data.viewMode, pagination.dateKeys, pagination.setPage);
     useAutoScrollToToday(data.viewMode, pagination.currentPage, pagination.currentItems);
     return { ...data, sortedEvents, ...pagination };
 }
@@ -183,21 +242,26 @@ function useListViewState(propDate, propEvents) {
 export function ListView({ selectedDate: propDate, events: propEvents }) {
     const state = useListViewState(propDate, propEvents);
     if (!state.sortedEvents.length) return <EmptyState />;
-    const showGrouped = state.viewMode !== 'day';
-    const body = showGrouped
-        ? <GroupedEventsList events={state.currentItems} />
-        : <FlatEventsList events={state.currentItems} />;
+    const isDay = state.viewMode === 'day';
+    const isWeek = state.viewMode === 'week';
+    const showAllEvents = isDay || isWeek;
+    const items = showAllEvents ? state.sortedEvents : state.currentItems;
+    const body = isDay
+        ? <FlatEventsList events={items} />
+        : <GroupedEventsList events={items} />;
     return (
         <div data-list-view className={styles.container}>
             <div className={styles.listCard}>
                 {body}
             </div>
-            <Pagination
-                currentPage={state.currentPage}
-                totalPages={state.totalPages}
-                onPageChange={state.setPage}
-            />
-            <BackToTop containerSelector={SCROLL_SELECTOR} />
+            {!showAllEvents && (
+                <Pagination
+                    currentPage={state.currentPage}
+                    totalPages={state.totalPages}
+                    onPageChange={state.setPage}
+                />
+            )}
+            {!showAllEvents && <BackToTop containerSelector={SCROLL_SELECTOR} />}
         </div>
     );
 }

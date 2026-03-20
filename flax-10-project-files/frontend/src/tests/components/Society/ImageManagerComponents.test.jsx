@@ -66,12 +66,16 @@ describe('ImageManagerComponents', () => {
 
     const { container } = render(<AddImageView onClose={onClose} onAdd={onAdd} availablePhotos={[]} />);
 
-    const fileInput = container.querySelector('input[type="file"]');
+    // StandardModal renders via portal, so the input lives under document.body.
+    const fileInput = document.body.querySelector('input[type="file"]');
+    expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, { target: { files: [new File(['x'], 'upload.png', { type: 'image/png' })] } });
 
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith('data:upload.png'));
 
-    fireEvent.mouseDown(container.firstChild);
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -82,7 +86,10 @@ describe('ImageManagerComponents', () => {
     const { container } = render(<AddImageView onClose={onClose} onAdd={onAdd} availablePhotos={['a.jpg', 'b.jpg']} />);
 
     fireEvent.click(screen.getByText('From Photos'));
-    const photoCards = Array.from(container.querySelectorAll('div')).filter((node) => node.style.backgroundImage.includes('b.jpg'));
+    const photoCards = Array.from(document.body.querySelectorAll('div')).filter((node) =>
+      node.style.backgroundImage && node.style.backgroundImage.includes('b.jpg')
+    );
+    expect(photoCards.length).toBeGreaterThan(0);
     fireEvent.click(photoCards[0]);
     fireEvent.click(screen.getByText('Add Selected'));
 
@@ -106,7 +113,8 @@ describe('ImageManagerComponents', () => {
   it('performUpload handles empty file gracefully', async () => {
     const onAdd = vi.fn();
     const { container } = render(<AddImageView onClose={vi.fn()} onAdd={onAdd} availablePhotos={[]} />);
-    const fileInput = container.querySelector('input[type="file"]');
+    const fileInput = document.body.querySelector('input[type="file"]');
+    expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, { target: { files: [] } });
     expect(onAdd).not.toHaveBeenCalled();
   });

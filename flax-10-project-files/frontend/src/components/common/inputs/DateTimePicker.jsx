@@ -186,12 +186,12 @@ function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly, setOp
       <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(hour)} onChange={v => changeHour(Number(v))}
-          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd} />
+          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd} menuMaxHeight={180} allowFlipUpward />
       </div>
       <span className={styles.timeSep}>:</span>
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(minute)} onChange={v => changeMinute(Number(v))}
-          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd} />
+          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd} menuMaxHeight={180} allowFlipUpward />
       </div>
       <button type="button" className={styles.doneBtn} onClick={() => setOpen(false)}>Done</button>
     </div>
@@ -204,16 +204,16 @@ function useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos) {
     const rect = ref.current.getBoundingClientRect();
     const gap = 6;
     const dropdownHeight = getDropdownHeight(timeOnly, dateOnly);
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
-    setDropdownPos({ top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap, left: rect.left });
+    const maxTop = window.innerHeight - dropdownHeight - gap;
+    const top = Math.min(rect.bottom + gap, maxTop);
+    setDropdownPos({ top, left: rect.left });
   }, [open, timeOnly, dateOnly, ref, setDropdownPos]);
 }
 
 function getDropdownHeight(timeOnly, dateOnly) {
-  if (timeOnly) return 130;
-  if (dateOnly) return 280;
-  return 320;
+  if (timeOnly) return 90;
+  if (dateOnly) return 290;
+  return 330;
 }
 
 function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM) {

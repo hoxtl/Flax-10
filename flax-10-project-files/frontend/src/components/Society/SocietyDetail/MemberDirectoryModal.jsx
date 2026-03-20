@@ -32,15 +32,18 @@ function RemoveButton({ member, onRemove }) {
 }
 
 function useMemberDirectory(members, onFetchMembers, searchQuery) {
-    const [loading, setLoading] = useState(!members || members.length === 0);
+    const [hasLoaded, setHasLoaded] = useState(Boolean(members?.length) || !onFetchMembers);
     useEffect(() => {
         if (!onFetchMembers) return;
-        setLoading(true);
-        onFetchMembers().finally(() => setLoading(false));
+        let active = true;
+        onFetchMembers().finally(() => {
+            if (active) setHasLoaded(true);
+        });
+        return () => { active = false; };
     }, [onFetchMembers]);
     const baseFiltered = useSearchFilter(members || [], searchQuery, ['username', 'name']);
     const displayMembers = useMemo(() => sortByRole(baseFiltered), [baseFiltered]);
-    return { loading, displayMembers };
+    return { loading: !hasLoaded && !members?.length, displayMembers };
 }
 
 function sortByRole(members) {

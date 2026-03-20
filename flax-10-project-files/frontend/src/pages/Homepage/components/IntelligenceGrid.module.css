@@ -68,6 +68,14 @@
   flex-direction: column;
 }
 
+.afterHeroBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: -4px;
+  margin-bottom: 2px;
+}
+
 .delBtn {
   position: absolute;
   top: -8px;
@@ -147,7 +155,7 @@
 .addSheetBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 10020;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -156,8 +164,9 @@
 .addSheetOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(40, 32, 26, 0.4);
-  backdrop-filter: blur(2px);
+  background: rgba(20, 14, 8, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .addSheet {
@@ -165,8 +174,10 @@
   background: var(--color-card);
   border-radius: 20px 20px 0 0;
   width: 100%;
-  max-width: 820px;
-  padding: 28px 28px 48px;
+  max-width: 760px;
+  max-height: min(82vh, 700px);
+  padding: 20px 22px 30px;
+  overflow-y: auto;
   box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.14);
   animation: slideUp 0.3s ease-out;
 }
@@ -181,38 +192,58 @@
   height: 4px;
   border-radius: 2px;
   background: var(--color-border-base);
-  margin: 0 auto 22px;
+  margin: 0 auto 14px;
 }
 
 .addSheetTitle {
   font-family: var(--font-heading);
-  font-size: 24px;
+  font-size: 20px;
   color: var(--text-charcoal);
   margin-bottom: 4px;
 }
 
 .addSheetSubtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted-sage);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+}
+
+.addSections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addSectionTitle {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted-sage);
 }
 
 .addOptionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
 }
 
 .addOptionCard {
   background: var(--widget-surface);
   border: 1.5px solid var(--color-border-base);
-  border-radius: 14px;
-  padding: 16px 18px;
+  border-radius: 12px;
+  padding: 12px 14px;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .addOptionCard:hover {
@@ -222,7 +253,7 @@
 }
 
 .addOptionIcon {
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .addOptionInfo {
@@ -232,12 +263,14 @@
 
 .addOptionLabel {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
   color: var(--text-charcoal);
 }
 
 .addOptionMeta {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted-sage);
-  margin-top: 2px;
+  margin-top: 1px;
 }

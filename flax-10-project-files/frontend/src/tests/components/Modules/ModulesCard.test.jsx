@@ -1,15 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModulesCard from '../../../components/Modules/ModulesCard';
+import ModulesCard from '../../../components/Modules/Modules/ModulesCard';
 
 vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
     formatWeekdayTime: vi.fn(() => 'Mondays at 09:00'),
+    formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
     getDepartment: vi.fn(() => "King's College London"),
+    getCourse: vi.fn(() => null),
 }));
 
-vi.mock('../../../components/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+vi.mock('../../../components/Modules/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
 
 const module = {
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -26,8 +28,8 @@ const mockParameters = {
 describe('ModulesCard', () => {
     it('should render module name and code', () => {
         render(<ModulesCard {...mockParameters} />);
-        expect(screen.getByText('5CCS2SEG')).toBeInTheDocument();
-        expect(screen.getByText('Software Engineering')).toBeInTheDocument();
+        expect(screen.getByText(/5CCS2SEG/)).toBeInTheDocument();
+        expect(screen.getByText(/Software Engineering/)).toBeInTheDocument();
     });
 
     it('should render enroll button for student', () => {
@@ -52,7 +54,8 @@ describe('ModulesCard', () => {
     it('should call onViewModule when card is clicked by student', () => {
         const onViewModule = vi.fn();
         render(<ModulesCard {...mockParameters} onViewModule={onViewModule} />);
-        fireEvent.click(screen.getByRole('article'));
+        const title = screen.getByRole('heading', { level: 3, name: /Software Engineering/i });
+        fireEvent.click(title.closest('div'));
         expect(onViewModule).toHaveBeenCalled();
     });
 
@@ -91,14 +94,28 @@ describe('ModulesCard', () => {
         expect(screen.getByText('📌 Core module')).toBeInTheDocument();
     });
 
-    it('shows Read more for long description', () => {
+    it('renders long description text directly', () => {
         render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
-        expect(screen.getByText('Read more')).toBeInTheDocument();
+        expect(screen.getByText(/A{20}/)).toBeInTheDocument();
     });
 
-    it('toggles Show less after Read more', () => {
-        render(<ModulesCard {...mockParameters} module={{ ...module, description: 'A'.repeat(200) }} />);
-        fireEvent.click(screen.getByText('Read more'));
-        expect(screen.getByText('Show less')).toBeInTheDocument();
+    it('should render readings button for teacher', () => {
+        render(<ModulesCard {...mockParameters} isTeacher={true} />);
+        expect(screen.getByText('Readings')).toBeInTheDocument();
     });
+
+    it('shows assignment count pill from module deadlines when browsing', () => {
+        render(<ModulesCard {...mockParameters} module={{ ...module, deadlines: [{ id: 1 }, { id: 2 }] }} />);
+        expect(
+            screen.getByText((_, node) => node?.tagName === 'SPAN' && (node.textContent?.includes('2 assignments') ?? false))
+        ).toBeInTheDocument();
+    });
+
+    it('should call onDelete when delete is clicked', () => {
+        const onManageReadings = vi.fn();
+        render(<ModulesCard {...mockParameters} isTeacher={true} onManageReadings={onManageReadings} />);
+        fireEvent.click(screen.getByText('Readings'));
+        expect(onManageReadings).toHaveBeenCalled();
+    });
+
 });

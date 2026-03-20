@@ -40,25 +40,33 @@ class TaskSerialiser(serializers.ModelSerializer):
     """Serialiser for individual tasks with related field summaries."""
 
     module_code = serializers.SerializerMethodField()
+    module_name = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
     reading_id = serializers.SerializerMethodField()
     reading_page_count = serializers.SerializerMethodField()
+    reading_chapter = serializers.SerializerMethodField()
+    reading_start_page = serializers.SerializerMethodField()
+    reading_end_page = serializers.SerializerMethodField()
     group_project_name = serializers.SerializerMethodField()
     assignees_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
         fields = [
-            'id', 'task_list', 'list_name', 'module', 'module_code',
+            'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',
             'group_project', 'group_project_name', 'assigned_to', 'assignees_info',
             'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
             'estimated_blocks', 'completed_blocks', 'page_count', 'reading_id',
-            'reading_page_count', 'created_at', 'updated_at'
+            'reading_page_count', 'reading_chapter', 'reading_start_page',
+            'reading_end_page', 'created_at', 'updated_at'
         ]
 
     def get_module_code(self, obj):
         return obj.module.module_code if obj.module else None
+
+    def get_module_name(self, obj):
+        return obj.module.module_name if obj.module else None
 
     def get_list_name(self, obj):
         return obj.task_list.name if obj.task_list else None
@@ -68,6 +76,15 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def get_reading_page_count(self, obj):
         return obj.reading.page_count() if obj.reading_id else None
+
+    def get_reading_chapter(self, obj):
+        return obj.reading.chapter if obj.reading_id and obj.reading else None
+
+    def get_reading_start_page(self, obj):
+        return obj.reading.start_page if obj.reading_id and obj.reading else None
+
+    def get_reading_end_page(self, obj):
+        return obj.reading.end_page if obj.reading_id and obj.reading else None
 
     def get_group_project_name(self, obj):
         return obj.group_project.name if obj.group_project else None

@@ -1,4 +1,6 @@
-/** Single responsibility: persist which event IDs we have already prompted for. */
+/*
+ * Attendance prompt storage.
+ */
 
 const PROMPTED_KEY = "flax_attendance_prompted_ids";
 
@@ -12,7 +14,7 @@ export function getPromptedIds() {
 }
 
 export function setPromptedId(eventId) {
-  const set = getPromptedIds();
-  set.add(eventId);
-  localStorage.setItem(PROMPTED_KEY, JSON.stringify([...set]));
+  const ids = getPromptedIds();
+  ids.add(eventId);
+  localStorage.setItem(PROMPTED_KEY, JSON.stringify([...ids]));
 }

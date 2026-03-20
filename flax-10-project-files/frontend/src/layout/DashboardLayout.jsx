@@ -14,8 +14,8 @@ import { clearUserData } from "../components/Authentication/utils/authHelpers";
 import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
 import CreateSocietyModal from "../components/Society/CreateSocietyModal";
-import DeadlineModal from "../components/Modules/DeadlineModal";
-import ReadingModal from "../components/Modules/ReadingModal";
+import DeadlineModal from "../components/Modules/Deadlines/DeadlineModal";
+import ReadingModal from "../components/Modules/Readings/ReadingModal";
 import { createSociety } from "../api/societyApi";
 import { createTask, fetchTaskLists } from "../api/taskService";
 import { getModules, getEnrollments } from "../api/moduleApi";
@@ -102,6 +102,7 @@ function MainArea({
         {!isMobile && (
           <TopBar
             user={user}
+            onAddClick={onQuickAdd}
             onSettingsClick={onSettingsClick}
             onLogoutClick={onLogoutClick}
             onProfileClick={onProfileClick}
@@ -116,13 +117,14 @@ function MainArea({
   );
 }
 
-function QuickAddGate({ open, onClose, onSelectType, isTeacher }) {
+function QuickAddGate({ open, onClose, onSelectType, isTeacher, initialView }) {
   if (!open) return null;
   return (
     <QuickAddModal
       onClose={onClose}
       onSelectType={onSelectType}
       isTeacher={isTeacher}
+      initialView={initialView}
     />
   );
 }
@@ -155,7 +157,19 @@ function useModalStates() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [deadlineModule, setDeadlineModule] = useState(null);
   const [readingModule, setReadingModule] = useState(null);
-  return { showQuickAdd, setShowQuickAdd, showSocietyModal, setShowSocietyModal, showTaskModal, setShowTaskModal, deadlineModule, setDeadlineModule, readingModule, setReadingModule };
+  const [quickAddInitialView, setQuickAddInitialView] = useState('type');
+  return { showQuickAdd,
+          setShowQuickAdd,
+          showSocietyModal,
+          setShowSocietyModal,
+          showTaskModal,
+          setShowTaskModal,
+          deadlineModule,
+          setDeadlineModule,
+          readingModule,
+          setReadingModule,
+          quickAddInitialView,
+          setQuickAddInitialView };
 }
 
 function useTimerNav(activeNav, onNavChange, t) {
@@ -181,9 +195,21 @@ function useDashboardState(activeNav, onNavChange) {
   const t = useTimerContext();
   const { pendingNav, setPendingNav, handleNavChange } = useTimerNav(activeNav, onNavChange, t);
 
+  useEffect(() => {
+      const openQuickAdd = (event) => {
+        const nextView = event?.detail?.view || 'type';
+        modals.setQuickAddInitialView(nextView);
+        modals.setShowQuickAdd(true);
+      };
+
+      window.addEventListener('quick-add:open', openQuickAdd);
+      return () => window.removeEventListener('quick-add:open', openQuickAdd);
+    }, [modals.setQuickAddInitialView, modals.setShowQuickAdd]);
+
   const onPickNav = (id) => { handleNavChange(id); setMobileSidebarOpen(false); };
   const onSelectType = (id, extra) => {
     modals.setShowQuickAdd(false);
+    modals.setQuickAddInitialView('type');
     if (id === 'society') modals.setShowSocietyModal(true);
     else if (id === 'task') modals.setShowTaskModal(true);
     else if (id === 'create_module') onPickNav('modules_create');
@@ -281,9 +307,13 @@ function DashboardModals({ state }) {
     <>
       <QuickAddGate
         open={state.showQuickAdd}
-        onClose={() => state.setShowQuickAdd(false)}
+        onClose={() => {
+          state.setShowQuickAdd(false);
+          state.setQuickAddInitialView('type');
+        }}
         onSelectType={state.onSelectType}
         isTeacher={state.user?.role === "teacher"}
+        initialView={state.quickAddInitialView}
       />
       <EventModalGate modal={state.modal} />
       {state.showSocietyModal && (
@@ -326,6 +356,7 @@ function DashboardMain({ state, onNavChange, children }) {
     t,
     setPendingNav,
     setShowTaskModal,
+    setQuickAddInitialView,
   } = state;
   return (
     <>
@@ -335,6 +366,7 @@ function DashboardMain({ state, onNavChange, children }) {
           if (activeNav === "timer" && t.isActive && !t.isPaused) {
             setPendingNav("QUICK_ADD");
           } else {
+            setQuickAddInitialView('type');
             setShowQuickAdd(true);
           }
         }}
@@ -369,13 +401,33 @@ function LeaveTimerActions({ pendingNav, setPendingNav, t, setShowQuickAdd, onNa
     handlePendingAction(pendingNav, setShowQuickAdd, onNavChange);
     setPendingNav(null);
   };
+  const onTakeBreak = () => {
+    const breakSeconds = 5 * 60;
+    t.setMode('break');
+    t.setTimeLeft(breakSeconds);
+    t.setIsActive(true);
+    setPendingNav(null);
+  };
   const onExit = () => {
     t.setIsActive(false);
     t.resetTimer();
     handlePendingAction(pendingNav, setShowQuickAdd, onNavChange);
     setPendingNav(null);
   };
-  return <LeaveTimerModal onCancel={() => setPendingNav(null)} onPause={onPause} onExit={onExit} />;
+  const sessionTotalSeconds = Math.max(
+    60,
+    Number((t.mode === 'break' ? t.breakTime : t.workTime) || 25) * 60
+  );
+  return (
+    <LeaveTimerModal
+      onCancel={() => setPendingNav(null)}
+      onPause={onPause}
+      onExit={onExit}
+      onTakeBreak={onTakeBreak}
+      timeLeftSeconds={Math.max(0, Number(t.timeLeft || 0))}
+      sessionTotalSeconds={sessionTotalSeconds}
+    />
+  );
 }
 
 function shouldShowBackToTop(activeNav) {

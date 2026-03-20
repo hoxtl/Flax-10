@@ -19,12 +19,37 @@ import toolbarStyles from "./TaskFeedToolbar.module.css";
 import sectionStyles from "./TaskFeedSections.module.css";
 
 import useTaskFeedData from "../hooks/useTaskFeedData";
-import { isReadingList } from "../hooks/useCreateTaskBar";
 import SuggestedReadingsSection from "./SuggestedReadingsSection";
 import MobileTaskListsModal from "./MobileTaskListsModal";
+import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
 
 const styles = { ...layoutStyles, ...toolbarStyles, ...sectionStyles };
 const SECTION_SHOW_LIMIT = 8;
+const genericTaskFeedSubtitle = (
+  <>
+    Plan and track your <em>urgent tasks</em>, <em>coursework</em>,{" "}
+    <em>admin</em>, and <em>life</em>.
+  </>
+);
+
+function getTaskFeedSubtitle(activeList, readingList) {
+  if (!readingList || !activeList) {
+    return genericTaskFeedSubtitle;
+  }
+
+  const parsed = parseReadingListName(activeList.name);
+  const moduleLabel =
+    parsed.moduleName && parsed.moduleCode
+      ? `${parsed.moduleName} (${parsed.moduleCode})`
+      : parsed.moduleName || parsed.moduleCode || "this module";
+
+  return (
+    <>
+      Keep your <em>{moduleLabel}</em> readings, <em>lecture notes</em>,{" "}
+      <em>past papers</em>, and <em>revision prep</em> in one place.
+    </>
+  );
+}
 
 const MOBILE_VIEW_OPTIONS = [
   { value: "all", label: "All tasks" },
@@ -246,7 +271,12 @@ function AllTasksSection({ data, activeFilter, sectionPropsWithHandlers }) {
       sectionType="all"
       completedCount={data.completed.length}
       applyLimit={data.allTasksCombined.length > SECTION_SHOW_LIMIT}
-      emptyMessage="No tasks yet. Add one above or use Full Planning."
+      emptyCardProps={data.allTasksEmptyCardProps}
+      emptyMessage={
+        data.allTasksEmptyCardProps
+          ? null
+          : "No tasks yet. Add one above or use Full Planning."
+      }
       {...sectionPropsWithHandlers}
     />
   );
@@ -283,6 +313,7 @@ function TaskFeedSections({
   onDeleteTask,
   onEditTask,
   readingList,
+  activeList,
   onTaskAdded,
   taskCount,
 }) {
@@ -293,50 +324,57 @@ function TaskFeedSections({
         key={`sections-${activeListId ?? "all"}`}
       >
         <SearchEmptyBlock data={data} />
-        <OverdueTodaySection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        <TodaySection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        <OverdueFilterSection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        <ThisWeekSection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        <LaterSection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        <AllTasksSection
-          data={data}
-          activeFilter={activeFilter}
-          sectionPropsWithHandlers={sectionPropsWithHandlers}
-        />
-        {readingList && (
-          <SuggestedReadingsSection
-            key={activeListId}
-            onTaskAdded={onTaskAdded}
-            taskCount={taskCount}
-          />
+        {data.showSearchEmptyState ? null : (
+          <>
+            <OverdueTodaySection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            <TodaySection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            <OverdueFilterSection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            <ThisWeekSection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            <LaterSection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            <AllTasksSection
+              data={data}
+              activeFilter={activeFilter}
+              sectionPropsWithHandlers={sectionPropsWithHandlers}
+            />
+            {readingList && !data.search.trim() && (
+              <SuggestedReadingsSection
+                key={activeListId}
+                activeList={activeList}
+                onTaskAdded={onTaskAdded}
+                taskCount={taskCount}
+                pendingTasks={data.pending}
+                completedTasks={data.completed}
+              />
+            )}
+            <CompletedBlock
+              data={data}
+              lists={lists}
+              onToggleComplete={onToggleComplete}
+              onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
+            />
+          </>
         )}
-        <CompletedBlock
-          data={data}
-          lists={lists}
-          onToggleComplete={onToggleComplete}
-          onDeleteTask={onDeleteTask}
-          onEditTask={onEditTask}
-        />
       </div>
     </div>
   );
@@ -372,17 +410,18 @@ export default function TaskFeed(props) {
   const modalTasks = sidebarProps.tasks || props.tasks || [];
   const handleOpenLists = () => setShowMobileLists(true);
 
-  const pageSubtitle = useMemo(
-    () =>
-      isMobile
-        ? ""
-        : "Plan coursework, deadlines, and day-to-day admin in one place.",
-    [isMobile],
+  const taskFeedSubtitle = useMemo(
+    () => (isMobile ? "" : getTaskFeedSubtitle(activeList, readingList)),
+    [isMobile, activeList, readingList],
   );
 
   return (
     <div className={styles.feed}>
-      <PageHeader title={data.headerTitle} subtitle={pageSubtitle} compact />
+      <PageHeader
+        title={data.headerTitle}
+        subtitle={taskFeedSubtitle}
+        compact
+      />
       <TaskFeedSubHeader
         data={data}
         lists={props.lists}
@@ -406,6 +445,7 @@ export default function TaskFeed(props) {
         onDeleteTask={props.onDeleteTask}
         onEditTask={props.onEditTask}
         readingList={readingList}
+        activeList={activeList}
         onTaskAdded={props.onReloadTasks}
         taskCount={props.tasks?.length}
       />

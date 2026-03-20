@@ -4,6 +4,7 @@
  */
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
+import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
 
 /** Top-level modal content that selects the appropriate view and stops click propagation. */
 export function ModalContent(props) {
@@ -63,17 +64,16 @@ function SleepWarningBody({ settings }) {
 }
 
 function SleepWarningView({ settings, onCancel, onConfirm }) {
+    const sleepStr = formatTime(settings?.sleepTime);
+    const wakeStr = formatTime(settings?.wakeTime);
     return (
-        <div className="overlap-warning">
-            <div className="modal-header">
-                <h3>Sleep Hours</h3>
-                <button className="close-btn" onClick={onCancel}>x</button>
-            </div>
-            <SleepWarningBody settings={settings} />
-            <div className="modal-actions">
-                <button className="btn-secondary" onClick={onCancel}>Cancel</button>
-                <button className="btn-primary" onClick={onConfirm}>Add Anyway</button>
-            </div>
-        </div>
+        <ConfirmModal
+            title="You should be resting!"
+            message={<>Your sleep schedule is <strong>{sleepStr}</strong> to <strong>{wakeStr}</strong>. This event falls during your rest time. Are you sure you want to schedule something at this hour?</>}
+            cancelText="Cancel — I'll rest"
+            confirmText="Add Anyway"
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+        />
     );
 }

@@ -1,24 +1,44 @@
+import { useState } from 'react';
 import { useTags } from '../../../../context/TagContext';
-import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import { TagsSelector } from '../../../common/TagsSelector/TagsSelector';
+import TagManagerModal from '../../../Tags/TagManagerModal';
 
 export function TagField({ value, onChange, customTags }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;
+    const [showManager, setShowManager] = useState(false);
     const uniqueTags = Array.from(
         new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
     );
-    const options = uniqueTags.map(tag => ({ value: tag.id, label: tag.label }));
+
+    const selectedTags = uniqueTags.filter(t => String(t.id) === String(value));
+
+    const handleSelectionChange = (newSelection) => {
+        if (newSelection.length === 0) {
+            onChange({ target: { value: '' } });
+        } else {
+            const last = newSelection[newSelection.length - 1];
+            onChange({ target: { value: last.id } });
+        }
+    };
 
     return (
-        <div className="form-field">
-            <label htmlFor="field-tag">Type</label>
-            <AnimatedDropdown
-                value={value || ''}
-                onChange={(val) => onChange({ target: { value: val } })}
-                options={options}
-                placeholder="Select type"
-                align="left"
-            />
-        </div>
+        <>
+            <div className="form-field">
+                <div className="tag-field-header">
+                    <label>Type</label>
+                    <button type="button" className="tag-manage-btn" onClick={() => setShowManager(true)}>
+                        Manage tags…
+                    </button>
+                </div>
+                <TagsSelector
+                    tags={uniqueTags}
+                    selectedTags={selectedTags}
+                    onSelectionChange={handleSelectionChange}
+                    emptyHint="Select event type…"
+                />
+            </div>
+            {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
+        </>
     );
 }

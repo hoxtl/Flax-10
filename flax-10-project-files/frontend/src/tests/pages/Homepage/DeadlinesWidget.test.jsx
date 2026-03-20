@@ -19,6 +19,9 @@ vi.mock('framer-motion', () => ({
 vi.mock('lucide-react', () => ({
     AlertCircle: () => <svg />,
     ArrowRight: () => <svg />,
+    ChevronDown: () => <svg />,
+    ChevronUp: () => <svg />,
+    Clock: () => <svg />,
 }));
 
 import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
@@ -36,9 +39,9 @@ const mockDeadlines = [
 ];
 
 describe('DeadlinesWidget', () => {
-    it('renders Deadlines header', () => {
+    it('renders Upcoming Deadlines header', () => {
         render(<DeadlinesWidget deadlines={mockDeadlines} />);
-        expect(screen.getByText('Deadlines')).toBeTruthy();
+        expect(screen.getByText('Upcoming Deadlines')).toBeTruthy();
     });
 
     it('renders empty state when no deadlines', () => {

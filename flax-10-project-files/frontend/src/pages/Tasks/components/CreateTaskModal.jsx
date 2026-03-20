@@ -8,7 +8,7 @@ import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
@@ -45,7 +45,10 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
     <div className={styles.footer}>
       {saveError && <p className={styles.saveError} role="alert">{saveError}</p>}
       {isEditMode && onDeleteTask && (
-        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" onClick={handleDelete} disabled={saving} pill>Delete task</PrimaryButton>
+        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" size="small" onClick={handleDelete} disabled={saving} pill>
+          <Trash2 size={15} strokeWidth={2.1} aria-hidden />
+          Delete task
+        </PrimaryButton>
       )}
       <PrimaryButton type="button" className={styles.cancelBtn} variant="ghost" onClick={onClose} pill>Cancel</PrimaryButton>
       <PrimaryButton type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date} pill>
@@ -58,12 +61,14 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
 function CreateTaskModalTitleDesc({ form, set }) {
   return (
     <div className={styles.canvas}>
-      <FormField htmlFor="create-task-title" label={<>Task name <span className={styles.labelRequired}>*</span></>} className={styles.fieldGroup}>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-title">Task name <span className={styles.labelRequired}>*</span></label>
         <TextInput id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
-      </FormField>
-      <FormField htmlFor="create-task-desc" label="Description" className={styles.fieldGroup}>
-        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
-      </FormField>
+      </div>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-desc">Description <span className={styles.labelOptional}>(optional)</span></label>
+        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Add a description…" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
+      </div>
     </div>
   );
 }

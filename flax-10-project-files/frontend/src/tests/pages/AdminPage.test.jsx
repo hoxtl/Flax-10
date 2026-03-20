@@ -126,11 +126,11 @@ describe("AdminPage – shell", () => {
 
   it("renders all five tab buttons", () => {
     render(<AdminPage />);
-    expect(screen.getByText(/Users/)).toBeTruthy();
-    expect(screen.getByText(/Ratifications/)).toBeTruthy();
-    expect(screen.getByText(/Teacher Requests/)).toBeTruthy();
-    expect(screen.getByText(/Reported Societies/)).toBeTruthy();
-    expect(screen.getByText(/Course Change Requests/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Users/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Ratifications/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Teacher Requests/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Reported Societies/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Course Change Requests/i })).toBeTruthy();
   });
 
   it("shows users tab content by default", async () => {
@@ -194,7 +194,8 @@ describe("AdminPage – Users tab", () => {
     render(<AdminPage />);
     await waitFor(() => screen.getByText("Staff User"));
     expect(screen.queryAllByText("Ban").length).toBe(1);
-    expect(screen.getByText("Staff")).toBeTruthy();
+    // Avoid matching the "Staff" filter pill as well.
+    expect(screen.getByText("Staff User")).toBeTruthy();
   });
 
   it("filters users by search query", async () => {
@@ -292,7 +293,7 @@ describe("AdminPage – Users tab", () => {
     api.fetchAdminUsers.mockRejectedValue(new Error("Network error"));
     render(<AdminPage />);
     await waitFor(() =>
-      expect(screen.getByText(/Failed to load users/i)).toBeTruthy(),
+      expect(screen.getByText(/Network error/i)).toBeTruthy(),
     );
   });
 });

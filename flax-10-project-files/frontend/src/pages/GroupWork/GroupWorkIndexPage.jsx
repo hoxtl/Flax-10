@@ -11,9 +11,15 @@ import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import TextInput from "../../components/common/TextInput/TextInput";
 import styles from "./GroupWorkIndexPage.module.css";
 
+const groupStudySubtitle = (
+  <>
+    Plan <em>shared projects</em>, <em>group deadlines</em>, and <em>module teamwork</em> in one place.
+  </>
+);
+
 function GroupWorkIndexSkeleton() {
   return (
-    <AppPage className={styles.container} data-testid="groupwork-skeleton" aria-busy="true" title="Group work" subtitle="Create shared projects and link them to your modules.">
+    <AppPage className={styles.container} data-testid="groupwork-skeleton" aria-busy="true" title="Group Study" subtitle={groupStudySubtitle}>
       <div className={styles.skeletonHeader}>
         <SkeletonBlock className={styles.skeletonTitle} />
         <SkeletonBlock className={styles.skeletonSubtitle} />
@@ -106,7 +112,7 @@ export default function GroupWorkIndexPage() {
   if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
-    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
+    <AppPage className={styles.container} title="Group Study" subtitle={groupStudySubtitle}>
       <CreateProjectForm onCreated={onCreated} />
       <GroupWorkContent projects={projects} projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} />
     </AppPage>

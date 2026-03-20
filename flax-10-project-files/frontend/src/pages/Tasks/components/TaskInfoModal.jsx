@@ -7,6 +7,7 @@ import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } fro
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
+import { isReadingListName } from "../utils/readingListUtils";
 import styles from "./TaskInfoModal.module.css";
 
 import { useState, useEffect } from "react";
@@ -30,25 +31,52 @@ function InfoHero({ task }) {
   );
 }
 
-function ReadingSpeedRows({ task, speedData }) {
+function getPageRange(task, pageCount) {
+  if (task.reading_start_page && task.reading_end_page) {
+    return `pp. ${task.reading_start_page}–${task.reading_end_page}`;
+  }
+  return pageCount ? `${pageCount} pages` : null;
+}
+
+function ReadingPillRow({ task, speedData, showReadingContext }) {
   const pageCount = task.reading_page_count ?? task.page_count ?? null;
-  if (!pageCount) return null;
+  const pageRange = getPageRange(task, pageCount);
+  const speedText = speedData?.avg_min_per_page ? `${speedData.avg_min_per_page.toFixed(1)} min/page` : null;
+  if (!showReadingContext && !pageCount && !task.reading_chapter) return null;
+  const pills = showReadingContext
+    ? [
+        { label: "Chapter", value: task.reading_chapter || "—" },
+        { label: "Pages", value: pageRange || "—" },
+        { label: "Speed", value: speedText || "—" },
+      ]
+    : [
+        task.reading_chapter ? { label: "Chapter", value: task.reading_chapter } : null,
+        pageRange ? { label: "Pages", value: pageRange } : null,
+        speedText ? { label: "Speed", value: speedText } : null,
+      ].filter(Boolean);
+
+  if (pills.length === 0) return null;
+
   return (
-    <>
-      <InfoRow icon={<BookOpen size={14} strokeWidth={2} />} label="Pages" value={`${pageCount} pages`} full />
-      <InfoRow icon={<Zap size={14} strokeWidth={2} />} label="Reading speed"
-        value={speedData?.is_personalised ? `${speedData.avg_min_per_page.toFixed(1)} min/page` : "Complete a task with the timer to personalise"} full
-      />
-    </>
+    <div className={styles.readingPillRow}>
+      {pills.map((pill) => (
+        <span key={pill.label} className={styles.readingDetailPill}>
+          <span className={styles.readingDetailLabel}>{pill.label}</span>
+          <span className={styles.readingDetailValue}>{pill.value}</span>
+        </span>
+      ))}
+    </div>
   );
 }
 
-function InfoGridSection({ task, listName, dueFormatted, due, speedData }) {
+function InfoGridSection({ task, listName, dueFormatted, due }) {
+  const moduleLabel = task.module_code && task.module_name
+    ? `${task.module_code} — ${task.module_name}`
+    : task.module_code || task.module_name || "—";
   return (
     <div className={styles.infoGrid}>
       <InfoRow icon={<Flag size={14} strokeWidth={2} />} label="Priority" value={PRIORITY_LABELS[task.priority] || task.priority || "—"} />
       <InfoRow icon={<Zap size={14} strokeWidth={2} />} label="Sessions" value={formatFocusBlocks(task.estimated_blocks)} />
-      <ReadingSpeedRows task={task} speedData={speedData} />
       <InfoRow icon={<Clock size={14} strokeWidth={2} />} label="Due date" value={dueFormatted || due?.label || "—"} full />
       {listName && (
         <div className={styles.infoRowFull}>
@@ -56,8 +84,8 @@ function InfoGridSection({ task, listName, dueFormatted, due, speedData }) {
           <span className={styles.infoVal}><span className={styles.infoListDot} />{listName}</span>
         </div>
       )}
-      {task.module_code && (
-        <InfoRow icon={<BookOpen size={14} strokeWidth={2} />} label="Module" value={`${task.module_code}${task.module_name ? ` — ${task.module_name}` : ""}`} full />
+      {(task.module_code || task.module_name) && (
+        <InfoRow icon={<BookOpen size={14} strokeWidth={2} />} label="Module" value={moduleLabel} full />
       )}
     </div>
   );
@@ -68,10 +96,12 @@ function InfoModalBody({ task, listName, speedData }) {
   const dueFormatted = task.due_date
     ? new Date(task.due_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
     : null;
+  const showReadingContext = isReadingListName(listName);
   return (
     <div className={styles.infoModalBody}>
       <InfoHero task={task} />
-      <InfoGridSection task={task} listName={listName} dueFormatted={dueFormatted} due={due} speedData={speedData} />
+      <ReadingPillRow task={task} speedData={speedData} showReadingContext={showReadingContext} />
+      <InfoGridSection task={task} listName={listName} dueFormatted={dueFormatted} due={due} />
     </div>
   );
 }
@@ -103,14 +133,22 @@ function InfoModalFooter({ onClose }) {
 export function TaskInfoModal({ task, listName, onClose }) {
   const [speedData, setSpeedData] = useState(null);
   const pageCount = task.reading_page_count ?? task.page_count ?? null;
+  const showReadingContext = isReadingListName(listName);
 
   useEffect(() => {
-    if (!pageCount) return;
+    if (!pageCount && !showReadingContext) return;
     getReadingSpeed().then(setSpeedData).catch(() => setSpeedData(null));
-  }, [pageCount]);
+  }, [pageCount, showReadingContext]);
 
   return (
-      <StandardModal onClose={onClose} hideHeader size="md" modalClassName={styles.infoModal} contentClassName={styles.infoModalContent}>
+      <StandardModal
+        onClose={onClose}
+        hideHeader
+        size="md"
+        modalClassName={styles.infoModal}
+        contentClassName={styles.infoModalContent}
+        backdropClassName={styles.modalBackdrop}
+      >
         <div className={styles.infoModalAccent} aria-hidden />
         <InfoModalHeader onClose={onClose} />
         <InfoModalBody task={task} listName={listName} speedData={speedData} />

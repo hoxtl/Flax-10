@@ -1,24 +1,10 @@
-import * as Components from "../Authentication/AuthComponents";
+import * as Components from "./AuthComponents";
 
 function SignInFields({ formData, updateField, loading }) {
   return (
     <>
-      <Components.Input
-        type="text"
-        placeholder="Username"
-        value={formData.username}
-        onChange={updateField("username")}
-        required
-        disabled={loading}
-      />
-      <Components.Input
-        type="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={updateField("password")}
-        required
-        disabled={loading}
-      />
+      <Components.Input type="text" placeholder="Username" value={formData.username} onChange={updateField("username")} required disabled={loading} />
+      <Components.Input type="password" placeholder="Password" value={formData.password} onChange={updateField("password")} required disabled={loading} />
     </>
   );
 }

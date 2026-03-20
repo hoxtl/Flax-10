@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -52,6 +53,7 @@ import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import AppToast from "../../components/common/AppToast/AppToast";
 
 function HomepageSkeleton() {
   return (
@@ -536,7 +538,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(now);
     todayEnd.setHours(23, 59, 59, 999);
-    
+
     const filtered = (allTasks || []).filter((t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
       return d && d >= todayStart && d <= todayEnd;
@@ -614,7 +616,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         const due = t.due_date ? new Date(t.due_date) : null;
         let taskWidgetStatus = "upcoming";
         if (t.completed) taskWidgetStatus = "completed";
-        
+
         return {
           type: "task",
           id: `task-${t.id}`,
@@ -730,74 +732,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return null;
   }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
 
-  /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
-  const [replanLoading, setReplanLoading] = useState(false);
-  const handleReplanDay = useCallback(async () => {
-    const missedTasksOnly = missedItems.filter((item) => !isRoutineEvent(item));
-    const overdueTasks = overdueTasksForNow || [];
-    const hasMissed = missedTasksOnly.length > 0;
-    const hasOverdueTasks = overdueTasks.length > 0;
-    if (!hasMissed && !hasOverdueTasks) {
-      showToast("Nothing to re-plan.");
-      return;
-    }
-    const windows = getAllFreeWindowsToday(sortedEvents, selectedDate);
-    if (windows.length === 0) {
-      showToast("No free windows left today. Try re-scheduling for tomorrow.");
-      return;
-    }
-    setReplanLoading(true);
-    try {
-      const windowCopies = windows.map((w) => ({
-        start: new Date(w.start.getTime()),
-        end: new Date(w.end.getTime()),
-        minutes: w.minutes,
-      }));
-      let assignedCount = 0;
-      for (const item of [...missedTasksOnly].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))) {
-        const end = item.end_time ? new Date(item.end_time) : new Date(item.start_time);
-        const durationMins = Math.round((end - new Date(item.start_time)) / 60000) || 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await editEvent(extractBaseEventId(item.id), {
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      for (const task of overdueTasks) {
-        const durationMins = (task.estimated_blocks || 1) * 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await addEvent({
-          title: task.title,
-          description: task.description || "",
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      await loadEvents();
-      refetchTasks();
-      showToast(
-        assignedCount > 0
-          ? `Re-planned ${assignedCount} item${assignedCount === 1 ? "" : "s"} into your day.`
-          : "No items could fit in remaining windows."
-      );
-    } catch {
-      showToast("Couldn't re-plan. Try again.");
-    } finally {
-      setReplanLoading(false);
-    }
-  }, [missedItems, overdueTasksForNow, sortedEvents, selectedDate, editEvent, addEvent, loadEvents, showToast, refetchTasks]);
+  const openQuickAddSchedule = useCallback((view) => {
+    window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+  }, []);
 
 
   const handleTaskToggle = useCallback(
@@ -817,7 +754,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect, false, 'day');
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {
@@ -899,8 +836,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                 onSelectModule={(mod) => setSelectedModulePill(mod)}
               />
             }
-            studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
-            studyPulseNow={now}
             slot5Data={{
               now,
               isToday: isToday(selectedDate),
@@ -1029,7 +964,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           </div>
         )}
       </div>
-      
+
       <motion.div
         className={styles.bentoSpine}
         id="timeline-section"
@@ -1049,18 +984,31 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
             <div className={styles.timelineHeaderRight}>
               <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
               {isToday(selectedDate) && (
-                <motion.button
-                  type="button"
-                  className={styles.replanBtn}
-                  onClick={handleReplanDay}
-                  disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
+                <motion.div
+                  className={styles.scheduleActionGroup}
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25 }}
-                  aria-label="Re-plan overdue and missed items into free windows"
                 >
-                  {replanLoading ? "Re-planning…" : "✨ Re-plan"}
-                </motion.button>
+                <PrimaryButton
+                  variant="primary"
+                  size="small"
+                  pill
+                  onClick={() => openQuickAddSchedule('schedule_manual')}
+                  aria-label="Open manual schedule quick add"
+                >
+                  🧩 Manual Schedule
+                </PrimaryButton>
+                <PrimaryButton
+                  variant="ghost"
+                  size="small"
+                  pill
+                  onClick={() => openQuickAddSchedule('schedule_auto')}
+                  aria-label="Open auto schedule quick add"
+                >
+                  ⚙️ Auto Schedule
+                </PrimaryButton>
+                </motion.div>
               )}
             </div>
           </div>
@@ -1200,27 +1148,16 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         />
       )}
 
-      {!toastApi && fallbackToast && (
-        <div className={styles.toast} role="status" aria-live="polite">
-          <div>
-            <span className={styles.toastCheck}>✓</span>
-            <span>{fallbackToast.message}</span>
-          </div>
-          {fallbackToast.actionLabel && fallbackToast.onAction && (
-            <button
-              type="button"
-              onClick={async () => {
-                const action = fallbackToast.onAction;
-                setFallbackToast(null);
-                await action();
-              }}
-            >
-              {fallbackToast.actionLabel}
-            </button>
-          )}
-          <button type="button" onClick={() => setFallbackToast(null)}>✕</button>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {!toastApi && fallbackToast && (
+          <AppToast
+            message={fallbackToast.message}
+            actionLabel={fallbackToast.actionLabel}
+            onAction={fallbackToast.onAction}
+            onClose={() => setFallbackToast(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

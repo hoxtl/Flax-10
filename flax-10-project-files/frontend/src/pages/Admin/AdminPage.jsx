@@ -1058,7 +1058,6 @@ function CourseChangeRequestsTab({ onNavigate }) {
 
 function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
-
   return (
     <AppPage
       title={

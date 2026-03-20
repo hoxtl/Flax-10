@@ -19,12 +19,11 @@ category_fixtures = (
 # Format: (name, default_duration_minutes)
 tag_fixtures = (
     ('Lecture', 120),
-    ('Practical', 90),
-    ('Study Session', 120),
-    ('Meeting', 30),
-    ('Gym', 60),
-    ('Grocery Shopping', 45),
-    ('Assignment Deadline', 0),
+    ('Deadline', 0),
+    ('Exam', 120),
+    ('Schedule', 60),
+    ('Meals', 45),
+    ('Other', 30),
 )
 
 # Format: (frequency, interval)

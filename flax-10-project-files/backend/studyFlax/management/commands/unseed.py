@@ -40,8 +40,11 @@ def get_superuser_data():
     ]
 
 def truncate_tables(cursor, tables, stdout):
+    # Truncate in a single statement so PostgreSQL acquires the table locks
+    # in one consistent pass instead of deadlocking halfway through.
+    quoted_tables = ', '.join(f'"{table}"' for table in tables)
+    cursor.execute(f'TRUNCATE TABLE {quoted_tables} RESTART IDENTITY CASCADE;')
     for table in tables:
-        cursor.execute(f'TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;')
         stdout.write(f"  ✓  {table}")
 
 def _build_superuser_payload(data):

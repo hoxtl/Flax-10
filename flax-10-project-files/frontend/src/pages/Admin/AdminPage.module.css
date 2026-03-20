@@ -37,7 +37,6 @@
 .dashboardWord {
   display: inline;
 }
-
 .tabBar {
   display: flex;
   gap: 0.15rem;
@@ -130,7 +129,6 @@
   gap: 0.6rem;
   flex-wrap: wrap;
 }
-
 .filterGroupsWrap {
   display: flex;
   align-items: center;
@@ -138,21 +136,11 @@
   flex-wrap: wrap;
   padding-top: 9px;
 }
-
 .filterGroup {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
 }
-
-.filterGroupLabel {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--muted, #6b7280);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
 .filterButtons {
   display: inline-flex;
   align-items: center;
@@ -176,7 +164,6 @@
   font-family: inherit;
   margin-bottom: 9px;
 }
-
 .clearFiltersBtn:hover {
   background-color: var(--danger-bg);
   border-color: var(--danger);
@@ -188,7 +175,6 @@
   margin: 0;
   color: var(--text, #111);
 }
-
 .count {
   color: var(--muted, #888);
   font-weight: 400;
@@ -213,11 +199,18 @@
   border-color: var(--accent, #6c47ff);
   box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
 }
-
 .searchCompact {
   width: 130px;
   min-width: 130px;
   margin-left: auto;
+}
+
+.pillDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 8px 8px 8px;
+  flex-shrink: 0;
 }
 
 .pillDivider {
@@ -326,6 +319,10 @@
   flex-direction: column;
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+}
 .listRow {
   display: flex;
   align-items: center;
@@ -361,11 +358,48 @@
   font-size: 0.81rem;
   color: var(--muted, #6b7280);
 }
-
 .listActions {
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+.badgeActive {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badgeBanned {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.badgeTeacher {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.badgeStudent {
+  background: #f3f4f6;
+  color: #374151;
+}
+.badgePending {
+  background: #fef3c7;
+  color: #b45309;
+}
+.staffBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted, #9ca3af);
+  background: var(--bg, #f3f4f6);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
 }
 
 .badge {
@@ -441,52 +475,33 @@
     box-shadow 0.15s;
 }
 
-.banBtn {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-.banBtn:hover {
-  background: #fecaca;
-}
-.unbanBtn {
-  background: #dcfce7;
-  color: #15803d;
-}
-.unbanBtn:hover {
-  background: #bbf7d0;
-}
-
-.approveBtn {
-  background: #dcfce7;
-  color: #15803d;
-}
-.approveBtn:hover {
-  background: #bbf7d0;
-}
+.banBtn,
 .rejectBtn {
   background: #fee2e2;
   color: #b91c1c;
 }
+.banBtn:hover,
 .rejectBtn:hover {
   background: #fecaca;
 }
-
-.dismissBtn {
+.unbanBtn,
+.approveBtn {
+  background: #dcfce7;
+  color: #15803d;
+}
+.unbanBtn:hover,
+.approveBtn:hover {
+  background: #bbf7d0;
+}
+.dismissBtn,
+.cancelBtn {
   background: var(--bg, #f3f4f6);
   color: var(--muted, #374151);
 }
-.dismissBtn:hover {
-  background: #e5e7eb;
-}
-
-.cancelBtn {
-  background: var(--bg, #f3f4f6);
-  color: var(--text, #374151);
-}
+.dismissBtn:hover,
 .cancelBtn:hover {
   background: #e5e7eb;
 }
-
 .dangerBtn {
   background: #ef4444;
   color: #fff;
@@ -496,7 +511,6 @@
   background: #dc2626;
   box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
 }
-
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -734,7 +748,6 @@ button:disabled {
   margin-bottom: 0.5rem;
   text-align: center;
 }
-
 .modalTitle {
   font-size: 1.25rem;
   font-weight: 700;
@@ -742,14 +755,12 @@ button:disabled {
   color: var(--text, #111);
   text-align: center;
 }
-
 .modalSub {
   color: var(--muted, #6b7280);
   font-size: 0.88rem;
   margin: 0.25rem 0 0.75rem;
   text-align: center;
 }
-
 .modalActions {
   display: flex;
   gap: 0.75rem;

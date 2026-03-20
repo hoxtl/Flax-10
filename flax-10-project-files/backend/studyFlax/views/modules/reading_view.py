@@ -58,7 +58,19 @@ def load_task(request, reading_id):
     reading = get_object_or_404(Reading, id=reading_id)
     return create_reading_task(request.user, reading)
 
-def get_reading_list(user):
+def get_reading_list(user, module=None):
+    if module:
+        new_name = f"{module.module_code} - {module.module_name}"
+        module_list = TaskList.objects.filter(
+            user=user, name=new_name, archived=False,
+        ).first()
+        if module_list:
+            return module_list
+        legacy = TaskList.objects.filter(
+            user=user, name=f"Reading List - {module.module_name}", archived=False,
+        ).first()
+        if legacy:
+            return legacy
     return TaskList.objects.filter(user=user, name__icontains='reading', archived=False,).first()
 
 def create_reading_task(user, reading):
@@ -72,17 +84,19 @@ def create_reading_task(user, reading):
         priority='medium',
         estimated_blocks=max(1,math.ceil(estimated/MINUTES_PER_BLOCK)),
         reading=reading,
-        task_list = get_reading_list(user),
+        task_list=get_reading_list(user, reading.module),
         page_count=reading.page_count(),
     )
     return Response(task_payload(task), status=status.HTTP_201_CREATED)
 
 def create_description(reading):
-    strings = [reading.title]
+    parts = []
     if reading.chapter:
-        strings.append(reading.chapter)
-    strings.append(f"pages. {reading.start_page}-{reading.end_page}")
-    return ', '.join(strings)
+        parts.append(reading.chapter)
+    pages = reading.page_count()
+    if pages and pages > 0:
+        parts.append(f"{pages} pages (pp. {reading.start_page}–{reading.end_page})")
+    return ' · '.join(parts) if parts else reading.title
 
 def task_payload(task):
     return {
