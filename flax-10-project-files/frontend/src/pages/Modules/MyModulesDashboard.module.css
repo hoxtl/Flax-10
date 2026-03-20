@@ -5,52 +5,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* --- Stats row (matches AttendanceSummaryBar) --- */
-.statsRow {
-    display: flex;
-    align-items: center;
-    background: var(--surface-card);
-    border: var(--card-border);
-    border-radius: var(--card-radius-token);
-    padding: 0.875rem 1.25rem;
-    gap: 0;
-    flex-wrap: wrap;
-    row-gap: 0.5rem;
-    box-shadow: var(--card-shadow-rest);
-}
-
-.statCard {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: 0 1.25rem;
-    flex: 1;
-    text-align: center;
-}
-
-.statSep {
-    width: 1px;
-    height: 32px;
-    background: var(--border);
-    flex-shrink: 0;
-}
-
-.statValue {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1;
-    letter-spacing: -0.02em;
-}
-
-.statLabel {
-    font-size: 0.64rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-}
-
 /* --- Widget row --- */
 .widgetRow {
     display: grid;
@@ -63,7 +17,7 @@
     display: flex;
     flex-direction: column;
     border-radius: var(--card-radius-token);
-    background: color-mix(in srgb, #8B7355 5%, var(--surface-card));
+    background: var(--modules-panel-tint);
     border: var(--card-border);
     padding: var(--card-padding-lg);
     gap: 0.85rem;
@@ -75,6 +29,20 @@
 
 .widget:hover {
     box-shadow: var(--card-shadow-hover);
+}
+
+.widgetEmbedded {
+    align-self: stretch;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.widgetEmbedded:hover {
+    box-shadow: none;
 }
 
 .widgetHeader {
@@ -96,7 +64,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
 }
 
 .widgetTitle {
@@ -116,8 +84,8 @@
     height: 22px;
     padding: 0 7px;
     border-radius: 999px;
-    background: #5D4037;
-    color: #FAF9F6;
+    background: var(--modules-accent-ink);
+    color: var(--modules-accent-on-solid);
     font-size: 0.62rem;
     font-weight: 800;
     line-height: 1;
@@ -163,7 +131,7 @@
 .emptySub {
     margin: 0;
     font-size: 0.78rem;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-style: italic;
 }
 
@@ -198,10 +166,10 @@
 }
 
 .rowUrgentGlow {
-    border-color: color-mix(in srgb, var(--danger, #ef4444) 45%, var(--border));
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
     box-shadow:
-        0 0 0 1.5px color-mix(in srgb, var(--danger, #ef4444) 20%, transparent),
-        0 0 8px color-mix(in srgb, var(--danger, #ef4444) 18%, transparent);
+        0 0 0 1.5px color-mix(in srgb, var(--danger) 20%, transparent),
+        0 0 8px color-mix(in srgb, var(--danger) 18%, transparent);
 }
 
 .deadlineRowLeft {
@@ -222,9 +190,9 @@
 .moduleCodePill {
     display: inline-flex;
     align-items: center;
-    border: 0.5px solid color-mix(in srgb, #A08B74 40%, var(--border));
-    background: color-mix(in srgb, #C4A77D 10%, var(--surface-card));
-    color: #8B7355;
+    border: 0.5px solid var(--modules-chip-border-strong);
+    background: var(--modules-chip-bg-strong);
+    color: var(--modules-chip-fg);
     border-radius: 999px;
     padding: 0.18rem 0.5rem;
     font-size: 0.58rem;
@@ -237,16 +205,16 @@
 }
 
 .moduleCodePill:hover {
-    background: #8B7355;
-    color: #FAF9F6;
+    background: var(--modules-accent-ink);
+    color: var(--modules-accent-on-solid);
 }
 
 .typePill {
     display: inline-flex;
     align-items: center;
-    border: 0.5px solid color-mix(in srgb, #A08B74 30%, var(--border));
-    background: color-mix(in srgb, #C4A77D 8%, var(--panel));
-    color: #8B7355;
+    border: 0.5px solid var(--modules-chip-border);
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
     border-radius: 999px;
     padding: 0.18rem 0.5rem;
     font-size: 0.58rem;
@@ -274,7 +242,7 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     flex-shrink: 0;
-    color: #8B7355;
+    color: var(--modules-due-future);
 }
 
 /* --- Priority pills (matches TaskCard) --- */
@@ -284,6 +252,8 @@
     gap: 0.2rem;
     padding: 0.15rem 0.45rem;
     border-radius: 999px;
+    border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
     font-size: 0.6rem;
     font-weight: 700;
     white-space: nowrap;
@@ -291,37 +261,37 @@
 }
 
 .priorityPill_overdue {
-    background: rgba(239, 68, 68, 0.14);
-    color: #b91c1c;
+    background: var(--modules-priority-overdue-bg);
+    color: var(--modules-priority-overdue-fg);
 }
 
 .priorityPill_critical {
-    background: rgba(251, 146, 60, 0.14);
-    color: #c2410c;
+    background: var(--modules-priority-critical-bg);
+    color: var(--modules-priority-critical-fg);
 }
 
 .priorityPill_urgent {
-    background: rgba(250, 204, 21, 0.16);
-    color: #a16207;
+    background: var(--modules-priority-urgent-bg);
+    color: var(--modules-priority-urgent-fg);
 }
 
 .due_overdue {
-    color: #b91c1c;
+    color: var(--modules-priority-overdue-fg);
     font-weight: 700;
 }
 
 .due_today {
-    color: #b91c1c;
+    color: var(--modules-priority-overdue-fg);
     font-weight: 700;
 }
 
 .due_tomorrow {
-    color: #b45309;
+    color: var(--modules-priority-critical-fg);
     font-weight: 700;
 }
 
 .due_future {
-    color: #8B7355;
+    color: var(--modules-due-future);
     font-weight: 600;
 }
 
@@ -366,9 +336,9 @@
 .chapterPill {
     display: inline-flex;
     align-items: center;
-    border: 0.5px solid color-mix(in srgb, #A08B74 30%, var(--border));
-    background: color-mix(in srgb, #C4A77D 8%, var(--panel));
-    color: #8B7355;
+    border: 0.5px solid var(--modules-chip-border);
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
     border-radius: 999px;
     padding: 0.18rem 0.5rem;
     font-size: 0.58rem;
@@ -390,7 +360,7 @@
     display: flex;
     gap: 0.6rem;
     font-size: 0.68rem;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-weight: 500;
     font-style: italic;
 }
@@ -415,7 +385,7 @@
 
 .addTaskBtn:hover {
     background: var(--primary);
-    color: #FAF9F6;
+    color: var(--modules-accent-on-solid);
 }
 
 .addTaskBtn:disabled {
@@ -426,7 +396,7 @@
 .addedLabel {
     font-size: 0.62rem;
     font-weight: 700;
-    color: var(--success-text, #22c55e);
+    color: var(--success-text);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -466,7 +436,7 @@
 
 .nudgeText strong {
     font-weight: 800;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
 }
 
 .nudgeActions {
@@ -497,8 +467,29 @@
 
 .showMoreBtn:hover {
     background: var(--primary);
-    color: #FAF9F6;
+    color: var(--modules-accent-on-solid);
     border-color: var(--primary);
+}
+
+.widgetFooter {
+    display: flex;
+    align-items: center;
+    padding-top: 0.2rem;
+}
+
+.widgetFooterLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--modules-footer-link);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.widgetFooterLink:hover {
+    color: var(--text);
 }
 
 /* --- Play button (matches TaskCard actionBarBtnPlay) --- */
@@ -511,14 +502,14 @@
     border-radius: 12px;
     border: none;
     background: transparent;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     cursor: pointer;
     flex-shrink: 0;
     transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .playBtn:hover {
-    color: #3E2723;
+    color: var(--modules-accent-ink-strong);
     transform: scale(1.12);
 }
 
@@ -541,11 +532,5 @@
 @media (max-width: 768px) {
     .widgetRow {
         grid-template-columns: 1fr;
-    }
-    .statSep {
-        display: none;
-    }
-    .statCard {
-        padding: 0 0.75rem;
     }
 }
