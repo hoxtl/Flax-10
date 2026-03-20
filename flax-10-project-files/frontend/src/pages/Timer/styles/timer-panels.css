@@ -71,8 +71,6 @@
 
 .timerMainCard {
     width: 100%;
-    max-width: 900px;
-    margin-inline: auto;
     background: var(--surface-card);
     border: var(--card-border);
     border-radius: var(--card-radius-token);

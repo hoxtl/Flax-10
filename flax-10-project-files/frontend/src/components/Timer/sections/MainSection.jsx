@@ -41,18 +41,29 @@ function TimerTopSection({ t, onOpenFocus }) {
   );
 }
 
-function TimerInfoSection({ t, onPrimaryStart }) {
+function TimerInfoSection({ t, onPrimaryStart, onOpenFocus }) {
   const finishAt = estimatedFinishTime(t);
 
   return (
-    <>
-      <ProgressStrip value={t.progress} />
-      <SessionDots completedSessions={t.completedSessions} targetSessions={t.targetSessions} isActive={t.isActive} isPaused={t.isPaused} />
-      <ModeIndicator mode={t.mode} isOvertime={t.isOvertime} isBreakOvertime={t.isBreakOvertime} />
-      {finishAt && <div className={styles.estimatedFinish}>~Done by {finishAt}</div>}
-      <TimerRing t={t} />
+    <div className={styles.timerCenterContent}>
+
+
+      <div className={styles.sessionProgression}>
+        <div className={styles.sessionLabel}>Session {t.completedSessions + 1} of {t.targetSessions}</div>
+        <SessionDots completedSessions={t.completedSessions} targetSessions={t.targetSessions} isActive={t.isActive} isPaused={t.isPaused} />
+      </div>
+
+      <div className={styles.ringWrapper}>
+        <TimerRing t={t} />
+      </div>
+
+      <div className={styles.timerBottomLabels}>
+        <div className={styles.mainModeLabel}>Focus</div>
+        {finishAt && <div className={styles.estimatedFinish}>Done by ~{finishAt}</div>}
+      </div>
+
       <TimerControls isActive={t.isActive} isPaused={t.isPaused} onToggle={onPrimaryStart} onPause={t.togglePause} onReset={t.resetTimer} onEndEarly={() => t.setModal('endEarly')} totalPaused={t.totalPaused} />
-    </>
+    </div>
   );
 }
 

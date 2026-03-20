@@ -130,6 +130,22 @@
   --chip-font-size: var(--text-xs);
   --chip-font-weight: 600;
 
+  --segmented-bg: rgba(255, 255, 255, 0.6);
+  --segmented-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+  --segmented-button-fg: var(--muted);
+  --segmented-button-hover-bg: var(--hover);
+  --segmented-button-hover-fg: var(--text);
+  --segmented-active-bg: var(--active);
+  --segmented-active-fg: var(--primary-strong);
+  --segmented-solid-bg: rgba(255, 255, 255, 0.5);
+  --segmented-solid-border: rgba(74, 52, 33, 0.25);
+  --segmented-solid-shadow: none;
+  --segmented-solid-button-fg: var(--text);
+  --segmented-solid-button-hover-bg: rgba(74, 52, 33, 0.08);
+  --segmented-solid-button-hover-fg: var(--text);
+  --segmented-solid-active-bg: rgba(74, 52, 33, 0.88);
+  --segmented-solid-active-fg: #FAF9F6;
+
   /* Semantic text colors for typography — Warm-Classy */
   --text-charcoal: var(--color-primary);
   --text-muted-sage: #5a635a;
@@ -338,6 +354,34 @@
   --widget-metric-value: var(--text-primary);
   --widget-card-bg-glass: color-mix(in srgb, var(--color-card) 45%, transparent);
   --widget-card-bg-soft: color-mix(in srgb, var(--color-card) 94%, transparent);
+
+  /* Modules */
+  --modules-panel-tint: color-mix(in srgb, var(--color-primary) 5%, var(--surface-card));
+  --modules-accent-ink: var(--color-primary-strong);
+  --modules-accent-ink-strong: color-mix(in srgb, var(--color-primary-strong) 72%, var(--text) 28%);
+  --modules-accent-on-solid: var(--color-card);
+  --modules-chip-fg: color-mix(in srgb, var(--color-primary) 76%, var(--color-highlight) 24%);
+  --modules-chip-border: color-mix(in srgb, var(--color-highlight) 24%, var(--border));
+  --modules-chip-border-strong: color-mix(in srgb, var(--color-highlight) 34%, var(--border));
+  --modules-chip-bg: color-mix(in srgb, var(--color-highlight) 8%, var(--panel));
+  --modules-chip-bg-strong: color-mix(in srgb, var(--color-highlight) 10%, var(--surface-card));
+  --modules-inline-surface: color-mix(in srgb, var(--modules-accent-ink) 6%, var(--surface-card));
+  --modules-danger-soft: color-mix(in srgb, var(--danger) 8%, transparent);
+  --modules-danger-soft-hover: color-mix(in srgb, var(--danger) 14%, transparent);
+  --modules-error-soft: color-mix(in srgb, var(--danger) 10%, transparent);
+  --modules-error-soft-hover: color-mix(in srgb, var(--danger) 16%, transparent);
+  --modules-footer-link: color-mix(in srgb, var(--text) 62%, var(--text-secondary));
+  --modules-priority-overdue-bg: var(--danger-bg);
+  --modules-priority-overdue-fg: var(--danger);
+  --modules-priority-critical-bg: var(--warning-bg);
+  --modules-priority-critical-fg: var(--warning-text);
+  --modules-priority-urgent-bg: color-mix(in srgb, var(--color-highlight) 16%, transparent);
+  --modules-priority-urgent-fg: color-mix(in srgb, var(--color-highlight) 82%, var(--text) 18%);
+  --modules-due-future: var(--modules-chip-fg);
+  --modules-enrolled-badge-bg: color-mix(in srgb, var(--sage) 15%, var(--surface-card));
+  --modules-enrolled-badge-fg: var(--sage);
+  --modules-enrolled-badge-border: color-mix(in srgb, var(--sage) 30%, var(--border));
+  --modules-accent-line: linear-gradient(to bottom, var(--modules-accent-ink), color-mix(in srgb, var(--modules-accent-ink) 35%, transparent));
 
   /* Home page: solid background */
   --bg-home: var(--bg);
@@ -933,6 +977,54 @@
   --widget-metric-value: var(--text);
   --widget-card-bg-glass: color-mix(in srgb, var(--c-white) 8%, transparent);
   --widget-card-bg-soft: color-mix(in srgb, var(--c-white) 10%, transparent);
+
+  --segmented-bg: rgba(255, 255, 255, 0.04);
+  --segmented-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  --segmented-button-fg: var(--muted);
+  --segmented-button-hover-bg: var(--hover);
+  --segmented-button-hover-fg: var(--text);
+  --segmented-active-bg: var(--active);
+  --segmented-active-fg: var(--primary);
+  --segmented-solid-bg: rgba(255, 255, 255, 0.04);
+  --segmented-solid-border: rgba(255, 255, 255, 0.2);
+  --segmented-solid-shadow: none;
+  --segmented-solid-button-fg: rgba(255, 255, 255, 0.55);
+  --segmented-solid-button-hover-bg: rgba(255, 255, 255, 0.08);
+  --segmented-solid-button-hover-fg: var(--text);
+  --segmented-solid-active-bg: rgba(255, 255, 255, 0.22);
+  --segmented-solid-active-fg: #E8D5B5;
+
+  /* Modules */
+  --modules-panel-tint: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 82%, white 18%) 0%,
+    color-mix(in srgb, var(--surface-card) 92%, var(--color-bg) 8%) 100%
+  );
+  --modules-accent-ink: color-mix(in srgb, var(--text) 88%, var(--color-highlight) 12%);
+  --modules-accent-ink-strong: var(--text);
+  --modules-accent-on-solid: var(--color-bg);
+  --modules-chip-fg: color-mix(in srgb, var(--color-highlight) 62%, var(--text) 38%);
+  --modules-chip-border: color-mix(in srgb, var(--color-highlight) 18%, var(--border));
+  --modules-chip-border-strong: color-mix(in srgb, var(--color-highlight) 24%, var(--border));
+  --modules-chip-bg: color-mix(in srgb, var(--color-highlight) 10%, transparent);
+  --modules-chip-bg-strong: color-mix(in srgb, var(--color-highlight) 14%, transparent);
+  --modules-inline-surface: color-mix(in srgb, var(--modules-accent-ink) 8%, var(--surface-card));
+  --modules-danger-soft: color-mix(in srgb, var(--danger) 12%, transparent);
+  --modules-danger-soft-hover: color-mix(in srgb, var(--danger) 20%, transparent);
+  --modules-error-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+  --modules-error-soft-hover: color-mix(in srgb, var(--danger) 22%, transparent);
+  --modules-footer-link: color-mix(in srgb, var(--text) 70%, var(--text-secondary));
+  --modules-priority-overdue-bg: color-mix(in srgb, var(--danger) 24%, transparent);
+  --modules-priority-overdue-fg: color-mix(in srgb, var(--danger) 56%, white 44%);
+  --modules-priority-critical-bg: color-mix(in srgb, var(--warning-text) 22%, transparent);
+  --modules-priority-critical-fg: color-mix(in srgb, var(--warning-text) 54%, white 46%);
+  --modules-priority-urgent-bg: color-mix(in srgb, var(--color-highlight) 24%, transparent);
+  --modules-priority-urgent-fg: color-mix(in srgb, var(--color-highlight) 54%, white 46%);
+  --modules-due-future: var(--modules-chip-fg);
+  --modules-enrolled-badge-bg: color-mix(in srgb, var(--sage) 32%, var(--panel));
+  --modules-enrolled-badge-fg: color-mix(in srgb, var(--sage) 85%, var(--text));
+  --modules-enrolled-badge-border: color-mix(in srgb, var(--sage) 42%, var(--border));
+  --modules-accent-line: linear-gradient(to bottom, var(--modules-accent-ink), color-mix(in srgb, var(--modules-accent-ink) 35%, transparent));
   --warning-bg: rgba(192, 90, 62, 0.15);
   --warning-border: rgba(192, 90, 62, 0.4);
   --warning-text: #d97a65;

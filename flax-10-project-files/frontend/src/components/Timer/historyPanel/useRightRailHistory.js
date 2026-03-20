@@ -20,7 +20,6 @@ function removeHistoryListeners(refresh) {
 
 export function useRightRailHistory() {
   const [history, setHistory] = useState([]);
-  const [earlierExpanded, setEarlierExpanded] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
   const refresh = useCallback(() => refreshHistory(setHistory), []);
   const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
@@ -33,8 +32,9 @@ export function useRightRailHistory() {
     refresh();
   }, [refresh]);
   useEffect(() => listenToHistoryEvents(refresh), [refresh]);
-  return { history, setHistory, earlierExpanded, setEarlierExpanded, showClearModal, setShowClearModal, visibleBlocks, groupedByHorizon, weeklySeries, maxWeeklySeconds };
+  return { history, setHistory, showClearModal, setShowClearModal, visibleBlocks, groupedByHorizon, weeklySeries, maxWeeklySeconds };
 }
+
 
 async function refreshHistory(setHistory) {
   try {

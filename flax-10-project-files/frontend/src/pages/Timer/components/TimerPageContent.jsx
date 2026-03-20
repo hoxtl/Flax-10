@@ -66,17 +66,6 @@ function isStreakAtRisk(state) {
   return state.streakData !== null && !state.dismissedWarning && (state.streakData.current_streak_days ?? 0) > 0 && (state.streakData.total_sessions ?? 0) === 0 && hour >= 18;
 }
 
-function TimerGrid({ state }) {
-  return (
-    <div className={styles.timerGrid}>
-      <div className={styles.timerGridLeft}>
-        <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
-      </div>
-      <RightPanel t={state.t} />
-    </div>
-  );
-}
-
 function TimerLayout({ state }) {
   const navigate = useNavigate();
   const visibility = state.showPageSkeleton ? { visibility: 'hidden' } : {};
@@ -87,12 +76,22 @@ function TimerLayout({ state }) {
       <NotificationPrompt permission={state.permission} request={state.request} />
       {state.fromTaskPlay && !state.focusMode && <BackButton className={styles.focusEntryBackBtn} onClick={() => navigate(-1)} label="Back" />}
       <StreakWarning state={state} />
-      <TodayBanner onStreakData={state.setStreakData} isStudying={Boolean(state.t.isActive && !state.t.isPaused)} />
-      <TimerGrid state={state} />
+      
+      <div className={styles.timerTopSplit}>
+        <div className={styles.timerTopLeft}>
+          <TodayBanner onStreakData={state.setStreakData} isStudying={Boolean(state.t.isActive && !state.t.isPaused)} />
+          <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
+        </div>
+        <div className={styles.timerTopRight}>
+          <RightPanel t={state.t} />
+        </div>
+      </div>
+
       <PopupSection t={state.t} showHistory={state.showHistory} onCloseHistory={() => state.setShowHistory(false)} />
     </div>
   );
 }
+
 
 export function TimerPageContent({ state }) {
   const pageClassName = state.fromTaskPlay && state.showFocusTransition ? styles.containerFocusEntering : '';

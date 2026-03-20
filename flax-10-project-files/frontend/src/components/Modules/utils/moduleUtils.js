@@ -176,10 +176,10 @@ export function formatForInput(d) {
     return localDate.toISOString().slice(0, 16);
 }
 
-export function filterModules(modules, enrollments, search_query, filter_mode) {
+export function filterModules(modules, enrollments, search_query, filter_mode, options = {}) {
     return modules.filter(module => {
         const search_result = checkSearch(module, search_query)
-        const filter_result = checkFilter(module, enrollments, filter_mode);
+        const filter_result = checkFilter(module, enrollments, filter_mode, options);
         return search_result && filter_result;
     })
 }
@@ -190,8 +190,11 @@ function checkSearch(module, search_query) {
         || module.module_code.toLowerCase().includes(query_lower);
 }
 
-function checkFilter(module, enrollments, filter_mode) {
-    if (filter_mode === 'all') return true;
+function checkFilter(module, enrollments, filter_mode, options = {}) {
+    if (filter_mode === 'all') {
+        if (options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
+        return true;
+    }
     return isEnrolledIn(module.id, enrollments);
 }
 
@@ -228,4 +231,3 @@ export function applyFiltersAndSort(modules, selectedCoursesOrDepartment, sort_b
     }
     return sortModules(modules, sort_by);
 }
-

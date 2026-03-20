@@ -15,18 +15,13 @@
 }
 
 .scheduleItemWide {
-    flex: 1.15 1 250px;
-    min-width: 210px;
+    flex: 1.5 1 420px;
+    min-width: 280px;
 }
 
 .scheduleItemCompact {
     flex: 0.42 1 104px;
     min-width: 92px;
-}
-
-.scheduleItemLocation {
-    flex: 1.6 1 330px;
-    min-width: 280px;
 }
 
 .scheduleIcon {
@@ -60,11 +55,33 @@
     overflow-wrap: anywhere;
 }
 
-.scheduleValueLocation {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+.scheduleValueInlineWrap {
+    min-width: 0;
+}
+
+.scheduleValueInline {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    min-width: 0;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.scheduleInlinePrimary,
+.scheduleValueSeparator {
+    flex-shrink: 0;
+}
+
+.scheduleValueSeparator {
+    color: var(--muted);
+}
+
+.scheduleInlineLocation {
+    min-width: 0;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .recurringBadge {
@@ -92,13 +109,19 @@
     }
 
     .scheduleItemWide,
-    .scheduleItemCompact,
-    .scheduleItemLocation {
+    .scheduleItemCompact {
         flex: 1 1 auto;
         min-width: 0;
     }
 
-    .scheduleValueLocation {
-        -webkit-line-clamp: unset;
+    .scheduleValueInline {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    .scheduleInlineLocation {
+        overflow: visible;
+        text-overflow: initial;
+        white-space: normal;
     }
 }

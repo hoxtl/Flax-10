@@ -35,13 +35,14 @@
 /* === Big Timer Circle (animation + time + controls inside ring) === */
 .timerCircleWrap {
     position: relative;
-    width: 368px;
-    height: 368px;
+    width: 400px;
+    height: 400px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
+
 
 .timerCircleWrap::before {
     content: "";
@@ -251,13 +252,14 @@
 
 .timerRingWrap {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 250px;
+    height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
+
 
 .timerRingSvg {
     position: absolute;
@@ -285,4 +287,78 @@
     align-items: center;
     gap: 0.3rem;
     margin-top: 0.15rem;
+}
+
+.timerCenterContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+}
+
+.actionRow {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.chooseTaskBtn {
+    padding: 0.6rem 1.4rem;
+    background: #2d6a4f;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+}
+
+.fullFocusBtn {
+    padding: 0.5rem 1rem;
+    background: color-mix(in srgb, #95d5b2 15%, transparent);
+    color: #1b4332;
+    border: 1px solid color-mix(in srgb, #95d5b2 40%, transparent);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.sessionProgression {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sessionLabel {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.ringWrapper {
+    margin: 1rem 0;
+}
+
+.timerBottomLabels {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mainModeLabel {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
+
+.estimatedFinish {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
 }

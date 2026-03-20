@@ -142,11 +142,15 @@ function ScheduleCard({ module, nextClass }) {
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Schedule</h2>
             <div className={scheduleStyles.scheduleRow}>
-                <ScheduleItem icon="📅" label="Day & time" value={nextClass} className={scheduleStyles.scheduleItemWide} />
+                <ScheduleItem
+                    icon="📅"
+                    label="Day, time & location"
+                    value={<ScheduleSummary nextClass={nextClass} location={module.location} />}
+                    className={scheduleStyles.scheduleItemWide}
+                    valueClassName={scheduleStyles.scheduleValueInlineWrap}
+                />
                 <span className={scheduleStyles.scheduleDivider} />
                 <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} className={scheduleStyles.scheduleItemCompact} />
-                <span className={scheduleStyles.scheduleDivider} />
-                <ScheduleItem icon="📍" label="Location" value={module.location || 'To be announced'} className={scheduleStyles.scheduleItemLocation} valueClassName={scheduleStyles.scheduleValueLocation} />
             </div>
             {module.recurrence_rule && <RecurringBadge />}
         </article>
@@ -214,6 +218,17 @@ function ScheduleItem({ icon, label, value, className = "", valueClassName = "" 
                 <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
         </div>
+    );
+}
+
+function ScheduleSummary({ nextClass, location }) {
+    const resolvedLocation = location || 'To be announced';
+    return (
+        <span className={scheduleStyles.scheduleValueInline}>
+            <span className={scheduleStyles.scheduleInlinePrimary}>{nextClass}</span>
+            <span className={scheduleStyles.scheduleValueSeparator} aria-hidden="true">·</span>
+            <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
+        </span>
     );
 }
 

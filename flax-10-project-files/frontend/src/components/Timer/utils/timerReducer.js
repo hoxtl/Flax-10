@@ -9,6 +9,8 @@ export const initialState = (work = 25, breakTime = 5, sessions = 4) => ({
     isActive: false, isPaused: false, mode: 'work'
 });
 
+
+
 const tickState = (state) => {
     if (state.isPaused) return { ...state, totalPaused: state.totalPaused + 1 };
     const isWork = state.mode === 'work';

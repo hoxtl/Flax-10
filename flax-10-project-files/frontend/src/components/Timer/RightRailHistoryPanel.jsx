@@ -41,7 +41,8 @@ export default function RightRailHistoryPanel() {
     return (
         <div className={styles.rightHistoryPanel}>
             <WeeklyChart weeklySeries={state.weeklySeries} maxWeeklySeconds={state.maxWeeklySeconds} />
-            <div className={styles.rightHistorySections}>{state.groupedByHorizon.map((group) => <HistoryRailSection key={group.label} group={group} earlierExpanded={state.earlierExpanded} setEarlierExpanded={state.setEarlierExpanded} />)}</div>
+            <div className={styles.rightHistorySections}>{state.groupedByHorizon.map((group) => <HistoryRailSection key={group.label} group={group} />)}</div>
+
             <ClearHistoryAction setShowClearModal={state.setShowClearModal} />
             <ClearHistoryModal state={state} />
         </div>

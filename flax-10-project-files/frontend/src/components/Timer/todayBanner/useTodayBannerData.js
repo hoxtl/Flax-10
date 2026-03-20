@@ -88,9 +88,11 @@ function buildBannerMetrics(data, monthSummary, goalHours) {
   const streak = data?.current_streak_days ?? 0;
   const goalSessions = Math.max(1, Math.ceil((goalHours * 60) / 25));
   const sessionPct = Math.min(100, Math.round((sessions / goalSessions) * 100));
+  const timePct = Math.round((hours / goalHours) * 100);
   const milestone = monthSummary ? getNearestMilestone(Number(monthSummary.total_sessions ?? 0), Number(monthSummary.current_streak_days ?? 0), Number(monthSummary.total_study_hours ?? 0)) : null;
-  return { sessions, hours, streak, goalSessions, sessionPct, milestone, formattedHours: fmtHours(hours) };
+  return { sessions, hours, streak, goalSessions, sessionPct, timePct, milestone, formattedHours: fmtHours(hours) };
 }
+
 
 function buildRibbonMeta(metrics) {
   const weeklyProgressDays = Math.max(0, Math.min(7, metrics.streak > 0 && metrics.streak % 7 === 0 ? 7 : metrics.streak % 7));

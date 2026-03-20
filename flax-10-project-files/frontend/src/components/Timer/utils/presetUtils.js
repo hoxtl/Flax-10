@@ -14,12 +14,13 @@ export function inferTaskType(title = '') {
 
 export const BUILT_IN_PRESETS = [
     { id: 'pomodoro',  label: 'Pomodoro',  work: 25, brk: 5,  sessions: 4 },
-    { id: '5217',      label: '52/17',     work: 52, brk: 17, sessions: 3 },
-    { id: 'ultradian', label: 'Ultradian', work: 90, brk: 20, sessions: 2 },
-    { id: 'deepwork',  label: 'Deep Work', work: 60, brk: 10, sessions: 3 },
     { id: 'sprint',    label: 'Sprint',    work: 15, brk: 3,  sessions: 4 },
     { id: 'evening',   label: 'Evening',   work: 45, brk: 15, sessions: 2 },
+    { id: 'ultradian', label: 'Ultradian', work: 90, brk: 20, sessions: 2 },
+    { id: '5217',      label: '52/17',     work: 52, brk: 17, sessions: 3 },
+    { id: 'deepwork',  label: 'Deep Work', work: 60, brk: 10, sessions: 3 },
 ];
+
 
 export const CUSTOM_PRESETS_KEY = 'timerCustomPresets';
 export const AUTOSTART_KEY = 'timerAutoStart';

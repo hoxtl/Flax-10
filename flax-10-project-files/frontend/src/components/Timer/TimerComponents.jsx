@@ -19,9 +19,18 @@ export const formatTime = (seconds) => {
 };
 
 export const TimerDisplay = ({ timeLeft, mode, isOvertime }) => {
+    const timeText = formatTime(timeLeft);
+    const len = timeText.length;
+    // Scale font size based on length to prevent overlap with circular rings
+    // 5 chars (MM:SS) -> 3.5rem
+    // 6 chars (+MM:SS) -> 3.1rem
+    // 7+ chars -> 2.6rem
+    const fontSize = len > 6 ? '2.6rem' : len > 5 ? '3.1rem' : '3.5rem';
+    
     const className = `${styles.timerDisplay} ${mode === 'break' ? styles.break : ''} ${isOvertime ? styles.overtime : ''}`;
-    return <div className={className}>{formatTime(timeLeft)}</div>;
+    return <div className={className} style={{ fontSize }}>{timeText}</div>;
 };
+
 
 const getModeText = (mode, isOvertime, isBreakOvertime) => {
     if (mode === 'work') return isOvertime ? 'Overtime' : 'Focus';

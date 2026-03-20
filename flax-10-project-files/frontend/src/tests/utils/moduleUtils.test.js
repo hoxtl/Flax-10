@@ -150,6 +150,11 @@ describe('moduleUtils', () => {
             const result = filterModules(modules, enrollments, '', 'enrolled');
             expect(result).toHaveLength(2);
         });
+        it('can exclude enrolled modules in browse mode', () => {
+            const result = filterModules(modules, enrollments, '', 'all', { excludeEnrolled: true });
+            expect(result).toHaveLength(1);
+            expect(result[0].id).toBe(3);
+        });
     });
 
     describe('getDepartments', () => {
