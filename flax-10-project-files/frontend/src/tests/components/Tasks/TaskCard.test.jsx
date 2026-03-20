@@ -9,6 +9,7 @@ const showCompletionToastMock = vi.fn();
 const isRoutineTaskMock = vi.fn(() => false);
 const getCompletionMessageMock = vi.fn(() => 'Great job!');
 const getUserSettingsMock = vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
+const getReadingSpeedMock = vi.fn().mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true });
 const sleepWarningState = {
     sleepWarning: false,
     checkSleepAndRun: (_date, fn) => fn(),
@@ -35,6 +36,10 @@ vi.mock('../../../lib/completionMessages', () => ({
 
 vi.mock('../../../api/userService', () => ({
     getUserSettings: (...args) => getUserSettingsMock(...args),
+}));
+
+vi.mock('../../../api/readingApi', () => ({
+    getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
 
 vi.mock('../../../components/common/SleepWarningModal', () => ({
@@ -102,6 +107,7 @@ describe('TaskCard', () => {
         sleepWarningState.sleepWarning = false;
         sleepWarningState.checkSleepAndRun = (_date, fn) => fn();
         sleepWarningState.sleepWarningProps = {};
+        getReadingSpeedMock.mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true });
         sessionStorage.clear();
     });
 
@@ -192,16 +198,41 @@ describe('TaskCard', () => {
                 module_code: 'CS1234',
                 module_name: 'Algorithms',
                 estimated_blocks: 13,
+                reading_chapter: 'Ch.1',
+                reading_start_page: 1,
+                reading_end_page: 32,
+                reading_page_count: 32,
             },
             listName: 'Deep Work',
         });
         fireEvent.click(screen.getByText('Read paper'));
         expect(screen.getByText('Task details')).toBeTruthy();
         expect(screen.getByText('Important notes')).toBeTruthy();
+        expect(screen.getAllByText('Chapter').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Ch.1').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Pages').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('pp. 1–32').length).toBeGreaterThan(0);
         expect(screen.getByText(/1 session/)).toBeTruthy();
         expect(screen.getByText(/325m/)).toBeTruthy();
         fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[1]);
         expect(screen.queryByText('Task details')).toBeNull();
+    });
+
+    it('keeps reading detail pills out of the task card row', () => {
+        renderTaskCard({
+            task: {
+                ...defaultTask,
+                title: 'Read chapter 1',
+                reading_chapter: 'Ch.1',
+                reading_start_page: 1,
+                reading_end_page: 32,
+                reading_page_count: 32,
+            },
+        });
+
+        expect(screen.queryByText('Chapter')).toBeNull();
+        expect(screen.queryByText('Pages')).toBeNull();
+        expect(screen.queryByText('1.6 min/page')).toBeNull();
     });
 
     it('handles keyboard open and closes info modal via backdrop', () => {
