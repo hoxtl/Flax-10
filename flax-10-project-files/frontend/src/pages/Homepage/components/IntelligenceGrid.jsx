@@ -31,6 +31,10 @@ const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxR
   const canGrowHeight = row < maxRow;
   const canShrinkHeight = row > minRow;
 
+  if (!canGrowWidth && !canShrinkWidth && !canGrowHeight && !canShrinkHeight) {
+    return null;
+  }
+
   return (
     <div className={styles.resizeControls} onClick={(e) => e.stopPropagation()}>
       <div className={styles.resizeGroup} style={{ opacity: isHero ? 0.4 : 1, pointerEvents: isHero ? "none" : "auto" }}>

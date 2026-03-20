@@ -47,7 +47,7 @@ const CATALOGUE = [
   { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, maxRow: 2, section: "Planning" },
   { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, maxRow: 1, section: "Planning" },
   { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, maxRow: 2, section: "Planning" },
-  { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minRow: 2, section: "Planning" },
+  { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minCol: 2, maxCol: 2, minRow: 2, maxRow: 2, section: "Planning" },
   { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
 
   { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },

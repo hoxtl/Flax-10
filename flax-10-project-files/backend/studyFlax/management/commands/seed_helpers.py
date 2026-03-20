@@ -187,6 +187,9 @@ def _build_single_settings(user):
     for widget_id in selected:
         if widget_id == "hero":
             continue
+        if widget_id == "bigTimeline":
+            sizes[widget_id] = {"col": 2, "row": 2}
+            continue
         sizes[widget_id] = {
             "col": 2 if random.random() > 0.6 else 1,
             "row": 2 if random.random() > 0.7 else 1
