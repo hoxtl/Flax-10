@@ -70,6 +70,16 @@
   margin-bottom: 10px;
 }
 
+.mobileViewRow {
+  display: none;
+}
+
+.mobileViewSelectWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 
 
 .bannerRow {
