@@ -245,7 +245,14 @@ export default function GroupWorkIndexPage() {
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
-  if (pid) return <GroupProjectDetail projectId={pid} onBack={() => navigate("/group-work")} onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))} />;
+  if (pid) return (
+    <GroupProjectDetail 
+      projectId={pid} 
+      onBack={() => navigate("/group-work")} 
+      onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))}
+      onUpdate={(updated) => setProjects(prev => prev.map(p => String(p.id) === String(updated.id) ? { ...p, ...updated } : p))}
+    />
+  );
   if (loading) return <GroupWorkIndexSkeleton />;
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
   return (
