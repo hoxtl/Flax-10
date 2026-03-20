@@ -8,7 +8,6 @@ import styles from './ModuleCourseFilter.module.css';
 
 const TABS = [
     { value: 'courses', label: 'Courses' },
-    { value: 'enrollment', label: 'Enrollment' },
 ];
 
 const ENROLLMENT_OPTIONS = [
@@ -114,29 +113,26 @@ function EnrollmentTab({ filterMode, onFilterModeChange }) {
     return <div className={styles.listContainer}>{ENROLLMENT_OPTIONS.map(opt => <EnrollmentOption key={opt.value} option={opt} isActive={filterMode === opt.value} onSelect={onFilterModeChange} />)}</div>;
 }
 
-function DropdownContent({ activeTab, setActiveTab, filterQuery, setFilterQuery, selectedCourses, onToggleCourse, expanded, toggleExpanded, filterMode, onFilterModeChange }) {
+function DropdownContent({ filterQuery, setFilterQuery, selectedCourses, onToggleCourse, expanded, toggleExpanded }) {
     return (
         <motion.div initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className={styles.dropdown} onClick={e => e.stopPropagation()}>
-            <TabButtons activeTab={activeTab} setActiveTab={setActiveTab} />
-            {activeTab === 'courses' && <CoursesTab filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />}
-            {activeTab === 'enrollment' && <EnrollmentTab filterMode={filterMode} onFilterModeChange={onFilterModeChange} />}
+            <CoursesTab filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />
         </motion.div>
     );
 }
 
-export default function ModuleCourseFilter({ selectedCourses, onToggleCourse, filterMode, onFilterModeChange }) {
+export default function ModuleCourseFilter({ selectedCourses, onToggleCourse }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('courses');
     const [filterQuery, setFilterQuery] = useState('');
     const [expanded, setExpanded] = useState({});
     const ref = useRef(null);
     useClickOutside(ref, () => setIsOpen(false));
     const toggleExpanded = (key) => setExpanded(p => ({ ...p, [key]: !p[key] }));
-    const activeCount = selectedCourses.length + (filterMode !== 'all' ? 1 : 0);
+    const activeCount = selectedCourses.length;
     return (
         <div ref={ref} className={styles.wrapper}>
             <FilterButton activeCount={activeCount} onClick={() => setIsOpen(!isOpen)} />
-            <AnimatePresence>{isOpen && <DropdownContent activeTab={activeTab} setActiveTab={setActiveTab} filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} filterMode={filterMode} onFilterModeChange={onFilterModeChange} />}</AnimatePresence>
+            <AnimatePresence>{isOpen && <DropdownContent filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />}</AnimatePresence>
         </div>
     );
 }

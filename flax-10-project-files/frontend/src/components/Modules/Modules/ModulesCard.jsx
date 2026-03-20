@@ -92,8 +92,8 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
             <h3 className={styles.moduleTitle}>{moduleTitle}</h3>
             {module.description && <Description text={module.description} />}
-            <QuickMeta module={module} />
-            <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
+            <QuickMetaRow module={module} upcomingTasksCount={upcomingTasksCount} />
+            <ClassmatesLink module={module} classmatesCount={classmatesCount} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
                 onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines}  onManageReadings={onManageReadings}/>
         </div>
@@ -151,11 +151,11 @@ function CardHeader({ module, enrolled, isCore }) {
     const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
-            <div className={styles.headerTopRow}>
-                <div className={styles.headerIdentity}><div className={styles.iconWrap}>📚</div></div>
-                <div className={styles.headerRight}><EnrolledBadge enrolled={enrolled} isCore={isCore} /><TutorAvatar module={module} /></div>
+            {enrolled && <EnrolledBadge enrolled={enrolled} isCore={isCore} />}
+            <div className={styles.headerChipsRow}>
+                <HeaderChips course={course} department={department} />
+                <TutorAvatar module={module} />
             </div>
-            <HeaderChips course={course} department={department} />
         </div>
     );
 }
@@ -172,15 +172,18 @@ function getScheduleBits(start_time) {
     return { day, time };
 }
 
-function QuickMeta({ module }) {
+function QuickMetaRow({ module, upcomingTasksCount }) {
     const { day, time } = getScheduleBits(module.start_time);
     const duration = module.start_time && module.end_time ? formatDuration(module.start_time, module.end_time) : "TBA";
-    const deadlinesCount = module.deadlines?.length || 0;
     return (
         <div className={styles.metaPills}>
             <MetaPill icon="📅" text={`${day} ${time}`} />
             <MetaPill icon="⏱️" text={duration} />
-            <MetaPill icon="🗂️" text={`${deadlinesCount} due`} />
+            {hasValidCount(upcomingTasksCount) && (
+                <span className={styles.taskChipInline}>
+                    📋 {upcomingTasksCount} assignment{upcomingTasksCount === 1 ? "" : "s"}
+                </span>
+            )}
         </div>
     );
 }
@@ -193,33 +196,14 @@ function hasValidCount(count) {
     return Number.isFinite(Number(count)) && Number(count) > 0;
 }
 
-function TasksChip({ moduleCode, count }) {
-    if (!hasValidCount(count)) return null;
-    const plural = count === 1 ? "" : "s";
-    return (
-        <EntityLinkChip to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`}
-            className={styles.relatedChip} title="Open tasks linked to this module">
-            ✅ {count} upcoming task{plural}
-        </EntityLinkChip>
-    );
-}
-
-function ClassmatesChip({ moduleCode, count }) {
-    if (!hasValidCount(count)) return null;
-    return (
-        <EntityLinkChip to={`/users?module=${encodeURIComponent(moduleCode || "")}`}
-            className={styles.relatedChip} title="Find classmates in this module">
-            👥 {count} classmate{count === 1 ? "" : "s"}
-        </EntityLinkChip>
-    );
-}
-
-function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
-    if (!hasValidCount(upcomingTasksCount) && !hasValidCount(classmatesCount)) return null;
+function ClassmatesLink({ module, classmatesCount }) {
+    if (!hasValidCount(classmatesCount)) return null;
     return (
         <div className={styles.relatedRow}>
-            <TasksChip moduleCode={module.module_code} count={upcomingTasksCount} />
-            <ClassmatesChip moduleCode={module.module_code} count={classmatesCount} />
+            <EntityLinkChip to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
+                className={styles.relatedChip} title="Find classmates in this module">
+                👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
+            </EntityLinkChip>
         </div>
     );
 }

@@ -142,11 +142,11 @@ function ScheduleCard({ module, nextClass }) {
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Schedule</h2>
             <div className={scheduleStyles.scheduleRow}>
-                <ScheduleItem icon="📅" label="Day & time" value={nextClass} />
+                <ScheduleItem icon="📅" label="Day & time" value={nextClass} className={scheduleStyles.scheduleItemWide} />
                 <span className={scheduleStyles.scheduleDivider} />
-                <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
+                <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} className={scheduleStyles.scheduleItemCompact} />
                 <span className={scheduleStyles.scheduleDivider} />
-                <ScheduleItem icon="📍" label="Location" value={module.location || 'To be announced'} />
+                <ScheduleItem icon="📍" label="Location" value={module.location || 'To be announced'} className={scheduleStyles.scheduleItemLocation} valueClassName={scheduleStyles.scheduleValueLocation} />
             </div>
             {module.recurrence_rule && <RecurringBadge />}
         </article>
@@ -205,13 +205,13 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     );
 }
 
-function ScheduleItem({ icon, label, value }) {
+function ScheduleItem({ icon, label, value, className = "", valueClassName = "" }) {
     return (
-        <div className={scheduleStyles.scheduleItem}>
+        <div className={`${scheduleStyles.scheduleItem} ${className}`.trim()}>
             <span className={scheduleStyles.scheduleIcon}>{icon}</span>
             <div>
                 <div className={scheduleStyles.scheduleLabel}>{label}</div>
-                <div className={scheduleStyles.scheduleValue}>{value}</div>
+                <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
         </div>
     );
@@ -240,10 +240,12 @@ function DeadlineItem({ deadline, index, moduleCode }) {
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
                     <span className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
-                    <EntityLinkChip to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`} className={deadlineStyles.deadlineTitle} title="Open related tasks">{deadline.title}</EntityLinkChip>
-                    <span className={`${deadlineStyles.urgencyTag} ${deadlineStyles[urgency]}`}>{getUrgencyText(urgency)}</span>
+                    <span className={deadlineStyles.deadlineTitle}>{deadline.title}</span>
                 </div>
-                <span className={deadlineStyles.deadlineDate}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+                <div className={deadlineStyles.deadlineMeta}>
+                    <span className={`${deadlineStyles.urgencyTag} ${deadlineStyles[urgency]}`}>{getUrgencyText(urgency)}</span>
+                    <span className={deadlineStyles.deadlineDate}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+                </div>
             </div>
         </div>
     );
