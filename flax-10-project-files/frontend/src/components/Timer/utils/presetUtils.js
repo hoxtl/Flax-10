@@ -84,7 +84,6 @@ function applyTaskTiming(task, t, split) {
     t.updateTime('work', split.workMinutes);
     t.updateTime('sessions', split.sessionCount);
     t.setTimeLeft(split.workMinutes * 60);
-    t.setIsActive(true);
 }
 
 function persistTaskSelection(taskId) {
