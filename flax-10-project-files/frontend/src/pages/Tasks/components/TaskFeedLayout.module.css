@@ -88,7 +88,23 @@
   color: var(--muted);
 }
 
+.mobileViewSelect {
+  min-width: 180px;
+  border: 1px solid var(--widget-border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 7px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+}
 
+.mobileViewSelect:focus-visible {
+  outline: none;
+  border-color: var(--primary, #7b6751);
+  box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
+}
 
 .bannerRow {
   width: 100%;
