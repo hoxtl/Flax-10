@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserSearch from "../../components/Social/UserSearch";
 import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
 import { getUserColor } from "./utils/priorityUtils";
@@ -190,7 +190,15 @@ function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, 
   };
   const handleRemoveMember = async mid => {
     const res = await fetch(`/api/group-work/projects/${projectId}/members/${mid}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (res.ok) setMembers(prev => prev.filter(i => i.id !== mid));
+    if (res.ok) {
+        setMembers(prev => {
+            const next = prev.filter(i => i.id !== mid);
+            if (onUpdate && project) {
+                onUpdate({ ...project, members: next, member_count: next.length });
+            }
+            return next;
+        });
+    }
   };
   const handleDeleteProject = async () => {
     const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "DELETE", headers: getAuthHeaders() });
@@ -209,12 +217,48 @@ function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
   const { patchProject, handleRemoveMember, handleDeleteProject } = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
-  const onAdded = m => setMembers(p => p.some(i => i.id === m.id) ? p : [...p, m]);
+  const onAdded = m => {
+    setMembers(p => {
+        const next = p.some(i => i.id === m.id) ? p : [...p, m];
+        if (onUpdate && project) {
+            onUpdate({ ...project, members: next, member_count: next.length });
+        }
+        return next;
+    });
+  };
   return { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, onAdded, patchProject, handleRemoveMember, handleDeleteProject };
 }
 
 export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
   const d = useProjectDetail(projectId, onBack, onDelete, onUpdate);
+
+  // Sync task stats changes to index page
+  useEffect(() => {
+    if (onUpdate && d.project && d.taskStats.total !== undefined) {
+      const countsMatch = 
+        d.project.task_count === d.taskStats.total && 
+        d.project.completed_task_count === d.taskStats.completed;
+      
+      const membersMatch = (d.project.members || []).length === d.members.length;
+
+      if (!countsMatch || !membersMatch) {
+        // Guard: Only sync 0/0 if the project really has 0 tasks, 
+        // otherwise it's just the initial loading state of taskStats.
+        const statsAreValid = d.taskStats.total > 0 || d.project.task_count === 0;
+
+        if (statsAreValid || !membersMatch) {
+            onUpdate({
+              ...d.project,
+              task_count: d.taskStats.total,
+              completed_task_count: d.taskStats.completed,
+              members: d.members,
+              member_count: d.members.length
+            });
+        }
+      }
+    }
+  }, [d.taskStats.total, d.taskStats.completed, d.members, d.project, onUpdate]);
+
   if (d.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
   if (!d.project) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.empty}>Project not found.</p></div>;
 

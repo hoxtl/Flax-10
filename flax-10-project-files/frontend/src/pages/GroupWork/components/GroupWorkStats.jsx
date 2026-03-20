@@ -28,7 +28,10 @@ export default function GroupWorkStats({ projects }) {
   });
 
   // 3. Collaborators
-  const totalCollaborators = projects.reduce((sum, p) => sum + (p.member_count || 1), 0);
+  const totalCollaborators = projects.reduce((sum, p) => {
+    const count = p.members ? p.members.length : (p.member_count || 1);
+    return sum + count;
+  }, 0);
 
   // 4. Overall Progress
   const totalTasks = projects.reduce((sum, p) => sum + (p.task_count || 0), 0);
