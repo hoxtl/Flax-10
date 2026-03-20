@@ -57,7 +57,7 @@
 }
 
 .headerControls { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-.filterGroupsWrap { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; padding-top: 9px; }
+.filterGroupsWrap { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 .filterGroup { display: inline-flex; align-items: center; gap: 0.45rem; }
 .filterButtons { display: inline-flex; align-items: center; gap: 0.4rem; }
 
@@ -76,7 +76,6 @@
   white-space: nowrap;
   transition: all 0.2s;
   font-family: inherit;
-  margin-bottom: 9px;
 }
 .clearFiltersBtn:hover { background-color: var(--danger-bg); border-color: var(--danger); }
 
@@ -98,7 +97,7 @@
 .search:focus { border-color: var(--accent, #6c47ff); box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12); }
 .searchCompact { width: 130px; min-width: 130px; margin-left: auto; }
 
-.pillDivider { width: 1px; height: 24px; background: var(--border); margin: 0 8px 8px 8px; flex-shrink: 0; }
+.pillDivider { width: 1px; height: 24px; background: var(--border); margin: 0 8px; flex-shrink: 0; }
 
 .table { display: flex; flex-direction: column; }
 
