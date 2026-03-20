@@ -45,3 +45,9 @@
   background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
+.listDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
