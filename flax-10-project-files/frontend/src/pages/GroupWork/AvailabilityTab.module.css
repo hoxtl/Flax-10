@@ -130,27 +130,32 @@
 }
 
 .sectionTitle {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1em;
     margin: 0 0 16px 0;
+    opacity: 0.8;
 }
 
 .suggestionCard {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--card-bg);
+    background: var(--soft-paper);
     border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
     border-radius: 12px;
-    padding: 16px;
+    padding: 16px 20px;
     margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
 }
 
-.suggestionCard:last-child {
-    margin-bottom: 0;
+.suggestionCard:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
 .suggestionInfo {
@@ -158,7 +163,7 @@
 }
 
 .suggestionTitle {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text);
     margin-bottom: 4px;
@@ -168,60 +173,70 @@
     font-size: 13px;
     color: var(--text-secondary);
     margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .votes {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     font-size: 12px;
     font-weight: 600;
-}
-
-.voteCount {
     color: var(--text-secondary);
 }
 
-.voteSeparator {
-    color: var(--border);
+.voteCount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.voteCount svg {
+    opacity: 0.7;
 }
 
 .suggestionActions {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
 
 .acceptBtn,
 .rejectBtn,
 .deleteBtn {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    background: transparent;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: white;
     cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.2s ease;
-    padding: 6px;
-    opacity: 0.8;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.acceptBtn:hover,
-.rejectBtn:hover,
+.acceptBtn { color: #16a34a; }
+.rejectBtn { color: #dc2626; }
+.deleteBtn { color: #b91c1c; }
+
+.acceptBtn:hover {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    transform: translateY(-1px);
+}
+
+.rejectBtn:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    transform: translateY(-1px);
+}
+
 .deleteBtn:hover {
-    transform: scale(1.1);
-    opacity: 1;
-}
-
-.acceptBtn {
-    color: #4a6741;
-}
-
-.rejectBtn {
-    color: #8b4513;
-}
-
-.deleteBtn {
-    color: #b04b4b;
+    background: var(--danger-bg);
+    border-color: var(--danger);
+    transform: translateY(-1px);
 }
 
 /* Modal Styles */
