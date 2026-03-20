@@ -175,7 +175,7 @@ function ProjectRow({ project, onClick }) {
                   <circle cx="12" cy="12" r={radius} stroke={theme.ring} strokeWidth="3" fill="none" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" transform="rotate(-90 12 12)" />
                 </svg>
             </div>
-            <div className={isExpanded ? styles.arrowIconUp : styles.arrowIcon}>{isExpanded ? "↓" : "↑"}</div>
+            <div className={isExpanded ? styles.arrowIconUp : styles.arrowIcon}>↑</div>
         </div>
       </div>
       
