@@ -2,6 +2,7 @@
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import GridCard from '../../common/Card/GridCard';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
@@ -40,6 +41,22 @@ function normalizeModuleCode(code) {
     return String(code || "").toUpperCase().replace(/\s+/g, "");
 }
 
+function getModuleAssignmentCount(module, taskCountsByModule) {
+    const explicitCount = [
+        module?.assignments_count,
+        module?.assignment_count,
+        module?.deadlines_count,
+        module?.deadline_count,
+        module?.assessments_count,
+        module?.assessment_count,
+    ].find((value) => Number.isFinite(Number(value)));
+
+    if (Number.isFinite(Number(explicitCount))) return Number(explicitCount);
+    if (Array.isArray(module?.deadlines)) return module.deadlines.length;
+
+    return taskCountsByModule[normalizeModuleCode(module?.module_code)] || 0;
+}
+
 function resolveClassmatesCount(module) {
     return (
         module?.classmates_count ??
@@ -57,7 +74,7 @@ function useCardData(module, enrollments, taskCountsByModule) {
     return {
         enrolled, isCore: enrollment?.is_core || false,
         accent: DEPARTMENT_ACCENTS[department] || "var(--primary)",
-        upcomingTasksCount: taskCountsByModule[normalizeModuleCode(module.module_code)] || 0,
+        upcomingTasksCount: getModuleAssignmentCount(module, taskCountsByModule),
         classmatesCount: resolveClassmatesCount(module),
     };
 }
@@ -242,12 +259,24 @@ function StudentAction({ enrolled, isCore, onToggle }) {
     if (enrolled && isCore) {
         return <span className={styles.coreTag}>📌 Core module</span>;
     }
+    if (!enrolled) {
+        return (
+            <PrimaryButton
+                className={styles.enrollPrimaryButton}
+                onClick={onToggle}
+                size="small"
+                pill
+            >
+                + Enroll
+            </PrimaryButton>
+        );
+    }
     return (
         <button
-            className={enrolled ? styles.unenrollButton : styles.enrollButton}
+            className={styles.unenrollButton}
             onClick={onToggle}
         >
-            {enrolled ? '× Leave Module' : '+ Enroll'}
+            × Leave Module
         </button>
     );
 }

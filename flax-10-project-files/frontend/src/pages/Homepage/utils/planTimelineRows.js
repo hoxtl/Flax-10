@@ -269,6 +269,11 @@ function injectHourMarks(sorted) {
   const finalRows = [];
   let lastInjectedHour = -1;
   let prevEventEndMins = null; // track last event end to detect adjacent events
+  const rowEnd = (row) => {
+    if (row.type === "event" || row.type === "eventGroup") return row.endMins ?? null;
+    if (row.type === "free" || row.type === "tinyGap") return row.endMins ?? ((row.gapStartMins ?? row.startMins ?? 0) + (row.minutes ?? 0));
+    return null;
+  };
 
   for (let i = 0; i < sorted.length; i++) {
     const r = sorted[i];
@@ -292,9 +297,15 @@ function injectHourMarks(sorted) {
 
     finalRows.push(hideTimeLabel ? { ...r, hideTimeLabel: true } : r);
 
+    const endMins = rowEnd(r);
+    if (endMins != null && endMins > 0) {
+      const coveredHour = DAY_START_HOUR + Math.floor((Math.max(endMins - 1, 0)) / 60);
+      lastInjectedHour = Math.max(lastInjectedHour, coveredHour);
+    }
+
     // Update adjacency tracker — now-markers don't break adjacency, gap rows do.
-    if (r.type === "event") {
-      prevEventEndMins = r.endMins;
+    if (r.type === "event" || r.type === "eventGroup") {
+      prevEventEndMins = rowEnd(r);
     } else if (r.type !== "now") {
       prevEventEndMins = null;
     }

@@ -112,8 +112,14 @@ function useModulesPage(initialSearch = '', initialCreate = false) {
 }
 
 function useMainView(state) {
-    const { hook, search_query, filter_mode, setSearchQuery, setFilterMode } = state;
-    const filtered = filterModules(hook.modules, hook.enrollments, search_query, filter_mode);
+    const { hook, search_query, filter_mode, setSearchQuery, setFilterMode, is_teacher } = state;
+    const filtered = filterModules(
+        hook.modules,
+        hook.enrollments,
+        search_query,
+        filter_mode,
+        { excludeEnrolled: !is_teacher && filter_mode === 'all' },
+    );
     const sorting = useModuleSorting(filtered);
     const search = {
         query: search_query,

@@ -104,6 +104,13 @@ describe('ModulesCard', () => {
         expect(screen.getByText('Readings')).toBeInTheDocument();
     });
 
+    it('shows assignment count pill from module deadlines when browsing', () => {
+        render(<ModulesCard {...mockParameters} module={{ ...module, deadlines: [{ id: 1 }, { id: 2 }] }} />);
+        expect(
+            screen.getByText((_, node) => node?.tagName === 'SPAN' && (node.textContent?.includes('2 assignments') ?? false))
+        ).toBeInTheDocument();
+    });
+
     it('should call onDelete when delete is clicked', () => {
         const onManageReadings = vi.fn();
         render(<ModulesCard {...mockParameters} isTeacher={true} onManageReadings={onManageReadings} />);
