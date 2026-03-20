@@ -51,3 +51,14 @@
   border-radius: 999px;
   flex-shrink: 0;
 }
+
+.listName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
