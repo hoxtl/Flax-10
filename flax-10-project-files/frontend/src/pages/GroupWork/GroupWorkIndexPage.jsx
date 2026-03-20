@@ -1,282 +1,41 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import styles from "./GroupWorkIndexPage.module.css";
 import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
 import AppPage from "../../components/common/AppPage/AppPage";
-import Card from "../../components/common/Card/Card";
-import FormField from "../../components/common/FormField/FormField";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import GroupWorkStats from "./components/GroupWorkStats";
-import TextInput from "../../components/common/TextInput/TextInput";
-import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
-import MemberAvatar, { getDisplayName } from "./components/MemberAvatar";
-import DateTimePicker from "../../components/common/inputs/DateTimePicker";
-
-function GroupWorkIndexSkeleton() {
-  return (
-    <div className={styles.skeletonContainer}>
-      <div className={styles.skeletonStats}>
-        {[1, 2, 3, 4].map((i) => (
-          <SkeletonBlock key={i} className={styles.skeletonStatCard} height="100px" />
-        ))}
-      </div>
-      <SkeletonBlock className={styles.skeletonForm} height="200px" />
-      <div className={styles.skeletonList}>
-        {[1, 2, 3, 4].map((i) => (
-          <SkeletonBlock key={i} className={styles.skeletonRow} height="80px" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function CreateProjectInputs({ data, onChange }) {
-  return (
-    <>
-      <FormField label="Project Name" className={styles.inputName}>
-        <TextInput 
-          value={data.name} 
-          onChange={(e) => onChange('name', e.target.value)} 
-          placeholder="e.g. Machine Learning Research..." 
-          required 
-        />
-      </FormField>
-      <FormField label={<>Module <span className={styles.optionalText}>(Optional)</span></>} className={styles.inputField}>
-        <UserModuleDropdown
-          value={data.course_code}
-          onChange={(val) => onChange('course_code', val)}
-          placeholder="Select..."
-          usePortal={true}
-        />
-      </FormField>
-      <FormField label="Deadline" className={styles.inputField}>
-        <DateTimePicker
-          value={data.deadline}
-          onChange={(val) => onChange('deadline', val)}
-          placeholder="dd / mm / yyyy"
-          dateOnly={true}
-          hideIcon={true}
-          triggerClassName={styles.datePickerTrigger}
-          wrapperClassName={styles.datePickerWrap}
-        />
-      </FormField>
-    </>
-  );
-}
-
-function CreateProjectForm({ onCreated }) {
-  const [form, setForm] = useState({ name: "", course_code: "", deadline: "" });
-  const change = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-  
-  const submit = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
-    const res = await fetch("/api/group-work/projects/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Token ${token}` },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      onCreated(await res.json());
-      setForm({ name: "", course_code: "", deadline: "" });
-    }
-  };
-
-  return (
-    <Card className={styles.formCard} padding="sm">
-      <div className={styles.sectionHeader}>
-        <h3 className={styles.sectionTitle}>NEW PROJECT</h3>
-        <div className={styles.sectionLine} />
-      </div>
-      <form onSubmit={submit} className={styles.createProjectForm}>
-        <CreateProjectInputs data={form} onChange={change} />
-        <div className={styles.formFooter}>
-          <PrimaryButton type="submit" className={styles.submitBtn} pill>+ Create project</PrimaryButton>
-        </div>
-      </form>
-    </Card>
-  );
-}
-
-const THEMES = {
-  red: { pill: styles.daysRed, ring: "#ef4444" },
-  orange: { pill: styles.daysOrange, ring: "#f97316" },
-  yellow: { pill: styles.daysYellow, ring: "#eab308" },
-  green: { pill: styles.daysGreen, ring: "#22c55e" },
-  blue: { pill: styles.daysBlue, ring: "#3b82f6" },
-  grey: { pill: styles.daysGrey || "", ring: "#94a3b8" },
-};
-
-function getProjectTheme(daysLeft) {
-  if (daysLeft === null) return THEMES.blue;
-  if (daysLeft <= 7) return THEMES.red;
-  if (daysLeft <= 14) return THEMES.orange;
-  if (daysLeft <= 30) return THEMES.yellow;
-  return THEMES.green;
-}
-
-
-
-function ProjectRow({ project, onClick }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const dateObj = project.deadline ? new Date(project.deadline) : null;
-  const dateString = dateObj ? dateObj.toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }) : "--";
-  const diffTime = dateObj ? (dateObj - new Date()) : 0;
-  const daysLeft = dateObj ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : null;
-
-  const theme = getProjectTheme(daysLeft);
-  const totalTasks = project.task_count || 0;
-  const completedTasks = project.completed_task_count || 0;
-  const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  const members = project.members || [];
-  const avatarsToShow = members.slice(0, 3);
-  const remainingCount = members.length > 3 ? members.length - 3 : 0;
-  
-  const radius = 10;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percent / 100) * circumference;
-
-  return (
-    <div className={styles.projectRowContainer}>
-      <div className={styles.projectRow} onClick={() => setIsExpanded(!isExpanded)}>
-        <div className={styles.projectInfoArea}>
-            <div className={styles.projectIcon}>
-                {project.name ? project.name.charAt(0).toUpperCase() : "P"}
-            </div>
-            <div className={styles.projectText}>
-                <div className={styles.projectName}>{project.name}</div>
-                {project.module_name && (
-                    <div className={styles.projectModule}>{project.module_name}</div>
-                )}
-                <div className={styles.projectSub}>
-                    <div className={styles.avatarStack}>
-                        {avatarsToShow.map((member, i) => (
-                            <div 
-                                key={member.id} 
-                                className={styles.avatarWrapper} 
-                                style={{ zIndex: 10 - i }}
-                                title={getDisplayName(member)}
-                            >
-                                <MemberAvatar member={member} size={24} />
-                            </div>
-                        ))}
-                        {remainingCount > 0 && (
-                            <div className={styles.avatarPill} style={{ zIndex: 1 }}>+{remainingCount}</div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div className={styles.projectMetaArea}>
-            <div className={styles.deadlineInfo}>
-                <div className={styles.deadlineDate}>{dateString}</div>
-                {daysLeft !== null && (
-                    <div className={`${styles.daysPill} ${theme.pill}`}>
-                        {daysLeft < 0 ? 'Past due' : `${daysLeft} days`}
-                    </div>
-                )}
-            </div>
-            <div className={styles.progressCircleContainer}>
-                <svg width="24" height="24" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r={radius} stroke="var(--border)" strokeWidth="3" fill="none" />
-                  <motion.circle 
-                    cx="12" cy="12" r={radius} 
-                    stroke={theme.ring} strokeWidth="3" fill="none" 
-                    strokeDasharray={circumference} 
-                    initial={{ strokeDashoffset: circumference }}
-                    animate={{ strokeDashoffset: circumference - (percent / 100) * circumference }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    strokeLinecap="round" 
-                    transform="rotate(-90 12 12)" 
-                  />
-                </svg>
-            </div>
-            <div className={isExpanded ? styles.arrowIconUp : styles.arrowIcon}>↑</div>
-        </div>
-      </div>
-      
-      {isExpanded && (
-          <div className={styles.projectAccordion}>
-              <div className={styles.accordionStats}>
-                  <div className={styles.statBlock}>
-                      <span className={styles.statLabel}>COMPLETION</span>
-                      <span className={styles.statValue}>{percent}%</span>
-                  </div>
-                  <div className={styles.statBlock}>
-                      <span className={styles.statLabel}>MEMBERS</span>
-                      <span className={styles.statValue}>{project.member_count || 1}</span>
-                  </div>
-                  <div className={styles.statBlock}>
-                      <span className={styles.statLabel}>TASKS DONE</span>
-                      <span className={styles.statValue}>{completedTasks}/{totalTasks}</span>
-                  </div>
-              </div>
-              <div className={styles.accordionActions}>
-                  <button className={styles.btnOpen} onClick={(e) => { e.stopPropagation(); onClick(); }}>Open project →</button>
-              </div>
-          </div>
-      )}
-    </div>
-  );
-}
-
-function GroupWorkContent({ projects, projectListProps, filter, setFilter }) {
-  const filteredProjects = projects.filter(p => {
-    if (filter === "all") return true;
-    if (filter === "due_soon") {
-      const days = p.deadline ? Math.ceil((new Date(p.deadline) - Date.now()) / (1000 * 60 * 60 * 24)) : Infinity;
-      return days > 0 && days <= 30;
-    }
-    if (filter === "later") {
-      const days = p.deadline ? Math.ceil((new Date(p.deadline) - Date.now()) / (1000 * 60 * 60 * 24)) : Infinity;
-      return days > 30 || days === Infinity;
-    }
-    return true;
-  });
-
-  return (
-    <div className={styles.projectsSection}>
-      <div className={styles.projectsHeader}>
-        <h3 className={styles.sectionTitle}>PROJECTS</h3>
-        <div className={styles.filterTabs}>
-          <button className={`${styles.filterTab} ${filter === "all" ? styles.filterTabActive : ""}`} onClick={() => setFilter("all")}>All</button>
-          <button className={`${styles.filterTab} ${filter === "due_soon" ? styles.filterTabActive : ""}`} onClick={() => setFilter("due_soon")}>Due soon</button>
-          <button className={`${styles.filterTab} ${filter === "later" ? styles.filterTabActive : ""}`} onClick={() => setFilter("later")}>Later</button>
-        </div>
-      </div>
-      {filteredProjects.length === 0 ? (
-        <p className={styles.emptyMessage}>No projects match this filter.</p>
-      ) : (
-        <div className={styles.projectList}>
-          {filteredProjects.map((p) => <ProjectRow key={p.id} project={p} {...projectListProps(p)} />)}
-        </div>
-      )}
-    </div>
-  );
-}
+import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
+import CreateProjectForm from "./components/CreateProjectForm";
+import GroupWorkContent from "./components/GroupWorkContent";
 
 export default function GroupWorkIndexPage() {
   const { projects, setProjects, loading } = useGroupProjects();
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
   const pid = useSelectedProjectId();
-  if (pid) return (
-    <GroupProjectDetail 
-      projectId={pid} 
-      onBack={() => navigate("/group-work")} 
-      onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))}
-      onUpdate={(updated) => setProjects(prev => prev.map(p => String(p.id) === String(updated.id) ? { ...p, ...updated } : p))}
-    />
-  );
+
+  if (pid) {
+    return (
+      <GroupProjectDetail 
+        projectId={pid} 
+        onBack={() => navigate("/group-work")} 
+        onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))}
+        onUpdate={(upd) => setProjects(prev => prev.map(p => String(p.id) === String(upd.id) ? { ...p, ...upd } : p))}
+      />
+    );
+  }
+
   if (loading) return <GroupWorkIndexSkeleton />;
+
   const onCreated = (p) => setProjects((prev) => [p, ...prev]);
+
   return (
-    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
+    <AppPage 
+        className={styles.container} 
+        title="Group work" 
+        subtitle="Create shared projects and link them to your modules."
+    >
       <GroupWorkStats projects={projects} />
       <CreateProjectForm onCreated={onCreated} />
       <GroupWorkContent 
