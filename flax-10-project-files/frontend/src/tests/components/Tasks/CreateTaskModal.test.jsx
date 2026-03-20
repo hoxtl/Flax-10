@@ -102,7 +102,7 @@ describe('CreateTaskModal', () => {
 
     it('renders description input', () => {
         render(<CreateTaskModal {...defaultProps} />);
-        expect(screen.getByPlaceholderText('Optional')).toBeTruthy();
+        expect(screen.getByPlaceholderText(/add a description/i)).toBeTruthy();
     });
 
     it('renders priority chips', () => {

@@ -59,6 +59,19 @@ describe('Discover', () => {
         await waitFor(() => expect(screen.getByText(/No users found/)).toBeTruthy());
     });
 
+    it('shows only the query-specific empty search state when a search has no matches', async () => {
+        searchUsers.mockResolvedValue({ results: [], total_count: 0 });
+        render(<Discover onNavChange={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText(/Search by name/);
+        fireEvent.change(input, { target: { value: 'lkjnhb' } });
+
+        await waitFor(() => expect(screen.getByText('No users match "lkjnhb"')).toBeTruthy());
+        expect(screen.getByText('Try a different keyword or check your spelling')).toBeTruthy();
+        expect(screen.queryByText(/No users found/)).toBeNull();
+        expect(screen.queryByRole('button', { name: /Clear search/i })).toBeNull();
+    });
+
     it('renders user cards when users returned', async () => {
         searchUsers.mockResolvedValue({
             results: [{ id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' }],
