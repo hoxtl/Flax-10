@@ -198,24 +198,7 @@
 
 .viewProfileBtn {
     width: 100%;
-    padding: 8px 0;
-    border: none;
-    border-radius: var(--btn-radius, 8px);
-    background: var(--primary);
-    color: var(--c-white, #fff);
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.viewProfileBtn:hover {
-    background: var(--c-olive, var(--primary));
-    transform: translateY(-1px);
-}
-
-.viewProfileBtn:active {
-    transform: translateY(0);
+    justify-content: center;
 }
 
 @media (max-width: 900px) {

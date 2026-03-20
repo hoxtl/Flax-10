@@ -35,6 +35,7 @@ describe('DeadlinesWidget (Homepage)', () => {
   it('renders empty state when no deadlines', () => {
     renderWidget();
     expect(screen.getByText(/No deadlines need attention/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /view my modules/i })).not.toBeInTheDocument();
   });
 
   it('renders deadlines when provided', () => {

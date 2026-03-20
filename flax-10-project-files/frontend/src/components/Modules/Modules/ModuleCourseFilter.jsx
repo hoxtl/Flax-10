@@ -74,9 +74,9 @@ function useClickOutside(ref, onClose) {
     }, [ref, onClose]);
 }
 
-function FilterButton({ activeCount, onClick }) {
+function FilterButton({ activeCount, isOpen, onClick }) {
     return (
-        <button onClick={onClick} className={styles.filterBtn}>
+        <button onClick={onClick} className={styles.filterBtn} aria-expanded={isOpen} aria-haspopup="dialog">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
             Filter{activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
         </button>
@@ -130,8 +130,13 @@ export default function ModuleCourseFilter({ selectedCourses, onToggleCourse }) 
     const toggleExpanded = (key) => setExpanded(p => ({ ...p, [key]: !p[key] }));
     const activeCount = selectedCourses.length;
     return (
-        <div ref={ref} className={styles.wrapper}>
-            <FilterButton activeCount={activeCount} onClick={() => setIsOpen(!isOpen)} />
+        <div
+            ref={ref}
+            className={styles.wrapper}
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+        >
+            <FilterButton activeCount={activeCount} isOpen={isOpen} onClick={() => setIsOpen(true)} />
             <AnimatePresence>{isOpen && <DropdownContent filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />}</AnimatePresence>
         </div>
     );

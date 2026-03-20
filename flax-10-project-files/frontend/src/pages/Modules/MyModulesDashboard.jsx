@@ -1,14 +1,24 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, BookOpen, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 import { getUpcomingDeadlines } from '../../api/deadlineApi';
 import { getSuggestedReadings, convertReadingToTask } from '../../api/readingApi';
 import { createTask } from '../../api/taskService';
+import { UpcomingDeadlinesWidget } from '../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
+import {
+    PRIORITY_PILL,
+    TIER_ACCENT,
+    getDayCount,
+    getDaysLabel,
+    getDueStatusClass,
+    getUrgencyTier,
+} from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
 import { isEnrolledIn } from '../../components/Modules/utils/moduleUtils';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
+import StatStrip from '../../components/common/StatStrip/StatStrip';
 import { TaskInfoModal } from '../Tasks/components/TaskInfoModal';
 import styles from './MyModulesDashboard.module.css';
 
@@ -22,54 +32,6 @@ const expandBodyVariants = {
         height: 'auto',
         transition: { duration: 0.26, ease: [0.23, 1, 0.32, 1] },
     },
-};
-
-function getDayCount(dueDate) {
-    const ms = new Date(dueDate).getTime() - Date.now();
-    return Math.floor(ms / 86400000);
-}
-
-function getUrgencyTier(dueDate) {
-    const days = getDayCount(dueDate);
-    if (days < 0) return 'overdue';
-    if (days <= 2) return 'critical';
-    if (days <= 5) return 'urgent';
-    if (days <= 14) return 'upcoming';
-    return 'distant';
-}
-
-function getDaysLabel(dueDate) {
-    const days = getDayCount(dueDate);
-    if (days < 0) {
-        const over = Math.abs(days);
-        return over === 0 ? 'Overdue' : over === 1 ? '1d overdue' : `${over}d overdue`;
-    }
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Tomorrow';
-    return `${days}d`;
-}
-
-const PRIORITY_PILL = {
-    overdue: { label: 'Overdue', marks: '!!', cls: 'priorityPill_overdue' },
-    critical: { label: 'Urgent', marks: '!!!', cls: 'priorityPill_critical' },
-    urgent: null,
-    upcoming: null,
-    distant: null,
-};
-
-function getDueStatusClass(tier) {
-    if (tier === 'overdue') return 'due_overdue';
-    if (tier === 'critical') return 'due_today';
-    if (tier === 'urgent') return 'due_tomorrow';
-    return 'due_future';
-}
-
-const TIER_ACCENT = {
-    overdue: 'var(--home-urgency-danger)',
-    critical: 'var(--home-urgency-warning)',
-    urgent: 'var(--home-urgency-warning)',
-    upcoming: 'var(--home-urgency-neutral)',
-    distant: 'var(--home-urgency-neutral-border)',
 };
 
 const listVariants = {
@@ -96,38 +58,6 @@ function WidgetHeader({ icon: Icon, title, count }) {
     );
 }
 
-function DeadlineRow({ deadline, isMostUrgent }) {
-    const due = deadline.start_due_date;
-    const tier = getUrgencyTier(due);
-    const daysLabel = getDaysLabel(due);
-    const title = deadline.assessment_title || deadline.title || 'Assignment';
-    const moduleCode = deadline.module_code || '';
-    const typeLabel = (deadline.deadline_type || 'assessment').toUpperCase();
-    const urgentGlow = tier === 'overdue' || tier === 'critical';
-    const pill = PRIORITY_PILL[tier];
-    const dueCls = getDueStatusClass(tier);
-    return (
-        <motion.div
-            className={`${styles.deadlineRow} ${tier === 'overdue' ? styles.rowOverdue : ''} ${tier === 'critical' ? styles.rowCritical : ''} ${urgentGlow ? styles.rowUrgentGlow : ''}`}
-            style={{ '--deadline-row-accent': TIER_ACCENT[tier] }}
-            variants={itemVariants}
-        >
-            <div className={styles.deadlineRowLeft}>
-                <div className={styles.deadlinePills}>
-                    {moduleCode && <Link to={`/modules?code=${encodeURIComponent(moduleCode)}`} className={styles.moduleCodePill} onClick={e => e.stopPropagation()}>{moduleCode}</Link>}
-                    <span className={styles.typePill}>{typeLabel}</span>
-                </div>
-                <span className={styles.deadlineTitle}>{title}</span>
-            </div>
-            {pill && <span className={`${styles.priorityPill} ${styles[pill.cls]}`}>{pill.marks} {pill.label}</span>}
-            <span className={`${styles.daysLabel} ${styles[dueCls]}`}>
-                {(tier === 'overdue' || tier === 'critical' || tier === 'urgent') && <Clock size={11} className={styles.duePillIcon} />}
-                {daysLabel}
-            </span>
-        </motion.div>
-    );
-}
-
 function ShowMoreButton({ expanded, hiddenCount, onToggle }) {
     return (
         <motion.button
@@ -146,61 +76,8 @@ function ShowMoreButton({ expanded, hiddenCount, onToggle }) {
 }
 
 function DeadlinesPanel({ deadlines }) {
-    const [expanded, setExpanded] = useState(false);
-    const sorted = useMemo(() => {
-        const list = [...(deadlines || [])].filter(d => d.start_due_date);
-        list.sort((a, b) => {
-            const aTier = getUrgencyTier(a.start_due_date);
-            const bTier = getUrgencyTier(b.start_due_date);
-            const tierOrder = { overdue: 0, critical: 1, urgent: 2, upcoming: 3, distant: 4 };
-            if (tierOrder[aTier] !== tierOrder[bTier]) return tierOrder[aTier] - tierOrder[bTier];
-            return new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime();
-        });
-        return list;
-    }, [deadlines]);
-
-    const initial = sorted.slice(0, DEADLINES_INITIAL_SHOWN);
-    const extra = sorted.slice(DEADLINES_INITIAL_SHOWN);
-    const hiddenCount = extra.length;
-
     return (
-        <motion.div className={styles.widget} variants={containerVariants} initial="hidden" animate="visible">
-            <WidgetHeader icon={AlertCircle} title="Upcoming Deadlines" count={sorted.length} />
-            {sorted.length === 0 ? (
-                <div className={styles.emptyState}>
-                    <p className={styles.emptyMessage}>No upcoming deadlines</p>
-                    <p className={styles.emptySub}>You're all caught up — enjoy the calm.</p>
-                </div>
-            ) : (
-                <>
-                    <motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants}>
-                        {initial.map((d, idx) => (
-                            <DeadlineRow key={d.id} deadline={d} isMostUrgent={idx === 0} />
-                        ))}
-                        <AnimatePresence initial={false}>
-                            {expanded && (
-                                <motion.div
-                                    className={styles.expandableRows}
-                                    variants={expandBodyVariants}
-                                    initial="collapsed"
-                                    animate="expanded"
-                                    exit="collapsed"
-                                >
-                                    <motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
-                                        {extra.map((d) => (
-                                            <DeadlineRow key={d.id} deadline={d} isMostUrgent={false} />
-                                        ))}
-                                    </motion.div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                    {hiddenCount > 0 && (
-                        <ShowMoreButton expanded={expanded} hiddenCount={hiddenCount} onToggle={() => setExpanded(p => !p)} />
-                    )}
-                </>
-            )}
-        </motion.div>
+        <UpcomingDeadlinesWidget deadlines={deadlines} initialShown={DEADLINES_INITIAL_SHOWN} />
     );
 }
 
@@ -437,21 +314,6 @@ function SmartNudge({ deadlines, readings, onReadingAdded }) {
     );
 }
 
-function AnimatedStat({ value, label, delay = 0 }) {
-    const ref = useCountUp(value, 1200);
-    return (
-        <motion.div
-            className={styles.statCard}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay, ease: [0.23, 1, 0.32, 1] }}
-        >
-            <span className={styles.statValue} ref={ref}>0</span>
-            <span className={styles.statLabel}>{label}</span>
-        </motion.div>
-    );
-}
-
 export default function MyModulesDashboard({ modules, enrollments }) {
     const [deadlines, setDeadlines] = useState([]);
     const [readings, setReadings] = useState([]);
@@ -473,17 +335,20 @@ export default function MyModulesDashboard({ modules, enrollments }) {
         if (!modules || !enrollments) return 0;
         return modules.filter(m => isEnrolledIn(m.id, enrollments)).length;
     }, [modules, enrollments]);
+    const enrolledRef = useCountUp(enrolledCount, 1200);
+    const deadlinesRef = useCountUp(deadlines.length, 1200);
+    const readingsRef = useCountUp(readings.length, 1200);
 
     return (
         <motion.div className={styles.dashboard} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
             <SmartNudge deadlines={deadlines} readings={readings} onReadingAdded={handleReadingAdded} />
-            <div className={styles.statsRow}>
-                <AnimatedStat value={enrolledCount} label="Enrolled modules" delay={0.1} />
-                <div className={styles.statSep} />
-                <AnimatedStat value={deadlines.length} label="Upcoming assignment deadlines" delay={0.2} />
-                <div className={styles.statSep} />
-                <AnimatedStat value={readings.length} label="Readings to do" delay={0.3} />
-            </div>
+            <StatStrip
+                items={[
+                    { key: 'enrolled-modules', label: 'Enrolled modules', value: enrolledCount, valueRef: enrolledRef },
+                    { key: 'upcoming-deadlines', label: 'Upcoming assignment deadlines', value: deadlines.length, valueRef: deadlinesRef },
+                    { key: 'readings-to-do', label: 'Readings to do', value: readings.length, valueRef: readingsRef },
+                ]}
+            />
             <div className={styles.widgetRow}>
                 <DeadlinesPanel deadlines={deadlines} />
                 <ReadingsPanel readings={readings} onReadingAdded={handleReadingAdded} />

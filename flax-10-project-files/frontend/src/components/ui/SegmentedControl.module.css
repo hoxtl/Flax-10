@@ -2,14 +2,14 @@
 .container {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--segmented-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 2px;
     gap: 2px;
-    box-shadow: 0 1px 4px rgba(74, 52, 33, 0.08);
+    box-shadow: var(--segmented-shadow);
     height: 36px;
     width: fit-content;
 }
@@ -18,12 +18,9 @@
     width: 100%;
 }
 
-:root[data-mode="dark"] .container {
-    background: rgba(255, 255, 255, 0.04);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
 .button {
+    position: relative;
+    isolation: isolate;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -34,10 +31,15 @@
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--segmented-button-fg);
     transition: all 0.15s;
     white-space: nowrap;
     flex: 0 0 auto;
+}
+
+.button > *:not(.activeIndicator) {
+    position: relative;
+    z-index: 1;
 }
 
 .fillBtn {
@@ -45,17 +47,17 @@
 }
 
 .button svg {
-    stroke: var(--muted);
+    stroke: var(--segmented-button-fg);
     transition: stroke 0.15s;
 }
 
 .button:hover {
-    background: var(--hover);
-    color: var(--text);
+    background: var(--segmented-button-hover-bg);
+    color: var(--segmented-button-hover-fg);
 }
 
 .button:hover svg {
-    stroke: var(--text);
+    stroke: var(--segmented-button-hover-fg);
 }
 
 .iconOnly {
@@ -65,89 +67,67 @@
 }
 
 .active {
-    background: var(--active);
-    color: var(--primary-strong);
+    color: var(--segmented-active-fg);
 }
 
 .active svg {
-    stroke: var(--primary-strong);
+    stroke: var(--segmented-active-fg);
 }
 
-:root[data-mode="dark"] .active {
-    color: var(--primary);
-}
-
-:root[data-mode="dark"] .active svg {
-    stroke: var(--primary);
+.activeIndicator {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--segmented-active-bg);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 12%, transparent);
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* ─── Solid variant: warm charcoal inversion ─── */
 .solid {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--segmented-solid-bg);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    border: 1px solid rgba(74, 52, 33, 0.25);
+    border: 1px solid var(--segmented-solid-border);
     border-radius: 999px;
-    box-shadow: none;
-}
-
-:root[data-mode="dark"] .solid {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: var(--segmented-solid-shadow);
 }
 
 .solid .button {
     border-radius: 999px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--segmented-solid-button-fg);
     padding: 4px 14px;
 }
 
 .solid .button svg {
-    stroke: var(--text);
-}
-
-:root[data-mode="dark"] .solid .button {
-    color: rgba(255, 255, 255, 0.55);
-}
-
-:root[data-mode="dark"] .solid .button svg {
-    stroke: rgba(255, 255, 255, 0.55);
+    stroke: var(--segmented-solid-button-fg);
 }
 
 .solid .button:hover {
-    background: rgba(74, 52, 33, 0.08);
-    color: var(--text);
+    background: var(--segmented-solid-button-hover-bg);
+    color: var(--segmented-solid-button-hover-fg);
 }
 
 .solid .button:hover svg {
-    stroke: var(--text);
-}
-
-:root[data-mode="dark"] .solid .button:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text);
+    stroke: var(--segmented-solid-button-hover-fg);
 }
 
 .solid .active {
-    background: rgba(74, 52, 33, 0.88);
-    color: #FAF9F6;
+    color: var(--segmented-solid-active-fg);
+}
+
+.activeIndicatorSolid {
+    background: var(--segmented-solid-active-bg);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
 }
 
 .solid .active svg {
-    stroke: #FAF9F6;
+    stroke: var(--segmented-solid-active-fg);
 }
 
 .solid .active:hover {
-    background: rgba(74, 52, 33, 0.88);
-    color: #FAF9F6;
-}
-
-:root[data-mode="dark"] .solid .active {
-    background: rgba(255, 255, 255, 0.22);
-    color: #E8D5B5;
-}
-
-:root[data-mode="dark"] .solid .active svg {
-    stroke: #E8D5B5;
+    background: var(--segmented-solid-active-bg);
+    color: var(--segmented-solid-active-fg);
 }

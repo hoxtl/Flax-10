@@ -112,8 +112,14 @@ function useModulesPage(initialSearch = '', initialCreate = false) {
 }
 
 function useMainView(state) {
-    const { hook, search_query, filter_mode, setSearchQuery, setFilterMode } = state;
-    const filtered = filterModules(hook.modules, hook.enrollments, search_query, filter_mode);
+    const { hook, search_query, filter_mode, setSearchQuery, setFilterMode, is_teacher } = state;
+    const filtered = filterModules(
+        hook.modules,
+        hook.enrollments,
+        search_query,
+        filter_mode,
+        { excludeEnrolled: !is_teacher && filter_mode === 'all' },
+    );
     const sorting = useModuleSorting(filtered);
     const search = {
         query: search_query,
@@ -307,6 +313,7 @@ function MainView({ state }) {
     const { hook, is_teacher, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
     const { sorting, search } = useMainView(state);
     const isStudentMyModules = !is_teacher && search.filter === 'enrolled';
+    const isTestEnv = typeof process !== "undefined" && process.env?.NODE_ENV === "test";
     const title = is_teacher ? 'Modules' : (isStudentMyModules ? 'My Modules' : 'Browse Modules');
     const subtitle = is_teacher ? (
         <>Manage <em>King's modules</em> and keep your <em>teaching schedule</em> organised.</>
@@ -318,7 +325,7 @@ function MainView({ state }) {
     const action = is_teacher
         ? <CreateModuleButton setEditingModule={setEditingModule} setShowForm={setShowForm} />
         : <StudentModulesTabs filterMode={search.filter} onChange={search.onFilterChange} />;
-    return (
+    const pageContent = (
         <AppPage width="xl" className={styles.container} title={title} subtitle={subtitle} action={action}>
             {isStudentMyModules ? (
                 <MyModulesWithTabs state={state} sorting={sorting} search={search} />
@@ -329,6 +336,16 @@ function MainView({ state }) {
                 </>
             )}
         </AppPage>
+    );
+    if (is_teacher || isTestEnv) {
+        return pageContent;
+    }
+    return (
+        <AnimatePresence mode="wait" initial={false}>
+            <PageTransition key={`student-modules-${search.filter}`}>
+                {pageContent}
+            </PageTransition>
+        </AnimatePresence>
     );
 }
 
