@@ -273,7 +273,6 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    color: var(--text);
     font-size: 16px;
     border: 1px solid var(--border);
 }
@@ -305,6 +304,7 @@
 .avatarStack {
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .avatarWrapper {
@@ -315,6 +315,15 @@
     align-items: center;
     justify-content: center;
     background: var(--surface-panel);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatarWrapper:hover {
+    transform: scale(1.25) translateY(-2px);
+    z-index: 20 !important;
+    margin-right: -4px;
+    margin-left: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .avatarPill {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import styles from "./GroupWorkIndexPage.module.css";
 import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
@@ -11,7 +12,7 @@ import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import GroupWorkStats from "./components/GroupWorkStats";
 import TextInput from "../../components/common/TextInput/TextInput";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
-import MemberAvatar from "./components/MemberAvatar";
+import MemberAvatar, { getDisplayName } from "./components/MemberAvatar";
 import DateTimePicker from "../../components/common/inputs/DateTimePicker";
 
 function GroupWorkIndexSkeleton() {
@@ -153,7 +154,12 @@ function ProjectRow({ project, onClick }) {
                 <div className={styles.projectSub}>
                     <div className={styles.avatarStack}>
                         {avatarsToShow.map((member, i) => (
-                            <div key={member.id} className={styles.avatarWrapper} style={{ zIndex: 10 - i }}>
+                            <div 
+                                key={member.id} 
+                                className={styles.avatarWrapper} 
+                                style={{ zIndex: 10 - i }}
+                                title={getDisplayName(member)}
+                            >
                                 <MemberAvatar member={member} size={24} />
                             </div>
                         ))}
