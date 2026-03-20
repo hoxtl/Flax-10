@@ -98,6 +98,8 @@ export function ConflictPairRow({
             const accent = getAccent(r.item.title, tagName);
             const start = r.item.start_time ? formatTime(r.item.start_time) : "";
             const end = r.item.end_time ? formatTime(r.item.end_time) : "";
+            const isReadOnly = isReadOnlyEvent(r.item);
+            const canOpenCard = typeof onCardClick === "function" || typeof onEdit === "function";
             const isSleepTime =
               !!r.item.start_time &&
               isDuringSleepWindow(
@@ -112,27 +114,31 @@ export function ConflictPairRow({
                 role="button"
                 tabIndex={0}
                 onContextMenu={(e) => {
-                  if (isReadOnlyEvent(r.item)) return;
+                  if (isReadOnly) return;
                   e.preventDefault();
                   e.stopPropagation();
                   onEventContextMenu?.(r.item, e.clientX, e.clientY);
                 }}
                 onClick={(e) => {
-                  if (isReadOnlyEvent(r.item)) return;
                   const rect = e.currentTarget.getBoundingClientRect();
-                  if (onCardClick) onCardClick(r.item, null, rect);
-                  else onEdit?.(r.item, r.item.tag);
+                  if (onCardClick) {
+                    onCardClick(r.item, null, rect);
+                    return;
+                  }
+                  if (!isReadOnly) onEdit?.(r.item, r.item.tag);
                 }}
                 onKeyDown={(e) => {
-                  if (isReadOnlyEvent(r.item)) return;
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     const rect = e.currentTarget.getBoundingClientRect();
-                    if (onCardClick) onCardClick(r.item, null, rect);
-                    else onEdit?.(r.item, r.item.tag);
+                    if (onCardClick) {
+                      onCardClick(r.item, null, rect);
+                      return;
+                    }
+                    if (!isReadOnly) onEdit?.(r.item, r.item.tag);
                   }
                 }}
-                style={{ "--card-accent": accent, cursor: isReadOnlyEvent(r.item) ? "default" : undefined }}
+                style={{ "--card-accent": accent, cursor: canOpenCard ? "pointer" : "default" }}
               >
                 <div className={styles.planTimelineConflictPairCardAccent} aria-hidden />
                 <span className={styles.planTimelineConflictPairCardTime}>
@@ -152,7 +158,7 @@ export function ConflictPairRow({
                     </span>
                   )}
                 </div>
-                {!freeRow && onPushTomorrow && !isReadOnlyEvent(r.item) && (
+                {!freeRow && onPushTomorrow && !isReadOnly && (
                   <button
                     type="button"
                     className={styles.planTimelineConflictCardMoveBtn}

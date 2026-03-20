@@ -11,9 +11,41 @@
 
 .loadingContainer {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  min-height: 240px;
+  min-height: 420px;
+}
+
+.loadingSkeleton {
+  width: 100%;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.loadingTopCard {
+  height: 82px;
+  border-radius: 18px;
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.loadingCharts {
+  display: grid;
+  gap: 1rem;
+}
+
+.loadingChartCard {
+  height: 320px;
+  border-radius: 18px;
+}
+
+.loadingListCard {
+  min-height: 660px;
+  border-radius: 18px;
 }
 
 .error {
@@ -134,6 +166,10 @@
     grid-template-columns: 1fr;
     align-items: start;
     flex: none;
+  }
+
+  .loadingGrid {
+    grid-template-columns: 1fr;
   }
 
   .chartsCol {

@@ -297,9 +297,11 @@ function ScheduleManagerDialog({ open, onClose }) {
         if (!scheduleId) return;
         setIsDeleting(true);
         try {
+            const removedTitle = schedules.find((schedule) => schedule.id === scheduleId)?.title || 'Schedule';
             await deleteSchedule(scheduleId);
             setSchedules((prev) => prev.filter((schedule) => schedule.id !== scheduleId));
             setRemoveTargetId(null);
+            showToast(`"${removedTitle}" deleted.`);
         } catch (error) {
             showToast(error.message, { variant: 'error' });
         } finally {

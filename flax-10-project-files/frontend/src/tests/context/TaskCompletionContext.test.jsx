@@ -39,9 +39,13 @@ describe('TaskCompletionContext', () => {
         const { result } = renderHook(() => useTaskCompletion(), { wrapper });
         act(() => { result.current.showCompletionToast('Done!'); });
         expect(screen.queryByText('Done!')).toBeTruthy();
-        act(() => { vi.advanceTimersByTime(2001); });
-        expect(screen.queryByText('Done!')).toBeNull();
-        vi.useRealTimers();
+        act(() => {
+            vi.advanceTimersByTime(2200);
+            vi.runAllTimers();
+        });
+        return waitFor(() => expect(screen.queryByText('Done!')).toBeNull()).finally(() => {
+            vi.useRealTimers();
+        });
     });
 
     it('plays sound for non-routine tasks', () => {

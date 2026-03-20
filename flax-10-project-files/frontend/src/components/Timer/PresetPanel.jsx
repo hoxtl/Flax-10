@@ -7,6 +7,7 @@ import {
     getPresetIcon, getPresetDurationTag,
 } from './utils/presetUtils';
 import { fmtDuration } from './utils/timerFormatters';
+import { useToast } from '../../context/ToastContext';
 
 function PresetCard({ preset, t, onApply, onDelete }) {
     const [ctxMenu, setCtxMenu] = useState(null);
@@ -136,6 +137,7 @@ export function PresetPanel({ t, embedded = false }) {
     const [usageMap, setUsageMap] = useState(() => loadPresetUsage());
     const [saving, setSaving] = useState(false);
     const [saveName, setSaveName] = useState('');
+    const toast = useToast();
 
     const sortedPresets = [...BUILT_IN_PRESETS, ...customPresets].sort((a, b) => {
         const diff = Number(usageMap[b.id] || 0) - Number(usageMap[a.id] || 0);
@@ -160,10 +162,11 @@ export function PresetPanel({ t, embedded = false }) {
         setSaveName('');
     };
 
-    const handleDelete = (id) => {
-        const updated = customPresets.filter(p => p.id !== id);
+    const handleDelete = (preset) => {
+        const updated = customPresets.filter(p => p.id !== preset.id);
         setCustomPresets(updated);
         saveCustomPresets(updated);
+        toast?.(`"${preset.label}" deleted.`);
     };
 
     const content = (
@@ -173,7 +176,7 @@ export function PresetPanel({ t, embedded = false }) {
                     <PresetCard
                         key={p.id} preset={p} t={t}
                         onApply={applyPresetAndTrack}
-                        onDelete={customPresets.some(cp => cp.id === p.id) ? () => handleDelete(p.id) : null}
+                        onDelete={customPresets.some(cp => cp.id === p.id) ? () => handleDelete(p) : null}
                     />
                 ))}
             </div>
