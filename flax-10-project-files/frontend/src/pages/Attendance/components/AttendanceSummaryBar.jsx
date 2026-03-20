@@ -1,40 +1,23 @@
-/*
- * Attendance summary bar.
- */
-
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
+import { useCountUp } from "../../../hooks/useCountUp";
 import styles from "./AttendanceSummaryBar.module.css";
 
 export default function AttendanceSummaryBar({ summary }) {
   if (summary.pct === null) return null;
-  return <SummaryBarContent summary={summary} />;
-}
-
-function SummaryBarContent({ summary }) {
-  return (
-    <div className={styles.summaryBar}>
-      <SummaryMetric label="Overall" value={`${summary.pct}%`} first />
-      <SummaryDivider />
-      <SummaryMetric label="Attended" value={summary.attended} valueClassName={styles.summaryAttended} />
-      <SummaryDivider />
-      <SummaryMetric label="Missed" value={summary.missed} valueClassName={styles.summaryMissed} />
-      <SummaryDivider />
-      <SummaryMetric label="To record" value={summary.unmarkedCount} />
-    </div>
-  );
-}
-
-function SummaryMetric({ label, value, valueClassName = "", first = false }) {
-  const itemClassName = first ? `${styles.summaryItem} ${styles.summaryItemFirst}` : styles.summaryItem;
-  const metricClassName = valueClassName ? `${styles.summaryValue} ${valueClassName}` : styles.summaryValue;
+  const overallRef = useCountUp(summary.pct, 1200);
+  const attendedRef = useCountUp(summary.attended, 1200);
+  const missedRef = useCountUp(summary.missed, 1200);
+  const toRecordRef = useCountUp(summary.unmarkedCount, 1200);
 
   return (
-    <div className={itemClassName}>
-      <span className={metricClassName}>{value}</span>
-      <span className={styles.summaryLabel}>{label}</span>
-    </div>
+    <StatStrip
+      className={styles.summaryBar}
+      items={[
+        { key: "overall", label: "Overall", value: summary.pct, valueRef: overallRef, suffix: "%" },
+        { key: "attended", label: "Attended", value: summary.attended, valueRef: attendedRef, tone: "success" },
+        { key: "missed", label: "Missed", value: summary.missed, valueRef: missedRef, tone: "danger" },
+        { key: "to-record", label: "To record", value: summary.unmarkedCount, valueRef: toRecordRef },
+      ]}
+    />
   );
-}
-
-function SummaryDivider() {
-  return <div className={styles.summarySep} />;
 }
