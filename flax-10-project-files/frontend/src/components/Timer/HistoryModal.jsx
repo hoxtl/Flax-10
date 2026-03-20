@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { useState, useEffect, useMemo } from 'react';
 import styles from './HistoryModal.module.css';
 import * as historyUtils from './utils/historyUtils';
@@ -53,7 +57,9 @@ const useClearAction = (setHistory, confirm, toast) => {
 
 const useHistoryData = (confirm, toast) => {
     const [history, setHistory] = useState([]);
-    useEffect(() => { historyUtils.getHistory().then(setHistory); }, []);
+    useEffect(() => {
+        historyUtils.getHistory().then(setHistory);
+    }, []);
     const blocks = useMemo(() => groupHistoryByBlock(history), [history]);
     const { triggerClear } = useClearAction(setHistory, confirm, toast);
     return { history, blocks, triggerClear };

@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { useState } from 'react';
 import styles from './MiniTimer.module.css';
 import { formatTime } from './TimerComponents';

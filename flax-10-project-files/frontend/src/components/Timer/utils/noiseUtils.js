@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 
 const BUFFER_SIZE = 4096;
 
