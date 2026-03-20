@@ -1,351 +1,414 @@
 .sidebar {
-    width: 220px;
-    min-width: 220px;
-    max-width: 220px;
-    flex-shrink: 0;
-    border-right: 1px solid var(--widget-border);
-    background: var(--sidebar);
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 16px 12px 24px;
-    gap: 8px;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--widget-border);
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 16px 12px 24px;
+  gap: 8px;
 }
 
 .sectionLabel {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-    padding: 8px 8px 4px;
-    margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  padding: 8px 8px 4px;
+  margin-top: 8px;
 }
 
 .nav {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    margin-bottom: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 0.25rem;
 }
 
 .navItem {
-    width: 100%;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-    color: var(--text);
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+  color: var(--text);
 }
 .navItem:hover {
-    background: var(--hover);
-    transform: translateX(2px);
+  background: var(--hover);
+  transform: translateX(2px);
 }
-.navItem:active { transform: scale(0.98); }
+.navItem:active {
+  transform: scale(0.98);
+}
 
 .navActive {
-    background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
-    color: var(--primary);
-    transform: translateX(2px);
+  background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
+  color: var(--primary);
+  transform: translateX(2px);
 }
-.navActive .navLabel { color: var(--primary); font-weight: 600; }
-.navActive .navEmoji { filter: none; }
+.navActive .navLabel {
+  color: var(--primary);
+  font-weight: 600;
+}
+.navActive .navEmoji {
+  filter: none;
+}
 
-.navDanger .navLabel { color: #ef4444; }
-.navDanger .navEmoji { filter: none; }
+.navDanger .navLabel {
+  color: #ef4444;
+}
+.navDanger .navEmoji {
+  filter: none;
+}
 
 .navEmoji {
-    font-size: 0.82rem;
-    flex-shrink: 0;
-    width: 18px;
-    text-align: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
 }
 
 .navLabel {
-    flex: 1;
-    min-width: 0;
-    font-family: var(--font-body);
-    font-size: 0.97rem;
-    font-weight: 600;
-    color: var(--text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    letter-spacing: 0.01em;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .navCount {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    background: var(--border);
-    color: var(--muted);
-    border-radius: 9999px;
-    padding: 0.08rem 0.42rem;
-    min-width: 18px;
-    text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--border);
+  color: var(--muted);
+  border-radius: 9999px;
+  padding: 0.08rem 0.42rem;
+  min-width: 18px;
+  text-align: center;
 }
 .navCountDanger {
-    background: var(--danger-bg);
-    color: var(--danger);
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 .listItem {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    border-radius: 8px;
-    border-left: 3px solid transparent;
-    transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.25s ease,
+    transform 0.15s ease;
 }
 .listItem:hover {
-    background: var(--hover-light);
-    transform: translateX(2px);
+  background: var(--hover-light);
+  transform: translateX(2px);
 }
 
 .listActive {
-    background: var(--hover) !important;
-    font-weight: 500;
-    border-left-color: var(--primary);
-    padding-left: 9px;
-    transform: translateX(2px);
+  background: var(--hover) !important;
+  font-weight: 500;
+  border-left-color: var(--primary);
+  padding-left: 9px;
+  transform: translateX(2px);
 }
-.listActive .listName { color: var(--text); font-weight: 600; }
+.listActive .listName {
+  color: var(--text);
+  font-weight: 600;
+}
 
 .listBtn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  min-width: 0;
 }
 
 .listDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .listName {
-    flex: 1;
-    min-width: 0;
-    font-family: var(--font-body);
-    font-size: 0.97rem;
-    font-weight: 600;
-    color: var(--text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    letter-spacing: 0.01em;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .listCount {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--muted);
-    background: var(--pill-bg);
-    border-radius: 8px;
-    padding: 1px 6px;
-    min-width: 18px;
-    text-align: center;
-    flex-shrink: 0;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--pill-bg);
+  border-radius: 8px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .emptyLists {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: var(--muted);
-    padding: 0.4rem 0.55rem;
-    margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--muted);
+  padding: 0.4rem 0.55rem;
+  margin: 0;
 }
 
 /* ── Create new list button ── */
 .createListBtn {
-    width: 100%;
-    margin-top: 8px;
-    padding: 8px 12px;
-    background: none;
-    border: 1.5px dashed var(--muted);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: 1.5px dashed var(--muted);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
 }
 .createListBtn:hover {
-    color: var(--text);
-    border-color: var(--primary);
-    background: var(--hover-light);
+  color: var(--text);
+  border-color: var(--primary);
+  background: var(--hover-light);
 }
 
 .renameInput {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1.5px solid var(--primary);
-    border-radius: 12px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 0.875rem;
-    outline: none;
-    margin: 8px 8px;
+  flex: 1;
+  padding: 8px 12px;
+  border: 1.5px solid var(--primary);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  margin: 8px 8px;
 }
 
 .ctxMenu {
-    position: fixed;
-    background: var(--panel, #FFFCFA);
-    border: 1px solid rgba(74, 52, 33, 0.1);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
-    z-index: 500;
-    min-width: 160px;
-    overflow: hidden;
-    padding: 3px;
-    animation: ctxPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  position: fixed;
+  background: var(--panel, #fffcfa);
+  border: 1px solid rgba(74, 52, 33, 0.1);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 20px rgba(74, 52, 33, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  z-index: 500;
+  min-width: 160px;
+  overflow: hidden;
+  padding: 3px;
+  animation: ctxPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes ctxPop {
-    from { opacity: 0; transform: translateY(-6px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .ctxItem {
-    width: 100%;
-    padding: 6px 10px;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    text-align: left;
-    font-family: var(--font-body);
-    font-size: 0.76rem;
-    font-weight: 500;
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    transition: background 0.12s, color 0.12s;
+  width: 100%;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
-.ctxItem svg { color: var(--muted); flex-shrink: 0; transition: color 0.12s; }
-.ctxItem:hover { background: var(--hover); }
-.ctxItem:hover svg { color: var(--text); }
-.ctxDelete { color: #c53030; }
-.ctxDelete svg { color: #c53030; opacity: 0.7; }
-.ctxDelete:hover { background: rgba(197, 48, 48, 0.06); }
-.ctxDelete:hover svg { color: #c53030; opacity: 1; }
+.ctxItem svg {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+.ctxItem:hover {
+  background: var(--hover);
+}
+.ctxItem:hover svg {
+  color: var(--text);
+}
+.ctxDelete {
+  color: #c53030;
+}
+.ctxDelete svg {
+  color: #c53030;
+  opacity: 0.7;
+}
+.ctxDelete:hover {
+  background: rgba(197, 48, 48, 0.06);
+}
+.ctxDelete:hover svg {
+  color: #c53030;
+  opacity: 1;
+}
 
 .ctxDivider {
-    height: 1px;
-    background: var(--border);
-    margin: 2px 6px;
+  height: 1px;
+  background: var(--border);
+  margin: 2px 6px;
 }
 
 .archiveSection {
-    margin-top: 0.75rem;
-    border-top: 1px solid var(--border);
-    padding-top: 0.6rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
 }
 
 .archiveToggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--muted);
-    cursor: pointer;
-    border-radius: 12px;
-    transition: background 0.1s;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.1s;
 }
-.archiveToggle:hover { background: var(--hover); }
+.archiveToggle:hover {
+  background: var(--hover);
+}
 
 .archiveList {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 0.2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.2rem 0;
 }
 
 .archiveItem {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.55rem;
-    font-size: 0.78rem;
-    color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 
 .archiveActions {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
 }
 
 .archiveName {
-    flex: 1;
-    font-size: 0.78rem;
-    text-decoration: line-through;
-    opacity: 0.6;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  flex: 1;
+  font-size: 0.78rem;
+  text-decoration: line-through;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .restoreBtn {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.18rem 0.5rem;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.1s;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border: none;
+  border-radius: 9999px;
+  padding: 0.18rem 0.5rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.1s;
 }
-.restoreBtn:hover { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+.restoreBtn:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+}
 
 .deletePermanentBtn {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #dc2626;
-    background: color-mix(in srgb, #dc2626 10%, transparent);
-    border: none;
-    border-radius: 9999px;
-    padding: 0.18rem 0.5rem;
-    cursor: pointer;
-    transition: background 0.1s;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #dc2626;
+  background: color-mix(in srgb, #dc2626 10%, transparent);
+  border: none;
+  border-radius: 9999px;
+  padding: 0.18rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.1s;
 }
-.deletePermanentBtn:hover { background: color-mix(in srgb, #dc2626 20%, transparent); }
+.deletePermanentBtn:hover {
+  background: color-mix(in srgb, #dc2626 20%, transparent);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+}
