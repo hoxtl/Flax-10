@@ -3,20 +3,12 @@
     background: var(--surface-card);
     flex-direction: column;
     min-height: 0;
+    align-self: start;
     position: relative;
     overflow: hidden;
     border: 0.5px solid var(--border);
     border-radius: 20px;
     transition: transform 0.24s cubic-bezier(.2, .9, .2, 1), border-color 0.24s ease;
-}
-
-.card::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--module-accent, var(--primary)), color-mix(in srgb, var(--module-accent, var(--primary)) 30%, transparent));
-    pointer-events: none;
 }
 
 .card.clickable:hover {
@@ -36,7 +28,7 @@
     bottom: 0;
     width: 4px;
     height: auto;
-    background: linear-gradient(to bottom, #5D4037, color-mix(in srgb, #5D4037 35%, transparent));
+    background: var(--modules-accent-line);
     pointer-events: none;
     border-radius: 0;
     inset: auto;
@@ -47,7 +39,7 @@
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.58rem;
     overflow: hidden;
 }
 
@@ -96,7 +88,7 @@
     align-items: center;
     justify-content: center;
     background: var(--panel);
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-size: 0.6rem;
     font-weight: 700;
 }
@@ -106,7 +98,7 @@
     height: 36px;
     border-radius: 10px;
     display: block;
-    background: color-mix(in srgb, var(--module-accent, #5D4037) 10%, var(--surface-card));
+    background: color-mix(in srgb, var(--module-accent, var(--modules-accent-ink)) 10%, var(--surface-card));
     border: 0.5px solid color-mix(in srgb, var(--text) 40%, var(--border));
     flex: 0 0 auto;
     position: relative;
@@ -119,7 +111,7 @@
     left: 10px;
     right: 10px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--module-accent, #5D4037) 35%, transparent);
+    background: color-mix(in srgb, var(--module-accent, var(--modules-accent-ink)) 35%, transparent);
 }
 
 .iconWrap::before {
@@ -134,13 +126,13 @@
 }
 
 .enrolledBadge {
-    background: color-mix(in srgb, var(--sage) 15%, var(--surface-card));
-    color: var(--sage);
+    background: var(--modules-enrolled-badge-bg);
+    color: var(--modules-enrolled-badge-fg);
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
     font-size: 0.65rem;
     font-weight: 700;
-    border: 0.5px solid color-mix(in srgb, var(--sage) 30%, var(--border));
+    border: 0.5px solid var(--modules-enrolled-badge-border);
 }
 
 .headerChipsRow {
@@ -176,7 +168,7 @@
     border-radius: 999px;
     background: color-mix(in srgb, var(--module-accent, var(--primary)) 12%, var(--surface-card));
     border: 0.5px solid color-mix(in srgb, var(--module-accent, var(--primary)) 22%, var(--border));
-    color: color-mix(in srgb, var(--module-accent, var(--primary)) 70%, #2a2a2a);
+    color: color-mix(in srgb, var(--module-accent, var(--primary)) 70%, var(--text) 30%);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -187,7 +179,7 @@
     font-size: 0.82rem;
     font-weight: 600;
     font-style: italic;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     letter-spacing: 0.02em;
 }
 
@@ -207,6 +199,7 @@
     color: color-mix(in srgb, var(--text) 70%, var(--muted));
     line-height: 1.35;
     margin: 0;
+    min-height: calc(1.35em * 2);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -230,7 +223,7 @@
     font-size: 0.68rem;
     font-weight: 600;
     color: var(--text);
-    background: color-mix(in srgb, #5D4037 6%, var(--surface-card));
+    background: var(--modules-inline-surface);
     border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
     padding: 0.18rem 0.5rem;
     white-space: nowrap;
@@ -243,7 +236,7 @@
     align-items: center;
     gap: 0.32rem;
     font-size: 0.68rem;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-weight: 500;
     font-style: italic;
     padding: 0.18rem 0.5rem;
@@ -266,7 +259,7 @@
     font-size: 0.68rem;
     font-weight: 600;
     color: var(--text);
-    background: color-mix(in srgb, #5D4037 6%, var(--surface-card));
+    background: var(--modules-inline-surface);
     border-color: color-mix(in srgb, var(--text) 20%, var(--border));
     border-radius: 999px;
 }
@@ -294,13 +287,13 @@
     justify-content: flex-start;
     gap: 0.65rem;
     align-items: center;
-    margin-top: auto;
-    padding-top: 0.4rem;
+    margin-top: 0.4rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid color-mix(in srgb, var(--text) 12%, var(--border));
 }
 
 .editButton,
 .deleteButton,
-.enrollButton,
 .unenrollButton {
     padding: 0.45rem 0.85rem;
     border-radius: 999px;
@@ -323,38 +316,29 @@
 }
 
 .deleteButton {
-    background: rgba(220, 38, 38, 0.08);
+    background: var(--modules-danger-soft);
     color: var(--error-text);
     flex: 1;
 }
 
 .deleteButton:hover {
-    background: rgba(220, 38, 38, 0.14);
+    background: var(--modules-danger-soft-hover);
 }
 
-.enrollButton {
-    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 85%, #000));
-    color: #FAF9F6;
+.enrollPrimaryButton {
     flex: 1 1 auto;
-}
-
-.enrollButton:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
-}
-
-.enrollButton:active {
-    transform: translateY(0);
+    min-width: 0;
+    width: 100%;
 }
 
 .unenrollButton {
-    background: rgba(225, 29, 72, 0.08);
+    background: var(--modules-error-soft);
     color: var(--error-text);
     flex: 1 1 auto;
 }
 
 .unenrollButton:hover {
-    background: rgba(225, 29, 72, 0.14);
+    background: var(--modules-error-soft-hover);
 }
 
 .deadlineButton {
@@ -371,20 +355,20 @@
 
 .deadlineButton:hover {
     background: var(--text);
-    color: #FAF9F6;
+    color: var(--modules-accent-on-solid);
 }
 
 .viewDetailsBtn {
     border: none;
     background: transparent;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-size: 0.82rem;
     font-weight: 600;
     font-style: italic;
     padding: 0;
     cursor: pointer;
     text-decoration: none;
-    border-bottom: 1px solid color-mix(in srgb, #5D4037 40%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--modules-accent-ink) 40%, transparent);
     line-height: 1.1;
     transition: color 0.15s ease;
     white-space: nowrap;
@@ -399,34 +383,6 @@
 .coreTag {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #5D4037;
+    color: var(--modules-accent-ink);
     font-style: italic;
-}
-
-:global([data-mode="dark"]) .enrolledBadge {
-    background: color-mix(in srgb, var(--sage) 32%, var(--panel));
-    color: color-mix(in srgb, var(--sage) 85%, var(--text));
-}
-
-:global([data-mode="dark"]) .card {
-    border-color: color-mix(in srgb, var(--border) 80%, #666);
-}
-
-:global([data-mode="dark"]) .moduleTitle {
-    color: var(--text);
-}
-
-:global([data-mode="dark"]) .deadlineButton {
-    border-color: var(--border);
-    color: var(--text);
-}
-
-:global([data-mode="dark"]) .deadlineButton:hover {
-    background: var(--hover);
-    color: var(--text);
-}
-
-:global([data-mode="dark"]) .enrollButton {
-    background: var(--primary);
-    color: var(--c-white);
 }
