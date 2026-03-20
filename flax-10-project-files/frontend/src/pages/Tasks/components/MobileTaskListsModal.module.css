@@ -62,3 +62,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.listCount {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--pill-bg);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
