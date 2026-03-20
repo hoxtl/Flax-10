@@ -9,22 +9,25 @@ import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
 import styles from "./GroupWorkDetail.module.css";
 import DateTimePicker from "../../components/common/inputs/DateTimePicker";
+import { ChevronLeft, Trash2, Users, Calendar } from "lucide-react";
 
 function GroupWorkDetailSkeleton({ onBack }) {
   return (
     <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
-      <div className={styles.topBar}>
+      <div className={styles.topActions}>
         <BackButton onClick={onBack} />
         <SkeletonBlock className={styles.skeletonDeleteBtn} />
       </div>
       <section className={styles.headerSection}>
-        <div className={styles.headerInfo}>
-          <SkeletonBlock className={styles.skeletonProjectTitle} />
-          <SkeletonBlock className={styles.skeletonProjectMeta} />
-          <SkeletonBlock className={styles.skeletonProgressBar} />
-          <SkeletonBlock className={styles.skeletonStats} />
+        <div className={styles.headerBody}>
+          <SkeletonBlock className={styles.skeletonProjectMeta} style={{ width: '120px', borderRadius: '999px', height: '28px' }} />
+          <SkeletonBlock className={styles.skeletonProjectTitle} style={{ marginTop: '12px' }} />
+          <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+            <SkeletonBlock style={{ width: '100px', height: '20px', borderRadius: '4px' }} />
+            <SkeletonBlock style={{ width: '140px', height: '34px', borderRadius: '999px' }} />
+          </div>
+          <SkeletonBlock className={styles.skeletonProgressBar} style={{ marginTop: '20px' }} />
         </div>
-        <SkeletonBlock className={styles.skeletonDeadlinePill} />
       </section>
       <section className={styles.membersSection}>
         <SkeletonBlock className={styles.skeletonMembersTitle} />
@@ -57,12 +60,12 @@ function GroupWorkDetailSkeleton({ onBack }) {
 }
 
 function BackButton({ onClick }) {
-  return (
-    <button type="button" onClick={onClick} className={styles.backButton}>
-      <span>←</span>
-      <span>Back to all projects</span>
-    </button>
-  );
+    return (
+        <button onClick={onClick} className={styles.backButton}>
+            <ChevronLeft size={16} />
+            Back to all projects
+        </button>
+    );
 }
 
 function AddMemberForm({ projectId, onAdded }) {
@@ -133,40 +136,66 @@ function ProjectProgress({ taskStats }) {
   );
 }
 
-function ProjectHeader({ project, members, onPatch, taskStats }) {
+function ProjectHeader({ project, members, onPatch, taskStats, onDelete }) {
     const onName = e => { const v = e.target.value.trim(); if (v && v !== project.name) onPatch({ name: v }); };
     const onCourse = val => onPatch({ course_code: val });
-    const onDeadline = e => onPatch({ deadline: e.target.value ? new Date(e.target.value).toISOString() : null });
+
     return (
         <section className={styles.headerSection}>
-            <div className={styles.headerInfo}>
-                <input defaultValue={project.name} onBlur={onName} className={styles.nameInput} />
-                <div className={styles.metaRow}>
-                    <div className={styles.courseDropdownWrapper}>
+            <div className={styles.topActions}>
+                <BackButton onClick={() => window.history.back()} />
+                <button className={styles.deleteBtn} onClick={onDelete}>
+                    <Trash2 size={14} />
+                    Delete project
+                </button>
+            </div>
+
+            <div className={styles.headerBody}>
+                <div className={styles.moduleTagWrapper}>
+                    <div className={styles.moduleTag}>
+                        <div className={styles.moduleDot} />
                         <UserModuleDropdown
                             value={project.course_code || ""}
                             onChange={onCourse}
                             placeholder="Module"
-                            className={styles.detailCourseDropdown}
+                            className={styles.headerModuleDropdown}
                         />
                     </div>
-                    <span> · {members.length} members</span>
                 </div>
-                <ProjectProgress taskStats={taskStats} />
-            </div>
-            <div className={styles.deadlinePill}>
-                <DateTimePicker
-                    value={project.deadline}
-                    onChange={val => onPatch({ deadline: val })}
-                    dateOnly={true}
-                    placeholder="dd / mm / yyyy"
-                    hideIcon={true}
-                    triggerClassName={styles.detailDateTrigger}
+
+                <input 
+                    defaultValue={project.name} 
+                    onBlur={onName} 
+                    className={styles.nameInput} 
+                    placeholder="Project Name"
                 />
+
+                <div className={styles.metaRow}>
+                    <div className={styles.metaItem}>
+                        <Users size={14} className={styles.metaIcon} />
+                        <span>{members.length} members</span>
+                    </div>
+                    <div className={styles.metaItem}>
+                        <div className={styles.deadlinePill}>
+                            <Calendar size={14} className={styles.metaIcon} />
+                            <DateTimePicker
+                                value={project.deadline}
+                                onChange={val => onPatch({ deadline: val })}
+                                dateOnly={true}
+                                placeholder="dd / mm / yyyy"
+                                hideIcon={true}
+                                triggerClassName={styles.detailDateTrigger}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <ProjectProgress taskStats={taskStats} />
             </div>
         </section>
     );
 }
+
 
 function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate }) {
   const t = (id, label) => (
@@ -271,11 +300,13 @@ export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpda
 
   return (
     <div className={styles.container}>
-      <div className={styles.topBar}>
-        <BackButton onClick={onBack} />
-        <button type="button" onClick={d.handleDeleteProject} className={styles.deleteProjectBtn}>Delete project</button>
-      </div>
-      <ProjectHeader project={d.project} members={d.members} onPatch={d.patchProject} taskStats={d.taskStats} />
+      <ProjectHeader 
+        project={d.project} 
+        members={d.members} 
+        onPatch={d.patchProject} 
+        taskStats={d.taskStats} 
+        onDelete={d.handleDeleteProject}
+      />
       <MembersSection members={d.members} onRemove={d.handleRemoveMember} />
       <AddMemberForm projectId={projectId} onAdded={d.onAdded} />
       <TabsSection activeTab={d.activeTab} setActiveTab={d.setActiveTab} projectId={projectId} members={d.members} onStatsUpdate={d.setTaskStats} />

@@ -91,124 +91,31 @@
 
 .headerSection {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
     gap: 16px;
     margin-bottom: 24px;
 }
 
-.headerInfo {
-    flex: 1;
-}
-
-.progressContainer {
-    margin-top: 12px;
-}
-
-.statsText {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-}
-
-.loading, .empty {
-    text-align: center;
-    margin-top: 48px;
-    color: var(--text-secondary);
-}
-
-.topBar {
+.topActions {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-}
-
-.backButton {
-    padding: 8px 14px;
-    border-radius: 999px;
-    border: none;
-    background: var(--hover);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.deleteProjectBtn {
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: none;
-    background: var(--danger-bg);
-    color: var(--danger);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-/* Project header */
-.projectHeaderRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    margin-top: 12px;
-}
-
-.projectLeft {
-    flex: 1;
-}
-
-.projectNameInput {
-    font-size: 24px;
-    margin: 0 0 4px;
-    border: none;
-    background: transparent;
-    font-weight: 600;
-    color: var(--text);
-    width: 100%;
-}
-
-.projectNameInput:focus {
-    outline: none;
-    border-bottom: 1px solid var(--border);
-}
-
-.courseCodeInput {
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    color: var(--text-secondary);
-    padding: 0;
-    margin-right: 4px;
-}
-
-.courseCodeInput:focus {
-    outline: none;
+    margin-bottom: 24px;
 }
 
 .progressBarOuter {
-    height: 12px;
-    border-radius: 6px;
-    background: var(--border);
-    overflow: visible;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--surface-search);
+    overflow: hidden;
     display: flex;
-    margin-bottom: 4px;
-    margin-top: 8px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    position: relative;
+    margin-top: 16px;
+    border: 1px solid var(--border);
 }
 
 .progressBarInner {
     display: flex;
     width: 100%;
-    border-radius: 6px;
-    overflow: hidden;
     height: 100%;
 }
 
@@ -221,10 +128,10 @@
 
 .progressTooltip {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--card-bg);
+    background: white;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 6px 12px;
@@ -248,24 +155,141 @@
     flex-shrink: 0;
 }
 
+.backButton {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.backButton:hover {
+    background: var(--surface-search);
+    color: var(--text);
+}
+
+.deleteBtn {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(192, 90, 62, 0.2);
+    background: white;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.deleteBtn:hover {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+}
+
+.nameInput {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 4px 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+    line-height: 1.2;
+}
+
+.moduleTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--primary-light);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.moduleDot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.headerModuleDropdown {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 
+   IMPORTANT: Scope the override to .headerModuleDropdown to only affect the header tag.
+   We target the internal dropdownBtn class from AnimatedDropdown.
+*/
+.headerModuleDropdown :global([class*="dropdownBtn"]) {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    font-size: inherit !important;
+    color: inherit !important;
+    box-shadow: none !important;
+    width: auto !important;
+}
+
+.metaRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.metaIcon {
+    opacity: 0.7;
+}
+
 .deadlinePill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 999px;
-    background: var(--hover);
+    background: white;
+    border: 1px solid var(--border);
     font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
     white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .deadlinePill:hover {
-    background: var(--surface-raised);
     border-color: var(--primary);
+    background: var(--surface-search);
 }
 
 .detailDateTrigger {
