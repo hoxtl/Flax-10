@@ -26,12 +26,17 @@ function getPickerClassName(key, animationType) {
   return [styles.animPickerBtn, animationType === key ? styles.animPickerBtnActive : ''].filter(Boolean).join(' ');
 }
 
-export default function FocusAnimation({ progress, mode, isActive }) {
+function MaybePicker({ showPicker, animationType, setAnimationType }) {
+  if (!showPicker) return null;
+  return <AnimationPicker animationType={animationType} setAnimationType={setAnimationType} />;
+}
+
+export default function FocusAnimation({ progress, mode, isActive, showPicker = true }) {
   const { canvasRef, animationType, setAnimationType } = useFocusCanvasAnimation(mode, isActive, progress);
 
   return (
     <div className={styles.focusAnimWrapper}>
-      <AnimationPicker animationType={animationType} setAnimationType={setAnimationType} />
+      <MaybePicker showPicker={showPicker} animationType={animationType} setAnimationType={setAnimationType} />
       <div className={styles.focusAnimArea}>
         <div className={styles.treeAnimContainer}>
           <TreeScene progress={progress} />

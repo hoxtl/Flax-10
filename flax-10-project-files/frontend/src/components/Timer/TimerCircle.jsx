@@ -57,7 +57,7 @@ function getPrimaryButtonCopy(t) {
   return { label: 'Pause', icon: '❚❚' };
 }
 
-export default function TimerCircle({ t, onPrimaryStart }) {
+export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = true }) {
   const ringState = getRingState(t, 136, 'var(--focus-accent, var(--primary))');
   const isRunning = t.isActive && !t.isPaused;
   const className = `${styles.timerCircleWrap} ${isRunning ? styles.timerCircleActive : ''} ${isRunning && t.workTime >= 60 ? styles.timerCircleDeep : ''}`;
@@ -68,7 +68,7 @@ export default function TimerCircle({ t, onPrimaryStart }) {
     <div className={className}>
       <TimerRingSvg cx={160} cy={160} radius={136} ringState={ringState} trackColor="color-mix(in srgb, var(--focus-accent, var(--primary)) 12%, var(--border))" strokeWidth="4" activeClass={activeClass} />
       <div className={styles.timerCircleContent}>
-        <div className={styles.timerCircleAnimClip}><FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} /></div>
+        <div className={styles.timerCircleAnimClip}><FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} showPicker={showAnimationPicker} /></div>
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={ringState.isOvertime} />
         <CirclePrimaryButton isRunning={isRunning} action={getPrimaryAction(t, onPrimaryStart)} label={copy.label} icon={copy.icon} />
         <SecondaryButtons t={t} />
