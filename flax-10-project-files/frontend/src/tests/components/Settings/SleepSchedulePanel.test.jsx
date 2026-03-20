@@ -67,7 +67,7 @@ describe('SleepSchedulePanel', () => {
     });
 
     it('calls onSave with sleep and wake times on submit', async () => {
-        const onSave = vi.fn().mockResolvedValue();
+        const onSave = vi.fn().mockResolvedValue(true);
         const { container } = render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
         await waitFor(() => screen.getByText('Sleep Schedule'));
         fireEvent.submit(container.querySelector('form'));
@@ -77,7 +77,7 @@ describe('SleepSchedulePanel', () => {
     it('renders Save button', async () => {
         render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'Save' })).toBeTruthy();
+            expect(screen.getByRole('button', { name: 'Save Sleep Schedule' })).toBeTruthy();
         });
     });
 
@@ -86,6 +86,17 @@ describe('SleepSchedulePanel', () => {
         render(<SleepSchedulePanel onSave={vi.fn()} isSaving={false} />);
         await waitFor(() => {
             expect(screen.getByText('Sleep Schedule')).toBeTruthy();
+        });
+    });
+
+    it('shows saved tick after a successful sleep save', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '22:30' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
         });
     });
 });

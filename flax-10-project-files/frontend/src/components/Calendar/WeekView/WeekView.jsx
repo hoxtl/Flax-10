@@ -46,13 +46,13 @@ function useCurrentTime() {
 function CurrentTimeLine() {
   const now = useCurrentTime();
   const top = (now.getHours() * 60 + now.getMinutes()) * (SLOT_HEIGHT / 60);
-  const color = "var(--time-indicator, #ea4335)";
   return (
-    <div style={{ position: "absolute", top: `${top}px`, left: "60px", right: 0, height: "2px", background: color, zIndex: 15, pointerEvents: "none" }}>
-      <div style={{ position: "absolute", left: "-6px", top: "50%", transform: "translateY(-50%)", width: "12px", height: "12px", background: color, borderRadius: "50%" }} />
+    <div className="now-line" style={{ top: `${top}px` }}>
+      <div className="now-line-dot" />
     </div>
   );
 }
+
 
 function WeekGrid({ days, events, readOnly }) {
   return (

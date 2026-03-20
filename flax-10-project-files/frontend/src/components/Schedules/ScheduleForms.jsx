@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { getUpcomingDeadlines } from '../../api/deadlineApi';
 import { getEvents } from '../../api/eventApi';
 import { createSchedule } from '../../api/scheduleApi';
-import { useNotifications } from '../../context/NotificationContext';
+import { useToast } from '../../context/ToastContext';
 import styles from '../Dashboard/QuickAddModal.module.css';
 
 export function ScheduleManualForm({ onDone }) {
-  const { addNotification } = useNotifications();
+  const showToast = useToast();
   const [title, setTitle] = useState('');
   const [eventSearch, setEventSearch] = useState('');
   const [events, setEvents] = useState([]);
@@ -21,13 +21,9 @@ export function ScheduleManualForm({ onDone }) {
         setSelected(scheduleTagged.map((event) => event.id));
       })
       .catch(() => {
-        addNotification({
-          title: 'Schedule',
-          message: 'Unable to load schedule-tagged events.',
-          notification_type: 'general',
-        });
+        showToast('Unable to load schedule-tagged events.', { variant: 'error' });
       });
-  }, [addNotification]);
+  }, [showToast]);
 
   const filteredEvents = useMemo(() => {
     const query = eventSearch.trim().toLowerCase();
@@ -41,24 +37,24 @@ export function ScheduleManualForm({ onDone }) {
 
   const submit = async () => {
     if (!title.trim()) {
-      addNotification({ title: 'Schedule name required', message: 'Please enter a schedule name.', notification_type: 'general' });
+      showToast('Please enter a schedule name.', { variant: 'error' });
       return;
     }
 
     if (!selected.length) {
-      addNotification({ title: 'No events selected', message: 'Select at least one event tagged as schedule.', notification_type: 'general' });
+      showToast('Select at least one event tagged as schedule.', { variant: 'error' });
       return;
     }
 
     try {
       const data = await createSchedule({ mode: 'manual', title: title.trim(), event_ids: selected });
       if (data.overwritten) {
-        addNotification({ title: 'Schedule overwritten', message: 'A schedule with this name existed and was replaced.', notification_type: 'general' });
+        showToast('A schedule with this name existed and was replaced.', { variant: 'info' });
       }
-      addNotification({ title: 'Schedule created', message: `Saved ${selected.length} events to ${title.trim()}.`, notification_type: 'general' });
+      showToast(`Saved ${selected.length} events to "${title.trim()}".`, { variant: 'success' });
       onDone?.();
     } catch (error) {
-      addNotification({ title: 'Create schedule failed', message: error.message, notification_type: 'general' });
+      showToast(error.message, { variant: 'error' });
     }
   };
 
@@ -89,7 +85,7 @@ export function ScheduleManualForm({ onDone }) {
 }
 
 export function ScheduleAutoForm({ onDone }) {
-  const { addNotification } = useNotifications();
+  const showToast = useToast();
   const [title, setTitle] = useState('Auto schedule');
   const [deadlines, setDeadlines] = useState([]);
 
@@ -97,13 +93,13 @@ export function ScheduleAutoForm({ onDone }) {
     getUpcomingDeadlines()
       .then(setDeadlines)
       .catch(() => {
-        addNotification({ title: 'Schedule', message: 'Unable to load upcoming deadlines.', notification_type: 'general' });
+        showToast('Unable to load upcoming deadlines.', { variant: 'error' });
       });
-  }, [addNotification]);
+  }, [showToast]);
 
   const submit = async () => {
     if (!deadlines.length) {
-      addNotification({ title: 'No deadlines', message: 'No upcoming deadlines to auto-schedule.', notification_type: 'general' });
+      showToast('No upcoming deadlines to auto-schedule.', { variant: 'error' });
       return;
     }
 
@@ -118,12 +114,12 @@ export function ScheduleAutoForm({ onDone }) {
     try {
       const data = await createSchedule(payload);
       if (data.overwritten) {
-        addNotification({ title: 'Schedule overwritten', message: 'A schedule with this name existed and was replaced.', notification_type: 'general' });
+        showToast('A schedule with this name existed and was replaced.', { variant: 'info' });
       }
-      addNotification({ title: 'Auto schedule created', message: `Generated schedule: ${payload.title}.`, notification_type: 'general' });
+      showToast(`Generated schedule: "${payload.title}".`, { variant: 'success' });
       onDone?.();
     } catch (error) {
-      addNotification({ title: 'Auto schedule failed', message: error.message, notification_type: 'general' });
+      showToast(error.message, { variant: 'error' });
     }
   };
 

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getModules } from "../../../api/moduleApi";
 import { getHeaderTitle } from "../utils/taskFeedUtils";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
+import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
 import {
   buildDateBounds,
   filterBySearch,
@@ -115,25 +116,56 @@ function useTaskFeedModuleNameMap() {
   return moduleNameMap;
 }
 
+function getReadingListLabel(activeList) {
+  if (!activeList) return "this reading list";
+  const parsed = parseReadingListName(activeList.name);
+  return [parsed.moduleCode, parsed.moduleName].filter(Boolean).join(" ") || parsed.label || "this reading list";
+}
+
 /** Derives task feed state and section data from tasks, lists, and filter options. */
 export default function useTaskFeedData(opts) {
-  const { tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
+  const { tasks, allTasks = tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
   const navigate = useNavigate();
   const filterState = useTaskFeedFilterState(filterListIds, onFilterByList);
+  const hasSearchQuery = filterState.search.trim().length > 0;
   const moduleNameMap = useTaskFeedModuleNameMap();
   const filterOptions = useTaskFeedFilterOptions(tasks, lists, filterState.filterQuery, moduleNameMap);
   const listMap = useTaskFeedListMap(lists);
-  const tasksByModule = useMemo(() => { if (!filterState.filterModuleCodes?.length) return tasks; const set = new Set(filterState.filterModuleCodes.map(String)); return tasks.filter((t) => set.has(String(t.module_code || ""))); }, [tasks, filterState.filterModuleCodes]);
+  const searchSourceTasks = useMemo(() => {
+    if (!hasSearchQuery) return tasks;
+    if (activeFilter === "overdue") return allTasks.filter((t) => !t.completed && t.due_date && new Date(t.due_date) < new Date());
+    if (!filterListIds?.length) return allTasks;
+    const allowedListIds = new Set(filterListIds.map(String));
+    return allTasks.filter((task) => allowedListIds.has(String(task.task_list)));
+  }, [activeFilter, allTasks, filterListIds, hasSearchQuery, tasks]);
+  const tasksByModule = useMemo(() => {
+    if (!filterState.filterModuleCodes?.length) return searchSourceTasks;
+    const set = new Set(filterState.filterModuleCodes.map(String));
+    return searchSourceTasks.filter((t) => set.has(String(t.module_code || "")));
+  }, [searchSourceTasks, filterState.filterModuleCodes]);
   const pending = tasksByModule.filter((t) => !t.completed);
   const completed = tasksByModule.filter((t) => t.completed);
   const filtered = useMemo(() => filterBySearch(pending, filterState.search, listMap), [pending, filterState.search, listMap]);
   const filteredCompleted = useMemo(() => filterBySearch(completed, filterState.search, listMap), [completed, filterState.search, listMap]);
   const buckets = useTaskFeedBuckets(filtered, filteredCompleted, filterState.search);
-  const todayEmptyMessage = useMemo(() => getClearMessage(), []);
-  const todayEmptyCardProps = useMemo(() => ({ message: todayEmptyMessage, sub: buckets.completedTodayCount > 0 ? `${buckets.completedTodayCount} task${buckets.completedTodayCount !== 1 ? "s" : ""} completed today. Take a moment — you earned it.` : "No tasks due today.", ctaLabel: "Plan tomorrow →", onCtaClick: () => { if (typeof onPlanTomorrow === "function") onPlanTomorrow(); else navigate("/tasks?open=fullPlanning"); } }), [buckets.completedTodayCount, todayEmptyMessage, onPlanTomorrow, navigate]);
+  const clearMessage = useMemo(() => getClearMessage(), []);
+  const todayEmptyCardProps = useMemo(() => ({ message: clearMessage, sub: buckets.completedTodayCount > 0 ? `${buckets.completedTodayCount} task${buckets.completedTodayCount !== 1 ? "s" : ""} completed today. Take a moment — you earned it.` : "No tasks due today.", ctaLabel: "Plan tomorrow →", onCtaClick: () => { if (typeof onPlanTomorrow === "function") onPlanTomorrow(); else navigate("/tasks?open=fullPlanning"); } }), [buckets.completedTodayCount, clearMessage, onPlanTomorrow, navigate]);
   const activeList = useMemo(() => (activeListId && lists?.length ? lists.find((l) => String(l.id) === String(activeListId)) || null : null), [activeListId, lists]);
-  const headerTitle = getHeaderTitle(activeFilter, activeList, activeModuleCode);
-  const sectionProps = useMemo(() => ({ sortBy: filterState.sortBy, listMap, lists, hideListBadge: !!activeListId, searchQuery: filterState.search }), [filterState.sortBy, listMap, lists, activeListId, filterState.search]);
+  const allTasksEmptyCardProps = useMemo(() => {
+    if (buckets.allTasksCombined.length > 0 || completed.length === 0) return null;
+    if (isReadingList(activeList)) {
+      return {
+        message: "All caught up on readings!",
+        sub: `No suggested readings left for ${getReadingListLabel(activeList)} right now.`,
+      };
+    }
+    return {
+      message: clearMessage,
+      sub: `${completed.length} task${completed.length !== 1 ? "s" : ""} completed. Take a moment — you earned it.`,
+    };
+  }, [activeList, buckets.allTasksCombined.length, clearMessage, completed.length]);
+  const headerTitle = getHeaderTitle(activeFilter, hasSearchQuery ? null : activeList, activeModuleCode);
+  const sectionProps = useMemo(() => ({ sortBy: filterState.sortBy, listMap, lists, hideListBadge: !!activeListId && !hasSearchQuery, searchQuery: filterState.search }), [filterState.sortBy, listMap, lists, activeListId, hasSearchQuery, filterState.search]);
   useTaskFeedEffects(filterState.searchInputRef, filterState.filterRef, filterState.isFilterOpen, filterState.setIsFilterOpen);
-  return { ...filterState, ...filterOptions, listMap, pending, completed, filtered, filteredCompleted, ...buckets, sectionProps, todayEmptyCardProps, headerTitle, showDone: true, setShowDone: () => {}, filterListIds, filterModuleCodes: filterState.filterModuleCodes, showSearchEmptyState: buckets.showSearchEmptyState };
+  return { ...filterState, ...filterOptions, listMap, pending, completed, filtered, filteredCompleted, ...buckets, sectionProps, todayEmptyCardProps, allTasksEmptyCardProps, headerTitle, showDone: true, setShowDone: () => {}, filterListIds, filterModuleCodes: filterState.filterModuleCodes, showSearchEmptyState: buckets.showSearchEmptyState };
 }

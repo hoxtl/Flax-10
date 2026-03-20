@@ -1,3 +1,4 @@
+/** Hook for managing modules state, enrollments, and CRUD operations. */
 import { useState, useEffect } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
@@ -6,28 +7,28 @@ import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
-function useModuleActions(
-  modules,
-  enrollments,
-  loading,
-  setModules,
-  setEnrollments,
-  notify,
-  confirmFn,
-  taskCountsByModule,
-) {
+function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
   return {
-    modules, enrollments, loading,
-    taskCountsByModule,
     handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
     handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
       ? handleDisenrol(m, enrollments, setEnrollments, notify)
       : handleEnrollment(m, setEnrollments, notify),
+  };
+}
+
+function buildModuleHandlers(setModules, notify, confirmFn) {
+  return {
     handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, confirmFn, cb),
     handleModuleCreated: (m) => { setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
     handleModuleUpdated: (m) => { setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },
   };
+}
+
+function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule) {
+  const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify);
+  const moduleHandlers = buildModuleHandlers(setModules, notify, confirmFn);
+  return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
 }
 
 function normalizeModuleCode(code) {
@@ -44,27 +45,26 @@ function buildTaskCounts(tasks = []) {
   }, {});
 }
 
-async function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
-  try {
-    setLoading(true);
-    const [modulesRes, enrollmentsRes, tasksRes] = await Promise.allSettled([
-      getModules(),
-      getEnrollments(),
-      fetchTasks(),
-    ]);
-    if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
-    if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+function extractResults(results) {
+  const [modulesRes, enrollmentsRes, tasksRes] = results;
+  if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
+  if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+  const taskCounts = tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {};
+  return { modules: modulesRes.value || [], enrollments: enrollmentsRes.value || [], taskCounts };
+}
 
-    setModules(modulesRes.value || []);
-    setEnrollments(enrollmentsRes.value || []);
-    setTaskCountsByModule(
-      tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {},
-    );
-  } catch (err) {
-    notify(err.message, 'error');
-  } finally {
-    setLoading(false);
-  }
+function applyLoadedData(data, setModules, setEnrollments, setTaskCountsByModule) {
+  setModules(data.modules);
+  setEnrollments(data.enrollments);
+  setTaskCountsByModule(data.taskCounts);
+}
+
+function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
+  setLoading(true);
+  Promise.allSettled([getModules(), getEnrollments(), fetchTasks()])
+    .then(results => applyLoadedData(extractResults(results), setModules, setEnrollments, setTaskCountsByModule))
+    .catch(err => notify(err.message, 'error'))
+    .finally(() => setLoading(false));
 }
 
 async function handleEnrollment(module, setEnrollments, notify) {
@@ -123,7 +123,6 @@ export default function useModules() {
   const { addNotification } = useNotifications();
   const notify = createNotify(addNotification);
   const confirmFn = useConfirm();
-
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, []);
   return useModuleActions(
     modules,

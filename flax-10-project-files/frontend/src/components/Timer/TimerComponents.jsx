@@ -1,6 +1,11 @@
+/*
+ * Timer feature file.
+ */
+
 import { useState, useEffect } from 'react';
 import styles from '../../pages/Timer/TimerPage.module.css';
 import { noiseGenerator } from './utils/noiseUtils';
+export { SoundSelector } from './SoundSelector';
 
 // TaskInput lives in its own file; re-export for any existing imports
 export { TaskInput } from './TaskInput';
@@ -71,12 +76,11 @@ const commitInput = (local, value, min, setLocal, onUpdate, onError) => {
 };
 
 const handleKey = (e, local, min, onError) => {
-    if (e.key === 'Enter') e.target.blur();
-    if (e.key === 'ArrowDown') {
-        if (local !== '' && parseInt(local) > min) return;
-        e.preventDefault();
-        if (onError) onError(true);
-    }
+    if (e.key === 'Enter') return e.target.blur();
+    if (e.key !== 'ArrowDown') return;
+    if (local !== '' && parseInt(local) > min) return;
+    e.preventDefault();
+    if (onError) onError(true);
 };
 
 const useBufferedInput = (value, onUpdate, min, onError) => {
@@ -129,41 +133,4 @@ export const useAmbientSound = () => {
     }, [noiseType, volume]);
     const toggle = (value) => setNoiseType((prev) => prev === value ? 'none' : value);
     return { noiseType, toggle, volume, setVolume };
-};
-
-// Ambient noise selector used by tests (and potentially by future UI).
-// It is intentionally implemented with a native <select> so it has
-// an accessible "combobox" role in JSDOM/RTL tests.
-export const SoundSelector = () => {
-    const volume = 0.5; // tests assert this fixed volume
-    const [noiseType, setNoiseType] = useState('none');
-
-    useEffect(() => {
-        applyNoise(noiseType, volume);
-        return () => {
-            // Ensure we always stop on unmount/change
-            noiseGenerator.stop();
-        };
-    }, [noiseType]);
-
-    const options = [
-        { value: 'none', label: 'None' },
-        { value: 'pink', label: 'Pink Noise' },
-        { value: 'brown', label: 'Brown Noise' },
-        { value: 'white', label: 'White Noise' },
-    ];
-
-    return (
-        <select
-            value={noiseType}
-            onChange={(e) => setNoiseType(e.target.value)}
-            aria-label="Ambient sound selector"
-        >
-            {options.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                </option>
-            ))}
-        </select>
-    );
 };

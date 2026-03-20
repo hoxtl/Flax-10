@@ -8,7 +8,7 @@ import { formatDate, getWeekDays, formatMonthYear, isSameDay, getStartOfWeek, ad
 import { importTimetable } from "../../api/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
 import { getEvents } from "../../api/eventApi";
-import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton, ScheduleManagerButton} from "./header/CalendarHeaderUtils";
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, ViewModeButton, SearchButton, ScheduleManagerButton, FilterDropdownButton} from "./header/CalendarHeaderUtils";
 import TimetableImportModal from "../TimetableImportModal";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import "./CalendarHeader.css";
@@ -19,13 +19,15 @@ const VIEW_MODES = [
   { value: 'month', label: 'Month' },
 ];
 
+
 function useCalendarHeaderState() {
-  const { selectedDate, viewMode, displayMode, searchQuery } = useCalendar();
+  const { selectedDate, viewMode, displayMode, searchQuery, filter } = useCalendar();
   const dispatch = useCalendarDispatch();
   const { openModal } = useEventModal();
   const [showImportModal, setShowImportModal] = useState(false);
   const setSearchQuery = (q) => dispatch({ type: 'SET_SEARCH_QUERY', payload: q });
-  return { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, dispatch, openModal, showImportModal, setShowImportModal };
+  const setFilter = (key) => dispatch({ type: 'SET_FILTER', payload: key });
+  return { selectedDate, viewMode, displayMode, searchQuery, setSearchQuery, filter, setFilter, dispatch, openModal, showImportModal, setShowImportModal };
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
@@ -61,10 +63,11 @@ async function reloadEvents(dispatch, selectedDate, viewMode) {
   dispatch({ type: "SET_EVENTS", payload: await getEvents({ start, end }) });
 }
 
-function HeaderActions({ isMobile, searchQuery, setSearchQuery, modes, viewMode, setViewMode, displayMode, setDisplayMode, openModal, selectedDate, setShowImportModal }) {
+function HeaderActions({ isMobile, searchQuery, setSearchQuery, filter, setFilter, modes, viewMode, setViewMode, displayMode, setDisplayMode, openModal, selectedDate, setShowImportModal }) {
   return (
     <div className="header-actions">
       <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
+      <FilterDropdownButton active={filter} onChange={setFilter} />
       {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
       <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
       <ScheduleManagerButton />
@@ -92,6 +95,7 @@ function HeaderMain({ state, isMobile, modes, handlers }) {
           onDatePick={handlers.jumpToDate} title={!isMobile ? title : null} />
         {!isMobile && <div className="header-center"><ViewSwitcher modes={modes} activeMode={state.viewMode} onChange={handlers.setViewMode} /></div>}
         <HeaderActions isMobile={isMobile} searchQuery={state.searchQuery} setSearchQuery={state.setSearchQuery}
+          filter={state.filter} setFilter={state.setFilter}
           modes={modes} viewMode={state.viewMode} setViewMode={handlers.setViewMode} displayMode={state.displayMode}
           setDisplayMode={handlers.setDisplayMode} openModal={state.openModal} selectedDate={state.selectedDate}
           setShowImportModal={state.setShowImportModal} />
@@ -138,3 +142,4 @@ function DateCard({ day, isActive, onClick }) {
     </button>
   );
 }
+

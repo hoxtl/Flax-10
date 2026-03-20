@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ModuleDropdown from '../../../components/Modules/ModuleDropdown';
+import ModuleDropdown from '../../../components/Modules/Modules/ModuleDropdown';
 
 vi.mock('lucide-react', () => ({
   ChevronDown: () => <span data-testid="chevron" />,

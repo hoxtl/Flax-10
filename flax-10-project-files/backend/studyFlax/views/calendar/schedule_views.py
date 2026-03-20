@@ -1,14 +1,16 @@
+from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from studyFlax.models import CalendarEvent, Schedule, ScheduleEventAllocation
 from studyFlax.serialisers import ScheduleSerialiser
+
 from .auto_scheduler_views import build_auto_schedule
-from django.db import transaction
 from .system_tags import get_schedule_tag
-from django.db.models import Q
 from .schedule_helpers import (
     _schedule_queryset,
     _overwrite_same_name_schedules
@@ -17,12 +19,9 @@ from .schedule_helpers import (
 def _events_for_manual_schedule(user, event_ids):
     schedule_tag = get_schedule_tag()
     return list(
-        CalendarEvent.objects.filter(
-            user=user,
-            id__in=event_ids,
-        ).filter(
-            Q(tag=schedule_tag) | Q(tag__name__iexact='schedule')
-        ).order_by('start_time')
+        CalendarEvent.objects.filter(user=user, id__in=event_ids)
+        .filter(Q(tag=schedule_tag) | Q(tag__name__iexact='schedule'))
+        .order_by('start_time')
     )
 
 def _validate_manual_request(request):

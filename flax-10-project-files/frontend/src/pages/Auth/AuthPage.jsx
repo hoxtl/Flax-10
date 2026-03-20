@@ -84,7 +84,15 @@ export default function AuthPage({ initialSignIn = true }) {
         badge: "Study Flax",
         title: "StudyFlax",
         subtitle: "Built for calm study.",
-        pills: ["Calendar", "Tasks", "Deadlines", "Group Study", "Uni Map"],
+        pills: [
+          "Calendar",
+          "Tasks",
+          "Deadlines",
+          "Group Study",
+          "Uni Map",
+          "Analytics",
+          "Venio Insights",
+        ],
         description: (
           <>
             Study Flax helps{" "}

@@ -1,3 +1,6 @@
+/*
+ * useSocietyTags manages tag CRUD for society detail views.
+ */
 import * as api from '../../../api/societyApi';
 
 const appendTag = (setSociety, tag) =>

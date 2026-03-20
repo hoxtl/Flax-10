@@ -8,7 +8,7 @@ import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
 import { TagEditCell } from './cells/TagEditCell';
 import { DateTimeCell } from './cells/DateTimeCell';
-import { useQuickActions } from '../hooks/useQuickActions';
+
 import { useTags } from '../../../context/TagContext';
 import { getEventTheme } from '../utils/eventStyleUtils';
 import { isSameDay } from '../utils/dateUtils';
@@ -151,10 +151,13 @@ export function TableRow({ event, rowIndex, editState, navState, onCellClick, vi
   const state = useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode);
   const { tags } = useTags();
   const theme = getEventTheme(event, { tags });
+  const accentColor = theme.color;
   const quickAction = useQuickActions(event);
   return (
-    <tr className={state.rowClass} onClick={() => state.isReadOnly && state.setIsExpanded(p => !p)}>
+    <tr className={state.rowClass} style={accentColor ? { '--accent': accentColor } : undefined} 
+        onClick={() => state.isReadOnly && state.setIsExpanded(p => !p)}>
       <TableRowCells event={event} state={state} editState={editState} navState={navState} rowIndex={rowIndex} tags={tags} theme={theme} quickAction={quickAction} />
     </tr>
   );
+
 }

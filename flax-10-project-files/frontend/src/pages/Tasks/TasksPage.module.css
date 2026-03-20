@@ -20,7 +20,7 @@
 .toast {
     position: fixed;
     bottom: 24px;
-    left: calc(50% + 110px);
+    left: calc(50% + 136px);
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -104,8 +104,8 @@
   border-radius: 8px;
 }
 .skelSidebar {
-  width: 220px;
-  min-width: 220px;
+  width: 272px;
+  min-width: 272px;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
   background: var(--sidebar, var(--panel));

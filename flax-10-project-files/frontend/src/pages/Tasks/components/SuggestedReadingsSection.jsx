@@ -1,26 +1,29 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useMemo} from "react";
 import { getSuggestedReadings, getReadingSpeed } from "../../../api/readingApi";
-import { FileText, Calendar, Clock, Timer } from "lucide-react";
+import { FileText, Calendar, Clock, Timer, ChevronDown } from "lucide-react";
 import { convertReadingToTask } from "../../../api/readingApi";
+import { AnimatePresence, motion } from "framer-motion";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import AllTasksCompleteCard from "./AllTasksCompleteCard";
+import sectionStyles from "./TaskFeedSections.module.css";
+import { isReadingList, matchesReadingList, parseReadingListName } from "../utils/readingListUtils";
 import styles from "./SuggestedReadingsSection.module.css";
 
 export function useSuggestedReadings(taskCount) {
     const [readings, setReadings] = useState([]);
-    const [allAdded, setAllAdded] = useState(false);
     const [speedData, setSpeedData] = useState(null);
 
     useEffect(() => { async function load() {
       const [readingsData, speed] = await Promise.all([getSuggestedReadings(), getReadingSpeed()]);
-      setReadings(readingsData || []); setSpeedData(speed); setAllAdded(false);
+      setReadings(readingsData || []); setSpeedData(speed);
     }
     load().catch(() => {
       setReadings([]); setSpeedData(null);
     });
   }, [taskCount]);
 
-  return {readings, setReadings, allAdded, setAllAdded, speedData, setSpeedData};
+  return {readings, setReadings, speedData};
 }
 
 function estimateMinutes(pageCount, avgMinPerPage) {
@@ -40,7 +43,6 @@ function ReadingCardInfo({ reading, avgMinPerPage }) {
   const estimatedMinutes = estimateMinutes(reading.page_count, avgMinPerPage);
   return (
     <div className={styles.rowInfos}>
-      {reading.module_code && (<span className={styles.rowInfoPill}>{reading.module_code}</span> )}
       {reading.page_count && (<span className={styles.rowInfo}><FileText size={11} strokeWidth={2} /> {reading.page_count} pages</span>)}
       {deadline && (<span className={styles.rowInfo}><Calendar size={11} strokeWidth={2} /> Due {deadline}</span>)}
       {estimatedMinutes && (<span className={styles.rowInfo}><Clock size={11} strokeWidth={2} /> {estimatedMinutes} min to read</span>)}
@@ -73,8 +75,13 @@ export function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }) {
   const handleAdd = async () => {
     if (loading || added) return;
     setLoading(true);
-    await convertReadingToTask(reading.id);
-    setAdded(true); onAdded(reading.id); setLoading(false);
+    try {
+      await convertReadingToTask(reading.id);
+      setAdded(true);
+      onAdded(reading.id);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className={`${styles.row} ${added ? styles.rowAdded : ""}`}>
@@ -88,30 +95,50 @@ export function SuggestedReadingCard({ reading, onAdded, avgMinPerPage }) {
   );
 }
 
-function EmptyReadings({allAdded, readings, onAdded, avgMinPerPage}) {
-  if (allAdded || readings.length === 0) {
-    return <EmptyState icon="🎉" title="All caught up on readings!" description="No suggested readings left - check back when your teacher adds more." />;
-  }
-    return <SuggestedReadingsList readings={readings} onAdded={onAdded} avgMinPerPage={avgMinPerPage} />;
+const SECTION_BODY_ANIM = {
+  initial: { height: 0, opacity: 0, y: -4 },
+  animate: { height: "auto", opacity: 1, y: 0 },
+  exit: { height: 0, opacity: 0, y: -4 },
+  transition: {
+    height: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+    opacity: { duration: 0.2, ease: "easeOut" },
+    y: { duration: 0.2, ease: "easeOut" },
+  },
+};
+
+function getReadingListLabel(activeList) {
+  if (!activeList) return "this reading list";
+  const parsed = parseReadingListName(activeList.name);
+  return [parsed.moduleCode, parsed.moduleName].filter(Boolean).join(" ") || parsed.label || "this reading list";
 }
 
-function SuggestedReadingsHeader({ readings, speedData }) {
+function SuggestedReadingsHeader({ count, collapsed, onToggle, speedData }) {
   return (
-    <>
-      <div className={styles.cardHeader}>
-        <div className={styles.cardHeaderLeft}>
-          <span className={styles.sectionIcon}>📚</span>
-          <span className={styles.sectionTitle}>Suggested Readings</span>
-          {readings.length > 0 && <span className={styles.sectionPill}>{readings.length}</span>}
-        </div>
-        {speedData && (
-          <span className={styles.speedTag}>
-            {speedData.is_personalised ? `⚡ ${speedData.avg_min_per_page.toFixed(1)} min/page` : "Estimates based on average speed"}
+    <button type="button" className={sectionStyles.sectionHeader} onClick={onToggle} aria-expanded={!collapsed}>
+      <span className={sectionStyles.sectionIcon}>📚</span>
+      <span className={sectionStyles.sectionTitle}>Suggested Reading List</span>
+      {speedData && (
+        <span className={styles.headerMeta}>
+          {speedData.is_personalised ? `⚡ ${speedData.avg_min_per_page.toFixed(1)} min/page` : "Average speed estimate"}
+        </span>
+      )}
+      <span className={sectionStyles.sectionStatsChip}>
+        <span className={sectionStyles.sectionCountWrap}>
+          <span className={sectionStyles.sectionCountPill} aria-label={`${count} suggested readings`}>
+            {count}
           </span>
-        )}
-      </div>
-      <div className={styles.cardDivider} />
-    </>
+        </span>
+        <span className={sectionStyles.sectionChevronBtn} aria-hidden>
+          <motion.span
+            className={sectionStyles.sectionChevron}
+            animate={{ rotate: collapsed ? -90 : 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ChevronDown size={16} />
+          </motion.span>
+        </span>
+      </span>
+    </button>
   );
 }
 
@@ -125,22 +152,78 @@ function SuggestedReadingsList({ readings, onAdded, avgMinPerPage }) {
   );
 }
 
-export default function SuggestedReadingsSection({ onTaskAdded, taskCount }) {
-  const { readings, setReadings, allAdded, setAllAdded, speedData } = useSuggestedReadings(taskCount);
+function SuggestedReadingsBody({
+  activeList,
+  readings,
+  pendingTasks,
+  completedTasks,
+  onAdded,
+  avgMinPerPage,
+}) {
+  const showCompletionState = readings.length === 0 && completedTasks.length > 0 && pendingTasks.length === 0;
+  const activeListLabel = getReadingListLabel(activeList);
+
+  if (showCompletionState) {
+    return (
+      <AllTasksCompleteCard
+        message="All caught up on readings!"
+        sub={`No suggested readings left for ${activeListLabel} right now.`}
+      />
+    );
+  }
+
+  if (readings.length === 0) {
+    return (
+      <div className={styles.neutralEmptyState}>
+        <EmptyState
+          icon="📚"
+          title="No suggested readings right now."
+          description={`We’ll show extra reading recommendations for ${activeListLabel} here when they’re available.`}
+        />
+      </div>
+    );
+  }
+
+  return <SuggestedReadingsList readings={readings} onAdded={onAdded} avgMinPerPage={avgMinPerPage} />;
+}
+
+export default function SuggestedReadingsSection({ activeList, onTaskAdded, taskCount, pendingTasks = [], completedTasks = [] }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const { readings, setReadings, speedData } = useSuggestedReadings(taskCount);
+  const filteredReadings = useMemo(() => {
+    if (!activeList || !isReadingList(activeList)) return readings;
+    return readings.filter((reading) => matchesReadingList(reading, activeList));
+  }, [activeList, readings]);
+
   const handleAdded = (readingId) => {
-    setReadings((prev) => {
-      const next = prev.filter((r) => r.id !== readingId);
-      if (next.length === 0) setAllAdded(true);
-      return next;
-    });
+    setReadings((prev) => prev.filter((r) => r.id !== readingId));
     onTaskAdded?.();
   };
+
   return (
-    <div className={styles.section}>
-      <div className={styles.card}>
-        <SuggestedReadingsHeader readings={readings} speedData={speedData} />
-        <EmptyReadings allAdded={allAdded} readings={readings} onAdded={handleAdded} avgMinPerPage={speedData?.avg_min_per_page} />
-      </div>
+    <div className={`${sectionStyles.section} ${styles.section}`}>
+      <SuggestedReadingsHeader
+        count={filteredReadings.length}
+        collapsed={collapsed}
+        onToggle={() => setCollapsed((current) => !current)}
+        speedData={speedData}
+      />
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div key="suggested-readings-body" {...SECTION_BODY_ANIM} style={{ overflow: "hidden" }}>
+            <div className={`${sectionStyles.sectionBody} ${styles.body}`}>
+              <SuggestedReadingsBody
+                activeList={activeList}
+                readings={filteredReadings}
+                pendingTasks={pendingTasks}
+                completedTasks={completedTasks}
+                onAdded={handleAdded}
+                avgMinPerPage={speedData?.avg_min_per_page}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -2,6 +2,7 @@
  * Toolbar for TaskFeed: search, sort, and filter. Composed from small components.
  */
 
+import { useRef, useEffect, useCallback } from "react";
 import { X, Filter } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
@@ -46,8 +47,22 @@ function ToolbarSort({ sortBy, onSortChange }) {
 }
 
 function ToolbarFilterPanel({ filterRef, isFilterOpen, onFilterOpenChange, activeFilterCount, panelProps }) {
+  const hoverTimer = useRef(null);
+
+  const handleMouseEnter = useCallback(() => {
+    clearTimeout(hoverTimer.current);
+    if (!isFilterOpen) onFilterOpenChange(true);
+  }, [isFilterOpen, onFilterOpenChange]);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimer.current = setTimeout(() => onFilterOpenChange(false), 200);
+  }, [onFilterOpenChange]);
+
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+
   return (
-    <div className={styles.filterPanelWrap} ref={filterRef}>
+    <div className={styles.filterPanelWrap} ref={filterRef}
+      onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <button type="button" className={styles.filterBtn} onClick={() => onFilterOpenChange((o) => !o)} aria-haspopup="dialog" aria-expanded={isFilterOpen}>
         <Filter size={14} /><span>Filter</span>
         {activeFilterCount > 0 && <span className={styles.filterCount}>{activeFilterCount}</span>}

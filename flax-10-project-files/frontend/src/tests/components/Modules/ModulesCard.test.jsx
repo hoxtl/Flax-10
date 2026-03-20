@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import ModulesCard from '../../../components/Modules/ModulesCard';
+import ModulesCard from '../../../components/Modules/Modules/ModulesCard';
 
 vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
@@ -11,7 +11,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     getCourse: vi.fn(() => null),
 }));
 
-vi.mock('../../../components/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+vi.mock('../../../components/Modules/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
 
 const module = {
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',

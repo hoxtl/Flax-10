@@ -58,8 +58,8 @@ vi.mock("../../../components/Settings/SettingsUI", () => ({
       {description ? <p>{description}</p> : null}
     </div>
   ),
-  SubmitButton: ({ label, isSaving, savingLabel }) => (
-    <button type="submit">{isSaving ? savingLabel : label}</button>
+  SubmitButton: ({ label, isSaving, savingLabel, saveSignal = 0, savedLabel = "Saved!" }) => (
+    <button type="submit">{isSaving ? savingLabel : saveSignal ? `✓ ${savedLabel}` : label}</button>
   ),
 }));
 
@@ -160,5 +160,22 @@ describe("AccountForm - submission", () => {
       }),
     );
   });
-});
 
+  it("shows saved tick after a successful account save", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
+    const { container } = render(
+      <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
+    );
+
+    await waitFor(() => screen.getByDisplayValue("Alice"));
+
+    fireEvent.change(screen.getByLabelText("First Name"), {
+      target: { value: "Bob" },
+    });
+    fireEvent.submit(container.querySelector("form"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /saved!/i })).toBeTruthy();
+    });
+  });
+});

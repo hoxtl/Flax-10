@@ -8,6 +8,7 @@ import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userService";
 import { runQuickAdd } from "../utils/createTaskBarUtils";
+import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 
 function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const sortedLists = useMemo(
@@ -137,7 +138,7 @@ function useCreateTaskBarOptions(state) {
   return { moduleOptions, listOptions };
 }
 
-export const isReadingList = (list) => list?.name?.toLowerCase().includes('reading') ?? false;
+export const isReadingList = (list) => isReadingTaskList(list);
 
 export default function useCreateTaskBar(props) {
   const { lists = [], defaultListId, defaultDueDate, onAddTask, inputRef: externalInputRef } = props;

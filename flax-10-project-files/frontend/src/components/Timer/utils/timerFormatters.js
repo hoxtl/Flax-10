@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 export function fmtDuration(sec) {
     if (sec <= 0) return '0m';
     const h = Math.floor(sec / 3600);
@@ -24,17 +28,28 @@ export function taskDueText(task, now = new Date()) {
     const diffMs = due.getTime() - now.getTime();
     const absMin = Math.abs(diffMs) / 60000;
     if (absMin < 5) return 'now';
+    return diffMs < 0 ? formatOverdueText(absMin) : formatRemainingText(absMin);
+}
+
+function formatOverdueText(absMin) {
+    const parts = getDueTimeParts(absMin);
+    if (parts.days > 0) return `${parts.days}d ${parts.remainingHours}h overdue`;
+    return `${parts.hours > 0 ? `${parts.hours}h ` : ''}${parts.minutes}m overdue`;
+}
+
+function formatRemainingText(absMin) {
+    const parts = getDueTimeParts(absMin);
+    if (parts.days > 0) return `${parts.days}d ${parts.remainingHours}h left`;
+    if (parts.hours === 0) return `${parts.minutes}m left`;
+    return `${parts.hours}h ${parts.minutes}m left`;
+}
+
+function getDueTimeParts(absMin) {
     const days = Math.floor(absMin / (60 * 24));
-    const hrs = Math.floor(absMin / 60);
-    const mins = Math.round(absMin % 60);
-    const remHrs = Math.floor((absMin - days * 24 * 60) / 60);
-    if (diffMs < 0) {
-        if (days > 0) return `${days}d ${remHrs}h overdue`;
-        return `${hrs > 0 ? `${hrs}h ` : ''}${mins}m overdue`;
-    }
-    if (days > 0) return `${days}d ${remHrs}h left`;
-    if (hrs === 0) return `${mins}m left`;
-    return `${hrs}h ${mins}m left`;
+    const hours = Math.floor(absMin / 60);
+    const minutes = Math.round(absMin % 60);
+    const remainingHours = Math.floor((absMin - days * 24 * 60) / 60);
+    return { days, hours, minutes, remainingHours };
 }
 
 export const extractTime = (value) => {

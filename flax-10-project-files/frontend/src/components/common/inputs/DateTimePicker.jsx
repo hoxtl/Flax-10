@@ -211,16 +211,16 @@ function useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos) {
     const rect = ref.current.getBoundingClientRect();
     const gap = 6;
     const dropdownHeight = getDropdownHeight(timeOnly, dateOnly);
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
-    setDropdownPos({ top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap, left: rect.left });
+    const maxTop = window.innerHeight - dropdownHeight - gap;
+    const top = Math.min(rect.bottom + gap, maxTop);
+    setDropdownPos({ top, left: rect.left });
   }, [open, timeOnly, dateOnly, ref, setDropdownPos]);
 }
 
 function getDropdownHeight(timeOnly, dateOnly) {
-  if (timeOnly) return 130;
-  if (dateOnly) return 280;
-  return 320;
+  if (timeOnly) return 90;
+  if (dateOnly) return 290;
+  return 330;
 }
 
 function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM) {

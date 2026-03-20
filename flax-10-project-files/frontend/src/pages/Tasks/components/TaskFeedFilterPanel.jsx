@@ -3,7 +3,7 @@
  * floating panel with list and module checkboxes.
  */
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { Filter, Search } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "./TaskFeedFilter.module.css";
@@ -38,10 +38,23 @@ export default function TaskFeedFilterPanel({
   onClearAll,
 }) {
   const filterRef = useRef(null);
+  const hoverTimer = useRef(null);
   useOutsideClick(filterRef, isOpen, onToggle);
 
+  const handleMouseEnter = useCallback(() => {
+    clearTimeout(hoverTimer.current);
+    if (!isOpen) onToggle();
+  }, [isOpen, onToggle]);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimer.current = setTimeout(() => { if (isOpen) onToggle(); }, 200);
+  }, [isOpen, onToggle]);
+
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+
   return (
-    <div className={styles.filterPanelWrap} ref={filterRef}>
+    <div className={styles.filterPanelWrap} ref={filterRef}
+      onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <FilterButton onClick={onToggle} isOpen={isOpen} count={activeFilterCount} />
       <AnimatePresence>
         {isOpen && (

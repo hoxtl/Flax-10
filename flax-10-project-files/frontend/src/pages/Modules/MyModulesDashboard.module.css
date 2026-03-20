@@ -1,0 +1,551 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Stats row (matches AttendanceSummaryBar) --- */
+.statsRow {
+    display: flex;
+    align-items: center;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    padding: 0.875rem 1.25rem;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    box-shadow: var(--card-shadow-rest);
+}
+
+.statCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0 1.25rem;
+    flex: 1;
+    text-align: center;
+}
+
+.statSep {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+.statValue {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.statLabel {
+    font-size: 0.64rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+/* --- Widget row --- */
+.widgetRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.widget {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--card-radius-token);
+    background: color-mix(in srgb, #8B7355 5%, var(--surface-card));
+    border: var(--card-border);
+    padding: var(--card-padding-lg);
+    gap: 0.85rem;
+    min-height: 0;
+    box-shadow: var(--card-shadow-rest);
+    transition: box-shadow 0.2s ease;
+    align-self: start;
+}
+
+.widget:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.widgetHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+}
+
+.widgetIconWrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: var(--card-border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #5D4037;
+}
+
+.widgetTitle {
+    font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text);
+}
+
+.widgetCount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #5D4037;
+    color: #FAF9F6;
+    font-size: 0.62rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-left: auto;
+}
+
+.widgetList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.expandableRows {
+    overflow: hidden;
+}
+
+.expandableRowsInner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* --- Empty state --- */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+    padding: 1.5rem 0;
+    gap: 0.3rem;
+}
+
+.emptyMessage {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.emptySub {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #5D4037;
+    font-style: italic;
+}
+
+/* --- Deadline rows --- */
+.deadlineRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 52px;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+    background: var(--surface-inner, var(--panel));
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s ease;
+}
+
+.deadlineRow:hover {
+    border-color: var(--text);
+}
+
+.rowOverdue {
+    background: color-mix(in srgb, var(--danger) 6%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--danger) 25%, var(--border));
+    border-left-color: var(--home-urgency-danger);
+}
+
+.rowCritical {
+    background: color-mix(in srgb, var(--warning, orange) 5%, var(--surface-card));
+    border-left-color: var(--home-urgency-warning);
+}
+
+.rowUrgentGlow {
+    border-color: color-mix(in srgb, var(--danger, #ef4444) 45%, var(--border));
+    box-shadow:
+        0 0 0 1.5px color-mix(in srgb, var(--danger, #ef4444) 20%, transparent),
+        0 0 8px color-mix(in srgb, var(--danger, #ef4444) 18%, transparent);
+}
+
+.deadlineRowLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.deadlinePills {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.moduleCodePill {
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid color-mix(in srgb, #A08B74 40%, var(--border));
+    background: color-mix(in srgb, #C4A77D 10%, var(--surface-card));
+    color: #8B7355;
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.moduleCodePill:hover {
+    background: #8B7355;
+    color: #FAF9F6;
+}
+
+.typePill {
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid color-mix(in srgb, #A08B74 30%, var(--border));
+    background: color-mix(in srgb, #C4A77D 8%, var(--panel));
+    color: #8B7355;
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.deadlineTitle {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.daysLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: #8B7355;
+}
+
+/* --- Priority pills (matches TaskCard) --- */
+.priorityPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.priorityPill_overdue {
+    background: rgba(239, 68, 68, 0.14);
+    color: #b91c1c;
+}
+
+.priorityPill_critical {
+    background: rgba(251, 146, 60, 0.14);
+    color: #c2410c;
+}
+
+.priorityPill_urgent {
+    background: rgba(250, 204, 21, 0.16);
+    color: #a16207;
+}
+
+.due_overdue {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.due_today {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.due_tomorrow {
+    color: #b45309;
+    font-weight: 700;
+}
+
+.due_future {
+    color: #8B7355;
+    font-weight: 600;
+}
+
+.duePillIcon {
+    flex-shrink: 0;
+}
+
+/* --- Reading rows (matches deadline row style) --- */
+.readingRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 52px;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+    background: var(--surface-inner, var(--panel));
+    padding: 0.55rem 0.85rem;
+    transition: border-color 0.2s ease;
+}
+
+.readingRow:hover {
+    border-color: var(--text);
+}
+
+.readingRowLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.readingPills {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.chapterPill {
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid color-mix(in srgb, #A08B74 30%, var(--border));
+    background: color-mix(in srgb, #C4A77D 8%, var(--panel));
+    color: #8B7355;
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.readingTitle {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.readingMeta {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.68rem;
+    color: #5D4037;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* --- Add to tasks button --- */
+.addTaskBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.65rem;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-size: 0.62rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.18s ease;
+}
+
+.addTaskBtn:hover {
+    background: var(--primary);
+    color: #FAF9F6;
+}
+
+.addTaskBtn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.addedLabel {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--success-text, #22c55e);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.readingAddButton,
+.nudgeAddButton {
+    padding-inline: 0.85rem;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+/* --- Smart nudge --- */
+.nudgeBanner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 14px;
+    border: 0.5px solid color-mix(in srgb, var(--warning, orange) 30%, var(--border));
+    background: color-mix(in srgb, var(--warning, orange) 6%, var(--surface-card));
+    color: var(--text);
+}
+
+.nudgeIcon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.nudgeText {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.nudgeText strong {
+    font-weight: 800;
+    color: #5D4037;
+}
+
+.nudgeActions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+/* --- Show more / less --- */
+.showMoreBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    align-self: center;
+    margin-top: 0.35rem;
+    padding: 0.4rem 0.95rem;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.showMoreBtn:hover {
+    background: var(--primary);
+    color: #FAF9F6;
+    border-color: var(--primary);
+}
+
+/* --- Play button (matches TaskCard actionBarBtnPlay) --- */
+.playBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: #5D4037;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.playBtn:hover {
+    color: #3E2723;
+    transform: scale(1.12);
+}
+
+.playBtn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.15s ease;
+}
+
+.playBtn:hover svg {
+    transform: translateX(2px);
+}
+
+/* --- Collapse chevron (kept for layout) --- */
+.collapseChevron {
+    display: none;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .widgetRow {
+        grid-template-columns: 1fr;
+    }
+    .statSep {
+        display: none;
+    }
+    .statCard {
+        padding: 0 0.75rem;
+    }
+}

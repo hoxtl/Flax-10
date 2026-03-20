@@ -6,9 +6,8 @@ import { Pencil } from 'lucide-react';
 import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import styles from '../TableView.module.css';
 
-function TagBadge({ name, color }) {
-    const style = color ? { backgroundColor: color, color: '#fff' } : {};
-    return <span className={styles.tagBadge} style={style}>{name}</span>;
+function TagBadge({ name }) {
+    return <span className={styles.tagBadge}>{name}</span>;
 }
 
 function buildTagOptions(tags) {

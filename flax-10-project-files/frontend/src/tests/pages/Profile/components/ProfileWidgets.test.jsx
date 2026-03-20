@@ -8,17 +8,37 @@ import {
   StudyDNA,
   MiniHeatmap,
   ThisWeek,
+  CompactAttendanceTile,
   BadgesSection,
   ModulesSection,
   SocietiesSection,
-  CompatibilityScore,
 } from '../../../../pages/Profile/components/ProfileWidgets';
+import { useAttendanceWidgetData } from '../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData';
+
+vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+  },
+}));
 
 vi.mock('../../../../api/moduleApi', () => ({
   getModules: vi.fn().mockResolvedValue([
     { module_code: 'CS101', module_name: 'Intro to CS' },
     { module_code: 'MA102', module_name: 'Calculus' },
   ]),
+}));
+
+vi.mock('../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData', () => ({
+  useAttendanceWidgetData: vi.fn(),
+}));
+
+vi.mock('@mui/x-charts/PieChart', () => ({
+  PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? 'true' : 'false'} />,
+}));
+
+vi.mock('../../../../pages/Attendance/components/SegmentDetailPanel', () => ({
+  default: () => <div data-testid="segment-detail-panel" />,
 }));
 
 describe('PersonaCard', () => {
@@ -221,6 +241,53 @@ describe('ThisWeek', () => {
   });
 });
 
+describe('CompactAttendanceTile', () => {
+  beforeEach(() => {
+    useAttendanceWidgetData.mockReturnValue({
+      loading: false,
+      error: null,
+      stats: { overall: { attended: 110, missed: 8 } },
+      attendancePct: 93,
+      overallData: [
+        { id: 0, label: 'Attended', value: 110, color: '#2D8B5A' },
+        { id: 1, label: 'Missed', value: 8, color: '#C0392B' },
+      ],
+      byTypeData: [
+        { id: 0, label: 'Lecture', value: 55, color: '#D4AF37' },
+        { id: 1, label: 'Small group', value: 25, color: '#148C7D' },
+        { id: 2, label: 'Other', value: 28, color: '#E67E22' },
+        { id: 3, label: 'Practical/lab', value: 18, color: '#2E5BFF' },
+      ],
+      segmentEvents: [],
+      handleToggleStatus: vi.fn(),
+    });
+  });
+
+  it('shows clean by-type labels in the right-hand legend without duplicate loose numbers', () => {
+    render(<CompactAttendanceTile onNavigate={vi.fn()} />);
+
+    expect(screen.getByText('Lecture')).toBeTruthy();
+    expect(screen.getByText('Small group')).toBeTruthy();
+    expect(screen.getByText('Other')).toBeTruthy();
+    expect(screen.getByText('Practical/lab')).toBeTruthy();
+    expect(screen.queryByText('Lecture (55)')).toBeNull();
+    expect(screen.queryByText('Small group (25)')).toBeNull();
+    expect(screen.queryByText('Other (28)')).toBeNull();
+    expect(screen.queryByText('Practical/lab (18)')).toBeNull();
+    expect(screen.queryByText(/^55$/)).toBeNull();
+    expect(screen.queryByText(/^25$/)).toBeNull();
+    expect(screen.queryByText(/^28$/)).toBeNull();
+    expect(screen.queryByText(/^18$/)).toBeNull();
+  });
+
+  it('hides the built-in pie chart legends so only the custom right legend remains', () => {
+    render(<CompactAttendanceTile onNavigate={vi.fn()} />);
+    screen.getAllByTestId('pie-chart').forEach((chart) => {
+      expect(chart.getAttribute('data-hide-legend')).toBe('true');
+    });
+  });
+});
+
 describe('BadgesSection', () => {
   it('renders badge count and grid', () => {
     const badges = [
@@ -386,53 +453,5 @@ describe('SocietiesSection', () => {
     );
     fireEvent.click(screen.getByText('Athletics Club'));
     expect(onNavigate).toHaveBeenCalledWith('/societies?id=42');
-  });
-});
-
-describe('CompatibilityScore', () => {
-  const viewedSummary = { persona: { id: 'night_owl' } };
-  const currentUserSummary = { persona: { id: 'night_owl' } };
-
-  it('shows study together CTA for high compatibility and triggers callback', () => {
-    const onSuggestStudySession = vi.fn();
-    render(
-      <CompatibilityScore
-        viewedSummary={viewedSummary}
-        currentUserSummary={currentUserSummary}
-        sharedModuleCount={2}
-        totalModuleCount={2}
-        viewedUsername="bob"
-        onSuggestStudySession={onSuggestStudySession}
-        suggestionState="idle"
-      />
-    );
-    const cta = screen.getByRole('button', { name: 'Suggest a Study Session' });
-    fireEvent.click(cta);
-    expect(onSuggestStudySession).toHaveBeenCalled();
-  });
-
-  it('renders mutual connections text and activity sparkline dots', () => {
-    render(
-      <CompatibilityScore
-        viewedSummary={viewedSummary}
-        currentUserSummary={currentUserSummary}
-        sharedModuleCount={1}
-        totalModuleCount={2}
-        viewedUsername="bob"
-        mutualConnections={{ count: 3, users: [{ id: 1, username: 'ann' }] }}
-        activitySparkline={[
-          { date: '2026-03-12', level: 0 },
-          { date: '2026-03-13', level: 1 },
-          { date: '2026-03-14', level: 2 },
-          { date: '2026-03-15', level: 3 },
-          { date: '2026-03-16', level: 4 },
-          { date: '2026-03-17', level: 2 },
-          { date: '2026-03-18', level: 1 },
-        ]}
-      />
-    );
-    expect(screen.getByText('3 people you both know')).toBeTruthy();
-    expect(screen.getByText('Study momentum')).toBeTruthy();
-    expect(document.querySelectorAll('[class*="sparkDot"]').length).toBeGreaterThan(0);
   });
 });

@@ -1,5 +1,5 @@
 .section {
-  margin: 2rem 0 1rem;
+  margin: 0.5rem 0 1rem;
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -8,66 +8,21 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.card {
-  background: transparent;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  border-radius: 1rem;
+.body {
+  gap: 0.65rem;
 }
 
-.cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  gap: 4px;
-  flex-wrap:wrap;
-}
-
-.cardHeader:hover {
-  background: var(--hover-light);
-  transform: translateY(-0.5px);
-  box-shadow: var(--shadow-sm);
-}
-
-.cardHeaderLeft {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sectionIcon {
-  font-size: 0.9rem;
-}
-
-.sectionTitle {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-family: var(--font-body);
-}
-
-.sectionPill {
-  font-size: 0.75rem;
-  background: var(--border);
+.headerMeta {
+  margin-left: auto;
+  padding-right: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--muted);
-  border-radius: 999px;
-  padding: 1px 7px;
-  font-family: var(--font-body);
+  white-space: nowrap;
 }
 
-.speedTag {
-  font-size: 0.82rem;
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-weight: 500;
-}
-
-.cardDivider {
-  height: 1px;
-  background: var(--border);
+.neutralEmptyState {
+  padding: 0.4rem 0 0.25rem;
 }
 
 .rows {
@@ -155,12 +110,8 @@
   opacity: 0.7;
 }
 
-.rowInfoPill {
-  font-size: 0.72rem;
-  font-weight: 650;
-  font-family: var(--font-body);
-  color: var(--flax-brown-strong);
-  background: var(--border);
-  border-radius: 999px;
-  padding: 1px 8px;
+@media (max-width: 768px) {
+  .headerMeta {
+    display: none;
+  }
 }

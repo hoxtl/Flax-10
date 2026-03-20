@@ -1,3 +1,6 @@
+/*
+ * ActionCard.module.css styles the society action card.
+ */
 .card {
     height: 220px;
     border-radius: var(--card-radius-token);

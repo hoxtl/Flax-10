@@ -58,12 +58,14 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
 function CreateTaskModalTitleDesc({ form, set }) {
   return (
     <div className={styles.canvas}>
-      <FormField htmlFor="create-task-title" label={<>Task name <span className={styles.labelRequired}>*</span></>} className={styles.fieldGroup}>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-title">Task name <span className={styles.labelRequired}>*</span></label>
         <TextInput id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
-      </FormField>
-      <FormField htmlFor="create-task-desc" label="Description" className={styles.fieldGroup}>
-        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
-      </FormField>
+      </div>
+      <div className={styles.fieldGroup}>
+        <label className={styles.gridLabel} htmlFor="create-task-desc">Description <span className={styles.labelOptional}>(optional)</span></label>
+        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Add a description…" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
+      </div>
     </div>
   );
 }

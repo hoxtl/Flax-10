@@ -14,6 +14,7 @@ import { unsyncCalendar } from '../../api/societyApi';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useNotify } from '../Notifications/hooks/useNotify';
 import { useToast } from '../../context/ToastContext';
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 
 /** Main container rendering both modal and popover. */
 export function EventPopups({ allowModuleLeave = true }) {
@@ -60,7 +61,6 @@ async function confirmSingleDelete(event, confirmFn, removeEvent) {
   if (choice) { await executeDelete(event, { removeEvent }); return true; }
   return false;
 }
-
 function useEventDeletion() {
   const { removeEvent, addException } = useEventActions();
   const confirmFn = useConfirm();
@@ -86,6 +86,8 @@ function getPersonalActions(event, { openModal, onDeleteRequest, closePopup }) {
 
 function getModuleActions(event, { closePopup, loadEvents, disenrollFromModule }, { allowModuleLeave = true } = {}) {
   if (!allowModuleLeave) return null;
+  const tagName = (event.tag_name || event.tag?.name || '').toLowerCase();
+  if (tagName === 'lecture') return null;
   return [{ label: 'Leave Module', variant: 'danger', onClick: () => { closePopup(); disenrollFromModule(event.module, loadEvents); } }];
 }
 
@@ -95,7 +97,7 @@ function getSocietyActions(event, { closePopup, loadEvents, refreshTags, showToa
     await unsyncCalendar(event.society_id);
     await refreshTags();
     loadEvents();
-    showToast("Unsync Successful", `Calendar for ${event.society_name || 'this society'} is now unsynced.`);
+    showToast(`Calendar for ${event.society_name || 'this society'} has been unsynced`);
   };
   return [{ label: 'Unsync', variant: 'danger', onClick: handleUnsync }];
 }
@@ -125,10 +127,11 @@ function EventPopupContainer({ allowModuleLeave }) {
 
   const onDeleteWrapped = async (ev) => {
     state.closePopup();
-    if (await state.handleDeleteRequest(ev)) state.showToast("Event deleted", `"${ev.title}" deleted.`);
+    if (await state.handleDeleteRequest(ev)) state.showToast(`"${ev.title}" has been deleted`);
   };
   const handlers = { openModal: state.openModal, onDeleteRequest: onDeleteWrapped, closePopup: state.closePopup, loadEvents: state.loadEvents, disenrollFromModule: state.disenrollFromModule, refreshTags: state.refreshTags, showToast: state.showToast };
   const actions = getCalendarPopupActions(state.popupEvent, handlers, { allowModuleLeave });
 
   return <EventPopover event={state.popupEvent} anchorRect={state.popupAnchorRect} onClose={state.closePopup} actions={actions} tag={getEventTag(state.popupEvent, state.getTag)} readOnly={state.readOnly} viewMode={state.viewMode} />;
 }
+

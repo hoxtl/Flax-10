@@ -1,0 +1,327 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.soundDropdown {
+    min-width: 160px;
+}
+
+.volumeSlider {
+    flex: 1;
+    min-width: 60px;
+    accent-color: var(--primary);
+    height: 4px;
+}
+
+.taskInputContainer {
+    margin-bottom: 0;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+}
+
+.taskInputWrap {
+    margin-bottom: 0.6rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.taskInputActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.taskInputActionsRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
+.taskInputHint {
+    font-size: 0.75rem;
+    color: var(--muted, #6b7280);
+}
+
+.taskPickSortRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.6rem 0.4rem;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.taskPickSortLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary, #9ca3af);
+    flex-shrink: 0;
+}
+
+.taskPickSortSelect {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.6rem;
+    padding-right: 1.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--panel, #fff);
+    color: var(--text, #374151);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    transition: border-color 0.12s, background-color 0.12s;
+}
+
+.taskPickSortSelect:hover {
+    border-color: var(--primary);
+}
+
+.taskPickSortSelect:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.taskPickSortDropdown {
+    width: 100%;
+    min-width: 0;
+}
+
+.taskPickHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(74, 52, 33, 0.08);
+    flex-shrink: 0;
+}
+
+.taskPickHeaderCopy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.taskPickHeaderTitle {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text, #111827);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.taskPickHeaderSubtitle {
+    font-size: 0.8rem;
+    color: var(--muted, #6b7280);
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.taskPickCloseBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted, #6b7280);
+    border-radius: 50%;
+    padding: 0;
+    flex-shrink: 0;
+    transition: color 0.15s, background 0.15s;
+}
+
+.taskPickCloseBtn:hover {
+    color: var(--text, #374151);
+    background: var(--hover, rgba(74, 52, 33, 0.06));
+}
+
+.taskPickSearchRow {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(74, 52, 33, 0.07);
+    flex-shrink: 0;
+}
+
+.taskPickSearchInputWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid rgba(74, 52, 33, 0.12);
+    border-radius: 10px;
+    background: var(--bg, #F8F5F2);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.taskPickSearchInputWrap:focus-within {
+    border-color: color-mix(in srgb, var(--focus-accent) 42%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-accent) 18%, transparent);
+}
+
+.taskPickSearchIcon {
+    color: var(--muted, #9ca3af);
+    flex-shrink: 0;
+}
+
+.taskPickFiltersBar {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 12px 20px 14px;
+    border-bottom: 1px solid rgba(74, 52, 33, 0.07);
+    background: var(--surface-card, #faf7f3);
+    overflow: visible;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.taskPickFilterRow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    position: relative;
+    z-index: 5;
+}
+
+.taskPickFilterGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+    gap: 10px;
+}
+
+.taskPickField {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.taskPickFieldCompact {
+    flex: 1;
+}
+
+
+.taskPickFilterHalf {
+    width: 100%;
+    min-width: 0;
+}
+
+.taskPickSearchInput {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    font-size: 0.88rem;
+    color: var(--text, #374151);
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+}
+
+.taskPickSearchInput::placeholder {
+    color: var(--muted, #9ca3af);
+}
+
+.taskPickSearchInput:focus {
+    border-color: var(--primary);
+}
+
+.taskInput {
+    width: 100%;
+    padding: 0.82rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+    background: color-mix(in srgb, var(--primary) 7%, var(--surface-card));
+    border-radius: 12px;
+    font-size: 1.02rem;
+    text-align: left;
+    color: var(--text);
+    transition: all 0.2s ease;
+}
+
+.taskInput:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.taskInput::placeholder {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.currentTaskLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted, #6b7280);
+    margin-bottom: 0.25rem;
+}
+
+.taskInputHasValue {
+    color: var(--primary);
+    font-weight: 600;
+    border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.taskInputHasValue::placeholder {
+    color: var(--primary);
+    opacity: 0.7;
+}
+
+.taskInputCompact {
+    font-size: 0.92rem;
+    padding: 0.52rem 0.8rem;
+}
+
+.taskPickBtn {
+    font-size: 0.72rem;
+    color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.3rem 0.68rem;
+    border-radius: 999px;
+}
+
+.taskPickBtn:hover {
+    background: color-mix(in srgb, var(--primary) 18%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.taskClearBtn {
+    font-size: 0.72rem;
+    color: var(--primary-strong);
+    background: color-mix(in srgb, var(--primary) 6%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.3rem 0.68rem;
+    border-radius: 999px;
+    transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}

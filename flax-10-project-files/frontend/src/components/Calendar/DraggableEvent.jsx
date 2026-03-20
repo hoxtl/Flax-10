@@ -3,6 +3,7 @@
  * Renders personal events as draggable/resizable, others as read-only.
  */
 import { useRef, useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventModal, useEventPopup } from '../../context/CalendarContext';
@@ -12,7 +13,9 @@ import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
+import { useToast } from '../../context/ToastContext';
 import { getEventTheme } from './utils/eventStyleUtils';
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 import './DraggableEvent.css';
 
 /** Event block component with drag-and-drop and resize support. */
@@ -32,7 +35,7 @@ function ReadOnlyEvent({ event, style, minWidth }) {
 
     const handleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        openPopup(event, rect);
+        openPopup(event, rect, true);
     };
 
     return (
@@ -49,41 +52,41 @@ function getReadOnlyClassName(event) {
     return 'draggable-event';
 }
 
+function useDeleteHandler(event, setCtxMenu, removeEvent, addException) {
+    const confirm = useConfirm();
+    const toast = useToast();
+    const recurring = hasRecurrence(event);
+
+    return async () => {
+        setCtxMenu(null);
+        const choice = await confirm({
+            title: recurring ? "Delete Recurring Event" : "Delete Event",
+            message: recurring ? "This is a recurring event. How would you like to delete it?" : `Are you sure you want to delete "${event.title}"?`,
+            confirmText: recurring ? "Delete ALL occurrences" : "Delete",
+            alternateText: recurring ? "Delete ONLY this one" : undefined,
+            isDanger: true
+        });
+        if (choice === true) { await executeDelete(event, { removeEvent }); toast?.(`"${event.title}" deleted.`); }
+        else if (choice === 'ALTERNATE') { await deleteRecurrenceOccurrence(event, { addException }); toast?.(`"${event.title}" occurrence deleted.`); }
+    };
+}
+
 function useEventContextMenu(event, setCtxMenu) {
     const { removeEvent, addException } = useEventActions();
     const { openModal } = useEventModal();
-    const confirmFn = useConfirm();
-
-    const handleDelete = async () => {
-        setCtxMenu(null);
-        const recurring = hasRecurrence(event);
-        const choice = await confirmFn({
-            title: recurring ? "Delete Recurring Event" : "Delete Event",
-            message: recurring ? "This is a recurring event. How would you like to delete it?" : `Are you sure you want to delete "${event.title}"? This cannot be undone.`,
-            confirmText: recurring ? "Delete ALL occurrences" : "Delete",
-            alternateText: recurring ? "Delete ONLY this one" : undefined,
-            cancelText: "Cancel",
-            isDanger: true
-        });
-        if (choice === true) await executeDelete(event, { removeEvent });
-        else if (choice === 'ALTERNATE') await deleteRecurrenceOccurrence(event, { addException });
-    };
-
     const handleEdit = () => { setCtxMenu(null); openModal(event); };
-
+    const handleDelete = useDeleteHandler(event, setCtxMenu, removeEvent, addException);
     return { handleEdit, handleDelete };
 }
 
 function useEditableEventState(event) {
     const { editEvent } = useEventActions();
     const { openPopup } = useEventPopup();
-    const { openModal } = useEventModal();
     const theme = getEventTheme(event, useTags());
     const refs = { event: useRef(null), resizeEnded: useRef(false), ctxRef: useRef(null) };
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
     const resize = useEventResize(event, refs.event, editEvent, refs.resizeEnded);
     const [ctxMenu, setCtxMenu] = useState(null);
-
     const menuHandlers = useEventContextMenu(event, setCtxMenu);
 
     useEffect(() => {
@@ -91,7 +94,7 @@ function useEditableEventState(event) {
         const handler = (e) => { if (refs.ctxRef.current && !refs.ctxRef.current.contains(e.target)) setCtxMenu(null); };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
-    }, [ctxMenu]);
+    }, [ctxMenu, refs.ctxRef]);
 
     return { openPopup, theme, refs, dragProps, isDragging, resize, ctxMenu, setCtxMenu, menuHandlers };
 }
@@ -114,6 +117,7 @@ function EditableEvent({ event, style, minWidthForDetails }) {
         </>
     );
 }
+
 
 function EventContextMenu({ menu, handlers, innerRef }) {
     return (
@@ -173,10 +177,17 @@ function TimeDisplay({ event }) {
     return <div className="event-time">{startTime} - {endTime}</div>;
 }
 
+function hexToRgb(hex) {
+    const h = (hex || '#7B6751').replace('#', '');
+    const num = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+}
+
 function buildStyle(baseStyle, theme, resizePreview) {
     const style = { ...baseStyle };
     if (resizePreview) style.height = `${resizePreview}px`;
     style.borderLeftColor = theme.color;
+    style.backgroundColor = `rgba(${hexToRgb(theme.color)}, 0.12)`;
     return style;
 }
 

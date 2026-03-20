@@ -6,10 +6,12 @@ import styles from './SegmentedControl.module.css';
  * @param {string} value - Currently selected value
  * @param {function} onChange - Callback when selection changes
  * @param {string} className - Optional additional class name
+ * @param {string} variant - "default" or "solid" (charcoal inversion style)
  */
-export function SegmentedControl({ options, value, onChange, className = '', fill = false }) {
+export function SegmentedControl({ options, value, onChange, className = '', fill = false, variant = 'default' }) {
+    const variantClass = variant === 'solid' ? styles.solid : '';
     return (
-        <div className={`${styles.container} ${fill ? styles.fill : ''} ${className}`}>
+        <div className={`${styles.container} ${fill ? styles.fill : ''} ${variantClass} ${className}`}>
             {options.map((opt) => (
                 <SegmentButton
                     key={opt.value}

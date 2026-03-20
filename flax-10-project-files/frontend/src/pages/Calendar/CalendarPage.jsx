@@ -3,17 +3,15 @@
  * Handles view mode switching and filter state management.
  */
 import { useMemo, useEffect } from "react";
+import AppPage from "../../components/common/AppPage/AppPage";
 import { Calendar } from "../../components/Calendar/Calendar";
-import PillFilters from "../../components/Tags/PillFilters";
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import { getVisibleEventsInView } from "../../components/Calendar/utils/eventUtils";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import AppPage from "../../components/common/AppPage/AppPage";
 
 function SkeletonHeader() {
   return (
@@ -21,16 +19,6 @@ function SkeletonHeader() {
       <SkeletonBlock className={styles.skeletonNav} />
       <SkeletonBlock className={styles.skeletonTitle} />
       <SkeletonBlock className={styles.skeletonNav} />
-    </div>
-  );
-}
-
-function SkeletonFilters() {
-  return (
-    <div className={styles.filters}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <SkeletonBlock key={i} className={styles.skeletonFilterPill} />
-      ))}
     </div>
   );
 }
@@ -48,12 +36,17 @@ function SkeletonGrid() {
   );
 }
 
-function CalendarPageSkeleton({ showSearch = true }) {
+const calendarSubtitle = (
+  <>
+    Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em> organised across your week.
+  </>
+);
+
+function CalendarPageSkeleton() {
   return (
     <div className={styles.page} data-testid="calendar-skeleton" aria-busy="true">
       <div className={styles.skeletonStickyHeader}>
         <SkeletonHeader />
-        {showSearch && <SkeletonFilters />}
       </div>
       <main className={styles.mainContent}>
         <SkeletonGrid />
@@ -71,34 +64,22 @@ function useMobileViewRedirect(isMobile, viewMode, dispatch) {
 }
 
 function useCalendarPageState() {
-  const { filter, allEvents, selectedDate, viewMode, isLoading, displayMode } = useCalendar();
+  const { allEvents, isLoading, displayMode, viewMode } = useCalendar();
   const dispatch = useCalendarDispatch();
   const isMobile = useBreakpoint();
 
   useEventPopupListener();
   useMobileViewRedirect(isMobile, viewMode, dispatch);
 
-  const visibleItems = useMemo(
-    () => getVisibleEventsInView(allEvents, selectedDate, viewMode),
-    [allEvents, selectedDate, viewMode],
-  );
-
-  return { filter, allEvents, isLoading, displayMode, visibleItems, dispatch };
+  return { allEvents, isLoading, displayMode, dispatch };
 }
 
 function CalendarPageContent({ state }) {
-  const showFilters = state.displayMode !== "list" && state.displayMode !== "table";
-
   return (
-    <AppPage title="Calendar" subtitle="Your scheduled events and study sessions" width="full" className={styles.page}>
+    <AppPage title="Calendar" subtitle={calendarSubtitle} width="full" className={styles.page}>
       <div className={styles.calendarContainer}>
         <div className={styles.stickyHeader}>
           <CalendarHeader />
-          {showFilters && (
-            <div className={styles.filters}>
-              <PillFilters active={state.filter} onChange={(key) => state.dispatch({ type: "SET_FILTER", payload: key })} items={state.visibleItems} />
-            </div>
-          )}
         </div>
         <main className={styles.mainContent}><Calendar /></main>
       </div>
@@ -109,7 +90,7 @@ function CalendarPageContent({ state }) {
 
 export default function CalendarPage() {
   const state = useCalendarPageState();
-  const isListOrTable = state.displayMode === "list" || state.displayMode === "table";
-  if (state.isLoading && state.allEvents.length === 0) return <CalendarPageSkeleton showSearch={!isListOrTable} />;
+  if (state.isLoading && state.allEvents.length === 0) return <CalendarPageSkeleton />;
   return <CalendarPageContent state={state} />;
 }
+

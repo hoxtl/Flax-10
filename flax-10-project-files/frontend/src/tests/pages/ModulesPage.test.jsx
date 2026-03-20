@@ -22,7 +22,7 @@ vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     applyFiltersAndSort: vi.fn((modules) => modules),
     getDepartments: vi.fn(() => []),
 }));
-vi.mock('../../components/Modules/ModuleGrid', () => ({
+vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
         <div>
             <span>ModuleGrid</span>
@@ -31,7 +31,7 @@ vi.mock('../../components/Modules/ModuleGrid', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/ModuleForm', () => ({
+vi.mock('../../components/Modules/Modules/ModuleForm', () => ({
     default: ({ onCancel, onSuccess }) => (
         <div>
             <span>ModuleForm</span>
@@ -41,10 +41,10 @@ vi.mock('../../components/Modules/ModuleForm', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/ModuleDetails', () => ({
+vi.mock('../../components/Modules/Modules/ModuleDetails', () => ({
     default: ({ onBack }) => <div><button onClick={onBack}>Back</button></div>,
 }));
-vi.mock('../../components/Modules/DeadlineModal', () => ({
+vi.mock('../../components/Modules/Deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
 vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
@@ -209,14 +209,23 @@ describe('ModulesPage', () => {
                 <ModulesPage />
             </MemoryRouter>
         );
-        const input = screen.getByPlaceholderText(/search by module name or code/i);
+        const input = screen.getByPlaceholderText(/search king's modules by name or code/i);
         expect(input.value).toBe('UNKNOWN');
     });
 
     it('shows student subtitle and hides create button when user is not teacher', () => {
         localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
-        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        const { container } = render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.queryByText('+ Create Module')).not.toBeInTheDocument();
-        expect(screen.getByText(/browse and enroll into available modules/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("See your enrolled modules, readings, and deadlines in one place.");
+    });
+
+    it('shows browse action in student empty state by default', () => {
+        localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        expect(screen.getByText("You're not enrolled in any modules yet")).toBeInTheDocument();
+        expect(screen.getByText('Browse modules')).toBeInTheDocument();
     });
 });
