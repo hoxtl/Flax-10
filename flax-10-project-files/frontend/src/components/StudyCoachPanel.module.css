@@ -276,16 +276,16 @@
   flex: 1;
   background: var(--ai-chat-input-bg);
   border: 1px solid var(--ai-chat-input-border);
-  border-radius: 16px;
-  padding: 0.72rem 0.9rem;
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
   font-size: 0.88rem;
   color: var(--ai-chat-input-fg);
   resize: none;
   outline: none;
   font-family: inherit;
   line-height: 1.5;
-  min-height: 36px;
-  max-height: 72px;
+  min-height: 58px;
+  max-height: 132px;
   overflow-y: auto;
   transition: border-color 0.18s;
 }
