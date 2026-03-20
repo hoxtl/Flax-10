@@ -56,9 +56,11 @@ function useAutoScrollToToday(viewMode, currentPage, events) {
   useEffect(() => {
     if (viewMode === 'day' || !events.length) return;
     if (!events.some(e => getDateKey(e) === getTodayKey())) return;
-    const container = document.querySelector(SCROLL_SELECTOR);
-    const target = container?.querySelector(`[data-date-key="${getTodayKey()}"]`);
-    target?.scrollIntoView({ block: 'start' });
+    requestAnimationFrame(() => {
+      const container = document.querySelector(SCROLL_SELECTOR);
+      const target = container?.querySelector(`[data-date-key="${getTodayKey()}"]`);
+      target?.scrollIntoView({ block: 'start' });
+    });
   }, [viewMode, currentPage, events]);
 }
 
@@ -110,33 +112,39 @@ function GroupedEventsList({ events }) {
   return keys.map(key => <DateGroup key={key} dateKey={key} events={groups.get(key)} />);
 }
 
-function groupOverlappingEvents(events) {
-  const result = [];
-  let group = [];
-  let maxEnd = null;
-  for (const event of events) {
-    if (isAllDay(event)) {
-      if (group.length) { result.push(group); group = []; maxEnd = null; }
-      result.push([event]);
-      continue;
-    }
-    const start = new Date(event.start_time), end = new Date(event.end_time);
-    if (!maxEnd || start >= maxEnd) {
-      if (group.length) result.push(group);
-      group = [event]; maxEnd = end;
-    } else {
-      group.push(event); if (end > maxEnd) maxEnd = end;
-    }
+const appendToResult = (res, current, event) => {
+  if (current.length) res.push(current);
+  res.push([event]);
+  return { nextGroup: [], nextMax: null };
+};
+function handleEventOverlap(event, ctx) {
+  if (isAllDay(event)) {
+    const n = appendToResult(ctx.result, ctx.currentGroup, event);
+    ctx.currentGroup = n.nextGroup; ctx.maxEnd = n.nextMax; return;
   }
-  if (group.length) result.push(group);
-  return result;
+  const start = new Date(event.start_time), end = new Date(event.end_time);
+  const isOverlap = ctx.maxEnd && start < ctx.maxEnd;
+  if (!isOverlap && ctx.currentGroup.length) ctx.result.push(ctx.currentGroup);
+  if (!isOverlap) { ctx.currentGroup = [event]; ctx.maxEnd = end; return; }
+  ctx.currentGroup.push(event);
+  if (end > ctx.maxEnd) ctx.maxEnd = end;
+}
+function groupOverlappingEvents(events) {
+  const ctx = { result: [], currentGroup: [], maxEnd: null };
+  events.forEach(event => handleEventOverlap(event, ctx));
+  if (ctx.currentGroup.length) ctx.result.push(ctx.currentGroup);
+  return ctx.result;
 }
 
 function FlatEventsList({ events }) {
   const groups = useMemo(() => groupOverlappingEvents(events), [events]);
   return (
     <div className={styles.flatList}>
-      {groups.map((group, i) => group.length > 1 ? <ConflictRow key={i} events={group} /> : <EventRow key={group[0].id} event={group[0]} />)}
+      {groups.map((group, i) => (
+        group.length > 1 
+          ? <ConflictRow key={i} events={group} /> 
+          : <EventRow key={group[0].id} event={group[0]} />
+      ))}
     </div>
   );
 }
@@ -163,7 +171,9 @@ function useListViewState(propDate, propEvents) {
   const sortedEvents = useMemo(() => sortByStartTime(data.events || []), [data.events]);
   const pagination = useDayPagination(sortedEvents, DAYS_PER_PAGE);
   useInitialPageForToday(data.viewMode, pagination.dateKeys, pagination.setPage);
-  useAutoScrollToToday(data.viewMode, pagination.currentPage, pagination.currentItems);
+  const showAll = data.viewMode === 'day' || data.viewMode === 'week';
+  const scrollItems = showAll ? sortedEvents : pagination.currentItems;
+  useAutoScrollToToday(data.viewMode, pagination.currentPage, scrollItems);
   return { ...data, sortedEvents, ...pagination };
 }
 
