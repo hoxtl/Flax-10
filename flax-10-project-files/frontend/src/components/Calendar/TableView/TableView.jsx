@@ -1,3 +1,7 @@
+/**
+ * TableView - Spreadsheet-style calendar view with inline editing.
+ * Displays events in rows with editable columns and keyboard navigation.
+ */
 import { useRef, useEffect } from 'react';
 import { useCalendarData } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
@@ -79,6 +83,7 @@ function useTableViewData(propDate, propEvents) {
     return { data, pagination, editState, navState };
 }
 
+/** Spreadsheet-style table view with inline cell editing and pagination. */
 export function TableView({ selectedDate, events }) {
     const tableRef = useRef(null);
     const { data, pagination, editState, navState } = useTableViewData(selectedDate, events);

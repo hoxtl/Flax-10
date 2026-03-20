@@ -1,5 +1,9 @@
-// Grid configuration - change these to adjust the calendar layout
-export const SLOT_HEIGHT = 60;  // Height of one hour slot in pixels
+/**
+ * calendarConstants - Grid layout constants and pixel/time conversion utilities.
+ * Configures slot height, snap intervals, and provides position calculations.
+ */
+
+export const SLOT_HEIGHT = 60;
 export const SNAP_INTERVAL = 15; // Minutes to snap to (15 = quarter hours)
 export const MIN_EVENT_DURATION = 15; // Minimum event length in minutes
 

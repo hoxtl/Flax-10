@@ -158,23 +158,28 @@ const DropdownPanel = forwardRef(function DropdownPanel({ pos, timeOnly, dateOnl
   );
 });
 
+function CalendarHeader({ viewM, viewY, prevMonth, nextMonth }) {
+  return (
+    <div className={styles.calHeader}>
+      <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
+      <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
+      <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
+    </div>
+  );
+}
+
+function DayCell({ day, index, isToday, isSel, selectDay }) {
+  const cls = `${styles.dayCell} ${!day ? styles.dayCellEmpty : ""} ${day && isToday(day) ? styles.dayCellToday : ""} ${day && isSel(day) ? styles.dayCellSel : ""}`;
+  return <button key={index} type="button" disabled={!day} onClick={() => day && selectDay(day)} className={cls}>{day || ""}</button>;
+}
+
 function CalendarSection({ viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay }) {
   return (
     <>
-      <div className={styles.calHeader}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
-        <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
-        <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
-      </div>
+      <CalendarHeader viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} />
       <div className={styles.calGrid}>
         {DAYS.map(d => <div key={d} className={styles.dayHeader}>{d}</div>)}
-        {days.map((d, i) => (
-          <button key={i} type="button" disabled={!d} onClick={() => d && selectDay(d)}
-            className={`${styles.dayCell} ${!d ? styles.dayCellEmpty : ""}
-              ${d && isToday(d) ? styles.dayCellToday : ""} ${d && isSel(d) ? styles.dayCellSel : ""}`}>
-            {d || ""}
-          </button>
-        ))}
+        {days.map((d, i) => <DayCell key={i} day={d} index={i} isToday={isToday} isSel={isSel} selectDay={selectDay} />)}
       </div>
     </>
   );
@@ -186,12 +191,14 @@ function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly, setOp
       <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(hour)} onChange={v => changeHour(Number(v))}
-          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd} menuMaxHeight={180} allowFlipUpward />
+          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
       </div>
       <span className={styles.timeSep}>:</span>
       <div className={styles.timeDropdown}>
         <AnimatedDropdown value={String(minute)} onChange={v => changeMinute(Number(v))}
-          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd} menuMaxHeight={180} allowFlipUpward />
+          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
       </div>
       <button type="button" className={styles.doneBtn} onClick={() => setOpen(false)}>Done</button>
     </div>
@@ -226,11 +233,16 @@ function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute,
   }, [value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM]);
 }
 
+function isInsidePortaledDropdown(target) {
+  return target.closest('[data-dropdown-portal="true"]') !== null;
+}
+
 function useClickOutside(open, ref, dropdownRef, setOpen) {
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e) => {
       if (ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target)) return;
+      if (isInsidePortaledDropdown(e.target)) return;
       setOpen(false);
     };
     const handleEsc = (e) => { if (e.key === "Escape") setOpen(false); };

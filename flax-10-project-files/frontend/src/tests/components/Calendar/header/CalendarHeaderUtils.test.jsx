@@ -23,7 +23,7 @@ vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
     ),
 }));
 
-vi.mock('../../../../components/ui/SegmentedControl', () => ({
+vi.mock('../../../../components/common/SegmentedControl/SegmentedControl', () => ({
     SegmentedControl: ({ options, value, onChange }) => (
         <div data-testid="segmented-control">
             {options.map((o) => (

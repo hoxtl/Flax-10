@@ -1,6 +1,6 @@
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import { fetchTasks } from "../../api/taskService";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../components/common";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
 import { useState, useEffect } from "react";
 import { getSharingWith, getSharedWithMe } from "../../api/socialService";
@@ -22,7 +22,7 @@ function EventsModal({ isOpen, onClose, events, range, onRangeChange }) {
     <GenericSummaryModal
       isOpen={isOpen} onClose={onClose} title={title}
       emptyMessage="No events found for this period"
-      topContent={<SegmentedControl fill options={RANGE_OPTIONS.map(([key, label]) => ({ value: key, label }))} value={range} onChange={onRangeChange} />}
+      topContent={<SegmentedControl fill variant="solid" options={RANGE_OPTIONS.map(([key, label]) => ({ value: key, label }))} value={range} onChange={onRangeChange} />}
       items={events}
       renderItem={(event, i) => <SummaryItem key={i} avatar="📅" title={event.title} subtitle={formatEventMeta(event)} />}
     />

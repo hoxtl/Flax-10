@@ -25,6 +25,7 @@ export function calculatePopoverPosition(anchorRect, popWidth, popHeight, winWid
     return { top, left, placement };
 }
 
+/** Calculates arrow position relative to anchor center. */
 export function calculateArrowPosition(anchorRect, popoverPos, placement) {
     if (!anchorRect || !popoverPos) return 0;
     if (placement === 'top' || placement === 'bottom') return anchorRect.left + (anchorRect.width / 2) - popoverPos.left - 6;

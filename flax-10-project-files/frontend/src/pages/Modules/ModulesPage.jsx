@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import AppPage from '../../components/common/AppPage/AppPage';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 import PageTransition from '../../components/common/PageTransition/PageTransition.jsx';
-import { isEnrolledIn, filterModules } from '../../components/Modules/utils/moduleUtils.js';
+import { filterModules } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleForm from '../../components/Modules/Modules/ModuleForm.jsx';
 import ModuleDetails from '../../components/Modules/Modules/ModuleDetails.jsx';
@@ -43,10 +43,22 @@ function usePageState(initialSearch, initialCreate, searchParams) {
     };
 }
 
-function useInitialSearchMatch(initialSearch, codeFromUrl, moduleIdFromUrl, modules, setViewingModule) {
+function useModulesPage(initialSearch = '', initialCreate = false) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const st = usePageState(initialSearch, initialCreate, searchParams);
+    const [search_query, setSearchQuery] = st.search;
+    const [filter_mode, setFilterMode] = st.filter;
+    const [show_form, setShowForm] = st.form;
+    const [editing_module, setEditingModule] = st.editing;
+    const [viewing_module, setViewingModule] = st.viewing;
+    const [deadline_module, setDeadlineModule] = st.deadline;
+    const [reading_module, setReadingModule] = st.reading;
+    const hook = useModules();
+    const codeFromUrl = searchParams.get('code'), moduleIdFromUrl = searchParams.get('moduleId');
+
     useEffect(() => {
-        if (!initialSearch || codeFromUrl || moduleIdFromUrl || !modules?.length) return;
-        const match = modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
+        if (!initialSearch || codeFromUrl || moduleIdFromUrl || !hook.modules?.length) return;
+        const match = hook.modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
         if (match) setViewingModule(match);
     }, [initialSearch, modules, codeFromUrl, moduleIdFromUrl, setViewingModule]);
 }
@@ -61,23 +73,27 @@ function handleModuleIdMatch(moduleIdFromUrl, modules, setViewingModule, searchP
     return true;
 }
 
-function handleCodeMatch(codeFromUrl, modules, setViewingModule, setSearchQuery, setSearchParams) {
-    const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
-    const match = modules?.find((m) => norm(m.module_code) === norm(codeFromUrl));
-    if (match) { setViewingModule(match); setSearchParams({}, { replace: true }); }
-    else { setSearchQuery(codeFromUrl.trim()); setSearchParams({}, { replace: true }); }
-}
-
-function useUrlModuleMatch(codeFromUrl, moduleIdFromUrl, hook, setViewingModule, setSearchQuery, searchParams, setSearchParams) {
     useEffect(() => {
         if (!codeFromUrl && !moduleIdFromUrl) return;
         if (hook.loading || !hook.modules) return;
-        if (moduleIdFromUrl && handleModuleIdMatch(moduleIdFromUrl, hook.modules, setViewingModule, searchParams, setSearchParams)) return;
-        if (codeFromUrl) handleCodeMatch(codeFromUrl, hook.modules, setViewingModule, setSearchQuery, setSearchParams);
+        if (moduleIdFromUrl) {
+            const match = hook.modules.find(m => m.id === Number(moduleIdFromUrl));
+            if (match) {
+                setViewingModule(match);
+                const next = new URLSearchParams(searchParams);
+                next.delete('moduleId');
+                setSearchParams(next.toString(), { replace: true });
+                return;
+            }
+        }
+        if (codeFromUrl) {
+            const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
+            const match = hook.modules?.find(m => norm(m.module_code) === norm(codeFromUrl));
+            if (match) { setViewingModule(match); setSearchParams({}, { replace: true }); }
+            else { setSearchQuery(codeFromUrl.trim()); setSearchParams({}, { replace: true }); }
+        }
     }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams, setViewingModule, setSearchQuery]);
-}
 
-function useShowAllListener(setters, setSearchParams) {
     useEffect(() => {
         const showAll = () => {
             Object.values(setters).forEach(fn => fn(null));
@@ -116,8 +132,7 @@ function useMainViewData(state) {
     );
     const sorting = useModuleSorting(filtered);
     const search = {
-        query: search_query,
-        filter: filter_mode,
+        query: search_query, filter: filter_mode,
         onQueryChange: (q) => { setSearchQuery(q); sorting.setCurrentPage(1); },
         onFilterChange: (f) => { setFilterMode(f); sorting.setCurrentPage(1); },
     };
@@ -178,12 +193,12 @@ function TestModeContent({ state }) {
 }
 
 function AnimatedContent({ state, viewKey }) {
-    const { show_form, viewing_module } = state;
+    const { sorting, search } = useMainView(state);
     return (
         <AnimatePresence mode="wait" initial={false}>
-            {show_form && <PageTransition key={viewKey}><FormView state={state} /></PageTransition>}
-            {!show_form && viewing_module && <PageTransition key={viewKey}><DetailsView state={state} /></PageTransition>}
-            {!show_form && !viewing_module && <PageTransition key={viewKey}><MainView state={state} /></PageTransition>}
+            {state.show_form && <PageTransition key={viewKey}><FormView state={state} /></PageTransition>}
+            {!state.show_form && state.viewing_module && <PageTransition key={viewKey}><DetailsView state={state} /></PageTransition>}
+            {!state.show_form && !state.viewing_module && <PageTransition key={viewKey}><MainView state={state} sorting={sorting} search={search} /></PageTransition>}
         </AnimatePresence>
     );
 }

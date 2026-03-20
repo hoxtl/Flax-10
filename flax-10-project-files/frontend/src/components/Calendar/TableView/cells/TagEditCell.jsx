@@ -1,9 +1,14 @@
+/**
+ * TagEditCell - Tag selection cell for table view.
+ * Displays tag badge with dropdown editor on click.
+ */
 import { Pencil } from 'lucide-react';
 import AnimatedDropdown from '../../../common/AnimatedDropdown';
-import styles from '../TableView.module.css';
+import styles from './TagEditCell.module.css';
 
-function TagBadge({ name }) {
-    return <span className={styles.tagBadge}>{name}</span>;
+function TagBadge({ name, color }) {
+    const style = color ? { backgroundColor: color, color: 'white' } : {};
+    return <span className={styles.tagBadge} style={style}>{name}</span>;
 }
 
 function buildTagOptions(tags) {
@@ -21,30 +26,31 @@ function TagDropdown({ tags, value, onSave }) {
     );
 }
 
-export function TagEditCell({ event, tags, theme, isReadOnly, isEditing, editValue, onEdit, onSave, onCancel }) {
-    const tagName = event.tag_name || event.tag?.name;
-    const hasTag = !!tagName;
-
-    if (isEditing && !isReadOnly) {
-        return <TagDropdown tags={tags} value={editValue} onSave={onSave} />;
-    }
-
-    const handleClick = (e) => {
-        if (!isReadOnly && onEdit) onEdit(e);
-    };
-
-    if (!hasTag) {
-        return (
-            <span className={styles.emptyTagCell} onClick={handleClick}>
-                {!isReadOnly && <Pencil size={14} className={styles.editIcon} />}
-            </span>
-        );
-    }
-
+function EmptyTagDisplay({ isReadOnly, onClick, isRowHovered }) {
+    const cls = `${styles.tagEditIcon} ${isRowHovered ? styles.tagEditIconVisible : ''}`;
     return (
-        <span className={styles.tagCellContent} onClick={handleClick}>
-            <TagBadge name={tagName} color={theme.color} />
-            {!isReadOnly && <Pencil size={10} className={styles.tagEditIcon} />}
+        <span className={styles.emptyTagCell} onClick={onClick}>
+            {!isReadOnly && <Pencil size={14} className={cls} />}
         </span>
     );
+}
+
+function TagDisplay({ tagName, color, isReadOnly, onClick, isRowHovered }) {
+    const cls = `${styles.tagEditIcon} ${isRowHovered ? styles.tagEditIconVisible : ''}`;
+    return (
+        <span className={styles.tagCellContent} onClick={onClick}>
+            <TagBadge name={tagName} color={color} />
+            {!isReadOnly && <Pencil size={10} className={cls} />}
+        </span>
+    );
+}
+
+export function TagEditCell({ event, tags, theme, isReadOnly, isEditing, editValue, onEdit, onSave, isRowHovered }) {
+    const tagName = event.tag_name || event.tag?.name;
+    const handleClick = (e) => { if (!isReadOnly && onEdit) onEdit(e); };
+    const common = { isReadOnly, onClick: handleClick, isRowHovered };
+
+    if (isEditing && !isReadOnly) return <TagDropdown tags={tags} value={editValue} onSave={onSave} />;
+    if (!tagName) return <EmptyTagDisplay {...common} />;
+    return <TagDisplay tagName={tagName} color={theme.color} {...common} />;
 }

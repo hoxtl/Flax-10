@@ -19,3 +19,5 @@ export { default as Tabs } from "./Tabs/Tabs";
 export { default as TextInput } from "./TextInput/TextInput";
 export { default as UserAvatar } from "./UserAvatar/UserAvatar";
 export * from "./motion/transitions";
+export { SegmentedControl } from "./SegmentedControl/SegmentedControl";
+export { TabBar, TabContent } from "./TabBar/TabBar";
