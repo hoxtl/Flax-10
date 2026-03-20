@@ -148,11 +148,6 @@
     color: var(--muted, #9ca3af);
 }
 
-.addIcon {
-    font-size: 2rem;
-    color: var(--muted, #9ca3af);
-}
-
 .hint {
     font-size: 0.85rem;
     color: var(--muted, #6b7280);
