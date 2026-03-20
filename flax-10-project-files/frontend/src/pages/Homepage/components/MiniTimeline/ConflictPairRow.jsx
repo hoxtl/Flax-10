@@ -22,9 +22,9 @@ function enrichItemRows(items, getTag, sleepWindow) {
 }
 
 function handleActivate(event, itemRow, onCardClick, onEdit) {
-  if (itemRow.isReadOnly) return;
   const rect = event.currentTarget.getBoundingClientRect();
-  return onCardClick ? onCardClick(itemRow.item, null, rect) : onEdit?.(itemRow.item, itemRow.item.tag);
+  if (onCardClick) return onCardClick(itemRow.item, null, rect);
+  if (!itemRow.isReadOnly) onEdit?.(itemRow.item, itemRow.item.tag);
 }
 
 export function ConflictPairRow({ row, rows, onConflictAutoMove, onPushTomorrow, onCardClick, onEventContextMenu, onEdit, getTag, styles, selectedDate, sleepWindow }) {
