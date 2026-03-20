@@ -1,302 +1,50 @@
-import React, { useState, useEffect } from "react";
-import UserSearch from "../../components/Social/UserSearch";
-import { getAuthHeaders, useProject, useProjectMembers, useSelectedTab } from "./groupWorkHooks";
-import { getUserColor } from "./utils/priorityUtils";
-import GroupTasksTab from "./GroupTasksTab";
-import AvailabilityTab from "./AvailabilityTab";
-import MemberAvatar from "./components/MemberAvatar";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
+import React, { useEffect } from "react";
+import { useProjectDetail } from "./groupWorkHooks";
+import GroupWorkDetailSkeleton from "./components/GroupWorkDetailSkeleton";
+import ProjectHeader from "./components/ProjectHeader";
+import MembersSection from "./components/MembersSection";
+import AddMemberForm from "./components/AddMemberForm";
+import TabsSection from "./components/TabsSection";
+import BackButton from "./components/BackButton";
 import styles from "./GroupWorkDetail.module.css";
-import DateTimePicker from "../../components/common/inputs/DateTimePicker";
-import { ChevronLeft, Trash2, Users, Calendar } from "lucide-react";
 
-function GroupWorkDetailSkeleton({ onBack }) {
-  return (
-    <div className={styles.container} data-testid="groupwork-skeleton" aria-busy="true">
-      <div className={styles.topActions}>
-        <BackButton onClick={onBack} />
-        <SkeletonBlock className={styles.skeletonDeleteBtn} />
-      </div>
-      <section className={styles.headerSection}>
-        <div className={styles.headerBody}>
-          <SkeletonBlock className={styles.skeletonProjectMeta} style={{ width: '120px', borderRadius: '999px', height: '28px' }} />
-          <SkeletonBlock className={styles.skeletonProjectTitle} style={{ marginTop: '12px' }} />
-          <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
-            <SkeletonBlock style={{ width: '100px', height: '20px', borderRadius: '4px' }} />
-            <SkeletonBlock style={{ width: '140px', height: '34px', borderRadius: '999px' }} />
-          </div>
-          <SkeletonBlock className={styles.skeletonProgressBar} style={{ marginTop: '20px' }} />
-        </div>
-      </section>
-      <section className={styles.membersSection}>
-        <SkeletonBlock className={styles.skeletonMembersTitle} />
-        <div className={styles.membersList}>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className={styles.skeletonMemberPill}>
-              <SkeletonBlock className={styles.skeletonAvatar} />
-              <SkeletonBlock className={styles.skeletonMemberName} />
-            </div>
-          ))}
-        </div>
-      </section>
-      <div className={styles.skeletonAddMemberForm}>
-        <SkeletonBlock className={styles.skeletonAddMemberInput} />
-        <SkeletonBlock className={styles.skeletonAddMemberBtn} />
-      </div>
-      <section className={styles.tabsSection}>
-        <div className={styles.tabsRow}>
-          <SkeletonBlock className={styles.skeletonTab} />
-          <SkeletonBlock className={styles.skeletonTab} />
-        </div>
-        <div className={styles.skeletonTaskPanel}>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <SkeletonBlock key={index} className={styles.skeletonTaskRow} />
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
+function useSyncStats(d, onUpdate) {
+  useEffect(() => {
+    if (!onUpdate || !d.project || d.taskStats.total === undefined) return;
+    
+    const countsMatch = d.project.task_count === d.taskStats.total && 
+                        d.project.completed_task_count === d.taskStats.completed;
+    const membersMatch = (d.project.members || []).length === d.members.length;
 
-function BackButton({ onClick }) {
-    return (
-        <button onClick={onClick} className={styles.backButton}>
-            <ChevronLeft size={16} />
-            Back to all projects
-        </button>
-    );
-}
+    if (countsMatch && membersMatch) return;
 
-function AddMemberForm({ projectId, onAdded }) {
-  const handleSelect = async (user) => {
-    if (!user?.id) return;
-    const body = JSON.stringify({ user: user.id, role: "member" });
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body,
-    });
-    if (res.ok) onAdded(await res.json());
-  };
-  return (
-    <div className={styles.addMemberForm}>
-      <UserSearch
-        onUserSelect={handleSelect}
-        fullWidth
-        hideFilter
-        compact
-      />
-    </div>
-  );
-}
-
-function MemberPill({ member, onRemove }) {
-  return (
-    <div className={styles.memberPill}>
-      <MemberAvatar member={member} size={24} />
-      <span>{member.user_name}</span>
-      {member.role !== "owner" && (
-        <button type="button" onClick={() => onRemove(member.id)} className={styles.removeBtn}>Remove</button>
-      )}
-    </div>
-  );
-}
-
-function MembersSection({ members, onRemove }) {
-  return (
-    <section className={styles.membersSection}>
-      <h2 className={styles.membersTitle}>Members</h2>
-      <div className={styles.membersList}>
-        {members.map((m) => <MemberPill key={m.id} member={m} onRemove={onRemove} />)}
-        {members.length === 0 && <p className={styles.metaText}>No members yet. Add your first member below.</p>}
-      </div>
-    </section>
-  );
-}
-
-function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
-  return segments.map((seg, idx) => (
-    <div key={seg.id ?? idx} className={styles.progressSegment} style={{ width: `${seg.percentage}%`, background: seg.id === 'unassigned' ? '#c0b8b0' : getUserColor(seg.id), opacity: hoveredSeg && hoveredSeg !== (seg.id ?? idx) ? 0.65 : 1 }} onMouseEnter={() => setHoveredSeg(seg.id ?? idx)} onMouseLeave={() => setHoveredSeg(null)} />
-  ));
-}
-
-function ProjectProgress({ taskStats }) {
-  const [hoveredSeg, setHoveredSeg] = useState(null);
-  const segments = taskStats.segments || [];
-  const hovered = hoveredSeg !== null ? segments.find(s => (s.id ?? s.name) === hoveredSeg) || segments[hoveredSeg] : null;
-  return (
-    <div className={styles.progressContainer}>
-      <div className={styles.progressBarOuter}>
-        <div className={styles.progressBarInner}><ProgressSegments segments={segments} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} /></div>
-        {hovered && <div className={styles.progressTooltip}><span className={styles.tooltipDot} style={{ background: hovered.id === 'unassigned' ? '#c0b8b0' : getUserColor(hovered.id) }} />{hovered.tooltip || hovered.name}</div>}
-      </div>
-      <p className={styles.statsText}>{taskStats.completed} / {taskStats.total} tasks complete · {taskStats.percent}% complete</p>
-    </div>
-  );
-}
-
-function ProjectHeader({ project, members, onPatch, taskStats, onDelete }) {
-    const onName = e => { const v = e.target.value.trim(); if (v && v !== project.name) onPatch({ name: v }); };
-    const onCourse = val => onPatch({ course_code: val });
-
-    return (
-        <section className={styles.headerSection}>
-            <div className={styles.topActions}>
-                <BackButton onClick={() => window.history.back()} />
-                <button className={styles.deleteBtn} onClick={onDelete}>
-                    <Trash2 size={14} />
-                    Delete project
-                </button>
-            </div>
-
-            <div className={styles.headerBody}>
-                <div className={styles.moduleTagWrapper}>
-                    <div className={styles.moduleTag}>
-                        <div className={styles.moduleDot} />
-                        <UserModuleDropdown
-                            value={project.course_code || ""}
-                            onChange={onCourse}
-                            placeholder="Module"
-                            className={styles.headerModuleDropdown}
-                        />
-                    </div>
-                </div>
-
-                <input 
-                    defaultValue={project.name} 
-                    onBlur={onName} 
-                    className={styles.nameInput} 
-                    placeholder="Project Name"
-                />
-
-                <div className={styles.metaRow}>
-                    <div className={styles.metaItem}>
-                        <Users size={14} className={styles.metaIcon} />
-                        <span>{members.length} members</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                        <div className={styles.deadlinePill}>
-                            <Calendar size={14} className={styles.metaIcon} />
-                            <DateTimePicker
-                                value={project.deadline}
-                                onChange={val => onPatch({ deadline: val })}
-                                dateOnly={true}
-                                placeholder="dd / mm / yyyy"
-                                hideIcon={true}
-                                triggerClassName={styles.detailDateTrigger}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <ProjectProgress taskStats={taskStats} />
-            </div>
-        </section>
-    );
-}
-
-
-function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate }) {
-  const t = (id, label) => (
-    <button type="button" className={`${styles.tab} ${activeTab === id ? styles.tabActive : ""}`} onClick={() => setActiveTab(id)}>
-      {label}
-    </button>
-  );
-  return (
-    <section className={styles.tabsSection}>
-      <div className={styles.tabsRow}>
-        {t("tasks", "Tasks")}
-        {t("availability", "Availability")}
-      </div>
-      {activeTab === "tasks" && <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} />}
-      {activeTab === "availability" && <AvailabilityTab projectId={projectId} />}
-    </section>
-  );
-}
-
-function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate) {
-  const patchProject = async p => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "PATCH", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify(p) });
-    if (res.ok) {
-        const updated = await res.json();
-        setProject(updated);
-        if (onUpdate) onUpdate(updated);
-    }
-  };
-  const handleRemoveMember = async mid => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/${mid}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (res.ok) {
-        setMembers(prev => {
-            const next = prev.filter(i => i.id !== mid);
-            if (onUpdate && project) {
-                onUpdate({ ...project, members: next, member_count: next.length });
-            }
-            return next;
+    const statsAreValid = d.taskStats.total > 0 || d.project.task_count === 0;
+    if (statsAreValid || !membersMatch) {
+        onUpdate({
+          ...d.project,
+          task_count: d.taskStats.total,
+          completed_task_count: d.taskStats.completed,
+          members: d.members,
+          member_count: d.members.length
         });
     }
-  };
-  const handleDeleteProject = async () => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { method: "DELETE", headers: getAuthHeaders() });
-    if (res.ok) {
-        if (onDelete) onDelete(projectId);
-        onBack();
-    }
-  };
-  return { patchProject, handleRemoveMember, handleDeleteProject };
-}
-
-function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
-  const { project, setProject, loading } = useProject(projectId);
-  const { members, setMembers } = useProjectMembers(projectId);
-  const initialTab = useSelectedTab();
-  const [activeTab, setActiveTab] = useState(initialTab);
-  const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
-  const { patchProject, handleRemoveMember, handleDeleteProject } = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
-  const onAdded = m => {
-    setMembers(p => {
-        const next = p.some(i => i.id === m.id) ? p : [...p, m];
-        if (onUpdate && project) {
-            onUpdate({ ...project, members: next, member_count: next.length });
-        }
-        return next;
-    });
-  };
-  return { project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, onAdded, patchProject, handleRemoveMember, handleDeleteProject };
+  }, [d.taskStats.total, d.taskStats.completed, d.members, d.project, onUpdate]);
 }
 
 export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
   const d = useProjectDetail(projectId, onBack, onDelete, onUpdate);
-
-  // Sync task stats changes to index page
-  useEffect(() => {
-    if (onUpdate && d.project && d.taskStats.total !== undefined) {
-      const countsMatch = 
-        d.project.task_count === d.taskStats.total && 
-        d.project.completed_task_count === d.taskStats.completed;
-      
-      const membersMatch = (d.project.members || []).length === d.members.length;
-
-      if (!countsMatch || !membersMatch) {
-        // Guard: Only sync 0/0 if the project really has 0 tasks, 
-        // otherwise it's just the initial loading state of taskStats.
-        const statsAreValid = d.taskStats.total > 0 || d.project.task_count === 0;
-
-        if (statsAreValid || !membersMatch) {
-            onUpdate({
-              ...d.project,
-              task_count: d.taskStats.total,
-              completed_task_count: d.taskStats.completed,
-              members: d.members,
-              member_count: d.members.length
-            });
-        }
-      }
-    }
-  }, [d.taskStats.total, d.taskStats.completed, d.members, d.project, onUpdate]);
+  useSyncStats(d, onUpdate);
 
   if (d.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
-  if (!d.project) return <div className={styles.container}><BackButton onClick={onBack} /><p className={styles.empty}>Project not found.</p></div>;
+  
+  if (!d.project) {
+    return (
+      <div className={styles.container}>
+        <BackButton onClick={onBack} />
+        <p className={styles.empty}>Project not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -309,7 +57,13 @@ export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpda
       />
       <MembersSection members={d.members} onRemove={d.handleRemoveMember} />
       <AddMemberForm projectId={projectId} onAdded={d.onAdded} />
-      <TabsSection activeTab={d.activeTab} setActiveTab={d.setActiveTab} projectId={projectId} members={d.members} onStatsUpdate={d.setTaskStats} />
+      <TabsSection 
+        activeTab={d.activeTab} 
+        setActiveTab={d.setActiveTab} 
+        projectId={projectId} 
+        members={d.members} 
+        onStatsUpdate={d.setTaskStats} 
+      />
     </div>
   );
 }
