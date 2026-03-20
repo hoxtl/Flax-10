@@ -1,12 +1,23 @@
+/*
+ * Timer feature file.
+ */
+
 import { fetchApi } from '../../../api/client';
 
 export const getHistory = async () => {
     try {
-        return await fetchApi('/timer/history/');
+        return normalizeHistoryResponse(await fetchApi('/timer/history/'));
     } catch {
         return [];
     }
 };
+
+function normalizeHistoryResponse(response) {
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.results)) return response.results;
+    if (Array.isArray(response?.data)) return response.data;
+    return [];
+}
 
 const createSessionPayload = (work, brk, count, blockId, task, pause, status, distractions = 0) => ({
     start_time: new Date(Date.now() - work * 1000).toISOString(),
