@@ -25,8 +25,16 @@ const getOverviewContent = (loading, data, progressData, themeStats) =>
 const getTabContent = (loading, period) => (!loading ? <AIInsightsTab period={period} /> : null);
 
 const getTabs = (loading, period, data, progressData, themeStats) => [
-  { ...TABS[0], content: getOverviewContent(loading, data, progressData, themeStats) },
-  { ...TABS[1], content: getTabContent(loading, period) },
+  {
+    ...TABS[0],
+    label: <span className={styles.tabLabel}><span>{TABS[0].icon}</span> {TABS[0].label}</span>,
+    content: getOverviewContent(loading, data, progressData, themeStats)
+  },
+  {
+    ...TABS[1],
+    label: <span className={styles.tabLabel}><span>{TABS[1].icon}</span> {TABS[1].label}</span>,
+    content: getTabContent(loading, period)
+  },
 ];
 
 function ErrorBanner({ error }) {
@@ -47,8 +55,7 @@ export default function AnalyticsPage() {
       className={styles.page}
       title="Analytics"
       subtitle={analyticsSubtitle}
-      action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}
-    >
+      action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}>
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
       <TabBar tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" variant="heading" />

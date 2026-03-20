@@ -80,8 +80,8 @@ function MyEnrollmentsTabContent({ state }) {
 function MyModulesWithTabs({ state }) {
     const [innerTab, setInnerTab] = useState('overview');
     const tabs = [
-        { id: 'overview', icon: '📊', label: 'Overview', content: <MyModulesTabContent state={state} /> },
-        { id: 'enrollments', icon: '📚', label: 'My Enrollments', content: <MyEnrollmentsTabContent state={state} /> },
+        { id: 'overview', label: <span className={styles.tabLabel}><span>📊</span> Overview</span>, content: <MyModulesTabContent state={state} /> },
+        { id: 'enrollments', label: <span className={styles.tabLabel}><span>📚</span> My Enrollments</span>, content: <MyEnrollmentsTabContent state={state} /> },
     ];
     return (
         <>
@@ -133,13 +133,11 @@ export function MainView({ state, sorting, search }) {
     const action = is_teacher
         ? <CreateModuleButton setEditingModule={setEditingModule} setShowForm={setShowForm} />
         : <StudentModulesTabs filterMode={search.filter} onChange={search.onFilterChange} />;
-    
     const pageContent = (
         <AppPage width="xl" className={styles.container} title={title} subtitle={subtitle} action={action}>
             {isStudentMyModules ? <MyModulesWithTabs state={state} /> : <ModulesListSection state={state} sorting={sorting} search={search} />}
         </AppPage>
     );
-
     if (is_teacher || isTestEnv) return pageContent;
     return <AnimatePresence mode="wait" initial={false}><PageTransition key={`student-modules-${search.filter}`}>{pageContent}</PageTransition></AnimatePresence>;
 }
