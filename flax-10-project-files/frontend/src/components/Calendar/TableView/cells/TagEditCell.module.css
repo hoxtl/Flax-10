@@ -1,0 +1,64 @@
+.tagCellContent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.emptyTagCell {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    cursor: pointer;
+}
+
+.tagBadge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    background: var(--surface-card, #F2F0E9);
+    color: var(--text);
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.1));
+    transition: all 0.2s ease;
+}
+
+.tagCellContent:hover .tagBadge {
+    background: var(--hover, #E0DED7);
+}
+
+.tagEditIcon {
+    opacity: 0;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+
+.tagEditIconVisible {
+    opacity: 0.5;
+}
+
+.tagCellContent:hover .tagEditIcon {
+    opacity: 1;
+    color: var(--text);
+}
+
+.tagSelect {
+    padding: 6px 12px;
+    border: 0.5px solid rgba(51, 51, 51, 0.2);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tagSelect:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
+}

@@ -234,7 +234,7 @@ function DropdownContent({
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
   searchable, query, setQuery, searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark,
-  align, usePortal, coords
+  align, usePortal, coords, menuRef
 }) {
   const menuStyle = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
 
@@ -259,6 +259,8 @@ function DropdownPanel({
 
   return (
     <motion.div
+      ref={menuRef}
+      data-dropdown-portal="true"
       {...getDropdownPanelMotion(openUpward)}
       className={`${styles.dropdownMenu} ${alignCls}`} style={menuStyle}>
       <DropdownContent grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
@@ -286,7 +288,7 @@ function DropdownPanel({
 function DropdownMenu({
   isOpen, grouped, options, value, onSelect, searchable, query, setQuery,
   searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark, align,
-  usePortal, coords
+  usePortal, coords, menuRef
 }) {
   const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
   const menu = (
@@ -294,7 +296,7 @@ function DropdownMenu({
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
         openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark}
-        usePortal={usePortal} coords={coords} align={align} />}
+        usePortal={usePortal} coords={coords} align={align} menuRef={menuRef} />}
     </AnimatePresence>
   );
 
@@ -399,12 +401,13 @@ export default function AnimatedDropdown({
   emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false,
   isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false,
-  allowFlipUpward = false
+  allowFlipUpward = true
 }) {
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(
     options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange
   );
   const containerRef = useRef(null);
+  const menuRef = useRef(null);
   const timeoutRef = useRef(null);
   const { openUpward, coords } = useOpenDirection(
     containerRef,
@@ -430,13 +433,8 @@ export default function AnimatedDropdown({
     if (!openOnHover) {
       const listener = (event) => {
         const isInside = containerRef.current?.contains(event.target);
-        // If portaled, we also check if the click was inside the menu in the body
-        const dropdownMenu = document.querySelector(`.${styles.dropdownMenu}`);
-        const isInsideMenu = dropdownMenu?.contains(event.target);
-
-        if (!isInside && !isInsideMenu) {
-          setIsOpen(false);
-        }
+        const isInsideMenu = menuRef.current?.contains(event.target);
+        if (!isInside && !isInsideMenu) setIsOpen(false);
       };
       document.addEventListener("mousedown", listener);
       return () => document.removeEventListener("mousedown", listener);
@@ -461,7 +459,7 @@ export default function AnimatedDropdown({
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage}
         openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark}
-        align={align} usePortal={usePortal} coords={coords} />
+        align={align} usePortal={usePortal} coords={coords} menuRef={menuRef} />
     </div>
   );
 }
