@@ -26,6 +26,7 @@ def group_project_list(request):
                 task_count=Count("tasks", distinct=True),
                 completed_task_count=Count("tasks", filter=Q(tasks__completed=True), distinct=True),
             )
+            .prefetch_related("memberships", "memberships__user")
             .order_by("-created_at")
         )
         serialiser = GroupProjectSerialiser(qs, many=True)

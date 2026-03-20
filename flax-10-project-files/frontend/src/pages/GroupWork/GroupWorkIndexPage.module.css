@@ -271,6 +271,16 @@
     align-items: center;
 }
 
+.avatarWrapper {
+    margin-right: -8px;
+    border-radius: 50%;
+    border: 2px solid var(--surface-panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-panel);
+}
+
 .avatarPill {
     background: var(--surface-raised);
     border: 2px solid var(--surface-panel);

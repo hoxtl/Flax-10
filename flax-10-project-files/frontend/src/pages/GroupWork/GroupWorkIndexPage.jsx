@@ -11,6 +11,7 @@ import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import GroupWorkStats from "./components/GroupWorkStats";
 import TextInput from "../../components/common/TextInput/TextInput";
 import UserModuleDropdown from "../../components/Modules/UserModuleDropdown";
+import MemberAvatar from "./components/MemberAvatar";
 
 function GroupWorkIndexSkeleton() {
   return (
@@ -110,15 +111,7 @@ function getProjectTheme(daysLeft) {
   return THEMES.green;
 }
 
-function getMockAvatars(projectId, memberCount) {
-  const hash = projectId ? String(projectId).split("").reduce((a, b) => a + b.charCodeAt(0), 0) : 0;
-  const pool = ["AL", "BE", "CF", "DK", "EM", "FN", "GO", "HP", "IQ", "JR"];
-  if (!memberCount) return { avatars: [], remaining: 0 };
-  const count = Math.min(memberCount, 3);
-  const avatars = [];
-  for (let i = 0; i < count; i++) avatars.push(pool[(hash + i) % pool.length]);
-  return { avatars, remaining: memberCount > 3 ? memberCount - 3 : 0 };
-}
+
 
 function ProjectRow({ project, onClick }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -131,7 +124,9 @@ function ProjectRow({ project, onClick }) {
   const totalTasks = project.task_count || 0;
   const completedTasks = project.completed_task_count || 0;
   const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-  const mockMem = getMockAvatars(project.id, project.member_count);
+  const members = project.members || [];
+  const avatarsToShow = members.slice(0, 3);
+  const remainingCount = members.length > 3 ? members.length - 3 : 0;
   
   const radius = 10;
   const circumference = 2 * Math.PI * radius;
@@ -148,11 +143,13 @@ function ProjectRow({ project, onClick }) {
                 <div className={styles.projectName}>{project.name}</div>
                 <div className={styles.projectSub}>
                     <div className={styles.avatarStack}>
-                        {mockMem.avatars.map((ini, i) => (
-                            <div key={i} className={styles.avatarPill} style={{ zIndex: 10 - i }}>{ini}</div>
+                        {avatarsToShow.map((member, i) => (
+                            <div key={member.id} className={styles.avatarWrapper} style={{ zIndex: 10 - i }}>
+                                <MemberAvatar member={member} size={24} />
+                            </div>
                         ))}
-                        {mockMem.remaining > 0 && (
-                            <div className={styles.avatarPill} style={{ zIndex: 1 }}>+{mockMem.remaining}</div>
+                        {remainingCount > 0 && (
+                            <div className={styles.avatarPill} style={{ zIndex: 1 }}>+{remainingCount}</div>
                         )}
                     </div>
                 </div>

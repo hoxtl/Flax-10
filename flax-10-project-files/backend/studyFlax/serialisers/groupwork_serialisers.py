@@ -10,6 +10,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
     completed_task_count = serializers.IntegerField(read_only=True, default=0)
+    members = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupProject
@@ -21,8 +22,12 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "member_count",
             "task_count",
             "completed_task_count",
+            "members",
             "created_at",
         ]
+
+    def get_members(self, obj):
+        return GroupMembershipSerialiser(obj.memberships.all(), many=True).data
 
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
