@@ -1,240 +1,138 @@
-import { useState, useEffect, useRef } from 'react';
+/*
+ * Timer presets and configuration panels.
+ */
+
+import { useState } from 'react';
 import styles from '../../pages/Timer/TimerPage.module.css';
 import { TimerSettings } from './TimerComponents';
+import { AutoStartToggle } from './presets/AutoStartToggle';
+import { DailyGoalWidget } from './presets/DailyGoalWidget';
+import { PresetCard } from './presets/PresetCard';
+import { PresetSaveArea } from './presets/PresetSaveArea';
 import {
-    BUILT_IN_PRESETS, AUTOSTART_KEY, loadCustomPresets, saveCustomPresets,
-    loadPresetUsage, savePresetUsage, isPresetActive, applyPreset,
-    getPresetIcon, getPresetDurationTag,
+  BUILT_IN_PRESETS,
+  applyPreset,
+  loadCustomPresets,
+  loadPresetUsage,
+  saveCustomPresets,
+  savePresetUsage,
 } from './utils/presetUtils';
-import { fmtDuration } from './utils/timerFormatters';
 
-function PresetCard({ preset, t, onApply, onDelete }) {
-    const [ctxMenu, setCtxMenu] = useState(null);
-    const ctxRef = useRef(null);
-    const active = isPresetActive(preset, t);
-    const disabled = t.isActive;
-    const tooltipText = `${preset.work}m work · ${preset.brk}m break · ${preset.sessions} sessions`;
-
-    useEffect(() => {
-        if (!ctxMenu) return;
-        const handler = (e) => { if (ctxRef.current && !ctxRef.current.contains(e.target)) setCtxMenu(null); };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [ctxMenu]);
-
-    const handleContextMenu = (e) => {
-        if (!onDelete) return;
-        e.preventDefault();
-        setCtxMenu({ x: e.clientX, y: e.clientY });
-    };
-
-    return (
-        <div className={styles.presetListItemWrap} onContextMenu={handleContextMenu} data-tooltip={tooltipText}>
-            <button
-                className={`${styles.presetListItem} ${active ? styles.presetListItemActive : ''} ${disabled ? styles.presetListItemDisabled : ''}`}
-                onClick={() => !disabled && onApply?.(preset)}
-                disabled={disabled}
-            >
-                <span className={styles.presetListItemTop}>
-                    <span className={styles.presetListIcon} aria-hidden="true">{getPresetIcon(preset)}</span>
-                    <span className={styles.presetListItemName}>{preset.label}</span>
-                    <span className={styles.presetDurationTag}>{getPresetDurationTag(preset)}</span>
-                </span>
-                <span className={styles.presetListItemMeta}>{preset.sessions} sessions</span>
-            </button>
-            {onDelete && (
-                <button className={styles.presetDeleteBtn} onClick={onDelete} title="Delete preset" aria-label="Delete preset">✕</button>
-            )}
-            {ctxMenu && onDelete && (
-                <div ref={ctxRef} className={styles.presetCtxMenu} style={{ top: ctxMenu.y, left: ctxMenu.x }}>
-                    <button className={styles.presetCtxDeleteBtn} onClick={() => { onDelete(); setCtxMenu(null); }}>
-                        🗑 Delete preset
-                    </button>
-                </div>
-            )}
-        </div>
-    );
+function listPresets(customPresets) {
+  return [...BUILT_IN_PRESETS, ...customPresets];
 }
 
-function DailyGoalWidget() {
-    const [goalHours, setGoalHours] = useState(() => parseFloat(localStorage.getItem('timerDailyGoalHours') || '4'));
-    const [studiedHours, setStudiedHours] = useState(null);
-    const [editingGoal, setEditingGoal] = useState(false);
-    const [goalInput, setGoalInput] = useState('');
-
-    useEffect(() => {
-        import('../../api/analyticsService').then(m => {
-            m.default.getSummary(1)
-                .then(res => setStudiedHours(res?.summary?.total_study_hours ?? 0))
-                .catch(() => setStudiedHours(0));
-        });
-    }, []);
-
-    const pct = Math.min(100, goalHours > 0 && studiedHours !== null
-        ? Math.round((studiedHours / goalHours) * 100) : 0);
-
-    const commitGoal = (val) => {
-        const n = parseFloat(val);
-        if (!isNaN(n) && n > 0) {
-            setGoalHours(n);
-            try { localStorage.setItem('timerDailyGoalHours', String(n)); } catch {}
-        }
-        setEditingGoal(false);
-    };
-
-    const fmtStudied = studiedHours !== null
-        ? `${fmtDuration(Math.round((studiedHours || 0) * 3600))} of ${goalHours}h (${pct}%)`
-        : '…';
-
-    return (
-        <div className={styles.dailyGoalWidget}>
-            <div className={styles.dailyGoalHeader}>
-                <span className={styles.dailyGoalLabel}>Today's Goal</span>
-                {editingGoal ? (
-                    <input
-                        className={styles.todayGoalInput}
-                        type="number" min={0.5} max={24} step={0.5}
-                        value={goalInput}
-                        autoFocus
-                        onChange={e => setGoalInput(e.target.value)}
-                        onBlur={() => commitGoal(goalInput)}
-                        onKeyDown={e => { if (e.key === 'Enter') commitGoal(goalInput); if (e.key === 'Escape') setEditingGoal(false); }}
-                    />
-                ) : (
-                    <button className={styles.todayGoalEditBtn} onClick={() => { setGoalInput(String(goalHours)); setEditingGoal(true); }}>
-                        {goalHours}h
-                    </button>
-                )}
-            </div>
-            <div className={styles.todayGoalBar}>
-                <div className={styles.todayGoalFill} style={{ width: `${pct}%` }} />
-            </div>
-            <span className={styles.dailyGoalProgress}>{fmtStudied}</span>
-        </div>
-    );
+function saveCurrentPreset(saveName, setSaving, setSaveName, setCustomPresets, customPresets, t) {
+  const name = saveName.trim();
+  if (!name) return setSaving(false);
+  const updated = [...customPresets, createPreset(name, t)];
+  setCustomPresets(updated);
+  saveCustomPresets(updated);
+  setSaving(false);
+  setSaveName('');
 }
 
-function AutoStartToggle() {
-    const [autoStart, setAutoStart] = useState(() => localStorage.getItem(AUTOSTART_KEY) === 'true');
-    return (
-        <label className={styles.autoStartToggle}>
-            <input
-                type="checkbox"
-                checked={autoStart}
-                onChange={e => {
-                    setAutoStart(e.target.checked);
-                    try { localStorage.setItem(AUTOSTART_KEY, String(e.target.checked)); } catch {}
-                }}
-            />
-            Auto-start next session
-        </label>
-    );
+function createPreset(name, t) {
+  return { id: `custom_${Date.now()}`, label: name, work: t.workTime, brk: t.breakTime, sessions: t.targetSessions };
+}
+
+function usePresetState() {
+  const [customPresets, setCustomPresets] = useState(loadCustomPresets);
+  const [saving, setSaving] = useState(false);
+  const [saveName, setSaveName] = useState('');
+
+  return { customPresets, setCustomPresets, saving, setSaving, saveName, setSaveName };
+}
+
+function usePresetActions(state, t) {
+  const sortedPresets = listPresets(state.customPresets);
+  const applyPresetAndTrack = (preset) => trackPresetUsage(preset, state, t);
+  const handleDelete = (id) => deletePreset(id, state.customPresets, state.setCustomPresets);
+  const handleSave = () => saveCurrentPreset(state.saveName, state.setSaving, state.setSaveName, state.setCustomPresets, state.customPresets, t);
+
+  return { sortedPresets, applyPresetAndTrack, handleDelete, handleSave };
+}
+
+function trackPresetUsage(preset, state, t) {
+  applyPreset(preset, t);
+  const usage = loadPresetUsage();
+  savePresetUsage({ ...usage, [preset.id]: Number(usage[preset.id] || 0) + 1 });
+}
+
+function deletePreset(id, customPresets, setCustomPresets) {
+  const updated = customPresets.filter((preset) => preset.id !== id);
+  setCustomPresets(updated);
+  saveCustomPresets(updated);
+}
+
+function PresetGrid({ presets, customPresets, t, onApply, onDelete }) {
+  return (
+    <div className={styles.presetPanelGrid}>
+      {presets.map((preset) => <PresetCard key={preset.id} preset={preset} t={t} onApply={onApply} onDelete={findDeleteHandler(preset.id, customPresets, onDelete)} />)}
+    </div>
+  );
+}
+
+function findDeleteHandler(presetId, customPresets, onDelete) {
+  if (!customPresets.some((preset) => preset.id === presetId)) return null;
+  return () => onDelete(presetId);
+}
+
+function wrapEmbedded(content, embedded) {
+  if (embedded) return content;
+  return <div className={styles.presetPanelCard}>{content}</div>;
 }
 
 export function PresetPanel({ t, embedded = false }) {
-    const [customPresets, setCustomPresets] = useState(() => loadCustomPresets());
-    const [usageMap, setUsageMap] = useState(() => loadPresetUsage());
-    const [saving, setSaving] = useState(false);
-    const [saveName, setSaveName] = useState('');
+  const state = usePresetState();
+  const actions = usePresetActions(state, t);
+  const content = <PresetPanelContent t={t} state={state} actions={actions} />;
 
-    const sortedPresets = [...BUILT_IN_PRESETS, ...customPresets].sort((a, b) => {
-        const diff = Number(usageMap[b.id] || 0) - Number(usageMap[a.id] || 0);
-        return diff !== 0 ? diff : String(a.label).localeCompare(String(b.label));
-    });
+  return wrapEmbedded(content, embedded);
+}
 
-    const applyPresetAndTrack = (preset) => {
-        applyPreset(preset, t);
-        const next = { ...usageMap, [preset.id]: Number(usageMap[preset.id] || 0) + 1 };
-        setUsageMap(next);
-        savePresetUsage(next);
-    };
+function PresetPanelContent({ t, state, actions }) {
+  return (
+    <>
+      <PresetGrid presets={actions.sortedPresets} customPresets={state.customPresets} t={t} onApply={actions.applyPresetAndTrack} onDelete={actions.handleDelete} />
+      <div className={styles.presetSaveArea}>
+        <PresetSaveArea saving={state.saving} saveName={state.saveName} setSaveName={state.setSaveName} setSaving={state.setSaving} disabled={t.isActive} onSave={actions.handleSave} />
+      </div>
+      <DailyGoalWidget />
+    </>
+  );
+}
 
-    const handleSave = () => {
-        const name = saveName.trim();
-        if (!name) return;
-        const newPreset = { id: `custom_${Date.now()}`, label: name, work: t.workTime, brk: t.breakTime, sessions: t.targetSessions };
-        const updated = [...customPresets, newPreset];
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-        setSaving(false);
-        setSaveName('');
-    };
+function applyMinutes(minutes, t) {
+  t.updateTime('work', minutes);
+  t.setTimeLeft(minutes * 60);
+}
 
-    const handleDelete = (id) => {
-        const updated = customPresets.filter(p => p.id !== id);
-        setCustomPresets(updated);
-        saveCustomPresets(updated);
-    };
+function adjustMinutes(delta, t) {
+  applyMinutes(Math.max(5, Number(t.workTime || 25) + delta), t);
+}
 
-    const content = (
-        <>
-            <div className={styles.presetPanelGrid}>
-                {sortedPresets.map(p => (
-                    <PresetCard
-                        key={p.id} preset={p} t={t}
-                        onApply={applyPresetAndTrack}
-                        onDelete={customPresets.some(cp => cp.id === p.id) ? () => handleDelete(p.id) : null}
-                    />
-                ))}
-            </div>
-            <div className={styles.presetSaveArea}>
-                {saving ? (
-                    <div className={styles.presetSaveForm}>
-                        <input
-                            className={styles.presetNameInput}
-                            placeholder="Preset name…"
-                            value={saveName}
-                            onChange={e => setSaveName(e.target.value)}
-                            onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setSaving(false); }}
-                            autoFocus maxLength={24}
-                        />
-                        <button className={styles.presetSaveConfirm} onClick={handleSave}>Save</button>
-                        <button className={styles.presetSaveCancel} onClick={() => setSaving(false)}>Cancel</button>
-                    </div>
-                ) : (
-                    <button className={styles.presetSaveBtn} onClick={() => { setSaving(true); setSaveName(''); }} disabled={t.isActive}>
-                        + Save current
-                    </button>
-                )}
-            </div>
-            <DailyGoalWidget />
-        </>
-    );
-
-    if (embedded) return content;
-    return <div className={styles.presetPanelCard}>{content}</div>;
+function QuickAdjustButtons({ disabled, t }) {
+  return (
+    <div className={styles.quickAdjustRow}>
+      <button type="button" className={styles.quickAdjustBtn} onClick={() => adjustMinutes(-5, t)} disabled={disabled}>-5m</button>
+      <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(25, t)} disabled={disabled}>25m</button>
+      <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(50, t)} disabled={disabled}>50m</button>
+      <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(90, t)} disabled={disabled}>90m</button>
+      <button type="button" className={styles.quickAdjustBtn} onClick={() => adjustMinutes(5, t)} disabled={disabled}>+5m</button>
+    </div>
+  );
 }
 
 export function TimerConfigPanel({ t, embedded = false }) {
-    const disabled = t.isActive || t.isPaused;
+  const disabled = t.isActive || t.isPaused;
+  const content = (
+    <div className={styles.configInsetPanel}>
+      <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} />
+      <QuickAdjustButtons disabled={disabled} t={t} />
+      <AutoStartToggle />
+    </div>
+  );
 
-    const applyMinutes = (minutes) => {
-        if (disabled) return;
-        t.updateTime('work', minutes);
-        t.setTimeLeft(minutes * 60);
-    };
-
-    const adjustMinutes = (delta) => {
-        if (disabled) return;
-        const next = Math.max(5, Number(t.workTime || 25) + delta);
-        t.updateTime('work', next);
-        t.setTimeLeft(next * 60);
-    };
-
-    const content = (
-        <div className={styles.configInsetPanel}>
-            <TimerSettings work={t.workTime} breakTime={t.breakTime} sessions={t.targetSessions} onUpdate={t.updateTime} />
-            <div className={styles.quickAdjustRow}>
-                <button type="button" className={styles.quickAdjustBtn} onClick={() => adjustMinutes(-5)} disabled={disabled}>-5m</button>
-                <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(25)} disabled={disabled}>25m</button>
-                <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(50)} disabled={disabled}>50m</button>
-                <button type="button" className={styles.quickAdjustBtn} onClick={() => applyMinutes(90)} disabled={disabled}>90m</button>
-                <button type="button" className={styles.quickAdjustBtn} onClick={() => adjustMinutes(5)} disabled={disabled}>+5m</button>
-            </div>
-            <AutoStartToggle />
-        </div>
-    );
-
-    if (embedded) return content;
-    return <div className={styles.presetPanelCard}>{content}</div>;
+  return wrapEmbedded(content, embedded);
 }
