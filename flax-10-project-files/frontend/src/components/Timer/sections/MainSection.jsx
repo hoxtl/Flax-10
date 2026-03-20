@@ -46,8 +46,6 @@ function TimerInfoSection({ t, onPrimaryStart, onOpenFocus }) {
 
   return (
     <div className={styles.timerCenterContent}>
-
-
       <div className={styles.sessionProgression}>
         <div className={styles.sessionLabel}>Session {t.completedSessions + 1} of {t.targetSessions}</div>
         <SessionDots completedSessions={t.completedSessions} targetSessions={t.targetSessions} isActive={t.isActive} isPaused={t.isPaused} />
