@@ -266,8 +266,14 @@ export default function CampusMap() {
 
   const handleUserJourneyCalculate = (startCoords, destCoords) => {
     setStartLocation({ lng: startCoords.longitude, lat: startCoords.latitude });
-    setCustomDestination({ lng: destCoords.longitude, lat: destCoords.latitude, name: manualDestination, address: manualDestination });
-    setSelectedCampus(null);
+    if (!selectedCampus) {
+      setCustomDestination({
+        lng: destCoords.longitude,
+        lat: destCoords.latitude,
+        name: manualDestination,
+        address: manualDestination
+      });
+    }
     const bounds = new mapboxgl.LngLatBounds()
       .extend([startCoords.longitude, startCoords.latitude])
       .extend([destCoords.longitude, destCoords.latitude]);
