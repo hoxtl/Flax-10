@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchApi } from '../../../api/client';
 
 async function fetchProfileSummary(userId) {
@@ -10,16 +10,41 @@ export function useProfileSummary(userId) {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const summaryRef = useRef(null);
 
-  const load = useCallback(() => {
-    setLoading(true);
+  useEffect(() => {
+    summaryRef.current = summary;
+  }, [summary]);
+
+  const load = useCallback(({ showLoading = true } = {}) => {
+    const hasSummary = summaryRef.current !== null;
+    const shouldShowLoading = showLoading || !hasSummary;
+
+    if (shouldShowLoading) {
+      setLoading(true);
+    }
+
     fetchProfileSummary(userId)
-      .then(setSummary)
-      .catch(e => setError(e))
-      .finally(() => setLoading(false));
+      .then((nextSummary) => {
+        setSummary(nextSummary);
+        setError(null);
+      })
+      .catch((nextError) => {
+        setError(nextError);
+      })
+      .finally(() => {
+        if (shouldShowLoading) {
+          setLoading(false);
+        }
+      });
   }, [userId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load({ showLoading: true }); }, [load]);
 
-  return { summary, loading, error, refetch: load };
+  return {
+    summary,
+    loading,
+    error,
+    refetch: () => load({ showLoading: false }),
+  };
 }

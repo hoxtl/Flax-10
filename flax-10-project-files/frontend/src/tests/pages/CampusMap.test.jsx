@@ -61,20 +61,20 @@ vi.mock('framer-motion', () => ({
     useTransform: vi.fn(() => 0),
 }));
 
-vi.mock('../../api/tflService', () => ({
+vi.mock('../../api/tflApi', () => ({
     tflService: {
         getTfLDelays: vi.fn().mockResolvedValue([]),
         journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
 import CampusMap from '../../pages/CampusMap/CampusMap';
-import { getHomeAddress } from '../../api/userService';
-import { tflService } from '../../api/tflService';
+import { getHomeAddress } from '../../api/userApi';
+import { tflService } from '../../api/tflApi';
 
 describe('CampusMap', () => {
     beforeEach(() => {
@@ -240,7 +240,7 @@ describe('CampusMap', () => {
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         fireEvent.click(screen.getAllByTitle('Clear')[1]);
-        await waitFor(() => expect(screen.getByText(/Select a campus from the map/)).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText(/Select a campus or event as destination/)).toBeInTheDocument());
     });
 
     it('shows TfL journey when journeyPlanner returns data', async () => {

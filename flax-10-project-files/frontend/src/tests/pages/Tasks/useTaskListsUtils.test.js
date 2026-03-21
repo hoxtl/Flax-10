@@ -1,7 +1,4 @@
-/**
- * Tests for useTaskListsUtils: mergeListColors, addListImpl, renameListImpl,
- * removeListImpl, restoreListImpl, permanentlyDeleteListImpl.
- */
+/* Tests for task-list mutation helpers and stored colours. */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
@@ -13,20 +10,20 @@ import {
   permanentlyDeleteListImpl,
 } from "../../../pages/Tasks/utils/useTaskListsUtils";
 
-vi.mock("../../../api/taskService", () => ({
+vi.mock("../../../api/taskApi", () => ({
   createTaskList: vi.fn(),
   updateTaskList: vi.fn(),
   deleteTaskList: vi.fn(),
 }));
 
-import { createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskService";
+import { createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskApi";
 
 describe("useTaskListsUtils", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(global, "window", { value: {}, writable: true });
-    if (typeof global.localStorage === "undefined") {
-      global.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
+    Object.defineProperty(globalThis, "window", { value: {}, writable: true });
+    if (typeof globalThis.localStorage === "undefined") {
+      globalThis.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
     }
   });
 
@@ -36,7 +33,7 @@ describe("useTaskListsUtils", () => {
       expect(mergeListColors({})).toEqual([]);
     });
     it("merges list color with stored when list has no color", () => {
-      global.localStorage.getItem = vi.fn((k) => (k === "listColor:1" ? "#abc" : null));
+      globalThis.localStorage.getItem = vi.fn((k) => (k === "listColor:1" ? "#abc" : null));
       const out = mergeListColors([{ id: 1, name: "L" }]);
       expect(out[0].color).toBe("#abc");
     });

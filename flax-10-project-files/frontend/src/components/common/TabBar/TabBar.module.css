@@ -1,0 +1,61 @@
+/** Styles for the reusable TabBar component. */
+.tabBar {
+  display: flex;
+  gap: 0.15rem;
+  border-bottom: 2px solid var(--border, #e5e7eb);
+  margin-bottom: 1.8rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabBar::-webkit-scrollbar { display: none; }
+
+.tabBtn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted, #888);
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  transition: color 0.18s, background 0.18s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tabBtn:hover { color: var(--text, #111); background: var(--bg, #f9fafb); }
+.tabBtn:focus, .tabBtn:focus-visible { outline: none; box-shadow: none; }
+.tabActive { color: var(--accent, #6c47ff) !important; font-weight: 600; }
+
+.tabUnderline {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: var(--accent, #6c47ff);
+  border-radius: 2px 2px 0 0;
+}
+
+.tabContent { min-height: 320px; }
+
+/* Compact variant for Society detail pages */
+.compact.tabBar {
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compact.tabBtn {
+  padding: 14px 24px;
+  font-size: 0.95rem;
+  border-radius: 0;
+}
+
+.compact .tabUnderline {
+  height: 3px;
+  bottom: -1px;
+  background: var(--primary, #6c47ff);
+}
+
+.compact .tabActive { color: var(--primary, #6c47ff) !important; }

@@ -3,3 +3,4 @@
  */
 
 export { MiniTimeline } from "./MiniTimeline";
+export { HomepageTimelineSection } from "./HomepageTimelineSection";

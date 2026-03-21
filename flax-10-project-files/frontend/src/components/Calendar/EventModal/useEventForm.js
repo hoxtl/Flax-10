@@ -1,98 +1,103 @@
+/**
+ * useEventForm - Form state management for event creation and editing.
+ * Handles validation, sleep time warnings, and overlap detection.
+ */
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
 import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from '../hooks/useCalendarEvents';
 import { getInitialForm, validateAndSubmit } from '../utils/formUtils';
-import { getUserSettings } from '../../../api/userService';
+import { getUserSettings } from '../../../api/userApi';
 import { isDuringSleepWindow } from '../../Settings/hooks/useSleepWarning';
+import { useToast } from '../../../context/ToastContext';
 
 async function fetchSleepSettings() {
-    try {
-        const data = await getUserSettings();
-        return { sleepTime: data?.sleep_time?.slice(0, 5) || '23:00', wakeTime: data?.wake_time?.slice(0, 5) || '07:00' };
-    } catch {
-        return { sleepTime: '23:00', wakeTime: '07:00' };
-    }
+  try {
+    const data = await getUserSettings();
+    return { sleepTime: data?.sleep_time?.slice(0, 5) || '23:00', wakeTime: data?.wake_time?.slice(0, 5) || '07:00' };
+  } catch {
+    return { sleepTime: '23:00', wakeTime: '07:00' };
+  }
 }
 
-export function useEventForm(event, onClose, options = {}) {
-    const calendarContext = useCalendar();
-    const confirmFn = useConfirm();
-    const actions = useEventActions();
-    const [form, setForm] = useState(() => getInitialForm(event, options));
-    const [error, setError] = useState('');
-    const [sleepWarning, setSleepWarning] = useState(false);
-    const [pendingSubmit, setPendingSubmit] = useState(null);
-    const [sleepSettings, setSleepSettings] = useState(null);
-    const [overlapWarning, setOverlapWarning] = useState(null);
+function useFormHandlers(state, event, onClose, options, actions, confirmFn, events, toast) {
+  const doSubmit = async (e, skipOverlap) => {
+    const saved = await validateAndSubmit(e, state.form, event, actions, onClose, state.setError, confirmFn, events, skipOverlap);
+    if (saved && typeof toast === 'function') {
+      toast(event?.id ? 'Event updated' : 'Event saved', { variant: 'success' });
+    }
+    return saved;
+  };
 
-    useEffect(() => setForm(getInitialForm(event, options)), [event, options.initialTag, options.initialDate]);
-    useEffect(() => { fetchSleepSettings().then(setSleepSettings); }, []);
+  const checkSleepAndSubmit = (e) => checkSleepWindow(state.sleepSettings, state.form, doSubmit, state.setPendingSubmit, state.setSleepWarning, e);
+  const handleSubmit = options.customSubmit ? createCustomSubmitHandler(state.form, options.customSubmit, onClose, state.setError) : checkSleepAndSubmit;
+  const handleConfirmSave = () => validateAndSubmit(null, state.form, event, actions, onClose, state.setError, state.setOverlapWarning, events, true);
+  const handleCancelSave = () => state.setOverlapWarning(null);
+  const handleConfirmSleep = () => { state.setSleepWarning(false); state.pendingSubmit?.(); state.setPendingSubmit(null); };
+  const handleCancelSleep = () => { state.setSleepWarning(false); state.setPendingSubmit(null); };
+  return { handleSubmit, handleConfirmSave, handleCancelSave, handleConfirmSleep, handleCancelSleep };
+}
 
-    const doSubmit = async (e, skipOverlap = false) =>
-        await validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, calendarContext?.events || [], skipOverlap);
+function useSleepSettingsLoader() {
+  const [settings, setSettings] = useState(null);
+  useEffect(() => {
+    fetchSleepSettings().then(setSettings);
+  }, []);
+  return settings;
+}
 
-    const handleSubmit = options.customSubmit
-        ? createCustomSubmitHandler(form, options.customSubmit, onClose, setError)
-        : (e) => {
-            e?.preventDefault();
-            if (sleepSettings && form.start_time) {
-                const date = new Date(form.start_time);
-                if (isDuringSleepWindow(sleepSettings.sleepTime, sleepSettings.wakeTime, date)) {
-                    setPendingSubmit(() => () => doSubmit(null, false));
-                    setSleepWarning(true);
-                    return;
-                }
-            }
-            doSubmit(e, false);
-        };
+function useFormState(event, options) {
+  const [form, setForm] = useState(() => getInitialForm(event, options));
+  const [error, setError] = useState(null);
+  const [sleepWarning, setSleepWarning] = useState(false);
+  const [overlapWarning, setOverlapWarning] = useState(null);
+  const [pendingSubmit, setPendingSubmit] = useState(null);
 
-    const handleConfirmSave = () =>
-        validateAndSubmit(
-            null,
-            form,
-            event,
-            actions,
-            onClose,
-            setError,
-            setOverlapWarning,
-            calendarContext?.events || [],
-            true
-        );
-    const handleCancelSave = () => setOverlapWarning(null);
+  useEffect(() => {
+    setForm(getInitialForm(event, options));
+    setError(null);
+  }, [event, options.initialDate, options.initialTag]);
 
-    const handleConfirmSleep = () => {
-        setSleepWarning(false);
-        pendingSubmit?.();
-        setPendingSubmit(null);
-    };
-    const handleCancelSleep = () => {
-        setSleepWarning(false);
-        setPendingSubmit(null);
-    };
+  return { form, setForm, error, setError, sleepWarning, setSleepWarning, overlapWarning, setOverlapWarning, pendingSubmit, setPendingSubmit };
+}
 
-    return {
-        form,
-        setForm,
-        error,
-        sleepWarning,
-        sleepSettings,
-        overlapWarning,
-        isEditing: !!event?.id,
-        handleSubmit,
-        handleConfirmSleep,
-        handleCancelSleep,
-        handleConfirmSave,
-        handleCancelSave,
-        event
-    };
+function checkSleepWindow(settings, form, doSubmit, setPending, setWarning, e) {
+  if (e) e.preventDefault();
+  const isSleeping = isDuringSleepWindow(settings?.sleepTime, settings?.wakeTime, new Date(form.start_time));
+  if (isSleeping) {
+    setPending(() => () => doSubmit(null, false));
+    setWarning(true);
+    return false;
+  }
+  return doSubmit(null, false);
 }
 
 function createCustomSubmitHandler(form, customSubmit, onClose, setError) {
-    return (e) => {
-        e?.preventDefault();
-        if (!form.title?.trim()) { setError('Title is required'); return; }
-        customSubmit(form);
-        onClose();
-    };
+  return async (e) => {
+    if (e) e.preventDefault();
+    try {
+      await customSubmit(form);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+}
+
+/** Hook for managing event form state and submission. */
+export function useEventForm(event, onClose, options = {}) {
+  const calendarContext = useCalendar();
+  const confirmFn = useConfirm();
+  const actions = useEventActions();
+  const toast = useToast();
+  const sleepSettings = useSleepSettingsLoader();
+  const state = { ...useFormState(event, options), sleepSettings };
+  const handlers = useFormHandlers(state, event, onClose, options, actions, confirmFn, calendarContext?.events || [], toast);
+  
+  return { 
+    form: state.form, setForm: state.setForm, error: state.error, 
+    sleepWarning: state.sleepWarning, sleepSettings, 
+    overlapWarning: state.overlapWarning, isEditing: !!event?.id, 
+    ...handlers, event 
+  };
 }

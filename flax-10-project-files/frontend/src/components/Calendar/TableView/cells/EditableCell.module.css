@@ -1,0 +1,28 @@
+.cellInput {
+    width: 100%;
+    padding: 8px 12px;
+    border: 0.5px solid rgba(51, 51, 51, 0.2);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: inherit;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.cellInput:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px var(--hover, rgba(74, 52, 33, 0.1));
+}
+
+textarea.cellInput {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.cellText {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

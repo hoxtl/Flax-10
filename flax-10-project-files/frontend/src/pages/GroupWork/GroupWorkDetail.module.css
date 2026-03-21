@@ -1,0 +1,11 @@
+.container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.empty {
+    text-align: center;
+    margin-top: 48px;
+    color: var(--text-secondary);
+}

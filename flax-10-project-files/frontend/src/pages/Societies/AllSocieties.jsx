@@ -1,146 +1,150 @@
-import { useState, useMemo } from "react";
-import SocietyCard from "../../components/Society/SocietyCard";
-import styles from "./SocietiesPage.module.css";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
-import BasePill from "../../components/Tags/BasePill";
-import SearchBar from "../../components/common/SearchBar";
-import AnimatedDropdown from "../../components/ui/AnimatedDropdown";
-import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
-import { SOCIETY_CATEGORIES, RATIFICATION_FILTERS, matchesCategory, countByCategory } from "./societyFilters";
-import { usePagination } from "../../hooks/usePagination";
+/*
+ * AllSocieties renders the browse view for exploring the full societies directory.
+ */
 
-const PAGE_SIZE = 20;
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Filter } from "lucide-react";
+import styles from "./SocietiesPage.module.css";
+import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
+import SearchBar from "../../components/common/SearchBar";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown";
+import { TagsSelector } from "../../components/common/TagsSelector/TagsSelector";
+import { BackToTop } from "../../components/Pagination/Pagination";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import { SocietyBrowseResults } from "./SocietyBrowseResults";
+import { RATIFICATION_FILTERS, SOCIETY_CATEGORIES } from "./societyFilters";
+import { useSocietyBrowseFilters } from "./useSocietyBrowseFilters";
+import { countForFilter, filterAndSort } from "./societyBrowseUtils";
+
+const SORT_OPTIONS = [
+    { value: "name", label: "A → Z" },
+    { value: "name-desc", label: "Z → A" },
+    { value: "newest", label: "Newest" },
+    { value: "members", label: "Most Members" },
+];
 
 export default function AllSocieties({ onBack, onSelect, societies = [], onReport, onUnreport }) {
-    const { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy } = useFilters();
-    const filtered = useMemo(() => filterAndSort(societies, search, filters, sortBy), [societies, search, filters, sortBy]);
-    const { currentItems, totalPages, currentPage, setPage } = usePagination(filtered, PAGE_SIZE);
-
-    const resetAndSet = (setter) => (...args) => { setter(...args); setPage(1); };
-
+    const filterState = useSocietyBrowseFilters();
+    const filtered = useMemo(() => filterAndSort(societies, filterState.search, filterState.filters, filterState.sortBy), [societies, filterState.search, filterState.filters, filterState.sortBy]);
     return (
         <div className={styles.container}>
-            <Header onBack={onBack} search={search} setSearch={resetAndSet(setSearch)} sortBy={sortBy} setSortBy={resetAndSet(setSortBy)} />
-            <FilterPills filters={filters} toggleFilter={(...a) => { toggleFilter(...a); setPage(1); }} clearFilters={() => { clearFilters(); setPage(1); }} societies={societies} />
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-            <SocietyGrid items={currentItems} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
+            <BrowseHeader onBack={onBack} filterState={filterState} societies={societies} />
+            <SocietyBrowseResults items={filtered} search={filterState.search} setSearch={filterState.setSearch} onSelect={onSelect} onReport={onReport} onUnreport={onUnreport} />
             <BackToTop />
         </div>
     );
 }
 
-function useFilters() {
-    const [search, setSearch] = useState("");
-    const [filters, setFilters] = useState({ ratified: "all", category: "all" });
-    const [sortBy, setSortBy] = useState("name");
-
-    const toggleFilter = (type, value) => setFilters(prev => toggleFilterValue(prev, type, value));
-    const clearFilters = () => setFilters({ ratified: "all", category: "all" });
-
-    return { search, setSearch, filters, toggleFilter, clearFilters, sortBy, setSortBy };
-}
-
-function toggleFilterValue(prev, type, value) {
-    const newValue = prev[type] === value ? "all" : value;
-    return { ...prev, [type]: newValue };
-}
-
-function Header({ onBack, search, setSearch, sortBy, setSortBy }) {
+function BrowseHeader({ onBack, filterState, societies }) {
     return (
         <>
-            <header className={styles.header}>
-                <button onClick={onBack} className={styles.backBtn}>← Back</button>
-            </header>
+            <header className={styles.header}><BackButton onClick={onBack} label="Back" /></header>
             <div className={styles.browseToolbar}>
-                <div className={styles.browseSearch}>
-                    <SearchBar value={search} onChange={setSearch} placeholder="Search societies..." />
+                <div className={styles.browseSearch}><SearchBar value={filterState.search} onChange={filterState.setSearch} placeholder="Search societies..." /></div>
+                <div className={styles.browseControls}>
+                    <SocietyFilterButton filterState={filterState} societies={societies} />
+                    <ToolbarSortControl className={styles.browseSortControl}><SortDropdown value={filterState.sortBy} onChange={filterState.setSortBy} /></ToolbarSortControl>
                 </div>
-                <ToolbarSortControl className={styles.browseSortControl}>
-                    <SortDropdown value={sortBy} onChange={setSortBy} />
-                </ToolbarSortControl>
             </div>
         </>
     );
 }
 
-const SORT_OPTIONS = [
-    { value: "name", label: "A-Z" },
-    { value: "name-desc", label: "Z-A" },
-    { value: "newest", label: "Newest" },
-    { value: "members", label: "Most Members" },
-];
-
 function SortDropdown({ value, onChange }) {
-    return (
-        <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />
-    );
+    return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />;
 }
 
-function FilterPills({ filters, toggleFilter, clearFilters, societies }) {
-    const hasActiveFilters = filters.ratified !== "all" || filters.category !== "all";
+function SocietyFilterButton({ filterState, societies }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const wrapRef = useRef(null);
+    useCloseOnOutsideClick(wrapRef, isOpen, () => setIsOpen(false));
+    const hoverHandlers = useHoverClose(isOpen, setIsOpen);
+    const activeCount = getActiveFilterCount(filterState.filters);
     return (
-        <div className={styles.pillContainer}>
-            <RatificationPills current={filters.ratified} onChange={v => toggleFilter("ratified", v)} societies={societies} />
-            <span className={styles.pillDivider} />
-            <CategoryPills current={filters.category} onChange={v => toggleFilter("category", v)} societies={societies} />
-            {hasActiveFilters && <button className={styles.clearPill} onClick={clearFilters}>Clear x</button>}
+        <div className={styles.categoryFilterWrap} ref={wrapRef} {...hoverHandlers}>
+            <FilterToggleButton isOpen={isOpen} activeCount={activeCount} onClick={() => setIsOpen((value) => !value)} />
+            <AnimatePresence>{isOpen && <FilterPopup filterState={filterState} societies={societies} />}</AnimatePresence>
         </div>
     );
 }
 
-function RatificationPills({ current, onChange, societies }) {
-    return RATIFICATION_FILTERS.map(opt => (
-        <BasePill key={opt.id} label={`${countForFilter(societies, opt.id)} ${opt.label}`}
-            isActive={current === opt.id} onClick={() => onChange(opt.id)} />
-    ));
+function useCloseOnOutsideClick(wrapRef, isOpen, onClose) {
+    useEffect(() => {
+        if (!isOpen) return;
+        const handler = (event) => wrapRef.current && !wrapRef.current.contains(event.target) && onClose();
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [isOpen, onClose, wrapRef]);
 }
 
-function CategoryPills({ current, onChange, societies }) {
-    return SOCIETY_CATEGORIES.map(cat => (
-        <BasePill key={cat.id} label={cat.label} count={countByCategory(societies, cat.id)}
-            isActive={current === cat.id} onClick={() => onChange(cat.id)} />
-    ));
+function useHoverClose(isOpen, setIsOpen) {
+    const hoverTimer = useRef(null);
+    useEffect(() => () => clearTimeout(hoverTimer.current), []);
+    return {
+        onMouseEnter: () => {
+            clearTimeout(hoverTimer.current);
+            if (!isOpen) setIsOpen(true);
+        },
+        onMouseLeave: () => {
+            hoverTimer.current = setTimeout(() => setIsOpen(false), 200);
+        },
+    };
 }
 
-function SocietyGrid({ items, onSelect, onReport, onUnreport }) {
-    if (items.length === 0) return <EmptyState icon="🎭" title="No societies found" description="Try adjusting your search or filters." />;
+function getActiveFilterCount(filters) {
+    let count = 0;
+    if (filters.ratified !== "all") count += 1;
+    if (filters.category.length > 0) count += 1;
+    return count;
+}
+
+function FilterToggleButton({ isOpen, activeCount, onClick }) {
+    const activeClass = isOpen || activeCount > 0 ? styles.categoryFilterBtnActive : "";
     return (
-        <div className={styles.grid}>
-            {items.map(s => <SocietyCard key={s.id} society={s} onClick={() => onSelect?.(s)} onReport={onReport} onUnreport={onUnreport} />)}
+        <button type="button" className={`${styles.categoryFilterBtn} ${activeClass}`} onClick={onClick} aria-label="Filter societies">
+            <Filter size={14} />
+            <span>Filter</span>
+            {activeCount > 0 && <span className={styles.categoryFilterBadge}>{activeCount}</span>}
+        </button>
+    );
+}
+
+function FilterPopup({ filterState, societies }) {
+    return (
+        <motion.div className={styles.categoryFilterPopup} initial={{ opacity: 0, y: -6, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.97 }} transition={{ duration: 0.15, ease: "easeOut" }}>
+            <FilterSectionTitle title="Status" />
+            <RatificationOptions filterState={filterState} societies={societies} />
+            <FilterSectionTitle title="Category" />
+            <CategoryOptions filterState={filterState} />
+        </motion.div>
+    );
+}
+
+function FilterSectionTitle({ title }) {
+    return <span className={styles.categoryFilterTitle}>{title}</span>;
+}
+
+function RatificationOptions({ filterState, societies }) {
+    return (
+        <div className={styles.ratificationOptions}>
+            {RATIFICATION_FILTERS.map((filter) => <RatificationPill key={filter.id} filter={filter} currentValue={filterState.filters.ratified} count={countForFilter(societies, filter.id)} onSelect={() => filterState.toggleFilter("ratified", filter.id)} />)}
         </div>
     );
 }
 
-function countForFilter(societies, filterId) {
-    if (filterId === "all") return societies.length;
-    if (filterId === "ratified") return societies.filter(s => s.is_ratified).length;
-    return societies.filter(s => !s.is_ratified).length;
+function RatificationPill({ filter, currentValue, count, onSelect }) {
+    const activeClass = currentValue === filter.id ? styles.ratificationPillActive : "";
+    return <button type="button" className={`${styles.ratificationPill} ${activeClass}`} onClick={onSelect}>{filter.label} ({count})</button>;
 }
 
-function filterAndSort(list, search, filters, sortBy) {
-    const filtered = list.filter(s => matchesAllFilters(s, search, filters));
-    return sortSocieties(filtered, sortBy);
-}
-
-function matchesAllFilters(society, search, filters) {
-    const matchesSearch = society.name.toLowerCase().includes(search.toLowerCase());
-    const matchesRatified = matchesRatification(society, filters.ratified);
-    const categoryMatch = matchesCategory(society, filters.category);
-    return matchesSearch && matchesRatified && categoryMatch;
-}
-
-function matchesRatification(society, filter) {
-    if (filter === "all") return true;
-    return filter === "ratified" ? society.is_ratified : !society.is_ratified;
-}
-
-function sortSocieties(list, sortBy) {
-    const sorted = [...list];
-    if (sortBy === "name") return sorted.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortBy === "name-desc") return sorted.sort((a, b) => b.name.localeCompare(a.name));
-    if (sortBy === "newest") return sorted.sort((a, b) => b.id - a.id);
-    if (sortBy === "members") return sorted.sort((a, b) => (b.member_count || 0) - (a.member_count || 0));
-    return sorted;
+function CategoryOptions({ filterState }) {
+    return (
+        <TagsSelector
+            tags={SOCIETY_CATEGORIES}
+            selectedTags={filterState.filters.category}
+            onSelectionChange={filterState.setCategory}
+            emptyHint="All categories"
+        />
+    );
 }

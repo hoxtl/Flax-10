@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { isSameMonth, overlapsDay } from '../utils/dateUtils';
 import { DayCell } from './DayCell';
 
-export function WeekRow({ days, events, cur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
+export const WeekRow = memo(function WeekRow({ days, events, cur, onDateSelect, readOnly, onEventClick, onMoreClick, customTags }) {
     return (
         <div className="week-row">
             {days.map(d => (
@@ -10,7 +11,7 @@ export function WeekRow({ days, events, cur, onDateSelect, readOnly, onEventClic
             ))}
         </div>
     );
-}
+});
 
 function getEventsForDay(events, date) {
     return events

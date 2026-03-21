@@ -1,6 +1,10 @@
+/*
+ * Timer feature file.
+ */
+
 .container {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     margin: 0 auto 0.5rem;
     position: relative;
 }

@@ -24,19 +24,19 @@ describe('SocietyCard', () => {
 
     it('does not render ratified badge when not ratified', () => {
         render(<SocietyCard society={society} onClick={vi.fn()} />);
-        expect(screen.queryByTitle('Official Society')).toBeNull();
+    expect(screen.queryByTitle('Official Society')).toBeNull();
     });
 
     it('renders ratified badge when society is ratified', () => {
         render(<SocietyCard society={{ ...society, is_ratified: true }} onClick={vi.fn()} />);
-        expect(screen.getByTitle('Official Society')).toBeTruthy();
+    expect(screen.getByTitle('Official Society')).toBeTruthy();
     });
 
     it('calls onClick when card is clicked', () => {
         const onClick = vi.fn();
         const { container } = render(<SocietyCard society={society} onClick={onClick} />);
         fireEvent.click(container.firstChild);
-        expect(onClick).toHaveBeenCalledWith(society);
+        expect(onClick).toHaveBeenCalledWith(society.id);
     });
 
     it('does not throw when onClick is undefined', () => {

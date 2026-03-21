@@ -1,58 +1,76 @@
-/* Homepage module — composed from logical partials */
 @import './styles/Variables.module.css';
 @import './styles/Bento.module.css';
-@import './styles/Navigator.module.css';
 @import './styles/HomepageSlots.module.css';
-@import './styles/Analytics.module.css';
-@import './styles/DailyNarrative.module.css';
-@import './styles/Timer.module.css';
 @import './styles/Timeline.module.css';
 @import './styles/Overlays.module.css';
 
-.focusToolsSection {
+.timelineSection {
+  composes: timelineSection from './styles/Timeline.module.css';
+}
+
+.routeSkeleton {
   width: min(1200px, calc(100% - 32px));
   margin: 20px auto 0;
-}
-
-.focusToolsInner {
-  padding: 18px 20px;
-  border: 1px solid rgba(123, 103, 81, 0.1);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255, 252, 248, 0.92) 0%, rgba(255, 255, 255, 0.88) 100%);
-  box-shadow: 0 10px 24px rgba(74, 52, 33, 0.035);
-}
-
-.focusToolsHeader {
   display: grid;
-  gap: 6px;
-  margin-bottom: 16px;
+  gap: 20px;
 }
 
-.focusToolsEyebrow {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.63rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8f7b68;
+.routeSkeletonTop {
+  display: grid;
+  gap: 18px;
 }
 
-.focusToolsTitle {
-  margin: 0;
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #3d2d20;
+.routeSkeletonBanner {
+  height: 84px;
+  border-radius: 24px;
 }
+
+.routeSkeletonGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 18px;
+}
+
+.routeSkeletonCardLarge,
+.routeSkeletonCardMedium {
+  height: 220px;
+}
+
+.routeSkeletonTimeline {
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(123, 103, 81, 0.1);
+  background: var(--widget-surface-secondary);
+}
+
+.routeSkeletonTimelineHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.routeSkeletonTimelineTitle { width: 260px; height: 22px; border-radius: 10px; }
+.routeSkeletonTimelineAction { width: 112px; height: 34px; border-radius: 999px; }
+
+.routeSkeletonTimelineRow {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.routeSkeletonTime { height: 14px; border-radius: 8px; }
+.routeSkeletonEvent { height: 72px; }
 
 @media (max-width: 767px) {
-  .focusToolsSection {
+  .routeSkeleton {
     width: calc(100% - 24px);
   }
 
-  .focusToolsInner {
-    padding: 16px;
-    border-radius: 18px;
+  .routeSkeletonGrid,
+  .routeSkeletonTimelineRow {
+    grid-template-columns: 1fr;
   }
 }

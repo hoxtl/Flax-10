@@ -15,19 +15,19 @@ describe('UserAvatar', () => {
     });
 
     it('renders avatar only when avatarOnly is true', () => {
-        const user = { username: 'jane', first_name: 'Jane', last_name: 'Doe' };
+        const user = { username: 'plainjane', first_name: 'Mary', last_name: 'Lane' };
         render(<UserAvatar user={user} avatarOnly={true} />);
-        expect(screen.getByText('J')).toBeInTheDocument();
-        expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
-        expect(screen.queryByText('@jane')).not.toBeInTheDocument();
+        expect(screen.getByText('M')).toBeInTheDocument();
+        expect(screen.queryByText('Mary Lane')).not.toBeInTheDocument();
+        expect(screen.queryByText('@plainjane')).not.toBeInTheDocument();
     });
 
     it('renders full block with name and handle when avatarOnly is false', () => {
-        const user = { username: 'jane', first_name: 'Jane', last_name: 'Doe' };
+        const user = { username: 'plainjane', first_name: 'Mary', last_name: 'Lane' };
         render(<UserAvatar user={user} />);
-        expect(screen.getByText('Jane Doe')).toBeInTheDocument();
-        expect(screen.getByText('@jane')).toBeInTheDocument();
-        expect(screen.getByText('J')).toBeInTheDocument();
+        expect(screen.getByText('Mary Lane')).toBeInTheDocument();
+        expect(screen.getByText('@plainjane')).toBeInTheDocument();
+        expect(screen.getByText('M')).toBeInTheDocument();
     });
 
     it('uses profile_photo_url when present', () => {
@@ -50,6 +50,15 @@ describe('UserAvatar', () => {
         const { container } = render(<UserAvatar user={user} avatarOnly={true} />);
         const img = container.querySelector('img');
         expect(img).toHaveAttribute('src', 'https://example.com/av.gif');
+    });
+
+    it('uses seeded tutor photo when no uploaded photo exists', () => {
+        const user = { username: 'srahwan' };
+        const { container } = render(<UserAvatar user={user} avatarOnly={true} />);
+        const img = container.querySelector('img');
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('src');
+        expect(img.getAttribute('src')).toContain('images.unsplash.com');
     });
 
     it('shows initial from first_name', () => {

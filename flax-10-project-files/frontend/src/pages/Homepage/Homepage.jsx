@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { MapPin, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -14,7 +14,7 @@ import {
   useCalendarEvents,
   useEventActions,
 } from "../../components/Calendar/hooks/useCalendarEvents";
-import { updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskService";
+import { updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskApi";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";
@@ -22,6 +22,7 @@ import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
+import { useToast } from "../../context/ToastContext";
 import { getCompletionMessage, isRoutineTask } from "../../lib/completionMessages";
 import { playCompletionChime } from "../../lib/sounds";
 
@@ -29,6 +30,7 @@ import CreateTaskModal from "../Tasks/components/CreateTaskModal";
 import CreateListModal from "../Tasks/components/CreateListModal";
 import { EditTaskModal } from "../Tasks/components/TaskCard";
 import IntelligenceRow from "./components/IntelligenceRow";
+import baseStyles from "./styles/WidgetBase.module.css";
 import styles from "./Homepage.module.css";
 
 import {
@@ -41,7 +43,7 @@ import {
   isRoutineOrEventTask,
 } from "./utils/index";
 import { useHomeData } from "./hooks/useHomeData";
-import { MiniTimeline } from "./components";
+import { HomepageTimelineSection } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
@@ -49,8 +51,37 @@ import { DeadlinesWidget } from "./components/DeadlinesWidget";
 import { ModulePill, TypePill, getModulePillColors } from "./components/ModulePill";
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
-import PageSkeleton from "../../components/common/LoadingState/PageSkeleton";
 import { BackToTop } from "../../components/Pagination/Pagination";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import { useAutoResolveScheduleConflicts } from "./components/useAutoResolveScheduleConflicts";
+import AppToast from "../../components/common/AppToast/AppToast";
+
+function HomepageSkeleton() {
+  return (
+    <div className={styles.routeSkeleton} aria-busy="true">
+      <div className={styles.routeSkeletonTop}>
+        <SkeletonBlock className={styles.routeSkeletonBanner} />
+        <div className={styles.routeSkeletonGrid}>
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardLarge} />
+          <SkeletonBlock className={styles.routeSkeletonCardMedium} />
+        </div>
+      </div>
+      <div className={styles.routeSkeletonTimeline}>
+        <div className={styles.routeSkeletonTimelineHeader}>
+          <SkeletonBlock className={styles.routeSkeletonTimelineTitle} />
+          <SkeletonBlock className={styles.routeSkeletonTimelineAction} />
+        </div>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className={styles.routeSkeletonTimelineRow}>
+            <SkeletonBlock className={styles.routeSkeletonTime} />
+            <SkeletonBlock className={styles.routeSkeletonEvent} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 
 /* HOME PAGE */
@@ -79,8 +110,27 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     }
   }, []);
 
+  const toastApi = useToast();
+  const toastTimeoutRef = useRef(null);
+  const [fallbackToast, setFallbackToast] = useState(null);
+  const showToast = useMemo(() => {
+    if (typeof toastApi === "function") return toastApi;
+    if (typeof toastApi?.showToast === "function") return toastApi.showToast;
+    return (message, opts = {}) => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      setFallbackToast({
+        message,
+        actionLabel: opts.actionLabel || null,
+        onAction: typeof opts.onAction === "function" ? opts.onAction : null,
+      });
+      const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
+      toastTimeoutRef.current = setTimeout(() => {
+        setFallbackToast(null);
+        toastTimeoutRef.current = null;
+      }, duration);
+    };
+  }, [toastApi]);
   const { dayEvents, dayTasks, allTasks, removePendingTask, refetchTasks, loading: homeDataLoading } = useHomeData(selectedDate);
-  const [toast, setToast] = useState(null);
   const [modulesList, setModulesList] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [upcomingDeadlines, setUpcomingDeadlines] = useState([]);
@@ -92,12 +142,18 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   const prevTimeLeftRef = useRef(null);
   const [taskLists, setTaskLists] = useState([]);
   const [now, setNow] = useState(() => new Date());
-  const [completedEventIds, setCompletedEventIds] = useState(() => new Set());
   const [showAllTaskWidgetTasks, setShowAllTaskWidgetTasks] = useState(false);
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
-  const toastTimeoutRef = useRef(null);
+  const [completedEventIds, setCompletedEventIds] = useState(new Set());
+
+  useEffect(() => () => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+  }, []);
 
   /* Today-first: always show today on Homepage — removes choice paralysis */
   useEffect(() => {
@@ -114,9 +170,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return () => clearTimeout(id);
   }, [selectedDate, allCalEvents, loadEvents]);
 
-  /* Live Compass: recalc every 60s so the NOW line moves without refresh */
+  /* Live Compass: recalc every 10s so the NOW line moves without refresh */
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60000);
+    const id = setInterval(() => setNow(new Date()), 10000);
     return () => clearInterval(id);
   }, []);
 
@@ -128,6 +184,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, []);
   useEffect(() => {
     getUpcomingDeadlines().then((list) => setUpcomingDeadlines(Array.isArray(list) ? list : [])).catch(() => setUpcomingDeadlines([]));
+  }, []);
+  useEffect(() => {
+    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
   }, []);
 
 
@@ -146,14 +205,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     }
   }, [showCreateTaskModal]);
 
-  /* Fetch task lists on mount so Action Hub can show list names (e.g. University, SEG) and link to /tasks?list= */
-  useEffect(() => {
-    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
-  }, []);
-
-  useEffect(() => () => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-  }, []);
 
 
   const enrolledModules = useMemo(
@@ -203,28 +254,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, [getTag]);
 
 
-  const closeToast = useCallback(() => {
-    if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
-      toastTimeoutRef.current = null;
-    }
-    setToast(null);
-  }, []);
-
-  // Show toast (supports optional action)
-  const showToast = useCallback((msg, opts = {}) => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    setToast({
-      message: msg,
-      actionLabel: opts.actionLabel || null,
-      onAction: typeof opts.onAction === "function" ? opts.onAction : null,
-    });
-    const duration = Number.isFinite(opts.durationMs) ? opts.durationMs : 3200;
-    toastTimeoutRef.current = setTimeout(() => {
-      setToast(null);
-      toastTimeoutRef.current = null;
-    }, duration);
-  }, []);
 
   const handleTaskWidgetComplete = useCallback(async (t) => {
     const newCompleted = !t.completed;
@@ -250,7 +279,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         String(task?.id) === String(numericId) && !task.completed
       );
       if (taskStillIncomplete) {
-        setToast({ message: "Couldn't update task.", actionLabel: null, onAction: null });
+        showToast("Couldn't update task.");
       }
       return;
     }
@@ -400,7 +429,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   );
 
   const handleQuickStartGap = useCallback(
-    async (gapStartDate, _gapMins, task) => {
+    async (gapStartDate, _gapMins, task, nextTask) => {
       if (!task) return;
       try {
         const durationMins = (task.estimated_blocks || 1) * 25;
@@ -412,7 +441,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           description: task.description || "",
         });
         await loadEvents();
-        showToast(`"${task.title}" added to your schedule at ${formatTime(gapStartDate.toISOString())}`);
+        showToast(`"${task.title}" added to your schedule.`);
       } catch {
         showToast("Couldn't add to schedule. Try again.");
       }
@@ -421,23 +450,23 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   );
 
   const handleConflictAutoMove = useCallback(
-    async (event, newStart, newEnd) => {
+    async (event, newStart, newEnd, options = {}) => {
       try {
         await editEvent(extractBaseEventId(event.id), {
           start_time: newStart.toISOString(),
           end_time: newEnd.toISOString(),
         });
         await loadEvents();
-        showToast("Event moved to next available window.");
+        if (!options.silent) showToast("Event moved to next available window.");
       } catch {
-        showToast("Couldn't move event. Try again.");
+        if (!options.silent) showToast("Couldn't move event. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
   );
 
   const handleConflictPushTomorrow = useCallback(
-    async (event) => {
+    async (event, options = {}) => {
       if (!event?.start_time) return;
       try {
         const baseId = extractBaseEventId(event.id);
@@ -453,6 +482,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           end_time: movedEnd.toISOString(),
         });
         await loadEvents();
+        if (options.silent) return;
         showToast(`"${event.title}" moved to tomorrow.`, {
           actionLabel: "Undo",
           durationMs: 7000,
@@ -470,11 +500,19 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           },
         });
       } catch {
-        showToast("Couldn't move to tomorrow. Try again.");
+        if (!options.silent) showToast("Couldn't move to tomorrow. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
   );
+
+  useAutoResolveScheduleConflicts({
+    allEvents: allCalEvents,
+    selectedDate,
+    onConflictAutoMove: handleConflictAutoMove,
+    onPushTomorrow: handleConflictPushTomorrow,
+    enabled: true,
+  });
 
   const handleTimelineDelete = useCallback(
     async (eventLike) => {
@@ -510,17 +548,17 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
   const tasksDueToday = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
-    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     const filtered = (allTasks || []).filter((t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= dayStart && d <= dayEnd;
+      return d && d >= todayStart && d <= todayEnd;
     });
-    const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < now;
+
+    const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < todayStart;
     return [...filtered].sort((a, b) => {
       const aOver = isOverdue(a);
       const bOver = isOverdue(b);
@@ -528,7 +566,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
       if (!aOver && bOver) return 1;
       return 0;
     });
-  }, [selectedDate, allTasks]);
+  }, [allTasks, now]);
 
   /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps, conflictAt. */
   const navigatorContext = useMemo(
@@ -561,7 +599,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
 
   const overdueTasksForNow = useMemo(() => {
-    const now = new Date();
     return (tasksDueToday || [])
       .filter(
         (t) =>
@@ -571,59 +608,50 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           new Date(t.due_date) < now
       )
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
-  }, [tasksDueToday, getTag]);
+  }, [tasksDueToday, getTag, now]);
 
-  /** task-only. Include due-today tasks and incomplete overdue tasks. */
+  /** task-only. Include ONLY due-today tasks. Overdue tasks are shown on the 'Overdue' page. */
   const taskWidgetList = useMemo(() => {
-    if (!isToday(selectedDate)) return [];
-    const now = new Date();
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
+    // We always define "Today" relative to the actual current time (now)
+    // so this widget remains stable as "Today's Tasks" even if selectedDate changes.
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     const isDueToday = (t) => {
       const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d >= dayStart && d <= dayEnd;
-    };
-    const isOverdueTask = (t) => {
-      const d = t.due_date ? new Date(t.due_date) : null;
-      return d && d < now && !t.completed;
+      return d && d >= todayStart && d <= todayEnd;
     };
 
     const tasks = (allTasks || [])
-      .filter(
-        (t) =>
-          (isDueToday(t) || isOverdueTask(t))
-      )
+      .filter((t) => isDueToday(t)) // Strictly Today
       .map((t) => {
         const due = t.due_date ? new Date(t.due_date) : null;
-        const isOverdue = due && due < now && !t.completed;
         let taskWidgetStatus = "upcoming";
         if (t.completed) taskWidgetStatus = "completed";
-        else if (isOverdue) taskWidgetStatus = "overdue";
+
         return {
           type: "task",
           id: `task-${t.id}`,
-          sortTime: due || dayEnd,
-          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : dayEnd,
-          isOverdue,
+          sortTime: due || todayEnd,
+          endTime: due ? new Date(due.getTime() + (t.estimated_blocks || 1) * 25 * 60000) : todayEnd,
           taskWidgetStatus,
           ...t,
         };
       });
 
-    const futureTasks = tasks.filter((t) => !t.completed && t.sortTime >= now && t.sortTime <= dayEnd);
-    const nowTask = futureTasks.sort(
-      (a, b) => new Date(a.sortTime).getTime() - new Date(b.sortTime).getTime()
-    )[0];
-    if (nowTask) nowTask.taskWidgetStatus = "now";
+    // Mark the very next upcoming task as "now"
+    const incomplete = tasks.filter(t => !t.completed).sort((a, b) => a.sortTime - b.sortTime);
+    const nextTask = incomplete.find(t => t.sortTime >= now);
+    if (nextTask) nextTask.taskWidgetStatus = "now";
 
     const order = (a, b) => {
-      const statusOrder = { overdue: 0, now: 1, upcoming: 2, completed: 3 };
-      return (statusOrder[a.taskWidgetStatus] ?? 2) - (statusOrder[b.taskWidgetStatus] ?? 2);
+      const statusOrder = { now: 0, upcoming: 1, completed: 2 };
+      return (statusOrder[a.taskWidgetStatus] ?? 1) - (statusOrder[b.taskWidgetStatus] ?? 1);
     };
     return [...tasks].sort(order);
-  }, [selectedDate, allTasks, getTag]);
+  }, [allTasks, now]);
 
   /** Task-only: no events. */
   const taskWidgetItemsOnly = useMemo(
@@ -631,17 +659,17 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     [taskWidgetList]
   );
   const taskWidgetDueTodayCount = useMemo(() => {
-    if (!isToday(selectedDate)) return 0;
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
     return (taskWidgetItemsOnly || []).filter((t) => {
       if (t.completed || !t.due_date) return false;
       const due = new Date(t.due_date);
-      return due >= dayStart && due <= dayEnd;
+      return due >= todayStart && due <= todayEnd;
     }).length;
-  }, [selectedDate, taskWidgetItemsOnly, isToday]);
+  }, [taskWidgetItemsOnly, now]);
   const taskWidgetCompletedCount = useMemo(
     () => taskWidgetItemsOnly.filter((i) => i.completed).length,
     [taskWidgetItemsOnly]
@@ -718,74 +746,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
     return null;
   }, [taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel]);
 
-  /** Smart Re-plan: move missed (non-routine) events and overdue tasks into nearest future free windows today. */
-  const [replanLoading, setReplanLoading] = useState(false);
-  const handleReplanDay = useCallback(async () => {
-    const missedTasksOnly = missedItems.filter((item) => !isRoutineEvent(item));
-    const overdueTasks = overdueTasksForNow || [];
-    const hasMissed = missedTasksOnly.length > 0;
-    const hasOverdueTasks = overdueTasks.length > 0;
-    if (!hasMissed && !hasOverdueTasks) {
-      showToast("Nothing to re-plan.");
-      return;
-    }
-    const windows = getAllFreeWindowsToday(sortedEvents, selectedDate);
-    if (windows.length === 0) {
-      showToast("No free windows left today. Try re-scheduling for tomorrow.");
-      return;
-    }
-    setReplanLoading(true);
-    try {
-      const windowCopies = windows.map((w) => ({
-        start: new Date(w.start.getTime()),
-        end: new Date(w.end.getTime()),
-        minutes: w.minutes,
-      }));
-      let assignedCount = 0;
-      for (const item of [...missedTasksOnly].sort((a, b) => new Date(a.start_time) - new Date(b.start_time))) {
-        const end = item.end_time ? new Date(item.end_time) : new Date(item.start_time);
-        const durationMins = Math.round((end - new Date(item.start_time)) / 60000) || 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await editEvent(extractBaseEventId(item.id), {
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      for (const task of overdueTasks) {
-        const durationMins = (task.estimated_blocks || 1) * 25;
-        const win = windowCopies.find((w) => w.minutes >= durationMins);
-        if (!win) continue;
-        const slotStart = new Date(win.start.getTime());
-        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
-        await addEvent({
-          title: task.title,
-          description: task.description || "",
-          start_time: slotStart.toISOString(),
-          end_time: slotEnd.toISOString(),
-        });
-        win.start = slotEnd;
-        win.minutes -= durationMins;
-        assignedCount += 1;
-      }
-      await loadEvents();
-      refetchTasks();
-      showToast(
-        assignedCount > 0
-          ? `Re-planned ${assignedCount} item${assignedCount === 1 ? "" : "s"} into your day.`
-          : "No items could fit in remaining windows."
-      );
-    } catch {
-      showToast("Couldn't re-plan. Try again.");
-    } finally {
-      setReplanLoading(false);
-    }
-  }, [missedItems, overdueTasksForNow, sortedEvents, selectedDate, editEvent, addEvent, loadEvents, showToast, refetchTasks]);
+  const openQuickAddSchedule = useCallback((view) => {
+    window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+  }, []);
 
 
   const handleTaskToggle = useCallback(
@@ -805,7 +768,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   const openTimelinePopup = useCallback((event, _matchTask, anchorRect = null) => {
     if (!event) return;
-    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect);
+    openPopup({ ...event, forcePersonalPopup: true, timelineReadOnly: true }, anchorRect, false, 'day');
   }, [openPopup]);
 
   const fmtTimerSecs = (s) => {
@@ -817,315 +780,240 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
 
   return (
     <div className={`${styles.page} ${hasTimerSession ? styles.focusModeActive : ""}`}>
-      {toast && (
-        <div className={styles.alertToast}>
-          <div className={styles.alertContent}>
-            <span className={styles.alertIcon}>✓</span>
-            <span className={styles.alertMessage}>{toast.message}</span>
-          </div>
-          {toast.actionLabel && toast.onAction && (
-            <button
-              type="button"
-              className={styles.alertAction}
-              onClick={async () => {
-                const action = toast.onAction;
-                closeToast();
-                await action();
-              }}
-            >
-              {toast.actionLabel}
-            </button>
-          )}
-          <button className={styles.alertClose} onClick={closeToast}>✕</button>
-        </div>
-      )}
 
       {homeDataLoading ? (
-        <PageSkeleton label="Loading homepage" cardCount={5} cardHeight="180px" columns={2} />
+        <HomepageSkeleton />
       ) : (
-      <>
-      <div>
-        {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
-        {hasTimerSession && (
-          <div className={styles.focusBanner}>
-            <div className={styles.focusBannerLeft}>
-              <span className={`${styles.focusBannerBadge} ${timerMode === "break" ? styles.focusBannerBadgeBreak : ""}`}>
-                {timerMode === "break" ? "BREAK" : "FOCUS"}
-              </span>
-              {timerTask && <span className={styles.focusBannerTask}>{timerTask}</span>}
-            </div>
-            <div className={styles.focusBannerRight}>
-              <span className={styles.focusBannerTime}>{fmtTimerSecs(timeLeft)}</span>
-              <button type="button" className={styles.focusBannerBtn} onClick={() => navigate("/timer")}>
-                Open timer →
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
-        <SleepBanner />
-
-
-
-        {/* ─── INTELLIGENCE ROW ─── monochrome bento grid, contains all 4 main widgets */}
-        <div className={styles.intelligenceRowWrap}>
-          <IntelligenceRow
-            displayName={displayName}
-            recommendation={homepageRecommendation}
-
-            slot1TodayTasks={
-              // ─── SLOT 1: TASK WIDGET ─── today's tasks + completion spine
-              <TaskWidgetSlot
-                styles={taskWidgetStyles}
-                displayName={displayName}
-                isToday={isToday(selectedDate)}
-                taskWidgetOverdueCount={taskWidgetOverdueCount}
-                taskWidgetDueTodayCount={taskWidgetDueTodayCount}
-                taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
-                taskWidgetItemsOnly={taskWidgetItemsOnly}
-                taskWidgetList={taskWidgetList}
-                showAllTaskWidgetTasks={showAllTaskWidgetTasks}
-                setShowAllTaskWidgetTasks={setShowAllTaskWidgetTasks}
-                getTaskCategoryPill={getTaskCategoryPill}
-                getTaskCategoryColor={getTaskCategoryColor}
-                handleTaskWidgetComplete={handleTaskWidgetComplete}
-                taskWidgetRef={taskWidgetRef}
-                hasTimerSession={hasTimerSession}
-                onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
-                taskLists={taskLists}
-                onEditTask={(task) => setRescheduleTask(task)}
-                onDeleteTask={async (task) => {
-                  await deleteTask(task.id);
-                  refetchTasks();
-                }}
-                onInlineTaskEdit={async (task, patch) => {
-                  await updateTask(task.id, patch);
-                  refetchTasks();
-                }}
-              />
-            }
-            slot3Urgent={
-              // ─── SLOT 3: DEADLINES WIDGET ─── upcoming coursework/assessment deadlines
-              <DeadlinesWidget
-                deadlines={upcomingDeadlines || []}
-                onSelectDeadline={setSelectedDeadline}
-                onSelectModule={(mod) => setSelectedModulePill(mod)}
-              />
-            }
-            // ─── SLOT 2: STUDY PULSE WIDGET ─── free windows + focus suggestions
-            studyPulseWindows={isToday(selectedDate) ? todayFreeWindows : []}
-            studyPulseNow={now}
-            studyPulseOnStartFocus={() => navigate("/timer")}
-            studyPulseDeadlines={upcomingDeadlines || []}
-            // ─── SLOT 5: RIGHT NOW WIDGET ─── live schedule compass + timer overlay
-            slot5Data={{
-              now,
-              isToday: isToday(selectedDate),
-              navigatorContext,
-              sortedEvents,
-              hasTimerSession,
-              timerMode,
-              timeLeft,
-              workTime,
-              breakTime,
-              timerTask,
-              tomorrowFirstEvent,
-              taskWidgetItemsOnly,
-            }}
-          />
-        </div>
-
-        {/* Deadline detail popup — blurred backdrop, module/deadline card */}
-        {/* Module pill popup — blurred backdrop, module card */}
-        {selectedModulePill && (() => {
-          const mCode = selectedModulePill.code || "";
-          const mId = selectedModulePill.id;
-          const mColors = getModulePillColors(mCode);
-          const mModule = enrolledModules.find((m) =>
-            (mId && String(m.id) === String(mId)) ||
-            (m.module_code || "").toUpperCase() === mCode.toUpperCase()
-          );
-          const mName = mModule?.module_name || mModule?.name || null;
-          const mDept = mModule?.department || mModule?.school || null;
-          const mDesc = mModule?.description || null;
-          const mLeader = mModule?.module_leader || mModule?.leader || null;
-          const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
-          return (
-            <div
-              className={styles.deadlineDetailOverlay}
-              onClick={() => setSelectedModulePill(null)}
-              role="dialog"
-              aria-modal
-              aria-labelledby="module-card-title"
-            >
-              <div className={styles.moduleCardCard} onClick={(e) => e.stopPropagation()}>
-                <div className={styles.moduleCardHeader}>
-                  <div
-                    className={styles.moduleCardColorBar}
-                    style={{ background: mColors.bg, color: mColors.text }}
-                  >
-                    {mCode.slice(0, 2)}
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.deadlineDetailClose}
-                    onClick={() => setSelectedModulePill(null)}
-                    aria-label="Close"
-                  >
-                    <X size={14} strokeWidth={2} aria-hidden />
+        <>
+          <div>
+            {/* ─── ACTIVE FOCUS SESSION BANNER ─── shows when a timer is running */}
+            {hasTimerSession && (
+              <div className={styles.focusBanner}>
+                <div className={styles.focusBannerLeft}>
+                  <span className={`${styles.focusBannerBadge} ${timerMode === "break" ? styles.focusBannerBadgeBreak : ""}`}>
+                    {timerMode === "break" ? "BREAK" : "FOCUS"}
+                  </span>
+                  {timerTask && <span className={styles.focusBannerTask}>{timerTask}</span>}
+                </div>
+                <div className={styles.focusBannerRight}>
+                  <span className={styles.focusBannerTime}>{fmtTimerSecs(timeLeft)}</span>
+                  <button type="button" className={styles.focusBannerBtn} onClick={() => navigate("/timer")}>
+                    Open timer →
                   </button>
                 </div>
-                <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: mColors.text }}>
-                  {mCode}
-                </h2>
-                {mName && <p className={styles.moduleCardName}>{mName}</p>}
-                {mDept && <p className={styles.moduleCardDept}>{mDept}</p>}
-                {mDesc && <p className={styles.moduleCardDesc}>{mDesc.length > 120 ? mDesc.slice(0, 120) + "…" : mDesc}</p>}
-                {mLeader && <p className={styles.moduleCardLeader}>Leader: {mLeader}</p>}
-                <div className={styles.moduleCardDivider} />
-                <Link
-                  to={mUrl}
-                  className={styles.moduleCardLink}
-                  style={{ background: mColors.text }}
-                  onClick={() => setSelectedModulePill(null)}
-                >
-                  View module →
-                </Link>
               </div>
-            </div>
-          );
-        })()}
+            )}
 
-        {selectedDeadline && (
-          <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal aria-labelledby="deadline-detail-title">
-            <div className={styles.deadlineDetailCard} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.deadlineDetailHeader}>
-                <div className={styles.deadlineDetailPills}>
-                  {selectedDeadline.module_code && (
-                    <ModulePill moduleCode={selectedDeadline.module_code} />
+            {/* ─── SLEEP BANNER ─── motivational greeting shown at the top */}
+            <SleepBanner />
+
+
+
+            <div className={styles.intelligenceRowWrap}>
+              <IntelligenceRow
+                displayName={displayName}
+                recommendation={homepageRecommendation}
+                slot1TodayTasks={
+                  <TaskWidgetSlot
+                    styles={taskWidgetStyles}
+                    displayName={displayName}
+                    isToday={isToday(selectedDate)}
+                    taskWidgetOverdueCount={taskWidgetOverdueCount}
+                    taskWidgetDueTodayCount={taskWidgetDueTodayCount}
+                    taskWidgetSpineCompletedPct={taskWidgetSpineCompletedPct}
+                    taskWidgetItemsOnly={taskWidgetItemsOnly}
+                    taskWidgetList={taskWidgetList}
+                    showAllTaskWidgetTasks={showAllTaskWidgetTasks}
+                    setShowAllTaskWidgetTasks={setShowAllTaskWidgetTasks}
+                    getTaskCategoryPill={getTaskCategoryPill}
+                    getTaskCategoryColor={getTaskCategoryColor}
+                    handleTaskWidgetComplete={handleTaskWidgetComplete}
+                    taskWidgetRef={taskWidgetRef}
+                    hasTimerSession={hasTimerSession}
+                    onStartFocus={() => navigate("/timer", { state: { fromTaskPlay: true } })}
+                    taskLists={taskLists}
+                    onEditTask={(task) => setRescheduleTask(task)}
+                    onDeleteTask={async (task) => {
+                      await deleteTask(task.id);
+                      refetchTasks();
+                    }}
+                    onInlineTaskEdit={async (task, patch) => {
+                      await updateTask(task.id, patch);
+                      refetchTasks();
+                    }}
+                  />
+                }
+                slot3Urgent={
+                  <DeadlinesWidget
+                    deadlines={upcomingDeadlines || []}
+                    onSelectDeadline={setSelectedDeadline}
+                    onSelectModule={(mod) => setSelectedModulePill(mod)}
+                  />
+                }
+                slot5Data={{
+                  now,
+                  isToday: isToday(selectedDate),
+                  navigatorContext,
+                  sortedEvents,
+                  hasTimerSession,
+                  timerMode,
+                  timeLeft,
+                  workTime,
+                  breakTime,
+                  timerTask,
+                  tomorrowFirstEvent,
+                  taskWidgetItemsOnly,
+                }}
+                slot6Timeline={
+                  <HomepageTimelineSection
+                    selectedDate={selectedDate}
+                    handleReplanDay={null} // Placeholder if not defined
+                    replanLoading={false}
+                    missedItems={missedItems}
+                    overdueTasksForNow={overdueTasksForNow}
+                    sortedEvents={sortedEvents}
+                    now={now}
+                    dayTasks={dayTasks}
+                    tasksDueToday={tasksDueToday}
+                    suggestableTasks={suggestableTasks}
+                    deadlineSuggestions={deadlineSuggestions}
+                    taskLists={taskLists}
+                    handleQuickStartGap={handleQuickStartGap}
+                    handleTaskToggle={handleTaskToggle}
+                    openTimelinePopup={openTimelinePopup}
+                    openModal={openModal}
+                    handleConflictAutoMove={handleConflictAutoMove}
+                    handleConflictPushTomorrow={handleConflictPushTomorrow}
+                    handleTimelineDelete={handleTimelineDelete}
+                    handleReschedule={handleReschedule}
+                    getTag={getTag}
+                    completedEventIds={completedEventIds}
+                    setCompletedEventIds={setCompletedEventIds}
+                    onOpenQuickAddSchedule={openQuickAddSchedule}
+                    hasTimerSession={hasTimerSession}
+                    timerTask={timerTask}
+                    timeLeft={timeLeft}
+                    timerMode={timerMode}
+                    styles={styles}
+                  />
+                }
+              />
+            </div>
+
+            {/* Deadline detail popup — blurred backdrop, module/deadline card */}
+            {/* Module pill popup — blurred backdrop, module card */}
+            {selectedModulePill && (() => {
+              const mCode = selectedModulePill.code || "";
+              const mId = selectedModulePill.id;
+              const mColors = getModulePillColors(mCode);
+              const mModule = enrolledModules.find((m) =>
+                (mId && String(m.id) === String(mId)) ||
+                (m.module_code || "").toUpperCase() === mCode.toUpperCase()
+              );
+              const mName = mModule?.module_name || mModule?.name || null;
+              const mDept = mModule?.department || mModule?.school || null;
+              const mDesc = mModule?.description || null;
+              const mLeader = mModule?.module_leader || mModule?.leader || null;
+              const mUrl = mId ? `/modules?moduleId=${mId}` : `/modules?code=${encodeURIComponent(mCode)}`;
+              return (
+                <div
+                  className={styles.deadlineDetailOverlay}
+                  onClick={() => setSelectedModulePill(null)}
+                  role="dialog"
+                  aria-modal
+                  aria-labelledby="module-card-title"
+                >
+                  <div className={styles.moduleCardCard} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.moduleCardHeader}>
+                      <div
+                        className={styles.moduleCardColorBar}
+                        style={{ background: mColors.bg, color: mColors.text }}
+                      >
+                        {mCode.slice(0, 2)}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.deadlineDetailClose}
+                        onClick={() => setSelectedModulePill(null)}
+                        aria-label="Close"
+                      >
+                        <X size={14} strokeWidth={2} aria-hidden />
+                      </button>
+                    </div>
+                    <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: mColors.text }}>
+                      {mCode}
+                    </h2>
+                    {mName && <p className={styles.moduleCardName}>{mName}</p>}
+                    {mDept && <p className={styles.moduleCardDept}>{mDept}</p>}
+                    {mDesc && <p className={styles.moduleCardDesc}>{mDesc.length > 120 ? mDesc.slice(0, 120) + "…" : mDesc}</p>}
+                    {mLeader && <p className={styles.moduleCardLeader}>Leader: {mLeader}</p>}
+                    <div className={styles.moduleCardDivider} />
+                    <Link
+                      to={mUrl}
+                      className={styles.moduleCardLink}
+                      style={{ background: mColors.text }}
+                      onClick={() => setSelectedModulePill(null)}
+                    >
+                      View module →
+                    </Link>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {selectedDeadline && (
+              <div className={styles.deadlineDetailOverlay} onClick={() => setSelectedDeadline(null)} role="dialog" aria-modal aria-labelledby="deadline-detail-title">
+                <div className={styles.deadlineDetailCard} onClick={(e) => e.stopPropagation()}>
+                  <div className={styles.deadlineDetailHeader}>
+                    <div className={styles.deadlineDetailPills}>
+                      {selectedDeadline.module_code && (
+                        <ModulePill moduleCode={selectedDeadline.module_code} />
+                      )}
+                      {selectedDeadline.deadline_type && (
+                        <TypePill
+                          typeLabel={selectedDeadline.deadline_type.charAt(0).toUpperCase() + selectedDeadline.deadline_type.slice(1)}
+                          accentColor={selectedDeadline.module_code ? getModulePillColors(selectedDeadline.module_code).accent : undefined}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
+                    {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
+                  </h2>
+                  {selectedDeadline.start_due_date && (
+                    <p className={styles.deadlineDetailDate}>
+                      Due: {new Date(selectedDeadline.start_due_date).toLocaleDateString("en-GB", {
+                        weekday: "long", day: "numeric", month: "long", year: "numeric"
+                      })}
+                    </p>
                   )}
-                  {selectedDeadline.deadline_type && (
-                    <TypePill
-                      typeLabel={selectedDeadline.deadline_type.charAt(0).toUpperCase() + selectedDeadline.deadline_type.slice(1)}
-                      accentColor={selectedDeadline.module_code ? getModulePillColors(selectedDeadline.module_code).accent : undefined}
-                    />
+                  {selectedDeadline.description && (
+                    <p className={styles.deadlineDetailDesc}>{selectedDeadline.description}</p>
+                  )}
+                  {selectedDeadline.location && (
+                    <p className={styles.deadlineDetailMeta}>
+                      <MapPin size={14} className={styles.deadlineDetailMetaIcon} aria-hidden />
+                      {selectedDeadline.location}
+                    </p>
+                  )}
+                  {(selectedDeadline.module_id != null || selectedDeadline.module != null || selectedDeadline.module_code) && (
+                    <Link
+                      to={selectedDeadline.module_id != null || selectedDeadline.module != null
+                        ? `/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`
+                        : `/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
+                      className={styles.deadlineDetailLink}
+                      onClick={() => setSelectedDeadline(null)}
+                    >
+                      Go to module →
+                    </Link>
                   )}
                 </div>
               </div>
-              <h2 id="deadline-detail-title" className={styles.deadlineDetailTitle}>
-                {selectedDeadline.assessment_title || selectedDeadline.title || "Assignment"}
-              </h2>
-              {selectedDeadline.start_due_date && (
-                <p className={styles.deadlineDetailDate}>
-                  Due: {new Date(selectedDeadline.start_due_date).toLocaleDateString("en-GB", {
-                    weekday: "long", day: "numeric", month: "long", year: "numeric"
-                  })}
-                </p>
-              )}
-              {selectedDeadline.description && (
-                <p className={styles.deadlineDetailDesc}>{selectedDeadline.description}</p>
-              )}
-              {selectedDeadline.location && (
-                <p className={styles.deadlineDetailMeta}>
-                  <MapPin size={14} className={styles.deadlineDetailMetaIcon} aria-hidden />
-                  {selectedDeadline.location}
-                </p>
-              )}
-              {(selectedDeadline.module_id != null || selectedDeadline.module != null || selectedDeadline.module_code) && (
-                <Link
-                  to={selectedDeadline.module_id != null || selectedDeadline.module != null
-                    ? `/modules?moduleId=${selectedDeadline.module_id ?? selectedDeadline.module}`
-                    : `/modules?code=${encodeURIComponent(selectedDeadline.module_code)}`}
-                  className={styles.deadlineDetailLink}
-                  onClick={() => setSelectedDeadline(null)}
-                >
-                  Go to module →
-                </Link>
-              )}
-            </div>
+            )}
           </div>
-        )}
-      </div>
-      
-      <motion.div
-        className={styles.bentoSpine}
-        id="timeline-section"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-      >
-        <div className={styles.timelineBox}>
-          <div className={styles.timelineHeader}>
-            <div className={styles.timelineHeaderLeft}>
-              <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                <CalendarIcon size={17} strokeWidth={1.75} />
-              </div>
-              <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
-            </div>
-            <div className={styles.timelineHeaderRight}>
-              <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
-              {isToday(selectedDate) && (
-                <motion.button
-                  type="button"
-                  className={styles.replanBtn}
-                  onClick={handleReplanDay}
-                  disabled={replanLoading || (!missedItems?.length && !(overdueTasksForNow?.length))}
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                  aria-label="Re-plan overdue and missed items into free windows"
-                >
-                  {replanLoading ? "Re-planning…" : "✨ Re-plan"}
-                </motion.button>
-              )}
-            </div>
-          </div>
-          <div className={styles.timelineTrack}>
-            <motion.div
-              className={styles.timelineTrackContent}
-              layout
-              initial={false}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
-            >
-              <MiniTimeline
-                sortedEvents={sortedEvents}
-                selectedDate={selectedDate}
-                now={now}
-                dayTasks={dayTasks}
-                tasksDueToday={tasksDueToday}
-                suggestableTasks={suggestableTasks}
-                deadlineSuggestions={deadlineSuggestions}
-                taskLists={taskLists}
-                onQuickStart={handleQuickStartGap}
-                onTaskToggle={handleTaskToggle}
-                onCardClick={openTimelinePopup}
-                onEdit={(ev) => openModal(ev, ev.tag)}
-                onConflictAutoMove={handleConflictAutoMove}
-                onPushTomorrow={handleConflictPushTomorrow}
-                onDelete={handleTimelineDelete}
-                onReschedule={handleReschedule}
-                getTag={getTag}
-                completedEventIds={completedEventIds}
-                onToggleComplete={(eventId) => setCompletedEventIds((prev) => {
-                  const next = new Set(prev);
-                  if (next.has(eventId)) next.delete(eventId);
-                  else next.add(eventId);
-                  return next;
-                })}
-                hasTimerSession={hasTimerSession}
-                timerTask={timerTask}
-                timeLeft={timeLeft}
-                timerMode={timerMode}
-                styles={styles}
-              />
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-      <BackToTop containerSelector="[data-dashboard-main]" />
-      </>
+
+          <BackToTop containerSelector="[data-dashboard-main]" />
+        </>
       )}
 
       {showCreateTaskModal && (
@@ -1224,6 +1112,17 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           }}
         />
       )}
+
+      <AnimatePresence initial={false}>
+        {!toastApi && fallbackToast && (
+          <AppToast
+            message={fallbackToast.message}
+            actionLabel={fallbackToast.actionLabel}
+            onAction={fallbackToast.onAction}
+            onClose={() => setFallbackToast(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

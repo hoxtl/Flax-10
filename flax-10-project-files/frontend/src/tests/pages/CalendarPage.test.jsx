@@ -2,12 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import CalendarPage from '../../pages/Calendar/CalendarPage';
 
+const { mockEventPopups } = vi.hoisted(() => ({
+    mockEventPopups: vi.fn(),
+}));
+
 const mockDispatch = vi.fn();
 const mockCalendarState = {
     filter: 'all',
     allEvents: [],
     selectedDate: new Date('2025-01-15'),
     viewMode: 'month',
+    isLoading: false,
 };
 
 vi.mock('../../context/CalendarContext', () => ({
@@ -33,7 +38,10 @@ vi.mock('../../components/Calendar/CalendarHeader', () => ({
 }));
 
 vi.mock('../../components/Calendar/EventPopups', () => ({
-    EventPopups: () => <div data-testid="event-popups" />,
+    EventPopups: (props) => {
+        mockEventPopups(props);
+        return <div data-testid="event-popups" />;
+    },
 }));
 
 vi.mock('../../components/Calendar/hooks/useEventPopupListener', () => ({
@@ -71,6 +79,7 @@ describe('CalendarPage', () => {
     it('renders event popups', () => {
         render(<CalendarPage />);
         expect(screen.getByTestId('event-popups')).toBeTruthy();
+        expect(mockEventPopups).toHaveBeenCalledWith(expect.objectContaining({ allowModuleLeave: false }));
     });
 
     it('shows active filter', () => {
@@ -108,5 +117,11 @@ describe('CalendarPage', () => {
         unmount();
         expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function));
         removeSpy.mockRestore();
+    });
+
+    it('shows the shared skeleton while calendar data is initially loading', () => {
+        useCalendar.mockReturnValue({ ...mockCalendarState, isLoading: true, allEvents: [] });
+        render(<CalendarPage />);
+        expect(screen.getByTestId('calendar-skeleton')).toBeTruthy();
     });
 });

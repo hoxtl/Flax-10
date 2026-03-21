@@ -1,0 +1,56 @@
+.projectsSection {
+    margin-top: 32px;
+}
+
+.projectsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.sectionTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+}
+
+.filterTabs {
+    display: flex;
+    background: white;
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+}
+
+.filterTab {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.filterTabActive {
+    background: var(--surface-search);
+    color: var(--text);
+}
+
+.projectList {
+    display: flex;
+    flex-direction: column;
+}
+
+.emptyMessage {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-secondary);
+    background: white;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    font-style: italic;
+}

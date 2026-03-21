@@ -1,10 +1,23 @@
+/*
+ * KCL department groups and course names used in the registration form.
+ */
+
 export const KCL_DEPARTMENTS = {
     "Arts & Humanities": [
       "English Literature",
       "Film Studies",
       "History",
+      "Arabic",
+      "Modern Languages",
+      "French",
       "Music",
+      "Portuguese",
+      "German",
+      "Italian",
+      "Chinese",
       "Philosophy",
+      "Classical Studies",
+      "Spanish",
     ],
     "Business": [
       "Accounting & Finance",

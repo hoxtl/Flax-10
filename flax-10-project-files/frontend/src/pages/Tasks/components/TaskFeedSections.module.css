@@ -1,71 +1,7 @@
-/**
+/*
  * TaskFeed section styles: section headers, task rows, completed block,
  * search empty state, and show-more button.
  */
-
-.searchEmptyCard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2.5rem 1.5rem 2rem;
-    margin: 1rem 0;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: var(--card-shadow);
-    animation: searchEmptyFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes searchEmptyFadeIn {
-    from { opacity: 0; transform: translateY(10px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.searchEmptyEmoji {
-    font-size: 2.2rem;
-    line-height: 1;
-    margin-bottom: 0.75rem;
-    animation: searchEmojiFloat 2.4s ease-in-out infinite;
-}
-@keyframes searchEmojiFloat {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50%      { transform: translateY(-6px) scale(1.06); }
-}
-.searchEmptyMessage {
-    margin: 0;
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.5;
-    max-width: 22rem;
-}
-.searchEmptyHint {
-    margin: 0.3rem 0 0;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 400;
-    color: var(--muted);
-    line-height: 1.4;
-}
-.searchEmptyBtn {
-    margin-top: 1.1rem;
-    padding: 9px 22px;
-    background: transparent;
-    border: 1.5px solid rgba(123, 103, 81, 0.25);
-    border-radius: 100px;
-    color: var(--primary, #7B6751);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-}
-.searchEmptyBtn:hover {
-    background: rgba(123, 103, 81, 0.08);
-    border-color: rgba(123, 103, 81, 0.4);
-    transform: translateY(-1px);
-}
 
 .section {
     position: relative;
@@ -243,7 +179,7 @@
     font-size: 0.875rem;
     font-weight: 650;
     letter-spacing: 0.02em;
-    color: #fff;
+    color: var(--color-card);
     background: linear-gradient(180deg, rgba(84, 60, 39, 0.98), rgba(60, 41, 26, 0.98));
     border: 1px solid rgba(74, 52, 33, 0.38);
     border-radius: 9999px;

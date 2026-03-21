@@ -1,3 +1,6 @@
+/*
+ * Tests for ModulesPage component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
@@ -21,8 +24,9 @@ vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     filterModules: vi.fn((modules) => modules),
     applyFiltersAndSort: vi.fn((modules) => modules),
     getDepartments: vi.fn(() => []),
+    normaliseModuleCode: vi.fn((code) => String(code || '').toUpperCase().replace(/\s+/g, '')),
 }));
-vi.mock('../../components/Modules/ModuleGrid', () => ({
+vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
         <div>
             <span>ModuleGrid</span>
@@ -31,7 +35,7 @@ vi.mock('../../components/Modules/ModuleGrid', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/ModuleForm', () => ({
+vi.mock('../../components/Modules/Modules/ModuleForm', () => ({
     default: ({ onCancel, onSuccess }) => (
         <div>
             <span>ModuleForm</span>
@@ -41,15 +45,15 @@ vi.mock('../../components/Modules/ModuleForm', () => ({
         </div>
     ),
 }));
-vi.mock('../../components/Modules/ModuleDetails', () => ({
+vi.mock('../../components/Modules/Modules/ModuleDetails', () => ({
     default: ({ onBack }) => <div><button onClick={onBack}>Back</button></div>,
 }));
-vi.mock('../../components/Modules/DeadlineModal', () => ({
+vi.mock('../../components/Modules/Deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
 vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
 
-vi.mock('../../components/ui/AnimatedDropdown.jsx', () => ({
+vi.mock('../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, className }) => (
         <select
             data-testid={className || 'animated-dd'}
@@ -86,17 +90,18 @@ describe('ModulesPage', () => {
         vi.clearAllMocks();
         mockHook.loading = false;
         mockHook.modules = [];
+        localStorage.getItem.mockReturnValue(JSON.stringify({ role: 'teacher' }));
     });
 
     it('should render the loading state', () => {
         mockHook.loading = true;
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
-        expect(screen.getByText(/loading modules/i)).toBeInTheDocument();
+        expect(screen.getByTestId('modules-skeleton')).toBeInTheDocument();
     });
 
     it('should render the empty state when no modules', () => {
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
-        expect(screen.getByText(/no modules found/i)).toBeInTheDocument();
+        expect(screen.getByText(/no modules yet/i)).toBeInTheDocument();
     });
 
     it('should render module grid when modules exist', async () => {
@@ -163,19 +168,19 @@ describe('ModulesPage', () => {
         expect(screen.queryByText('ModuleForm')).not.toBeInTheDocument();
     });
 
-    it('uses filter from URL and allows changing filters and sort', () => {
+    it('uses filter from URL and lets students switch into browse modules controls', () => {
         mockHook.modules = [{ id: 1, module_code: '5CCS2SEG', module_name: 'Intro' }];
+        localStorage.getItem.mockReturnValue(JSON.stringify({ role: 'student' }));
         render(
             <MemoryRouter initialEntries={['/modules?filter=enrolled']}>
                 <ModulesPage />
             </MemoryRouter>
         );
-        const selects = screen.getAllByTestId('animated-dd');
-        // first select corresponds to filter (All / Enrolled)
-        fireEvent.change(selects[0], { target: { value: 'enrolled' } });
-        // change department and sort
-        fireEvent.change(selects[1], { target: { value: 'all' } });
-        fireEvent.change(selects[2], { target: { value: 'deadlines' } });
+        expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Browse Modules' }));
+        expect(screen.getByRole('heading', { name: 'Browse Modules' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /filter/i })).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Deadlines'));
     });
 
     it('renders DetailsView when moduleId is present and returns to main view on back', () => {
@@ -207,14 +212,25 @@ describe('ModulesPage', () => {
                 <ModulesPage />
             </MemoryRouter>
         );
-        const input = screen.getByPlaceholderText(/search by module name or code/i);
+        const input = screen.getByPlaceholderText(/search king's modules by name or code/i);
         expect(input.value).toBe('UNKNOWN');
     });
 
     it('shows student subtitle and hides create button when user is not teacher', () => {
-        localStorage.getItem.mockReturnValueOnce(JSON.stringify({ role: 'student' }));
-        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        localStorage.getItem.mockReturnValue(JSON.stringify({ role: 'student' }));
+        const { container } = render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.queryByText('+ Create Module')).not.toBeInTheDocument();
-        expect(screen.getByText(/browse and enroll into available modules/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("See your enrolled modules, readings, and deadlines in one place.");
+    });
+
+    it('shows the shared overview dashboard by default for students', () => {
+        localStorage.getItem.mockReturnValue(JSON.stringify({ role: 'student' }));
+        render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+        expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
+        expect(screen.getByText('Overview')).toBeInTheDocument();
+        expect(screen.getByText('My Enrolments')).toBeInTheDocument();
+        expect(screen.getByText('Upcoming assignment deadlines')).toBeInTheDocument();
     });
 });

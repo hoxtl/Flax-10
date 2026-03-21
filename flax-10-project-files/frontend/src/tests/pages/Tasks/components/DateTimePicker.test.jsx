@@ -1,3 +1,4 @@
+/* Tests for DateTimePicker component rendering and user interactions */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import DateTimePicker from "../../../../pages/Tasks/components/DateTimePicker";

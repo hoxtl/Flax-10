@@ -1,0 +1,42 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.eyebrow {
+  font-size: var(--type-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--primary) 72%, var(--kcl-accent) 28%);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--type-section);
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--type-body);
+  line-height: 1.55;
+  max-width: 56ch;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+}

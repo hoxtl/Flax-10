@@ -1,0 +1,23 @@
+/* Swipe Month View - Single month with swipe navigation */
+.container {
+    background: var(--panel);
+    min-height: 400px;
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.content {
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.slideUp {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.slideDown {
+    transform: translateY(20px);
+    opacity: 0;
+}

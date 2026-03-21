@@ -14,6 +14,7 @@ const {
   mockUseCalendarEvents,
   mockNavigate,
   mockGetTag,
+  mockGetUpcomingDeadlines,
 } = vi.hoisted(() => ({
   mockDispatch: vi.fn(),
   mockOpenModal: vi.fn(),
@@ -25,6 +26,7 @@ const {
   mockUseCalendarEvents: vi.fn(),
   mockNavigate: vi.fn(),
   mockGetTag: vi.fn(() => ({ label: 'Academic' })),
+  mockGetUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]),
 }));
 
 const TODAY = new Date();
@@ -233,9 +235,32 @@ vi.mock('../../pages/Homepage/components', () => ({
       <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
     </div>
   ),
+  HomepageTimelineSection: ({
+    onOpenQuickAddSchedule,
+    onTaskToggle,
+    onQuickStart,
+    onConflictAutoMove,
+    onPushTomorrow,
+    onDelete,
+    onReschedule,
+    sortedEvents,
+  }) => (
+    <div data-testid="homepage-timeline-section">
+      <button type="button" onClick={() => onOpenQuickAddSchedule?.('schedule_manual')}>Open manual schedule quick add</button>
+      <button type="button" onClick={() => onOpenQuickAddSchedule?.('schedule_auto')}>Open auto schedule quick add</button>
+      <button type="button" onClick={() => onTaskToggle?.({ id: 1 })}>task-toggle</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1 })}>quick-start</button>
+      <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 })}>conflict-auto-move</button>
+      <button type="button" onClick={() => onPushTomorrow?.({ id: 1 })}>push-tomorrow</button>
+      <button type="button" onClick={() => onDelete?.({ id: 1 })}>timeline-delete</button>
+      <button type="button" onClick={() => onDelete?.({ id: 'ev-1', source: 'task', external_id: 99 })}>timeline-delete-task</button>
+      <button type="button" onClick={() => onReschedule?.({ id: 1 })}>reschedule</button>
+      <div data-testid="mini-timeline">events:{(sortedEvents || []).length}</div>
+    </div>
+  ),
 }));
 
-vi.mock('../../api/taskService', () => ({
+vi.mock('../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}),
   createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
@@ -284,7 +309,7 @@ vi.mock('../../api/moduleApi', () => ({
 }));
 
 vi.mock('../../api/deadlineApi', () => ({
-  getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]),
+  getUpcomingDeadlines: mockGetUpcomingDeadlines,
 }));
 
 vi.mock('../../lib/completionMessages', () => ({
@@ -319,11 +344,12 @@ beforeEach(() => {
   mockRemoveEvent.mockResolvedValue(undefined);
   mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
+  mockGetUpcomingDeadlines.mockResolvedValue([{ id: 1, start_due_date: new Date(Date.now() + 2 * 86400000).toISOString() }]);
   global.IntersectionObserver = class {
-    constructor() {}
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    constructor() { }
+    observe() { }
+    unobserve() { }
+    disconnect() { }
   };
 });
 
@@ -393,7 +419,7 @@ describe('Homepage', () => {
   });
 
   it('completes a task via TaskWidgetSlot and shows completion toast path', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -405,8 +431,9 @@ describe('Homepage', () => {
   });
 
   it('shows an error toast when task update fails', async () => {
-    const svc = await import('../../api/taskService');
+    const svc = await import('../../api/taskApi');
     svc.updateTask.mockRejectedValueOnce(new Error('fail'));
+    mockRefetchTasks.mockResolvedValueOnce([{ id: 1, completed: false }]);
     render(
       <MemoryRouter>
         <Homepage />
@@ -581,7 +608,7 @@ describe('Homepage', () => {
   });
 
   it('handleTimelineDelete task event deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -633,7 +660,7 @@ describe('Homepage', () => {
   });
 
   it('handleTaskToggle calls updateTask and refetchTasks', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -644,50 +671,28 @@ describe('Homepage', () => {
     expect(mockRefetchTasks).toHaveBeenCalled();
   });
 
-  it('Re-plan button shows when today and triggers handleReplanDay', async () => {
+  it('shows auto schedule action for today', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
     isToday.mockReturnValue(true);
-    const { getNextFreeSlotToday, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    mockDayEvents = [{ id: 1, title: 'Past', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [{ id: 1, title: 'T', due_date: new Date().toISOString(), completed: false }];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/Re-planned|No items could fit|Nothing to re-plan|No free windows/)).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Open auto schedule quick add/i })).toBeInTheDocument();
   });
 
-  it('Re-plan button is disabled when no missed or overdue items', async () => {
+  it('auto schedule action opens quick add in auto mode', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
+    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
     isToday.mockReturnValue(true);
-    mockDayEvents = [];
-    mockAllTasks = [];
     render(
       <MemoryRouter>
         <Homepage />
       </MemoryRouter>
     );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    expect(screen.getByRole('button', { name: /Re-plan/ })).toBeDisabled();
-  });
-
-  it('Re-plan shows "No free windows" when getAllFreeWindowsToday returns empty', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    isToday.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([]);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: new Date(Date.now() - 2 * 3600000).toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText(/No free windows left today/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Open auto schedule quick add/i }));
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_auto' } }));
   });
 
   it('focus banner shows BREAK when timer mode is break', () => {
@@ -702,7 +707,7 @@ describe('Homepage', () => {
   });
 
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
-    const mod = await import('../../api/taskService');
+    const mod = await import('../../api/taskApi');
     mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
     render(
       <MemoryRouter>
@@ -763,7 +768,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal save updates task and closes modal', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -777,7 +782,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal delete deletes task and closes modal', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -803,7 +808,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save creates task and shows toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'New Task' });
     render(
       <MemoryRouter>
@@ -817,7 +822,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save with routine title sets Routine tag', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'breakfast' });
     render(
       <MemoryRouter>
@@ -829,7 +834,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save with addToSchedule adds event and shows schedule toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'Task', description: '', estimated_blocks: 2 });
     render(
       <MemoryRouter>
@@ -842,7 +847,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save error shows toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -874,7 +879,7 @@ describe('Homepage', () => {
   });
 
   it('CreateListModal save creates list and closes', async () => {
-    const { createTaskList, fetchTaskLists } = await import('../../api/taskService');
+    const { createTaskList, fetchTaskLists } = await import('../../api/taskApi');
     createTaskList.mockResolvedValue({ id: 2, name: 'My List' });
     fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }, { id: 2, name: 'My List' }]);
     render(
@@ -911,7 +916,7 @@ describe('Homepage', () => {
   });
 
   it('PlanReadDetailModal onDeleteTask deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage defaultPlanTimelineReadItem={{ task: { id: 1, title: 'T' } }} />
@@ -1005,7 +1010,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal onSave error does not close modal', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     updateTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -1020,7 +1025,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal onDelete error does not close modal', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     deleteTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -1073,7 +1078,7 @@ describe('Homepage', () => {
   });
 
   it('onInlineTaskEdit updates task and refetches', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -1105,44 +1110,6 @@ describe('Homepage', () => {
     );
     fireEvent.click(screen.getByText('reschedule'));
     await waitFor(() => expect(screen.getByText("Couldn't re-schedule. Try again.")).toBeInTheDocument());
-  });
-
-  it('Re-plan shows "Nothing to re-plan" when missed items are all routine', async () => {
-    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const { isRoutineEvent, getAllFreeWindowsToday } = await import('../../pages/Homepage/utils/index');
-    isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(true);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Routine', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    await waitFor(() => expect(screen.getByRole('button', { name: /Re-plan/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText('Nothing to re-plan.')).toBeInTheDocument());
-  });
-
-  it('Re-plan shows error toast when editEvent fails', async () => {
-    const { isToday, overlapsDay } = await import('../../components/Calendar/utils/dateUtils');
-    const { getAllFreeWindowsToday, isRoutineEvent } = await import('../../pages/Homepage/utils/index');
-    isToday.mockReturnValue(true);
-    isRoutineEvent.mockReturnValue(false);
-    getAllFreeWindowsToday.mockReturnValue([{ start: new Date(), end: new Date(Date.now() + 60 * 60000), minutes: 60 }]);
-    const past = new Date(Date.now() - 2 * 3600000);
-    mockDayEvents = [{ id: 1, title: 'Missed', start_time: past.toISOString(), end_time: new Date(Date.now() - 3600000).toISOString() }];
-    mockAllTasks = [];
-    mockEditEvent.mockRejectedValueOnce(new Error('fail'));
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole('button', { name: /Re-plan/ }));
-    await waitFor(() => expect(screen.getByText("Couldn't re-plan. Try again.")).toBeInTheDocument());
   });
 
   it('deadline detail shows link to module by code when only module_code set', async () => {

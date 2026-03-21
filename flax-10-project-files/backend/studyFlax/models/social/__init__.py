@@ -1,1 +1,1 @@
-from .shareModel import CalendarShare
+from .share_model import CalendarShare

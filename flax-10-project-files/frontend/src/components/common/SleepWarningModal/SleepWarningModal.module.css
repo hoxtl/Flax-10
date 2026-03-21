@@ -1,0 +1,32 @@
+.body {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.message {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: var(--text-base);
+}
+
+.question {
+  margin: 0;
+  color: var(--text);
+  font-weight: 500;
+  font-size: var(--text-base);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.cancelBtn,
+.confirmBtn {
+  min-width: 132px;
+}

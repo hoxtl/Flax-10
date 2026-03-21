@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
-import { tflService } from "../../../api/tflService";
+import { tflService } from "../../../api/tflApi";
 
 const mockMapInstance = {
   on: vi.fn(function (event, cb) {
@@ -53,14 +53,14 @@ vi.mock("mapbox-gl", () => ({
   },
 }));
 
-vi.mock("../../../api/tflService", () => ({
+vi.mock("../../../api/tflApi", () => ({
   tflService: {
     getTfLDelays: vi.fn().mockResolvedValue([]),
     journeyPlanner: vi.fn().mockResolvedValue(null),
   },
 }));
 
-vi.mock("../../../api/userService", () => ({
+vi.mock("../../../api/userApi", () => ({
   getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
@@ -82,6 +82,14 @@ describe("CampusMap", () => {
       if (event === "load") cb();
       return mockMapInstance;
     });
+  });
+
+  it("shows the shared skeleton before the map finishes loading", () => {
+    mockMapInstance.on.mockImplementation(function () {
+      return mockMapInstance;
+    });
+    render(<CampusMap />);
+    expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument();
   });
 
   it("renders StudyFlax Map title and subtitle", async () => {
@@ -115,6 +123,9 @@ describe("CampusMap", () => {
 
   it("selecting a campus shows campus name in chip", async () => {
     render(<CampusMap />);
+    await waitFor(() =>
+      expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
+    );
     const strandButtons = await screen.findAllByRole("button", { name: /Strand/ });
     fireEvent.click(strandButtons[0]);
     await waitFor(() => expect(screen.getByText("Strand Campus")).toBeInTheDocument());

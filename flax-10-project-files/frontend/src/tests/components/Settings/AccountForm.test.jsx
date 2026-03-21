@@ -1,95 +1,181 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AccountForm from '../../../components/Settings/AccountForm';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
-vi.mock('../../../api/userService', () => ({
-    getUserProfile: vi.fn(),
+vi.mock("../../../api/userApi", () => ({
+  getUserProfile: vi.fn(),
 }));
 
-vi.mock('../../../lib/kclCourses', () => ({
-    KCL_DEPARTMENTS: {
-        'Science': ['Physics', 'Chemistry'],
-        'Arts': ['English', 'History'],
-    },
+vi.mock("../../../api/adminApi", () => ({
+  getMyCourseChangeRequest: vi.fn(),
+  requestCourseChange: vi.fn(),
+  cancelCourseChangeRequest: vi.fn().mockResolvedValue(null),
 }));
 
-import { getUserProfile } from '../../../api/userService';
+vi.mock("../../../lib/kclCourses", () => ({
+  KCL_DEPARTMENTS: {
+    Science: ["Physics", "Chemistry"],
+    Arts: ["English", "History"],
+  },
+}));
 
-describe('AccountForm', () => {
-    const user = {
-        first_name: 'Alice',
-        last_name: 'Smith',
-        email: 'alice@example.com',
-        year: 'Year 2',
-        major: '',
-    };
+vi.mock("../../../components/Settings/SettingsUI", () => ({
+  FormInput: ({ label, name, value, onChange, type = "text", required }) => (
+    <div>
+      <label htmlFor={name}>{label}</label>
+      <input
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        type={type}
+        required={required}
+      />
+    </div>
+  ),
+  FormSelect: ({ id, label, value, onChange, options, grouped }) => (
+    <div>
+      {label && <label htmlFor={id}>{label}</label>}
+      <select id={id} name={id} value={value} onChange={onChange}>
+        {grouped
+          ? options.map((g) =>
+              g.options.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              )),
+            )
+          : options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+      </select>
+    </div>
+  ),
+  SectionHeader: ({ title, description }) => (
+    <div>
+      <h3>{title}</h3>
+      {description ? <p>{description}</p> : null}
+    </div>
+  ),
+  SubmitButton: ({ label, isSaving, savingLabel, saveSignal = 0, savedLabel = "Saved!" }) => (
+    <button type="submit">{isSaving ? savingLabel : saveSignal ? `✓ ${savedLabel}` : label}</button>
+  ),
+}));
 
-    beforeEach(() => {
-        getUserProfile.mockResolvedValue({ year: 'Year 2', major: '' });
+vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
+
+import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import AccountForm from "../../../components/Settings/AccountForm";
+
+const baseUser = {
+  first_name: "Alice",
+  last_name: "Smith",
+  email: "alice@example.com",
+  year: "Year 2",
+  major: "",
+  role: "student",
+};
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  localStorage.clear();
+  getMyCourseChangeRequest.mockResolvedValue(null);
+});
+
+describe("AccountForm - basic rendering", () => {
+  it("renders first/last name and email fields", async () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Alice")).toBeTruthy();
+      expect(screen.getByDisplayValue("Smith")).toBeTruthy();
+      expect(screen.getByDisplayValue("alice@example.com")).toBeTruthy();
+    });
+  });
+
+  it("renders Save Changes button", async () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Save Changes" })).toBeTruthy();
+    });
+  });
+
+  it("shows Saving... when isSaving is true", () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={true} />);
+    expect(screen.getByText("Saving...")).toBeTruthy();
+  });
+});
+
+describe("AccountForm - course display", () => {
+  it("shows locked course display and request button when user has a major", async () => {
+    render(
+      <AccountForm
+        user={{ ...baseUser, major: "Physics" }}
+        onSave={vi.fn()}
+        isSaving={false}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Physics")).toBeTruthy();
+      expect(
+        screen.getByRole("button", { name: /request a course change/i }),
+      ).toBeTruthy();
+    });
+  });
+
+  it("shows 'No course set' when user has no major", async () => {
+    render(<AccountForm user={baseUser} onSave={vi.fn()} isSaving={false} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/No course set/i)).toBeTruthy();
+    });
+  });
+});
+
+describe("AccountForm - submission", () => {
+  it("calls onSave with changed form data", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
+    const { container } = render(
+      <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
+    );
+
+    await waitFor(() => screen.getByDisplayValue("Alice"));
+
+    fireEvent.change(screen.getByLabelText("First Name"), {
+      target: { value: "Bob" },
     });
 
-    it('renders personal info fields', async () => {
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByDisplayValue('Alice')).toBeTruthy();
-            expect(screen.getByDisplayValue('Smith')).toBeTruthy();
-        });
-    });
+    fireEvent.submit(container.querySelector("form"));
 
-    it('renders email field', async () => {
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByDisplayValue('alice@example.com')).toBeTruthy();
-        });
-    });
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        firstName: "Bob",
+        lastName: "Smith",
+        email: "alice@example.com",
+        year: "Year 2",
+      }),
+    );
+  });
 
-    it('renders Save Changes button', async () => {
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'Save Changes' })).toBeTruthy();
-        });
-    });
+  it("shows saved tick after a successful account save", async () => {
+    const onSave = vi.fn().mockResolvedValue(true);
+    const { container } = render(
+      <AccountForm user={baseUser} onSave={onSave} isSaving={false} />,
+    );
 
-    it('shows Saving... when isSaving', async () => {
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={true} />);
-        await waitFor(() => {
-            expect(screen.getByText('Saving...')).toBeTruthy();
-        });
-    });
+    await waitFor(() => screen.getByDisplayValue("Alice"));
 
-    it('shows locked course field when user has major', async () => {
-        getUserProfile.mockResolvedValueOnce({ year: 'Year 1', major: 'Physics' });
-        render(<AccountForm user={{ ...user, major: 'Physics' }} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByText('Physics')).toBeTruthy();
-            expect(screen.getByText(/cannot be changed after/)).toBeTruthy();
-        });
+    fireEvent.change(screen.getByLabelText("First Name"), {
+      target: { value: "Bob" },
     });
+    fireEvent.submit(container.querySelector("form"));
 
-    it('shows editable course field when user has no major', async () => {
-        getUserProfile.mockResolvedValueOnce({ year: 'Year 1', major: '' });
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByText(/Choose carefully/)).toBeTruthy();
-        });
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /saved!/i })).toBeTruthy();
     });
-
-    it('calls onSave with form data when submitted', async () => {
-        const onSave = vi.fn();
-        const { container } = render(<AccountForm user={user} onSave={onSave} isSaving={false} />);
-        await waitFor(() => screen.getByDisplayValue('Alice'));
-        fireEvent.submit(container.querySelector('form'));
-        expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
-            firstName: 'Alice',
-            lastName: 'Smith',
-        }));
-    });
-
-    it('handles getUserProfile error gracefully', async () => {
-        getUserProfile.mockRejectedValueOnce(new Error('Network error'));
-        render(<AccountForm user={user} onSave={vi.fn()} isSaving={false} />);
-        await waitFor(() => {
-            expect(screen.getByDisplayValue('Alice')).toBeTruthy();
-        });
-    });
+  });
 });

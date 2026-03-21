@@ -1,72 +1,65 @@
-/**
- * Tasks page: list sidebar, task feed, create modals, toasts.
- * Uses useTasksPage for state and subcomponents for layout.
+/*
+ * Tasks page shell with sidebar, feed, modals, and toast feedback.
  */
 
 import TaskFeed from "./components/TaskFeed";
 import ListSidebar from "./components/ListSidebar";
 import CreateTaskModal from "./components/CreateTaskModal";
 import CreateListModal from "./components/CreateListModal";
+import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
+import AppToast from "../../components/common/AppToast/AppToast";
 import styles from "./TasksPage.module.css";
 
 function ToastUndo({ onUndo, onClose }) {
   return (
-    <div className={styles.toast}>
-      <span>Task added.</span>
-      <button type="button" className={styles.toastUndoBtn} onClick={onUndo}>Undo</button>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast
+      message="Task added."
+      actionLabel="Undo"
+      onAction={onUndo}
+      onClose={onClose}
+      variant="success"
+    />
   );
 }
 
 function ToastDelete({ onClose }) {
   return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>🗑 Task deleted.</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
+    <AppToast message="Task deleted." onClose={onClose} variant="success" />
   );
 }
 
 function ToastInfo({ message, onClose }) {
-  return (
-    <div className={`${styles.toast} ${styles.toastDelete}`}>
-      <span>{message}</span>
-      <button type="button" className={styles.toastClose} onClick={onClose}>✕</button>
-    </div>
-  );
+  return <AppToast message={message} onClose={onClose} variant="success" />;
 }
 
 function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask, setToastUndo, setToastDelete, setToastInfo }) {
   return (
-    <>
+    <AnimatePresence initial={false}>
       {toastUndo && <ToastUndo onUndo={handleUndoAddTask} onClose={() => setToastUndo(null)} />}
       {toastDelete && <ToastDelete onClose={() => setToastDelete(false)} />}
       {toastInfo && <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />}
-    </>
+    </AnimatePresence>
   );
+}
+
+function SkeletonRows({ count, className, step }) {
+  return [...Array(count)].map((_, index) => <div key={index} className={`${styles.skel} ${className}`} style={{ animationDelay: `${index * step}s` }} />);
 }
 
 function TasksSkeleton() {
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-testid="tasks-skeleton">
       <div className={styles.skelSidebar}>
         <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
-        ))}
+        <SkeletonRows count={3} className={styles.skelSidebarRow} step={0.08} />
         <div className={styles.skelDivider} />
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
-        ))}
+        <SkeletonRows count={4} className={styles.skelSidebarRow} step={0.08} />
       </div>
       <div className={styles.skelFeed}>
         <div className={`${styles.skel} ${styles.skelFeedHeader}`} />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelTaskRow}`} style={{ animationDelay: `${i * 0.06}s` }} />
-        ))}
+        <SkeletonRows count={5} className={styles.skelTaskRow} step={0.06} />
       </div>
     </div>
   );

@@ -1,3 +1,7 @@
+/**
+ * Utility functions for managing the AnnouncementModal form state,
+ * validation, and image processing.
+ */
 import { validateEventTimes } from '../../../../Calendar/utils/dateValidation';
 
 export const MAX_IMAGES = 5;
@@ -12,7 +16,7 @@ export function getInitialForm(announcement) {
 }
 
 function mapAnnouncementToForm(base, announcement) {
-    const images = extractImageUrls(announcement.images);
+    const images = getImageList(announcement);
     return {
         ...base,
         title: announcement.title || "",
@@ -26,10 +30,9 @@ function mapAnnouncementToForm(base, announcement) {
     };
 }
 
-function extractImageUrls(images) {
-    return (images || [])
-        .map(img => (typeof img === 'object' && img.url) ? img.url : img)
-        .filter(Boolean);
+export function getImageList(ann) {
+    const raw = Array.isArray(ann?.images) ? ann.images : (ann?.image ? [ann.image] : []);
+    return raw.map(img => (typeof img === 'object' && img.url) ? img.url : img).filter(Boolean);
 }
 
 export function validateForm(form) {

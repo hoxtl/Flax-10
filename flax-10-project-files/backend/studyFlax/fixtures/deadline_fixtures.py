@@ -48,6 +48,21 @@ module_deadline_fixtures = {
         ("presentation", "Design Review Presentation", "10-minute group presentation of your design concept to a panel. Q&A follows. Slides to be uploaded to KEATS by 09:00 on the day."),
         ("exam", "Summer Term Exam", "Closed-book written exam. Covers thermodynamics, materials, and engineering mathematics. Formula sheet provided. Check KEATS for room."),
     ],
+    "LS4303": [
+        ("coursework", "Cadaveric Dissection Report", "Detailed write-up of your dissection session with labelled diagrams and clinical correlations. Submit via KEATS."),
+        ("exam", "Anatomy Spotter Exam", "Practical exam identifying structures on cadaveric specimens and models. Held at Guy's campus."),
+        ("exam", "Summer Term Exam", "Closed-book written exam covering all body systems. Bring student ID."),
+    ],
+    "LS4404": [
+        ("coursework", "Cardiovascular Physiology Lab Report", "Write-up of your ECG and blood pressure practical. Include data analysis and clinical interpretation. Submit via KEATS."),
+        ("quiz", "Renal Physiology KEATS Quiz", "20-question quiz on nephron function and fluid balance. Available on KEATS for 24 hours."),
+        ("exam", "Summer Term Exam", "Closed-book written exam on all physiological systems covered. Held at Guy's campus."),
+    ],
+    "LS4505": [
+        ("coursework", "Microbiology Case Study", "Analyse a clinical infection scenario: identify the pathogen, mechanism of infection and treatment options. 2000 words. Submit via KEATS."),
+        ("coursework", "Immunology Literature Review", "Critical review of recent developments in vaccine immunology. 2000 words. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book written exam on microbiology and immunology. Held at Guy's campus."),
+    ],
     "LS": [
         ("coursework", "Lab Practical Report", "Full write-up of your laboratory session. Use the standard scientific report format: introduction, methods, results, discussion. Submit via KEATS."),
         ("exam", "Reading Week Progress Test", "In-person multiple choice and short answer exam held during reading week. Covers weeks 1-5. Check KEATS for time and room allocation."),
@@ -59,6 +74,31 @@ module_deadline_fixtures = {
         ("coursework", "Mooting Skeleton Argument", "Written skeleton argument for your moot problem. Max 5 pages. Submit to KEATS 48 hours before your moot session."),
         ("presentation", "Oral Mooting Exercise", "Formal oral advocacy assessment. You will argue a ground of appeal before a panel. Dress professionally. Preparation materials on KEATS."),
         ("exam", "Summer Term Exam", "Open-book written exam. No annotations or sticky tabs in materials. Two problem questions in 2 hours. Check KEATS for room."),
+    ],
+    "PS4101": [
+        ("coursework", "Research Methods Portfolio", "Compile your weekly lab exercises into a single portfolio with reflections. APA format. Submit via Turnitin on KEATS."),
+        ("quiz", "Statistics KEATS Quiz", "Online quiz covering descriptive stats, t-tests and ANOVA from weeks 1-5. Available on KEATS for 24 hours."),
+        ("exam", "Summer Term Exam", "Closed-book written exam covering all major psychological approaches. 2 hours. Held at Strand campus."),
+    ],
+    "PS4202": [
+        ("coursework", "fMRI Data Analysis Report", "Analyse the provided neuroimaging dataset and write a 2000-word report interpreting activation patterns. Submit via Turnitin on KEATS."),
+        ("coursework", "Critical Literature Review", "2000-word critical review of three cognitive neuroscience papers on your assigned topic. APA referencing. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book written exam on perception, memory and attention. 2 hours. Held at Strand campus."),
+    ],
+    "PS4303": [
+        ("coursework", "Experimental Design Proposal", "Draft a full research proposal including hypotheses, methodology, and planned analysis. 2500 words. Submit via Turnitin."),
+        ("coursework", "Statistical Analysis Report", "Analyse the provided dataset using SPSS/R. Submit annotated output and a 1500-word interpretation. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book exam on research design, ethics and statistical methods. 2 hours. Held at Strand campus."),
+    ],
+    "PS4404": [
+        ("coursework", "Developmental Case Study", "2500-word case study applying developmental theories to a child observation scenario. APA format. Submit via Turnitin."),
+        ("coursework", "Piaget vs Vygotsky Essay", "2000-word comparative essay on constructivist theories of cognitive development. APA referencing. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book written exam on lifespan development. Two essays from a choice of four. 2 hours."),
+    ],
+    "PS4505": [
+        ("coursework", "Social Influence Experiment Report", "Write up your lab study on conformity or obedience in APA format. 2500 words. Submit via Turnitin on KEATS."),
+        ("coursework", "Prejudice & Discrimination Essay", "2000-word essay critically evaluating theories of prejudice. APA referencing. Submit via KEATS."),
+        ("exam", "Summer Term Exam", "Closed-book written exam on group dynamics and social cognition. 2 hours. Held at Strand campus."),
     ],
     "PS": [
         ("coursework", "Empirical Research Report", "Write up your lab study in APA format: abstract, introduction, methods, results, discussion. 2500 words. Submit via Turnitin on KEATS."),

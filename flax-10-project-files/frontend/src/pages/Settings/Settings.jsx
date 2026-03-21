@@ -1,46 +1,45 @@
-import { useState } from "react";
-import styles from "./Settings.module.css";
-import { SettingsTabs, SuccessBanner } from "../../components/Settings/SettingsUI";
-import AccountForm from "../../components/Settings/AccountForm";
-import SecurityForm from "../../components/Settings/SecurityForm";
-import PreferencesPanel from "../../components/Settings/PreferencesPanel";
-import HomeAddressForm from "../../components/Settings/HomeAddressForm";
-import { SleepSchedulePanel } from "../../components/Settings/SleepSchedulePanel";
+ /*
+ * Settings page shell and tab state.
+ */
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { ErrorMessage, SettingsSidebar } from "../../components/Settings/SettingsUI";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
+import AppPage from "../../components/common/AppPage/AppPage";
+import styles from "./Settings.module.css";
+import SettingsPanelContent from "./SettingsPanelContent";
+import { VALID_TABS } from "./settingsPageConfig";
 
-function SettingsHeader({ onBack }) {
-  return (
-    <div className={styles.header}>
-      <button className={styles.backButton} onClick={onBack}>←</button>
-      <h1 className={styles.title}>Settings</h1>
-    </div>
-  );
+function useActiveTab() {
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(getValidTab(tabFromUrl));
+
+  useEffect(() => {
+    setActiveTab(getValidTab(tabFromUrl));
+  }, [tabFromUrl]);
+
+  return { activeTab, setActiveTab };
 }
 
-function SettingsPanel({ activeTab, handlers, user }) {
-  const { isSaving, passwordError, handleAccountSave, handlePasswordSave, handlePreferencesSave, handleHomeAddressSave, homeAddressError, handleSleepSave } = handlers;
-  return (
-    <div className={styles.panel}>
-      {activeTab === "account" && <AccountForm user={user} onSave={handleAccountSave} isSaving={isSaving} />}
-      {activeTab === "security" && <SecurityForm onSave={handlePasswordSave} isSaving={isSaving} error={passwordError} />}
-      {activeTab === "preferences" && <PreferencesPanel onSave={handlePreferencesSave} isSaving={isSaving} />}
-      {activeTab === "home" && <HomeAddressForm onSave={handleHomeAddressSave} isSaving={isSaving} error={homeAddressError} />}
-      {activeTab === "sleep" && <SleepSchedulePanel onSave={handleSleepSave} isSaving={isSaving} />}
-    </div>
-  );
+function getValidTab(tabId) {
+  return VALID_TABS.has(tabId) ? tabId : "account";
 }
 
-export default function Settings({ user, onBack }) {
-  const [activeTab, setActiveTab] = useState("account");
-  const handlers = useSettingsHandlers(onBack);
+export default function Settings({ user }) {
+  const { activeTab, setActiveTab } = useActiveTab();
+  const handlers = useSettingsHandlers();
+
   return (
-    <div className={styles.container}>
-      <SettingsHeader onBack={onBack} />
-      <SuccessBanner message={handlers.successMessage} />
+    <AppPage title="Settings" width="lg" className={styles.pageWrapper}>
+      <ErrorMessage message={handlers.bannerMessage} />
       <div className={styles.content}>
-        <SettingsTabs activeTab={activeTab} onChange={setActiveTab} />
-        <SettingsPanel activeTab={activeTab} handlers={handlers} user={user} />
+        <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} user={user} />
+        <div className={styles.contentMain}>
+          <SettingsPanelContent activeTab={activeTab} handlers={handlers} user={user} />
+        </div>
       </div>
-    </div>
+    </AppPage>
   );
 }

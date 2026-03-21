@@ -1,48 +1,34 @@
-import styles from "../AttendancePage.module.css";
+/*
+ * Attendance segment detail panel.
+ */
 
-function formatEventDate(startTime) {
-  if (!startTime) return "";
-  const d = new Date(startTime);
-  return d.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+import { useState } from "react";
+import SegmentDetailHeader from "./SegmentDetailHeader";
+import SegmentDetailList from "./SegmentDetailList";
+import styles from "./AttendanceDetailPanel.module.css";
+
+export default function SegmentDetailPanel({ segmentLabel, events, onToggleStatus, onClose, className = "" }) {
+  const [toggling, setToggling] = useState({});
+  return <SegmentDetailPanelContent className={className} segmentLabel={segmentLabel} events={events} toggling={toggling} setToggling={setToggling} onToggleStatus={onToggleStatus} onClose={onClose} />;
 }
 
-/** Single responsibility: show list of events for the selected chart segment. */
-export default function SegmentDetailPanel({ segmentLabel, events, onClose }) {
-  if (!segmentLabel) return null;
+function SegmentDetailPanelContent({ className, segmentLabel, events, toggling, setToggling, onToggleStatus, onClose }) {
+  const panelClassName = className ? `${styles.detailPanel} ${className}` : styles.detailPanel;
+  const handleToggleStatus = (eventId, attended) => toggleDetailStatus(eventId, attended, onToggleStatus, setToggling);
 
   return (
-    <aside className={styles.detailPanel}>
-      <div className={styles.detailPanelHeader}>
-        <h3 className={styles.detailPanelTitle}>{segmentLabel}</h3>
-        <button
-          type="button"
-          className={styles.detailPanelClose}
-          onClick={onClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
-      </div>
-      <ul className={styles.detailList}>
-        {events.length === 0 ? (
-          <li className={styles.detailEmpty}>No events in this segment.</li>
-        ) : (
-          events.map((ev) => (
-            <li key={ev.id} className={styles.detailRow}>
-              <strong className={styles.detailRowTitle}>{ev.title}</strong>
-              <span className={styles.detailRowMeta}>
-                {formatEventDate(ev.start_time)}
-              </span>
-            </li>
-          ))
-        )}
-      </ul>
-    </aside>
+    <div className={panelClassName}>
+      <SegmentDetailHeader segmentLabel={segmentLabel} count={events.length} onClose={onClose} />
+      <ul className={styles.detailList}><SegmentDetailList events={events} toggling={toggling} onToggleStatus={handleToggleStatus} /></ul>
+    </div>
   );
+}
+
+async function toggleDetailStatus(eventId, attended, onToggleStatus, setToggling) {
+  setToggling((current) => ({ ...current, [eventId]: true }));
+  try {
+    await onToggleStatus?.(eventId, !attended);
+  } finally {
+    setToggling((current) => ({ ...current, [eventId]: false }));
+  }
 }

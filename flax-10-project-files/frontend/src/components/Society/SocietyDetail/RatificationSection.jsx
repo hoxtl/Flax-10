@@ -1,3 +1,7 @@
+/**
+ * RatificationSection manages the display and request flow for official society recognition.
+ * RatificationToggle allows admins to opt-in during society creation.
+ */
 import styles from "./RatificationSection.module.css";
 
 export function RatificationSection({ status, isRatified, onRequest }) {
@@ -36,20 +40,27 @@ function RatificationRequest({ onRequest }) {
     );
 }
 
+/** Toggle for requesting ratification during society setup. */
 export function RatificationToggle({ requested, onToggle }) {
     return (
         <div className={styles.toggleSection}>
-            <div className={styles.toggleRow}>
-                <div>
-                    <label className={styles.toggleLabel}>Request Ratification</label>
-                    <p className={styles.toggleHint}>Ratified societies are officially recognized</p>
-                </div>
-                <button className={`${styles.toggle} ${requested ? styles.toggleOn : ""}`}
-                    onClick={() => onToggle(!requested)} type="button">
-                    <span className={styles.toggleKnob} />
-                </button>
-            </div>
+            <ToggleHeader requested={requested} onToggle={onToggle} />
             {requested && <RatificationNotice />}
+        </div>
+    );
+}
+
+function ToggleHeader({ requested, onToggle }) {
+    return (
+        <div className={styles.toggleRow}>
+            <div>
+                <label className={styles.toggleLabel}>Request Ratification</label>
+                <p className={styles.toggleHint}>Ratified societies are officially recognised</p>
+            </div>
+            <button className={`${styles.toggle} ${requested ? styles.toggleOn : ""}`}
+                onClick={() => onToggle(!requested)} type="button">
+                <span className={styles.toggleKnob} />
+            </button>
         </div>
     );
 }

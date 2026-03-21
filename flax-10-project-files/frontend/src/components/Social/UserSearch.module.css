@@ -5,12 +5,19 @@
 }
 
 .searchBarContainer {
-    width: 200px;
-    transition: width 0.2s ease;
+    width: 250px;
 }
 
-.searchBarContainer:focus-within {
-    width: 300px;
+.fullWidthWrapper {
+    width: 100%;
+}
+
+.fullWidthSearch {
+    flex: 1;
+}
+
+.searchBarFull {
+    width: 100%;
 }
 
 .searchResults {
@@ -68,7 +75,8 @@
     top: 100%;
     margin-top: 8px;
     right: 0;
-    width: 350px;
+    width: var(--user-filter-dropdown-width);
+    max-width: var(--user-filter-dropdown-max-width);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -85,6 +93,8 @@
 .searchDropdownContainer {
     position: absolute;
     top: 100%;
+    left: 0;
+    width: 100%;
     margin-top: 8px;
     z-index: 9999;
     display: flex;
@@ -239,4 +249,24 @@
     gap: 12px;
     align-items: center;
     position: relative;
+}
+
+.compactDropdown {
+    max-height: 220px;
+    padding: 6px;
+    gap: 2px;
+    border-radius: 10px;
+    box-shadow: none;
+    border: 1px solid var(--border);
+}
+
+.compactDropdown .emptyStateWrap {
+    padding: 0;
+}
+
+.searchContainer .compactUserItem {
+    justify-content: flex-start;
+    padding: 6px 8px;
+    gap: 10px;
+    border-radius: 8px;
 }

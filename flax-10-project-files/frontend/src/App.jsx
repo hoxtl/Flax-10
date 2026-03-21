@@ -1,9 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import { APP_ROUTES } from "./lib/routes";
-import { getUserSettings, getUserProfile } from "./api/userService";
+import { getUserSettings, getUserProfile } from "./api/userApi";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -11,8 +17,10 @@ import { TimerProvider } from "./context/TimerContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
 import { TaskCompletionProvider } from "./context/TaskCompletionContext";
+import { ToastProvider } from "./context/ToastContext";
 import { NotificationToast } from "./components/Notifications";
 import AttendancePrompt from "./components/Attendance/AttendancePrompt";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import OnboardingModal from "./components/Onboarding/OnboardingModal";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -23,6 +31,7 @@ import PasswordResetConfirm from "./pages/Auth/PasswordResetConfirm";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Profile/Profile";
 import SocietyDetailPage from "./pages/Societies/SocietyDetailPage";
+import BannedPage from "./pages/Banned/BannedPage";
 
 import "./App.css";
 
@@ -79,23 +88,28 @@ function isAuthenticated() {
   return !!localStorage.getItem("token");
 }
 
+function isBannedFromStorage() {
+  return localStorage.getItem("banned") === "1";
+}
+
 function resolveScreen(authed, user, showWelcome) {
+  console.log('[App] resolveScreen - authed:', authed, 'user:', !!user, 'showWelcome:', showWelcome);
   if (!authed || !user) return "auth";
   if (showWelcome) return "welcome";
   return "app";
 }
 
 function resolveRouteContent(activeNav, user, setActiveNav) {
-  const baseNav = activeNav.split('_')[0];
-  const navParam = activeNav.split('_').slice(1).join('_');
+  const baseNav = activeNav.split("_")[0];
+  const navParam = activeNav.split("_").slice(1).join("_");
   const route = APP_ROUTES.find((r) => r.id === baseNav) || APP_ROUTES[0];
   const el = route.element;
   if (el && typeof el === "object") {
-    const extraProps = { user, onNavChange: setActiveNav };
+    const extraProps = { user, onNavChange: setActiveNav, onBack: () => setActiveNav("home") };
     // Pass the search param or create flag to modules view if provided
-    if (baseNav === 'modules' && navParam === 'create') {
+    if (baseNav === "modules" && navParam === "create") {
       extraProps.initialCreate = true;
-    } else if (baseNav === 'modules' && navParam) {
+    } else if (baseNav === "modules" && navParam) {
       extraProps.initialSearch = navParam;
     }
     return { ...el, props: { ...el.props, ...extraProps } };
@@ -118,49 +132,46 @@ function onBackToAuth() {
 }
 
 // Async helpers
-async function loadTheme(authed, setInitialTheme, setIsLoadingTheme) {
+async function loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme) {
   if (!authed) {
     setIsLoadingTheme(false);
     return;
   }
   try {
     const s = await getUserSettings();
-    setInitialTheme(s.theme || "light");
+    setInitialTheme(s.theme || "flax");
+    setInitialMode(s.mode || "light");
   } catch {
-    setInitialTheme("light");
+    setInitialTheme("flax");
+    setInitialMode("light");
   } finally {
     setIsLoadingTheme(false);
   }
 }
 
-function checkOnboarding(setShowOnboarding) {
-  getUserProfile()
-    .then((data) => {
-      if (!data?.major || data.major === "") setShowOnboarding(true);
-    })
-    .catch(() => { });
-}
 
 // Custom hooks
-function useSyncAuth(setAuthed, setUser, setShowWelcome) {
+function useSyncAuth(setAuthed, setUser, setBanned, setShowWelcome) {
   useEffect(() => {
     const sync = () => {
       setAuthed(isAuthenticated());
       setUser(readUser());
+      setBanned(isBannedFromStorage());
       setShowWelcome(localStorage.getItem(WELCOME_SEEN_KEY) !== "1");
     };
     window.addEventListener("auth-changed", sync);
     return () => window.removeEventListener("auth-changed", sync);
-  }, [setAuthed, setUser, setShowWelcome]);
+  }, [setAuthed, setUser, setBanned, setShowWelcome]);
 }
 
 function useThemeState(authed) {
-  const [initialTheme, setInitialTheme] = useState("light");
+  const [initialTheme, setInitialTheme] = useState("flax");
+  const [initialMode, setInitialMode] = useState("light");
   const [isLoadingTheme, setIsLoadingTheme] = useState(true);
   useEffect(() => {
-    loadTheme(authed, setInitialTheme, setIsLoadingTheme);
+    loadTheme(authed, setInitialTheme, setInitialMode, setIsLoadingTheme);
   }, [authed]);
-  return { initialTheme, isLoadingTheme };
+  return { initialTheme, initialMode, isLoadingTheme };
 }
 
 function readActiveNav() {
@@ -168,41 +179,45 @@ function readActiveNav() {
 }
 
 function useAppState() {
+  const { user, authenticated: authed, profile, loading: authLoading } = useAuth();
   const [activeNav, setActiveNavState] = useState(readActiveNav);
-  const [user, setUser] = useState(() => readUser());
-  const [authed, setAuthed] = useState(() => isAuthenticated());
   const [showWelcome, setShowWelcome] = useState(
     () => localStorage.getItem(WELCOME_SEEN_KEY) !== "1",
   );
-  useSyncAuth(setAuthed, setUser, setShowWelcome);
-  const { initialTheme, isLoadingTheme } = useThemeState(authed);
+  const [isBanned, setIsBanned] = useState(() => isBannedFromStorage());
+
+  const { initialTheme, initialMode, isLoadingTheme } = useThemeState(authed);
 
   const setActiveNav = useCallback((nav) => {
     localStorage.setItem(ACTIVE_NAV_KEY, nav);
     setActiveNavState(nav);
   }, []);
 
-  useEffect(() => {
-    // Moved custom 'navigate' event listener to AppScreen where useNavigate is available
-  }, []);
-
   return {
     activeNav,
     setActiveNav,
     initialTheme,
-    isLoadingTheme,
+    initialMode,
+    isLoadingTheme: isLoadingTheme || authLoading,
     user,
+    profile,
     authed,
     showWelcome,
     setShowWelcome,
+    isBanned,
   };
 }
 
 function useOnboardingCheck() {
+  const { profile, loading } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
   useEffect(() => {
-    checkOnboarding(setShowOnboarding);
-  }, []);
+    if (!loading && profile && (!profile.major || profile.major === "")) {
+      setShowOnboarding(true);
+    }
+  }, [profile, loading]);
+
   return [showOnboarding, setShowOnboarding];
 }
 
@@ -227,17 +242,19 @@ function AppProviders({ children }) {
   return (
     <NotificationProvider>
       <ConfirmProvider>
-        <CalendarProvider>
-          <TagProvider>
-            <TimerProvider>
-              <TaskCompletionProvider>
-                {children}
-                <NotificationToast />
-                <AttendancePrompt />
-              </TaskCompletionProvider>
-            </TimerProvider>
-          </TagProvider>
-        </CalendarProvider>
+        <ToastProvider>
+          <CalendarProvider>
+            <TagProvider>
+              <TimerProvider>
+                <TaskCompletionProvider>
+                  {children}
+                  <NotificationToast />
+                  <AttendancePrompt />
+                </TaskCompletionProvider>
+              </TimerProvider>
+            </TagProvider>
+          </CalendarProvider>
+        </ToastProvider>
       </ConfirmProvider>
     </NotificationProvider>
   );
@@ -248,6 +265,7 @@ function AuthRoutes({ location }) {
   return (
     <Routes location={location}>
       <Route path="/login" element={<AuthPage />} />
+      <Route path="/signup" element={<AuthPage initialSignIn={false} />} />
       <Route path="/reset-password" element={<PasswordResetRequest />} />
       <Route path="/reset-password/:token" element={<PasswordResetConfirm />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
@@ -289,22 +307,36 @@ function WelcomeScreen({ user, setShowWelcome, setActiveNav }) {
   );
 }
 
-function DashboardContent({ activeNav, setActiveNav, user }) {
+function DashboardContent({ activeNav, setActiveNav, user, onNavChange }) {
   if (activeNav === "settings")
     return <Settings user={user} onBack={() => setActiveNav("home")} />;
   if (activeNav === "profile")
-    return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+    return (
+      <Profile
+        user={user}
+        onBack={() => setActiveNav("home")}
+        onNavigate={onNavChange}
+      />
+    );
   if (activeNav.startsWith("profile_"))
-    return renderProfileView(activeNav, setActiveNav, user);
+    return renderProfileView(activeNav, setActiveNav, user, onNavChange);
   return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
-function renderProfileView(activeNav, setActiveNav, user) {
+function renderProfileView(activeNav, setActiveNav, user, onNavChange) {
   const viewedUserId = activeNav.split("_")[1];
-  return <Profile user={user} viewedUserId={viewedUserId} onBack={() => setActiveNav("home")} onNavigate={setActiveNav} />;
+  return (
+    <Profile
+      user={user}
+      viewedUserId={viewedUserId}
+      onBack={() => setActiveNav("users")}
+      backLabel="Back to All Users"
+      onNavigate={onNavChange}
+    />
+  );
 }
 
-function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
+function AnimatedDashboardContent({ activeNav, setActiveNav, user, onNavChange }) {
   return (
     <div style={DASH_WRAP_STYLE}>
       <AnimatePresence>
@@ -313,6 +345,7 @@ function AnimatedDashboardContent({ activeNav, setActiveNav, user }) {
             activeNav={activeNav}
             setActiveNav={setActiveNav}
             user={user}
+            onNavChange={onNavChange}
           />
         </motion.div>
       </AnimatePresence>
@@ -324,60 +357,104 @@ function OnboardingWrapper({ onComplete }) {
   const [showOnboarding, setShowOnboarding] = useOnboardingCheck();
   const handleComplete = () => {
     setShowOnboarding(false);
-    window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
+    window.dispatchEvent(new CustomEvent("navigate", { detail: "settings" }));
   };
   return (
     <OnboardingModal isOpen={showOnboarding} onComplete={handleComplete} />
   );
 }
 
-import ScrollToTop from "./components/common/ScrollToTop";
+import ScrollToTop from "./components/common/ScrollToTop/ScrollToTop";
 
 function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();
   const navigate = useNavigate();
   useSyncNavFromUrl(location.pathname, setActiveNav);
 
-  const handleNavChange = useCallback((id) => {
-    if (id.startsWith("societies_")) {
-      setActiveNav("societies");
-      const parts = id.split("_");
-      const socId = parts[1];
-      const tab = parts[2];
-      const url = tab ? `/societies?id=${socId}&tab=${tab}` : `/societies?id=${socId}`;
-      navigate(url);
-      return;
-    }
+  const handleNavChange = useCallback(
+    (id) => {
+      if (id.startsWith("societies_")) {
+        setActiveNav("societies");
+        const parts = id.split("_");
+        const socId = parts[1];
+        const tab = parts[2];
+        const url = tab
+          ? `/societies?id=${socId}&tab=${tab}`
+          : `/societies?id=${socId}`;
+        navigate(url);
+        return;
+      }
 
-    if (id.startsWith('/')) {
-      navigate(id);
-      return;
-    }
+      if (id.startsWith("group-work_")) {
+        const parts = id.split("_");
+        const projectId = parts[1];
+        const tab = parts[2];
+        const url = tab
+          ? `/group-work?project=${projectId}&tab=${tab}`
+          : `/group-work?project=${projectId}`;
+        handleNavChange(url);
+        return;
+      }
 
-    const baseNav = id.split('?')[0];
-    const route = APP_ROUTES.find((r) => r.id === baseNav);
+      if (id === "profile") {
+        setActiveNav("profile");
+        navigate("/profile");
+        return;
+      }
 
-    if (route) {
-      setActiveNav(baseNav);
-      const queryPart = id.includes('?') ? `?${id.split('?')[1]}` : '';
-      navigate(`${route.path}${queryPart}`);
-    } else {
-      setActiveNav(id);
-    }
-  }, [navigate, setActiveNav]);
+      if (id.startsWith("profile_")) {
+        const viewedUserId = id.split("_")[1];
+        setActiveNav(id);
+        navigate(`/profile/${viewedUserId}`);
+        return;
+      }
+
+      if (id === "settings") {
+        setActiveNav("settings");
+        navigate("/settings");
+        return;
+      }
+
+      if (id.startsWith("/")) {
+        navigate(id);
+        return;
+      }
+
+      const baseNav = id.split("?")[0];
+      const route = APP_ROUTES.find((r) => r.id === baseNav);
+
+      if (route) {
+        setActiveNav(baseNav);
+        const queryPart = id.includes("?") ? `?${id.split("?")[1]}` : "";
+        navigate(`${route.path}${queryPart}`);
+      } else {
+        setActiveNav(id);
+      }
+    },
+    [navigate, setActiveNav],
+  );
 
   useEffect(() => {
     const handleGlobalNavigate = (e) => handleNavChange(e.detail);
-    window.addEventListener('navigate', handleGlobalNavigate);
-    return () => window.removeEventListener('navigate', handleGlobalNavigate);
+    window.addEventListener("navigate", handleGlobalNavigate);
+    return () => window.removeEventListener("navigate", handleGlobalNavigate);
   }, [handleNavChange]);
 
   return (
     <ScreenWrap animKey="app">
       <AppProviders>
         <ScrollToTop />
-        <DashboardLayout activeNav={activeNav} onNavChange={handleNavChange} user={user}>
-          <AnimatedDashboardContent activeNav={activeNav} setActiveNav={setActiveNav} user={user} />
+        <DashboardLayout
+          activeNav={activeNav}
+          onNavChange={handleNavChange}
+          user={user}
+        >
+          <AnimatedDashboardContent
+            activeNav={activeNav}
+            setActiveNav={setActiveNav}
+            user={user}
+            onNavChange={handleNavChange}
+          />
         </DashboardLayout>
         <OnboardingWrapper />
       </AppProviders>
@@ -388,6 +465,19 @@ function AppScreen({ activeNav, setActiveNav, user }) {
 function useSyncNavFromUrl(pathname, setActiveNav) {
   useEffect(() => {
     const path = pathname || "/";
+    if (path === "/profile") {
+      setActiveNav("profile");
+      return;
+    }
+    if (path.startsWith("/profile/")) {
+      const viewedUserId = path.split("/")[2];
+      if (viewedUserId) setActiveNav(`profile_${viewedUserId}`);
+      return;
+    }
+    if (path === "/settings") {
+      setActiveNav("settings");
+      return;
+    }
     const route = APP_ROUTES.find((r) => r.path === path);
     if (route) setActiveNav(route.id);
   }, [pathname, setActiveNav]);
@@ -395,8 +485,22 @@ function useSyncNavFromUrl(pathname, setActiveNav) {
 
 // Screen render
 function renderScreen(screen, state) {
-  const { user, authed, showWelcome, setShowWelcome, activeNav, setActiveNav } =
-    state;
+  const {
+    user,
+    authed,
+    showWelcome,
+    setShowWelcome,
+    activeNav,
+    setActiveNav,
+    isBanned,
+  } = state;
+  if (isBanned)
+    return (
+      <BannedPage
+        key="banned"
+        reason={localStorage.getItem("ban_reason") || ""}
+      />
+    );
   if (screen === "auth") return <AuthScreen key="auth" />;
   if (screen === "welcome")
     return (
@@ -419,11 +523,24 @@ function renderScreen(screen, state) {
 
 // Root
 export default function App() {
-  const state = useAppState();
-  if (state.isLoadingTheme) return null;
-  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
   return (
-    <ThemeProvider initialTheme={state.initialTheme}>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
+  const state = useAppState();
+  console.log('[App] AppContent render - isLoadingTheme:', state.isLoadingTheme, 'authed:', state.authed);
+  if (state.isLoadingTheme) {
+    console.log('[App] rendering NULL (loading theme/auth)');
+    return null;
+  }
+  const screen = resolveScreen(state.authed, state.user, state.showWelcome);
+  console.log('[App] rendering screen:', screen);
+  return (
+    <ThemeProvider initialTheme={state.initialTheme} initialMode={state.initialMode}>
       <div style={ROOT_STYLE}>
         <AnimatePresence>{renderScreen(screen, state)}</AnimatePresence>
       </div>

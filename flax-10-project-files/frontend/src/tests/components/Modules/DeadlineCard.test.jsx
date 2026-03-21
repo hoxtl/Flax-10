@@ -1,6 +1,9 @@
+/*
+ * Tests for DeadlineCard component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import DeadlineCard from '../../../components/Modules/DeadlineCard';
+import DeadlineCard from '../../../components/Modules/Deadlines/DeadlineCard';
 
 vi.mock('../../../components/Modules/utils/deadlineUtils', () => ({
     getDeadlineCountdown: vi.fn(() => '5 days remaining'),
@@ -11,7 +14,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     formatFullDateTime: vi.fn(() => 'Friday, 6 March 2026, 10:00'),
 }));
 
-vi.mock('../../../components/Modules/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
 
 import { getDeadlineCountdown } from '../../../components/Modules/utils/deadlineUtils';
 

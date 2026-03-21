@@ -1,3 +1,5 @@
+/* Tests for the CreateTaskBar quick-add component. */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CreateTaskBar from '../../../pages/Tasks/components/CreateTaskBar';
@@ -11,7 +13,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn().mockReturnValue(false),
 }));
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
@@ -27,8 +29,8 @@ vi.mock('../../../components/common/SleepWarningModal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
-    default: ({ value, onChange, options, placeholder, className }) => (
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
             value={value}

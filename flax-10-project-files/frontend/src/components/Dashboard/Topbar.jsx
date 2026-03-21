@@ -1,3 +1,7 @@
+/*
+ * Dashboard top navigation bar.
+ */
+
 import styles from "./Topbar.module.css";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../../context/NotificationContext";
@@ -5,18 +9,23 @@ import { NotificationPanel } from "../Notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
-import { Bell, Plus, ChevronDown, Calendar, Clock } from "lucide-react";
-import { SegmentedControl } from "../ui/SegmentedControl";
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import {
+  Bell,
+  ChevronDown,
+  Calendar,
+  Clock,
+} from "lucide-react";
+import { SegmentedControl } from "../common";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { useState, useRef } from "react";
 
 
 function BrandLogo({ onNavChange }) {
   return (
     <div className={styles.brandContainer} onClick={() => onNavChange?.("home")} style={{ cursor: "pointer" }}>
-      <motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
+      <Motion.div className={styles.logoMark} whileHover={{ rotate: 8, scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
       <span className={styles.brandName}>StudyFlax</span>
     </div>
   );
@@ -43,22 +52,43 @@ function parseRouteOption(r) {
   return { value: r.id, label };
 }
 
-function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange }) {
-  const hasActive = routes.some(r => r.id === activeNav);
-  const trigger = <NavDropdownTrigger title={title} hasActive={hasActive} />;
+function buildNavDropdownOptions(routes) {
+  return routes.map(parseRouteOption);
+}
+
+function handleNavSelection(nextId, onNavChange) {
+  if (nextId === "modules") window.dispatchEvent(new CustomEvent("modules:show-all"));
+  onNavChange?.(nextId);
+}
+
+function NavDropdownMenu(props) {
+  return (
+    <AnimatedDropdown
+      customTrigger={<NavDropdownTrigger title={props.title} hasActive={props.routes.some((route) => route.id === props.activeNav)} />}
+      options={buildNavDropdownOptions(props.routes)}
+      value={props.activeNav}
+      onChange={(nextId) => handleNavSelection(nextId, props.onNavChange)}
+      hideCheckmark={true}
+      isOpen={props.isOpen}
+      onOpenChange={props.onOpenChange}
+      usePortal={props.usePortal}
+    />
+  );
+}
+
+function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal }) {
   return (
     <div className={styles.navGroup}>
-      <AnimatedDropdown customTrigger={trigger} options={routes.map(parseRouteOption)}
-        value={activeNav} onChange={onNavChange} hideCheckmark={true}
-        isOpen={isOpen} onOpenChange={onOpenChange} />
+      <NavDropdownMenu title={title} routes={routes} activeNav={activeNav} onNavChange={onNavChange} isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} />
     </div>
   );
 }
 
 const NAV_SECTIONS = [
-  { title: "Plan", ids: ["calendar", "tasks", "timer", "analytics"] },
+  { title: "Plan", ids: ["calendar", "tasks", "timer"] },
   { title: "Study", ids: ["modules", "group-work"] },
   { title: "My KCL", ids: ["map", "societies", "users"] },
+  { title: "My Insights", ids: ["analytics", "attendance"] },
   { title: "Admin", ids: ["admin"] }
 ];
 
@@ -80,7 +110,7 @@ function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu
   return (
     <div onMouseEnter={() => onEnter(title)}>
       <NavDropdown title={title} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
-        isOpen={activeMenu === title} onOpenChange={change} />
+        isOpen={activeMenu === title} onOpenChange={change} usePortal={true} />
     </div>
   );
 }
@@ -98,20 +128,25 @@ function TopBarNav({ activeNav, onNavChange, user }) {
   );
 }
 
-function QuickTabs({ onAddClick }) {
+function NotifTab() {
   const { togglePanel, notifications } = useNotifications();
   const unreadCount = notifications.filter(n => !n.read).length;
-  const tabs = [{ title: "Add", icon: Plus, autoCollapse: true }, { type: "separator" }, { title: "Notifications", icon: Bell, badge: unreadCount }];
-  const change = (i) => i === 0 ? onAddClick?.() : i === 2 && togglePanel();
-  return <ExpandableTabs tabs={tabs} onChange={change} />;
+  const tabs = [{ title: "Notifications", icon: Bell, badge: unreadCount }];
+  return <ExpandableTabs tabs={tabs} onChange={(i) => i !== null && togglePanel()} />;
 }
 
-function ActionPill({ onAddClick, onNavChange }) {
+function ActionPill({ onNavChange }) {
+  const openQuickActions = () => window.dispatchEvent(new CustomEvent("quick-actions:open"));
   return (
     <div className={styles.actionPill}>
+      <button type="button" className={styles.quickActionsBtn} onClick={openQuickActions}>
+        Quick actions
+        <span className={styles.quickActionsKey}>/</span>
+      </button>
+      <div className={styles.pillDivider} />
       <ThemeToggle />
       <div className={styles.pillDivider} />
-      <QuickTabs onAddClick={onAddClick} />
+      <NotifTab />
       <NotificationPanel onNavChange={onNavChange} />
     </div>
   );
@@ -139,9 +174,9 @@ const TopbarTools = ({ onNavChange, activeNav }) => (
   </div>
 );
 
-function TopBarActions({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
-  const action = <ActionPill onAddClick={onAddClick} onNavChange={onNavChange} />;
+  const action = <ActionPill onNavChange={onNavChange} />;
   const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
   return <div className={styles.actions}>{tools}{action}{pDrop}</div>;
 }
@@ -153,8 +188,8 @@ const TopBarLeftSection = ({ onNavChange, activeNav, user }) => (
   </div>
 );
 
-export default function TopBar({ onAddClick, user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+export default function TopBar({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
   const left = <TopBarLeftSection onNavChange={onNavChange} activeNav={activeNav} user={user} />;
-  const right = <div className={styles.rightSection}><TopBarActions onAddClick={onAddClick} user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
+  const right = <div className={styles.rightSection}><TopBarActions user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} onNavChange={onNavChange} activeNav={activeNav} /></div>;
   return <header className={styles.container}>{left}{right}</header>;
 }

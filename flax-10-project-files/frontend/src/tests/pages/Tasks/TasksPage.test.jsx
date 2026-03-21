@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for TasksPage: loading state, main layout, toasts, modals.
  */
 
@@ -46,7 +46,7 @@ describe("TasksPage", () => {
   it("shows loading when loading is true", () => {
     useTasksPage.mockReturnValue({ ...defaultPageProps, loading: true });
     render(<MemoryRouter><TasksPage /></MemoryRouter>);
-    expect(screen.getByText(/Loading tasks/i)).toBeInTheDocument();
+    expect(screen.getByTestId('tasks-skeleton')).toBeInTheDocument();
   });
 
   it("renders ListSidebar and TaskFeed when not loading", () => {

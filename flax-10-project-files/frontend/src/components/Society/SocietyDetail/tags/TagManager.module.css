@@ -1,3 +1,4 @@
+/* Styles for the society custom tag administrative interface. */
 .manager {
     padding: 16px;
     background: var(--panel);
@@ -153,4 +154,11 @@
 .addBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.error {
+    color: var(--danger, #ef4444);
+    font-size: 0.75rem;
+    margin: 4px 0 0;
+    width: 100%;
 }

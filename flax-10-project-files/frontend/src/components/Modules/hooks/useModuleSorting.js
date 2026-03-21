@@ -1,19 +1,30 @@
-import {useState} from 'react';
+/*
+ * Hook for managing module sorting, filtering, and pagination.
+ */
+import { useState } from 'react';
 import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15;
+
+function paginate(items, page) {
+    return items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+}
 
 export default function useModuleSorting(modules) {
     const [currentPage, setCurrentPage] = useState(1);
-    const [department, setDepartment] = useState('all');
+    const [selectedCourses, setSelectedCourses] = useState([]);
     const [sortBy, setSortBy] = useState('name');
 
-    const results = applyFiltersAndSort(modules, department, sortBy);
-    const pageModules = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    const toggleCourse = (course) => {
+        setSelectedCourses(prev => prev.includes(course) ? prev.filter(c => c !== course) : [...prev, course]);
+        setCurrentPage(1);
+    };
+    const handleNewSort = (sort) => { setSortBy(sort); setCurrentPage(1); };
+    const clearFilters = () => { setSelectedCourses([]); setCurrentPage(1); };
+
+    const results = applyFiltersAndSort(modules, selectedCourses, sortBy);
+    const pageModules = paginate(results, currentPage);
     const totalPages = Math.ceil(results.length / PAGE_SIZE);
 
-    const handleNewDepartment = (dept) => { setDepartment(dept); setCurrentPage(1); };
-    const handleNewSort = (sort) => { setSortBy(sort); setCurrentPage(1); };
-
-    return { pageModules, results, department, sortBy, currentPage, totalPages, handleNewDepartment, handleNewSort, setCurrentPage };
-}   
+    return { pageModules, results, selectedCourses, toggleCourse, sortBy, currentPage, totalPages, handleNewSort, setCurrentPage, clearFilters };
+}

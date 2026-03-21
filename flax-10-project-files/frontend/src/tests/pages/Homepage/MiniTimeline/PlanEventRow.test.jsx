@@ -122,7 +122,7 @@ describe('PlanEventRow', () => {
         renderRow({ onCardClick: undefined, onEdit });
         const card = document.querySelector('[role="button"]');
         fireEvent.click(card);
-        expect(onEdit).toHaveBeenCalledWith(baseRow.item, null);
+        expect(onEdit).toHaveBeenCalledWith(baseRow.item, null, expect.anything());
     });
 
     it('calls onEventContextMenu on context menu', () => {

@@ -40,6 +40,8 @@ describe('TreeAnimation', () => {
         expect(group).toHaveStyle({ clipPath: 'inset(0% 0 0 0)' });
 
         rerender(<TreeAnimation progress={0} mode="work" />);
-        expect(group).toHaveStyle({ clipPath: 'inset(100% 0 0 0)' });
+        // TreeAnimation clamps displayProgress to at least 15.
+        // progress=0 => displayProgress=15 => percentHidden=85
+        expect(group).toHaveStyle({ clipPath: 'inset(85% 0 0 0)' });
     });
 });

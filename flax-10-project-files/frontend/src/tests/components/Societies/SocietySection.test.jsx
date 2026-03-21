@@ -4,7 +4,7 @@ import SocietySection from '../../../pages/Societies/SocietySection';
 
 vi.mock('../../../components/Society/SocietyCard', () => ({
     default: ({ society, onClick }) => (
-        <div data-testid="society-card" onClick={onClick}>{society.name}</div>
+        <div data-testid="society-card" onClick={() => onClick?.(society)}>{society.name}</div>
     ),
 }));
 
@@ -100,6 +100,6 @@ describe('SocietySection', () => {
                 pagination={{ currentPage: 1, totalPages: 2, onPageChange: vi.fn() }}
             />
         );
-        expect(screen.getByRole('button', { name: /Next/ })).toBeInTheDocument();
+        expect(screen.getAllByRole('button', { name: /Next/ }).length).toBeGreaterThan(0);
     });
 });

@@ -1,11 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SecurityForm from '../../../components/Settings/SecurityForm';
 
 describe('SecurityForm', () => {
     it('renders password fields', () => {
         render(<SecurityForm onSave={vi.fn()} isSaving={false} />);
-        expect(screen.getByLabelText('Current Password')).toBeTruthy();
         expect(screen.getByLabelText('New Password')).toBeTruthy();
         expect(screen.getByLabelText('Confirm New Password')).toBeTruthy();
     });
@@ -28,14 +27,23 @@ describe('SecurityForm', () => {
     it('calls onSave with form data on submit', () => {
         const onSave = vi.fn();
         const { container } = render(<SecurityForm onSave={onSave} isSaving={false} />);
-        fireEvent.change(screen.getByLabelText('Current Password'), { target: { name: 'currentPassword', value: 'old123' } });
         fireEvent.change(screen.getByLabelText('New Password'), { target: { name: 'newPassword', value: 'new123' } });
         fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { name: 'confirmPassword', value: 'new123' } });
         fireEvent.submit(container.querySelector('form'));
         expect(onSave).toHaveBeenCalledWith({
-            currentPassword: 'old123',
             newPassword: 'new123',
             confirmPassword: 'new123',
+        });
+    });
+
+    it('shows saved tick after a successful password change', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        const { container } = render(<SecurityForm onSave={onSave} isSaving={false} />);
+        fireEvent.change(screen.getByLabelText('New Password'), { target: { name: 'newPassword', value: 'new12345' } });
+        fireEvent.change(screen.getByLabelText('Confirm New Password'), { target: { name: 'confirmPassword', value: 'new12345' } });
+        fireEvent.submit(container.querySelector('form'));
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
         });
     });
 });

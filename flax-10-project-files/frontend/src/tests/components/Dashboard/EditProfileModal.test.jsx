@@ -4,7 +4,7 @@ import EditProfileModal from '../../../components/Dashboard/EditProfileModal';
 
 const updateUserProfileMock = vi.fn();
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
   updateUserProfile: (...args) => updateUserProfileMock(...args),
 }));
 
@@ -58,7 +58,7 @@ describe('EditProfileModal', () => {
     expect(updateUserProfileMock).not.toHaveBeenCalled();
   });
 
-  it('submits form successfully and closes after delay', async () => {
+  it('submits form successfully and shows saved tick feedback', async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     const onClose = vi.fn();
 
@@ -75,8 +75,9 @@ describe('EditProfileModal', () => {
       expect(formData.get('bio')).toBe('new bio');
     });
 
-    expect(await screen.findByText('Profile saved successfully!')).toBeTruthy();
-    await waitFor(() => expect(onClose).toHaveBeenCalled(), { timeout: 2500 });
+    expect(await screen.findByRole('button', { name: '✓ Saved!' })).toBeTruthy();
+    expect(screen.queryByText('Profile saved successfully!')).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('supports photo upload/remove and shows server error', async () => {
@@ -103,11 +104,11 @@ describe('EditProfileModal', () => {
     expect(await screen.findByText('Server exploded')).toBeTruthy();
   });
 
-  it('calls onClose when overlay is clicked', () => {
+  it('calls onClose when backdrop is clicked', () => {
     const onClose = vi.fn();
-    const { container } = render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
-    const overlay = container.querySelector('[class*="overlay"]');
-    fireEvent.click(overlay);
+    render(<EditProfileModal user={user} isOpen onClose={onClose} onSave={vi.fn()} />);
+    const backdrop = document.querySelector('[class*="backdrop"]');
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 

@@ -1,65 +1,59 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Filter } from "lucide-react";
 import styles from "./PillFilters.module.css";
 import { countByType } from "./utils/pillUtils";
 import { useTags } from "../../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
-import BasePill from "./BasePill";
+import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
 
 export default function PillFilters({ active, onChange, items }) {
   const { tags } = useTags();
   const [showManager, setShowManager] = useState(false);
   const counts = countByType(items);
-  const pills = getAllPills(tags);
+
+  const options = useMemo(() => {
+    const uniqueTags = Array.from(
+      new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
+    );
+    return [
+      { value: "all", label: `All (${counts["all"] || 0})` },
+      ...uniqueTags.map(t => ({
+        value: t.label.toLowerCase(),
+        label: `${t.label} (${counts[t.label.toLowerCase()] || 0})`,
+      })),
+    ];
+  }, [tags, counts]);
+
+  const activeLabel = options.find(o => o.value === active)?.label || "Filter";
+
+  const trigger = (
+    <button className={styles.filterTrigger} type="button">
+      <Filter size={15} />
+      <span>{activeLabel}</span>
+    </button>
+  );
+
   return (
     <>
       <div className={styles.row}>
-        {pills.map((p) => (
-          <PillItem
-            key={p.id} pill={p} active={active}
-            counts={counts} onChange={onChange}
-          />
-        ))}
-        <ManagerButton onClick={() => setShowManager(true)} />
+        <AnimatedDropdown
+          customTrigger={trigger}
+          options={options}
+          value={active}
+          onChange={onChange}
+          align="left"
+          className={styles.filterDropdown}
+        />
+        <button
+          className={styles.managerBtn}
+          onClick={() => setShowManager(true)}
+          aria-label="Manage Tags"
+          type="button"
+        >
+          Manage Tags
+        </button>
       </div>
       {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
     </>
   );
-}
-
-/**
- * Combines the static 'All' option with dynamic tags from context.
- */
-function getAllPills(tags) {
-  return [
-    { id: "all", key: "all", label: "All" },
-    ...tags.map(t => ({ id: t.id, key: t.label.toLowerCase(), label: t.label, color: t.color })),
-  ];
-}
-
-/**
- * Renders an individual pill button.
- */
-function PillItem({ pill, active, counts, onChange }) {
-  return (
-    <BasePill
-      label={pill.label}
-      count={counts[pill.key] || 0}
-      isActive={checkActive(active, pill.key)}
-      onClick={() => onChange(pill.key)}
-      color={pill.color}
-    />
-  );
-}
-
-/**
- * Checks if a specific key is currently active in the filter state.
- * Handles both string (single) and array (multi) active states.
- */
-function checkActive(active, key) {
-  if (Array.isArray(active)) return active.includes(key);
-  return active === key;
-}
-
-function ManagerButton({ onClick }) {
-  return <button className={`${styles.pill} ${styles.inactive}`} onClick={onClick} aria-label="Manage Tags">✎</button>;
 }

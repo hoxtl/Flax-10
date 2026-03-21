@@ -1,14 +1,14 @@
-/**
- * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
+/*
+ * Modal for creating and editing tasks.
  */
 
-import { createPortal } from "react-dom";
-
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
-import EstTimeHelpBanner from "../../../components/ui/EstTimeHelpBanner";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import { Trash2, X } from "lucide-react";
+import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 
@@ -32,7 +32,9 @@ function CreateTaskModalHeader({ isEditMode, onClose }) {
   return (
     <div className={styles.header}>
       <h2 className={styles.title}>{isEditMode ? "Edit task" : "New task"}</h2>
-      <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+      <PrimaryButton type="button" variant="ghost" className={styles.closeBtn} onClick={onClose} aria-label="Close" pill>
+        <X size={18} strokeWidth={2.5} />
+      </PrimaryButton>
     </div>
   );
 }
@@ -42,12 +44,15 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
     <div className={styles.footer}>
       {saveError && <p className={styles.saveError} role="alert">{saveError}</p>}
       {isEditMode && onDeleteTask && (
-        <button type="button" className={styles.deleteBtn} onClick={handleDelete} disabled={saving}>Delete task</button>
+        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" size="small" onClick={handleDelete} disabled={saving} pill>
+          <Trash2 size={15} strokeWidth={2.1} aria-hidden />
+          Delete task
+        </PrimaryButton>
       )}
-      <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-      <button type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date}>
+      <PrimaryButton type="button" className={styles.cancelBtn} variant="ghost" onClick={onClose} pill>Cancel</PrimaryButton>
+      <PrimaryButton type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date} pill>
         {saving ? "Saving…" : (isEditMode ? "Save" : "Add task")}
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
@@ -55,13 +60,13 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
 function CreateTaskModalTitleDesc({ form, set }) {
   return (
     <div className={styles.canvas}>
-      <label htmlFor="create-task-title" className={styles.label}>Task name <span className={styles.labelRequired}>*</span></label>
       <div className={styles.fieldGroup}>
-        <input id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
+        <label className={styles.gridLabel} htmlFor="create-task-title">Task name <span className={styles.labelRequired}>*</span></label>
+        <TextInput id="create-task-title" className={styles.titleInput} placeholder="What do you need to do?" value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus />
       </div>
-      <label htmlFor="create-task-desc" className={styles.label}>Description</label>
       <div className={styles.fieldGroup}>
-        <textarea id="create-task-desc" className={styles.desc} placeholder="Optional" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
+        <label className={styles.gridLabel} htmlFor="create-task-desc">Description <span className={styles.labelOptional}>(optional)</span></label>
+        <TextInput multiline id="create-task-desc" className={styles.desc} placeholder="Add a description…" rows={2} value={form.description} onChange={(e) => set("description", e.target.value)} />
       </div>
     </div>
   );
@@ -78,18 +83,52 @@ function CreateTaskModalDateTime({ form, set }) {
   );
 }
 
-function CreateTaskModalDuration({ form, setForm, askFlaxInitialMessage }) {
+function StudyBlockOptions({ form, setForm }) {
   return (
-    <div className={styles.durationRow}>
-      <EstTimeHelpBanner message="Not sure what estimated time to put? Ask Flax for a suggestion." ctaLabel="Ask Flax" initialMessage={askFlaxInitialMessage} className={styles.estTimeBannerModal} />
-      <span className={styles.focusBlocksLabel}>Est. time</span>
-      <div className={styles.chipGroup}>
+    <div className={styles.chipGroup}>
         {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
-          <button key={value} type="button" className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`} onClick={() => setForm((p) => ({ ...p, estimated_blocks: value }))}>{label}</button>
+          <button key={value} type="button" className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
+            onClick={() => setForm((p) => ({ ...p, estimated_blocks: value }))}
+          >
+            {label}
+          </button>
         ))}
       </div>
+  );
+}
+
+function CreateTaskModalDuration({ form, setForm, isReadingList }) {
+  if (isReadingList) return null;
+  return (
+    <div className={styles.durationRow}>
+      <span className={styles.focusBlocksLabel}>Est. time</span>
+        <StudyBlockOptions form={form} setForm={setForm} />
     </div>
   );
+}
+
+function getBlockLabel(estimatedReadingMinutes) {
+    const blocks = estimatedReadingMinutes ? Math.max(1, Math.round(estimatedReadingMinutes / 25)) : null;
+    return blocks ? `~${estimatedReadingMinutes} min · ${blocks * 25}m block${blocks > 1 ? "s" : ""}` : null;
+}
+
+function CreateTaskModalPageCount({ form, set, isReadingList, estimatedReadingMinutes }) {
+    if (!isReadingList) return null;
+    const blockLabel = getBlockLabel(estimatedReadingMinutes);
+    return (
+        <div className={styles.durationRow}>
+            <div className={styles.rowBlock}>
+                <span className={styles.focusBlocksLabel}>
+                    Page count <span style={{ opacity: 0.5, fontSize: "0.8em" }}>(optional)</span>
+                </span>
+                <input className={`${styles.titleInput} ${styles.pageCountModalInput}`} type="number" min="1"
+                    placeholder="e.g. 38" value={form.page_count ?? ""}
+                    onChange={(e) => set("page_count", e.target.value ? Number(e.target.value) : null)}
+                />
+                {blockLabel && <p className={styles.pageCountHint}>📖 Est. reading time: {blockLabel}</p>}
+            </div>
+        </div>
+    );
 }
 
 function CreateTaskModalCategory({ form, categoryOptions, selectedListColor, handleCategoryChange }) {
@@ -158,14 +197,15 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
-  const { form, set, setForm, categoryOptions, selectedListColor, askFlaxInitialMessage, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule } = state;
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
-      <CreateTaskModalDuration form={form} setForm={setForm} askFlaxInitialMessage={askFlaxInitialMessage} />
+      <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
+      <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>
@@ -179,7 +219,6 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
       onClose={onClose}
       hideHeader
       size="xl"
-      backdropClassName={styles.modalBackdrop}
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
@@ -194,11 +233,10 @@ function CreateTaskModalView({ state, addToScheduleLabel, onDeleteTask }) {
 
 export default function CreateTaskModal(props) {
   const state = useCreateTaskModal(props);
-  return createPortal(
+  return (
     <>
       <CreateTaskModalView state={state} addToScheduleLabel={props.addToScheduleLabel ?? "Add to today's schedule"} onDeleteTask={props.onDeleteTask} />
       {state.sleepWarning && <SleepWarningModal {...state.sleepWarningProps} />}
-    </>,
-    document.body
+    </>
   );
 }

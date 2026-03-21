@@ -1,33 +1,32 @@
+/*
+ * Password settings form.
+ */
 import { useState } from "react";
-import { FormInput, SectionHeader, SubmitButton, ErrorMessage } from "./SettingsUI";
-import styles from "../../pages/Settings/Settings.module.css";
+import SecurityFormLayout from "./SecurityFormLayout";
 
-function getInitialData() {
-  return { currentPassword: "", newPassword: "", confirmPassword: "" };
-}
-
-function PasswordFields({ formData, onChange }) {
-  return (
-    <>
-      <FormInput id="currentPassword" label="Current Password" type="password" value={formData.currentPassword} onChange={onChange} required />
-      <FormInput id="newPassword" label="New Password" type="password" value={formData.newPassword} onChange={onChange} required />
-      <FormInput id="confirmPassword" label="Confirm New Password" type="password" value={formData.confirmPassword} onChange={onChange} required />
-    </>
-  );
+function usePasswordForm() {
+  const [formData, setFormData] = useState({ newPassword: "", confirmPassword: "" });
+  const [saveSignal, setSaveSignal] = useState(0);
+  return { formData, setFormData, saveSignal, setSaveSignal };
 }
 
 export default function SecurityForm({ onSave, isSaving, error }) {
-  const [formData, setFormData] = useState(getInitialData());
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const form = usePasswordForm();
+  const hasUnsaved = Boolean(form.formData.newPassword || form.formData.confirmPassword);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    form.setFormData((previous) => ({ ...previous, [name]: value }));
   };
-  const handleSubmit = (e) => { e.preventDefault(); onSave(formData); };
-  return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <SectionHeader title="Change Password" description="Ensure your password is at least 8 characters long" />
-      <ErrorMessage message={error} />
-      <PasswordFields formData={formData} onChange={handleChange} />
-      <SubmitButton isSaving={isSaving} label="Change Password" savingLabel="Changing..." />
-    </form>
-  );}
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const ok = await onSave(form.formData);
+    if (ok) {
+      form.setFormData({ newPassword: "", confirmPassword: "" });
+      form.setSaveSignal((count) => count + 1);
+    }
+  };
+
+  return <SecurityFormLayout onSubmit={handleSubmit} error={error} formData={form.formData} handleChange={handleChange} isSaving={isSaving} hasUnsaved={hasUnsaved} saveSignal={form.saveSignal} />;
+}

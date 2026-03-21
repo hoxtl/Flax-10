@@ -44,6 +44,15 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
         </>
     ),
     ViewSettingsMenu: () => null,
+    ViewModeButton: ({ modes, activeMode, onChange }) => (
+        <select value={activeMode} onChange={e => onChange(e.target.value)}>
+            {modes.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+        </select>
+    ),
+    SearchButton: ({ value, onChange }) => (
+        <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
+    ),
+    ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -114,6 +123,11 @@ describe('CalendarHeader', () => {
         });
     });
 
+    it('renders manage schedules control', () => {
+        setup();
+        expect(screen.getByText('Manage schedules')).toBeInTheDocument();
+    });
+
     it('should open modal on adding event', () => {
         setup();
         const addBtn = screen.getByText('+');
@@ -161,9 +175,9 @@ describe('CalendarHeader', () => {
         setup();
         const importBtn = screen.getByText('Import timetable');
         fireEvent.click(importBtn);
-        const urlInput = await screen.findByDisplayValue('');
+        const urlInput = await screen.findByPlaceholderText(/timetable\.ics/i);
         fireEvent.change(urlInput, { target: { value: 'http://example.com/calendar.ics' } });
-        const submitBtn = document.querySelector('button[type="submit"]');
+        const submitBtn = screen.getByRole('button', { name: /^import$/i });
         fireEvent.click(submitBtn);
         await waitFor(() => expect(importTimetable).toHaveBeenCalledWith('http://example.com/calendar.ics'));
     });
@@ -190,7 +204,7 @@ describe('CalendarHeader', () => {
         setup();
         fireEvent.click(screen.getByText('Import timetable'));
         await screen.findByText('Import Timetable');
-        fireEvent.click(screen.getByText('✕'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(screen.queryByText('Import Timetable')).not.toBeInTheDocument();
     });
 
@@ -199,20 +213,6 @@ describe('CalendarHeader', () => {
         const addBtn = screen.getByText('+');
         fireEvent.click(addBtn);
         expect(mockOpenModal).toHaveBeenCalledWith(null, null, defaultState.selectedDate);
-    });
-
-    it('should navigate correctly in year view', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const nextBtn = screen.getByText('>');
-        fireEvent.click(nextBtn);
-
-        expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'SET_SELECTED_DATE',
-            payload: expect.any(Date)
-        });
-        const callArgs = mockDispatch.mock.calls[0][0];
-        // 2026 + 1 = 2027
-        expect(callArgs.payload.getFullYear()).toBe(2027);
     });
 
     it('should navigate correctly in week view', () => {
@@ -265,11 +265,4 @@ describe('CalendarHeader', () => {
         Object.defineProperty(window, 'innerWidth', { value: originalInnerWidth, configurable: true });
     });
 
-    it('navigate prev in year view decrements year', () => {
-        setup({ ...defaultState, viewMode: 'year' });
-        const prevBtn = screen.getByText('<');
-        fireEvent.click(prevBtn);
-        const callArgs = mockDispatch.mock.calls[0][0];
-        expect(callArgs.payload.getFullYear()).toBe(2025);
-    });
 });

@@ -1,200 +1,43 @@
+/*
+ * GroupWork index page.
+ */
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./GroupWorkIndexPage.module.css";
+import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
-import {
-  containerStyle,
-  listStyle,
-  rowStyle,
-  metaStyle,
-} from "./groupWorkStyles";
-import {
-  getAuthHeaders,
-  useGroupProjects,
-  useSelectedProjectId,
-} from "./groupWorkHooks";
-
-function getDeadlineLabel(deadline) {
-  if (!deadline) return null;
-  const due = new Date(deadline);
-  if (Number.isNaN(due.getTime())) return null;
-  const now = new Date();
-  const oneDayMs = 1000 * 60 * 60 * 24;
-  const diffDays = Math.round((due - now) / oneDayMs);
-  if (diffDays < 0) return "Past due";
-  if (diffDays === 0) return "Due today";
-  if (diffDays <= 7) return `Due in ${diffDays} days`;
-  return due.toLocaleDateString();
-}
-
-function CreateProjectForm({ onCreated }) {
-  const [name, setName] = useState("");
-  const [courseCode, setCourseCode] = useState("");
-  const [deadline, setDeadline] = useState("");
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!name.trim()) return;
-
-    const body = JSON.stringify({
-      name: name.trim(),
-      course_code: courseCode.trim() || "",
-      deadline: deadline ? new Date(deadline).toISOString() : null,
-    });
-    const res = await fetch("/api/group-work/projects/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body,
-    });
-    if (!res.ok) return;
-    const project = await res.json();
-    onCreated(project);
-    setName("");
-    setCourseCode("");
-    setDeadline("");
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        display: "flex",
-        gap: 8,
-        alignItems: "center",
-        marginTop: 16,
-      }}
-    >
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Group project name"
-        style={{
-          flex: 2,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
-          fontSize: 13,
-        }}
-        required
-      />
-      <input
-        value={courseCode}
-        onChange={(e) => setCourseCode(e.target.value)}
-        placeholder="Course code (optional)"
-        style={{
-          flex: 1,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
-          fontSize: 13,
-        }}
-      />
-      <input
-        type="date"
-        value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
-        style={{
-          flex: 1,
-          padding: "10px 12px",
-          borderRadius: 999,
-          border: "1px solid #e3d4c6",
-          background: "#fffaf4",
-          fontSize: 13,
-          color: "#3c2a20",
-        }}
-      />
-      <button
-        type="submit"
-        style={{
-          padding: "10px 18px",
-          borderRadius: 999,
-          border: "none",
-          background: "#9b8b7c",
-          color: "#fffaf4",
-          fontSize: 13,
-          fontWeight: 500,
-          cursor: "pointer",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Create
-      </button>
-    </form>
-  );
-}
+import AppPage from "../../components/common/AppPage/AppPage";
+import GroupWorkStats from "./components/GroupWorkStats";
+import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
+import CreateProjectForm from "./components/CreateProjectForm";
+import GroupWorkContent from "./components/GroupWorkContent";
 
 export default function GroupWorkIndexPage() {
-  const { projects, setProjects, loading } = useGroupProjects();
-  const navigate = useNavigate();
   const projectId = useSelectedProjectId();
+  return projectId ? <ProjectDetailRoute projectId={projectId} /> : <GroupWorkOverview />;
+}
 
-  const handleCreated = (project) => {
-    setProjects((prev) => [project, ...prev]);
-  };
+function ProjectDetailRoute({ projectId }) {
+  const navigate = useNavigate();
+  const goBack = () => navigate("/group-work", { replace: true });
+  return <GroupProjectDetail projectId={projectId} onBack={goBack} onDelete={goBack} onUpdate={undefined} />;
+}
 
-  const openProject = (id) => {
-    navigate(`/group-work?project=${id}`);
-  };
-
-  const title = "Group work";
-  const subtitle = "Create shared projects and link them to your modules.";
-
-  if (projectId) {
-    return (
-      <GroupProjectDetail
-        projectId={projectId}
-        onBack={() => navigate("/group-work")}
-      />
-    );
-  }
-
+function GroupWorkOverview() {
+  const [filter, setFilter] = useState("all");
+  const navigate = useNavigate();
+  const data = useGroupProjects();
+  if (data.loading) return <GroupWorkIndexSkeleton />;
   return (
-    <div style={containerStyle}>
-      <h1 style={{ fontSize: 24, margin: 0 }}>{title}</h1>
-      <p style={metaStyle}>{subtitle}</p>
-      <CreateProjectForm onCreated={handleCreated} />
-
-      {loading && <p style={metaStyle}>Loading your group projects…</p>}
-
-      {!loading && projects.length === 0 && (
-        <p style={{ marginTop: 24, fontSize: 14, color: "#8f7969" }}>
-          You do not have any group projects yet. Use the form above to create one.
-        </p>
-      )}
-
-      {!loading && projects.length > 0 && (
-        <div style={listStyle}>
-          {projects.map((project) => {
-            const deadlineLabel = getDeadlineLabel(project.deadline);
-            return (
-              <div
-                key={project.id}
-                style={rowStyle}
-                onClick={() => openProject(project.id)}
-              >
-                <div>
-                  <div style={{ fontWeight: 500, color: "#3c2a20" }}>
-                    {project.name}
-                  </div>
-                  <div style={metaStyle}>
-                    {project.course_code || "No course code"} ·{" "}
-                    {(project.member_count ?? 0) === 1
-                      ? "1 member"
-                      : `${project.member_count ?? 0} members`}
-                  </div>
-                </div>
-                {deadlineLabel && (
-                  <div style={{ fontSize: 12, color: "#8f7969" }}>
-                    {deadlineLabel}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
+      <GroupWorkStats projects={data.projects} />
+      <CreateProjectForm onCreated={(project) => prependProject(project, data.setProjects)} />
+      <GroupWorkContent projects={data.projects} projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })} filter={filter} setFilter={setFilter} />
+    </AppPage>
   );
 }
 
+function prependProject(project, setProjects) {
+  setProjects((prev) => [project, ...prev]);
+}

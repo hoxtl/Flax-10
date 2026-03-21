@@ -1,23 +1,20 @@
-/**
+/*
  * Form field and control styles for CreateTaskModal.
  * Layout (overlay, modal, header, footer) in CreateTaskModalLayout.module.css.
  */
-
-.label {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: block;
-  margin-bottom: 6px;
-}
 
 .labelRequired {
   color: #b42318;
   font-weight: 800;
   font-size: 1.02em;
+}
+
+.labelOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85em;
+  color: var(--muted, #9a8778);
 }
 
 .canvas {
@@ -35,38 +32,9 @@
 .titleInput,
 .desc {
   width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid rgba(74, 52, 33, 0.12);
-  border-radius: 10px;
-  background: var(--bg, #F8F5F2);
-  color: var(--text);
-  font-size: 0.95rem;
-  font-family: inherit;
-  box-sizing: border-box;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.titleInput {
-  font-weight: 500;
-}
-
-.titleInput::placeholder,
-.desc::placeholder {
-  font-weight: 400;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.titleInput:focus,
-.desc:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
-}
-
-.desc {
-  resize: vertical;
+.desc :global(.multiline) {
   min-height: 64px;
 }
 
@@ -80,13 +48,6 @@
 
 .rowBlock .rowLabel {
   margin-bottom: 0;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: flex-start;
-  gap: 16px;
 }
 
 .rowLabel,
@@ -227,7 +188,6 @@
 }
 
 @media (max-width: 420px) {
-  .row,
   .timeRow {
     grid-template-columns: 1fr;
   }
@@ -270,4 +230,15 @@
 
 .settingRow {
   width: 100%;
+}
+
+.pageCountModalInput {
+  width: 100px;
+  margin-top: 6px;
+}
+
+.pageCountHint {
+  margin: 6px 0 0;
+  font-size: 0.8em;
+  opacity: 0.6;
 }

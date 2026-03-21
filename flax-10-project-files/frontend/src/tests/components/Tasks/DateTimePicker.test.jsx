@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+/* Tests for the DateTimePicker component. */
+
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DateTimePicker from '../../../pages/Tasks/components/DateTimePicker';
 
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             data-testid={`dropdown-${placeholder}`}

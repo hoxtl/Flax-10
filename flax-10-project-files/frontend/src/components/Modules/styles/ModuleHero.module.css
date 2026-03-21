@@ -1,0 +1,176 @@
+/* Styles for the module details hero section. */
+.hero {
+    background: var(--surface-card);
+    border: var(--stroke-soft);
+    border-radius: var(--radius-xl);
+    padding: 1.25rem 1.4rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
+}
+
+.heroTop {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+}
+
+.moduleCode {
+    background: var(--pill-bg);
+    color: var(--primary);
+    padding: 0.28rem 0.62rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.departmentChip {
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    color: color-mix(in srgb, var(--primary) 82%, var(--text) 18%);
+    border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
+.courseChip {
+    background: color-mix(in srgb, var(--muted) 10%, var(--surface-card));
+    color: var(--muted);
+    border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+}
+
+.enrolledBadge {
+    margin-left: auto;
+    background: var(--success-bg);
+    color: var(--success-text);
+    border-radius: var(--radius-md);
+    padding: 0.22rem 0.62rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.moduleTitle {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+    color: var(--text);
+    line-height: 1.22;
+}
+
+.heroSubtext {
+    margin: 0.5rem 0 0;
+    color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
+    line-height: 1.45;
+}
+
+.heroMeta {
+    margin-top: 0.9rem;
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heroMetaItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+}
+
+.tutorInline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.tutorPhoto {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    display: inline-block;
+    border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.tutorAvatarFallback {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: var(--radius-pill);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: color-mix(in srgb, var(--primary) 86%, var(--text) 14%);
+    background: color-mix(in srgb, var(--primary) 16%, var(--surface-card));
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+}
+
+.heroMetaLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+.heroMetaValue,
+.heroLink {
+    font-size: 0.92rem;
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.heroLink:hover {
+    text-decoration: underline;
+}
+
+.heroActions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.7rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.secondaryAction {
+    border: var(--stroke-soft);
+    border-radius: var(--radius-md);
+    padding: 0.55rem 0.9rem;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    background: var(--panel);
+}
+
+.secondaryAction:hover {
+    background: var(--hover);
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 0.9rem;
+    }
+
+    .heroMeta {
+        grid-template-columns: 1fr;
+    }
+
+    .heroActions {
+        justify-content: stretch;
+    }
+
+    .secondaryAction {
+        width: 100%;
+        text-align: center;
+    }
+}

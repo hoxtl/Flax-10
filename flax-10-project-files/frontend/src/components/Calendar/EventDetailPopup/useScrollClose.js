@@ -1,19 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from 'react';
 
+/**
+ * Registers a capture-phase scroll listener that calls `onClose`
+ * when the anchor rect is outside the viewport.
+ *
+ * @param {{ top: number, bottom: number } | null} anchorRect
+ * @param {() => void} onClose
+ */
 export function useScrollClose(anchorRect, onClose) {
-    const initialRect = useRef(anchorRect);
-    useEffect(() => {
-        if (!anchorRect) return;
-        initialRect.current = anchorRect;
-        const handleScroll = () => {
-            if (!initialRect.current) return;
-            if (isOutOfView(initialRect.current)) onClose();
-        };
-        window.addEventListener('scroll', handleScroll, true);
-        return () => window.removeEventListener('scroll', handleScroll, true);
-    }, [anchorRect, onClose]);}
+  useEffect(() => {
+    if (!anchorRect) return undefined;
 
-function isOutOfView(rect) {
-    const margin = 50;
-    return rect.top < -margin || rect.bottom > window.innerHeight + margin;
+    const handleScroll = () => {
+      const isOutOfViewAbove = anchorRect.top < 0;
+      const isOutOfViewBelow = anchorRect.bottom > window.innerHeight;
+      if (isOutOfViewAbove || isOutOfViewBelow) onClose?.();
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+    return () => window.removeEventListener('scroll', handleScroll, true);
+  }, [anchorRect, onClose]);
 }
+

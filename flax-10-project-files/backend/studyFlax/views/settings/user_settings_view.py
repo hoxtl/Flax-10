@@ -1,17 +1,22 @@
+"""
+View for retrieving and updating user account settings.
+"""
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from studyFlax.models.auth.userSettingsModel import UserSettings
-from studyFlax.serialisers.user_settings_serialisers import UserSettingsSerialiser
-from studyFlax.serialisers.auth_serialisers import UserSerialiser
-
+from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
+from studyFlax.serialisers.auth.auth_serialisers import UserSerialiser
+from studyFlax.views.user.settings_view import get_or_create_user_settings
 
 def update_user_name(user, data):
     if 'first_name' in data:
         user.first_name = data['first_name']
     if 'last_name' in data:
         user.last_name = data['last_name']
+    if 'email' in data:
+        user.email = data['email']
 
 def update_user_password(user, data):
     password = data.get('password')
@@ -37,11 +42,10 @@ def patch_settings(settings, data, user):
     serialiser.save()
     return Response({'settings': serialiser.data, 'user': UserSerialiser(user).data})
 
-
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
-    settings, _ = UserSettings.objects.get_or_create(user=request.user)
+    settings = get_or_create_user_settings(request.user)
     if request.method == 'GET':
         return Response(UserSettingsSerialiser(settings).data)
     error = apply_user_updates(request.user, request.data)

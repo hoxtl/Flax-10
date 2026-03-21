@@ -1,0 +1,324 @@
+/*
+ * Timer page styles chunk.
+ */
+/* timerLayout: top-aligned centered column, replaces the old centered hero */
+.timerLayout {
+    --focus-accent: #c8102e;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    width: 100%;
+    position: relative;
+    isolation: isolate;
+}
+
+.timerLayout::before {
+    content: "";
+    position: absolute;
+    inset: -0.35rem;
+    border-radius: 24px;
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 24%, transparent);
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--focus-accent) 9%, transparent),
+        0 0 26px color-mix(in srgb, var(--focus-accent) 15%, transparent);
+    opacity: 0.58;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.timerLayout>* {
+    position: relative;
+    z-index: 1;
+}
+
+.timerTopSplit {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
+}
+
+.timerTopLeft {
+    min-width: 0;
+}
+
+.timerTopRight {
+    min-width: 320px;
+}
+
+.timerMainCentered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+@media (max-width: 1150px) {
+    .timerTopSplit {
+        grid-template-columns: 1fr;
+    }
+
+    .timerMainTopRow {
+        grid-template-columns: 1fr;
+    }
+
+    .timerHeroWrap {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+
+.focusPageSkeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--surface-page);
+    border-radius: var(--radius-2xl);
+}
+
+.focusPageSkeletonHeader {
+    width: min(920px, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.focusPageSkeletonTitle {
+    width: min(240px, 48%);
+    height: 38px;
+    border-radius: 14px;
+}
+
+.focusPageSkeletonAction {
+    width: 112px;
+    height: 36px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonTask {
+    width: min(540px, 100%);
+    height: 56px;
+    border-radius: 20px;
+}
+
+.focusPageSkeletonTree {
+    width: min(340px, 72vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.focusPageSkeletonBadge {
+    width: 148px;
+    height: 34px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonTime {
+    width: min(220px, 56vw);
+    height: 62px;
+    border-radius: 18px;
+}
+
+.focusPageSkeletonControls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.focusPageSkeletonBtnPrimary,
+.focusPageSkeletonBtnSecondary {
+    height: 44px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonBtnPrimary {
+    width: 140px;
+}
+
+.focusPageSkeletonBtnSecondary {
+    width: 118px;
+}
+
+.focusPageSkeletonSettings {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: min(640px, 100%);
+    padding-top: 1rem;
+    border-top: var(--card-border);
+}
+
+.focusPageSkeletonSetting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.focusPageSkeletonLabel,
+.focusPageSkeletonLabelWide {
+    height: 12px;
+    border-radius: 999px;
+}
+
+.focusPageSkeletonLabel {
+    width: 72px;
+}
+
+.focusPageSkeletonLabelWide {
+    width: 128px;
+}
+
+.focusPageSkeletonInput {
+    width: 60px;
+    height: 38px;
+    border-radius: 8px;
+}
+
+.focusPageSkeletonSound {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.focusPageSkeletonSoundInput {
+    width: 180px;
+    height: 40px;
+    border-radius: 999px;
+}
+
+/* === Session Dots === */
+
+.sessionDots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0.5rem 0 0.25rem;
+}
+
+.sessionDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.sessionDotDone {
+    background: var(--primary);
+}
+
+.sessionDotActive {
+    background: transparent;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+    animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+.sessionDotPending {
+    background: var(--border);
+}
+
+.sessionDotCheckmark {
+    color: white;
+    font-size: 0.58rem;
+    font-weight: 800;
+    line-height: 1;
+    position: relative;
+    top: -0.5px;
+    left: -0.5px;
+}
+
+@keyframes dotPulse {
+    0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
+    60%  { box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 0%, transparent); }
+    100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent); }
+}
+
+/* === Live Stats Row === */
+
+.liveStatsRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: var(--card-border);
+    width: 100%;
+}
+
+.liveStat {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.liveStat strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* === Focus Progress Strip === */
+
+.linearProgressWrap {
+    width: 100%;
+}
+
+.linearProgressBar {
+    width: 100%;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+}
+
+.linearProgressFill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 65%, var(--sage)));
+    border-radius: inherit;
+    transition: width 0.35s linear;
+}
+
+/* === Block Stats Card === */
+
+.timerBlockStatsCard {
+    flex: 1;
+    min-width: 150px;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+}
+
+.blockStatsBody {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}

@@ -1,0 +1,330 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.blockStatsLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    align-self: flex-start;
+}
+
+.blockRingWrap {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blockRingInner {
+    position: absolute;
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+}
+
+.blockRingValue {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.blockRingDenom {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.blockStatRows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+}
+
+.blockStatRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.blockStatKey {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.blockStatVal {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* === Card Layout === */
+
+.timerMainCard {
+    width: 100%;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    transition: box-shadow 0.2s ease;
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 94%, var(--primary) 6%), var(--surface-card));
+}
+
+.timerMainCard:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.timerMainTopRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr minmax(200px, 250px);
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.timerMainTopTask {
+    min-width: 0;
+}
+
+.timerMainTopSound {
+    width: 100%;
+}
+
+.timerHeroWrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    margin-top: 0.05rem;
+}
+
+.timerBlockStatsCompact {
+    max-width: 170px;
+    min-width: 150px;
+    padding: 0.55rem 0.6rem;
+}
+
+.inlinePresetSection {
+    width: 100%;
+    margin-top: 0.3rem;
+}
+
+.presetOutsideSection {
+    width: 100%;
+}
+
+.timerSettingsRow {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.timerSettingsCard {
+    width: 100%;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.timerSoundCard {
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.timerSoundCardInline {
+    padding: var(--card-padding);
+    gap: 0.65rem;
+}
+
+.timerSoundCardInline .soundSelectorContainer {
+    margin-top: 0;
+    gap: 0.4rem;
+}
+
+/* Zoom-in transition when navigating from task Play */
+.focusModeTransition {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 10;
+    animation: focusOverlayZoomInHoldZoomOut 4.5s ease-in-out forwards;
+}
+
+.focusModeTransitionText {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--color-primary, #7B6751);
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+    position: relative;
+}
+
+@keyframes focusOverlayZoomInHoldZoomOut {
+    0% {
+        opacity: 1;
+        transform: scale(0.92);
+    }
+
+    6% {
+        transform: scale(1);
+    }
+
+    6.01%,
+    72% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(1.06);
+    }
+}
+
+.containerFocusEntering .focusModeContent {
+    animation: focusContentZoomIn 0.9s 3.6s ease-out forwards;
+    opacity: 0;
+    transform: scale(0.94);
+}
+
+@keyframes focusContentZoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.historyButton {
+    display: none;
+}
+
+
+
+.sessionStatus {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.timerDisplay {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    font-family: "JetBrains Mono", "Roboto Mono", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0.01em;
+    color: var(--primary);
+    margin: 0.5rem 0;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.timerDisplay.break {
+    color: var(--sage);
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Resume / Start / Pause text button (no play circle) */
+.timerResumeBtn {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-sage-primary);
+    background: transparent;
+    color: var(--color-sage-primary);
+}
+
+.timerResumeBtn:hover {
+    background: rgba(139, 166, 143, 0.12);
+}
+
+.timerResumeBtnActive {
+    background: var(--color-sage-primary);
+    color: white;
+    border-color: var(--color-sage-primary);
+}
+
+.timerResumeBtnActive:hover {
+    filter: brightness(1.05);
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 1rem;
+}
+
+.pauseIndicator {
+    font-size: 0.9rem;
+    color: var(--danger);
+    font-weight: 600;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

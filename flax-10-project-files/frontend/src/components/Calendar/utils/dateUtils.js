@@ -1,3 +1,9 @@
+/**
+ * dateUtils - Date manipulation and formatting utilities for calendar views.
+ * Provides week/month calculations, formatting, and day comparison helpers.
+ */
+
+/** Returns array of 7 dates representing the week containing the given date. */
 export function getWeekDays(date) {
     const start = getStartOfWeek(date);
     return Array.from({ length: 7 }, (_, i) => addDays(start, i));
@@ -104,7 +110,7 @@ export function formatTimeRange(startTime, endTime, allDay) {
     const end = new Date(endTime);
     const isMidnight = (d) => d.getHours() === 0 && d.getMinutes() === 0;
     if (allDay || (isMidnight(start) && isMidnight(end))) return "All day";
-    return `${formatTime(start)} to ${formatTime(end)}`;
+    return `${formatTime(start)} - ${formatTime(end)}`;
 }
 
 export function addHourToTime(time) {
@@ -147,6 +153,31 @@ export function parseDateInput(v) {
     if (!v) return null;
     const x = new Date(v); x.setHours(0, 0, 0, 0);
     return x;
+}
+
+export function getMonthWeeks(date) {
+    const weeks = [];
+    const current = getMonthGridStartDate(date);
+    const last = getEndOfMonth(date);
+    while (current <= last || current.getDay() !== 0) {
+        weeks.push(generateMonthWeek(current));
+    }
+    return weeks;
+}
+
+function getMonthGridStartDate(date) {
+    const d = getStartOfMonth(date);
+    d.setDate(d.getDate() - d.getDay());
+    return d;
+}
+
+function generateMonthWeek(current) {
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+        week.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+    return week;
 }
 
 export function formatDayLabel(date, today = new Date()) {

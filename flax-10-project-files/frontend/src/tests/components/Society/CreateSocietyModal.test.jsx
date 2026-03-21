@@ -73,7 +73,7 @@ describe('CreateSocietyModal', () => {
     it('renders the modal with title and subtitle', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         expect(screen.getAllByText('Create Society').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText('Start your own society or club')).toBeInTheDocument();
+        expect(screen.getByText('Start your own society')).toBeInTheDocument();
     });
 
     it('renders the Society Name field', () => {

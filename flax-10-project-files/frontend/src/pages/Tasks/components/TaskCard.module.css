@@ -1,3 +1,5 @@
+/* Task card styles: layout, priority accents, check button, and action bar. */
+
 .card {
     position: relative;
     display: flex;
@@ -24,35 +26,43 @@
         0 0 16px rgba(239, 68, 68, 0.22);
     animation: urgentGlowPulse 1.8s ease-in-out infinite;
 }
+
 .cardAccentHigh {
     border-left-color: #fb923c;
     border: none;
     box-shadow: none;
     animation: none;
 }
+
 .cardAccentMedium {
     border-left-color: #fdba74;
 }
 
 @keyframes urgentGlowPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow:
             0 0 0 1px rgba(239, 68, 68, 0.28),
             0 0 14px rgba(239, 68, 68, 0.18);
     }
+
     50% {
         box-shadow:
             0 0 0 1px rgba(239, 68, 68, 0.4),
             0 0 20px rgba(239, 68, 68, 0.3);
     }
 }
+
 .cardDone {
     opacity: 1;
 }
+
 .cardCompletedRow {
     opacity: 0.6;
     transition: opacity 0.2s ease;
 }
+
 .cardCompletedRow:hover {
     opacity: 0.85;
 }
@@ -60,6 +70,7 @@
 .cardOverdue {
     background: var(--danger-bg);
 }
+
 .cardOverdue:hover {
     background: color-mix(in srgb, var(--danger) 12%, transparent);
 }
@@ -69,9 +80,17 @@
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
     animation: cardPulse 2s ease-in-out infinite;
 }
+
 @keyframes cardPulse {
-    0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent); }
-    50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
+    }
+
+    50% {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent);
+    }
 }
 
 .check {
@@ -103,15 +122,24 @@
     border-color: var(--list-color, var(--primary));
     animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 .checkDoneCompleted {
     background: #22c55e !important;
     border-color: #22c55e !important;
 }
 
 @keyframes checkPop {
-    0% { transform: scale(0.85); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0.85);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .checkMark {
@@ -127,6 +155,7 @@
         opacity: 0;
         transform: scale(0) rotate(-30deg);
     }
+
     100% {
         opacity: 1;
         transform: scale(1) rotate(0deg);
@@ -141,6 +170,7 @@
     gap: 4px;
     cursor: pointer;
 }
+
 .content:focus,
 .content:focus-visible {
     outline: none;
@@ -152,8 +182,8 @@
     gap: 0.25rem;
     flex-shrink: 0;
     margin-left: auto;
-    opacity: 0;
-    transform: translateX(4px);
+    opacity: 0.45;
+    transform: translateX(0);
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -185,16 +215,19 @@
     color: var(--primary, #7B6751);
     transition: color 0.2s ease, transform 0.2s ease;
 }
+
 .actionBarBtnPlay:hover {
     background: transparent !important;
     color: var(--primary-strong, #5D4037);
     transform: scale(1.12);
 }
+
 .actionBarBtnPlay .actionIcon {
     width: 20px;
     height: 20px;
     transition: transform 0.15s ease;
 }
+
 .actionBarBtnPlay:hover .actionIcon {
     transform: translateX(2px);
 }
@@ -254,28 +287,36 @@
     border: 1px solid transparent;
     line-height: 1.35;
 }
+
 .priorityText_urgent {
     color: #b91c1c;
     background: rgba(239, 68, 68, 0.14);
     border-color: rgba(239, 68, 68, 0.28);
 }
+
 .priorityText_high {
     color: #c2410c;
     background: rgba(251, 146, 60, 0.14);
     border-color: rgba(251, 146, 60, 0.3);
 }
+
 .priorityText_medium {
     color: #a16207;
     background: rgba(250, 204, 21, 0.16);
     border-color: rgba(250, 204, 21, 0.34);
 }
-.priorityText_low { color: #854d0e; }
+
+.priorityText_low {
+    color: #854d0e;
+}
+
 .priorityMarks {
     font-size: 0.64rem;
     line-height: 1;
     letter-spacing: 0;
     margin-right: 4px;
 }
+
 .priorityLabel {
     line-height: 1;
 }
@@ -283,14 +324,20 @@
 .titleClickable {
     cursor: pointer;
 }
-.titleClickable:hover { text-decoration: none; }
+
+.titleClickable:hover {
+    text-decoration: none;
+}
 
 .titleDone {
     text-decoration: line-through;
     text-decoration-color: var(--c-greige, #B4A490);
     color: var(--c-greige, #B4A490);
 }
-.titleDone.titleClickable:hover { text-decoration: line-through; }
+
+.titleDone.titleClickable:hover {
+    text-decoration: line-through;
+}
 
 .dueLabelCompleted {
     color: var(--muted) !important;
@@ -303,83 +350,26 @@
     padding: 0 1px;
 }
 
-.meta {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
-}
-.metaDone {
-    opacity: 0.45;
-    filter: saturate(0.3);
-}
-
 .duePillIcon {
     flex-shrink: 0;
 }
+
 .due_overdue {
     color: #b91c1c;
     font-weight: 600;
 }
+
 .due_today {
     color: #b91c1c;
     font-weight: 600;
 }
+
 .due_tomorrow {
     color: #b45309;
     font-weight: 600;
 }
+
 .due_future {
     color: var(--muted);
     font-weight: 400;
-}
-
-.modulePill {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    border: 1px solid;
-    white-space: nowrap;
-    line-height: 1.4;
-    color: var(--c-greige, #B4A490);
-    background: rgba(123, 103, 81, 0.06);
-    letter-spacing: 0.02em;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-.modulePillLink {
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.15s, filter 0.15s;
-}
-.modulePillLink:hover {
-    opacity: 0.92;
-    filter: brightness(0.97);
-}
-.modulePillLink:active {
-    opacity: 0.88;
-}
-
-.listIndicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    white-space: nowrap;
-    color: var(--text);
-    border: 1px solid;
-    border-radius: 999px;
-    padding: 2px 8px 2px 6px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
-}
-.listDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
 }

@@ -1,3 +1,4 @@
+/* Styles for the CreateSocietyModal multi-step form. */
 .form {
     display: flex;
     flex-direction: column;
@@ -12,13 +13,29 @@
 
 .label {
     font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text, #374151);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary, #9a8778);
+}
+
+.required {
+    color: var(--danger, #ef4444);
+}
+
+.optional {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.8em;
+    color: var(--muted, #9ca3af);
 }
 
 .hint {
-    font-size: 0.8rem;
-    color: var(--muted, #9ca3af);
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--primary, #7B6751);
+    opacity: 0.85;
     margin: 0;
 }
 
@@ -34,7 +51,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     transition: border-color 0.2s;
 }
@@ -49,7 +66,7 @@
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 10px;
     font-size: 0.95rem;
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     color: var(--text, #1f2937);
     resize: vertical;
     min-height: 80px;
@@ -140,7 +157,7 @@
 .cancelBtn {
     padding: 10px 20px;
     border: 1px solid var(--border, #e5e7eb);
-    background: var(--bg, #fff);
+    background: var(--bg, var(--color-card));
     border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 500;

@@ -1,19 +1,25 @@
+/*
+ * Task sorting and focus session planning utilities.
+ */
+
 export const PRIORITY_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
 
 export function getTaskDurationMinutes(task) {
   return (task?.estimated_blocks || 1) * 25;
 }
 
-export function splitEstimatedBlocks(blocks) {
-  const total = Math.max(1, Number(blocks) || 1);
+function findSessionSplit(total) {
   for (const perSession of [1, 2, 3, 4]) {
     if (total % perSession !== 0) continue;
-    const sessionCount = total / perSession;
-    if (sessionCount >= 1 && sessionCount <= 12) {
-      return { sessionCount, workMinutes: perSession * 25 };
-    }
+    const count = total / perSession;
+    if (count >= 1 && count <= 12) return { sessionCount: count, workMinutes: perSession * 25 };
   }
-  return { sessionCount: 1, workMinutes: total * 25 };
+  return null;
+}
+
+export function splitEstimatedBlocks(blocks) {
+  const total = Math.max(1, Number(blocks) || 1);
+  return findSessionSplit(total) || { sessionCount: 1, workMinutes: total * 25 };
 }
 
 export function compareTaskPriority(a, b) {

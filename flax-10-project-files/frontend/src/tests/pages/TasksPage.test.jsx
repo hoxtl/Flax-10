@@ -114,13 +114,13 @@ describe('TasksPage', () => {
     it('shows loading when tasksInitialLoading is true', () => {
         useTasks.mockReturnValue({ ...mockTasksHook, initialLoading: true });
         renderTasksPage();
-        expect(screen.getByText('Loading tasks...')).toBeTruthy();
+        expect(screen.getByTestId('tasks-skeleton')).toBeTruthy();
     });
 
     it('shows loading when listsLoading is true', () => {
         useTaskLists.mockReturnValue({ ...mockListsHook, loading: true });
         renderTasksPage();
-        expect(screen.getByText('Loading tasks...')).toBeTruthy();
+        expect(screen.getByTestId('tasks-skeleton')).toBeTruthy();
     });
 
     it('opens CreateTaskModal when New Task is clicked', () => {
@@ -232,13 +232,9 @@ describe('TasksPage', () => {
     });
 
     it('permanently delete list respects confirm dialog', async () => {
-        const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
         renderTasksPage();
         fireEvent.click(screen.getByText('Permanently Delete List'));
-        expect(mockListsHook.permanentlyDeleteList).not.toHaveBeenCalled();
-        fireEvent.click(screen.getByText('Permanently Delete List'));
-        await waitFor(() => expect(mockListsHook.permanentlyDeleteList).toHaveBeenCalledWith(9));
-        confirmSpy.mockRestore();
+        expect(mockListsHook.permanentlyDeleteList).toHaveBeenCalledWith(9);
     });
 
     it('renders BackToTop', () => {

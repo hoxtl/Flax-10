@@ -1,25 +1,11 @@
-/**
- * DateTimePicker.jsx
- *
- * A minimal, self-contained date + time picker.
- * No external UI libraries required — uses native inputs and a lightweight
- * calendar rendered with vanilla JS date math.
- *
- * Usage:
- *   import DateTimePicker from "./DateTimePicker";
- *
- *   <DateTimePicker
- *     value={dateISOString}         // e.g. "2026-03-15T14:00"
- *     onChange={isoStr => ...}      // called with ISO datetime string or ""
- *     placeholder="Pick date & time"
- *   />
- *
- * Dependencies: none (pure React + CSS modules)
+/*
+ * Self-contained date and time picker with an inline calendar and time dropdowns.
  */
+
 import { useState, useRef, useEffect, useMemo, forwardRef } from "react";
 import { createPortal } from "react-dom";
 import { Clock } from "lucide-react";
-import AnimatedDropdown from "../../ui/AnimatedDropdown";
+import AnimatedDropdown from "../AnimatedDropdown";
 import styles from "./DateTimePicker.module.css";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -33,13 +19,18 @@ const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({ value: String(i),
 
 function formatDisplay(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    + "  " + pad(date.getHours()) + ":" + pad(date.getMinutes());
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}  ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function formatDateOnly(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}`;
 }
 
 function getDisplayValue(date, timeOnly, dateOnly) {
@@ -72,119 +63,10 @@ function parseIncomingValue(value, timeOnly, dateOnly) {
   return new Date(value);
 }
 
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false }) {
-  const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
-
-  const [open, setOpen] = useState(false);
-  const [viewY, setViewY] = useState((parsed || new Date()).getFullYear());
-  const [viewM, setViewM] = useState((parsed || new Date()).getMonth());
-  const [selDate, setSelDate] = useState(parsed);
-  const [hour, setHour] = useState(parsed ? parsed.getHours() : 12);
-  const [minute, setMinute] = useState(parsed ? parsed.getMinutes() : 0);
-
-  const ref = useRef(null);
-  const dropdownRef = useRef(null);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
-
-  useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos);
-  useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM);
-  useClickOutside(open, ref, dropdownRef, setOpen);
-
-  const emitChange = (date, h, m) => emitDateTimeChange(date, h, m, timeOnly, dateOnly, onChange);
-  const selectDay = (day) => handleDaySelect(day, viewY, viewM, setSelDate, emitChange, hour, minute);
-  const changeHour = (h) => handleHourChange(h, setHour, selDate, emitChange, minute);
-  const changeMinute = (m) => handleMinuteChange(m, setMinute, selDate, emitChange, hour);
-  const prevMonth = () => navigateMonth(-1, viewM, setViewM, setViewY);
-  const nextMonth = () => navigateMonth(1, viewM, setViewM, setViewY);
-
-  const days = calendarDays(viewY, viewM);
-  const today = new Date();
-  const isToday = (d) => d === today.getDate() && viewM === today.getMonth() && viewY === today.getFullYear();
-  const isSel = (d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
-
-  return (
-    <div className={styles.wrap} ref={ref}>
-      <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly}
-        placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} />
-      {open && createPortal(
-        <DropdownPanel ref={dropdownRef} pos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY}
-          prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel}
-          selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour}
-          changeMinute={changeMinute} setOpen={setOpen} />,
-        document.body
-      )}
-    </div>
-  );
-}
-
-function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder, setSelDate, onChange }) {
-  const displayValue = selDate
-    ? getDisplayValue(selDate, timeOnly, dateOnly)
-    : placeholder;
-
-  const handleClear = (e) => { e.stopPropagation(); setSelDate(null); onChange?.(""); };
-
-  return (
-    <button type="button" onClick={() => setOpen(p => !p)}
-      className={`${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}>
-      <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>
-      <span className={selDate ? styles.triggerValueMono : ""}>{displayValue}</span>
-      {selDate && <button type="button" className={styles.clearBtn} onClick={handleClear}>✕</button>}
-    </button>
-  );
-}
-
-const DropdownPanel = forwardRef(function DropdownPanel({ pos, timeOnly, dateOnly, viewM, viewY, prevMonth, nextMonth, days, isToday, isSel,
-  selectDay, hour, minute, changeHour, changeMinute, setOpen }, ref) {
-  const handleDaySelect = (day) => { selectDay(day); if (dateOnly) setOpen(false); };
-  return (
-    <div ref={ref} className={styles.dropdown} style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 10000 }}>
-      {!timeOnly && <CalendarSection viewM={viewM} viewY={viewY} prevMonth={prevMonth}
-        nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={handleDaySelect} />}
-      {!dateOnly && <TimePickerRow hour={hour} minute={minute} changeHour={changeHour}
-        changeMinute={changeMinute} timeOnly={timeOnly} setOpen={setOpen} />}
-    </div>
-  );
-});
-
-function CalendarSection({ viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay }) {
-  return (
-    <>
-      <div className={styles.calHeader}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
-        <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
-        <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
-      </div>
-      <div className={styles.calGrid}>
-        {DAYS.map(d => <div key={d} className={styles.dayHeader}>{d}</div>)}
-        {days.map((d, i) => (
-          <button key={i} type="button" disabled={!d} onClick={() => d && selectDay(d)}
-            className={`${styles.dayCell} ${!d ? styles.dayCellEmpty : ""}
-              ${d && isToday(d) ? styles.dayCellToday : ""} ${d && isSel(d) ? styles.dayCellSel : ""}`}>
-            {d || ""}
-          </button>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly, setOpen }) {
-  return (
-    <div className={`${styles.timePicker} ${timeOnly ? styles.timeOnlyPicker : ""}`}>
-      <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
-      <div className={styles.timeDropdown}>
-        <AnimatedDropdown value={String(hour)} onChange={v => changeHour(Number(v))}
-          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd} />
-      </div>
-      <span className={styles.timeSep}>:</span>
-      <div className={styles.timeDropdown}>
-        <AnimatedDropdown value={String(minute)} onChange={v => changeMinute(Number(v))}
-          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd} />
-      </div>
-      <button type="button" className={styles.doneBtn} onClick={() => setOpen(false)}>Done</button>
-    </div>
-  );
+function getDropdownHeight(timeOnly, dateOnly) {
+  if (timeOnly) return 90;
+  if (dateOnly) return 290;
+  return 330;
 }
 
 function useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos) {
@@ -192,17 +74,9 @@ function useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos) {
     if (!open || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const gap = 6;
-    const dropdownHeight = getDropdownHeight(timeOnly, dateOnly);
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
-    setDropdownPos({ top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap, left: rect.left });
+    const maxTop = window.innerHeight - getDropdownHeight(timeOnly, dateOnly) - gap;
+    setDropdownPos({ top: Math.min(rect.bottom + gap, maxTop), left: rect.left });
   }, [open, timeOnly, dateOnly, ref, setDropdownPos]);
-}
-
-function getDropdownHeight(timeOnly, dateOnly) {
-  if (timeOnly) return 130;
-  if (dateOnly) return 280;
-  return 320;
 }
 
 function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM) {
@@ -215,11 +89,16 @@ function useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute,
   }, [value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM]);
 }
 
+function isInsidePortaledDropdown(target) {
+  return target.closest('[data-dropdown-portal="true"]') !== null;
+}
+
 function useClickOutside(open, ref, dropdownRef, setOpen) {
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e) => {
       if (ref.current?.contains(e.target) || dropdownRef.current?.contains(e.target)) return;
+      if (isInsidePortaledDropdown(e.target)) return;
       setOpen(false);
     };
     const handleEsc = (e) => { if (e.key === "Escape") setOpen(false); };
@@ -235,8 +114,7 @@ function emitDateTimeChange(date, h, m, timeOnly, dateOnly, onChange) {
   d.setHours(h, m, 0, 0);
   if (timeOnly) { onChange?.(`${pad(d.getHours())}:${pad(d.getMinutes())}`); return; }
   if (dateOnly) { onChange?.(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`); return; }
-  const iso = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  onChange?.(iso);
+  onChange?.(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`);
 }
 
 function handleDaySelect(day, viewY, viewM, setSelDate, emitChange, hour, minute) {
@@ -256,6 +134,143 @@ function handleMinuteChange(m, setMinute, selDate, emitChange, hour) {
 }
 
 function navigateMonth(dir, viewM, setViewM, setViewY) {
-  if (dir === -1) { if (viewM === 0) { setViewY(y => y - 1); setViewM(11); } else setViewM(m => m - 1); }
-  else { if (viewM === 11) { setViewY(y => y + 1); setViewM(0); } else setViewM(m => m + 1); }
+  if (dir === -1 && viewM === 0) { setViewY(y => y - 1); setViewM(11); return; }
+  if (dir === -1) { setViewM(m => m - 1); return; }
+  if (viewM === 11) { setViewY(y => y + 1); setViewM(0); return; }
+  setViewM(m => m + 1);
+}
+
+function useDateTimePickerState(value, timeOnly, dateOnly) {
+  const parsed = useMemo(() => parseIncomingValue(value, timeOnly, dateOnly), [value, timeOnly, dateOnly]);
+  const [open, setOpen] = useState(false);
+  const [viewY, setViewY] = useState((parsed || new Date()).getFullYear());
+  const [viewM, setViewM] = useState((parsed || new Date()).getMonth());
+  const [selDate, setSelDate] = useState(parsed);
+  const [hour, setHour] = useState(parsed ? parsed.getHours() : 12);
+  const [minute, setMinute] = useState(parsed ? parsed.getMinutes() : 0);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+  return { open, setOpen, viewY, setViewY, viewM, setViewM, selDate, setSelDate, hour, setHour, minute, setMinute, dropdownPos, setDropdownPos };
+}
+
+function useDateTimeHandlers(viewY, viewM, setViewM, setViewY, selDate, setSelDate, hour, setHour, minute, setMinute, timeOnly, dateOnly, onChange) {
+  const emitChange = (date, h, m) => emitDateTimeChange(date, h, m, timeOnly, dateOnly, onChange);
+  const selectDay = (day) => handleDaySelect(day, viewY, viewM, setSelDate, emitChange, hour, minute);
+  const changeHour = (h) => handleHourChange(h, setHour, selDate, emitChange, minute);
+  const changeMinute = (m) => handleMinuteChange(m, setMinute, selDate, emitChange, hour);
+  const prevMonth = () => navigateMonth(-1, viewM, setViewM, setViewY);
+  const nextMonth = () => navigateMonth(1, viewM, setViewM, setViewY);
+  return { selectDay, changeHour, changeMinute, prevMonth, nextMonth };
+}
+
+function useDerivedCalendarState(viewY, viewM, selDate) {
+  const days = calendarDays(viewY, viewM);
+  const today = new Date();
+  const isToday = (d) => d === today.getDate() && viewM === today.getMonth() && viewY === today.getFullYear();
+  const isSel = (d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
+  return { days, isToday, isSel };
+}
+
+function PickerTrigger({ customTrigger, setOpen, open, selDate, timeOnly, dateOnly, placeholder, setSelDate, onChange, triggerClassName, hideIcon }) {
+  if (customTrigger) return <div onClick={() => setOpen(p => !p)} style={{ cursor: "pointer" }}>{customTrigger}</div>;
+  return <TriggerButton open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly} placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} triggerClassName={triggerClassName} hideIcon={hideIcon} />;
+}
+
+function PickerPortal({ open, dropdownRef, dropdownPos, timeOnly, dateOnly, viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay, hour, minute, changeHour, changeMinute, setOpen }) {
+  if (!open) return null;
+  return createPortal(
+    <DropdownPanel ref={dropdownRef} pos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour} changeMinute={changeMinute} setOpen={setOpen} />,
+    document.body
+  );
+}
+
+/** Date and time picker with an inline calendar and dropdowns for hour and minute. */
+export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, wrapperClassName, hideIcon }) {
+  const { open, setOpen, viewY, setViewY, viewM, setViewM, selDate, setSelDate, hour, setHour, minute, setMinute, dropdownPos, setDropdownPos } = useDateTimePickerState(value, timeOnly, dateOnly);
+  const ref = useRef(null);
+  const dropdownRef = useRef(null);
+  useDropdownPosition(open, ref, timeOnly, dateOnly, setDropdownPos);
+  useSyncValue(value, timeOnly, dateOnly, setSelDate, setHour, setMinute, setViewY, setViewM);
+  useClickOutside(open, ref, dropdownRef, setOpen);
+  const { selectDay, changeHour, changeMinute, prevMonth, nextMonth } = useDateTimeHandlers(viewY, viewM, setViewM, setViewY, selDate, setSelDate, hour, setHour, minute, setMinute, timeOnly, dateOnly, onChange);
+  const { days, isToday, isSel } = useDerivedCalendarState(viewY, viewM, selDate);
+  return (
+    <div className={`${styles.wrap} ${wrapperClassName || ""}`} ref={ref}>
+      <PickerTrigger customTrigger={customTrigger} setOpen={setOpen} open={open} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly} placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} triggerClassName={triggerClassName} hideIcon={hideIcon} />
+      <PickerPortal open={open} dropdownRef={dropdownRef} dropdownPos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour} changeMinute={changeMinute} setOpen={setOpen} />
+    </div>
+  );
+}
+
+function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder, setSelDate, onChange, triggerClassName, hideIcon }) {
+  const displayValue = selDate ? getDisplayValue(selDate, timeOnly, dateOnly) : placeholder;
+  const handleClear = (e) => { e.stopPropagation(); setSelDate(null); onChange?.(""); };
+  const handleKeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(p => !p); } };
+  return (
+    <div role="button" tabIndex={0} onClick={() => setOpen(p => !p)} onKeyDown={handleKeydown}
+      className={triggerClassName || `${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}>
+      {!hideIcon && <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>}
+      <span className={selDate && !triggerClassName ? styles.triggerValueMono : ""}>{displayValue}</span>
+      {selDate && <button type="button" className={styles.clearBtn} onClick={handleClear} aria-label="Clear date">✕</button>}
+    </div>
+  );
+}
+
+const DropdownPanel = forwardRef(function DropdownPanel({ pos, timeOnly, dateOnly, viewM, viewY, prevMonth, nextMonth, days, isToday, isSel,
+  selectDay, hour, minute, changeHour, changeMinute, setOpen }, ref) {
+  const handleDaySelect = (day) => { selectDay(day); if (dateOnly) setOpen(false); };
+  return (
+    <div ref={ref} className={styles.dropdown} style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 10000 }}>
+      {!timeOnly && <CalendarSection viewM={viewM} viewY={viewY} prevMonth={prevMonth}
+        nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={handleDaySelect} />}
+      {!dateOnly && <TimePickerRow hour={hour} minute={minute} changeHour={changeHour}
+        changeMinute={changeMinute} timeOnly={timeOnly} setOpen={setOpen} />}
+    </div>
+  );
+});
+
+function CalendarHeader({ viewM, viewY, prevMonth, nextMonth }) {
+  return (
+    <div className={styles.calHeader}>
+      <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
+      <span className={styles.monthLabel}>{MONTHS[viewM]} {viewY}</span>
+      <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
+    </div>
+  );
+}
+
+function DayCell({ day, index, isToday, isSel, selectDay }) {
+  const cls = `${styles.dayCell} ${!day ? styles.dayCellEmpty : ""} ${day && isToday(day) ? styles.dayCellToday : ""} ${day && isSel(day) ? styles.dayCellSel : ""}`;
+  return <button key={index} type="button" disabled={!day} onClick={() => day && selectDay(day)} className={cls}>{day || ""}</button>;
+}
+
+function CalendarSection({ viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay }) {
+  return (
+    <>
+      <CalendarHeader viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} />
+      <div className={styles.calGrid}>
+        {DAYS.map(d => <div key={d} className={styles.dayHeader}>{d}</div>)}
+        {days.map((d, i) => <DayCell key={i} day={d} index={i} isToday={isToday} isSel={isSel} selectDay={selectDay} />)}
+      </div>
+    </>
+  );
+}
+
+function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly, setOpen }) {
+  return (
+    <div className={`${styles.timePicker} ${timeOnly ? styles.timeOnlyPicker : ""}`}>
+      <Clock size={14} strokeWidth={2} className={styles.timeIcon} />
+      <div className={styles.timeDropdown}>
+        <AnimatedDropdown value={String(hour)} onChange={v => changeHour(Number(v))}
+          options={HOUR_OPTIONS} placeholder="HH" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
+      </div>
+      <span className={styles.timeSep}>:</span>
+      <div className={styles.timeDropdown}>
+        <AnimatedDropdown value={String(minute)} onChange={v => changeMinute(Number(v))}
+          options={MINUTE_OPTIONS} placeholder="MM" className={styles.timeAnimatedDd}
+          allowFlipUpward usePortal menuMaxHeight={200} />
+      </div>
+      <button type="button" className={styles.doneBtn} onClick={() => setOpen(false)}>Done</button>
+    </div>
+  );
 }

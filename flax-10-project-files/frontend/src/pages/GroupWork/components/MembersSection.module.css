@@ -1,0 +1,42 @@
+.membersSection {
+    margin-top: 24px;
+}
+
+.membersTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.membersList {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.memberPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--hover);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.removeBtn {
+    margin-left: 4px;
+    font-size: 11px;
+    border: none;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.emptyText {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}

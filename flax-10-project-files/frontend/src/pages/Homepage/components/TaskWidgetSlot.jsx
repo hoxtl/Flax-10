@@ -3,25 +3,27 @@
  */
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useMemo, useState, useRef, useCallback } from "react";
 import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
+import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
 
 const VISIBLE_COUNT = 3;
 
 const CATEGORY_COLOURS = {
-  UNIVERSITY: { bg: "rgba(123, 163, 196, 0.08)", text: "#4A6D8C" },
-  HEALTH:     { bg: "rgba(123, 179, 142, 0.08)", text: "#4A7C5A" },
-  PERSONAL:   { bg: "#F5F0E8",                   text: "#736048" },
-  WORK:       { bg: "rgba(196, 148, 109, 0.08)", text: "#8C5D3F" },
-  FINANCE:    { bg: "rgba(196, 164, 109, 0.08)", text: "#8C6D3F" },
-  STUDY:      { bg: "rgba(139, 123, 184, 0.08)", text: "#5B4A8A" },
-  default:    { bg: "#F5F0E8",                   text: "#736048" },
+  UNIVERSITY: { bg: "color-mix(in srgb, #4A6D8C 35%, transparent)", text: "#7FA7C2" },
+  HEALTH:     { bg: "color-mix(in srgb, #D97A65 35%, transparent)", text: "#E2907E" },
+  INTERNSHIPS: { bg: "color-mix(in srgb, var(--color-primary) 35%, transparent)", text: "var(--color-primary)" },
+  WORK:       { bg: "color-mix(in srgb, #4F6D8A 35%, transparent)", text: "#7FA7C2" },
+  PERSONAL:   { bg: "color-mix(in srgb, var(--color-primary) 35%, transparent)", text: "var(--color-primary)" },
+  FINANCE:    { bg: "color-mix(in srgb, #B57A42 35%, transparent)", text: "#E3B285" },
+  default:    { bg: "color-mix(in srgb, var(--color-primary) 30%, transparent)", text: "var(--color-primary)" },
 };
 
 const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
@@ -29,11 +31,30 @@ const MODULE_CODE_RE = /^[A-Z]{2,4}\d{3,4}$/;
 function getCategoryStyle(label) {
   if (!label) return CATEGORY_COLOURS.default;
   const key = label.toUpperCase().trim();
+  
+  const isDark = document.documentElement.getAttribute('data-mode') === 'dark';
+  let style = CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
+  
+  if (isDark) {
+    // In dark mode, we force the text to be a very light tint of the color for maximum pop
+    // And increase background opacity to ground it better
+    return {
+      bg: style.bg.replace('35%', '42%').replace('30%', '42%'),
+      text: "#FFFFFF"
+    };
+  } else {
+    // Light mode: use a darker version of the theme primary or the specific text color
+    return {
+      bg: style.bg,
+      text: "var(--color-primary-strong)"
+    };
+  }
+  
   if (MODULE_CODE_RE.test(key)) {
     const c = getModulePillColors(key);
     return { bg: c.bg, text: c.text };
   }
-  return CATEGORY_COLOURS[key] || CATEGORY_COLOURS.default;
+  return style;
 }
 
 function getEstTime(items) {
@@ -54,6 +75,74 @@ function getUrgencyMeta(task) {
   if (p === "high") return { label: "High", tone: "high" };
   if (status === "now") return { label: "Now", tone: "now" };
   return null;
+}
+
+/** Individual task row with inline title editing */
+function TaskRow({ task, idx, styles, isOverdue, urgency, categoryLabel, categoryStyle, rowAccent, handleTaskWidgetComplete, onInlineTaskEdit, setCtxMenu }) {
+  const edit = useInlineEdit(task.title, (newTitle) => onInlineTaskEdit?.(task, { title: newTitle }));
+  return (
+    <motion.li
+      layout
+      variants={itemVariants}
+      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""} ${idx === 0 ? styles.taskWidgetTaskRowNext : ""}`}
+      style={{ "--task-row-accent": rowAccent }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setCtxMenu({ task, x: e.clientX, y: e.clientY });
+      }}
+    >
+      {/* Checkbox */}
+      <button
+        type="button"
+        className={styles.taskWidgetCheckbox}
+        onClick={(e) => { e.stopPropagation(); handleTaskWidgetComplete(task); }}
+        aria-label={`Complete ${task.title}`}
+      >
+        <motion.span
+          className={styles.taskWidgetCheckboxCircle}
+          aria-hidden
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
+        />
+      </button>
+
+      <div className={styles.taskWidgetTaskBody}>
+        <div className={styles.taskWidgetTaskTopRow}>
+          {categoryLabel && (
+            <span
+              className={styles.taskWidgetCategoryPill}
+              style={{ background: categoryStyle.bg, color: categoryStyle.text }}
+            >
+              {categoryLabel}
+            </span>
+          )}
+          <span className={styles.taskWidgetTaskTitle}>
+            <InlineTitleField
+              value={task.title}
+              isEditing={edit.isEditing}
+              draft={edit.draft}
+              setDraft={edit.setDraft}
+              onStart={edit.start}
+              onSave={edit.save}
+              onCancel={edit.cancel}
+            />
+          </span>
+          {urgency && !edit.isEditing && (
+            <span
+              className={`${styles.taskWidgetUrgencyPill} ${urgency.tone === "urgent"
+                  ? styles.taskWidgetUrgencyPillUrgent
+                  : urgency.tone === "high"
+                    ? styles.taskWidgetUrgencyPillHigh
+                    : styles.taskWidgetUrgencyPillNow
+                }`}
+            >
+              {urgency.label}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.li>
+  );
 }
 
 const listVariants = {
@@ -85,19 +174,21 @@ export function TaskWidgetSlot({
   onEditTask,
   onDeleteTask,
   onInlineTaskEdit,
+  row = 1,
 }) {
+  const navigate = useNavigate();
   const [ctxMenu, setCtxMenu] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
-  const incompleteTasks   = taskWidgetList.filter((t) => !t.completed);
+  const incompleteTasks = taskWidgetList.filter((t) => !t.completed);
   const completedTasks = taskWidgetList.filter((t) => t.completed);
-  const visibleIncomplete = showAllTaskWidgetTasks
-    ? incompleteTasks
-    : incompleteTasks.slice(0, VISIBLE_COUNT);
-  const visibleCompleted = completedTasks.slice(0, 3);
-  const hiddenCount = Math.max(0, incompleteTasks.length - VISIBLE_COUNT);
 
-  const allTasksDone   = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
-  const clearMessage   = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
+  const visibleLimit = row === 1 ? 3 : 6;
+  const visibleIncomplete = incompleteTasks.slice(0, visibleLimit);
+  const visibleCompleted = completedTasks.slice(0, 3);
+  const hiddenCount = Math.max(0, incompleteTasks.length - visibleLimit);
+
+  const allTasksDone = taskWidgetItemsOnly.length > 0 && taskWidgetItemsOnly.every((t) => t.completed);
+  const clearMessage = useMemo(() => (allTasksDone ? getClearMessage() : null), [allTasksDone]);
   const incompleteCount = taskWidgetItemsOnly.filter((i) => !i.completed).length;
   const estimatedLeft = getEstTime(taskWidgetList);
 
@@ -135,15 +226,12 @@ export function TaskWidgetSlot({
           {taskWidgetItemsOnly.length > 0 ? (
             <>
               {/* Header */}
-              <div className={styles.taskWidgetSlotHeader}>
-                <div className={styles.taskWidgetSlotHeaderLeft}>
-                  <div className={styles.taskWidgetSlotIconWrap}>
-                    <CheckSquare className={styles.taskWidgetSlotIcon} size={17} strokeWidth={1.75} aria-hidden />
-                  </div>
-                  <div className={styles.taskWidgetSlotTitleBlock}>
-                    <h3 className={styles.taskWidgetSlotTitle}>Today&apos;s Tasks</h3>
-                  </div>
+              <div className={baseStyles.widgetHeader}>
+                <div className={baseStyles.headerIconWrap}>
+                  <CheckSquare className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
                 </div>
+                <h3 className={baseStyles.headerTitle}>Today&apos;s Tasks</h3>
+                
                 {!hasTimerSession && incompleteCount > 0 && (
                   <button
                     type="button"
@@ -181,8 +269,8 @@ export function TaskWidgetSlot({
                 layout
               >
                 {visibleIncomplete.map((t, idx) => {
-                  const status      = t.taskWidgetStatus;
-                  const isOverdue   = status === "overdue";
+                  const status = t.taskWidgetStatus;
+                  const isOverdue = status === "overdue";
                   const rowAccent = isOverdue
                     ? "var(--home-urgency-danger)"
                     : "var(--home-urgency-neutral)";
@@ -191,62 +279,20 @@ export function TaskWidgetSlot({
                   const categoryStyle = getCategoryStyle(categoryLabel);
 
                   return (
-                    <motion.li
+                    <TaskRow
                       key={t.id}
-                      layout
-                      variants={itemVariants}
-                      className={`${styles.taskWidgetTaskRow} ${isOverdue ? styles.taskWidgetTaskRowOverdue : ""} ${idx === 0 ? styles.taskWidgetTaskRowNext : ""}`}
-                      style={{ "--task-row-accent": rowAccent }}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        setCtxMenu({ task: t, x: e.clientX, y: e.clientY });
-                      }}
-                      title="Right-click for options"
-                    >
-                      {/* Checkbox */}
-                      <button
-                        type="button"
-                        className={styles.taskWidgetCheckbox}
-                        onClick={(e) => { e.stopPropagation(); handleTaskWidgetComplete(t); }}
-                        aria-label={`Complete ${t.title}`}
-                      >
-                        <motion.span
-                          className={styles.taskWidgetCheckboxCircle}
-                          aria-hidden
-                          animate={{ scale: 1 }}
-                          transition={{ duration: 0.2 }}
-                        />
-                      </button>
-
-                      <div className={styles.taskWidgetTaskBody}>
-                        <div className={styles.taskWidgetTaskTopRow}>
-                          {categoryLabel && (
-                            <span
-                              className={styles.taskWidgetCategoryPill}
-                              style={{ background: categoryStyle.bg, color: categoryStyle.text }}
-                            >
-                              {categoryLabel}
-                            </span>
-                          )}
-                          <span className={styles.taskWidgetTaskTitle} title={t.title}>
-                            {t.title}
-                          </span>
-                          {urgency && (
-                            <span
-                              className={`${styles.taskWidgetUrgencyPill} ${
-                                urgency.tone === "urgent"
-                                  ? styles.taskWidgetUrgencyPillUrgent
-                                  : urgency.tone === "high"
-                                    ? styles.taskWidgetUrgencyPillHigh
-                                    : styles.taskWidgetUrgencyPillNow
-                              }`}
-                            >
-                              {urgency.label}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.li>
+                      task={t}
+                      idx={idx}
+                      styles={styles}
+                      isOverdue={isOverdue}
+                      urgency={urgency}
+                      categoryLabel={categoryLabel}
+                      categoryStyle={categoryStyle}
+                      rowAccent={rowAccent}
+                      handleTaskWidgetComplete={handleTaskWidgetComplete}
+                      onInlineTaskEdit={onInlineTaskEdit}
+                      setCtxMenu={setCtxMenu}
+                    />
                   );
                 })}
 
@@ -255,9 +301,9 @@ export function TaskWidgetSlot({
                     <button
                       type="button"
                       className={styles.taskWidgetMoreText}
-                      onClick={() => setShowAllTaskWidgetTasks((v) => !v)}
+                      onClick={() => navigate("/tasks?filter=today")}
                     >
-                      {showAllTaskWidgetTasks ? "Show less" : `+ ${hiddenCount} more`}
+                      + {hiddenCount} more · View all tasks
                     </button>
                   </li>
                 )}

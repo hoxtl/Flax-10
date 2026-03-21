@@ -1,0 +1,388 @@
+/* --- Soft Folder Card --- */
+.card {
+    background: var(--surface-card);
+    flex-direction: column;
+    min-height: 0;
+    align-self: start;
+    position: relative;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    transition: transform 0.24s cubic-bezier(.2, .9, .2, 1), border-color 0.24s ease;
+}
+
+.card.clickable:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+.card.enrolled {
+    background: var(--surface-card);
+}
+
+.card.enrolled::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    height: auto;
+    background: var(--modules-accent-line);
+    pointer-events: none;
+    border-radius: 0;
+    inset: auto;
+}
+
+.content {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.58rem;
+    overflow: hidden;
+}
+
+.cardHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.38rem;
+    min-width: 0;
+}
+
+.headerTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.headerIdentity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.tutorAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    margin-left: auto;
+}
+
+.tutorAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tutorAvatarFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    color: var(--modules-accent-ink);
+    font-size: 0.6rem;
+    font-weight: 700;
+}
+
+.iconWrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: block;
+    background: color-mix(in srgb, var(--module-accent, var(--modules-accent-ink)) 10%, var(--surface-card));
+    border: 0.5px solid color-mix(in srgb, var(--text) 40%, var(--border));
+    flex: 0 0 auto;
+    position: relative;
+}
+
+.iconWrap::before,
+.iconWrap::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--module-accent, var(--modules-accent-ink)) 35%, transparent);
+}
+
+.iconWrap::before {
+    top: 12px;
+    height: 4px;
+}
+
+.iconWrap::after {
+    top: 20px;
+    height: 3px;
+    opacity: 0.78;
+}
+
+.enrolledBadge {
+    background: var(--modules-enrolled-badge-bg);
+    color: var(--modules-enrolled-badge-fg);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border: 0.5px solid var(--modules-enrolled-badge-border);
+}
+
+.headerChipsRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.headerChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.departmentText {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel) 84%, transparent);
+    border: 0.5px solid color-mix(in srgb, var(--text) 25%, var(--border));
+    color: var(--muted);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.courseText {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--module-accent, var(--primary)) 12%, var(--surface-card));
+    border: 0.5px solid color-mix(in srgb, var(--module-accent, var(--primary)) 22%, var(--border));
+    color: color-mix(in srgb, var(--module-accent, var(--primary)) 70%, var(--text) 30%);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.moduleCode {
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--modules-accent-ink);
+    letter-spacing: 0.02em;
+}
+
+.moduleTitle {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    white-space: normal;
+    overflow: visible;
+}
+
+.description {
+    font-size: 0.82rem;
+    color: color-mix(in srgb, var(--text) 70%, var(--muted));
+    line-height: 1.35;
+    margin: 0;
+    min-height: calc(1.35em * 2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.metaPills {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    row-gap: 0.35rem;
+    flex-wrap: wrap;
+    padding-top: 0.42rem;
+    border-top: 1px solid color-mix(in srgb, var(--text) 15%, var(--border));
+}
+
+.taskChipInline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--modules-inline-surface);
+    border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
+    padding: 0.18rem 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-radius: 999px;
+}
+
+.metaPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    font-size: 0.68rem;
+    color: var(--modules-accent-ink);
+    font-weight: 500;
+    font-style: italic;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel) 88%, var(--surface-card) 12%);
+    border: 0.5px solid color-mix(in srgb, var(--text) 18%, var(--border));
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.relatedRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.relatedChip {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--modules-inline-surface);
+    border-color: color-mix(in srgb, var(--text) 20%, var(--border));
+    border-radius: 999px;
+}
+
+/* --- Progress pill (reading summary) --- */
+.progressPill {
+    width: 100%;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel) 60%, var(--surface-card));
+    overflow: hidden;
+    margin-top: auto;
+}
+
+.progressFill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--primary);
+    transition: width 0.4s ease;
+}
+
+/* --- Actions --- */
+.actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.65rem;
+    align-items: center;
+    margin-top: 0.4rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid color-mix(in srgb, var(--text) 12%, var(--border));
+}
+
+.editButton,
+.deleteButton,
+.unenrollButton {
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(.2, .9, .2, 1);
+    border: none;
+    min-width: 0;
+}
+
+.editButton {
+    background: var(--hover);
+    color: var(--text);
+    flex: 1;
+}
+
+.editButton:hover {
+    background: color-mix(in srgb, var(--text) 10%, var(--hover));
+}
+
+.deleteButton {
+    background: var(--modules-danger-soft);
+    color: var(--error-text);
+    flex: 1;
+}
+
+.deleteButton:hover {
+    background: var(--modules-danger-soft-hover);
+}
+
+.enrollPrimaryButton {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+}
+
+.unenrollButton {
+    background: var(--modules-error-soft);
+    color: var(--error-text);
+    flex: 1 1 auto;
+}
+
+.unenrollButton:hover {
+    background: var(--modules-error-soft-hover);
+}
+
+.deadlineButton {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.deadlineButton:hover {
+    background: var(--text);
+    color: var(--modules-accent-on-solid);
+}
+
+.viewDetailsBtn {
+    border: none;
+    background: transparent;
+    color: var(--modules-accent-ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-style: italic;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--modules-accent-ink) 40%, transparent);
+    line-height: 1.1;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.viewDetailsBtn:hover {
+    color: var(--text);
+    border-bottom-color: var(--text);
+}
+
+.coreTag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--modules-accent-ink);
+    font-style: italic;
+}

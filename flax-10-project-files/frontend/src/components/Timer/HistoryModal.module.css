@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 .modalShell {
     width: min(555px, 92vw);
 }
@@ -10,9 +14,9 @@
 
 .clearButton {
     padding: var(--btn-padding-sm);
-    background-color: #fee2e2;
-    color: #dc2626;
-    border: none;
+    background: var(--surface-card);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: var(--btn-radius);
     cursor: pointer;
     font-weight: 600;
@@ -79,33 +83,34 @@
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
     border-radius: 20px;
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.25rem;
     white-space: nowrap;
+    background: var(--hover);
+    color: var(--muted);
+    border: 1px solid var(--border);
 }
 
 .focusPill {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--hover);
+    color: var(--muted);
 }
 
 .breakPill {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--hover);
+    color: var(--muted);
 }
 
 .pausePill {
-    background: #fef08a;
-    /* Soft Yellow */
-    color: #854d0e;
-    /* Darker Yellow/Brown for text */
+    background: var(--hover);
+    color: var(--muted);
 }
 
 .sessionPill {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--hover);
+    color: var(--text);
 }
 
 .empty {
@@ -113,4 +118,15 @@
     color: var(--muted);
     font-style: italic;
     padding: 2rem;
+}
+
+.blockTask {
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.clearButtonWrap {
+    margin-top: var(--space-6);
+    text-align: right;
 }

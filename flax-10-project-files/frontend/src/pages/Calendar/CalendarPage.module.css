@@ -1,18 +1,77 @@
 .page {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
   background-color: var(--bg);
 }
 
-.filters {
-  padding: 4px 16px;
+.skeletonStickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.skeletonCalendarHeader {
+  display: grid;
+  grid-template-columns: 64px minmax(180px, 280px) 64px;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 12px 16px 4px;
+}
+
+.skeletonNav {
+  height: 36px;
+  border-radius: 999px;
+}
+
+.skeletonTitle {
+  height: 34px;
+}
+
+.skeletonFilterPill {
+  width: 88px;
+  height: 32px;
+  border-radius: 999px;
   flex-shrink: 0;
+}
+
+.skeletonCalendarGrid {
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonCalendarRow {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.skeletonTimeCol {
+  height: 18px;
+  border-radius: 8px;
+}
+
+.skeletonEventLane {
+  height: 76px;
+  border-radius: 18px;
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.filters {
+  padding: 4px 16px 8px;
   overflow-x: auto;
   white-space: nowrap;
   display: flex;
   gap: 8px;
+  scrollbar-width: none;
 }
 
 .filters::-webkit-scrollbar {
@@ -20,21 +79,20 @@
 }
 
 .mainContent {
-  flex: 1;
-  min-height: 0;
-  overflow-y: hidden;
   background: var(--calendar-bg);
   border-top-left-radius: 22px;
   border-top-right-radius: 24px;
-  display: flex;
-  flex-direction: column;
 }
 
 @media (max-width: 768px) {
   .filters {
     padding: 8px 12px;
     background: var(--bg);
-    border-bottom: 1px solid var(--border);
     -webkit-overflow-scrolling: touch;
+  }
+
+  .skeletonCalendarHeader {
+    grid-template-columns: 44px minmax(140px, 1fr) 44px;
+    gap: 0.75rem;
   }
 }

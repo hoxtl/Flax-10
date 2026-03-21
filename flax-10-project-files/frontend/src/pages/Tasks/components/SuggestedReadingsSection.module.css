@@ -1,0 +1,119 @@
+/* Styles for the suggested readings section. */
+
+.section {
+  margin: 0.5rem 0 1rem;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.body {
+  gap: 0.65rem;
+}
+
+.headerMeta {
+  margin-left: auto;
+  padding-right: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.neutralEmptyState {
+  padding: 0.4rem 0 0.25rem;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s ease, opacity 0.2s;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--hover-light);
+  transform: translateY(-0.5px);
+  box-shadow: var(--shadow-sm);
+}
+
+.row:active {
+  background: rgba(123, 103, 81, 0.06);
+  transform: translateY(0);
+}
+
+.rowAdded {
+  opacity: 0.35;
+}
+
+.rowTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-body);
+}
+
+.rowLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+
+.rowInfos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 4px 0;
+}
+
+.rowInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--flax-brown-strong);
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.rowHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: var(--flax-brown-strong);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-style: italic;
+  margin: 4px 0 0;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .headerMeta {
+    display: none;
+  }
+}

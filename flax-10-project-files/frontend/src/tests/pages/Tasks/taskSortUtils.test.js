@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks taskSortUtils: sortTasks by priority, due, alpha, list, date_added, est_time.
  */
 

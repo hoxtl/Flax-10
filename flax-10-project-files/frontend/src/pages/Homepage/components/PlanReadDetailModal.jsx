@@ -1,7 +1,5 @@
-/**
- * Plan timeline read modal — task or event detail overlay.
- */
-
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { formatTime } from "../utils/dateFormatUtils";
 
 export function PlanReadDetailModal({
@@ -42,33 +40,21 @@ export function PlanReadDetailModal({
       (data.start_time && data.end_time ? ` · ${Math.round((new Date(data.end_time) - new Date(data.start_time)) / 60000)}m` : "");
 
   return (
-    <div
-      className={styles.actionHubReadOverlay}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="plan-read-title"
-      onClick={onClose}
+    <StandardModal
+      title={title}
+      subtitle={timeStr}
+      onClose={onClose}
+      size="sm"
     >
-      <div className={styles.actionHubReadModal} onClick={(e) => e.stopPropagation()}>
-        <h2 id="plan-read-title" className={styles.actionHubReadTitle}>
-          {title}
-        </h2>
-        <p className={styles.actionHubReadTime}>{timeStr}</p>
+      <div className={styles.actionHubReadContent}>
         {data?.description && (
           <p className={styles.actionHubReadDescription}>{data.description}</p>
         )}
         <div className={styles.actionHubReadFooter}>
-          <button type="button" className={styles.actionHubReadBtn} onClick={handleEdit}>
-            Edit
-          </button>
-          <button type="button" className={styles.actionHubReadBtnDanger} onClick={handleDelete}>
-            Delete
-          </button>
+          <PrimaryButton type="button" className={styles.actionHubReadBtn} variant="ghost" pill onClick={handleEdit}>Edit</PrimaryButton>
+          <PrimaryButton type="button" className={styles.actionHubReadBtnDanger} variant="danger" pill onClick={handleDelete}>Delete</PrimaryButton>
         </div>
-        <button type="button" className={styles.actionHubReadClose} onClick={onClose} aria-label="Close">
-          ×
-        </button>
       </div>
-    </div>
+    </StandardModal>
   );
 }

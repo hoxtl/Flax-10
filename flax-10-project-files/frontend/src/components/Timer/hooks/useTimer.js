@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { useReducer, useEffect, useRef } from 'react';
 import { timerReducer, initialState } from '../utils/timerReducer';
 
@@ -10,12 +14,21 @@ const useInterval = (isActive, dispatch) => {
     }, [isActive, dispatch]);
 };
 
-/** Helper to update settings and potentially reset time left */
-const updateSettings = (dispatch, mode, isActive, type, val) => {
+/** Helper to update settings and potentially reset or adjust time left */
+const updateSettings = (dispatch, state, type, val) => {
     const key = type === 'work' ? 'workTime' : type === 'break' ? 'breakTime' : 'targetSessions';
+    const oldVal = state[key];
     dispatch({ type: 'UPDATE_SETTINGS', payload: { [key]: val } });
-    if (mode === type && !isActive && typeof val === 'number')
-        dispatch({ type: 'SET_TIME_LEFT', payload: val * 60 });
+
+    if (state.mode === type && typeof val === 'number') {
+        if (!state.isActive) {
+            dispatch({ type: 'SET_TIME_LEFT', payload: val * 60 });
+        } else if (state.isPaused) {
+            // Adjust timeLeft by the difference in total duration
+            const diffSeconds = (val - oldVal) * 60;
+            dispatch({ type: 'SET_TIME_LEFT', payload: state.timeLeft + diffSeconds });
+        }
+    }
 };
 
 export function useTimer(initWork, initBreak, initSessions) {
@@ -24,7 +37,7 @@ export function useTimer(initWork, initBreak, initSessions) {
 
     return {
         ...state,
-        updateTime: (type, val) => updateSettings(dispatch, state.mode, state.isActive, type, val),
+        updateTime: (type, val) => updateSettings(dispatch, state, type, val),
         updateSettings: (payload) => dispatch({ type: 'UPDATE_SETTINGS', payload }),
         resetTimer: () => dispatch({ type: 'RESET' }),
         setIsActive: (v) => dispatch({ type: 'SET_ACTIVE', payload: v }),

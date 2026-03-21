@@ -1,0 +1,346 @@
+/*
+ * Timer page theme overrides for task picker, focus overlay,
+ * and session modals (loaded last to override base styles).
+ */
+
+/* ── Select task button: brown/flax solid fill ── */
+.taskPickBtn {
+    font-size: 0.82rem !important;
+    background: var(--primary-strong) !important;
+    color: #fff !important;
+    border-color: var(--primary-strong) !important;
+}
+
+.taskPickBtn:hover {
+    filter: brightness(1.06) !important;
+}
+
+/* ── Task actions row: clear task right-aligned ── */
+.taskInputActions {
+    justify-content: center !important;
+}
+
+.taskInputActionsRow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+}
+
+.taskClearBtn {
+    margin-left: auto !important;
+}
+
+/* ── Task picker toolbar: uniform control sizing ────── */
+.taskPickToolbarRow {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 0.4rem !important;
+}
+
+.taskPickToolbarRow .taskPickSearch {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+}
+
+.taskPickToolbarRow .taskPickSearch > div {
+    height: 100% !important;
+}
+
+.taskPickToolbarRow .taskPickSearch input {
+    height: 36px !important;
+    font-size: 0.82rem !important;
+    padding: 0 0.6rem 0 2rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+}
+
+.taskPickSortWrap {
+    flex-shrink: 0 !important;
+    min-width: 120px !important;
+}
+
+.taskPickSortWrap > div > button {
+    height: 36px !important;
+    padding: 0 0.6rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* ── Exit Focus Button ───────────────────────────────── */
+
+.focusOverlayRailBackBtn {
+    background: var(--primary-strong) !important;
+    border: 1.5px solid var(--primary-strong) !important;
+    color: #fff !important;
+    border-radius: 999px !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    padding: 0.38rem 0.9rem !important;
+    transition: background 0.16s ease, border-color 0.16s ease !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.focusOverlayRailBackBtn:hover {
+    background: color-mix(in srgb, var(--primary-strong) 88%, #000) !important;
+    border-color: color-mix(in srgb, var(--primary-strong) 88%, #000) !important;
+    transform: none !important;
+}
+
+/* ── Leave Focus Modal: text black + visible middle button ── */
+
+.leaveNudgeModal {
+    background: var(--surface-card) !important;
+    border: 2px solid var(--border) !important;
+}
+
+.leaveNudgeLoss {
+    color: var(--text) !important;
+    background: var(--hover) !important;
+    border-color: var(--border) !important;
+}
+
+.leaveNudgeMinutes {
+    color: var(--primary-strong) !important;
+    font-style: italic !important;
+    font-weight: 700 !important;
+}
+
+.leaveNudgeProgressMeta {
+    color: var(--text) !important;
+}
+
+.leaveNudgeProgressMeta span:last-child {
+    color: var(--primary-strong) !important;
+    font-style: italic !important;
+}
+
+.leaveNudgeBreakBtn {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+    color: var(--color-on-primary) !important;
+}
+
+.leaveNudgeBreakBtn:hover {
+    filter: brightness(1.06) !important;
+    border-color: var(--primary-strong) !important;
+}
+
+.leaveNudgeReggie {
+    color: var(--primary-strong) !important;
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card)) !important;
+    border: 1.5px solid color-mix(in srgb, var(--primary) 22%, transparent) !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 0.8rem !important;
+    font-weight: 600 !important;
+}
+
+/* ── End Session Modal: enhanced ────────────────────── */
+
+.endSessionModal {
+    background: var(--surface-card) !important;
+    border: 2px solid var(--border) !important;
+}
+
+.endSessionTitle {
+    color: var(--text) !important;
+    font-size: 1.4rem !important;
+}
+
+.endSessionRecapLabel {
+    color: var(--muted) !important;
+    font-size: 0.68rem !important;
+}
+
+.endSessionRecapText {
+    color: var(--text) !important;
+    font-size: 0.92rem !important;
+}
+
+.endSessionProgressMeta {
+    color: var(--text) !important;
+}
+
+.endSessionKeepBtn {
+    background: var(--primary-strong) !important;
+    border-color: var(--primary-strong) !important;
+    color: var(--color-on-primary) !important;
+}
+
+.endSessionQuitBtn {
+    background: var(--surface-card) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+.endSessionHighlight {
+    color: var(--primary-strong) !important;
+    font-style: italic !important;
+    font-weight: 700 !important;
+}
+
+.endSessionActions {
+    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+}
+
+/* Shared timer modal border consistency */
+.taskPickDropdown,
+.leaveNudgeModal,
+.endSessionModal,
+.clearHistoryModal {
+    border: 2px solid #000 !important;
+}
+
+.taskPickList {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.42rem !important;
+    max-height: 520px !important;
+    overflow-y: auto !important;
+    padding: 0.7rem 1rem 1.15rem !important;
+}
+
+.taskPickList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.taskPickList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.taskPickList::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    border-radius: 10px;
+}
+
+.taskPickList::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+
+.taskPickItem {
+    display: block !important;
+    width: 100% !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    border-radius: 12px !important;
+    border: 1px solid color-mix(in srgb, var(--border) 88%, transparent) !important;
+    background: color-mix(in srgb, var(--surface-card) 97%, var(--hover)) !important;
+    box-shadow: none !important;
+}
+
+.taskPickItem + .taskPickItem {
+    margin-top: 0 !important;
+}
+
+.taskPickItemContent {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.62rem 0.8rem !important;
+}
+
+.taskPickItemSelected {
+    background: color-mix(in srgb, var(--focus-accent) 14%, var(--surface-card)) !important;
+    border-color: color-mix(in srgb, var(--focus-accent) 44%, var(--border)) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--focus-accent) 18%, transparent) inset !important;
+    color: var(--text) !important;
+}
+
+.taskPickItemSelected.taskPickItemRecommended {
+    background: color-mix(in srgb, var(--focus-accent) 16%, var(--surface-card)) !important;
+    border-color: color-mix(in srgb, var(--focus-accent) 50%, var(--border)) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--focus-accent) 22%, transparent) inset !important;
+}
+
+.taskPickItemSelected .taskPickTitle,
+.taskPickItemSelected .taskPickPriorityIcon,
+.taskPickItemSelected .taskPickDurationInline,
+.taskPickItemSelected .taskPickMetaDivider,
+.taskPickItemSelected .taskPickMetaLine,
+.taskPickItemSelected .taskPickMetaSubline {
+    color: var(--text) !important;
+}
+
+.taskPickSingleLine {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.72rem !important;
+    min-width: 0 !important;
+}
+
+.taskPickTitle {
+    line-height: 1.24 !important;
+}
+
+.taskPickInlineMeta {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    flex-shrink: 0 !important;
+}
+
+/* Goal reached modal: align with other timer modals */
+.goalReachedModal {
+    background: var(--surface-card) !important;
+    border: 2px solid #000 !important;
+    box-shadow: var(--modal-shadow) !important;
+}
+
+.goalReachedContent {
+    padding: 0 !important;
+}
+
+.goalReachedBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.4rem;
+    padding: 1.5rem 1.75rem 1.6rem;
+}
+
+
+.goalReachedRecapLabel {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 800;
+    color: var(--text-secondary);
+}
+
+.goalReachedSummary {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.goalReachedSummaryText {
+    margin: 0;
+    color: var(--text);
+    line-height: 1.45;
+    font-size: 0.93rem;
+}
+
+.goalReachedStats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+    width: 100%;
+}
+
+
+.goalReachedStats .summaryItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+

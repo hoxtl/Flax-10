@@ -28,8 +28,8 @@ vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
     ),
 }));
 
-vi.mock('../../../components/Calendar/EventDetailPopup', () => ({
-    EventDetailPopup: ({ event, onClose, actions }) => (
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+    EventPopover: ({ event, onClose, actions }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>
             <button onClick={onClose}>Close Popup</button>
@@ -166,6 +166,19 @@ describe('EventPopups', () => {
         getEventType.mockReturnValue('module');
         render(<EventPopups />);
         expect(screen.getByText('Leave Module')).toBeTruthy();
+    });
+
+    it('hides Leave Module action when module leave is disabled', () => {
+        useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
+        useEventPopup.mockReturnValue({
+            popupEvent: { id: 4, title: 'Module Event', source: 'module', tag: null, module: 'CS3001' },
+            popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 },
+            closePopup: vi.fn(),
+            readOnly: false,
+        });
+        getEventType.mockReturnValue('module');
+        render(<EventPopups allowModuleLeave={false} />);
+        expect(screen.queryByText('Leave Module')).not.toBeInTheDocument();
     });
 
     it('shows Unsync action for society events', () => {

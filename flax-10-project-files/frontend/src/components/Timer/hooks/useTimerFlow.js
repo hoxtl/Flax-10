@@ -1,35 +1,114 @@
-import { useState, useRef, useCallback } from 'react';
-import { useCompletionCheck } from '../utils/timerUtils';
+/*
+ * Timer completion and session flow state.
+ */
+
+import { useCallback, useRef, useState } from 'react';
+import { logTaskTime } from '../../../api/taskApi';
+import { playCompletionChime } from '../../../lib/sounds';
 import { saveSession } from '../utils/historyUtils';
+import { useCompletionCheck } from '../utils/timerUtils';
+
+const AUTO_BREAK_SECONDS = 5 * 60;
+
+function useTimerFlowState() {
+  const [modal, setModal] = useState(null);
+  const [distractionCount, setDistractionCount] = useState(0);
+  const studyBlockId = useRef(Date.now());
+
+  return { modal, setModal, distractionCount, setDistractionCount, studyBlockId };
+}
+
+function buildTaskLabel(t) {
+  const moduleCode = t.activeTaskMeta?.moduleCode;
+  if (!t.task) return '';
+  return moduleCode ? `${t.task} - ${moduleCode}` : t.task;
+}
+
+function saveCurrentSession(t, studyBlockId, distractionCount, status) {
+  const completed = status === 'Completed' ? t.completedSessions + 1 : t.completedSessions;
+  saveSession(t.totalWork, t.totalBreak, completed, studyBlockId.current, buildTaskLabel(t), t.totalPaused, status, distractionCount);
+}
+
+function logActiveTaskMinutes(activeTaskId, totalWork) {
+  if (!activeTaskId) return;
+  logTaskTime(activeTaskId, Math.round(totalWork / 60));
+}
+
+function resetBlockMetrics(t, setDistractionCount) {
+  setDistractionCount(0);
+  t.updateSettings({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
+}
+
+function showGoalModal(t, studyBlockId, setModal) {
+  studyBlockId.current = Date.now();
+  t.setIsActive(false);
+  t.setTimeLeft(t.workTime * 60);
+  setModal('goal');
+}
+
+function continueNextSession(t, modal) {
+  t.setMode('work');
+  t.setTimeLeft(t.workTime * 60);
+  t.setIsActive(modal !== 'break');
+}
+
+function completeSession(state, t) {
+  saveCurrentSession(t, state.studyBlockId, state.distractionCount, 'Completed');
+  logActiveTaskMinutes(t.activeTaskId, t.totalWork);
+  updateCompletedSession(state, t);
+}
+
+function updateCompletedSession(state, t) {
+  const next = t.completedSessions + 1;
+  t.setCompletedSessions(next);
+  resetBlockMetrics(t, state.setDistractionCount);
+  if (next >= t.targetSessions) return showGoalModal(t, state.studyBlockId, state.setModal);
+  continueNextSession(t, state.modal);
+}
+
+function resetFlow(state, t) {
+  state.setModal(null);
+  state.setDistractionCount(0);
+  t.resetTimer();
+}
+
+function finishEarly(state, t) {
+  if (t.totalWork > 0) saveCurrentSession(t, state.studyBlockId, state.distractionCount, 'Incomplete');
+  logActiveTaskMinutes(t.activeTaskId, t.totalWork);
+  resetFlow(state, t);
+  state.studyBlockId.current = Date.now();
+}
+
+function launchAutoBreak(state, t) {
+  playCompletionChime(0.3);
+  state.setModal('autoBreak');
+  t.setMode('break');
+  t.setTimeLeft(AUTO_BREAK_SECONDS);
+  t.setIsActive(true);
+}
+
+function finishAutoBreak(state, startNext) {
+  state.setDistractionCount(0);
+  if (state.modal !== 'autoBreak') return;
+  startNext();
+}
+
+function useTimerFlowActions(state, t) {
+  const startNext = useCallback(() => completeSession(state, t), [state, t]);
+  const endEarly = useCallback(() => finishEarly(state, t), [state, t]);
+  const onWorkComplete = useCallback(() => launchAutoBreak(state, t), [state, t]);
+  const autoBreakDone = useCallback(() => finishAutoBreak(state, startNext), [state, startNext]);
+  const resetBlockId = useCallback(() => { state.studyBlockId.current = Date.now(); }, [state.studyBlockId]);
+  const resetTimer = useCallback(() => resetFlow(state, t), [state, t]);
+
+  return { startNext, endEarly, onWorkComplete, autoBreakDone, resetBlockId, resetTimer };
+}
 
 export function useTimerFlow(t, notify) {
-    const [modal, setModal] = useState(null);
-    const studyBlockId = useRef(Date.now());
+  const state = useTimerFlowState();
+  const actions = useTimerFlowActions(state, t);
+  const addDistraction = useCallback(() => state.setDistractionCount((value) => value + 1), [state]);
 
-    const save = useCallback((st = 'Completed') => {
-        const c = st === 'Completed' ? t.completedSessions + 1 : t.completedSessions;
-        saveSession(t.totalWork, t.totalBreak, c, studyBlockId.current, t.task, t.totalPaused, st);
-    }, [t.totalWork, t.totalBreak, t.completedSessions, t.task, t.totalPaused]);
-
-    const startNext = useCallback(() => {
-        save('Completed');
-        const next = t.completedSessions + 1;
-        t.setCompletedSessions(next);
-        t.updateSettings({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
-        if (next >= t.targetSessions) {
-            studyBlockId.current = Date.now(); t.setIsActive(false); t.setTimeLeft(t.workTime * 60);
-            return setModal('goal');
-        }
-        t.setMode('work'); t.setTimeLeft(t.workTime * 60); t.setIsActive(modal !== 'break');
-    }, [save, t.completedSessions, t.targetSessions, modal, t.setCompletedSessions, t.updateSettings, t.setMode, t.setTimeLeft, t.setIsActive]);
-
-    const endEarly = useCallback(() => {
-        if (t.totalWork > 0) save('Incomplete');
-        t.resetTimer();
-        setModal(null);
-        studyBlockId.current = Date.now();
-    }, [save, t.resetTimer, setModal]);
-
-    useCompletionCheck(t, startNext, notify);
-    return { modal, setModal, startNext, endEarly, resetBlockId: useCallback(() => studyBlockId.current = Date.now(), []) };
+  useCompletionCheck(t, actions.startNext, notify, actions.onWorkComplete);
+  return { ...state, ...actions, addDistraction, resetTimer: actions.resetTimer };
 }

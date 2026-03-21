@@ -1,6 +1,9 @@
+/*
+ * Tests for DeadlineModal component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DeadlineModal from '../../../components/Modules/DeadlineModal';
+import DeadlineModal from '../../../components/Modules/Deadlines/DeadlineModal';
 
 // Const values for the test Modal
 const mockModal = {
@@ -56,7 +59,7 @@ describe('DeadlineModal', () => {
     it('should call onClose when close button is clicked', () => {
         const onClose = vi.fn();
         render(<DeadlineModal module={module} onClose={onClose} />);
-        fireEvent.click(screen.getByText('×'));
+        fireEvent.click(screen.getByRole('button', { name: /close/i }));
         expect(onClose).toHaveBeenCalled();
     });
 
@@ -90,10 +93,12 @@ describe('DeadlineModal', () => {
         expect(mockModal.close).toHaveBeenCalled();
     });
 
-    it('calls onClose when overlay is clicked', () => {
+    it('calls onClose when backdrop is clicked', () => {
         const onClose = vi.fn();
-        const { container } = render(<DeadlineModal module={module} onClose={onClose} />);
-        fireEvent.click(container.firstChild);
+        render(<DeadlineModal module={module} onClose={onClose} />);
+        const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+        expect(backdrop).toBeTruthy();
+        fireEvent.mouseDown(backdrop);
         expect(onClose).toHaveBeenCalled();
     });
 

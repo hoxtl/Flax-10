@@ -1,0 +1,342 @@
+/*
+ * Timer page styles chunk.
+ */
+
+.todayBannerDivider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+.todayStatChip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.todayStatValue {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+}
+
+.todayStatLabel {
+    font-size: 0.65rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.todayGoalSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 120px;
+}
+
+.todayGoalBar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.todayGoalFill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+.todayGoalMeta {
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+}
+
+.todayGoalEditBtn {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+}
+
+.todayGoalInput {
+    width: 44px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.1rem 0.3rem;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--surface-card);
+    outline: none;
+    text-align: center;
+}
+
+/* === Preset Panel (right sidebar card) === */
+
+.presetPanelCard {
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    box-shadow: var(--card-shadow-rest);
+    padding: var(--card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.presetPanelLabel {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    border-left: 3px solid var(--primary);
+    padding-left: 0.5rem;
+}
+
+.presetPanelGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.presetSuggestionCard {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 30%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 9%, var(--surface-card));
+    border-radius: 12px;
+    padding: 0.45rem 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.presetSuggestionText {
+    font-size: 0.72rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.presetSuggestionBtn {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 45%, transparent);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--focus-accent) 15%, var(--surface-card));
+    color: color-mix(in srgb, var(--focus-accent) 78%, #111);
+    cursor: pointer;
+}
+
+.presetSuggestionBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.timerSettingsDivider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0.1rem 0;
+}
+
+.autoBreakContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+}
+
+.autoBreakLabel {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.autoBreakTime {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.autoBreakText {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+}
+
+/* Vertical list layout for presets */
+.presetList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.presetListItemWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+
+.presetListItem {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    gap: 0.4rem;
+    position: relative;
+}
+
+.presetListItemTop {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.presetListIcon {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.presetListItem:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
+    transform: translateY(-1px);
+}
+
+.presetListItemActive {
+    border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+.presetListItemActive:hover {
+    background: color-mix(in srgb, var(--primary) 11%, var(--surface-card)) !important;
+}
+
+.presetListItemDisabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.presetListItemName {
+    font-size: 0.79rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: normal;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.presetListItemMeta {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.presetDurationTag {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.2rem 0.4rem;
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    border-radius: 6px;
+    color: var(--muted);
+}
+
+/* Legacy: keep for any lingering references */
+.presetRow {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.presetRowLabel {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+}
+
+.presetCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.presetCardWrap {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+}
+
+.presetCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.18rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--surface-card);
+    border: var(--card-border);
+    border-radius: var(--card-radius-token);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    text-align: left;
+}
+
+.presetCard:hover:not(:disabled) {
+    background: var(--hover);
+    box-shadow: var(--card-shadow-rest);
+}
+
+.presetCardActive {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-card));
+}
+
+.presetCardDisabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.presetCardLabel {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+}
+

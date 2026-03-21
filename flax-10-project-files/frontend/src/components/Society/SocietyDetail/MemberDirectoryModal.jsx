@@ -1,3 +1,7 @@
+/**
+ * MemberDirectoryModal displays a searchable list of all society members.
+ * Admins can remove members from the directory.
+ */
 import { useState, useEffect, useMemo } from "react";
 import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
@@ -28,15 +32,18 @@ function RemoveButton({ member, onRemove }) {
 }
 
 function useMemberDirectory(members, onFetchMembers, searchQuery) {
-    const [loading, setLoading] = useState(!members || members.length === 0);
+    const [hasLoaded, setHasLoaded] = useState(Boolean(members?.length) || !onFetchMembers);
     useEffect(() => {
         if (!onFetchMembers) return;
-        setLoading(true);
-        onFetchMembers().finally(() => setLoading(false));
+        let active = true;
+        onFetchMembers().finally(() => {
+            if (active) setHasLoaded(true);
+        });
+        return () => { active = false; };
     }, [onFetchMembers]);
     const baseFiltered = useSearchFilter(members || [], searchQuery, ['username', 'name']);
     const displayMembers = useMemo(() => sortByRole(baseFiltered), [baseFiltered]);
-    return { loading, displayMembers };
+    return { loading: !hasLoaded && !members?.length, displayMembers };
 }
 
 function sortByRole(members) {
@@ -44,6 +51,14 @@ function sortByRole(members) {
     const regular = members.filter(m => m.role === 'member');
     return [...admins, ...regular];
 }
+
+const ListItems = ({ members, isAdmin, onRemove }) => (
+    members.map(m => (
+        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly />} title={<MemberTitle member={m} />}
+            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: `profile_${m.user}` }))}
+            rightAction={isAdmin ? <RemoveButton member={m} onRemove={onRemove} /> : null} />
+    ))
+);
 
 export default function MemberDirectoryModal({ societyName, members, onFetchMembers, onRemoveMember, isAdmin, onClose }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -56,16 +71,12 @@ export default function MemberDirectoryModal({ societyName, members, onFetchMemb
         if (conf) onRemoveMember?.(member.user);
     };
 
-    const renderItem = (m) => (
-        <SummaryItem key={m.user} avatar={<UserAvatar user={m} avatarOnly />} title={<MemberTitle member={m} />}
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: `profile_${m.user}` }))}
-            rightAction={isAdmin ? <RemoveButton member={m} onRemove={handleRemove} /> : null} />
-    );
-
     return (
         <GenericSummaryModal isOpen={true} onClose={onClose} title={`Members of ${societyName}`} subtitle="View everyone in this society"
             emptyMessage={loading ? "Loading members..." : "No members found."}
             topContent={<SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search members..." />}
-            items={displayMembers} renderItem={renderItem} />
+            items={displayMembers}>
+            <ListItems members={displayMembers} isAdmin={isAdmin} onRemove={handleRemove} />
+        </GenericSummaryModal>
     );
 }

@@ -1,3 +1,6 @@
+/*
+ * BrowseCard renders a compact society browse card.
+ */
 import styles from './BrowseCard.module.css';
 import ActionCard from './ActionCard';
 
@@ -20,5 +23,5 @@ function ImageGrid({ images }) {
 }
 
 function GridImage({ src }) {
-    return <div className={styles.gridItem} style={{ backgroundImage: `url(${src})` }} />;
+    return <div className={styles.gridItem} style={{ backgroundImage: `url("${src}")` }} />;
 }

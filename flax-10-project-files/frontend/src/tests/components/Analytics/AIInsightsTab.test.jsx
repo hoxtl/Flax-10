@@ -18,7 +18,7 @@ vi.mock('react-markdown', () => ({
 
 vi.mock('remark-gfm', () => ({ default: () => {} }));
 
-vi.mock('../../../api/analyticsService', () => ({
+vi.mock('../../../api/analyticsApi', () => ({
     default: {
         getAiInsights: vi.fn().mockResolvedValue({ insights: 'You study well!' }),
         aiChat: vi.fn().mockResolvedValue({ reply: 'Great question!' }),
@@ -26,7 +26,7 @@ vi.mock('../../../api/analyticsService', () => ({
 }));
 
 import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/Analytics/AIInsightsTab';
-import analyticsService from '../../../api/analyticsService';
+import analyticsService from '../../../api/analyticsApi';
 
 // jsdom doesn't implement scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();
@@ -105,7 +105,7 @@ describe('ChatPanel', () => {
 
     it('sends message on Enter (without shift) and shows reply', async () => {
         render(<ChatPanel period={7} />);
-        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        const box = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(box, { target: { value: 'Hello' } });
         fireEvent.keyDown(box, { key: 'Enter', shiftKey: false });
         await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalledWith(
@@ -118,7 +118,7 @@ describe('ChatPanel', () => {
     it('shows error when chat fails', async () => {
         analyticsService.aiChat.mockRejectedValueOnce(new Error('fail'));
         render(<ChatPanel period={30} />);
-        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        const box = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(box, { target: { value: 'Hi' } });
         fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => expect(screen.getByText(/Could not get a response/)).toBeTruthy());
@@ -126,7 +126,7 @@ describe('ChatPanel', () => {
 
     it('shows Clear button after messages and clears chat', async () => {
         render(<ChatPanel period={30} />);
-        const box = screen.getByPlaceholderText('Ask about your study patterns…');
+        const box = screen.getByPlaceholderText('Ask me anything…');
         fireEvent.change(box, { target: { value: 'Hi' } });
         fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
         await waitFor(() => expect(analyticsService.aiChat).toHaveBeenCalled());

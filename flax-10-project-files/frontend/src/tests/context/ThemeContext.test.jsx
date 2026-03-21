@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
 
@@ -10,6 +10,7 @@ vi.mock('../../api/client', () => ({
 describe('ThemeContext', () => {
     beforeEach(() => {
         localStorage.clear();
+        document.documentElement.removeAttribute('data-mode');
         document.documentElement.removeAttribute('data-theme');
         vi.clearAllMocks();
     });
@@ -24,70 +25,74 @@ describe('ThemeContext', () => {
         consoleSpy.mockRestore();
     });
 
-    it('defaults to light theme', () => {
+    it('defaults to light mode and flax theme', () => {
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        expect(result.current.theme).toBe('light');
+        expect(result.current.mode).toBe('light');
+        expect(result.current.theme).toBe('flax');
     });
 
-    it('uses stored theme from localStorage', () => {
-        localStorage.setItem('theme', 'dark');
+    it('uses stored mode from localStorage', () => {
+        localStorage.setItem('mode', 'dark');
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        expect(result.current.theme).toBe('dark');
+        expect(result.current.mode).toBe('dark');
     });
 
-    it('falls back to initialTheme prop when no stored theme', () => {
-        const wrapper = ({ children }) => <ThemeProvider initialTheme="dark">{children}</ThemeProvider>;
+    it('falls back to initialMode prop when no stored mode', () => {
+        const wrapper = ({ children }) => <ThemeProvider initialMode="dark">{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        expect(result.current.theme).toBe('dark');
+        expect(result.current.mode).toBe('dark');
     });
 
-    it('ignores invalid stored theme', () => {
-        localStorage.setItem('theme', 'invalid-value');
+    it('ignores invalid stored mode', () => {
+        localStorage.setItem('mode', 'invalid-value');
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        expect(result.current.theme).toBe('light');
+        expect(result.current.mode).toBe('light');
     });
 
-    it('sets data-theme attribute on documentElement', () => {
-        render(<ThemeProvider><div /></ThemeProvider>);
-        expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    it('sets data-mode and data-theme attributes on documentElement', () => {
+        act(() => {
+            render(<ThemeProvider><div /></ThemeProvider>);
+        });
+        expect(document.documentElement.getAttribute('data-mode')).toBe('light');
+        expect(document.documentElement.getAttribute('data-theme')).toBe('flax');
     });
 
-    it('toggleTheme switches light to dark', () => {
+    it('toggleMode switches light to dark', () => {
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        act(() => { result.current.toggleTheme(); });
-        expect(result.current.theme).toBe('dark');
+        act(() => { result.current.toggleMode(); });
+        expect(result.current.mode).toBe('dark');
     });
 
-    it('toggleTheme switches dark to light', () => {
-        const wrapper = ({ children }) => <ThemeProvider initialTheme="dark">{children}</ThemeProvider>;
+    it('toggleMode switches dark to light', () => {
+        const wrapper = ({ children }) => <ThemeProvider initialMode="dark">{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        act(() => { result.current.toggleTheme(); });
-        expect(result.current.theme).toBe('light');
+        act(() => { result.current.toggleMode(); });
+        expect(result.current.mode).toBe('light');
     });
 
-    it('setTheme changes to specified theme', () => {
+    it('setTheme changes to specified palette theme', () => {
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        act(() => { result.current.setTheme('dark'); });
-        expect(result.current.theme).toBe('dark');
+        act(() => { result.current.setTheme('coral'); });
+        expect(result.current.theme).toBe('coral');
     });
 
     it('setTheme is a no-op when theme already set', () => {
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        act(() => { result.current.setTheme('light'); });
-        expect(result.current.theme).toBe('light');
+        act(() => { result.current.setTheme('flax'); });
+        expect(result.current.theme).toBe('flax');
     });
 
-    it('persists theme to localStorage on toggle', () => {
+    it('persists mode to localStorage on toggle', () => {
         const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
         const { result } = renderHook(() => useTheme(), { wrapper });
-        act(() => { result.current.toggleTheme(); });
-        expect(localStorage.getItem('theme')).toBe('dark');
+        act(() => { result.current.toggleMode(); });
+        expect(localStorage.getItem('mode')).toBe('dark');
     });
 
     it('registers and cleans up beforeunload listener', () => {

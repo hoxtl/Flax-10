@@ -136,6 +136,16 @@ describe('calendarReducer', () => {
         expect(state.filter).toEqual(['all']);
     });
 
+    it('should handle SET_FILTER with multi-select array payload', () => {
+        const state = calendarReducer(initialState, { type: 'SET_FILTER', payload: ['lecture', 'exam'] });
+        expect(state.filter).toEqual(['lecture', 'exam']);
+    });
+
+    it('should normalize mixed-case and nested SET_FILTER payloads', () => {
+        const state = calendarReducer(initialState, { type: 'SET_FILTER', payload: [['Lecture'], 'EXAM', ' lecture '] });
+        expect(state.filter).toEqual(['lecture', 'exam']);
+    });
+
     it('should handle OPEN_POPUP', () => {
         const event = { id: 1, title: 'Pop' };
         const rect = { top: 10, left: 20 };
@@ -154,6 +164,13 @@ describe('calendarReducer', () => {
     it('should handle SET_READ_ONLY', () => {
         const state = calendarReducer(initialState, { type: 'SET_READ_ONLY', payload: true });
         expect(state.readOnly).toBe(true);
+    });
+
+    it('should handle TRIGGER_RELOAD', () => {
+        const state = calendarReducer(initialState, { type: 'TRIGGER_RELOAD' });
+        expect(state.reloadKey).toBe(1);
+        const state2 = calendarReducer(state, { type: 'TRIGGER_RELOAD' });
+        expect(state2.reloadKey).toBe(2);
     });
 
     // Test openModalHandler edge cases

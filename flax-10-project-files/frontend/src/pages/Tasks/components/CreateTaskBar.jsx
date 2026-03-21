@@ -1,10 +1,10 @@
-/**
- * Quick-add task bar: input row and expandable options (est. time, module, list).
- * Uses useCreateTaskBar for state and subcomponents for UI.
+/*
+ * Quick-add task bar with optional reading and module details.
  */
 
-import AnimatedDropdown from "../../../components/ui/AnimatedDropdown";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
 
@@ -17,7 +17,7 @@ function CreateTaskBarInput({ styles: s, title, setTitle, saving, inputRef, exte
   return (
     <div className={s.inputRow}>
       <input ref={externalInputRef ?? inputRef} type="text" className={s.input} placeholder="Quick add: what needs to be done?" value={title} onChange={(e) => setTitle(e.target.value)} onFocus={() => setInputFocused(true)} onBlur={onBlur} onKeyDown={onKeyDown} aria-label="Quick add task" />
-      {title.trim() && <button type="submit" className={s.addBtn} disabled={saving || !title.trim()} aria-label="Add task">{saving ? "…" : "Add"}</button>}
+      {title.trim() && <PrimaryButton type="submit" className={s.addBtn} disabled={saving || !title.trim()} aria-label="Add task">{saving ? "…" : "Add"}</PrimaryButton>}
     </div>
   );
 }
@@ -35,35 +35,65 @@ function DurationGroup({ styles: s, estimatedBlocks, setEstimatedBlocks }) {
   );
 }
 
-function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions }) {
+function PageCountField({ styles: s, pageCount, setPageCount }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>Pages</span>
+      <input
+        type="number" min="1" placeholder="e.g. 48" value={pageCount ?? ""} 
+        onChange={(e) => setPageCount(e.target.value ? Number(e.target.value) : null)}
+        className={`${s.input} ${s.pageCountInput}`} aria-label="Page count"
+      />
+    </>
+  );
+}
+
+function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>List</span>
+      <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
+        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+      </div>
+    </>
+  );
+}
+
+function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
   return (
     <div className={s.optionsRowWrapper}>
       <div className={`${s.optionsRow} ${showOptions ? s.optionsRowOpen : ""}`}>
-        <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
+        {!isReadingList && (
+          <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
+        )}
+        {isReadingList && (
+          <PageCountField styles={s} pageCount={pageCount} setPageCount={setPageCount} />
+        )}
         <span className={s.optionsRowDivider} aria-hidden />
         <span className={s.optionsRowLabel}>Module</span>
         <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
           <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
         </div>
-        <span className={s.optionsRowDivider} aria-hidden />
-        <span className={s.optionsRowLabel}>List</span>
-        <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
-          <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
         </div>
-      </div>
     </div>
   );
 }
 
 export default function CreateTaskBar(props) {
-  const bar = useCreateTaskBar(props);
+  const { cardRef, handleSubmit, handleInputBlur, handleInputKeyDown, inputRef, sleepWarning, sleepWarningProps, ...bar } = useCreateTaskBar(props);
   return (
     <>
-      <form className={styles.card} onSubmit={bar.handleSubmit} ref={bar.cardRef} data-create-task-bar-card>
-        <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={bar.inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={bar.handleInputBlur} onKeyDown={bar.handleInputKeyDown} />
-        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions} />
+      <form className={styles.card} onSubmit={handleSubmit} ref={cardRef} data-create-task-bar-card>
+        <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={handleInputBlur} onKeyDown={handleInputKeyDown} />
+        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
+         sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
+         isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
+        />
       </form>
-      {bar.sleepWarning && <SleepWarningModal {...bar.sleepWarningProps} />}
+      {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
     </>
   );
 }

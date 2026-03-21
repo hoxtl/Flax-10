@@ -1,4 +1,4 @@
-import AnimatedDropdown from "../ui/AnimatedDropdown";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +27,7 @@ function FormTitle() {
   return (
     <h2 className={styles.title}>
       You&rsquo;re in the right place{" "}
-      <motion.span style={{ display: "inline-block", color: "var(--primary, #9E7E5D)" }} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>
+      <motion.span style={{ display: "inline-block", color: "var(--primary)" }} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>
         ✦
       </motion.span>
     </h2>
@@ -45,6 +45,8 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
   );
 }
 
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+
 /**
  * Collects onboarding fields and confirms course mapping before setup.
  */
@@ -56,9 +58,17 @@ export default function OnboardingForm({ year, setYear, major, handleMajorChange
       <p className={styles.subtitle}>Two quick things and we'll have your modules ready to go.</p>
       <YearCourseFields year={year} setYear={setYear} major={major} handleMajorChange={handleMajorChange} courseOptions={courseOptions} />
       <WarningSection year={year} major={major} confirmed={confirmed} setConfirmed={setConfirmed} />
-      <button className={styles.btn} onClick={handleSubmit} disabled={isSubmitDisabled}>
-        {loading ? "Setting up your modules..." : "Set up my modules"}
-      </button>
+      <div style={{ marginTop: "1.25rem" }}>
+        <PrimaryButton 
+          onClick={handleSubmit} 
+          disabled={isSubmitDisabled}
+          loading={loading}
+          width="100%"
+          pill
+        >
+          {loading ? "Setting up your modules..." : "Set up my modules"}
+        </PrimaryButton>
+      </div>
     </motion.div>
   );
 }

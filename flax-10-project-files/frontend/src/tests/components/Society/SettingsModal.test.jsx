@@ -8,6 +8,11 @@ vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => confirmMock,
 }));
 
+vi.mock('../../../components/Society/SocietyDetail/SettingsModal.module.css', () => ({
+    default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
+}));
+import styles from '../../../components/Society/SocietyDetail/SettingsModal.module.css';
+
 vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
@@ -62,7 +67,7 @@ describe('SocietyDetail/SettingsModal', () => {
     render(<SettingsModal {...props} />);
 
     expect(props.onFetchMembers).toHaveBeenCalled();
-    expect(screen.getByText('Society Settings')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
     expect(screen.getByText('Ratification: draft')).toBeTruthy();
   });
 
@@ -98,7 +103,10 @@ describe('SocietyDetail/SettingsModal', () => {
     fireEvent.click(screen.getByRole('button', { name: '×' }));
     expect(props.onClose).toHaveBeenCalledTimes(1);
 
-    fireEvent.mouseDown(container.firstChild);
+    // Modal backdrop is portal-rendered into document.body.
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(props.onClose).toHaveBeenCalledTimes(2);
 
     fireEvent.click(screen.getByText('Delete Society'));
@@ -134,7 +142,7 @@ describe('SocietyDetail/SettingsModal', () => {
   it('handles members being null', () => {
     const props = baseProps({ members: null });
     render(<SettingsModal {...props} />);
-    expect(screen.getByText('Society Settings')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
     expect(screen.getByTestId('collab-count').textContent).toBe('0');
   });
 
@@ -149,5 +157,15 @@ describe('SocietyDetail/SettingsModal', () => {
       expect(props.onAddCollaborator).toHaveBeenCalledWith('existingUser', 'editor');
       expect(props.onAddCollaborator).toHaveBeenCalledWith('newUser', 'editor');
     });
+  });
+
+  it('stops propagation when modal content is clicked', () => {
+    const props = baseProps();
+    render(<SettingsModal {...props} />);
+    const modalContent = screen.getByRole('heading', { name: 'Settings' }).closest('.' + styles.modal);
+    const e = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    const spy = vi.spyOn(e, 'stopPropagation');
+    fireEvent(modalContent, e);
+    expect(spy).toHaveBeenCalled();
   });
 });

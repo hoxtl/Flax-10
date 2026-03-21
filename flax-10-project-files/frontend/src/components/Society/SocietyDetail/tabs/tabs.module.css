@@ -1,3 +1,6 @@
+/*
+ * tabs.module.css styles the society detail tab layouts.
+ */
 .empty {
     color: var(--muted);
     text-align: center;
@@ -16,6 +19,7 @@
     white-space: pre-wrap;
 }
 
+/* Base layouts for the different society detail tabs. */
 .aboutContainer {
     display: flex;
     flex-direction: column;

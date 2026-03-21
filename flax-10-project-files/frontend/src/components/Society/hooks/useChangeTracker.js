@@ -1,3 +1,6 @@
+/*
+ * useChangeTracker records edit-mode changes made to society content.
+ */
 import { useState, useCallback } from "react";
 
 const EMPTY_CHANGES = {

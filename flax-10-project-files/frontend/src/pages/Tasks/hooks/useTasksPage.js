@@ -1,5 +1,5 @@
-/**
- * Hook for TasksPage: composes useTasks, useTaskLists, filtered tasks, and handlers.
+/*
+ * Tasks page state, URL synchronisation, and composed view props.
  */
 
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -24,21 +24,43 @@ function useTasksPageState(searchParams, setSearchParams) {
   return { activeListId, setActiveListId, filterListIds, setFilterListIds, activeFilter, setActiveFilter, showTaskModal, setShowTaskModal, taskModalDueDate, setTaskModalDueDate, showListModal, setShowListModal, showCreateListFromTask, setShowCreateListFromTask, lastCreatedListId, setLastCreatedListId, toastUndo, setToastUndo, toastDelete, setToastDelete, toastInfo, setToastInfo, openedFullPlanningFromUrl, searchParams, setSearchParams };
 }
 
-function useTasksPageEffects(state, searchParams) {
+function useListParamEffect(searchParams, setActiveListId) {
   useEffect(() => {
     const listParam = searchParams.get("list");
-    if (listParam != null && listParam !== "") state.setActiveListId(listParam);
-  }, [searchParams, state.setActiveListId]);
-  const openParam = searchParams.get("open");
+    if (listParam != null && listParam !== "") setActiveListId(listParam);
+  }, [searchParams, setActiveListId]);
+}
+
+function useOpenParamEffect(searchParams, setSearchParams, openedRef, setShowTaskModal) {
   useEffect(() => {
-    if (openParam !== "fullPlanning" || state.openedFullPlanningFromUrl.current) return;
-    state.openedFullPlanningFromUrl.current = true;
-    state.setShowTaskModal(true);
+    if (searchParams.get("open") !== "fullPlanning" || openedRef.current) return;
+    openedRef.current = true;
+    setShowTaskModal(true);
     const next = new URLSearchParams(searchParams);
     next.delete("open");
     next.delete("due");
-    state.setSearchParams(next, { replace: true });
-  }, [openParam, searchParams, state]);
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, openedRef, setShowTaskModal]);
+}
+
+function applyFilterParam(filterParam, searchParams, setSearchParams, setActiveFilter) {
+  setActiveFilter(filterParam);
+  const next = new URLSearchParams(searchParams);
+  next.delete("filter");
+  setSearchParams(next, { replace: true });
+}
+
+function useFilterParamEffect(searchParams, setSearchParams, setActiveFilter) {
+  useEffect(() => {
+    const filterParam = searchParams.get("filter");
+    if (filterParam) applyFilterParam(filterParam, searchParams, setSearchParams, setActiveFilter);
+  }, [searchParams, setSearchParams, setActiveFilter]);
+}
+
+function useTasksPageEffects(state) {
+  useListParamEffect(state.searchParams, state.setActiveListId);
+  useOpenParamEffect(state.searchParams, state.setSearchParams, state.openedFullPlanningFromUrl, state.setShowTaskModal);
+  useFilterParamEffect(state.searchParams, state.setSearchParams, state.setActiveFilter);
 }
 
 export default function useTasksPage() {
@@ -46,7 +68,7 @@ export default function useTasksPage() {
   const listsApi = useTaskLists();
   const tasksApi = useTasks();
   const state = useTasksPageState(searchParams, setSearchParams);
-  useTasksPageEffects(state, searchParams);
+  useTasksPageEffects(state);
   const filteredTasks = useMemo(() => filterTasksByListAndFilter(tasksApi.tasks, state.activeListId, state.activeFilter, state.filterListIds), [tasksApi.tasks, state.activeListId, state.activeFilter, state.filterListIds]);
   const defaultDueDateForNewTask = state.activeFilter === "today" ? getTodayEndISO() : null;
   const activeModuleCode = searchParams.get("module") || null;

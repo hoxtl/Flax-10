@@ -1,8 +1,10 @@
+/* Styles for the quick-add task bar. */
+
 .card {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 8px 0 6px;
+  padding: 4px 0 4px;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -20,7 +22,7 @@
 .input {
   flex: 1;
   min-width: 80px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 500;
@@ -46,7 +48,7 @@
   padding: var(--btn-padding, 8px 16px);
   font-size: 0.875rem;
   font-weight: 500;
-  color: #fff;
+  color: var(--color-card);
   background: var(--primary);
   border: none;
   border-radius: var(--btn-radius, var(--radius-md, 8px));
@@ -86,7 +88,7 @@
   pointer-events: auto;
   overflow: visible;
   transform: translateY(0);
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .optionsRowLabel {
@@ -165,7 +167,12 @@
 .durationBtn:hover { background: var(--hover); color: var(--text); border-color: var(--border); }
 .durationBtnActive {
   background: var(--primary, #7B6751);
-  color: #fff;
+  color: var(--color-card);
   border-color: var(--primary, #7B6751);
   font-weight: 600;
+}
+
+.pageCountInput {
+  width: 70px;
+  padding: 4px 8px;
 }

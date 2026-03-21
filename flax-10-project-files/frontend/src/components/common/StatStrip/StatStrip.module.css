@@ -1,0 +1,81 @@
+.strip {
+  display: flex;
+  align-items: center;
+  background: var(--surface-card);
+  border: var(--card-border);
+  border-radius: var(--card-radius-token);
+  padding: 0.875rem 1.25rem;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  box-shadow: var(--card-shadow-rest);
+}
+
+.item {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0 1.25rem;
+  text-align: center;
+}
+
+.sep {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.05em;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.valueNumber,
+.valueAffix {
+  font: inherit;
+  color: inherit;
+}
+
+.label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text);
+}
+
+.valueSuccess {
+  color: var(--success-text);
+}
+
+.valueDanger {
+  color: var(--danger);
+}
+
+.valueWarning {
+  color: var(--warning-text);
+}
+
+.valueAccent {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .sep {
+    display: none;
+  }
+
+  .item {
+    padding: 0 0.75rem;
+  }
+}

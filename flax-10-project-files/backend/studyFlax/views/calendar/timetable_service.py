@@ -1,12 +1,22 @@
+"""
+Service for syncing and parsing timetable events from external ICS sources.
+"""
+
 import re
 from datetime import datetime, timedelta, timezone as dt_timezone
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse, urljoin
 from urllib.request import Request, urlopen
+from django.db import DatabaseError
 from django.utils import timezone as django_timezone
 from icalendar import Calendar
-from studyFlax.models.calendar.calendarEventModel import CalendarEvent
-from studyFlax.models.calendar.timetableSourceModel import TimetableSource
+from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.calendar.timetable_source_model import TimetableSource
 
+class TimetableSyncError(Exception):
+    """Raised when a remote timetable sync cannot be processed."""
+
+SYNC_FAILURE_EXCEPTIONS = (ValueError, KeyError, TypeError, UnicodeDecodeError, HTTPError, URLError, DatabaseError)
 
 def sync_timetable(source_url, user=None):
     source_key = get_source_key(source_url)
@@ -15,9 +25,9 @@ def sync_timetable(source_url, user=None):
         created, updated = upsert_events(events, user)
         update_source_status(source_url, user, True, "")
         return {"created": created, "updated": updated, "source_url": source_url}
-    except Exception as exc:
+    except SYNC_FAILURE_EXCEPTIONS as exc:
         update_source_status(source_url, user, False, str(exc))
-        raise
+        raise TimetableSyncError("Failed to sync timetable") from exc
 
 def sync_timetable_if_needed(user, min_interval=timedelta(hours=6)):
     if not user.is_authenticated:

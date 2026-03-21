@@ -28,7 +28,8 @@ describe('UserListModal', () => {
 
   it('renders empty state when users array is empty', () => {
     render(<UserListModal title="People" users={[]} onClose={vi.fn()} />);
-    expect(screen.getByText('No users found.')).toBeInTheDocument();
+    expect(screen.getByText('No users found')).toBeInTheDocument();
+    expect(screen.getByText('No one is sharing with you yet.')).toBeInTheDocument();
   });
 
   it('sorts current user first, then sharing users', () => {
@@ -68,15 +69,16 @@ describe('UserListModal', () => {
     const onClose = vi.fn();
     const { container } = render(<UserListModal title="People" users={users} onClose={onClose} />);
 
-    const backdrop = container.querySelector('[class*="backdrop"]');
-    if (backdrop) fireEvent.mouseDown(backdrop);
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]') || document.body.querySelector('[class*="backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
 
-    const closeBtn = screen.getAllByRole('button').find(b => b.textContent === '×');
+    const closeBtn = screen.getByRole('button', { name: /close/i });
     fireEvent.click(closeBtn);
     expect(onClose).toHaveBeenCalledTimes(2);
 
-    const modalContent = container.querySelector('[class*="modal"]');
+    const modalContent = document.body.querySelector('div[class*="_modal"]') || container.querySelector('[class*="modal"]');
     if (modalContent) fireEvent.click(modalContent);
     expect(onClose).toHaveBeenCalledTimes(2);
   });
@@ -140,5 +142,13 @@ describe('UserListModal', () => {
     ];
     render(<UserListModal title="People" users={usersNoId} onClose={vi.fn()} />);
     expect(screen.getByText('No Id')).toBeInTheDocument();
+  });
+
+  it('renders a profile photo when a shared user has one resolved', () => {
+    const photoUsers = [
+      { id: 99, username: 'ricky.curtis', first_name: 'Ricky', last_name: 'Curtis', is_sharing: true, profile_photo_url: 'https://example.com/avatar.jpg' },
+    ];
+    const { container } = render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
+    expect(container.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
   });
 });

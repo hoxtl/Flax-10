@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Discover from '../../pages/Discover/Discover';
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
     searchUsers: vi.fn().mockResolvedValue({ results: [], total_count: 0 }),
 }));
 
@@ -24,7 +24,7 @@ vi.mock('../../components/Pagination/Pagination', () => ({
     BackToTop: () => <button data-testid="back-to-top">Top</button>,
 }));
 
-import { searchUsers } from '../../api/userService';
+import { searchUsers } from '../../api/userApi';
 
 describe('Discover', () => {
     beforeEach(() => {
@@ -34,12 +34,13 @@ describe('Discover', () => {
 
     it('renders page title', () => {
         render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText('Users')).toBeTruthy();
+        expect(screen.getByText('Discover', { selector: 'h1' })).toBeTruthy();
     });
 
     it('renders subtitle', () => {
-        render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText(/Find course mates/)).toBeTruthy();
+        const { container } = render(<Discover onNavChange={vi.fn()} />);
+        const subtitle = container.querySelector('p[class*="subtitle"]');
+        expect(subtitle?.textContent).toContain("Find King's students, course mates, and professors across your subjects.");
     });
 
     it('renders search input', () => {
@@ -48,14 +49,27 @@ describe('Discover', () => {
     });
 
     it('shows loading state initially', () => {
-        render(<Discover onNavChange={vi.fn()} />);
-        expect(screen.getByText('Loading users...')).toBeTruthy();
+        const { container } = render(<Discover onNavChange={vi.fn()} />);
+        expect(container.querySelector('[class*="skelWrap"]')).toBeTruthy();
     });
 
     it('shows empty state when no users found', async () => {
         searchUsers.mockResolvedValue({ results: [], total_count: 0 });
         render(<Discover onNavChange={vi.fn()} />);
         await waitFor(() => expect(screen.getByText(/No users found/)).toBeTruthy());
+    });
+
+    it('shows only the query-specific empty search state when a search has no matches', async () => {
+        searchUsers.mockResolvedValue({ results: [], total_count: 0 });
+        render(<Discover onNavChange={vi.fn()} />);
+
+        const input = screen.getByPlaceholderText(/Search by name/);
+        fireEvent.change(input, { target: { value: 'lkjnhb' } });
+
+        await waitFor(() => expect(screen.getByText('No users match "lkjnhb"')).toBeTruthy());
+        expect(screen.getByText('Try a different keyword or check your spelling')).toBeTruthy();
+        expect(screen.queryByText(/No users found/)).toBeNull();
+        expect(screen.queryByRole('button', { name: /Clear search/i })).toBeNull();
     });
 
     it('renders user cards when users returned', async () => {
@@ -65,6 +79,17 @@ describe('Discover', () => {
         });
         render(<Discover onNavChange={vi.fn()} />);
         await waitFor(() => expect(screen.getByText('@bob')).toBeTruthy());
+    });
+
+    it('shows professor pill and Dr prefix for teacher cards', async () => {
+        searchUsers.mockResolvedValue({
+            results: [{ id: 7, username: 'teach', first_name: 'Sam', last_name: 'Rahwan', role: 'teacher' }],
+            total_count: 1,
+        });
+        render(<Discover onNavChange={vi.fn()} />);
+        await waitFor(() => expect(screen.getByText('@teach')).toBeTruthy());
+        expect(screen.getByText('Dr. Sam Rahwan')).toBeTruthy();
+        expect(screen.getByText('Professor')).toBeTruthy();
     });
 
     it('calls onNavChange with profile id when user card is clicked', async () => {

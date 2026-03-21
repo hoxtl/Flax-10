@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId, endEarly) {
     return {
         break: () => {
@@ -10,6 +14,7 @@ export function useTimerHandlers(t, modal, setModal, startNext, resetBlockId, en
         },
         goal: () => { t.resetTimer(); setModal(null); resetBlockId(); },
         overtimeBreak: () => { t.setIsActive(false); startNext(); },
+        autoBreakDone: () => { t.setIsActive(false); startNext(); },
         endEarly: () => { endEarly(); }
     };
 }
