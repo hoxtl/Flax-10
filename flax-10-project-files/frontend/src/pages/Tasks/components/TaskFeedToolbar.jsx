@@ -1,13 +1,11 @@
-/**
- * Toolbar for TaskFeed: search, sort, and filter. Composed from small components.
+/*
+ * Task feed toolbar with search, sort, and filter controls.
  */
 
-import { useRef, useEffect, useCallback } from "react";
-import { X, Filter } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import SearchBar from "../../../components/common/SearchBar";
-import TaskFilterPanel from "./TaskFilterPanel";
+import TaskFeedFilterPanel from "./TaskFeedFilterPanel";
 import styles from "./TaskFeedToolbar.module.css";
 
 const SORT_OPTIONS = [
@@ -46,46 +44,38 @@ function ToolbarSort({ sortBy, onSortChange }) {
   );
 }
 
-function ToolbarFilterPanel({ filterRef, isFilterOpen, onFilterOpenChange, activeFilterCount, panelProps }) {
-  const hoverTimer = useRef(null);
+function buildFilterProps(props) {
+  return {
+    containerRef: props.filterRef,
+    isOpen: props.isFilterOpen,
+    onToggle: () => props.onFilterOpenChange((open) => !open),
+    activeFilterCount: props.activeFilterCount,
+    activeFilterTab: props.activeFilterTab,
+    onTabChange: props.onFilterTabChange,
+    filterQuery: props.filterQuery,
+    onFilterQueryChange: props.onFilterQueryChange,
+    visibleListItems: props.visibleListItems,
+    filterListIds: props.filterListIds,
+    onToggleList: props.onToggleList,
+    groupedVisibleModuleItems: props.groupedVisibleModuleItems,
+    moduleGroupKeys: props.moduleGroupKeys,
+    filterModuleCodes: props.filterModuleCodes,
+    onToggleModule: props.onToggleModule,
+    onClearAll: props.onClearAllFilters,
+  };
+}
 
-  const handleMouseEnter = useCallback(() => {
-    clearTimeout(hoverTimer.current);
-    if (!isFilterOpen) onFilterOpenChange(true);
-  }, [isFilterOpen, onFilterOpenChange]);
-
-  const handleMouseLeave = useCallback(() => {
-    hoverTimer.current = setTimeout(() => onFilterOpenChange(false), 200);
-  }, [onFilterOpenChange]);
-
-  useEffect(() => () => clearTimeout(hoverTimer.current), []);
-
-  return (
-    <div className={styles.filterPanelWrap} ref={filterRef}
-      onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <button type="button" className={styles.filterBtn} onClick={() => onFilterOpenChange((o) => !o)} aria-haspopup="dialog" aria-expanded={isFilterOpen}>
-        <Filter size={14} /><span>Filter</span>
-        {activeFilterCount > 0 && <span className={styles.filterCount}>{activeFilterCount}</span>}
-      </button>
-      <AnimatePresence>
-        {isFilterOpen && (
-          <motion.div className={styles.filterPanel} role="dialog" aria-label="Task filters" onClick={(e) => e.stopPropagation()} initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} style={{ originY: 0, originX: 1 }}>
-            <TaskFilterPanel {...panelProps} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+function ToolbarFilters(props) {
+  return <TaskFeedFilterPanel {...buildFilterProps(props)} />;
 }
 
 export default function TaskFeedToolbar(props) {
-  const panelProps = { activeFilterTab: props.activeFilterTab, onTabChange: props.onFilterTabChange, filterQuery: props.filterQuery, onQueryChange: props.onFilterQueryChange, visibleListItems: props.visibleListItems, filterListIds: props.filterListIds, onToggleList: props.onToggleList, moduleGroupKeys: props.moduleGroupKeys, groupedModuleItems: props.groupedVisibleModuleItems, filterModuleCodes: props.filterModuleCodes, onToggleModule: props.onToggleModule, onClearAll: props.onClearAllFilters };
   return (
     <div className={styles.toolbarStrip}>
       <div className={styles.toolbar}>
         <ToolbarSearch search={props.search} onSearchChange={props.onSearchChange} searchInputRef={props.searchInputRef} />
         <ToolbarSort sortBy={props.sortBy} onSortChange={props.onSortChange} />
-        <ToolbarFilterPanel filterRef={props.filterRef} isFilterOpen={props.isFilterOpen} onFilterOpenChange={props.onFilterOpenChange} activeFilterCount={props.activeFilterCount} panelProps={panelProps} />
+        <ToolbarFilters {...props} />
       </div>
     </div>
   );
