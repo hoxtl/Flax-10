@@ -1,40 +1,47 @@
-import React from "react";
+/*
+ * GroupWork create project inputs.
+ */
+
 import FormField from "../../../components/common/FormField/FormField";
 import TextInput from "../../../components/common/TextInput/TextInput";
 import UserModuleDropdown from "../../../components/Modules/UserModuleDropdown";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import styles from "./CreateProjectForm.module.css";
 
-export function CreateProjectInputs({ data, onChange }) {
+export function CreateProjectInputs({ data, onChange, errors }) {
   return (
     <>
-      <FormField label="Project Name" className={styles.inputName}>
-        <TextInput 
-          value={data.name} 
-          onChange={(e) => onChange('name', e.target.value)} 
-          placeholder="e.g. Machine Learning Research..." 
-          required 
-        />
-      </FormField>
-      <FormField label={<>Module <span className={styles.optionalText}>(Optional)</span></>} className={styles.inputField}>
-        <UserModuleDropdown
-          value={data.course_code}
-          onChange={(val) => onChange('course_code', val)}
-          placeholder="Select..."
-          usePortal={true}
-        />
-      </FormField>
-      <FormField label="Deadline" className={styles.inputField}>
-        <DateTimePicker
-          value={data.deadline}
-          onChange={(val) => onChange('deadline', val)}
-          placeholder="dd / mm / yyyy"
-          dateOnly={true}
-          hideIcon={true}
-          triggerClassName={styles.datePickerTrigger}
-          wrapperClassName={styles.datePickerWrap}
-        />
-      </FormField>
+      <ProjectNameField value={data.name} onChange={onChange} error={errors?.name} />
+      <ProjectModuleField value={data.course_code} onChange={onChange} />
+      <ProjectDeadlineField value={data.deadline} onChange={onChange} error={errors?.deadline} />
     </>
+  );
+}
+
+function ProjectNameField({ value, onChange, error }) {
+  return (
+    <FormField label="Project Name" className={styles.inputName} error={error}>
+      <TextInput value={value} onChange={(event) => onChange("name", event.target.value)} placeholder="e.g. Machine Learning Research..." required />
+    </FormField>
+  );
+}
+
+function ProjectModuleField({ value, onChange }) {
+  return (
+    <FormField label={<OptionalModuleLabel />} className={styles.inputField}>
+      <UserModuleDropdown value={value} onChange={(nextValue) => onChange("course_code", nextValue)} placeholder="Select..." usePortal />
+    </FormField>
+  );
+}
+
+function OptionalModuleLabel() {
+  return <>Module <span className={styles.optionalText}>(Optional)</span></>;
+}
+
+function ProjectDeadlineField({ value, onChange, error }) {
+  return (
+    <FormField label="Deadline" className={styles.inputField} error={error}>
+      <DateTimePicker value={value} onChange={(nextValue) => onChange("deadline", nextValue)} placeholder="dd / mm / yyyy" dateOnly hideIcon triggerClassName={styles.datePickerTrigger} wrapperClassName={styles.datePickerWrap} />
+    </FormField>
   );
 }

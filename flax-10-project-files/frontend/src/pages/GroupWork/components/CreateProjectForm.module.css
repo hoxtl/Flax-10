@@ -58,7 +58,6 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s ease;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -75,8 +74,17 @@
 .formFooter {
     grid-column: 1 / -1;
     display: flex;
+    align-items: center;
+    gap: 12px;
     justify-content: flex-end;
     margin-top: 8px;
+}
+
+.formError {
+    margin: 0;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .submitBtn {
