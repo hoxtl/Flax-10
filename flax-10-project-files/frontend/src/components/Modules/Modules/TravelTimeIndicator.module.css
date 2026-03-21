@@ -14,3 +14,9 @@
   font-size: 1.2rem;
   flex-shrink: 0;
 }
+
+.travelContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
