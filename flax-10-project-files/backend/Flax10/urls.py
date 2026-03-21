@@ -26,7 +26,6 @@ urlpatterns = [
     path("api/", include("studyFlax.urls.api_urls")),
     re_path(
         r"^(?!api/|admin/|static/|media/).*$",
-        ),
         SpaView.as_view(),
         name="spa",
     ),
