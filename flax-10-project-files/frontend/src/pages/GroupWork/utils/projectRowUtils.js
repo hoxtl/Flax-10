@@ -83,6 +83,13 @@ export function getProjectTeacherPhoto(project) {
   });
 }
 
+export function openTeacherProfile(event, project) {
+  const tutorId = project?.module_tutor_id;
+  if (!tutorId) return;
+  event?.stopPropagation?.();
+  window.dispatchEvent(new CustomEvent("navigate", { detail: `profile_${tutorId}` }));
+}
+
 export function compareProjectsBySort(left, right, sortBy) {
   if (sortBy === "name-desc") return compareNames(right, left);
   if (sortBy === "name") return compareNames(left, right);

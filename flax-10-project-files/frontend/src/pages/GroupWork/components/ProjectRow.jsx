@@ -4,9 +4,9 @@
 
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import ProjectRowInfo from "./ProjectRowInfo";
+import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
-import { formatProjectHeadlineDate, getDaysLeft, getProjectDate, getProjectMembers, getProjectPercent } from "../utils/projectRowUtils";
+import { getDaysLeft, getProjectDate, getProjectMembers, getProjectPercent } from "../utils/projectRowUtils";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRow({ project, onClick }) {
@@ -22,15 +22,15 @@ export default function ProjectRow({ project, onClick }) {
           members={members}
           action={(
             <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.projectDetailsButton} onClick={onClick}>
-              View more details
+              Schedule times and view more details
             </PrimaryButton>
           )}
         />
         <div className={styles.projectMetaArea}>
           <div className={styles.deadlineInfo}>
-            <div className={styles.deadlineDate}>{formatProjectHeadlineDate(date)}</div>
             <DeadlineCountdown dueDate={date} className={styles.deadlineCountdown} forceClock />
           </div>
+          <ProjectModuleBadge project={project} />
         </div>
       </div>
       <ProjectRowAccordion

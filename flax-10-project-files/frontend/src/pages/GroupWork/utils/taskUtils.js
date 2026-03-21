@@ -11,8 +11,10 @@ export function buildToggleAssignee(assignees, taskId, onUpdate) {
 
 export function filterVisibleAssignees(assignees, members) {
   if (!Array.isArray(assignees) || !Array.isArray(members)) return assignees || [];
-  const memberIds = new Set(members.map((member) => String(member.user)));
-  return assignees.filter((assignee) => memberIds.has(String(assignee.id)));
+  const memberByUserId = Object.fromEntries(members.map((m) => [String(m.user), m]));
+  return assignees
+    .filter((assignee) => memberByUserId[String(assignee.id)])
+    .map((assignee) => ({ ...memberByUserId[String(assignee.id)], id: assignee.id }));
 }
 
 export function handleDragStartTask(e, taskId) {

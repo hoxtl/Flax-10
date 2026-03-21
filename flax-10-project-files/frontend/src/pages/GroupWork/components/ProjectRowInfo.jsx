@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
-import { getProjectCaption, getProjectTeacherName, getProjectTeacherPhoto } from "../utils/projectRowUtils";
+import { getProjectTeacherName, getProjectTeacherPhoto, openTeacherProfile } from "../utils/projectRowUtils";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
@@ -19,10 +19,6 @@ export default function ProjectRowInfo({ project, members, action = null }) {
           <div className={styles.projectName}>{project.name}</div>
           {action ? <div className={styles.projectTitleAction}>{action}</div> : null}
         </div>
-        <p className={styles.projectCaption}>{getProjectCaption(project)}</p>
-        <div className={styles.projectSubRow}>
-          <ProjectModuleBadge project={project} />
-        </div>
         <AvatarStack members={members} />
       </div>
     </div>
@@ -34,15 +30,20 @@ function ProjectTeacherAvatar({ project }) {
   const photoUrl = getProjectTeacherPhoto(project);
   const fallback = getTeacherInitial(teacherName);
   return (
-    <Tooltip content={teacherName} wrapperClassName={styles.teacherAvatarTooltipWrap}>
-      <div className={styles.teacherAvatarShell} role="img" aria-label={teacherName}>
+    <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.teacherAvatarTooltipWrap}>
+      <button
+        type="button"
+        className={styles.teacherAvatarShell}
+        aria-label={`Open ${teacherName}'s profile`}
+        onClick={(e) => openTeacherProfile(e, project)}
+      >
         {photoUrl ? <img src={photoUrl} alt={teacherName} className={styles.teacherAvatarImage} /> : <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>}
-      </div>
+      </button>
     </Tooltip>
   );
 }
 
-function ProjectModuleBadge({ project }) {
+export function ProjectModuleBadge({ project }) {
   if (!project.course_code && !project.module_name) return null;
   return (
     <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.projectModuleLink} aria-label={`Open ${project.module_name || project.course_code} module`}>

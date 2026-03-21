@@ -49,7 +49,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 14px;
-    padding: 15px 18px 13px;
+    padding: 11px 16px 10px;
 }
 
 .projectInfoArea {
@@ -85,8 +85,8 @@
 }
 
 .teacherAvatarShell {
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -102,6 +102,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top center;
 }
 
 .teacherAvatarFallback {
@@ -130,7 +131,6 @@
     min-height: 30px;
     padding: 0.32rem 0.82rem;
     font-size: 0.73rem;
-    white-space: nowrap;
     border-color: rgba(74, 52, 33, 0.16);
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 8px 22px rgba(74, 52, 33, 0.08);
@@ -170,7 +170,7 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 0.22rem;
-    margin-top: 0.82rem;
+    margin-top: 0.5rem;
     padding-left: 0;
 }
 
@@ -202,23 +202,18 @@
 
 .projectMetaArea {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 134px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    min-width: fit-content;
+    flex-shrink: 0;
 }
 
 .deadlineInfo {
     display: flex;
-    flex-direction: column;
     align-items: flex-end;
-    gap: 8px;
     text-align: right;
-}
-
-.deadlineDate {
-    font-size: 0.94rem;
-    font-weight: 600;
-    color: var(--text);
 }
 
 .deadlineCountdown {
@@ -226,7 +221,7 @@
 }
 
 .projectAccordion {
-    padding: 0 18px 14px;
+    padding: 0 16px 10px;
     background: transparent;
     display: flex;
     flex-direction: column;
@@ -245,7 +240,7 @@
 .progressTrack {
     position: relative;
     width: 100%;
-    height: 10px;
+    height: 6px;
     border-radius: 999px;
     background: color-mix(in srgb, var(--c-green) 12%, #ffffff 88%);
     overflow: hidden;
