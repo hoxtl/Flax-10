@@ -225,6 +225,7 @@ export default function CampusMap() {
 
   const handleClearStart = () => {
     setStartLocation(null);
+    setManualStart('');
     setRouteInfo(null);
     setTflRouteInfo(null);
     startMarker.current?.remove();
