@@ -7,7 +7,7 @@ import {
   getSuggestedReadings,
   convertReadingToTask,
 } from "../../api/readingApi";
-import { createTask } from "../../api/taskService";
+import { createTask } from "../../api/taskApi";
 import { UpcomingDeadlinesWidget } from "../../components/Modules/Deadlines/UpcomingDeadlinesWidget";
 import {
   PRIORITY_PILL,

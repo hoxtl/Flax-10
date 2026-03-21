@@ -20,7 +20,7 @@ import ModuleDetails from "../../components/Modules/Modules/ModuleDetails.jsx";
 import styles from "./ModulesPage.module.css";
 import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal.jsx";
 import useModuleSorting from "../../components/Modules/hooks/useModuleSorting.js";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl";
 import Tabs from "../../components/common/Tabs/Tabs";
 import ModuleCourseFilter from "../../components/Modules/Modules/ModuleCourseFilter";
 import {

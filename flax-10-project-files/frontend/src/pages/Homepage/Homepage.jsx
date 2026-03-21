@@ -24,7 +24,7 @@ import {
   fetchTaskLists,
   createTaskList,
   deleteTask,
-} from "../../api/taskService";
+} from "../../api/taskApi";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";

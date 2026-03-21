@@ -5,7 +5,7 @@
 import AIInsightsTab from "../../components/Analytics/AIInsightsTab";
 import AppPage from "../../components/common/AppPage/AppPage";
 import Tabs from "../../components/common/Tabs/Tabs";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl";
 import AnalyticsOverview from "./components/AnalyticsOverview";
 import AnalyticsSkeleton from "./components/AnalyticsSkeleton";
 import useAnalyticsOverview from "./hooks/useAnalyticsOverview";

@@ -13,7 +13,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { DatePickerButton } from "./DatePickerButton";
 import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import { SegmentedControl } from "../../ui/SegmentedControl";
+import { SegmentedControl } from "../../common/SegmentedControl/SegmentedControl";
 import MultiSelectDropdown from "../../ui/MultiSelectDropdown";
 import AnimatedDropdown from "../../common/AnimatedDropdown";
 import SearchBar from "../../common/SearchBar/SearchBar";
