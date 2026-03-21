@@ -7,6 +7,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
 import { EditableCell } from './cells/EditableCell';
 import { TagEditCell } from './cells/TagEditCell';
+import { LocationEditCell } from './cells/LocationEditCell';
 import { DateTimeCell } from './cells/DateTimeCell';
 
 import { useTags } from '../../../context/TagContext';
