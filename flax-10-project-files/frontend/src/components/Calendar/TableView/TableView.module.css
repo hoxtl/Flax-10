@@ -259,3 +259,8 @@ textarea.cellInput {
 .row.expanded {
     background: var(--hover, rgba(74, 52, 33, 0.04));
 }
+
+.autocompleteCell {
+  width: 100%;
+  min-width: 200px;
+}
