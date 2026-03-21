@@ -157,7 +157,7 @@ function TableRowCells({ event, state, editState, navState, rowIndex, tags, them
         cellValue={editState.cellValue} onEdit={e => state.onEdit(e, 'tag')} onSave={editState.saveWithValue} 
         badge={getSourceBadge(event)} isRowHovered={isRowHovered} />
       <DateCell event={event} state={state} editState={editState} isRowHovered={isRowHovered} />
-      <LocationCell event={event} state={state} {...common} />
+      <LocationCell event={event} state={state} editState={editState} navState={navState} rowIndex={rowIndex} isRowHovered={isRowHovered} />
       <DescriptionCell event={event} state={state} {...common} />
       <ActionCell eventId={event.id} isReadOnly={state.isReadOnly} />
     </>
