@@ -62,10 +62,7 @@ def _get_user_profile(username):
 
 def _event_type_label(title):
     """Infer session type from event title prefix."""
-    for prefix, type_label in _TITLE_TYPE_MAP.items():
-        if title.startswith(prefix):
-            return type_label
-    return "Other"
+    return next((label for prefix, label in _TITLE_TYPE_MAP.items() if title.startswith(prefix)), "Other")
 
 
 def _should_attend(username, event, profile):
