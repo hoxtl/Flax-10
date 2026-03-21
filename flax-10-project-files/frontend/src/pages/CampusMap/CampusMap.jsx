@@ -253,6 +253,7 @@ export default function CampusMap() {
 
   const handleSelectCampus = (campus) => {
     setSelectedCampus(campus);
+    setManualDestination(campus.name);
     flyToCampus(campus);
   };
 
