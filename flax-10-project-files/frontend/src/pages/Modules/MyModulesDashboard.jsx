@@ -55,7 +55,7 @@ function useStatItems(modules, enrollments, deadlineCount, readingCount) {
     const readingsRef = useCountUp(readingCount, 1200);
     return [
         { key: 'enrolled-modules', label: 'Enrolled modules', value: enrolledCount, valueRef: enrolledRef },
-        { key: 'upcoming-deadlines', label: 'Upcoming assignment deadlines', value: deadlineCount, valueRef: deadlinesRef },
+        { key: 'upcoming-deadlines', label: 'Upcoming assignment deadlines', value: deadlineCount, valueRef: deadlinesRef, tone: deadlineCount > 0 ? 'danger' : undefined },
         { key: 'readings-to-do', label: 'Readings to do', value: readingCount, valueRef: readingsRef },
     ];
 }

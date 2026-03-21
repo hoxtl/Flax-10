@@ -3,12 +3,10 @@
  */
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
-import { BookOpen, Clock } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
+import DeadlineCountdown from '../../components/common/DeadlineCountdown/DeadlineCountdown';
 import {
-    PRIORITY_PILL,
     TIER_ACCENT,
-    getDaysLabel,
-    getDueStatusClass,
     getUrgencyTier,
 } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
 import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
@@ -54,9 +52,10 @@ function computePageCount(reading) {
 }
 
 function buildReadingTitle(reading) {
-    const moduleName = reading.module_name || '';
-    if (!moduleName) return reading.title;
-    return `${moduleName}: ${reading.title.replace(new RegExp(`^${moduleName}:\\s*`, 'i'), '')}`;
+    const moduleName = String(reading.module_name || '').trim();
+    const title = String(reading.title || '').trim();
+    if (!moduleName) return title;
+    return title.replace(new RegExp(`^${moduleName}:\\s*`, 'i'), '').trim();
 }
 
 function rowClassName(tier, urgentGlow) {
@@ -67,29 +66,16 @@ function rowClassName(tier, urgentGlow) {
     return parts.join(' ');
 }
 
-function isUrgentTier(tier) {
-    return tier === 'overdue' || tier === 'critical' || tier === 'urgent';
-}
-
-function ReadingRowMeta({ tier, daysLabel }) {
-    const pill = PRIORITY_PILL[tier];
-    const dueCls = getDueStatusClass(tier);
+function ReadingRowMeta({ tier, dueDate }) {
     return (
-        <>
-            {pill && <span className={`${styles.priorityPill} ${styles[pill.cls]}`}>{pill.marks} {pill.label}</span>}
-            {daysLabel && (
-                <span className={`${styles.daysLabel} ${styles[dueCls]}`}>
-                    {isUrgentTier(tier) && <Clock size={11} className={styles.duePillIcon} />}
-                    {daysLabel}
-                </span>
-            )}
-        </>
+        <div className={styles.widgetRowMeta}>
+            <DeadlineCountdown dueDate={dueDate} tier={tier} showPriority={false} />
+        </div>
     );
 }
 
 function ReadingRow({ reading, isMostUrgent, onReadingAdded, onSelect }) {
     const dueDate = reading.deadline || reading.due_date;
-    const daysLabel = dueDate ? getDaysLabel(dueDate) : null;
     const tier = dueDate ? getUrgencyTier(dueDate) : 'distant';
     const urgentGlow = isMostUrgent && dueDate && (tier === 'overdue' || tier === 'critical');
     return (
@@ -102,7 +88,7 @@ function ReadingRow({ reading, isMostUrgent, onReadingAdded, onSelect }) {
             <div className={styles.readingRowLeft}>
                 <span className={styles.readingTitle}>{buildReadingTitle(reading)}</span>
             </div>
-            <ReadingRowMeta tier={tier} daysLabel={daysLabel} />
+            <ReadingRowMeta tier={tier} dueDate={dueDate} />
             <AddReadingToTasksButton readingId={reading.id} onAdded={onReadingAdded} className={styles.readingAddButton} styles={styles} />
         </Motion.div>
     );
@@ -167,6 +153,7 @@ export default function ReadingsPanel({ readings, onReadingAdded }) {
     return (
         <Motion.div className={styles.widget} variants={containerVariants} initial="hidden" animate="visible">
             <WidgetHeader icon={BookOpen} title="Reading List" count={sorted.length} styles={styles} />
+            <p className={styles.readingCaption}>Suggested by your teachers to keep your reading focused and easy to action.</p>
             {sorted.length === 0
                 ? <EmptyReadings />
                 : <ReadingsList initial={initial} extra={extra} expanded={expanded} onToggle={() => setExpanded(p => !p)} onReadingAdded={onReadingAdded} onSelect={setSelectedReading} />}

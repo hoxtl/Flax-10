@@ -4,7 +4,8 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import DeadlineCountdown from '../../common/DeadlineCountdown/DeadlineCountdown';
 import {
   containerVariants,
   expandBodyVariants,
@@ -20,10 +21,7 @@ import dashStyles from '../../../pages/Modules/MyModulesDashboard.module.css';
 import rowStyles from '../../../pages/Modules/DashboardRows.module.css';
 import {
   DEADLINE_TIER_ORDER,
-  PRIORITY_PILL,
   TIER_ACCENT,
-  getDaysLabel,
-  getDueStatusClass,
   getUrgencyTier,
 } from './upcomingDeadlinesUtils';
 
@@ -85,7 +83,7 @@ function buildRowClassName(tier, urgentGlow) {
   return `${base} ${overdue} ${critical} ${glow}`;
 }
 
-function DeadlineRowContent({ tier, moduleCode, deadline, onSelectModule, title, pill, dueCls, daysLabel }) {
+function DeadlineRowContent({ tier, moduleCode, deadline, onSelectModule, title }) {
   return (
     <>
       <div className={styles.deadlineRowLeft}>
@@ -95,11 +93,9 @@ function DeadlineRowContent({ tier, moduleCode, deadline, onSelectModule, title,
         </div>
         <span className={styles.deadlineTitle}>{title}</span>
       </div>
-      {pill ? <span className={`${styles.priorityPill} ${styles[pill.cls]}`}>{pill.marks} {pill.label}</span> : null}
-      <span className={`${styles.daysLabel} ${styles[dueCls]}`}>
-        {(tier === 'overdue' || tier === 'critical' || tier === 'urgent') ? <Clock size={11} className={styles.duePillIcon} /> : null}
-        {daysLabel}
-      </span>
+      <div className={styles.widgetRowMeta}>
+        <DeadlineCountdown dueDate={deadline.start_due_date} tier={tier} showPriority={false} />
+      </div>
     </>
   );
 }
@@ -114,7 +110,7 @@ function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onSelectModu
 
   return (
     <Motion.div className={buildRowClassName(tier, tier === 'overdue' || tier === 'critical')} style={buildRowStyle(tier, interactiveRows)} variants={itemVariants} {...props}>
-      <DeadlineRowContent tier={tier} moduleCode={deadline.module_code || ''} deadline={deadline} onSelectModule={onSelectModule} title={deadline.assessment_title || deadline.title || 'Assignment'} pill={PRIORITY_PILL[tier]} dueCls={getDueStatusClass(tier)} daysLabel={getDaysLabel(deadline.start_due_date)} />
+      <DeadlineRowContent tier={tier} moduleCode={deadline.module_code || ''} deadline={deadline} onSelectModule={onSelectModule} title={deadline.assessment_title || deadline.title || 'Assignment'} />
     </Motion.div>
   );
 }
