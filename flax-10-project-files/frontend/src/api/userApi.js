@@ -64,3 +64,19 @@ function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearF
 export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '', sortBy = 'name') {
   return fetchApi(buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy));
 }
+
+export async function reverseGeocode(latitude, longitude) {
+  try {
+    const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxToken}&types=address,poi,place`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.features && data.features.length > 0) {
+      return data.features[0].place_name;
+    }
+    return null;
+  } catch (error) {
+    console.error('Reverse geocoding error: ', error);
+    return null;
+  }
+}

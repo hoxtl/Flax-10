@@ -1,4 +1,5 @@
 import mapboxgl from 'mapbox-gl';
+import { reverseGeocode } from '../../api/userApi';
 
 const BUILDING_LAYER_PAINT = {
   'fill-extrusion-color': [
@@ -127,20 +128,28 @@ export function createHomeMarkerEl(stylesModule) {
 export function homePopupHTML(userHome) {
   return `<div class="HomePopupContent">
     <div class="HomePopupTitle">🏠User Home</div>
-    <button id="setHomeAsStart" class="HomePopupButton">Set Home as Start</button>
+    <button id="setHomeAsStart" class="HomePopupButton" style="color: black;">Set Home as Start</button>
   </div>`;
 }
 
-function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation) {
+async function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation, setManualStart) {
   setStartLocation({ lng: userHome.lng, lat: userHome.lat });
+  if (userHome.address) {
+    setManualStart(userHome.address)
+  } else {
+    const address = await reverseGeocode(userHome.lat, userHome.lng);
+    if (address) {
+      setManualStart(address);
+    }
+  }
   if (homePointerRef.current?.getPopup().isOpen()) homePointerRef.current.togglePopup();
   mapRef.current?.flyTo({ center: [userHome.lng, userHome.lat], zoom: 15, pitch: 55, duration: 1200 });
 }
 
-export function wireHomeButton(userHome, homePointerRef, mapRef, setStartLocation) {
+export function wireHomeButton(userHome, homePointerRef, mapRef, setStartLocation, setManualStart) {
   const btn = document.getElementById('setHomeAsStart');
   if (!btn) return;
-  btn.addEventListener('click', () => handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation));
+  btn.addEventListener('click', () => handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation, setManualStart));
 }
 
 export function createStartMarkerEl(stylesModule) {

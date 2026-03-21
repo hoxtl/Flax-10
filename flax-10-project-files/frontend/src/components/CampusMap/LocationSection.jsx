@@ -13,13 +13,15 @@ function GeoButton({ locating, onGeolocate }) {
   );
 }
 
-export function LocationSection({ startLocation, locating, onGeolocate, onClear }) {
-  const coordsTitle = startLocation ? `${startLocation.lat.toFixed(5)}, ${startLocation.lng.toFixed(5)}` : null;
+export function LocationSection({ startLocation, locating, onGeolocate, onClear, manualStart }) {
+  const displayTitle = manualStart || (startLocation ? `${startLocation.lat.toFixed(5)}, ${startLocation.lng.toFixed(5)}` : null);
+  const displaySubtitle = manualStart ? "Starting point" : "My location";
+  
   return (
     <section className={styles.section}>
-      <div className={styles.sectionLabel}><span className={styles.stepBadge}>1</span> Starting Location</div>
-      {coordsTitle
-        ? <LocationChip dotColor="var(--primary)" title={coordsTitle} subtitle="My location" onClear={onClear} />
+      <div className={styles.sectionLabel}><span className={styles.stepBadge}>1</span>Starting Location</div>
+      {displayTitle
+        ? <LocationChip dotColor="var(--primary)" title={displayTitle} subtitle={displaySubtitle} onClear={onClear} />
         : <p className={styles.hintText}>Click a point on the map to set a starting position.</p>}
       <GeoButton locating={locating} onGeolocate={onGeolocate} />
     </section>
