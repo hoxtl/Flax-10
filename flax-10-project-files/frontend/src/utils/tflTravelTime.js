@@ -28,5 +28,16 @@ export async function getTravelTimeModule(homeAddress, moduleLocation) {
             moduleLat,
             moduleLng
         );
+
+        if (!journey) {
+            return null;
+        }
+
+        return {
+            duration: journey.duration,
+            legs: journey.legs
+        };
+    } catch (error) {
+        console.error('Tfl Home to Module calculation error: ', error);
     }
 }
