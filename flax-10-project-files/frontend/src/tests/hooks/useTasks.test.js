@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useTasks from '../../pages/Tasks/hooks/useTasks';
 
-vi.mock('../../api/taskService', () => ({
+vi.mock('../../api/taskApi', () => ({
     fetchTasks: vi.fn(),
     createTask: vi.fn(),
     updateTask: vi.fn(),
     deleteTask: vi.fn(),
 }));
 
-import { fetchTasks, createTask, updateTask, deleteTask } from '../../api/taskService';
+import { fetchTasks, createTask, updateTask, deleteTask } from '../../api/taskApi';
 
 describe('useTasks', () => {
     beforeEach(() => {

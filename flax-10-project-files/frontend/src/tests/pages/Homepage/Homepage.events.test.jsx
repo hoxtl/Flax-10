@@ -78,7 +78,7 @@ vi.mock('../../../pages/Homepage/components', async () => {
   const { MiniTimelineMock } = await import('./homepageMocks');
   return { MiniTimeline: MiniTimelineMock };
 });
-vi.mock('../../../api/taskService', () => ({
+vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -198,7 +198,7 @@ describe('Homepage – overlays & event operations', () => {
   });
 
   it('handleTimelineDelete task event deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../../api/taskService');
+    const { deleteTask } = await import('../../../api/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete-task'));
     await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(99));
@@ -231,7 +231,7 @@ describe('Homepage – overlays & event operations', () => {
   });
 
   it('handleTaskToggle calls updateTask and refetchTasks', async () => {
-    const { updateTask } = await import('../../../api/taskService');
+    const { updateTask } = await import('../../../api/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('task-toggle'));
     await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, { completed: true }));

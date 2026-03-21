@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SleepBanner from '../../../pages/Homepage/components/SleepBanner';
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),
 }));
 
@@ -10,7 +10,7 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     isDuringSleepWindow: vi.fn(),
 }));
 
-import { getUserSettings } from '../../../api/userService';
+import { getUserSettings } from '../../../api/userApi';
 import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
 
 describe('SleepBanner', () => {

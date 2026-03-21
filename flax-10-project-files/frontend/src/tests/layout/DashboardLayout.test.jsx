@@ -12,7 +12,7 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
-import { authService } from "../../api/authService";
+import { authService } from "../../api/authApi";
 import { clearUserData } from "../../components/Authentication/utils/authHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
@@ -53,7 +53,7 @@ vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
 vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authService", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
@@ -66,7 +66,7 @@ const mockTimerContext = {
 vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
 vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
 vi.mock("../../api/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
-vi.mock("../../api/taskService", () => ({
+vi.mock("../../api/taskApi", () => ({
   createTask: vi.fn().mockResolvedValue({}), fetchTaskLists: vi.fn().mockResolvedValue([]),
 }));
 vi.mock("../../api/moduleApi", () => ({
@@ -322,7 +322,7 @@ describe("DashboardLayout", () => {
   });
 
   it("handleLogoutClick clears user data even when logout throws", async () => {
-    const { authService } = await import("../../api/authService");
+    const { authService } = await import("../../api/authApi");
     authService.logout.mockRejectedValueOnce(new Error("network error"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Logout"));

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Discover from '../../pages/Discover/Discover';
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
     searchUsers: vi.fn().mockResolvedValue({ results: [], total_count: 0 }),
 }));
 
@@ -24,7 +24,7 @@ vi.mock('../../components/Pagination/Pagination', () => ({
     BackToTop: () => <button data-testid="back-to-top">Top</button>,
 }));
 
-import { searchUsers } from '../../api/userService';
+import { searchUsers } from '../../api/userApi';
 
 describe('Discover', () => {
     beforeEach(() => {

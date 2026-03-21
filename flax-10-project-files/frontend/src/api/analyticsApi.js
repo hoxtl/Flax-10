@@ -1,10 +1,10 @@
 /*
- * Analytics API service.
+ * Fetches analytics summaries, progress stats, and AI insights.
  */
 
 import { fetchApi } from './client';
 
-const analyticsService = {
+const analyticsApi = {
   getSummary: async (days = 30) => fetchApi(`/analytics/summary/?days=${days}`),
   getProgress: async (days = 30) => fetchApi(`/analytics/progress/?days=${days}`),
   getThemeStats: async (days = 30) => fetchApi(`/analytics/theme-stats/?days=${days}`),
@@ -18,4 +18,4 @@ const analyticsService = {
   }),
 };
 
-export default analyticsService;
+export default analyticsApi;

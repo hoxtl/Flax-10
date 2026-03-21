@@ -2,7 +2,7 @@
  * Preferences panel for appearance, sleep, and scheduling settings.
  */
 import { useEffect, useState } from "react";
-import { getUserSettings } from "../../api/userService";
+import { getUserSettings } from "../../api/userApi";
 import { useTheme } from "../../context/ThemeContext";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";

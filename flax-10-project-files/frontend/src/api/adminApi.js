@@ -1,3 +1,7 @@
+/*
+ * Admin actions for managing users, teacher requests, reports, and society ratification.
+ */
+
 import { fetchApi } from "./client";
 
 function postJson(url, data) {

@@ -1,5 +1,5 @@
 /*
- * societyApi exposes frontend API helpers for society-related requests.
+ * Manages societies, members, tags, announcements, events, and calendar sync.
  */
 import { fetchApi } from './client';
 

@@ -1,5 +1,5 @@
 /*
- * API client for module, deadline, and reading endpoints.
+ * Creates, reads, updates, and deletes modules and enrolments.
  */
 import {fetchApi} from './client.js'
 

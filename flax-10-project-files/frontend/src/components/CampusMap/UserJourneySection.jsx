@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
-import { geocodeAddress } from '../../api/userService';
+import { geocodeAddress } from '../../api/userApi';
 import styles from './UserJourneySection.module.css';
 
 export function UserJourneySection({

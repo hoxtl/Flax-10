@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { tflService } from '../../../api/tflService';
+import { tflService } from '../../../api/tflApi';
 
 async function fetchDisruptions(setDisruptions, setLoading) {
   setLoading(true);

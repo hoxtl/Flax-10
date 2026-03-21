@@ -10,7 +10,7 @@ import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft } from "l
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
-import { getUserSettings } from "../../../api/userService";
+import { getUserSettings } from "../../../api/userApi";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";

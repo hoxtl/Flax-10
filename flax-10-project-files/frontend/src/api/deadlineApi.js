@@ -1,3 +1,7 @@
+/*
+ * Creates, updates, and deletes deadlines for each module.
+ */
+
 import {fetchApi} from './client.js';
 
 export async function getDeadlines(module_id) {

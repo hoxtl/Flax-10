@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useTaskLists from '../../pages/Tasks/hooks/useTaskLists';
 
-vi.mock('../../api/taskService', () => ({
+vi.mock('../../api/taskApi', () => ({
     fetchTaskLists: vi.fn(),
     fetchArchivedTaskLists: vi.fn(),
     createTaskList: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock('../../api/taskService', () => ({
     deleteTaskList: vi.fn(),
 }));
 
-import { fetchTaskLists, fetchArchivedTaskLists, createTaskList, updateTaskList, deleteTaskList } from '../../api/taskService';
+import { fetchTaskLists, fetchArchivedTaskLists, createTaskList, updateTaskList, deleteTaskList } from '../../api/taskApi';
 
 describe('useTaskLists', () => {
     beforeEach(() => {

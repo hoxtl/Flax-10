@@ -2,13 +2,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
-vi.mock("../../../../api/taskService", () => ({
+vi.mock("../../../../api/taskApi", () => ({
   fetchTaskLists: vi.fn(),
   fetchArchivedTaskLists: vi.fn(),
 }));
 
 import useTaskListsLoad from "../../../../pages/Tasks/hooks/useTaskListsLoad";
-import { fetchTaskLists, fetchArchivedTaskLists } from "../../../../api/taskService";
+import { fetchTaskLists, fetchArchivedTaskLists } from "../../../../api/taskApi";
 
 describe("useTaskListsLoad", () => {
   beforeEach(() => {

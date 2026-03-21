@@ -260,7 +260,7 @@ vi.mock('../../pages/Homepage/components', () => ({
   ),
 }));
 
-vi.mock('../../api/taskService', () => ({
+vi.mock('../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}),
   createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
@@ -419,7 +419,7 @@ describe('Homepage', () => {
   });
 
   it('completes a task via TaskWidgetSlot and shows completion toast path', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -431,7 +431,7 @@ describe('Homepage', () => {
   });
 
   it('shows an error toast when task update fails', async () => {
-    const svc = await import('../../api/taskService');
+    const svc = await import('../../api/taskApi');
     svc.updateTask.mockRejectedValueOnce(new Error('fail'));
     mockRefetchTasks.mockResolvedValueOnce([{ id: 1, completed: false }]);
     render(
@@ -608,7 +608,7 @@ describe('Homepage', () => {
   });
 
   it('handleTimelineDelete task event deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -660,7 +660,7 @@ describe('Homepage', () => {
   });
 
   it('handleTaskToggle calls updateTask and refetchTasks', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -707,7 +707,7 @@ describe('Homepage', () => {
   });
 
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
-    const mod = await import('../../api/taskService');
+    const mod = await import('../../api/taskApi');
     mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
     render(
       <MemoryRouter>
@@ -768,7 +768,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal save updates task and closes modal', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -782,7 +782,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal delete deletes task and closes modal', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />
@@ -808,7 +808,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save creates task and shows toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'New Task' });
     render(
       <MemoryRouter>
@@ -822,7 +822,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save with routine title sets Routine tag', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'breakfast' });
     render(
       <MemoryRouter>
@@ -834,7 +834,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save with addToSchedule adds event and shows schedule toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockResolvedValue({ id: 1, title: 'Task', description: '', estimated_blocks: 2 });
     render(
       <MemoryRouter>
@@ -847,7 +847,7 @@ describe('Homepage', () => {
   });
 
   it('CreateTaskModal save error shows toast', async () => {
-    const { createTask } = await import('../../api/taskService');
+    const { createTask } = await import('../../api/taskApi');
     createTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -879,7 +879,7 @@ describe('Homepage', () => {
   });
 
   it('CreateListModal save creates list and closes', async () => {
-    const { createTaskList, fetchTaskLists } = await import('../../api/taskService');
+    const { createTaskList, fetchTaskLists } = await import('../../api/taskApi');
     createTaskList.mockResolvedValue({ id: 2, name: 'My List' });
     fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }, { id: 2, name: 'My List' }]);
     render(
@@ -916,7 +916,7 @@ describe('Homepage', () => {
   });
 
   it('PlanReadDetailModal onDeleteTask deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage defaultPlanTimelineReadItem={{ task: { id: 1, title: 'T' } }} />
@@ -1010,7 +1010,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal onSave error does not close modal', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     updateTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -1025,7 +1025,7 @@ describe('Homepage', () => {
   });
 
   it('EditTaskModal onDelete error does not close modal', async () => {
-    const { deleteTask } = await import('../../api/taskService');
+    const { deleteTask } = await import('../../api/taskApi');
     deleteTask.mockRejectedValueOnce(new Error('fail'));
     render(
       <MemoryRouter>
@@ -1078,7 +1078,7 @@ describe('Homepage', () => {
   });
 
   it('onInlineTaskEdit updates task and refetches', async () => {
-    const { updateTask } = await import('../../api/taskService');
+    const { updateTask } = await import('../../api/taskApi');
     render(
       <MemoryRouter>
         <Homepage />

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { tflService } from '../../api/tflService';
+import { tflService } from '../../api/tflApi';
 
 describe('tflService', () => {
     beforeEach(() => {

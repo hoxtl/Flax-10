@@ -9,7 +9,7 @@ import { ProfileCalendar } from "./ProfileCalendar";
 import { useProfileState, useProfileBodyData, useProfileContent } from "./hooks/useProfile";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import { useProfileVisibility } from "./hooks/useProfileVisibility";
-import analyticsService from "../../api/analyticsService";
+import analyticsService from "../../api/analyticsApi";
 import { fetchApi } from "../../api/client";
 import ProfileHeader from "./components/ProfileHeader";
 import { SocietiesModal } from "./ProfileModals";

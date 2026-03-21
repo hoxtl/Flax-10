@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SleepSchedulePanel } from '../../../components/Settings/SleepSchedulePanel';
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),
 }));
 
@@ -16,7 +16,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
     ),
 }));
 
-import { getUserSettings } from '../../../api/userService';
+import { getUserSettings } from '../../../api/userApi';
 
 describe('SleepSchedulePanel', () => {
     beforeEach(() => {

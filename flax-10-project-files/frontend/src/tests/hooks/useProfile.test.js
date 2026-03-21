@@ -9,12 +9,12 @@ vi.mock('../../context/AuthContext', () => ({
   useAuth: () => useAuthMock(),
 }));
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
   getUserProfile: vi.fn(),
   getAnotherUserProfile: vi.fn(),
 }));
 
-vi.mock('../../api/analyticsService', () => ({
+vi.mock('../../api/analyticsApi', () => ({
   getAnalytics: vi.fn(),
 }));
 
@@ -32,7 +32,7 @@ vi.mock('../../pages/Profile/utils/profileHelpers', () => ({
   getUpcomingCount: vi.fn(() => 0),
 }));
 
-import { getUserProfile, getAnotherUserProfile } from '../../api/userService';
+import { getUserProfile, getAnotherUserProfile } from '../../api/userApi';
 import { getEvents } from '../../api/eventApi';
 import { getFilteredEvents, getUpcomingCount } from '../../pages/Profile/utils/profileHelpers';
 
