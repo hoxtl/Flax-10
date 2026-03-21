@@ -358,7 +358,13 @@
   pointer-events: none;
 }
 
-
+:root[data-mode="dark"] .mobileScrollFade {
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--glass) 88%, rgba(10, 12, 16, 0.9))
+  );
+}
 
 .mobileNavIcon {
   display: flex;
