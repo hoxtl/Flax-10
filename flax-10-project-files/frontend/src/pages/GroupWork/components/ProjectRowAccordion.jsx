@@ -2,33 +2,19 @@
  * GroupWork project row accordion.
  */
 
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowAccordion({ percent, completedTasks, totalTasks, memberCount, onClick }) {
+export default function ProjectRowAccordion({ percent }) {
   return (
     <div className={styles.projectAccordion}>
-      <div className={styles.accordionStats}>
-        <StatBlock label="COMPLETION" value={`${percent}%`} />
-        <StatBlock label="MEMBERS" value={memberCount} />
-        <StatBlock label="TASKS DONE" value={`${completedTasks}/${totalTasks}`} />
+      <div className={styles.accordionSummary}>
+        <Tooltip content={`${percent}% complete`} wrapperClassName={styles.progressTooltipWrap}>
+          <div className={styles.progressTrack} aria-label={`${percent}% completion`}>
+            <div className={styles.progressFill} style={{ width: percent > 0 ? `${percent}%` : "0%" }} />
+          </div>
+        </Tooltip>
       </div>
-      <div className={styles.accordionActions}>
-        <button className={styles.btnOpen} onClick={(event) => handleOpenProject(event, onClick)}>Open project →</button>
-      </div>
-    </div>
-  );
-}
-
-function handleOpenProject(event, onClick) {
-  event.stopPropagation();
-  onClick();
-}
-
-function StatBlock({ label, value }) {
-  return (
-    <div className={styles.statBlock}>
-      <span className={styles.statLabel}>{label}</span>
-      <span className={styles.statValue}>{value}</span>
     </div>
   );
 }

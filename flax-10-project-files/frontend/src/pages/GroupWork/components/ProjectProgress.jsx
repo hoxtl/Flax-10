@@ -3,7 +3,8 @@
  */
 
 import { useState } from "react";
-import { getUserColor } from "../utils/priorityUtils";
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import styles from "./ProjectProgress.module.css";
 
 function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
@@ -11,13 +12,24 @@ function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
 }
 
 function ProgressSegment({ segment, index, segments, hoveredSeg, setHoveredSeg }) {
-  return <div className={styles.progressSegment} style={buildSegmentStyle(segment, index, segments, hoveredSeg)} onMouseEnter={() => setHoveredSeg(segment.id ?? index)} onMouseLeave={() => setHoveredSeg(null)} />;
+  const hoveredKey = segment.id ?? index;
+  return (
+    <Tooltip content={segment.name} wrapperClassName={styles.segmentTooltipWrap}>
+      <div
+        className={styles.progressSegment}
+        style={buildSegmentStyle(segment, index, segments, hoveredSeg)}
+        onMouseEnter={() => setHoveredSeg(hoveredKey)}
+        onMouseLeave={() => setHoveredSeg(null)}
+        aria-label={`${segment.name} segment`}
+      />
+    </Tooltip>
+  );
 }
 
 function buildSegmentStyle(segment, index, segments, hoveredSeg) {
   return {
     width: `${segment.percentage}%`,
-    background: segment.id === "unassigned" ? "#c0b8b0" : getUserColor(segment.id),
+    background: segment.color || (segment.id === "unassigned" ? "#c0b8b0" : "#7BB38E"),
     opacity: hoveredSeg && hoveredSeg !== (segment.id ?? index) ? 0.65 : 1,
     zIndex: segments.length - index,
   };
@@ -25,39 +37,23 @@ function buildSegmentStyle(segment, index, segments, hoveredSeg) {
 
 export default function ProjectProgress({ taskStats }) {
   const [hoveredSeg, setHoveredSeg] = useState(null);
-  const hovered = getHoveredSegment(taskStats.segments || [], hoveredSeg);
   return (
     <div className={styles.progressContainer}>
+      <StatStrip items={buildProjectStats(taskStats)} className={styles.projectStatsStrip} />
       <div className={styles.progressBarOuter}>
         <div className={styles.progressBarInner}>
           <ProgressSegments segments={taskStats.segments || []} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} />
         </div>
-        {hovered && <ProgressTooltip segment={hovered} />}
       </div>
-      <ProgressStats taskStats={taskStats} />
     </div>
   );
 }
 
-function getHoveredSegment(segments, hoveredSeg) {
-  if (hoveredSeg === null) return null;
-  return segments.find((segment) => (segment.id ?? segment.name) === hoveredSeg) || segments[hoveredSeg];
-}
-
-function ProgressTooltip({ segment }) {
-  return (
-    <div className={styles.progressTooltip}>
-      <span className={styles.tooltipDot} style={{ background: segment.id === "unassigned" ? "#c0b8b0" : getUserColor(segment.id) }} />
-      {segment.tooltip || segment.name}
-    </div>
-  );
-}
-
-function ProgressStats({ taskStats }) {
-  return (
-    <div className={styles.statsText}>
-      <span><strong>{taskStats.completed} / {taskStats.total}</strong> tasks complete</span>
-      <span><strong>{taskStats.percent}%</strong> complete</span>
-    </div>
-  );
+function buildProjectStats(taskStats) {
+  const remaining = Math.max((taskStats.total || 0) - (taskStats.completed || 0), 0);
+  return [
+    { key: "overall", value: `${taskStats.percent || 0}%`, label: "Overall", tone: "accent" },
+    { key: "complete", value: taskStats.completed || 0, label: "Tasks complete", tone: "success" },
+    { key: "remaining", value: remaining, label: "Remaining", tone: "danger" },
+  ];
 }

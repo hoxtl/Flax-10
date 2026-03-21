@@ -6,7 +6,7 @@ export function calculateDays(targetDate) {
   if (!targetDate) return null;
   const diffTime = new Date(targetDate) - new Date();
   if (diffTime < 0) return null;
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
 export function getModulesCount(projects) {
