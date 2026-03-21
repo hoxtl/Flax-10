@@ -43,67 +43,82 @@ def _prefetch_personal_lists(students):
     return {tl.user_id: tl for tl in lists}
 
 
+def _extract_module_code(name):
+    """Extract module code from TaskList name like 'CS101 - Intro'."""
+    return name.split(" - ")[0] if " - " in name else None
+
+
+def _get_module_id_for_code(code):
+    """Get module ID for a module code."""
+    module = Module.objects.filter(module_code=code).first()
+    return module.id if module else None
+
+
 def _prefetch_module_lists(students):
-    """Fetch module TaskLists grouped by (user_id, module_id)."""
+    """Fetch module TaskLists grouped by user_id -> module_id -> TaskList."""
     lists = TaskList.objects.filter(user__in=students, category="uni")
     result = defaultdict(dict)
     for tl in lists:
-        if " - " in tl.name:
-            code = tl.name.split(" - ")[0]
-            module = Module.objects.filter(module_code=code).first()
-            if module:
-                result[tl.user_id][module.id] = tl
+        code = _extract_module_code(tl.name)
+        module_id = _get_module_id_for_code(code) if code else None
+        if module_id:
+            result[tl.user_id][module_id] = tl
     return result
 
 
-def _build_all_reading_tasks(students, readings_by_module, enrollments_by_student,
-                              personal_lists, module_lists):
+def _build_student_tasks(student, readings_by_module, enrollments_by_student, personal_lists, module_lists):
+    """Build reading tasks for a single student."""
+    module_ids = enrollments_by_student.get(student.id, set())
+    default_list = personal_lists.get(student.id)
+    if not default_list:
+        return []
+    user_module_lists = module_lists.get(student.id, {})
+    return build_reading_tasks_for_user(student, module_ids, readings_by_module, user_module_lists, default_list)
+
+
+def _build_all_reading_tasks(students, readings_by_module, enrollments_by_student, personal_lists, module_lists):
     """Build all reading tasks for all students."""
     tasks = []
     for student in students:
-        module_ids = enrollments_by_student.get(student.id, set())
-        default_list = personal_lists.get(student.id)
-        if not default_list:
-            continue
-        user_module_lists = module_lists.get(student.id, {})
-        user_tasks = build_reading_tasks_for_user(
-            student, module_ids, readings_by_module, user_module_lists, default_list
-        )
-        tasks.extend(user_tasks)
+        tasks.extend(_build_student_tasks(student, readings_by_module, enrollments_by_student, personal_lists, module_lists))
     return tasks
+
+
+def _student_has_reading_tasks(student):
+    """Check if student has any reading tasks."""
+    return Task.objects.filter(user=student, reading__isnull=False).exists()
 
 
 def _update_all_reading_estimates(students):
     """Update reading estimates for all students with tasks."""
     for student in students:
-        if Task.objects.filter(user=student, reading__isnull=False).exists():
+        if _student_has_reading_tasks(student):
             update_reading_estimates(student)
+
+
+def _create_module_readings(modules, stdout):
+    """Create readings for all modules."""
+    readings = _build_all_readings(modules)
+    Reading.objects.bulk_create(readings, ignore_conflicts=True, batch_size=500)
+    stdout.write(f"  Created {len(readings)} readings across {len(modules)} modules.")
+
+
+def _create_reading_tasks(students, stdout):
+    """Create reading tasks for all students."""
+    readings_by_module = _prefetch_readings_by_module()
+    enrollments_by_student = _prefetch_enrollments_by_student(students)
+    personal_lists = _prefetch_personal_lists(students)
+    module_lists = _prefetch_module_lists(students)
+    tasks = _build_all_reading_tasks(students, readings_by_module, enrollments_by_student, personal_lists, module_lists)
+    Task.objects.bulk_create(tasks, ignore_conflicts=True, batch_size=500)
+    stdout.write(f"  Created {len(tasks)} reading tasks for {len(students)} students.")
 
 
 @transaction.atomic
 def create_readings(modules, students, stdout):
     """Create readings for modules and reading tasks for students."""
     stdout.write("Seeding readings...")
-
-    # Create readings for modules
-    readings = _build_all_readings(modules)
-    Reading.objects.bulk_create(readings, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(readings)} readings across {len(modules)} modules.")
-
-    # Prefetch all needed data
-    readings_by_module = _prefetch_readings_by_module()
-    enrollments_by_student = _prefetch_enrollments_by_student(students)
-    personal_lists = _prefetch_personal_lists(students)
-    module_lists = _prefetch_module_lists(students)
-
-    # Build and create reading tasks
-    tasks = _build_all_reading_tasks(
-        students, readings_by_module, enrollments_by_student,
-        personal_lists, module_lists
-    )
-    Task.objects.bulk_create(tasks, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(tasks)} reading tasks for {len(students)} students.")
-
-    # Update estimates
+    _create_module_readings(modules, stdout)
+    _create_reading_tasks(students, stdout)
     _update_all_reading_estimates(students)
     stdout.write(f"  {Reading.objects.count()} total readings in database.")

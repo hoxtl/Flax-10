@@ -19,12 +19,8 @@ def _build_single_reading(module, title, chapter, start, end, deadline):
     """Build an unsaved Reading instance."""
     from studyFlax.models import Reading
     return Reading(
-        module=module,
-        title=title,
-        chapter=chapter,
-        start_page=start,
-        end_page=end,
-        deadline=deadline,
+        module=module, title=title, chapter=chapter,
+        start_page=start, end_page=end, deadline=deadline,
     )
 
 
@@ -41,29 +37,32 @@ def build_readings_for_module(module):
     return results
 
 
+def _reading_task_fields(user, reading, task_list, completed):
+    """Build field dict for a reading task."""
+    pages = reading.page_count()
+    speed = round(random.uniform(1.2, 2.5), 1)
+    completed_at = timezone.now() - timedelta(days=random.randint(1, 14)) if completed else None
+    return {
+        'user': user, 'task_list': task_list, 'module': reading.module,
+        'reading': reading, 'title': f"Read: {reading.title}", 'page_count': pages,
+        'time_spent_minutes': round(pages * speed) if completed else 0,
+        'completed': completed, 'completed_at': completed_at,
+        'priority': 'medium', 'energy_level': 'medium', 'due_date': reading.deadline,
+    }
+
+
 def _build_reading_task(user, reading, task_list, completed):
     """Build an unsaved Task for a reading."""
     from studyFlax.models.tasks.task_model import Task
-    pages = reading.page_count()
-    if pages <= 0:
+    if reading.page_count() <= 0:
         return None
-    speed = round(random.uniform(1.2, 2.5), 1)
-    completed_at = timezone.now() - timedelta(days=random.randint(1, 14)) if completed else None
-    time_spent = round(pages * speed) if completed else 0
-    return Task(
-        user=user,
-        task_list=task_list,
-        module=reading.module,
-        reading=reading,
-        title=f"Read: {reading.title}",
-        page_count=pages,
-        time_spent_minutes=time_spent,
-        completed=completed,
-        completed_at=completed_at,
-        priority='medium',
-        energy_level='medium',
-        due_date=reading.deadline,
-    )
+    return Task(**_reading_task_fields(user, reading, task_list, completed))
+
+
+def _build_task_for_reading(user, reading, task_list, index):
+    """Build a task for a single reading at given index."""
+    completed = (index == 0)
+    return _build_reading_task(user, reading, task_list, completed)
 
 
 def _build_module_reading_tasks(user, module_id, readings, task_list):
@@ -72,13 +71,8 @@ def _build_module_reading_tasks(user, module_id, readings, task_list):
         return []
     shuffled = readings[:]
     random.shuffle(shuffled)
-    tasks = []
-    for i, reading in enumerate(shuffled[:2]):
-        completed = (i == 0)
-        task = _build_reading_task(user, reading, task_list, completed)
-        if task:
-            tasks.append(task)
-    return tasks
+    tasks = [_build_task_for_reading(user, r, task_list, i) for i, r in enumerate(shuffled[:2])]
+    return [t for t in tasks if t]
 
 
 def build_reading_tasks_for_user(user, module_ids, readings_by_module, task_lists_by_module, default_list):
