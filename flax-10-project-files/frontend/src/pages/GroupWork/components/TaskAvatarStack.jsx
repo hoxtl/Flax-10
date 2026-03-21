@@ -3,6 +3,7 @@
  * Uses the shared MemberAvatar component.
  */
 import MemberAvatar from "./MemberAvatar";
+import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./TaskAvatarStack.module.css";
 
 function OverflowBadge({ count, size }) {
@@ -21,7 +22,15 @@ export default function TaskAvatarStack({ assignees, max = 3, size = 20 }) {
         <div className={styles.stack}>
             {visible.map((a, i) => (
                 <div key={a.id} style={{ marginLeft: i > 0 ? -(size * 0.3) : 0, zIndex: max - i }}>
-                    <MemberAvatar member={a} size={size} />
+                    <button
+                        type="button"
+                        className={styles.avatarButton}
+                        title={getDisplayName(a)}
+                        aria-label={`Open ${getDisplayName(a)} profile`}
+                        onClick={(event) => openMemberProfile(event, a)}
+                    >
+                        <MemberAvatar member={a} size={size} />
+                    </button>
                 </div>
             ))}
             {remaining > 0 && <OverflowBadge count={remaining} size={size} />}

@@ -3,13 +3,13 @@
  */
 
 import { useRef, useState } from "react";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Calendar, Trash2 } from "lucide-react";
+import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
-import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
-import { getPriorityStyle, getUserColor } from "../utils/priorityUtils";
-import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr } from "../utils/taskUtils";
+import { getUserColor } from "../utils/priorityUtils";
+import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate } from "../utils/taskUtils";
 import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
@@ -39,33 +39,17 @@ function AssignCell({ task, members, onUpdate }) {
 }
 
 function PrioritySelect({ priority, onUpdate, taskId }) {
-  const style = getPriorityStyle(priority);
-  return (
-    <select
-      value={priority || "medium"}
-      className={styles.prioritySelect}
-      style={{ backgroundColor: style.backgroundColor, color: style.color }}
-      onChange={(event) => onUpdate(taskId, { priority: event.target.value })}
-    >
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-      <option value="urgent">Urgent</option>
-    </select>
-  );
+  return <TaskPriorityPill priority={priority || "medium"} className={styles.priorityPill} />;
 }
 
-function DateCell({ taskId, dueDate, onUpdate }) {
+function DateCell({ dueDate }) {
+  const label = formatTaskDueDate(dueDate);
   return (
     <div className={styles.dateCell}>
-      <DateTimePicker
-        value={getDueDateStr(dueDate)}
-        onChange={(value) => onUpdate(taskId, { due_date: value ? new Date(value).toISOString() : null })}
-        placeholder="Set Date"
-        dateOnly
-        triggerClassName={styles.dateLabel}
-        hideIcon
-      />
+      <span className={styles.dateLabel}>
+        <Calendar size={14} />
+        {label || "No due date"}
+      </span>
     </div>
   );
 }
@@ -119,7 +103,7 @@ export default function TaskListRow({ task, members, onToggle, onUpdate, onDelet
         <TaskRowTitle task={task} onUpdate={onUpdate} />
       </div>
       <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />
-      <DateCell taskId={task.id} dueDate={task.due_date} onUpdate={onUpdate} />
+      <DateCell dueDate={task.due_date} />
       <AssignCell task={task} members={members} onUpdate={onUpdate} />
       <ActionCell taskId={task.id} onDelete={onDelete} />
     </div>

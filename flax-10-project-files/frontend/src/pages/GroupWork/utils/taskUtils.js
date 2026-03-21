@@ -24,6 +24,13 @@ export function getDueDateStr(due_date) {
   return new Date(due_date).toISOString().slice(0, 10);
 }
 
+export function formatTaskDueDate(dueDate) {
+  if (!dueDate) return "";
+  const date = new Date(dueDate);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 export function getDeadlineLabel(deadline) {
   if (!deadline) return null;
   const due = new Date(deadline);

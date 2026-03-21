@@ -50,21 +50,9 @@
 }
 
 
-/* Priority Select */
-.prioritySelect {
-    border: none;
-    border-radius: 20px;
-    padding: 6px 4px;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    text-align: center;
+.priorityPill {
+    justify-self: center;
     width: 100%;
-    letter-spacing: 0.05em;
-    margin-right: 12px;
 }
 
 /* Date Cell */
@@ -78,23 +66,18 @@
 
 .dateLabel {
     font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: #64748b;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 6px 10px;
-    background: var(--hover-light);
-    border-radius: 8px;
+    padding: 8px 12px;
+    background: #f8f7f4;
+    border-radius: 12px;
     width: 100%;
-    border: none;
-    cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--border) 92%, #ffffff 8%);
     white-space: nowrap;
-}
-
-.dateLabel:hover {
-    background: rgba(143, 121, 105, 0.1);
 }
 
 /* Assign Cell */

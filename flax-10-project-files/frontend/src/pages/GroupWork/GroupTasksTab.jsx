@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { List, CalendarIcon, Square, ChevronDown } from "lucide-react";
+import { List, CalendarIcon, Square } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
-import AnimatedDropdown from "../../components/common/AnimatedDropdown/AnimatedDropdown";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
+import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl.jsx";
 import TaskListView from "./components/TaskListView";
 import TaskTimelineView from "./components/TaskTimelineView";
 import TaskBoardView from "./components/TaskBoardView";
@@ -14,18 +16,16 @@ import styles from "./GroupTasksTab.module.css";
 
 function TaskFilter({ filterUser, setFilterUser, members }) {
     const options = [{ value: "", label: "All Members" }, ...members.map(m => ({ value: String(m.user), label: m.user_name }))];
-    const selectedName = filterUser ? members.find(m => String(m.user) === String(filterUser))?.user_name : "All Members";
 
     return (
         <div className={styles.filterWrapper}>
-            <AnimatedDropdown value={filterUser} onChange={setFilterUser} placeholder="All Members" options={options}
+            <AnimatedDropdown
+                className={styles.memberDropdown}
+                value={filterUser}
+                onChange={setFilterUser}
+                placeholder="All Members"
+                options={options}
                 usePortal={true}
-                customTrigger={
-                    <div className={styles.filterCustomTrigger}>
-                        <span>{selectedName}</span>
-                        <div className={styles.filterCustomArrow}><ChevronDown size={14} /></div>
-                    </div>
-                }
             />
         </div>
     );
@@ -35,7 +35,7 @@ function AddTaskForm({ newTaskTitle, setNewTaskTitle, filterUser, setFilterUser,
     return (
         <form onSubmit={onAdd} className={styles.addTaskForm}>
             <input value={newTaskTitle} onChange={(e) => setNewTaskTitle(e.target.value)} placeholder="Add a new task..." className={styles.taskInput} />
-            <button type="submit" className={styles.addBtn}>Add</button>
+            <PrimaryButton type="submit" size="small" pill className={styles.addBtn}>Add</PrimaryButton>
             <TaskFilter filterUser={filterUser} setFilterUser={setFilterUser} members={members} />
         </form>
     );
@@ -43,18 +43,18 @@ function AddTaskForm({ newTaskTitle, setNewTaskTitle, filterUser, setFilterUser,
 
 function TaskViewSwitcher({ currentView, setTaskView }) {
     const views = [
-        { id: "list", icon: <List size={14} />, label: "List" },
-        { id: "timeline", icon: <CalendarIcon size={14} />, label: "Timeline" },
-        { id: "board", icon: <Square size={14} />, label: "Board" },
+        { value: "list", icon: List, label: "List" },
+        { value: "timeline", icon: CalendarIcon, label: "Timeline" },
+        { value: "board", icon: Square, label: "Board" },
     ];
     return (
-        <div className={styles.viewToggleGroup}>
-            {views.map(v => (
-                <button key={v.id} onClick={() => setTaskView(v.id)} className={`${styles.viewToggleBtn} ${currentView === v.id ? styles.viewToggleBtnActive : ""}`}>
-                    {v.icon} {v.label}
-                </button>
-            ))}
-        </div>
+        <SegmentedControl
+            className={styles.viewToggleControl}
+            options={views}
+            value={currentView}
+            onChange={setTaskView}
+            variant="solid"
+        />
     );
 }
 

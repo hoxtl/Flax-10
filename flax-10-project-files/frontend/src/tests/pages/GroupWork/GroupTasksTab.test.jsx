@@ -24,7 +24,7 @@ vi.mock('../../../pages/GroupWork/components/TaskTimelineView', () => ({
 vi.mock('../../../pages/GroupWork/components/TaskBoardView', () => ({
   default: () => <div data-testid="task-board-view" />,
 }));
-vi.mock('../../../components/ui/AnimatedDropdown', () => ({
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
   default: () => <div data-testid="animated-dropdown" />,
 }));
 
@@ -83,7 +83,7 @@ describe('GroupTasksTab', () => {
     
     const timelineBtn = screen.getByText(/Timeline/i);
     fireEvent.click(timelineBtn);
-    expect(timelineBtn.className).toContain('viewToggleBtnActive');
+    expect(screen.getByTestId('task-timeline-view')).toBeTruthy();
   });
 
   it('adds a new task', async () => {
