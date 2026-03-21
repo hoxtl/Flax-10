@@ -134,7 +134,7 @@ def weekly_goal_badges(sessions_all, user):
 
 def build_weekly_goal_badges(sessions_all, now, weekly_goal, week_minutes):
     earned = []
-    if week_minutes / 60 >= weekly_goal:
+    if week_minutes / 3600 >= weekly_goal:
         earned.append(badge('goal_getter', 'Goal Getter', '🎯', 'Hit your weekly study goal', 'silver'))
     if hit_goal_four_weeks(sessions_all, now, weekly_goal):
         earned.append(badge('consistent_goals', 'Consistent Goals', '📆', 'Hit your weekly goal 4 weeks running', 'gold'))
@@ -148,7 +148,7 @@ def week_minutes(sessions, week_start, week_end):
 def week_hours_for_offset(sessions, now, offset):
     week_start = now - timedelta(days=7 * (offset + 1))
     week_end = now - timedelta(days=7 * offset)
-    return week_minutes(sessions, week_start, week_end) / 60
+    return week_minutes(sessions, week_start, week_end) / 3600
 
 
 def hit_goal_four_weeks(sessions, now, goal):
@@ -180,4 +180,4 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
 def get_weekly_study_hours(sessions_all):
     week_ago = timezone.now() - timedelta(days=7)
     week_sessions = [session for session in sessions_all if session.end_time >= week_ago]
-    return round(sum(session.duration for session in week_sessions) / 60, 1)
+    return round(sum(session.duration for session in week_sessions) / 3600, 1)

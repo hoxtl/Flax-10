@@ -89,22 +89,6 @@ function ProfileStats({ profileData, handlers, visibility, societyCount, onSocie
   );
 }
 
-function HeaderSocieties({ societies, onNavigate }) {
-  if (!societies?.length) return null;
-  return <div className={styles.headerSocietiesRow}>{societies.map((society) => <SocietyItem key={society.society_id ?? society.id ?? society.name} society={society} onNavigate={onNavigate} />)}</div>;
-}
-
-function SocietyItem({ society, onNavigate }) {
-  const societyId = society.society_id ?? society.id;
-  const imageUrl = society.cover_image || society.image;
-  return (
-    <button className={styles.headerSocietyItem} onClick={() => societyId && onNavigate?.(`/societies?id=${societyId}`)}>
-      <div className={styles.headerSocLogoWrap}>{imageUrl ? <img src={imageUrl} alt={society.name} className={styles.headerSocLogo} /> : <div className={styles.headerSocInitial}>{society.name[0]}</div>}</div>
-      <span className={styles.headerSocName}>{society.name}</span>
-    </button>
-  );
-}
-
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
   const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak` : null;
@@ -153,14 +137,13 @@ function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, pe
 }
 
 function DesktopHeader(props) {
-  const { user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick, resolvedPhoto } = props;
+  const { user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick, resolvedPhoto } = props;
   return (
     <div className={`${styles.header} ${styles.desktopOnly}`}>
       <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
       <div className={styles.headerInfo}>
         <HeaderMeta user={user} profileData={profileData} handlers={handlers} visibility={visibility} societies={societies} onSocietiesClick={onSocietiesClick} />
         <HeaderInsights badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} onViewAllBadges={onViewAllBadges} persona={persona} peakHour={peakHour} visibility={visibility} />
-        <HeaderSocieties societies={societies} onNavigate={onNavigate} />
       </div>
     </div>
   );
