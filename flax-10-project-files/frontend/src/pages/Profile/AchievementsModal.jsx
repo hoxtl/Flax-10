@@ -1,10 +1,9 @@
+/**
+ * Profile achievements catalogue modal.
+ */
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
 import StandardModal from "../../components/common/StandardModal/StandardModal";
-
-// ---------------------------------------------------------------------------
-// Full badge catalogue — must match backend IDs exactly
-// ---------------------------------------------------------------------------
 
 const ALL_BADGES = [
   // Hours
@@ -52,8 +51,6 @@ const TIER_COLOR = {
 };
 
 const TIER_LABEL = { gold: '🥇 Gold', silver: '🥈 Silver', bronze: '🥉 Bronze' };
-
-// ---------------------------------------------------------------------------
 
 function BadgeTile({ badge, earned }) {
   const t = TIER_COLOR[badge.tier];
@@ -104,17 +101,29 @@ function CategorySection({ cat, earnedIds }) {
   );
 }
 
-export default function AchievementsModal({ badges, onClose }) {
-  const earnedIds = new Set((badges || []).map(b => b.id));
-  const totalBadges = ALL_BADGES.length;
-  const totalEarned = ALL_BADGES.filter((badge) => earnedIds.has(badge.id)).length;
-
+function useCloseOnEscape(onClose) {
   useEffect(() => {
-    const handler = e => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    const handler = (event) => event.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
+}
 
+function AchievementsBody({ earnedIds }) {
+  return <div className={styles.body}>{CATEGORIES.map((cat) => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}</div>;
+}
+
+function buildEarnedIds(badges) {
+  return new Set((badges || []).map((badge) => badge.id));
+}
+
+function countEarnedBadges(earnedIds) {
+  return ALL_BADGES.filter((badge) => earnedIds.has(badge.id)).length;
+}
+
+export default function AchievementsModal({ badges, onClose }) {
+  const earnedIds = buildEarnedIds(badges);
+  useCloseOnEscape(onClose);
   return (
     <StandardModal
       onClose={onClose}
@@ -124,11 +133,8 @@ export default function AchievementsModal({ badges, onClose }) {
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
-      <AchievementsHeader totalEarned={totalEarned} totalBadges={totalBadges} onClose={onClose} />
-
-      <div className={styles.body}>
-        {CATEGORIES.map((cat) => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}
-      </div>
+      <AchievementsHeader totalEarned={countEarnedBadges(earnedIds)} totalBadges={ALL_BADGES.length} onClose={onClose} />
+      <AchievementsBody earnedIds={earnedIds} />
     </StandardModal>
   );
 }
