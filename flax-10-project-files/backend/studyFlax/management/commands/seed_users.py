@@ -115,7 +115,6 @@ def _create_single_fixture_user(data, stdout):
     stdout.write(f"  {username:<12} {role}")
 
 def create_fixture_users(stdout):
-    stdout.write("Creating fixture users...")
     role_order = {'admin': 0, 'student': 1, 'teacher': 2}
     ordered_fixtures = sorted(
         FIXTURE_USERS,
@@ -146,23 +145,19 @@ def _create_users_if_needed(stdout, target_teacher_count):
     """Create random users if below target count."""
     needed = USER_COUNT - User.objects.count()
     if needed <= 0:
-        stdout.write("Enough users already exist.")
         return
     student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
-    stdout.write(f"Seeding {needed} random users ({student_count} students, {teacher_count} teachers)...")
     new_users = _build_new_users(student_count, teacher_count)
     User.objects.bulk_create(new_users, ignore_conflicts=True)
+    stdout.write(f"  + {needed} random users")
 
 
 def _ensure_user_settings(stdout):
     """Ensure all users have settings rows."""
-    stdout.write("Ensuring all users have settings...")
     new_settings = build_settings_for_new_users()
     if not new_settings:
-        stdout.write("  All users already have settings.")
         return
     UserSettings.objects.bulk_create(new_settings)
-    stdout.write(f"  Created {len(new_settings)} new UserSettings rows.")
 
 
 def create_random_users(stdout, target_teacher_count=14):

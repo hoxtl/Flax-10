@@ -22,9 +22,8 @@ def _build_all_user_events(user, tags, rules):
 @transaction.atomic
 def create_events_for_users(users, tags, rules, stdout):
     """Create personal, meal, and afternoon events for all users."""
-    stdout.write("Seeding events for users...")
     all_events = []
     for user in users:
         all_events.extend(_build_all_user_events(user, tags, rules))
     CalendarEvent.objects.bulk_create(all_events, batch_size=500)
-    stdout.write(f"  Created {len(all_events):,} events across {len(users)} users.")
+    stdout.write(f"  \u2713  {'Events':<14} {len(all_events):,}")

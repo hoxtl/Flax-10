@@ -107,7 +107,6 @@ def _group_events_by_user(events):
 @transaction.atomic
 def seed_attendance(stdout):
     """Create attendance records for all students' timetable events."""
-    stdout.write("Seeding attendance records...")
     now = timezone.now()
     students = list(User.objects.filter(role='student'))
     events = _fetch_all_timetable_events(students, now)
@@ -118,4 +117,5 @@ def seed_attendance(stdout):
         user_events = events_by_user.get(user.id, [])
         all_records.extend(_build_user_attendance(user, user_events, profile))
     EventAttendance.objects.bulk_create(all_records, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(all_records):,} attendance records.")
+    stdout.write(f"  \u2713  {'Attendance':<14} {len(all_records):,}")
+    stdout.write("")

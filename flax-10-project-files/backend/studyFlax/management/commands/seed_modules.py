@@ -276,10 +276,8 @@ def _seed_modules_by_specs(specs, department_to_pool, weekly_rule, stdout):
         _seed_single_spec(spec, department_to_pool, weekly_rule, stdout, teacher_load, department_cursor)
 
 def create_modules(stdout):
-    stdout.write("Seeding modules...")
     teachers = _base_teachers()
     if not teachers:
-        stdout.write("  No teachers available, skipping module creation.")
         return
     pool = _department_pool(teachers)
     _ensure_department_coverage(pool, teachers)
@@ -289,12 +287,10 @@ def create_modules(stdout):
     _sync_teacher_departments()
 
 def create_deadlines(modules, stdout):
-    stdout.write("Seeding deadlines...")
     deadlines_to_create = []
     for module in modules:
         deadlines_to_create.extend(build_deadlines_for_module(module))
     Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
-    stdout.write(f"  Created {len(deadlines_to_create)} deadlines.")
 
 def _should_enroll(user, module):
     return not Enrollment.objects.filter(student=user, module=module).exists()
@@ -389,11 +385,9 @@ def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_
 @transaction.atomic
 def create_enrollments(modules, tags, stdout):
     """Create enrollments and all module events for all users."""
-    stdout.write("Seeding enrollments and module events...")
     now = timezone.now()
     deadlines_by_module = _prefetch_deadlines_by_module(modules)
     users = list(User.objects.all().select_related('settings'))
     all_enrollments, all_events = _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
     Enrollment.objects.bulk_create(all_enrollments, ignore_conflicts=True, batch_size=500)
     CalendarEvent.objects.bulk_create(all_events, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(all_enrollments)} enrollments, {len(all_events)} events.")

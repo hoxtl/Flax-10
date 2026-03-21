@@ -47,7 +47,6 @@ def _build_user_sessions(user):
 @transaction.atomic
 def create_study_sessions(stdout):
     """Create study and theme sessions for all students."""
-    stdout.write("Seeding study sessions and theme sessions...")
     students = list(User.objects.filter(role='student'))
     all_study = []
     all_theme = []
@@ -57,4 +56,4 @@ def create_study_sessions(stdout):
         all_theme.extend(theme)
     StudySession.objects.bulk_create(all_study, ignore_conflicts=True, batch_size=500)
     ThemeSession.objects.bulk_create(all_theme, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(all_study):,} study sessions, {len(all_theme):,} theme sessions.")
+    stdout.write(f"  \u2713  {'Sessions':<14} {len(all_study):,} study \u00b7 {len(all_theme):,} theme")

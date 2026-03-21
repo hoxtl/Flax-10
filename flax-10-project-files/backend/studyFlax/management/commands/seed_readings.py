@@ -115,7 +115,6 @@ def _create_module_readings(modules, stdout):
     """Create readings for all modules."""
     readings = _build_all_readings(modules)
     Reading.objects.bulk_create(readings, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(readings)} readings across {len(modules)} modules.")
 
 
 def _create_reading_tasks(students, stdout):
@@ -126,14 +125,12 @@ def _create_reading_tasks(students, stdout):
     module_lists = _prefetch_module_lists(students)
     tasks = _build_all_reading_tasks(students, readings_by_module, enrollments_by_student, personal_lists, module_lists)
     Task.objects.bulk_create(tasks, ignore_conflicts=True, batch_size=500)
-    stdout.write(f"  Created {len(tasks)} reading tasks for {len(students)} students.")
 
 
 @transaction.atomic
 def create_readings(modules, students, stdout):
     """Create readings for modules and reading tasks for students."""
-    stdout.write("Seeding readings...")
     _create_module_readings(modules, stdout)
     _create_reading_tasks(students, stdout)
     _update_all_reading_estimates(students)
-    stdout.write(f"  {Reading.objects.count()} total readings in database.")
+    stdout.write(f"  \u2713  {'Readings':<14} {Reading.objects.count():,}")

@@ -160,9 +160,13 @@ class Command(BaseCommand):
             self._print_already_seeded_warning()
             return
         self.teacher_count = options.get('teacher_count', 14) or 14
-        self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
+        div = "\u2500" * 40
+        self.stdout.write(self.style.SUCCESS(div))
+        self.stdout.write(self.style.SUCCESS("  Seeding database"))
+        self.stdout.write(self.style.SUCCESS(div))
         self._ensure_usersettings_seed_compatibility()
         self._seed_users()
+        self.stdout.write("")
         self._seed_catalogue()
         self._load_shared_data()
         self._seed_content()
@@ -183,7 +187,6 @@ class Command(BaseCommand):
         table_name = UserSettings._meta.db_table
         if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
             return
-        self.stdout.write(f"Detected legacy {LEGACY_WIDGET_SIZES_COLUMN} column; enabling seed compatibility...")
         _apply_legacy_column_fix(table_name)
 
     def _load_shared_data(self):
@@ -210,6 +213,11 @@ class Command(BaseCommand):
         self.modules = list(Module.objects.all())
         create_deadlines(self.modules, self.stdout)
         create_enrollments(self.modules, self.tags, self.stdout)
+        self.stdout.write(
+            f"  \u2713  {'Modules':<14} {Module.objects.count():,}"
+            f"  \u00b7  Deadlines {Deadline.objects.count():,}"
+            f"  \u00b7  Enrolments {Enrollment.objects.count():,}"
+        )
         create_tasks(self.users, self.stdout)
         self._seed_societies_and_groups()
         self._seed_calendar_shares()
@@ -223,20 +231,19 @@ class Command(BaseCommand):
         create_society_memberships(self.stdout)
         create_society_events(self.stdout)
         create_society_images(self.stdout)
+        self.stdout.write(f"  \u2713  {'Societies':<14} {Society.objects.count():,}")
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
+        self.stdout.write(f"  \u2713  {'Group projects':<14} {GroupProject.objects.count():,}")
 
     def _seed_calendar_shares(self):
-        self.stdout.write("Seeding calendar shares...")
         users = sorted(User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"), key=lambda u: u.username)
         if len(users) < 2:
-            self.stdout.write("  Skipped calendar shares: need at least two non-admin users.")
             return
         planned_pairs = _build_calendar_share_pairs(users)
-        created = _create_calendar_shares(users, planned_pairs)
-        share_counts = {u.username: sum(1 for oid, _ in planned_pairs if oid == u.id) for u in users}
-        self.stdout.write(f"  {CalendarShare.objects.count()} total shares ({created} new, {min(share_counts.values())}-{max(share_counts.values())} per user).")
+        _create_calendar_shares(users, planned_pairs)
+        self.stdout.write(f"  \u2713  {'Shares':<14} {CalendarShare.objects.count():,}")
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")

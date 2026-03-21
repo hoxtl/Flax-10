@@ -34,7 +34,6 @@ def _seed_society_tags(society, tag_labels):
         SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
 
 def create_societies(stdout):
-    stdout.write("Seeding societies...")
     for data in build_society_seed_data():
         society = _create_society_from_config(data)
         _seed_society_tags(society, data.get('tags', []))
@@ -65,7 +64,6 @@ def _seed_events_for_society(society):
         _create_event_from_template(society, event_template, tags)
 
 def create_society_events(stdout):
-    stdout.write("Seeding society events...")
     for society in Society.objects.all():
         _seed_events_for_society(society)
 
@@ -85,7 +83,6 @@ def _add_extra_images(society):
         )
 
 def create_society_images(stdout):
-    stdout.write("Seeding society images...")
     for society in Society.objects.all():
         _set_cover_image(society)
         _add_extra_images(society)
@@ -120,7 +117,6 @@ def _seed_society_members(society, admin_counts, member_counts, student_users):
     _seed_regular_members(society, admin, member_counts, student_users)
 
 def create_society_memberships(stdout):
-    stdout.write("Seeding society memberships...")
     SocietyMembership.objects.filter(user__role='teacher').delete()
     student_users = list(User.objects.filter(role='student'))
     admin_counts = {u.id: 0 for u in student_users}
