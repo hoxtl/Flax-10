@@ -1,4 +1,6 @@
-/* Readings panel — sorted reading list with expand/collapse and task conversion. */
+/*
+ * Readings panel with sorted reading list, expand/collapse, and task conversion.
+ */
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen, Clock } from 'lucide-react';

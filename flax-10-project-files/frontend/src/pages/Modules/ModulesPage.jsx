@@ -1,4 +1,6 @@
-/* Modules browsing page with filtering, sorting, and pagination. */
+/*
+ * Modules browsing page with filtering, sorting, and pagination.
+ */
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';

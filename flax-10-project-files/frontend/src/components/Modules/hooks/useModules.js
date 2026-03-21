@@ -1,4 +1,6 @@
-/* Hook for managing modules state, enrolments, and CRUD operations. */
+/*
+ * Hook for managing modules state, enrolments, and CRUD operations.
+ */
 import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';

@@ -1,4 +1,6 @@
-/* My modules dashboard — top-level layout with stats, deadlines, and readings. */
+/*
+ * My modules dashboard with stats, deadlines, and readings.
+ */
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { getUpcomingDeadlines } from '../../api/deadlineApi';

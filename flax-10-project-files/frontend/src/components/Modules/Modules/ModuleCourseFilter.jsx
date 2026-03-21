@@ -1,4 +1,6 @@
-/* Dropdown filter for modules by course and enrolment status. */
+/*
+ * Dropdown filter for modules by course and enrolment status.
+ */
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';

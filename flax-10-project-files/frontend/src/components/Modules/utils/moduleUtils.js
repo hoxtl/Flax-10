@@ -1,4 +1,6 @@
-/* Utility functions for module filtering, sorting, formatting, and data transformations. */
+/*
+ * Utility functions for module filtering, sorting, formatting, and data transformations.
+ */
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {

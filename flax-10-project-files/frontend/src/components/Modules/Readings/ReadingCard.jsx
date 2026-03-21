@@ -1,4 +1,6 @@
-/* Reading card displaying page range, estimated duration, and teacher actions. */
+/*
+ * Reading card displaying page range, estimated duration, and teacher actions.
+ */
 import { useState } from 'react';
 import styles from '../Deadlines/DeadlineCard.module.css';
 import {formatDate} from '../../Calendar/utils/dateUtils';
