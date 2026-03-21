@@ -1,4 +1,4 @@
-/**
+/*
  * TaskFeed layout styles: main feed container, header, sub-header, create row,
  * toolbar strip, sections wrapper, and add button.
  */
@@ -15,49 +15,6 @@
     background: var(--bg);
 }
 
-.listHeader {
-    flex-shrink: 0;
-    padding: 24px 0 0;
-    margin-bottom: 12px;
-    animation: taskFeedHeaderFade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.listHeaderTitleWrap {
-    min-width: 0;
-}
-
-.listHeaderTitle {
-    font-family: var(--font-heading);
-    font-size: var(--type-page);
-    font-weight: var(--font-weight-title);
-    color: var(--text);
-    margin: 0;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.listHeaderDivider {
-    height: 1px;
-    background: var(--border, rgba(74, 52, 33, 0.12));
-    border: none;
-    margin: 10px 0 0;
-}
-
-@keyframes taskFeedHeaderFade {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .subHeader {
     display: flex;
     flex-direction: column;
@@ -67,17 +24,6 @@
     position: relative;
     z-index: 2;
     margin-bottom: 10px;
-}
-
-.bannerRow {
-    width: 100%;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-}
-
-.inlineBanner {
-    flex-shrink: 1;
-    min-width: 0;
 }
 
 .createRow {

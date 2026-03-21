@@ -1,18 +1,7 @@
-/**
+/*
  * Form field and control styles for CreateTaskModal.
  * Layout (overlay, modal, header, footer) in CreateTaskModalLayout.module.css.
  */
-
-.label {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: block;
-  margin-bottom: 6px;
-}
 
 .labelRequired {
   color: #b42318;
@@ -59,13 +48,6 @@
 
 .rowBlock .rowLabel {
   margin-bottom: 0;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: flex-start;
-  gap: 16px;
 }
 
 .rowLabel,
@@ -206,7 +188,6 @@
 }
 
 @media (max-width: 420px) {
-  .row,
   .timeRow {
     grid-template-columns: 1fr;
   }
