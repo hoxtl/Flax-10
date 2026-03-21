@@ -1,4 +1,4 @@
-/** Styles for module schedule section with day/time, duration, and location. */
+/* Styles for the module schedule section. */
 .scheduleRow {
     display: flex;
     align-items: flex-start;
@@ -10,8 +10,18 @@
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    flex: 1;
-    min-width: 140px;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.scheduleItemWide {
+    flex: 1.5 1 420px;
+    min-width: 280px;
+}
+
+.scheduleItemCompact {
+    flex: 0.42 1 104px;
+    min-width: 92px;
 }
 
 .scheduleIcon {
@@ -42,6 +52,36 @@
     color: var(--text);
     font-weight: 600;
     line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.scheduleValueInlineWrap {
+    min-width: 0;
+}
+
+.scheduleValueInline {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    min-width: 0;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.scheduleInlinePrimary,
+.scheduleValueSeparator {
+    flex-shrink: 0;
+}
+
+.scheduleValueSeparator {
+    color: var(--muted);
+}
+
+.scheduleInlineLocation {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .recurringBadge {
@@ -66,5 +106,22 @@
 
     .scheduleDivider {
         display: none;
+    }
+
+    .scheduleItemWide,
+    .scheduleItemCompact {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .scheduleValueInline {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    .scheduleInlineLocation {
+        overflow: visible;
+        text-overflow: initial;
+        white-space: normal;
     }
 }

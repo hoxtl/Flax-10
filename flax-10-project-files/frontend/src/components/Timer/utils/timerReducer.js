@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 export const initialState = (work = 25, breakTime = 5, sessions = 4) => ({
     workTime: work, breakTime, targetSessions: sessions, completedSessions: 0,
     timeLeft: work * 60, totalWork: 0, totalBreak: 0, totalPaused: 0,

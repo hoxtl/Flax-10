@@ -1,163 +1,92 @@
 import { useState, useEffect, useRef } from "react";
 import styles from './LocationAutocomplete.module.css';
-
-export function LocationAutocomplete({ value, onChange, placeholder = "Enter location" }) {
-    const [suggestions, setSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const inputRef = useRef(null);
-    const wrapperRef = useRef(null);
-    const justSelectedRef = useRef(false);
-    const isInitialMount = useRef(true);
-
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
-
-        if (!userHasTyped.current) {
-            return;
-        }
-
-        if (justSelectedRef.current) {
-            return;
-        }
-
-        if (!value || value.length < 3) {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-        }
-
-        const timeoutId = setTimeout(async () => {
-            await fetchSuggestions(value);
-        }, 300)
-
-        return () => clearTimeout(timeoutId);
-    }, [value]);
-
+function useClickOutside(ref, callback) {
     useEffect(() => {
         function handleClickOutside(event) {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
+            if (ref.current && !ref.current.contains(event.target)) callback();
         }
-
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const fetchSuggestions = async (query) => {
-        setIsLoading(true);
-        try {
-            const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-            const encodedQuery = encodeURIComponent(query);
-
-            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedQuery}.json?` +
-                `access_token=${mapboxToken}&` +
-                `country=GB&` +
-                `proximity=-0.1276,51.5074&` +
-                `limit=5&` +
-                `types=address,poi,place`;
-            
-            const response = await fetch(url);
-            const data = await response.json();
-            
-            if (data.features) {
-                setSuggestions(data.features);
-                setShowSuggestions(true);
-            }
-        } catch (error) {
-            console.error('Error when geocoding: ', error);
-            setSuggestions([]);
-        } finally {
-            setIsLoading(false);
+    }, [ref, callback]);
+}
+function buildMapboxUrl(query) {
+    const token = import.meta.env.VITE_MAPBOX_TOKEN;
+    const q = encodeURIComponent(query);
+    const baseUrl = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
+    return `${baseUrl}/${q}.json?access_token=${token}&country=GB&proximity=-0.1276,51.5074&limit=5&types=address,poi,place`;
+}
+function useLocationSuggestions(value, userHasTyped) {
+    const [suggestions, setSuggestions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    useEffect(() => {
+        if (!userHasTyped.current || !value || value.length < 3) return;
+        const fetchGeocode = async () => {
+            setIsLoading(true);
+            try {
+                const res = await fetch(buildMapboxUrl(value));
+                const data = await res.json();
+                setSuggestions(data.features || []);
+            } catch (err) { setSuggestions([]); }
+            finally { setIsLoading(false); }
+        };
+        const tid = setTimeout(fetchGeocode, 300);
+        return () => clearTimeout(tid);
+    }, [value, userHasTyped]);
+    return { suggestions, setSuggestions, isLoading };
+}
+function SuggestionItem({ suggestion, onClick }) {
+    return (
+        <div className={styles.suggestionItem} onMouseDown={(e) => { e.preventDefault(); onClick(suggestion); }}>
+            <div className={styles.suggestionIcon}>📍</div>
+            <div className={styles.suggestionText}>
+                <div className={styles.suggestionName}>{suggestion.text}</div>
+                <div className={styles.suggestionAddress}>{suggestion.place_name}</div>
+            </div>
+        </div>
+    );
+}
+function Dropdown({ suggestions, onSelect, value, isLoading, show }) {
+    if (!show || value.length < 3) return null;
+    if (isLoading) return <div className={styles.loadingIndicator}><span className={styles.spinner} /></div>;
+    if (suggestions.length === 0) return (
+        <div className={styles.suggestionsDropdown}>
+            <div className={styles.noResults}>No locations found. You can still save this manually.</div>
+        </div>
+    );
+    return (
+        <div className={styles.suggestionsDropdown}>
+            {suggestions.map((s) => <SuggestionItem key={s.id} suggestion={s} onClick={onSelect} />)}
+        </div>
+    );
+}
+function useLocationHandlers(onChange, setShow, suggestions, value) {
+    const justSelected = useRef(false);
+    return {
+        handleSelect: (s) => {
+            justSelected.current = true; onChange(s.place_name); setShow(false);
+            setTimeout(() => { justSelected.current = false; }, 200);
+        },
+        onInputChange: (e) => {
+            onChange(e.target.value);
+            if (e.target.value.length >= 3) setShow(true);
+        },
+        onInputFocus: () => {
+            if (!justSelected.current && suggestions.length > 0 && value.length >= 3) setShow(true);
         }
     };
-
-    const handleSuggestionClick = (suggestion) => {
-        justSelectedRef.current = true;
-        onChange(suggestion.place_name);
-        setSuggestions([]);
-        setShowSuggestions(false);
-
-        setTimeout(() => {
-            justSelectedRef.current = false;
-        }, 200);
-    };
-
+}
+export function LocationAutocomplete({ value, onChange, placeholder = "Enter location" }) {
+    const [show, setShow] = useState(false);
+    const wrapperRef = useRef(null);
     const userHasTyped = useRef(false);
-
-    const handleInputChange = (e) => {
-        userHasTyped.current = true;
-        onChange(e.target.value);
-        if (e.target.value.length >= 3) {
-            setShowSuggestions(true);
-        }
-    };
-
-    const handleInputFocus = () => {
-        if (justSelectedRef.current) {
-            return;
-        }
-
-        if (suggestions.length > 0 && value.length >= 3) {
-            setShowSuggestions(true);
-        }
-    };
-
+    const { suggestions, setSuggestions, isLoading } = useLocationSuggestions(value, userHasTyped);
+    useClickOutside(wrapperRef, () => setShow(false));
+    const h = useLocationHandlers(onChange, setShow, suggestions, value);
     return (
         <div className={styles.autocompleteWrapper} ref={wrapperRef}>
-        <input
-            ref={inputRef}
-            type="text"
-            value={value}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            placeholder={placeholder}
-            className={styles.input}
-            autoComplete="off"
-        />
-
-        {isLoading && value.length >= 3 && (
-            <div className={styles.loadingIndicator}>
-            <span className={styles.spinner} />
-            </div>
-        )}
-
-        {showSuggestions && suggestions.length > 0 && (
-            <div className={styles.suggestionsDropdown}>
-            {suggestions.map((suggestion) => (
-                <div
-                key={suggestion.id}
-                className={styles.suggestionItem}
-                onMouseDown={(e) => {
-                    e.preventDefault();
-                    handleSuggestionClick(suggestion);
-                }}
-                >
-                <div className={styles.suggestionIcon}>📍</div>
-                <div className={styles.suggestionText}>
-                    <div className={styles.suggestionName}>
-                    {suggestion.text}
-                    </div>
-                    <div className={styles.suggestionAddress}>
-                    {suggestion.place_name}
-                    </div>
-                </div>
-                </div>
-            ))}
-            </div>
-        )}
-
-        {showSuggestions && value.length >= 3 && suggestions.length === 0 && !isLoading && (
-            <div className={styles.suggestionsDropdown}>
-            <div className={styles.noResults}>
-                No locations found. You can still save this manually.
-            </div>
-            </div>
-        )}
+            <input type="text" value={value} onChange={(e) => { userHasTyped.current = true; h.onInputChange(e); }} 
+                onFocus={h.onInputFocus} placeholder={placeholder} className={styles.input} autoComplete="off" />
+            <Dropdown suggestions={suggestions} onSelect={h.handleSelect} value={value} isLoading={isLoading} show={show} />
         </div>
     );
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks tasksPageUtils: getTodayEndISO, getTomorrowEndISO,
  * filterTasksByListAndFilter, buildTasksPageHandlers, buildTasksPageViewProps.
  */
@@ -112,12 +112,12 @@ describe("tasksPageUtils", () => {
       expect(tasksApi.removeTask).not.toHaveBeenCalled();
     });
 
-    it("handleDeleteTask removes and sets toastDelete", () => {
+    it("handleDeleteTask removes and sets toastDelete", async () => {
       vi.useFakeTimers();
       const state = { setToastDelete: vi.fn() };
       const tasksApi = { removeTask: vi.fn() };
       const handlers = buildTasksPageHandlers(state, {}, tasksApi);
-      handlers.handleDeleteTask(3);
+      await handlers.handleDeleteTask(3);
       expect(tasksApi.removeTask).toHaveBeenCalledWith(3);
       expect(state.setToastDelete).toHaveBeenCalledWith(true);
       vi.advanceTimersByTime(3600);
@@ -125,13 +125,30 @@ describe("tasksPageUtils", () => {
       vi.useRealTimers();
     });
 
-    it("handleDeleteList clears activeListId when deleting active list", () => {
-      const state = { activeListId: "1", setActiveListId: vi.fn(), setActiveFilter: vi.fn() };
-      const listsApi = { removeList: vi.fn() };
+    it("handleDeleteList clears activeListId when deleting active list", async () => {
+      vi.useFakeTimers();
+      const state = { activeListId: "1", setActiveListId: vi.fn(), setActiveFilter: vi.fn(), setToastInfo: vi.fn() };
+      const listsApi = { removeList: vi.fn(), lists: [{ id: "1", name: "University" }] };
       const handlers = buildTasksPageHandlers(state, listsApi, {});
-      handlers.handleDeleteList("1");
+      await handlers.handleDeleteList("1");
       expect(state.setActiveListId).toHaveBeenCalledWith(null);
       expect(state.setActiveFilter).toHaveBeenCalledWith("all");
+      expect(state.setToastInfo).toHaveBeenCalledWith('"University" deleted.');
+      vi.useRealTimers();
+    });
+
+    it("handlePermanentlyDeleteList shows a delete toast", async () => {
+      vi.useFakeTimers();
+      const state = { setToastInfo: vi.fn() };
+      const listsApi = {
+        permanentlyDeleteList: vi.fn(),
+        archivedLists: [{ id: 9, name: "Old List" }],
+      };
+      const handlers = buildTasksPageHandlers(state, listsApi, {});
+      await handlers.handlePermanentlyDeleteList(9);
+      expect(listsApi.permanentlyDeleteList).toHaveBeenCalledWith(9);
+      expect(state.setToastInfo).toHaveBeenCalledWith('"Old List" permanently deleted.');
+      vi.useRealTimers();
     });
   });
 

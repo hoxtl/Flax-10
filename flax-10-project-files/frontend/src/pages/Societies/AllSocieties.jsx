@@ -9,6 +9,7 @@ import styles from "./SocietiesPage.module.css";
 import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
 import SearchBar from "../../components/common/SearchBar";
 import AnimatedDropdown from "../../components/common/AnimatedDropdown";
+import { TagsSelector } from "../../components/common/TagsSelector/TagsSelector";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import { SocietyBrowseResults } from "./SocietyBrowseResults";
@@ -94,7 +95,7 @@ function useHoverClose(isOpen, setIsOpen) {
 function getActiveFilterCount(filters) {
     let count = 0;
     if (filters.ratified !== "all") count += 1;
-    if (filters.category !== "all") count += 1;
+    if (filters.category.length > 0) count += 1;
     return count;
 }
 
@@ -138,10 +139,12 @@ function RatificationPill({ filter, currentValue, count, onSelect }) {
 }
 
 function CategoryOptions({ filterState }) {
-    return <div className={styles.ratificationOptions}>{SOCIETY_CATEGORIES.map((category) => <CategoryPill key={category.id} category={category} currentValue={filterState.filters.category} onSelect={() => filterState.toggleFilter("category", category.id)} />)}</div>;
-}
-
-function CategoryPill({ category, currentValue, onSelect }) {
-    const activeClass = currentValue === category.id ? styles.ratificationPillActive : "";
-    return <button type="button" className={`${styles.ratificationPill} ${activeClass}`} onClick={onSelect}>{category.label}</button>;
+    return (
+        <TagsSelector
+            tags={SOCIETY_CATEGORIES}
+            selectedTags={filterState.filters.category}
+            onSelectionChange={filterState.setCategory}
+            emptyHint="All categories"
+        />
+    );
 }

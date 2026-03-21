@@ -43,6 +43,7 @@ describe('TopBar', () => {
     expect(screen.getByText('Plan')).toBeTruthy();
     expect(screen.getByText('Study')).toBeTruthy();
     expect(screen.getByText('My KCL')).toBeTruthy();
+    expect(screen.getByText('My Insights')).toBeTruthy();
   });
 
   it('renders without user', () => {

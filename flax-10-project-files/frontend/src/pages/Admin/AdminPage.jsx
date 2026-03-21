@@ -28,7 +28,7 @@ function renderTab(activeTab, onNavChange) {
 export default function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
   return (
-    <AppPage title="Admin Dashboard" subtitle="Manage users, societies and platform requests" onBack={onBack} width="xl">
+    <AppPage title="Admin Dashboard" subtitle="Manage users, societies and platform requests" width="xl">
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
       <TabContent activeTab={activeTab}>{renderTab(activeTab, onNavChange)}</TabContent>
     </AppPage>

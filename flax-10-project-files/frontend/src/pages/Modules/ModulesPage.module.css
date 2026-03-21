@@ -2,6 +2,12 @@
     min-height: 100%;
 }
 
+.tabLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .skeletonHeader {
     display: flex;
     justify-content: space-between;
@@ -40,6 +46,21 @@
 .createButton {
     white-space: nowrap;
 }
+
+.studentTabs {
+    min-width: 0;
+    width: fit-content;
+    height: 36px;
+    --segmented-solid-bg: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
+    --segmented-solid-border: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border));
+    --segmented-solid-shadow: 0 8px 20px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+    --segmented-solid-button-fg: var(--text);
+    --segmented-solid-button-hover-bg: color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+    --segmented-solid-button-hover-fg: var(--text);
+    --segmented-solid-active-bg: var(--modules-accent-ink);
+    --segmented-solid-active-fg: var(--modules-accent-on-solid);
+}
+
 .toolbarDropdown {
     flex: 1;
     min-width: 150px;
@@ -70,6 +91,11 @@
         min-width: 0;
     }
     .createButton {
+        width: 100%;
+    }
+
+    .studentTabs {
+        min-width: 0;
         width: 100%;
     }
 }

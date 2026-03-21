@@ -86,12 +86,12 @@ export function ConsistencyScore({ data }) {
   const maxDays = Math.max(data.period_days || 30, 1);
   const score = calcScore(totalDays, maxDays, streak);
   const color = getColor(score);
+  const explanation = getExplanation(totalDays, maxDays, streak, score);
   return (
-    <div className={styles.scoreCard}>
+    <div className={styles.scoreCard} data-tooltip={explanation}>
       <p className={styles.cardLabel} title={SCORE_TITLE}>Consistency</p>
       <ScoreRing score={score} color={color} />
       <span className={styles.scoreLabel} style={{ color }}>{getLabel(score)}</span>
-      <p className={styles.scoreExplain}>{getExplanation(totalDays, maxDays, streak, score)}</p>
     </div>
   );
 }

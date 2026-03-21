@@ -1,4 +1,6 @@
-/** Grid layout for rendering module cards with actions. */
+/*
+ * Grid layout for rendering module cards with actions.
+ */
 import ModulesCard from './ModulesCard.jsx';
 import gridStyles from '../../common/Card/CardGrid.module.css';
 

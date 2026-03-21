@@ -1,4 +1,6 @@
-/** Utility functions for module filtering, sorting, formatting, and data transformations. */
+/*
+ * Utility functions for module filtering, sorting, formatting, and data transformations.
+ */
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
@@ -109,6 +111,10 @@ export function getEnrollmentId(module_id, enrollments) {
     return enrollment ? enrollment.id : null;
 }
 
+export function normaliseModuleCode(code) {
+    return String(code || '').toUpperCase().replace(/\s+/g, '');
+}
+
 export function serialiseModule(form_data) {
     const safeIsoOrOriginal = (value) => {
         if (!value) return '';
@@ -167,7 +173,6 @@ function createDurationString(duration) {
     return `${mins}m`;
 }
 
-//from formUtils.js - move to dateUtils to allow export
 export function formatForInput(d) {
     if (!d) return new Date().toISOString().slice(0, 16);
     const date = typeof d === 'string' ? new Date(d) : d;
@@ -176,10 +181,10 @@ export function formatForInput(d) {
     return localDate.toISOString().slice(0, 16);
 }
 
-export function filterModules(modules, enrollments, search_query, filter_mode) {
+export function filterModules(modules, enrollments, search_query, filter_mode, options = {}) {
     return modules.filter(module => {
         const search_result = checkSearch(module, search_query)
-        const filter_result = checkFilter(module, enrollments, filter_mode);
+        const filter_result = checkFilter(module, enrollments, filter_mode, options);
         return search_result && filter_result;
     })
 }
@@ -190,7 +195,8 @@ function checkSearch(module, search_query) {
         || module.module_code.toLowerCase().includes(query_lower);
 }
 
-function checkFilter(module, enrollments, filter_mode) {
+function checkFilter(module, enrollments, filter_mode, options = {}) {
+    if (filter_mode === 'all' && options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
     if (filter_mode === 'all') return true;
     return isEnrolledIn(module.id, enrollments);
 }
@@ -228,4 +234,3 @@ export function applyFiltersAndSort(modules, selectedCoursesOrDepartment, sort_b
     }
     return sortModules(modules, sort_by);
 }
-

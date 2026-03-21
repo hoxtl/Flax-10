@@ -1,3 +1,6 @@
+/*
+ * Tests for DeadlineCard component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DeadlineCard from '../../../components/Modules/Deadlines/DeadlineCard';

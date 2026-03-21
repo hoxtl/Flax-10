@@ -154,13 +154,17 @@ function SelfView({ summary, analyticsData, onNavigate, refetch }) {
   return (
     <div className={styles.leftCol}>
       <div className={styles.leftTopMetricsRow}>
-        <CompactAttendanceTile onNavigate={onNavigate} />
-        <div className={styles.leftTopSideCol}>
-          <CompactStreakTile streaks={summary?.streaks} />
-          <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} showStreak={false} onGoalSave={n => fetchApi("/profile/", { method: "PATCH", body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
-          <StudyDNA heatmap={analyticsData?.heatmap} />
+          <CompactAttendanceTile onNavigate={onNavigate} />
+          <div className={styles.leftTopSideCol}>
+            <div className={styles.leftTopStreakCard}>
+              <CompactStreakTile streaks={summary?.streaks} />
+            </div>
+            <div className={styles.leftTopWeekCard}>
+              <ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} showStreak={false} onGoalSave={n => fetchApi("/profile/", { method: "PATCH", body: JSON.stringify({ weekly_goal_hours: n }) }).then(refetch)} />
+            </div>
+            <StudyDNA heatmap={analyticsData?.heatmap} className={styles.leftTopStudyDnaCard} />
+          </div>
         </div>
-      </div>
       <FocusHeatmapWidget heatmap={analyticsData?.heatmap} onNavigate={onNavigate} />
     </div>
   );

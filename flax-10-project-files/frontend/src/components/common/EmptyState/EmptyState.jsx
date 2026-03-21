@@ -1,13 +1,10 @@
+/*
+ * Generic empty state block for lists and grids with no items to show.
+ */
+
 import styles from "./EmptyState.module.css";
 
-/**
- * Shared empty-state block used when a list or grid has no items to show.
- * Props:
- *   icon        – emoji or character, default "🔍"
- *   title       – required short message, e.g. "No modules found"
- *   description – optional secondary line, e.g. "Try adjusting your filters"
- *   action      – optional ReactNode (e.g. a button to create an item)
- */
+/** Empty state with an icon, title, description, and optional action. */
 export default function EmptyState({ icon = "🔍", title, description, action }) {
   return (
     <div className={styles.wrap}>

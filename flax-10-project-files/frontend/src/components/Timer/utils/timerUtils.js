@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import { useEffect, useState, useRef } from 'react';
 import { requestPermission } from '../../Notifications/utils/browserNotification';
 

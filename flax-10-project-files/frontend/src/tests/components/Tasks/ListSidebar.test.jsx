@@ -1,3 +1,4 @@
+/* Tests for ListSidebar component rendering, selection, and list management */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ListSidebar from '../../../pages/Tasks/components/ListSidebar';
@@ -35,10 +36,10 @@ const defaultProps = {
 };
 
 describe('ListSidebar', () => {
-    it('renders VIEWS and LISTS section labels', () => {
+    it('renders VIEWS and list sections', () => {
         render(<ListSidebar {...defaultProps} />);
         expect(screen.getByText('VIEWS')).toBeTruthy();
-        expect(screen.getByText('LISTS')).toBeTruthy();
+        expect(screen.getByText('LIFE')).toBeTruthy();
     });
 
     it('renders smart filters', () => {
@@ -75,6 +76,14 @@ describe('ListSidebar', () => {
         render(<ListSidebar {...defaultProps} lists={lists} />);
         expect(screen.getByText('Work')).toBeTruthy();
         expect(screen.getByText('Personal')).toBeTruthy();
+    });
+
+    it('renders reading lists as module name followed by code in brackets', () => {
+        const lists = [
+            { id: 7, name: 'LW4202 - Constitutional Law' },
+        ];
+        render(<ListSidebar {...defaultProps} lists={lists} />);
+        expect(screen.getByText('Constitutional Law (LW4202)')).toBeTruthy();
     });
 
     it('calls onNewList when "+ Add list" is clicked', () => {

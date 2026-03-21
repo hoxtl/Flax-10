@@ -1,5 +1,5 @@
-/**
- * Deadlines widget (Homepage component) – takes deadlines prop, no API fetch.
+/*
+ * Tests for UpcomingDeadlinesWidget component.
  */
 import { MemoryRouter } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -35,6 +35,7 @@ describe('DeadlinesWidget (Homepage)', () => {
   it('renders empty state when no deadlines', () => {
     renderWidget();
     expect(screen.getByText(/No deadlines need attention/i)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /view my modules/i })).not.toBeInTheDocument();
   });
 
   it('renders deadlines when provided', () => {

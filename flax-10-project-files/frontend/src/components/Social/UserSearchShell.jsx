@@ -7,13 +7,35 @@ import SearchBar from '../common/SearchBar/SearchBar';
 import { FilterDropdown, SearchDropdown } from './UserSearchLists';
 import { styles } from './userSearchShared';
 
-export function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDropdown, loading, userResults, handleSelect, fullWidth, compact }) {
+export function GlobalSearchBar({
+    query,
+    setQuery,
+    setFocus,
+    containerRef,
+    showDropdown,
+    loading,
+    userResults,
+    handleSelect,
+    fullWidth,
+    compact,
+    renderEmptyState,
+}) {
     const widthClass = fullWidth ? styles.fullWidthSearch : '';
     const searchClass = fullWidth ? styles.searchBarFull : styles.searchBarContainer;
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer} ${widthClass}`} ref={containerRef}>
             <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder="Search users..." className={searchClass} />
-            {showDropdown && <SearchDropdown loading={loading} query={query} userResults={userResults} onUserSelect={handleSelect} compact={compact} />}
+            {showDropdown && (
+                <SearchDropdown
+                    loading={loading}
+                    query={query}
+                    setQuery={setQuery}
+                    userResults={userResults}
+                    onUserSelect={handleSelect}
+                    compact={compact}
+                    renderEmptyState={renderEmptyState}
+                />
+            )}
         </div>
     );
 }

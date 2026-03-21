@@ -4,8 +4,10 @@
 
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
 import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
 import UserAvatar from '../common/UserAvatar/UserAvatar';
+import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 
 function getCurrentUser() {
     return JSON.parse(localStorage.getItem('user')) || {};
@@ -38,7 +40,8 @@ function buildRenderItem(currentUser, onUserClick, onUserUpdate) {
 function UserListItem({ user, currentUser, onUserClick, onUserUpdate }) {
     const isSelf = isCurrentUser(user, currentUser);
     const rightAction = isSelf ? null : <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />;
-    return <SummaryItem avatar={<UserAvatar user={user} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
+    const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
+    return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
 }
 
 export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
@@ -46,5 +49,20 @@ export default function UserListModal({ title, users, onClose, onUserClick, onUs
     const currentUser = getCurrentUser();
     const items = sortUsers(users, currentUser);
     const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate);
-    return <GenericSummaryModal isOpen={true} onClose={onClose} title={title} emptyMessage="No users found." emptyIcon="👥" emptyDescription="No one is sharing with you yet" items={items} renderItem={renderItem} />;
+    return (
+        <GenericSummaryModal
+            isOpen={true}
+            onClose={onClose}
+            title={title}
+            emptyContent={
+                <SearchEmptyState
+                    itemLabel="users"
+                    title="No users found"
+                    hint="No one is sharing with you yet."
+                />
+            }
+            items={items}
+            renderItem={renderItem}
+        />
+    );
 }

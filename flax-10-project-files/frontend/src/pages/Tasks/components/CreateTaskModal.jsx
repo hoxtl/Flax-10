@@ -1,14 +1,13 @@
-/**
- * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
+/*
+ * Modal for creating and editing tasks.
  */
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
@@ -45,7 +44,10 @@ function CreateTaskModalFooter({ saveError, isEditMode, onDeleteTask, saving, on
     <div className={styles.footer}>
       {saveError && <p className={styles.saveError} role="alert">{saveError}</p>}
       {isEditMode && onDeleteTask && (
-        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" onClick={handleDelete} disabled={saving} pill>Delete task</PrimaryButton>
+        <PrimaryButton type="button" className={styles.deleteBtn} variant="danger" size="small" onClick={handleDelete} disabled={saving} pill>
+          <Trash2 size={15} strokeWidth={2.1} aria-hidden />
+          Delete task
+        </PrimaryButton>
       )}
       <PrimaryButton type="button" className={styles.cancelBtn} variant="ghost" onClick={onClose} pill>Cancel</PrimaryButton>
       <PrimaryButton type="button" className={styles.saveBtn} onClick={handleSave} disabled={saving || !form.title.trim() || !form.due_date} pill>
@@ -195,7 +197,7 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
-  const { form, set, setForm, categoryOptions, selectedListColor, askFlaxInitialMessage, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />

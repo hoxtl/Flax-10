@@ -51,11 +51,11 @@ function DnaLegend({ segments }) {
   );
 }
 
-export function StudyDNA({ heatmap }) {
+export function StudyDNA({ heatmap, className = "" }) {
   if (!heatmap?.data) return null;
   const segments = computeDnaSegments(heatmap);
   return (
-    <Card className={`${styles.glassCard} ${styles.dnaCard}`} variant="glass">
+    <Card className={`${styles.glassCard} ${styles.dnaCard} ${className}`.trim()} variant="glass">
       <div className={styles.cardLabel}>STUDY DNA</div>
       <DnaBar segments={segments} />
       <DnaLegend segments={segments} />

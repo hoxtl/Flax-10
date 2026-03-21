@@ -3,7 +3,6 @@
  */
 
 import AttendanceDonutChart from "./AttendanceDonutChart";
-import AttendanceLegend from "./AttendanceLegend";
 import AttendancePercentLine from "./AttendancePercentLine";
 import { buildValueFormatter } from "../utils/attendanceChartUtils";
 import styles from "./AttendanceCharts.module.css";
@@ -20,7 +19,6 @@ function ByTypeAttendanceChartBody({ data, onSegmentClick }) {
     <>
       <AttendancePercentLine hidden>spacer</AttendancePercentLine>
       <AttendanceDonutChart chart="byType" data={data} onSegmentClick={onSegmentClick} valueFormatter={buildValueFormatter(data, total)} />
-      <AttendanceLegend>{data.map(({ label, value }) => <span key={label} className={styles.byTypeLegendItem}>{`${label}: ${value}`}</span>)}</AttendanceLegend>
     </>
   );
 }

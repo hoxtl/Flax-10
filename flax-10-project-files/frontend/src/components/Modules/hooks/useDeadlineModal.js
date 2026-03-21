@@ -1,4 +1,6 @@
-/** Hook for managing deadline modal state and CRUD operations. */
+/*
+ * Hook for managing deadline modal state and CRUD operations.
+ */
 import { useState, useEffect } from 'react';
 import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../../../api/deadlineApi';
 

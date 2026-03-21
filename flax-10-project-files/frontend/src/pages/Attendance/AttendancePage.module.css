@@ -11,9 +11,41 @@
 
 .loadingContainer {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  min-height: 240px;
+  min-height: 420px;
+}
+
+.loadingSkeleton {
+  width: 100%;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.loadingTopCard {
+  height: 82px;
+  border-radius: 18px;
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.loadingCharts {
+  display: grid;
+  gap: 1rem;
+}
+
+.loadingChartCard {
+  height: 320px;
+  border-radius: 18px;
+}
+
+.loadingListCard {
+  min-height: 660px;
+  border-radius: 18px;
 }
 
 .error {
@@ -74,40 +106,12 @@
   overflow: hidden;
 }
 
-.attendanceTabs {
-  display: flex;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.attendanceTab,
-.attendanceTabActive {
-  flex: 1;
+.tabLabelWithBadge {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  transition: background 0.15s, color 0.15s;
-  font-family: inherit;
 }
 
-.attendanceTab:hover {
-  background: var(--hover, rgba(0, 0, 0, 0.04));
-  color: var(--text);
-}
-
-.attendanceTabActive {
-  color: var(--text);
-  box-shadow: inset 0 -2px 0 var(--primary);
-  cursor: default;
-}
 
 .tabBadge {
   display: inline-flex;
@@ -134,6 +138,10 @@
     grid-template-columns: 1fr;
     align-items: start;
     flex: none;
+  }
+
+  .loadingGrid {
+    grid-template-columns: 1fr;
   }
 
   .chartsCol {

@@ -1,4 +1,4 @@
-/**
+/*
  * Helpers for DateTimePicker: parse, format, calendar grid.
  */
 

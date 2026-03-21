@@ -1,3 +1,5 @@
+/* Styles for the read-only task detail modal. */
+
 .modalBackdrop {
     background: rgba(0,0,0,0.32);
     backdrop-filter: blur(4px);
@@ -128,6 +130,40 @@
     word-break: break-word;
 }
 
+.readingPillRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0 0 1rem;
+}
+
+.readingDetailPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    max-width: 100%;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary, #7B6751) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary, #7B6751) 14%, transparent);
+}
+
+.readingDetailLabel {
+    font-size: 0.64rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.readingDetailValue {
+    font-size: 0.82rem;
+    font-weight: 650;
+    color: var(--text);
+    white-space: nowrap;
+}
+
 .infoGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -224,24 +260,6 @@
     flex-shrink: 0;
 }
 
-.infoCloseBtn {
-    padding: 10px 20px;
-    border-radius: 10px;
-    background: var(--primary, #7B6751);
-    border: none;
-    color: var(--color-card);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-.infoCloseBtn:hover {
-    background: var(--primary-strong, #5D4037);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(123, 103, 81, 0.25);
-}
-
 :root[data-mode="dark"] .infoModal {
     background: var(--card-bg);
     border-color: var(--border-color);
@@ -271,12 +289,4 @@
 :root[data-mode="dark"] .infoModalFooter {
     background: rgba(255, 255, 255, 0.03);
     border-top-color: var(--border-color);
-}
-:root[data-mode="dark"] .infoCloseBtn {
-    background: var(--primary);
-    color: var(--card-bg);
-}
-:root[data-mode="dark"] .infoCloseBtn:hover {
-    background: var(--primary);
-    filter: brightness(1.1);
 }

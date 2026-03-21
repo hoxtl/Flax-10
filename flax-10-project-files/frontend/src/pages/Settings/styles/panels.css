@@ -13,6 +13,10 @@
   position: relative;
 }
 
+.panelHome {
+  overflow: visible !important;
+}
+
 .panel::before,
 .panel::after {
   content: "";

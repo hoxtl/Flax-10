@@ -9,7 +9,6 @@ import { getChartColors, getChartSx } from './utils/chartColors';
 const FLAX_BROWN = '#7B6751';
 const SAGE_GREEN = '#8C9A86';
 const FONT_MONO = '"JetBrains Mono", "Roboto Mono", ui-monospace, monospace';
-const FONT_HEADING = '"Lexend", system-ui, sans-serif';
 const CHART_MARGIN = { left: 50, right: 20, top: 20, bottom: 38 };
 const DATE_FORMAT = { weekday: 'short', day: 'numeric' };
 const WARM_COLORS = { textColor: 'rgba(123, 103, 81, 0.7)', gridColor: 'rgba(123, 103, 81, 0.12)' };
@@ -30,7 +29,7 @@ function getChartPalette(theme, variant) {
 function getChartSxConfig(textColor, gridColor) {
   return {
     ...getChartSx(textColor, gridColor),
-    '& .MuiChartsLegend-label': { fill: `${textColor} !important`, fontFamily: FONT_HEADING },
+    '& .MuiChartsLegend-label': { fill: `${textColor} !important` },
   };
 }
 

@@ -1,4 +1,6 @@
-/** Modal for managing module deadlines with create, edit, and delete functionality. */
+/*
+ * Modal for managing module deadlines.
+ */
 import { useDeadlineModal } from '../hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';

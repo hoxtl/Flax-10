@@ -18,9 +18,21 @@
   padding: 12px 16px 4px;
 }
 
-.skeletonNav { height: 36px; border-radius: 999px; }
-.skeletonTitle { height: 34px; }
-.skeletonFilterPill { width: 88px; height: 32px; border-radius: 999px; flex-shrink: 0; }
+.skeletonNav {
+  height: 36px;
+  border-radius: 999px;
+}
+
+.skeletonTitle {
+  height: 34px;
+}
+
+.skeletonFilterPill {
+  width: 88px;
+  height: 32px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
 
 .skeletonCalendarGrid {
   padding: 12px 16px 24px;
@@ -36,8 +48,15 @@
   align-items: center;
 }
 
-.skeletonTimeCol { height: 18px; border-radius: 8px; }
-.skeletonEventLane { height: 76px; border-radius: 18px; }
+.skeletonTimeCol {
+  height: 18px;
+  border-radius: 8px;
+}
+
+.skeletonEventLane {
+  height: 76px;
+  border-radius: 18px;
+}
 
 .stickyHeader {
   position: sticky;

@@ -1,7 +1,10 @@
-/** Detailed view of a single module with schedule, deadlines, and readings. */
+/*
+ * Detailed view of a single module with schedule, deadlines, and readings.
+ */
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
@@ -53,13 +56,6 @@ function getNextClassText(startTime, endTime) {
     const date = new Date(startTime);
     const day = date.toLocaleDateString("en-GB", { weekday: "long" });
     return `${day}, ${formatTime(startTime)} - ${formatTime(endTime)}`;
-}
-
-function getInitials(name) {
-    if (!name) return "TU";
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
 function getTutorImage(moduleData) {
@@ -142,11 +138,15 @@ function ScheduleCard({ module, nextClass }) {
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Schedule</h2>
             <div className={scheduleStyles.scheduleRow}>
-                <ScheduleItem icon="📅" label="Day & time" value={nextClass} />
+                <ScheduleItem
+                    icon="📅"
+                    label="Day, time & location"
+                    value={<ScheduleSummary nextClass={nextClass} location={module.location} />}
+                    className={scheduleStyles.scheduleItemWide}
+                    valueClassName={scheduleStyles.scheduleValueInlineWrap}
+                />
                 <span className={scheduleStyles.scheduleDivider} />
-                <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} />
-                <span className={scheduleStyles.scheduleDivider} />
-                <ScheduleItem icon="📍" label="Location" value={module.location || 'To be announced'} />
+                <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} className={scheduleStyles.scheduleItemCompact} />
             </div>
             {module.recurrence_rule && <RecurringBadge />}
         </article>
@@ -205,15 +205,26 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     );
 }
 
-function ScheduleItem({ icon, label, value }) {
+function ScheduleItem({ icon, label, value, className = "", valueClassName = "" }) {
     return (
-        <div className={scheduleStyles.scheduleItem}>
+        <div className={`${scheduleStyles.scheduleItem} ${className}`.trim()}>
             <span className={scheduleStyles.scheduleIcon}>{icon}</span>
             <div>
                 <div className={scheduleStyles.scheduleLabel}>{label}</div>
-                <div className={scheduleStyles.scheduleValue}>{value}</div>
+                <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
         </div>
+    );
+}
+
+function ScheduleSummary({ nextClass, location }) {
+    const resolvedLocation = location || 'To be announced';
+    return (
+        <span className={scheduleStyles.scheduleValueInline}>
+            <span className={scheduleStyles.scheduleInlinePrimary}>{nextClass}</span>
+            <span className={scheduleStyles.scheduleValueSeparator} aria-hidden="true">·</span>
+            <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
+        </span>
     );
 }
 
@@ -229,10 +240,10 @@ function RecurringBadge() {
 function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
     return is_enrolled
         ? <button className={styles.unenrollButton} onClick={onUnenroll}>Leave module</button>
-        : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in module</button>;
+        : <button className={styles.enrollButton} onClick={onEnroll}>Enrol in module</button>;
 }
 
-function DeadlineItem({ deadline, index, moduleCode }) {
+function DeadlineItem({ deadline, index }) {
     const urgency = getUrgencyLabel(deadline.start_due_date);
     return (
         <div className={deadlineStyles.deadlineItem}>
@@ -240,20 +251,22 @@ function DeadlineItem({ deadline, index, moduleCode }) {
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
                     <span className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
-                    <EntityLinkChip to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`} className={deadlineStyles.deadlineTitle} title="Open related tasks">{deadline.title}</EntityLinkChip>
-                    <span className={`${deadlineStyles.urgencyTag} ${deadlineStyles[urgency]}`}>{getUrgencyText(urgency)}</span>
+                    <span className={deadlineStyles.deadlineTitle}>{deadline.title}</span>
                 </div>
-                <span className={deadlineStyles.deadlineDate}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+                <div className={deadlineStyles.deadlineMeta}>
+                    <span className={`${deadlineStyles.urgencyTag} ${deadlineStyles[urgency]}`}>{getUrgencyText(urgency)}</span>
+                    <span className={deadlineStyles.deadlineDate}>{formatDeadlineDateTime(deadline.start_due_date)}</span>
+                </div>
             </div>
         </div>
     );
 }
 
-function DeadlinesSection({ deadlines, moduleCode }) {
+function DeadlinesSection({ deadlines }) {
     if (!deadlines?.length) return <p className={deadlineStyles.emptyText}>No assignments yet.</p>;
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} moduleCode={moduleCode} />)}
+            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} />)}
         </div>
     );
 }

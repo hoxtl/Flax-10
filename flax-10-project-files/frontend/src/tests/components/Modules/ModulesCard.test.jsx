@@ -1,3 +1,6 @@
+/*
+ * Tests for ModulesCard component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModulesCard from '../../../components/Modules/Modules/ModulesCard';
@@ -102,6 +105,13 @@ describe('ModulesCard', () => {
     it('should render readings button for teacher', () => {
         render(<ModulesCard {...mockParameters} isTeacher={true} />);
         expect(screen.getByText('Readings')).toBeInTheDocument();
+    });
+
+    it('shows assignment count pill from module deadlines when browsing', () => {
+        render(<ModulesCard {...mockParameters} module={{ ...module, deadlines: [{ id: 1 }, { id: 2 }] }} />);
+        expect(
+            screen.getByText((_, node) => node?.tagName === 'SPAN' && (node.textContent?.includes('2 assignments') ?? false))
+        ).toBeInTheDocument();
     });
 
     it('should call onDelete when delete is clicked', () => {

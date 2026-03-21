@@ -2,6 +2,12 @@
   min-height: 100%;
 }
 
+.tabLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .skeletonHeader {
   display: flex;
   justify-content: space-between;
@@ -126,10 +132,10 @@
 
 .cardLabel {
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
   margin: 0 0 1rem;
 }
 

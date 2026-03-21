@@ -1,44 +1,45 @@
+/**
+ * allDayRowHelpers - Layout calculations for all-day events in week view.
+ * Handles positioning events across multiple days with row stacking.
+ */
 import { isSameDay } from '../../utils/dateUtils';
 import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 
-export function calculateEventLayout(events, days) {
-    const visibleEvents = events.map(event => {
-        const range = getAllDayVisualRange(event);
-        if (!range) return null;
-        const startIdx = getStartIndex(range.start, days);
-        const endIdx = getEndIndex(range.end, days);
-        if (startIdx === null || endIdx === null) return null;
-        return {
-            event,
-            startCol: startIdx + 1,
-            endCol: endIdx + 2
-        };
-    }).filter(Boolean);
+function mapEventToLayout(event, days) {
+    const range = getAllDayVisualRange(event);
+    if (!range) return null;
+    const startIdx = getStartIndex(range.start, days);
+    const endIdx = getEndIndex(range.end, days);
+    if (startIdx === null || endIdx === null) return null;
+    return { event, startCol: startIdx + 1, endCol: endIdx + 2 };
+}
 
-    visibleEvents.sort((a, b) => {
-        if (a.startCol !== b.startCol) return a.startCol - b.startCol;
-        const widthA = a.endCol - a.startCol;
-        const widthB = b.endCol - b.startCol;
-        return widthB - widthA;
-    });
+function sortByStartAndWidth(a, b) {
+    if (a.startCol !== b.startCol) return a.startCol - b.startCol;
+    return (b.endCol - b.startCol) - (a.endCol - a.startCol);
+}
 
+function findRowForItem(rows, item) {
+    const index = rows.findIndex(row => !rowCollides(row, item));
+    return index;
+}
+
+function placeItemInRow(rows, item, rowIdx) {
+    if (rowIdx >= 0) { rows[rowIdx].push(item); item.row = rowIdx + 1; return; }
+    rows.push([item]);
+    item.row = rows.length;
+}
+
+function assignRowsToItems(items) {
     const rows = [];
-    visibleEvents.forEach(item => {
-        let placed = false;
-        for (let i = 0; i < rows.length; i++) {
-            if (!rowCollides(rows[i], item)) {
-                rows[i].push(item);
-                item.row = i + 1;
-                placed = true;
-                break;
-            }
-        }
-        if (!placed) {
-            rows.push([item]);
-            item.row = rows.length;
-        }
-    });
+    items.forEach(item => placeItemInRow(rows, item, findRowForItem(rows, item)));
+}
 
+/** Calculates layout positions for all-day events across week columns. */
+export function calculateEventLayout(events, days) {
+    const visibleEvents = events.map(e => mapEventToLayout(e, days)).filter(Boolean);
+    visibleEvents.sort(sortByStartAndWidth);
+    assignRowsToItems(visibleEvents);
     return visibleEvents;
 }
 

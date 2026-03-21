@@ -1,4 +1,4 @@
-/** Styles for module deadlines and readings list items. */
+/* Styles for module deadlines and reading list items. */
 .deadlinesList {
     display: flex;
     flex-direction: column;
@@ -39,6 +39,16 @@
     align-items: center;
     gap: 0.42rem;
     min-width: 0;
+    flex: 1 1 auto;
+}
+
+.deadlineMeta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.48rem;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .deadlinesType {
@@ -55,6 +65,7 @@
     font-size: 0.9rem;
     font-weight: 700;
     color: var(--text);
+    min-width: 0;
 }
 
 .urgencyTag {
@@ -89,6 +100,18 @@
     color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .deadlineBody {
+        align-items: flex-start;
+        gap: 0.42rem;
+    }
+
+    .deadlineMeta {
+        gap: 0.36rem;
+        flex-wrap: wrap;
+    }
 }
 
 .emptyText,

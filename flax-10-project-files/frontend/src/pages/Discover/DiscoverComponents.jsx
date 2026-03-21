@@ -3,7 +3,7 @@
  */
 
 import PageToolbar, { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
-import { SegmentedControl } from "../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../components/common";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
 import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
 import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
@@ -11,6 +11,7 @@ import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 import GridCard from "../../components/common/Card/GridCard";
 import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import { FilterSection } from "../../components/Social/UserSearch";
@@ -68,11 +69,24 @@ function UserCardInfo({ user }) {
 
 function UserCard({ user, onNavChange }) {
     const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
+    const handleOpenProfile = () => onNavChange?.(`profile_${user.id}`);
     return (
-        <GridCard className={styles.userCard} onClick={() => onNavChange?.(`profile_${user.id}`)}>
+        <GridCard className={styles.userCard} onClick={handleOpenProfile}>
             <UserAvatar user={avatarUser} avatarOnly size={64} />
             <UserCardInfo user={user} />
-            <div className={styles.cardFooter}><button type="button" className={styles.viewProfileBtn}>View Profile</button></div>
+            <div className={styles.cardFooter}>
+                <PrimaryButton
+                    type="button"
+                    className={styles.viewProfileBtn}
+                    pill
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        handleOpenProfile();
+                    }}
+                >
+                    View Profile
+                </PrimaryButton>
+            </div>
         </GridCard>
     );
 }
@@ -102,14 +116,14 @@ function PaginatedGrid({ users, onNavChange, currentPage, totalPages, setCurrent
     );
 }
 
-function EmptyUsersState({ searchQuery, setSearchQuery }) {
-    if (String(searchQuery || "").trim()) return <SearchEmptyState query={searchQuery} itemLabel="users" onClear={() => setSearchQuery("")} />;
+function EmptyUsersState({ searchQuery }) {
+    if (String(searchQuery || "").trim()) return <SearchEmptyState query={searchQuery} itemLabel="users" />;
     return <EmptyState icon="👥" title="No users found" description="Try adjusting your search or filters." />;
 }
 
 export function UsersGrid({ users, onNavChange, loading, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery }) {
     const visibleUsers = filterVisibleUsers(users);
-    if (!loading && visibleUsers.length === 0) return <EmptyUsersState searchQuery={searchQuery} setSearchQuery={setSearchQuery} />;
+    if (!loading && visibleUsers.length === 0) return <EmptyUsersState searchQuery={searchQuery} />;
     return <PaginatedGrid users={visibleUsers} onNavChange={onNavChange} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />;
 }
 

@@ -97,19 +97,15 @@
   min-width: 138px;
 }
 
+.saveBtnSaved {
+  background: color-mix(in srgb, var(--success-text) 84%, var(--primary));
+  border-color: color-mix(in srgb, var(--success-text) 42%, transparent);
+}
+
 .error {
   background: #fee;
   border: 1px solid #fcc;
   color: #c33;
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  margin-bottom: 16px;
-}
-
-.success {
-  background: var(--success-bg);
-  color: var(--success-text);
   padding: var(--space-3);
   border-radius: var(--radius-md);
   font-size: var(--text-base);

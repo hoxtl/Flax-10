@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SegmentedControl } from '../../../components/ui/SegmentedControl';
+import { SegmentedControl } from '../../../components/common/SegmentedControl/SegmentedControl';
 
 const MockIcon = () => <svg data-testid="icon" />;
 

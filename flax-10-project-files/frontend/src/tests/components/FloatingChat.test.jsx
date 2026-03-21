@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
@@ -34,17 +34,63 @@ describe('FloatingChat', () => {
         vi.clearAllMocks();
     });
 
-    function renderChat() {
+    function renderChat(entry = '/tasks') {
         return render(
-            <MemoryRouter initialEntries={['/tasks']}>
+            <MemoryRouter initialEntries={[entry]}>
                 <FloatingChat />
             </MemoryRouter>
+        );
+    }
+
+    function RouteButtons() {
+        const navigate = useNavigate();
+        return (
+            <>
+                <button type="button" onClick={() => navigate('/tasks')}>Go tasks</button>
+                <button type="button" onClick={() => navigate('/analytics')}>Go analytics</button>
+            </>
         );
     }
 
     it('renders the FAB button', () => {
         renderChat();
         expect(screen.getByRole('button', { name: 'Open chat' })).toBeTruthy();
+    });
+
+    it('shows the task planning prompt on the tasks route', () => {
+        renderChat('/tasks');
+        expect(screen.getByText(/Not sure how long a task will take/i)).toBeTruthy();
+    });
+
+    it('shows the module selection prompt on the modules route', () => {
+        renderChat('/modules');
+        expect(screen.getByText(/Curious about new modules/i)).toBeTruthy();
+    });
+
+    it('shows the societies selection prompt on the societies route', () => {
+        renderChat('/societies');
+        expect(screen.getByText(/Don't know what societies to pick/i)).toBeTruthy();
+    });
+
+    it('shows the analytics results prompt on the analytics route', () => {
+        renderChat('/analytics');
+        expect(screen.getByText(/Need help understanding your results/i)).toBeTruthy();
+    });
+
+    it('reopens the prompt on the first visit to a new prompt-enabled page', async () => {
+        render(
+            <MemoryRouter initialEntries={['/tasks']}>
+                <FloatingChat />
+                <RouteButtons />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: 'Minimize' }));
+        await waitFor(() => expect(screen.queryByText(/Not sure how long a task will take/i)).toBeNull());
+
+        fireEvent.click(screen.getByRole('button', { name: 'Go analytics' }));
+
+        expect(await screen.findByText(/Need help understanding your results/i)).toBeTruthy();
     });
 
     it('opens chat window when FAB clicked', () => {

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddCollaboratorModal from '../../../components/Society/AddCollaboratorModal';
 
 vi.mock('../../../components/Social/UserSearch', () => ({
-    default: ({ onUserSelect, filterUsers }) => {
+    default: ({ onUserSelect, filterUsers, renderEmptyState }) => {
         // Expose a way to test the filter
         const dummyResults = [
             { id: 1, username: 'alice' },
@@ -16,6 +16,9 @@ vi.mock('../../../components/Social/UserSearch', () => ({
             <div data-testid="mock-user-search">
                 <div data-testid="filtered-results">
                     {filtered.map(u => u.username).join(',')}
+                </div>
+                <div data-testid="custom-empty-state">
+                    {renderEmptyState ? 'has-custom-empty-state' : 'no-custom-empty-state'}
                 </div>
                 <button onClick={() => onUserSelect({ id: 1, username: 'alice' })}>Select Alice</button>
                 <button onClick={() => onUserSelect({ id: 2, username: 'bob' })}>Select Bob</button>
@@ -38,6 +41,7 @@ describe('AddCollaboratorModal', () => {
     it('renders UserSearch component', () => {
         render(<AddCollaboratorModal onClose={vi.fn()} onAdd={vi.fn()} />);
         expect(screen.getByTestId('mock-user-search')).toBeTruthy();
+        expect(screen.getByTestId('custom-empty-state').textContent).toBe('has-custom-empty-state');
     });
 
     it('calls onClose when close button is clicked', () => {

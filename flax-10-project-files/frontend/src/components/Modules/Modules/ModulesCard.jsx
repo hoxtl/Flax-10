@@ -1,7 +1,11 @@
-/** Module card component displaying module info, enrollment status, and actions. */
-import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
+/*
+ * Module card displaying module info, enrolment status, and actions.
+ */
+import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import GridCard from '../../common/Card/GridCard';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
@@ -17,18 +21,6 @@ const DEPARTMENT_ACCENTS = {
     "Dentistry, Oral & Craniofacial Sciences": "var(--danger)",
 };
 
-const DEPARTMENT_SHORT_NAMES = {
-    "Natural, Mathematical & Engineering Sciences": "Natural, Mathematical & Engineering Sciences",
-    "Life Sciences & Medicine": "Life Sciences & Medicine",
-    "Law": "Law",
-    "Psychiatry, Psychology & Neuroscience": "Psychiatry, Psychology & Neuroscience",
-    "Business": "Business",
-    "Arts & Humanities": "Arts & Humanities",
-    "Social Science & Public Policy": "Social Science & Public Policy",
-    "Nursing, Midwifery & Palliative Care": "Nursing, Midwifery & Palliative Care",
-    "Dentistry, Oral & Craniofacial Sciences": "Dentistry, Oral & Craniofacial Sciences",
-};
-
 function getCardClass(enrolled, is_teacher) {
     let cls = styles.card;
     if (enrolled) cls += ` ${styles.enrolled}`;
@@ -36,8 +28,20 @@ function getCardClass(enrolled, is_teacher) {
     return cls;
 }
 
-function normalizeModuleCode(code) {
-    return String(code || "").toUpperCase().replace(/\s+/g, "");
+function getModuleAssignmentCount(module, taskCountsByModule) {
+    const explicitCount = [
+        module?.assignments_count,
+        module?.assignment_count,
+        module?.deadlines_count,
+        module?.deadline_count,
+        module?.assessments_count,
+        module?.assessment_count,
+    ].find((value) => Number.isFinite(Number(value)));
+
+    if (Number.isFinite(Number(explicitCount))) return Number(explicitCount);
+    if (Array.isArray(module?.deadlines)) return module.deadlines.length;
+
+    return taskCountsByModule[normaliseModuleCode(module?.module_code)] || 0;
 }
 
 function resolveClassmatesCount(module) {
@@ -57,7 +61,7 @@ function useCardData(module, enrollments, taskCountsByModule) {
     return {
         enrolled, isCore: enrollment?.is_core || false,
         accent: DEPARTMENT_ACCENTS[department] || "var(--primary)",
-        upcomingTasksCount: taskCountsByModule[normalizeModuleCode(module.module_code)] || 0,
+        upcomingTasksCount: getModuleAssignmentCount(module, taskCountsByModule),
         classmatesCount: resolveClassmatesCount(module),
     };
 }
@@ -92,8 +96,8 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
             {isTeacher ? <CardHeader module={module} /> : <CardHeader module={module} enrolled={enrolled} isCore={isCore} />}
             <h3 className={styles.moduleTitle}>{moduleTitle}</h3>
             {module.description && <Description text={module.description} />}
-            <QuickMeta module={module} />
-            <RelatedLinks module={module} upcomingTasksCount={upcomingTasksCount} classmatesCount={classmatesCount} />
+            <QuickMetaRow module={module} upcomingTasksCount={upcomingTasksCount} />
+            <ClassmatesLink module={module} classmatesCount={classmatesCount} />
             <CardActions isTeacher={isTeacher} enrolled={enrolled} isCore={isCore}
                 onView={onView} onEdit={onEdit} onDelete={onDelete} onToggle={onToggle} onManageDeadlines={onManageDeadlines}  onManageReadings={onManageReadings}/>
         </div>
@@ -109,10 +113,6 @@ function getTutorImage(moduleData) {
         profile_photo_url: moduleData?.created_by_profile_photo_url,
         seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
     }, { allowGeneric: true });
-}
-
-function getInitials(name) {
-    return (name || 'T').split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase();
 }
 
 function handleImageError(e) {
@@ -141,7 +141,7 @@ function HeaderChips({ course, department }) {
     return (
         <div className={styles.headerChips}>
             {course && <span className={styles.courseText}>{course}</span>}
-            <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+            <span className={styles.departmentText}>{department}</span>
         </div>
     );
 }
@@ -151,11 +151,11 @@ function CardHeader({ module, enrolled, isCore }) {
     const course = getCourse(module.module_code, module.course);
     return (
         <div className={styles.cardHeader}>
-            <div className={styles.headerTopRow}>
-                <div className={styles.headerIdentity}><div className={styles.iconWrap}>📚</div></div>
-                <div className={styles.headerRight}><EnrolledBadge enrolled={enrolled} isCore={isCore} /><TutorAvatar module={module} /></div>
+            {enrolled && <EnrolledBadge enrolled={enrolled} isCore={isCore} />}
+            <div className={styles.headerChipsRow}>
+                <HeaderChips course={course} department={department} />
+                <TutorAvatar module={module} />
             </div>
-            <HeaderChips course={course} department={department} />
         </div>
     );
 }
@@ -172,15 +172,18 @@ function getScheduleBits(start_time) {
     return { day, time };
 }
 
-function QuickMeta({ module }) {
+function QuickMetaRow({ module, upcomingTasksCount }) {
     const { day, time } = getScheduleBits(module.start_time);
     const duration = module.start_time && module.end_time ? formatDuration(module.start_time, module.end_time) : "TBA";
-    const deadlinesCount = module.deadlines?.length || 0;
     return (
         <div className={styles.metaPills}>
             <MetaPill icon="📅" text={`${day} ${time}`} />
             <MetaPill icon="⏱️" text={duration} />
-            <MetaPill icon="🗂️" text={`${deadlinesCount} due`} />
+            {hasValidCount(upcomingTasksCount) && (
+                <span className={styles.taskChipInline}>
+                    📋 {upcomingTasksCount} assignment{upcomingTasksCount === 1 ? "" : "s"}
+                </span>
+            )}
         </div>
     );
 }
@@ -193,33 +196,14 @@ function hasValidCount(count) {
     return Number.isFinite(Number(count)) && Number(count) > 0;
 }
 
-function TasksChip({ moduleCode, count }) {
-    if (!hasValidCount(count)) return null;
-    const plural = count === 1 ? "" : "s";
-    return (
-        <EntityLinkChip to={`/tasks?module=${encodeURIComponent(moduleCode || "")}`}
-            className={styles.relatedChip} title="Open tasks linked to this module">
-            ✅ {count} upcoming task{plural}
-        </EntityLinkChip>
-    );
-}
-
-function ClassmatesChip({ moduleCode, count }) {
-    if (!hasValidCount(count)) return null;
-    return (
-        <EntityLinkChip to={`/users?module=${encodeURIComponent(moduleCode || "")}`}
-            className={styles.relatedChip} title="Find classmates in this module">
-            👥 {count} classmate{count === 1 ? "" : "s"}
-        </EntityLinkChip>
-    );
-}
-
-function RelatedLinks({ module, upcomingTasksCount, classmatesCount }) {
-    if (!hasValidCount(upcomingTasksCount) && !hasValidCount(classmatesCount)) return null;
+function ClassmatesLink({ module, classmatesCount }) {
+    if (!hasValidCount(classmatesCount)) return null;
     return (
         <div className={styles.relatedRow}>
-            <TasksChip moduleCode={module.module_code} count={upcomingTasksCount} />
-            <ClassmatesChip moduleCode={module.module_code} count={classmatesCount} />
+            <EntityLinkChip to={`/users?module=${encodeURIComponent(module.module_code || "")}`}
+                className={styles.relatedChip} title="Find classmates in this module">
+                👥 {classmatesCount} classmate{classmatesCount === 1 ? "" : "s"}
+            </EntityLinkChip>
         </div>
     );
 }
@@ -254,16 +238,20 @@ function StudentActions({ enrolled, isCore, onToggle, onView }) {
     );
 }
 
-function StudentAction({ enrolled, isCore, onToggle }) {
-    if (enrolled && isCore) {
-        return <span className={styles.coreTag}>📌 Core module</span>;
-    }
+function EnrollButton({ onToggle }) {
     return (
-        <button
-            className={enrolled ? styles.unenrollButton : styles.enrollButton}
-            onClick={onToggle}
-        >
-            {enrolled ? '× Leave Module' : '+ Enroll'}
-        </button>
+        <PrimaryButton className={styles.enrollPrimaryButton} onClick={onToggle} size="small" pill>
+            + Enrol
+        </PrimaryButton>
     );
+}
+
+function UnenrollButton({ onToggle }) {
+    return <button className={styles.unenrollButton} onClick={onToggle}>× Leave Module</button>;
+}
+
+function StudentAction({ enrolled, isCore, onToggle }) {
+    if (enrolled && isCore) return <span className={styles.coreTag}>📌 Core module</span>;
+    if (!enrolled) return <EnrollButton onToggle={onToggle} />;
+    return <UnenrollButton onToggle={onToggle} />;
 }

@@ -1,3 +1,4 @@
+/* Tests for CreateListModal component rendering and list creation */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CreateListModal from "../../../pages/Tasks/components/CreateListModal";

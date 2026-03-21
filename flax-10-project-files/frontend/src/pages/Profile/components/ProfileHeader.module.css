@@ -71,43 +71,8 @@
 }
 
 .btnEdit {
-  padding: 6px 14px;
-  background: var(--panel);
-  border: 1px solid var(--widget-border);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text);
-  font-family: inherit;
-  transition: background 0.2s;
-}
-
-.btnEdit:hover {
-  background: var(--hover);
-}
-
-.lastActivePulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--muted);
-  width: fit-content;
-}
-
-.lastActiveDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #35b66f;
-  box-shadow: 0 0 0 6px rgba(53, 182, 111, 0.15);
-  animation: activeDotPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes activeDotPulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(53, 182, 111, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(53, 182, 111, 0.15); }
+  min-width: 116px;
+  flex-shrink: 0;
 }
 
 .stats {
@@ -240,15 +205,6 @@
   font-weight: 500;
 }
 
-.mobileActivePulse {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  margin-bottom: 8px;
-  color: rgba(255,255,255,0.92);
-}
-
 .mobileRolePill {
   display: inline-flex;
   align-items: center;
@@ -269,21 +225,7 @@
 }
 
 .mobileBtnEdit {
-  padding: 8px 18px;
-  background: rgba(255,255,255,0.25);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 20px;
-  color: white;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: background 0.2s;
-}
-
-.mobileBtnEdit:active {
-  background: rgba(255,255,255,0.35);
+  min-width: 124px;
 }
 
 .mobileStatsGrid {

@@ -3,7 +3,6 @@
  */
 
 import AttendanceDonutChart from "./AttendanceDonutChart";
-import AttendanceLegend, { AttendanceLegendStat } from "./AttendanceLegend";
 import AttendancePercentLine from "./AttendancePercentLine";
 import { buildValueFormatter } from "../utils/attendanceChartUtils";
 import { computeAttendancePct } from "../utils/attendanceSummary";
@@ -27,7 +26,6 @@ function OverallAttendanceChartBody({ data, attended, missed, onSegmentClick }) 
     <>
       <AttendancePercentLine>{`${percent}% attended`}</AttendancePercentLine>
       <AttendanceDonutChart chart="overall" data={data} onSegmentClick={onSegmentClick} valueFormatter={buildValueFormatter(data, total)} />
-      <AttendanceLegend><AttendanceLegendStat className={styles.legendAttended}>{`Attended: ${attended}`}</AttendanceLegendStat><AttendanceLegendStat className={styles.legendMissed}>{`Missed: ${missed}`}</AttendanceLegendStat></AttendanceLegend>
     </>
   );
 }

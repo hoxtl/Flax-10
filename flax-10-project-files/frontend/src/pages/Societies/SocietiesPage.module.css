@@ -171,21 +171,22 @@
 }
 
 .ratificationPill {
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  background: transparent;
+  padding: 3px 10px;
+  border: 1.5px solid rgba(74, 52, 33, 0.1);
+  border-radius: 999px;
+  background: rgba(123, 103, 81, 0.07);
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: var(--font-body);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background 0.13s, border-color 0.13s, transform 0.1s;
 }
 
 .ratificationPill:hover {
-  background: var(--hover);
-  border-color: var(--primary);
+  background: rgba(123, 103, 81, 0.14);
+  border-color: rgba(74, 52, 33, 0.2);
+  transform: translateY(-1px);
 }
 
 .ratificationPillActive {

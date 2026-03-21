@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -54,6 +54,7 @@ import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
 import { useAutoResolveScheduleConflicts } from "./components/useAutoResolveScheduleConflicts";
+import AppToast from "../../components/common/AppToast/AppToast";
 
 function HomepageSkeleton() {
   return (
@@ -182,6 +183,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, []);
   useEffect(() => {
     getUpcomingDeadlines().then((list) => setUpcomingDeadlines(Array.isArray(list) ? list : [])).catch(() => setUpcomingDeadlines([]));
+  }, []);
+  useEffect(() => {
+    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
   }, []);
 
 
@@ -454,7 +458,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         await loadEvents();
         if (!options.silent) showToast("Event moved to next available window.");
       } catch {
-        showToast("Couldn't move event. Try again.");
+        if (!options.silent) showToast("Couldn't move event. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
@@ -495,7 +499,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           },
         });
       } catch {
-        showToast("Couldn't move to tomorrow. Try again.");
+        if (!options.silent) showToast("Couldn't move to tomorrow. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
@@ -1003,15 +1007,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
                   variant="primary"
                   size="small"
                   pill
-                  onClick={() => openQuickAddSchedule('schedule_manual')}
-                  aria-label="Open manual schedule quick add"
-                >
-                  🧩 Manual Schedule
-                </PrimaryButton>
-                <PrimaryButton
-                  variant="ghost"
-                  size="small"
-                  pill
                   onClick={() => openQuickAddSchedule('schedule_auto')}
                   aria-label="Open auto schedule quick add"
                 >
@@ -1157,27 +1152,16 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
         />
       )}
 
-      {!toastApi && fallbackToast && (
-        <div className={styles.toast} role="status" aria-live="polite">
-          <div>
-            <span className={styles.toastCheck}>✓</span>
-            <span>{fallbackToast.message}</span>
-          </div>
-          {fallbackToast.actionLabel && fallbackToast.onAction && (
-            <button
-              type="button"
-              onClick={async () => {
-                const action = fallbackToast.onAction;
-                setFallbackToast(null);
-                await action();
-              }}
-            >
-              {fallbackToast.actionLabel}
-            </button>
-          )}
-          <button type="button" onClick={() => setFallbackToast(null)}>✕</button>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {!toastApi && fallbackToast && (
+          <AppToast
+            message={fallbackToast.message}
+            actionLabel={fallbackToast.actionLabel}
+            onAction={fallbackToast.onAction}
+            onClose={() => setFallbackToast(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

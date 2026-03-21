@@ -8,6 +8,12 @@ import AppPage from "../../components/common/AppPage/AppPage";
 import { DiscoverSkeleton, DiscoverToolbar, UsersGrid } from "./DiscoverComponents";
 import { useDiscoverSearch } from "./discoverHooks";
 
+const discoverSubtitle = (
+    <>
+        Find <em>King's students</em>, <em>course mates</em>, and <em>professors</em> across your subjects.
+    </>
+);
+
 function DiscoverContent({ showLoader, users, onNavChange, loading, currentPage, totalPages, setCurrentPage, searchQuery, setSearchQuery }) {
     if (showLoader) return <DiscoverSkeleton />;
     return <UsersGrid users={users} onNavChange={onNavChange} loading={loading} currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />;
@@ -18,7 +24,7 @@ export default function Discover({ onNavChange }) {
     const showLoader = state.loading && state.users.length === 0;
     return (
         <ErrorBoundary>
-            <AppPage className={styles.container} title="Discover" subtitle="Find course mates and study partners">
+            <AppPage className={styles.container} title="Discover" subtitle={discoverSubtitle}>
                 <DiscoverToolbar searchQuery={state.searchQuery} setSearchQuery={state.setSearchQuery} filterRef={state.filterRef} filterState={state.filterState} sortBy={state.sortBy} setSortBy={state.setSortBy} />
                 <DiscoverContent showLoader={showLoader} users={state.users} onNavChange={onNavChange} loading={state.loading} currentPage={state.currentPage} totalPages={state.totalPages} setCurrentPage={state.setCurrentPage} searchQuery={state.searchQuery} setSearchQuery={state.setSearchQuery} />
             </AppPage>

@@ -1,4 +1,4 @@
-/** Styles for module details hero section with title, chips, and tutor info. */
+/* Styles for the module details hero section. */
 .hero {
     background: var(--surface-card);
     border: var(--stroke-soft);

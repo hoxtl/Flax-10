@@ -1,3 +1,4 @@
+/* Tests for TaskCard component rendering and user interactions */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -24,6 +25,7 @@ vi.mock("../../../../lib/completionMessages", () => ({
   isRoutineTask: () => false,
 }));
 vi.mock("../../../../api/userService", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
+vi.mock("../../../../api/readingApi", () => ({ getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true }) }));
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() }),
 }));

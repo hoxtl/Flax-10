@@ -20,6 +20,11 @@ import styles from "./SocietiesPage.module.css";
 import extraStyles from "./SocietiesPageExtras.module.css";
 
 const pageStyles = { ...styles, ...extraStyles };
+const societiesSubtitle = (
+    <>
+        Keep up with <em>King's societies</em>, <em>committees</em>, and <em>student communities</em>.
+    </>
+);
 
 const PAGE_SIZE = 15;
 
@@ -101,7 +106,7 @@ function MySocietiesView({ state }) {
     const filtered = filterSocieties(state.societies, search);
     const tabs = buildTabs(filtered, state.societies, state);
     return (
-        <AppPage className={pageStyles.container} title="Societies" subtitle="Your communities at King's College London">
+        <AppPage className={pageStyles.container} title="Societies" subtitle={societiesSubtitle}>
             <Tabs
                 tabs={tabs}
                 activeTab={activeTab}

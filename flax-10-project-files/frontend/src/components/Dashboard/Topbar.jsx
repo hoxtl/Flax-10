@@ -11,7 +11,7 @@ import {
   Calendar,
   Clock,
 } from "lucide-react";
-import { SegmentedControl } from "../ui/SegmentedControl";
+import { SegmentedControl } from "../common";
 import AnimatedDropdown from "../common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion } from "framer-motion";
@@ -74,9 +74,10 @@ function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChan
 }
 
 const NAV_SECTIONS = [
-  { title: "Plan", ids: ["calendar", "tasks", "timer", "analytics"] },
+  { title: "Plan", ids: ["calendar", "tasks", "timer"] },
   { title: "Study", ids: ["modules", "group-work"] },
   { title: "My KCL", ids: ["map", "societies", "users"] },
+  { title: "My Insights", ids: ["analytics", "attendance"] },
   { title: "Admin", ids: ["admin"] }
 ];
 

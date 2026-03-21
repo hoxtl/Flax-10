@@ -180,14 +180,17 @@
 
 .dnaLegend {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
 }
 
 .dnaLegendItem {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  width: 100%;
 }
 
 .dnaDot {

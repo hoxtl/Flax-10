@@ -1,3 +1,7 @@
+/*
+ * Timer feature file.
+ */
+
 import styles from './TreeAnimation.module.css';
 
 const Pixel = ({ x, y, cls }) => <rect x={x} y={y} width="1" height="1" className={cls} />;

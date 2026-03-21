@@ -4,8 +4,7 @@
 
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import AppPage from '../../components/common/AppPage/AppPage';
-import Tabs from '../../components/common/Tabs/Tabs';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { TabBar, TabContent, SegmentedControl } from '../../components/common';
 import AnalyticsOverview from './components/AnalyticsOverview';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
@@ -14,14 +13,28 @@ import { PERIODS, TABS } from './pageConfig';
 import { useAnalyticsPageState } from './pageState';
 import styles from './AnalyticsPage.module.css';
 
+const analyticsSubtitle = (
+  <>
+    See your <em>study patterns</em>, <em>focus habits</em>, and <em>performance trends</em>.
+  </>
+);
+
 const getOverviewContent = (loading, data, progressData, themeStats) =>
   (!loading && data ? <AnalyticsOverview data={data} progressData={progressData} themeStats={themeStats} /> : null);
 
 const getTabContent = (loading, period) => (!loading ? <AIInsightsTab period={period} /> : null);
 
 const getTabs = (loading, period, data, progressData, themeStats) => [
-  { ...TABS[0], content: getOverviewContent(loading, data, progressData, themeStats) },
-  { ...TABS[1], content: getTabContent(loading, period) },
+  {
+    ...TABS[0],
+    label: <span className={styles.tabLabel}><span>{TABS[0].icon}</span> {TABS[0].label}</span>,
+    content: getOverviewContent(loading, data, progressData, themeStats)
+  },
+  {
+    ...TABS[1],
+    label: <span className={styles.tabLabel}><span>{TABS[1].icon}</span> {TABS[1].label}</span>,
+    content: getTabContent(loading, period)
+  },
 ];
 
 function ErrorBanner({ error }) {
@@ -41,12 +54,14 @@ export default function AnalyticsPage() {
       width="xl"
       className={styles.page}
       title="Analytics"
-      subtitle="Your study patterns & performance"
-      action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}
-    >
+      subtitle={analyticsSubtitle}
+      action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}>
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
+      <TabBar tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" variant="heading" />
+      <TabContent activeTab={activeTab}>
+        {tabs.find(t => t.id === activeTab)?.content}
+      </TabContent>
       <BackToTop />
     </AppPage>
   );

@@ -43,11 +43,12 @@ const TIER_LABEL = { gold: "🥇 Gold", silver: "🥈 Silver", bronze: "🥉 Bro
 
 function BadgeTile({ badge, earned }) {
   const t = TIER_COLOR[badge.tier];
+  const tooltip = earned ? badge.description : `Locked: ${badge.description}`;
   return (
     <div
       className={`${styles.tile} ${earned ? styles.tileEarned : styles.tileLocked}`}
       style={earned ? { background: t.bg, borderColor: t.border } : {}}
-      title={earned ? badge.description : `🔒 ${badge.description}`}
+      data-tooltip={tooltip}
     >
       <span className={styles.tileEmoji} style={{ opacity: earned ? 1 : 0.25 }}>{earned ? badge.emoji : "🔒"}</span>
       <span className={styles.tileLabel} style={{ color: earned ? "var(--text)" : "var(--muted)" }}>{badge.label}</span>
@@ -58,6 +59,7 @@ function BadgeTile({ badge, earned }) {
 }
 
 function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
+  const progressWidth = totalBadges > 0 ? `${(totalEarned / totalBadges) * 100}%` : "0%";
   return (
     <div className={styles.header}>
       <div>
@@ -65,7 +67,7 @@ function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
         <p className={styles.subtitle}>{totalEarned} / {totalBadges} unlocked</p>
       </div>
       <div className={styles.progressWrap}>
-        <div className={styles.progressBar} style={{ width: `${(totalEarned / totalBadges) * 100}%` }} />
+        <div className={styles.progressBar} style={{ width: progressWidth }} />
       </div>
       <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
     </div>
@@ -90,11 +92,15 @@ function CategorySection({ cat, earnedIds }) {
 
 export default function AchievementsModal({ badges, onClose }) {
   const earnedIds = new Set((badges || []).map(b => b.id));
+  const totalBadges = ALL_BADGES.length;
+  const totalEarned = ALL_BADGES.filter((badge) => earnedIds.has(badge.id)).length;
+
   useEffect(() => {
     const handler = e => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
+
   return (
     <StandardModal
       onClose={onClose}
@@ -104,44 +110,11 @@ export default function AchievementsModal({ badges, onClose }) {
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
-        {/* Header */}
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.title}>Achievements</h2>
-            <p className={styles.subtitle}>
-              {totalEarned} / {totalBadges} unlocked
-            </p>
-          </div>
-          {/* Progress bar */}
-          <div className={styles.progressWrap}>
-            <div
-              className={styles.progressBar}
-              style={{ width: `${(totalEarned / totalBadges) * 100}%` }}
-            />
-          </div>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
-        </div>
+      <AchievementsHeader totalEarned={totalEarned} totalBadges={totalBadges} onClose={onClose} />
 
-        {/* Body */}
-        <div className={styles.body}>
-          {CATEGORIES.map(cat => {
-            const catBadges = ALL_BADGES.filter(b => b.category === cat);
-            const catEarned = catBadges.filter(b => earnedIds.has(b.id)).length;
-            return (
-              <div key={cat} className={styles.category}>
-                <div className={styles.catHeader}>
-                  <span className={`${styles.catName} ${styles.catNameEmphasis}`}>{cat}</span>
-                  <span className={styles.catCount}>{catEarned}/{catBadges.length}</span>
-                </div>
-                <div className={styles.grid}>
-                  {catBadges.map(b => (
-                    <BadgeTile key={b.id} badge={b} earned={earnedIds.has(b.id)} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div className={styles.body}>
+        {CATEGORIES.map((cat) => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}
+      </div>
     </StandardModal>
   );
 }

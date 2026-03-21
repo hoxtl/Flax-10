@@ -48,6 +48,7 @@ function UserSearchLayout({
   fullWidth,
   hideFilter,
   compact,
+  renderEmptyState,
 }) {
   const handleSelect = (user) =>
     handleUserSelect(user, onUserSelect, setIsSearchFocused, searchState);
@@ -69,6 +70,7 @@ function UserSearchLayout({
         handleSelect={handleSelect}
         fullWidth={fullWidth}
         compact={compact}
+        renderEmptyState={renderEmptyState}
       />
       {!hideFilter && (
         <FilterSection
@@ -88,6 +90,7 @@ export default function UserSearch({
   fullWidth,
   hideFilter,
   compact,
+  renderEmptyState,
 }) {
   const searchState = useSearchState(hideFilter);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -117,6 +120,7 @@ export default function UserSearch({
       fullWidth={fullWidth}
       hideFilter={hideFilter}
       compact={compact}
+      renderEmptyState={renderEmptyState}
     />
   );
 }

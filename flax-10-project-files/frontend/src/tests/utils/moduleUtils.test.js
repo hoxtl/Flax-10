@@ -1,3 +1,6 @@
+/*
+ * Tests for module utility functions.
+ */
 import { describe, it, expect } from 'vitest';
 import {
     getDepartment, isEnrolledIn, getEnrollmentId, serialiseModule,
@@ -149,6 +152,11 @@ describe('moduleUtils', () => {
         it('filters by enrolled mode', () => {
             const result = filterModules(modules, enrollments, '', 'enrolled');
             expect(result).toHaveLength(2);
+        });
+        it('can exclude enrolled modules in browse mode', () => {
+            const result = filterModules(modules, enrollments, '', 'all', { excludeEnrolled: true });
+            expect(result).toHaveLength(1);
+            expect(result[0].id).toBe(3);
         });
     });
 
