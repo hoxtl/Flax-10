@@ -274,8 +274,3 @@ textarea.cellInput {
   background: var(--input-bg);
   color: var(--text);
 }
-
-.autocompleteCell input:focus {
-  outline: none;
-  border-color: var(--primary);
-}
