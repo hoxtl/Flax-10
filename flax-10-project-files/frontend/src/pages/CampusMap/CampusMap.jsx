@@ -242,6 +242,7 @@ export default function CampusMap() {
   const handleClearCampus = () => {
     setSelectedCampus(null);
     setCustomDestination(null);
+    setManualDestination("");
     setRouteInfo(null);
     setTflRouteInfo(null);
     resetRoute();
