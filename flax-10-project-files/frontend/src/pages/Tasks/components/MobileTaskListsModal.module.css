@@ -12,6 +12,18 @@
   color: var(--muted);
 }
 
+.sectionDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.sectionEmpty {
+  margin: 4px 2px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
 .listWrap {
   display: flex;
   flex-direction: column;
