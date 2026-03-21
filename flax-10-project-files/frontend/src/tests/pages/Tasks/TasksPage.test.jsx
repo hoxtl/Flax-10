@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for TasksPage: loading state, main layout, toasts, modals.
  */
 

@@ -1,3 +1,4 @@
+/* Tests for SuggestedReadingsSection component data fetching and rendering */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
@@ -38,7 +39,7 @@ describe("SuggestedReadingsSection", () => {
       />
     );
 
-    expect(await screen.findByText("Suggested Reading List")).toBeInTheDocument();
+    expect(await screen.findByText("Suggested reading list")).toBeInTheDocument();
     expect(screen.getByText("Core Principles")).toBeInTheDocument();
     expect(screen.queryByText("PH4505 Astrophysics")).not.toBeInTheDocument();
   });
