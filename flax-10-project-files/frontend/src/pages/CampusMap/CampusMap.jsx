@@ -129,7 +129,7 @@ export default function CampusMap() {
       .addTo(map.current);
     const isHomeStart = startLocation && Math.abs(startLocation.lat - userHome.lat) < 0.0001 && Math.abs(startLocation.lng - userHome.lng) < 0.0001;
     if (!isHomeStart) homePointer.current.togglePopup();
-    setTimeout(() => wireHomeButton(userHome, homePointer, map, setStartLocation), 100);
+    setTimeout(() => wireHomeButton(userHome, homePointer, map, setStartLocation, setManualStart), 100);
   }, [userHome, mapLoaded, startLocation]);
 
   useEffect(() => {
