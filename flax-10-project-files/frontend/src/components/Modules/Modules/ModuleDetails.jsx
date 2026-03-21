@@ -150,6 +150,7 @@ function ScheduleCard({ module, nextClass }) {
                 <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} className={scheduleStyles.scheduleItemCompact} />
             </div>
             {module.recurrence_rule && <RecurringBadge />}
+            <TravelTimeIndicator duration={travelTime} />
         </article>
     );
 }
