@@ -21,6 +21,7 @@ vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     filterModules: vi.fn((modules) => modules),
     applyFiltersAndSort: vi.fn((modules) => modules),
     getDepartments: vi.fn(() => []),
+    normaliseModuleCode: vi.fn((code) => String(code || '').toUpperCase().replace(/\s+/g, '')),
 }));
 vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (

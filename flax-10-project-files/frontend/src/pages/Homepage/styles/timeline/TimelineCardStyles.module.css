@@ -1,55 +1,4 @@
 /* Gutter, card styles, categories, empty slots. */
-
-  .gutter {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-start;
-    gap: 1px;
-    padding-top: 10px;
-    padding-right: 8px;
-    width: 80px;
-    min-width: 80px;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .gutter::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    margin-left: -4px;
-    top: 14px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--primary);
-    border: 2px solid var(--bg);
-    box-shadow: 0 0 0 1px var(--border);
-    z-index: 2;
-  }
-
-  .gutterTime {
-    font-size: 0.6rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-slate-400);
-    opacity: 0.85;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-  }
-
-  .gutterDur {
-    font-size: 0.6rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-slate-400);
-    opacity: 0.85;
-    font-variant-numeric: tabular-nums;
-  }
-
   .pastBar {
     margin: 2px 8px 2px 2px;
     min-height: 10px;
@@ -58,9 +7,6 @@
     transition: opacity 0.15s;
   }
   .pastBar:hover { opacity: 0.9; }
-
-  .spine { display: flex; flex-shrink: 0; width: 56px; }
-  .spineTime, .spineTrack, .spineLine, .spineNode, .spineNodeDash { display: none; }
 
   .card {
     margin: 2px 8px 12px 0;

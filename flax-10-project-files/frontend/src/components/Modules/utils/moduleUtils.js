@@ -1,4 +1,4 @@
-/** Utility functions for module filtering, sorting, formatting, and data transformations. */
+/* Utility functions for module filtering, sorting, formatting, and data transformations. */
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
@@ -107,6 +107,10 @@ export function isEnrolledIn(module_id, enrollments) {
 export function getEnrollmentId(module_id, enrollments) {
     const enrollment = enrollments.find(e => e.module === module_id);
     return enrollment ? enrollment.id : null;
+}
+
+export function normaliseModuleCode(code) {
+    return String(code || '').toUpperCase().replace(/\s+/g, '');
 }
 
 export function serialiseModule(form_data) {

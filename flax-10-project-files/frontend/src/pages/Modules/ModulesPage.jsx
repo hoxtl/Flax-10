@@ -5,18 +5,17 @@ import { AnimatePresence } from 'framer-motion';
 import AppPage from '../../components/common/AppPage/AppPage';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 import PageTransition from '../../components/common/PageTransition/PageTransition.jsx';
-import { filterModules } from '../../components/Modules/utils/moduleUtils.js';
+import { filterModules, isEnrolledIn, normaliseModuleCode } from '../../components/Modules/utils/moduleUtils.js';
 import useModules from '../../components/Modules/hooks/useModules.js';
 import ModuleForm from '../../components/Modules/Modules/ModuleForm.jsx';
 import ModuleDetails from '../../components/Modules/Modules/ModuleDetails.jsx';
 import DeadlineModal from '../../components/Modules/Deadlines/DeadlineModal.jsx';
 import useModuleSorting from '../../components/Modules/hooks/useModuleSorting.js';
-import { SegmentedControl } from '../../components/ui/SegmentedControl';
+import { SegmentedControl } from '../../components/common/SegmentedControl/SegmentedControl.jsx';
 import Tabs from '../../components/common/Tabs/Tabs';
 import { BackToTop } from '../../components/Pagination/Pagination.jsx';
 import ReadingModal from '../../components/Modules/Readings/ReadingModal.jsx';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
-import SearchEmptyState from '../../components/common/SearchEmptyState/SearchEmptyState.jsx';
 import MyModulesDashboard from './MyModulesDashboard.jsx';
 import { ModuleToolbar, EnrollmentToolbar, EnrollmentGrid, ModuleResults } from './ModulesPageParts.jsx';
 import styles from './ModulesPage.module.css';
@@ -43,85 +42,81 @@ function usePageState(initialSearch, initialCreate, searchParams) {
     };
 }
 
-function useModulesPage(initialSearch = '', initialCreate = false) {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const st = usePageState(initialSearch, initialCreate, searchParams);
-    const [search_query, setSearchQuery] = st.search;
-    const [filter_mode, setFilterMode] = st.filter;
-    const [show_form, setShowForm] = st.form;
-    const [editing_module, setEditingModule] = st.editing;
-    const [viewing_module, setViewingModule] = st.viewing;
-    const [deadline_module, setDeadlineModule] = st.deadline;
-    const [reading_module, setReadingModule] = st.reading;
-    const hook = useModules();
-    const codeFromUrl = searchParams.get('code'), moduleIdFromUrl = searchParams.get('moduleId');
-
-    useEffect(() => {
-        if (!initialSearch || codeFromUrl || moduleIdFromUrl || !hook.modules?.length) return;
-        const match = hook.modules.find(m => m.module_code?.toLowerCase() === initialSearch.toLowerCase());
-        if (match) setViewingModule(match);
-    }, [initialSearch, modules, codeFromUrl, moduleIdFromUrl, setViewingModule]);
-}
-
 function handleModuleIdMatch(moduleIdFromUrl, modules, setViewingModule, searchParams, setSearchParams) {
     const match = modules.find((m) => m.id === Number(moduleIdFromUrl));
     if (!match) return false;
     setViewingModule(match);
     const next = new URLSearchParams(searchParams);
     next.delete('moduleId');
-    setSearchParams(next.toString(), { replace: true });
+    setSearchParams(next, { replace: true });
     return true;
 }
 
+function handleModuleCodeMatch(codeFromUrl, modules, setViewingModule, setSearchQuery, setSearchParams) {
+    const match = modules.find((m) => normaliseModuleCode(m.module_code) === normaliseModuleCode(codeFromUrl));
+    if (match) {
+        setViewingModule(match);
+        setSearchParams({}, { replace: true });
+        return;
+    }
+    setSearchQuery(codeFromUrl.trim());
+    setSearchParams({}, { replace: true });
+}
+
+function useInitialSearchMatch(initialSearch, codeFromUrl, moduleIdFromUrl, modules, setViewingModule) {
+    useEffect(() => {
+        if (!initialSearch || codeFromUrl || moduleIdFromUrl || !modules?.length) return;
+        const match = modules.find((module) => normaliseModuleCode(module.module_code) === normaliseModuleCode(initialSearch));
+        if (match) setViewingModule(match);
+    }, [initialSearch, codeFromUrl, moduleIdFromUrl, modules, setViewingModule]);
+}
+
+function useUrlModuleMatch(codeFromUrl, moduleIdFromUrl, hook, setViewingModule, setSearchQuery, searchParams, setSearchParams) {
     useEffect(() => {
         if (!codeFromUrl && !moduleIdFromUrl) return;
         if (hook.loading || !hook.modules) return;
-        if (moduleIdFromUrl) {
-            const match = hook.modules.find(m => m.id === Number(moduleIdFromUrl));
-            if (match) {
-                setViewingModule(match);
-                const next = new URLSearchParams(searchParams);
-                next.delete('moduleId');
-                setSearchParams(next.toString(), { replace: true });
-                return;
-            }
-        }
-        if (codeFromUrl) {
-            const norm = (s) => (s || '').toUpperCase().replace(/\s/g, '');
-            const match = hook.modules?.find(m => norm(m.module_code) === norm(codeFromUrl));
-            if (match) { setViewingModule(match); setSearchParams({}, { replace: true }); }
-            else { setSearchQuery(codeFromUrl.trim()); setSearchParams({}, { replace: true }); }
-        }
+        if (moduleIdFromUrl && handleModuleIdMatch(moduleIdFromUrl, hook.modules, setViewingModule, searchParams, setSearchParams)) return;
+        if (codeFromUrl) handleModuleCodeMatch(codeFromUrl, hook.modules, setViewingModule, setSearchQuery, setSearchParams);
     }, [codeFromUrl, moduleIdFromUrl, hook.loading, hook.modules, searchParams, setSearchParams, setViewingModule, setSearchQuery]);
+}
 
+function resetPageState(setters, setSearchParams) {
+    setters.setViewingModule(null);
+    setters.setEditingModule(null);
+    setters.setShowForm(false);
+    setters.setDeadlineModule(null);
+    setters.setReadingModule(null);
+    setters.setSearchQuery('');
+    setters.setFilterMode('all');
+    setSearchParams({}, { replace: true });
+}
+
+function useShowAllListener(setters, setSearchParams) {
     useEffect(() => {
-        const showAll = () => {
-            Object.values(setters).forEach(fn => fn(null));
-            setters.setSearchQuery('');
-            setters.setFilterMode('all');
-            setSearchParams({}, { replace: true });
-        };
+        const showAll = () => resetPageState(setters, setSearchParams);
         window.addEventListener('modules:show-all', showAll);
         return () => window.removeEventListener('modules:show-all', showAll);
-    }, [setSearchParams, setters]);
+    }, [setters, setSearchParams]);
 }
 
 function useModulesPage(initialSearch = '', initialCreate = false) {
     const [searchParams, setSearchParams] = useSearchParams();
-    const ps = usePageState(initialSearch, initialCreate, searchParams);
-    const [search_query, setSearchQuery] = ps.search;
-    const [filter_mode, setFilterMode] = ps.filter;
-    const [show_form, setShowForm] = ps.form;
-    const [editing_module, setEditingModule] = ps.editing;
-    const [viewing_module, setViewingModule] = ps.viewing;
-    const [deadline_module, setDeadlineModule] = ps.deadline;
-    const [reading_module, setReadingModule] = ps.reading;
+    const pageState = usePageState(initialSearch, initialCreate, searchParams);
+    const [search_query, setSearchQuery] = pageState.search;
+    const [filter_mode, setFilterMode] = pageState.filter;
+    const [show_form, setShowForm] = pageState.form;
+    const [editing_module, setEditingModule] = pageState.editing;
+    const [viewing_module, setViewingModule] = pageState.viewing;
+    const [deadline_module, setDeadlineModule] = pageState.deadline;
+    const [reading_module, setReadingModule] = pageState.reading;
     const hook = useModules();
-    const [codeFromUrl, moduleIdFromUrl] = [searchParams.get('code'), searchParams.get('moduleId')];
+    const codeFromUrl = searchParams.get('code');
+    const moduleIdFromUrl = searchParams.get('moduleId');
+    const setters = { setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule, setSearchQuery, setFilterMode };
     useInitialSearchMatch(initialSearch, codeFromUrl, moduleIdFromUrl, hook.modules, setViewingModule);
     useUrlModuleMatch(codeFromUrl, moduleIdFromUrl, hook, setViewingModule, setSearchQuery, searchParams, setSearchParams);
-    useShowAllListener({ setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule, setSearchQuery, setFilterMode }, setSearchParams);
-    return { is_teacher: ps.is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook, reading_module, setReadingModule };
+    useShowAllListener(setters, setSearchParams);
+    return { is_teacher: pageState.is_teacher, search_query, setSearchQuery, filter_mode, setFilterMode, show_form, setShowForm, editing_module, setEditingModule, viewing_module, setViewingModule, deadline_module, setDeadlineModule, hook, reading_module, setReadingModule };
 }
 
 function useMainViewData(state) {
@@ -193,12 +188,11 @@ function TestModeContent({ state }) {
 }
 
 function AnimatedContent({ state, viewKey }) {
-    const { sorting, search } = useMainView(state);
     return (
         <AnimatePresence mode="wait" initial={false}>
             {state.show_form && <PageTransition key={viewKey}><FormView state={state} /></PageTransition>}
             {!state.show_form && state.viewing_module && <PageTransition key={viewKey}><DetailsView state={state} /></PageTransition>}
-            {!state.show_form && !state.viewing_module && <PageTransition key={viewKey}><MainView state={state} sorting={sorting} search={search} /></PageTransition>}
+            {!state.show_form && !state.viewing_module && <PageTransition key={viewKey}><MainView state={state} /></PageTransition>}
         </AnimatePresence>
     );
 }

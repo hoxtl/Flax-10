@@ -1,5 +1,6 @@
-/** Module card component displaying module info, enrollment status, and actions. */
-import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
+/* Module card component displaying module info, enrolment status, and actions. */
+import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import GridCard from '../../common/Card/GridCard';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
@@ -25,10 +26,6 @@ function getCardClass(enrolled, is_teacher) {
     return cls;
 }
 
-function normalizeModuleCode(code) {
-    return String(code || "").toUpperCase().replace(/\s+/g, "");
-}
-
 function getModuleAssignmentCount(module, taskCountsByModule) {
     const explicitCount = [
         module?.assignments_count,
@@ -42,7 +39,7 @@ function getModuleAssignmentCount(module, taskCountsByModule) {
     if (Number.isFinite(Number(explicitCount))) return Number(explicitCount);
     if (Array.isArray(module?.deadlines)) return module.deadlines.length;
 
-    return taskCountsByModule[normalizeModuleCode(module?.module_code)] || 0;
+    return taskCountsByModule[normaliseModuleCode(module?.module_code)] || 0;
 }
 
 function resolveClassmatesCount(module) {
@@ -114,10 +111,6 @@ function getTutorImage(moduleData) {
         profile_photo_url: moduleData?.created_by_profile_photo_url,
         seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
     }, { allowGeneric: true });
-}
-
-function getInitials(name) {
-    return (name || 'T').split(/\s+/).filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase();
 }
 
 function handleImageError(e) {
