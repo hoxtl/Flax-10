@@ -102,6 +102,7 @@ function TaskFeedSubHeader({
     onOpenLists,
   };
   const handleMobileFilterChange = (nextFilter) => {
+    data.clearAllFilters?.();
     onSelectList?.(null);
     onSelectFilter?.(nextFilter);
   };
