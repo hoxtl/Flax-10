@@ -1,101 +1,17 @@
-/**
- * Filter panel for the TaskFeed. Renders a toggle button that opens a
- * floating panel with list and module checkboxes.
+/*
+ * Shared filter popover wrapper used by tasks and the timer task picker.
  */
 
 import { useRef, useEffect, useCallback } from "react";
-import { Filter, Search } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import styles from "./TaskFeedFilter.module.css";
+import { Filter } from "lucide-react";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 
-const PANEL_TRANSITION = { duration: 0.2, ease: [0.22, 1, 0.36, 1] };
+import TaskFilterPanel from "./TaskFilterPanel";
+import styles from "./TaskFeedToolbar.module.css";
 
-/**
- * @param {object}   props
- * @param {boolean}  props.isOpen
- * @param {Function} props.onToggle
- * @param {number}   props.activeFilterCount
- * @param {string}   props.activeFilterTab
- * @param {Function} props.onTabChange
- * @param {string}   props.filterQuery
- * @param {Function} props.onFilterQueryChange
- * @param {object[]} props.visibleListItems
- * @param {string[]} props.filterListIds
- * @param {Function} props.onToggleList
- * @param {object}   props.groupedVisibleModuleItems
- * @param {string[]} props.moduleGroupKeys
- * @param {string[]} props.filterModuleCodes
- * @param {Function} props.onToggleModule
- * @param {Function} props.onClearAll
- */
-export default function TaskFeedFilterPanel({
-  isOpen, onToggle, activeFilterCount,
-  activeFilterTab, onTabChange,
-  filterQuery, onFilterQueryChange,
-  visibleListItems, filterListIds, onToggleList,
-  groupedVisibleModuleItems, moduleGroupKeys,
-  filterModuleCodes, onToggleModule,
-  onClearAll,
-}) {
-  const filterRef = useRef(null);
-  const hoverTimer = useRef(null);
-  useOutsideClick(filterRef, isOpen, onToggle);
-
-  const handleMouseEnter = useCallback(() => {
-    clearTimeout(hoverTimer.current);
-    if (!isOpen) onToggle();
-  }, [isOpen, onToggle]);
-
-  const handleMouseLeave = useCallback(() => {
-    hoverTimer.current = setTimeout(() => { if (isOpen) onToggle(); }, 200);
-  }, [isOpen, onToggle]);
-
-  useEffect(() => () => clearTimeout(hoverTimer.current), []);
-
+function FilterButton({ isOpen, count, onToggle }) {
   return (
-    <div className={styles.filterPanelWrap} ref={filterRef}
-      onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <FilterButton onClick={onToggle} isOpen={isOpen} count={activeFilterCount} />
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className={styles.filterPanel}
-            role="dialog"
-            aria-label="Task filters"
-            onClick={e => e.stopPropagation()}
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={PANEL_TRANSITION}
-            style={{ originY: 0, originX: 1 }}
-          >
-            <FilterTabs activeTab={activeFilterTab} onTabChange={onTabChange} />
-            <FilterSearch value={filterQuery} onChange={onFilterQueryChange} tab={activeFilterTab} />
-            <div className={styles.filterListContainer}>
-              {activeFilterTab === "lists"
-                ? <ListFilterItems items={visibleListItems} selectedIds={filterListIds} onToggle={onToggleList} />
-                : <ModuleFilterGroups groups={groupedVisibleModuleItems} keys={moduleGroupKeys} selected={filterModuleCodes} onToggle={onToggleModule} />
-              }
-            </div>
-            <div className={styles.filterActions}>
-              <button type="button" className={styles.filterClearBtn} onClick={onClearAll}>Clear all</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function FilterButton({ onClick, isOpen, count }) {
-  return (
-    <button
-      type="button"
-      className={styles.filterBtn}
-      onClick={onClick}
-      aria-haspopup="dialog"
-      aria-expanded={isOpen}
-    >
+    <button type="button" className={styles.filterBtn} onClick={onToggle} aria-haspopup="dialog" aria-expanded={isOpen}>
       <Filter size={14} />
       <span>Filter</span>
       {count > 0 && <span className={styles.filterCount}>{count}</span>}
@@ -103,85 +19,21 @@ function FilterButton({ onClick, isOpen, count }) {
   );
 }
 
-function FilterTabs({ activeTab, onTabChange }) {
+function useHoverPanel(isOpen, onToggle) {
+  const hoverTimer = useRef(null);
+  const onMouseEnter = useCallback(() => { clearTimeout(hoverTimer.current); if (!isOpen) onToggle(); }, [isOpen, onToggle]);
+  const onMouseLeave = useCallback(() => { hoverTimer.current = setTimeout(() => { if (isOpen) onToggle(); }, 200); }, [isOpen, onToggle]);
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+  return { onMouseEnter, onMouseLeave };
+}
+
+export default function TaskFeedFilterPanel({ isOpen, onToggle, activeFilterCount, activeFilterTab, onTabChange, filterQuery, onFilterQueryChange, visibleListItems, filterListIds, onToggleList, groupedVisibleModuleItems, moduleGroupKeys, filterModuleCodes, onToggleModule, onClearAll, containerRef = null }) {
+  const hoverProps = useHoverPanel(isOpen, onToggle);
+  const panelProps = { activeFilterTab, onTabChange, filterQuery, onQueryChange: onFilterQueryChange, visibleListItems, filterListIds, onToggleList, moduleGroupKeys, groupedModuleItems: groupedVisibleModuleItems, filterModuleCodes, onToggleModule, onClearAll };
   return (
-    <div className={styles.filterTabs}>
-      <button type="button" className={`${styles.filterTab} ${activeTab === "lists" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("lists")}>Lists</button>
-      <button type="button" className={`${styles.filterTab} ${activeTab === "modules" ? styles.filterTabActive : ""}`} onClick={() => onTabChange("modules")}>Modules</button>
+    <div ref={containerRef} className={styles.filterPanelWrap} {...hoverProps}>
+      <FilterButton isOpen={isOpen} count={activeFilterCount} onToggle={onToggle} />
+      <AnimatePresence>{isOpen && <Motion.div className={styles.filterPanel} role="dialog" aria-label="Task filters" onClick={(event) => event.stopPropagation()} initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} style={{ originY: 0, originX: 1 }}><TaskFilterPanel {...panelProps} /></Motion.div>}</AnimatePresence>
     </div>
   );
-}
-
-function FilterSearch({ value, onChange, tab }) {
-  return (
-    <div className={styles.filterSearchWrap}>
-      <Search size={14} className={styles.filterSearchIcon} />
-      <input
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        className={styles.filterSearchInput}
-        placeholder={`Search ${tab}...`}
-      />
-    </div>
-  );
-}
-
-function ListFilterItems({ items, selectedIds, onToggle }) {
-  if (items.length === 0) return <p className={styles.filterEmptyText}>No lists found.</p>;
-  return (
-    <div className={styles.filterItems}>
-      {items.map(item => (
-        <FilterCheckbox
-          key={item.value}
-          label={item.label}
-          checked={(selectedIds || []).map(String).includes(String(item.value))}
-          onChange={() => onToggle(item.value)}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ModuleFilterGroups({ groups, keys, selected, onToggle }) {
-  if (keys.length === 0) return <p className={styles.filterEmptyText}>No modules found.</p>;
-  return (
-    <div className={styles.filterGroups}>
-      {keys.map(group => (
-        <div key={group} className={styles.filterGroup}>
-          <h4 className={styles.filterGroupTitle}>{group}</h4>
-          <div className={styles.filterItems}>
-            {(groups[group] || []).map(item => (
-              <FilterCheckbox
-                key={item.value}
-                label={item.label}
-                checked={selected.includes(String(item.value))}
-                onChange={() => onToggle(item.value)}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function FilterCheckbox({ label, checked, onChange }) {
-  return (
-    <label className={styles.filterItemRow}>
-      <input type="checkbox" checked={checked} onChange={onChange} />
-      <span>{label}</span>
-    </label>
-  );
-}
-
-function useOutsideClick(ref, active, onClose) {
-  useEffect(() => {
-    if (!active) return;
-    const onDown = e => {
-      if (ref.current && !ref.current.contains(e.target)) onClose();
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [active, ref, onClose]);
 }

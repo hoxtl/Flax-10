@@ -1,3 +1,6 @@
+/*
+ * Tests for ReadingCard component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ReadingCard from '../../../components/Modules/Readings/ReadingCard';

@@ -671,7 +671,7 @@ describe('Homepage', () => {
     expect(mockRefetchTasks).toHaveBeenCalled();
   });
 
-  it('shows manual and auto schedule actions for today', async () => {
+  it('shows auto schedule action for today', async () => {
     const { isToday } = await import('../../components/Calendar/utils/dateUtils');
     isToday.mockReturnValue(true);
     render(
@@ -679,21 +679,7 @@ describe('Homepage', () => {
         <Homepage />
       </MemoryRouter>
     );
-    expect(screen.getByRole('button', { name: /Open manual schedule quick add/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Open auto schedule quick add/i })).toBeInTheDocument();
-  });
-
-  it('manual schedule action opens quick add in manual mode', async () => {
-    const { isToday } = await import('../../components/Calendar/utils/dateUtils');
-    const dispatchEventSpy = vi.spyOn(window, 'dispatchEvent');
-    isToday.mockReturnValue(true);
-    render(
-      <MemoryRouter>
-        <Homepage />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole('button', { name: /Open manual schedule quick add/i }));
-    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'quick-add:open', detail: { view: 'schedule_manual' } }));
   });
 
   it('auto schedule action opens quick add in auto mode', async () => {

@@ -22,7 +22,17 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
     class Meta:
         model = UserSettings
         fields = [
-            'theme', 'mode', 'timezone', 'year', 'major', 'major_locked', 
-            'sleep_time', 'wake_time', 'homepage_widgets', 'homepage_widget_sizes',
-            'preferred_study_minutes_per_day', 'week_preference', 'worktime_preference'
+            'theme',
+            'mode',
+            'timezone',
+            'year',
+            'major',
+            'major_locked',
+            'sleep_time',
+            'wake_time',
+            'homepage_widgets',
+            'homepage_widget_sizes',
+            'preferred_study_minutes_per_day',
+            'week_preference',
+            'worktime_preference',
         ]

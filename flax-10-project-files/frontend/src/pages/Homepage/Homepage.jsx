@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
 import { isToday, overlapsDay } from "../../components/Calendar/utils/dateUtils";
@@ -44,7 +43,7 @@ import {
   isRoutineOrEventTask,
 } from "./utils/index";
 import { useHomeData } from "./hooks/useHomeData";
-import { MiniTimeline, HomepageTimelineSection } from "./components";
+import { HomepageTimelineSection } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
@@ -54,6 +53,7 @@ import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import { useAutoResolveScheduleConflicts } from "./components/useAutoResolveScheduleConflicts";
 import AppToast from "../../components/common/AppToast/AppToast";
 
 function HomepageSkeleton() {
@@ -184,6 +184,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   }, []);
   useEffect(() => {
     getUpcomingDeadlines().then((list) => setUpcomingDeadlines(Array.isArray(list) ? list : [])).catch(() => setUpcomingDeadlines([]));
+  }, []);
+  useEffect(() => {
+    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
   }, []);
 
 
@@ -447,23 +450,23 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   );
 
   const handleConflictAutoMove = useCallback(
-    async (event, newStart, newEnd) => {
+    async (event, newStart, newEnd, options = {}) => {
       try {
         await editEvent(extractBaseEventId(event.id), {
           start_time: newStart.toISOString(),
           end_time: newEnd.toISOString(),
         });
         await loadEvents();
-        showToast("Event moved to next available window.");
+        if (!options.silent) showToast("Event moved to next available window.");
       } catch {
-        showToast("Couldn't move event. Try again.");
+        if (!options.silent) showToast("Couldn't move event. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
   );
 
   const handleConflictPushTomorrow = useCallback(
-    async (event) => {
+    async (event, options = {}) => {
       if (!event?.start_time) return;
       try {
         const baseId = extractBaseEventId(event.id);
@@ -479,6 +482,7 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           end_time: movedEnd.toISOString(),
         });
         await loadEvents();
+        if (options.silent) return;
         showToast(`"${event.title}" moved to tomorrow.`, {
           actionLabel: "Undo",
           durationMs: 7000,
@@ -496,11 +500,19 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
           },
         });
       } catch {
-        showToast("Couldn't move to tomorrow. Try again.");
+        if (!options.silent) showToast("Couldn't move to tomorrow. Try again.");
       }
     },
     [editEvent, loadEvents, showToast]
   );
+
+  useAutoResolveScheduleConflicts({
+    allEvents: allCalEvents,
+    selectedDate,
+    onConflictAutoMove: handleConflictAutoMove,
+    onPushTomorrow: handleConflictPushTomorrow,
+    enabled: true,
+  });
 
   const handleTimelineDelete = useCallback(
     async (eventLike) => {
@@ -999,7 +1011,6 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
               </div>
             )}
           </div>
-
 
           <BackToTop containerSelector="[data-dashboard-main]" />
         </>

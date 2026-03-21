@@ -1,7 +1,10 @@
-/** Detailed view of a single module with schedule, deadlines, and readings. */
+/*
+ * Detailed view of a single module with schedule, deadlines, and readings.
+ */
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
@@ -53,13 +56,6 @@ function getNextClassText(startTime, endTime) {
     const date = new Date(startTime);
     const day = date.toLocaleDateString("en-GB", { weekday: "long" });
     return `${day}, ${formatTime(startTime)} - ${formatTime(endTime)}`;
-}
-
-function getInitials(name) {
-    if (!name) return "TU";
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
 function getTutorImage(moduleData) {
@@ -244,10 +240,10 @@ function RecurringBadge() {
 function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
     return is_enrolled
         ? <button className={styles.unenrollButton} onClick={onUnenroll}>Leave module</button>
-        : <button className={styles.enrollButton} onClick={onEnroll}>Enroll in module</button>;
+        : <button className={styles.enrollButton} onClick={onEnroll}>Enrol in module</button>;
 }
 
-function DeadlineItem({ deadline, index, moduleCode }) {
+function DeadlineItem({ deadline, index }) {
     const urgency = getUrgencyLabel(deadline.start_due_date);
     return (
         <div className={deadlineStyles.deadlineItem}>
@@ -266,11 +262,11 @@ function DeadlineItem({ deadline, index, moduleCode }) {
     );
 }
 
-function DeadlinesSection({ deadlines, moduleCode }) {
+function DeadlinesSection({ deadlines }) {
     if (!deadlines?.length) return <p className={deadlineStyles.emptyText}>No assignments yet.</p>;
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} moduleCode={moduleCode} />)}
+            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} />)}
         </div>
     );
 }

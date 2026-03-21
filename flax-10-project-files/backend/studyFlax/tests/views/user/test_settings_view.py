@@ -296,3 +296,30 @@ class UserSettingsSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         updated = serializer.save()
         self.assertEqual(updated.preferred_study_minutes_per_day, 180)
+        
+    def test_patch_updates_preferred_study_minutes(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'preferred_study_minutes_per_day': 180},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['preferred_study_minutes_per_day'], 180)
+
+    def test_patch_updates_week_preference(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'week_preference': 'weekdays'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['week_preference'], 'weekdays')
+
+    def test_patch_updates_worktime_preference(self):
+        response = self.client.patch(
+            '/api/settings/',
+            {'worktime_preference': 'night'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['worktime_preference'], 'night')

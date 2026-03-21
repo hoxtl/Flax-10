@@ -1,4 +1,4 @@
-/**
+/*
  * Load task lists and archived lists. Used by useTaskLists.
  */
 

@@ -29,8 +29,10 @@ export function RoleBadge({ role }) {
   return <span className={`${styles.badge} ${map[role] || styles.badgeStudent}`}>{role.replace("_", " ")}</span>;
 }
 
-export function SearchBar({ value, onChange, placeholder, className = "" }) {
-  return <input className={`${styles.search} ${className}`.trim()} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />;
+import CommonSearchBar from "../../../components/common/SearchBar/SearchBar";
+
+export function SearchBar(props) {
+  return <CommonSearchBar {...props} />;
 }
 
 export function FilterToggleGroup({ options, selected, onToggle }) {

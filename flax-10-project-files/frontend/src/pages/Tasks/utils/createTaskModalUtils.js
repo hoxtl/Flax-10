@@ -1,10 +1,8 @@
-import { getEstimateBlocks } from "./createTaskBarUtils";
-
-/**
- * Builds the API payload for create/edit task from form state.
+/*
+ * Payload builders and save logic for the create/edit task modal.
  */
 
-/** Builds the payload object for the task API from form fields. */
+import { getEstimateBlocks } from "./createTaskBarUtils";
 
 export function buildCreateTaskPayload(form) {
   const blocks = form.page_count ? getEstimateBlocks(form.page_count) : Math.max(1, Number(form.estimated_blocks) || 1);
@@ -20,7 +18,6 @@ export function buildCreateTaskPayload(form) {
   };
 }
 
-/** Runs save: builds payload, calls onSave, then onClose. Catches and sets error. */
 export async function runCreateTaskSave(form, addToSchedule, mode, showAddToScheduleToggle, onSave, onClose, setSaveError) {
   setSaveError("");
   const payload = buildCreateTaskPayload(form);

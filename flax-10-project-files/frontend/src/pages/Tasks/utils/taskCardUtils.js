@@ -1,4 +1,4 @@
-/**
+/*
  * Display and formatting utilities for TaskCard components.
  */
 
@@ -16,7 +16,6 @@ const MODULE_COLORS = [
 export const PRIORITY_LABELS = { urgent: "Urgent", high: "High", medium: "Medium" };
 export const PRIORITY_MARKS = { urgent: "❗❗❗", high: "❗❗", medium: "❗" };
 
-/** Returns a deterministic colour palette entry for a module code string. */
 export function getModuleColor(code) {
   let hash = 0;
   for (let i = 0; i < code.length; i++) {
@@ -25,7 +24,6 @@ export function getModuleColor(code) {
   return MODULE_COLORS[Math.abs(hash) % MODULE_COLORS.length];
 }
 
-/** Returns a due date display label and status string. */
 export function formatDueDate(dueDate) {
   if (!dueDate) return null;
   const due = new Date(dueDate);
@@ -40,7 +38,6 @@ export function formatDueDate(dueDate) {
   return { label: due.toLocaleDateString(undefined, { month: "short", day: "numeric" }), status: "future" };
 }
 
-/** Returns a human-readable completion label relative to today. */
 export function getCompletedDueLabel(dueDate) {
   if (!dueDate) return "Completed";
   const due = new Date(dueDate);
@@ -53,7 +50,6 @@ export function getCompletedDueLabel(dueDate) {
   return `Completed ${due.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
-/** Decomposes an estimated-blocks count into sessions and minutes per session. */
 export function splitEstimatedBlocks(blocks) {
   const total = Math.max(1, Number(blocks) || 1);
   const found = [1, 2, 3, 4]
@@ -67,7 +63,6 @@ export function splitEstimatedBlocks(blocks) {
   return found || { sessionCount: 1, workMinutes: total * 25 };
 }
 
-/** Returns a human-readable focus block summary string. */
 export function formatFocusBlocks(blocks) {
   const split = splitEstimatedBlocks(blocks);
   const unit = split.sessionCount === 1 ? "session" : "sessions";

@@ -1,13 +1,15 @@
-/**
- * Hook that derives task feed data. Composes sub-hooks and utils.
+/*
+ * Derive task feed search, filter, grouping, and empty-state data.
  */
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getModules } from "../../../api/moduleApi";
+import { normalizeModuleCode } from "../../../utils/moduleCodeUtils";
+import { buildListItems, groupModuleItems, filterListItems } from "../../../components/Timer/taskInput/taskInputUtils";
 import { getHeaderTitle } from "../utils/taskFeedUtils";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
-import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
+import { isReadingList, getReadingListLabel } from "../utils/readingListUtils";
 import {
   buildDateBounds,
   filterBySearch,
@@ -21,8 +23,15 @@ import {
   getFilterHandlers,
 } from "../utils/taskFeedDataUtils";
 
-function normalizeModuleCode(value) {
-  return String(value || "").trim().toUpperCase();
+function buildModuleItems(tasks, moduleNameMap) {
+  const byCode = new Map();
+  (tasks || []).forEach((task) => {
+    const code = normalizeModuleCode(task.module_code);
+    if (!code) return;
+    const name = String(task.module_name || moduleNameMap[code] || "").trim();
+    if (!byCode.has(code) || (!byCode.get(code) && name)) byCode.set(code, name);
+  });
+  return Array.from(byCode.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([code, name]) => ({ value: code, label: name ? `${code} — ${name}` : code }));
 }
 
 function useTaskFeedFilterState(filterListIds, onFilterByList) {
@@ -43,26 +52,10 @@ function useTaskFeedFilterState(filterListIds, onFilterByList) {
 }
 
 function useTaskFeedFilterOptions(tasks, lists, filterQuery, moduleNameMap) {
-  const listItems = useMemo(() => (lists || []).map((l) => ({ value: String(l.id), label: l.name || "List" })), [lists]);
-  const moduleItems = useMemo(() => {
-    const byCode = new Map();
-    (tasks || []).forEach((t) => {
-      const code = normalizeModuleCode(t.module_code);
-      if (!code) return;
-      const name = String(t.module_name || moduleNameMap[code] || "").trim();
-      if (!byCode.has(code)) byCode.set(code, name);
-      else if (!byCode.get(code) && name) byCode.set(code, name);
-    });
-    return Array.from(byCode.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([code, name]) => ({
-        value: code,
-        label: name ? `${code} — ${name}` : code,
-      }));
-  }, [tasks, moduleNameMap]);
-  const visibleListItems = useMemo(() => { const q = filterQuery.trim().toLowerCase(); return !q ? listItems : listItems.filter((o) => o.label.toLowerCase().includes(q)); }, [listItems, filterQuery]);
-  const moduleCodePrefix = (code = "") => code.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() || "Other";
-  const groupedVisibleModuleItems = useMemo(() => { const q = filterQuery.trim().toLowerCase(); const base = !q ? moduleItems : moduleItems.filter((o) => o.label.toLowerCase().includes(q)); return base.reduce((acc, item) => { const k = moduleCodePrefix(item.value); if (!acc[k]) acc[k] = []; acc[k].push(item); return acc; }, {}); }, [moduleItems, filterQuery]);
+  const listItems = useMemo(() => buildListItems(lists), [lists]);
+  const moduleItems = useMemo(() => buildModuleItems(tasks, moduleNameMap), [tasks, moduleNameMap]);
+  const visibleListItems = useMemo(() => filterListItems(listItems, filterQuery), [listItems, filterQuery]);
+  const groupedVisibleModuleItems = useMemo(() => groupModuleItems(moduleItems, filterQuery), [moduleItems, filterQuery]);
   const moduleGroupKeys = useMemo(() => Object.keys(groupedVisibleModuleItems).sort(), [groupedVisibleModuleItems]);
   return { visibleListItems, groupedVisibleModuleItems, moduleGroupKeys };
 }
@@ -86,13 +79,31 @@ function useTaskFeedBuckets(filtered, filteredCompleted, search) {
   return { overdue, today, thisWeek, later, completedTodayCount, completedWeekCount, completedLaterCount, allTasksCombined, showSearchEmptyState };
 }
 
-function useTaskFeedEffects(searchInputRef, filterRef, isFilterOpen, setIsFilterOpen) {
+function useTaskFeedKeyboardShortcuts() {
   useEffect(() => {
     const handler = (e) => { const tag = e.target?.tagName; const isEditing = tag === "INPUT" || tag === "TEXTAREA" || e.target?.contentEditable === "true"; if (e.key === "n" && !isEditing) { e.preventDefault(); document.querySelector('input[aria-label="Task name"]')?.focus(); } if (e.key === "Escape" && isEditing) e.target.blur(); };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [searchInputRef]);
+  }, []);
+}
+
+function useFilterClickOutside(filterRef, isFilterOpen, setIsFilterOpen) {
   useEffect(() => { if (!isFilterOpen) return; const onDown = (e) => { if (filterRef.current && !filterRef.current.contains(e.target)) setIsFilterOpen(false); }; document.addEventListener("mousedown", onDown); return () => document.removeEventListener("mousedown", onDown); }, [isFilterOpen, filterRef, setIsFilterOpen]);
+}
+
+function useTaskFeedEffects(filterRef, isFilterOpen, setIsFilterOpen) {
+  useTaskFeedKeyboardShortcuts();
+  useFilterClickOutside(filterRef, isFilterOpen, setIsFilterOpen);
+}
+
+function buildModuleNameMap(modules) {
+  const map = {};
+  (modules || []).forEach((m) => {
+    const code = normalizeModuleCode(m?.module_code);
+    const name = String(m?.module_name || m?.title || "").trim();
+    if (code && name) map[code] = name;
+  });
+  return map;
 }
 
 function useTaskFeedModuleNameMap() {
@@ -100,72 +111,87 @@ function useTaskFeedModuleNameMap() {
   useEffect(() => {
     let cancelled = false;
     getModules()
-      .then((modules) => {
-        if (cancelled) return;
-        const next = {};
-        (modules || []).forEach((m) => {
-          const code = normalizeModuleCode(m?.module_code);
-          const name = String(m?.module_name || m?.title || "").trim();
-          if (code && name) next[code] = name;
-        });
-        setModuleNameMap(next);
-      })
+      .then((modules) => { if (!cancelled) setModuleNameMap(buildModuleNameMap(modules)); })
       .catch(() => { if (!cancelled) setModuleNameMap({}); });
     return () => { cancelled = true; };
   }, []);
   return moduleNameMap;
 }
 
-function getReadingListLabel(activeList) {
-  if (!activeList) return "this reading list";
-  const parsed = parseReadingListName(activeList.name);
-  return [parsed.moduleCode, parsed.moduleName].filter(Boolean).join(" ") || parsed.label || "this reading list";
+function useSearchSourceTasks(hasSearchQuery, activeFilter, allTasks, filterListIds, tasks) {
+  return useMemo(() => {
+    if (!hasSearchQuery) return tasks;
+    if (activeFilter === "overdue") return allTasks.filter((task) => !task.completed && task.due_date && new Date(task.due_date) < new Date());
+    if (!filterListIds?.length) return allTasks;
+    const allowedListIds = new Set(filterListIds.map(String));
+    return allTasks.filter((task) => allowedListIds.has(String(task.task_list)));
+  }, [activeFilter, allTasks, filterListIds, hasSearchQuery, tasks]);
 }
 
-/** Derives task feed state and section data from tasks, lists, and filter options. */
+function useTaskFeedCollections(searchSourceTasks, filterModuleCodes) {
+  return useMemo(() => {
+    if (!filterModuleCodes?.length) return { pending: searchSourceTasks.filter((task) => !task.completed), completed: searchSourceTasks.filter((task) => task.completed) };
+    const selectedCodes = new Set(filterModuleCodes.map(String));
+    const filteredTasks = searchSourceTasks.filter((task) => selectedCodes.has(String(task.module_code || "")));
+    return { pending: filteredTasks.filter((task) => !task.completed), completed: filteredTasks.filter((task) => task.completed) };
+  }, [filterModuleCodes, searchSourceTasks]);
+}
+
+function useActiveTaskList(activeListId, lists) {
+  return useMemo(() => (activeListId && lists?.length ? lists.find((list) => String(list.id) === String(activeListId)) || null : null), [activeListId, lists]);
+}
+
+function buildTodayEmptyCardProps(clearMessage, completedTodayCount, navigate, onPlanTomorrow) {
+  const sub = completedTodayCount > 0
+    ? `${completedTodayCount} task${completedTodayCount !== 1 ? "s" : ""} completed today. Take a moment — you earned it.`
+    : "No tasks due today.";
+  return {
+    message: clearMessage,
+    sub,
+    ctaLabel: "Plan tomorrow →",
+    onCtaClick: () => (typeof onPlanTomorrow === "function" ? onPlanTomorrow() : navigate("/tasks?open=fullPlanning")),
+  };
+}
+
+function buildAllTasksEmptyCardProps(activeList, allTasksCombined, clearMessage, completedCount) {
+  if (allTasksCombined.length > 0 || completedCount === 0) return null;
+  if (isReadingList(activeList)) return { message: "All caught up on readings!", sub: `No suggested readings left for ${getReadingListLabel(activeList)} right now.` };
+  return { message: clearMessage, sub: `${completedCount} task${completedCount !== 1 ? "s" : ""} completed. Take a moment — you earned it.` };
+}
+
+function buildSectionProps(sortBy, listMap, lists, activeListId, hasSearchQuery, search) {
+  return { sortBy, listMap, lists, hideListBadge: !!activeListId && !hasSearchQuery, searchQuery: search };
+}
+
+function useTaskFeedFilteredResults({ activeFilter, allTasks, filterListIds, filterModuleCodes, hasSearchQuery, listMap, search, tasks }) {
+  const searchSourceTasks = useSearchSourceTasks(hasSearchQuery, activeFilter, allTasks, filterListIds, tasks);
+  const { pending, completed } = useTaskFeedCollections(searchSourceTasks, filterModuleCodes);
+  const filtered = useMemo(() => filterBySearch(pending, search, listMap), [pending, search, listMap]);
+  const filteredCompleted = useMemo(() => filterBySearch(completed, search, listMap), [completed, search, listMap]);
+  return { pending, completed, filtered, filteredCompleted, ...useTaskFeedBuckets(filtered, filteredCompleted, search) };
+}
+
+function useTaskFeedPresentation({ activeFilter, activeListId, activeModuleCode, buckets, completedCount, filterState, hasSearchQuery, listMap, lists, onPlanTomorrow }) {
+  const navigate = useNavigate();
+  const clearMessage = useMemo(() => getClearMessage(), []);
+  const activeList = useActiveTaskList(activeListId, lists);
+  const todayEmptyCardProps = useMemo(() => buildTodayEmptyCardProps(clearMessage, buckets.completedTodayCount, navigate, onPlanTomorrow), [buckets.completedTodayCount, clearMessage, navigate, onPlanTomorrow]);
+  const allTasksEmptyCardProps = useMemo(() => buildAllTasksEmptyCardProps(activeList, buckets.allTasksCombined, clearMessage, completedCount), [activeList, buckets.allTasksCombined, clearMessage, completedCount]);
+  const headerTitle = getHeaderTitle(activeFilter, hasSearchQuery ? null : activeList, activeModuleCode);
+  const sectionProps = useMemo(() => buildSectionProps(filterState.sortBy, listMap, lists, activeListId, hasSearchQuery, filterState.search), [activeListId, filterState.search, filterState.sortBy, hasSearchQuery, listMap, lists]);
+  return { headerTitle, sectionProps, todayEmptyCardProps, allTasksEmptyCardProps };
+}
+
+/* Derive task feed state and section data from tasks, lists, and filter options. */
 export default function useTaskFeedData(opts) {
   const { tasks, allTasks = tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
-  const navigate = useNavigate();
   const filterState = useTaskFeedFilterState(filterListIds, onFilterByList);
   const hasSearchQuery = filterState.search.trim().length > 0;
   const moduleNameMap = useTaskFeedModuleNameMap();
   const filterOptions = useTaskFeedFilterOptions(tasks, lists, filterState.filterQuery, moduleNameMap);
   const listMap = useTaskFeedListMap(lists);
-  const searchSourceTasks = useMemo(() => {
-    if (!hasSearchQuery) return tasks;
-    if (activeFilter === "overdue") return allTasks.filter((t) => !t.completed && t.due_date && new Date(t.due_date) < new Date());
-    if (!filterListIds?.length) return allTasks;
-    const allowedListIds = new Set(filterListIds.map(String));
-    return allTasks.filter((task) => allowedListIds.has(String(task.task_list)));
-  }, [activeFilter, allTasks, filterListIds, hasSearchQuery, tasks]);
-  const tasksByModule = useMemo(() => {
-    if (!filterState.filterModuleCodes?.length) return searchSourceTasks;
-    const set = new Set(filterState.filterModuleCodes.map(String));
-    return searchSourceTasks.filter((t) => set.has(String(t.module_code || "")));
-  }, [searchSourceTasks, filterState.filterModuleCodes]);
-  const pending = tasksByModule.filter((t) => !t.completed);
-  const completed = tasksByModule.filter((t) => t.completed);
-  const filtered = useMemo(() => filterBySearch(pending, filterState.search, listMap), [pending, filterState.search, listMap]);
-  const filteredCompleted = useMemo(() => filterBySearch(completed, filterState.search, listMap), [completed, filterState.search, listMap]);
-  const buckets = useTaskFeedBuckets(filtered, filteredCompleted, filterState.search);
-  const clearMessage = useMemo(() => getClearMessage(), []);
-  const todayEmptyCardProps = useMemo(() => ({ message: clearMessage, sub: buckets.completedTodayCount > 0 ? `${buckets.completedTodayCount} task${buckets.completedTodayCount !== 1 ? "s" : ""} completed today. Take a moment — you earned it.` : "No tasks due today.", ctaLabel: "Plan tomorrow →", onCtaClick: () => { if (typeof onPlanTomorrow === "function") onPlanTomorrow(); else navigate("/tasks?open=fullPlanning"); } }), [buckets.completedTodayCount, clearMessage, onPlanTomorrow, navigate]);
-  const activeList = useMemo(() => (activeListId && lists?.length ? lists.find((l) => String(l.id) === String(activeListId)) || null : null), [activeListId, lists]);
-  const allTasksEmptyCardProps = useMemo(() => {
-    if (buckets.allTasksCombined.length > 0 || completed.length === 0) return null;
-    if (isReadingList(activeList)) {
-      return {
-        message: "All caught up on readings!",
-        sub: `No suggested readings left for ${getReadingListLabel(activeList)} right now.`,
-      };
-    }
-    return {
-      message: clearMessage,
-      sub: `${completed.length} task${completed.length !== 1 ? "s" : ""} completed. Take a moment — you earned it.`,
-    };
-  }, [activeList, buckets.allTasksCombined.length, clearMessage, completed.length]);
-  const headerTitle = getHeaderTitle(activeFilter, hasSearchQuery ? null : activeList, activeModuleCode);
-  const sectionProps = useMemo(() => ({ sortBy: filterState.sortBy, listMap, lists, hideListBadge: !!activeListId && !hasSearchQuery, searchQuery: filterState.search }), [filterState.sortBy, listMap, lists, activeListId, hasSearchQuery, filterState.search]);
-  useTaskFeedEffects(filterState.searchInputRef, filterState.filterRef, filterState.isFilterOpen, filterState.setIsFilterOpen);
-  return { ...filterState, ...filterOptions, listMap, pending, completed, filtered, filteredCompleted, ...buckets, sectionProps, todayEmptyCardProps, allTasksEmptyCardProps, headerTitle, showDone: true, setShowDone: () => {}, filterListIds, filterModuleCodes: filterState.filterModuleCodes, showSearchEmptyState: buckets.showSearchEmptyState };
+  const results = useTaskFeedFilteredResults({ activeFilter, allTasks, filterListIds, filterModuleCodes: filterState.filterModuleCodes, hasSearchQuery, listMap, search: filterState.search, tasks });
+  const presentation = useTaskFeedPresentation({ activeFilter, activeListId, activeModuleCode, buckets: results, completedCount: results.completed.length, filterState, hasSearchQuery, listMap, lists, onPlanTomorrow });
+  useTaskFeedEffects(filterState.filterRef, filterState.isFilterOpen, filterState.setIsFilterOpen);
+  return { ...filterState, ...filterOptions, listMap, ...results, ...presentation, filterListIds, filterModuleCodes: filterState.filterModuleCodes };
 }

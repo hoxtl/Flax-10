@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 function authHeaders(extra = {}) {
   const token = localStorage.getItem('token');
@@ -11,8 +11,12 @@ async function apiFetch(path, options = {}) {
   return response.json();
 }
 
+function normalizeSettingsPayload(payload) {
+  return payload?.settings || payload;
+}
+
 export function getUserSettings() {
-  return apiFetch('/settings/', { headers: authHeaders() });
+  return apiFetch('/settings/', { headers: authHeaders(), cache: 'no-store' }).then(normalizeSettingsPayload);
 }
 
 export function updateUserSettings(settings) {

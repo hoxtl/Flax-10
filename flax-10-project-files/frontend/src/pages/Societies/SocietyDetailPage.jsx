@@ -24,7 +24,7 @@ import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSo
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
 
 import {
-    getImageUrls, getAvailablePhotos, scrollContentToTop,
+    getImageUrls, scrollContentToTop,
     wrapAddEvent, wrapUpdateEvent, wrapDeleteEvent,
     wrapAddAnnouncement, wrapUpdateAnnouncement, wrapDeleteAnnouncement
 } from "./SocietyDetailPageUtils";
@@ -105,7 +105,7 @@ const ModalsContainer = ({ state, data, handlers, societyId }) => {
             {state.showSettings && <SettingsModal onClose={() => handlers.setS(false)} onDelete={handlers.onDelete} members={data.members} onFetchMembers={handlers.fetchM} onUpdateRole={data.updateMemberRole} onRemoveMember={handlers.removeM} onAddCollaborator={data.addCollaborator} ratificationStatus={data.society.ratification_status} isRatified={data.society.is_ratified} onRequestRatification={data.requestRatification} />}
             {state.showReportModal && <ReportSocietyModal society={data.society} onClose={() => handlers.setR(false)} onReportSuccess={() => handlers.updateLS({ has_reported: true })} />}
             {state.galleryOpen && <ImageGalleryModal images={urls} initialIndex={state.activeGallery?.index} onClose={() => handlers.setG(null)} />}
-            {state.showCoverModal && <CoverImageModal images={urls} availablePhotos={getAvailablePhotos(data.society)} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
+            {state.showCoverModal && <CoverImageModal images={urls} onClose={() => handlers.setCE(false)} onUpdate={(imgs) => handlers.updateS({ images: imgs, image: imgs[0] || null })} />}
             {state.showMembersModal && <MemberDirectoryModal societyName={data.society.name} members={data.members} onFetchMembers={handlers.fetchM} onRemoveMember={handlers.removeM} isAdmin={isAdmin} onClose={() => handlers.setM(false)} />}
             {state.editingAnnouncement && <AnnouncementModal announcements={data.society.announcements} announcement={state.editingAnnouncement} societyId={societyId} onClose={() => handlers.setEA(null)} onSubmit={(d, conflict) => handlers.onAnnounceSubmit(d, conflict)} onDelete={(id) => handlers.onAnnounceDelete(id)} tags={data.society.tags} />}
         </>

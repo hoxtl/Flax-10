@@ -71,13 +71,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
     cursor: pointer;
-}
-
-.boardCard:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
 }
 
 
@@ -127,7 +121,6 @@
     display: flex;
     gap: 4px;
     opacity: 0;
-    transition: opacity 0.2s;
 }
 
 .boardCard:hover .cardActions {
@@ -257,7 +250,6 @@
     color: var(--text-secondary);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
     font-family: inherit;
 }
 

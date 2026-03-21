@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks createTaskModalUtils: buildCreateTaskPayload, runCreateTaskSave.
  */
 

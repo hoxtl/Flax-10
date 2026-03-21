@@ -15,7 +15,8 @@ export function filterAndSort(list, search, filters, sortBy) {
 
 function matchesAllFilters(society, search, filters) {
     const matchesSearch = society.name.toLowerCase().includes(search.toLowerCase());
-    return matchesSearch && matchesRatification(society, filters.ratified) && matchesCategory(society, filters.category);
+    const matchesCat = !filters.category.length || filters.category.some(cat => matchesCategory(society, cat.id));
+    return matchesSearch && matchesRatification(society, filters.ratified) && matchesCat;
 }
 
 function matchesRatification(society, filter) {

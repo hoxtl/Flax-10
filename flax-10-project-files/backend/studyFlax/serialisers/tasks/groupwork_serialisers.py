@@ -11,6 +11,10 @@ from studyFlax.serialisers.common import build_profile_photo_url
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
+    task_count = serializers.IntegerField(read_only=True, default=0)
+    completed_task_count = serializers.IntegerField(read_only=True, default=0)
+    module_name = serializers.CharField(read_only=True, required=False)
+    members = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupProject
@@ -18,10 +22,18 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "id",
             "name",
             "course_code",
+            "module_name",
             "deadline",
             "member_count",
+            "task_count",
+            "completed_task_count",
+            "members",
             "created_at",
         ]
+
+    def get_members(self, obj):
+        return GroupMembershipSerialiser(obj.memberships.all(), many=True).data
+
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.username", read_only=True)

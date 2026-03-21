@@ -1,6 +1,5 @@
-/**
- * Quick-add task bar: input row and expandable options (est. time, module, list).
- * Uses useCreateTaskBar for state and subcomponents for UI.
+/*
+ * Quick-add task bar with optional reading and module details.
  */
 
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
@@ -47,7 +46,7 @@ function PageCountField({ styles: s, pageCount, setPageCount }) {
         className={`${s.input} ${s.pageCountInput}`} aria-label="Page count"
       />
     </>
-  )
+  );
 }
 
 function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }) {
@@ -56,10 +55,10 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }
       <span className={s.optionsRowDivider} aria-hidden />
       <span className={s.optionsRowLabel}>List</span>
       <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
-          <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
       </div>
     </>
-  )
+  );
 }
 
 function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
@@ -84,17 +83,17 @@ function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEsti
 }
 
 export default function CreateTaskBar(props) {
-  const bar = useCreateTaskBar(props);
+  const { cardRef, handleSubmit, handleInputBlur, handleInputKeyDown, inputRef, sleepWarning, sleepWarningProps, ...bar } = useCreateTaskBar(props);
   return (
     <>
-      <form className={styles.card} onSubmit={bar.handleSubmit} ref={bar.cardRef} data-create-task-bar-card>
-        <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={bar.inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={bar.handleInputBlur} onKeyDown={bar.handleInputKeyDown} />
+      <form className={styles.card} onSubmit={handleSubmit} ref={cardRef} data-create-task-bar-card>
+        <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={handleInputBlur} onKeyDown={handleInputKeyDown} />
         <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
          sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
          isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
         />
       </form>
-      {bar.sleepWarning && <SleepWarningModal {...bar.sleepWarningProps} />}
+      {sleepWarning && <SleepWarningModal {...sleepWarningProps} />}
     </>
   );
 }

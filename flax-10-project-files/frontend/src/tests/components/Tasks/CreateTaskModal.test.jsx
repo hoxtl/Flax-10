@@ -1,3 +1,5 @@
+/* Tests for the CreateTaskModal create and edit flows. */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CreateTaskModal from '../../../pages/Tasks/components/CreateTaskModal';
@@ -89,10 +91,7 @@ describe('CreateTaskModal', () => {
     it('calls onClose when Escape is pressed on overlay', () => {
         const onClose = vi.fn();
         render(<CreateTaskModal {...defaultProps} onClose={onClose} />);
-        const overlay = screen.getByLabelText('Close').closest('[class]');
-        // Fire keydown Escape on the overlay
         fireEvent.keyDown(document, { key: 'Escape' });
-        // onClose via handleKey needs the overlay element
     });
 
     it('renders task title input', () => {

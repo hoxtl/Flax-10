@@ -1,6 +1,8 @@
-/**
+/*
  * Helpers for TasksPage: date helpers, filtered tasks, and handler builders.
  */
+
+import { buildDateBounds } from "./taskFeedDataUtils";
 
 export function getTodayEndISO() {
   const d = new Date();
@@ -20,34 +22,18 @@ function showInfoToast(state, message, duration = 3000) {
   setTimeout(() => state.setToastInfo(null), duration);
 }
 
-function showDeleteToast(state, message, duration = 3500) {
-  showInfoToast(state, message, duration);
-}
-
-function getDateBounds() {
-  const dayStart = new Date();
-  dayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
-  const weekEnd = new Date(todayEnd);
-  weekEnd.setDate(weekEnd.getDate() + 7);
-  return { dayStart, todayEnd, weekEnd };
+function filterByListOrId(tasks, activeListId, filterListIds) {
+  if (filterListIds?.length > 0) {
+    const set = new Set(filterListIds.map(String));
+    return tasks.filter((t) => set.has(String(t.task_list)));
+  }
+  if (activeListId) return tasks.filter((t) => String(t.task_list) === String(activeListId));
+  return tasks;
 }
 
 export function filterTasksByListAndFilter(tasks, activeListId, activeFilter, filterListIds) {
-  const { dayStart, todayEnd, weekEnd } = getDateBounds();
-  let filtered = tasks;
-  if (filterListIds?.length > 0) {
-    const set = new Set(filterListIds.map(String));
-    filtered = tasks.filter((t) => set.has(String(t.task_list)));
-  } else if (activeListId) {
-    filtered = tasks.filter((t) => String(t.task_list) === String(activeListId));
-  } else if (activeFilter !== "all" && activeFilter !== "today" && activeFilter !== "this_week" && activeFilter !== "later" && activeFilter !== "overdue") {
-    // If we're on a specific list or filter that implies a task_list, we might keep filtering.
-    // But for "All tasks", "Today", "This Week", etc., we should show ALL relevant tasks (including group ones).
-    // The current logic already handles this because 'filtered' starts as 'tasks'.
-  }
-
+  const { dayStart, todayEnd, weekEnd } = buildDateBounds();
+  const filtered = filterByListOrId(tasks, activeListId, filterListIds);
   if (activeFilter === "overdue") return filtered.filter((t) => !t.completed && t.due_date && new Date(t.due_date) < new Date());
   if (activeFilter === "today") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= todayEnd);
   if (activeFilter === "this_week") return filtered.filter((t) => t.due_date && new Date(t.due_date) >= dayStart && new Date(t.due_date) <= weekEnd);
@@ -78,7 +64,7 @@ async function handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta)
 async function handleDeleteListImpl(state, listsApi, listId) {
   const listName = listsApi.lists.find((list) => String(list.id) === String(listId))?.name || "List";
   await listsApi.removeList(listId);
-  showDeleteToast(state, `"${listName}" deleted.`);
+  showInfoToast(state, `"${listName}" deleted.`);
   if (state.activeListId === listId) {
     state.setActiveListId(null);
     state.setActiveFilter("all");
@@ -99,7 +85,7 @@ export function buildTasksPageHandlers(state, listsApi, tasksApi) {
     handlePermanentlyDeleteList: async (listId) => {
       const listName = listsApi.archivedLists.find((list) => String(list.id) === String(listId))?.name || "List";
       await listsApi.permanentlyDeleteList(listId);
-      showDeleteToast(state, `"${listName}" permanently deleted.`);
+      showInfoToast(state, `"${listName}" permanently deleted.`);
     },
   };
 }
