@@ -1,0 +1,57 @@
+.container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.topActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.headerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.skeletonDeleteBtn { width: 110px; height: 30px; border-radius: 999px; }
+.skeletonProjectMeta { width: 120px; border-radius: 999px; height: 28px; }
+.skeletonProjectTitle { width: min(280px, 60%); height: 32px; margin-top: 12px; }
+.skeletonMetaRow { display: flex; gap: 16px; margin-top: 16px; }
+.skeletonMetaItem { width: 100px; height: 20px; border-radius: 4px; }
+.skeletonMetaItemWide { width: 140px; height: 34px; border-radius: 999px; }
+.skeletonProgressBar { width: 100%; height: 12px; margin-top: 20px; border-radius: 999px; }
+
+.membersSection { margin-top: 24px; }
+.skeletonMembersTitle { width: 90px; height: 16px; margin-bottom: 12px; }
+.membersList { display: flex; gap: 8px; flex-wrap: wrap; }
+.skeletonMemberPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+}
+.skeletonAvatar { width: 24px; height: 24px; border-radius: 50%; }
+.skeletonMemberName { width: 90px; height: 12px; border-radius: 8px; }
+
+.skeletonAddMemberForm { display: flex; gap: 8px; margin-top: 16px; }
+.skeletonAddMemberInput { flex: 1; height: 40px; }
+.skeletonAddMemberBtn { width: 80px; height: 40px; border-radius: 999px; }
+
+.tabsRow {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 24px;
+    padding-bottom: 15px;
+}
+.skeletonTab { width: 110px; height: 36px; border-radius: 999px; }
+.skeletonTaskPanel { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.skeletonTaskRow { width: 100%; height: 54px; }

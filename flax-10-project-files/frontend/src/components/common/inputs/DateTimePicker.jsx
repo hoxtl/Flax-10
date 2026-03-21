@@ -19,13 +19,18 @@ const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => ({ value: String(i),
 
 function formatDisplay(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-    + "  " + pad(date.getHours()) + ":" + pad(date.getMinutes());
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}  ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function formatDateOnly(date) {
   if (!date) return "";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  const d = pad(date.getDate());
+  const m = pad(date.getMonth() + 1);
+  const y = date.getFullYear();
+  return `${d} / ${m} / ${y}`;
 }
 
 function getDisplayValue(date, timeOnly, dateOnly) {
@@ -179,7 +184,7 @@ function PickerPortal({ open, dropdownRef, dropdownPos, timeOnly, dateOnly, view
 }
 
 /** Date and time picker with an inline calendar and dropdowns for hour and minute. */
-export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, hideIcon }) {
+export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, wrapperClassName, hideIcon }) {
   const { open, setOpen, viewY, setViewY, viewM, setViewM, selDate, setSelDate, hour, setHour, minute, setMinute, dropdownPos, setDropdownPos } = useDateTimePickerState(value, timeOnly, dateOnly);
   const ref = useRef(null);
   const dropdownRef = useRef(null);
@@ -189,7 +194,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
   const { selectDay, changeHour, changeMinute, prevMonth, nextMonth } = useDateTimeHandlers(viewY, viewM, setViewM, setViewY, selDate, setSelDate, hour, setHour, minute, setMinute, timeOnly, dateOnly, onChange);
   const { days, isToday, isSel } = useDerivedCalendarState(viewY, viewM, selDate);
   return (
-    <div className={styles.wrap} ref={ref}>
+    <div className={`${styles.wrap} ${wrapperClassName || ""}`} ref={ref}>
       <PickerTrigger customTrigger={customTrigger} setOpen={setOpen} open={open} selDate={selDate} timeOnly={timeOnly} dateOnly={dateOnly} placeholder={placeholder} setSelDate={setSelDate} onChange={onChange} triggerClassName={triggerClassName} hideIcon={hideIcon} />
       <PickerPortal open={open} dropdownRef={dropdownRef} dropdownPos={dropdownPos} timeOnly={timeOnly} dateOnly={dateOnly} viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={selectDay} hour={hour} minute={minute} changeHour={changeHour} changeMinute={changeMinute} setOpen={setOpen} />
     </div>

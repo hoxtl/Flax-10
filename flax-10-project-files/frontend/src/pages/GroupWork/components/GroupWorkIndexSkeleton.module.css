@@ -1,0 +1,29 @@
+.skeletonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeletonStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.skeletonStatCard {
+    border-radius: 12px;
+}
+
+.skeletonForm {
+    border-radius: 16px;
+}
+
+.skeletonList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeletonRow {
+    border-radius: 12px;
+}

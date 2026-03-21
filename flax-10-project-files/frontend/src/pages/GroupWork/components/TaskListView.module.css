@@ -6,7 +6,6 @@
     border-bottom: 1px solid var(--border);
     padding: 16px 0;
     gap: 16px;
-    transition: background 0.2s;
 }
 
 .taskRow:last-child {
@@ -38,7 +37,6 @@
     flex-shrink: 0;
     margin-top: 2px;
     padding: 0;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .checkboxDone {
@@ -66,12 +64,7 @@
     text-align: center;
     width: 100%;
     letter-spacing: 0.05em;
-    transition: transform 0.15s;
     margin-right: 12px;
-}
-
-.prioritySelect:hover {
-    transform: translateY(-1px);
 }
 
 /* Date Cell */
@@ -97,7 +90,6 @@
     width: 100%;
     border: none;
     cursor: pointer;
-    transition: background 0.15s ease;
     white-space: nowrap;
 }
 
@@ -121,7 +113,6 @@
     cursor: pointer;
     padding: 6px 10px;
     border-radius: 10px;
-    transition: background 0.2s;
     min-height: 38px;
 }
 
@@ -178,19 +169,6 @@
     z-index: 100;
     min-width: 180px;
     padding: 10px 0;
-    animation: popupFadeIn 0.2s ease;
-}
-
-@keyframes popupFadeIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
 }
 
 .assignPopupHeader {
@@ -213,7 +191,6 @@
 .closePopupBtn {
     cursor: pointer;
     color: #a89b91;
-    transition: color 0.2s;
     display: flex;
     align-items: center;
 }
@@ -228,7 +205,6 @@
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: background 0.15s;
     font-size: 13px;
     color: #3c2a20;
     font-weight: 500;
@@ -257,7 +233,6 @@
     place-items: center;
     padding: 10px;
     border-radius: 8px;
-    transition: all 0.2s;
 }
 
 .deleteBtn:hover {

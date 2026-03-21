@@ -122,7 +122,7 @@ function DropdownButton({ selectedLabel, value, isOpen, onClick }) {
   return (
     <motion.button type="button" whileTap={{ scale: 0.99 }} onClick={onClick} className={styles.dropdownBtn}>
       <span style={{ color: value ? 'inherit' : 'var(--muted)' }}>{selectedLabel}</span>
-      <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={chevronRotateTransition}>
+      <motion.div animate={{ rotate: isOpen ? 0 : 180 }} transition={chevronRotateTransition}>
         <ChevronDown size={16} />
       </motion.div>
     </motion.button>
