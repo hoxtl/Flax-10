@@ -1,369 +1,425 @@
 .boardContainer {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    overflow-x: auto;
-    padding-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 
 .column {
-    flex: 1 1 320px;
-    max-width: 450px;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    max-height: calc(100vh - 200px);
-    border: 1px solid var(--border);
-    background: var(--bg);
-    overflow: hidden;
+  flex: 1 1 320px;
+  max-width: 450px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 200px);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
 }
 
 .colHeader {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
 }
 
 .colTitleWrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .colDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .colTitle {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: inherit;
-    letter-spacing: 0.02em;
-    color: var(--text);
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  color: var(--text);
 }
 
 .taskCount {
-    background: var(--hover);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-secondary);
+  background: var(--hover);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .cardList {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    min-height: 100px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 100px;
 }
 
 .boardCard {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    cursor: pointer;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
 }
 
-
 .boardCardActive {
-    position: relative;
-    z-index: 50;
+  position: relative;
+  z-index: 50;
 }
 
 .cardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .cardPriority {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-family: inherit;
-    letter-spacing: 0.05em;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  letter-spacing: 0.05em;
 }
 
 .prioritySelect {
-    appearance: none;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-family: inherit;
-    letter-spacing: 0.05em;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    cursor: pointer;
-    outline: none;
-    line-height: 1.5;
+  appearance: none;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  line-height: 1.5;
 }
 
 .prioritySelect:hover {
-    filter: brightness(0.95);
+  filter: brightness(0.95);
 }
 
 .cardActions {
-    display: flex;
-    gap: 4px;
-    opacity: 0;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
 }
 
 .boardCard:hover .cardActions {
-    opacity: 1;
+  opacity: 1;
 }
 
 .iconBtn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--text-secondary);
-    padding: 4px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .iconBtn:hover {
-    background: var(--hover);
-    color: var(--text);
+  background: var(--hover);
+  color: var(--text);
 }
 
 .iconBtnDone {
-    color: var(--success);
+  color: var(--success);
 }
 
 .iconBtnDelete:hover {
-    background: var(--danger-bg);
-    color: var(--danger);
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 /* Status Column Themes */
-.colTodo { background: var(--hover-light) !important; color: #8a7a6a; }
-.colInProgress { background: rgba(84, 125, 163, 0.08) !important; color: #547da3; }
-.colDone { background: rgba(107, 138, 106, 0.08) !important; color: #6b8a6a; }
+.colTodo {
+  background: var(--hover-light) !important;
+  color: #8a7a6a;
+}
+.colInProgress {
+  background: rgba(84, 125, 163, 0.08) !important;
+  color: #547da3;
+}
+.colDone {
+  background: rgba(107, 138, 106, 0.08) !important;
+  color: #6b8a6a;
+}
 
-[data-theme="dark"] .colTodo { background: rgba(180, 164, 144, 0.1) !important; color: #b0a396; }
-[data-theme="dark"] .colInProgress { background: rgba(84, 125, 163, 0.15) !important; color: #80b2d6; }
-[data-theme="dark"] .colDone { background: rgba(107, 138, 106, 0.15) !important; color: #8bc28a; }
+[data-theme="dark"] .colTodo {
+  background: rgba(180, 164, 144, 0.1) !important;
+  color: #b0a396;
+}
+[data-theme="dark"] .colInProgress {
+  background: rgba(84, 125, 163, 0.15) !important;
+  color: #80b2d6;
+}
+[data-theme="dark"] .colDone {
+  background: rgba(107, 138, 106, 0.15) !important;
+  color: #8bc28a;
+}
 
-.colTodoDot { background: #c0a080; }
-.colInProgressDot { background: #80b2d6; }
-.colDoneDot { background: #8bc28a; }
+.colTodoDot {
+  background: #c0a080;
+}
+.colInProgressDot {
+  background: #80b2d6;
+}
+.colDoneDot {
+  background: #8bc28a;
+}
 
-.colTodoText { color: inherit; }
-.colInProgressText { color: inherit; }
-.colDoneText { color: inherit; }
+.colTodoText {
+  color: inherit;
+}
+.colInProgressText {
+  color: inherit;
+}
+.colDoneText {
+  color: inherit;
+}
 
 .cardTitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.4;
-    word-break: break-word;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .cardFooter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--border);
-    padding-top: 12px;
-    margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
 }
 
 .cardDate {
-    font-size: 11px;
-    color: var(--text-secondary);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .avatarStack {
-    display: flex;
+  display: flex;
 }
 
 .avatarMini {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid var(--card-bg);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--card-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .emptyCol {
-    text-align: center;
-    font-size: 13px;
-    color: var(--muted);
-    padding: 24px 0;
-    font-weight: 500;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 24px 0;
+  font-weight: 500;
 }
 
 .statusSelect {
-    appearance: none;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2px 6px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text);
-    cursor: pointer;
-    font-family: inherit;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .statusSelect:hover {
-    background: var(--hover);
+  background: var(--hover);
 }
 
 .addCardBtn {
-    background: transparent;
-    border: 1px dashed var(--border);
-    border-radius: 12px;
-    width: 100%;
-    padding: 12px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  width: 100%;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .addCardBtn:hover {
-    background: var(--hover);
-    border-style: solid;
-    color: var(--text);
+  background: var(--hover);
+  border-style: solid;
+  color: var(--text);
 }
 
 .addCardInputWrapper {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 .addCardInput {
-    width: 100%;
-    border: none;
-    resize: none;
-    font-size: 14px;
-    font-family: inherit;
-    font-weight: 500;
-    color: var(--text);
-    outline: none;
-    background: transparent;
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  background: transparent;
 }
 
 .addCardInput::placeholder {
-    color: var(--muted);
+  color: var(--muted);
 }
 
 .dateLabelInteractive {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    text-align: left;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
 .dateLabelInteractive:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .assignPopupBoard {
-    position: absolute;
-    top: 100%;
-    margin-top: -30px;
-    right: -20px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-    width: 200px;
-    box-shadow: var(--shadow-lg);
-    z-index: 100;
-    max-height: 250px;
-    overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  margin-top: -30px;
+  right: -20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  width: 200px;
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .assignPopupHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .assignPopupTitle {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .closePopupBtn {
-    cursor: pointer;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
 
 .closePopupBtn:hover {
-    background: var(--hover);
-    color: var(--text);
+  background: var(--hover);
+  color: var(--text);
 }
 
 .assignItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 8px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    margin-bottom: 2px;
-    color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 2px;
+  color: var(--text);
 }
 
 .assignItem:hover {
-    background: var(--hover-light);
+  background: var(--hover-light);
 }
 
 .assignItemSelected {
-    background: var(--hover);
+  background: var(--hover);
+}
+
+@media (max-width: 900px) {
+  .boardContainer {
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+
+  .column {
+    flex: 0 0 280px;
+    max-width: 320px;
+    max-height: 70vh;
+  }
+}
+
+@media (max-width: 520px) {
+  .column {
+    flex-basis: 260px;
+  }
+
+  .cardList {
+    padding: 10px;
+  }
+
+  .boardCard {
+    padding: 12px;
+  }
 }
