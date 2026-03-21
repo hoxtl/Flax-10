@@ -314,6 +314,7 @@ export default function CampusMap() {
           locating={locating}
           onGeolocate={handleGeolocate}
           onClear={handleClearStart}
+          manualStart={manualStart}
         />
         <DestinationSection
           selectedCampus={selectedCampus}
