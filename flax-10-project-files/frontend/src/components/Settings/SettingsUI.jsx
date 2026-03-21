@@ -1,7 +1,7 @@
 /*
  * Barrel exports for shared settings UI primitives.
  */
-import { User, Lock, MapPin, BookOpen, Paintbrush, Moon } from "lucide-react";
+import { User, Lock, MapPin, BookOpen, Paintbrush, Moon, Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../common/AnimatedDropdown";
@@ -16,12 +16,10 @@ const TAB_CONFIG = [
   { id: "account", label: "Account", icon: User, group: "My Details" },
   { id: "home", label: "Location", icon: MapPin, group: "My Details" },
   { id: "security", label: "Security", icon: Lock, group: "My Details" },
-  { id: "preferences_themes", label: "Themes", icon: Paintbrush, group: "Preferences" },
-  { id: "preferences_sleep", label: "Sleep Time", icon: Moon, group: "Preferences" },
+  { id: "preferences_themes", label: "Appearance", icon: Paintbrush, group: "Preferences" },
+  { id: "preferences_sleep", label: "Sleep Schedule", icon: Moon, group: "Preferences" },
+  { id: "preferences_scheduling", label: "Scheduling", icon: Clock3, group: "Preferences" },
   { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
-  { id: "preferences_studytime", label: "Study Time", icon: BookOpen, group: "Preferences" },
-  { id: "preferences_week", label: "Week Time", icon: BookOpen, group: "Preferences" },
-  { id: "preferences_daynight", label: "Work Time", icon: BookOpen, group: "Preferences" },
 ];
 
 function getProfileCompletion(user) {
@@ -265,10 +263,3 @@ export function ThemeGridSelector({ value, onChange }) {
     </div>
   );
 }
-export { default as FormField } from "../common/FormField/FormField";
-export { ErrorMessage, SuccessBanner } from "./ui/Feedback";
-export { FormInput, FormSelect } from "./ui/FormControls";
-export { default as SectionHeader } from "./ui/SectionHeader";
-export { SettingsSidebar, SettingsTabs, TabButton } from "./ui/SettingsSidebar";
-export { default as SubmitButton } from "./ui/SubmitButton";
-export { ThemeGridSelector, ThemeSelector } from "./ui/ThemeSelectors";
