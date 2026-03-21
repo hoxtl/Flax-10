@@ -128,7 +128,7 @@ export function createHomeMarkerEl(stylesModule) {
 export function homePopupHTML(userHome) {
   return `<div class="HomePopupContent">
     <div class="HomePopupTitle">🏠User Home</div>
-    <button id="setHomeAsStart" class="HomePopupButton">Set Home as Start</button>
+    <button id="setHomeAsStart" class="HomePopupButton" style="color: black;">Set Home as Start</button>
   </div>`;
 }
 
