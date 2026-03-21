@@ -11,6 +11,12 @@ export function LocationEditCell({ value, isEditing, onChange, onSave }) {
         onChange(newValue);
     };
 
+    const handleBlur = () => {
+        if (onSave) {
+            onSave();
+        }
+    };
+
     return (
         <div className={styles.autocompleteCell} onBlur={handleBlur}>
         <LocationAutocomplete
