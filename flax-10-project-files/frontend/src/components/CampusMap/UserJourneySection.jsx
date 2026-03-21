@@ -39,8 +39,6 @@ export function UserJourneySection({
 
     const handleStartSelect = async (address) => {
         setManualStart(address);
-        const coords = await geocodeAddress(address);
-        setStartCoords(coords);
     };
 
     const handleDestSelect = async (address) => {
