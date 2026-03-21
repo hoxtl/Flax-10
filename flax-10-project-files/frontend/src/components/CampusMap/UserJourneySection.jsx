@@ -43,8 +43,6 @@ export function UserJourneySection({
 
     const handleDestSelect = async (address) => {
         setManualDestination(address);
-        const coords = await geocodeAddress(address);
-        setDestCoords(coords);
     };
 
     const handleGo = () => {
