@@ -307,6 +307,10 @@ export default function CampusMap() {
           manualDestination={manualDestination}
           setManualDestination={setManualDestination}
           onCalculate={handleUserJourneyCalculate}
+          onClearAll={() => {
+            handleClearStart();
+            handleClearCampus();
+          }}
         />
         <CalendarEventsSection events={calendarEvents} onEventClick={handleEventClick} />
         <LocationSection
