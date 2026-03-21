@@ -84,7 +84,8 @@ function createSaveWithValue(state, events, tags, dispatch, cancelEdit) {
         if (!state.editingCell || value === state.originalValue) { cancelEdit(); return; }
         const event = events.find(e => e.id === state.editingCell.eventId);
         if (!event) { cancelEdit(); return; }
-        await persistEventUpdate(buildUpdatedEvent(event, state.editingCell.field, value, tags), dispatch);
+        const updatedEvent = await buildUpdatedEvent(event, state.editingCell.field, value, tags);
+        await persistEventUpdate(updatedEvent, dispatch);
         cancelEdit();
     };
 }
