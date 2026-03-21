@@ -208,6 +208,12 @@ export default function CampusMap() {
 
   const onGeoSuccess = async ({ coords }) => {
     const loc = { lng: coords.longitude, lat: coords.latitude };
+    try {
+      const address = await reverseGeocode(coords.latitude, coords.longitude);
+      if (address) { setManualStart(address) };
+    } catch (error) {
+      console.error('Reverse geocoding failes: ', error);
+    }
     setStartLocation(loc);
     const address = await reverseGeocode(coords.latitude, coords.longitude);
     if (address) { setManualStart(address) };
