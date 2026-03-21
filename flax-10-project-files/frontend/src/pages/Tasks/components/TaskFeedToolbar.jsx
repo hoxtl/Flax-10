@@ -39,7 +39,7 @@ function ToolbarSort({ sortBy, onSortChange }) {
   return (
     <div className={styles.sortWrap}>
       <label className={styles.sortLabel}>SORT</label>
-      <AnimatedDropdown value={sortBy} onChange={onSortChange} options={SORT_OPTIONS} className={styles.sortDropdown} />
+      <AnimatedDropdown value={sortBy} onChange={onSortChange} options={SORT_OPTIONS} className={styles.sortDropdown} menuMaxHeight={220} />
     </div>
   );
 }

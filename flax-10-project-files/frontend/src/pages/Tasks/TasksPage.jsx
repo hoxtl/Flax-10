@@ -31,12 +31,7 @@ function ToastDelete({ onClose }) {
 }
 
 function ToastInfo({ message, onClose }) {
-  const variant = typeof message === "string" && message.toLowerCase().includes("deleted")
-    ? "success"
-    : "info";
-  return (
-    <AppToast message={message} onClose={onClose} variant={variant} />
-  );
+  return <AppToast message={message} onClose={onClose} variant="success" />;
 }
 
 function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask, setToastUndo, setToastDelete, setToastInfo }) {
