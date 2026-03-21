@@ -12,6 +12,13 @@
     margin-bottom: 24px;
 }
 
+.deleteError {
+    margin: -12px 0 20px;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+}
+
 .deleteBtn {
     padding: 8px 16px;
     border-radius: 999px;
@@ -24,7 +31,6 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .deleteBtn:hover {
