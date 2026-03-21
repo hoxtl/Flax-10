@@ -177,7 +177,8 @@
 .personaEmoji {
   font-size: 30px;
   line-height: 1;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 
 .personaLabel {
@@ -222,7 +223,7 @@
 .dnaSegment {
   height: 100%;
   min-width: 6px;
-  transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dnaLegend {
@@ -384,7 +385,9 @@
 }
 
 .goalRingActive .goalRingSvg {
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-primary) 50%, transparent));
+  filter: drop-shadow(
+    0 0 8px color-mix(in srgb, var(--color-primary) 50%, transparent)
+  );
 }
 
 .goalRingSvg {
@@ -507,9 +510,11 @@
   appearance: none;
   width: 100%;
   height: 6px;
-  background: linear-gradient(to right,
-      var(--color-primary) var(--slider-pct, 0%),
-      var(--border) var(--slider-pct, 0%));
+  background: linear-gradient(
+    to right,
+    var(--color-primary) var(--slider-pct, 0%),
+    var(--border) var(--slider-pct, 0%)
+  );
   border-radius: 3px;
   outline: none;
   cursor: pointer;
@@ -663,7 +668,8 @@
 }
 
 .focusHeatmapCardInteractive:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-primary) 28%, transparent);
 }
 
 .compactRingWrap {
@@ -872,8 +878,14 @@
 }
 
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .attendanceWarning {
@@ -894,8 +906,15 @@
 }
 
 @keyframes warningPulse {
-    0%, 100% { box-shadow: 0 0 8px rgba(239, 83, 80, 0.25); transform: scale(1); }
-    50% { box-shadow: 0 0 15px rgba(239, 83, 80, 0.45); transform: scale(1.02); }
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(239, 83, 80, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(239, 83, 80, 0.45);
+    transform: scale(1.02);
+  }
 }
 
 .goalSaveBtn {
@@ -934,7 +953,11 @@
   font-weight: 700;
   color: var(--text);
   line-height: 1;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-highlight));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-highlight)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -958,12 +981,18 @@
   cursor: default;
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
   backdrop-filter: blur(8px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .badgeGold {
   background: color-mix(in srgb, var(--home-urgency-warning) 12%, transparent);
-  border-color: color-mix(in srgb, var(--home-urgency-warning) 30%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--home-urgency-warning) 30%,
+    transparent
+  );
 }
 
 .badgeSilver {
@@ -982,7 +1011,8 @@
 }
 
 .badgeEmoji {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
   font-size: 13px;
   line-height: 1;
 }
@@ -1029,13 +1059,22 @@
 
 /* ── Skeleton Animation ── */
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skel {
   border-radius: 16px;
-  background: linear-gradient(90deg, var(--panel) 0%, var(--hover) 50%, var(--panel) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--panel) 0%,
+    var(--hover) 50%,
+    var(--panel) 100%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.6s ease infinite;
   border: 1px solid var(--border);
@@ -1048,10 +1087,18 @@
   gap: 12px;
 }
 
-.skelPersona { height: 72px; }
-.skelWeek { height: 120px; }
-.skelDna { height: 64px; }
-.skelHeatmap { height: 90px; }
+.skelPersona {
+  height: 72px;
+}
+.skelWeek {
+  height: 120px;
+}
+.skelDna {
+  height: 64px;
+}
+.skelHeatmap {
+  height: 90px;
+}
 
 .skelBadgeRow {
   display: flex;
@@ -1094,8 +1141,17 @@
   padding-top: 8px;
 }
 
-.skelName { height: 22px; width: 200px; border-radius: 8px; }
-.skelBio { height: 16px; width: 320px; border-radius: 8px; opacity: 0.7; }
+.skelName {
+  height: 22px;
+  width: 200px;
+  border-radius: 8px;
+}
+.skelBio {
+  height: 16px;
+  width: 320px;
+  border-radius: 8px;
+  opacity: 0.7;
+}
 
 .skelStatsRow {
   display: flex;
@@ -1103,7 +1159,11 @@
   margin-top: 8px;
 }
 
-.skelStat { height: 40px; width: 80px; border-radius: 10px; }
+.skelStat {
+  height: 40px;
+  width: 80px;
+  border-radius: 10px;
+}
 
 .skelBody {
   display: grid;
@@ -1112,9 +1172,19 @@
   align-items: start;
 }
 
-.skelLeftCol { display: flex; flex-direction: column; gap: 12px; }
-.skelRightCol { display: flex; flex-direction: column; gap: 12px; }
-.skelWidget { height: 140px; }
+.skelLeftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skelRightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skelWidget {
+  height: 140px;
+}
 
 /* ── Legacy list/modal styles ── */
 .listItem {
@@ -1122,19 +1192,23 @@
   align-items: center;
   gap: 12px;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
   transition: background 0.12s;
 }
 
-.listItem:hover { background: rgba(255,255,255,0.3); }
-.listItem:last-child { border-bottom: none; }
+.listItem:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.listItem:last-child {
+  border-bottom: none;
+}
 
 .listAvatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1142,15 +1216,26 @@
   flex-shrink: 0;
 }
 
-.listInfo { flex: 1; min-width: 0; }
-.listName { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-.listMeta { font-size: 12px; color: var(--muted); }
+.listInfo {
+  flex: 1;
+  min-width: 0;
+}
+.listName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.listMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
 
 .rangeSelector {
   display: flex;
   gap: 8px;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .rangeSelector button {
@@ -1158,7 +1243,7 @@
   padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   color: var(--text);
   font-size: 13px;
   font-weight: 500;
@@ -1167,7 +1252,9 @@
   transition: all 0.15s;
 }
 
-.rangeSelector button:hover { background: rgba(255,255,255,0.5); }
+.rangeSelector button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
 
 .rangeActive {
   background: var(--color-primary) !important;
@@ -1184,13 +1271,29 @@
 
 /* ── Media Queries ── */
 @media (max-width: 860px) {
-  .twoCol { grid-template-columns: 1fr; }
-  .leftTopMetricsRow { grid-template-columns: 1fr; }
-  .rightCol { position: static; }
-  .skelBody { grid-template-columns: 1fr; }
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+  .leftTopMetricsRow {
+    grid-template-columns: 1fr;
+  }
+  .rightCol {
+    position: static;
+  }
+  .skelBody {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .skelAvatar { width: 80px; height: 80px; }
-  .skelBio { width: 200px; }
+  .backButton {
+    display: none;
+  }
+  .skelAvatar {
+    width: 80px;
+    height: 80px;
+  }
+  .skelBio {
+    width: 200px;
+  }
 }
