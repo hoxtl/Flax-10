@@ -13,5 +13,15 @@ export function LocationEditCell({ value, isEditing, onChange, onSave }) {
         if (onSave) {
             onSave();
         }
-    }
+    };
+
+    return (
+        <div className={styles.autocompleteCell} onBlur={handleBlur}>
+        <LocationAutocomplete
+            value={value || ''}
+            onChange={handleChange}
+            placeholder="Enter location"
+        />
+        </div>
+    );
 }
