@@ -2,49 +2,70 @@
  * GroupWork project list content.
  */
 
-import { SegmentedControl } from "../../../components/common/SegmentedControl/SegmentedControl.jsx";
+import PageToolbar, { ToolbarSortControl } from "../../../components/common/PageToolbar/PageToolbar";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import CreateProjectForm from "./CreateProjectForm";
 import ProjectRow from "./ProjectRow";
+import { compareProjectsBySort } from "../utils/projectRowUtils";
 import styles from "./GroupWorkContent.module.css";
 
-const FILTER_TABS = [
-  { id: "all", label: "All" },
-  { id: "due_soon", label: "Due soon" },
-  { id: "later", label: "Later" },
+const SORT_OPTIONS = [
+  { value: "due-date", label: "Due date" },
+  { value: "most-completed", label: "Most completed" },
+  { value: "least-completed", label: "Least completed" },
+  { value: "name", label: "A → Z" },
+  { value: "name-desc", label: "Z → A" },
 ];
 
-function filterProjects(projects, filter) {
-  return projects.filter((project) => matchesProjectFilter(project, filter));
+function sortProjects(projects, sortBy) {
+  const sorted = [...projects];
+  sorted.sort((left, right) => compareProjectsBySort(left, right, sortBy));
+  return sorted;
 }
 
-function matchesProjectFilter(project, filter) {
-  if (filter === "all") return true;
-  const days = getDaysUntilDeadline(project.deadline);
-  if (filter === "due_soon") return days > 0 && days <= 30;
-  if (filter === "later") return days > 30 || days === Infinity;
-  return true;
-}
-
-function getDaysUntilDeadline(deadline) {
-  if (!deadline) return Infinity;
-  return Math.ceil((new Date(deadline) - Date.now()) / (1000 * 60 * 60 * 24));
-}
-
-export default function GroupWorkContent({ projects, projectListProps, filter, setFilter }) {
-  const filteredProjects = filterProjects(projects, filter);
+export default function GroupWorkContent({ projects, projectListProps, sortBy, setSortBy, onProjectCreated }) {
+  const sortedProjects = sortProjects(projects, sortBy);
   return (
     <div className={styles.projectsSection}>
-      <ProjectsHeader filter={filter} setFilter={setFilter} />
-      {filteredProjects.length === 0 ? <p className={styles.emptyMessage}>No projects match this filter.</p> : <ProjectList projects={filteredProjects} projectListProps={projectListProps} />}
+      <ProjectsHeader sortBy={sortBy} setSortBy={setSortBy} onProjectCreated={onProjectCreated} />
+      {sortedProjects.length === 0 ? (
+        <SearchEmptyState
+          title="No group projects yet."
+          hint="Create a shared project linked to one of your modules and start planning time with your teammates."
+          icon={null}
+          className={styles.emptyStateCard}
+          titleClassName={styles.emptyStateTitle}
+          hintClassName={styles.emptyStateHint}
+        />
+      ) : (
+        <ProjectList projects={sortedProjects} projectListProps={projectListProps} />
+      )}
     </div>
   );
 }
 
-function ProjectsHeader({ filter, setFilter }) {
+function ProjectsHeader({ sortBy, setSortBy, onProjectCreated }) {
   return (
-    <div className={styles.projectsHeader}>
-      <h3 className={styles.sectionTitle}>PROJECTS</h3>
-      <SegmentedControl options={FILTER_TABS.map((tab) => ({ value: tab.id, label: tab.label }))} value={filter} onChange={setFilter} />
-    </div>
+    <PageToolbar
+      className={styles.projectsHeader}
+      controlsSlot={
+        <div className={styles.projectsHeaderActions}>
+          <ToolbarSortControl className={styles.sortControl}>
+            <AnimatedDropdown
+              className={styles.sortDropdownWrap}
+              value={sortBy}
+              onChange={setSortBy}
+              options={SORT_OPTIONS}
+              placeholder="Choose a sort"
+              usePortal
+              triggerClassName={styles.sortDropdownTrigger}
+            />
+          </ToolbarSortControl>
+          <CreateProjectForm onCreated={onProjectCreated} size="small" className={styles.createButton} />
+        </div>
+      }
+    />
   );
 }
 

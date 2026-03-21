@@ -1,56 +1,93 @@
 .projectsSection {
-    margin-top: 32px;
+    margin-top: 28px;
 }
 
 .projectsHeader {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    justify-content: flex-end;
+    margin-bottom: 18px;
 }
 
-.sectionTitle {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--text-secondary);
-}
-
-.filterTabs {
+.projectsHeaderActions {
     display: flex;
-    background: white;
-    padding: 4px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
 }
 
-.filterTab {
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    border: none;
-    background: transparent;
-    cursor: pointer;
+.sortControl {
+    gap: 6px;
 }
 
-.filterTabActive {
-    background: var(--surface-search);
+.sortDropdownWrap {
+    min-width: 190px;
+}
+
+.sortDropdownTrigger {
+    min-height: 36px;
+    padding: 0 0.95rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border));
     color: var(--text);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+}
+
+.sortDropdownTrigger:hover {
+    background: color-mix(in srgb, var(--modules-accent-ink) 16%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 26%, var(--border));
+}
+
+.sortDropdownTrigger :global(svg) {
+    color: color-mix(in srgb, var(--modules-accent-ink) 76%, var(--text-secondary));
+}
+
+.createButton {
+    min-height: 36px;
+    padding-inline: 16px;
+    box-shadow: none;
+    font-size: 0.82rem;
 }
 
 .projectList {
     display: flex;
     flex-direction: column;
+    gap: 12px;
 }
 
-.emptyMessage {
-    text-align: center;
-    padding: 48px;
-    color: var(--text-secondary);
-    background: white;
-    border: 1px dashed var(--border);
-    border-radius: 16px;
+.emptyStateCard {
+    margin: 0;
+    padding: 34px 22px;
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.emptyStateTitle {
     font-style: italic;
+}
+
+.emptyStateHint {
+    max-width: 32rem;
+}
+
+@media (max-width: 768px) {
+    .projectsHeader {
+        justify-content: stretch;
+    }
+
+    .projectsHeaderActions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .sortDropdownWrap {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .createButton {
+        width: 100%;
+    }
 }
