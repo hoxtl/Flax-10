@@ -196,6 +196,10 @@
   border-top: 1px solid var(--border);
 }
 
+.dragHandle {
+  display: none;
+}
+
 .mapWrapper {
   flex: 1;
   position: relative;
@@ -395,18 +399,17 @@
   }
 
   .dragHandle {
+    display: block;
     width: 48px;
-    height: 5px;
-    background: color-mix(in srgb, var(--muted) 34%, transparent);
+    height: 6px;
+    background: color-mix(in srgb, var(--text) 26%, transparent);
+    border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
     border-radius: 999px;
     margin: 10px auto 2px;
     flex-shrink: 0;
-    cursor: grab;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-
-  .sidebar:active .dragHandle {
-    cursor: grabbing;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 1px 3px rgba(0, 0, 0, 0.12);
   }
 
   .sidebarHeader {
