@@ -20,7 +20,7 @@ function TabButton({ tab, isActive, onClick, layoutId, tabClassName, tabVariant 
 }
 
 /** Tabs component with animated indicator and content transitions. */
-export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default" }) {
+export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default", middle }) {
   if (!tabs?.length) return null;
   const containerClass = `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();
   return (
@@ -32,6 +32,7 @@ export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndi
             tabClassName={tabClassName} tabVariant={tabVariant} />
         ))}
       </motion.div>
+      {middle}
       <AnimatePresence mode="wait">
         <motion.div key={activeTab} {...tabContentMotion} className={styles.content}>
           {tabs.find(t => t.id === activeTab)?.content}

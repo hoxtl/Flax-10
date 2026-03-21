@@ -16,9 +16,21 @@
   row-gap: 0.3rem;
 }
 
+.stripBare {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
 .stripCompact .item {
   gap: 0.18rem;
   padding: 0 0.7rem;
+}
+
+.stripBare .item {
+  padding: 0 1rem;
 }
 
 .stripCompact .value {

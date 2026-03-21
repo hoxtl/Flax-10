@@ -57,10 +57,10 @@ function StatItem({ item }) {
 }
 
 /** Horizontal row of stats, each with a value, label, and optional colour tone. */
-export default function StatStrip({ items = [], className = '', compact = false }) {
+export default function StatStrip({ items = [], className = '', compact = false, bare = false }) {
   if (!items.length) return null;
   return (
-    <div className={[styles.strip, compact ? styles.stripCompact : '', className].filter(Boolean).join(' ')}>
+    <div className={[styles.strip, compact ? styles.stripCompact : '', bare ? styles.stripBare : '', className].filter(Boolean).join(' ')}>
       {items.map((item, index) => (
         <Fragment key={item.key || item.label}>
           <StatItem item={item} />
