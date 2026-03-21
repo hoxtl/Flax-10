@@ -16,9 +16,10 @@ function getTaskMarker(task, urgencyTone) {
   return task.module_code ? '🦁' : null;
 }
 
-export function TaskPickItem({ task, value, recommendedTaskId, onSelect }) {
+export function TaskPickItem({ task, selectedTaskId, recommendedTaskId, onSelect }) {
   const urgencyTone = getTaskUrgencyTone(task);
-  const className = `${styles.taskPickItem} ${getUrgencyClass(urgencyTone)} ${value === task.title ? styles.taskPickItemSelected : ''} ${recommendedTaskId === task.id ? styles.taskPickItemRecommended : ''}`;
+  const isSelected = String(selectedTaskId) === String(task.id);
+  const className = `${styles.taskPickItem} ${getUrgencyClass(urgencyTone)} ${isSelected ? styles.taskPickItemSelected : ''} ${recommendedTaskId === task.id ? styles.taskPickItemRecommended : ''}`;
 
   return (
     <button key={task.id} type="button" className={className} onClick={() => onSelect(task)} title={task.title}>

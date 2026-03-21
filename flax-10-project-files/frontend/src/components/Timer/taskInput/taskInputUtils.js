@@ -3,6 +3,7 @@
  */
 
 import { FOCUS_BLOCK_COLOURS_HEX } from '../../../pages/Tasks/constants/focusBlockColours';
+import { normalizeModuleCode, getModuleCodePrefix } from '../../../utils/moduleCodeUtils';
 import { isEnrolledIn } from '../../Modules/utils/moduleUtils';
 import { compareTaskDue, compareTaskEstimatedTime, compareTaskPriority, getTaskDurationMinutes } from '../../../lib/focusPlanner';
 import { SORT_ALPHA, SORT_DATE_ADDED, SORT_DUE, SORT_TIME } from './taskInputConstants';
@@ -23,18 +24,10 @@ function getEndOfToday() {
   return now;
 }
 
-export function normalizeModuleCode(code) {
-  return String(code || '').trim().toUpperCase();
-}
-
 export function urgencyRank(task) {
   const tone = getTaskUrgencyTone(task);
   if (tone === 'hot') return 0;
   return tone === 'warm' ? 1 : 2;
-}
-
-export function moduleCodePrefix(code = '') {
-  return code.match(/^[A-Za-z]+/)?.[0]?.toUpperCase() || 'Other';
 }
 
 export function sortTasks(list, sort) {
@@ -87,7 +80,7 @@ export function groupModuleItems(moduleItems, filterQuery) {
 }
 
 function appendGroupedItem(accumulator, item) {
-  const key = moduleCodePrefix(item.value);
+  const key = getModuleCodePrefix(item.value);
   if (!accumulator[key]) accumulator[key] = [];
   accumulator[key].push(item);
   return accumulator;

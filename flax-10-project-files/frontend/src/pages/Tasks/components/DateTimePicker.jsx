@@ -1,6 +1,5 @@
-/**
- * Date/time picker: trigger button and dropdown (calendar + time).
- * Uses useDateTimePicker and utils for logic; subcomponents for UI.
+/*
+ * Date-time picker with calendar and time dropdown controls.
  */
 
 import { createPortal } from "react-dom";
@@ -62,14 +61,14 @@ function DateTimePickerTime({ hour, minute, changeHour, changeMinute, setOpen, t
 }
 
 export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false }) {
-  const picker = useDateTimePicker(value, onChange, timeOnly);
+  const { ref, dropdownRef, open, setOpen, selDate, dropdownPos, viewM, viewY, prevMonth, nextMonth, days, isToday, isSel, selectDay, hour, minute, changeHour, changeMinute, clearSelection } = useDateTimePicker(value, onChange, timeOnly);
   return (
-    <div className={styles.wrap} ref={picker.ref}>
-      <DateTimePickerTrigger open={picker.open} setOpen={picker.setOpen} selDate={picker.selDate} timeOnly={picker.timeOnly} placeholder={placeholder} clearSelection={picker.clearSelection} styles={styles} />
-      {picker.open && createPortal(
-        <div ref={picker.dropdownRef} className={styles.dropdown} style={{ position: "fixed", top: picker.dropdownPos.top, left: picker.dropdownPos.left, zIndex: 10000 }}>
-          {!picker.timeOnly && <DateTimePickerCalendar viewM={picker.viewM} viewY={picker.viewY} prevMonth={picker.prevMonth} nextMonth={picker.nextMonth} days={picker.days} isToday={picker.isToday} isSel={picker.isSel} selectDay={picker.selectDay} styles={styles} />}
-          <DateTimePickerTime hour={picker.hour} minute={picker.minute} changeHour={picker.changeHour} changeMinute={picker.changeMinute} setOpen={picker.setOpen} timeOnly={picker.timeOnly} styles={styles} />
+    <div className={styles.wrap} ref={ref}>
+      <DateTimePickerTrigger open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} placeholder={placeholder} clearSelection={clearSelection} styles={styles} />
+      {open && createPortal(
+        <div ref={dropdownRef} className={styles.dropdown} style={{ position: "fixed", top: dropdownPos.top, left: dropdownPos.left, zIndex: 10000 }}>
+          {!timeOnly && <DateTimePickerCalendar viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={selectDay} styles={styles} />}
+          <DateTimePickerTime hour={hour} minute={minute} changeHour={changeHour} changeMinute={changeMinute} setOpen={setOpen} timeOnly={timeOnly} styles={styles} />
         </div>,
         document.body
       )}

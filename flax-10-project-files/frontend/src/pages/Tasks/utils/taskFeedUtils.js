@@ -1,8 +1,7 @@
-/**
+/*
  * Helpers for the TaskFeed page: routine/event detection and header title.
  */
 
-/** Returns true if the task is treated as a routine or event (excluded from overdue). */
 export function isRoutineOrEventTask(task) {
   if (!task) return false;
   const title = (task.title || "").toLowerCase();
@@ -13,7 +12,6 @@ export function isRoutineOrEventTask(task) {
   return false;
 }
 
-/** Returns the feed header title from active filter and list state. */
 export function getHeaderTitle(activeFilter, activeList, activeModuleCode) {
   if (activeFilter === "today") return "Today";
   if (activeFilter === "this_week") return "This Week";

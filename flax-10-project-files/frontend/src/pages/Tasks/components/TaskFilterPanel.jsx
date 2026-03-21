@@ -1,4 +1,4 @@
-/**
+/*
  * Dropdown panel for filtering tasks by list and module code.
  */
 
@@ -84,7 +84,7 @@ function ModulesTab({ moduleGroupKeys, groupedModuleItems, filterModuleCodes, on
   );
 }
 
-/** Dropdown panel for filtering tasks by list or module. */
+/* Dropdown panel for filtering tasks by list or module. */
 export default function TaskFilterPanel(props) {
   return (
     <>

@@ -1,10 +1,9 @@
-/**
- * Modal for creating and editing tasks. Uses useCreateTaskModal for state.
+/*
+ * Modal for creating and editing tasks.
  */
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import FormField from "../../../components/common/FormField/FormField";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
@@ -198,7 +197,7 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
-  const { form, set, setForm, categoryOptions, selectedListColor, askFlaxInitialMessage, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />

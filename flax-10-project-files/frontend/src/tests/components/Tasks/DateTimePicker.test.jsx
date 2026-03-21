@@ -1,4 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+/* Tests for the DateTimePicker component. */
+
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import DateTimePicker from '../../../pages/Tasks/components/DateTimePicker';
 

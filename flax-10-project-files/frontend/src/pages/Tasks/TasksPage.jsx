@@ -1,6 +1,5 @@
-/**
- * Tasks page: list sidebar, task feed, create modals, toasts.
- * Uses useTasksPage for state and subcomponents for layout.
+/*
+ * Tasks page shell with sidebar, feed, modals, and toast feedback.
  */
 
 import TaskFeed from "./components/TaskFeed";
@@ -50,24 +49,22 @@ function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask,
   );
 }
 
+function SkeletonRows({ count, className, step }) {
+  return [...Array(count)].map((_, index) => <div key={index} className={`${styles.skel} ${className}`} style={{ animationDelay: `${index * step}s` }} />);
+}
+
 function TasksSkeleton() {
   return (
     <div className={styles.page} data-testid="tasks-skeleton">
       <div className={styles.skelSidebar}>
         <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
-        ))}
+        <SkeletonRows count={3} className={styles.skelSidebarRow} step={0.08} />
         <div className={styles.skelDivider} />
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelSidebarRow}`} style={{ animationDelay: `${i * 0.08}s` }} />
-        ))}
+        <SkeletonRows count={4} className={styles.skelSidebarRow} step={0.08} />
       </div>
       <div className={styles.skelFeed}>
         <div className={`${styles.skel} ${styles.skelFeedHeader}`} />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className={`${styles.skel} ${styles.skelTaskRow}`} style={{ animationDelay: `${i * 0.06}s` }} />
-        ))}
+        <SkeletonRows count={5} className={styles.skelTaskRow} step={0.06} />
       </div>
     </div>
   );
