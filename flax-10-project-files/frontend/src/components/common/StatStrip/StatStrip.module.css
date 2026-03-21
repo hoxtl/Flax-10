@@ -1,6 +1,6 @@
 .strip {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background: var(--surface-card);
   border: var(--card-border);
   border-radius: var(--card-radius-token);
@@ -11,20 +11,60 @@
   box-shadow: var(--card-shadow-rest);
 }
 
-.item {
+.stripCompact {
+  padding: 0.6rem 0.85rem;
+  row-gap: 0.3rem;
+}
+
+.stripCompact .item {
+  gap: 0.18rem;
+  padding: 0 0.7rem;
+}
+
+.stripCompact .value {
+  font-size: 1.05rem;
+}
+
+.stripCompact .label {
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.stripCompact .copy {
+  gap: 0.08rem;
+}
+
+.stripCompact .meta {
+  font-size: 0.7rem;
+}
+
+.itemSlot {
   display: flex;
   flex: 1;
   min-width: 0;
+}
+
+.item {
+  display: flex;
+  width: 100%;
+  min-width: 0;
   flex-direction: column;
-  gap: 0.15rem;
+  justify-content: center;
+  gap: 0.35rem;
   padding: 0 1.25rem;
   text-align: center;
 }
 
+.itemTooltipWrap {
+  cursor: default;
+}
+
 .sep {
   width: 1px;
-  height: 32px;
+  height: auto;
+  min-height: 32px;
   background: var(--border);
+  align-self: stretch;
   flex-shrink: 0;
 }
 
@@ -47,11 +87,29 @@
 }
 
 .label {
+  display: block;
   font-size: 0.64rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--text);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  align-items: center;
+}
+
+.meta {
+  font-size: 0.76rem;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: normal;
+  max-width: 20ch;
 }
 
 .valueSuccess {

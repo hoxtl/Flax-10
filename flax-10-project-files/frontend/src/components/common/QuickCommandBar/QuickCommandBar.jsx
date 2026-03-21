@@ -31,7 +31,7 @@ function actionDefs({ onNavChange, onOpenTask }) {
     { id: "go-map", title: "Open campus map", hint: "Navigate the campus map and plan your journey", Icon: MapPin, run: nav("map") },
     { id: "go-societies", title: "Browse societies", hint: "Explore and join student societies", Icon: Sparkles, run: () => onNavChange?.("/societies?tab=all") },
     { id: "go-users", title: "Discover users", hint: "Find and connect with other students", Icon: Users, run: nav("users") },
-    { id: "go-group-work", title: "Group work", hint: "Collaborate with your group", Icon: UserCheck, run: nav("group-work") },
+    { id: "go-group-work", title: "Group Projects", hint: "Track shared project work", Icon: UserCheck, run: nav("group-work") },
     { id: "go-analytics", title: "View analytics", hint: "See your study statistics and insights", Icon: BarChart2, run: nav("analytics") },
     { id: "go-attendance", title: "Attendance", hint: "Check your lecture attendance", Icon: ClipboardCheck, run: nav("attendance") },
   ];

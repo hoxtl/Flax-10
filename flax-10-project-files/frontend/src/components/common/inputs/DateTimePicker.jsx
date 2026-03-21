@@ -205,9 +205,10 @@ function TriggerButton({ open, setOpen, selDate, timeOnly, dateOnly, placeholder
   const displayValue = selDate ? getDisplayValue(selDate, timeOnly, dateOnly) : placeholder;
   const handleClear = (e) => { e.stopPropagation(); setSelDate(null); onChange?.(""); };
   const handleKeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(p => !p); } };
+  const triggerClasses = [styles.trigger, open ? styles.triggerOpen : "", !selDate ? styles.triggerEmpty : "", triggerClassName || ""].filter(Boolean).join(" ");
   return (
     <div role="button" tabIndex={0} onClick={() => setOpen(p => !p)} onKeyDown={handleKeydown}
-      className={triggerClassName || `${styles.trigger} ${open ? styles.triggerOpen : ""} ${!selDate ? styles.triggerEmpty : ""}`}>
+      className={triggerClasses}>
       {!hideIcon && <span className={styles.triggerIcon}>{timeOnly ? "🕒" : "📅"}</span>}
       <span className={selDate && !triggerClassName ? styles.triggerValueMono : ""}>{displayValue}</span>
       {selDate && <button type="button" className={styles.clearBtn} onClick={handleClear} aria-label="Clear date">✕</button>}

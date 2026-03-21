@@ -1,0 +1,51 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  min-width: 102px;
+  min-height: 36px;
+  padding: 0.34rem 0.78rem;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+.marks {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.label {
+  line-height: 1;
+}
+
+.urgent {
+  color: #dc2626;
+  background: rgba(254, 226, 226, 0.92);
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.high {
+  color: #c2410c;
+  background: rgba(255, 237, 213, 0.92);
+  border-color: rgba(251, 146, 60, 0.36);
+}
+
+.medium {
+  color: #a16207;
+  background: rgba(254, 249, 195, 0.94);
+  border-color: rgba(250, 204, 21, 0.34);
+}
+
+.low {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.92);
+  border-color: rgba(74, 222, 128, 0.28);
+}
