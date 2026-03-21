@@ -9,6 +9,7 @@ export function UserJourneySection({
     manualDestination,
     setManualDestination,
     onCalculate,
+    onClearAll,
 }) {
     const [startCoords, setStartCoords] = useState(null);
     const [destCoords, setDestCoords] = useState(null);
@@ -56,6 +57,9 @@ export function UserJourneySection({
         setManualDestination("");
         setStartCoords(null);
         setDestCoords(null);
+        if (onClearAll) {
+            onClearAll();
+        }
     };
 
     const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
