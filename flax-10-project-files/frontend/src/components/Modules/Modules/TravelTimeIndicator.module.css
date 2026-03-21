@@ -28,3 +28,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+.travelDuration {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+}
