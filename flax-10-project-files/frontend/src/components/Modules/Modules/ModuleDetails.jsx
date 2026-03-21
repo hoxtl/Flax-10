@@ -208,6 +208,11 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
             try {
                 const homeAddress = await getHomeAddress();
                 const travelInfo = await getTravelTimeModule(homeAddress, module.location);
+                if (travelInfo) {
+                    setTravelTime(travelInfo.duration);
+                }
+            } catch (error) {
+                console.error('Travel time fetch in module details error: ', error);
             }
         }
     })
