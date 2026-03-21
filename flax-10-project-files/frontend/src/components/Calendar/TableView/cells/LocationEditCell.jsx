@@ -1,4 +1,6 @@
 import { LocationAutocomplete } from '../../../Calendar/EventModal/components/LocationAutocomplete';
+import styles from '../TableView.module.css';
+
 
 export function LocationEditCell({ value, isEditing, onChange, onSave }) {
     if (!isEditing) {
