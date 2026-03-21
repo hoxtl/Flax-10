@@ -1,6 +1,6 @@
 /* Homepage timeline section: merged widget support with refactored timeline helpers. */
 
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon } from "lucide-react";
 import baseStyles from "../styles/WidgetBase.module.css";
@@ -59,7 +59,7 @@ function ReplanButton({ selectedDate, handleReplanDay, replanLoading, missedItem
 
   const disabled = replanLoading || (!missedItems?.length && !overdueTasksForNow?.length);
   return (
-    <motion.button
+    <Motion.button
       type="button"
       className={styles.manualScheduleBtn}
       onClick={handleReplanDay}
@@ -70,28 +70,30 @@ function ReplanButton({ selectedDate, handleReplanDay, replanLoading, missedItem
       aria-label="Re-plan overdue and missed items into free windows"
     >
       {replanLoading ? "Re-planning..." : "Re-plan"}
-    </motion.button>
+    </Motion.button>
   );
 }
 
-function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles }) {
+function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles, isWidget }) {
   if (!isToday(selectedDate) || !onOpenQuickAddSchedule) return null;
 
   return (
-    <motion.div
+    <Motion.div
       className={styles.scheduleActionGroup}
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <button
-        type="button"
-        className={styles.manualScheduleBtn}
-        onClick={() => onOpenQuickAddSchedule("schedule_manual")}
-        aria-label="Open manual schedule quick add"
-      >
-        Manual Schedule
-      </button>
+      {!isWidget && (
+        <button
+          type="button"
+          className={styles.manualScheduleBtn}
+          onClick={() => onOpenQuickAddSchedule("schedule_manual")}
+          aria-label="Open manual schedule quick add"
+        >
+          Manual Schedule
+        </button>
+      )}
       <button
         type="button"
         className={styles.autoScheduleBtn}
@@ -100,7 +102,7 @@ function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles }) {
       >
         Auto Schedule
       </button>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -126,7 +128,7 @@ function TimelineHeader(props) {
       )}
       <div className={styles.timelineHeaderRight}>
         <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
-        <ScheduleActions selectedDate={selectedDate} onOpenQuickAddSchedule={onOpenQuickAddSchedule} styles={styles} />
+        <ScheduleActions selectedDate={selectedDate} onOpenQuickAddSchedule={onOpenQuickAddSchedule} styles={styles} isWidget={isWidget} />
         <ReplanButton
           selectedDate={selectedDate}
           handleReplanDay={handleReplanDay}
@@ -143,14 +145,14 @@ function TimelineHeader(props) {
 function TimelineTrack({ styles, children }) {
   return (
     <div className={styles.timelineTrack}>
-      <motion.div
+      <Motion.div
         className={styles.timelineTrackContent}
         layout
         initial={false}
         transition={{ type: "spring", stiffness: 400, damping: 35 }}
       >
         {children}
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }
@@ -177,7 +179,7 @@ export function HomepageTimelineSection(props) {
   }
 
   return (
-    <motion.div
+    <Motion.div
       className={styles.bentoSpine}
       id="timeline-section"
       initial={SECTION_ANIMATION}
@@ -186,6 +188,6 @@ export function HomepageTimelineSection(props) {
       transition={SECTION_TRANSITION}
     >
       {content}
-    </motion.div>
+    </Motion.div>
   );
 }

@@ -1,3 +1,7 @@
+/*
+ * Topbar profile dropdown menu.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
@@ -87,38 +91,53 @@ function AvatarButton({ initials, profilePhotoUrl, onClick }) {
   );
 }
 
+function closeAndRun(setIsOpen, callback) {
+  setIsOpen(false);
+  callback?.();
+}
+
+function useDropdownHandlers(setIsOpen, onSettingsClick, onLogoutClick, onProfileClick) {
+  return {
+    handleSettingsClick: () => closeAndRun(setIsOpen, onSettingsClick),
+    handleLogoutClick: () => closeAndRun(setIsOpen, onLogoutClick),
+    handleProfileClick: () => closeAndRun(setIsOpen, onProfileClick),
+  };
+}
+
+function clearCloseTimer(closeTimerRef) {
+  if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+}
+
+function openDropdown(setIsOpen, closeTimerRef) {
+  clearCloseTimer(closeTimerRef);
+  setIsOpen(true);
+}
+
+function queueClose(setIsOpen, closeTimerRef) {
+  clearCloseTimer(closeTimerRef);
+  closeTimerRef.current = setTimeout(() => setIsOpen(false), 180);
+}
+
+function useHoverHandlers(setIsOpen, closeTimerRef) {
+  return {
+    onHoverEnter: () => openDropdown(setIsOpen, closeTimerRef),
+    onHoverLeave: () => queueClose(setIsOpen, closeTimerRef),
+  };
+}
 
 function useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick) {
-  const { profile: profileData, refreshProfile } = useAuth();
+  const { profile: profileData } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const closeTimerRef = useRef(null);
-
-  const handleSettingsClick = () => { setIsOpen(false); onSettingsClick?.(); };
-  const handleLogoutClick = () => { setIsOpen(false); onLogoutClick?.(); };
-  const handleProfileClick = () => { setIsOpen(false); onProfileClick?.(); };
-  
-  const onHoverEnter = () => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    setIsOpen(true);
-  };
-  const onHoverLeave = () => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = setTimeout(() => setIsOpen(false), 180);
-  };
-
-  useEffect(() => () => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-  }, []);
-
+  const handlers = useDropdownHandlers(setIsOpen, onSettingsClick, onLogoutClick, onProfileClick);
+  const hoverHandlers = useHoverHandlers(setIsOpen, closeTimerRef);
+  useEffect(() => () => clearCloseTimer(closeTimerRef), []);
   return {
     isOpen,
     setIsOpen,
     profileData,
-    handleSettingsClick,
-    handleLogoutClick,
-    handleProfileClick,
-    onHoverEnter,
-    onHoverLeave,
+    ...handlers,
+    ...hoverHandlers,
   };
 }
 
@@ -130,32 +149,29 @@ function buildDisplayUser(user, profileData) {
   };
 }
 
+function getProfilePhotoUrl(profileData, displayUser) {
+  return profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: true });
+}
+
+function buildDropdownUser(displayUser) {
+  return { ...displayUser, major: displayUser.major || "Computer Science" };
+}
+
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {
-  const {
-    isOpen,
-    setIsOpen,
-    profileData,
-    handleSettingsClick,
-    handleLogoutClick,
-    handleProfileClick,
-    onHoverEnter,
-    onHoverLeave,
-  } =
-    useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick);
+  const dropdown = useProfileDropdown(onSettingsClick, onLogoutClick, onProfileClick);
   const initials = getInitials(user?.name) || "?";
-  const displayUser = buildDisplayUser(user, profileData);
-  const profilePhotoUrl = profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: true });
-  const displayMajor = displayUser.major || "Computer Science";
+  const displayUser = buildDisplayUser(user, dropdown.profileData);
+  const profilePhotoUrl = getProfilePhotoUrl(dropdown.profileData, displayUser);
   return (
-    <div className={styles.container} onMouseEnter={onHoverEnter} onMouseLeave={onHoverLeave}>
-      <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => setIsOpen(!isOpen)} />
+    <div className={styles.container} onMouseEnter={dropdown.onHoverEnter} onMouseLeave={dropdown.onHoverLeave}>
+      <AvatarButton initials={initials} profilePhotoUrl={profilePhotoUrl} onClick={() => dropdown.setIsOpen(!dropdown.isOpen)} />
       <DropdownMenu
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onSettingsClick={handleSettingsClick}
-        onLogoutClick={handleLogoutClick}
-        onProfileClick={handleProfileClick}
-        user={{ ...displayUser, major: displayMajor }}
+        isOpen={dropdown.isOpen}
+        onClose={() => dropdown.setIsOpen(false)}
+        onSettingsClick={dropdown.handleSettingsClick}
+        onLogoutClick={dropdown.handleLogoutClick}
+        onProfileClick={dropdown.handleProfileClick}
+        user={buildDropdownUser(displayUser)}
         profilePhotoUrl={profilePhotoUrl}
       />
     </div>
