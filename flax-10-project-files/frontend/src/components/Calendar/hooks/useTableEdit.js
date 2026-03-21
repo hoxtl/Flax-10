@@ -73,7 +73,8 @@ function createSaveEdit(state, events, tags, dispatch, cancelEdit) {
         if (!state.editingCell || state.cellValue === state.originalValue) { cancelEdit(); return; }
         const event = events.find(e => e.id === state.editingCell.eventId);
         if (!event) { cancelEdit(); return; }
-        await persistEventUpdate(buildUpdatedEvent(event, state.editingCell.field, state.cellValue, tags), dispatch);
+        const updatedEvent = await buildUpdatedEvent(event, state.editingCell.field, state.cellValue, tags);
+        await persistEventUpdate(updatedEvent, dispatch);
         cancelEdit();
     };
 }
