@@ -14,7 +14,7 @@ import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
 import { useEffect, useState } from 'react';
-import { getHomeAddress } from '../../../api/userService.js';
+import { getHomeAddress } from '../../../api/userApi.js';
 import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {

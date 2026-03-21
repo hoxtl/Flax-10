@@ -38,7 +38,7 @@ import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/I
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
-import { updateUserSettings } from "../../../api/userService";
+import { updateUserSettings } from "../../../api/userApi";
 
 
 const CATALOGUE = [

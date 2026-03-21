@@ -5,7 +5,7 @@
 import { useState, useCallback } from 'react';
 import { updateEvent } from '../../../api/eventApi';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
-import { geocodeAddress } from '../../../api/userService';
+import { geocodeAddress } from '../../../api/userApi';
 
 async function buildUpdatedEvent(event, field, value, tags) {
     const updated = {...event };

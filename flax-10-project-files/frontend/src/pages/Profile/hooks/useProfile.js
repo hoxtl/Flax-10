@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { fetchTasks } from "../../../api/taskService";
-import { getUserProfile, getAnotherUserProfile } from "../../../api/userService";
+import { fetchTasks } from "../../../api/taskApi";
+import { getUserProfile, getAnotherUserProfile } from "../../../api/userApi";
 import { getEvents } from "../../../api/eventApi";
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
 import { useAuth } from "../../../context/AuthContext";
