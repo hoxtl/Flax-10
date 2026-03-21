@@ -1,6 +1,7 @@
 from rest_framework import status
 
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
+from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.base import BaseTestCase
 from studyFlax.tests.helpers.factories import make_user
 
@@ -41,6 +42,18 @@ class GroupProjectListTests(BaseTestCase):
         self.assertIn("P1", names)
         self.assertIn("P2", names)
         self.assertNotIn("P3", names)
+
+    def test_list_projects_includes_task_counts(self):
+        project = _make_project(self.user, "Metrics")
+        Task.objects.create(user=self.user, group_project=project, title="Done task", status="done", completed=True)
+        Task.objects.create(user=self.user, group_project=project, title="Todo task", status="todo", completed=False)
+
+        res = self.client.get("/api/group-work/projects/")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        payload = next(project for project in res.data if project["name"] == "Metrics")
+        self.assertEqual(payload["task_count"], 2)
+        self.assertEqual(payload["completed_task_count"], 1)
 
 
 class GroupProjectDetailTests(BaseTestCase):

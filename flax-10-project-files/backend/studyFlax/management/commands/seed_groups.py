@@ -30,6 +30,13 @@ PROJECT_TYPE_TEMPLATES = {
     "analysis": ["case study workshop", "insight presentation", "research summary"],
     "default": ["group presentation", "research workshop", "strategy deck"],
 }
+GENERIC_SUBJECT_WORDS = {
+    "analysis", "assignment", "case", "coursework", "deck", "discussion", "essay",
+    "final", "findings", "group", "lab", "methods", "oral", "paper", "poster",
+    "presentation", "problem", "project", "report", "research", "review", "seminar",
+    "session", "sheet", "showcase", "study", "submission", "summary", "workshop",
+    "writeup",
+}
 PROJECT_TASK_STATUS_PATTERNS = (
     ("todo", "todo", "in_progress", "todo", "todo"),
     ("done", "in_progress", "todo", "todo", "todo"),
@@ -161,8 +168,20 @@ def _looks_generic_project_title(label):
     generic_patterns = (
         r"^(coursework|assignment|presentation|essay|report|poster|seminar|project)\s*\d*$",
         r"^(group\s+)?coursework\s*\d*$",
+        r"^problem\s+sheet\s*\d*$",
+        r"^lab\s+report(\s+\d+)?$",
+        r"^report\s+review$",
+        r"^findings\s+deck$",
+        r"^research\s+poster$",
+        r"^case\s+report\s+review$",
     )
     return any(re.fullmatch(pattern, normalised) for pattern in generic_patterns)
+
+def _looks_generic_subject(subject):
+    tokens = [token for token in re.split(r"[^A-Za-z0-9]+", _normalise_spacing(subject).lower()) if token]
+    if not tokens:
+        return True
+    return all(token.isdigit() or token in GENERIC_SUBJECT_WORDS for token in tokens)
 
 def _build_topic_project_name(module, index):
     topic = _module_topic_label(module)
@@ -181,6 +200,7 @@ def _derive_collaborative_deadline_name(module, label, index):
         ("case study", "case study workshop"),
         ("presentation", "presentation"),
         ("report", "report review"),
+        ("problem sheet", "problem clinic"),
         ("poster", "poster session"),
         ("coursework", "group coursework"),
     )
@@ -188,10 +208,11 @@ def _derive_collaborative_deadline_name(module, label, index):
         if needle not in lower:
             continue
         prefix = _normalise_spacing(clean[:lower.index(needle)])
-        subject = prefix or _module_topic_label(module)
+        subject = prefix if prefix and not _looks_generic_subject(prefix) else _module_topic_label(module)
         return _title_case(f"{subject} {replacement}")
     if len(clean.split()) <= 2:
-        return _title_case(f"{clean} workshop")
+        subject = clean if not _looks_generic_subject(clean) else _module_topic_label(module)
+        return _title_case(f"{subject} workshop")
     return _title_case(clean)
 
 def _project_fallback_names(module):
@@ -252,6 +273,26 @@ def _build_project_specs(showcase_student, student_modules, seed_modules, now):
     specs = []
     for module in modules:
         specs.extend(_build_module_project_specs(module, now))
+    return _uniquify_project_spec_names(specs)
+
+def _uniquify_project_spec_names(specs):
+    counts = {}
+    used_names = set()
+    for spec in specs:
+        name = spec["name"]
+        counts[name] = counts.get(name, 0) + 1
+    for index, spec in enumerate(specs):
+        original_name = spec["name"]
+        if counts.get(original_name, 0) <= 1 and original_name not in used_names:
+            used_names.add(original_name)
+            continue
+        candidate = _build_topic_project_name(spec["module"], index)
+        variant_index = 1
+        while candidate in used_names:
+            candidate = _build_topic_project_name(spec["module"], index + variant_index)
+            variant_index += 1
+        spec["name"] = candidate
+        used_names.add(candidate)
     return specs
 
 def create_group_projects(stdout):

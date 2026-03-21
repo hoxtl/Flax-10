@@ -32,7 +32,7 @@ def build_readings_for_module(module):
     results = []
     for i, (s, c, st, en) in enumerate(examples):
         offset = READING_DAY_OFFSETS[i % len(READING_DAY_OFFSETS)]
-        r = _build_single_reading(module, f"{module.module_name}: {s}", c, st, en, now, offset)
+        r = _build_single_reading(module, s, c, st, en, now, offset)
         if r:
             results.append(r)
     return results

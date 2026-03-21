@@ -9,7 +9,7 @@ def build_profile_photo_url(photo, request):
     """Return the absolute URL for a profile photo, or None."""
     if not photo:
         return None
-    return request.build_absolute_uri(photo.url) if request else None
+    return request.build_absolute_uri(photo.url) if request else photo.url
 
 def ensure_teacher_user(request, error_message: str) -> None:
     """Ensure the request user is a teacher, otherwise raise a ValidationError."""
