@@ -1,7 +1,11 @@
-import React, { useState, useMemo, useRef } from "react";
+/*
+ * GroupWork task timeline view.
+ */
+
+import { useMemo, useRef, useState } from "react";
 import styles from "./TaskTimelineView.module.css";
-import { getPriorityStyle, getUserColor } from "../utils/priorityUtils";
-import { handleDragStartTask, buildToggleAssignee } from "../utils/taskUtils";
+import { getPriorityStyle } from "../utils/priorityUtils";
+import { handleDragStartTask, buildToggleAssignee, filterVisibleAssignees } from "../utils/taskUtils";
 import { 
     getTimelineAnchor, 
     buildWeeks, 
@@ -13,7 +17,7 @@ import TaskAssigneePopup from "./TaskAssigneePopup";
 
 // --- Logic helpers for TaskTimelineView ---
 
-function useDragHandlers(onUpdate, setPage) {
+function useDragHandlers(onUpdate) {
     const onDragOver = (e) => { e.preventDefault(); e.currentTarget.classList.add(styles.timelineCellDropTarget); };
     const onDragLeave = (e) => { e.currentTarget.classList.remove(styles.timelineCellDropTarget); };
     const onDrop = (e, ts) => {
@@ -33,7 +37,7 @@ function useDragHandlers(onUpdate, setPage) {
     return { onDragOver, onDragLeave, onDrop, onDropWidget };
 }
 
-function UnscheduledCard({ t }) {
+function UnscheduledCard({ t, members }) {
     const style = getPriorityStyle(t.priority);
     return (
         <div className={styles.unscheduledCard} draggable onDragStart={(e) => handleDragStartTask(e, t.id)}>
@@ -42,13 +46,13 @@ function UnscheduledCard({ t }) {
                 <span className={styles.priorityBadge} style={{ color: style.color, backgroundColor: style.backgroundColor }}>
                     {(t.priority || "medium").toUpperCase()}
                 </span>
-                <TaskAvatarStack assignees={t.assignees_info || []} size={16} />
+                <TaskAvatarStack assignees={filterVisibleAssignees(t.assignees_info || [], members)} size={16} />
             </div>
         </div>
     );
 }
 
-function UnscheduledWidget({ tasks, onDrop }) {
+function UnscheduledWidget({ tasks, members, onDrop }) {
     const onOver = (e) => { e.preventDefault(); e.currentTarget.classList.add(styles.widgetListDropTarget); };
     const onLeave = (e) => { e.currentTarget.classList.remove(styles.widgetListDropTarget); };
     return (
@@ -57,7 +61,7 @@ function UnscheduledWidget({ tasks, onDrop }) {
                 <h3 className={styles.widgetTitle}>Unscheduled <span className={styles.widgetCount}>{tasks.length}</span></h3>
             </div>
             <div className={styles.widgetList} onDragOver={onOver} onDragLeave={onLeave} onDrop={onDrop}>
-                {tasks.map(t => <UnscheduledCard key={t.id} t={t} />)}
+                {tasks.map(t => <UnscheduledCard key={t.id} t={t} members={members} />)}
                 {tasks.length === 0 && <div className={styles.allScheduledMsg}>All tasks scheduled!</div>}
             </div>
         </div>
@@ -77,7 +81,16 @@ function TimelineCell({ wk, di, tasks, members, onUpdate, handlers }) {
     const ts = wk.startTs + di * DAY_MS;
     return (
         <div className={styles.timelineCell} onDragOver={handlers.onDragOver} onDragLeave={handlers.onDragLeave} onDrop={(e) => handlers.onDrop(e, ts)}>
-            {tasks.map(t => <TimelineCard key={t.id} task={t} members={members} assignees={t.assignees_info || []} onUpdate={onUpdate} onDragStart={handleDragStartTask} />)}
+            {tasks.map(t => (
+                <TimelineCard
+                key={t.id}
+                task={t}
+                members={members}
+                assignees={filterVisibleAssignees(t.assignees_info || [], members)}
+                onUpdate={onUpdate}
+                onDragStart={handleDragStartTask}
+              />
+            ))}
         </div>
     );
 }
@@ -118,11 +131,11 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
     const anchor = useMemo(() => getTimelineAnchor(), []);
     const [page, setPage] = useState(0);
     const { weeks, placed, unscheduled, visible } = useTimelineState(tasks, anchor, page);
-    const handlers = useDragHandlers(onUpdate, setPage);
+    const handlers = useDragHandlers(onUpdate);
 
     return (
         <div className={styles.viewContainer}>
-            <UnscheduledWidget tasks={unscheduled} onDrop={handlers.onDropWidget} />
+            <UnscheduledWidget tasks={unscheduled} members={members} onDrop={handlers.onDropWidget} />
             <div className={styles.timelineArea}>
                 <TimelineHeader days={days} />
                 <TimelineGrid visible={visible} days={days} placed={placed} members={members} onUpdate={onUpdate} handlers={handlers} />

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Zap, Sparkles, Plus, RefreshCw, ArrowRight, MapPinned } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./QuickActionsWidget.module.css";
 
 const containerVariants = {
@@ -48,11 +49,11 @@ export function QuickActionsWidget({ onStartFocus, onAddEvent, focusWindowDurati
 
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <div className={styles.headerIconWrap}>
-          <Zap className={styles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+      <div className={baseStyles.widgetHeader}>
+        <div className={baseStyles.headerIconWrap}>
+          <Zap className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
         </div>
-        <span className={styles.headerLabel}>Quick Actions</span>
+        <span className={baseStyles.headerTitle}>Quick Actions</span>
       </div>
 
       <motion.div className={styles.list} initial="hidden" animate="visible" variants={containerVariants}>

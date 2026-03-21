@@ -1,3 +1,6 @@
+/**
+ * Shared attendance widget primitives.
+ */
 import SegmentDetailPanel from "../../../../Attendance/components/SegmentDetailPanel";
 import { PieChart } from "@mui/x-charts/PieChart";
 import widgetStyles from "../ProfileWidgets.module.css";
@@ -54,51 +57,41 @@ export function AttendanceWarningBadge({ attendancePct }) {
   );
 }
 
+function handleDonutClick(event) {
+  event.stopPropagation();
+}
+
+function buildSegmentHandler(chart, onSegmentClick) {
+  return (label) => label && onSegmentClick({ chart, label });
+}
+
+function CompactDonutLayout({ canvasClassName, chart, data, chartProps, legendTone, onSegmentClick }) {
+  return (
+    <div className={styles.compactDonutRow}>
+      <div className={canvasClassName}><DonutChart data={data} {...chartProps} onSelect={buildSegmentHandler(chart, onSegmentClick)} /></div>
+      <CompactLegend items={data} tone={legendTone} />
+    </div>
+  );
+}
+
 export function CompactOverallDonut({ overallData, onSegmentClick }) {
   if (!overallData.length) return <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>;
+  const chartProps = { width: 240, height: 210, margin: { top: 10, bottom: 10, left: 10, right: 10 }, innerRadius: 38, outerRadius: 84, cornerRadius: 4 };
   return (
-    <div className={styles.compactAttendanceDonut} onClick={(event) => event.stopPropagation()}>
-      <div className={styles.compactDonutRow}>
-        <div className={styles.compactDonutCanvas}>
-          <DonutChart
-            data={overallData}
-            width={240}
-            height={210}
-            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            innerRadius={38}
-            outerRadius={84}
-            cornerRadius={4}
-            onSelect={(label) => label && onSegmentClick({ chart: "overall", label })}
-          />
-        </div>
-        <CompactLegend items={overallData} tone="soft" />
-      </div>
+    <div className={styles.compactAttendanceDonut} onClick={handleDonutClick}>
+      <CompactDonutLayout canvasClassName={styles.compactDonutCanvas} chart="overall" data={overallData} chartProps={chartProps} legendTone="soft" onSegmentClick={onSegmentClick} />
     </div>
   );
 }
 
 export function CompactByTypeDonut({ byTypeData, onSegmentClick }) {
   if (!byTypeData.length) return null;
-
+  const chartProps = { width: 244, height: 188, margin: { top: 8, bottom: 4, left: 8, right: 8 }, innerRadius: 34, outerRadius: 76, cornerRadius: 3 };
   return (
-    <div className={styles.compactByTypeSection} onClick={(event) => event.stopPropagation()}>
+    <div className={styles.compactByTypeSection} onClick={handleDonutClick}>
       <div className={styles.compactByTypeTitle}>By Type</div>
       <div className={styles.compactByTypeDonut}>
-        <div className={styles.compactDonutRow}>
-          <div className={styles.compactByTypeCanvas}>
-            <DonutChart
-              data={byTypeData}
-              width={244}
-              height={188}
-              margin={{ top: 8, bottom: 4, left: 8, right: 8 }}
-              innerRadius={34}
-              outerRadius={76}
-              cornerRadius={3}
-              onSelect={(label) => label && onSegmentClick({ chart: "byType", label })}
-            />
-          </div>
-          <CompactLegend items={byTypeData} />
-        </div>
+        <CompactDonutLayout canvasClassName={styles.compactByTypeCanvas} chart="byType" data={byTypeData} chartProps={chartProps} onSegmentClick={onSegmentClick} />
       </div>
     </div>
   );
@@ -113,23 +106,23 @@ export function CompactAttHeader({ onNavigate }) {
         className={`${styles.heatmapLinkBtn} ${styles.compactAttAnalysisBtn}`}
         onClick={(event) => {
           event.stopPropagation();
-          triggerAnalyticsNavigation(onNavigate);
+          triggerAttendanceNavigation(onNavigate);
         }}
         style={{ pointerEvents: "auto", position: "relative", zIndex: 1 }}
       >
-        View full analytics
+        View attendance details
       </button>
     </div>
   );
 }
 
-function triggerAnalyticsNavigation(onNavigate) {
+function triggerAttendanceNavigation(onNavigate) {
   if (typeof onNavigate === "function") {
     onNavigate();
     return;
   }
 
-  window.dispatchEvent(new CustomEvent("navigate", { detail: "analytics" }));
+  window.dispatchEvent(new CustomEvent("navigate", { detail: "attendance" }));
 }
 
 export function SegmentDetailPanelWrapper({ selectedSegment, events, onToggleStatus, onClose }) {

@@ -1,4 +1,6 @@
-/** Form for creating and editing module deadlines with validation. */
+/*
+ * Form for creating and editing module deadlines.
+ */
 import { useState } from 'react';
 import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../utils/deadlineUtils.js';
 import AnimatedDropdown from '../../common/AnimatedDropdown';

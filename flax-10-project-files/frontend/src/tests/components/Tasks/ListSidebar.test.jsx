@@ -1,3 +1,4 @@
+/* Tests for ListSidebar component rendering, selection, and list management */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ListSidebar from '../../../pages/Tasks/components/ListSidebar';

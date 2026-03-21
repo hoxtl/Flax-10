@@ -1,9 +1,11 @@
-/** Hook for managing modules state, enrollments, and CRUD operations. */
-import { useState, useEffect } from 'react';
+/*
+ * Hook for managing modules state, enrolments, and CRUD operations.
+ */
+import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
-import { fetchTasks } from '../../../api/taskService.js';
-import { isEnrolledIn, getEnrollmentId } from '../utils/moduleUtils.js';
+import { fetchTasks } from '../../../api/taskApi.js';
+import { isEnrolledIn, getEnrollmentId, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
@@ -31,14 +33,10 @@ function useModuleActions(modules, enrollments, loading, setModules, setEnrollme
   return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
 }
 
-function normalizeModuleCode(code) {
-  return String(code || "").toUpperCase().replace(/\s+/g, "");
-}
-
 function buildTaskCounts(tasks = []) {
   return tasks.reduce((acc, task) => {
     if (task?.completed) return acc;
-    const code = normalizeModuleCode(task?.module_code);
+    const code = normaliseModuleCode(task?.module_code);
     if (!code) return acc;
     acc[code] = (acc[code] || 0) + 1;
     return acc;
@@ -121,9 +119,9 @@ export default function useModules() {
   const [enrollments, setEnrollments] = useState([]);
   const [taskCountsByModule, setTaskCountsByModule] = useState({});
   const { addNotification } = useNotifications();
-  const notify = createNotify(addNotification);
+  const notify = useMemo(() => createNotify(addNotification), [addNotification]);
   const confirmFn = useConfirm();
-  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, []);
+  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
     modules,
     enrollments,

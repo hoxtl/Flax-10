@@ -63,13 +63,13 @@ describe("TabButton", () => {
 });
 
 describe("SettingsTabs", () => {
-  it("renders all 6 tabs", () => {
+  it("renders preference tabs with updated labels", () => {
     render(<SettingsTabs activeTab="account" onChange={vi.fn()} />);
     expect(screen.getByText("Account")).toBeTruthy();
     expect(screen.getByText("Security")).toBeTruthy();
-    // Tab labels currently rendered by SettingsSidebar
-    expect(screen.getByText("Themes")).toBeTruthy();
-    expect(screen.getByText("Sleep Time")).toBeTruthy();
+    expect(screen.getByText("Appearance")).toBeTruthy();
+    expect(screen.getByText("Sleep Schedule")).toBeTruthy();
+    expect(screen.getByText("Scheduling")).toBeTruthy();
     expect(screen.getByText("Location")).toBeTruthy();
     expect(screen.getByText("Teacher Access")).toBeTruthy();
   });

@@ -11,7 +11,7 @@ import {
   geocodeAddress,
   saveHomeAddress,
   updateUserSettings,
-} from "../../../api/userService";
+} from "../../../api/userApi";
 
 export function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
@@ -123,10 +123,10 @@ function createPatchSaveHandler(key, errorMessage) {
     if (!hasToken()) return false;
     setIsSaving(true);
     const payload = { [key]: data[key] };
-    const response = await patchSettingsSafe(payload, { ok: false });
-    if (!response.ok) showTemporaryMessage(setBannerMessage, errorMessage);
+    const response = await updateUserSettings(payload).catch(() => null);
+    if (!response) showTemporaryMessage(setBannerMessage, errorMessage);
     setIsSaving(false);
-    return response.ok;
+    return response?.settings || response || false;
   };
 }
 
@@ -155,10 +155,10 @@ export async function saveSleepWindow(data, actions) {
   if (!hasToken()) return false;
   setIsSaving(true);
   const payload = { sleep_time: data.sleep_time, wake_time: data.wake_time };
-  const response = await patchSettingsSafe(payload, { ok: false });
-  if (!response.ok) showTemporaryMessage(setBannerMessage, "Failed to save sleep schedule");
+  const response = await updateUserSettings(payload).catch(() => null);
+  if (!response) showTemporaryMessage(setBannerMessage, "Failed to save sleep schedule");
   setIsSaving(false);
-  return response.ok;
+  return response?.settings || response || false;
 }
 
 function notifyHomeAddressUpdated() {

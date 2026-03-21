@@ -164,6 +164,37 @@ def _random_theme():
 
 def _build_single_settings(user):
     is_teacher = getattr(user, 'role', None) == 'teacher'
+    
+    # Pinned widgets — always present, always at the top
+    PINNED = ["deadlines", "todayTasks", "bigTimeline"]
+
+    # Remaining optional widgets (exclude pinned ones)
+    optional_widgets = [
+        "rightNow", "tinyTimeline",
+        "semesterOverview", "studyStreak", "weeklyGoal", "photo",
+        "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
+        "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",
+        "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
+    ]
+
+    # Pick 2-5 additional random widgets
+    shuffled = optional_widgets[:]
+    random.shuffle(shuffled)
+    selected = ["hero"] + PINNED + shuffled[:random.randint(2, 5)]
+
+    # Randomize sizes for chosen widgets
+    sizes = {}
+    for widget_id in selected:
+        if widget_id == "hero":
+            continue
+        if widget_id == "bigTimeline":
+            sizes[widget_id] = {"col": 2, "row": 2}
+            continue
+        sizes[widget_id] = {
+            "col": 2 if random.random() > 0.6 else 1,
+            "row": 2 if random.random() > 0.7 else 1
+        }
+
     return UserSettings(
         user=user,
         theme=_random_theme(),
@@ -173,7 +204,8 @@ def _build_single_settings(user):
         sleep_time=time(23, 0),
         wake_time=time(7, 0),
         mode=_random_theme(),
-        homepage_widgets=[],
+        homepage_widgets=selected,
+        homepage_widget_sizes=sizes,
     )
 
 def build_settings_for_new_users():

@@ -1,15 +1,15 @@
-/**
- * Hook for CreateTaskModal state, effects, and handlers.
+/*
+ * State and handlers for the create or edit task modal.
  */
 
 import { useState, useMemo, useEffect } from "react";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import { getUserSettings } from "../../../api/userService";
+import { getUserSettings } from "../../../api/userApi";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";
-import { isReadingList } from "./useCreateTaskBar";
+import { isReadingList } from "../utils/readingListUtils";
 
 const ALLOWED_PRIORITIES = new Set(["medium", "high", "urgent"]);
 
@@ -29,9 +29,7 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
   };
 }
 
-function useCreateTaskModalFormState(props) {
-  const { lists, defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
-  const sortedLists = useMemo(() => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
+function useAvailableModules(modules) {
   const [loadedModules, setLoadedModules] = useState([]);
   useEffect(() => {
     if ((modules || []).length > 0) return;
@@ -46,15 +44,21 @@ function useCreateTaskModalFormState(props) {
     return () => { cancelled = true; };
   }, [modules]);
   const availableModules = (modules || []).length > 0 ? modules : loadedModules;
-  const sortedModules = useMemo(
-    () => [...availableModules].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")),
-    [availableModules]
-  );
+  return useMemo(() => [...availableModules].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")), [availableModules]);
+}
+
+function useCreateTaskModalFormState(props) {
+  const { lists, defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
+  const sortedLists = useMemo(() => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
+  const sortedModules = useAvailableModules(modules);
   const [form, setForm] = useState(() => getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists));
   const [addToSchedule, setAddToSchedule] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
-  useEffect(() => { if (newListIdCreated) setForm((p) => ({ ...p, task_list: String(newListIdCreated) })); }, [newListIdCreated]);
+  useEffect(() => {
+    if (!newListIdCreated) return;
+    queueMicrotask(() => setForm((prev) => ({ ...prev, task_list: String(newListIdCreated) })));
+  }, [newListIdCreated]);
   return { form, setForm, addToSchedule, setAddToSchedule, saving, setSaving, saveError, setSaveError, sortedLists, sortedModules };
 }
 
@@ -74,13 +78,11 @@ function useCreateTaskModalDerived(form, sortedLists, onOpenCreateList) {
   const selectedList = useMemo(() => sortedLists.find((l) => String(l.id) === String(form.task_list)), [sortedLists, form.task_list]);
   const selectedListColor = selectedList ? getListColor(selectedList, sortedLists.indexOf(selectedList)) : null;
   const readingList = isReadingList(selectedList);
-
-  const estimatedReadingMinutes = useMemo( () => {
+  const estimatedReadingMinutes = useMemo(() => {
     if (!readingList || !form.page_count) return null;
     return Math.round(Number(form.page_count) * 2);
-  }, [readingList, form.page_count])
-  const askFlaxInitialMessage = useMemo(() => ((form.title || "").trim() ? `Help me estimate how long "${(form.title || "").trim()}" might take and which focus block I should pick.` : "Help me estimate how long this task might take — what time block should I pick?"), [form.title]);
-  return { categoryOptions, selectedList, selectedListColor, isReadingList: readingList, estimatedReadingMinutes, askFlaxInitialMessage };
+  }, [readingList, form.page_count]);
+  return { categoryOptions, selectedList, selectedListColor, isReadingList: readingList, estimatedReadingMinutes };
 }
 
 function useCreateTaskModalHandlers(props, formState, sleepState) {
@@ -89,14 +91,14 @@ function useCreateTaskModalHandlers(props, formState, sleepState) {
   const { checkSleepAndRun } = sleepState;
   const set = (field, val) => setForm((p) => ({ ...p, [field]: val }));
   const doSave = () => runCreateTaskSave(form, addToSchedule, mode, showAddToScheduleToggle, onSave, onClose, setSaveError);
-  const handleSave = () => { if (!form.title.trim() || !form.due_date || saving) return; checkSleepAndRun(form.due_date, async () => { setSaving(true); try { await runCreateTaskSave(form, addToSchedule, mode, showAddToScheduleToggle, onSave, onClose, setSaveError); } finally { setSaving(false); } }); };
+  const handleSave = () => { if (!form.title.trim() || !form.due_date || saving) return; checkSleepAndRun(form.due_date, async () => { setSaving(true); try { await doSave(); } finally { setSaving(false); } }); };
   const handleKey = (e) => { if (e.key === "Escape") onClose(); };
   const handleDelete = async () => { if (!onDeleteTask) return; setSaving(true); try { await onDeleteTask(); onClose(); } finally { setSaving(false); } };
   const handleCategoryChange = (v) => { if (v === "__new_list__") { onOpenCreateList?.(); return; } setForm((p) => ({ ...p, task_list: v })); };
   return { set, doSave, handleSave, handleKey, handleDelete, handleCategoryChange };
 }
 
-/** State and handlers for CreateTaskModal. */
+/* State and handlers for CreateTaskModal. */
 export function useCreateTaskModal(props) {
   const formState = useCreateTaskModalFormState(props);
   const sleepState = useCreateTaskModalSleep();

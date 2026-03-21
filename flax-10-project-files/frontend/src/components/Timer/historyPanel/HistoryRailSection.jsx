@@ -37,27 +37,13 @@ function HistoryTags({ block, partial, completedCount, totalSessions }) {
   );
 }
 
-function EarlierToggle({ group, earlierExpanded, setEarlierExpanded, hiddenCount }) {
-  if (group.label !== 'Earlier' || group.entries.length <= 1) return null;
 
-  return (
-    <div className={styles.rightHistoryShowMoreWrap}>
-      <PrimaryButton type="button" pill size="small" onClick={() => setEarlierExpanded((value) => !value)}>
-        {earlierExpanded ? 'Show less ↑' : `Show all ${hiddenCount + 1} →`}
-      </PrimaryButton>
-    </div>
-  );
-}
-
-export function HistoryRailSection({ group, earlierExpanded, setEarlierExpanded }) {
-  const visibleEntries = group.label === 'Earlier' && !earlierExpanded ? group.entries.slice(0, 1) : group.entries;
-  const hiddenCount = group.label === 'Earlier' ? Math.max(0, group.entries.length - visibleEntries.length) : 0;
-
+export function HistoryRailSection({ group }) {
   return (
     <section className={styles.rightHistorySection}>
       <div className={styles.rightHistorySectionTitle}>{group.label}</div>
-      <ul className={styles.rightHistoryCardList}>{visibleEntries.map((block, index) => <HistoryCard key={`${group.label}-${block.id ?? index}`} block={block} />)}</ul>
-      <EarlierToggle group={group} earlierExpanded={earlierExpanded} setEarlierExpanded={setEarlierExpanded} hiddenCount={hiddenCount} />
+      <ul className={styles.rightHistoryCardList}>{group.entries.map((block, index) => <HistoryCard key={`${group.label}-${block.id ?? index}`} block={block} />)}</ul>
     </section>
   );
 }
+

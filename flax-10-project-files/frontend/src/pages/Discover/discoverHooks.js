@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { searchUsers } from "../../api/userService";
+import { searchUsers } from "../../api/userApi";
 import { useClickOutside, useFilterState, useSearchInit } from "../../components/Social/UserSearch";
 import { sortDiscoverUsers, USERS_PER_PAGE } from "./discoverHelpers";
 

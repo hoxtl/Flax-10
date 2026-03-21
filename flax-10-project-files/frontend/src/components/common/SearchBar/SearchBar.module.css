@@ -12,15 +12,3 @@
 .input::placeholder {
     color: var(--muted);
 }
-
-/* Compact variant for topbar */
-.compact {
-    flex: none;
-}
-
-.compact .input {
-    width: 200px;
-    padding: var(--space-2) var(--space-3) var(--space-2) 32px;
-    font-size: var(--text-sm);
-    border-radius: var(--radius-md);
-}

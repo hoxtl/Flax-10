@@ -12,7 +12,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/tflService', () => ({
+vi.mock('../../../api/tflApi', () => ({
     tflService: { getTfLDelays: vi.fn().mockResolvedValue([]) },
 }));
 
@@ -102,21 +102,21 @@ describe('IntelligenceRow', () => {
     });
 
     it('handles TfL getTfLDelays rejection', async () => {
-        const { tflService } = await import('../../../api/tflService');
+        const { tflService } = await import('../../../api/tflApi');
         tflService.getTfLDelays.mockRejectedValueOnce(new Error('Network error'));
         renderRow();
         await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
     });
 
     it('handles TfL getTfLDelays returning non-array', async () => {
-        const { tflService } = await import('../../../api/tflService');
+        const { tflService } = await import('../../../api/tflApi');
         tflService.getTfLDelays.mockResolvedValueOnce({ data: [] });
         renderRow();
         await waitFor(() => expect(screen.getByText(/breathing room|up next|on now|travel|attention/i)).toBeTruthy());
     });
 
     it('shows event-specific TfL warning for the next KCL event', async () => {
-        const { tflService } = await import('../../../api/tflService');
+        const { tflService } = await import('../../../api/tflApi');
         tflService.getTfLDelays.mockResolvedValueOnce([
             { lineName: 'Northern', severityDescription: 'Minor delays' },
         ]);

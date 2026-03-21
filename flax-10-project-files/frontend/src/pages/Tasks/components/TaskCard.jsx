@@ -1,23 +1,25 @@
-/**
- * Task card: checkbox, title, due/list badges, play action, context menu (edit/move/due/delete), info modal, edit modal.
+/*
+ * Task card with quick actions, contextual menu, and detail modals.
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
+import { Clock, Pencil, FolderInput, CalendarDays, Trash2, ChevronLeft } from "lucide-react";
 
 import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
-import { getUserSettings } from "../../../api/userService";
+import { getUserSettings } from "../../../api/userApi";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
 import { TaskInfoModal } from "./TaskInfoModal";
-import { formatDueDate, getCompletedDueLabel, getModuleColor, formatFocusBlocks, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
+import TaskCardMeta from "./TaskCardMeta";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import { formatDueDate, getCompletedDueLabel, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
 
 import cardStyles from "./TaskCard.module.css";
 import ctxMenuStyles from "./TaskCardContextMenu.module.css";
@@ -25,7 +27,7 @@ const styles = { ...cardStyles, ...ctxMenuStyles };
 
 function useActiveTimerTaskId() {
   const [id, setId] = useState(() => {
-    try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch (_) { return null; }
+    try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch { return null; }
   });
   useEffect(() => {
     const onStorage = (e) => { if (e.key === "timerTaskId") setId(e.newValue); };
@@ -52,17 +54,6 @@ function HighlightText({ text, query }) {
   );
 }
 
-function ModulePillLink({ task }) {
-  const mc = getModuleColor(task.module_code);
-  const moduleId = task.module_id ?? task.module ?? task.moduleId;
-  const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
-  return (
-    <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: mc.text, background: "transparent", borderColor: mc.border }} onClick={(e) => e.stopPropagation()} title={`Open ${task.module_code} module`}>
-      {task.module_code}
-    </Link>
-  );
-}
-
 function useTaskContextMenuState(task) {
   const [view, setView] = useState("main");
   const [dueValue, setDueValue] = useState(task.due_date ? task.due_date.slice(0, 16) : "");
@@ -76,14 +67,14 @@ function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
     const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
+  }, [menuRef, onClose]);
   useEffect(() => {
     let cancelled = false;
     getUserSettings()
       .then((data) => { if (!cancelled) setSleepSettings({ sleep_time: data?.sleep_time?.slice(0, 5) || "23:00", wake_time: data?.wake_time?.slice(0, 5) || "07:00" }); })
       .catch(() => { if (!cancelled) setSleepSettings({ sleep_time: "23:00", wake_time: "07:00" }); });
     return () => { cancelled = true; };
-  }, []);
+  }, [setSleepSettings]);
 }
 
 function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) {
@@ -93,24 +84,28 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) 
       {lists?.length > 0 && <button className={styles.ctxItem} onClick={() => setView("move")}><FolderInput size={14} strokeWidth={2} /> Move to list</button>}
       <button className={styles.ctxItem} onClick={() => setView("due")}><CalendarDays size={14} strokeWidth={2} /> Set due date</button>
       <div className={styles.ctxDivider} />
-      <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onDelete(); onClose(); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
+      <button className={`${styles.ctxItem} ${styles.ctxItemDanger}`} onClick={() => { onClose(); onDelete(); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
     </>
   );
 }
 
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
+  const safeList = lists || [];
+  const fromListName = safeList.find((x) => String(x.id) === String(task.task_list))?.name || null;
+  const options = safeList.map(l => ({ value: String(l.id), label: l.name }));
+  const handleMove = (listId) => {
+    const l = safeList.find(x => String(x.id) === listId);
+    if (!l) return;
+    onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
+    onClose();
+  };
   return (
     <>
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
-      {(lists || []).map((l) => {
-        const fromList = (lists || []).find((x) => String(x.id) === String(task.task_list));
-        return (
-          <button key={l.id} className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`} onClick={() => { onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName: fromList?.name || null }); onClose(); }}>
-            <span className={styles.ctxListDot} style={{ background: l.color }} />{l.name}
-          </button>
-        );
-      })}
+      <div className={styles.ctxMoveDropdownWrap}>
+        <AnimatedDropdown value={String(task.task_list || "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
+      </div>
     </>
   );
 }
@@ -197,11 +192,9 @@ function useTaskCardHandlers(props) {
   const { showCompletionToast } = useTaskCompletion();
   const setBurstPop = props.setBurstPop;
   const setCheckBounce = props.setCheckBounce;
-  const handleCheckClick = useCallback(buildCheckClickHandler({
-    task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast,
-  }), [task, due, isOverdue, onToggle, showCompletionToast]);
-  useEffect(() => () => { if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current); }, []);
-  const handleContextMenu = useCallback((e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); }, []);
+  const handleCheckClick = useCallback(() => buildCheckClickHandler({ task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast })(), [task, due, isOverdue, onToggle, setBurstPop, setCheckBounce, burstTimeoutRef, showCompletionToast]);
+  useEffect(() => () => { if (burstTimeoutRef.current) clearTimeout(burstTimeoutRef.current); }, [burstTimeoutRef]);
+  const handleContextMenu = useCallback((event) => { event.preventDefault(); setCtxMenu({ x: event.clientX, y: event.clientY }); }, [setCtxMenu]);
   return { handleCheckClick, handleContextMenu };
 }
 
@@ -237,54 +230,12 @@ function CardTitleRow({ task, searchQuery, showPriorityText, priorityKey, hideDu
   );
 }
 
-function CardMetaRow({ task, listName, hideListBadge, listColor }) {
-  const listStyle = { "--lc": listColor || "#a89890", background: `color-mix(in srgb, ${listColor || "#a89890"} 8%, transparent)`, borderColor: `color-mix(in srgb, ${listColor || "#a89890"} 18%, transparent)` };
-  const projectStyle = { color: "var(--primary)", background: "var(--primary-light)", borderColor: "var(--primary-border)" };
-
-  const societyName = task.society_name || task.society?.name || "";
-  const societyId = task.society_id || task.society?.id;
-  const peopleCount = task.assignees_count ?? task.people_count ?? task.group_member_count ?? (Array.isArray(task.assignees) ? task.assignees.length : null);
-
-  return (
-    <div className={`${styles.meta} ${task.completed ? styles.metaDone : ""}`}>
-      {listName && !hideListBadge && <span className={styles.listIndicator} style={listStyle}><span className={styles.listDot} style={{ background: listColor || "var(--muted)" }} />{listName}</span>}
-      {task.module_code && <ModulePillLink task={task} />}
-      {societyName && (
-        <Link
-          to={societyId ? `/societies?id=${societyId}` : `/societies?search=${encodeURIComponent(societyName)}`}
-          className={styles.societyPill}
-          onClick={(e) => e.stopPropagation()}
-          title={`Open ${societyName}`}
-        >
-          🏛️ {societyName}
-        </Link>
-      )}
-      {Number.isFinite(Number(peopleCount)) && Number(peopleCount) > 0 && (
-        <Link
-          to="/users"
-          className={styles.peoplePill}
-          onClick={(e) => e.stopPropagation()}
-          title="Open users"
-        >
-          👥 {peopleCount} people
-        </Link>
-      )}
-      {task.group_project_name && (
-        <span className={styles.projectPill} style={projectStyle} title={`Project: ${task.group_project_name}`}>
-          <ClipboardList size={11} className={styles.projectPillIcon} />
-          {task.group_project_name}
-        </span>
-      )}
-    </div>
-  );
-}
-
 function CardContentArea({ card, task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, due, priorityKey, showPriorityText }) {
   const openInfo = (e) => { if (!e.target.closest?.("button") && !e.target.closest?.("a")) card.setShowInfo(true); };
   return (
     <div className={styles.content} role="button" tabIndex={0} onClick={openInfo} onKeyDown={(e) => { if (e.key === "Enter") card.setShowInfo(true); }}>
       <CardTitleRow task={task} searchQuery={searchQuery} showPriorityText={showPriorityText} priorityKey={priorityKey} hideDueBadge={hideDueBadge} due={due} isCompletedSection={isCompletedSection} />
-      <CardMetaRow task={task} listName={listName} hideListBadge={hideListBadge} listColor={listColor} />
+      <TaskCardMeta task={task} listName={listName} hideListBadge={hideListBadge} listColour={listColor} isCompleted={task.completed} />
     </div>
   );
 }

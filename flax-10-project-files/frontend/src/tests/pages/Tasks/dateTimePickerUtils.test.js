@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks dateTimePickerUtils: pad, formatDisplay, calendarDays, parseIncomingValue, emitChange.
  */
 

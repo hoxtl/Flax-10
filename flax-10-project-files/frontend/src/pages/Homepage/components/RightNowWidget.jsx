@@ -16,9 +16,10 @@ import { Link } from "react-router-dom";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useCountdown } from "../hooks/useCountdown";
 import { isNow } from "../utils/eventUtils";
-import { tflService } from "../../../api/tflService";
-import { getHomeAddress } from "../../../api/userService";
+import { tflService } from "../../../api/tflApi";
+import { getHomeAddress } from "../../../api/userApi";
 import { resolveCampusFromText } from "../../../lib/kclCampuses";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./RightNowWidget.module.css";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -148,12 +149,12 @@ function fadeIn(delay = 0) {
 
 function WidgetHeader({ eventCount, taskCount }) {
   return (
-    <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
-      <div className={styles.headerIconWrap}>
-        <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
+    <motion.div className={baseStyles.widgetHeader} {...fadeIn(0)}>
+      <div className={baseStyles.headerIconWrap}>
+        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
       </div>
-      <span className={styles.headerLabel}>Right Now</span>
-      <span className={styles.headerMeta}>
+      <span className={baseStyles.headerTitle}>Right Now</span>
+      <span className={baseStyles.headerMeta}>
         {eventCount} event{eventCount !== 1 ? "s" : ""}
         {taskCount > 0 && ` · ${taskCount} task${taskCount !== 1 ? "s" : ""} left`}
       </span>
@@ -278,12 +279,12 @@ function CommuteContextCard({ campus, journey, loading, leaveByInfo }) {
 
 function SimpleHeader({ liveClock }) {
   return (
-    <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
-      <div className={styles.headerIconWrap}>
-        <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
+    <motion.div className={baseStyles.widgetHeader} {...fadeIn(0)}>
+      <div className={baseStyles.headerIconWrap}>
+        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
       </div>
-      <span className={styles.headerLabel}>Right Now</span>
-      {liveClock && <span className={styles.headerMeta}>{liveClock}</span>}
+      <span className={baseStyles.headerTitle}>Right Now</span>
+      {liveClock && <span className={baseStyles.headerMeta}>{liveClock}</span>}
     </motion.div>
   );
 }

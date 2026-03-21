@@ -156,9 +156,9 @@ describe('QuickAddModal', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('opens directly in manual schedule mode when initialView is provided', () => {
+    it('redirects legacy manual schedule view to auto schedule', () => {
         renderModal({ initialView: 'schedule_manual' });
-        expect(screen.getByText('Manual Schedule')).toBeTruthy();
-        expect(screen.getByText(/Name it and pick existing events tagged as schedule/i)).toBeTruthy();
+        expect(screen.getByText('Auto Schedule')).toBeTruthy();
+        expect(screen.getByText(/Generate schedule blocks from upcoming deadlines/i)).toBeTruthy();
     });
 });

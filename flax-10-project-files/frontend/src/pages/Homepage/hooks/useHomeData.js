@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 import { useCalendar } from "../../../context/CalendarContext";
-import { fetchTasks } from "../../../api/taskService";
+import { fetchTasks } from "../../../api/taskApi";
 import { getEvents } from "../../../api/eventApi";
 
 export function useHomeData(selectedDate) {

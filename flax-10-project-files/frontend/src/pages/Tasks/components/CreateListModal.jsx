@@ -1,4 +1,4 @@
-/**
+/*
  * Modal to create a new task list (name + colour). Subcomponents keep main fn under 20 lines.
  */
 

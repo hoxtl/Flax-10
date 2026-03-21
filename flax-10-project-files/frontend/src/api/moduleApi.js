@@ -1,3 +1,6 @@
+/*
+ * Creates, reads, updates, and deletes modules and enrolments.
+ */
 import {fetchApi} from './client.js'
 
 export async function getModules() {

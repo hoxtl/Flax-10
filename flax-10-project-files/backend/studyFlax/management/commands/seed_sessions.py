@@ -56,6 +56,22 @@ def _seed_sessions_for_user(username, study_profile, theme_profile):
     ThemeSession.objects.bulk_create(theme_sessions, ignore_conflicts=True)
     return len(study_sessions), len(theme_sessions)
 
+def _seed_all_students(stdout):
+    """Seed sessions for any students not already processed, if they have no data."""
+    students = User.objects.filter(role='student').exclude(username__in=PROFILES.keys())
+    total_study = 0
+    total_theme = 0
+    for user in students:
+        if not StudySession.objects.filter(user=user).exists():
+            study_sessions = build_study_sessions_for_user(user, 'balanced')
+            StudySession.objects.bulk_create(study_sessions, ignore_conflicts=True)
+            theme_sessions = build_theme_sessions_for_user(user, 'balanced')
+            ThemeSession.objects.bulk_create(theme_sessions, ignore_conflicts=True)
+            total_study += len(study_sessions)
+            total_theme += len(theme_sessions)
+    if total_study > 0:
+        stdout.write(f"  Seeded {total_study} study sessions and {total_theme} theme sessions for {students.count()} additional students.")
+
 def create_study_sessions(stdout):
     stdout.write("Seeding study sessions and theme sessions...")
     total_study = 0
@@ -64,4 +80,5 @@ def create_study_sessions(stdout):
         study, theme = _seed_sessions_for_user(username, study_profile, theme_profile)
         total_study += study
         total_theme += theme
-    stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions.")
+    stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions for fixture users.")
+    _seed_all_students(stdout)

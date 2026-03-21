@@ -185,8 +185,13 @@ INSIGHT_PROMPT_TEMPLATE = (
     "Student data:\n{context}"
 )
 
-def _extract_schedule_events(api_key, reply_text, today_str):
-    """Extract structured calendar events from an AI reply. Returns [] on any failure."""
+def _strip_markdown(raw):
+    if not raw.startswith('```'):
+        return raw
+    content = raw.split('```')[1]
+    return content[4:] if content.startswith('json') else content
+
+def _parse_json_reply(reply):
     try:
         return _parse_schedule_events(api_key, reply_text, today_str)
     except Exception:

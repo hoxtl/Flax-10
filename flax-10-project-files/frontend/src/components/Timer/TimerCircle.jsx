@@ -58,7 +58,7 @@ function getPrimaryButtonCopy(t) {
 }
 
 export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = true }) {
-  const ringState = getRingState(t, 136, 'var(--focus-accent, var(--primary))');
+  const ringState = getRingState(t, 150, 'var(--focus-accent, var(--primary))');
   const isRunning = t.isActive && !t.isPaused;
   const className = `${styles.timerCircleWrap} ${isRunning ? styles.timerCircleActive : ''} ${isRunning && t.workTime >= 60 ? styles.timerCircleDeep : ''}`;
   const activeClass = isRunning ? styles.timerProgressActive : '';
@@ -66,7 +66,7 @@ export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = t
 
   return (
     <div className={className}>
-      <TimerRingSvg cx={160} cy={160} radius={136} ringState={ringState} trackColor="color-mix(in srgb, var(--focus-accent, var(--primary)) 12%, var(--border))" strokeWidth="4" activeClass={activeClass} />
+      <TimerRingSvg cx={175} cy={175} radius={150} ringState={ringState} trackColor="color-mix(in srgb, var(--focus-accent, var(--primary)) 12%, var(--border))" strokeWidth="4" activeClass={activeClass} />
       <div className={styles.timerCircleContent}>
         <div className={styles.timerCircleAnimClip}><FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} showPicker={showAnimationPicker} /></div>
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={ringState.isOvertime} />
@@ -78,15 +78,16 @@ export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = t
 }
 
 export function TimerRing({ t }) {
-  const ringState = getRingState(t, 90, 'var(--primary)');
+  const ringState = getRingState(t, 105, 'var(--primary)');
   const activeClass = t.isActive && !t.isPaused ? styles.timerProgressActive : '';
 
   return (
     <div className={styles.timerRingWrap}>
-      <TimerRingSvg cx={110} cy={110} radius={90} ringState={ringState} trackColor="var(--border)" strokeWidth="3" activeClass={activeClass} />
+      <TimerRingSvg cx={125} cy={125} radius={105} ringState={ringState} trackColor="var(--border)" strokeWidth="3" activeClass={activeClass} />
       <div className={styles.timerRingContent}>
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={ringState.isOvertime} />
       </div>
     </div>
   );
 }
+

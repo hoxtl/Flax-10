@@ -1,3 +1,6 @@
+/*
+ * Tests for MyModulesDashboard page.
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -5,7 +8,7 @@ import { MemoryRouter } from "react-router-dom";
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
-import { createTask } from "../../../api/taskService";
+import { createTask } from "../../../api/taskApi";
 
 vi.mock("../../../api/deadlineApi", () => ({
   getUpcomingDeadlines: vi.fn(),
@@ -16,7 +19,7 @@ vi.mock("../../../api/readingApi", () => ({
   convertReadingToTask: vi.fn(),
 }));
 
-vi.mock("../../../api/taskService", () => ({
+vi.mock("../../../api/taskApi", () => ({
   createTask: vi.fn(),
 }));
 
@@ -32,6 +35,16 @@ vi.mock("../../../context/ToastContext", () => ({
 vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: () => null,
 }));
+
+const NUDGE_DEADLINE = {
+  id: 12,
+  module: 42,
+  assessment_title: "Renal Physiology KEATS Quiz",
+  module_code: "LS4404",
+  module_name: "Renal Physiology",
+  start_due_date: "2026-03-23T10:00:00Z",
+  description: "Quiz prep",
+};
 
 function renderDashboard() {
   return render(
@@ -95,19 +108,8 @@ describe("MyModulesDashboard", () => {
   });
 
   it("shows an add-to-tasks button in the smart nudge banner for deadlines", async () => {
-    getUpcomingDeadlines.mockResolvedValue([
-      {
-        id: 12,
-        module: 42,
-        assessment_title: "Renal Physiology KEATS Quiz",
-        module_code: "LS4404",
-        module_name: "Renal Physiology",
-        start_due_date: "2026-03-23T10:00:00Z",
-        description: "Quiz prep",
-      },
-    ]);
+    getUpcomingDeadlines.mockResolvedValue([NUDGE_DEADLINE]);
     getSuggestedReadings.mockResolvedValue([]);
-
     renderDashboard();
 
     const addButton = await screen.findByRole("button", { name: /\+ add to tasks/i });

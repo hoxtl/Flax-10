@@ -102,8 +102,21 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly, viewMode, popupViewMode } = context;
-    const openPopup = (event, anchorRect, readOnly = false, viewModeOverride = null) => dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
+    const { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode, popupViewMode } = context;
+    const openPopup = (event, anchorRect, readOnlyOverride = null, viewModeOverride = null) => {
+        const readOnly = readOnlyOverride === null ? (contextReadOnly || false) : readOnlyOverride;
+        dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
+    };
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
+}
+
+export function useEventDelete() {
+    const context = useContext(CalendarContext);
+    const dispatch = useContext(CalendarDispatchContext);
+    if (!context || !dispatch) return { isDeleteOpen: false, deleteEvent: null, deleteType: null, openDelete: () => { }, closeDelete: () => { } };
+    const { isDeleteConfirmOpen, deleteConfirmEvent, deleteConfirmType } = context;
+    const openDelete = (event, type = null) => dispatch({ type: 'OPEN_DELETE_CONFIRM', payload: { event, type } });
+    const closeDelete = () => dispatch({ type: 'CLOSE_DELETE_CONFIRM' });
+    return { isDeleteOpen: isDeleteConfirmOpen, deleteEvent: deleteConfirmEvent, deleteType: deleteConfirmType, openDelete, closeDelete };
 }

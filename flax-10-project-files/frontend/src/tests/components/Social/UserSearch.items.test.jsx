@@ -11,7 +11,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/userService', () => ({ searchUsers: vi.fn(() => Promise.resolve([])) }));
+vi.mock('../../../api/userApi', () => ({ searchUsers: vi.fn(() => Promise.resolve([])) }));
 vi.mock('../../../api/societyApi', () => ({ fetchSocieties: vi.fn(() => Promise.resolve([])) }));
 vi.mock('../../../lib/kclCourses', () => ({
     KCL_DEPARTMENTS: {

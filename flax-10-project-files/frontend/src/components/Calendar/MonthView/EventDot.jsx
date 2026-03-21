@@ -4,10 +4,10 @@ import { useTags } from '../../../context/TagContext';
 import { getEventType } from '../utils/eventUtils';
 import { getEventTheme } from '../utils/eventStyleUtils';
 
-export function EventDot({ e, onEventClick, customTags }) {
+export function EventDot({ e, onEventClick, customTags, readOnly }) {
     const eventType = getEventType(e);
-    const isReadOnly = eventType !== 'personal';
-    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType);
+    const isReadOnly = readOnly || eventType !== 'personal';
+    const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType, readOnly);
 
     return (
         <div className={className} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
@@ -23,7 +23,7 @@ function getTitle(event) {
     return event.title;
 }
 
-function useEventDotLogic(event, onEventClick, customTags, eventType) {
+function useEventDotLogic(event, onEventClick, customTags, eventType, readOnly) {
     const { openPopup } = useEventPopup();
     const globalTags = useTags();
     const theme = getEventTheme(event, globalTags);
@@ -33,7 +33,7 @@ function useEventDotLogic(event, onEventClick, customTags, eventType) {
         ev.stopPropagation();
         const rect = ev.currentTarget.getBoundingClientRect();
         if (onEventClick) onEventClick(event, rect);
-        else openPopup(event, rect);
+        else openPopup(event, rect, readOnly);
     };
 
     return {

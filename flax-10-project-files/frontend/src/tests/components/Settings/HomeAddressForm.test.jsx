@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import HomeAddressForm from '../../../components/Settings/HomeAddressForm';
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getHomeAddress: vi.fn(),
 }));
 
-import { getHomeAddress } from '../../../api/userService';
+import { getHomeAddress } from '../../../api/userApi';
 
 describe('HomeAddressForm', () => {
     beforeEach(() => {

@@ -12,3 +12,75 @@ This chapter provides a conceptual description of how the software system develo
 
 The design as it is described herein must be an accurate reflection of what the team has built.  This is important: your claims about the design must match what was actually built.  Minor details can be omitted if they are not critical to the design and facilitates readability and understandability.  Make sure all diagrams are legible when this document is printed on A4.  If necessary, provide multiple diagrams with different levels of abstraction.
 \end{expectations}
+
+\section{System Overview}
+
+\section{Architectural Pattern}
+
+\section{Frontend Design}
+\label{sect:frontend}
+
+The frontend is built using React with Vite as the build tool, and follows a component-based architecture. The application is structured around a set of page-level components and over 180 smaller reusable components, organised by feature domain (e.g.\ \texttt{calendar/}, \texttt{tasks/}, \texttt{societies/}).
+
+Routing is handled by React Router, with all authenticated pages wrapped in a shared \texttt{DashboardLayout} component that provides the navigation bar and global UI shell. This ensures consistent layout and navigation behaviour across the application without duplicating structure in each page.
+
+State management follows two patterns depending on complexity. Simple, localised state is handled with React's built-in \texttt{useState} and \texttt{useEffect} hooks. For more complex, cross-component state, the application uses React Context combined with a reducer pattern. The most notable example is \texttt{CalendarContext}, which manages event data, modal visibility, and selected date state across the entire calendar feature using a dedicated reducer for predictability. Nine context providers are used in total, covering areas such as theming, 
+notifications, task completion, and timer state.
+
+API communication is abstracted into a dedicated \texttt{api/} service layer, keeping data-fetching logic separate from component rendering logic. Custom hooks (e.g.\ \texttt{useCalendarEvents}, \texttt{useTimerLogic}) further encapsulate reusable behaviour and are consumed by page components.
+
+Styling uses a combination of CSS Modules and styled-components, with all colour values defined in a central \texttt{variables.css} file. This is described further in Section~\ref{sect:design-decisions}.
+
+\section{Backend Design}
+
+\section{Data Model/ Entity Relationships}
+
+\section{Key Design Decisions}
+\label{sect:design-decisions}
+
+This section documents the significant design decisions made during development, focusing on choices where alternatives were considered or where the approach was non-obvious.
+
+\subsection{Custom User Model with Unified Role System}
+
+A custom user model was defined from the outset of the project, extending Django's \texttt{AbstractUser} to incorporate roles (\texttt{student}, \texttt{teacher}, and \texttt{staff}) and profile-specific fields such as profile photo and home address, with study preferences such as year and major stored in a linked \texttt{UserSettings} model. This decision was made early and deliberately, as retrofitting a custom user model after initial migrations would have required resetting the database entirely. The unified model ensures that role-based behaviour --- such as restricting module creation to teachers and administration tools to admins --- is handled consistently through a single identity model rather than through separate profile tables.
+
+\subsection{Token-Based Authentication}
+Token-based authentication was chosen over session-based authentication to keep the backend stateless: the server does not store session data, and each request is authenticated independently via a token passed in the request header. This integrates naturally with a decoupled frontend and backend architecture, where the React frontend and Django REST Framework backend communicate purely through the API with no shared session state.
+
+\subsection{Course-Prefix Mapping for Module Onboarding}
+
+During onboarding, modules are automatically assigned to a student based on their selected major using a course-prefix mapping (e.g.\ selecting Computer Science maps to all modules with the prefix \texttt{6CCS} or \texttt{5CCS}). The alternative --- manual per-user module assignment --- was rejected as it would not scale and would place an unnecessary burden on both users and administrators. The prefix-mapping approach means that as new modules are added to the system, they are automatically surfaced to the correct students without any additional configuration.
+
+\subsection{CSS Variables for Theming}
+
+Colour values are primarily defined as CSS custom properties in a central \texttt{variables.css} file, which underpins the light and dark theme toggle and enforces visual consistency across the UI.
+
+
+\subsection{Tasks as a Standalone Page}
+
+An early version of the application included a To Do sidebar panel that opens from a floating button shown on all pages. This was replaced with a dedicated Tasks page after it became clear that the panel format constrained the feature's functionality. The standalone page allows tasks to be linked to calendar events, completed via study timer sessions, and associated with module deadlines --- interactions that would not have been possible within a sidebar panel. The change also improved cohesion: task management is now a first-class feature rather than an auxiliary widget.
+
+\subsection{Navigation: Sidebar to Top Bar and Bottom Bar}
+The original navigation design used a collapsible sidebar on both desktop and mobile. During development it was observed that opening and closing the sidebar caused the main content area to resize, pushing and rearranging page content. This was replaced with a persistent top navigation bar on desktop and a fixed bottom navigation bar on mobile. This approach eliminates layout shift entirely, provides a more conventional navigation pattern for each platform, and preserves the full viewport width for page content at all times.
+
+
+\subsection{Modular Bento Dashboard with Widget Customisation}
+
+Rather than a static homepage layout, the dashboard was implemented as a modular Bento-style grid in which users can personalise their view by selecting which widgets to display. Users can choose from widgets including a daily timeline, upcoming deadlines, task list, reading plan, and AI study coach panel. Widget preferences are persisted in the user's settings. This design decision prioritises personalisation: different students have different workflows, and a fixed layout would not serve all use cases equally. The grid structure ensures visual consistency is maintained regardless of which widgets are active.
+
+\subsection{Auto-Scheduler Design}
+
+The auto-scheduler feature generates study events based on a student's module deadlines, daily study time preferences set in settings, and sleep schedule (no events are scheduled during the user's configured sleep hours). Rather than implementing the scheduler as a standalone module with its own event model, a wrapper class was used to reference and manage the generated schedule events. This keeps the scheduler coupled to the existing calendar infrastructure, meaning future changes to calendar functionality automatically apply to scheduled events without requiring parallel updates to a separate module. Schedules are named and managed through a dedicated auto-scheduler page, where students can rename or delete a schedule (which removes all associated events). A replan button on the homepage mini-timeline also triggers the auto-scheduler to update the current schedule based on the latest deadlines and preferences.
+
+\section{External Integrations}
+\label{sect:integrations}
+
+The system integrates with four external services.
+
+\textbf{OpenAI API} powers the AI study coach feature. When a student requests insights or asks a question through the coach interface, the system constructs a context object from the student's study session history, streak statistics, peak study hours, dark mode usage patterns, and upcoming calendar events, and sends this to the OpenAI API. The response is returned as personalised, data-aware feedback. The integration is conditionally loaded so that the application remains functional if the API is unavailable.
+
+\textbf{Mapbox GL} is used to render the campus map feature, which displays the five KCL campus locations (Strand, Guy's, Waterloo, St Thomas, and Denmark Hill) and provides journey planning functionality. Students can calculate walking routes to any campus using the Mapbox Directions API, or public transport routes using the TfL Journey Planner API, based on their saved home address.
+
+\textbf{iCalendar (RFC 5545)} format is supported for timetable import. Students can provide their KCL timetable URL, and the system downloads and parses the \texttt{.ics} file to extract scheduled classes and import them directly into the application's calendar as events.
+
+\textbf{Transport for London (TfL) API} is used alongside Mapbox to provide public transport routing on the campus map, giving students the option to plan their journey to campus by tube, bus, or rail.

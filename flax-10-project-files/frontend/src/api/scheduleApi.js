@@ -1,3 +1,7 @@
+/*
+ * Creates, renames, and deletes timetable schedules.
+ */
+
 import { fetchApi } from './client';
 
 export function getSchedules() {

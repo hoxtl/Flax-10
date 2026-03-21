@@ -76,7 +76,7 @@ function getCollabModalProps(form, setModals, onAdd) {
 
 function getPhotoModalProps(form, setModals, update) {
     return {
-        images: form.images, availablePhotos: [],
+        images: form.images,
         onClose: () => setModals(m => ({ ...m, photo: false })),
         onUpdate: (imgs) => update("images", imgs)
     };

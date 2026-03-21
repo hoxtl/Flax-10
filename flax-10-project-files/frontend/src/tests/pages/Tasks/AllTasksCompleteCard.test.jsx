@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks AllTasksCompleteCard: rendering emoji, message, sub, CTA button, and children.
  */
 

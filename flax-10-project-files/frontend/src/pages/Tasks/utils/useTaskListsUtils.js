@@ -1,14 +1,14 @@
-/**
- * Merge API list data with stored colors from localStorage.
+/*
+ * Task list helpers for merging colours and mutating list data.
  */
 
-import { createTaskList, deleteTaskList, updateTaskList } from "../../../api/taskService";
+import { createTaskList, deleteTaskList, updateTaskList } from "../../../api/taskApi";
 
 function getStoredColorForList(list) {
   if (!list.id || typeof window === "undefined") return null;
   try {
     return localStorage.getItem("listColor:" + list.id);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -24,7 +24,9 @@ export function mergeListColors(data) {
 function setStoredListColor(listId, color) {
   try {
     localStorage.setItem("listColor:" + listId, color);
-  } catch (_) {}
+  } catch {
+    return;
+  }
 }
 
 export async function addListImpl(setLists, data) {

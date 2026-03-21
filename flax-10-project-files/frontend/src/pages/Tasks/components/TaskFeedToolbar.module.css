@@ -1,4 +1,4 @@
-/**
+/*
  * TaskFeed toolbar styles: search, sort dropdown, and filter panel.
  */
 
@@ -279,13 +279,6 @@
   max-height: 300px;
   overflow-y: auto;
   padding-right: 2px;
-}
-
-.filterEmptyText {
-  margin: 8px 0;
-  color: var(--muted, var(--color-primary));
-  font-size: 0.88rem;
-  text-align: center;
 }
 
 .filterGroups {

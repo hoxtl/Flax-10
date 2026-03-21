@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useSettingsHandlers from '../../components/Settings/hooks/useSettingsHandlers';
 
-vi.mock('../../api/userService', () => ({
+vi.mock('../../api/userApi', () => ({
     updateUserSettings: vi.fn(),
     saveHomeAddress: vi.fn(),
     geocodeAddress: vi.fn(),
@@ -15,7 +15,7 @@ vi.mock('../../api/settingsApi', () => ({
     hasToken: vi.fn(),
 }));
 
-import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/userService';
+import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/userApi';
 import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/settingsApi';
 
 describe('useSettingsHandlers', () => {

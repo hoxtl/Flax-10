@@ -1,3 +1,6 @@
+/**
+ * Weekly goal and streak widget.
+ */
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Card from "../../../../components/common/Card/Card";
@@ -5,6 +8,11 @@ import PrimaryButton from "../../../../components/common/PrimaryButton/PrimaryBu
 import widgetStyles from "./ProfileWidgets.module.css";
 import weekStyles from "./ProfileWeekGoal.module.css";
 const styles = { ...widgetStyles, ...weekStyles };
+const WEEK_EDITOR_TRANSITION = {
+  height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+  opacity: { duration: 0.18, ease: "easeOut" },
+  y: { duration: 0.18, ease: "easeOut" },
+};
 
 function buildSliderPct(value) {
   const normalizedValue = Math.min(Math.max(value, 1), 40);
@@ -54,26 +62,25 @@ function GoalRing({ percentage, hoursStudied, goalHours, editing, onToggle }) {
 }
 
 function GoalEditor({ val, onSave, onCancel, onChange, isSaving }) {
+  const saveLabel = isSaving ? "Saving..." : "Save goal";
   return (
     <div className={styles.goalEditorPanel}>
       <div className={styles.goalEditorLabel}>
         <span className={styles.goalEditorTitle}>Weekly target</span>
         <span className={styles.goalEditorHrs}>{val}h / week</span>
       </div>
-      <input
-        type="range" min="1" max="40" step="1"
-        value={Math.min(val, 40)}
-        onChange={e => onChange(parseInt(e.target.value))}
-        className={styles.goalSlider}
-        style={{ "--slider-pct": buildSliderPct(val) }}
-        disabled={isSaving}
-      />
-      <div className={styles.goalEditorActions}>
-        <PrimaryButton className={styles.goalCancelBtn} variant="ghost" size="small" pill onClick={onCancel} disabled={isSaving}>Cancel</PrimaryButton>
-        <PrimaryButton className={styles.goalSaveBtn} size="small" pill onClick={() => onSave(val)} disabled={isSaving}>{isSaving ? "Saving..." : "Save goal"}</PrimaryButton>
-      </div>
+      <GoalSlider value={val} onChange={onChange} isSaving={isSaving} />
+      <GoalEditorActions saveLabel={saveLabel} onCancel={onCancel} onSave={() => onSave(val)} isSaving={isSaving} />
     </div>
   );
+}
+
+function GoalSlider({ value, onChange, isSaving }) {
+  return <input type="range" min="1" max="40" step="1" value={Math.min(value, 40)} onChange={(event) => onChange(parseInt(event.target.value))} className={styles.goalSlider} style={{ "--slider-pct": buildSliderPct(value) }} disabled={isSaving} />;
+}
+
+function GoalEditorActions({ saveLabel, onCancel, onSave, isSaving }) {
+  return <div className={styles.goalEditorActions}><PrimaryButton className={styles.goalCancelBtn} variant="ghost" size="small" pill onClick={onCancel} disabled={isSaving}>Cancel</PrimaryButton><PrimaryButton className={styles.goalSaveBtn} size="small" pill onClick={onSave} disabled={isSaving}>{saveLabel}</PrimaryButton></div>;
 }
 
 function StreakDisplay({ streaks }) {
@@ -110,61 +117,54 @@ function WeekRow({ weekly, showStreak, streaks, editing, setEditing }) {
 }
 
 function WeekEditor({ editing, tempGoal, setTempGoal, setEditing, onSave, isSaving }) {
-  return (
-    <AnimatePresence initial={false}>
-      {editing && (
-        <motion.div
-          className={styles.goalEditorOpen}
-          initial={{ height: 0, opacity: 0, y: -8 }}
-          animate={{ height: "auto", opacity: 1, y: 0 }}
-          exit={{ height: 0, opacity: 0, y: -8 }}
-          transition={{
-            height: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
-            opacity: { duration: 0.18, ease: "easeOut" },
-            y: { duration: 0.18, ease: "easeOut" },
-          }}
-          style={{ overflow: "hidden" }}
-        >
-          <GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} isSaving={isSaving} />
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  return <AnimatePresence initial={false}>{editing && <WeekEditorPanel tempGoal={tempGoal} setTempGoal={setTempGoal} setEditing={setEditing} onSave={onSave} isSaving={isSaving} />}</AnimatePresence>;
 }
 
-export function ThisWeek({ weekly, streaks, onGoalSave, showStreak = true }) {
-  const [editing, setEditing] = useState(false);
+function WeekEditorPanel({ tempGoal, setTempGoal, setEditing, onSave, isSaving }) {
+  return <motion.div className={styles.goalEditorOpen} initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: "auto", opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -8 }} transition={WEEK_EDITOR_TRANSITION} style={{ overflow: "hidden" }}><GoalEditor val={tempGoal} onChange={setTempGoal} onSave={onSave} onCancel={() => setEditing(false)} isSaving={isSaving} /></motion.div>;
+}
+
+function useWeekGoalState(weekly) {
   const resolvedGoal = weekly?.goal_hours || 20;
   const [tempGoal, setTempGoal] = useState(resolvedGoal);
   const [optimisticGoal, setOptimisticGoal] = useState(resolvedGoal);
   const [isSaving, setIsSaving] = useState(false);
-  if (!weekly) return null;
-  useEffect(() => {
-    setTempGoal(resolvedGoal);
-    setOptimisticGoal(resolvedGoal);
-  }, [resolvedGoal]);
+  useEffect(() => syncGoals(setTempGoal, setOptimisticGoal, resolvedGoal), [resolvedGoal]);
+  return { isSaving, optimisticGoal, resolvedGoal, setIsSaving, setOptimisticGoal, setTempGoal, tempGoal };
+}
 
-  const displayedWeekly = buildDisplayedWeekly(weekly, optimisticGoal);
+function syncGoals(setTempGoal, setOptimisticGoal, resolvedGoal) {
+  setTempGoal(resolvedGoal);
+  setOptimisticGoal(resolvedGoal);
+}
 
-  const handleSave = async (n) => {
-    const previousGoal = optimisticGoal;
-    setIsSaving(true);
-    setOptimisticGoal(n);
+function createSaveHandler(goalState, onGoalSave, setEditing) {
+  return async (nextGoal) => {
+    const previousGoal = goalState.optimisticGoal;
+    goalState.setIsSaving(true);
+    goalState.setOptimisticGoal(nextGoal);
     try {
-      await onGoalSave?.(n);
+      await onGoalSave?.(nextGoal);
       setEditing(false);
     } catch {
-      setOptimisticGoal(previousGoal);
+      goalState.setOptimisticGoal(previousGoal);
     } finally {
-      setIsSaving(false);
+      goalState.setIsSaving(false);
     }
   };
+}
 
+export function ThisWeek({ weekly, streaks, onGoalSave, showStreak = true }) {
+  const [editing, setEditing] = useState(false);
+  const goalState = useWeekGoalState(weekly);
+  if (!weekly) return null;
+  const displayedWeekly = buildDisplayedWeekly(weekly, goalState.optimisticGoal);
+  const handleSave = createSaveHandler(goalState, onGoalSave, setEditing);
   return (
     <Card className={`${styles.glassCard} ${styles.weekCard}`} variant="glass">
       <div className={styles.cardLabel}>THIS WEEK</div>
       <WeekRow weekly={displayedWeekly} streaks={streaks} showStreak={showStreak} editing={editing} setEditing={setEditing} />
-      <WeekEditor editing={editing} tempGoal={tempGoal} setTempGoal={setTempGoal} setEditing={setEditing} onSave={handleSave} isSaving={isSaving} />
+      <WeekEditor editing={editing} tempGoal={goalState.tempGoal} setTempGoal={goalState.setTempGoal} setEditing={setEditing} onSave={handleSave} isSaving={goalState.isSaving} />
     </Card>
   );
 }

@@ -4,6 +4,7 @@ Serialisers for user registration, authentication, and profile display.
 
 from rest_framework import serializers
 from studyFlax.models import User
+from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.serialisers.common import (
     build_profile_photo_url,
     can_view_user_stats,
@@ -39,6 +40,7 @@ class UserSerialiser(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     year = serializers.SerializerMethodField()
     major = serializers.SerializerMethodField()
+    settings = UserSettingsSerialiser(read_only=True)
     bio = serializers.CharField(read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
     shared_by_count = serializers.SerializerMethodField()
@@ -55,6 +57,7 @@ class UserSerialiser(serializers.ModelSerializer):
             'id', 'username', 'email', 'first_name', 'last_name',
             'name', 'year', 'major',
             'bio', 'profile_photo_url',
+            'settings',
             'pinned_badge_id',
             'shared_by_count', 'shared_with_count', 'is_shared_with_me', 'is_sharing',
             'modules', 'study_hours_this_week', 'study_streak',
@@ -70,6 +73,8 @@ class UserSerialiser(serializers.ModelSerializer):
 
     def get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)
+        if not settings:
+            return ''
         return getattr(settings, field, '') or ''
 
     def get_year(self, obj):

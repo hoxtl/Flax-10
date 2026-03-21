@@ -12,17 +12,6 @@ function extractUrl(item) {
     return typeof url === 'string' ? url.trim() : null;
 }
 
-export function getAvailablePhotos(society) {
-    if (!society) return [];
-    const announcementImages = extractAnnouncementImages(society.announcements || []);
-    const currentCovers = new Set(getImageUrls(society.images));
-    return announcementImages.filter(img => !currentCovers.has(img));
-}
-
-function extractAnnouncementImages(announcements) {
-    return announcements.flatMap(a => (a?.images || []).map(extractUrl)).filter(Boolean);
-}
-
 export function scrollContentToTop() {
     const scrollable = findScrollableParent();
     if (scrollable) scrollable.scrollTop = 0;

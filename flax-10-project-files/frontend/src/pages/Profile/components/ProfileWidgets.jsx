@@ -1,12 +1,14 @@
-export { default as ProfileWidget } from "./widgets/ProfileWidget";
-export { PersonaCard } from "./widgets/PersonaCard";
-export { StudyDNA } from "./widgets/StudyDNA";
-export { MiniHeatmap } from "./widgets/MiniHeatmap";
-export { ThisWeek } from "./widgets/ThisWeek";
-export { BadgesSection, BadgesBanner } from "./widgets/BadgesWidgets";
-export { ModulesSection, SocietiesSection, ModulesSocietiesWidget } from "./widgets/ModulesSocieties";
-export { QuickStatsRail } from "./widgets/QuickStatsRail";
-export { CompatibilityScore } from "./widgets/CompatibilityScore";
+/**
+ * Profile widget re-exports.
+ */
+export { AttendanceWidget, CompactAttendanceTile, CompactStreakTile } from "./widgets/AttendanceWidgets";
+export { BadgesBanner, BadgesSection } from "./widgets/BadgesWidgets";
 export { CommonGroundSection } from "./widgets/CommonGround";
-export { CompactAttendanceTile, CompactStreakTile, AttendanceWidget } from "./widgets/AttendanceWidgets";
-export { FocusHeatmapWidget, ContributionHeatmap } from "./widgets/FocusHeatmap";
+export { CompatibilityScore } from "./widgets/CompatibilityScore";
+export { ContributionHeatmap, FocusHeatmapWidget } from "./widgets/FocusHeatmap";
+export { MiniHeatmap } from "./widgets/MiniHeatmap";
+export { ModulesSection, ModulesSocietiesWidget, SocietiesSection } from "./widgets/ModulesSocieties";
+export { PersonaCard } from "./widgets/PersonaCard";
+export { QuickStatsRail } from "./widgets/QuickStatsRail";
+export { StudyDNA } from "./widgets/StudyDNA";
+export { ThisWeek } from "./widgets/ThisWeek";

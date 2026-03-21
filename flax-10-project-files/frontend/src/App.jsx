@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 import { APP_ROUTES } from "./lib/routes";
-import { getUserSettings, getUserProfile } from "./api/userService";
+import { getUserSettings, getUserProfile } from "./api/userApi";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";

@@ -3,52 +3,47 @@
  */
 
 import styles from '../../pages/Timer/TimerPage.module.css';
-import { GoalEditor } from './todayBanner/GoalEditor';
 import { ProgressBar } from './todayBanner/ProgressBar';
 import { useTodayBannerData } from './todayBanner/useTodayBannerData';
 
-function StreakBadge({ streak, streakTooltip }) {
+function MetricSection({ label, value, sub, icon, iconBg, divider = true }) {
   return (
-    <span className={styles.todayRibbonStreakWrap} data-tooltip={streakTooltip}>
-      <span className={styles.todayRibbonStreakIcon}>🔥</span>
-      <span className={styles.todayRibbonStreakValue}>{streak}d</span>
-    </span>
-  );
-}
-
-function SessionCounter({ sessions, goalSessions, counterAnimating }) {
-  const extraText = sessions > goalSessions ? ` (+${sessions - goalSessions} extra)` : '';
-  return (
-    <span className={styles.todayRibbonSessionsText}>
-      <span className={styles.todayRibbonSessionDigitWrap}>
-        <span key={sessions} className={`${styles.todayRibbonSessionDigit} ${counterAnimating ? styles.todayRibbonSessionDigitAnimate : ''}`}>{Math.min(sessions, goalSessions)}</span>
-      </span>
-      /{goalSessions} sessions today{extraText}
-    </span>
-  );
-}
-
-function BannerCenter({ state, isStudying }) {
-  return (
-    <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneCenter}`}>
-      <div className={styles.todayRibbonHeroRow}>
-        <SessionCounter sessions={state.sessions} goalSessions={state.goalSessions} counterAnimating={state.counterAnimating} />
-        <span className={styles.todayRibbonMilestoneActive}>{state.weeklyGoalText}</span>
+    <>
+      <div className={styles.todayMetricSection}>
+        <div className={styles.todayMetricIconWrap} style={{ backgroundColor: iconBg }}>
+          <span className={styles.todayMetricIcon}>{icon}</span>
+        </div>
+        <div className={styles.todayMetricInfo}>
+          <span className={styles.todayMetricLabel}>{label}</span>
+          <span className={styles.todayMetricValue}>{value}</span>
+          {sub && <div className={styles.todayMetricSub}>{sub}</div>}
+        </div>
       </div>
-      <div className={styles.todayRibbonScale}><span>0</span><span>{state.goalSessions}</span></div>
-      <ProgressBar sessions={state.sessions} goalSessions={state.goalSessions} sessionPct={state.sessionPct} fillAnimating={state.fillAnimating} isStudying={isStudying} activePulseLeft={state.activePulseLeft} tickCount={state.tickCount} />
-    </div>
+      {divider && <div className={styles.todayMetricDivider} />}
+    </>
   );
 }
 
-function BannerRight({ state }) {
+function getWeeklyProgressDays(streak) {
+  const weeklyDays = streak % 7;
+  if (streak > 0 && weeklyDays === 0) return 7;
+  return Math.max(0, Math.min(7, weeklyDays));
+}
+
+function FocusTimeSub({ goalHours, timePct }) {
+  return <div className={styles.todayGoalInlineMeta}>of {goalHours}h · {timePct}%</div>;
+}
+
+function BannerMetrics({ state, isStudying }) {
+  const weeklyProgressDays = getWeeklyProgressDays(state.streak);
+
   return (
-    <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneRight}`}>
-      <span className={styles.todayRibbonFocusValue}>🕒 {state.formattedHours}</span>
-      <span className={styles.todayRibbonMeta}>
-        Goal: <GoalEditor goalHours={state.goalHours} editingGoal={state.editingGoal} goalInput={state.goalInput} setGoalInput={state.setGoalInput} setEditingGoal={state.setEditingGoal} setGoalHours={state.setGoalHours} />
-      </span>
-    </div>
+    <>
+      <MetricSection label="STREAK" value={`${state.streak} day${state.streak !== 1 ? 's' : ''}`} icon="🔥" iconBg="#fff7ed" />
+      <MetricSection label="SESSIONS" value={`${state.sessions} / ${state.goalSessions}`} sub={<ProgressBar sessions={state.sessions} goalSessions={state.goalSessions} sessionPct={state.sessionPct} fillAnimating={state.fillAnimating} isStudying={isStudying} activePulseLeft={state.activePulseLeft} tickCount={state.tickCount} />} icon="🎯" iconBg="#f5f3ff" />
+      <MetricSection label="WEEKLY GOAL" value={`${weeklyProgressDays} / 7 days`} sub={<ProgressBar sessions={weeklyProgressDays} goalSessions={7} sessionPct={(weeklyProgressDays / 7) * 100} isStudying={false} />} icon="🏆" iconBg="#f0fdf4" />
+      <MetricSection label="FOCUS TIME" value={state.formattedHours} sub={<FocusTimeSub goalHours={state.goalHours} timePct={state.timePct} />} icon="🕒" iconBg="#fafaf9" divider={false} />
+    </>
   );
 }
 
@@ -57,10 +52,9 @@ export default function TodayBanner({ onStreakData, isStudying = false }) {
   if (state.loading) return null;
 
   return (
-    <div className={styles.todayRibbon}>
-      <div className={`${styles.todayRibbonZone} ${styles.todayRibbonZoneLeft}`}><StreakBadge streak={state.streak} streakTooltip={state.streakTooltip} /></div>
-      <BannerCenter state={state} isStudying={isStudying} />
-      <BannerRight state={state} />
+    <div className={styles.todayMetricBanner}>
+      <BannerMetrics state={state} isStudying={isStudying} />
     </div>
   );
 }
+

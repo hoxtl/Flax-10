@@ -29,18 +29,48 @@
 }
 
 .dangerBadge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    color: #8a3f2b;
+    background: #fff7f3;
+    border: 1px solid #f0c7b6;
+    border-left: 4px solid #d97757;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+}
+
+.dangerIcon {
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
-    gap: 0.42rem;
-    width: fit-content;
-    font-size: 0.75rem;
-    font-weight: 700;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #fff;
+    background: #d97757;
+}
+
+.dangerText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.dangerTitle {
+    font-size: 0.82rem;
+    font-weight: 800;
     letter-spacing: 0.02em;
-    color: var(--primary-strong);
-    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card));
-    border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
-    border-radius: 999px;
-    padding: 0.3rem 0.58rem;
+    text-transform: uppercase;
+}
+
+.dangerDescription {
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.45;
 }
 
 .messageDanger {

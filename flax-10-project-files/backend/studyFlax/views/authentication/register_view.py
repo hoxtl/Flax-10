@@ -25,5 +25,5 @@ def register_view(request):
     )
     get_or_create_user_settings(new_user)
     token, _ = Token.objects.get_or_create(user=new_user)
-    return Response({'user': UserSerialiser(new_user).data,
+    return Response({'user': UserSerialiser(new_user, context={'request': request}).data,
                     'token': token.key}, status=status.HTTP_201_CREATED)

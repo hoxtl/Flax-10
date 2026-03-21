@@ -6,6 +6,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Flame } from "lucide-react";
 import { fetchApi } from "../../../api/client";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/StudyStreakWidget.module.css";
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -91,11 +92,11 @@ export default function StudyStreakWidget() {
 
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <div className={styles.iconWrap}>
-          <Flame size={15} strokeWidth={1.75} aria-hidden />
+      <div className={baseStyles.widgetHeader}>
+        <div className={baseStyles.headerIconWrap}>
+          <Flame size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
         </div>
-        <span className={styles.label}>STUDY STREAK</span>
+        <span className={baseStyles.headerTitle}>Study Streak</span>
       </div>
 
       <div className={styles.streakRow}>

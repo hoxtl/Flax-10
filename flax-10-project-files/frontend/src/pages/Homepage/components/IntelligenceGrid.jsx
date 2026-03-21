@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./IntelligenceGrid.module.css";
 import { BentoCard } from "../../../components/ui/bento-grid";
+import { Pencil, Check, RotateCcw, Plus, Minus, Shuffle } from "lucide-react";
 
 // Helper for drag animations/logic
 const DelBtn = ({ onClick }) => (
@@ -22,6 +23,62 @@ const Grip = () => (
     ))}
   </div>
 );
+
+const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxRow = 4, onResize }) => {
+  const isHero = id === "hero";
+  const canGrowWidth = !isHero && col < maxCol;
+  const canShrinkWidth = !isHero && col > minCol;
+  const canGrowHeight = row < maxRow;
+  const canShrinkHeight = row > minRow;
+
+  if (!canGrowWidth && !canShrinkWidth && !canGrowHeight && !canShrinkHeight) {
+    return null;
+  }
+
+  return (
+    <div className={styles.resizeControls} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.resizeGroup} style={{ opacity: isHero ? 0.4 : 1, pointerEvents: isHero ? "none" : "auto" }}>
+        <button 
+          className={styles.resizeBtn} 
+          onClick={() => canShrinkWidth && onResize(id, { col: col - 1, row })}
+          disabled={!canShrinkWidth}
+          title={canShrinkWidth ? "Shrink Width" : "Minimum width reached"}
+        >
+          <Minus size={13} strokeWidth={3} />
+        </button>
+        <span className={styles.resizeVal}>{col}W</span>
+        <button 
+          className={styles.resizeBtn} 
+          onClick={() => canGrowWidth && onResize(id, { col: col + 1, row })}
+          disabled={!canGrowWidth}
+          title="Grow Width"
+        >
+          <Plus size={13} strokeWidth={3} />
+        </button>
+      </div>
+      <div className={styles.resizeDivider} />
+      <div className={styles.resizeGroup}>
+        <button 
+          className={styles.resizeBtn} 
+          onClick={() => canShrinkHeight && onResize(id, { col, row: row - 1 })}
+          disabled={!canShrinkHeight}
+          title={canShrinkHeight ? "Shrink Height" : "Minimum height reached"}
+        >
+          <Minus size={13} strokeWidth={3} />
+        </button>
+        <span className={styles.resizeVal}>{row}H</span>
+        <button 
+          className={styles.resizeBtn} 
+          onClick={() => canGrowHeight && onResize(id, { col, row: row + 1 })}
+          disabled={!canGrowHeight}
+          title="Grow Height"
+        >
+          <Plus size={13} strokeWidth={3} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
   const available = catalogue.filter((w) => !active.includes(w.id));
@@ -84,12 +141,16 @@ const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
 export default function IntelligenceGrid({
   layout,
   setLayout,
+  widgetSizes,
+  setWidgetSize,
   edit,
+  setEdit,
+  onReset,
   catalogue,
   widgetRenderer,
   showAdd,
   setShowAdd,
-  renderAfterHero,
+  onRandomize,
 }) {
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
@@ -126,49 +187,91 @@ export default function IntelligenceGrid({
   const handleAddWidget = (id) => {
     setLayout((prev) => {
       if (prev.includes(id)) return prev;
-      const next = [...prev];
-      const widget = catalogue.find((item) => item.id === id);
-      // Keep wide widgets near the top so grid placement feels predictable.
-      if (widget?.col >= 2) {
-        const firstNonHeroIdx = next.findIndex((itemId) => itemId !== "hero");
-        if (firstNonHeroIdx === -1) {
-          next.push(id);
-          return next;
-        }
-        next.splice(firstNonHeroIdx, 0, id);
-        return next;
-      }
-      next.push(id);
-      return next;
+      return [...prev, id];
     });
   };
 
   return (
     <div className={styles.gridContainer}>
+      {/* Floating Edit Button positioned top-right relative to the grid area */}
+      <div className={styles.gridActions}>
+        <button
+          onClick={() => {
+            setEdit(!edit);
+            if (edit) setShowAdd(false);
+          }}
+          className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
+          title={edit ? "Done" : "Edit Layout"}
+          aria-label={edit ? "Done editing layout" : "Edit dashboard layout"}
+        >
+          {edit ? <Check size={26} /> : <Pencil size={24} />}
+        </button>
+        {edit && (
+          <>
+            <button 
+              onClick={onRandomize} 
+              className={styles.iconActionBtn}
+              title="Shuffle Layout"
+            >
+              <Shuffle size={16} />
+            </button>
+            <button 
+              onClick={onReset} 
+              className={styles.iconActionBtn}
+              title="Reset Layout"
+            >
+              <RotateCcw size={16} />
+            </button>
+          </>
+        )}
+      </div>
 
       <div className={styles.bentoGrid} data-testid="bento-grid">
         {/* Pinned Hero Section inside the grid container */}
-        {layout.includes("hero") && (
-          <div 
-            className={`${styles.widgetWrapper} ${styles["widget-hero"]}`}
-            style={{ gridColumn: "1 / -1" }}
-          >
-            <div className={styles.widgetClip}>
-              <div className={styles.widgetContent}>
-                {widgetRenderer("hero")}
+        {layout.includes("hero") && (() => {
+          const w = catalogue.find(item => item.id === "hero");
+          const customSize = widgetSizes["hero"] || {};
+          const row = customSize.row || w?.row || 2;
+          
+          return (
+            <div 
+              className={`${styles.widgetWrapper} ${styles["widget-hero"]} ${edit ? styles.editMode : ""}`}
+              style={{ gridColumn: "1 / -1", gridRow: `span ${row}` }}
+            >
+              {edit && (
+                <div style={{ position: "absolute", bottom: 8, right: 8, zIndex: 30 }}>
+                  <ResizeControls 
+                    id="hero" 
+                    col={2} 
+                    row={row} 
+                    minCol={w?.minCol}
+                    minRow={w?.minRow}
+                    maxCol={w?.maxCol}
+                    maxRow={w?.maxRow}
+                    onResize={setWidgetSize} 
+                  />
+                </div>
+              )}
+              <div className={styles.widgetClip}>
+                <div className={styles.widgetContent}>
+                  {widgetRenderer("hero", { col: 2, row })}
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {renderAfterHero && (
-          <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
-            {renderAfterHero()}
-          </div>
-        )}
+          );
+        })()}
+
         {layout.filter(id => id !== "hero").map((id) => {
           const w = catalogue.find((item) => item.id === id);
           if (!w) return null;
           
+          const customSize = widgetSizes[id] || {};
+          const col = customSize.col || w.col;
+          const row = customSize.row || w.row;
+
+          const content = widgetRenderer(id, { col, row });
+          if (content === null) return null;
+
           const isDragSrc = dragging === id;
           const isDragTgt = dragOver === id;
 
@@ -191,15 +294,27 @@ export default function IntelligenceGrid({
               className={wrapperClass}
               data-widget-id={id}
               style={{
-                gridColumn: `span ${w.col}`,
-                gridRow: `span ${w.row}`,
+                gridColumn: `span ${col}`,
+                gridRow: `span ${row}`,
               }}
             >
               {edit && <DelBtn onClick={() => setLayout((prev) => prev.filter((x) => x !== id))} />}
               {edit && <Grip />}
+              {edit && (
+                <ResizeControls 
+                  id={id} 
+                  col={col} 
+                  row={row} 
+                  minCol={w.minCol}
+                  minRow={w.minRow}
+                  maxCol={w.maxCol}
+                  maxRow={w.maxRow}
+                  onResize={setWidgetSize} 
+                />
+              )}
               <div className={styles.widgetClip}>
                 <div className={styles.widgetContent}>
-                  <BentoCard>{widgetRenderer(id)}</BentoCard>
+                  <BentoCard>{widgetRenderer(id, { col, row })}</BentoCard>
                 </div>
               </div>
             </div>
