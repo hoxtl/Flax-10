@@ -78,7 +78,7 @@ vi.mock('../../../pages/Homepage/components', async () => {
   const { MiniTimelineMock } = await import('./homepageMocks');
   return { MiniTimeline: MiniTimelineMock };
 });
-vi.mock('../../../api/taskService', () => ({
+vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -158,7 +158,7 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
-    const mod = await import('../../../api/taskService');
+    const mod = await import('../../../api/taskApi');
     mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
     // Homepage only fetches task lists when the create task modal is enabled.
     render(<MemoryRouter><Homepage defaultShowCreateTaskModal={true} /></MemoryRouter>);
@@ -250,7 +250,7 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('onInlineTaskEdit updates task and refetches', async () => {
-    const { updateTask } = await import('../../../api/taskService');
+    const { updateTask } = await import('../../../api/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('inline-edit'));
     await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, expect.objectContaining({ title: 'X' })));

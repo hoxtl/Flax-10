@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchTaskLists, fetchArchivedTaskLists } from "../../../api/taskService";
+import { fetchTaskLists, fetchArchivedTaskLists } from "../../../api/taskApi";
 import { mergeListColors } from "../utils/useTaskListsUtils";
 
 export default function useTaskListsLoad() {

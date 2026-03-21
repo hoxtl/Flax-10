@@ -11,7 +11,7 @@ import {
   geocodeAddress,
   saveHomeAddress,
   updateUserSettings,
-} from "../../../api/userService";
+} from "../../../api/userApi";
 
 export function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);

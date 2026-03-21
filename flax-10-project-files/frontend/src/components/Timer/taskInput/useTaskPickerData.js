@@ -58,7 +58,7 @@ function useEnrolledModules(setEnrolledModules) {
 }
 
 async function fetchTaskPayload() {
-  const taskService = await import('../../../api/taskService');
+  const taskService = await import('../../../api/taskApi');
   return Promise.all([taskService.fetchTasks(), taskService.fetchTaskLists()]);
 }
 

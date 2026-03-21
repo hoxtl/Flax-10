@@ -21,7 +21,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../api/userService', () => ({
+vi.mock('../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ theme: 'light' }),
     getUserProfile: vi.fn().mockResolvedValue({ major: 'Computer Science' }),
 }));
@@ -225,7 +225,7 @@ describe('App', () => {
     });
 
     it('loadTheme uses light when getUserSettings rejects', async () => {
-        const { getUserSettings } = await import('../api/userService');
+        const { getUserSettings } = await import('../api/userApi');
         getUserSettings.mockRejectedValueOnce(new Error('network error'));
         localStorage.setItem('token', 'abc');
         localStorage.setItem('user', JSON.stringify({ id: 1 }));
@@ -235,7 +235,7 @@ describe('App', () => {
     });
 
     it('shows onboarding when profile has no major', async () => {
-        const { getUserProfile } = await import('../api/userService');
+        const { getUserProfile } = await import('../api/userApi');
         getUserProfile.mockResolvedValueOnce({});
         localStorage.setItem('token', 'abc');
         localStorage.setItem('user', JSON.stringify({ id: 1 }));
@@ -245,7 +245,7 @@ describe('App', () => {
     });
 
     it('onboarding complete dispatches navigate and closes modal', async () => {
-        const { getUserProfile } = await import('../api/userService');
+        const { getUserProfile } = await import('../api/userApi');
         getUserProfile.mockResolvedValueOnce({});
         localStorage.setItem('token', 'abc');
         localStorage.setItem('user', JSON.stringify({ id: 1 }));

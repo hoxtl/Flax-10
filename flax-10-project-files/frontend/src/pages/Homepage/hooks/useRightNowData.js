@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getHomeAddress } from "../../../api/userService";
-import { tflService } from "../../../api/tflService";
+import { getHomeAddress } from "../../../api/userApi";
+import { tflService } from "../../../api/tflApi";
 import { resolveCampusFromText } from "../../../lib/kclCampuses";
 import { getCurrentBlock, getNextEvent, hasCampusCommute, getLeaveByInfo, formatTimeLeft } from "../components/RightNowUtils";
 import { useCountdown } from "../hooks/useCountdown";

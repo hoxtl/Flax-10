@@ -8,7 +8,7 @@ import { MemoryRouter } from "react-router-dom";
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
-import { createTask } from "../../../api/taskService";
+import { createTask } from "../../../api/taskApi";
 
 vi.mock("../../../api/deadlineApi", () => ({
   getUpcomingDeadlines: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock("../../../api/readingApi", () => ({
   convertReadingToTask: vi.fn(),
 }));
 
-vi.mock("../../../api/taskService", () => ({
+vi.mock("../../../api/taskApi", () => ({
   createTask: vi.fn(),
 }));
 

@@ -14,7 +14,7 @@ import {
   useCalendarEvents,
   useEventActions,
 } from "../../components/Calendar/hooks/useCalendarEvents";
-import { updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskService";
+import { updateTask, createTask, fetchTaskLists, createTaskList, deleteTask } from "../../api/taskApi";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
 import { getModules, getEnrollments } from "../../api/moduleApi";

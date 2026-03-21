@@ -1,3 +1,7 @@
+/*
+ * Creates, updates, and deletes task tags.
+ */
+
 import { fetchApi } from './client';
 
 export async function getTags() {

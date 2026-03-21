@@ -1,3 +1,7 @@
+/*
+ * KCL campus coordinates, name aliases, and accent colours for the map.
+ */
+
 export const KCL_CAMPUSES = [
   {
     id: "strand",

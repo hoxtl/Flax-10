@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
-import { updateUserProfile } from '../../api/userService';
+import { updateUserProfile } from '../../api/userApi';
 import { getInitials } from '../Authentication/utils/userUtils';
 import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 import FormField from '../common/FormField/FormField';

@@ -1,3 +1,7 @@
+/*
+ * Shared fetch wrapper that injects auth tokens and normalises errors.
+ */
+
 const API_BASE_URL = "/api";
 
 export async function fetchApi(endpoint, options = {}) {

@@ -43,7 +43,7 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     })),
 }));
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 

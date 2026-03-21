@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { fetchTasks } from "../../../api/taskService";
+import { fetchTasks } from "../../../api/taskApi";
 
 async function loadTasks(filters, setTasks, setLoading, setInitialLoading) {
   setLoading(true);
