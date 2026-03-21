@@ -20,3 +20,11 @@
   flex-direction: column;
   gap: 2px;
 }
+
+.travelLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
