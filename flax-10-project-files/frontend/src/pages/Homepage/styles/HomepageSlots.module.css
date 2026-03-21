@@ -2265,4 +2265,16 @@
   color: var(--schedule-auto-text);
 }
 
+@media (max-width: 640px) {
+  .scheduleActionGroup {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .scheduleActionGroup > * {
+    flex: 1 1 calc(50% - 3px);
+    min-width: 0;
+    justify-content: center;
+  }
+}
 
