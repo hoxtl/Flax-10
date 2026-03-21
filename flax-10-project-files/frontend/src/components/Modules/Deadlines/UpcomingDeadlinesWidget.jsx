@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { AlertCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { AlertCircle, ChevronDown, ChevronUp, Clock } from "lucide-react";
 
-import styles from '../../../pages/Modules/MyModulesDashboard.module.css';
+import styles from "../../../pages/Modules/MyModulesDashboard.module.css";
 import {
   DEADLINE_TIER_ORDER,
   PRIORITY_PILL,
@@ -11,13 +11,13 @@ import {
   getDaysLabel,
   getDueStatusClass,
   getUrgencyTier,
-} from './upcomingDeadlinesUtils';
+} from "./upcomingDeadlinesUtils";
 
 const expandBodyVariants = {
   collapsed: { opacity: 0, height: 0 },
   expanded: {
     opacity: 1,
-    height: 'auto',
+    height: "auto",
     transition: { duration: 0.26, ease: [0.23, 1, 0.32, 1] },
   },
 };
@@ -28,12 +28,20 @@ const listVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] },
+  },
 };
 
 const containerVariants = {
   hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
+  },
 };
 
 function WidgetHeader({ icon: Icon, title, count }) {
@@ -57,9 +65,14 @@ function ShowMoreButton({ expanded, hiddenCount, onToggle }) {
       whileTap={{ scale: 0.98 }}
     >
       {expanded ? (
-        <><ChevronUp size={14} strokeWidth={2.5} aria-hidden /> Show less</>
+        <>
+          <ChevronUp size={14} strokeWidth={2.5} aria-hidden /> Show less
+        </>
       ) : (
-        <><ChevronDown size={14} strokeWidth={2.5} aria-hidden /> + {hiddenCount} more</>
+        <>
+          <ChevronDown size={14} strokeWidth={2.5} aria-hidden /> +{" "}
+          {hiddenCount} more
+        </>
       )}
     </motion.button>
   );
@@ -75,7 +88,10 @@ function ModuleCodePill({ moduleCode, deadline, onSelectModule }) {
         className={styles.moduleCodePill}
         onClick={(e) => {
           e.stopPropagation();
-          onSelectModule({ code: moduleCode, id: deadline.module_id ?? deadline.module ?? null });
+          onSelectModule({
+            code: moduleCode,
+            id: deadline.module_id ?? deadline.module ?? null,
+          });
         }}
       >
         {moduleCode}
@@ -94,24 +110,29 @@ function ModuleCodePill({ moduleCode, deadline, onSelectModule }) {
   );
 }
 
-function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onSelectModule }) {
+function DeadlineRow({
+  deadline,
+  interactiveRows,
+  onSelectDeadline,
+  onSelectModule,
+}) {
   const due = deadline.start_due_date;
   const tier = getUrgencyTier(due);
   const daysLabel = getDaysLabel(due);
-  const title = deadline.assessment_title || deadline.title || 'Assignment';
-  const moduleCode = deadline.module_code || '';
-  const typeLabel = (deadline.deadline_type || 'assessment').toUpperCase();
-  const urgentGlow = tier === 'overdue' || tier === 'critical';
+  const title = deadline.assessment_title || deadline.title || "Assignment";
+  const moduleCode = deadline.module_code || "";
+  const typeLabel = (deadline.deadline_type || "assessment").toUpperCase();
+  const urgentGlow = tier === "overdue" || tier === "critical";
   const pill = PRIORITY_PILL[tier];
   const dueCls = getDueStatusClass(tier);
 
   const interactiveProps = interactiveRows
     ? {
-        role: 'button',
+        role: "button",
         tabIndex: 0,
         onClick: () => onSelectDeadline?.(deadline),
         onKeyDown: (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             onSelectDeadline?.(deadline);
           }
@@ -121,49 +142,69 @@ function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onSelectModu
 
   return (
     <motion.div
-      className={`${styles.deadlineRow} ${tier === 'overdue' ? styles.rowOverdue : ''} ${tier === 'critical' ? styles.rowCritical : ''} ${urgentGlow ? styles.rowUrgentGlow : ''}`}
-      style={{ '--deadline-row-accent': TIER_ACCENT[tier], cursor: interactiveRows ? 'pointer' : 'default' }}
+      className={`${styles.deadlineRow} ${tier === "overdue" ? styles.rowOverdue : ""} ${tier === "critical" ? styles.rowCritical : ""} ${urgentGlow ? styles.rowUrgentGlow : ""}`}
+      style={{
+        "--deadline-row-accent": TIER_ACCENT[tier],
+        cursor: interactiveRows ? "pointer" : "default",
+      }}
       variants={itemVariants}
       {...interactiveProps}
     >
       <div className={styles.deadlineRowLeft}>
         <div className={styles.deadlinePills}>
-          <ModuleCodePill moduleCode={moduleCode} deadline={deadline} onSelectModule={onSelectModule} />
+          <ModuleCodePill
+            moduleCode={moduleCode}
+            deadline={deadline}
+            onSelectModule={onSelectModule}
+          />
           <span className={styles.typePill}>{typeLabel}</span>
         </div>
         <span className={styles.deadlineTitle}>{title}</span>
       </div>
-      {pill ? <span className={`${styles.priorityPill} ${styles[pill.cls]}`}>{pill.marks} {pill.label}</span> : null}
-      <span className={`${styles.daysLabel} ${styles[dueCls]}`}>
-        {(tier === 'overdue' || tier === 'critical' || tier === 'urgent') ? <Clock size={11} className={styles.duePillIcon} /> : null}
-        {daysLabel}
-      </span>
+      <div className={styles.deadlineRowRight}>
+        {pill ? (
+          <span className={`${styles.priorityPill} ${styles[pill.cls]}`}>
+            {pill.marks} {pill.label}
+          </span>
+        ) : null}
+        <span className={`${styles.daysLabel} ${styles[dueCls]}`}>
+          {tier === "overdue" || tier === "critical" || tier === "urgent" ? (
+            <Clock size={11} className={styles.duePillIcon} />
+          ) : null}
+          {daysLabel}
+        </span>
+      </div>
     </motion.div>
   );
 }
 
 export function UpcomingDeadlinesWidget({
   deadlines = [],
-  title = 'Upcoming Deadlines',
+  title = "Upcoming Deadlines",
   initialShown = 4,
   embedded = false,
   interactiveRows = false,
   onSelectDeadline,
   onSelectModule,
-  emptyMessage = 'No upcoming deadlines',
+  emptyMessage = "No upcoming deadlines",
   emptySub = "You're all caught up — enjoy the calm.",
 }) {
   const [expanded, setExpanded] = useState(false);
 
   const sorted = useMemo(() => {
-    const list = [...(deadlines || [])].filter((deadline) => deadline?.start_due_date);
+    const list = [...(deadlines || [])].filter(
+      (deadline) => deadline?.start_due_date,
+    );
     list.sort((a, b) => {
       const aTier = getUrgencyTier(a.start_due_date);
       const bTier = getUrgencyTier(b.start_due_date);
       if (DEADLINE_TIER_ORDER[aTier] !== DEADLINE_TIER_ORDER[bTier]) {
         return DEADLINE_TIER_ORDER[aTier] - DEADLINE_TIER_ORDER[bTier];
       }
-      return new Date(a.start_due_date).getTime() - new Date(b.start_due_date).getTime();
+      return (
+        new Date(a.start_due_date).getTime() -
+        new Date(b.start_due_date).getTime()
+      );
     });
     return list;
   }, [deadlines]);
@@ -176,7 +217,7 @@ export function UpcomingDeadlinesWidget({
 
   return (
     <motion.div
-      className={`${styles.widget} ${embedded ? styles.widgetEmbedded : ''}`}
+      className={`${styles.widget} ${embedded ? styles.widgetEmbedded : ""}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -189,7 +230,12 @@ export function UpcomingDeadlinesWidget({
         </div>
       ) : (
         <>
-          <motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants}>
+          <motion.div
+            className={styles.widgetList}
+            initial="hidden"
+            animate="visible"
+            variants={listVariants}
+          >
             {initial.map((deadline) => (
               <DeadlineRow
                 key={deadline.id}
@@ -208,7 +254,12 @@ export function UpcomingDeadlinesWidget({
                   animate="expanded"
                   exit="collapsed"
                 >
-                  <motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
+                  <motion.div
+                    className={styles.expandableRowsInner}
+                    initial="hidden"
+                    animate="visible"
+                    variants={listVariants}
+                  >
                     {extra.map((deadline) => (
                       <DeadlineRow
                         key={deadline.id}
@@ -224,7 +275,11 @@ export function UpcomingDeadlinesWidget({
             </AnimatePresence>
           </motion.div>
           {hiddenCount > 0 ? (
-            <ShowMoreButton expanded={expanded} hiddenCount={hiddenCount} onToggle={() => setExpanded((prev) => !prev)} />
+            <ShowMoreButton
+              expanded={expanded}
+              hiddenCount={hiddenCount}
+              onToggle={() => setExpanded((prev) => !prev)}
+            />
           ) : null}
         </>
       )}
