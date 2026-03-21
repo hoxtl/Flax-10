@@ -146,10 +146,10 @@ async function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartL
   mapRef.current?.flyTo({ center: [userHome.lng, userHome.lat], zoom: 15, pitch: 55, duration: 1200 });
 }
 
-export function wireHomeButton(userHome, homePointerRef, mapRef, setStartLocation) {
+export function wireHomeButton(userHome, homePointerRef, mapRef, setStartLocation, setManualStart) {
   const btn = document.getElementById('setHomeAsStart');
   if (!btn) return;
-  btn.addEventListener('click', () => handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation));
+  btn.addEventListener('click', () => handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation, setManualStart));
 }
 
 export function createStartMarkerEl(stylesModule) {
