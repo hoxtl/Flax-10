@@ -119,4 +119,4 @@ def create_tasks(users, stdout):
     stdout.write("Seeding tasks...")
     now = timezone.now()
     total = sum(_seed_tasks_for_user(user, now) for user in users)
-    stdout.write(f"  Created {total} tasks.")
+    stdout.write(f"  Created {total:,} tasks.")

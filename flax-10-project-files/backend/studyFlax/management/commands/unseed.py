@@ -19,14 +19,17 @@ User = get_user_model()
 TABLES = [
     'studyFlax_calendarevent', 'studyFlax_tag', 'studyFlax_category',
     'studyFlax_recurrencerule', 'studyFlax_usersettings', 'studyFlax_notification',
-    'studyFlax_timetablesource',
+    'studyFlax_timetablesource', 'studyFlax_eventattendance', 'studyFlax_calendarshare',
+    'studyFlax_schedule', 'studyFlax_scheduleeventallocation',
     'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
-    'studyFlax_societyevent', 'studyFlax_societyimage',
+    'studyFlax_societyevent', 'studyFlax_societyimage', 'studyFlax_societyannouncement',
+    'studyFlax_societyannouncementimage', 'studyFlax_societyreport', 'studyFlax_societycalendarsync',
     'studyFlax_deadline', 'studyFlax_enrollment', 'studyFlax_module',
     'studyFlax_groupproject', 'studyFlax_groupmembership',
     'studyFlax_meetingsuggestion', 'studyFlax_meetingresponse',
     'studyFlax_studysession', 'studyFlax_themesession',
-    'studyFlax_reading',
+    'studyFlax_reading', 'studyFlax_task', 'studyFlax_tasklist',
+    'studyFlax_coursechangerequest',
     'studyFlax_user',
 ]
 

@@ -35,7 +35,7 @@ from .seed_users import (
 )
 from .seed_events import create_events_for_users
 from .seed_modules import create_modules, create_deadlines, create_enrollments
-from .seed_tasks import create_tasks, create_module_reading_lists
+from .seed_tasks import create_tasks
 from .seed_groups import (
     create_group_projects, create_group_memberships, create_group_tasks,
 )
@@ -44,9 +44,8 @@ from .seed_societies import (
     create_societies, create_society_memberships,
     create_society_events, create_society_images,
 )
-from .seed_reading_helpers import build_readings_for_module, build_reading_user_history
+from .seed_readings import create_readings
 from .seed_attendance import seed_attendance
-from studyFlax.utils.reading_utils import update_reading_estimates
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
@@ -83,6 +82,13 @@ def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
 
 
+def _is_already_seeded():
+    """Check if fixture users exist to detect prior seeding."""
+    fixture_usernames = {'johndoe', 'janedoe', 'charlie', 'amiller'}
+    existing = set(User.objects.filter(username__in=fixture_usernames).values_list('username', flat=True))
+    return len(existing) >= 2
+
+
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset."""
 
@@ -95,6 +101,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        if _is_already_seeded():
+            self._print_already_seeded_warning()
+            return
         self.teacher_count = options.get('teacher_count', 14) or 14
         self.stdout.write(self.style.SUCCESS('Starting seeding process...'))
         self._ensure_usersettings_seed_compatibility()
@@ -103,6 +112,17 @@ class Command(BaseCommand):
         self._load_shared_data()
         self._seed_content()
         self.print_stats()
+
+    def _print_already_seeded_warning(self):
+        div = "\u2500" * 40
+        self.stdout.write("")
+        self.stdout.write(self.style.WARNING(div))
+        self.stdout.write(self.style.WARNING("  Database already seeded"))
+        self.stdout.write(self.style.WARNING(div))
+        self.stdout.write("")
+        self.stdout.write("  Fixture users detected. To reseed, first run:")
+        self.stdout.write(self.style.SUCCESS("    python manage.py unseed"))
+        self.stdout.write("")
 
     def _ensure_usersettings_seed_compatibility(self):
         table_name = UserSettings._meta.db_table
@@ -150,7 +170,8 @@ class Command(BaseCommand):
         self._seed_societies_and_groups()
         self._seed_calendar_shares()
         create_study_sessions(self.stdout)
-        self._seed_readings()
+        students = list(User.objects.filter(role='student'))
+        create_readings(self.modules, students, self.stdout)
         seed_attendance(self.stdout)
 
     def _seed_societies_and_groups(self):
@@ -258,40 +279,6 @@ class Command(BaseCommand):
                 defaults={'category': None, 'default_duration': 0, 'color': pill_color},
             )
 
-    def _seed_readings(self):
-        self.stdout.write("Seeding readings...")
-        self._seed_readings_for_modules()
-        self._seed_reading_history_all_students()
-        self.stdout.write(f"  {Reading.objects.count()} total readings in database.")
-
-    def _seed_readings_for_modules(self):
-        readings = []
-        for module in self.modules:
-            readings.extend(build_readings_for_module(module))
-        Reading.objects.bulk_create(readings, ignore_conflicts=True)
-        self.stdout.write(f"  Created {len(readings)} readings across {len(self.modules)} modules.")
-
-    def _reading_list_for(self, user):
-        return TaskList.objects.filter(user=user, name="Personal").first()
-
-    def _seed_reading_history_for(self, user):
-        reading_list = self._reading_list_for(user)
-        if not reading_list:
-            return 0
-        module_ids = set(Enrollment.objects.filter(student=user).values_list('module', flat=True))
-        modules = [m for m in self.modules if m.id in module_ids]
-        module_reading_lists = create_module_reading_lists(user, modules)
-        tasks = build_reading_user_history(user, modules, reading_list, module_reading_lists)
-        Task.objects.bulk_create(tasks, ignore_conflicts=True)
-        if tasks:
-            update_reading_estimates(user)
-        return len(tasks)
-
-    def _seed_reading_history_all_students(self):
-        students = list(User.objects.filter(role='student'))
-        total = sum(self._seed_reading_history_for(s) for s in students)
-        self.stdout.write(f"  {total} reading tasks seeded across {len(students)} students.")
-
     def _build_stats(self):
         return [
             ("Users",       User.objects.count()),
@@ -322,7 +309,7 @@ class Command(BaseCommand):
     def _print_database_stats(self):
         self.stdout.write("  Database")
         for label, count in self._build_stats():
-            self.stdout.write(f"  {label:<14}  {count}")
+            self.stdout.write(f"  {label:<16}{count:,}")
 
     def print_stats(self):
         """Print a summary of all seeded data."""

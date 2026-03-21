@@ -40,15 +40,21 @@ def _in_reading_week(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
     return READING_WEEK_START <= d <= READING_WEEK_END
 
-ACADEMIC_TAG_NAMES = {'Lecture', 'Exam'}
+ACADEMIC_TAG_NAMES = {'Lecture', 'Exam', 'Deadline'}
+
+
+def _personal_tags(user, tags):
+    """Return non-academic tags for personal events."""
+    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
+    return [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
+
 
 def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
-    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    personal_tags = [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
-    tag = random.choice(personal_tags) if personal_tags and random.random() > 0.2 else None
+    personal = _personal_tags(user, tags)
+    tag = random.choice(personal) if personal and random.random() > 0.2 else None
     return CalendarEvent(
         user=user,
         title=title,
@@ -112,8 +118,8 @@ def build_today_afternoon_events(user, tags):
     """Five mock events for today between 14:30 and 20:00."""
     now = timezone.now()
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    tag = random.choice(user_tags) if user_tags else None
+    personal = _personal_tags(user, tags)
+    tag = random.choice(personal) if personal else None
     return [_afternoon_event(user, today, h, m, d, t, tag) for h, m, d, t in AFTERNOON_SLOTS]
 
 def _meal_event(user, base, day_offset, label, fixtures, sh, sm, eh, em, tag):
@@ -258,19 +264,18 @@ def build_deadlines_for_module(module):
     results = [_build_single_deadline(module, *t, now, used_offsets, index=i) for i, t in enumerate(templates)]
     return [d for d in results if d is not None]
 
-def create_deadline_calendar_event(user, deadline):
-    """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""
-    CalendarEvent.objects.get_or_create(
+def build_deadline_event(user, deadline, tag=None):
+    """Build an unsaved CalendarEvent for a deadline."""
+    return CalendarEvent(
         user=user,
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
         start_time=deadline.start_due_date,
-        defaults={
-            'end_time': deadline.end_due_date or deadline.start_due_date,
-            'location': deadline.location,
-            'description': deadline.description,
-            'priority': 'high',
-            'module': deadline.module,
-            'source': 'module_deadline',
-            'external_id': str(deadline.id),
-        },
+        end_time=deadline.end_due_date or deadline.start_due_date,
+        location=deadline.location,
+        description=deadline.description,
+        priority='high',
+        module=deadline.module,
+        source='module_deadline',
+        external_id=str(deadline.id),
+        tag=tag,
     )
