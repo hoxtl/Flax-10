@@ -13,6 +13,7 @@ import CompletedTasksSection from "./CompletedTasksSection";
 import PageHeader from "../../../components/common/PageHeader/PageHeader";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
 import toolbarStyles from "./TaskFeedToolbar.module.css";
@@ -110,20 +111,15 @@ function TaskFeedSubHeader({
     <div className={styles.subHeader}>
       {isMobile && (
         <div className={styles.mobileViewRow}>
-          <label className={styles.mobileViewSelectWrap}>
+          <div className={styles.mobileViewSelectWrap}>
             <span className={styles.mobileViewLabel}>View</span>
-            <select
-              className={styles.mobileViewSelect}
+            <AnimatedDropdown
+              className={styles.mobileViewDropdown}
               value={activeFilter}
-              onChange={(e) => handleMobileFilterChange(e.target.value)}
-            >
-              {MOBILE_VIEW_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={handleMobileFilterChange}
+              options={MOBILE_VIEW_OPTIONS}
+            />
+          </div>
         </div>
       )}
       <div className={styles.createRow}>
