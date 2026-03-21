@@ -14,6 +14,8 @@ import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
 import { useEffect, useState } from 'react';
+import { getHomeAddress } from '../../api/userService';
+import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -203,7 +205,10 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
 
     useEffect(() => {
         async function fetchTravelTime() {
-
+            try {
+                const homeAddress = await getHomeAddress();
+                const travelInfo = await getTravelTimeModule(homeAddress, module.location);
+            }
         }
     })
 
