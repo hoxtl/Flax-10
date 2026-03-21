@@ -16,6 +16,7 @@ import { CampusQuickNav } from '../../components/CampusMap/CampusQuickNav';
 import { useDisruptions } from './hooks/useDisruptions';
 import { useCalendarEvents } from './hooks/useCalendarEvents';
 import { useHomeAddress } from './hooks/useHomeAddress';
+import { reverseGeocode } from '../../api/userApi';
 import { tflService } from '../../api/tflApi';
 import {
   initMapInstance, handleMapLoad, cleanupMap,
@@ -96,8 +97,15 @@ export default function CampusMap() {
     map.current = initMapInstance(mapContainer.current);
     map.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
     map.current.on('load', () => handleMapLoad(map.current, KCL_CAMPUSES, campusMarkers, routeLayerAdded, styles, onCampusMarkerSelect, () => setMapLoaded(true)));
-    map.current.on('click', (e) => {
-      if (!e.originalEvent.defaultPrevented) setStartLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
+    map.current.on('click', async (e) => {
+      if (!e.originalEvent.defaultPrevented) {
+        const { lng, lat} = e.lngLat;
+        setStartLocation({ lng, lat });
+        const address = await reverseGeocode(lat, lng);
+        if (address) {
+          setManualStart(address);
+        }
+      }
     });
     return () => cleanupMap(map, campusMarkers, eventMarkers, homePointer, homePopup);
   }, []);
@@ -121,7 +129,7 @@ export default function CampusMap() {
       .addTo(map.current);
     const isHomeStart = startLocation && Math.abs(startLocation.lat - userHome.lat) < 0.0001 && Math.abs(startLocation.lng - userHome.lng) < 0.0001;
     if (!isHomeStart) homePointer.current.togglePopup();
-    setTimeout(() => wireHomeButton(userHome, homePointer, map, setStartLocation), 100);
+    setTimeout(() => wireHomeButton(userHome, homePointer, map, setStartLocation, setManualStart), 100);
   }, [userHome, mapLoaded, startLocation]);
 
   useEffect(() => {
@@ -198,9 +206,17 @@ export default function CampusMap() {
     if (!clickedMarker.getPopup().isOpen()) clickedMarker.togglePopup();
   };
 
-  const onGeoSuccess = ({ coords }) => {
+  const onGeoSuccess = async ({ coords }) => {
     const loc = { lng: coords.longitude, lat: coords.latitude };
+    try {
+      const address = await reverseGeocode(coords.latitude, coords.longitude);
+      if (address) { setManualStart(address) };
+    } catch (error) {
+      console.error('Reverse geocoding failes: ', error);
+    }
     setStartLocation(loc);
+    const address = await reverseGeocode(coords.latitude, coords.longitude);
+    if (address) { setManualStart(address) };
     map.current?.flyTo({ center: [loc.lng, loc.lat], zoom: 15, pitch: 55, duration: 1200 });
     setLocating(false);
   };
@@ -213,6 +229,7 @@ export default function CampusMap() {
 
   const handleClearStart = () => {
     setStartLocation(null);
+    setManualStart('');
     setRouteInfo(null);
     setTflRouteInfo(null);
     startMarker.current?.remove();
@@ -225,6 +242,7 @@ export default function CampusMap() {
   const handleClearCampus = () => {
     setSelectedCampus(null);
     setCustomDestination(null);
+    setManualDestination("");
     setRouteInfo(null);
     setTflRouteInfo(null);
     resetRoute();
@@ -236,13 +254,26 @@ export default function CampusMap() {
 
   const handleSelectCampus = (campus) => {
     setSelectedCampus(campus);
+    setManualDestination(campus.name);
+    setCustomDestination({
+      lng: campus.coords[0],
+      lat: campus.coords[1],
+      name: campus.name,
+      address: campus.name
+    });
     flyToCampus(campus);
   };
 
   const handleUserJourneyCalculate = (startCoords, destCoords) => {
     setStartLocation({ lng: startCoords.longitude, lat: startCoords.latitude });
-    setCustomDestination({ lng: destCoords.longitude, lat: destCoords.latitude, name: manualDestination, address: manualDestination });
-    setSelectedCampus(null);
+    if (!selectedCampus) {
+      setCustomDestination({
+        lng: destCoords.longitude,
+        lat: destCoords.latitude,
+        name: manualDestination,
+        address: manualDestination
+      });
+    }
     const bounds = new mapboxgl.LngLatBounds()
       .extend([startCoords.longitude, startCoords.latitude])
       .extend([destCoords.longitude, destCoords.latitude]);
@@ -290,6 +321,10 @@ export default function CampusMap() {
           manualDestination={manualDestination}
           setManualDestination={setManualDestination}
           onCalculate={handleUserJourneyCalculate}
+          onClearAll={() => {
+            handleClearStart();
+            handleClearCampus();
+          }}
         />
         <CalendarEventsSection events={calendarEvents} onEventClick={handleEventClick} />
         <LocationSection
@@ -297,6 +332,7 @@ export default function CampusMap() {
           locating={locating}
           onGeolocate={handleGeolocate}
           onClear={handleClearStart}
+          manualStart={manualStart}
         />
         <DestinationSection
           selectedCampus={selectedCampus}

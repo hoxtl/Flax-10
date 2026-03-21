@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import { geocodeAddress } from '../../api/userApi';
 import styles from './UserJourneySection.module.css';
@@ -9,20 +9,41 @@ export function UserJourneySection({
     manualDestination,
     setManualDestination,
     onCalculate,
+    onClearAll,
 }) {
     const [startCoords, setStartCoords] = useState(null);
     const [destCoords, setDestCoords] = useState(null);
 
+    useEffect(() => {
+        async function geocodeStart() {
+            if (manualStart && manualStart.trim()) {
+                const coords = await geocodeAddress(manualStart);
+                setStartCoords(coords);
+            } else {
+                setStartCoords(null);
+            }
+        }
+        geocodeStart();
+    }, [manualStart]);
+
+    useEffect(() => {
+        async function geocodeDest() {
+            if (manualDestination && manualDestination.trim()) {
+                const coords = await geocodeAddress(manualDestination);
+                setDestCoords(coords);
+            } else {
+                setDestCoords(null);
+            }
+        }
+        geocodeDest();
+    }, [manualDestination]);
+
     const handleStartSelect = async (address) => {
         setManualStart(address);
-        const coords = await geocodeAddress(address);
-        setStartCoords(coords);
     };
 
     const handleDestSelect = async (address) => {
         setManualDestination(address);
-        const coords = await geocodeAddress(address);
-        setDestCoords(coords);
     };
 
     const handleGo = () => {
@@ -36,6 +57,9 @@ export function UserJourneySection({
         setManualDestination("");
         setStartCoords(null);
         setDestCoords(null);
+        if (onClearAll) {
+            onClearAll();
+        }
     };
 
     const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
