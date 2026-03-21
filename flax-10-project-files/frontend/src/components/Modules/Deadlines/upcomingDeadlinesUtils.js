@@ -1,3 +1,6 @@
+/*
+ * Helpers for counting days until deadline and formatting labels.
+ */
 export function getDayCount(dueDate) {
   const ms = new Date(dueDate).getTime() - Date.now();
   return Math.floor(ms / 86400000);

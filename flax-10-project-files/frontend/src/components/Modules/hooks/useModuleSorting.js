@@ -1,4 +1,6 @@
-/* Hook for managing module sorting, filtering, and pagination. */
+/*
+ * Hook for managing module sorting, filtering, and pagination.
+ */
 import { useState } from 'react';
 import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 

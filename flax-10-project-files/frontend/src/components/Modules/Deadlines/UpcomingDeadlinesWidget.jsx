@@ -1,4 +1,6 @@
-/* Upcoming-deadlines widget with expandable row list */
+/*
+ * Upcoming-deadlines widget with expandable row list.
+ */
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';

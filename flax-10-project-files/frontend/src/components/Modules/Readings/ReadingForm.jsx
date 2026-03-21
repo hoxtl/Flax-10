@@ -1,4 +1,6 @@
-/* Form for creating and editing module readings. */
+/*
+ * Form for creating and editing module readings.
+ */
 import {useState} from 'react';
 import styles from '../Deadlines/DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';

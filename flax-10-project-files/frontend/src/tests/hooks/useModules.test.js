@@ -1,3 +1,6 @@
+/*
+ * Tests for useModules hook.
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useModules from '../../components/Modules/hooks/useModules';

@@ -1,4 +1,6 @@
-/* Toolbar, empty states, and grid components for the modules page. */
+/*
+ * Toolbar, empty states, and grid components for the modules page.
+ */
 import { SegmentedControl } from '../../components/common/SegmentedControl/SegmentedControl.jsx';
 import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
