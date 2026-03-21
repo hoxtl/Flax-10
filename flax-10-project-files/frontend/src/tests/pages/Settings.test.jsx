@@ -8,9 +8,10 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
     <div data-testid="settings-tabs">
       <button onClick={() => onChange("account")}>Account</button>
       <button onClick={() => onChange("security")}>Security</button>
-      <button onClick={() => onChange("preferences_themes")}>Preferences</button>
+      <button onClick={() => onChange("preferences_themes")}>Appearance</button>
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
+      <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
       <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
@@ -19,9 +20,10 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
     <div data-testid="settings-tabs">
       <button onClick={() => onChange("account")}>Account</button>
       <button onClick={() => onChange("security")}>Security</button>
-      <button onClick={() => onChange("preferences_themes")}>Preferences</button>
+      <button onClick={() => onChange("preferences_themes")}>Appearance</button>
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
+      <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
       <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
@@ -43,12 +45,21 @@ vi.mock("../../components/Settings/SecurityForm", () => ({
 }));
 
 vi.mock("../../components/Settings/PreferencesPanel", () => ({
-  default: ({ activeSubTab }) =>
-    activeSubTab === "sleep" ? (
-      <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
+  default: ({ activeSubTab }) => {
+    const labels = {
+      sleep: "sleep-schedule-panel",
+      scheduling: "scheduling-panel",
+      studytime: "study-time-panel",
+      week: "week-preference-panel",
+      daynight: "worktime-preference-panel",
+    };
+
+    return activeSubTab && labels[activeSubTab] ? (
+      <div data-testid={labels[activeSubTab]}>{activeSubTab}</div>
     ) : (
       <div data-testid="preferences-panel">PreferencesPanel</div>
-    ),
+    );
+  },
 }));
 
 vi.mock("../../components/Settings/HomeAddressForm", () => ({
@@ -80,6 +91,9 @@ vi.mock("../../components/Settings/hooks/useSettingsHandlers", () => ({
     handlePreferencesSave: vi.fn(),
     handleHomeAddressSave: vi.fn(),
     handleSleepSave: vi.fn(),
+    handleStudyTimeSave: vi.fn(),
+    handleWeekPreferenceSave: vi.fn(),
+    handleWorktimePreferenceSave: vi.fn(),
   })),
 }));
 
@@ -111,7 +125,7 @@ describe("Settings", () => {
 
   it("switches to PreferencesPanel when preferences tab selected", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
-    fireEvent.click(screen.getByText("Preferences"));
+    fireEvent.click(screen.getByText("Appearance"));
     expect(screen.getByTestId("preferences-panel")).toBeTruthy();
   });
 
@@ -144,6 +158,9 @@ describe("Settings", () => {
       handlePreferencesSave: vi.fn(),
       handleHomeAddressSave: vi.fn(),
       handleSleepSave: vi.fn(),
+      handleStudyTimeSave: vi.fn(),
+      handleWeekPreferenceSave: vi.fn(),
+      handleWorktimePreferenceSave: vi.fn(),
     });
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     expect(screen.getByTestId("error-banner")).toBeTruthy();
@@ -158,5 +175,23 @@ describe("Settings", () => {
   it("renders SettingsTabs", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     expect(screen.getByTestId("settings-tabs")).toBeTruthy();
+  });
+
+  it("switches to combined scheduling panel when scheduling tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Scheduling"));
+    expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
+  });
+
+  it("switches to CourseChangePanel when course tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Course Change"));
+    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
+  });
+
+  it("legacy scheduling tab ids still route to scheduling panel", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Scheduling"));
+    expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
   });
 });

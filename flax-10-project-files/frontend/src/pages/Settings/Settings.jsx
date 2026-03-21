@@ -1,18 +1,23 @@
 /*
  * Settings page shell and tab state.
  */
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import styles from "./Settings.module.css";
 import { ErrorMessage, SettingsSidebar } from "../../components/Settings/SettingsUI";
 import AppPage from "../../components/common/AppPage/AppPage";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
+import styles from "./Settings.module.css";
 import SettingsPanelContent from "./SettingsPanelContent";
 import { VALID_TABS } from "./settingsPageConfig";
 
+function normalizeSettingsTab(tab) {
+  if (["preferences_studytime", "preferences_week", "preferences_daynight"].includes(tab)) return "preferences_scheduling";
+  return tab;
+}
+
 function useActiveTab() {
   const [searchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get("tab");
+  const tabFromUrl = normalizeSettingsTab(searchParams.get("tab"));
   const [activeTab, setActiveTab] = useState(VALID_TABS.has(tabFromUrl) ? tabFromUrl : "account");
 
   useEffect(() => {

@@ -22,14 +22,13 @@ function useSchedules(open) {
     return { schedules, setSchedules, loading };
 }
 function ScheduleEmpty({ onClose }) {
-    const openQuickAdd = (view) => {
-        window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view } }));
+    const openQuickAdd = () => {
+        window.dispatchEvent(new CustomEvent('quick-add:open', { detail: { view: 'schedule_auto' } }));
         onClose?.();
     };
     return (
         <div className={styles.scheduleEmptyActions}>
-            <PrimaryButton variant="primary" pill onClick={() => openQuickAdd('schedule_manual')}>🧩 Manual Schedule</PrimaryButton>
-            <PrimaryButton variant="ghost" pill onClick={() => openQuickAdd('schedule_auto')}>⚙️ Auto Schedule</PrimaryButton>
+            <PrimaryButton variant="primary" pill onClick={openQuickAdd}>⚙️ Auto Schedule</PrimaryButton>
         </div>
     );
 }

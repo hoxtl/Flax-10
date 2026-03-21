@@ -1,15 +1,16 @@
 /*
  * Settings sidebar navigation and related tab controls.
  */
-import { BookOpen, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
+import { BookOpen, Clock3, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
 import styles from "../../../pages/Settings/Settings.module.css";
 
 const TAB_CONFIG = [
   { id: "account", label: "Account", icon: User, group: "My Details" },
   { id: "home", label: "Location", icon: MapPin, group: "My Details" },
   { id: "security", label: "Security", icon: Lock, group: "My Details" },
-  { id: "preferences_themes", label: "Themes", icon: Paintbrush, group: "Preferences" },
-  { id: "preferences_sleep", label: "Sleep Time", icon: Moon, group: "Preferences" },
+  { id: "preferences_themes", label: "Appearance", icon: Paintbrush, group: "Preferences" },
+  { id: "preferences_sleep", label: "Sleep Schedule", icon: Moon, group: "Preferences" },
+  { id: "preferences_scheduling", label: "Scheduling", icon: Clock3, group: "Preferences" },
   { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
 ];
 

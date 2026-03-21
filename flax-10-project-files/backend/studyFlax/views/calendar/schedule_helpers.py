@@ -1,14 +1,18 @@
+"""
+Schedule view helpers.
+"""
+
 from studyFlax.models import Notification, Schedule
 
 def _schedule_queryset(user):
-    return Schedule.objects.filter(user=user).prefetch_related('event_allocations__event', 'deadline')
+    return Schedule.objects.filter(user=user).prefetch_related("event_allocations__event", "deadline")
 
 def _notify_schedule_overwrite(user, title):
     Notification.objects.create(
         user=user,
-        title='Schedule overwritten',
+        title="Schedule overwritten",
         message=f'Your previous schedule "{title}" has been overwritten by a newer one.',
-        notification_type='general',
+        notification_type="general",
     )
 
 def _overwrite_same_name_schedules(user, title):
