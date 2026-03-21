@@ -347,7 +347,7 @@ export default function CampusMap() {
 
   const handleClearStart = () => {
     setStartLocation(null);
-    setManualStart('');
+    setManualStart("");
     setRouteInfo(null);
     setTflRouteInfo(null);
     startMarker.current?.remove();
@@ -383,7 +383,7 @@ export default function CampusMap() {
       lng: campus.coords[0],
       lat: campus.coords[1],
       name: campus.name,
-      address: campus.name
+      address: campus.name,
     });
     flyToCampus(campus);
   };
