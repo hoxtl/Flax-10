@@ -1,3 +1,7 @@
+/*
+ * Password strength meter with rule checklist and colour-coded progress bar.
+ */
+
 import styles from "./PasswordStrength.module.css";
 
 const DEFAULT_RULES = [
@@ -15,36 +19,35 @@ function getStrengthMeta(password, rules) {
   return { pct, tone, label };
 }
 
-export default function PasswordStrength({
-  password,
-  rules = DEFAULT_RULES,
-  title = "Password strength",
-  showOnlyWhenTyping = true,
-}) {
-  if (showOnlyWhenTyping && !password) return null;
+function StrengthBar({ pct, tone }) {
+  return (
+    <div className={styles.bar}>
+      <div className={`${styles.fill} ${styles[tone]}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
 
+function RuleList({ rules, password }) {
+  return (
+    <ul className={styles.rules}>
+      {rules.map((rule) => {
+        const met = rule.test(password);
+        return <li key={rule.label} className={met ? styles.ruleMet : styles.ruleUnmet}>{met ? "✓" : "•"} {rule.label}</li>;
+      })}
+    </ul>
+  );
+}
+
+/** Visual password strength indicator with a progress bar and rule checklist. */
+export default function PasswordStrength({ password, rules = DEFAULT_RULES, title = "Password strength", showOnlyWhenTyping = true }) {
+  if (showOnlyWhenTyping && !password) return null;
   const safePassword = password || "";
   const { pct, tone, label } = getStrengthMeta(safePassword, rules);
-
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <span>{title}</span>
-        <span>{label}</span>
-      </div>
-      <div className={styles.bar}>
-        <div className={`${styles.fill} ${styles[tone]}`} style={{ width: `${pct}%` }} />
-      </div>
-      <ul className={styles.rules}>
-        {rules.map((rule) => {
-          const met = rule.test(safePassword);
-          return (
-            <li key={rule.label} className={met ? styles.ruleMet : styles.ruleUnmet}>
-              {met ? "✓" : "•"} {rule.label}
-            </li>
-          );
-        })}
-      </ul>
+      <div className={styles.header}><span>{title}</span><span>{label}</span></div>
+      <StrengthBar pct={pct} tone={tone} />
+      <RuleList rules={rules} password={safePassword} />
     </div>
   );
 }

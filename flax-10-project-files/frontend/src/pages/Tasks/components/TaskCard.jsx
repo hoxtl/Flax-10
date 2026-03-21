@@ -18,6 +18,7 @@ import { CheckBurst } from "../../../components/TaskCelebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
 import { TaskInfoModal } from "./TaskInfoModal";
 import TaskCardMeta from "./TaskCardMeta";
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import { formatDueDate, getCompletedDueLabel, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
 
 import cardStyles from "./TaskCard.module.css";
@@ -88,25 +89,23 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) 
   );
 }
 
-function buildMoveHandler(l, task, fromListName, onEdit, onClose) {
-  return () => {
-    onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
-    onClose();
-  };
-}
-
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
   const safeList = lists || [];
   const fromListName = safeList.find((x) => String(x.id) === String(task.task_list))?.name || null;
+  const options = safeList.map(l => ({ value: String(l.id), label: l.name }));
+  const handleMove = (listId) => {
+    const l = safeList.find(x => String(x.id) === listId);
+    if (!l) return;
+    onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
+    onClose();
+  };
   return (
     <>
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
-      {safeList.map((l) => (
-        <button key={l.id} className={`${styles.ctxItem} ${String(task.task_list) === String(l.id) ? styles.ctxItemActive : ""}`} onClick={buildMoveHandler(l, task, fromListName, onEdit, onClose)}>
-          <span className={styles.ctxListDot} style={{ background: l.color }} />{l.name}
-        </button>
-      ))}
+      <div className={styles.ctxMoveDropdownWrap}>
+        <AnimatedDropdown value={String(task.task_list || "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
+      </div>
     </>
   );
 }
