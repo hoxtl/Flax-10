@@ -17,13 +17,6 @@ function resolveProfilePhoto(user) {
   });
 }
 
-function resolveProfilePhoto(user) {
-  return getResolvedUserPhoto(user, {
-    allowGeneric: false,
-    seed: user?.username || user?.id || user?.name,
-  });
-}
-
 function useProfileForm(user) {
   const [username, setUsername] = useState(user?.username || '');
   const [bio, setBio] = useState(user?.bio || '');
