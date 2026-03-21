@@ -2,28 +2,26 @@
  * GroupWork detail tabs.
  */
 
+import Tabs from "../../../components/common/Tabs/Tabs";
 import GroupTasksTab from "../GroupTasksTab";
 import AvailabilityTab from "../AvailabilityTab";
 import styles from "./TabsSection.module.css";
 
-const DETAIL_TABS = [
-  { id: "tasks", label: "Tasks" },
-  { id: "availability", label: "Availability" },
-];
-
 export default function TabsSection({ activeTab, setActiveTab, projectId, members, onStatsUpdate }) {
+  const tabs = [
+    { id: "tasks", icon: "📝", label: "Tasks", content: <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} /> },
+    { id: "availability", icon: "🤝", label: "Availability", content: <AvailabilityTab projectId={projectId} /> },
+  ];
   return (
     <section className={styles.tabsSection}>
-      <div className={styles.tabsRow}>
-        {DETAIL_TABS.map((tab) => <TabButton key={tab.id} tab={tab} activeTab={activeTab} onClick={setActiveTab} />)}
-      </div>
-      <div className={styles.tabContent}>
-        {activeTab === "tasks" ? <GroupTasksTab projectId={projectId} members={members} onStatsUpdate={onStatsUpdate} /> : <AvailabilityTab projectId={projectId} />}
-      </div>
+      <Tabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        layoutId="group-project-detail-tabs"
+        tabVariant="heading"
+        className={styles.sharedTabs}
+      />
     </section>
   );
-}
-
-function TabButton({ tab, activeTab, onClick }) {
-  return <button type="button" className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ""}`} onClick={() => onClick(tab.id)}>{tab.label}</button>;
 }
