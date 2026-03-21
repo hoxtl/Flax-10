@@ -2,29 +2,76 @@
  * GroupWork project header.
  */
 
-import PageHeader from "../../../components/common/PageHeader/PageHeader";
+import { CalendarDays, BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProjectDeleteAction from "./ProjectHeaderSub";
-import { ProjectHeaderMeta } from "./ProjectHeaderMeta";
-import ProjectProgress from "./ProjectProgress";
+import { ProjectHeaderMeta, ProjectTeacherMeta } from "./ProjectHeaderMeta";
+import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
 import BackButton from "../../../components/common/BackButton/BackButton.jsx";
-import { getProjectCaption } from "../utils/projectRowUtils";
+import { formatProjectHeadlineDate, getProjectCaption, getProjectDate } from "../utils/projectRowUtils";
 import styles from "./ProjectHeader.module.css";
 
-export default function ProjectHeader({ project, members, taskStats, onDelete, onBack }) {
+export default function ProjectHeader({ project, members, onDelete, onBack }) {
+  const date = getProjectDate(project.deadline);
+
   return (
     <section className={styles.headerSection}>
       <div className={styles.topActions}>
-        <BackButton onClick={onBack} label="Back" />
+        <BackButton onClick={onBack} label="Back to all projects" />
         <ProjectDeleteAction onDelete={onDelete} />
       </div>
-      <PageHeader
-        title={project.name}
-        subtitle={getProjectCaption(project)}
-        details={<ProjectHeaderMeta project={project} members={members} />}
-      />
-      <div className={styles.detailsPanel}>
-        <ProjectProgress taskStats={taskStats} />
+
+      <div className={styles.headerCard}>
+        <div className={styles.headerCopy}>
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>{project.name}</h1>
+            <div className={styles.headerRightMeta}>
+              <HeaderDeadlineMeta date={date} />
+              <div className={styles.headerPillRow}>
+                <ProjectModulePill project={project} />
+                <ProjectTeacherMeta project={project} />
+              </div>
+            </div>
+          </div>
+          <div className={styles.subtitleRow}>
+            <p className={styles.subtitle}>{getProjectCaption(project)}</p>
+          </div>
+          <ProjectHeaderMeta project={project} members={members} />
+        </div>
       </div>
+
     </section>
+  );
+}
+
+function ProjectModulePill({ project }) {
+  const code = project.course_code;
+  const name = project.module_name;
+  if (!code && !name) return null;
+  return (
+    <Link
+      to={`/modules?code=${encodeURIComponent(code || "")}`}
+      className={styles.modulePillBtn}
+      aria-label={`Open ${name || code} module`}
+    >
+      <div className={styles.modulePillRight}>
+        <BookOpen size={13} className={styles.metaIcon} />
+        <span>{code ? <>{code}{name ? ` ${name}` : ""}</> : name}</span>
+      </div>
+    </Link>
+  );
+}
+
+function HeaderDeadlineMeta({ date }) {
+  if (!date) return null;
+  return (
+    <div className={styles.inlineDeadlineMeta}>
+      <span className={styles.inlineDeadlineDate}>
+        <CalendarDays size={14} />
+        <span>{formatProjectHeadlineDate(date)}</span>
+      </span>
+      <span className={styles.inlineDeadlineSeparator} aria-hidden="true">•</span>
+      <DeadlineCountdown dueDate={date} showPriority={false} forceClock align="start" className={styles.inlineCountdown} />
+    </div>
   );
 }

@@ -23,6 +23,7 @@ export default function ProjectDeleteAction({ onDelete }) {
       {showDeleteModal && (
         <HoldConfirmModal
           title="Delete project"
+          warningBanner="This will permanently remove the project and all its tasks for every team member."
           warningText="Hold to permanently delete this shared project and its tasks."
           cancelLabel="Keep project"
           holdLabel="Hold to delete"

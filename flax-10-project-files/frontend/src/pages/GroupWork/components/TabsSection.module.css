@@ -1,5 +1,8 @@
 .tabsSection {
-    margin-top: 22px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
 .sharedTabs {

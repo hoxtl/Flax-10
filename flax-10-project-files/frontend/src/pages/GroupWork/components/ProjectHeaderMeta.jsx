@@ -2,35 +2,26 @@
  * GroupWork project header metadata.
  */
 
-import { Calendar, Mail, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
-import { formatProjectCountdownText, formatProjectHeadlineDate, getProjectDate, getProjectTeacherEmail, getProjectTeacherName } from "../utils/projectRowUtils";
+import { getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectHeader.module.css";
 
 export function ProjectHeaderMeta({ project, members }) {
-  const date = getProjectDate(project.deadline);
   return (
     <div className={styles.metaStack}>
-      <div className={styles.metaRow}>
-        <ProjectModuleTag project={project} />
-        <ProjectTeacherMeta project={project} />
-        <ProjectTeacherEmail project={project} />
-      </div>
-      <div className={styles.metaRow}>
-        <ProjectMembersMeta members={members} />
-        <ProjectDeadlineMeta date={date} />
-        <ProjectCountdownMeta date={date} />
-      </div>
+      <ProjectMembersMeta members={members} />
     </div>
   );
 }
 
 function ProjectModuleTag({ project }) {
   if (!project.course_code && !project.module_name) return null;
+
   return (
     <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.metaLink}>
       <Badge className={styles.modulePill}>
@@ -41,30 +32,28 @@ function ProjectModuleTag({ project }) {
   );
 }
 
-function ProjectTeacherMeta({ project }) {
+export function ProjectTeacherMeta({ project }) {
   const teacherName = getProjectTeacherName(project);
   if (!teacherName) return null;
-  return (
-    <Badge className={styles.teacherPill}>
-      <UserRound size={13} className={styles.metaIcon} />
-      <span>{teacherName}</span>
-    </Badge>
-  );
-}
 
-function ProjectTeacherEmail({ project }) {
-  const email = getProjectTeacherEmail(project);
-  if (!email) return null;
   return (
-    <a href={`mailto:${email}`} className={styles.contactPill}>
-      <Mail size={13} className={styles.metaIcon} />
-      <span>{email}</span>
-    </a>
+    <button
+      type="button"
+      className={styles.teacherPillBtn}
+      onClick={(e) => openTeacherProfile(e, project)}
+      aria-label={`Open ${teacherName}'s profile`}
+    >
+      <Badge className={styles.teacherPill}>
+        <UserRound size={13} className={styles.metaIcon} />
+        <span>{teacherName}</span>
+      </Badge>
+    </button>
   );
 }
 
 function ProjectMembersMeta({ members }) {
   if (!members.length) return null;
+
   return (
     <div className={styles.memberMeta}>
       <span className={styles.memberMetaLabel}>Team</span>
@@ -85,19 +74,4 @@ function ProjectMembersMeta({ members }) {
       </div>
     </div>
   );
-}
-
-function ProjectDeadlineMeta({ date }) {
-  if (!date) return null;
-  return (
-    <div className={styles.textMeta}>
-      <Calendar size={14} className={styles.metaIcon} />
-      <span>{formatProjectHeadlineDate(date)}</span>
-    </div>
-  );
-}
-
-function ProjectCountdownMeta({ date }) {
-  if (!date) return null;
-  return <div className={styles.textMeta}>{formatProjectCountdownText(date)}</div>;
 }
