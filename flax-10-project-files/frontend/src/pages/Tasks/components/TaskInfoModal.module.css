@@ -343,4 +343,59 @@
   filter: brightness(1.1);
 }
 
+@media (max-width: 768px) {
+  .infoModal {
+    max-height: 90vh;
+  }
 
+  .infoModalHeader {
+    gap: 10px;
+    padding: 14px 14px 12px;
+  }
+
+  .infoModalBody {
+    padding: 12px 14px 14px;
+  }
+
+  .infoModalFooter {
+    padding: 10px 14px 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .infoHint {
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .readingPillRow {
+    gap: 0.45rem;
+  }
+
+  .readingDetailPill {
+    max-width: 100%;
+    min-width: 0;
+    padding: 0.4rem 0.62rem;
+  }
+
+  .readingDetailValue {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .infoRow,
+  .infoRowFull {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 9px 10px;
+  }
+
+  .infoValPill {
+    white-space: normal;
+  }
+}
