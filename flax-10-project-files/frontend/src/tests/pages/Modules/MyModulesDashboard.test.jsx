@@ -33,6 +33,16 @@ vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
   TaskInfoModal: () => null,
 }));
 
+const NUDGE_DEADLINE = {
+  id: 12,
+  module: 42,
+  assessment_title: "Renal Physiology KEATS Quiz",
+  module_code: "LS4404",
+  module_name: "Renal Physiology",
+  start_due_date: "2026-03-23T10:00:00Z",
+  description: "Quiz prep",
+};
+
 function renderDashboard() {
   return render(
     <MemoryRouter>
@@ -95,19 +105,8 @@ describe("MyModulesDashboard", () => {
   });
 
   it("shows an add-to-tasks button in the smart nudge banner for deadlines", async () => {
-    getUpcomingDeadlines.mockResolvedValue([
-      {
-        id: 12,
-        module: 42,
-        assessment_title: "Renal Physiology KEATS Quiz",
-        module_code: "LS4404",
-        module_name: "Renal Physiology",
-        start_due_date: "2026-03-23T10:00:00Z",
-        description: "Quiz prep",
-      },
-    ]);
+    getUpcomingDeadlines.mockResolvedValue([NUDGE_DEADLINE]);
     getSuggestedReadings.mockResolvedValue([]);
-
     renderDashboard();
 
     const addButton = await screen.findByRole("button", { name: /\+ add to tasks/i });

@@ -1,6 +1,4 @@
-/*
- * Derived data for the homepage mini timeline.
- */
+/* Derived data for the homepage mini timeline. */
 
 import { useMemo } from "react";
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
@@ -19,27 +17,31 @@ function getDayBounds(selectedDate) {
 
 function getCurrentBlock(sortedEvents, selectedDate, hasTimerSession) {
   if (hasTimerSession || !isToday(selectedDate)) return null;
-  return (sortedEvents || []).find((event) => event.start_time && event.end_time && isNow(event.start_time, event.end_time)) || null;
+  return (sortedEvents || []).find((ev) => ev.start_time && ev.end_time && isNow(ev.start_time, ev.end_time)) || null;
 }
 
-export function useMiniTimelineData({
-  sortedEvents,
-  selectedDate,
-  now,
-  dayTasks,
-  tasksDueToday,
-  suggestableTasks,
-  deadlineSuggestions,
-  hasTimerSession,
-  skippedGapTasks,
-  slottedTaskIds,
-  slottedTitles,
-}) {
-  const bounds = useMemo(() => getDayBounds(selectedDate), [selectedDate]);
-  const rows = useMemo(() => computePlanTimelineRows(sortedEvents, selectedDate, bounds.start, bounds.end, now, dayTasks, tasksDueToday, isToday), [bounds.end, bounds.start, dayTasks, now, selectedDate, sortedEvents, tasksDueToday]);
+function useDerivedTimelineData(rows, props) {
+  const { suggestableTasks, now, skippedGapTasks, slottedTaskIds, slottedTitles, deadlineSuggestions } = props;
   const bestFreeRowId = useMemo(() => deriveBestFreeRowId(rows, suggestableTasks, now), [now, rows, suggestableTasks]);
-  const assignedGapTasks = useMemo(() => deriveAssignedGapTasks(rows, suggestableTasks, now, skippedGapTasks, slottedTaskIds, slottedTitles), [now, rows, skippedGapTasks, slottedTaskIds, slottedTitles, suggestableTasks]);
-  const gapDeadlineFallbacks = useMemo(() => deriveGapDeadlineFallbacks(rows, assignedGapTasks, deadlineSuggestions, slottedTitles), [assignedGapTasks, deadlineSuggestions, rows, slottedTitles]);
+  const assignedGapTasks = useMemo(
+    () => deriveAssignedGapTasks(rows, suggestableTasks, now, skippedGapTasks, slottedTaskIds, slottedTitles),
+    [now, rows, skippedGapTasks, slottedTaskIds, slottedTitles, suggestableTasks],
+  );
+  const gapDeadlineFallbacks = useMemo(
+    () => deriveGapDeadlineFallbacks(rows, assignedGapTasks, deadlineSuggestions, slottedTitles),
+    [assignedGapTasks, deadlineSuggestions, rows, slottedTitles],
+  );
+  return { bestFreeRowId, assignedGapTasks, gapDeadlineFallbacks };
+}
+
+export function useMiniTimelineData(props) {
+  const { sortedEvents, selectedDate, now, dayTasks, tasksDueToday, hasTimerSession } = props;
+  const bounds = useMemo(() => getDayBounds(selectedDate), [selectedDate]);
+  const rows = useMemo(
+    () => computePlanTimelineRows(sortedEvents, selectedDate, bounds.start, bounds.end, now, dayTasks, tasksDueToday, isToday),
+    [bounds.end, bounds.start, dayTasks, now, selectedDate, sortedEvents, tasksDueToday],
+  );
+  const derived = useDerivedTimelineData(rows, props);
   const currentBlock = useMemo(() => getCurrentBlock(sortedEvents, selectedDate, hasTimerSession), [hasTimerSession, selectedDate, sortedEvents]);
-  return { rows, bestFreeRowId, assignedGapTasks, gapDeadlineFallbacks, currentBlock };
+  return { rows, ...derived, currentBlock };
 }

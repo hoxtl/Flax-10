@@ -18,18 +18,6 @@ const DEPARTMENT_ACCENTS = {
     "Dentistry, Oral & Craniofacial Sciences": "var(--danger)",
 };
 
-const DEPARTMENT_SHORT_NAMES = {
-    "Natural, Mathematical & Engineering Sciences": "Natural, Mathematical & Engineering Sciences",
-    "Life Sciences & Medicine": "Life Sciences & Medicine",
-    "Law": "Law",
-    "Psychiatry, Psychology & Neuroscience": "Psychiatry, Psychology & Neuroscience",
-    "Business": "Business",
-    "Arts & Humanities": "Arts & Humanities",
-    "Social Science & Public Policy": "Social Science & Public Policy",
-    "Nursing, Midwifery & Palliative Care": "Nursing, Midwifery & Palliative Care",
-    "Dentistry, Oral & Craniofacial Sciences": "Dentistry, Oral & Craniofacial Sciences",
-};
-
 function getCardClass(enrolled, is_teacher) {
     let cls = styles.card;
     if (enrolled) cls += ` ${styles.enrolled}`;
@@ -158,7 +146,7 @@ function HeaderChips({ course, department }) {
     return (
         <div className={styles.headerChips}>
             {course && <span className={styles.courseText}>{course}</span>}
-            <span className={styles.departmentText}>{DEPARTMENT_SHORT_NAMES[department] || department}</span>
+            <span className={styles.departmentText}>{department}</span>
         </div>
     );
 }
@@ -255,28 +243,20 @@ function StudentActions({ enrolled, isCore, onToggle, onView }) {
     );
 }
 
-function StudentAction({ enrolled, isCore, onToggle }) {
-    if (enrolled && isCore) {
-        return <span className={styles.coreTag}>📌 Core module</span>;
-    }
-    if (!enrolled) {
-        return (
-            <PrimaryButton
-                className={styles.enrollPrimaryButton}
-                onClick={onToggle}
-                size="small"
-                pill
-            >
-                + Enroll
-            </PrimaryButton>
-        );
-    }
+function EnrollButton({ onToggle }) {
     return (
-        <button
-            className={styles.unenrollButton}
-            onClick={onToggle}
-        >
-            × Leave Module
-        </button>
+        <PrimaryButton className={styles.enrollPrimaryButton} onClick={onToggle} size="small" pill>
+            + Enrol
+        </PrimaryButton>
     );
+}
+
+function UnenrollButton({ onToggle }) {
+    return <button className={styles.unenrollButton} onClick={onToggle}>× Leave Module</button>;
+}
+
+function StudentAction({ enrolled, isCore, onToggle }) {
+    if (enrolled && isCore) return <span className={styles.coreTag}>📌 Core module</span>;
+    if (!enrolled) return <EnrollButton onToggle={onToggle} />;
+    return <UnenrollButton onToggle={onToggle} />;
 }

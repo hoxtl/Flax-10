@@ -96,7 +96,7 @@ function collectOverlappingGroup(rows, startIndex) {
 
 function getEventGroupChunks(group, baseRow) {
   if (group.length === 1) return [baseRow];
-  return group.filter((_, index) => index % 3 === 0).map((_, index) => buildEventGroup(group.slice(index * 3, index * 3 + 3), baseRow, index));
+  return [buildEventGroup(group, baseRow, 0)];
 }
 
 function appendGroupedRows(rows, index, result) {

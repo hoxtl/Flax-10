@@ -1,6 +1,4 @@
-/**
- * Homepage timeline helpers. Pure functions only.
- */
+/* Homepage timeline helpers. Pure functions only. */
 
 import { isLecture } from "./eventUtils";
 import { formatTimeHHMM } from "./dateFormatUtils";
@@ -9,14 +7,10 @@ export const DAY_START_HOUR = 6;
 export const DAY_END_HOUR = 22;
 export const PX_PER_HOUR = 80;
 export const PX_PER_MIN = PX_PER_HOUR / 60;
-/** Gaps below this get a thin line; 30+ get the full ghost "Gap Card". */
 export const GAP_CARD_THRESHOLD_MINS = 30;
-/** Vertical px between rows for compact list-style timeline. */
 export const FIXED_ROW_GAP_PX = 4;
-
 export const MINI_TIMELINE_HEIGHT = (DAY_END_HOUR - DAY_START_HOUR) * PX_PER_HOUR;
 
-/** Percent of "day budget" passed (6am–11pm). 0–100 for Daily Energy bar. */
 export function getDailyEnergyPercent() {
   const now = new Date();
   const start = new Date(now);
@@ -30,7 +24,6 @@ export function getDailyEnergyPercent() {
   return Math.round((elapsed / total) * 100);
 }
 
-/** Percent through the event (0–100) for the current time; null if not active. */
 export function getNowLinePercent(startStr, endStr) {
   if (!startStr || !endStr) return null;
   const now = new Date();
@@ -41,15 +34,16 @@ export function getNowLinePercent(startStr, endStr) {
   return Math.max(0, Math.min(100, p));
 }
 
-/** Compute top-3 peak hours from 7×24 heatmap matrix. */
+function sumHourTotals(heatmap) {
+  return heatmap.data.reduce((totals, dayRow) => {
+    dayRow.forEach((val, h) => { totals[h] += val || 0; });
+    return totals;
+  }, Array(24).fill(0));
+}
+
 export function getPeakHours(heatmap) {
   if (!heatmap?.data || !Array.isArray(heatmap.data)) return [];
-  const hourTotals = Array(24).fill(0);
-  for (const dayRow of heatmap.data) {
-    for (let h = 0; h < dayRow.length; h++) {
-      hourTotals[h] += dayRow[h] || 0;
-    }
-  }
+  const hourTotals = sumHourTotals(heatmap);
   return hourTotals
     .map((total, hour) => ({ hour, total }))
     .filter((h) => h.total > 0)
@@ -57,7 +51,6 @@ export function getPeakHours(heatmap) {
     .slice(0, 3);
 }
 
-/** Returns "urgent" if deadlines within 3 days and low focus today, else "normal". */
 export function getUrgencyLevel(deadlines, analyticsProgress) {
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayEntry = (analyticsProgress?.daily_progress || []).find((d) => d.date === todayStr);
@@ -70,120 +63,139 @@ export function getUrgencyLevel(deadlines, analyticsProgress) {
   return critical && todayActual < 2 ? "urgent" : "normal";
 }
 
-/** Compute daily narrative: day type, session count, best window for deep work. */
-export function getDailyNarrative(selectedDate, sortedEvents) {
+function determineDayType(lectureCount, sessionCount) {
+  if (lectureCount >= 3) return "Lecture Heavy";
+  if (lectureCount >= 1) return "Moderate";
+  if (sessionCount > 0) return "Busy";
+  return "Free";
+}
+
+function checkGap(gapStartMs, gapEndMs, currentBest) {
+  const mins = (gapEndMs - gapStartMs) / 60000;
+  if (mins < 60 || mins <= currentBest.bestMinutes) return currentBest;
+  return { bestMinutes: mins, bestWindowStart: new Date(gapStartMs), bestWindowEnd: new Date(gapEndMs) };
+}
+
+function emptyDayWindow(dayStartMs, dayEndMs) {
+  return { bestMinutes: (dayEndMs - dayStartMs) / 60000, bestWindowStart: new Date(dayStartMs), bestWindowEnd: new Date(dayEndMs) };
+}
+
+function getEventEndMs(event) {
+  return new Date(event.end_time || event.start_time).getTime();
+}
+
+function scanBetweenGaps(events, best) {
+  return events.slice(0, -1).reduce((acc, ev, i) => checkGap(getEventEndMs(ev), new Date(events[i + 1].start_time).getTime(), acc), best);
+}
+
+function findBestWindow(events, dayStartMs, dayEndMs) {
+  if (events.length === 0) return emptyDayWindow(dayStartMs, dayEndMs);
+  let best = { bestMinutes: 0, bestWindowStart: null, bestWindowEnd: null };
+  best = checkGap(dayStartMs, new Date(events[0].start_time).getTime(), best);
+  best = scanBetweenGaps(events, best);
+  return checkGap(getEventEndMs(events[events.length - 1]), dayEndMs, best);
+}
+
+function narrativeDayBounds(selectedDate) {
   const dayStart = new Date(selectedDate);
   dayStart.setHours(8, 0, 0, 0);
   const dayEnd = new Date(selectedDate);
   dayEnd.setHours(22, 0, 0, 0);
-  const lectureCount = (sortedEvents || []).filter(isLecture).length;
-  const sessionCount = (sortedEvents || []).length;
-  const dayType =
-    lectureCount >= 3 ? "Lecture Heavy" : lectureCount >= 1 ? "Moderate" : sessionCount > 0 ? "Busy" : "Free";
+  return { dayStart, dayEnd };
+}
 
-  let bestWindowStart = null;
-  let bestWindowEnd = null;
-  let bestMinutes = 0;
-
-  const events = [...(sortedEvents || [])].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  const dayStartMs = dayStart.getTime();
-  const dayEndMs = dayEnd.getTime();
-
-  if (events.length === 0) {
-    bestWindowStart = dayStart;
-    bestWindowEnd = dayEnd;
-    bestMinutes = (dayEndMs - dayStartMs) / 60000;
-  } else {
-    const firstStart = new Date(events[0].start_time).getTime();
-    if (firstStart > dayStartMs) {
-      const mins = (firstStart - dayStartMs) / 60000;
-      if (mins >= 60 && mins > bestMinutes) {
-        bestMinutes = mins;
-        bestWindowStart = new Date(dayStartMs);
-        bestWindowEnd = new Date(firstStart);
-      }
-    }
-    for (let i = 0; i < events.length - 1; i++) {
-      const end1 = new Date(events[i].end_time || events[i].start_time).getTime();
-      const start2 = new Date(events[i + 1].start_time).getTime();
-      const gapMins = (start2 - end1) / 60000;
-      if (gapMins >= 60 && gapMins > bestMinutes) {
-        bestMinutes = gapMins;
-        bestWindowStart = new Date(end1);
-        bestWindowEnd = new Date(start2);
-      }
-    }
-    const lastEnd = new Date(events[events.length - 1].end_time || events[events.length - 1].start_time).getTime();
-    if (dayEndMs > lastEnd) {
-      const mins = (dayEndMs - lastEnd) / 60000;
-      if (mins >= 60 && mins > bestMinutes) {
-        bestMinutes = mins;
-        bestWindowStart = new Date(lastEnd);
-        bestWindowEnd = new Date(dayEndMs);
-      }
-    }
-  }
+export function getDailyNarrative(selectedDate, sortedEvents) {
+  const { dayStart, dayEnd } = narrativeDayBounds(selectedDate);
+  const safe = sortedEvents || [];
+  const lectureCount = safe.filter(isLecture).length;
+  const events = [...safe].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  const { bestWindowStart, bestWindowEnd } = findBestWindow(events, dayStart.getTime(), dayEnd.getTime());
 
   return {
-    dayType,
-    sessionCount,
+    dayType: determineDayType(lectureCount, safe.length),
+    sessionCount: safe.length,
     lectureCount,
     bestWindowStart: bestWindowStart ? formatTimeHHMM(bestWindowStart) : null,
     bestWindowEnd: bestWindowEnd ? formatTimeHHMM(bestWindowEnd) : null,
   };
 }
 
-/** Group overlapping events into clusters, then interleave gaps. */
-export function groupOverlaps(sortedItems) {
-  const groups = [];
-  let current = [];
-  let clusterEnd = null;
+function flushCluster(current) {
+  if (current.length === 1) return { type: "single", item: current[0] };
+  return { type: "cluster", items: current };
+}
 
-  for (const item of sortedItems) {
-    const start = new Date(item.start_time);
-    const end = new Date(item.end_time || item.start_time);
-    if (current.length === 0 || start < clusterEnd) {
-      current.push(item);
-      if (!clusterEnd || end > clusterEnd) clusterEnd = end;
-    } else {
-      groups.push(current.length === 1 ? { type: "single", item: current[0] } : { type: "cluster", items: current });
-      current = [item];
-      clusterEnd = end;
-    }
-  }
-  if (current.length > 0) {
-    groups.push(current.length === 1 ? { type: "single", item: current[0] } : { type: "cluster", items: current });
-  }
+function getItemEnd(item) {
+  return new Date(item.end_time || item.start_time);
+}
+
+function shouldMerge(item, clusterEnd) {
+  return clusterEnd !== null && new Date(item.start_time) < clusterEnd;
+}
+
+function extendClusterEnd(clusterEnd, end) {
+  return (!clusterEnd || end > clusterEnd) ? end : clusterEnd;
+}
+
+function mergeIntoCluster(acc, item) {
+  acc.current.push(item);
+  acc.clusterEnd = extendClusterEnd(acc.clusterEnd, getItemEnd(item));
+  return acc;
+}
+
+function startNewCluster(acc, item) {
+  acc.groups.push(flushCluster(acc.current));
+  acc.current = [item];
+  acc.clusterEnd = getItemEnd(item);
+  return acc;
+}
+
+function overlapReducer(acc, item) {
+  if (acc.current.length === 0 || shouldMerge(item, acc.clusterEnd)) return mergeIntoCluster(acc, item);
+  return startNewCluster(acc, item);
+}
+
+export function groupOverlaps(sortedItems) {
+  const { groups, current } = sortedItems.reduce(overlapReducer, { groups: [], current: [], clusterEnd: null });
+  if (current.length > 0) groups.push(flushCluster(current));
   return groups;
+}
+
+function buildGapEntry(lastItem, nextGroup, pendingTasks) {
+  const curEnd = new Date(lastItem.end_time || lastItem.start_time);
+  const firstNext = nextGroup.type === "cluster" ? nextGroup.items[0] : nextGroup.item;
+  const nextStart = new Date(firstNext.start_time);
+  const gapMins = Math.round((nextStart - curEnd) / 60000);
+  if (gapMins < 30) return null;
+
+  const fits = (t) => ((t.estimated_blocks || 1) * 25) <= gapMins;
+  const suggestedTask = pendingTasks.find(fits) || pendingTasks[0] || null;
+  const isQuickWin = gapMins >= 30 && gapMins < 60;
+  return { type: "gap", minutes: gapMins, gapStart: curEnd, suggestedTask, isQuickWin };
+}
+
+function groupToEntry(g) {
+  return g.type === "cluster" ? { type: "cluster", items: g.items } : { type: "item", data: g.item };
+}
+
+function getLastItem(g) {
+  return g.type === "cluster" ? g.items[g.items.length - 1] : g.item;
+}
+
+function interleaveGaps(grouped, pendingTasks) {
+  return grouped.slice(0, -1).flatMap((g, i) => {
+    const gap = buildGapEntry(getLastItem(g), grouped[i + 1], pendingTasks);
+    return gap ? [groupToEntry(g), gap] : [groupToEntry(g)];
+  });
 }
 
 export function computeTimelineWithGaps(sortedItems, pendingTasks) {
   const grouped = groupOverlaps(sortedItems);
-  const result = [];
-
-  for (let i = 0; i < grouped.length; i++) {
-    const g = grouped[i];
-    result.push(g.type === "cluster" ? { type: "cluster", items: g.items } : { type: "item", data: g.item });
-
-    if (i < grouped.length - 1) {
-      const lastItem = g.type === "cluster" ? g.items[g.items.length - 1] : g.item;
-      const curEnd = new Date(lastItem.end_time || lastItem.start_time);
-      const nextGroup = grouped[i + 1];
-      const firstNext = nextGroup.type === "cluster" ? nextGroup.items[0] : nextGroup.item;
-      const nextStart = new Date(firstNext.start_time);
-      const gapMins = Math.round((nextStart - curEnd) / 60000);
-      if (gapMins >= 30) {
-        const fits = (t) => ((t.estimated_blocks || 1) * 25) <= gapMins;
-        const suggestedTask = pendingTasks.find(fits) || pendingTasks[0] || null;
-        const isQuickWin = gapMins >= 30 && gapMins < 60;
-        result.push({ type: "gap", minutes: gapMins, gapStart: curEnd, suggestedTask, isQuickWin });
-      }
-    }
-  }
-  return result;
+  if (grouped.length === 0) return [];
+  const body = interleaveGaps(grouped, pendingTasks);
+  return [...body, groupToEntry(grouped[grouped.length - 1])];
 }
 
-/** Smart gap label and variant by time of day. */
 export function getSmartWindowLabel(gapStartDate) {
   const d = gapStartDate instanceof Date ? gapStartDate : new Date(gapStartDate);
   const hour = d.getHours() + d.getMinutes() / 60;
@@ -199,7 +211,6 @@ export function minsFromDayStart(d, dayStartHour = DAY_START_HOUR) {
   return date.getHours() * 60 + date.getMinutes() - dayStartHour * 60;
 }
 
-/** Date at gapStartMins from day start (for plan timeline). */
 export function getGapStartDate(selectedDate, gapStartMins, dayStartHour = DAY_START_HOUR) {
   const d = new Date(selectedDate);
   d.setHours(dayStartHour, 0, 0, 0);

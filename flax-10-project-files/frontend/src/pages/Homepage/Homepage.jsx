@@ -183,6 +183,9 @@ export default function Homepage({ defaultShowCreateTaskModal = false, defaultPl
   useEffect(() => {
     getUpcomingDeadlines().then((list) => setUpcomingDeadlines(Array.isArray(list) ? list : [])).catch(() => setUpcomingDeadlines([]));
   }, []);
+  useEffect(() => {
+    fetchTaskLists().then((list) => setTaskLists(Array.isArray(list) ? list : [])).catch(() => setTaskLists([]));
+  }, []);
 
 
 

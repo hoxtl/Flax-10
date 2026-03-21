@@ -1,6 +1,4 @@
-/*
- * Timeline styles chunk 06.
- */
+/* Gutter, card styles, categories, empty slots. */
 
   .gutter {
     display: flex;
@@ -113,8 +111,6 @@
   .card.timeOfDayEvening::after {
     background: linear-gradient(180deg, rgba(210, 195, 255, 0.4), rgba(230, 220, 255, 0.2));
   }
-  .timeOfDayMorning,
-  .timeOfDayEvening { /* hook for ::after time-of-day wash */ }
   .card::before {
     content: "";
     position: absolute;

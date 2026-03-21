@@ -22,7 +22,6 @@ function handleNewForm(field, value, setFormData, setErrors, errors) {
 function getInput(error, s) {
     return error ? `${s.input} ${s.inputError}` : s.input;
 }
-// Validates and submits the form
 async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubmitting, onSuccess) {
     e.preventDefault();
     const new_errors = validateForm(form_data);
@@ -38,7 +37,6 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
     } finally {
         setSubmitting(false);}}
 
-//Form container with all field sections and submit / cancel actions
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
     return (
         <form onSubmit={onSubmit} className={styles.form}>
@@ -96,7 +94,6 @@ function NameFields({ form_data, errors, is_editing, onChange }) {
         </>
     );
 }
-// Description and text area 
 function DescriptionLocationFields({ form_data, onChange }) {
     return (
         <>
@@ -110,7 +107,6 @@ function DescriptionLocationFields({ form_data, onChange }) {
     );
 }
 
-//Datetime pickers for the lecture 
 function TimeFields({ form_data, errors, onChange }) {
     return (
         <>
@@ -140,7 +136,6 @@ function FormGroup({ label, error, required = false, children }) {
         </div>
     );
 }
-//Enables calendar event to repeat each week
 function RecurringCheckbox({ checked, onChange }) {
     return (
         <div className={styles.checkboxGroup}>

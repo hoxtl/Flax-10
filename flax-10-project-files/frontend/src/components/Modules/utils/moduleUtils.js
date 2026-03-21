@@ -167,7 +167,6 @@ function createDurationString(duration) {
     return `${mins}m`;
 }
 
-//from formUtils.js - move to dateUtils to allow export
 export function formatForInput(d) {
     if (!d) return new Date().toISOString().slice(0, 16);
     const date = typeof d === 'string' ? new Date(d) : d;
@@ -191,10 +190,8 @@ function checkSearch(module, search_query) {
 }
 
 function checkFilter(module, enrollments, filter_mode, options = {}) {
-    if (filter_mode === 'all') {
-        if (options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
-        return true;
-    }
+    if (filter_mode === 'all' && options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
+    if (filter_mode === 'all') return true;
     return isEnrolledIn(module.id, enrollments);
 }
 

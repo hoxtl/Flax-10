@@ -1,3 +1,4 @@
+/* Deadline card displaying due date, countdown, and teacher actions. */
 import { useState } from 'react';
 import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
