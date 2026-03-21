@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
 DEBUG = False
-ALLOWED_HOSTS = [os.environ.get("RAILWAY_PUBLIC_DOMAIN")]
+ALLOWED_HOSTS = [os.environ.get("RAILWAY_PUBLIC_DOMAIN"), "localhost"]
 
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ORIGIN", "").split(",")
 
