@@ -13,7 +13,7 @@ export async function getTravelTimeModule(homeAddress, moduleLocation) {
         const encodedLocation = encodeURIComponent(moduleLocation);
         const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedLocation}.json?access_token=${mapboxToken}&country=GB&limit=1`
 
-        const geocodeRespo = await fetch(geocodeUrl);
+        const geocodeResponse = await fetch(geocodeUrl);
         const geocodeData = await geocodeResponse.json();
 
         if (!geocodeData.features || geocodeData.features.length === 0) {
