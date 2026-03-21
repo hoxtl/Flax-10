@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { motion, animate, useMotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 import styles from "./CampusMap.module.css";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 import { CampusMapSkeleton } from "../../components/CampusMap/CampusMapSkeleton";
@@ -74,10 +74,14 @@ async function applyTflRoute(
 
 const MIN_MAP_SKELETON_MS = 900;
 
+const SHEET_VARIANTS = {
+  closed: { y: "calc(85vh - 70px)" },
+  mid: { y: "calc(85vh - 300px)" },
+  open: { y: 0 },
+};
+
 export default function CampusMap() {
   const mapContainer = useRef(null);
-  const sidebarRef = useRef(null);
-  const mobileSheetInitialised = useRef(false);
   const map = useRef(null);
   const startMarker = useRef(null);
   const startPopup = useRef(null);
@@ -104,8 +108,7 @@ export default function CampusMap() {
   const [manualDestination, setManualDestination] = useState("");
   const [minSkeletonElapsed, setMinSkeletonElapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
-  const [mobileSnapY, setMobileSnapY] = useState(0);
-  const sheetY = useMotionValue(0);
+  const [mobileInitialOpen, setMobileInitialOpen] = useState(true);
 
   const { disruptions, loading: loadingDisruptions } = useDisruptions();
   const { events: calendarEvents } = useCalendarEvents();
@@ -156,54 +159,14 @@ export default function CampusMap() {
     return () => cancelAnimationFrame(id);
   }, [mapLoaded, isMobile]);
 
-  const computeMobileSnapY = useCallback(() => {
-    if (!isMobile) return 0;
-
-    const sidebarEl = sidebarRef.current;
-    if (!sidebarEl) return 0;
-
-    const sidebarRect = sidebarEl.getBoundingClientRect();
-    const sheetHeight = sidebarRect.height || window.innerHeight * 0.85;
-    const headerEl = sidebarEl.querySelector(`.${styles.sidebarHeader}`);
-    const headerHeight = headerEl?.getBoundingClientRect().height || 76;
-    const bottomBarEl = document.querySelector('[class*="mobileBottomBar"]');
-    const bottomBarHeight = bottomBarEl?.getBoundingClientRect().height || 64;
-
-    return Math.max(
-      0,
-      Math.round(sheetHeight - headerHeight - bottomBarHeight),
-    );
-  }, [isMobile]);
-
   useEffect(() => {
     if (!isMobile) {
-      mobileSheetInitialised.current = false;
-      sheetY.set(0);
-      setMobileSnapY(0);
+      setMobileInitialOpen(true);
       return;
     }
-
-    const updateSnap = () => {
-      const nextSnapY = computeMobileSnapY();
-      setMobileSnapY(nextSnapY);
-
-      if (!mobileSheetInitialised.current) {
-        sheetY.set(0);
-        mobileSheetInitialised.current = true;
-        return;
-      }
-
-      const currentY = sheetY.get();
-      if (currentY > nextSnapY) sheetY.set(nextSnapY);
-    };
-
-    const raf = requestAnimationFrame(updateSnap);
-    window.addEventListener("resize", updateSnap);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", updateSnap);
-    };
-  }, [isMobile, mapLoaded, computeMobileSnapY, sheetY]);
+    const raf = requestAnimationFrame(() => setMobileInitialOpen(false));
+    return () => cancelAnimationFrame(raf);
+  }, [isMobile]);
 
   useEffect(() => {
     if (!mapLoaded || !userHome) return;
@@ -450,31 +413,15 @@ export default function CampusMap() {
       {showInitialSkeleton && <CampusMapSkeleton />}
 
       <motion.aside
-        ref={sidebarRef}
         className={styles.sidebar}
-        style={
-          showInitialSkeleton
-            ? { visibility: "hidden", y: isMobile ? sheetY : 0 }
-            : { y: isMobile ? sheetY : 0 }
-        }
-        initial={false}
-        animate={isMobile ? undefined : { y: 0 }}
+        style={showInitialSkeleton ? { visibility: "hidden" } : undefined}
+        initial={isMobile ? "open" : false}
+        animate={isMobile ? (mobileInitialOpen ? "open" : undefined) : { y: 0 }}
         drag={isMobile ? "y" : false}
-        dragConstraints={isMobile ? { top: 0, bottom: mobileSnapY } : undefined}
-        dragElastic={isMobile ? 0.08 : 0}
-        dragMomentum={false}
-        onDragEnd={() => {
-          if (!isMobile) return;
-          const currentY = sheetY.get();
-          const snapThreshold = mobileSnapY * 0.28;
-          const nextY = currentY >= snapThreshold ? mobileSnapY : 0;
-          animate(sheetY, nextY, {
-            type: "spring",
-            stiffness: 420,
-            damping: 36,
-            mass: 0.55,
-          });
-        }}
+        dragConstraints={{ top: 0, bottom: 500 }}
+        dragElastic={0.1}
+        onDragEnd={() => {}}
+        variants={SHEET_VARIANTS}
       >
         <div className={styles.dragHandle} />
         <SidebarHeader />
