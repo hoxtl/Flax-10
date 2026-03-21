@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import TimerPage from '../../pages/timer/TimerPage';
-import { TimerSettings } from '../../components/timer/TimerComponents';
-import * as historyUtils from '../../components/timer/utils/historyUtils';
+import TimerPage from '../../pages/Timer/TimerPage';
+import { TimerSettings } from '../../components/Timer/TimerComponents';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
 import { vi } from 'vitest';
 
 import { TimerProvider } from '../../context/TimerContext';
@@ -11,7 +11,6 @@ function advanceTimeSafely() {
 }
 
 /** Renders TimerPage with necessary providers/mocks implicitly handled if needed */
-
 export const renderTimerPage = ({ settle = true } = {}) => {
     const view = render(
         <TimerProvider>
@@ -23,7 +22,6 @@ export const renderTimerPage = ({ settle = true } = {}) => {
 };
 
 /** Renders TimerSettings in isolation */
-
 export const renderTimerSettings = (props) => render(<TimerSettings {...props} />);
 
 export const clickButton = (text) => fireEvent.click(screen.getByText(text));
@@ -32,7 +30,7 @@ export const clickStart = () => clickButton('Start');
 export const clickPause = () => clickButton('Pause');
 export const clickReset = () => clickButton('Reset');
 export const clickHistory = () => {
-    // On mobile, the View History button opens HistoryModal.
+    // Mobile: "View History 📜" opens HistoryModal.
     const viewHistory = screen.queryByText(/View History/i);
     if (viewHistory) {
         fireEvent.click(viewHistory);
@@ -47,7 +45,6 @@ export const clickHistory = () => {
 };
 
 /** Wraps vi.advanceTimersByTime in act to handle state updates */
-
 export const advanceTimer = (ms) => act(() => vi.advanceTimersByTime(ms));
 
 export const expectTimer = (time) => expect(screen.getByText(time)).toBeInTheDocument();
@@ -73,7 +70,6 @@ export const updateSettings = (workIndex, value) => {
 };
 
 /** Simulate blur event, optionally changing value first to test validation */
-
 export const blurInput = (index, value) => {
     const existing = screen.queryAllByRole('spinbutton');
     if (!existing.length) {
@@ -90,7 +86,6 @@ export const blurInput = (index, value) => {
 };
 
 /** Mock browser Notification API */
-
 export const mockNotifications = () => {
     const NotificationMock = vi.fn();
     NotificationMock.permission = 'granted';

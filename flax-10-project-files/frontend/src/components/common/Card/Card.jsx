@@ -9,7 +9,10 @@ function joinClassNames(...values) {
 }
 
 /** Card container with configurable variant, padding, and optional interactive state. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export default function Card({ as: Component = "div", children, className = "", variant = "default", padding = "md", interactive = false, ...props }) {
   return (
     <Component className={joinClassNames(

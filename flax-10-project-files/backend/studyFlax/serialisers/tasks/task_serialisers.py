@@ -7,7 +7,10 @@ from django.utils import timezone
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.utils.reading_utils import update_reading_estimates
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _sync_status_and_completed(validated_data, instance):
     """Synchronise the status and completed fields in validated_data."""
     if 'completed' in validated_data and 'status' not in validated_data:
@@ -25,6 +28,7 @@ def _update_completed_at(validated_data, completed, instance):
     if completed is False:
         validated_data['completed_at'] = None
 
+<<<<<<< HEAD
 def _module_attr(obj, field):
     module = getattr(obj, "module", None)
     return getattr(module, field, None)
@@ -64,10 +68,13 @@ def _group_project_name(obj):
     group_project = getattr(obj, "group_project", None)
     return getattr(group_project, "name", None)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class TaskListSerialiser(serializers.ModelSerializer):
     """Serialiser for task lists with a count of incomplete tasks."""
 
     task_count = serializers.SerializerMethodField()
+<<<<<<< HEAD
     society_id = serializers.SerializerMethodField()
     society_name = serializers.SerializerMethodField()
 
@@ -75,24 +82,36 @@ class TaskListSerialiser(serializers.ModelSerializer):
         """Metadata for task list serialiser."""
         model = TaskList
         fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at', 'society_id', 'society_name']
+=======
+
+    class Meta:
+        model = TaskList
+        fields = ['id', 'name', 'category', 'archived', 'task_count', 'created_at']
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
     def get_task_count(self, obj):
         return obj.tasks.filter(completed=False).count()
 
+<<<<<<< HEAD
     def get_society_id(self, obj):
         return _society_attr(obj, "id")
 
     def get_society_name(self, obj):
         return _society_attr(obj, "name")
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class TaskSerialiser(serializers.ModelSerializer):
     """Serialiser for individual tasks with related field summaries."""
 
     module_code = serializers.SerializerMethodField()
     module_name = serializers.SerializerMethodField()
     list_name = serializers.SerializerMethodField()
+<<<<<<< HEAD
     society_id = serializers.SerializerMethodField()
     society_name = serializers.SerializerMethodField()
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     reading_id = serializers.SerializerMethodField()
     reading_page_count = serializers.SerializerMethodField()
     reading_chapter = serializers.SerializerMethodField()
@@ -102,11 +121,17 @@ class TaskSerialiser(serializers.ModelSerializer):
     assignees_info = serializers.SerializerMethodField()
 
     class Meta:
+<<<<<<< HEAD
         """Metadata for task serialiser."""
         model = Task
         fields = [
             'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',
             'society_id', 'society_name',
+=======
+        model = Task
+        fields = [
+            'id', 'task_list', 'list_name', 'module', 'module_code', 'module_name',
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             'group_project', 'group_project_name', 'assigned_to', 'assignees_info',
             'title', 'description', 'priority', 'status', 'energy_level', 'due_date',
             'completed', 'completed_at', 'add_to_calendar', 'time_spent_minutes',
@@ -115,6 +140,7 @@ class TaskSerialiser(serializers.ModelSerializer):
             'reading_end_page', 'created_at', 'updated_at'
         ]
 
+<<<<<<< HEAD
     def _get_module_code(self, obj):
         return _module_attr(obj, "module_code")
 
@@ -149,12 +175,46 @@ class TaskSerialiser(serializers.ModelSerializer):
         return _group_project_name(obj)
 
     def _get_assignees_info(self, obj):
+=======
+    def get_module_code(self, obj):
+        return obj.module.module_code if obj.module else None
+
+    def get_module_name(self, obj):
+        return obj.module.module_name if obj.module else None
+
+    def get_list_name(self, obj):
+        return obj.task_list.name if obj.task_list else None
+
+    def get_reading_id(self, obj):
+        return obj.reading_id if obj.reading_id else None
+
+    def get_reading_page_count(self, obj):
+        return obj.reading.page_count() if obj.reading_id else None
+
+    def get_reading_chapter(self, obj):
+        return obj.reading.chapter if obj.reading_id and obj.reading else None
+
+    def get_reading_start_page(self, obj):
+        return obj.reading.start_page if obj.reading_id and obj.reading else None
+
+    def get_reading_end_page(self, obj):
+        return obj.reading.end_page if obj.reading_id and obj.reading else None
+
+    def get_group_project_name(self, obj):
+        return obj.group_project.name if obj.group_project else None
+
+    def get_assignees_info(self, obj):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         return [
             {"id": u.id, "name": u.first_name or u.username}
             for u in obj.assigned_to.all()
         ]
 
+<<<<<<< HEAD
     def _create(self, validated_data):
+=======
+    def create(self, validated_data):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         """Create a task, deriving the completed state from the status."""
         status_val = validated_data.get('status', 'todo')
         validated_data['status'] = status_val
@@ -163,7 +223,11 @@ class TaskSerialiser(serializers.ModelSerializer):
             validated_data['completed_at'] = timezone.now()
         return super().create(validated_data)
 
+<<<<<<< HEAD
     def _update(self, instance, validated_data):
+=======
+    def update(self, instance, validated_data):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         """Update a task, keeping status, completed, and timestamps in sync."""
         completed = _sync_status_and_completed(validated_data, instance)
         _update_completed_at(validated_data, completed, instance)
@@ -171,6 +235,7 @@ class TaskSerialiser(serializers.ModelSerializer):
         if completed is True and (updated.reading_id or updated.page_count):
             update_reading_estimates(updated.user)
         return updated
+<<<<<<< HEAD
 
 
 TaskSerialiser.get_module_code = TaskSerialiser._get_module_code
@@ -187,3 +252,5 @@ TaskSerialiser.get_group_project_name = TaskSerialiser._get_group_project_name
 TaskSerialiser.get_assignees_info = TaskSerialiser._get_assignees_info
 TaskSerialiser.create = TaskSerialiser._create
 TaskSerialiser.update = TaskSerialiser._update
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

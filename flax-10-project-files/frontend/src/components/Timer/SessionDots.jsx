@@ -2,7 +2,11 @@
  * Session progress dots and live stats.
  */
 
+<<<<<<< HEAD
 import styles from '../../pages/timer/TimerPage.module.css';
+=======
+import styles from '../../pages/Timer/TimerPage.module.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { fmtDuration } from './utils/timerFormatters';
 
 function getDotState(index, completedSessions, isActive, isPaused) {
@@ -31,12 +35,29 @@ export default function SessionDots({ completedSessions, targetSessions, isActiv
   );
 }
 
+<<<<<<< HEAD
+=======
+function DistractButton({ isActive, isPaused, onDistract }) {
+  if (!isActive || isPaused) return null;
+  return <button className={styles.distractChip} onClick={onDistract}>+ distracted</button>;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function PausedStat({ totalPaused }) {
   if (totalPaused <= 30) return null;
   return <span className={styles.liveStat}>⏸ <strong>{fmtDuration(totalPaused)}</strong> paused</span>;
 }
 
+<<<<<<< HEAD
 export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, isActive, isPaused }) {
+=======
+function DistractionStat({ distractions }) {
+  if (distractions <= 0) return null;
+  return <span className={styles.liveStat}>⚡ <strong>{distractions}</strong> distraction{distractions !== 1 ? 's' : ''}</span>;
+}
+
+export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, distractions, isActive, isPaused, onDistract }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const everStarted = isActive || isPaused || blockTotalWork > 0 || blockTotalBreak > 0;
   if (!everStarted) return null;
 
@@ -45,6 +66,11 @@ export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, isA
       <span className={styles.liveStat}>🔥 <strong>{blockTotalWork > 0 ? fmtDuration(blockTotalWork) : '—'}</strong> focus</span>
       <span className={styles.liveStat}>☕ <strong>{blockTotalBreak > 0 ? fmtDuration(blockTotalBreak) : '—'}</strong> break</span>
       <PausedStat totalPaused={totalPaused} />
+<<<<<<< HEAD
+=======
+      <DistractionStat distractions={distractions} />
+      <DistractButton isActive={isActive} isPaused={isPaused} onDistract={onDistract} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }

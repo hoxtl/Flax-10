@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import MemberDirectoryModal from '../../../components/society/society_detail/MemberDirectoryModal';
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/generic_summary_modal/GenericSummaryModal', () => ({
+=======
+vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ title, subtitle, emptyMessage, topContent, items, renderItem, children }) => {
         const hasItems = items && items.length > 0;
         const listContent = children || (renderItem && items?.map(renderItem));

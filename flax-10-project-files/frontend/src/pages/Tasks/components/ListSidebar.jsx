@@ -3,6 +3,7 @@
  */
 
 import { getListColor } from "../utils/listColorUtils";
+<<<<<<< HEAD
 import EmptyState from "../../../components/common/empty_state/EmptyState";
 import HoldConfirmModal from "../../../components/common/hold_confirm_modal/HoldConfirmModal";
 import {
@@ -13,6 +14,12 @@ import {
   isTeachingList,
   parseReadingListName,
 } from "../utils/readingListUtils";
+=======
+import { computeListSidebarCounts } from "../utils/listSidebarUtils";
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from "./ListSidebar.module.css";
 import { ListContextMenu, RenameInput } from "./listSidebarParts";
 import { useListSidebarState } from "./useListSidebarState";
@@ -33,20 +40,29 @@ function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectLi
 }
 
 function ListLabel({ list }) {
+<<<<<<< HEAD
   if (isSocietyList(list)) {
     return <span className={styles.listName}>{getSocietyDisplayName(list)}</span>;
   }
   if (isTeachingList(list)) {
     return <span className={styles.listName}>{getTeachingListDisplayName(list)}</span>;
   }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   if (!isReadingList(list)) {
     return <span className={styles.listName}>{list.name}</span>;
   }
 
   const parsed = parseReadingListName(list.name);
+<<<<<<< HEAD
   const displayLabel = parsed.moduleCode
     ? `${parsed.moduleName} (${parsed.moduleCode})`
     : parsed.moduleName;
+=======
+  const displayLabel = parsed.moduleName && parsed.moduleCode
+    ? `${parsed.moduleName} (${parsed.moduleCode})`
+    : parsed.moduleName || parsed.moduleCode || list.name;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   return <span className={styles.readingListLabel}>{displayLabel}</span>;
 }
@@ -81,6 +97,7 @@ function ListSection({ label, lists, emptyState, listCounts, activeListId, renam
 }
 
 function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, setRenamingId, onSelectList, onSelectFilter, onRenameList, onCtxMenu }) {
+<<<<<<< HEAD
   const { profile } = useAuth();
   const isTeacher = profile?.role === "teacher";
   const readingLists = lists.filter(isReadingList);
@@ -93,6 +110,14 @@ function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, set
       {!isTeacher && <ListSection label="READING LISTS" lists={readingLists} {...shared} />}
       {isTeacher && <ListSection label="MY TEACHING" lists={teachingLists} emptyState={<EmptyState icon="📋" title="No teaching lists yet" description="Create a list for meetings, planning, or admin." />} {...shared} />}
       <ListSection label="SOCIETIES" lists={societyLists} {...shared} />
+=======
+  const readingLists = lists.filter(isReadingList);
+  const lifeLists = lists.filter((list) => !isReadingList(list));
+  const shared = { listCounts, activeListId, renamingId, setRenamingId, onSelectList, onSelectFilter, onRenameList, onCtxMenu };
+  return (
+    <>
+      <ListSection label="READING LISTS" lists={readingLists} {...shared} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <ListSection label="LIFE" lists={lifeLists} emptyState={<EmptyState icon="🗂️" title="No lists yet" description="Create a list to organise your tasks." />} {...shared} />
     </>
   );
@@ -127,6 +152,20 @@ function ListSidebarArchive({ archivedLists, showArchived, setShowArchived, onUn
   );
 }
 
+<<<<<<< HEAD
+=======
+function useListSidebarState(props) {
+  const [ctxMenu, setCtxMenu] = useState(null);
+  const [renamingId, setRenamingId] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [deleteListId, setDeleteListId] = useState(null);
+  const [permDeleteId, setPermDeleteId] = useState(null);
+  const { listCounts, smartFilters } = computeListSidebarCounts(props.tasks, props.lists);
+  const handleCtxMenu = (event, listId) => { event.preventDefault(); setCtxMenu({ x: event.clientX, y: event.clientY, listId }); };
+  return { ctxMenu, setCtxMenu, renamingId, setRenamingId, showArchived, setShowArchived, deleteListId, setDeleteListId, permDeleteId, setPermDeleteId, listCounts, smartFilters, handleCtxMenu };
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function getSidebarListName(lists, id) {
   return id ? (lists.find((list) => list.id === id)?.name || "this list") : "";
 }
@@ -144,7 +183,11 @@ function ListSidebarDialogs({ props, state }) {
 }
 
 export default function ListSidebar(props) {
+<<<<<<< HEAD
   const state = useListSidebarState(props.tasks, props.lists);
+=======
+  const state = useListSidebarState(props);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sectionLabel}>VIEWS</div>

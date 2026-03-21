@@ -82,6 +82,7 @@
   background: var(--card-icon-surface);
 }
 
+<<<<<<< HEAD
 .productivityGrid {
   grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
 }
@@ -106,6 +107,12 @@
   font-size: 1.1rem;
 }
 
+=======
+.icon {
+  font-size: 1.1rem;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .content {
   min-width: 0;
 }
@@ -150,8 +157,11 @@
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
+<<<<<<< HEAD
 
   .productivityGridBalanced {
     grid-template-columns: 1fr;
   }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

@@ -1,14 +1,11 @@
 """
 Model for images associated with a society, including cover image flag.
 """
-
 from django.db import models
 
 from .society_model import Society
 
-
 class SocietyImage(models.Model):
-    """Stored image belonging to a society."""
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='images')
     url = models.TextField()
     is_cover = models.BooleanField(default=False)

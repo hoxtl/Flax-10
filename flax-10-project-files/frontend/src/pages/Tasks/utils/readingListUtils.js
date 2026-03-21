@@ -4,6 +4,7 @@
 
 const READING_LIST_PATTERN = /^([a-z]{2,}\d+)\s*-\s*(.+)$/i;
 const LEGACY_READING_LIST_PATTERN = /^reading list\s*-\s*(.+)$/i;
+<<<<<<< HEAD
 const TEACHING_LIST_PATTERN = /^Teaching\s*-\s*/i;
 
 export function isTeachingList(list) {
@@ -22,6 +23,8 @@ export function getSocietyDisplayName(list) {
   const label = list?.society_name || list?.name || "Society";
   return label.replace(/\s+Admin$/i, "").trim() || "Society";
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function isReadingListName(name) {
   const normalized = String(name || "").trim();

@@ -99,6 +99,7 @@ describe('SleepSchedulePanel', () => {
             expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
         });
     });
+<<<<<<< HEAD
 
     it('falls back to default bedtime when the picker clears its value', async () => {
         const onSave = vi.fn().mockResolvedValue(true);
@@ -119,4 +120,6 @@ describe('SleepSchedulePanel', () => {
         expect(screen.queryByRole('button', { name: /saved!/i })).toBeNull();
         expect(screen.getByRole('button', { name: 'Save Sleep Schedule' })).toBeTruthy();
     });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

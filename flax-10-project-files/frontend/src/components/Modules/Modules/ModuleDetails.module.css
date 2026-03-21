@@ -84,6 +84,38 @@
     background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 60%, var(--sage)));
 }
 
+<<<<<<< HEAD
+=======
+.enrollButton,
+.unenrollButton {
+    padding: 0.55rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.enrollButton {
+    background: var(--primary);
+    color: var(--c-white);
+}
+
+.enrollButton:hover {
+    background: var(--primary-strong);
+}
+
+.unenrollButton {
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+
+.unenrollButton:hover {
+    background: color-mix(in srgb, var(--error-bg) 80%, var(--error-border));
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 @media (max-width: 980px) {
     .layout {
@@ -95,6 +127,7 @@
     }
 }
 
+<<<<<<< HEAD
 .disabledBtn {
     opacity: 0.55;
     cursor: not-allowed !important;
@@ -103,4 +136,16 @@
 .disabledWrapper {
     display: inline-flex;
     cursor: not-allowed;
+=======
+@media (max-width: 768px) {
+    .sectionCard {
+        padding: 0.9rem;
+    }
+
+    .enrollButton,
+    .unenrollButton {
+        width: 100%;
+        text-align: center;
+    }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

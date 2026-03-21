@@ -6,7 +6,11 @@
   /* Past events */
   .pastDetails {
     border-bottom: none;
+<<<<<<< HEAD
     background: var(--widget-card-bg-glass);
+=======
+    background: #FFFFFF;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   }
   
   .pastSummary {
@@ -44,7 +48,11 @@
   .missedSection {
     padding: var(--home-space-lg);
     border-bottom: none;
+<<<<<<< HEAD
     background: color-mix(in srgb, var(--danger) 6%, var(--color-bg));
+=======
+    background: color-mix(in srgb, var(--danger) 6%, #FFFFFF);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   }
   .missedSectionHeader {
     font-size: var(--home-text-heading);
@@ -70,7 +78,11 @@
     align-items: center;
     gap: var(--home-space-sm);
     padding: 0.5rem 0.6rem;
+<<<<<<< HEAD
     background: var(--widget-card-bg-glass);
+=======
+    background: #FFFFFF;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border-radius: 12px;
     border: none;
     box-shadow: var(--home-card-shadow);
@@ -149,7 +161,11 @@
     min-height: 52px;
     border-radius: 8px;
     border: 1px solid rgba(192, 113, 78, 0.2);
+<<<<<<< HEAD
     background: var(--widget-card-bg-glass);
+=======
+    background: #FFFFFF;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     overflow: hidden;
@@ -184,7 +200,11 @@
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
+<<<<<<< HEAD
     color: var(--text);
+=======
+    color: #2d2d2d;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -286,8 +306,13 @@
     padding: 4px 10px;
     border-radius: 9999px;
     border: 1px solid rgba(107, 83, 68, 0.25);
+<<<<<<< HEAD
     background: var(--widget-card-bg-glass);
     color: var(--text);
+=======
+    background: #fff;
+    color: #5f4b39;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
@@ -298,7 +323,11 @@
     transition: background 0.15s, border-color 0.15s;
   }
   .planTimelineConflictItemBtn:hover {
+<<<<<<< HEAD
     background: var(--hover);
+=======
+    background: #fbf8f4;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border-color: rgba(107, 83, 68, 0.45);
   }
 

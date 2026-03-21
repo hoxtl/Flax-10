@@ -1,7 +1,10 @@
 /*
  * useSocietyTags manages tag CRUD for society detail views.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../api/societyApi';
 
 const appendTag = (setSociety, tag) =>

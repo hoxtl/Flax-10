@@ -1,7 +1,10 @@
 /*
  * useCarouselNavigation provides carousel state plus gesture and keyboard helpers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useCallback, useEffect, useRef } from "react";
 
 export function useCarouselNavigation(length, initialIndex = 0) {

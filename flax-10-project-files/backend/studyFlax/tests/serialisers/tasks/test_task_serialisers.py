@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for task serialisers.
 """
+=======
+"""Tests for task serialiser and task query helper branches."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from datetime import timedelta
 
@@ -9,12 +13,19 @@ from django.utils import timezone
 from rest_framework import status
 
 from studyFlax.models.tasks.task_model import Task, TaskList
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_society, make_user
+=======
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 class TaskSerializerTest(TestCase):
     """Tests for task serializer."""
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user = make_user('taskser_user', 'taskser@e.com')
 
@@ -44,6 +55,7 @@ class TaskSerializerTest(TestCase):
         serializer = TaskListSerialiser(task_list)
         self.assertEqual(serializer.data['task_count'], 1)
 
+<<<<<<< HEAD
     def test_task_and_list_serializers_expose_society_context(self):
         from studyFlax.serialisers.tasks.task_serialisers import TaskListSerialiser, TaskSerialiser
 
@@ -64,6 +76,8 @@ class TaskSerializerTest(TestCase):
         self.assertEqual(task_data["society_id"], society.id)
         self.assertEqual(task_data["society_name"], "Chess Society")
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_sync_status_in_validated_data_sets_completed(self):
         from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
         task = Task.objects.create(user=self.user, title='Status Task', status='todo')
@@ -82,9 +96,14 @@ class TaskSerializerTest(TestCase):
 
 class TaskGroupProjectFilterTest(TestCase):
     """Tests for get_user_tasks group_project filter."""
+<<<<<<< HEAD
 
     def test_filter_tasks_by_group_project(self):
         from studyFlax.views.tasks.task_view_service import get_user_tasks
+=======
+    def test_filter_tasks_by_group_project(self):
+        from studyFlax.views.tasks.task_view import get_user_tasks
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMembership
         user = make_user('gp_filter', 'gp_filter@e.com')
         project = GroupProject.objects.create(name='GP', owner=user)
@@ -98,7 +117,10 @@ class TaskGroupProjectFilterTest(TestCase):
 
 class TaskUpdateReadingEstimateTest(TestCase):
     """Tests for task update triggering reading estimate refresh."""
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_completing_task_with_reading_triggers_estimate_update(self):
         from studyFlax.serialisers.tasks.task_serialisers import TaskSerialiser
         from studyFlax.models.modules.module_model import Module

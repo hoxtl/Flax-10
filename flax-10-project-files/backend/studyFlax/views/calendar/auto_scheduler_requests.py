@@ -22,9 +22,17 @@ def _validate_auto_request(request):
         return None, None, Response({"detail": "Invalid deadlines."}, status=status.HTTP_400_BAD_REQUEST)
     return payload, deadline_map, deadlines
 
+<<<<<<< HEAD
 def _deadline_map(payload):
     return {item["deadline_id"]: item["ideal_minutes_per_day"] for item in payload["deadline_preferences"]}
 
+=======
+
+def _deadline_map(payload):
+    return {item["deadline_id"]: item["ideal_minutes_per_day"] for item in payload["deadline_preferences"]}
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _enrolled_deadlines(user, deadline_map):
     return list(
         Deadline.objects.filter(id__in=deadline_map.keys(), module__enrollments__student=user, start_due_date__gte=timezone.now())

@@ -1,9 +1,14 @@
 /*
  * Sleep settings section and duration card.
  */
+<<<<<<< HEAD
 
 import DateTimePicker from "../../../pages/tasks/components/DateTimePicker";
 import styles from "../../../pages/settings/Settings.module.css";
+=======
+import DateTimePicker from "../../../pages/Tasks/components/DateTimePicker";
+import styles from "../../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton } from "../SettingsUI";
 import { getSleepDuration, getSleepQuality } from "./sleepUtils";

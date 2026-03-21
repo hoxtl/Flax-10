@@ -118,10 +118,16 @@
     font-size: 0.65rem;
     font-weight: 600;
     padding: 1px 2px;
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/month-view.css
     background-color: var(--dot-bg, transparent);
     border: none;
     border-radius: 0;
     color: var(--dot-text, var(--text));
+=======
+    background-color: transparent;
+    border-radius: 0;
+    color: var(--text);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/MonthView.css
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -129,9 +135,12 @@
     display: flex;
     align-items: center;
     gap: 4px;
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/month-view.css
     width: 100%;
     text-align: left;
     font-family: inherit;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/MonthView.css
 }
 
 /* Dot removed per design review */

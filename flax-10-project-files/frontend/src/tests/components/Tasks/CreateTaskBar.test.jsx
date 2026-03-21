@@ -29,7 +29,11 @@ vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/animated_dropdown', () => ({
+=======
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

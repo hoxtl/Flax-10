@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import User
 
+<<<<<<< HEAD
 
 def _username_error(message):
     return Response({'available': False, 'error': message})
@@ -21,6 +22,8 @@ def _invalid_username_message(username):
         return 'Username must be at least 3 characters'
     return None
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_username(request):

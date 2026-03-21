@@ -76,6 +76,7 @@ describe('useProfileSummary', () => {
 
         expect(result.current.summary).toEqual({ total_sessions: 20, total_hours: 40 });
     });
+<<<<<<< HEAD
 
     it('refetch preserves the previous summary and records an error when it fails', async () => {
         fetchApi.mockResolvedValueOnce({ total_sessions: 10, total_hours: 20 });
@@ -119,4 +120,6 @@ describe('useProfileSummary', () => {
         expect(result.current.summary).toEqual({ total_sessions: 30, total_hours: 60 });
         await waitFor(() => expect(result.current.loading).toBe(false));
     });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

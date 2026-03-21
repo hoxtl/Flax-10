@@ -1,17 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import SleepBanner from '../../../pages/homepage/components/SleepBanner';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import SleepBanner from '../../../pages/Homepage/components/SleepBanner';
 
 vi.mock('../../../api/userApi', () => ({
     getUserSettings: vi.fn(),
 }));
 
-vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
+vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     isDuringSleepWindow: vi.fn(),
 }));
 
 import { getUserSettings } from '../../../api/userApi';
-import { isDuringSleepWindow } from '../../../components/settings/hooks/useSleepWarning';
+import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
 
 describe('SleepBanner', () => {
     beforeEach(() => {
@@ -51,12 +51,12 @@ describe('SleepBanner', () => {
     it('dismisses banner when x is clicked', async () => {
         getUserSettings.mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
         isDuringSleepWindow.mockReturnValue(true);
-        render(<SleepBanner />);
+        const { container } = render(<SleepBanner />);
         await waitFor(() => {
             expect(screen.getByText('🌙')).toBeTruthy();
         });
-        fireEvent.click(screen.getByRole('button', { name: /dismiss sleep banner/i }));
-        await waitForElementToBeRemoved(() => screen.queryByText('🌙'));
+        fireEvent.click(screen.getByText('x'));
+        expect(container.firstChild).toBeNull();
     });
 
     it('handles getUserSettings error gracefully', async () => {

@@ -183,6 +183,7 @@ describe('calendarReducer', () => {
         expect(state.readOnly).toBe(true);
     });
 
+<<<<<<< HEAD
     it('should normalize non-string and manage-only filter payloads back to all', () => {
         const state = calendarReducer(initialState, {
             type: 'SET_FILTER',
@@ -227,6 +228,8 @@ describe('calendarReducer', () => {
         expect(state.searchQuery).toBe('essay');
     });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     it('should handle TRIGGER_RELOAD', () => {
         const state = calendarReducer(initialState, { type: 'TRIGGER_RELOAD' });
         expect(state.reloadKey).toBe(1);

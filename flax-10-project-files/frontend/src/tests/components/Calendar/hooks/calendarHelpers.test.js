@@ -1,9 +1,14 @@
 /**
  * Tests for calendarHelpers - date range calculation utilities.
  */
+<<<<<<< HEAD
 
 import { describe, it, expect } from 'vitest';
 import { getDateRangeForView } from '../../../../components/calendar/hooks/calendarHelpers';
+=======
+import { describe, it, expect } from 'vitest';
+import { getDateRangeForView } from '../../../../components/Calendar/hooks/calendarHelpers';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('calendarHelpers', () => {
     describe('getDateRangeForView', () => {

@@ -2,6 +2,7 @@
  * ProfileCalendar - Read-only calendar view for user profiles.
  * Displays monthly calendar with event summary modal.
  */
+<<<<<<< HEAD
 
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
@@ -13,6 +14,33 @@ import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
 import { EventsSummaryModal } from "../../components/calendar/events_summary_modal/EventsSummaryModal";
 import "../../components/calendar/calendar-header.css";
 import "../../components/calendar/calendar.css";
+
+function useProfileCalendarMode(dispatch) {
+  useEffect(() => {
+    dispatch({ type: "SET_VIEW_MODE", payload: "month" });
+    dispatch({ type: "SET_READ_ONLY", payload: true });
+  }, [dispatch]);
+}
+
+function useProfileNavigation() {
+  const { selectedDate } = useCalendar();
+  const dispatch = useCalendarDispatch();
+  useProfileCalendarMode(dispatch);
+  const setDate = (date) => dispatch({ type: "SET_SELECTED_DATE", payload: date });
+  return { selectedDate, setDate };
+}
+=======
+import { useEffect, useState } from "react";
+import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
+import { addMonths, formatMonthYear, isSameMonth } from "../../components/Calendar/utils/dateUtils";
+import { CalendarNav } from "../../components/Calendar/header/CalendarHeaderUtils";
+import { MonthView } from "../../components/Calendar/MonthView/MonthView";
+import { EventPopups } from "../../components/Calendar/EventPopups";
+import { ResizeHighlightProvider } from "../../context/ResizeHighlightContext";
+import { EventsSummaryModal } from "../../components/Calendar/EventsSummaryModal/EventsSummaryModal";
+import "../../components/Calendar/CalendarHeader.css";
+import "../../components/Calendar/Calendar.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function useProfileCalendarMode(dispatch) {
   useEffect(() => {
@@ -83,7 +111,10 @@ function ProfileCalendarInner({ allEvents }) {
 }
 
 /** Profile calendar wrapper with context providers. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function ProfileCalendar({ allEvents }) {
   return (
     <CalendarProvider>

@@ -1,7 +1,10 @@
 /*
  * Manual schedule helpers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function filterScheduleEvents(events, query) {
   const value = query.trim().toLowerCase();
   return value ? events.filter((event) => matchesScheduleEvent(event, value)) : events;

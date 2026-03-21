@@ -1,12 +1,9 @@
 """
 Model defining recurrence rules for repeating calendar events.
 """
-
 from django.db import models
 
-
 class RecurrenceRule(models.Model):
-    """Recurrence pattern for repeating calendar events."""
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),

@@ -1,7 +1,10 @@
 /*
  * Connected account-form container.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import CourseChangeModal from "./CourseChangeModal";
 import AccountFormLayout from "./AccountFormLayout";
 import { hasAccountChanges } from "./accountFormConfig";
@@ -41,7 +44,11 @@ function buildContainerProps(controller, isSaving) {
   return { showModal, setShowModal, cancellingRequest, courseRequestNotice, courseRequestError, saveSignal, isSaving };
 }
 
+<<<<<<< HEAD
 function buildLayoutProps(controller, view, isTeacher) {
+=======
+function buildLayoutProps(controller, view) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return {
     onSubmit: createAccountSubmitHandler(controller.context),
     formData: controller.account.formData,
@@ -56,7 +63,10 @@ function buildLayoutProps(controller, view, isTeacher) {
     isSaving: view.isSaving,
     hasUnsaved: controller.context.hasUnsaved,
     saveSignal: view.saveSignal,
+<<<<<<< HEAD
     isTeacher,
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   };
 }
 
@@ -64,19 +74,34 @@ function CourseRequestModal({ showModal, setShowModal, onSuccess }) {
   return showModal ? <CourseChangeModal onClose={() => setShowModal(false)} onSuccess={onSuccess} /> : null;
 }
 
+<<<<<<< HEAD
 function AccountFormBody({ controller, view, isTeacher }) {
   const layoutProps = buildLayoutProps(controller, view, isTeacher);
   return (
     <>
       <AccountFormLayout {...layoutProps} />
       {!isTeacher && <CourseRequestModal showModal={view.showModal} setShowModal={view.setShowModal} onSuccess={createCourseRequestSuccessHandler(controller.context)} />}
+=======
+function AccountFormBody({ controller, view }) {
+  const layoutProps = buildLayoutProps(controller, view);
+  return (
+    <>
+      <AccountFormLayout {...layoutProps} />
+      <CourseRequestModal showModal={view.showModal} setShowModal={view.setShowModal} onSuccess={createCourseRequestSuccessHandler(controller.context)} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </>
   );
 }
 
 export default function AccountFormContainer({ user, onSave, isSaving }) {
+<<<<<<< HEAD
   const isTeacher = user?.role === "teacher";
   const controller = useAccountFormController(user, onSave);
   const view = buildContainerProps(controller, isSaving);
   return <AccountFormBody controller={controller} view={view} isTeacher={isTeacher} />;
+=======
+  const controller = useAccountFormController(user, onSave);
+  const view = buildContainerProps(controller, isSaving);
+  return <AccountFormBody controller={controller} view={view} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

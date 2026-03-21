@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import AttendanceSummaryBar from "../../pages/attendance/components/AttendanceSummaryBar";
+import AttendanceSummaryBar from "../../pages/Attendance/components/AttendanceSummaryBar";
 
 const useCountUpMock = vi.fn();
 

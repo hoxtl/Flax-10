@@ -1,11 +1,18 @@
 /*
  * Preferences panel tests.
  */
+<<<<<<< HEAD
 
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import PreferencesPanel from '../../../components/settings/PreferencesPanel';
+=======
+import { useState } from 'react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import PreferencesPanel from '../../../components/Settings/PreferencesPanel';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('../../../context/ThemeContext', () => ({
   useTheme: vi.fn(() => ({
@@ -23,6 +30,7 @@ vi.mock('../../../api/userApi', () => ({
   }),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../pages/tasks/components/DateTimePicker', () => ({
   default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
 }));
@@ -33,6 +41,10 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
     </select>
   ),
+=======
+vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
+  default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }));
 
 import { useTheme } from '../../../context/ThemeContext';
@@ -105,13 +117,21 @@ describe('PreferencesPanel', () => {
   it('submits study-time preference', async () => {
     const onStudyTimeSave = vi.fn().mockResolvedValue(true);
     render(<PreferencesPanel onSave={vi.fn()} onSleepSave={vi.fn()} onStudyTimeSave={onStudyTimeSave} isSaving={false} activeSubTab="studytime" />);
+<<<<<<< HEAD
     const input = await screen.findByTestId('Choose a target');
+=======
+    const input = await screen.findByLabelText('Daily study time');
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     fireEvent.change(input, { target: { value: '180' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save daily study time' }));
     await waitFor(() => expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 }));
   });
 
+<<<<<<< HEAD
   it('keeps the selected appearance after a successful appearance save', async () => {
+=======
+  it('shows saved tick after a successful appearance save', async () => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const onSave = vi.fn().mockResolvedValue(true);
     mockStatefulTheme();
     const { container } = render(<PreferencesPanel onSave={onSave} isSaving={false} />);
@@ -119,8 +139,12 @@ describe('PreferencesPanel', () => {
     const interfaceModeGroup = screen.getByText('Interface Mode').closest('div');
     fireEvent.click(within(interfaceModeGroup).getByText('Dark').closest('button'));
     fireEvent.submit(container.querySelector('form'));
+<<<<<<< HEAD
     await waitFor(() => expect(onSave).toHaveBeenCalledWith({ mode: 'dark', theme: 'flax' }));
     expect(within(interfaceModeGroup).getByText('✓')).toBeInTheDocument();
+=======
+    await waitFor(() => expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy());
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it('shows saved tick after a successful sleep save', async () => {
@@ -132,6 +156,7 @@ describe('PreferencesPanel', () => {
     fireEvent.submit(bedtimeInput.closest('form'));
     await waitFor(() => expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy());
   });
+<<<<<<< HEAD
 
   it('skips appearance saves when nothing changed and renders scheduling subtabs', async () => {
     const onSave = vi.fn();
@@ -184,4 +209,6 @@ describe('PreferencesPanel', () => {
     await waitFor(() => expect(onSleepSave).toHaveBeenCalledWith({ sleep_time: '22:45', wake_time: '07:00' }));
     expect(screen.queryByRole('button', { name: /saved!/i })).not.toBeInTheDocument();
   });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

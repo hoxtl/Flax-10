@@ -16,7 +16,10 @@ function useCurrentTime() {
 }
 
 /** Renders a red line and dot at the current time position. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function CurrentTimeLine() {
     const now = useCurrentTime();
     const totalMinutes = now.getHours() * 60 + now.getMinutes();

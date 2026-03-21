@@ -1,6 +1,7 @@
 /*
  * Tests for ModuleCourseFilter component.
  */
+<<<<<<< HEAD
 
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -16,6 +17,12 @@ vi.mock('framer-motion', () => ({
     },
   },
 }));
+=======
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+import ModuleCourseFilter from '../../../components/Modules/Modules/ModuleCourseFilter';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('ModuleCourseFilter', () => {
   it('opens on hover and closes when the pointer leaves', async () => {
@@ -32,6 +39,7 @@ describe('ModuleCourseFilter', () => {
       expect(screen.queryByPlaceholderText(/search courses or departments/i)).not.toBeInTheDocument();
     });
   });
+<<<<<<< HEAD
 
   it('shows badge when courses are selected', () => {
     render(<ModuleCourseFilter selectedCourses={['CS', 'Law']} onToggleCourse={() => {}} />);
@@ -81,4 +89,6 @@ describe('ModuleCourseFilter', () => {
     // Just assert the filter runs without throwing
     expect(searchInput).toBeInTheDocument();
   });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

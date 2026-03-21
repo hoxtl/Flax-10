@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for society event views.
 """
+=======
+"""Tests for society event endpoints."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -9,14 +13,21 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from studyFlax.models.society.society_event_model import SocietyEvent
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_society, make_society_admin, make_society_member
 
+=======
+from studyFlax.tests.helpers.factories import make_society, make_society_admin, make_society_member
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 
 
 class SocietyEventViewTest(TestCase):
+<<<<<<< HEAD
     """Tests society event view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

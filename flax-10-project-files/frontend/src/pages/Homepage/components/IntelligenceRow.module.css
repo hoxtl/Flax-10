@@ -1,5 +1,1259 @@
+<<<<<<< HEAD
 /* Homepage CSS barrel for components/IntelligenceRow.module.css */
 @import "./IntelligenceRow.hero-and-shell.module.css";
 @import "./IntelligenceRow.alerts-and-status.module.css";
 @import "./IntelligenceRow.metrics-and-context.module.css";
 @import "./IntelligenceRow.bento-and-travel.module.css";
+=======
+/* Intelligence Row — Layout and Edit Bar styles only */
+
+.section {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  background: transparent;
+}
+
+.editBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.editBtn {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.editBtn:hover {
+  background: var(--hover-light);
+  color: var(--text-primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.editBtnActive {
+  background: var(--primary);
+  color: #fff !important;
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.editBtnActive:hover {
+  background: var(--primary-strong);
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.analyticsWidgetShell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.analyticsWidgetTitle {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+  margin: 0;
+}
+
+.analyticsWidgetLoading,
+.analyticsWidgetEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--widget-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  min-height: 180px;
+}
+
+.analyticsScrollable {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.analyticsInsightsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 26px 28px;
+  border: 1px solid var(--widget-border);
+  border-radius: 28px;
+  background: var(--widget-surface-secondary);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.045);
+  overflow: hidden;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top right, var(--widget-accent-soft), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 52%);
+}
+
+@media (min-width: 768px) {
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(420px, 0.9fr);
+    align-items: stretch;
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+}
+
+.headerLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+}
+
+.headerDateRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerDateIcon {
+  color: var(--widget-text-tertiary);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: clamp(2.35rem, 3.9vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  color: var(--widget-text-primary);
+  margin: 0;
+  max-width: none;
+}
+
+.headerRight {
+  display: grid;
+  align-content: start;
+  min-width: 280px;
+}
+
+@media (max-width: 767px) {
+  .headerRight {
+    min-width: 0;
+  }
+}
+
+/* Row that holds statusStrip pill + TFL pill side by side */
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compact Day Progress in greeting header */
+.headerDayProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.headerDayProgressTrack {
+  height: 4px;
+  background: var(--widget-border);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 200px;
+  max-width: 100%;
+}
+
+.headerDayProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #7B6751 0%, #4A3421 100%);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.headerDayProgressMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.headerDayProgressCount {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--widget-text-secondary);
+}
+
+.headerDayProgressOverdue {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #C0714E;
+  letter-spacing: 0.04em;
+}
+
+.headerDayProgressStreak {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+
+/* Pills row at the top of the Right Now bento card */
+.rightNowPillsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+/* ── Combined amber alerts container (status strip + TFL) ── */
+.intRowAlertsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.intRowAlertsContainer:has(> *) {
+  background: var(--widget-accent-soft);
+  border-left: 3px solid var(--widget-accent);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+
+.intRowAlertRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.intRowAlertDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #c49a4b;
+}
+
+.intRowAlertText {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: var(--widget-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intRowAlertDismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #b8933a;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.12s;
+}
+.intRowAlertDismiss:hover { color: #7a5520; }
+
+.intRowAlertOverflow {
+  font-size: 0.69rem;
+  color: #b8933a;
+  padding-left: 12px;
+}
+
+/* Status strip — dynamic schedule state below greeting */
+.statusStrip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--widget-border);
+  background: var(--widget-icon-bg);
+  max-width: fit-content;
+}
+
+.statusStripDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #7B6751;
+}
+
+.statusStripText {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--widget-text-secondary);
+}
+
+/* Conflict variant — terracotta with glow pulse */
+.statusStripConflict {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: rgba(254, 226, 226, 0.6);
+}
+.statusStripConflict .statusStripDot {
+  background: #dc2626;
+  animation: stripConflictGlow 1.6s ease-in-out infinite;
+}
+.statusStripConflict .statusStripText { color: #dc2626; }
+
+@keyframes stripConflictGlow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0);
+  }
+}
+
+/* ── TFL card (replaces old pill) ─────────────────────────────────────────── */
+
+.tflCard {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 8px 10px 8px 0;
+  border-radius: 10px;
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
+  overflow: hidden;
+}
+
+.tflCardSevere {
+  background: rgba(123, 103, 81, 0.09);
+  border-color: rgba(123, 103, 81, 0.22);
+}
+
+/* Left colour accent strip — colour set via inline style */
+.tflCardAccent {
+  width: 4px;
+  flex-shrink: 0;
+  border-radius: 0;
+  align-self: stretch;
+}
+
+.tflCardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tflCardTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tflCardLine {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--widget-text-primary);
+}
+
+.tflCardStatus {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #8a7060;
+}
+
+.tflCardLeave {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+}
+
+.tflCardDismiss {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: rgba(122, 85, 32, 0.4);
+  transition: color 0.15s;
+  margin-top: 1px;
+}
+.tflCardDismiss:hover { color: var(--widget-accent); }
+
+/* "+N more lines affected" overflow label */
+.tflOverflow {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: rgba(155, 58, 42, 0.65);
+  padding: 2px 0 2px 4px;
+}
+
+/* Dismiss button inside a pill */
+.statusStripPillDismiss {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 2px;
+  cursor: pointer;
+  color: rgba(122, 85, 32, 0.4);
+  transition: color 0.15s;
+  line-height: 1;
+}
+.statusStripPillDismiss:hover { color: var(--widget-accent); }
+
+/* Gap variant — sage green */
+.statusStripGap {
+  border-color: rgba(22, 163, 74, 0.25);
+  background: rgba(220, 252, 231, 0.6);
+}
+.statusStripGap .statusStripDot { background: #16a34a; }
+.statusStripGap .statusStripText { color: #16a34a; }
+
+/* Active task variant — warm brown */
+.statusStripTask {
+  border-color: rgba(120, 113, 108, 0.2);
+  background: rgba(250, 250, 249, 0.8);
+}
+.statusStripTask .statusStripDot {
+  background: #78716c;
+  animation: stripPulse 2s ease-in-out infinite;
+}
+.statusStripTask .statusStripText { color: #44403c; }
+
+@keyframes stripPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes intRowPulseTerracotta {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.headerSubtitle {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgba(74, 52, 33, 0.76);
+  margin: 0;
+  max-width: 39ch;
+}
+
+.headerPlannerPanel {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 22px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: blur(8px);
+}
+
+.semesterWidget {
+  display: grid;
+  gap: 6px;
+  padding: 11px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  background: color-mix(in srgb, var(--panel) 82%, var(--surface-page));
+}
+
+.semesterWidgetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.semesterWidgetLabel {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--primary) 72%, var(--muted));
+}
+
+.semesterWidgetValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.semesterWidgetTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.semesterWidgetFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    color-mix(in srgb, var(--primary) 65%, var(--accent))
+  );
+  transition: width 0.3s ease;
+}
+
+.semesterWidgetMeta {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 66%, var(--muted));
+}
+
+.metricRail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metricChip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  min-width: 98px;
+  border-radius: 18px;
+  background: var(--widget-metric-bg);
+  border: 1px solid var(--widget-border);
+}
+
+@media (max-width: 767px) {
+  .metricRail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metricLabel {
+  color: var(--widget-metric-label);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  color: var(--widget-metric-value);
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.nextStepCard {
+  display: grid;
+  gap: 8px;
+  padding: 16px 17px;
+  border-radius: 18px;
+  background: var(--widget-card-bg-soft);
+  border: 1px solid var(--widget-border);
+}
+
+.nextStepLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+}
+
+.nextStepText {
+  margin: 0;
+  color: var(--widget-text-primary);
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.nextStepMeta {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--widget-text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.nextStepFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.analyticsInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.analyticsPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--widget-text-secondary);
+}
+
+.analyticsLink {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--widget-accent);
+  text-decoration: none;
+}
+
+.analyticsLink:hover {
+  color: #4a3421;
+}
+
+.liveContextStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+
+
+.liveContextCard {
+  display: grid;
+  gap: 8px;
+  width: fit-content;
+  max-width: min(100%, 34rem);
+  padding: 14px 16px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  border-radius: 18px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.025);
+  backdrop-filter: blur(6px);
+}
+
+.liveContextCardWarning {
+  background: rgba(255, 248, 244, 0.78);
+  border-color: rgba(192, 113, 78, 0.14);
+}
+
+.liveContextInlineAlert {
+  position: relative;
+}
+
+.liveContextTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 18px;
+}
+
+.liveContextLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+}
+
+.liveContextIcon {
+  color: rgba(192, 113, 78, 0.78);
+  flex-shrink: 0;
+}
+
+.liveContextDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #f0b29d 0%, #c0714e 55%, #b83232 100%);
+  box-shadow:
+    0 0 0 4px rgba(192, 113, 78, 0.1),
+    0 0 14px rgba(192, 113, 78, 0.42);
+  animation: liveAlertDotPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.liveContextBody {
+  display: grid;
+  gap: 5px;
+}
+
+.liveContextText {
+  margin: 0;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--widget-text-primary);
+  max-width: 35ch;
+}
+
+.liveContextMeta {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(132, 87, 72, 0.72);
+}
+
+.liveContextInlineAlert .liveContextTop {
+  justify-content: flex-start;
+}
+
+@keyframes liveAlertDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 4px rgba(192, 113, 78, 0.1),
+      0 0 14px rgba(192, 113, 78, 0.42);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 6px rgba(192, 113, 78, 0.08),
+      0 0 18px rgba(192, 113, 78, 0.5);
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .headerPlannerPanel {
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .headerTitle {
+    font-size: clamp(2rem, 10vw, 2.55rem);
+  }
+}
+
+.primaryGrid {
+  margin-bottom: 14px;
+}
+
+@media (min-width: 1024px) {
+  .primaryGrid {
+    grid-template-columns: minmax(300px, 0.48fr) minmax(0, 1fr) !important;
+    grid-auto-rows: minmax(0, auto);
+    gap: 12px;
+    align-items: stretch;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+/* Row 1: Right Now (left) | Today's Tasks (right) — equal height */
+.span5 { grid-column: 1; grid-row: 1; }
+.span1 { grid-column: 2; grid-row: 1; }
+/* Row 2: Deadlines (left) | Focus Windows (right) — equal height */
+.span3 { grid-column: 1; grid-row: 2; }
+.span4 { grid-column: 2; grid-row: 2; }
+
+@media (max-width: 767px) {
+  .span5 { grid-column: 1 / -1; grid-row: 1; }
+  .span1 { grid-column: 1 / -1; grid-row: 2; }
+  .span3 { grid-column: 1 / -1; grid-row: 3; }
+  .span4 { grid-column: 1 / -1; grid-row: 4; }
+}
+
+.bentoSlot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--widget-border);
+  background: var(--widget-surface);
+  padding: 1.08rem;
+  min-height: 160px;
+  opacity: 0;
+}
+
+
+
+/* Widget cards: same base style for all — no colored tints */
+.bentoSlotVariantRightNow {
+  background: var(--widget-surface);
+}
+.bentoSlotVariantRightNow .bentoIcon {
+  color: var(--widget-text-tertiary);
+}
+
+.bentoSlotVariantTasks {
+  background: var(--widget-surface);
+}
+.bentoSlotVariantTasks .bentoIcon {
+  color: var(--widget-text-tertiary);
+}
+
+.bentoSlotVariantDeadlines {
+  background: var(--widget-surface);
+}
+.bentoSlotVariantDeadlines .bentoIcon {
+  color: var(--widget-text-tertiary);
+}
+
+.bentoSlotVariantFocus {
+  background: var(--widget-surface);
+}
+.bentoSlotVariantFocus .bentoIcon {
+  color: var(--widget-text-tertiary);
+}
+
+.bentoSlot.bentoVisible {
+  animation: intRowCard 0.8s ease-out forwards;
+}
+
+@keyframes intRowCard {
+  0% { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.96); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.bentoSlot.iconPulse .bentoIcon {
+  color: #dc2626; /* soft red-600 for overdue pulse */
+  animation: intRowPulseTerracotta 2s ease-in-out infinite;
+}
+
+@keyframes intRowPulseTerracotta {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.bentoGlow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  mask-image: radial-gradient(
+    220px 220px at var(--x, 50%) var(--y, 50%),
+    black,
+    transparent
+  );
+  -webkit-mask-image: radial-gradient(
+    220px 220px at var(--x, 50%) var(--y, 50%),
+    black,
+    transparent
+  );
+}
+
+.bentoSlot:hover .bentoGlow {
+  opacity: 1;
+}
+
+.bentoGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  border: 1px solid var(--widget-border);
+}
+
+.bentoContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+.bentoTop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.bentoIconWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.bentoIconWrap.bentoIconOverdue .bentoIcon {
+  color: #dc2626; /* soft red — urgency */
+}
+
+.bentoIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--widget-text-tertiary);
+}
+
+.bentoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* All widget titles: text-sm font-semibold uppercase tracking-wider text-stone-700 */
+.bentoTitle {
+  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--widget-text-primary);
+  margin: 0;
+}
+
+/* Secondary stats: text-xs text-stone-400 font-medium */
+.bentoMeta {
+  margin-left: auto;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--widget-text-tertiary);
+}
+
+.bentoBody {
+  flex: 1;
+  min-height: 0;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--widget-text-secondary);
+}
+
+.bentoCenteredBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--widget-border);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--widget-text-tertiary);
+  opacity: 0.85;
+}
+
+/* ── Today at a Glance strip ─────────────────────────────────────────────── */
+
+.glanceStrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 640px) {
+  .glanceStrip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.glanceStat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--widget-surface-raised);
+  border: 1px solid var(--widget-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glanceStat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glanceStatIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--widget-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--widget-accent);
+  transition: background 0.2s;
+}
+
+.glanceStatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.glanceStatNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.glanceStatLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── TFL Travel Alert Banner ─────────────────────────────────────────────── */
+
+.travelAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--widget-accent-soft);
+  border: 1px solid var(--widget-accent);
+}
+
+.travelAlertLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.travelAlertIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--widget-icon-bg);
+  color: var(--widget-accent);
+}
+
+.travelAlertBody {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.travelAlertLine {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7A5520;
+}
+
+.travelAlertDot,
+.travelAlertSep {
+  font-size: 0.65rem;
+  color: rgba(154, 110, 42, 0.5);
+}
+
+.travelAlertStatus {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: var(--widget-accent);
+}
+
+.travelAlertSuggestion {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--widget-text-secondary);
+}
+
+.travelAlertDismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(154, 110, 42, 0.6);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.travelAlertDismiss:hover {
+  background: rgba(185, 130, 55, 0.12);
+  color: #7A5520;
+}
+
+/* ── Bento grid positions (desktop 2-col layout) ─────────────────── */
+@media (min-width: 1024px) {
+  .posDeadlines      { grid-column: 1; grid-row: 1; }
+  .posTodaysTasks    { grid-column: 2; grid-row: 1; align-self: stretch; }
+}
+
+.posTodaysTasks {
+  min-height: 100%;
+}
+
+/* ── Dark-mode overrides for homepage greeting cards ─────────────────────── */
+:global([data-theme="dark"]) .courseChangeCard {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(200, 180, 150, 0.2);
+  border-left-color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeLabel {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeSub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn {
+  color: #d4b896;
+  border-color: rgba(200, 180, 150, 0.35);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn:hover {
+  background: rgba(200, 180, 150, 0.12);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss {
+  color: rgba(200, 180, 150, 0.5);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss:hover {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeIcon {
+  color: #c4a46d;
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

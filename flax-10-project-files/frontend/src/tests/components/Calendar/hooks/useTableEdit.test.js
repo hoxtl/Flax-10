@@ -1,10 +1,16 @@
 /**
  * Tests for useTableEdit - inline cell editing for table view.
  */
+<<<<<<< HEAD
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useTableEdit } from '../../../../components/calendar/hooks/useTableEdit';
+=======
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useTableEdit } from '../../../../components/Calendar/hooks/useTableEdit';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { createMockEvent, createMockDispatch, mockTags } from '../mocks/calendarMocks';
 
 const mockDispatch = createMockDispatch();

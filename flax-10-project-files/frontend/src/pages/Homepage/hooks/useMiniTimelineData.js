@@ -1,11 +1,19 @@
 /* Derived data for the homepage mini timeline. */
 
 import { useMemo } from "react";
+<<<<<<< HEAD
 import { isToday } from "../../../components/calendar/utils/dateUtils";
 import { DAY_END_HOUR, DAY_START_HOUR } from "../utils/timelineUtils";
 import { computePlanTimelineRows } from "../utils/planTimelineRows";
 import { isNow } from "../utils/eventUtils";
 import { deriveAssignedGapTasks, deriveBestFreeRowId, deriveGapDeadlineFallbacks } from "./mini_timeline/assignmentUtils";
+=======
+import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { DAY_END_HOUR, DAY_START_HOUR } from "../utils/timelineUtils";
+import { computePlanTimelineRows } from "../utils/planTimelineRows";
+import { isNow } from "../utils/eventUtils";
+import { deriveAssignedGapTasks, deriveBestFreeRowId, deriveGapDeadlineFallbacks } from "./miniTimeline/assignmentUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function getDayBounds(selectedDate) {
   const start = new Date(selectedDate);

@@ -9,7 +9,10 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import TaskCard from "./TaskCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
+<<<<<<< HEAD
 import { isReadingList } from "../utils/readingListUtils";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
 
 import styles from "./TaskFeedSections.module.css";

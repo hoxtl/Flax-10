@@ -12,11 +12,17 @@ from rest_framework import status
 from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Module, Enrollment, CalendarEvent, Deadline, User
 from studyFlax.models.auth.user_settings_model import UserSettings
+<<<<<<< HEAD
 
 
 class EnrollmentViewTests(BaseTestCase):
     """Tests for enrollment views."""
 
+=======
+
+class EnrollmentViewTests(BaseTestCase):
+    """Tests for enrollment views."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'

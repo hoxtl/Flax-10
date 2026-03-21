@@ -3,7 +3,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+<<<<<<< HEAD
 import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/tasks/components/TaskCard';
+=======
+import TaskCard, { EditTaskModal, TaskContextMenu } from '../../../pages/Tasks/components/TaskCard';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const navigateMock = vi.fn();
 const setActiveTaskIdMock = vi.fn();
 const showCompletionToastMock = vi.fn();
@@ -36,10 +40,17 @@ vi.mock('../../../api/userApi', () => ({
 vi.mock('../../../api/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/common/sleep_warning_modal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 vi.mock('../../../components/settings/hooks/useSleepWarning', () => ({
+=======
+vi.mock('../../../components/common/SleepWarningModal', () => ({
+    SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
+}));
+vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     useSleepWarning: vi.fn(() => sleepWarningState),
 }));
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
@@ -47,7 +58,11 @@ vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
         <input data-testid="date-picker" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
+<<<<<<< HEAD
 vi.mock('../../../pages/tasks/components/CreateTaskModal', () => ({
+=======
+vi.mock('../../../pages/Tasks/components/CreateTaskModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ onClose, onSave, mode }) => (
         <div data-testid="create-task-modal">
             <span>{mode === 'edit' ? 'Edit' : 'Create'} task modal</span>
@@ -56,6 +71,7 @@ vi.mock('../../../pages/tasks/components/CreateTaskModal', () => ({
         </div>
     ),
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/task_celebration/CheckBurst', () => ({
     CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
 }));
@@ -68,6 +84,11 @@ vi.mock('../../../components/common/animated_dropdown/AnimatedDropdown', () => (
         </div>
     ),
 }));
+=======
+vi.mock('../../../components/TaskCelebration/CheckBurst', () => ({
+    CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
+}));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const defaultTask = {
     id: 1, title: 'Buy groceries', completed: false, due_date: null, priority: 'medium', task_list: 1, estimated_blocks: 1,
 };

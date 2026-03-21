@@ -2,9 +2,15 @@
  * Focus tree animation with selectable visual mode.
  */
 
+<<<<<<< HEAD
 import styles from '../../pages/timer/TimerPage.module.css';
 import { TreeScene } from './focus_animation/TreeScene';
 import { useFocusCanvasAnimation } from './focus_animation/useFocusCanvasAnimation';
+=======
+import styles from '../../pages/Timer/TimerPage.module.css';
+import { TreeScene } from './focusAnimation/TreeScene';
+import { useFocusCanvasAnimation } from './focusAnimation/useFocusCanvasAnimation';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const ANIMATION_TYPES = [
   { key: 'tree', title: 'Tree' },

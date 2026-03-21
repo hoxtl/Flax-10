@@ -1,14 +1,11 @@
 """
 Models for group projects, memberships, meeting suggestions, and responses.
 """
-
 from django.db import models
 
 from studyFlax.models.auth.user_model import User
 
-
 class GroupProject(models.Model):
-    """Collaborative project shared by a small group."""
     name = models.CharField(max_length=255)
     course_code = models.CharField(max_length=50, blank=True)
     owner = models.ForeignKey(
@@ -23,7 +20,6 @@ class GroupProject(models.Model):
         return self.name
 
 class GroupMembership(models.Model):
-    """Membership record linking a user to a group project."""
     ROLE_CHOICES = [
         ("owner", "Owner"),
         ("member", "Member"),
@@ -47,11 +43,9 @@ class GroupMembership(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Metadata for group membership."""
         unique_together = ("project", "user")
 
 class MeetingSuggestion(models.Model):
-    """Proposed meeting slot for a group project."""
     project = models.ForeignKey(
         GroupProject,
         on_delete=models.CASCADE,
@@ -70,7 +64,6 @@ class MeetingSuggestion(models.Model):
         return f"Suggestion for {self.project.name} at {self.start_time}"
 
 class MeetingResponse(models.Model):
-    """Member response to a suggested meeting slot."""
     STATUS_CHOICES = [
         ("accepted", "Accepted"),
         ("rejected", "Rejected"),
@@ -95,7 +88,6 @@ class MeetingResponse(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Metadata for meeting response."""
         unique_together = ("suggestion", "user")
 
     def __str__(self):

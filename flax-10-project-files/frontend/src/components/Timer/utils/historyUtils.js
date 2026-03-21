@@ -19,7 +19,11 @@ function normalizeHistoryResponse(response) {
     return [];
 }
 
+<<<<<<< HEAD
 const createSessionPayload = (work, brk, count, blockId, task, pause, status) => ({
+=======
+const createSessionPayload = (work, brk, count, blockId, task, pause, status, distractions = 0) => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     start_time: new Date(Date.now() - work * 1000).toISOString(),
     end_time: new Date().toISOString(),
     duration: work,
@@ -28,11 +32,12 @@ const createSessionPayload = (work, brk, count, blockId, task, pause, status) =>
     session_count: count,
     study_block_id: blockId,
     task: task,
-    status: status
+    status: status,
+    distractions
 });
 
-export const saveSession = async (work, brk, count, blockId, task = '', pause = 0, status = 'Completed') => {
-    const payload = createSessionPayload(work, brk, count, blockId, task, pause, status);
+export const saveSession = async (work, brk, count, blockId, task = '', pause = 0, status = 'Completed', distractions = 0) => {
+    const payload = createSessionPayload(work, brk, count, blockId, task, pause, status, distractions);
     await fetchApi('/timer/history/', {
         method: 'POST',
         body: JSON.stringify(payload)

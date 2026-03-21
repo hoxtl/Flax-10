@@ -1,6 +1,7 @@
 /*
  * Tests for ReadingModal component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -12,6 +13,18 @@ vi.mock('../../../components/modules/hooks/useReadingModal', () => ({
 }));
 
 vi.mock('../../../components/modules/readings/ReadingForm', () => ({
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import ReadingModal from '../../../components/Modules/Readings/ReadingModal';
+import { useReadingModal } from '../../../components/Modules/hooks/useReadingModal';
+
+vi.mock('../../../components/Modules/hooks/useReadingModal', () => ({
+    useReadingModal: vi.fn(),
+}));
+
+vi.mock('../../../components/Modules/ReadingForm', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ onCancel}) => (
         <div>
             <span>ReadingForm</span>
@@ -20,13 +33,21 @@ vi.mock('../../../components/modules/readings/ReadingForm', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/modules/readings/ReadingCard', () => ({
+=======
+vi.mock('../../../components/Modules/ReadingCard', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ reading }) => (
         <div> {reading.title} </div>
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
+=======
+vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({title, children, onClose}) => (
         <div> 
             <span>{title}</span>
@@ -90,7 +111,11 @@ describe('ReadingModal', () => {
     it('should render reading list when readings exist', () => {
         mockModal({readings : [ {id:1, title: 'Module Handbook', start_page: 13, end_page:63, deadline:'2026-04-01'}, ]});
         render(<ReadingModal module={module} onClose={vi.fn()} />);
+<<<<<<< HEAD
         expect(screen.getByText('Module Handbook')).toBeInTheDocument();
+=======
+        expect(screen.getByText('ReadingForm')).toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('should call onClose when close button is clicked', () => {
@@ -100,4 +125,8 @@ describe('ReadingModal', () => {
         fireEvent.click(screen.getByText('Close'));
         expect(onClose).toHaveBeenCalled();
     });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

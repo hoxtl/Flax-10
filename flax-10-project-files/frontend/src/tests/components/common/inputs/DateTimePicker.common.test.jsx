@@ -34,7 +34,11 @@ vi.mock(
   }),
 );
 
+<<<<<<< HEAD
 vi.mock('../../../../components/common/animated_dropdown', () => ({
+=======
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: function MockAnimatedDropdown({ value, onChange, options, placeholder, className }) {
     return (
       <select

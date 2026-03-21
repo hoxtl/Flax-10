@@ -5,7 +5,11 @@
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../../api/userApi';
+<<<<<<< HEAD
 import { isDuringSleepWindow } from '../../../components/settings/hooks/useSleepWarning';
+=======
+import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './SleepBanner.module.css';
 
 const MESSAGES = [

@@ -1,13 +1,10 @@
 """
 Model for recording individual study sessions with duration and pause tracking.
 """
-
 from django.db import models
 from ..auth.user_model import User
 
-
 class StudySession(models.Model):
-    """Recorded study session for a user."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='study_sessions')
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -21,7 +18,6 @@ class StudySession(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Metadata for study session."""
         ordering = ['-end_time']
 
     def __str__(self):

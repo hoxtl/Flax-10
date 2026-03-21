@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+<<<<<<< HEAD
 import TagManager from '../../../components/society/society_detail/tags/TagManager';
+=======
+import TagManager from '../../../components/Society/SocietyDetail/tags/TagManager';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const mockTags = [
     { id: 1, label: 'Important', color: '#3b82f6' },
@@ -102,6 +106,7 @@ describe('TagManager', () => {
     it('allows choosing custom color', () => {
         render(<TagManager tags={[]} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         const colorInput = document.querySelector('input[type="color"]');
+<<<<<<< HEAD
         fireEvent.change(colorInput, { target: { value: '#123456' } });
         expect(colorInput.value).toBe('#123456');
     });
@@ -118,10 +123,15 @@ describe('TagManager', () => {
         });
 
         expect(onAddTag).toHaveBeenCalledWith({ label: 'Custom', color: '#123456' });
+=======
+        fireEvent.change(colorInput, { target: { value: '#000000' } });
+        expect(colorInput.value).toBe('#000000');
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('getNextColor falls back to first color if all taken', () => {
         const fullTags = [
+<<<<<<< HEAD
             "var(--color-light-blue)",
             "var(--color-error)",
             "var(--gw-priority-low)",
@@ -133,5 +143,12 @@ describe('TagManager', () => {
         ].map((c, i) => ({ id: i, label: `Tag ${i}`, color: c }));
         render(<TagManager tags={fullTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         expect(screen.getByText('8/7')).toBeInTheDocument();
+=======
+            "#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"
+        ].map((c, i) => ({ id: i, label: `Tag ${i}`, color: c }));
+        render(<TagManager tags={fullTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
+        // This is harder to test directly via UI since the form is hidden, but internal logic is tested
+        // We could export getNextColor, but let's just trust the branch coverage for now or add a test that triggers it
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

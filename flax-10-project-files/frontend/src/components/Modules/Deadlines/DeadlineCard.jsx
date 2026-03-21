@@ -1,12 +1,19 @@
 /*
  * Deadline card displaying due date, countdown, and teacher actions.
  */
+<<<<<<< HEAD
 
 import { useState } from 'react';
 import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
 import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
 import LocationLink from '../../common/location_link/LocationLink';
+=======
+import { useState } from 'react';
+import { formatFullDateTime } from '../utils/moduleUtils';
+import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
+import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {
@@ -16,9 +23,17 @@ export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete })
         <div className={`${styles.card} ${countdown === 'Past due' ? styles.past : ''}`}>
             <DeadlineCardHeader deadline={deadline} countdown={countdown} />
             <DeadlineCardBody deadline={deadline} />
+<<<<<<< HEAD
             {is_teacher && <ModuleItemCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} styles={styles} />}
             {showDeleteConfirm && (
                 <ModuleItemDeleteDialog itemType="Deadline" itemTitle={deadline.title} onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)} />
+=======
+            {is_teacher && <DeadlineCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} />}
+            {showDeleteConfirm && (
+                <ConfirmModal title="Delete Deadline" message={`Are you sure you want to delete "${deadline.title}"? This action cannot be undone.`}
+                    onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)}
+                    confirmText="Delete" isDanger={true} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             )}
         </div>
     );

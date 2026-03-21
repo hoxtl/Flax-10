@@ -4,7 +4,10 @@
 .modalShell {
     width: 90%;
     max-width: 460px;
+<<<<<<< HEAD
     overflow: visible !important;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .modalContent {

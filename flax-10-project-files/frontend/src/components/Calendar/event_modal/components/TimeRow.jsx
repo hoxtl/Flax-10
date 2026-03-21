@@ -1,7 +1,13 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/event_modal/components/TimeRow.jsx
 import AnimatedDropdown from '../../../common/animated_dropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
 import './time-row.css';
+=======
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
+import './TimeRow.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/EventModal/components/TimeRow.jsx
 
 const FREQUENCY_OPTIONS = [
     { value: 'none', label: 'None' },

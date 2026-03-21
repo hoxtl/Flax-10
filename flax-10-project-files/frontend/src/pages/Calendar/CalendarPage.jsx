@@ -3,6 +3,7 @@
  * Main entry point for the calendar page.
  */
 
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppPage from "../../components/common/app_page/AppPage";
@@ -17,6 +18,18 @@ import { EventPopups } from "../../components/calendar/EventPopups";
 import { useEventPopupListener } from "../../components/calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
 import { getAnotherUserProfile } from "../../api/userApi";
+=======
+import { useEffect } from "react";
+import AppPage from "../../components/common/AppPage/AppPage";
+import { Calendar } from "../../components/Calendar/Calendar";
+import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
+import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
+import styles from "./CalendarPage.module.css";
+import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
+import { EventPopups } from "../../components/Calendar/EventPopups";
+import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
+import useBreakpoint from "../../hooks/useBreakpoint";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function SkeletonHeader() {
   return (
@@ -48,6 +61,7 @@ function SkeletonGrid() {
 
 const calendarSubtitle = (
   <>
+<<<<<<< HEAD
     Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em>{" "}
     organised across your week.
   </>
@@ -160,6 +174,15 @@ function CalendarPageSkeleton() {
       data-testid="calendar-skeleton"
       aria-busy="true"
     >
+=======
+    Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em> organised across your week.
+  </>
+);
+
+function CalendarPageSkeleton() {
+  return (
+    <div className={styles.page} data-testid="calendar-skeleton" aria-busy="true">
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <div className={styles.skeletonStickyHeader}>
         <SkeletonHeader />
       </div>
@@ -181,11 +204,15 @@ function useCalendarPageState() {
   const { allEvents, isLoading, viewMode } = useCalendar();
   const dispatch = useCalendarDispatch();
   const isMobile = useBreakpoint();
+<<<<<<< HEAD
   const sharedCalendar = useSharedCalendarState(dispatch);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   useEventPopupListener();
   useMobileViewRedirect(isMobile, viewMode, dispatch);
 
+<<<<<<< HEAD
   return { allEvents, isLoading, ...sharedCalendar };
 }
 
@@ -227,10 +254,19 @@ function CalendarFrame(props) {
   return (
     <div className={getCalendarShellClass(props.isSharedCalendar)}>
       <SharedCalendarSection {...props} />
+=======
+  return { allEvents, isLoading };
+}
+
+function CalendarPageContent() {
+  return (
+    <AppPage title="Calendar" subtitle={calendarSubtitle} width="full" className={styles.page}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <div className={styles.calendarContainer}>
         <div className={styles.stickyHeader}>
           <CalendarHeader />
         </div>
+<<<<<<< HEAD
         <main className={styles.mainContent}>
           <Calendar />
         </main>
@@ -260,12 +296,26 @@ function CalendarPageContent(props) {
       />
       <CalendarFrame {...props} />
       <CalendarPageFooter isSharedCalendar={isSharedCalendar} />
+=======
+        <main className={styles.mainContent}><Calendar /></main>
+      </div>
+      <EventPopups allowModuleLeave={false} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </AppPage>
   );
 }
 
 export default function CalendarPage() {
+<<<<<<< HEAD
   const { allEvents, isLoading, ...sharedCalendar } = useCalendarPageState();
   if (isLoading && allEvents.length === 0) return <CalendarPageSkeleton />;
   return <CalendarPageContent {...sharedCalendar} />;
 }
+=======
+  const state = useCalendarPageState();
+  const showSkeleton = state.isLoading && state.allEvents.length === 0;
+  if (showSkeleton) return <CalendarPageSkeleton />;
+  return <CalendarPageContent />;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

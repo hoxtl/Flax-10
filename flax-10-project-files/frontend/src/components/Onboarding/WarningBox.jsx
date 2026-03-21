@@ -16,11 +16,19 @@ function WarningText({ major }) {
     <>
       <div className={styles.warningRow}>
         <span style={{ fontSize: '0.95rem' }}>⚠️</span>
+<<<<<<< HEAD
         <span className={styles.warningTitle}>
           Just so you know
         </span>
       </div>
       <p className={styles.warningBody}>
+=======
+        <span style={{ fontWeight: 600, color: 'var(--warning-text)', fontSize: '0.83rem' }}>
+          Just so you know
+        </span>
+      </div>
+      <p style={{ margin: '0 0 0.75rem', lineHeight: 1.6, color: 'var(--text)', opacity: 0.75 }}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         <strong style={{ fontWeight: 600 }}>{major}</strong> can&rsquo;t be changed after this. Your modules will be set up automatically based on your course.
       </p>
     </>
@@ -29,8 +37,13 @@ function WarningText({ major }) {
 
 function ConfirmCheckbox({ confirmed, onConfirm }) {
   return (
+<<<<<<< HEAD
     <label className={styles.confirmLabel}>
       <FilterCheckbox checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
+=======
+    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text)', opacity: 0.8, fontWeight: 500 }}>
+      <input type="checkbox" checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       Yes, this is my course
     </label>
   );

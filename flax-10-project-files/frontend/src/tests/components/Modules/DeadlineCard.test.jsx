@@ -1,11 +1,17 @@
 /*
  * Tests for DeadlineCard component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import DeadlineCard from '../../../components/modules/deadlines/DeadlineCard';
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import DeadlineCard from '../../../components/Modules/Deadlines/DeadlineCard';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
     getDeadlineCountdown: vi.fn(() => '5 days remaining'),
@@ -16,7 +22,11 @@ vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     formatFullDateTime: vi.fn(() => 'Friday, 6 March 2026, 10:00'),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/modules/deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
+=======
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard.module.css', () => ({ default: { card: 'card', past: 'past' } }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { getDeadlineCountdown } from '../../../components/modules/utils/deadlineUtils';
 

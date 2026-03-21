@@ -8,7 +8,11 @@ from django.test import TestCase
 from django.utils import timezone
 from rest_framework.test import APIRequestFactory
 
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 class ModuleSerialiserExceptionBranchTest(TestCase):

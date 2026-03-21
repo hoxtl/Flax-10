@@ -8,6 +8,7 @@ import { useNotifications } from "../../context/NotificationContext";
 import { NotificationPanel } from "../notifications/NotificationPanel";
 import { ExpandableTabs } from "./ExpandableTabs";
 import ThemeToggle from "./ThemeToggle";
+<<<<<<< HEAD
 import MiniTimer from "../timer/MiniTimer";
 import {
   Bell,
@@ -19,6 +20,17 @@ import {
 } from "lucide-react";
 import { SegmentedControl } from "../common";
 import AnimatedDropdown from "../common/animated_dropdown";
+=======
+import MiniTimer from "../Timer/MiniTimer";
+import {
+  Bell,
+  ChevronDown,
+  Calendar,
+  Clock,
+} from "lucide-react";
+import { SegmentedControl } from "../common";
+import AnimatedDropdown from "../common/AnimatedDropdown";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { APP_ROUTES } from "../../lib/routes";
 import { motion as Motion } from "framer-motion";
 import { useState, useRef } from "react";
@@ -56,8 +68,13 @@ function parseRouteOption(r, user) {
   return { value: r.id, label };
 }
 
+<<<<<<< HEAD
 function buildNavDropdownOptions(routes, user) {
   return routes.map(r => parseRouteOption(r, user));
+=======
+function buildNavDropdownOptions(routes) {
+  return routes.map(parseRouteOption);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function handleNavSelection(nextId, onNavChange) {
@@ -69,7 +86,11 @@ function NavDropdownMenu(props) {
   return (
     <AnimatedDropdown
       customTrigger={<NavDropdownTrigger title={props.title} hasActive={props.routes.some((route) => route.id === props.activeNav)} />}
+<<<<<<< HEAD
       options={buildNavDropdownOptions(props.routes, props.user)}
+=======
+      options={buildNavDropdownOptions(props.routes)}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       value={props.activeNav}
       onChange={(nextId) => handleNavSelection(nextId, props.onNavChange)}
       hideCheckmark={true}
@@ -80,18 +101,31 @@ function NavDropdownMenu(props) {
   );
 }
 
+<<<<<<< HEAD
 function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal, user }) {
   return (
     <div className={styles.navGroup}>
       <NavDropdownMenu title={title} routes={routes} activeNav={activeNav} onNavChange={onNavChange} isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} user={user} />
+=======
+function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal }) {
+  return (
+    <div className={styles.navGroup}>
+      <NavDropdownMenu title={title} routes={routes} activeNav={activeNav} onNavChange={onNavChange} isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
 const NAV_SECTIONS = [
+<<<<<<< HEAD
   { title: "Plan", ids: ["calendar", "tasks"] },
   { title: "Study", ids: ["modules", "group-work", "timer"] },
   { title: "Explore", ids: ["map", "societies", "users"] },
+=======
+  { title: "Plan", ids: ["calendar", "tasks", "timer"] },
+  { title: "Study", ids: ["modules", "group-work"] },
+  { title: "My KCL", ids: ["map", "societies", "users"] },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   { title: "My Insights", ids: ["analytics", "attendance"] },
   { title: "Admin", ids: ["admin"] }
 ];
@@ -115,8 +149,13 @@ function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu
   const change = (v) => onOpenChange(title, v);
   return (
     <div onMouseEnter={() => onEnter(title)}>
+<<<<<<< HEAD
       <NavDropdown title={displayTitle} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
         isOpen={activeMenu === title} onOpenChange={change} usePortal={true} user={user} />
+=======
+      <NavDropdown title={title} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
+        isOpen={activeMenu === title} onOpenChange={change} usePortal={true} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
@@ -197,7 +236,11 @@ const TopbarTools = ({ onNavChange, activeNav, user }) => (
 );
 
 function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
+<<<<<<< HEAD
   const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} user={user} />;
+=======
+  const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const action = <ActionPill onNavChange={onNavChange} />;
   const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
   return <div className={styles.actions}>{tools}{action}{pDrop}</div>;

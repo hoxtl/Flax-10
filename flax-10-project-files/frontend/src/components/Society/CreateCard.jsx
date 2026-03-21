@@ -1,7 +1,10 @@
 /*
  * CreateCard renders the entry card for creating a new society.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import ActionCard from './ActionCard';
 import { Plus } from 'lucide-react';
 

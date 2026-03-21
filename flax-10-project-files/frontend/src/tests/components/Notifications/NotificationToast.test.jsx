@@ -71,10 +71,18 @@ describe('NotificationToast', () => {
 
     act(() => {
       vi.advanceTimersByTime(3200);
+<<<<<<< HEAD
       rerender(<NotificationToast />);
     });
 
     expect(playNotificationSoundMock).toHaveBeenCalledTimes(1);
+=======
+      vi.runAllTimers();
+      rerender(<NotificationToast />);
+    });
+
+    await waitFor(() => expect(container.firstChild).toBeNull());
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it('executes parsed action on clickable toast click', () => {
@@ -145,6 +153,19 @@ describe('NotificationToast', () => {
     });
 
     expect(document.querySelector('[class*="info"]')).toBeTruthy();
+  });
+
+  it('uses success styling for done notifications', () => {
+    let state = { notifications: [oldNotification], loading: false };
+    useNotificationsMock.mockImplementation(() => state);
+
+    const { rerender } = render(<NotificationToast />);
+    state = { notifications: [oldNotification, { id: 9, title: '✓ Done', message: 'Saved.' }], loading: false };
+    act(() => {
+      rerender(<NotificationToast />);
+    });
+
+    expect(document.querySelector('[class*="success"]')).toBeTruthy();
   });
 
   it('queues multiple new notifications and shows the next toast after timeout', () => {

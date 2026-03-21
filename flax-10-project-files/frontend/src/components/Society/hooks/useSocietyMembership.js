@@ -1,7 +1,10 @@
 /*
  * useSocietyMembership handles joining and leaving societies.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../api/societyApi';
 import { useTags } from '../../../context/TagContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -31,9 +34,13 @@ const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
             updateMemberState(setSociety, true, 1);
             await promptSubscription(confirm, id, setSociety);
             onMembershipChange?.();
+<<<<<<< HEAD
         } catch (err) {
             console.error('Join failed:', err);
         }
+=======
+        } catch (e) { console.error('Join failed:', e); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     };
 
 const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
@@ -43,9 +50,13 @@ const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
             updateMemberState(setSociety, false, -1);
             refreshTags();
             onMembershipChange?.();
+<<<<<<< HEAD
         } catch (err) {
             console.error('Leave failed:', err);
         }
+=======
+        } catch (e) { console.error('Leave failed:', e); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     };
 
 const makeRequestRatification = (id, setSociety) =>

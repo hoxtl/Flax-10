@@ -2,6 +2,7 @@
  * Floating launcher for the study coach.
  */
 
+<<<<<<< HEAD
 import ChatPromptBubble from "./floating_chat/ChatPromptBubble";
 import FloatingChatFab from "./floating_chat/FloatingChatFab";
 import { useFloatingChatState } from "./floating_chat/useFloatingChatState.jsx";
@@ -16,6 +17,19 @@ export default function FloatingChat() {
     <div className={styles.root}>
       {chat.open && chat.renderWindow()}
       {chat.showPrompt && <ChatPromptBubble onAsk={chat.openPrompt} onMinimize={chat.minimizePrompt} text={chat.promptText} />}
+=======
+import ChatPromptBubble from "./floatingChat/ChatPromptBubble";
+import FloatingChatFab from "./floatingChat/FloatingChatFab";
+import { useFloatingChatState } from "./floatingChat/useFloatingChatState.jsx";
+import styles from "./FloatingChat.module.css";
+
+export default function FloatingChat() {
+  const chat = useFloatingChatState();
+  return (
+    <div className={styles.root}>
+      {chat.open && chat.renderWindow()}
+      {chat.showPrompt && <ChatPromptBubble onAsk={chat.openTaskPrompt} onMinimize={chat.minimizePrompt} text={chat.promptText} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <FloatingChatFab open={chat.open} minimized={chat.minimized} onClick={chat.toggleFab} />
     </div>
   );

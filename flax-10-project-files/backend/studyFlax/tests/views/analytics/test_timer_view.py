@@ -9,8 +9,12 @@ from datetime import timedelta
 
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.tasks.task_model import Task
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_session, authed_client
 
+=======
+from studyFlax.tests.helpers.factories import make_user, make_session, authed_client
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class StudySessionSerializerTest(TestCase):
     """Tests for timer_serialisers.py (StudySessionSerializer)."""
@@ -86,6 +90,7 @@ class StudySessionViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
+<<<<<<< HEAD
     def test_list_sessions_ordered_by_start_time_desc(self):
         now = timezone.now()
         StudySession.objects.create(
@@ -100,6 +105,8 @@ class StudySessionViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['duration'], 50)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_list_sessions_only_own(self):
         other = make_user("other_timer", "other_timer@example.com")
         make_session(other)

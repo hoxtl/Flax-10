@@ -3,6 +3,7 @@
  */
 
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+<<<<<<< HEAD
 import AnimatedDropdown from "../../../components/common/animated_dropdown";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
@@ -10,6 +11,14 @@ import StandardModal from "../../../components/common/standard_modal/StandardMod
 import { Trash2, X } from "lucide-react";
 import TextInput from "../../../components/common/text_input/TextInput";
 import EstimatedDurationControl from "../../../components/common/estimated_duration_control/EstimatedDurationControl";
+=======
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import { Trash2, X } from "lucide-react";
+import TextInput from "../../../components/common/TextInput/TextInput";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 import { POMODORO_BLOCK_MINUTES, minutesToEstimateBlocks } from "../utils/createTaskBarUtils";
@@ -92,6 +101,7 @@ function CreateTaskModalDateTime({ form, set }) {
   );
 }
 
+<<<<<<< HEAD
 function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   if (isReadingList) return null;
   const duration = useModalDurationControl(form, setForm);
@@ -105,10 +115,33 @@ function CreateTaskModalDuration({ form, setForm, isReadingList }) {
         ariaLabel="Estimated duration"
         classes={buildModalDurationClasses()}
       />
+=======
+function StudyBlockOptions({ form, setForm }) {
+  return (
+    <div className={styles.chipGroup}>
+        {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
+          <button key={value} type="button" className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
+            onClick={() => setForm((p) => ({ ...p, estimated_blocks: value }))}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+  );
+}
+
+function CreateTaskModalDuration({ form, setForm, isReadingList }) {
+  if (isReadingList) return null;
+  return (
+    <div className={styles.durationRow}>
+      <span className={styles.focusBlocksLabel}>Est. time</span>
+        <StudyBlockOptions form={form} setForm={setForm} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 function useModalDurationControl(form, setForm) {
   const minutesValue = getMinutesFromForm(form);
   const handleMinutesChange = (minutes) => {
@@ -136,6 +169,32 @@ function buildModalDurationClasses() {
 }
 
 
+=======
+function getBlockLabel(estimatedReadingMinutes) {
+    const blocks = estimatedReadingMinutes ? Math.max(1, Math.round(estimatedReadingMinutes / 25)) : null;
+    return blocks ? `~${estimatedReadingMinutes} min · ${blocks * 25}m block${blocks > 1 ? "s" : ""}` : null;
+}
+
+function CreateTaskModalPageCount({ form, set, isReadingList, estimatedReadingMinutes }) {
+    if (!isReadingList) return null;
+    const blockLabel = getBlockLabel(estimatedReadingMinutes);
+    return (
+        <div className={styles.durationRow}>
+            <div className={styles.rowBlock}>
+                <span className={styles.focusBlocksLabel}>
+                    Page count <span style={{ opacity: 0.5, fontSize: "0.8em" }}>(optional)</span>
+                </span>
+                <input className={`${styles.titleInput} ${styles.pageCountModalInput}`} type="number" min="1"
+                    placeholder="e.g. 38" value={form.page_count ?? ""}
+                    onChange={(e) => set("page_count", e.target.value ? Number(e.target.value) : null)}
+                />
+                {blockLabel && <p className={styles.pageCountHint}>📖 Est. reading time: {blockLabel}</p>}
+            </div>
+        </div>
+    );
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function CreateTaskModalCategory({ form, categoryOptions, selectedListColor, handleCategoryChange }) {
   return (
     <div className={styles.settingRow}>
@@ -193,14 +252,23 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
+<<<<<<< HEAD
   const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList } = state;
+=======
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
+<<<<<<< HEAD
 <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
+=======
+      <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
+      <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>

@@ -8,6 +8,14 @@
     border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
+<<<<<<< HEAD
+=======
+.taskInputActionsCompact {
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .taskPickDropdown {
     overflow: hidden;
     display: flex;

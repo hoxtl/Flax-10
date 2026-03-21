@@ -2,11 +2,18 @@
  * Payload builders and save logic for the create/edit task modal.
  */
 
+<<<<<<< HEAD
 import { POMODORO_BLOCK_MINUTES, getEstimateBlocks, minutesToEstimateBlocks } from "./createTaskBarUtils";
 
 export function buildCreateTaskPayload(form) {
   const fallbackMinutes = form.estimated_minutes ?? (form.estimated_blocks ? form.estimated_blocks * POMODORO_BLOCK_MINUTES : undefined);
   const blocks = form.page_count ? getEstimateBlocks(form.page_count) : minutesToEstimateBlocks(fallbackMinutes);
+=======
+import { getEstimateBlocks } from "./createTaskBarUtils";
+
+export function buildCreateTaskPayload(form) {
+  const blocks = form.page_count ? getEstimateBlocks(form.page_count) : Math.max(1, Number(form.estimated_blocks) || 1);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return {
     title: form.title.trim(),
     description: form.description || "",

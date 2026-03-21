@@ -19,14 +19,22 @@ vi.mock('../../../lib/kclCourses', () => ({
         'Arts & Humanities': ['History'],
     },
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/common/search_bar/SearchBar', () => ({
+=======
+vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input value={value} onChange={e => onChange(e.target.value)}
             placeholder={placeholder} onFocus={onFocus} data-testid="search-bar" />
     ),
 }));
 
+<<<<<<< HEAD
 import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/social/UserSearch';
+=======
+import { UserResultItem, CourseResultItem, SocietyResultItem, useClickOutside } from '../../../components/Social/UserSearch';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('UserResultItem', () => {
     it('renders user name and handle', () => {

@@ -1,19 +1,31 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+<<<<<<< HEAD
 import { NavigationButtons } from '../../../../components/calendar/header/NavigationButtons';
+=======
+import { NavigationButtons } from '../../../../components/Calendar/header/NavigationButtons';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useCalendar } from '../../../../context/CalendarContext';
 
 vi.mock('../../../../context/CalendarContext', () => ({
     useCalendar: vi.fn(() => ({ viewMode: 'week' })),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/calendar/utils/dateUtils', () => ({
+=======
+vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     isSameDay: vi.fn(() => false),
     getWeekDays: vi.fn(() => []),
     isSameMonth: vi.fn(() => false),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
+=======
+vi.mock('../../../../components/Calendar/header/DatePickerButton', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     DatePickerButton: ({ selectedDate, onDatePick }) => (
         <div data-testid="date-picker-button">
             <span data-testid="date-value">{selectedDate instanceof Date ? selectedDate.toISOString() : selectedDate}</span>
@@ -22,7 +34,11 @@ vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 import * as dateUtils from '../../../../components/calendar/utils/dateUtils';
+=======
+import * as dateUtils from '../../../../components/Calendar/utils/dateUtils';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('NavigationButtons', () => {
     const mockNavigate = vi.fn();

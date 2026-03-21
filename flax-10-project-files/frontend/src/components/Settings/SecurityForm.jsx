@@ -1,7 +1,10 @@
 /*
  * Password settings form.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from "react";
 import SecurityFormLayout from "./SecurityFormLayout";
 

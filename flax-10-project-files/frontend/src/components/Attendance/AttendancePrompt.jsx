@@ -3,16 +3,23 @@
  */
 
 import { useState } from "react";
+<<<<<<< HEAD
 import { AnimatePresence } from "framer-motion";
 import AttendancePromptModal from "./AttendancePromptModal";
 import { dismissAttendancePrompt, submitAttendancePromptAnswer } from "./attendancePromptActions";
 import { useCandidateEvent } from "./hooks/useCandidateEvent";
 import { useAuth } from "../../context/AuthContext";
+=======
+import AttendancePromptModal from "./AttendancePromptModal";
+import { dismissAttendancePrompt, submitAttendancePromptAnswer } from "./attendancePromptActions";
+import { useCandidateEvent } from "./hooks/useCandidateEvent";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export default function AttendancePrompt() {
   const { profile } = useAuth();
   const [event, setEvent] = useCandidateEvent();
   const [submitting, setSubmitting] = useState(false);
+<<<<<<< HEAD
   if (profile?.role === "teacher") return null;
   return (
     <AnimatePresence>
@@ -26,4 +33,8 @@ export default function AttendancePrompt() {
       )}
     </AnimatePresence>
   );
+=======
+  if (!event) return null;
+  return <AttendancePromptModal event={event} onAnswer={(attended) => submitAttendancePromptAnswer(event, attended, submitting, setEvent, setSubmitting)} onDismiss={() => dismissAttendancePrompt(event, setEvent)} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

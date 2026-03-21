@@ -1,6 +1,7 @@
 /*
  * Modal for requesting a course change.
  */
+<<<<<<< HEAD
 
 import { useState } from "react";
 import { requestCourseChange } from "../../../api/adminApi";
@@ -10,6 +11,15 @@ import InlineAlert from "../../common/inline_alert/InlineAlert";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import StandardModal from "../../common/standard_modal/StandardModal";
 import RequestDecisionNotice from "../ui/RequestDecisionNotice";
+=======
+import { useState } from "react";
+import { requestCourseChange } from "../../../api/adminApi";
+import styles from "../../../pages/Settings/Settings.module.css";
+import AnimatedDropdown from "../../common/AnimatedDropdown/AnimatedDropdown";
+import InlineAlert from "../../common/InlineAlert/InlineAlert";
+import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../common/StandardModal/StandardModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { groupedCourses } from "./accountCourseRequests";
 
 function useCourseRequestForm() {
@@ -53,6 +63,18 @@ function CourseDropdown({ selectedCourse, setSelectedCourse }) {
   return <AnimatedDropdown value={selectedCourse} onChange={setSelectedCourse} options={groupedCourses} grouped searchable usePortal placeholder="Search for a course..." searchPlaceholder="Type to search courses" emptyMessage="No courses found" menuMaxHeight={220} />;
 }
 
+<<<<<<< HEAD
+=======
+function ModalWarning() {
+  return (
+    <div className={styles.modalWarning}>
+      <span className={styles.modalWarningIcon}>⚠️</span>
+      <span>Your request may be <strong>accepted or rejected</strong>. You'll be notified once a decision is made.</span>
+    </div>
+  );
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function SubmitAction({ submitting }) {
   return (
     <div className={styles.formActions}>
@@ -92,7 +114,11 @@ function CourseChangeModalContent({ form, onClose, onSuccess }) {
       <form onSubmit={handleSubmit}>
         <CourseReasonField reason={form.reason} setReason={form.setReason} />
         <CourseSelectionField selectedCourse={form.selectedCourse} setSelectedCourse={form.setSelectedCourse} />
+<<<<<<< HEAD
         <RequestDecisionNotice />
+=======
+        <ModalWarning />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         <InlineAlert message={form.error} variant="error" />
         <SubmitAction submitting={form.submitting} />
       </form>

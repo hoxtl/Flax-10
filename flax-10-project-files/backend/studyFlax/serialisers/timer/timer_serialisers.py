@@ -4,7 +4,10 @@ Serialiser for study session timer records.
 
 from rest_framework import serializers
 from studyFlax.models.timer.session_model import StudySession
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class StudySessionSerializer(serializers.ModelSerializer):
     """Serialiser for study session."""

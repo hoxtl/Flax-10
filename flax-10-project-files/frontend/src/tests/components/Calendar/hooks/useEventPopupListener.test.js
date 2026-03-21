@@ -1,10 +1,16 @@
 /**
  * Tests for useEventPopupListener - event popup via custom events.
  */
+<<<<<<< HEAD
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useEventPopupListener } from '../../../../components/calendar/hooks/useEventPopupListener';
+=======
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { useEventPopupListener } from '../../../../components/Calendar/hooks/useEventPopupListener';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const mockOpenPopup = vi.fn();
 const mockEvents = [{ id: 1, title: 'Test Event' }, { id: 2, title: 'Other' }];

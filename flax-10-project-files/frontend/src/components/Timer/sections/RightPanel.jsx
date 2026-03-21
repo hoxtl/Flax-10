@@ -3,8 +3,13 @@
  */
 
 import { useState } from 'react';
+<<<<<<< HEAD
 import styles from '../../../pages/timer/TimerPage.module.css';
 import Tabs from '../../common/tabs/Tabs';
+=======
+import styles from '../../../pages/Timer/TimerPage.module.css';
+import Tabs from '../../common/Tabs/Tabs';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import InlineSoundPanel from '../InlineSoundPanel';
 import RightRailHistoryPanel from '../RightRailHistoryPanel';
 import { PresetPanel, TimerConfigPanel } from '../PresetPanel';
@@ -28,6 +33,10 @@ export function RightPanel({ t }) {
   return (
     <div className={styles.timerRightPanel}>
       <RightRailTabs t={t} />
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <InlineSoundPanel />
     </div>
   );

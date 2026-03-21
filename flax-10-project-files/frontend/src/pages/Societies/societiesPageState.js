@@ -1,11 +1,18 @@
 /*
  * societiesPageState centralizes societies page navigation and modal state.
  */
+<<<<<<< HEAD
 
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSocieties } from "../../components/society/hooks/useSocieties";
 import { useUnreportSociety } from "../../components/society/hooks/useUnreportSociety";
+=======
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useSocieties } from "../../components/Society/hooks/useSocieties";
+import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useSocietiesPage() {
     const navigation = useSocietiesNavigation();

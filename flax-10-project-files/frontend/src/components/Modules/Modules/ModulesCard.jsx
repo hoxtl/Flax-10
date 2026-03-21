@@ -1,6 +1,7 @@
 /*
  * Module card displaying module info, enrolment status, and actions.
  */
+<<<<<<< HEAD
 
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { getInitials } from '../../auth/utils/userUtils.js';
@@ -9,6 +10,14 @@ import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import EntityLinkChip from '../../common/entity_link_chip/EntityLinkChip.jsx';
 import Tooltip from '../../common/tooltip/Tooltip';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
+=======
+import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
+import GridCard from '../../common/Card/GridCard';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -106,13 +115,38 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
     );
 }
 
+<<<<<<< HEAD
 function TutorAvatar({ module }) {
     const src = getModuleTutorPhoto(module);
+=======
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        username: moduleData?.created_by_username,
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
+    }, { allowGeneric: true });
+}
+
+function handleImageError(e) {
+    e.currentTarget.style.display = 'none';
+    e.currentTarget.nextElementSibling.style.display = 'flex';
+}
+
+function TutorAvatar({ module }) {
+    const src = getTutorImage(module);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const initials = getInitials(module.created_by_name);
     const tutorName = module.created_by_name || 'Tutor';
     return (
         <div className={styles.tutorAvatar} title={tutorName}>
+<<<<<<< HEAD
             {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={hideBrokenTutorImage} />}
+=======
+            {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={handleImageError} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <span className={styles.tutorAvatarFallback} style={src ? { display: 'none' } : undefined}>{initials}</span>
         </div>
     );
@@ -237,6 +271,7 @@ function UnenrollButton({ onToggle }) {
 }
 
 function StudentAction({ enrolled, isCore, onToggle }) {
+<<<<<<< HEAD
     if (!enrolled) return <EnrollButton onToggle={onToggle} />;
     if (isCore) {
         return (
@@ -249,5 +284,9 @@ function StudentAction({ enrolled, isCore, onToggle }) {
             </Tooltip>
         );
     }
+=======
+    if (enrolled && isCore) return <span className={styles.coreTag}>📌 Core module</span>;
+    if (!enrolled) return <EnrollButton onToggle={onToggle} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return <UnenrollButton onToggle={onToggle} />;
 }

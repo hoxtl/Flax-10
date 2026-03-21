@@ -3,7 +3,10 @@
  */
 @import "./styles/layout.css";
 @import "./styles/panels.css";
+<<<<<<< HEAD
 @import "./styles/scheduling.css";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @import "./styles/interactive.css";
 @import "./styles/polish-core.css";
 @import "./styles/polish-responsive.css";

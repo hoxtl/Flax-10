@@ -1,7 +1,10 @@
 /*
  * Upcoming deadline loading.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useEffect, useState } from 'react';
 import { getUpcomingDeadlines } from '../../../api/deadlineApi';
 import { useToast } from '../../../context/ToastContext';

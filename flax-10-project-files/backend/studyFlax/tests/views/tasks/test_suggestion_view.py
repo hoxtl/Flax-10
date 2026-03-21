@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for suggestion views.
 """
+=======
+"""Backend tests for meeting suggestion and response views."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -10,11 +14,17 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMember
 from django.utils import timezone
 from datetime import timedelta
 
+<<<<<<< HEAD
 
 User = get_user_model()
 
 class SuggestionViewsTest(TestCase):
     """Tests suggestion views."""
+=======
+User = get_user_model()
+
+class SuggestionViewsTest(TestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.owner = User.objects.create_user(username="owner", email="o@e.com", password="p")

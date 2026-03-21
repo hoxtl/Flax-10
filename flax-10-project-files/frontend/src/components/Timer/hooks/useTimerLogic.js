@@ -3,7 +3,11 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+<<<<<<< HEAD
 import { useNotify } from '../../notifications/hooks/useNotify';
+=======
+import { useNotify } from '../../Notifications/hooks/useNotify';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getProgress } from '../utils/timerUtils';
 import { useTimer } from './useTimer';
 import { useTimerFlow } from './useTimerFlow';
@@ -37,7 +41,11 @@ function applyTaskEstimate(t, activeTaskMeta) {
   t.setTimeLeft(minutes * 60);
 }
 
+<<<<<<< HEAD
 function useBuildTimerState(t, flow, task, setTask, activeTaskMeta) {
+=======
+function buildTimerState(t, flow, task, setTask, activeTaskMeta) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const handlers = useTimerHandlers(t, flow.modal, flow.setModal, flow.startNext, flow.resetBlockId, flow.endEarly);
   const isOvertime = t.timeLeft <= 0 && t.mode === 'work';
   const isBreakOvertime = t.timeLeft <= 0 && t.mode === 'break';
@@ -45,6 +53,7 @@ function useBuildTimerState(t, flow, task, setTask, activeTaskMeta) {
   return { ...t, ...flow, task, setTask, handlers, progress: getProgress(t), activeTaskMeta, isOvertime, isBreakOvertime };
 }
 
+<<<<<<< HEAD
 function shouldApplyTaskEstimate(activeTaskId, activeTaskMeta, prevTaskId, prevMetaTitle) {
   const taskIdChanged = activeTaskId !== prevTaskId.current;
   const metaTitleChanged = activeTaskMeta?.title !== prevMetaTitle.current;
@@ -67,13 +76,35 @@ function useTaskEstimateSync(activeTaskId, activeTaskMeta, t) {
   }, [activeTaskId, activeTaskMeta, t]);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useTimerLogic(activeTaskId, _setActiveTaskId, activeTaskMeta) {
   const t = useTimer();
   const [task, setTask] = useState('');
   const notify = useNotify();
   const flow = useTimerFlow({ ...t, task, activeTaskId, activeTaskMeta }, notify);
 
+<<<<<<< HEAD
   useTaskTitleSync(activeTaskMeta, setTask);
   useTaskEstimateSync(activeTaskId, activeTaskMeta, t);
   return useBuildTimerState(t, flow, task, setTask, activeTaskMeta);
+=======
+  const prevTaskId = useRef(null);
+  const prevMetaTitle = useRef(null);
+
+  useEffect(() => syncTaskTitle(activeTaskMeta, setTask), [activeTaskMeta]);
+  
+  useEffect(() => {
+    const taskIdChanged = activeTaskId !== prevTaskId.current;
+    const metaTitleChanged = activeTaskMeta?.title !== prevMetaTitle.current;
+    
+    if (activeTaskId && (taskIdChanged || metaTitleChanged)) {
+      applyTaskEstimate(t, activeTaskMeta);
+      prevTaskId.current = activeTaskId;
+      prevMetaTitle.current = activeTaskMeta?.title;
+    }
+  }, [activeTaskId, activeTaskMeta, t]);
+
+  return buildTimerState(t, flow, task, setTask, activeTaskMeta);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

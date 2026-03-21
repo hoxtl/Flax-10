@@ -8,6 +8,7 @@ export function getTaskDurationMinutes(task) {
   return (task?.estimated_blocks || 1) * 25;
 }
 
+<<<<<<< HEAD
 function isValidSplit(total, perSession) {
   if (total % perSession !== 0) return false;
   const count = total / perSession;
@@ -18,6 +19,15 @@ function findSessionSplit(total) {
   const perSession = [1, 2, 3, 4].find((n) => isValidSplit(total, n));
   if (!perSession) return null;
   return { sessionCount: total / perSession, workMinutes: perSession * 25 };
+=======
+function findSessionSplit(total) {
+  for (const perSession of [1, 2, 3, 4]) {
+    if (total % perSession !== 0) continue;
+    const count = total / perSession;
+    if (count >= 1 && count <= 12) return { sessionCount: count, workMinutes: perSession * 25 };
+  }
+  return null;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export function splitEstimatedBlocks(blocks) {

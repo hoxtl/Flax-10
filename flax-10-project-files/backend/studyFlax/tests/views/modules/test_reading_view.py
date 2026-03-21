@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for reading views.
 """
+=======
+"""Backend tests for reading endpoints and helper utilities."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from datetime import timedelta
 
@@ -8,14 +12,23 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import status
 
+<<<<<<< HEAD
 from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Module, Enrollment, Reading, Task
 from studyFlax.views.modules.reading_task_service import (
+=======
+from ..base import BaseTestCase
+from studyFlax.models import Module, Enrollment, Reading, Task
+from studyFlax.views.modules.reading_view import (
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     create_description,
     task_payload,
 )
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 
@@ -141,6 +154,7 @@ class ReadingViewsTests(BaseTestCase):
         )
         self.assertEqual(create_description(reading), 'Reading, Unit, pages. 5-9')
 
+<<<<<<< HEAD
     def test_get_reading_list_without_module_calls_generic_search(self):
         from studyFlax.models.tasks.task_model import TaskList
         from studyFlax.views.modules.reading_task_lists import get_reading_list
@@ -149,6 +163,8 @@ class ReadingViewsTests(BaseTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result.name, 'My reading notes')
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_task_payload_format(self):
         reading = Reading.objects.create(
             module=self.module,

@@ -1,6 +1,7 @@
 /*
  * Form for creating and editing module deadlines.
  */
+<<<<<<< HEAD
 
 import { useState } from 'react';
 import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../utils/deadlineUtils.js';
@@ -8,6 +9,13 @@ import AnimatedDropdown from '../../common/animated_dropdown';
 import styles from './DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 import { buildValidationState, failValidation, finishValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';
+=======
+import { useState } from 'react';
+import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../utils/deadlineUtils.js';
+import AnimatedDropdown from '../../common/AnimatedDropdown';
+import styles from './DeadlineForm.module.css';
+import DateTimePicker from '../../common/inputs/DateTimePicker';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
 
 function Field({ label, children }) {
@@ -76,6 +84,30 @@ function useDeadlineFormValidation() {
     return buildValidationState(error, validate);
 }
 
+<<<<<<< HEAD
+=======
+function useDeadlineFormValidation() {
+    const [error, setError] = useState('');
+    const validate = (form) => {
+        if (!form.start_due_date) {
+            setError(form.deadline_type === 'exam' ? "Start time cannot be empty." : "Due date cannot be empty.");
+            return false;
+        }
+        if (TYPES_WITH_END_DATE.includes(form.deadline_type) && !form.end_due_date) {
+            setError("End time cannot be empty.");
+            return false;
+        }
+        if (form.end_due_date && new Date(form.end_due_date) <= new Date(form.start_due_date)) {
+            setError("End time must be after start time."); 
+            return false
+        }
+        setError('');
+        return true;
+    };
+    return {error, validate};
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const buildFormData = (form) => ({
     ...form,
     start_due_date: form.start_due_date ? new Date(form.start_due_date).toISOString() : '',
@@ -96,7 +128,11 @@ export default function DeadlineForm({ initial, onSubmit, onCancel }) {
             {TYPES_WITH_LOCATION.includes(form.deadline_type) && <LocationField value={form.location} onChange={onChange} />}
             <DescriptionField value={form.description} onChange={onChange} />
             {error && <div className={styles.error}> {error}</div>}
+<<<<<<< HEAD
             <ModuleFormActions onCancel={onCancel} isEditing={!!initial} createLabel="Add Deadline" styles={styles} />
+=======
+            <FormActions onCancel={onCancel} isEditing={!!initial} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </form>
     );
 }

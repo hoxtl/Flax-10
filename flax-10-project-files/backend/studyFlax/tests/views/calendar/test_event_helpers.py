@@ -14,10 +14,15 @@ from studyFlax.models import CalendarEvent, User
 from studyFlax.models.calendar.recurrence_rule_model import RecurrenceRule
 from studyFlax.models.timer.theme_session_model import ThemeSession
 
+<<<<<<< HEAD
 
 class EventHelpersCoverageTest(TestCase):
     """Tests for event helpers coverage."""
 
+=======
+class EventHelpersCoverageTest(TestCase):
+    """Tests for event helpers coverage."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_parse_date_param_returns_datetime(self):
         from studyFlax.views.calendar.event_helpers import parse_date_param
         result = parse_date_param('2026-03-01T10:00:00Z')
@@ -27,6 +32,7 @@ class EventHelpersCoverageTest(TestCase):
         from studyFlax.views.calendar.event_helpers import get_base_instance
 
         class Rule:
+<<<<<<< HEAD
             """Rule stub."""
 
             exception_dates = [timezone.now().strftime('%Y-%m-%d')]
@@ -34,6 +40,11 @@ class EventHelpersCoverageTest(TestCase):
         class Event:
             """Event stub."""
 
+=======
+            exception_dates = [timezone.now().strftime('%Y-%m-%d')]
+
+        class Event:
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             start_time = timezone.now()
             end_time = start_time + timedelta(hours=1)
 
@@ -154,7 +165,11 @@ class RecurrenceEndDateTest(TestCase):
 
 
 class ApplyFilterNoneRecurringTests(TestCase):
+<<<<<<< HEAD
     """Apply start filters when recurring_qs is None."""
+=======
+    """_apply_start_end_filter and _apply_start_only_filter with recurring_qs=None."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
     def test_apply_start_end_filter_with_none_recurring(self):
         from studyFlax.views.calendar.event_helpers import _apply_start_end_filter
@@ -252,9 +267,12 @@ class InternalHelperCoverageTest(TestCase):
             None, timedelta(hours=1), now, now + timedelta(days=1), rule,
         )
         self.assertFalse(result)
+<<<<<<< HEAD
 
     def test_parse_date_param_makes_naive_datetime_aware(self):
         from studyFlax.views.calendar.event_helpers import parse_date_param
         result = parse_date_param('2026-03-24T10:00:00')
         self.assertIsNotNone(result)
         self.assertTrue(timezone.is_aware(result))
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

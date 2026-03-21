@@ -38,6 +38,7 @@ function toggleFilterPanel(setIsSearchFocused, filterState) {
   setIsSearchFocused(false);
 }
 
+<<<<<<< HEAD
 function buildSearchBarProps(p) {
   return {
     query: p.searchState.query,
@@ -62,10 +63,55 @@ function UserSearchLayout(p) {
     <div className={`${styles.userSearchWrapper} ${p.fullWidth ? styles.fullWidthWrapper : ''}`}>
       <GlobalSearchBar {...buildSearchBarProps(p)} />
       {!p.hideFilter && <FilterSection fRef={p.filterRef} isOpen={p.filterState.isFilterOpen} setOpen={toggleFilter} props={p.filterState.props} />}
+=======
+function UserSearchLayout({
+  searchState,
+  filterState,
+  filterRef,
+  setIsSearchFocused,
+  onUserSelect,
+  filterUsers,
+  fullWidth,
+  hideFilter,
+  compact,
+  renderEmptyState,
+}) {
+  const handleSelect = (user) =>
+    handleUserSelect(user, onUserSelect, setIsSearchFocused, searchState);
+
+  const setFocus = () => focusSearch(setIsSearchFocused, filterState);
+  const toggleFilter = () => toggleFilterPanel(setIsSearchFocused, filterState);
+  const displayResults = getDisplayResults(filterUsers, searchState.userResults);
+
+  return (
+    <div className={`${styles.userSearchWrapper} ${fullWidth ? styles.fullWidthWrapper : ''}`}>
+      <GlobalSearchBar
+        query={searchState.query}
+        setQuery={searchState.setQuery}
+        setFocus={setFocus}
+        containerRef={searchState.containerRef}
+        showDropdown={filterState.active}
+        loading={searchState.loading}
+        userResults={displayResults}
+        handleSelect={handleSelect}
+        fullWidth={fullWidth}
+        compact={compact}
+        renderEmptyState={renderEmptyState}
+      />
+      {!hideFilter && (
+        <FilterSection
+          fRef={filterRef}
+          isOpen={filterState.isFilterOpen}
+          setOpen={toggleFilter}
+          props={filterState.props}
+        />
+      )}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 export default function UserSearch({ onUserSelect, filterUsers, fullWidth, hideFilter, compact, renderEmptyState, searchPlaceholder = "Search users...", openOnEmptyQuery = true, dropdownMode = "overlay" }) {
   const searchState = useSearchState(hideFilter);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -77,6 +123,45 @@ export default function UserSearch({ onUserSelect, filterUsers, fullWidth, hideF
     <UserSearchLayout searchState={searchState} filterState={filterState} filterRef={filterRef} setIsSearchFocused={setIsSearchFocused}
       onUserSelect={onUserSelect} filterUsers={filterUsers} fullWidth={fullWidth} hideFilter={hideFilter} compact={compact}
       renderEmptyState={renderEmptyState} searchPlaceholder={searchPlaceholder} openOnEmptyQuery={openOnEmptyQuery} dropdownMode={dropdownMode}
+=======
+export default function UserSearch({
+  onUserSelect,
+  filterUsers,
+  fullWidth,
+  hideFilter,
+  compact,
+  renderEmptyState,
+}) {
+  const searchState = useSearchState(hideFilter);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const filterRef = useRef(null);
+
+  const filterState = useFilterState(
+    searchState.allCourses,
+    searchState.allSocieties,
+    searchState.query,
+    isSearchFocused,
+    searchState.userResults,
+    searchState.setUserResults,
+    searchState.setLoading
+  );
+
+  useClickOutside(searchState.containerRef, () => setIsSearchFocused(false));
+  useClickOutside(filterRef, () => filterState.setIsFilterOpen(false));
+
+  return (
+    <UserSearchLayout
+      searchState={searchState}
+      filterState={filterState}
+      filterRef={filterRef}
+      setIsSearchFocused={setIsSearchFocused}
+      onUserSelect={onUserSelect}
+      filterUsers={filterUsers}
+      fullWidth={fullWidth}
+      hideFilter={hideFilter}
+      compact={compact}
+      renderEmptyState={renderEmptyState}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     />
   );
 }

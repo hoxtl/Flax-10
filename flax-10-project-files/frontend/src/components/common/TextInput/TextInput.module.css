@@ -1,0 +1,67 @@
+.root {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--input-height);
+  padding: var(--input-padding);
+  border: var(--input-border);
+  border-radius: var(--dropdown-radius);
+  font: inherit;
+  font-size: var(--text-base);
+  background: #ffffff;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-sizing: border-box;
+}
+
+[data-mode="dark"] .input {
+  background: var(--color-card);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: var(--input-focus-ring);
+}
+
+.leading,
+.trailing {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.leading {
+  left: var(--space-3);
+}
+
+.trailing {
+  right: var(--space-3);
+}
+
+.hasLeading .input {
+  padding-left: 2.35rem;
+}
+
+.hasTrailing .input {
+  padding-right: 2.35rem;
+}
+
+.multiline {
+  min-height: 110px;
+  resize: vertical;
+  padding-top: var(--space-3);
+}

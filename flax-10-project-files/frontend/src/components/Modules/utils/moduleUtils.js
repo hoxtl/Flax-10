@@ -1,9 +1,13 @@
 /*
  * Utility functions for module filtering, sorting, formatting, and data transformations.
  */
+<<<<<<< HEAD
 
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import { formatForDateTimeInput } from '../../../utils/dateTimeInput';
+=======
+import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
     CS: "Natural, Mathematical & Engineering Sciences",
@@ -131,8 +135,13 @@ export function serialiseModule(form_data) {
         description: form_data.description,
         department: form_data.department,
         course: form_data.course,
+<<<<<<< HEAD
         start_time: safeIsoOrOriginal(form_data.start_time),
         end_time: safeIsoOrOriginal(form_data.end_time),
+=======
+        start_time: form_data.start_time ? safeIsoOrOriginal(form_data.start_time) : '',
+        end_time: form_data.end_time ? safeIsoOrOriginal(form_data.end_time) : '',
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         location: form_data.location,
         is_recurring: form_data.is_recurring !== false
     };
@@ -193,7 +202,11 @@ function checkSearch(module, search_query) {
         || module.module_code.toLowerCase().includes(query_lower);
 }
 
+<<<<<<< HEAD
 function checkFilter(module, enrollments, filter_mode, options) {
+=======
+function checkFilter(module, enrollments, filter_mode, options = {}) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if (filter_mode === 'all' && options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
     if (filter_mode === 'all') return true;
     return isEnrolledIn(module.id, enrollments);

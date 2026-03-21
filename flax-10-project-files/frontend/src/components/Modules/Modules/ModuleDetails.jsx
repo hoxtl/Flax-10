@@ -1,6 +1,7 @@
 /*
  * Detailed view of a single module with schedule, deadlines, and readings.
  */
+<<<<<<< HEAD
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -17,12 +18,27 @@ import PrimaryButton from '../../common/primary_button/PrimaryButton.jsx';
 import Tooltip from '../../common/tooltip/Tooltip.jsx';
 import LocationLink from '../../common/location_link/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
+=======
+import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
+import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
+import { formatDate } from '../../Calendar/utils/dateUtils.js';
+import { getInitials } from '../../Authentication/utils/userUtils.js';
+import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
+import BackButton from '../../common/BackButton/BackButton.jsx';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
+<<<<<<< HEAD
 import { useModuleTravelTime } from './useModuleTravelTime.js';
+=======
+import { useEffect, useState } from 'react';
+import { getHomeAddress } from '../../../api/userApi.js';
+import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -35,15 +51,26 @@ function getNextDeadline(deadlines = []) {
 }
 
 function getUrgencyLabel(dueDate) {
+<<<<<<< HEAD
     const tier = getUrgencyTier(dueDate);
     if (tier === "overdue") return "overdue";
     if (tier === "critical") return "due-soon";
     if (tier === "urgent") return "this-week";
+=======
+    const now = new Date();
+    const diffMs = new Date(dueDate) - now;
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    if (diffDays <= 2) return "due-soon";
+    if (diffDays <= 7) return "this-week";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return "later";
 }
 
 function getUrgencyText(kind) {
+<<<<<<< HEAD
     if (kind === "overdue") return "Passed";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if (kind === "due-soon") return "Due soon";
     if (kind === "this-week") return "This week";
     return "Later";
@@ -69,9 +96,32 @@ function getNextClassText(startTime, endTime) {
     return `${day}, ${formatTime(startTime)} - ${formatTime(endTime)}`;
 }
 
+<<<<<<< HEAD
 function TutorPhoto({ photo, name }) {
     if (!photo) return null;
     return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={(event) => hideBrokenTutorImage(event, "inline-flex")} />;
+=======
+function getTutorImage(moduleData) {
+    return getResolvedUserPhoto({
+        id: moduleData?.created_by,
+        name: moduleData?.created_by_name,
+        role: 'teacher',
+        username: moduleData?.created_by_username,
+        profile_photo_url: moduleData?.created_by_profile_photo_url,
+        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
+    }, { allowGeneric: true });
+}
+
+function handleTutorImageError(e) {
+    e.currentTarget.style.display = "none";
+    const fallback = e.currentTarget.nextElementSibling;
+    if (fallback) fallback.style.display = "inline-flex";
+}
+
+function TutorPhoto({ photo, name }) {
+    if (!photo) return null;
+    return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={handleTutorImageError} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function TutorName({ id, name }) {
@@ -80,14 +130,23 @@ function TutorName({ id, name }) {
 }
 
 function TutorMetaItem({ module, photo }) {
+<<<<<<< HEAD
     const tutorName = module.created_by_name || "Unknown";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return (
         <div className={heroStyles.heroMetaItem}>
             <span className={heroStyles.heroMetaLabel}>Tutor</span>
             <div className={heroStyles.tutorInline}>
+<<<<<<< HEAD
                 <TutorPhoto photo={photo} name={tutorName} />
                 <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(tutorName)}</span>
                 <TutorName id={module.created_by} name={tutorName} />
+=======
+                <TutorPhoto photo={photo} name={module.created_by_name || "Tutor"} />
+                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(module.created_by_name)}</span>
+                <TutorName id={module.created_by} name={module.created_by_name} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             </div>
         </div>
     );
@@ -103,6 +162,7 @@ function EmailMetaItem({ email }) {
 }
 
 function HeroTop({ module, department, course, is_enrolled }) {
+<<<<<<< HEAD
   return (
     <div className={heroStyles.heroTop}>
       <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
@@ -114,11 +174,25 @@ function HeroTop({ module, department, course, is_enrolled }) {
 }
 
 function HeroSection({ module, department, course, is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll, tutorPhoto }) {
+=======
+    return (
+        <div className={heroStyles.heroTop}>
+            <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
+            <span className={heroStyles.departmentChip}>{department}</span>
+            {course && <span className={heroStyles.courseChip}>{course}</span>}
+            {is_enrolled && <span className={heroStyles.enrolledBadge}>✓ Enrolled</span>}
+        </div>
+    );
+}
+
+function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnenroll, tutorPhoto }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return (
         <section className={heroStyles.hero}>
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
             <h1 className={heroStyles.moduleTitle}>{module.module_name}</h1>
             <p className={heroStyles.heroSubtext}>{module.description || "No module summary available yet."}</p>
+<<<<<<< HEAD
             <div className={heroStyles.heroBottom}>
                 <div className={heroStyles.heroMeta}>
                     <TutorMetaItem module={module} photo={tutorPhoto} />
@@ -128,6 +202,12 @@ function HeroSection({ module, department, course, is_enrolled, is_core, isModul
                     {module.created_by_email && <PrimaryButton variant="secondary" pill onClick={() => window.location.href = `mailto:${module.created_by_email}`}>Email tutor</PrimaryButton>}
                     <EnrollmentAction is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} />
                 </div>
+=======
+            <div className={heroStyles.heroMeta}><TutorMetaItem module={module} photo={tutorPhoto} /><EmailMetaItem email={module.created_by_email} /></div>
+            <div className={heroStyles.heroActions}>
+                {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
+                <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             </div>
         </section>
     );
@@ -185,6 +265,7 @@ function useModuleData(module) {
     };
 }
 
+<<<<<<< HEAD
 function useModuleProjects(moduleCode) {
     const [projects, setProjects] = useState([]);
     useEffect(() => {
@@ -230,27 +311,59 @@ function ModuleProjectsCard({ moduleCode }) {
     );
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
     return (
         <div className={styles.mainColumn}>
             <ScheduleCard module={module} nextClass={nextClass} travelTime={travelTime} />
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Assignments</h2><DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} /></article>
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Readings</h2><ReadingsSection readings={module.readings} /></article>
+<<<<<<< HEAD
             <ModuleProjectsCard moduleCode={module.module_code} />
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </div>
     );
 }
 
+<<<<<<< HEAD
 export default function ModuleDetails({ module, is_enrolled, is_core, onBack, onEnroll, onUnenroll }) {
     const { profile } = useAuth();
     const data = useModuleData(module);
     const travelTime = useModuleTravelTime(module.location);
     const isModuleOwner = profile?.role === "teacher" && String(profile?.id) === String(module.created_by);
+=======
+export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
+    const data = useModuleData(module);
+    const [travelTime, setTravelTime] = useState(null);
+
+    useEffect(() => {
+        async function fetchTravelTime() {
+            try {
+                const homeAddress = await getHomeAddress();
+                const travelInfo = await getTravelTimeModule(homeAddress, module.location);
+                if (travelInfo) {
+                    setTravelTime(travelInfo.duration);
+                }
+            } catch (error) {
+                console.error('Travel time fetch in module details error: ', error);
+            }
+        }
+        if (module.location) {
+            fetchTravelTime();
+        }
+    }, [module.location]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
+<<<<<<< HEAD
             <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
+=======
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getTutorImage(module)} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
@@ -260,7 +373,11 @@ function ScheduleItem({ icon, label, value, className = "", valueClassName = "" 
     return (
         <div className={`${scheduleStyles.scheduleItem} ${className}`.trim()}>
             <span className={scheduleStyles.scheduleIcon}>{icon}</span>
+<<<<<<< HEAD
             <div className={scheduleStyles.scheduleItemBody}>
+=======
+            <div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
                 <div className={scheduleStyles.scheduleLabel}>{label}</div>
                 <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
@@ -274,6 +391,7 @@ function ScheduleSummary({ nextClass, location }) {
         <span className={scheduleStyles.scheduleValueInline}>
             <span className={scheduleStyles.scheduleInlinePrimary}>{nextClass}</span>
             <span className={scheduleStyles.scheduleValueSeparator} aria-hidden="true">·</span>
+<<<<<<< HEAD
             {location ? (
                 <LocationLink
                     location={location}
@@ -284,6 +402,9 @@ function ScheduleSummary({ nextClass, location }) {
             ) : (
                 <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
             )}
+=======
+            <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </span>
     );
 }
@@ -297,6 +418,7 @@ function RecurringBadge() {
     );
 }
 
+<<<<<<< HEAD
 function LeaveModuleButton({ is_core, onUnenroll }) {
     const btn = <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll} disabled={is_core} aria-disabled={is_core} className={is_core ? styles.disabledBtn : undefined}>Leave module</PrimaryButton>;
     if (is_core) return <Tooltip content="Cannot leave a core course module" position="bottom"><span className={styles.disabledWrapper}>{btn}</span></Tooltip>;
@@ -307,6 +429,12 @@ function EnrollmentAction({ is_enrolled, is_core, isModuleOwner, onEnroll, onUne
     if (isModuleOwner) return null;
     if (!is_enrolled) return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
     return <LeaveModuleButton is_core={is_core} onUnenroll={onUnenroll} />;
+=======
+function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
+    return is_enrolled
+        ? <button className={styles.unenrollButton} onClick={onUnenroll}>Leave module</button>
+        : <button className={styles.enrollButton} onClick={onEnroll}>Enrol in module</button>;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function DeadlineItem({ deadline, index }) {
@@ -316,7 +444,11 @@ function DeadlineItem({ deadline, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
+<<<<<<< HEAD
                     <Badge tone="muted" className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</Badge>
+=======
+                    <span className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
                     <span className={deadlineStyles.deadlineTitle}>{deadline.title}</span>
                 </div>
                 <div className={deadlineStyles.deadlineMeta}>
@@ -348,14 +480,22 @@ function ReadingsSection({ readings }) {
 }
 
 function ReadingRow({ reading, index }) {
+<<<<<<< HEAD
     const cleanTitle = stripModulePrefix(reading.title, reading.module_name);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return (
         <div className={deadlineStyles.deadlineItem}>
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
+<<<<<<< HEAD
                     <Badge tone="muted" className={deadlineStyles.deadlinesType}>Reading</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{cleanTitle}</span>
+=======
+                    <span className={deadlineStyles.deadlinesType}>📖 Reading</span>
+                    <span className={deadlineStyles.deadlineTitle}>{reading.title}</span>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
                 </div>
                 <span className={deadlineStyles.deadlineDate}>
                     {reading.start_page != null && reading.end_page != null
@@ -367,6 +507,7 @@ function ReadingRow({ reading, index }) {
         </div>
     );
 }
+<<<<<<< HEAD
 
 function stripModulePrefix(title = "", moduleName = "") {
     const cleanTitle = String(title || "").trim();
@@ -378,3 +519,5 @@ function stripModulePrefix(title = "", moduleName = "") {
     }
     return cleanTitle;
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

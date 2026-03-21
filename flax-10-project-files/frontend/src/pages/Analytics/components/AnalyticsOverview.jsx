@@ -3,6 +3,7 @@
  */
 
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
 import { BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AttendanceChart from '../../../components/analytics/AttendanceChart';
@@ -15,19 +16,38 @@ import StudyHoursChart from '../../../components/analytics/StudyHoursChart';
 import SummaryCards from '../../../components/analytics/SummaryCards';
 import ThemeUsageChart from '../../../components/analytics/ThemeUsageChart';
 import EmptyState from '../../../components/common/empty_state/EmptyState';
+=======
+import AttendanceChart from '../../../components/Analytics/AttendanceChart';
+import DailyBreakdownChart from '../../../components/Analytics/DailyBreakdownChart';
+import { ConsistencyScore, PeakHoursCard } from '../../../components/Analytics/InsightCards';
+import PlannedVsActualChart from '../../../components/Analytics/PlannedVsActualChart';
+import ProductivityCards from '../../../components/Analytics/ProductivityCards';
+import StudyHeatmap from '../../../components/Analytics/StudyHeatmap';
+import StudyHoursChart from '../../../components/Analytics/StudyHoursChart';
+import SummaryCards from '../../../components/Analytics/SummaryCards';
+import ThemeUsageChart from '../../../components/Analytics/ThemeUsageChart';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { fadeUp } from '../pageConfig';
 import styles from '../AnalyticsPage.module.css';
 
 const MotionDiv = motion.div;
 const MotionSection = motion.section;
 
+<<<<<<< HEAD
 const getChartItems = (data, progressData, themeStats, isTeacher) => [
+=======
+const getChartItems = (data, progressData, themeStats) => [
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   { index: 2, title: 'Study Hours', element: <StudyHoursChart data={data.daily_breakdown} /> },
   { index: 3, title: 'Daily Breakdown', element: <DailyBreakdownChart data={data.daily_breakdown} /> },
   getProgressChart(progressData),
   { index: 5, title: 'Focus Heatmap', element: <StudyHeatmap heatmapData={data.heatmap} />, wide: true },
   getThemeChart(themeStats),
+<<<<<<< HEAD
   !isTeacher ? { index: 7, title: 'Attendance', element: <AttendanceChart /> } : null,
+=======
+  { index: 7, title: 'Attendance', element: <AttendanceChart /> },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 ].filter(Boolean);
 
 function getProgressChart(progressData) {
@@ -86,16 +106,24 @@ function ChartCard({ title, element, index, wide }) {
   );
 }
 
+<<<<<<< HEAD
 function ChartsGrid({ data, progressData, themeStats, isTeacher }) {
   return (
     <div className={styles.chartsGrid}>
       {getChartItems(data, progressData, themeStats, isTeacher).map(({ title, element, index, wide }) => (
+=======
+function ChartsGrid({ data, progressData, themeStats }) {
+  return (
+    <div className={styles.chartsGrid}>
+      {getChartItems(data, progressData, themeStats).map(({ title, element, index, wide }) => (
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         <ChartCard key={title} title={title} element={element} index={index} wide={wide} />
       ))}
     </div>
   );
 }
 
+<<<<<<< HEAD
 function hasStudyData(data) {
   const summary = data?.summary ?? {};
   return Number(summary.total_sessions || 0) > 0 || Number(summary.total_study_hours || 0) > 0;
@@ -121,11 +149,18 @@ function AnalyticsEmptyState() {
 
 export default function AnalyticsOverview({ data, progressData, themeStats, isTeacher }) {
   if (!hasStudyData(data)) return <AnalyticsEmptyState />;
+=======
+export default function AnalyticsOverview({ data, progressData, themeStats }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <div className={styles.overviewWrap}>
       <AnimatedSection index={0}><SummaryCards data={data} /></AnimatedSection>
       <InsightsSection data={data} progressData={progressData} />
+<<<<<<< HEAD
       <ChartsGrid data={data} progressData={progressData} themeStats={themeStats} isTeacher={isTeacher} />
+=======
+      <ChartsGrid data={data} progressData={progressData} themeStats={themeStats} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }

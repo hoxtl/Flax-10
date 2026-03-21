@@ -54,8 +54,14 @@ describe('TaskCompletionContext', () => {
             vi.advanceTimersByTime(2200);
             vi.runAllTimers();
         });
+<<<<<<< HEAD
         expect(screen.queryByText('Done!')).toBeNull();
         vi.useRealTimers();
+=======
+        return waitFor(() => expect(screen.queryByText('Done!')).toBeNull()).finally(() => {
+            vi.useRealTimers();
+        });
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('plays sound for non-routine tasks', () => {

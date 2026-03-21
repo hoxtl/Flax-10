@@ -16,6 +16,7 @@ function getFixedStyle(position, rect) {
   }
 }
 
+<<<<<<< HEAD
 function TooltipPortal({ content, position, rect, className }) {
   if (!rect) return null;
   if (!content) return null;
@@ -23,6 +24,13 @@ function TooltipPortal({ content, position, rect, className }) {
   return createPortal(
     <div className={`${styles.tooltip} ${styles.tooltipFixed} ${styles[position]} ${className}`.trim()} role="tooltip"
       style={posStyle}>
+=======
+function TooltipPortal({ content, position, rect }) {
+  if (!rect || !content) return null;
+  return createPortal(
+    <div className={`${styles.tooltip} ${styles[position]}`} role="tooltip"
+      style={{ position: 'fixed', ...getFixedStyle(position, rect) }}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       {content}
     </div>,
     document.body
@@ -30,6 +38,7 @@ function TooltipPortal({ content, position, rect, className }) {
 }
 
 /** Tooltip that appears on hover, rendered via a portal to avoid clipping. */
+<<<<<<< HEAD
 
 export default function Tooltip({ content, children, position = 'top', wrapperClassName = "", className = "" }) {
   const [rect, setRect] = useState(null);
@@ -40,6 +49,17 @@ export default function Tooltip({ content, children, position = 'top', wrapperCl
       onMouseLeave={() => setRect(null)}>
       {children}
       <TooltipPortal content={content} position={position} rect={rect} className={className} />
+=======
+export default function Tooltip({ content, children, position = 'top' }) {
+  const [rect, setRect] = useState(null);
+  const wrapperRef = useRef(null);
+  return (
+    <div ref={wrapperRef} className={styles.wrapper}
+      onMouseEnter={() => setRect(wrapperRef.current?.getBoundingClientRect())}
+      onMouseLeave={() => setRect(null)}>
+      {children}
+      <TooltipPortal content={content} position={position} rect={rect} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }

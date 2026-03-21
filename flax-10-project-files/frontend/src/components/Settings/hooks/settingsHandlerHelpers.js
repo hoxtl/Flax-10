@@ -1,15 +1,26 @@
 /*
  * Shared async helpers for settings save handlers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import {
   clearAuthAndRedirect,
   hasToken,
   patchSettings,
   saveUserToStorage,
 } from "../../../api/settingsApi";
+<<<<<<< HEAD
 import { saveHomeAddress, updateUserSettings } from "../../../api/userApi";
 import { geocodeAddress } from "../../../api/geocodeApi";
+=======
+import {
+  geocodeAddress,
+  saveHomeAddress,
+  updateUserSettings,
+} from "../../../api/userApi";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);
@@ -32,6 +43,10 @@ function normaliseYearForStorage(year) {
 }
 
 function mergeAccountSettingsToUser(storedUser, settingsPayload) {
+<<<<<<< HEAD
+=======
+  if (!settingsPayload) return storedUser;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   if (!storedUser) return settingsPayload;
   const updates = buildUserUpdates(settingsPayload);
   if (!Object.keys(updates).length) return storedUser;
@@ -49,6 +64,10 @@ function buildUserUpdates(settingsPayload) {
 }
 
 function saveAuthUser(user) {
+<<<<<<< HEAD
+=======
+  if (!user) return;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   saveUserToStorage(user);
   window.dispatchEvent(new Event("auth-changed"));
 }

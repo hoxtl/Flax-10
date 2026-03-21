@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import StatStrip from "../../../components/common/stat_strip/StatStrip";
+=======
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useCountUp } from "../../../hooks/useCountUp";
 import styles from "./AttendanceSummaryBar.module.css";
 

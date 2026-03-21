@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import Card from "../../../../components/common/card/Card";
+=======
+import Card from "../../../../components/common/Card/Card";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from "./ProfileWidgets.module.css";
 import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";
 
@@ -9,12 +13,19 @@ function cellOpacity(val, maxVal) {
 }
 
 function HeatmapCell({ val, maxVal, label }) {
+<<<<<<< HEAD
   const cellStyle = { opacity: cellOpacity(val, maxVal) };
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <div className={styles.heatmapCol}>
       <div
         className={styles.heatmapCell}
+<<<<<<< HEAD
         style={cellStyle}
+=======
+        style={{ opacity: cellOpacity(val, maxVal) }}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         title={`${label}: ${(val / 60).toFixed(1)}h`}
       />
       <span className={styles.heatmapDayLabel}>{label}</span>

@@ -9,30 +9,7 @@ def build_profile_photo_url(photo, request):
     """Return the absolute URL for a profile photo, or None."""
     if not photo:
         return None
-    absolute_url = _photo_string_url(photo)
-    if absolute_url:
-        return absolute_url
-    url = _safe_photo_url(photo)
-    if not url:
-        return None
-    return _request_photo_url(request, url)
-
-def _photo_string_url(photo):
-    photo_str = str(photo).strip()
-    if photo_str.startswith(("http://", "https://")):
-        return photo_str
-    return None
-
-def _safe_photo_url(photo):
-    try:
-        return photo.url
-    except (ValueError, AttributeError):
-        return None
-
-def _request_photo_url(request, url):
-    if not request:
-        return None
-    return request.build_absolute_uri(url)
+    return request.build_absolute_uri(photo.url) if request else None
 
 def ensure_teacher_user(request, error_message: str) -> None:
     """Ensure the request user is a teacher, otherwise raise a ValidationError."""
@@ -45,18 +22,10 @@ def format_teacher_name(user) -> str:
     if not user:
         return "Unknown"
     name = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
-    if getattr(user, "role", None) == "teacher":
-        return format_teacher_display_name(name)
+    if getattr(user, "role", None) == "teacher" and not name.startswith("Dr."):
+        return f"Dr. {name}"
     return name or "Unknown"
 
-def format_teacher_display_name(name: str) -> str:
-    """Return a teacher display name with a Dr. prefix when one is missing."""
-    clean = str(name or "").strip()
-    if not clean:
-        return "Unknown"
-    if clean.startswith("Dr."):
-        return clean
-    return f"Dr. {clean}"
 
 def is_shared_with_requester(owner, request):
     """Return true if owner has explicitly shared with the requesting user."""
@@ -64,6 +33,7 @@ def is_shared_with_requester(owner, request):
     if not user or not getattr(user, "is_authenticated", False):
         return False
     return owner.sharing_with.filter(shared_with=user).exists()
+
 
 def is_user_sharing_with(owner, request, *, allow_self=False):
     """Return true if request.user is sharing their calendar with owner."""
@@ -73,6 +43,7 @@ def is_user_sharing_with(owner, request, *, allow_self=False):
     if allow_self and user == owner:
         return True
     return user.sharing_with.filter(shared_with=owner).exists()
+
 
 def can_view_user_stats(request, user_obj):
     """Return true when a user can access another user's study visibility fields."""

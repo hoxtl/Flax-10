@@ -1,6 +1,7 @@
 /*
  * SocietiesPageContent renders the societies feature views and modal chrome.
  */
+<<<<<<< HEAD
 
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -13,6 +14,19 @@ import { BackToTop } from "../../components/pagination/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import CreateSocietyModal from "../../components/society/CreateSocietyModal";
 import ReportSocietyModal from "../../components/society/society_detail/ReportSocietyModal";
+=======
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import AppPage from "../../components/common/AppPage/AppPage";
+import PageTransition from "../../components/common/PageTransition/PageTransition";
+import Tabs from "../../components/common/Tabs/Tabs";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
+import { BackToTop } from "../../components/Pagination/Pagination";
+import { usePagination } from "../../hooks/usePagination";
+import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
+import ReportSocietyModal from "../../components/Society/SocietyDetail/ReportSocietyModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import AllSocieties from "./AllSocieties";
 import SocietySection from "./SocietySection";
 import SocietyDetailPage from "./SocietyDetailPage";

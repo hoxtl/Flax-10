@@ -1,7 +1,10 @@
 /*
  * Auto schedule submission.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { createSchedule } from '../../../api/scheduleApi';
 import { buildAutoSchedulePayload, getAutoScheduleError } from './autoScheduleUtils';
 

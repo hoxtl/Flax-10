@@ -3,6 +3,7 @@ Helpers for creating, syncing, and deleting deadline calendar events.
 """
 
 from studyFlax.models import CalendarEvent, User
+<<<<<<< HEAD
 from studyFlax.views.calendar.system_tags import get_deadline_tag, get_exam_tag
 
 
@@ -10,6 +11,8 @@ def _get_deadline_tag(deadline):
     if deadline.deadline_type.lower() == 'exam':
         return get_exam_tag()
     return get_deadline_tag()
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def event_data(deadline, user):
     return dict(

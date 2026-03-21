@@ -1,7 +1,12 @@
 /*
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tags/TagManager.test.jsx
  * TagManager.test verifies tag management behaviour in society detail tabs.
  */
 
+=======
+ * TagManager.test verifies tag management behavior in society detail tabs.
+ */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tags/TagManager.test.jsx
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TagManager from './TagManager';

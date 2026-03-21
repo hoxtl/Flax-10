@@ -13,7 +13,6 @@ from ...helpers.test_case_support import BaseTestCase
 from studyFlax.models import Enrollment, Module, Notification, User
 from studyFlax.serialisers import ModuleSerialiser
 
-
 class ModuleViewTests(BaseTestCase):
     """Tests for module view."""
 

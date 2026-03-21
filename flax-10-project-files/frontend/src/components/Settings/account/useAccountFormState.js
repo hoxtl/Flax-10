@@ -1,7 +1,10 @@
 /*
  * Account-form state management and request loading.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useEffect, useState } from "react";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { useAuth } from "../../../context/AuthContext";

@@ -1,3 +1,4 @@
+<<<<<<< HEAD:flax-10-project-files/backend/studyFlax/tests/helpers/test_case_support.py
 """
 Shared base classes and assertion helpers for backend tests.
 """
@@ -94,3 +95,9 @@ def parse_iso_datetime(value):
 def get_datetime_fields(data):
     fields = ["start_time", "end_time"]
     return [(field, data.get(field)) for field in fields if isinstance(data.get(field), str)]
+=======
+"""Re-export base test classes for convenience."""
+from .helpers.base import BaseTestCase, BaseEventTestCase
+
+__all__ = ['BaseTestCase', 'BaseEventTestCase']
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/backend/studyFlax/tests/base.py

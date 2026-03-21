@@ -2,7 +2,10 @@
  * useEventResize - Event duration resizing via drag handle.
  * Handles grid snapping, overlap checking, and recurring event confirmation.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useCallback } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -13,7 +16,10 @@ import { checkOverlapWithConfirm } from '../utils/overlapUtils';
 import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
 /** Hook for resizing event duration by dragging the bottom handle. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const { events } = useCalendar();
     const confirmFn = useConfirm();

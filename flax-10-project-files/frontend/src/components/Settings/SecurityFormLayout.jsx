@@ -1,9 +1,14 @@
 /*
  * Presentational layout for the password form.
  */
+<<<<<<< HEAD
 
 import PasswordStrength from "../common/password_strength";
 import styles from "../../pages/settings/Settings.module.css";
+=======
+import PasswordStrength from "../common/PasswordStrength";
+import styles from "../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import SettingsContextCard from "./SettingsContextCard";
 import { ErrorMessage, FormInput, SectionHeader, SubmitButton } from "./SettingsUI";
 

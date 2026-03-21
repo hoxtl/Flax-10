@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for the event map view.
 """
@@ -5,11 +6,20 @@ Tests for the event map view.
 from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
+=======
+from unittest.mock import patch
+from datetime import datetime, timedelta, timezone
+from studyFlax.tests.helpers.base import BaseTestCase
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from studyFlax.models import CalendarEvent
 
 
 class EventMapViewTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests event map view."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def _create_map_event(self, **overrides):
         now = datetime.now(timezone.utc)
         defaults = {

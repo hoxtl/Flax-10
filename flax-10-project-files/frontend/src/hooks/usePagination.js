@@ -7,7 +7,10 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
  * @param {number} initialPage - Initial page number (default 1).
  * @returns {Object} { currentItems, totalPages, currentPage, setPage }
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function usePagination(items, pageSize, initialPage = 1) {
     const [currentPage, setPageInternal] = useState(initialPage);
     const totalPages = Math.max(1, Math.ceil(items.length / pageSize));

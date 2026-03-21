@@ -40,6 +40,7 @@ export function saveHomeAddress(address, latitude, longitude) {
   });
 }
 
+<<<<<<< HEAD
 function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy) {
   const params = new URLSearchParams({
     q: query,
@@ -52,6 +53,27 @@ function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearF
   if (yearFilter) params.append('year', yearFilter);
   if (roleFilter) params.append('role', roleFilter);
   return `/users/search/?${params.toString().replace(/\+/g, '%20')}`;
+=======
+export async function geocodeAddress(address) {
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxToken}&limit=1&country=GB`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('User home geocoding has failed');
+  const data = await response.json();
+  if (!data.features?.length) return null;
+  const [lng, lat] = data.features[0].center;
+  return { latitude: lat, longitude: lng };
+}
+
+function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy) {
+  let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
+  if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
+  if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
+  if (yearFilter) url += `&year=${encodeURIComponent(yearFilter)}`;
+  if (roleFilter) url += `&role=${encodeURIComponent(roleFilter)}`;
+  url += `&ordering=${sortBy === 'name-desc' ? '-name' : 'name'}`;
+  return url;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '', sortBy = 'name') {

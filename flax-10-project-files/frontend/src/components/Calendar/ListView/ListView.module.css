@@ -1,0 +1,280 @@
+/* List view — Clean agenda style */
+.container {
+    display: flex;
+    flex-direction: column;
+    background: var(--calendar-bg);
+    max-height: calc(100vh - 280px);
+    padding: 0 12px;
+}
+
+/* Remove card shell for cleaner look — overflow on this element so sticky headers work */
+.listCard {
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+/* Day group */
+.dayGroup {
+    border-bottom: none;
+    position: relative;
+    padding-left: 8px;
+}
+
+.dayGroup:last-of-type {
+    border-bottom: none;
+}
+
+/* Large bold day header */
+.dayHeader {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px 0;
+    background: var(--calendar-bg);
+    border-bottom: none;
+}
+
+.dayHeaderToday {
+    background: var(--calendar-bg);
+}
+
+/* Day number — large bold */
+.dayNumber {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    min-width: 36px;
+    text-align: center;
+}
+
+.dayHeaderToday .dayNumber {
+    color: var(--text);
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    border-bottom: 2px solid var(--text);
+}
+
+.dayMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dayName {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.daySubRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--muted, #5D4037);
+    font-style: italic;
+}
+
+.dayBadges {
+    display: flex;
+    gap: 6px;
+}
+
+.dayBadge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.todayBadge {
+    background: var(--hover, rgba(74, 52, 33, 0.08));
+    color: var(--text);
+}
+
+.deadlineBadge {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* Events list */
+.eventsList {
+    display: flex;
+    flex-direction: column;
+}
+
+.flatList {
+    display: flex;
+    flex-direction: column;
+    padding-left: 8px;
+    position: relative;
+}
+
+/* Event row — slim with pastel accent tint */
+.eventRow {
+    border-bottom: none;
+    cursor: pointer;
+    background: color-mix(in srgb, var(--accent, transparent) 8%, transparent);
+    transition: background 0.15s ease;
+    position: relative;
+    min-height: 40px;
+    border-radius: 6px;
+    margin-bottom: 2px;
+}
+
+
+.eventRow:last-of-type {
+    border-bottom: none;
+}
+
+.eventRow:hover {
+    background: color-mix(in srgb, var(--accent, transparent) 15%, transparent);
+}
+
+.eventRow.readOnly {
+    opacity: 0.9;
+}
+
+.eventMain {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px 8px 8px;
+    gap: 0;
+}
+
+.eventTime {
+    font-size: 0.7rem;
+    color: var(--muted, #5D4037);
+    font-style: italic;
+    width: 72px;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+}
+
+/* Groups event name + pills inline */
+.eventContent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.eventName {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.badgesContainer {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Soft pill — Flax tonal */
+.tagBadge {
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    background: var(--surface-card, #F2F0E9);
+    color: var(--text);
+    border: 0.5px solid var(--border, rgba(51, 51, 51, 0.12));
+}
+
+/* Source pill — solid charcoal */
+.sourceBadge {
+    border-radius: 999px;
+    padding: 3px 14px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    background: var(--text);
+    color: var(--calendar-bg, #FAF9F6);
+}
+
+
+/* Conflict row — overlapping events stacked vertically */
+.conflictRow {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 40px;
+}
+
+
+/* Container for stacked conflict cells */
+.conflictCells {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Each individual conflict cell — pastel accent tint */
+.conflictCell {
+    background: color-mix(in srgb, var(--accent, transparent) 8%, var(--calendar-bg, #FAF9F6));
+    padding: 8px 12px 8px 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    min-width: 0;
+    border-radius: 6px;
+    margin-bottom: 2px;
+}
+
+.conflictCell:hover {
+    background: color-mix(in srgb, var(--accent, transparent) 15%, var(--calendar-bg, #FAF9F6));
+}
+
+/* Empty state */
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--muted);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 8px;
+    }
+
+    .dayGroup {
+        padding-left: 4px;
+    }
+
+    .eventMain {
+        padding-inline: 0 10px;
+    }
+
+    .eventDetail {
+        margin-left: 0;
+    }
+
+    .badgesContainer {
+        display: none;
+    }
+}

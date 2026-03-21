@@ -1,7 +1,10 @@
 /*
  * useSocietyCalendarSync keeps society calendar sync state in step with the API.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect } from 'react';
 import { getSyncStatus, syncCalendar, unsyncCalendar } from '../../../api/societyApi';
 import { useNotify } from '../../notifications/hooks/useNotify';
@@ -43,9 +46,13 @@ async function handleToggle(societyId, isSynced, setIsSynced, setLoading, notify
     try {
         const action = isSynced ? handleUnsync : handleSync;
         await action(societyId, setIsSynced, notify, societyName, refreshTags, reloadCalendar);
+<<<<<<< HEAD
     } catch (err) {
         console.error('Failed to toggle sync:', err);
     }
+=======
+    } catch (err) { console.error('Failed to toggle sync:', err); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     finally { setLoading(false); }
 }
 

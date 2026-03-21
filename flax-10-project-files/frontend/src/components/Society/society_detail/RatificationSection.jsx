@@ -2,7 +2,10 @@
  * RatificationSection manages the display and request flow for official society recognition.
  * RatificationToggle allows admins to opt-in during society creation.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/RatificationSection.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/RatificationSection.jsx
 import styles from "./RatificationSection.module.css";
 
 export function RatificationSection({ status, isRatified, onRequest }) {
@@ -42,7 +45,10 @@ function RatificationRequest({ onRequest }) {
 }
 
 /** Toggle for requesting ratification during society setup. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/RatificationSection.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/RatificationSection.jsx
 export function RatificationToggle({ requested, onToggle }) {
     return (
         <div className={styles.toggleSection}>

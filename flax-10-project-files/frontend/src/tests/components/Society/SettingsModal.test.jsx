@@ -8,12 +8,21 @@ vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => confirmMock,
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/society/society_detail/SettingsModal.module.css', () => ({
     default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
 }));
 import styles from '../../../components/society/society_detail/SettingsModal.module.css';
 
 vi.mock('../../../components/society/AddCollaboratorModal', () => ({
+=======
+vi.mock('../../../components/Society/SocietyDetail/SettingsModal.module.css', () => ({
+    default: { backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title' }
+}));
+import styles from '../../../components/Society/SocietyDetail/SettingsModal.module.css';
+
+vi.mock('../../../components/Society/AddCollaboratorModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: ({ onClose, onAdd, existingUsernames }) => (
     <div>
       <div data-testid="existing-users">{existingUsernames.join(',')}</div>
@@ -159,6 +168,7 @@ describe('SocietyDetail/SettingsModal', () => {
     });
   });
 
+<<<<<<< HEAD
   it('handles add workflow when members is omitted', async () => {
     const props = baseProps({ members: undefined });
     render(<SettingsModal {...props} />);
@@ -172,6 +182,8 @@ describe('SocietyDetail/SettingsModal', () => {
     });
   });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   it('stops propagation when modal content is clicked', () => {
     const props = baseProps();
     render(<SettingsModal {...props} />);

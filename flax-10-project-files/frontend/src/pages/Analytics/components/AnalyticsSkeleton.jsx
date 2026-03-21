@@ -2,7 +2,11 @@
  * Analytics loading skeleton.
  */
 
+<<<<<<< HEAD
 import SkeletonBlock from '../../../components/common/loading_state/SkeletonBlock';
+=======
+import SkeletonBlock from '../../../components/common/LoadingState/SkeletonBlock';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from '../AnalyticsPage.module.css';
 
 const PERIOD_PLACEHOLDERS = [0, 1, 2];

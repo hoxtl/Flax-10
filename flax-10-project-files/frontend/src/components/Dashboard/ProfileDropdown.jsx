@@ -5,7 +5,11 @@
 import { useState, useRef, useEffect } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
 import styles from "./ProfileDropdown.module.css";
+<<<<<<< HEAD
 import { getInitials } from "../auth/utils/userUtils";
+=======
+import { getInitials } from "../Authentication/utils/userUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useAuth } from "../../context/AuthContext";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
 
@@ -46,7 +50,11 @@ function resolveDisplayName(user) {
 function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
   const displayName = resolveDisplayName(user);
+<<<<<<< HEAD
   const major = user?.major || "";
+=======
+  const major = user?.major || "Computer Science";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <div className={styles.dropdownHeader}>
       <HeaderAvatar profilePhotoUrl={profilePhotoUrl} initials={initials} />
@@ -145,16 +153,28 @@ function buildDisplayUser(user, profileData) {
   const merged = { ...user, ...profileData };
   return {
     ...merged,
+<<<<<<< HEAD
     major: merged.major || "",
+=======
+    major: merged.major || "Computer Science",
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   };
 }
 
 function getProfilePhotoUrl(profileData, displayUser) {
+<<<<<<< HEAD
   return profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: false });
 }
 
 function buildDropdownUser(displayUser) {
   return { ...displayUser, major: displayUser.major || "" };
+=======
+  return profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: true });
+}
+
+function buildDropdownUser(displayUser) {
+  return { ...displayUser, major: displayUser.major || "Computer Science" };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {

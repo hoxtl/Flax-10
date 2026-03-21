@@ -8,8 +8,12 @@ from django.test import TestCase
 from django.utils import timezone
 
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_task
 
+=======
+from studyFlax.tests.helpers.factories import make_user, make_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class SyncCalendarEventForTaskTest(TestCase):
     """Unit tests for the sync_calendar_event_for_task helper."""
@@ -18,7 +22,11 @@ class SyncCalendarEventForTaskTest(TestCase):
         self.user = make_user()
 
     def test_sync_creates_event_for_task_with_due_date(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import sync_calendar_event_for_task
+=======
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Due Task', due_date=due)
         sync_calendar_event_for_task(task)
@@ -27,7 +35,11 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_deletes_event_when_completed(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import sync_calendar_event_for_task
+=======
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Completed', due_date=due, completed=True)
         CalendarEvent.objects.create(
@@ -40,7 +52,11 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_deletes_event_when_no_due_date(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import sync_calendar_event_for_task
+=======
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'NoDue')
         CalendarEvent.objects.create(
@@ -53,7 +69,11 @@ class SyncCalendarEventForTaskTest(TestCase):
         )
 
     def test_sync_uses_estimated_blocks_for_duration(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import sync_calendar_event_for_task
+=======
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Blocks', due_date=due, estimated_blocks=4)
         sync_calendar_event_for_task(task)
@@ -62,7 +82,11 @@ class SyncCalendarEventForTaskTest(TestCase):
         self.assertEqual(duration, 100)
 
     def test_sync_updates_existing_event(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import sync_calendar_event_for_task
+=======
+        from studyFlax.views.tasks.task_view import sync_calendar_event_for_task
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         due = timezone.now() + timedelta(days=1)
         task = make_task(self.user, 'Existing', due_date=due)
         CalendarEvent.objects.create(

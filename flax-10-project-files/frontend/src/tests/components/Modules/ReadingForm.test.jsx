@@ -1,12 +1,20 @@
 /*
  * Tests for ReadingForm component.
  */
+<<<<<<< HEAD
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ReadingForm from '../../../components/modules/readings/ReadingForm';
 
 vi.mock('../../../components/modules/deadlines/DeadlineForm.module.css', () => ({ default: { } }));
+=======
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import ReadingForm from '../../../components/Modules/Readings/ReadingForm';
+
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: { } }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     default: ({onChange, placeholder }) => (
         <input placeholder={placeholder} onChange={e =>onChange(e.target.value)} />
@@ -45,7 +53,11 @@ describe('ReadingForm', () => {
         fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '13' } });
         fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '63' } });
         fireEvent.click(screen.getByText('Add Reading'));
+<<<<<<< HEAD
         expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
+=======
+        expect(screen.getByText('Chapter cannot be negative.')).toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
      it('shows an error when end page is less than start page', () => {
@@ -54,7 +66,14 @@ describe('ReadingForm', () => {
         fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '40' } });
         fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '10' } });
         fireEvent.click(screen.getByText('Add Reading'));
+<<<<<<< HEAD
         expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
     });
 
 });
+=======
+        expect(screen.getByText('End page must be greater than or equal to start page.')).toBeInTheDocument();
+    });
+
+});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

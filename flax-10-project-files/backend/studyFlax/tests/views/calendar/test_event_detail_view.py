@@ -3,8 +3,13 @@ Tests for event detail view edge cases: locked events, overlap limits, and CRUD.
 """
 
 from rest_framework import status
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseEventTestCase
 from studyFlax.tests.helpers.test_fixture_builders import create_simple_event, get_datetime_str
+=======
+from studyFlax.tests.helpers.base import BaseEventTestCase
+from studyFlax.tests.helpers.fixtures import create_simple_event, get_datetime_str
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 class LockedEventUpdateTests(BaseEventTestCase):
@@ -59,7 +64,11 @@ class OverlapLimitUpdateTests(BaseEventTestCase):
     def test_update_causing_overlap_limit_returns_400(self):
         start = get_datetime_str(hours_offset=10)
         end = get_datetime_str(hours_offset=11)
+<<<<<<< HEAD
         for i in range(2):
+=======
+        for i in range(3):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             self.create_event_in_db({
                 'title': f'Overlap {i}',
                 'start_time': start,

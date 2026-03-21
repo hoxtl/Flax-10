@@ -19,11 +19,15 @@ from .event_helpers import (
     parse_date_param,
     expand_recurring_events
 )
-from .timetable_service import sync_timetable_if_needed
+from .timetable_service import sync_timetable_if_needed, TimetableSyncError
 from .society_sync_service import get_synced_society_events
 import logging
 import sys
 
+logger = logging.getLogger(__name__)
+
+def _is_running_tests():
+    return "test" in sys.argv
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +105,11 @@ def create_event(request):
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     data = serialiser.validated_data
     if exceeds_overlap_limit(request.user, data['start_time'], data['end_time']):
+<<<<<<< HEAD
         return Response({'error': 'Cannot have more than 2 overlapping events.'}, status=status.HTTP_400_BAD_REQUEST)
+=======
+        return Response({'error': 'Cannot have more than 3 overlapping events.'}, status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     overlap = check_event_overlap(request.user, data)
     event = serialiser.save(user=request.user)
     response_data = CalendarEventSerialiser(event).data

@@ -2,7 +2,10 @@
  * SyncButton allows users to synchronize society events with their personal calendar.
  * Utilizes the useSocietyCalendarSync hook for state management.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/calendar_tab/SyncButton.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tabs/calendarTab/SyncButton.jsx
 import { useSocietyCalendarSync } from "../../../hooks/useSocietyCalendarSync";
 import PrimaryButton from "../../../../common/primary_button/PrimaryButton";
 import styles from "./SyncButton.module.css";

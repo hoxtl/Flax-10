@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for groupwork project views.
 """
@@ -12,6 +13,13 @@ from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupPro
 from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from rest_framework import status
+
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
+from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -19,6 +27,7 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
     GroupMembership.objects.create(project=project, user=owner, role="owner")
     return project
 
+<<<<<<< HEAD
 def _add_members(project, count, prefix="member"):
     added = []
     for index in range(count):
@@ -37,6 +46,14 @@ class GroupProjectListTests(BaseTestCase):
         res = self.client.post(
             "/api/group-work/projects/",
             {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id for teammate in teammates]},
+=======
+
+class GroupProjectListTests(BaseTestCase):
+    def test_create_project(self):
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Alpha", "course_code": "CS100"},
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -47,6 +64,7 @@ class GroupProjectListTests(BaseTestCase):
             ).exists()
         )
 
+<<<<<<< HEAD
     def test_create_project_with_member_ids(self):
         teammates = [
             make_user(f"teammate_{index}", f"teammate_{index}@example.com")
@@ -136,10 +154,13 @@ class GroupProjectListTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("member_ids", res.data)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_create_project_invalid(self):
         res = self.client.post("/api/group-work/projects/", {}, format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+<<<<<<< HEAD
     def test_create_project_rejects_past_deadline(self):
         teammates = [
             make_user(f"past_deadline_mate_{index}", f"past_deadline_mate_{index}@example.com")
@@ -156,6 +177,8 @@ class GroupProjectListTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("deadline", res.data)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_list_projects(self):
         _make_project(self.user, "P1")
         _make_project(self.user, "P2")
@@ -168,6 +191,7 @@ class GroupProjectListTests(BaseTestCase):
         self.assertIn("P2", names)
         self.assertNotIn("P3", names)
 
+<<<<<<< HEAD
     def test_list_projects_includes_task_counts(self):
         project = _make_project(self.user, "Metrics")
         Task.objects.create(user=self.user, group_project=project, title="Done task", status="done", completed=True)
@@ -212,6 +236,10 @@ class GroupProjectListTests(BaseTestCase):
 
 class GroupProjectDetailTests(BaseTestCase):
     """Tests group project detail."""
+=======
+
+class GroupProjectDetailTests(BaseTestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -233,6 +261,7 @@ class GroupProjectDetailTests(BaseTestCase):
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+<<<<<<< HEAD
     def test_patch_project_rejects_past_deadline(self):
         past_date = (timezone.localdate() - timedelta(days=1)).isoformat()
 
@@ -245,6 +274,8 @@ class GroupProjectDetailTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("deadline", res.data)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_delete_project_owner(self):
         res = self.client.delete(f"/api/group-work/projects/{self.project.id}/")
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
@@ -256,6 +287,7 @@ class GroupProjectDetailTests(BaseTestCase):
         self.client.force_authenticate(user=member)
         res = self.client.delete(f"/api/group-work/projects/{self.project.id}/")
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+<<<<<<< HEAD
 
 class GroupProjectMembersTests(BaseTestCase):
     """Tests group project members."""
@@ -368,3 +400,5 @@ class GroupProjectViewHelpersTest(BaseTestCase):
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

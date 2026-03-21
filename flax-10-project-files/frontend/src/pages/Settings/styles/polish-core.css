@@ -58,6 +58,56 @@
   margin-bottom: 8px;
 }
 
+<<<<<<< HEAD
+=======
+.teacherCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: color-mix(in srgb, var(--primary) 4%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.teacherCardIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.teacherCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacherCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 2px;
+}
+
+.teacherCardSub {
+  font-size: 11.5px;
+  color: color-mix(in srgb, var(--primary) 50%, var(--muted));
+  margin: 0;
+  line-height: 1.4;
+}
+
+.teacherCardAction {
+  flex-shrink: 0;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 /* ── Two-column layout shared by Academic + Location ──────── */
 .twoColLayout {
   display: grid;
@@ -76,6 +126,19 @@
   position: relative;
 }
 
+<<<<<<< HEAD
+=======
+.contextCard::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed color-mix(in srgb, var(--primary) 28%, transparent);
+  border-radius: calc(var(--radius-lg) - 6px);
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .contextCardEmoji {
   font-size: 18px;
   display: block;
@@ -279,5 +342,8 @@
   background: color-mix(in srgb, var(--surface-raised) 92%, var(--surface-warm) 8%);
   border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
 }
+<<<<<<< HEAD
 
 .remainingCount { color: var(--muted); font-size: 0.9em; margin-left: 5px; }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

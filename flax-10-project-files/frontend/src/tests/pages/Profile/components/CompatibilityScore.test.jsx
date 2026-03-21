@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CompatibilityScore } from '../../../../pages/profile/components/ProfileWidgets';
+import { CompatibilityScore } from '../../../../pages/Profile/components/ProfileWidgets';
 
 describe('CompatibilityScore', () => {
   const viewedSummary = { persona: { id: 'night_owl' } };
@@ -43,6 +43,7 @@ describe('CompatibilityScore', () => {
         ]}
       />
     );
+    expect(screen.getByText('3 people you both know')).toBeTruthy();
     expect(screen.getByText('Study momentum')).toBeTruthy();
     expect(document.querySelectorAll('[class*="sparkDot"]').length).toBeGreaterThan(0);
   });

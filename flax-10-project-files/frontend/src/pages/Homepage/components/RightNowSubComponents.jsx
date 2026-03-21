@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Right Now card primitives.
  */
@@ -8,6 +9,14 @@ import { Train, AlertTriangle, X, MapPinned, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import styles from "./RightNowWidget.module.css";
 import { getTimeLeftBand, getJourneySummary } from "./rightNowUtils";
+=======
+import React from "react";
+import { motion } from "framer-motion";
+import { Clock, Train, AlertTriangle, X, MapPinned, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import styles from "./RightNowWidget.module.css";
+import { getTimeLeftBand, getJourneySummary } from "./RightNowUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export const fadeIn = (delay = 0) => ({
   initial: { opacity: 0, y: 6 },
@@ -15,12 +24,38 @@ export const fadeIn = (delay = 0) => ({
   transition: { duration: 0.35, delay, ease: [0.23, 1, 0.32, 1] },
 });
 
+<<<<<<< HEAD
 export const ActiveEventCard = ({ currentBlock, timeRangeStr, timeLeftStr, currentProgressPct }) => {
   const minutesLeft = currentBlock?.end_time
     ? Math.max(0, Math.floor((new Date(currentBlock.end_time).getTime() - Date.now()) / 60000))
     : null;
   const band = getTimeLeftBand(minutesLeft);
   const color = band === "under10" ? "var(--home-urgency-danger)" : band === "10to30" ? "var(--home-urgency-warning)" : "var(--sage)";
+=======
+export const WidgetHeader = ({ eventCount, taskCount }) => (
+  <motion.div className={styles.widgetHeader} {...fadeIn(0)}>
+    <div className={styles.headerIconWrap}>
+      <Clock size={15} strokeWidth={1.75} className={styles.headerIcon} aria-hidden />
+    </div>
+    <span className={styles.headerLabel}>Right Now</span>
+    <HeaderMeta eventCount={eventCount} taskCount={taskCount} />
+  </motion.div>
+);
+
+const HeaderMeta = ({ eventCount, taskCount }) => (
+  <span className={styles.headerMeta}>
+    {eventCount} event{eventCount !== 1 ? "s" : ""}
+    {taskCount > 0 && ` · ${taskCount} task${taskCount !== 1 ? "s" : ""} left`}
+  </span>
+);
+
+export const ActiveEventCard = ({ currentBlock, timeRangeStr, timeLeftStr, currentProgressPct }) => {
+  const minutesLeft = currentBlock?.end_time 
+    ? Math.max(0, Math.floor((new Date(currentBlock.end_time).getTime() - Date.now()) / 60000))
+    : null;
+  const band = getTimeLeftBand(minutesLeft);
+  const color = band === "under10" ? "#dc3545" : band === "10to30" ? "#d4850a" : "#4A7C5A";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   return (
     <motion.div className={styles.currentEventCard} {...fadeIn(0.07)}>
@@ -67,10 +102,15 @@ const DismissButton = ({ onDismiss, label }) => (
 export const ConflictSummary = ({ conflicts, onDismiss }) => {
   const first = conflicts[0];
   const time = first?.a?.start_time ? new Date(first.a.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : null;
+<<<<<<< HEAD
   const label = time
     ? `Warning: Schedule overlap at ${time}`
     : `${conflicts.length} schedule overlap${conflicts.length === 1 ? "" : "s"} today`;
 
+=======
+  const label = time ? `Warning: Schedule overlap at ${time}` : `${conflicts.length} overlaps today`;
+  
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <motion.div className={styles.alertPill} {...fadeIn(0.12)}>
       <AlertTriangle size={12} strokeWidth={2} className={styles.alertIconWarn} aria-hidden />
@@ -82,11 +122,15 @@ export const ConflictSummary = ({ conflicts, onDismiss }) => {
 
 export const CommuteContextCard = ({ campus, journey, loading, leaveByInfo }) => {
   const summary = getJourneySummary(journey);
+<<<<<<< HEAD
   const lead = leaveByInfo?.leaveByStr
     ? `Leave by ${leaveByInfo.leaveByStr}`
     : summary?.duration
       ? `${summary.duration} from home`
       : "Check travel";
+=======
+  const lead = leaveByInfo?.leaveByStr ? `Leave by ${leaveByInfo.leaveByStr}` : summary?.duration ? `${summary.duration} from home` : "Check travel";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   return (
     <motion.div className={styles.contextCard} {...fadeIn(0.22)}>

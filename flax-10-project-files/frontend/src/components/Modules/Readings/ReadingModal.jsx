@@ -1,12 +1,20 @@
 /*
  * Modal for managing module readings.
  */
+<<<<<<< HEAD
 
 import { useReadingModal } from "../hooks/useReadingModal";
 import ReadingForm from "./ReadingForm";
 import ReadingCard from "./ReadingCard";
 import styles from '../deadlines/DeadlineModal.module.css';
 import StandardModal from "../../common/standard_modal/StandardModal";
+=======
+import { useReadingModal } from "../hooks/useReadingModal";
+import ReadingForm from "./ReadingForm";
+import ReadingCard from "./ReadingCard";
+import styles from '../Deadlines/DeadlineModal.module.css';
+import StandardModal from "../../common/StandardModal/StandardModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export default function ReadingModal({ module, onClose}) {
     const modal = useReadingModal(module.id);

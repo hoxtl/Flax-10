@@ -4,9 +4,15 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+<<<<<<< HEAD
 import { ErrorMessage, SettingsSidebar } from "../../components/settings/SettingsUI";
 import useSettingsHandlers from "../../components/settings/hooks/useSettingsHandlers";
 import AppPage from "../../components/common/app_page/AppPage";
+=======
+import { ErrorMessage, SettingsSidebar } from "../../components/Settings/SettingsUI";
+import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
+import AppPage from "../../components/common/AppPage/AppPage";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from "./Settings.module.css";
 import SettingsPanelContent from "./SettingsPanelContent";
 import { VALID_TABS } from "./settingsPageConfig";

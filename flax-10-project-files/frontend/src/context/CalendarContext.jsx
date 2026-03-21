@@ -43,7 +43,11 @@ function applyFilters(events, filter, searchQuery) {
 }
 
 function filterEventsByTag(events, filter) {
+<<<<<<< HEAD
     const currentFilter = [filter].flat(Infinity)
+=======
+    const currentFilter = (Array.isArray(filter) ? filter.flat(Infinity) : [filter])
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         .filter((value) => typeof value === 'string')
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean);
@@ -67,10 +71,17 @@ function matchesSearch(event, query) {
 export function useCalendarData(props = {}) {
     const calendarState = useCalendar();
     return useMemo(() => ({
+<<<<<<< HEAD
         selectedDate: props.selectedDate ?? calendarState.selectedDate,
         events: props.events ?? calendarState.events,
         viewMode: props.viewMode ?? calendarState.viewMode,
         displayMode: props.displayMode ?? calendarState.displayMode,
+=======
+        selectedDate: props.selectedDate ?? calendarState.selectedDate ?? new Date(),
+        events: props.events ?? calendarState.events ?? [],
+        viewMode: props.viewMode ?? calendarState.viewMode ?? 'month',
+        displayMode: props.displayMode ?? calendarState.displayMode ?? 'grid',
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     }), [props.selectedDate, props.events, props.viewMode, props.displayMode, calendarState]);
 }
 
@@ -102,13 +113,21 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
+<<<<<<< HEAD
     const { popupEvent, popupAnchorRect, readOnly: contextReadOnly, popupReadOnly, viewMode, popupViewMode } = context;
+=======
+    const { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode, popupViewMode } = context;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const openPopup = (event, anchorRect, readOnlyOverride = null, viewModeOverride = null) => {
         const readOnly = readOnlyOverride === null ? (contextReadOnly || false) : readOnlyOverride;
         dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
     };
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
+<<<<<<< HEAD
     return { popupEvent, popupAnchorRect, readOnly: popupReadOnly || contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
+=======
+    return { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export function useEventDelete() {

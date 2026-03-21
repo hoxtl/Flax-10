@@ -50,6 +50,7 @@
     background: color-mix(in srgb, var(--danger) 10%, transparent);
 }
 
+<<<<<<< HEAD
 .timerControlBtn {
     min-width: 132px;
 }
@@ -79,6 +80,8 @@
     color: #ab4343 !important;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .settingsContainer {
     display: flex;
     flex-direction: column;
@@ -207,11 +210,14 @@
     font-variant-numeric: tabular-nums;
 }
 
+<<<<<<< HEAD
 .overtimeActionBtn {
     min-width: 184px;
     justify-content: center;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @keyframes slideUp {
     from {
         transform: translate(-50%, 100%);

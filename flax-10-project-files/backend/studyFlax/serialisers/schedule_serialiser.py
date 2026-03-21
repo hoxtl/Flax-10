@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 """
 Serialisers for schedule planning requests and allocations.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from rest_framework import serializers
 
 from studyFlax.models import Deadline, Schedule, ScheduleEventAllocation
@@ -9,24 +12,36 @@ from studyFlax.serialisers.calendar.event_serialisers import CalendarEventSerial
 
 
 class ScheduleEventAllocationSerialiser(serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for schedule event allocation."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     event = CalendarEventSerialiser(read_only=True)
     deadline_title = serializers.CharField(source='deadline.title', read_only=True)
 
     class Meta:
+<<<<<<< HEAD
         """Metadata for schedule event allocation serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         model = ScheduleEventAllocation
         fields = ['id', 'event', 'deadline', 'deadline_title', 'allocated_minutes']
 
 
 class ScheduleSerialiser(serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for schedule."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     id = serializers.IntegerField(read_only=True)
     event_allocations = ScheduleEventAllocationSerialiser(many=True, read_only=True)
     deadline = serializers.PrimaryKeyRelatedField(queryset=Deadline.objects.all(), many=True)
 
     class Meta:
+<<<<<<< HEAD
         """Metadata for schedule serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         model = Schedule
         fields = [
             'id',
@@ -46,13 +61,19 @@ class ScheduleSerialiser(serializers.ModelSerializer):
 
 
 class DeadlinePlanningPreferenceSerialiser(serializers.Serializer):
+<<<<<<< HEAD
     """Serialiser for deadline planning preference."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     deadline_id = serializers.IntegerField()
     ideal_minutes_per_day = serializers.IntegerField(min_value=1)
 
 
 class AutoScheduleRequestSerialiser(serializers.Serializer):
+<<<<<<< HEAD
     """Serialiser for auto schedule request."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     title = serializers.CharField(max_length=100, required=False, default='Auto schedule')
     wake_time = serializers.TimeField(required=False, allow_null=True)
     sleep_time = serializers.TimeField(required=False, allow_null=True)

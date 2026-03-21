@@ -11,14 +11,23 @@ import { useTimerContext } from "../../../context/TimerContext";
 import { useTaskCompletion } from "../../../context/TaskCompletionContext";
 import { getCompletionMessage, isRoutineTask } from "../../../lib/completionMessages";
 import { getUserSettings } from "../../../api/userApi";
+<<<<<<< HEAD
 import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
 import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
+=======
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { CheckBurst } from "../../../components/task_celebration/CheckBurst";
 import CreateTaskModal from "./CreateTaskModal";
 import { TaskInfoModal } from "./TaskInfoModal";
 import TaskCardMeta from "./TaskCardMeta";
+<<<<<<< HEAD
 import AnimatedDropdown from "../../../components/common/animated_dropdown";
+=======
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { formatDueDate, getCompletedDueLabel, splitEstimatedBlocks, PRIORITY_LABELS, PRIORITY_MARKS } from "../utils/taskCardUtils";
 
 import cardStyles from "./TaskCard.module.css";
@@ -27,7 +36,11 @@ const styles = { ...cardStyles, ...ctxMenuStyles };
 
 function useActiveTimerTaskId() {
   const [id, setId] = useState(() => {
+<<<<<<< HEAD
     try { return sessionStorage.getItem("timerTaskId"); } catch { return null; }
+=======
+    try { return typeof window !== "undefined" ? sessionStorage.getItem("timerTaskId") : null; } catch { return null; }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
   useEffect(() => {
     const onStorage = (e) => { if (e.key === "timerTaskId") setId(e.newValue); };
@@ -90,10 +103,18 @@ function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) 
 }
 
 function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
+<<<<<<< HEAD
   const fromListName = lists.find((x) => String(x.id) === String(task.task_list))?.name;
   const options = lists.map(l => ({ value: String(l.id), label: l.name }));
   const handleMove = (listId) => {
     const l = lists.find(x => String(x.id) === listId);
+=======
+  const safeList = lists || [];
+  const fromListName = safeList.find((x) => String(x.id) === String(task.task_list))?.name || null;
+  const options = safeList.map(l => ({ value: String(l.id), label: l.name }));
+  const handleMove = (listId) => {
+    const l = safeList.find(x => String(x.id) === listId);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if (!l) return;
     onEdit({ task_list: l.id }, { source: "context-menu", action: "move-list", listId: l.id, listName: l.name, fromListId: task.task_list, fromListName });
     onClose();
@@ -103,7 +124,11 @@ function ContextMenuMoveView({ task, lists, onEdit, onClose, setView }) {
       <button className={styles.ctxBack} onClick={() => setView("main")}><ChevronLeft size={14} strokeWidth={2} /> Back</button>
       <div className={styles.ctxDivider} />
       <div className={styles.ctxMoveDropdownWrap}>
+<<<<<<< HEAD
         <AnimatedDropdown value={String(task.task_list ?? "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
+=======
+        <AnimatedDropdown value={String(task.task_list || "")} onChange={handleMove} options={options} menuMaxHeight={200} usePortal allowFlipUpward />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </div>
     </>
   );
@@ -255,7 +280,11 @@ function TaskCardView(card) {
   const { task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, setActiveTaskId, nav } = card;
   const cardCls = `${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${card.isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`;
   return (
+<<<<<<< HEAD
     <div className={cardCls} style={{ "--list-color": listColor || "var(--task-list-fallback)" }} onContextMenu={handleContextMenu} title="Right-click for more options">
+=======
+    <div className={cardCls} style={{ "--list-color": listColor || "#a89890" }} onContextMenu={handleContextMenu} title="Right-click for more options">
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <CheckBurst active={burstPop}>
         <button className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`} onClick={handleCheckClick} aria-label={task.completed ? "Mark incomplete" : "Mark complete"}>
           {task.completed && <span className={styles.checkMark}>✓</span>}
@@ -272,9 +301,15 @@ export default function TaskCard(props) {
   return (
     <>
       <TaskCardView {...card} />
+<<<<<<< HEAD
       {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={card.onEdit ? () => card.setShowEdit(true) : undefined} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
       {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
       {card.showEdit && card.onEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
+=======
+      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={() => card.setShowEdit(true)} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
+      {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
+      {card.showEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </>
   );
 }

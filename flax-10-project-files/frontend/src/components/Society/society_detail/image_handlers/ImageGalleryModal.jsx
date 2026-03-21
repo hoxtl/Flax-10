@@ -1,9 +1,14 @@
 /*
  * ImageGalleryModal renders the fullscreen carousel for society images.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/image_handlers/ImageGalleryModal.jsx
 
 import { useRef } from "react";
 import StandardModal from "../../../common/standard_modal/StandardModal";
+=======
+import { useRef } from "react";
+import StandardModal from "../../../common/StandardModal/StandardModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/imageHandlers/ImageGalleryModal.jsx
 import styles from "./ImageGalleryModal.module.css";
 import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../../hooks/useCarouselNavigation";
 

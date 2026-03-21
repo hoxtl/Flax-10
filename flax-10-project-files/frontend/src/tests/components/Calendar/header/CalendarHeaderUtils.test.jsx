@@ -1,6 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+<<<<<<< HEAD
 import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/calendar/header/calendarHeaderUtils';
+=======
+import { CalendarNav, ViewSwitcher, ActionMenu, ViewSettingsMenu, FilterDropdownButton } from '../../../../components/Calendar/header/CalendarHeaderUtils';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -23,7 +27,11 @@ vi.mock('../../../../components/calendar/header/DatePickerButton', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/common/segmented_control/SegmentedControl', () => ({
+=======
+vi.mock('../../../../components/common/SegmentedControl/SegmentedControl', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     SegmentedControl: ({ options, value, onChange }) => (
         <div data-testid="segmented-control">
             {options.map((o) => (
@@ -34,7 +42,11 @@ vi.mock('../../../../components/common/segmented_control/SegmentedControl', () =
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/common/animated_dropdown', () => ({
+=======
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ customTrigger, options, onChange, value }) => (
         <div data-testid="animated-dropdown">
             {customTrigger}
@@ -55,7 +67,11 @@ vi.mock('../../../../context/TagContext', () => ({
     }),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
+=======
+vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     TagsSelector: ({ tags }) => (
         <div data-testid="tags-selector">
             {tags.map((tag) => <span key={tag.id}>{tag.label}</span>)}
@@ -63,7 +79,11 @@ vi.mock('../../../../components/common/tags_selector/TagsSelector', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/tags/TagManagerModal', () => ({
+=======
+vi.mock('../../../../components/Tags/TagManagerModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: () => <div data-testid="tag-manager-modal" />,
 }));
 
@@ -188,6 +208,7 @@ describe('CalendarHeaderUtils', () => {
             fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
             expect(screen.getByText('Filter by tag')).toBeInTheDocument();
             expect(screen.getByTestId('tags-selector')).toBeInTheDocument();
+<<<<<<< HEAD
         });
 
         it('hides the manage tags action when tag management is disabled', () => {
@@ -204,6 +225,8 @@ describe('CalendarHeaderUtils', () => {
             fireEvent.mouseEnter(trigger);
             fireEvent.click(screen.getByText(/Manage tags/i));
             expect(screen.getByTestId('tag-manager-modal')).toBeInTheDocument();
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         });
     });
 });

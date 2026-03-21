@@ -12,7 +12,11 @@ vi.mock('../../components/dashboard/ProfileDropdown', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../components/dashboard/ExpandableTabs', () => ({
+=======
+vi.mock('../../components/Dashboard/ExpandableTabs', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   ExpandableTabs: ({ tabs = [], onChange }) => (
     <div>
       <button data-testid={`tab-${tabs[0]?.title || 'unknown'}`} onClick={() => onChange(0)}>
@@ -42,7 +46,11 @@ describe('TopBar', () => {
     render(<TopBar />);
     expect(screen.getByText('Plan')).toBeTruthy();
     expect(screen.getByText('Study')).toBeTruthy();
+<<<<<<< HEAD
     expect(screen.getByText('Explore')).toBeTruthy();
+=======
+    expect(screen.getByText('My KCL')).toBeTruthy();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     expect(screen.getByText('My Insights')).toBeTruthy();
   });
 

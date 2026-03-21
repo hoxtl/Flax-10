@@ -144,6 +144,7 @@
 }
 
 .menuItemDanger {
+<<<<<<< HEAD
   color: var(--text);
 }
 
@@ -170,4 +171,11 @@
 
 :global([data-mode="dark"]) .menuItemDanger .menuIcon {
   color: color-mix(in srgb, var(--danger, #dc2626) 88%, #ffb7b7 12%);
+=======
+  color: var(--danger, #dc2626);
+}
+
+.menuItemDanger:hover {
+  background: rgba(220, 38, 38, 0.12);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

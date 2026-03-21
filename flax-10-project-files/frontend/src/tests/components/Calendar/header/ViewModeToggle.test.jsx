@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ViewSwitcher } from "../../../../components/calendar/header/calendarHeaderUtils";
 
+<<<<<<< HEAD
 vi.mock(
   "../../../../components/common/segmented_control/SegmentedControl",
   () => ({
@@ -24,6 +25,21 @@ vi.mock(
           ))}
         </div>
       );
+=======
+vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+    default: function MockAnimatedDropdown({ value, onChange, options, placeholder }) {
+        return (
+            <div data-testid="view-mode-toggle">
+                <span>{placeholder}</span>
+                <span data-value={value}>{value}</span>
+                {options.map(opt => (
+                    <button key={opt.value} type="button" onClick={() => onChange(opt.value)}>
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+        );
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     },
   }),
 );
@@ -45,7 +61,13 @@ describe("ViewSwitcher", () => {
     fireEvent.click(screen.getByText("Day"));
     expect(onChange).toHaveBeenCalledWith("day");
 
+<<<<<<< HEAD
     fireEvent.click(screen.getByText("Month"));
     expect(onChange).toHaveBeenCalledWith("month");
   });
+=======
+        fireEvent.click(screen.getByText('Month'));
+        expect(dispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'month' });
+    });
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

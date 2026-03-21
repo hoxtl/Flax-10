@@ -4,7 +4,10 @@
  */
 
 /** Returns a change handler for the DateTimePicker in all-day mode. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/event_modal/components/timeRowHelpers.js
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/EventModal/components/timeRowHelpers.js
 export function handleDateOnlyPickerChange(field, update) {
     return (val) => {
         if (!val) return update(field)({ target: { value: "" } });

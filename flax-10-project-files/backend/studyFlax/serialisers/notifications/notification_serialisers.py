@@ -5,7 +5,6 @@ Serialiser for user notifications.
 from rest_framework import serializers
 from studyFlax.models import Notification
 
-
 class NotificationSerialiser(serializers.ModelSerializer):
     """Serialiser for notification."""
     class Meta:

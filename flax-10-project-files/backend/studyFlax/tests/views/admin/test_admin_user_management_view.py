@@ -7,14 +7,21 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
+=======
+from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 
 
 class AdminUserListTest(TestCase):
+<<<<<<< HEAD
     """Tests admin user list."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.admin = make_superuser()
         self.url = '/api/admin/users/'
@@ -48,7 +55,10 @@ class AdminUserListTest(TestCase):
 
 
 class AdminBanUserTest(TestCase):
+<<<<<<< HEAD
     """Tests admin ban user."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.admin = make_superuser()
         self.target = make_user('target')
@@ -65,6 +75,7 @@ class AdminBanUserTest(TestCase):
         self.assertEqual(self.target.ban_reason, 'Spam')
 
     def test_ban_returns_200(self):
+<<<<<<< HEAD
         response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': 'Spam'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -74,6 +85,11 @@ class AdminBanUserTest(TestCase):
         self.target.refresh_from_db()
         self.assertTrue(self.target.is_active)
 
+=======
+        response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': ''}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_unban_restores_active(self):
         self.target.is_active = False
         self.target.ban_reason = 'Old reason'
@@ -95,6 +111,7 @@ class AdminBanUserTest(TestCase):
             username='staff2', email='staff2@example.com', password='pass', is_staff=True,
         )
         url = f'/api/admin/users/{staff.id}/ban/'
+<<<<<<< HEAD
         response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': 'Spam'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -124,6 +141,11 @@ class AdminBanUserTest(TestCase):
         self.assertTrue(protected.is_active)
         self.assertEqual(protected.ban_reason, '')
 
+=======
+        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': ''}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_ban_nonexistent_user_returns_404(self):
         url = '/api/admin/users/999999/ban/'
         response = authed_client(self.admin).post(url, {'action': 'ban'}, format='json')

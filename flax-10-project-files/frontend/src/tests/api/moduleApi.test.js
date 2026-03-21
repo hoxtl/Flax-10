@@ -1,7 +1,10 @@
 /*
  * Tests for module API client.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../api/client', () => ({

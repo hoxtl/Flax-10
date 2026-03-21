@@ -2,7 +2,10 @@
  * EventModal - Modal dialog for creating and editing calendar events.
  * Wraps form logic with tag loading and default value handling.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/event_modal/EventModal.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/EventModal/EventModal.jsx
 import { useEventForm } from './useEventForm';
 import { useTags } from '../../../context/TagContext';
 import { ModalContent } from './components/ModalContent';
@@ -11,6 +14,7 @@ import './event-modal.css';
 
 /** Modal for creating or editing a calendar event. */
 
+/** Modal for creating or editing a calendar event. */
 export function EventModal({ event, onClose, initialType, initialDate, showReminder = true, customTags = null, onSubmit = null, onDelete = null }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;

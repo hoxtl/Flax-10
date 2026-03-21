@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { AlarmClock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { UpcomingDeadlinesWidget } from '../../../components/modules/deadlines/UpcomingDeadlinesWidget';
@@ -20,14 +21,28 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
     <UpcomingDeadlinesWidget
       deadlines={deadlines}
       title={isTeacher ? "Teaching Deadlines" : "Upcoming Deadlines"}
+=======
+import { UpcomingDeadlinesWidget } from '../../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
+
+export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModule }) {
+  return (
+    <UpcomingDeadlinesWidget
+      deadlines={deadlines}
+      title="Upcoming Deadlines"
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       initialShown={3}
       embedded
       interactiveRows
       onSelectDeadline={onSelectDeadline}
       onSelectModule={onSelectModule}
+<<<<<<< HEAD
       emptyMessage={isTeacher ? "No teaching deadlines upcoming." : "No deadlines need attention."}
       emptySub={isTeacher ? "Deadlines from modules you teach will show up here." : "Upcoming coursework and exams will show up here."}
       renderEmpty={() => <DeadlineEmptyState isTeacher={isTeacher} />}
+=======
+      emptyMessage="No deadlines need attention."
+      emptySub="Upcoming coursework and exams will show up here."
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     />
   );
 }

@@ -12,7 +12,11 @@ vi.mock('../../../context/CalendarContext', () => ({
 }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => mockConfirm }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/month_view/MonthView', () => ({
+=======
+vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   MonthView: ({ onEventClick, onMoreClick, readOnly, events }) => (
     <div>
       <div>readOnly:{String(!!readOnly)}</div>
@@ -34,6 +38,7 @@ vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   addMonths: vi.fn((d) => d), formatMonthYear: () => 'March 2026', isSameMonth: vi.fn(() => false), formatTimeRange: () => '10:00 - 11:00',
 }));
@@ -55,11 +60,37 @@ vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
 }));
 
 vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
+=======
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+  addMonths: vi.fn((d) => d), formatMonthYear: () => 'March 2026', isSameMonth: vi.fn(() => false), formatTimeRange: () => '10:00 - 11:00',
+}));
+vi.mock('../../../components/Calendar/utils/recurrenceUtils', () => ({ expandRecurringEvents: (events) => events }));
+vi.mock('../../../components/Calendar/utils/eventUtils', () => ({ hasRecurrence: (e) => !!e?.recurrence_rule, extractBaseEventId: (id) => String(id).split('-')[0] }));
+
+vi.mock('../../../components/Society/SocietyDetail/tags/TagFilterBar', () => ({
+  default: ({ onFilterChange }) => (<div>TagFilterBar<button type="button" onClick={() => onFilterChange([1])}>filter-tag-1</button><button type="button" onClick={() => onFilterChange([])}>clear-filter</button></div>),
+}));
+vi.mock('../../../components/Society/SocietyDetail/tags/TagManager', () => ({ default: () => <div>TagManager</div> }));
+vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/SyncButton', () => ({ default: () => <div>SyncButton</div> }));
+
+vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+  EventModal: ({ onDelete, onSubmit }) => (<div data-testid="event-modal"><button type="button" onClick={() => onSubmit?.({ title: 'Updated' })}>submit</button>{onDelete != null && <button type="button" onClick={() => onDelete?.()}>delete</button>}</div>),
+}));
+
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+  EventPopover: ({ actions, onClose }) => (<div data-testid="detail-popup"><button type="button" onClick={onClose}>close-popup</button>{actions?.map((a) => (<button key={a.label} type="button" onClick={a.onClick}>{a.label}</button>))}</div>),
+}));
+
+vi.mock('../../../components/Calendar/EventsSummaryModal/EventsSummaryModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   EventsSummaryModal: ({ isOpen, onClose }) => (isOpen ? <div data-testid="summary-modal">Summary<button type="button" onClick={onClose}>close-summary</button></div> : null),
 }));
 
 import CalendarTab from '../../../components/society/society_detail/tabs/calendar_tab/CalendarTab';
 import * as dateUtils from '../../../components/calendar/utils/dateUtils';
+
+const defaultProps = { events: [], editMode: false, societyId: 1, isMember: true, societyName: 'Chess' };
+const renderTab = (props = {}) => render(<CalendarTab {...defaultProps} {...props} />);
 
 const defaultProps = { events: [], editMode: false, societyId: 1, isMember: true, societyName: 'Chess' };
 const renderTab = (props = {}) => render(<CalendarTab {...defaultProps} {...props} />);
@@ -182,6 +213,10 @@ describe('Society detail CalendarTab', () => {
     mockIsModalOpen = true;
     mockModalEvent = { id: 1, title: 'E', start_time: '2026-03-09T10:00:00Z' };
     mockConfirm.mockRejectedValueOnce(new Error('cancel'));
+<<<<<<< HEAD
+=======
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     renderTab({ editMode: true, eventHandlers: { onDelete: vi.fn() }, tags: [] });
     fireEvent.click(screen.getByText('delete'));
     await waitFor(() => expect(mockCloseModal).toHaveBeenCalled());

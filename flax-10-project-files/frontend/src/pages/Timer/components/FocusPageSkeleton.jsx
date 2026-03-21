@@ -3,7 +3,11 @@
  */
 
 import styles from '../TimerPage.module.css';
+<<<<<<< HEAD
 import SkeletonBlock from '../../../components/common/loading_state/SkeletonBlock';
+=======
+import SkeletonBlock from '../../../components/common/LoadingState/SkeletonBlock';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function SkeletonControls() {
   return (

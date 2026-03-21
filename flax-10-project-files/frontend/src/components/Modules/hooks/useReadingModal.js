@@ -1,7 +1,10 @@
 /*
  * Hook for managing reading modal state and CRUD operations.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect, useCallback } from 'react';
 import { getReadings, createReading, updateReading, deleteReading } from '../../../api/readingApi';
 

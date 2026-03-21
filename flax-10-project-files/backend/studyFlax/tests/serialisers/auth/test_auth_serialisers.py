@@ -13,12 +13,18 @@ from studyFlax.models.auth.user_settings_model import UserSettings
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.tasks.task_model import Task
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 
 class ResetPasswordSerializerTest(TestCase):
+<<<<<<< HEAD
     """Tests reset password serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_normalise_email(self):
         from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
         serializer = ResetPasswordSerialiser()
@@ -40,7 +46,10 @@ class ResetPasswordSerializerTest(TestCase):
 
 
 class RegistrationSerializerEmailTest(TestCase):
+<<<<<<< HEAD
     """Tests registration serialiser email."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         User.objects.create_user(
             username='existing', email='existing@test.com', password='pass',
@@ -60,7 +69,10 @@ class RegistrationSerializerEmailTest(TestCase):
 
 
 class AuthAndTaskCoverageTest(TestCase):
+<<<<<<< HEAD
     """Tests auth and task coverage."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = User.objects.create_user(username='auth_cov', email='auth_cov@example.com', password='pass')
@@ -82,7 +94,11 @@ class AuthAndTaskCoverageTest(TestCase):
         self.assertEqual(serializer.data['modules'], ['CS200'])
 
     def test_get_user_tasks_list_filter_helper(self):
+<<<<<<< HEAD
         from studyFlax.views.tasks.task_view_service import get_user_tasks
+=======
+        from studyFlax.views.tasks.task_view import get_user_tasks
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         task_list = self.user.task_lists.create(name='Personal', category='personal')
         Task.objects.create(user=self.user, title='Listed', task_list=task_list)
         Task.objects.create(user=self.user, title='Other')
@@ -91,7 +107,10 @@ class AuthAndTaskCoverageTest(TestCase):
 
 
 class SerializerCoverageTest(TestCase):
+<<<<<<< HEAD
     """Tests serialiser coverage."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user = User.objects.create_user(username='ser_user', email='ser_user@test.com', password='pass')
 
@@ -165,7 +184,10 @@ class SerializerCoverageTest(TestCase):
 
 
 class ResetPasswordSerialiserCoverageTest(TestCase):
+<<<<<<< HEAD
     """Tests reset password serialiser coverage."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_validate_email_normalises(self):
         from studyFlax.serialisers.auth.reset_password_serialisers import ResetPasswordSerialiser
         s = ResetPasswordSerialiser(data={'email': 'Test@Example.COM'})
@@ -182,7 +204,10 @@ class ResetPasswordSerialiserCoverageTest(TestCase):
 
 
 class CommonSerialiserUtilsTest(TestCase):
+<<<<<<< HEAD
     """Tests common serialiser utils."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_is_user_sharing_with_allow_self_returns_true(self):
         from studyFlax.serialisers.common import is_user_sharing_with
         user = User.objects.create_user(username='self_share', email='self_share@test.com', password='pass')
@@ -193,14 +218,20 @@ class CommonSerialiserUtilsTest(TestCase):
 
 
 class FormatTeacherNameTest(TestCase):
+<<<<<<< HEAD
     """Tests format teacher name."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_returns_unknown_for_none_user(self):
         from studyFlax.serialisers.common import format_teacher_name
         self.assertEqual(format_teacher_name(None), 'Unknown')
 
 
 class RegistrationSerialiserFieldTest(TestCase):
+<<<<<<< HEAD
     """Tests registration serialiser field."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_get_first_name_from_valid_registration(self):
         from studyFlax.serialisers.auth.auth_serialisers import RegistrationUserSerialiser
         data = {

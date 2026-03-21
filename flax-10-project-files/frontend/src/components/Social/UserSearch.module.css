@@ -317,8 +317,13 @@
 }
 
 .compactDropdown {
+<<<<<<< HEAD
     max-height: min(420px, 44vh);
     padding: 10px;
+=======
+    max-height: 220px;
+    padding: 6px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     gap: 2px;
     border-radius: 10px;
     box-shadow: none;
@@ -335,6 +340,7 @@
     gap: 10px;
     border-radius: 8px;
 }
+<<<<<<< HEAD
 
 @media (max-width: 768px) {
     .searchDropdownContainer {
@@ -346,3 +352,5 @@
         max-height: min(220px, 30vh);
     }
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

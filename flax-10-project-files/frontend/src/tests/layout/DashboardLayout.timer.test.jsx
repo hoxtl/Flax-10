@@ -12,6 +12,7 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
+<<<<<<< HEAD
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
 
@@ -44,22 +45,71 @@ vi.mock("../../components/timer/TimerPopups", async () => {
   return { LeaveTimerModal: LeaveTimerMock };
 });
 vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
+=======
+import { authService } from "../../api/authApi";
+import { clearUserData } from "../../components/Authentication/utils/authHelpers";
+import { useEventModal, useCalendar } from "../../context/CalendarContext";
+import { useLocation } from "react-router-dom";
+
+vi.mock("../../components/Dashboard/Sidebar", async () => {
+  const { SidebarMock } = await import("./dashboardMocks");
+  return { default: SidebarMock };
+});
+vi.mock("../../components/Dashboard/Topbar", async () => {
+  const { TopbarMock } = await import("./dashboardMocks");
+  return { default: TopbarMock };
+});
+vi.mock("../../components/Dashboard/QuickAddModal", async () => {
+  const { QuickAddMock } = await import("./dashboardMocks");
+  return { default: QuickAddMock };
+});
+vi.mock("../../components/Calendar/EventModal/EventModal", async () => {
+  const { EventModalMock } = await import("./dashboardMocks");
+  return { EventModal: EventModalMock };
+});
+vi.mock("../../components/Society/CreateSocietyModal", async () => {
+  const { CreateSocietyMock } = await import("./dashboardMocks");
+  return { default: CreateSocietyMock };
+});
+vi.mock("../../components/Modules/DeadlineModal", async () => {
+  const { DeadlineModalMock } = await import("./dashboardMocks");
+  return { default: DeadlineModalMock };
+});
+vi.mock("../../components/Timer/TimerPopups", async () => {
+  const { LeaveTimerMock } = await import("./dashboardMocks");
+  return { LeaveTimerModal: LeaveTimerMock };
+});
+vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const { CreateTaskMock } = await import("./dashboardMocks");
   return { default: CreateTaskMock };
 });
 
+<<<<<<< HEAD
 vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("../../components/auth/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+=======
+vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
+vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
 }));
 
 const mockTimerContext = {
+<<<<<<< HEAD
   isActive: false, isPaused: false, mode: "work", timeLeft: 1500,
   togglePause: vi.fn(), setIsActive: vi.fn(), setMode: vi.fn(), setTimeLeft: vi.fn(), resetTimer: vi.fn(),
+=======
+  isActive: false, isPaused: false, timeLeft: 1500,
+  togglePause: vi.fn(), setIsActive: vi.fn(), resetTimer: vi.fn(),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 };
 vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
 vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
@@ -70,7 +120,11 @@ vi.mock("../../api/taskApi", () => ({
 vi.mock("../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]),
 }));
+<<<<<<< HEAD
 vi.mock("../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+=======
+vi.mock("../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const mockStore = {};
 vi.stubGlobal('localStorage', {
@@ -91,22 +145,38 @@ describe("DashboardLayout – society, timer, global task", () => {
     useCalendar.mockReturnValue({ selectedDate: new Date() });
     mockTimerContext.isActive = false;
     mockTimerContext.isPaused = false;
+<<<<<<< HEAD
     mockTimerContext.mode = "work";
     useLocation.mockReturnValue({ pathname: "/", search: "", hash: "", state: null, key: "default" });
     localStorage.setItem("user", JSON.stringify(mockUser));
     window.innerWidth = 1024;
     window.dispatchEvent(new Event("resize"));
+=======
+    useLocation.mockReturnValue({ pathname: "/", search: "", hash: "", state: null, key: "default" });
+    localStorage.setItem("user", JSON.stringify(mockUser));
+    global.innerWidth = 1024;
+    global.dispatchEvent(new Event("resize"));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it("society creation error is caught and logged", async () => {
     const { createSociety } = await import("../../api/societyApi");
     createSociety.mockRejectedValueOnce(new Error("fail"));
+<<<<<<< HEAD
+=======
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Society"));
     fireEvent.click(screen.getByText("Create Society"));
     await waitFor(() => expect(createSociety).toHaveBeenCalled());
+<<<<<<< HEAD
     expect(screen.getByTestId("society-modal")).toBeInTheDocument();
+=======
+    await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith("Failed to create society:", expect.any(Error)));
+    consoleSpy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it("society creation success closes modal", async () => {
@@ -123,12 +193,21 @@ describe("DashboardLayout – society, timer, global task", () => {
   it("GlobalTaskModal handleSave error is caught", async () => {
     const { createTask } = await import("../../api/taskApi");
     createTask.mockRejectedValueOnce(new Error("fail"));
+<<<<<<< HEAD
+=======
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Task"));
     fireEvent.click(screen.getByText("Save Task"));
     await waitFor(() => expect(createTask).toHaveBeenCalled());
+<<<<<<< HEAD
     expect(screen.getByTestId("create-task-modal")).toBeInTheDocument();
+=======
+    await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith("Failed to create task:", expect.any(Error)));
+    consoleSpy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it("when timer active and not paused, Quick Add sets pendingNav to QUICK_ADD", () => {
@@ -190,8 +269,13 @@ describe("DashboardLayout – society, timer, global task", () => {
     mockTimerContext.isActive = true;
     mockTimerContext.isPaused = false;
     const onNavChange = vi.fn();
+<<<<<<< HEAD
     window.innerWidth = 500;
     window.dispatchEvent(new Event("resize"));
+=======
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
     fireEvent.click(screen.getByText("Nav to Settings"));
     expect(screen.getByTestId("leave-timer-modal")).toBeInTheDocument();
@@ -199,6 +283,7 @@ describe("DashboardLayout – society, timer, global task", () => {
     expect(onNavChange).toHaveBeenCalledWith("settings");
   });
 
+<<<<<<< HEAD
   it("Take a 5m Break instead starts a break and continues the pending navigation", () => {
     mockTimerContext.isActive = true;
     mockTimerContext.isPaused = false;
@@ -233,6 +318,12 @@ describe("DashboardLayout – society, timer, global task", () => {
     const onNavChange = vi.fn();
     window.innerWidth = 500;
     window.dispatchEvent(new Event("resize"));
+=======
+  it("handleNavChange when nav is timer calls onNavChange without setting pending", () => {
+    const onNavChange = vi.fn();
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
     fireEvent.click(screen.getByText("Nav to Timer"));
     expect(onNavChange).toHaveBeenCalledWith("timer");
@@ -240,8 +331,13 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("user sync on auth-changed updates user", async () => {
+<<<<<<< HEAD
     window.innerWidth = 500;
     window.dispatchEvent(new Event("resize"));
+=======
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByText("User: John Doe")).toBeInTheDocument();
     localStorage.setItem("user", JSON.stringify({ ...mockUser, first_name: "Jane", last_name: "Doe" }));
@@ -251,8 +347,13 @@ describe("DashboardLayout – society, timer, global task", () => {
 
   it("parseStoredUser includes year and major when present", () => {
     localStorage.setItem("user", JSON.stringify({ username: "u", first_name: "F", last_name: "L", year: 2, major: "CS", email: "e@e.com" }));
+<<<<<<< HEAD
     window.innerWidth = 500;
     window.dispatchEvent(new Event("resize"));
+=======
+    global.innerWidth = 500;
+    global.dispatchEvent(new Event("resize"));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByText("User: F L")).toBeInTheDocument();
   });
@@ -293,7 +394,11 @@ describe("DashboardLayout – society, timer, global task", () => {
 
   it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
     const { getModules, getEnrollments } = await import("../../api/moduleApi");
+<<<<<<< HEAD
     const { isEnrolledIn } = await import("../../components/modules/utils/moduleUtils");
+=======
+    const { isEnrolledIn } = await import("../../components/Modules/utils/moduleUtils");
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
     getEnrollments.mockResolvedValueOnce([{ module: 1 }]);
     isEnrolledIn.mockImplementation((moduleId, enrollments) => enrollments.some((e) => e.module === moduleId));

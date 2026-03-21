@@ -89,16 +89,24 @@
   text-align: center;
   pointer-events: none;
   opacity: 0;
+<<<<<<< HEAD
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
+=======
+  transition: opacity 0.15s ease, transform 0.15s ease;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   z-index: 100;
   box-shadow: var(--shadow-md);
 }
 
 .scoreCard[data-tooltip]::before,
 .peakCard[data-tooltip]::before {
+<<<<<<< HEAD
   content: "";
+=======
+  content: '';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   position: absolute;
   bottom: calc(100% + 2px);
   left: 50%;
@@ -107,9 +115,13 @@
   border-top-color: var(--text);
   pointer-events: none;
   opacity: 0;
+<<<<<<< HEAD
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
+=======
+  transition: opacity 0.15s ease, transform 0.15s ease;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   z-index: 100;
 }
 

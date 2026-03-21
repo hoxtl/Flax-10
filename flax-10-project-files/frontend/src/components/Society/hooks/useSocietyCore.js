@@ -1,7 +1,10 @@
 /*
  * useSocietyCore manages the core society detail fetch and update flow.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect, useCallback } from 'react';
 import * as api from '../../../api/societyApi';
 

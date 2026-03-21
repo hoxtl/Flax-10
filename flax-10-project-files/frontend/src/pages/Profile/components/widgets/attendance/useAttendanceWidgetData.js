@@ -1,11 +1,20 @@
 import { useMemo } from "react";
+<<<<<<< HEAD
 import { useAttendanceRecords } from "../../../../attendance/hooks/useAttendanceRecords";
 import { useAttendanceStats } from "../../../../attendance/hooks/useAttendanceStats";
+=======
+import { useAttendanceRecords } from "../../../../Attendance/hooks/useAttendanceRecords";
+import { useAttendanceStats } from "../../../../Attendance/hooks/useAttendanceStats";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import {
   buildByTypeChartData,
   buildOverallChartData,
   withByTypeColors,
+<<<<<<< HEAD
 } from "../../../../attendance/utils/attendanceChartData";
+=======
+} from "../../../../Attendance/utils/attendanceChartData";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { recordAttendance } from "../../../../../api/attendanceApi";
 import {
   buildMarkedEvents,

@@ -1,13 +1,23 @@
+<<<<<<< HEAD
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementsTab from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementsTab';
+=======
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import AnnouncementsTab from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as Mocks from './societyTestMocks';
 
 vi.mock('../../../components/calendar/utils/dateUtils', () => ({
   formatShortDate: () => 'Mar 9',
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/society/society_detail/image_handlers/ImageGalleryModal', () => ({
+=======
+vi.mock('../../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: ({ onClose }) => (
     <div data-testid="gallery-modal">
       <button onClick={onClose}>close</button>
@@ -61,6 +71,7 @@ describe('AnnouncementsTab', () => {
     vi.useFakeTimers();
     renderTab({ announcements: [{ id: 99, title: 'F', content: 'x' }], focusAnnouncementId: 99 });
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
+<<<<<<< HEAD
     act(() => {
       vi.advanceTimersByTime(2000);
     });
@@ -86,4 +97,8 @@ describe('AnnouncementsTab', () => {
     render(<AnnouncementsTab editMode={false} tags={[]} />);
     expect(screen.getByText('No announcements yet.')).toBeInTheDocument();
   });
+=======
+    vi.useRealTimers();
+  });
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

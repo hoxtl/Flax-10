@@ -1,7 +1,10 @@
 /*
  * BrowseCard renders a compact society browse card.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './BrowseCard.module.css';
 import ActionCard from './ActionCard';
 

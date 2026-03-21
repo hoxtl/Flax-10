@@ -1,6 +1,7 @@
 /*
  * Smart nudge banner for urgent deadlines or readings due within 7 days.
  */
+<<<<<<< HEAD
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
@@ -10,6 +11,65 @@ import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 
 const styles = { ...widgetStyles, ...rowStyles };
+=======
+import { useState, useMemo, useCallback } from 'react';
+import { motion as Motion } from 'framer-motion';
+import { getDayCount, getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
+import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
+import { createTask } from '../../api/taskApi';
+import { useToast } from '../../context/ToastContext';
+import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
+import dashStyles from './MyModulesDashboard.module.css';
+import rowStyles from './DashboardRows.module.css';
+
+const styles = { ...dashStyles, ...rowStyles };
+
+function deadlineToTask(deadline) {
+    const tier = deadline?.start_due_date ? getUrgencyTier(deadline.start_due_date) : 'upcoming';
+    const priority = tier === 'overdue' || tier === 'critical' ? 'high' : tier === 'urgent' ? 'medium' : 'low';
+    return {
+        title: deadline?.assessment_title || deadline?.title || deadline?.module_code || 'Assignment',
+        description: '',
+        priority,
+        due_date: deadline?.start_due_date || null,
+        module: deadline?.module ?? null,
+        module_code: deadline?.module_code || null,
+        module_name: deadline?.module_name || null,
+        task_list: null,
+        estimated_blocks: 1,
+    };
+}
+
+async function submitDeadlineAsTask(deadline, setState, onAdded, toast) {
+    setState('loading');
+    try {
+        await createTask(deadlineToTask(deadline));
+        setState('added');
+        onAdded?.(deadline?.id);
+        toast?.('Deadline added to tasks!');
+    } catch {
+        setState('idle');
+        toast?.('Failed to add deadline.', { variant: 'error' });
+    }
+}
+
+function AddDeadlineToTaskButton({ deadline, onAdded, className = '', variant = 'secondary' }) {
+    const [state, setState] = useState('idle');
+    const toast = useToast();
+
+    const handleAdd = (e) => {
+        e.stopPropagation();
+        if (state === 'idle') submitDeadlineAsTask(deadline, setState, onAdded, toast);
+    };
+
+    if (state === 'added') return <span className={styles.addedLabel}>✓ Added</span>;
+    return (
+        <PrimaryButton className={className} variant={variant} size="small" pill onClick={handleAdd} disabled={state === 'loading'}>
+            {state === 'loading' ? 'Adding…' : '+ Add to tasks'}
+        </PrimaryButton>
+    );
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function collectDeadlineNudges(deadlines) {
     return (deadlines || [])
@@ -70,7 +130,11 @@ function NudgeActions({ nudgeItem, onDeadlineAdded, onReadingAdded }) {
     return (
         <div className={styles.nudgeActions}>
             {nudgeItem.type === 'deadline' && nudgeItem.deadline && (
+<<<<<<< HEAD
                 <AddDeadlineToTasksButton deadline={nudgeItem.deadline} onAdded={onDeadlineAdded} className={styles.nudgeAddButton} variant="primary" styles={styles} />
+=======
+                <AddDeadlineToTaskButton deadline={nudgeItem.deadline} onAdded={onDeadlineAdded} className={styles.nudgeAddButton} variant="primary" />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             )}
             {nudgeItem.type === 'reading' && nudgeItem.readingId && (
                 <AddReadingToTasksButton readingId={nudgeItem.readingId} onAdded={onReadingAdded} className={styles.nudgeAddButton} variant="primary" styles={styles} />

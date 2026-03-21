@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useSocietyMembership } from '../../../../components/society/hooks/useSocietyMembership';
+=======
+import { useSocietyMembership } from '../../../../components/Society/hooks/useSocietyMembership';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../../api/societyApi';
 import { useTags } from '../../../../context/TagContext';
 import { useConfirm } from '../../../../context/ConfirmContext';
@@ -54,16 +58,25 @@ describe('useSocietyMembership', () => {
     });
 
     it('joinSociety handles error and subscription cancel/error', async () => {
+<<<<<<< HEAD
         api.joinSociety.mockRejectedValue(new Error('join fail'));
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         await act(async () => { await result.current.joinSociety(); });
         expect(api.joinSociety).toHaveBeenCalledWith(mockId);
         expect(mockSoc.is_member).toBe(false);
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        api.joinSociety.mockRejectedValue(new Error('join fail'));
+        const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
+        await act(async () => { await result.current.joinSociety(); });
+        expect(spy).toHaveBeenCalledWith('Join failed:', expect.any(Error));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
         api.joinSociety.mockResolvedValue({});
         confirm.mockResolvedValue(false);
         await act(async () => { await result.current.joinSociety(); });
         expect(api.toggleSubscription).not.toHaveBeenCalled();
+<<<<<<< HEAD
         expect(mockSoc.is_member).toBe(true);
 
         confirm.mockResolvedValue(true);
@@ -74,6 +87,19 @@ describe('useSocietyMembership', () => {
     });
 
     it('leaveSociety successfully and error paths', async () => {
+=======
+
+        confirm.mockResolvedValue(true);
+        api.toggleSubscription.mockRejectedValue(new Error('sub fail'));
+        await act(async () => { await result.current.joinSociety(); });
+        expect(spy).toHaveBeenCalledWith('Join failed:', expect.any(Error));
+        
+        spy.mockRestore();
+    });
+
+    it('leaveSociety successfully and error paths', async () => {
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         api.leaveSociety.mockResolvedValue({});
         const { result } = renderHook(() => useSocietyMembership(mockId, setSociety));
         
@@ -85,13 +111,22 @@ describe('useSocietyMembership', () => {
 
         api.leaveSociety.mockRejectedValue(new Error('leave fail'));
         await act(async () => { await result.current.leaveSociety(); });
+<<<<<<< HEAD
         expect(api.leaveSociety).toHaveBeenCalledWith(mockId, 'me');
+=======
+        expect(spy).toHaveBeenCalledWith('Leave failed:', expect.any(Error));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
         // Missing member_count branch
         mockSoc = { id: 1, is_member: true }; // No member_count
         api.leaveSociety.mockResolvedValue({});
         await act(async () => { await result.current.leaveSociety(); });
         expect(mockSoc.member_count).toBe(0);
+<<<<<<< HEAD
+=======
+
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('joinSociety missing member_count branch', async () => {

@@ -28,18 +28,38 @@ function getTitle(event) {
     return event.title;
 }
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/EventDot.jsx
 function createDotClickHandler(event, onEventClick, openPopup, popupReadOnly) {
     return (ev) => { ev.stopPropagation(); const rect = ev.currentTarget.getBoundingClientRect(); if (onEventClick) onEventClick(event, rect); else openPopup(event, rect, popupReadOnly); };
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/EventDot.jsx
 function useEventDotLogic(event, onEventClick, customTags, eventType, readOnly) {
     const { openPopup } = useEventPopup();
     const globalTags = useTags();
     const theme = getEventTheme(event, globalTags);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/EventDot.jsx
     const popupReadOnly = readOnly || eventType !== 'personal';
     const handleClick = createDotClickHandler(event, onEventClick, openPopup, popupReadOnly);
     return { color: theme.color, className: getEventClassName(eventType, isDragging), onClick: handleClick, dragProps };
+=======
+
+    const handleClick = (ev) => {
+        ev.stopPropagation();
+        const rect = ev.currentTarget.getBoundingClientRect();
+        if (onEventClick) onEventClick(event, rect);
+        else openPopup(event, rect, readOnly);
+    };
+
+    return {
+        color: theme.color,
+        className: getEventClassName(eventType, isDragging),
+        onClick: handleClick,
+        dragProps
+    };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/EventDot.jsx
 }
 
 function getEventClassName(eventType, isDragging) {

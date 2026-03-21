@@ -61,6 +61,7 @@
   .twoColLayout {
     grid-template-columns: 1fr;
   }
+<<<<<<< HEAD
 
   .schedulingLayout {
     grid-template-columns: 1fr;
@@ -69,6 +70,8 @@
   .schedulingSplitRow {
     grid-template-columns: 1fr;
   }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .preferencesContent {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * CommonGroundSection widget – shared modules and societies between two users.
  */
@@ -10,6 +11,11 @@ const COMMON_GROUND_COLORS = {
   societies: "var(--common-ground-societies)",
 };
 
+=======
+import ProfileWidget from "./ProfileWidget";
+import compatStyles from "./ProfileCompat.module.css";
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function buildCommonGroundData(viewedModules, viewedSocieties, currentUserModules, currentUserSocieties) {
   const sharedModules = (viewedModules || []).filter(m => (currentUserModules || []).includes(m));
   const sharedSocieties = (viewedSocieties || []).filter(s =>
@@ -22,6 +28,7 @@ function buildCommonGroundData(viewedModules, viewedSocieties, currentUserModule
   return { sharedModules, sharedSocieties, otherModules, otherSocieties };
 }
 
+<<<<<<< HEAD
 function buildModuleCard(data) {
   if (!data.sharedModules.length && !data.otherModules.length) return null;
   return { key: "modules", icon: "📚", color: COMMON_GROUND_COLORS.modules, label: "Modules", value: data.sharedModules.length, unit: "in common" };
@@ -34,6 +41,13 @@ function buildSocietyCard(data) {
 
 function buildInsightCards(data) {
   return [buildModuleCard(data), buildSocietyCard(data)].filter(Boolean);
+=======
+function buildSummaryText(sharedModules, sharedSocieties, viewedUsername) {
+  const parts = [];
+  if (sharedModules.length) parts.push(`${sharedModules.length} module${sharedModules.length > 1 ? "s" : ""}`);
+  if (sharedSocieties.length) parts.push(`${sharedSocieties.length} societ${sharedSocieties.length > 1 ? "ies" : "y"}`);
+  return parts.length ? `You share ${parts.join(" and ")} with ${viewedUsername}.` : null;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function ModulePills({ sharedModules, otherModules, onNavigate }) {
@@ -62,6 +76,7 @@ function SocietyPills({ sharedSocieties, otherSocieties, onNavigate }) {
   );
 }
 
+<<<<<<< HEAD
 function CommonGroundInsightCard({ icon, color, label, value, unit, content }) {
   return (
     <div className={compatStyles.commonInsightCard} style={{ borderLeftColor: color }}>
@@ -78,10 +93,18 @@ function CommonGroundInsightCard({ icon, color, label, value, unit, content }) {
         </div>
       </div>
       <div className={compatStyles.commonInsightPills}>{content}</div>
+=======
+function CommonGroundGroup({ label, children }) {
+  return (
+    <div className={compatStyles.commonSubGroup}>
+      <div className={compatStyles.commonSubHeader}>{label}</div>
+      {children}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 function buildCardContent(card, data, onNavigate) {
   if (card.key === "modules") return <ModulePills sharedModules={data.sharedModules} otherModules={data.otherModules} onNavigate={onNavigate} />;
   return <SocietyPills sharedSocieties={data.sharedSocieties} otherSocieties={data.otherSocieties} onNavigate={onNavigate} />;
@@ -102,5 +125,19 @@ export function CommonGroundSection({ viewedModules, viewedSocieties, currentUse
         {cards.map(({ key, ...card }) => <CommonGroundInsightCard key={key} {...card} />)}
       </div>
     </Card>
+=======
+export function CommonGroundSection({ viewedModules, viewedSocieties, currentUserModules, currentUserSocieties, viewedUsername, onNavigate }) {
+  const { sharedModules, sharedSocieties, otherModules, otherSocieties } = buildCommonGroundData(viewedModules, viewedSocieties, currentUserModules, currentUserSocieties);
+  const hasModules = sharedModules.length > 0 || otherModules.length > 0;
+  const hasSocieties = sharedSocieties.length > 0 || otherSocieties.length > 0;
+  if (!hasModules && !hasSocieties) return null;
+  const summaryText = buildSummaryText(sharedModules, sharedSocieties, viewedUsername);
+  return (
+    <ProfileWidget title="COMMON GROUND">
+      {summaryText && <p className={compatStyles.commonGroundTitle}>{summaryText}</p>}
+      {hasModules && <CommonGroundGroup label="MODULES"><ModulePills sharedModules={sharedModules} otherModules={otherModules} onNavigate={onNavigate} /></CommonGroundGroup>}
+      {hasSocieties && <CommonGroundGroup label="SOCIETIES"><SocietyPills sharedSocieties={sharedSocieties} otherSocieties={otherSocieties} onNavigate={onNavigate} /></CommonGroundGroup>}
+    </ProfileWidget>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   );
 }

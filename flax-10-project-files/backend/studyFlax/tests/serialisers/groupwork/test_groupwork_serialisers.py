@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for groupwork serialisers.
 """
@@ -10,6 +11,13 @@ from studyFlax.serialisers.tasks.groupwork_serialisers import (
     GroupProjectSerialiser,
 )
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
+=======
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
+from studyFlax.serialisers.tasks.groupwork_serialisers import (
+    GroupMembershipSerialiser,
+)
+from studyFlax.tests.helpers.base import BaseTestCase
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -19,12 +27,16 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupMembershipSerialiserTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests group membership serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_profile_photo_url_none_when_no_photo(self):
         project = _make_project(self.user)
         membership = GroupMembership.objects.get(project=project, user=self.user)
         serialiser = GroupMembershipSerialiser(membership)
         self.assertIsNone(serialiser.data["profile_photo_url"])
+<<<<<<< HEAD
 
 
 class GroupProjectSerialiserPhotoTests(BaseTestCase):
@@ -70,3 +82,5 @@ class GroupProjectSerialiserPhotoTests(BaseTestCase):
         serialiser = GroupProjectSerialiser(project)
         result = serialiser.get_module_tutor_profile_photo_url(project)
         self.assertIsNone(result)
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

@@ -1,9 +1,14 @@
 /*
  * Settings sidebar navigation and related tab controls.
  */
+<<<<<<< HEAD
 
 import { Clock3, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
 import styles from "../../../pages/settings/Settings.module.css";
+=======
+import { BookOpen, Clock3, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
+import styles from "../../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const TAB_CONFIG = [
   { id: "account", label: "Account", icon: User, group: "My Details" },
@@ -12,6 +17,10 @@ const TAB_CONFIG = [
   { id: "preferences_themes", label: "Appearance", icon: Paintbrush, group: "Preferences" },
   { id: "preferences_sleep", label: "Sleep Schedule", icon: Moon, group: "Preferences" },
   { id: "preferences_scheduling", label: "Scheduling", icon: Clock3, group: "Preferences" },
+<<<<<<< HEAD
+=======
+  { id: "course", label: "Teacher Access", icon: BookOpen, group: "Teacher" },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 ];
 
 function getProfileCompletion(user) {
@@ -59,7 +68,11 @@ function SidebarButton({ tab, activeTab, onChange }) {
   );
 }
 
+<<<<<<< HEAD
 function SidebarGroup({ group, activeTab, onChange, user }) {
+=======
+function SidebarGroup({ group, activeTab, onChange }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const tabs = TAB_CONFIG.filter((tab) => tab.group === group);
 
   return (
@@ -77,7 +90,11 @@ export function SettingsSidebar({ activeTab, onChange, user }) {
     <aside className={styles.sidebar}>
       <ProfileCompletion user={user} />
       <nav className={styles.sidebarNav}>
+<<<<<<< HEAD
         {groups.map((group) => <SidebarGroup key={group} group={group} activeTab={activeTab} onChange={onChange} user={user} />)}
+=======
+        {groups.map((group) => <SidebarGroup key={group} group={group} activeTab={activeTab} onChange={onChange} />)}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </nav>
     </aside>
   );

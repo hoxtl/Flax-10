@@ -2,11 +2,11 @@
  * Deterministic avatar fallbacks for tutors and students.
  */
 
-function normalise(value) {
-  return `${value ?? ""}`.trim().toLowerCase().replace(/^dr\.\s*/i, "");
+function normalise(value = "") {
+  return `${value}`.trim().toLowerCase().replace(/^dr\.\s*/i, "");
 }
 
-function getHash(value) {
+function getHash(value = "") {
   return Math.abs(
     [...`${value || "user"}`].reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
   );
@@ -28,14 +28,14 @@ const KNOWN_FEMALE_NAMES = new Set([
   "zoe", "maria", "yasmin", "yamada", "farrell",
 ]);
 
-function getFirstName(fullName) {
+function getFirstName(fullName = "") {
   return normalise(fullName).split(/\s+/)[0] || "";
 }
 
 const MALE_USERNAME_PATTERN = /^johndoe|charlie|omar|liamk|srahwan|echen|jmurphy|rkapoor|dnguyen|tbrown|fnunes|cellis|bkwame|jpark$/;
 const FEMALE_USERNAME_PATTERN = /^janedoe|riley|nina|sofia|amiller|hpatel|swan|lturner|ofarrell|ayamada|hlewis|asmith$/;
 
-function inferGender({ fullName, username }) {
+function inferGender({ fullName = "", username = "" } = {}) {
   const first = getFirstName(fullName);
   const uname = normalise(username);
   if (KNOWN_MALE_NAMES.has(first) || MALE_USERNAME_PATTERN.test(uname)) return "male";
@@ -43,19 +43,22 @@ function inferGender({ fullName, username }) {
   return "unknown";
 }
 
-function buildGenderAvatar(seedKey, gender) {
+function buildGenderAvatar(seedKey = "", gender = "unknown") {
   const hash = getHash(seedKey);
   if (gender === "male") return `https://randomuser.me/api/portraits/men/${MALE_AVATAR_INDICES[hash % MALE_AVATAR_INDICES.length]}.jpg`;
   if (gender === "female") return `https://randomuser.me/api/portraits/women/${FEMALE_AVATAR_INDICES[hash % FEMALE_AVATAR_INDICES.length]}.jpg`;
   return `https://i.pravatar.cc/96?img=${(hash % 50) + 1}`;
 }
 
-function buildNonHumanAvatar(seedKey) {
-  return `https://robohash.org/${encodeURIComponent(seedKey)}?set=set4&size=96x96`;
+function buildNonHumanAvatar(seedKey = "") {
+  const hash = getHash(seedKey);
+  if (hash % 2 === 0) return `https://robohash.org/${encodeURIComponent(seedKey)}?set=set4&size=96x96`;
+  return `https://picsum.photos/seed/${encodeURIComponent(seedKey)}/96/96`;
 }
 
-function buildStudentFallback(seedKey) {
+function buildStudentFallback(seedKey = "") {
   const hash = getHash(seedKey);
+  if (hash % 10 === 0) return null;
   if (hash % 4 === 0) return buildNonHumanAvatar(seedKey);
   return buildGenderAvatar(seedKey, "unknown");
 }
@@ -125,22 +128,16 @@ function extractFullName(user) {
   return user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
 }
 
-function extractUsername(user) {
-  return user.username || user.user_name || "";
-}
-
 /** Resolves a user's display photo, falling back to a deterministic avatar. */
-
 export function getResolvedUserPhoto(user, options = {}) {
   if (!user) return null;
   const direct = extractDirectPhoto(user);
   if (direct) return direct;
-  const username = extractUsername(user);
   return getTutorPhotoFallback({
     fullName: extractFullName(user),
-    username,
+    username: user.username,
     role: user.role,
-    seed: options.seed || username || user.id || extractFullName(user),
+    seed: options.seed,
     allowGeneric: Boolean(options.allowGeneric),
   });
 }

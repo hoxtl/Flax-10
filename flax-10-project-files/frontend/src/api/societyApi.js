@@ -1,7 +1,10 @@
 /*
  * Manages societies, members, tags, announcements, events, and calendar sync.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { fetchApi } from './client';
 
 const BASE = '/societies';

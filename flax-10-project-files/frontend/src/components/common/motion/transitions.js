@@ -24,6 +24,7 @@ export const viewSwapMotion = {
   transition: { duration: 0.22, ease: STANDARD_EASE },
 };
 
+<<<<<<< HEAD
 export const pageMotion = {
   initial: { opacity: 0, y: 10, scale: 0.995 },
   animate: { opacity: 1, y: 0, scale: 1 },
@@ -33,6 +34,9 @@ export const pageMotion = {
 
 /** Returns panel entrance/exit motion props, flipping y direction when opening upward. */
 
+=======
+/** Returns panel entrance/exit motion props, flipping y direction when opening upward. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getDropdownPanelMotion(openUpward = false) {
   const yOffset = openUpward ? 8 : -8;
   return {
@@ -44,7 +48,10 @@ export function getDropdownPanelMotion(openUpward = false) {
 }
 
 /** Returns staggered item entrance motion props based on list index. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getDropdownItemMotion(index = 0) {
   return {
     initial: { opacity: 0, x: -10 },

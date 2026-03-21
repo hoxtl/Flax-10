@@ -133,16 +133,23 @@
   .timeline { display: flex; flex-direction: column; }
 
   .timelineBox {
+<<<<<<< HEAD
     border: 1px solid var(--home-widget-frame-border);
+=======
+    border: 1px solid var(--border);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border-radius: 22px;
     background: linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
     padding: 0.95rem 1.05rem 1.08rem;
     overflow: visible;
     position: relative;
     flex: 1 1 auto;
+<<<<<<< HEAD
     box-shadow:
       inset 0 0 0 1px color-mix(in srgb, white 16%, transparent),
       0 10px 22px color-mix(in srgb, var(--color-primary) 4%, transparent);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   }
   .timelineBox:hover {
     /* No shadow — match other widget cards */

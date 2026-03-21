@@ -1,7 +1,10 @@
 /*
  * societyHookUtils contains small data mappers shared across society hooks.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export const normalizeIsoTime = (time) => {
     if (!time || time.length > 16) return time;
     return `${time}:00`;

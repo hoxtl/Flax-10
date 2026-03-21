@@ -10,9 +10,15 @@ import {
   FormInput,
   FormSelect,
   ThemeSelector,
+<<<<<<< HEAD
 } from "../../../components/settings/SettingsUI";
 
 vi.mock("../../../components/common/animated_dropdown", () => ({
+=======
+} from "../../../components/Settings/SettingsUI";
+
+vi.mock("../../../components/common/AnimatedDropdown", () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: ({ value, onChange, options, placeholder, grouped }) => {
     const opts = grouped
       ? (options || []).flatMap((g) => g.options || [])
@@ -71,6 +77,10 @@ describe("SettingsTabs", () => {
     expect(screen.getByText("Sleep Schedule")).toBeTruthy();
     expect(screen.getByText("Scheduling")).toBeTruthy();
     expect(screen.getByText("Location")).toBeTruthy();
+<<<<<<< HEAD
+=======
+    expect(screen.getByText("Teacher Access")).toBeTruthy();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it("calls onChange when a tab is clicked", () => {

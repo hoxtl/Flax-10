@@ -1,8 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+<<<<<<< HEAD
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CoverImageModal from '../../../components/society/society_detail/image_handlers/CoverImageModal';
 
 vi.mock('../../../components/society/society_detail/image_handlers/ImageManagerComponents.module.css', () => ({
+=======
+import { fireEvent, render, screen } from '@testing-library/react';
+import CoverImageModal from '../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal';
+
+vi.mock('../../../components/Society/SocietyDetail/imageHandlers/ImageManagerComponents.module.css', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: {
     backdrop: 'backdrop', modal: 'modal', header: 'header', title: 'title', close: 'close', hint: 'hint',
     grid: 'grid', addCard: 'addCard', addIcon: 'addIcon', imageCard: 'imageCard', pinned: 'pinned',
@@ -11,12 +18,21 @@ vi.mock('../../../components/society/society_detail/image_handlers/ImageManagerC
     photoSelectCard: 'photoSelectCard', selected: 'selected', actions: 'actions', cancelBtn: 'cancelBtn', confirmBtn: 'confirmBtn',
   },
 }));
+<<<<<<< HEAD
 
 const baseImages = ['a.jpg', 'b.jpg'];
 const renderModal = (props = {}) => render(
   <CoverImageModal images={baseImages} availablePhotos={[]} onClose={vi.fn()} onUpdate={vi.fn()} {...props} />
 );
 
+=======
+
+const baseImages = ['a.jpg', 'b.jpg'];
+const renderModal = (props = {}) => render(
+  <CoverImageModal images={baseImages} availablePhotos={[]} onClose={vi.fn()} onUpdate={vi.fn()} {...props} />
+);
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 describe('CoverImageModal', () => {
   const originalAlert = window.alert;
   beforeEach(() => { vi.restoreAllMocks(); window.alert = vi.fn(); });
@@ -68,6 +84,7 @@ describe('CoverImageModal', () => {
     expect(fullAddBtn).toBeDisabled();
   });
 
+<<<<<<< HEAD
   it('adds image via file upload', async () => {
     class MockFileReader {
       readAsDataURL(file) {
@@ -84,6 +101,20 @@ describe('CoverImageModal', () => {
     expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, { target: { files: [new File(['x'], 'x.png', { type: 'image/png' })] } });
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(['1.jpg', '2.jpg', 'data:x.png']));
+=======
+  it('adds image from photos tab', () => {
+    const onUpdate = vi.fn();
+    renderModal({ images: ['1.jpg', '2.jpg'], availablePhotos: ['x.jpg'], onUpdate });
+    const addBtn = document.body.querySelector('button[title="Add image"]');
+    expect(addBtn).toBeTruthy();
+    fireEvent.click(addBtn);
+    fireEvent.click(screen.getByText('From Photos'));
+    const photoCard = document.body.querySelector('.photoSelectCard');
+    expect(photoCard).toBeTruthy();
+    fireEvent.click(photoCard);
+    fireEvent.click(screen.getByText('Add Selected'));
+    expect(onUpdate).toHaveBeenCalledWith(['1.jpg', '2.jpg', 'x.jpg']);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 });
 

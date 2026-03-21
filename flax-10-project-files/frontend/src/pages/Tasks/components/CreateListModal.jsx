@@ -3,10 +3,17 @@
  */
 
 import { useState } from "react";
+<<<<<<< HEAD
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import styles from "./CreateListModal.module.css";
 import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
+=======
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import styles from "./CreateListModal.module.css";
+import { FOCUS_BLOCK_PALETTE } from "../constants/focusBlockColours";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function CreateListModalBody({ name, setName, color, setColor, onEnter }) {
   return (

@@ -1,6 +1,7 @@
 /*
  * Tests for ModuleDetails component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -8,12 +9,18 @@ import { MemoryRouter } from 'react-router-dom';
 import ModuleDetails from '../../../components/modules/modules/ModuleDetails';
 
 const useAuthMock = vi.hoisted(() => vi.fn(() => ({ profile: null })));
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('../../../utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/modules/modules/ModuleDetails.module.css', () => ({ default: {} }));
 vi.mock('../../../components/modules/styles/ModuleHero.module.css', () => ({ default: {} }));
 vi.mock('../../../components/modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
@@ -21,6 +28,12 @@ vi.mock('../../../components/modules/styles/ModuleDeadlines.module.css', () => (
 vi.mock('../../../context/AuthContext.jsx', () => ({
     useAuth: useAuthMock,
 }));
+=======
+vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const module = { //values for mock module
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -59,18 +72,31 @@ describe('ModuleDetails', () => {
     });
 
     it('should render enroll button when not enrolled', () => {
+<<<<<<< HEAD
         renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
         expect(screen.getByText('Enrol in module')).toBeInTheDocument();
     });
 
     it('should render leave button when enrolled', () => {
         renderDetails({ module, is_enrolled: true, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Enroll in module')).toBeInTheDocument();
+    });
+
+    it('should render leave button when enrolled', () => {
+        render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(screen.getByText('Leave module')).toBeInTheDocument();
     });
 
     it('should call onBack when back button is clicked', () => {
         const onBack = vi.fn();
+<<<<<<< HEAD
         renderDetails({ module, is_enrolled: false, onBack, onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={module} is_enrolled={false} onBack={onBack} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         // Use a more flexible selector for the back button
         fireEvent.click(screen.getByRole('button', { name: /Back to all modules/i }));
         expect(onBack).toHaveBeenCalled();
@@ -78,8 +104,13 @@ describe('ModuleDetails', () => {
 
     it('should call onEnroll when enroll button is clicked', () => {
         const onEnroll = vi.fn();
+<<<<<<< HEAD
         renderDetails({ module, is_enrolled: false, onBack: vi.fn(), onEnroll, onUnenroll: vi.fn() });
         fireEvent.click(screen.getByText('Enrol in module'));
+=======
+        render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={onEnroll} onUnenroll={vi.fn()} />);
+        fireEvent.click(screen.getByText('Enroll in module'));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(onEnroll).toHaveBeenCalled();
     });
 
@@ -91,13 +122,21 @@ describe('ModuleDetails', () => {
 
     it('should call onUnenroll when leave button is clicked', () => {
         const onUnenroll = vi.fn();
+<<<<<<< HEAD
         renderDetails({ module, is_enrolled: true, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll });
+=======
+        render(<ModuleDetails module={module} is_enrolled={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={onUnenroll} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         fireEvent.click(screen.getByText('Leave module'));
         expect(onUnenroll).toHaveBeenCalled();
     });
 
     it('shows No description provided when description is null', () => {
+<<<<<<< HEAD
         renderDetails({ module: { ...module, description: null }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={{ ...module, description: null }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(screen.getByText('No module summary available yet.')).toBeInTheDocument();
     });
 
@@ -107,12 +146,20 @@ describe('ModuleDetails', () => {
     });
 
     it('shows No deadlines assigned yet when deadlines empty', () => {
+<<<<<<< HEAD
         renderDetails({ module: { ...module, deadlines: [] }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={{ ...module, deadlines: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(screen.getByText('No assignments yet.')).toBeInTheDocument();
     });
 
     it('shows No readings message when readings is empty', () => {
+<<<<<<< HEAD
         renderDetails({ module: { ...module, readings: [] }, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={{ ...module, readings: [] }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(screen.getByText('No readings assigned yet.')).toBeInTheDocument();
     });
 
@@ -124,7 +171,11 @@ describe('ModuleDetails', () => {
 
     it('renders readings list when readings exist', () => {
         const modWithReadings = { ...module, readings: [{ id: 1, title: 'Module Handbook', start_page: 13, end_page: 63, 'deadline': '2026-04-01T00:00:00' }] };
+<<<<<<< HEAD
         renderDetails({ module: modWithReadings, is_enrolled: false, onBack: vi.fn(), onEnroll: vi.fn(), onUnenroll: vi.fn() });
+=======
+        render(<ModuleDetails module={modWithReadings} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         expect(screen.getByText('Module Handbook')).toBeInTheDocument();
     });
 

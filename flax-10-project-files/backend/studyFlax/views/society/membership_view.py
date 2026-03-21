@@ -14,7 +14,6 @@ from .helpers import (
     society_not_found_response, permission_denied_response
 )
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def membership_list(request, society_id):
@@ -46,6 +45,7 @@ def join_society(user, society):
     return Response(SocietyMembershipSerialiser(membership).data, status=status.HTTP_201_CREATED)
 
 def add_collaborator(request, society):
+<<<<<<< HEAD
     payload, errors, status_code = add_collaborator_result(request.user, request.data, society)
 
     if errors:
@@ -83,6 +83,21 @@ def collaborator_target(data, society):
 def create_collaborator_membership(user, society, data):
     return SocietyMembership.objects.create(user=user, society=society, role=data.get('role', 'editor'))
 
+=======
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+    user = find_user_by_identifier(request.data)
+    if not user:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    if getattr(user, 'role', None) == 'teacher':
+        return Response({'error': 'Teachers cannot join societies.'}, status=status.HTTP_403_FORBIDDEN)
+    if get_membership(user, society):
+        return Response({'error': 'Already a member'}, status=status.HTTP_400_BAD_REQUEST)
+    role = request.data.get('role', 'editor')
+    membership = SocietyMembership.objects.create(user=user, society=society, role=role)
+    return Response(SocietyMembershipSerialiser(membership).data, status=status.HTTP_201_CREATED)
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def find_user_by_identifier(data):
     username = data.get('username')
     email = data.get('email')
@@ -112,6 +127,7 @@ def leave_or_remove(request, society, user_id):
         return error_response
     membership = get_membership_by_user_id(society, user_id)
 
+<<<<<<< HEAD
     remove_membership(membership, request.user.id == user_id, society, user_id)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -130,6 +146,15 @@ def remove_membership(membership, is_self, society, user_id):
         membership._skip_notification = True
     membership.delete()
 
+=======
+    SocietyCalendarSync.objects.filter(user_id=user_id, society=society).delete()
+    if is_self:
+        membership._skip_notification = True
+
+    membership.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def update_role(request, society, user_id):
     if not is_society_admin(request.user, society):
         return permission_denied_response()

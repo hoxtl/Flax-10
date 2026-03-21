@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_announcement_model import SocietyAnnouncement
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import (
     make_society, make_society_admin, make_society_member,
 )
@@ -18,6 +19,15 @@ User = get_user_model()
 
 class SocietyTagViewExtendedTest(TestCase):
     """Tests society tag view extended."""
+=======
+from studyFlax.tests.helpers.factories import (
+    make_society, make_society_admin, make_society_member,
+)
+
+User = get_user_model()
+
+class SocietyTagViewExtendedTest(TestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='stag_admin', email='stag_admin@e.com', password='pass')
@@ -65,7 +75,10 @@ class SocietyTagViewExtendedTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class SocietySerializerEdgeCaseTest(TestCase):
+<<<<<<< HEAD
     """Tests society serialiser edge case."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_profile_photo_url_with_request_and_photo(self):
         from unittest.mock import MagicMock, PropertyMock, patch
         from rest_framework.test import APIRequestFactory
@@ -90,7 +103,10 @@ class SocietySerializerEdgeCaseTest(TestCase):
         self.assertFalse(serializer.data['has_reported'])
 
 class SocietyAnnouncementViewTest(TestCase):
+<<<<<<< HEAD
     """Tests society announcement view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -131,7 +147,10 @@ class SocietyAnnouncementViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class SocietyTagViewTest(TestCase):
+<<<<<<< HEAD
     """Tests society tag view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -164,7 +183,10 @@ class SocietyTagViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class RatificationViewTest(TestCase):
+<<<<<<< HEAD
     """Tests ratification view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')
@@ -217,7 +239,10 @@ class RatificationViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class CalendarSyncViewTest(TestCase):
+<<<<<<< HEAD
     """Tests calendar sync view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='user', email='user@example.com', password='pass')
@@ -252,7 +277,10 @@ class CalendarSyncViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 class PublishChangesViewTest(TestCase):
+<<<<<<< HEAD
     """Tests publish changes view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@example.com', password='pass')

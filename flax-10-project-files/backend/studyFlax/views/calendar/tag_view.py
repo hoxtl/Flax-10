@@ -11,7 +11,10 @@ from studyFlax.models.society import SocietyCalendarSync
 from studyFlax.serialisers import TagSerialiser, CategorySerialiser
 from django.db.models import Q
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 PROTECTED_TAGS = {'other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'}
 
 @api_view(['GET', 'POST'])
@@ -42,7 +45,11 @@ def get_tags(user):
 
 def ensure_user_system_tags(user):
     from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
+<<<<<<< HEAD
     from studyFlax.views.calendar.system_tags import get_exam_tag, get_schedule_tag, get_societies_tag
+=======
+    from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag, get_schedule_tag
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     from studyFlax.views.calendar.system_tags import fix_untagged_deadline_events
     _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events)
     _ensure_society_tags(user, get_societies_tag)
@@ -59,6 +66,10 @@ def _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, f
 def _ensure_society_tags(user, get_societies_tag):
     if has_society_syncs(user):
         get_societies_tag()
+<<<<<<< HEAD
+=======
+    get_schedule_tag()
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def has_module_enrollments(user):
     """Return whether has module enrollments."""

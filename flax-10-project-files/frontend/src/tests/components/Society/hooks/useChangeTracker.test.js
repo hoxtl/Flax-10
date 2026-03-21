@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useChangeTracker } from '../../../../components/society/hooks/useChangeTracker';
+=======
+import { useChangeTracker } from '../../../../components/Society/hooks/useChangeTracker';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('useChangeTracker', () => {
     it('starts with no changes and hasChanges returns false', () => {

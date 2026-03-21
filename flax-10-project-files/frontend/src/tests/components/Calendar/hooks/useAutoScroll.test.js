@@ -1,10 +1,16 @@
 /**
  * Tests for useAutoScroll - auto-scrolls calendar to current time.
  */
+<<<<<<< HEAD
 
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useAutoScroll } from '../../../../components/calendar/hooks/useAutoScroll';
+=======
+import { renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { useAutoScroll } from '../../../../components/Calendar/hooks/useAutoScroll';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { createMockRef, setupRAFMock, mockTime } from '../mocks/calendarMocks';
 
 describe('useAutoScroll', () => {

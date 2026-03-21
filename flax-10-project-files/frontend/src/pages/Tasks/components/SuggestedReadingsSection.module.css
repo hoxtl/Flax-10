@@ -19,7 +19,11 @@
   padding-right: 0.25rem;
   font-size: 0.78rem;
   font-weight: 600;
+<<<<<<< HEAD
   color: var(--text-secondary);
+=======
+  color: var(--muted);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   white-space: nowrap;
 }
 
@@ -54,7 +58,11 @@
 }
 
 .row:active {
+<<<<<<< HEAD
   background: var(--hover-light);
+=======
+  background: rgba(123, 103, 81, 0.06);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   transform: translateY(0);
 }
 
@@ -94,7 +102,11 @@
   align-items: center;
   gap: 4px;
   font-size: 0.82rem;
+<<<<<<< HEAD
   color: var(--text-secondary);
+=======
+  color: var(--flax-brown-strong);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   font-family: var(--font-body);
   font-weight: 500;
 }
@@ -104,12 +116,20 @@
   align-items: center;
   gap: 4px;
   font-size: 0.76rem;
+<<<<<<< HEAD
   color: var(--text-secondary);
+=======
+  color: var(--flax-brown-strong);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   font-family: var(--font-body);
   font-weight: 400;
   font-style: italic;
   margin: 4px 0 0;
+<<<<<<< HEAD
   opacity: 0.82;
+=======
+  opacity: 0.7;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 @media (max-width: 768px) {

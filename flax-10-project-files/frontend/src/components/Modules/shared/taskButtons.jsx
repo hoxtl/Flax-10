@@ -1,6 +1,7 @@
 /*
  * Shared task-conversion actions for module dashboard content.
  */
+<<<<<<< HEAD
 
 import { useState } from 'react';
 import { convertReadingToTask } from '../../../api/readingApi';
@@ -47,11 +48,33 @@ function deadlineToTask(deadline) {
     };
 }
 
+=======
+import { useState } from 'react';
+import { convertReadingToTask } from '../../../api/readingApi';
+import { useToast } from '../../../context/ToastContext';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+
+async function submitReadingAsTask(readingId, setState, onAdded, toast) {
+    setState('loading');
+    try {
+        await convertReadingToTask(readingId);
+        setState('added');
+        onAdded?.(readingId);
+        toast?.('Reading added to tasks!');
+    } catch {
+        setState('idle');
+        toast?.('Failed to add reading.', { variant: 'error' });
+    }
+}
+
+/* Converts a reading into a task from shared module widgets. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function AddReadingToTasksButton({ readingId, onAdded, className = '', variant = 'primary', styles }) {
     const [state, setState] = useState('idle');
     const toast = useToast();
     const handleAdd = (event) => {
         event.stopPropagation();
+<<<<<<< HEAD
         if (state === 'idle') {
             submitAsTask(
                 setState,
@@ -77,4 +100,14 @@ export function AddDeadlineToTasksButton({ deadline, onAdded, className = '', va
     const toast = useToast();
     const handleAdd = (event) => handleDeadlineAdd(event, state, setState, onAdded, toast, deadline);
     return <TaskActionButton state={state} className={className} variant={variant} onClick={handleAdd} addedLabel="✓ Added" styles={styles} />;
+=======
+        if (state === 'idle') submitReadingAsTask(readingId, setState, onAdded, toast);
+    };
+    if (state === 'added') return <span className={styles.addedLabel}>✓ Added</span>;
+    return (
+        <PrimaryButton className={className} variant={variant} size="small" pill onClick={handleAdd} disabled={state === 'loading'}>
+            {state === 'loading' ? 'Adding…' : '+ Add to tasks'}
+        </PrimaryButton>
+    );
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

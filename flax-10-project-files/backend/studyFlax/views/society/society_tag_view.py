@@ -17,8 +17,11 @@ from .helpers import (
 )
 
 
+<<<<<<< HEAD
 MAX_TAGS = 7
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def society_tag_list(request, society_id):
@@ -55,7 +58,10 @@ def society_tag_detail(request, society_id, tag_id):
         return permission_denied_response()
     return _society_tag_detail_result(request.method, request.data, society, tag_id)
 
+<<<<<<< HEAD
 def _society_tag_detail_result(method, data, society, tag_id):
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     tag = get_society_object_or_none(SocietyTag, society, tag_id)
     if not tag:
         return _society_tag_not_found_response()
@@ -67,7 +73,11 @@ def _society_tag_not_found_response():
 def _society_tag_detail_response(method, tag, data):
     if method == 'DELETE':
         return delete_tag(tag)
+<<<<<<< HEAD
     return update_tag(tag, data)
+=======
+    return update_tag(tag, request.data)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def update_tag(tag, data):
     serialiser = SocietyTagSerialiser(tag, data=data, partial=True)

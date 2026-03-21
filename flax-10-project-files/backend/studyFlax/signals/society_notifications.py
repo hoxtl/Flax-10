@@ -6,7 +6,10 @@ from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 from studyFlax.models.society import Society, SocietyEvent, SocietyAnnouncement, SocietyMembership
 from studyFlax.models.notifications.notification_model import Notification
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 _deleting_societies = set()
 
@@ -42,9 +45,12 @@ def notify_members_on_announcement(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=SocietyAnnouncement)
 def handle_announcement_delete(sender, instance, **kwargs):
     """Notify members and clean up linked events when an announcement is deleted."""
+<<<<<<< HEAD
     _delete_announcement_with_notification(instance)
 
 def _delete_announcement_events(instance):
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     has_event = instance.events.exists()
     instance.events.all().delete()
     return has_event
@@ -55,9 +61,12 @@ def _delete_announcement_with_notification(instance):
         return
     _send_removed_announcement_notice(instance, has_event)
 
+<<<<<<< HEAD
 def _send_removed_announcement_notice(instance, has_event):
     notify_society_members(instance.society, build_delete_notification(instance, has_event))
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @receiver(pre_delete, sender=SocietyEvent)
 def handle_event_delete(sender, instance, **kwargs):
     """Notify members when a society event is cancelled."""
@@ -150,6 +159,7 @@ def build_event_notification(event, action='new'):
     }
 
 def build_announcement_notification(announcement):
+    """Return notification data dict for a new society announcement."""
     return {
         'title': f"New announcement from {announcement.society.name}",
         'message': announcement.title,

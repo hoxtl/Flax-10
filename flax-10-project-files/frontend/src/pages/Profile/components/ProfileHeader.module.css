@@ -1,12 +1,17 @@
 .header {
   display: flex;
+<<<<<<< HEAD
   gap: 56px;
+=======
+  gap: 80px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   margin-bottom: 32px;
   padding-bottom: 32px;
   border-bottom: none;
 }
 
 .avatar {
+<<<<<<< HEAD
   margin-left: clamp(56px, 8vw, 120px);
   width: 150px;
   height: 150px;
@@ -16,6 +21,12 @@
     var(--color-primary),
     var(--color-highlight)
   );
+=======
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-highlight));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   color: var(--color-on-primary);
   display: flex;
   align-items: center;
@@ -24,8 +35,12 @@
   font-weight: 600;
   flex-shrink: 0;
   overflow: hidden;
+<<<<<<< HEAD
   box-shadow: 0 8px 32px
     color-mix(in srgb, var(--color-primary) 25%, transparent);
+=======
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--color-primary) 25%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .avatarImage {
@@ -81,6 +96,7 @@
   flex-shrink: 0;
 }
 
+<<<<<<< HEAD
 .calendarActionsGroup {
   display: flex;
   flex-direction: column;
@@ -116,6 +132,10 @@
 .stats {
   display: flex;
   flex-wrap: wrap;
+=======
+.stats {
+  display: flex;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   gap: 32px;
 }
 
@@ -150,11 +170,15 @@
   border-radius: 999px;
   padding: 2px 8px;
   border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
+<<<<<<< HEAD
   background: color-mix(
     in oklab,
     var(--primary-soft, var(--panel)) 60%,
     var(--panel)
   );
+=======
+  background: color-mix(in oklab, var(--primary-soft, var(--panel)) 60%, var(--panel));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   color: var(--primary-700, var(--primary));
   font-size: 11px;
   font-weight: 700;
@@ -162,9 +186,14 @@
 }
 
 .teacherEmail {
+<<<<<<< HEAD
   margin-top: -8px;
   font-size: 13px;
   line-height: 1.35;
+=======
+  margin-top: 4px;
+  font-size: 13px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .teacherEmail a {
@@ -187,6 +216,7 @@
   font-style: italic;
 }
 
+<<<<<<< HEAD
 .emailTipRow {
   display: flex;
   align-items: center;
@@ -221,6 +251,8 @@
   flex-shrink: 0;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .desktopOnly {
   display: flex;
 }
@@ -349,7 +381,11 @@
   .desktopOnly { display: none !important; }
   .mobileOnly { display: flex; }
   .header { gap: 24px; }
+<<<<<<< HEAD
   .avatar { width: 80px; height: 80px; font-size: 32px; margin-left: 0; }
+=======
+  .avatar { width: 80px; height: 80px; font-size: 32px; }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   .username { font-size: 20px; }
   .stats { gap: 20px; }
 }

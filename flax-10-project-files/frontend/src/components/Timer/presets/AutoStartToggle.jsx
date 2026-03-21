@@ -3,7 +3,11 @@
  */
 
 import { useState } from 'react';
+<<<<<<< HEAD
 import styles from '../../../pages/timer/TimerPage.module.css';
+=======
+import styles from '../../../pages/Timer/TimerPage.module.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { AUTOSTART_KEY } from '../utils/presetUtils';
 
 function persistAutoStart(checked, setAutoStart) {

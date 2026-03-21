@@ -1,11 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD
+=======
 
 const mockOpenModal = vi.fn();
 const mockCloseModal = vi.fn();
 let mockIsModalOpen = false;
 let mockModalEvent = null;
 
+vi.mock('../../../context/CalendarContext', () => ({
+    CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
+    useEventModal: () => ({
+        openModal: mockOpenModal,
+        closeModal: mockCloseModal,
+        isModalOpen: mockIsModalOpen,
+        modalEvent: mockModalEvent,
+        modalInitialDate: null,
+    }),
+}));
+
+vi.mock('../../../context/ConfirmContext', () => ({
+    useConfirm: () => vi.fn().mockResolvedValue(true),
+}));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+
+const mockOpenModal = vi.fn();
+const mockCloseModal = vi.fn();
+let mockIsModalOpen = false;
+let mockModalEvent = null;
+
+<<<<<<< HEAD
 vi.mock('../../../context/CalendarContext', () => ({
     CalendarProvider: ({ children }) => <div data-testid="calendar-provider">{children}</div>,
     useEventModal: () => ({
@@ -39,6 +63,22 @@ vi.mock('../../../components/calendar/month_view/MonthView', () => ({
 }));
 
 vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
+=======
+vi.mock('../../../components/Calendar/MonthView/MonthView', () => ({
+    MonthView: ({ events, onEventClick, onMoreClick }) => (
+        <div data-testid="month-view">
+            {events?.map(e => (
+                <button key={e.id} onClick={(ev) => onEventClick(e, ev.target.getBoundingClientRect())}>
+                    {e.title}-click
+                </button>
+            ))}
+            <button onClick={() => onMoreClick(new Date())}>summary</button>
+        </div>
+    ),
+}));
+
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     EventPopover: ({ event, actions }) => (
         <div data-testid="event-popover">
             <span>{event.title}</span>
@@ -47,6 +87,7 @@ vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/events_summary_modal/EventsSummaryModal', () => ({
     EventsSummaryModal: ({ isOpen }) => isOpen ? <div data-testid="summary-modal" /> : null,
 }));
@@ -60,6 +101,21 @@ vi.mock('../../../components/society/society_detail/tags/TagManager', () => ({
 }));
 
 vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
+=======
+vi.mock('../../../components/Calendar/EventsSummaryModal/EventsSummaryModal', () => ({
+    EventsSummaryModal: ({ isOpen }) => isOpen ? <div data-testid="summary-modal" /> : null,
+}));
+
+vi.mock('../../../components/Society/SocietyDetail/tags/TagFilterBar', () => ({
+    default: () => <div data-testid="filter-bar" />,
+}));
+
+vi.mock('../../../components/Society/SocietyDetail/tags/TagManager', () => ({
+    default: () => <div data-testid="tag-manager" />,
+}));
+
+vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     EventModal: ({ onSubmit, onDelete }) => (
         <div data-testid="event-modal">
             <button onClick={() => onSubmit({ title: 'New' })}>submit</button>
@@ -68,7 +124,11 @@ vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 import CalendarTab from '../../../components/society/society_detail/tabs/calendar_tab/CalendarTab';
+=======
+import CalendarTab from '../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('CalendarTab', () => {
     beforeEach(() => {

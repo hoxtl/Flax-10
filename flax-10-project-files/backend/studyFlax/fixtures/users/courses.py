@@ -1,6 +1,38 @@
 """
-Course and department mappings for seeded users and modules.
+User-level lookup tables and course configuration fixtures.
+
+Provides default categories, event tags, recurrence rule templates, the
+KCL course catalogue, a mapping from course name to module-code prefixes,
+and a mapping from module-code prefix to faculty department.
 """
+
+# Format: (name, color, is_default)
+category_fixtures = (
+    ('Work', '#FF5733', True),
+    ('University', '#33FF57', True),
+    ('Personal', '#3357FF', True),
+    ('Chores', '#FF33A8', False),
+    ('Social', '#A833FF', False),
+    ('Health', '#33FFF5', False),
+)
+
+# Format: (name, default_duration_minutes)
+tag_fixtures = (
+    ('Lecture', 120),
+    ('Deadline', 0),
+    ('Exam', 120),
+    ('Schedule', 60),
+    ('Meals', 45),
+    ('Other', 30),
+)
+
+# Format: (frequency, interval)
+recurrence_fixtures = (
+    ('daily', 1),
+    ('weekly', 1),
+    ('weekly', 2),
+    ('monthly', 1),
+)
 
 course_fixtures = (
     "Computer Science", "Artificial Intelligence", "Mathematics", "Physics", "Chemistry",
@@ -88,10 +120,3 @@ module_prefix_to_department = {
     "CL": "Arts & Humanities",
     "CR": "Arts & Humanities",
 }
-
-__all__ = [
-    "course_fixtures",
-    "course_to_module_prefixes",
-    "module_prefix_to_department",
-]
-

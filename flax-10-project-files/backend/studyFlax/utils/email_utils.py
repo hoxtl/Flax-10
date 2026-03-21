@@ -1,12 +1,14 @@
 """
 Utility functions for sending application emails.
 """
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
 
 def send_reset_password_email(user, reset_link):
     subject = 'Request to reset password - StudyFlax'

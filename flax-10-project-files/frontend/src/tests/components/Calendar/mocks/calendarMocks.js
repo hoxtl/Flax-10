@@ -2,7 +2,10 @@
  * Shared mocks and fixtures for Calendar component tests.
  * Provides reusable mock factories and test data.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { vi } from 'vitest';
 
 // Mock event factory

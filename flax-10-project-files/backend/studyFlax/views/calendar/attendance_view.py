@@ -17,6 +17,10 @@ from .attendance_helpers import get_event_for_attendance, build_attendance_stats
 
 
 def _internal_error(detail):
+<<<<<<< HEAD
+=======
+    """Return a standard 500 response payload."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return Response({"detail": detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def _safe_attendance_stats_response(request):

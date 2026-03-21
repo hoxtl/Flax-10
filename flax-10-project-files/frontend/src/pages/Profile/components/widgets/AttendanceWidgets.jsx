@@ -1,5 +1,9 @@
 import { useState } from "react";
+<<<<<<< HEAD
 import Card from "../../../../components/common/card/Card";
+=======
+import Card from "../../../../components/common/Card/Card";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import ProfileWidget from "./ProfileWidget";
 import AttendanceCharts from "./attendance/AttendanceCharts";
 import {
@@ -39,7 +43,11 @@ export function CompactAttendanceTile({ onNavigate }) {
   return (
     <Card className={`${styles.glassCard} ${styles.compactAttCard}`} variant="glass">
       {data.attendancePct < 50 && <AttendanceWarningBadge attendancePct={data.attendancePct} />}
+<<<<<<< HEAD
       <CompactAttHeader onNavigate={() => onNavigate?.("attendance")} />
+=======
+      <CompactAttHeader onNavigate={() => onNavigate?.("analytics")} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <CompactOverallDonut overallData={data.overallData} onSegmentClick={setSelectedSegment} />
       <CompactByTypeDonut byTypeData={data.byTypeData} onSegmentClick={setSelectedSegment} />
       <AttendanceDetails

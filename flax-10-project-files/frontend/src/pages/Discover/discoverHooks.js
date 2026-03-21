@@ -4,7 +4,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { searchUsers } from "../../api/userApi";
+<<<<<<< HEAD
 import { useClickOutside, useFilterState, useSearchInit } from "../../components/social/UserSearch";
+=======
+import { useClickOutside, useFilterState, useSearchInit } from "../../components/Social/UserSearch";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { sortDiscoverUsers, USERS_PER_PAGE } from "./discoverHelpers";
 
 async function loadUsers(query, filters, page, setUsers, setTotalPages, setLoading, sortBy) {
@@ -41,6 +45,7 @@ export function useDiscoverFetch(query, filterState, sortBy) {
     const joinedFilters = getJoinedFilterValues(filterState);
     const { currentPage, setCurrentPage } = usePaginationReset(query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles);
     useEffect(() => {
+<<<<<<< HEAD
         const filters = {
             courses: filterState.props.selectedCourses,
             years: filterState.props.selectedYears,
@@ -50,6 +55,12 @@ export function useDiscoverFetch(query, filterState, sortBy) {
         const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading, sortBy), 300);
         return () => clearTimeout(timer);
     }, [query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles, currentPage, sortBy]);
+=======
+        const filters = { courses: filterState.props.selectedCourses, years: filterState.props.selectedYears, socs: filterState.props.selectedSocieties, roles: filterState.props.selectedRoles || [] };
+        const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading, sortBy), 300);
+        return () => clearTimeout(timer);
+    }, [query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles, currentPage, sortBy, filterState.props.selectedCourses, filterState.props.selectedSocieties, filterState.props.selectedYears, filterState.props.selectedRoles]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return { loading, users, currentPage, setCurrentPage, totalPages };
 }
 

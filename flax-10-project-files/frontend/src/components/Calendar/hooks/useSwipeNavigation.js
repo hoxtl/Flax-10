@@ -2,7 +2,10 @@
  * useSwipeNavigation - Touch and scroll gesture detection for navigation.
  * Enables swipe and wheel-based navigation between calendar views.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useRef, useEffect, useCallback } from 'react';
 
 const WHEEL_THRESHOLD = 80;
@@ -80,7 +83,10 @@ function useSwipeEventListeners(containerRef, handleWheel, handleTouchStart, han
 }
 
 /** Hook for detecting swipe/scroll gestures and triggering navigation callbacks. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useSwipeNavigation({ containerRef, onPrev, onNext, enabled = true }) {
     const lastTriggerRef = useRef(0);
     const touchStartRef = useRef(null);

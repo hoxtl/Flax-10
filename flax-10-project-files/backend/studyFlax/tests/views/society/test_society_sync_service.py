@@ -9,8 +9,12 @@ from datetime import timedelta, datetime, timezone as dt_timezone
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_event_model import SocietyEvent
 from studyFlax.models.society.society_calendar_sync_model import SocietyCalendarSync
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_society
 
+=======
+from studyFlax.tests.helpers.factories import make_user, make_society
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def make_event(society, title='Event', recurrence='none', start=None, end=None):
     start = start or timezone.now() + timedelta(days=1)

@@ -1,7 +1,10 @@
 /*
  * Helper functions for module form state and validation.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { formatForInput } from './moduleUtils.js';
 
 export function getFormData() {

@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddCollaboratorModal from '../../../components/society/AddCollaboratorModal';
 
+<<<<<<< HEAD
 vi.mock('../../../components/social/UserSearch', () => ({
+=======
+vi.mock('../../../components/Social/UserSearch', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ onUserSelect, filterUsers, renderEmptyState }) => {
         // Expose a way to test the filter
         const dummyResults = [
@@ -11,6 +15,7 @@ vi.mock('../../../components/social/UserSearch', () => ({
             { id: 3, username: 'charlie' }
         ];
         const filtered = filterUsers ? filterUsers(dummyResults) : dummyResults;
+<<<<<<< HEAD
 
         return (
             <div data-testid="mock-user-search">
@@ -28,6 +33,25 @@ vi.mock('../../../components/social/UserSearch', () => ({
     }
 }));
 
+=======
+
+        return (
+            <div data-testid="mock-user-search">
+                <div data-testid="filtered-results">
+                    {filtered.map(u => u.username).join(',')}
+                </div>
+                <div data-testid="custom-empty-state">
+                    {renderEmptyState ? 'has-custom-empty-state' : 'no-custom-empty-state'}
+                </div>
+                <button onClick={() => onUserSelect({ id: 1, username: 'alice' })}>Select Alice</button>
+                <button onClick={() => onUserSelect({ id: 2, username: 'bob' })}>Select Bob</button>
+                <button onClick={() => onUserSelect({ id: 3, username: 'charlie' })}>Select Charlie</button>
+            </div>
+        );
+    }
+}));
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 describe('AddCollaboratorModal', () => {
     beforeEach(() => {
         vi.clearAllMocks();

@@ -1,3 +1,5 @@
+/* Tasks page layout and skeleton loading styles. */
+
 .page {
   min-height: 100%;
   display: flex;
@@ -16,6 +18,7 @@
   font-family: inherit;
 }
 
+<<<<<<< HEAD
 .toast {
   position: fixed;
   bottom: 24px;
@@ -100,6 +103,8 @@
     left: 50%;
   }
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 /* ── Skeleton ── */
 @keyframes shimmer {

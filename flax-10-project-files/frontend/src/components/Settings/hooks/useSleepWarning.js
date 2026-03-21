@@ -1,12 +1,20 @@
 /*
  * Warns before running actions during a user's sleep window.
  */
+<<<<<<< HEAD
 
 import { doesEventOverlapSleepWindow, isDuringSleepWindow } from "../sleep/sleepWarningUtils";
 import useSleepWarningState from "./useSleepWarningState";
 
 export { doesEventOverlapSleepWindow, isDuringSleepWindow };
 
+=======
+import { isDuringSleepWindow } from "../sleep/sleepWarningUtils";
+import useSleepWarningState from "./useSleepWarningState";
+
+export { isDuringSleepWindow };
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function getSleepWindow(settings) {
   return {
     sleepTime: settings?.sleep_time || "23:00",

@@ -15,6 +15,10 @@ def get_target_user(target_user_id):
     except (ValueError, TypeError, User.DoesNotExist):
         return None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def validate_target_user(target_user, request_user):
     if not target_user:
         return Response({'error': 'Target user not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -22,6 +26,10 @@ def validate_target_user(target_user, request_user):
         return Response({'error': 'Cannot suggest a session to yourself'}, status=status.HTTP_400_BAD_REQUEST)
     return None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_suggestion_message(request_user, data):
     custom_message = (data.get('message') or '').strip()
     if custom_message:
@@ -32,6 +40,10 @@ def build_suggestion_message(request_user, data):
         return f"{request_user.username} suggested a study session from {slot_start} to {slot_end}."
     return f"{request_user.username} suggested studying together this week."
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def create_study_suggestion(target_user, request_user, data):
     Notification.objects.create(
         user=target_user,

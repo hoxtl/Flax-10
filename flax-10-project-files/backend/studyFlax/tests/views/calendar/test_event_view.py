@@ -3,14 +3,23 @@ Backend tests for event views.
 """
 
 from rest_framework import status
+<<<<<<< HEAD
 from ...helpers.test_case_support import BaseEventTestCase
 from ...helpers.test_fixture_builders import (
     create_simple_event, create_minimal_event,
+=======
+from ..base import BaseEventTestCase
+from ..fixtures import (
+    create_simple_event, create_minimal_event, 
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     create_recurring_event, get_datetime_str
 )
 from studyFlax.models import CalendarEvent
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class EventCreateTests(BaseEventTestCase):
     """Tests for creating events."""
     
@@ -246,4 +255,7 @@ class ExceptionDateViewTests(BaseEventTestCase):
         event.recurrence_rule.refresh_from_db()
         self.assertEqual(event.recurrence_rule.exception_dates.count(existing_date), 1)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

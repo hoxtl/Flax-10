@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useUnreportSociety } from '../../../../components/society/hooks/useUnreportSociety';
+=======
+import { useUnreportSociety } from '../../../../components/Society/hooks/useUnreportSociety';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../../api/societyApi';
 import { useConfirm } from '../../../../context/ConfirmContext';
 
@@ -34,10 +38,19 @@ describe('useUnreportSociety', () => {
     });
 
     it('logs error when unreportSociety fails', async () => {
+<<<<<<< HEAD
         api.unreportSociety.mockRejectedValue(new Error('fail'));
         const { result } = renderHook(() => useUnreportSociety(onUpdateLocal));
         await act(async () => { await result.current({ id: 3, name: 'FailSoc' }); });
         expect(api.unreportSociety).toHaveBeenCalledWith(3);
         expect(onUpdateLocal).not.toHaveBeenCalled();
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        api.unreportSociety.mockRejectedValue(new Error('fail'));
+        const { result } = renderHook(() => useUnreportSociety(onUpdateLocal));
+        await act(async () => { await result.current({ id: 3, name: 'FailSoc' }); });
+        expect(spy).toHaveBeenCalledWith('Failed to unreport society:', expect.any(Error));
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

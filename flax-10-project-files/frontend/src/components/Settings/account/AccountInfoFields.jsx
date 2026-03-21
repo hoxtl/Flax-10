@@ -1,8 +1,12 @@
 /*
  * Account profile fields for personal details.
  */
+<<<<<<< HEAD
 
 import styles from "../../../pages/settings/Settings.module.css";
+=======
+import styles from "../../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { FormInput, FormSelect } from "../SettingsUI";
 import { YEAR_OPTIONS } from "./accountFormConfig";
 

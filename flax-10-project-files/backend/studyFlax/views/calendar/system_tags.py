@@ -84,6 +84,10 @@ def get_societies_tag():
 
 def get_schedule_tag():
     return get_system_tag('Schedule')
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def fix_untagged_deadline_events():
     deadline_tag = get_deadline_tag()

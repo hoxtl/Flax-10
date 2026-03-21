@@ -5,8 +5,12 @@ import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
+<<<<<<< HEAD
 import { hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
 import { applyCalculatedEventMove, applyEventMoveWindow, handleRecurringMoveChoice, moveSingleOccurrenceToWindow } from "./eventMoveUtils";
+=======
+import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();

@@ -1,4 +1,5 @@
 /* StandardModal handles overlay and container positioning */
+<<<<<<< HEAD
 .onboardingPanel {
   width: min(760px, 96vw);
   max-height: min(620px, 86vh);
@@ -10,10 +11,13 @@
   max-height: min(780px, 92vh);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .modal {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+<<<<<<< HEAD
   overflow: visible;
 }
 
@@ -123,3 +127,41 @@
     max-height: min(780px, 94vh);
   }
 }
+=======
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  color: var(--text);
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.btn {
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

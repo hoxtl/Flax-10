@@ -1,12 +1,10 @@
 """
 Model representing a user's membership in a society with role and subscription.
 """
-
 from django.db import models
 
 from ..auth.user_model import User
 from .society_model import Society
-
 
 ROLE_CHOICES = [
     ('member', 'Member'),
@@ -15,7 +13,6 @@ ROLE_CHOICES = [
 ]
 
 class SocietyMembership(models.Model):
-    """Membership record linking a user to a society."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='society_memberships')
     society = models.ForeignKey(Society, on_delete=models.CASCADE, related_name='memberships')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='member')
@@ -23,7 +20,6 @@ class SocietyMembership(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Metadata for society membership."""
         unique_together = ('user', 'society')
 
     def __str__(self):

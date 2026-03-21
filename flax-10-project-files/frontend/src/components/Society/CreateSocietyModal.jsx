@@ -2,11 +2,15 @@
  * CreateSocietyModal provides the interface for users to establish new societies.
  * Collects basic info, categories, admins, and initial collaborators.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from "react";
 import styles from "./CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
 import CollaboratorList from "./CollaboratorList";
+<<<<<<< HEAD
 import { RatificationToggle } from "./society_detail/RatificationSection";
 import CoverImageModal from "./society_detail/image_handlers/CoverImageModal";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/societies/societyFilters";
@@ -14,6 +18,15 @@ import { TagsSelector } from "../common/tags_selector/TagsSelector";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
 import StandardModal from "../common/standard_modal/StandardModal";
 import TextInput from "../common/text_input/TextInput";
+=======
+import { RatificationToggle } from "./SocietyDetail/RatificationSection";
+import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
+import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
+import { TagsSelector } from "../common/TagsSelector/TagsSelector";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import StandardModal from "../common/StandardModal/StandardModal";
+import TextInput from "../common/TextInput/TextInput";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 
@@ -27,7 +40,11 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
     const { collab, photo } = logic.modals;
     return (
         <>
+<<<<<<< HEAD
             <StandardModal title="Create Society" onClose={onClose} modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
+=======
+            <StandardModal title="Create Society" onClose={onClose}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
                 <FormFields form={logic.form} update={logic.update} setModals={logic.setModals} />
                 <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
             </StandardModal>
@@ -38,7 +55,10 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 /** Custom hook to manage the creation form state and modal logic. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function useCreateSocietyForm(onCreate) {
     const [form, setForm] = useState(initialForm());
     const [modals, setModals] = useState({ collab: false, photo: false });
@@ -195,7 +215,11 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
 function ModalFooter({ onClose, onCreate, disabled }) {
     return (
         <div className={styles.footer}>
+<<<<<<< HEAD
             <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="secondary" pill>Cancel</PrimaryButton>
+=======
+            <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="ghost" pill>Cancel</PrimaryButton>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <PrimaryButton className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled} pill>
                 Create Society
             </PrimaryButton>

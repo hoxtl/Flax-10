@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for course change views.
 """
+=======
+"""Backend tests for course change request views."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -8,11 +12,17 @@ from rest_framework import status
 
 from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
 from studyFlax.models.auth.user_settings_model import UserSettings
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
 
 class RequestCourseChangeTest(TestCase):
     """Tests request course change."""
+=======
+from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+
+class RequestCourseChangeTest(TestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user = make_user()
         self.url = '/api/course-change/request/'
@@ -54,7 +64,10 @@ class RequestCourseChangeTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class MyCourseChangeRequestTest(TestCase):
+<<<<<<< HEAD
     """Tests my course change request."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user = make_user()
         self.url = '/api/course-change/my-request/'
@@ -79,7 +92,10 @@ class MyCourseChangeRequestTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 class ListCourseChangeRequestsTest(TestCase):
+<<<<<<< HEAD
     """Tests list course change requests."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user()
@@ -111,7 +127,10 @@ class ListCourseChangeRequestsTest(TestCase):
         self.assertEqual(len(response.data), 0)
 
 class ResolveCourseChangeRequestTest(TestCase):
+<<<<<<< HEAD
     """Tests resolve course change request."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user()

@@ -15,7 +15,10 @@ from studyFlax.serialisers.social.social_serialisers import (
     CalendarShareSerialiser,
     CalendarShareUserSerialiser,
 )
+<<<<<<<< HEAD:flax-10-project-files/backend/studyFlax/tests/views/user/social/test_social_view.py
 
+========
+>>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/backend/studyFlax/tests/views/user/test_social_view.py
 
 User = get_user_model()
 

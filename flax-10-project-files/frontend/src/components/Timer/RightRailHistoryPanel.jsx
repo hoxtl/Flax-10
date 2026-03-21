@@ -2,6 +2,7 @@
  * Right rail timer history panel.
  */
 
+<<<<<<< HEAD
 import styles from '../../pages/timer/TimerPage.module.css';
 import historyStyles from './HistoryModal.module.css';
 import PrimaryButton from '../common/primary_button/PrimaryButton';
@@ -9,11 +10,24 @@ import HoldConfirmModal from '../common/hold_confirm_modal/HoldConfirmModal';
 import { HistoryRailSection } from './history_panel/HistoryRailSection';
 import { WeeklyChart } from './history_panel/WeeklyChart';
 import { clearRightRailHistory, useRightRailHistory } from './history_panel/useRightRailHistory';
+=======
+import styles from '../../pages/Timer/TimerPage.module.css';
+import historyStyles from './HistoryModal.module.css';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
+import { HistoryRailSection } from './historyPanel/HistoryRailSection';
+import { WeeklyChart } from './historyPanel/WeeklyChart';
+import { clearRightRailHistory, useRightRailHistory } from './historyPanel/useRightRailHistory';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function ClearHistoryAction({ setShowClearModal }) {
     return (
         <div className={styles.rightHistoryActions}>
+<<<<<<< HEAD
             <PrimaryButton type="button" variant="primary" pill size="small" onClick={() => setShowClearModal(true)}>Clear History</PrimaryButton>
+=======
+            <PrimaryButton type="button" variant="ghost" pill size="small" onClick={() => setShowClearModal(true)}>Clear History</PrimaryButton>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </div>
     );
 }
@@ -26,6 +40,17 @@ function ClearHistoryModal({ state }) {
     );
 }
 
+<<<<<<< HEAD
+=======
+function useHistoryEvents(refresh) {
+    useEffect(() => {
+        const evs = ['timerHistoryUpdated', 'historyCleared'];
+        evs.forEach(e => window.addEventListener(e, refresh));
+        return () => evs.forEach(e => window.removeEventListener(e, refresh));
+    }, [refresh]);
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export default function RightRailHistoryPanel() {
     const state = useRightRailHistory();
     if (state.visibleBlocks.length === 0) return <div className={historyStyles.empty}>No recent sessions.</div>;
@@ -40,3 +65,28 @@ export default function RightRailHistoryPanel() {
         </div>
     );
 }
+<<<<<<< HEAD
+=======
+
+function FooterActions({ onClear }) {
+    return (
+        <div className={styles.rightHistoryActions}>
+            <PrimaryButton type="button" variant="ghost" pill size="small" onClick={onClear}>Clear History</PrimaryButton>
+        </div>
+    );
+}
+
+function ClearModal({ onConfirm, onCancel }) {
+    return (
+        <HoldConfirmModal
+            title="Clear History"
+            warningText="This will permanently delete all logged sessions. This action cannot be undone."
+            cancelLabel="Keep History"
+            holdLabel="Hold to Clear"
+            onConfirm={onConfirm}
+            onCancel={onCancel}
+        />
+    );
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

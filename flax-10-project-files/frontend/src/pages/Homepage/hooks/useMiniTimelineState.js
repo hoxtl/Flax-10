@@ -1,8 +1,13 @@
 /* UI state for the homepage mini timeline. */
 
 import { useCallback, useRef, useState } from "react";
+<<<<<<< HEAD
 import { usePopoverDismiss } from "./mini_timeline/usePopoverDismiss";
 import { useSleepWindow } from "./mini_timeline/useSleepWindow";
+=======
+import { usePopoverDismiss } from "./miniTimeline/usePopoverDismiss";
+import { useSleepWindow } from "./miniTimeline/useSleepWindow";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function useConflictPopover() {
   const [rowId, setRowId] = useState(null);

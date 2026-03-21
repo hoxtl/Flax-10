@@ -6,17 +6,27 @@
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
 import { useEventModal, useEventPopup, useEventDelete } from '../../context/CalendarContext';
+<<<<<<< HEAD
 import { EventModal } from './event_modal/EventModal';
 import { EventPopover } from './event_popover/EventPopover';
+=======
+import { EventModal } from './EventModal/EventModal';
+import { EventPopover } from './EventPopover/EventPopover';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
 import { unsyncCalendar } from '../../api/societyApi';
+<<<<<<< HEAD
 import HoldConfirmModal from '../common/hold_confirm_modal/HoldConfirmModal';
 
 /** Main entry point for calendar popups. */
+=======
+import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
+/** Main entry point for calendar popups. */
 export function EventPopups() {
   return (
     <>
@@ -98,7 +108,11 @@ function EventPopupContainer() {
 
   const actions = getPopupActions(state.popupEvent, state);
   const tag = (state.popupEvent.source === 'society' && state.popupEvent.tag_name) 
+<<<<<<< HEAD
     ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || 'var(--color-caramel)' }
+=======
+    ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || '#9E7E5D' }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     : state.getTag(state.popupEvent.tag);
 
   return (

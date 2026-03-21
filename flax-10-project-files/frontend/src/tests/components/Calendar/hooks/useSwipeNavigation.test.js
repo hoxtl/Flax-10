@@ -1,10 +1,16 @@
 /**
  * Tests for useSwipeNavigation - touch/scroll gesture navigation.
  */
+<<<<<<< HEAD
 
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useSwipeNavigation } from '../../../../components/calendar/hooks/useSwipeNavigation';
+=======
+import { renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { useSwipeNavigation } from '../../../../components/Calendar/hooks/useSwipeNavigation';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('useSwipeNavigation', () => {
     let container, onPrev, onNext, listeners;

@@ -1,6 +1,7 @@
 /*
  * Shared motion variants for module dashboard widgets.
  */
+<<<<<<< HEAD
 
 export const expandBodyVariants = {
     collapsed: {
@@ -22,6 +23,14 @@ export const expandBodyVariants = {
             opacity: { duration: 0.2, ease: "easeOut", delay: 0.04 },
             y: { duration: 0.22, ease: [0.23, 1, 0.32, 1] },
         },
+=======
+export const expandBodyVariants = {
+    collapsed: { opacity: 0, height: 0 },
+    expanded: {
+        opacity: 1,
+        height: 'auto',
+        transition: { duration: 0.26, ease: [0.23, 1, 0.32, 1] },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     },
 };
 

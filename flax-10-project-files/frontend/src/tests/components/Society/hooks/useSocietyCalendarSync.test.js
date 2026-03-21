@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useSocietyCalendarSync } from '../../../../components/society/hooks/useSocietyCalendarSync';
 import * as api from '../../../../api/societyApi';
 import { useNotify } from '../../../../components/notifications/hooks/useNotify';
+=======
+import { useSocietyCalendarSync } from '../../../../components/Society/hooks/useSocietyCalendarSync';
+import * as api from '../../../../api/societyApi';
+import { useNotify } from '../../../../components/Notifications/hooks/useNotify';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useTags } from '../../../../context/TagContext';
 
 vi.mock('../../../../api/societyApi', () => ({
@@ -11,7 +17,11 @@ vi.mock('../../../../api/societyApi', () => ({
     unsyncCalendar: vi.fn()
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../../components/notifications/hooks/useNotify', () => ({
+=======
+vi.mock('../../../../components/Notifications/hooks/useNotify', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     useNotify: vi.fn(() => vi.fn())
 }));
 
@@ -43,11 +53,21 @@ describe('useSocietyCalendarSync', () => {
     });
 
     it('handles load error', async () => {
+<<<<<<< HEAD
         api.getSyncStatus.mockRejectedValue(new Error('fail'));
         const { result } = renderHook(() => useSocietyCalendarSync(mockId, 'Soc'));
         await act(async () => {});
         expect(result.current.isSynced).toBe(false);
         expect(result.current.loading).toBe(false);
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        api.getSyncStatus.mockRejectedValue(new Error('fail'));
+        const { result } = renderHook(() => useSocietyCalendarSync(mockId, 'Soc'));
+        await act(async () => {});
+        expect(spy).toHaveBeenCalled();
+        expect(result.current.loading).toBe(false);
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('toggleSync unsyncs when already synced', async () => {
@@ -82,6 +102,10 @@ describe('useSocietyCalendarSync', () => {
     });
 
     it('toggleSync handles error', async () => {
+<<<<<<< HEAD
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         const { result } = renderHook(() => useSocietyCalendarSync(mockId, 'Soc'));
         await act(async () => {});
         
@@ -89,8 +113,13 @@ describe('useSocietyCalendarSync', () => {
         await act(async () => {
             await result.current.toggleSync();
         });
+<<<<<<< HEAD
         expect(api.syncCalendar).toHaveBeenCalledWith(mockId);
         expect(result.current.isSynced).toBe(false);
+=======
+        expect(spy).toHaveBeenCalled();
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('does not load if id is missing', () => {

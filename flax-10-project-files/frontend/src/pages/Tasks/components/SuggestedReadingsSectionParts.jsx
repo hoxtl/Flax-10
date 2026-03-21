@@ -6,8 +6,13 @@ import { useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { FileText, Calendar, Clock, Timer, ChevronDown } from "lucide-react";
 
+<<<<<<< HEAD
 import EmptyState from "../../../components/common/empty_state/EmptyState";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+=======
+import EmptyState from "../../../components/common/EmptyState/EmptyState";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { convertReadingToTask } from "../../../api/readingApi";
 

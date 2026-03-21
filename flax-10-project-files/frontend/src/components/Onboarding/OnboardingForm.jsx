@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Onboarding form for year and course selection.
  */
@@ -5,6 +6,9 @@
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import AnimatedDropdown from "../common/animated_dropdown";
 import PrimaryButton from "../common/primary_button/PrimaryButton";
+=======
+import AnimatedDropdown from "../common/AnimatedDropdown";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 
@@ -26,11 +30,22 @@ function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptio
 }
 
 function FormTitle() {
+<<<<<<< HEAD
   return <h2 className={styles.title}>You&rsquo;re in the right place <Motion.span className={styles.starSpan} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>✦</Motion.span></h2>;
 }
 
 function FormSubtitle() {
   return <p className={styles.subtitle}>Two quick things and we'll have your modules ready to go.</p>;
+=======
+  return (
+    <h2 className={styles.title}>
+      You&rsquo;re in the right place{" "}
+      <motion.span style={{ display: "inline-block", color: "var(--primary)" }} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>
+        ✦
+      </motion.span>
+    </h2>
+  );
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function WarningSection({ year, major, confirmed, setConfirmed }) {
@@ -38,11 +53,20 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
   return <AnimatePresence><Motion.div initial={WARNING_ANIMATION.initial} animate={WARNING_ANIMATION.animate} exit={WARNING_ANIMATION.exit} transition={{ duration: 0.3, ease: "easeOut" }} style={{ overflow: "hidden" }}><WarningBox major={major} confirmed={confirmed} onConfirm={setConfirmed} /></Motion.div></AnimatePresence>;
 }
 
+<<<<<<< HEAD
 function SubmitButton({ loading, disabled, onClick }) {
   return <div className={styles.submitRow}><PrimaryButton onClick={onClick} disabled={disabled} className={styles.submitButton} pill>{loading ? "Setting up your modules..." : "Set up my modules"}</PrimaryButton></div>;
 }
 
 export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions, onDropdownOpenChange }) {
+=======
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+
+/**
+ * Collects onboarding fields and confirms course mapping before setup.
+ */
+export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const isSubmitDisabled = !year || !major || !confirmed || loading;
   return (
     <Motion.div key="form" {...FORM_ANIMATION}>
@@ -50,7 +74,22 @@ export default function OnboardingForm({ year, setYear, major, handleMajorChange
       <FormSubtitle />
       <YearCourseFields year={year} setYear={setYear} major={major} handleMajorChange={handleMajorChange} courseOptions={courseOptions} onDropdownOpenChange={onDropdownOpenChange} />
       <WarningSection year={year} major={major} confirmed={confirmed} setConfirmed={setConfirmed} />
+<<<<<<< HEAD
       <SubmitButton loading={loading} disabled={isSubmitDisabled} onClick={handleSubmit} />
     </Motion.div>
+=======
+      <div style={{ marginTop: "1.25rem" }}>
+        <PrimaryButton 
+          onClick={handleSubmit} 
+          disabled={isSubmitDisabled}
+          loading={loading}
+          width="100%"
+          pill
+        >
+          {loading ? "Setting up your modules..." : "Set up my modules"}
+        </PrimaryButton>
+      </div>
+    </motion.div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   );
 }

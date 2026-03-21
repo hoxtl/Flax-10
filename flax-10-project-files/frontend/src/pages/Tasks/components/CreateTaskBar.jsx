@@ -2,10 +2,16 @@
  * Quick-add task bar with optional reading and module details.
  */
 
+<<<<<<< HEAD
 import AnimatedDropdown from "../../../components/common/animated_dropdown";
 import { SleepWarningModal } from "../../../components/common/sleep_warning_modal";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import EstimatedDurationControl from "../../../components/common/estimated_duration_control/EstimatedDurationControl";
+=======
+import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
 
@@ -49,6 +55,7 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }
   );
 }
 
+<<<<<<< HEAD
 function CreateTaskBarOptions(props) {
   const vm = buildOptionsRowViewModel(props);
   return (
@@ -57,6 +64,51 @@ function CreateTaskBarOptions(props) {
         {vm.primaryField}
         <TaskBarDropdownFields {...props} />
       </div>
+=======
+function PageCountField({ styles: s, pageCount, setPageCount }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>Pages</span>
+      <input
+        type="number" min="1" placeholder="e.g. 48" value={pageCount ?? ""} 
+        onChange={(e) => setPageCount(e.target.value ? Number(e.target.value) : null)}
+        className={`${s.input} ${s.pageCountInput}`} aria-label="Page count"
+      />
+    </>
+  );
+}
+
+function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>List</span>
+      <div className={`${s.dropdownWrap} ${s.listDropdownWrap}`}>
+        <AnimatedDropdown value={taskListId || ""} onChange={(v) => setTaskListId(v || (sortedLists[0]?.id ?? ""))} placeholder="Select list" options={listOptions} className={s.moduleListDropdown} />
+      </div>
+    </>
+  );
+}
+
+function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
+  return (
+    <div className={s.optionsRowWrapper}>
+      <div className={`${s.optionsRow} ${showOptions ? s.optionsRowOpen : ""}`}>
+        {!isReadingList && (
+          <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
+        )}
+        {isReadingList && (
+          <PageCountField styles={s} pageCount={pageCount} setPageCount={setPageCount} />
+        )}
+        <span className={s.optionsRowDivider} aria-hidden />
+        <span className={s.optionsRowLabel}>Module</span>
+        <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
+          <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
+        </div>
+        <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
+        </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
@@ -147,7 +199,11 @@ export default function CreateTaskBar(props) {
     <>
       <form className={styles.card} onSubmit={handleSubmit} ref={cardRef} data-create-task-bar-card>
         <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={handleInputBlur} onKeyDown={handleInputKeyDown} />
+<<<<<<< HEAD
         <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedMinutes={bar.estimatedMinutes} setEstimatedMinutes={bar.setEstimatedMinutes} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
+=======
+        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
          sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
          isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
         />

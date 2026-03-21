@@ -1,17 +1,27 @@
 /*
  * SocietyInfo renders editable metadata and membership actions for a society.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
 
 import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import Badge from "../../common/badge/Badge";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
+=======
+import { useState } from "react";
+import { Bell, BellOff } from "lucide-react";
+import Badge from "../../common/Badge/Badge";
+import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
 /** Primary metadata and action row for the society detail page. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
 export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers, isSubscribed, onToggleSubscription }) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
@@ -28,7 +38,10 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
 }
 
 /** Displays or edits the society biography. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
 function BioSection({ text, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
     if (editing) return <BioEditor initialValue={text || ""} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
@@ -57,14 +70,24 @@ function BioEditor({ initialValue, onSave }) {
         <div className={styles.bioEditor}>
             <textarea className={styles.bioInput} value={value} onChange={(e) => setValue(e.target.value)}
                 placeholder="Describe your society..." rows={2} autoFocus />
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
             <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
+=======
+            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
         </div>
     );
 }
 
+const ensureArray = (val) => val || [];
+
 function CategorySection({ categories, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
     if (editing) return <CategoryEditor initialValue={categories} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
+=======
+    if (editing) return <CategoryEditor initialValue={ensureArray(categories)} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
     return <CategoryDisplay category={categories} editMode={editMode} onEdit={() => setEditing(true)} />;
 }
 
@@ -73,7 +96,11 @@ function CategoryEditor({ initialValue, onSave }) {
     return (
         <div className={styles.categoryEditor}>
             <CategorySelector value={value} onChange={setValue} label="" multiple />
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietyInfo.jsx
             <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
+=======
+            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietyInfo.jsx
         </div>
     );
 }

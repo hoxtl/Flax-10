@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from studyFlax.models.society import Society, SocietyMembership, SocietyImage
 
-
 def get_society_or_404(society_id):
     try:
         return Society.objects.get(pk=society_id)

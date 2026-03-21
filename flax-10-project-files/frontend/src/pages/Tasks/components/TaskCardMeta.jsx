@@ -13,16 +13,25 @@ function ModulePillLink({ task }) {
   const moduleColours = getModuleColor(task.module_code);
   const moduleId = task.module_id ?? task.module ?? task.moduleId;
   const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
+<<<<<<< HEAD
   const pillStyle = { color: moduleColours.text, background: "transparent", borderColor: moduleColours.border };
   return (
     <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={pillStyle} onClick={(event) => event.stopPropagation()} title={`Open ${task.module_code} module`}>
+=======
+  return (
+    <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: moduleColours.text, background: "transparent", borderColor: moduleColours.border }} onClick={(event) => event.stopPropagation()} title={`Open ${task.module_code} module`}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       {task.module_code}
     </Link>
   );
 }
 
 function ListBadge({ listName, listColour }) {
+<<<<<<< HEAD
   const colour = listColour || "var(--task-list-fallback)";
+=======
+  const colour = listColour || "#a89890";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const style = { "--lc": colour, background: `color-mix(in srgb, ${colour} 8%, transparent)`, borderColor: `color-mix(in srgb, ${colour} 18%, transparent)` };
   return <span className={styles.listIndicator} style={style}><span className={styles.listDot} style={{ background: colour }} />{listName}</span>;
 }
@@ -42,6 +51,10 @@ function PeoplePill({ task }) {
 }
 
 function ProjectPill({ task }) {
+<<<<<<< HEAD
+=======
+  if (!task.group_project_name) return null;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return <span className={styles.projectPill} title={`Project: ${task.group_project_name}`}><ClipboardList size={11} className={styles.projectPillIcon} />{task.group_project_name}</span>;
 }
 

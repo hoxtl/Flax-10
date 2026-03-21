@@ -1,9 +1,14 @@
 /*
  * Presentational account form layout.
  */
+<<<<<<< HEAD
 
 import InlineAlert from "../../common/inline_alert/InlineAlert";
 import styles from "../../../pages/settings/Settings.module.css";
+=======
+import InlineAlert from "../../common/InlineAlert/InlineAlert";
+import styles from "../../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton } from "../SettingsUI";
 import { PersonalInfoFields, YearField } from "./AccountInfoFields";
@@ -14,6 +19,10 @@ function AccountSidebarCard() {
     <SettingsContextCard
       emoji="🧾"
       title="Account setup"
+<<<<<<< HEAD
+=======
+      body="Keep your profile updated for a personalised experience."
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       items={[
         "Accurate first and last name for your timetable display",
         "Correct year and course for relevant recommendations",
@@ -37,6 +46,7 @@ function AccountFields(props) {
     isSaving,
     hasUnsaved,
     saveSignal,
+<<<<<<< HEAD
     isTeacher,
   } = props;
 
@@ -45,6 +55,15 @@ function AccountFields(props) {
 
 function AccountPrimaryFields({ formData, handleChange, isTeacher }) {
   return <><PersonalInfoFields formData={formData} onChange={handleChange} />{!isTeacher && <YearField value={formData.year} onChange={(event) => handleChange({ target: { name: "year", value: event.target.value } })} />}</>;
+=======
+  } = props;
+
+  return <div><AccountPrimaryFields formData={formData} handleChange={handleChange} /><AccountCourseSection currentCourse={currentCourse} pendingRequest={pendingRequest} onRequestClick={onRequestClick} onCancelRequest={onCancelRequest} cancellingRequest={cancellingRequest} courseRequestNotice={courseRequestNotice} courseRequestError={courseRequestError} /><SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} /></div>;
+}
+
+function AccountPrimaryFields({ formData, handleChange }) {
+  return <><PersonalInfoFields formData={formData} onChange={handleChange} /><YearField value={formData.year} onChange={(event) => handleChange({ target: { name: "year", value: event.target.value } })} /></>;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function AccountCourseSection(props) {
@@ -56,7 +75,11 @@ export default function AccountFormLayout(props) {
     <form onSubmit={props.onSubmit} className={styles.form}>
       <SectionHeader title="Personal Information" description="Your profile details and current degree are shown everywhere across the app" />
       <div className={styles.twoColLayout}>
+<<<<<<< HEAD
         <AccountFields {...props} isTeacher={props.isTeacher} />
+=======
+        <AccountFields {...props} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         <AccountSidebarCard />
       </div>
     </form>

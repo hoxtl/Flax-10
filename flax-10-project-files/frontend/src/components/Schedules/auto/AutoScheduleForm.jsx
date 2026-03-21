@@ -1,7 +1,10 @@
 /*
  * Auto schedule form.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from 'react';
 import styles from '../shared/scheduleFormStyles';
 import { AutoScheduleSummary } from './AutoScheduleSummary';

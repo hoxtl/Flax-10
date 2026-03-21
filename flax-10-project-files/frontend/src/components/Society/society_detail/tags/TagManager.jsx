@@ -2,7 +2,10 @@
  * TagManager allows society admins to define, color-code, and delete
  * custom tags for categorizing society events and announcements.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tags/TagManager.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tags/TagManager.jsx
 import { useState } from "react";
 import styles from "./TagManager.module.css";
 

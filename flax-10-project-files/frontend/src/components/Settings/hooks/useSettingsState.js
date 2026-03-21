@@ -1,7 +1,10 @@
 /*
  * Shared state container for settings save handlers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from "react";
 
 export default function useSettingsState() {

@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
+<<<<<<< HEAD
 import { useSocieties } from '../../../../components/society/hooks/useSocieties';
+=======
+import { useSocieties } from '../../../../components/Society/hooks/useSocieties';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../../api/societyApi';
 
 vi.mock('../../../../api/societyApi', () => ({

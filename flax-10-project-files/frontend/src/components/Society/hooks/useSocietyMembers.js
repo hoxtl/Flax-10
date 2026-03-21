@@ -1,7 +1,10 @@
 /*
  * useSocietyMembers manages member and collaborator operations for a society.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from 'react';
 import * as api from '../../../api/societyApi';
 

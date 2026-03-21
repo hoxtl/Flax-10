@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import Card from "../../../../components/common/card/Card";
 import StudyHeatmap from "../../../../components/analytics/StudyHeatmap";
+=======
+import Card from "../../../../components/common/Card/Card";
+import StudyHeatmap from "../../../../components/Analytics/StudyHeatmap";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";
 import { buildButtonActionProps, buildNavigateAction } from "./widgetActionProps";
@@ -17,7 +22,11 @@ function normalizeHeatmapData(heatmap) {
     : DEFAULT_HEATMAP_DAYS.slice(0, data.length);
   return {
     data,
+<<<<<<< HEAD
     days,
+=======
+    days: days.length ? days : DEFAULT_HEATMAP_DAYS,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     hours: Array.isArray(heatmap?.hours) && heatmap.hours.length ? heatmap.hours : DEFAULT_HEATMAP_HOURS,
   };
 }
@@ -26,10 +35,17 @@ function getContributionColor(val, maxVal) {
   if (val == null) return "transparent";
   if (val === 0) return "color-mix(in srgb, var(--border) 60%, transparent)";
   const t = val / maxVal;
+<<<<<<< HEAD
   if (t < 0.25) return "var(--heatmap-low)";
   if (t < 0.5) return "var(--heatmap-mid)";
   if (t < 0.75) return "var(--heatmap-high)";
   return "var(--heatmap-full)";
+=======
+  if (t < 0.25) return "color-mix(in srgb, #5D4037 25%, var(--panel))";
+  if (t < 0.5) return "#8D6E63";
+  if (t < 0.75) return "#6D4C41";
+  return "#5D4037";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function buildContributionWeeks(dailyTotals) {
@@ -44,17 +60,31 @@ function buildContributionWeeks(dailyTotals) {
   return weeks;
 }
 
+<<<<<<< HEAD
 function ContributionCell({ val, maxVal }) {
   const cellStyle = { background: getContributionColor(val, maxVal) };
   return <div className={styles.contributionCell} style={cellStyle} title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""} />;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function ContributionGrid({ weeks, maxVal }) {
   return (
     <div className={styles.contributionGrid}>
       {weeks.map((week, wi) => (
         <div key={wi} className={styles.contributionWeek}>
+<<<<<<< HEAD
           {week.map((val, di) => <ContributionCell key={di} val={val} maxVal={maxVal} />)}
+=======
+          {week.map((val, di) => (
+            <div
+              key={di}
+              className={styles.contributionCell}
+              style={{ background: getContributionColor(val, maxVal) }}
+              title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""}
+            />
+          ))}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </div>
       ))}
     </div>

@@ -160,9 +160,16 @@ describe('QuickAddModal', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
+<<<<<<< HEAD
     it('redirects legacy manual schedule view back to the main quick-add chooser', () => {
         renderModal({ initialView: 'schedule_manual' });
         expect(screen.getByText('Quick Add')).toBeTruthy();
         expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
+=======
+    it('redirects legacy manual schedule view to auto schedule', () => {
+        renderModal({ initialView: 'schedule_manual' });
+        expect(screen.getByText('Auto Schedule')).toBeTruthy();
+        expect(screen.getByText(/Generate schedule blocks from upcoming deadlines/i)).toBeTruthy();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

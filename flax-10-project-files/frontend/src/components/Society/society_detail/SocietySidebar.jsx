@@ -2,7 +2,10 @@
  * SocietySidebar displays pinned announcements and the upcoming society event.
  * In edit mode, it provides direct actions for creating new content.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietySidebar.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietySidebar.jsx
 import { useState } from "react";
 import styles from "./SocietySidebar.module.css";
 import AnnouncementModal from "./tabs/announcement_tab/AnnouncementModal";
@@ -11,6 +14,7 @@ import { formatDateTime } from "../../calendar/utils/dateUtils";
 
 /** Secondary column for highlights and quick actions. */
 
+/** Secondary column for highlights and quick actions. */
 export default function SocietySidebar({ society, editMode, onAddAnnouncement, onUpdateAnnouncement, onAddEvent, tags }) {
     const [showAnnounce, setShowAnnounce] = useState(false);
     const [showEvent, setShowEvent] = useState(false);
@@ -28,7 +32,10 @@ export default function SocietySidebar({ society, editMode, onAddAnnouncement, o
 }
 
 /** Specific wrapper for sidebar announcement logic. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/SocietySidebar.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/SocietySidebar.jsx
 function SidebarAnnouncementModal({ society, tags, onAdd, onUpdate, onClose }) {
     const handleSubmit = (data, conflicting) => {
         if (conflicting) onUpdate?.(conflicting.id, { ...conflicting, pinned: false });

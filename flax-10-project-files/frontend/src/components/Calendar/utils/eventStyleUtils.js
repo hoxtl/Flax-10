@@ -2,11 +2,17 @@
  * eventStyleUtils - Event theming based on tags and event type.
  * Resolves colors and icons for event display.
  */
+<<<<<<< HEAD
 
 import { getEffectiveTagName } from "./eventUtils";
 
 /** Returns color and icon theme for an event based on its tag. */
 
+=======
+import { getEffectiveTagName } from "./eventUtils";
+
+/** Returns color and icon theme for an event based on its tag. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getEventTheme(event, tags) {
     if (event.tag_color) return { color: event.tag_color, icon: '🏷️' };
     const tagName = getEffectiveTagName(event);

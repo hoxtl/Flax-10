@@ -1,9 +1,14 @@
 /*
  * SocietyCardContent renders the informational content inside a society card.
  */
+<<<<<<< HEAD
 
 import styles from './SocietyCard.module.css';
 import EntityLinkChip from '../common/entity_link_chip/EntityLinkChip';
+=======
+import styles from './SocietyCard.module.css';
+import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function SocietyCardContent({ society, hasImage, RatifiedBadge }) {
     const content = <CardInfo society={society} RatifiedBadge={RatifiedBadge} />;

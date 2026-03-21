@@ -9,7 +9,6 @@ from rest_framework.response import Response
 
 from studyFlax.models import CalendarEvent
 
-
 def _normalize_event_type(name):
     """Map tag name to display type: Small group, Lecture, Practical/lab, Other."""
     if not name or not isinstance(name, str):

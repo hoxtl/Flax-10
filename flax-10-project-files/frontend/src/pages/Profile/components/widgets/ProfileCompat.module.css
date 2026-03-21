@@ -1,5 +1,6 @@
 /* ── Common Ground ── */
 .commonGroundTitle {
+<<<<<<< HEAD
   font-size: 0.9rem;
   color: color-mix(in srgb, var(--text) 86%, var(--muted) 14%);
   margin: 0 0 1rem;
@@ -33,11 +34,19 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.68rem;
   align-items: start;
+=======
+  font-size: 12px;
+  font-style: italic;
+  color: #5D4037;
+  margin: 6px 0 10px;
+  line-height: 1.4;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .commonGroundPills {
   display: flex;
   flex-wrap: wrap;
+<<<<<<< HEAD
   gap: 5px;
 }
 
@@ -117,12 +126,37 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+=======
+  gap: 6px;
+  padding-bottom: 2px;
+}
+
+.commonSubGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.commonSubGroup:last-child {
+  margin-bottom: 0;
+}
+
+.commonSubHeader {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding-top: 4px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .sharedPill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+<<<<<<< HEAD
   padding: 4px 10px;
   border-radius: 999px;
   background: var(--color-primary);
@@ -130,6 +164,15 @@
   font-size: 10px;
   font-weight: 600;
   border: 1px solid var(--color-primary);
+=======
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #212121;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #212121;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   cursor: pointer;
   transition: transform 0.12s ease, opacity 0.12s ease;
   font-family: inherit;
@@ -143,12 +186,21 @@
 .otherPill {
   display: inline-flex;
   align-items: center;
+<<<<<<< HEAD
   padding: 4px 10px;
   border-radius: 999px;
   background: transparent;
   border: 1px solid var(--color-primary);
   color: var(--color-primary);
   font-size: 10px;
+=======
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid #212121;
+  color: #212121;
+  font-size: 11px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
@@ -157,7 +209,11 @@
 
 .otherPill:hover {
   transform: translateY(-1px);
+<<<<<<< HEAD
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+=======
+  background: rgba(33,33,33,0.06);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Compatibility Score ── */
@@ -165,6 +221,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+<<<<<<< HEAD
   justify-content: flex-start;
   gap: 0.45rem;
   padding: clamp(0.95rem, 2vw, 1.1rem);
@@ -250,11 +307,43 @@
 
 .compatHeroMatch {
   font-size: 0.98rem;
+=======
+  gap: 12px;
+  padding: 18px 22px;
+  background: var(--surface-glass-card, var(--panel));
+  border: 1px solid var(--surface-glass-card-border, var(--border));
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.compatTopRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.compatRing {
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.compatInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.compatPct {
+  font-size: 20px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   font-weight: 700;
   color: var(--text);
   line-height: 1.1;
 }
 
+<<<<<<< HEAD
 .compatDetail {
   font-size: 0.82rem;
   color: color-mix(in srgb, var(--text) 88%, var(--muted) 12%);
@@ -267,6 +356,19 @@
   display: grid;
   gap: 8px;
   margin-top: 0.2rem;
+=======
+.compatLabel {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-primary);
+  line-height: 1.3;
+}
+
+.compatDetail {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .studyTogetherBtn {
@@ -306,11 +408,14 @@
 
 .mutualAvatarWrap {
   margin-left: -8px;
+<<<<<<< HEAD
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
   display: block;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .mutualAvatarWrap:first-child {
@@ -343,7 +448,13 @@
 .mutualText {
   font-size: 12px;
   color: var(--muted);
+<<<<<<< HEAD
   line-height: 1.35;
+=======
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Activity Sparkline ── */
@@ -352,6 +463,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+<<<<<<< HEAD
   flex-wrap: wrap;
   width: 100%;
   margin-top: 0;
@@ -361,6 +473,14 @@
   font-size: 12px;
   color: var(--text);
   font-weight: 700;
+=======
+}
+
+.sparklineLabel {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 600;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   white-space: nowrap;
 }
 
@@ -386,6 +506,7 @@
   background: var(--color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
+<<<<<<< HEAD
 
 @media (max-width: 900px) {
   .commonGroundGrid {
@@ -396,3 +517,5 @@
     align-items: center;
   }
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

@@ -73,7 +73,12 @@ async function deleteTagAction(id, setTags) {
         await apiDeleteTag(id);
         setTags((prev) => prev.filter((t) => t.id !== id));
         return true;
+<<<<<<< HEAD
     } catch {
+=======
+    } catch (err) {
+        console.error('Failed to delete tag:', err);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         return false;
     }
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for groupwork availability views.
 """
@@ -6,6 +7,12 @@ from rest_framework import status
 
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
+=======
+from rest_framework import status
+
+from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
+from studyFlax.tests.helpers.base import BaseTestCase
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -15,7 +22,10 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupAvailabilityTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests group availability."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -40,6 +50,7 @@ class GroupAvailabilityTests(BaseTestCase):
             self.assertIn("free_count", slot)
             self.assertIn("total_count", slot)
             self.assertIn("members", slot)
+<<<<<<< HEAD
 
 
 class AvailabilityViewHelperTest(BaseTestCase):
@@ -89,3 +100,5 @@ class AvailabilityViewHelperTest(BaseTestCase):
         self.assertEqual(result['accepted_count'], 1)
         self.assertEqual(result['rejected_count'], 0)
         self.assertEqual(result['pending_count'], 0)
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

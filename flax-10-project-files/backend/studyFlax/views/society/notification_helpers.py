@@ -12,6 +12,7 @@ def is_only_announcement_changes(changes):
 def format_change_list(items, prefix):
     return [f"{prefix}: {item}" for item in items[:3]]
 
+<<<<<<< HEAD
 def _event_change_parts(changes):
     return (
         format_change_list(changes.get('events_added', []), 'New event') +
@@ -28,6 +29,16 @@ def _announcement_change_parts(changes):
 
 def build_change_message(changes):
     parts = _event_change_parts(changes) + _announcement_change_parts(changes)
+=======
+def build_change_message(changes):
+    parts = []
+    parts.extend(format_change_list(changes.get('events_added', []), 'New event'))
+    parts.extend(format_change_list(changes.get('events_updated', []), 'Updated event'))
+    parts.extend(format_change_list(changes.get('events_deleted', []), 'Deleted event'))
+    parts.extend(format_change_list(changes.get('announcements_added', []), 'New announcement'))
+    parts.extend(format_change_list(changes.get('announcements_updated', []), 'Updated announcement'))
+    parts.extend(format_change_list(changes.get('announcements_deleted', []), 'Deleted announcement'))
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return ' | '.join(parts) if parts else None
 
 def build_update_notification(society, changes):
@@ -45,3 +56,7 @@ def get_notification_action_url(society_id, changes):
     if is_only_announcement_changes(changes):
         return f"/societies?id={society_id}&tab=announcements"
     return f"/societies?id={society_id}"
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

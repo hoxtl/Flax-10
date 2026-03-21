@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getModules } from "../../../../api/moduleApi";
+<<<<<<< HEAD
 import Card from "../../../../components/common/card/Card";
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
@@ -8,6 +9,12 @@ import teacherStyles from "./ProfileTeacherModules.module.css";
 import teachingCardColors from './teachingCardColors.json';
 const styles = { ...widgetStyles, ...badgeStyles };
 const TEACHING_CARD_COLORS = teachingCardColors;
+=======
+import ProfileWidget from "./ProfileWidget";
+import widgetStyles from "./ProfileWidgets.module.css";
+import badgeStyles from "./ProfileBadgesModules.module.css";
+const styles = { ...widgetStyles, ...badgeStyles };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useModuleNameMap() {
   const [nameMap, setNameMap] = useState({});
@@ -64,6 +71,7 @@ function SocietyList({ societies, onNavigate }) {
   );
 }
 
+<<<<<<< HEAD
 function TeacherModuleCard({ code, name, color, onNavigate }) {
   return (
     <button
@@ -102,6 +110,8 @@ function TeacherModulesSection({ modules, nameMap, onNavigate }) {
   );
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function TabsAction({ tab, setTab, isTeacher, hasSocieties }) {
   if (!hasSocieties) return null;
   return (
@@ -110,7 +120,11 @@ function TabsAction({ tab, setTab, isTeacher, hasSocieties }) {
         className={`${styles.widgetTab} ${tab === "modules" ? styles.widgetTabActive : ""}`}
         onClick={() => setTab("modules")}
       >
+<<<<<<< HEAD
         Modules
+=======
+        {isTeacher ? "Teaching" : "Modules"}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </button>
       <button
         className={`${styles.widgetTab} ${tab === "societies" ? styles.widgetTabActive : ""}`}
@@ -128,10 +142,16 @@ export function ModulesSocietiesWidget({ modules, societies, onNavigate, role, c
   const hasSocieties = canViewSocieties && societies?.length > 0;
   const [tab, setTab] = useState("modules");
 
+<<<<<<< HEAD
   if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
   if (!modules?.length && !isTeacher) return null;
 
   const title = tab === "modules" ? "MODULES" : "SOCIETIES JOINED";
+=======
+  if (!modules?.length && !isTeacher) return null;
+
+  const title = tab === "modules" ? (isTeacher ? "MODULES I TEACH" : "MODULES") : "SOCIETIES JOINED";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const tabsAction = <TabsAction tab={tab} setTab={setTab} isTeacher={isTeacher} hasSocieties={hasSocieties} />;
 
   return (
@@ -145,10 +165,16 @@ export function ModulesSocietiesWidget({ modules, societies, onNavigate, role, c
 export function ModulesSection({ modules, onNavigate, role }) {
   const nameMap = useModuleNameMap();
   const isTeacher = role === "teacher";
+<<<<<<< HEAD
   if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
   if (!modules?.length) return null;
   return (
     <ProfileWidget title="MODULES" className={styles.modulesWidget}>
+=======
+  if (!modules?.length && !isTeacher) return null;
+  return (
+    <ProfileWidget title={isTeacher ? "MODULES I TEACH" : "MODULES"} className={styles.modulesWidget}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       {modules?.length > 0 && <ModuleList modules={modules} nameMap={nameMap} onNavigate={onNavigate} />}
     </ProfileWidget>
   );

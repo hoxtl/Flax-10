@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for attendance helpers.
 """
@@ -5,6 +6,11 @@ Tests for attendance helpers.
 from unittest.mock import patch, MagicMock
 from django.db import DatabaseError
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
+=======
+from unittest.mock import patch, MagicMock
+from django.db import DatabaseError
+from studyFlax.tests.helpers.base import BaseTestCase
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from studyFlax.models import CalendarEvent, EventAttendance, Tag
 from studyFlax.views.calendar.attendance_helpers import (
     _normalize_event_type,
@@ -16,7 +22,11 @@ from datetime import datetime, timedelta, timezone
 
 
 class AttendanceViewTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests attendance view."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def _create_timetable_event(self, **overrides):
         defaults = {
             "user": self.user,
@@ -130,14 +140,22 @@ class AttendanceViewTests(BaseTestCase):
 
     @patch("studyFlax.views.calendar.attendance_view.EventAttendance.objects")
     def test_attendance_records_database_error(self, mock_objects):
+<<<<<<< HEAD
         mock_objects.filter.return_value.select_related.side_effect = DatabaseError("boom")
+=======
+        mock_objects.filter.return_value.values_list.side_effect = DatabaseError("boom")
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         response = self.client.get("/api/attendance/records/")
         self.assertEqual(response.status_code, 500)
         self.assertIn("unavailable", response.json()["detail"])
 
 
 class NormalizeEventTypeTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests normalize event type."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_none_returns_other(self):
         self.assertEqual(_normalize_event_type(None), "Other")
 
@@ -170,7 +188,11 @@ class NormalizeEventTypeTests(BaseTestCase):
 
 
 class InferTypeFromTitleAndDescTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests infer type from title and desc."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def _make_event(self, title="", description=""):
         mock = MagicMock()
         mock.title = title
@@ -209,7 +231,11 @@ class InferTypeFromTitleAndDescTests(BaseTestCase):
 
 
 class EventTypeFromRecordTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests event type from record."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_no_event_attr(self):
         record = MagicMock(spec=[])
         self.assertEqual(_event_type_from_record(record), "Other")
@@ -247,7 +273,11 @@ class EventTypeFromRecordTests(BaseTestCase):
 
 
 class BuildAttendanceStatsTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests build attendance stats."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_empty_records(self):
         result = build_attendance_stats([])
         self.assertEqual(result["overall"], {"attended": 0, "missed": 0})

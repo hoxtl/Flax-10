@@ -2,7 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { RecurrenceField } from '../../../../../components/calendar/event_modal/components/RecurrenceField';
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/components/RecurrenceField.test.jsx
 vi.mock('../../../../../components/common/animated_dropdown', () => ({
+=======
+vi.mock('../../../../../components/common/AnimatedDropdown', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/tests/components/Calendar/EventModal/components/RecurrenceField.test.jsx
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={(e) => onChange(e.target.value)}>
             {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}

@@ -1,8 +1,12 @@
 /*
  * Settings page tab metadata and panel styling.
  */
+<<<<<<< HEAD
 
 import { Clock3, Lock, MapPin, Moon, Palette, User } from "lucide-react";
+=======
+import { BookOpen, Clock3, Lock, MapPin, Moon, Palette, User } from "lucide-react";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export const PANEL_META = {
   account: { icon: User, title: "Account", desc: "Manage your personal information and year of study." },
@@ -12,6 +16,10 @@ export const PANEL_META = {
   preferences_themes: { icon: Palette, title: "Appearance", desc: "Customise how StudyFlax looks." },
   preferences_sleep: { icon: Moon, title: "Sleep Schedule", desc: "Manage your daily sleep and wake times." },
   preferences_scheduling: { icon: Clock3, title: "Scheduling", desc: "Set your study budget and preferred scheduling windows." },
+<<<<<<< HEAD
+=======
+  course: { icon: BookOpen, title: "Teacher Access", desc: "Manage your teacher request and course changes." },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 };
 
 export const panelVariantClass = {
@@ -22,6 +30,10 @@ export const panelVariantClass = {
   preferences_themes: "panelPreferences",
   preferences_sleep: "panelPreferences",
   preferences_scheduling: "panelPreferences",
+<<<<<<< HEAD
+=======
+  course: "panelCourse",
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 };
 
 export const VALID_TABS = new Set(Object.keys(PANEL_META));

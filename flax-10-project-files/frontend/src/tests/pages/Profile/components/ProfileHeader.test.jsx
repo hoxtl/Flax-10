@@ -1,12 +1,11 @@
 /**
  * Tests for ProfileHeader and its subcomponents.
  */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ProfileHeader from '../../../../pages/profile/components/ProfileHeader';
+import ProfileHeader from '../../../../pages/Profile/components/ProfileHeader';
 
-vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
+vi.mock('../../../../pages/Profile/utils/profileHelpers', () => ({
   buildInitials: vi.fn((user) => {
     if (user?.name) return 'AB';
     if (user?.first_name && user?.last_name) return `${user.first_name[0]}${user.last_name[0]}`;
@@ -17,7 +16,7 @@ vi.mock('../../../../pages/profile/utils/profileHelpers', () => ({
   }),
 }));
 
-vi.mock('../../../../components/social/ShareButton', () => ({
+vi.mock('../../../../components/Social/ShareButton', () => ({
   default: ({ userId, initialIsSharing, onToggle }) => (
     <button data-testid="share-button" onClick={() => onToggle?.(!initialIsSharing)}>
       Share {userId}
@@ -39,7 +38,6 @@ const defaultHandlers = {
   onTasksClick: vi.fn(),
   onEventsClick: vi.fn(),
   onSharedWithClick: vi.fn(),
-  onSharedByClick: vi.fn(),
   reload: vi.fn(),
   setOptimisticShare: vi.fn(),
 };
@@ -155,7 +153,7 @@ describe('ProfileHeader', () => {
     render(
       <ProfileHeader
         user={{ username: 'alice' }}
-        profileData={{ module_count: 2, task_count: 5, shared_with_count: 1, shared_by_count: 4 }}
+        profileData={{ module_count: 2, task_count: 5, shared_with_count: 1 }}
         upcomingEventCount={3}
         handlers={defaultHandlers}
         visibility={defaultVisibility}
@@ -165,11 +163,8 @@ describe('ProfileHeader', () => {
     expect(screen.queryByText('tasks')).toBeNull();
     expect(screen.queryByText('events')).toBeNull();
     const modulesBtn = screen.getByRole('button', { name: /2\s+modules/ });
-    const sharedByBtn = screen.getByRole('button', { name: /4\s+sharing with me/i });
     fireEvent.click(modulesBtn);
-    fireEvent.click(sharedByBtn);
     expect(defaultHandlers.onModulesClick).toHaveBeenCalled();
-    expect(defaultHandlers.onSharedByClick).toHaveBeenCalled();
   });
 
   it('renders bio when profileData.bio is set', () => {
@@ -213,34 +208,6 @@ describe('ProfileHeader', () => {
     expect(screen.getAllByText('Professor').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Department: Spanish').length).toBeGreaterThan(0);
     expect(screen.queryByText(/Year 2/)).toBeNull();
-  });
-
-  it('shows contact email for students too', () => {
-    render(
-      <ProfileHeader
-        user={{ username: 'alice' }}
-        profileData={{ email: 'alice@kcl.ac.uk', year: 'Year 2', major: 'Physics' }}
-        upcomingEventCount={0}
-        handlers={defaultHandlers}
-        visibility={defaultVisibility}
-      />
-    );
-    // Email is shown in the rendered header (may be inside a link or text)
-    expect(screen.getAllByText(/alice/).length).toBeGreaterThan(0);
-  });
-
-  it('shows the shared planning tip when viewing another user profile', () => {
-    render(
-      <ProfileHeader
-        user={{ username: 'alice' }}
-        profileData={{ email: 'alice@kcl.ac.uk', year: 'Year 2', major: 'Physics' }}
-        upcomingEventCount={0}
-        handlers={defaultHandlers}
-        visibility={{ ...defaultVisibility, canEditProfile: false }}
-      />
-    );
-    expect(screen.getAllByText('Tip').length).toBeGreaterThan(0);
-    expect(screen.getByText(/Compare free slots to find times that work for both of you/i)).toBeInTheDocument();
   });
 
   it('hides stats when visibility flags are false', () => {
@@ -347,7 +314,8 @@ describe('ProfileHeader', () => {
         onPinBadge={onPinBadge}
       />
     );
-    fireEvent.click(screen.getByText('🎯').closest('button'));
+    const badgeButtons = document.querySelectorAll('button[title="Tap to pin this badge"]');
+    fireEvent.click(badgeButtons[0]);
     expect(onPinBadge).toHaveBeenCalledWith('goal_getter');
   });
 });

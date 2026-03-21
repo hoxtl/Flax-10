@@ -6,7 +6,10 @@ from studyFlax.models.society import SocietyCalendarSync, SocietyEvent
 from studyFlax.serialisers.society.society_serialisers import get_society_color
 from .recurrence_utils import is_time_overlap, next_society_occurrence, add_months, add_years
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def add_month(dt):
     return add_months(dt, 1, max_day=28)
 
@@ -75,7 +78,10 @@ def serialize_event(event, idx, start_override=None, end_override=None):
         'description': event.description,
         'start_time': (start_override or event.start_time).isoformat(),
         'end_time': (end_override or event.end_time).isoformat(),
+<<<<<<< HEAD
         'all_day': event.all_day,
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         'location': event.location, 'source': 'society',
         'society_id': event.society_id,
         'society_name': event.society.name,

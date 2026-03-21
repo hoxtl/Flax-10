@@ -14,11 +14,15 @@ vi.mock('../../api/settingsApi', () => ({
     hasToken: vi.fn(),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../api/geocodeApi', () => ({
     geocodeAddress: vi.fn(),
 }));
 
 import { updateUserSettings, saveHomeAddress } from '../../api/userApi';
+=======
+import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/userApi';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/settingsApi';
 import { geocodeAddress } from '../../api/geocodeApi';
 
@@ -225,7 +229,11 @@ describe('useSettingsHandlers', () => {
             await act(async () => {
                 await result.current.handleStudyTimeSave({ preferred_study_minutes_per_day: 150 });
             });
+<<<<<<< HEAD
             expect(updateUserSettings).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 150 });
+=======
+            expect(patchSettings).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 150 });
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         });
 
         it('returns early when not logged in', async () => {

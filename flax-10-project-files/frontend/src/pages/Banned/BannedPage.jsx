@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
+<<<<<<< HEAD
 import BackButton from "../../components/common/back_button/BackButton.jsx";
+=======
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from "./BannedPage.module.css";
 
 function handleBackToAuth() {
@@ -61,7 +65,11 @@ function BannedBackButton() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.42, duration: 0.3 }}
+<<<<<<< HEAD
       className={styles.backBtnWrapper}
+=======
+      style={{ display: 'flex', justifyContent: 'center' }}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     >
       <BackButton onClick={handleBackToAuth} label="Back to Sign In" />
     </motion.div>

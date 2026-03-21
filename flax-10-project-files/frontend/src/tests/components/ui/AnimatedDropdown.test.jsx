@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+<<<<<<< HEAD
 import AnimatedDropdown from '../../../components/common/animated_dropdown';
+=======
+import AnimatedDropdown from '../../../components/common/AnimatedDropdown';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
@@ -73,6 +77,7 @@ describe('AnimatedDropdown', () => {
     expect(screen.getByText('Option A1')).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   it('supports portal rendering and hover-style custom triggers', () => {
     render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Portal" options={OPTIONS} usePortal
       customTrigger={<span data-testid="portal-trigger">Portal trigger</span>} openOnHover />);
@@ -83,12 +88,23 @@ describe('AnimatedDropdown', () => {
 
   it('controlled closed state hides options', () => {
     render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select" options={OPTIONS} isOpen={false} onOpenChange={vi.fn()} />);
+=======
+  it('controlled closed state hides options', () => {
+    render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select"
+      options={OPTIONS} isOpen={false} onOpenChange={vi.fn()} />);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
   });
 
   it('controlled open state shows options and calls onOpenChange on select', () => {
     const onOpenChange = vi.fn();
+<<<<<<< HEAD
     render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select" options={OPTIONS} isOpen={true} onOpenChange={onOpenChange} />);
+=======
+    render(<AnimatedDropdown value="" onChange={vi.fn()} placeholder="Select"
+      options={OPTIONS} isOpen={true} onOpenChange={onOpenChange} />);
+    expect(screen.getByText('Option A1')).toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     fireEvent.click(screen.getByText('Option A1'));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });

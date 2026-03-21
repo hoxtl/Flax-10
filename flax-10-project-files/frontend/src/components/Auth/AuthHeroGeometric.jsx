@@ -30,10 +30,13 @@ function ShapeInner() {
 }
 
 function FloatingShape({ width, height, driftX, driftY, floatDuration }) {
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Auth/AuthHeroGeometric.jsx
   const shapeStyle = {
     '--shape-width': typeof width === 'number' ? `${width}px` : width,
     '--shape-height': typeof height === 'number' ? `${height}px` : height,
   };
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Authentication/AuthHeroGeometric.jsx
   return (
     <motion.div
       className={styles.shape}

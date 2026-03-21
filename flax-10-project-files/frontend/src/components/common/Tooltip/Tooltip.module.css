@@ -5,7 +5,11 @@
 
 .tooltip {
     position: absolute;
+<<<<<<< HEAD
     z-index: 10050;
+=======
+    z-index: 9999;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     background: #1a1a1a;
     color: #ffffff;
     font-size: 0.75rem;
@@ -67,7 +71,10 @@
     transform: translateY(-50%);
     border-right-color: #1a1a1a;
 }
+<<<<<<< HEAD
 
 .tooltipFixed {
   position: fixed;
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for groupwork models.
 """
+=======
+"""Backend tests for groupwork models."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -8,11 +12,17 @@ from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMember
 from django.utils import timezone
 from datetime import timedelta
 
+<<<<<<< HEAD
 
 User = get_user_model()
 
 class GroupWorkModelTest(TestCase):
     """Tests group work model."""
+=======
+User = get_user_model()
+
+class GroupWorkModelTest(TestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user1 = User.objects.create_user(username="u1", email="u1@e.com", password="p")
         self.user2 = User.objects.create_user(username="u2", email="u2@e.com", password="p")

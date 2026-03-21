@@ -10,7 +10,10 @@ from rest_framework.test import APIRequestFactory
 from studyFlax.models.society.society_image_model import SocietyImage
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_model import Society
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 

@@ -1,10 +1,16 @@
 /*
  * Tests for DeadlineForm component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import DeadlineForm from '../../../components/modules/deadlines/DeadlineForm';
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import DeadlineForm from '../../../components/Modules/Deadlines/DeadlineForm';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
     DEADLINE_TYPES: [
@@ -17,7 +23,11 @@ vi.mock('../../../components/modules/utils/deadlineUtils', () => ({
     TYPES_WITH_LOCATION: ['exam', 'presentation'],
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/animated_dropdown', () => ({
+=======
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -31,6 +41,7 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input
@@ -43,6 +54,9 @@ vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
 }));
 
 vi.mock('../../../components/modules/deadlines/DeadlineForm.module.css', () => ({ default: {} }));
+=======
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: {} }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('DeadlineForm', () => {
     it('should render the title and type field', () => {

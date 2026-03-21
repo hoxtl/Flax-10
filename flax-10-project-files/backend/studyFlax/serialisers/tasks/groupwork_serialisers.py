@@ -2,12 +2,16 @@
 Serialisers for group projects and group memberships.
 """
 
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from rest_framework import serializers
 from studyFlax.models.groupwork.groupwork_model import (
     GroupProject,
     GroupMembership,
 )
+<<<<<<< HEAD
 from studyFlax.serialisers.common import build_profile_photo_url, format_teacher_display_name
 
 
@@ -36,10 +40,16 @@ def absolute_photo_url(photo_path, request):
 class GroupProjectSerialiser(serializers.ModelSerializer):
     """Serialiser for group project."""
     course_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+=======
+from studyFlax.serialisers.common import build_profile_photo_url
+
+class GroupProjectSerialiser(serializers.ModelSerializer):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
     completed_task_count = serializers.IntegerField(read_only=True, default=0)
     module_name = serializers.CharField(read_only=True, required=False)
+<<<<<<< HEAD
     module_tutor_id = serializers.IntegerField(read_only=True, required=False)
     module_tutor_name = serializers.SerializerMethodField()
     module_tutor_username = serializers.CharField(read_only=True, required=False)
@@ -49,17 +59,25 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
 
     class Meta:
         """Metadata for group project serialiser."""
+=======
+    members = serializers.SerializerMethodField()
+
+    class Meta:
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         model = GroupProject
         fields = [
             "id",
             "name",
             "course_code",
             "module_name",
+<<<<<<< HEAD
             "module_tutor_id",
             "module_tutor_name",
             "module_tutor_username",
             "module_tutor_email",
             "module_tutor_profile_photo_url",
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             "deadline",
             "member_count",
             "task_count",
@@ -68,6 +86,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "created_at",
         ]
 
+<<<<<<< HEAD
     def get_module_tutor_name(self, obj):
         return format_teacher_display_name(getattr(obj, "module_tutor_name", None))
 
@@ -85,13 +104,23 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
 
 class GroupMembershipSerialiser(serializers.ModelSerializer):
     """Serialiser for group membership."""
+=======
+    def get_members(self, obj):
+        return GroupMembershipSerialiser(obj.memberships.all(), many=True).data
+
+
+class GroupMembershipSerialiser(serializers.ModelSerializer):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     user_name = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", read_only=True)
     last_name = serializers.CharField(source="user.last_name", read_only=True)
     profile_photo_url = serializers.SerializerMethodField()
 
     class Meta:
+<<<<<<< HEAD
         """Metadata for group membership serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         model = GroupMembership
         fields = [
             "id",

@@ -1,11 +1,17 @@
 /*
  * useSocietyAnnouncements manages announcement CRUD for a society.
  */
+<<<<<<< HEAD
 
 import * as api from '../../../api/societyApi';
 
 /** Helper to update local society state when an announcement's linked event changes. */
 
+=======
+import * as api from '../../../api/societyApi';
+
+/** Helper to update local society state when an announcement's linked event changes. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const updateAnnEventState = (setSociety, annId, eventId) => {
     setSociety(prev => ({
         ...prev,
@@ -14,14 +20,20 @@ const updateAnnEventState = (setSociety, annId, eventId) => {
 };
 
 /** Handles the removal of a linked event when an announcement is unsynced. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const handleRemoval = async (ann, eventOps, onIdUpdate) => {
     await deleteLinkedEvent(ann, eventOps);
     onIdUpdate(ann.id, null);
 };
 
 /** Logic for creating or updating a linked event. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const handleLinkedUpdate = async (ann, evData, eventOps, onIdUpdate) => {
     if (ann.event_id) return await eventOps.updateEvent(ann.event_id, evData, true);
     const ev = await eventOps.addEvent(evData, true);
@@ -29,19 +41,30 @@ const handleLinkedUpdate = async (ann, evData, eventOps, onIdUpdate) => {
 };
 
 /** Coordinates syncing an announcement with the events system. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const syncAnnouncement = async (ann, data, eventOps, onIdUpdate) => {
     if (!data.addAsEvent) return handleRemoval(ann, eventOps, onIdUpdate);
     const evData = { ...data, description: data.content, tag: data.tag || null, announcement: ann.id };
     try {
         await handleLinkedUpdate(ann, evData, eventOps, onIdUpdate);
+<<<<<<< HEAD
     } catch (err) {
         console.error('Failed to sync announcement with event:', err);
+=======
+    } catch (e) {
+        console.error('Failed to sync event:', e);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     }
 };
 
 /** Hook for managing society announcements and their lifecycle. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const appendAnnouncement = (setSociety, ann) =>
     setSociety(prev => ({ ...prev, announcements: [...prev.announcements, ann] }));
 
@@ -66,9 +89,13 @@ const deleteLinkedEvent = async (ann, eventOps) => {
     if (!ann?.event_id) return;
     try {
         await eventOps.deleteEvent(ann.event_id, true);
+<<<<<<< HEAD
     } catch (err) {
         console.error('Failed to delete linked event:', err);
     }
+=======
+    } catch (e) { console.error('Failed to delete linked event:', e); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 };
 
 const makeAddAnnouncement = (id, setSociety, eventOps, onIdUpdate) =>

@@ -4,8 +4,13 @@
 
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
+<<<<<<< HEAD
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import StandardModal from "../../../components/common/standard_modal/StandardModal";
+=======
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import { isReadingListName } from "../utils/readingListUtils";
 import styles from "./TaskInfoModal.module.css";
@@ -72,7 +77,11 @@ function ReadingPillRow({ task, speedData, showReadingContext }) {
 }
 
 function getModuleLabel(task) {
+<<<<<<< HEAD
   return task.module_code && task.module_name ? `${task.module_code} — ${task.module_name}` : task.module_code || task.module_name;
+=======
+  return task.module_code && task.module_name ? `${task.module_code} — ${task.module_name}` : task.module_code || task.module_name || "—";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function ListInfoRow({ listName }) {

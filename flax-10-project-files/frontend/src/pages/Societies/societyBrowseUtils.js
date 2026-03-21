@@ -1,7 +1,10 @@
 /*
  * societyBrowseUtils contains pure filtering and sorting helpers for the browse page.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { matchesCategory } from "./societyFilters";
 
 export function countForFilter(societies, filterId) {

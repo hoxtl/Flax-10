@@ -1,7 +1,10 @@
 /*
  * Manual schedule inputs.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from '../shared/scheduleFormStyles';
 
 export function ManualScheduleFields({ title, setTitle, eventSearch, setEventSearch }) {

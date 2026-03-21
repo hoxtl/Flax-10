@@ -1,8 +1,12 @@
 /*
  * Home address settings form.
  */
+<<<<<<< HEAD
 
 import SectionSkeleton from "../common/loading_state/SectionSkeleton";
+=======
+import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import HomeAddressFormLayout from "./HomeAddressFormLayout";
 import useHomeAddressForm from "./home/useHomeAddressForm";
 

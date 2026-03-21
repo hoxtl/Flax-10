@@ -163,12 +163,21 @@
 
 .sidebarSectionLabel {
   font-size: 9.5px;
+<<<<<<< HEAD
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: color-mix(in srgb, var(--text) 88%, var(--primary) 12%);
   padding: 10px 10px 3px;
   opacity: 0.95;
+=======
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 10px 10px 3px;
+  opacity: 0.7;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   margin-top: 4px;
   position: relative;
   isolation: isolate;
@@ -201,9 +210,15 @@
   background: none;
   border: none;
   cursor: pointer;
+<<<<<<< HEAD
   color: color-mix(in srgb, var(--text) 74%, var(--muted) 26%);
   font-size: 13px;
   font-weight: 550;
+=======
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   font-family: var(--font-body);
   transition: all 0.14s;
   text-align: left;
@@ -363,6 +378,7 @@
   color: var(--c-white);
   filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--primary-strong) 55%, transparent));
 }
+<<<<<<< HEAD
 
 .themePreviewColored {
   background: var(--tp-bg);
@@ -372,3 +388,5 @@
 .swatchTitleColored {
   color: var(--tp-text);
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

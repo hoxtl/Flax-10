@@ -1,10 +1,16 @@
 /**
  * Tests for useKeyboardNav - keyboard navigation for table cells.
  */
+<<<<<<< HEAD
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useKeyboardNav } from '../../../../components/calendar/hooks/useKeyboardNav';
+=======
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useKeyboardNav } from '../../../../components/Calendar/hooks/useKeyboardNav';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('useKeyboardNav', () => {
     const mockSave = vi.fn();

@@ -1,15 +1,25 @@
 /*
  * Presentational layout for the home-address form.
  */
+<<<<<<< HEAD
 
 import { LocationAutocomplete } from "../calendar/event_modal/components/LocationAutoComplete";
 import InlineAlert from "../common/inline_alert/InlineAlert";
 import styles from "../../pages/settings/Settings.module.css";
+=======
+import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
+import InlineAlert from "../common/InlineAlert/InlineAlert";
+import styles from "../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import SettingsContextCard from "./SettingsContextCard";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 
 function isLookupMiss(error) {
+<<<<<<< HEAD
   return `${error}`.toLowerCase().startsWith("address not found");
+=======
+  return String(error || "").toLowerCase().startsWith("address not found");
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function AddressField({ homeAddress, setHomeAddress, error, isSaving, hasUnsaved, saveSignal }) {

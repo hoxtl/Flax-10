@@ -13,6 +13,7 @@ vi.mock("../../context/CalendarContext", () => ({
 
 import DashboardLayout from "../../layout/DashboardLayout";
 import { authService } from "../../api/authApi";
+<<<<<<< HEAD
 import { clearUserData } from "../../components/auth/utils/authHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
@@ -50,15 +51,58 @@ vi.mock("../../components/timer/TimerPopups", async () => {
   return { LeaveTimerModal: LeaveTimerMock };
 });
 vi.mock("../../pages/tasks/components/CreateTaskModal", async () => {
+=======
+import { clearUserData } from "../../components/Authentication/utils/authHelpers";
+import { useEventModal, useCalendar } from "../../context/CalendarContext";
+import { useLocation } from "react-router-dom";
+
+vi.mock("../../components/Dashboard/Sidebar", async () => {
+  const { SidebarMock } = await import("./dashboardMocks");
+  return { default: SidebarMock };
+});
+vi.mock("../../components/Dashboard/Topbar", async () => {
+  const { TopbarMock } = await import("./dashboardMocks");
+  return { default: TopbarMock };
+});
+vi.mock("../../components/Dashboard/QuickAddModal", async () => {
+  const { QuickAddMock } = await import("./dashboardMocks");
+  return { default: QuickAddMock };
+});
+vi.mock("../../components/Calendar/EventModal/EventModal", async () => {
+  const { EventModalMock } = await import("./dashboardMocks");
+  return { EventModal: EventModalMock };
+});
+vi.mock("../../components/Society/CreateSocietyModal", async () => {
+  const { CreateSocietyMock } = await import("./dashboardMocks");
+  return { default: CreateSocietyMock };
+});
+vi.mock("../../components/Modules/DeadlineModal", async () => {
+  const { DeadlineModalMock } = await import("./dashboardMocks");
+  return { default: DeadlineModalMock };
+});
+vi.mock("../../components/Timer/TimerPopups", async () => {
+  const { LeaveTimerMock } = await import("./dashboardMocks");
+  return { LeaveTimerModal: LeaveTimerMock };
+});
+vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const { CreateTaskMock } = await import("./dashboardMocks");
   return { default: CreateTaskMock };
 });
 
+<<<<<<< HEAD
 vi.mock("../../components/dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
 vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("../../components/auth/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+=======
+vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
+vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
+vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
 }));
@@ -76,7 +120,11 @@ vi.mock("../../api/taskApi", () => ({
 vi.mock("../../api/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]),
 }));
+<<<<<<< HEAD
 vi.mock("../../components/modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+=======
+vi.mock("../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const mockStore = {};
 vi.stubGlobal('localStorage', {
@@ -252,6 +300,36 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("create-task-modal")).toBeTruthy();
   });
 
+<<<<<<< HEAD
+=======
+  it("calls openModal from QuickAdd event selection", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    fireEvent.click(screen.getByText("Quick Add"));
+    fireEvent.click(screen.getByText("Add Event"));
+    expect(mockOpenModal).toHaveBeenCalled();
+  });
+
+  it("shows EventModal when isModalOpen is true", () => {
+    useEventModal.mockReturnValue({
+      isModalOpen: true, closeModal: vi.fn(), openModal: vi.fn(),
+      modalEvent: { id: 1, title: 'Test' }, modalType: 'event', modalInitialDate: null,
+    });
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    expect(screen.getByTestId("event-modal")).toBeTruthy();
+  });
+
+  it("EventModal closeModal is called when Close Event Modal clicked", () => {
+    const closeModal = vi.fn();
+    useEventModal.mockReturnValue({
+      isModalOpen: true, closeModal, openModal: vi.fn(),
+      modalEvent: null, modalType: null, modalInitialDate: null,
+    });
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    fireEvent.click(screen.getByText("Close Event Modal"));
+    expect(closeModal).toHaveBeenCalled();
+  });
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   it("does not show Topbar on mobile", () => {
     global.innerWidth = 500;
     global.dispatchEvent(new Event("resize"));
@@ -338,12 +416,22 @@ describe("DashboardLayout", () => {
     expect(screen.getByText("Quick Add")).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   it("defaults quick-add listener events without a detail payload to the type chooser", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     act(() => {
       window.dispatchEvent(new CustomEvent("quick-add:open"));
     });
     expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("type");
+=======
+  it("opens QuickAdd modal directly in scheduler mode from the quick-add event", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    act(() => {
+      window.dispatchEvent(new CustomEvent("quick-add:open", { detail: { view: "schedule_auto" } }));
+    });
+    expect(screen.getByTestId("quick-add-modal")).toBeTruthy();
+    expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("schedule_auto");
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 });
 

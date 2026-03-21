@@ -1,7 +1,10 @@
 /*
  * Hook for managing modules state, enrolments, and CRUD operations.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { useTags } from '../../../context/TagContext';
@@ -11,6 +14,7 @@ import { isEnrolledIn, getEnrollmentId, normaliseModuleCode } from '../utils/mod
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';
 
+<<<<<<< HEAD
 function buildEnrollmentHandlers(enrollments, setEnrollments, notify, refreshTags) {
   return {
     handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify, refreshTags),
@@ -18,6 +22,15 @@ function buildEnrollmentHandlers(enrollments, setEnrollments, notify, refreshTag
     toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
       ? handleDisenrol(m, enrollments, setEnrollments, notify, refreshTags)
       : handleEnrollment(m, setEnrollments, notify, refreshTags),
+=======
+function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
+  return {
+    handleEnrollment: (m) => handleEnrollment(m, setEnrollments, notify),
+    handleDisenrol: (m) => handleDisenrol(m, enrollments, setEnrollments, notify),
+    toggleEnrollment: (m) => isEnrolledIn(m.id, enrollments)
+      ? handleDisenrol(m, enrollments, setEnrollments, notify)
+      : handleEnrollment(m, setEnrollments, notify),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   };
 }
 
@@ -30,10 +43,49 @@ function buildModuleHandlers(setModules, notify, confirmFn) {
   };
 }
 
+<<<<<<< HEAD
 function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule, refreshTags) {
   const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify, refreshTags);
   const moduleHandlers = buildModuleHandlers(setModules, notify, confirmFn);
   return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
+=======
+function useModuleActions(modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn, taskCountsByModule) {
+  const enrollmentHandlers = buildEnrollmentHandlers(enrollments, setEnrollments, notify);
+  const moduleHandlers = buildModuleHandlers(setModules, notify, confirmFn);
+  return { modules, enrollments, loading, taskCountsByModule, ...enrollmentHandlers, ...moduleHandlers };
+}
+
+function buildTaskCounts(tasks = []) {
+  return tasks.reduce((acc, task) => {
+    if (task?.completed) return acc;
+    const code = normaliseModuleCode(task?.module_code);
+    if (!code) return acc;
+    acc[code] = (acc[code] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function extractResults(results) {
+  const [modulesRes, enrollmentsRes, tasksRes] = results;
+  if (modulesRes.status !== "fulfilled") throw modulesRes.reason;
+  if (enrollmentsRes.status !== "fulfilled") throw enrollmentsRes.reason;
+  const taskCounts = tasksRes.status === "fulfilled" ? buildTaskCounts(tasksRes.value) : {};
+  return { modules: modulesRes.value || [], enrollments: enrollmentsRes.value || [], taskCounts };
+}
+
+function applyLoadedData(data, setModules, setEnrollments, setTaskCountsByModule) {
+  setModules(data.modules);
+  setEnrollments(data.enrollments);
+  setTaskCountsByModule(data.taskCounts);
+}
+
+function loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify) {
+  setLoading(true);
+  Promise.allSettled([getModules(), getEnrollments(), fetchTasks()])
+    .then(results => applyLoadedData(extractResults(results), setModules, setEnrollments, setTaskCountsByModule))
+    .catch(err => notify(err.message, 'error'))
+    .finally(() => setLoading(false));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function buildTaskCounts(tasks = []) {
@@ -98,7 +150,10 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify, refre
     await disenrolFromModule(enrollment_id);
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
+<<<<<<< HEAD
     await safeRefreshTags(refreshTags);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   } catch (err) {
     handleDisenrolError(err, module, setEnrollments, notify);
   }
@@ -139,10 +194,23 @@ export default function useModules() {
   const { addNotification } = useNotifications();
   const notify = useMemo(() => createNotify(addNotification), [addNotification]);
   const confirmFn = useConfirm();
+<<<<<<< HEAD
   const { refreshTags } = useTags();
   useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
     modules, enrollments, loading, setModules, setEnrollments, notify, confirmFn,
     taskCountsByModule, refreshTags
+=======
+  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
+  return useModuleActions(
+    modules,
+    enrollments,
+    loading,
+    setModules,
+    setEnrollments,
+    notify,
+    confirmFn,
+    taskCountsByModule,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   );
 }

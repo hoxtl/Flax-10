@@ -24,7 +24,11 @@ async function logThemeSession(theme, startedAt) {
       method: "POST",
       body: JSON.stringify({ theme, started_at: startedAt, ended_at: endedAt }),
     });
+<<<<<<< HEAD
   } catch {}
+=======
+  } catch { /* silently fail */ }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function getStored(key, valid, fallback) {
@@ -32,6 +36,7 @@ function getStored(key, valid, fallback) {
   return valid.includes(stored) ? stored : fallback;
 }
 
+<<<<<<< HEAD
 function useThemeSession(mode, setModeState) {
   const currentMode = useRef(mode);
   const sessionStart = useRef(new Date().toISOString());
@@ -44,6 +49,11 @@ function bindThemeUnload(currentMode, sessionStart) {
   window.addEventListener("beforeunload", handleUnload);
   return () => window.removeEventListener("beforeunload", handleUnload);
 }
+=======
+function useThemeSession(theme, setThemeState) {
+  const sessionStart = useRef(new Date().toISOString());
+  const currentTheme = useRef(theme);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function applyThemeChange(currentMode, sessionStart, nextMode, setModeState) {
   logThemeSession(currentMode.current, sessionStart.current);
@@ -65,6 +75,7 @@ function usePersistedAttribute(attribute, storageKey, value) {
   }, [attribute, storageKey, value]);
 }
 
+<<<<<<< HEAD
 function usePersistedTheme(theme) {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -103,3 +114,53 @@ export function ThemeProvider({ children, initialTheme, initialMode }) {
   useThemePersistence(mode, theme);
   return <ThemeContext.Provider value={{ mode, theme, ...controls }}>{children}</ThemeContext.Provider>;
 }
+=======
+  function applyThemeChange(newTheme) {
+    logThemeSession(currentTheme.current, sessionStart.current);
+    sessionStart.current = new Date().toISOString();
+    currentTheme.current = newTheme;
+    setThemeState(newTheme);
+  }
+
+  return { applyThemeChange };
+}
+
+const VALID_MODES = ['light', 'dark'];
+const VALID_THEMES = ['flax', 'coral', 'rust', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'mint', 'sand'];
+
+export function ThemeProvider({ children, initialTheme, initialMode }) {
+  const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
+  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_THEMES, 'flax'));
+  const { applyThemeChange } = useThemeSession(theme, setThemeState);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-mode', mode);
+    localStorage.setItem('mode', mode);
+  }, [mode]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('colorTheme', theme);
+  }, [theme]);
+
+  function setMode(newMode) {
+    if (newMode !== mode && VALID_MODES.includes(newMode)) {
+        setModeState(newMode);
+    }
+  }
+
+  const toggleMode = () => setMode(mode === 'light' ? 'dark' : 'light');
+
+  function setTheme(newTheme) {
+    if (newTheme !== theme && VALID_THEMES.includes(newTheme)) {
+        applyThemeChange(newTheme);
+    }
+  }
+
+  return (
+    <ThemeContext.Provider value={{ mode, setMode, toggleMode, theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

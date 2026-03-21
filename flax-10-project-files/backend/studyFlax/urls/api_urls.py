@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 """
 API URL routes for studyFlax.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -9,7 +12,15 @@ from studyFlax.views.admin.admin_view import (
     ban_reported_society,
     ban_user,
     dismiss_report,
+<<<<<<< HEAD
     reported_societies,
+=======
+    cancel_teacher_role_request,
+    reported_societies,
+    request_teacher_role,
+    resolve_teacher_request,
+    teacher_requests,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     user_list,
 )
 from studyFlax.views.admin.course_change_view import (
@@ -20,12 +31,21 @@ from studyFlax.views.admin.course_change_view import (
 )
 from studyFlax.views.analytics import ai_chat, get_ai_insights, get_theme_stats, log_theme_session
 from studyFlax.views.analytics.analytics_view import get_analytics_summary, get_progress_data
+<<<<<<< HEAD
 from studyFlax.views.auth.confirm_password_reset_view import confirm_password_reset_view
 from studyFlax.views.auth.home_address_view import home_address_view
 from studyFlax.views.auth.login_view import login_view
 from studyFlax.views.auth.logout_view import logout_view
 from studyFlax.views.auth.password_reset_request_view import reset_password_view
 from studyFlax.views.auth.register_view import register_view
+=======
+from studyFlax.views.authentication.confirm_password_reset_view import confirm_password_reset_view
+from studyFlax.views.authentication.home_address_view import home_address_view
+from studyFlax.views.authentication.login_view import login_view
+from studyFlax.views.authentication.logout_view import logout_view
+from studyFlax.views.authentication.password_reset_request_view import reset_password_view
+from studyFlax.views.authentication.register_view import register_view
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from studyFlax.views.calendar.attendance_view import attendance_records, attendance_stats, record_attendance
 from studyFlax.views.calendar.event_detail_view import add_exception_date, event_detail
 from studyFlax.views.calendar.event_map_view import calendar_events_map_view
@@ -85,7 +105,10 @@ from studyFlax.views.user.profile_view import another_user_profile_view, profile
 from studyFlax.views.user.settings_view import onboarding_view
 from studyFlax.views.user.user_search_view import user_search
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 router = DefaultRouter()
 router.register(r'timer/history', StudySessionViewSet, basename='study-session')
 router.register(r'social', CalendarShareViewSet, basename='social')
@@ -178,9 +201,19 @@ urlpatterns = [
     path('user/home-address/', home_address_view, name='home-address'),
     path('admin/users/', user_list, name='admin-user-list'),
     path('admin/users/<int:user_id>/ban/', ban_user, name='admin-ban-user'),
+<<<<<<< HEAD
     path('admin/reported-societies/', reported_societies, name='admin-reported-societies'),
     path('admin/reports/<int:report_id>/dismiss/', dismiss_report, name='admin-dismiss-report'),
     path('admin/reports/<int:report_id>/ban/', ban_reported_society, name='admin-ban-reported-society'),
+=======
+    path('admin/teacher-requests/', teacher_requests, name='admin-teacher-requests'),
+    path('admin/teacher-requests/<int:user_id>/resolve/', resolve_teacher_request, name='admin-resolve-teacher'),
+    path('admin/reported-societies/', reported_societies, name='admin-reported-societies'),
+    path('admin/reports/<int:report_id>/dismiss/', dismiss_report, name='admin-dismiss-report'),
+    path('admin/reports/<int:report_id>/ban/', ban_reported_society, name='admin-ban-reported-society'),
+    path('request-teacher-role/', request_teacher_role, name='request-teacher-role'),
+    path('cancel-teacher-role/', cancel_teacher_role_request, name='cancel-teacher-role'),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     path('course-change/request/', request_course_change, name='course-change-request'),
     path('course-change/my-request/', my_course_change_request, name='course-change-my-request'),
     path('admin/course-change-requests/', list_course_change_requests, name='admin-course-change-list'),

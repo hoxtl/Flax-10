@@ -20,6 +20,10 @@
 .eventList {
   flex: 1;
   min-height: 0;
+<<<<<<< HEAD
+=======
+  list-style: none;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   padding: 0;
   margin: 0;
   overflow-y: auto;
@@ -27,6 +31,7 @@
   scrollbar-color: var(--border) transparent;
 }
 
+<<<<<<< HEAD
 /* Date grouping */
 .dateGroup {
   margin-bottom: 0.5rem;
@@ -56,6 +61,8 @@
   margin: 0;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .eventRow {
   display: flex;
   align-items: center;
@@ -133,6 +140,7 @@
   cursor: not-allowed;
 }
 
+<<<<<<< HEAD
 /* Future events: buttons shown as muted outlines, not clickable */
 .btnFuture {
   background: transparent !important;
@@ -142,6 +150,8 @@
   cursor: not-allowed !important;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .btnChange {
   padding: 0.3rem 0.6rem;
   border-radius: 6px;

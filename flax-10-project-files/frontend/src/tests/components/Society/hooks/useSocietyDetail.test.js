@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
+<<<<<<< HEAD
 import { useSocietyDetail, buildHandlers } from '../../../../components/society/hooks/useSocietyDetail';
 import { useSocietyCore } from '../../../../components/society/hooks/useSocietyCore';
 import { useSocietyTags } from '../../../../components/society/hooks/useSocietyTags';
@@ -14,6 +15,22 @@ vi.mock('../../../../components/society/hooks/useSocietyEvents', () => ({ useSoc
 vi.mock('../../../../components/society/hooks/useSocietyAnnouncements', () => ({ useSocietyAnnouncements: vi.fn() }));
 vi.mock('../../../../components/society/hooks/useSocietyMembers', () => ({ useSocietyMembers: vi.fn() }));
 vi.mock('../../../../components/society/hooks/useSocietyMembership', () => ({ useSocietyMembership: vi.fn() }));
+=======
+import { useSocietyDetail, buildHandlers } from '../../../../components/Society/hooks/useSocietyDetail';
+import { useSocietyCore } from '../../../../components/Society/hooks/useSocietyCore';
+import { useSocietyTags } from '../../../../components/Society/hooks/useSocietyTags';
+import { useSocietyEvents } from '../../../../components/Society/hooks/useSocietyEvents';
+import { useSocietyAnnouncements } from '../../../../components/Society/hooks/useSocietyAnnouncements';
+import { useSocietyMembers } from '../../../../components/Society/hooks/useSocietyMembers';
+import { useSocietyMembership } from '../../../../components/Society/hooks/useSocietyMembership';
+
+vi.mock('../../../../components/Society/hooks/useSocietyCore', () => ({ useSocietyCore: vi.fn() }));
+vi.mock('../../../../components/Society/hooks/useSocietyTags', () => ({ useSocietyTags: vi.fn() }));
+vi.mock('../../../../components/Society/hooks/useSocietyEvents', () => ({ useSocietyEvents: vi.fn() }));
+vi.mock('../../../../components/Society/hooks/useSocietyAnnouncements', () => ({ useSocietyAnnouncements: vi.fn() }));
+vi.mock('../../../../components/Society/hooks/useSocietyMembers', () => ({ useSocietyMembers: vi.fn() }));
+vi.mock('../../../../components/Society/hooks/useSocietyMembership', () => ({ useSocietyMembership: vi.fn() }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('useSocietyDetail', () => {
     beforeEach(() => {

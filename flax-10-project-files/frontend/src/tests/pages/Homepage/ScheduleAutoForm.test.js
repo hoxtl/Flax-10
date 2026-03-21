@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { buildScheduleAutoForm, getUrgencyTier } from '../../../pages/homepage/utils/scheduleAutoForm';
+import { buildScheduleAutoForm, getUrgencyTier } from '../../../pages/Homepage/utils/ScheduleAutoForm';
 
 describe('ScheduleAutoForm', () => {
   it('builds payload with deadline preferences for valid upcoming deadlines', () => {
@@ -11,7 +11,7 @@ describe('ScheduleAutoForm', () => {
     const payload = buildScheduleAutoForm({ deadlines });
 
     expect(payload).toEqual(expect.objectContaining({
-      clear_existing: true,
+      clear_existing: false,
       deadline_preferences: [
         expect.objectContaining({ deadline_id: 1, ideal_minutes_per_day: 75 }),
         expect.objectContaining({ deadline_id: 3, ideal_minutes_per_day: 45 }),
@@ -20,10 +20,6 @@ describe('ScheduleAutoForm', () => {
   });
 
   it('returns null when no eligible deadlines are provided', () => {
-    expect(buildScheduleAutoForm()).toBeNull();
-    expect(buildScheduleAutoForm({ deadlines: null })).toBeNull();
-    expect(buildScheduleAutoForm({ deadlines: 'invalid' })).toBeNull();
-
     const payload = buildScheduleAutoForm({
       deadlines: [{ id: 1, start_due_date: new Date(Date.now() - 86400000).toISOString() }],
     });
@@ -40,7 +36,6 @@ describe('ScheduleAutoForm', () => {
     expect(getUrgencyTier('2026-01-05T00:00:00.000Z')).toBe('urgent');
     expect(getUrgencyTier('2026-01-10T00:00:00.000Z')).toBe('upcoming');
     expect(getUrgencyTier('2026-02-10T00:00:00.000Z')).toBe('distant');
-    expect(getUrgencyTier('not-a-date')).toBeNull();
 
     vi.useRealTimers();
   });

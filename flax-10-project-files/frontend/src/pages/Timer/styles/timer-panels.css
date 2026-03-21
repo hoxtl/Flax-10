@@ -69,6 +69,7 @@
 
 /* === Card Layout === */
 
+<<<<<<< HEAD
 .timerRightPanel {
     display: flex;
     flex-direction: column;
@@ -80,6 +81,8 @@
 
 
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .timerMainCard {
     width: 100%;
     background: var(--surface-card);
@@ -168,15 +171,29 @@
     padding: var(--card-padding);
     display: flex;
     flex-direction: column;
+<<<<<<< HEAD
     align-items: stretch;
     justify-content: flex-start;
+=======
+    align-items: center;
+    justify-content: center;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     width: 100%;
 }
 
 .timerSoundCardInline {
     padding: var(--card-padding);
+<<<<<<< HEAD
     gap: 0.75rem;
     min-height: 214px;
+=======
+    gap: 0.65rem;
+}
+
+.timerSoundCardInline .soundSelectorContainer {
+    margin-top: 0;
+    gap: 0.4rem;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* Zoom-in transition when navigating from task Play */
@@ -311,8 +328,11 @@
 .buttonGroup {
     display: flex;
     gap: 1rem;
+<<<<<<< HEAD
     flex-wrap: wrap;
     justify-content: center;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .pauseIndicator {

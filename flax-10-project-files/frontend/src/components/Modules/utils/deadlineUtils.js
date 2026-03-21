@@ -1,7 +1,10 @@
 /*
  * Utility functions for deadline formatting and urgency.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export const DEADLINE_LABELS = {
     exam: 'Exam' ,
     coursework: 'Coursework',

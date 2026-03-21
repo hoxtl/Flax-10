@@ -1,0 +1,39 @@
+.readOnly {
+  display: block;
+  cursor: text;
+  width: 100%;
+  min-height: 1.5em;
+  transition: color 0.15s ease;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.readOnly:hover {
+  color: var(--primary);
+}
+
+.editTextarea {
+  width: 100%;
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  border-radius: 0;
+  padding: 1px 0 4px;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.editTextarea:focus {
+  border-bottom-color: var(--primary);
+  background: transparent;
+  box-shadow: none;
+}

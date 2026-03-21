@@ -1,33 +1,22 @@
-/**
- * Covers TimerPage integration flows, including history modal branches.
- */
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as helpers from '../utils/timerTestHelpers';
+import * as historyUtils from '../../components/Timer/utils/historyUtils';
 import { fireEvent, screen, act } from '@testing-library/react';
 
 const { mockGetHistory } = vi.hoisted(() => ({
     mockGetHistory: vi.fn(),
 }));
 
-vi.mock('../../components/timer/utils/historyUtils', async () => {
-    const actual = await vi.importActual('../../components/timer/utils/historyUtils');
+vi.mock('../../components/Timer/utils/historyUtils', async () => {
+    const actual = await vi.importActual('../../components/Timer/utils/historyUtils');
     return {
         ...actual,
         getHistory: mockGetHistory,
     };
 });
 
-vi.mock('../../components/timer/TreeAnimation', () => ({
+vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
-}));
-
-vi.mock('../../components/timer/FocusAnimation', () => ({
-    default: () => <div data-testid="focus-animation" />,
-}));
-
-vi.mock('../../components/timer/TodayBanner', () => ({
-    default: () => <div data-testid="today-banner" />,
 }));
 
 vi.mock('framer-motion', () => ({
@@ -35,22 +24,13 @@ vi.mock('framer-motion', () => ({
     get: (_, tag) => (props) => {
       const { children, ...rest } = props || {};
       const Tag = typeof tag === 'string' ? tag : 'div';
-      delete rest.animate;
-      delete rest.exit;
-      delete rest.initial;
-      delete rest.layout;
-      delete rest.layoutId;
-      delete rest.layoutRoot;
-      delete rest.transition;
-      delete rest.whileHover;
-      delete rest.whileTap;
       return <Tag {...rest}>{children}</Tag>;
     },
   }),
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../components/notifications/hooks/useNotify', () => ({
+vi.mock('../../components/Notifications/hooks/useNotify', () => ({
     useNotify: () => vi.fn(),
 }));
 
@@ -62,8 +42,8 @@ vi.mock('react-router-dom', () => ({
 
 let mockNotificationPermission = 'granted';
 const mockRequestPermission = vi.fn();
-vi.mock('../../components/timer/utils/timerUtils', async () => {
-    const actual = await vi.importActual('../../components/timer/utils/timerUtils');
+vi.mock('../../components/Timer/utils/timerUtils', async () => {
+    const actual = await vi.importActual('../../components/Timer/utils/timerUtils');
     return {
         ...actual,
         useNotificationPermission: () => ({ permission: mockNotificationPermission, request: mockRequestPermission }),
@@ -132,64 +112,89 @@ const testBreakModalEnter = () => {
     helpers.expectTimer('05:00');
 };
 
-const historyBackdrop = () => document.body.querySelector('div[class*="_backdrop"]');
-
-const flushHistoryModal = async () => {
-    act(() => vi.advanceTimersByTime(500));
-    await act(async () => { await Promise.resolve(); });
-};
-
-const withDesktopWidth = async (run) => {
-    const origInnerWidth = window.innerWidth;
-    Object.defineProperty(window, 'innerWidth', { value: 800, writable: true, configurable: true });
-    try {
-        await run();
-    } finally {
-        Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
-    }
-};
-
-const openHistoryModal = async () => {
-    helpers.renderTimerPage();
-    fireEvent.click(screen.getByRole('button', { name: /View History/i }));
-    await flushHistoryModal();
-};
-
 const testHistoryModal = async () => {
     mockGetHistory.mockResolvedValue([{ id: 1, duration: 25 }]);
-    await withDesktopWidth(async () => {
-        await openHistoryModal();
-        expect(mockGetHistory).toHaveBeenCalled();
-        expect(historyBackdrop()).toBeTruthy();
-        expect(document.body.textContent || '').toMatch(/History/i);
-        expect(document.body.textContent || '').toMatch(/Clear History/i);
+    const origInnerWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { value: 800, writable: true, configurable: true });
+    helpers.renderTimerPage();
+    const viewBtn = screen.getByRole('button', { name: /View History/i });
+    expect(viewBtn).toBeInTheDocument();
+    fireEvent.click(viewBtn);
+    // If it's unexpectedly missing, fall back to history tab.
+    if (!viewBtn) {
+        const historyBtn = screen.getAllByRole('button').find((b) => /history/i.test(b.textContent || ''));
+        if (!historyBtn) throw new Error('No history trigger button found');
+        fireEvent.click(historyBtn);
+    }
+    // RTL polling + effects rely on timers under fake-timers.
+    act(() => vi.advanceTimersByTime(500));
+    expect(mockGetHistory).toHaveBeenCalled();
+    // Flush promise resolutions from HistoryModal's useEffect
+    await act(async () => {
+        await Promise.resolve();
     });
+    // Wait for modal mount
+    expect(document.body.querySelector('div[class*="_backdrop"]')).toBeTruthy();
+    expect(document.body.textContent || '').toMatch(/History/i);
+    // Wait for modal to load data (fake-timers can stall RTL findByRole polling)
+    expect(document.body.textContent || '').toMatch(/Clear History/i);
+    Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
 };
 
 const testHistoryModalClose = async () => {
+    // Mock getHistory so it doesn't crash
     mockGetHistory.mockResolvedValue([]);
-    await withDesktopWidth(async () => {
-        await openHistoryModal();
-        expect(historyBackdrop()).toBeTruthy();
-        fireEvent.click(screen.getByRole('button', { name: /close/i }));
-        await flushHistoryModal();
-        const backdrop = historyBackdrop();
-        expect(backdrop === null || /_hidden_/.test(backdrop.className)).toBe(true);
-        expect(document.body.textContent || '').not.toMatch(/Clear History/i);
+    const origInnerWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { value: 800, writable: true, configurable: true });
+    helpers.renderTimerPage();
+    const viewBtn = screen.getByRole('button', { name: /View History/i });
+    expect(viewBtn).toBeInTheDocument();
+    fireEvent.click(viewBtn);
+    if (!viewBtn) {
+        const historyBtn = screen.getAllByRole('button').find((b) => /history/i.test(b.textContent || ''));
+        if (!historyBtn) throw new Error('No history trigger button found');
+        fireEvent.click(historyBtn);
+    }
+    // RTL polling + effects rely on timers under fake-timers.
+    act(() => vi.advanceTimersByTime(500));
+    // Flush promise resolutions from HistoryModal's useEffect
+    await act(async () => {
+        await Promise.resolve();
     });
+    // Modal should be mounted
+    expect(document.body.querySelector('div[class*="_backdrop"]')).toBeTruthy();
+
+    // StandardModal close button uses aria-label="Close"
+    const closeBtn = screen.getByRole('button', { name: /close/i });
+    fireEvent.click(closeBtn);
+
+    // Flush state updates after close
+    act(() => vi.advanceTimersByTime(200));
+    await act(async () => {
+        await Promise.resolve();
+    });
+
+    // Modal should be gone
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+    expect(backdrop).toBeTruthy();
+    // StandardModal appears to keep the portal node mounted and toggles visibility via CSS.
+    expect(backdrop.className).toMatch(/_hidden_/);
+    // Clear History should not exist (and in this test getHistory returns [])
+    expect(document.body.textContent || '').not.toMatch(/Clear History/i);
+    Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
 };
 
 describe('TimerPage Integration', () => {
     beforeEach(setupTests);
     afterEach(cleanupTests);
-    it('renders initial state correctly', testInitialState, 15000);
-    it('starts and stops the timer', testStartStop, 15000);
+    it('renders initial state correctly', testInitialState);
+    it('starts and stops the timer', testStartStop);
     it('resets the timer', testReset);
-    it('updates settings', testSettings, 15000);
-    it('shows break modal when work session finishes', testBreakModalShow, 15000);
-    it('enters break mode from modal', testBreakModalEnter, 15000);
-    it('opens history modal when history button is clicked', testHistoryModal, 15000);
-    it('closes history modal', testHistoryModalClose, 15000);
+    it('updates settings', testSettings);
+    it('shows break modal when work session finishes', testBreakModalShow);
+    it('enters break mode from modal', testBreakModalEnter);
+    it('opens history modal when history button is clicked', testHistoryModal);
+    it('closes history modal', testHistoryModalClose);
 
     it('shows Enable Notifications when permission is default and click calls request', () => {
         mockNotificationPermission = 'default';
@@ -218,16 +223,6 @@ describe('TimerPage Integration', () => {
         expect(screen.getByTestId('focus-page-skeleton')).toBeInTheDocument();
     });
 
-    it('shows the overtime modal even while full focus mode is open', () => {
-        helpers.renderTimerPage();
-        helpers.updateSettings(0, '1');
-        helpers.clickStart();
-        fireEvent.click(screen.getByRole('button', { name: /full focus mode/i }));
-        helpers.advanceTimer(61000);
-        expect(screen.getByRole('button', { name: /exit focus/i })).toBeInTheDocument();
-        expect(screen.getByText("Time's Up!")).toBeInTheDocument();
-    }, 15000);
-
     it('cycles focus transition messages and hides after 10s', () => {
         mockLocationState = { fromTaskPlay: true };
         helpers.renderTimerPage();
@@ -250,5 +245,5 @@ describe('TimerPage Integration', () => {
         helpers.renderTimerPage();
         expect(screen.getByRole('button', { name: /History/i })).toBeInTheDocument();
         Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
-    }, 15000);
+    });
 });

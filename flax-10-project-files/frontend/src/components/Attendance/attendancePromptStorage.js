@@ -1,8 +1,11 @@
 /*
  * Attendance prompt storage.
+<<<<<<< HEAD
  *
  * localStorage  — permanently answered events (Yes / No).  Survives across sessions.
  * sessionStorage — dismissed events for the current session only.  Cleared on new login.
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
  */
 
 const ANSWERED_KEY  = "flax_attendance_prompted_ids";
@@ -18,6 +21,7 @@ function readSet(storage, key) {
   }
 }
 
+<<<<<<< HEAD
 function writeSet(storage, key, ids) {
   try {
     storage.setItem(key, JSON.stringify([...ids]));
@@ -72,4 +76,10 @@ export function setLastPromptShownAt(timestamp = Date.now()) {
   } catch {
     // storage quota or private-mode — silently ignore
   }
+=======
+export function setPromptedId(eventId) {
+  const ids = getPromptedIds();
+  ids.add(eventId);
+  localStorage.setItem(PROMPTED_KEY, JSON.stringify([...ids]));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

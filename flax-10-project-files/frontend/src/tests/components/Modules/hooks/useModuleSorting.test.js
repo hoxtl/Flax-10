@@ -1,7 +1,10 @@
 /*
  * Tests for useModuleSorting hook.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useModuleSorting from '../../../../components/modules/hooks/useModuleSorting';
@@ -68,6 +71,7 @@ describe('useModuleSorting', () => {
         expect(result.current.currentPage).toBe(1);
         act(() => result.current.toggleCourse(1));
         expect(result.current.selectedCourses).toEqual([]);
+<<<<<<< HEAD
     });
 
     it('clearFilters clears selections and resets paging', () => {
@@ -86,5 +90,7 @@ describe('useModuleSorting', () => {
 
         expect(result.current.selectedCourses).toEqual([]);
         expect(result.current.currentPage).toBe(1);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

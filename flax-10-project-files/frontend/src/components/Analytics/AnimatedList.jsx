@@ -31,7 +31,11 @@ const renderDefaultItem = (item, index, selectedIndex) => (
 const getItemContent = (renderItem, item, index, selectedIndex) =>
   (renderItem ? renderItem(item, index, selectedIndex === index) : renderDefaultItem(item, index, selectedIndex));
 
+<<<<<<< HEAD
 const AnimatedItem = ({ children, delay, index, onMouseEnter, onClick }) => {
+=======
+const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }) => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5, triggerOnce: false });
   return (

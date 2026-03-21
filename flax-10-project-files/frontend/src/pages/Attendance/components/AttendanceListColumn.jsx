@@ -2,7 +2,10 @@
  * Attendance list column.
  */
 
+<<<<<<< HEAD
 import { Tabs } from "../../../components/common";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import MarkedAttendanceList from "./MarkedAttendanceList";
 import RecordAttendanceList from "./RecordAttendanceList";
 import SegmentDetailPanel from "./SegmentDetailPanel";
@@ -24,6 +27,7 @@ function AttendanceSegmentPanel({ model }) {
 }
 
 function AttendanceTabbedList({ model }) {
+<<<<<<< HEAD
   const tabs = buildAttendanceTabs(model);
   return (
     <div className={styles.listCol}>
@@ -38,16 +42,29 @@ function AttendanceTabbedList({ model }) {
             className={styles.attendanceTabs}
           />
         </div>
+=======
+  return (
+    <div className={styles.listCol}>
+      <div className={styles.listPanel}>
+        <AttendanceTabs model={model} />
+        <AttendanceListContent model={model} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </div>
     </div>
   );
 }
 
+<<<<<<< HEAD
+=======
+import { TabBar } from "../../../components/common";
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const TABS = [
   { id: "record", label: "Record attendance" },
   { id: "marked", label: "Marked" }
 ];
 
+<<<<<<< HEAD
 function buildAttendanceTabs(model) {
   return TABS.map((tab) => ({
     ...tab,
@@ -60,6 +77,26 @@ function buildAttendanceTabs(model) {
     ),
     content: tab.id === "record" ? <RecordTabContent model={model} /> : <MarkedTabContent model={model} />
   }));
+=======
+function AttendanceTabs({ model }) {
+  const tabs = TABS.map(t => ({
+    ...t,
+    label: (
+      <div className={styles.tabLabelWithBadge}>
+        {t.label}
+        {t.id === "record" && model.unmarkedEvents.length > 0 && <span className={styles.tabBadge}>{model.unmarkedEvents.length}</span>}
+        {t.id === "marked" && model.markedEvents.length > 0 && <span className={styles.tabBadge}>{model.markedEvents.length}</span>}
+      </div>
+    )
+  }));
+
+  return <TabBar tabs={tabs} activeTab={model.listTab} onTabChange={(id) => id === "record" ? model.showRecordTab() : model.showMarkedTab()} layoutId="attendance-tab-underline" />;
+}
+
+function AttendanceListContent({ model }) {
+  if (model.listTab === "record") return <RecordTabContent model={model} />;
+  return <MarkedTabContent model={model} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function RecordTabContent({ model }) {

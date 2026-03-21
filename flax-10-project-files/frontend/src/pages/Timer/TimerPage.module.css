@@ -11,9 +11,13 @@
 @import './styles/task-picker-list.css';
 @import './styles/supporting-ui.css';
 @import './styles/today-banner.css';
+<<<<<<< HEAD
 @import './styles/today-banner-metrics.css';
 @import './styles/focus-timer.css';
 @import './styles/focus-timer-overlay.css';
+=======
+@import './styles/focus-timer.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @import './styles/sound-and-animation.css';
 @import './styles/focus-support.css';
 @import './styles/calm-mode.css';

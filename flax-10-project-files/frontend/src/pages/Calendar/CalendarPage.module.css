@@ -2,6 +2,7 @@
   background-color: var(--bg);
 }
 
+<<<<<<< HEAD
 .calendarFrame {
   min-width: 0;
 }
@@ -105,6 +106,8 @@
   text-decoration: underline;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .skeletonStickyHeader {
   position: sticky;
   top: 0;
@@ -185,6 +188,7 @@
   background: var(--calendar-bg);
   border-top-left-radius: 22px;
   border-top-right-radius: 24px;
+<<<<<<< HEAD
 }
 
 [data-mode="dark"] .sharedCalendarFrame {
@@ -217,6 +221,8 @@
 [data-mode="dark"] .sharedCalendarDescription,
 [data-mode="dark"] .sharedCalendarDescription {
   color: rgba(234, 224, 224, 0.86);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 @media (max-width: 768px) {
@@ -248,4 +254,8 @@
     grid-template-columns: 44px minmax(140px, 1fr) 44px;
     gap: 0.75rem;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

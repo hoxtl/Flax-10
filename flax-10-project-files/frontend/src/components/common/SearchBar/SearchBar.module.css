@@ -1,0 +1,14 @@
+.container {
+    position: relative;
+    flex: 1;
+}
+
+.input {
+    font-size: var(--text-md);
+    background: var(--panel);
+    color: var(--text);
+}
+
+.input::placeholder {
+    color: var(--muted);
+}

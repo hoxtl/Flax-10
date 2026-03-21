@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Profile header component – avatar, stats, badges, persona, and calendar sharing.
  */
@@ -12,6 +13,14 @@ import ShareButton from "../../../components/social/ShareButton";
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
 const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
+=======
+import { useState } from "react";
+import styles from "../Profile.module.css";
+import { buildInitials, buildFullName } from "../utils/profileHelpers";
+import ShareButton from "../../../components/Social/ShareButton";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function buildHeaderDescription(isTeacher, major, year) {
   return isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
@@ -21,6 +30,7 @@ function buildHeaderVars(user, profileData) {
   const role = profileData?.role || user?.role || "student";
   const fullName = buildFullName(profileData || user);
   const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
+<<<<<<< HEAD
   const year = !isTeacher && role === "student" ? profileData?.year || user?.year || "" : "";
   const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
   return { isTeacher, roleLabel: isTeacher ? "Professor" : "Student", description: buildHeaderDescription(isTeacher, major, year) };
@@ -125,11 +135,45 @@ function BadgeRail({ topBadges, onViewAll, canPin, onPinBadge, activeTooltip, on
         {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
       </div>
     </div>
+=======
+  const isStudent = !isTeacher && role === "student";
+  const year = isStudent ? (profileData?.year || user?.year || "") : "";
+  const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
+  
+  return {
+    role,
+    isTeacher,
+    description: buildHeaderDescription(isTeacher, major, year),
+    roleLabel: isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student"
+  };
+}
+
+function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
+  return (
+    <button
+      key={badge.id}
+      type="button"
+      className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onClick={() => canPin && onPinBadge?.(badge.id)}
+      title={canPin ? "Tap to pin this badge" : badge.label}
+    >
+      <span className={styles.headerBadgeEmoji}>{badge.emoji}</span>
+      {activeTooltip === badge.id && (
+        <div className={styles.badgeTooltip}>
+          <span className={styles.badgeTooltipLabel}>{badge.label}</span>
+          <span className={styles.badgeTooltipDesc}>{badge.description}</span>
+        </div>
+      )}
+    </button>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   );
 }
 
 function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
+<<<<<<< HEAD
   const allBadges = badges || [];
   if (!allBadges.length) return null;
   const { featuredBadge, topBadges } = resolveBadgeLists(allBadges, pinnedBadgeId);
@@ -140,11 +184,46 @@ function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll })
         {featuredBadge && <FeaturedBadgeCard key={featuredBadge.id} badge={featuredBadge} canPin={canPin} onPinBadge={onPinBadge} />}
       </AnimatePresence>
       <BadgeRail topBadges={topBadges} onViewAll={onViewAll} {...tooltipProps} />
+=======
+  const pinnedBadge = badges.find(b => b.id === pinnedBadgeId);
+  const otherBadges = badges.filter(b => b.id !== pinnedBadgeId);
+  const topBadges = otherBadges.slice(0, 3);
+
+  const renderBadge = (badge, { pinned = false } = {}) => (
+    <BadgeButton
+      key={badge.id}
+      badge={badge}
+      canPin={canPin}
+      onPinBadge={onPinBadge}
+      activeTooltip={activeTooltip}
+      onEnter={() => setActiveTooltip(badge.id)}
+      onLeave={() => setActiveTooltip(null)}
+      pinned={pinned}
+    />
+  );
+
+  return (
+    <div className={styles.headerBadges}>
+      {pinnedBadge && (
+        <div className={styles.pinnedBadgeWrap}>
+          {renderBadge(pinnedBadge, { pinned: true })}
+        </div>
+      )}
+      <div className={styles.headerBadgesMain}>
+        {topBadges.map(badge => renderBadge(badge))}
+      </div>
+      {onViewAll && (
+        <button className={styles.badgesViewAllLink} onClick={onViewAll}>
+          View All &rarr;
+        </button>
+      )}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
 function ProfileAvatar({ user, profilePhotoUrl }) {
+<<<<<<< HEAD
   return (
     <div className={styles.avatar}>
       {profilePhotoUrl ? (
@@ -182,10 +261,27 @@ function ProfileStats({
       {visibility.canEditProfile && societyCount > 0 && <StatItem value={societyCount} label="societies" onClick={onSocietiesClick} />}
       {visibility.canViewSharedWith && <StatItem value={profileData?.shared_with_count || 0} label="shared" onClick={handlers.onSharedWithClick} />}
       {visibility.canViewSharedWith && <StatItem value={profileData?.shared_by_count || 0} label="sharing with me" onClick={handlers.onSharedByClick} />}
+=======
+  return <div className={styles.avatar}>{profilePhotoUrl ? <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>;
+}
+
+function StatItem({ value, label, onClick }) {
+  return <button className={styles.statButton} onClick={onClick}><span className={styles.statValue}>{value}</span> {label}</button>;
+}
+
+function ProfileStats({ profileData, handlers, visibility, societyCount, onSocietiesClick }) {
+  const { onModulesClick: om, onSharedWithClick: os } = handlers;
+  return (
+    <div className={styles.stats}>
+      {visibility.canViewModules && visibility.canEditProfile && <StatItem value={profileData?.module_count || 0} label="modules" onClick={om} />}
+      {visibility.canEditProfile && societyCount > 0 && <StatItem value={societyCount} label="societies" onClick={onSocietiesClick} />}
+      {visibility.canViewSharedWith && <StatItem value={profileData?.shared_with_count || 0} label="shared" onClick={os} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 function ContactEmail({ email }) {
   if (!email) return null;
   return <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>;
@@ -207,10 +303,54 @@ function PersonaInlineChip({ persona, peakHour }) {
         {peakLabel && <span className={styles.headerPersonaPeak}>{peakLabel}</span>}
       </div>
       <p className={styles.headerPersonaDesc}>{persona.description}</p>
+=======
+function HeaderSocieties({ societies, onNavigate }) {
+  if (!societies?.length) return null;
+  return (
+    <div className={styles.headerSocietiesRow}>
+      {societies.map(soc => {
+        const societyId = soc.society_id ?? soc.id;
+        const imageUrl = soc.cover_image || soc.image;
+        return (
+          <button key={societyId || soc.name} className={styles.headerSocietyItem} onClick={() => societyId && onNavigate?.(`/societies?id=${societyId}`)}>
+            <div className={styles.headerSocLogoWrap}>
+              {imageUrl ? <img src={imageUrl} alt={soc.name} className={styles.headerSocLogo} /> : <div className={styles.headerSocInitial}>{soc.name[0]}</div>}
+            </div>
+            <span className={styles.headerSocName}>{soc.name}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
+function PersonaInlineChip({ persona, peakHour }) {
+  if (!persona) return null;
+  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? 'pm' : 'am'} peak` : null;
+  return (
+    <div className={styles.headerPersonaCard}>
+      <div className={styles.headerPersonaLeft}>
+        <span className={styles.headerPersonaEmoji} role="img" aria-label={persona.label}>{persona.emoji}</span>
+        <span className={styles.headerPersonaName}>{persona.label}</span>
+        {peakLabel && <span className={styles.headerPersonaPeak}>{peakLabel}</span>}
+      </div>
+      <p className={styles.headerPersonaDesc}>{persona.description}</p>
+    </div>
+  );
+}
+
+function ProfileBioSection({ isTeacher, email, bio }) {
+  if (!((isTeacher && email) || bio)) return null;
+  return (
+    <div className={styles.bio}>
+      {isTeacher && email && <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>}
+      {bio && <div className={styles.reminder}>{bio}</div>}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    </div>
+  );
+}
+
+<<<<<<< HEAD
 function ProfileBioSection({ bio }) {
   if (!bio) return null;
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
@@ -240,15 +380,25 @@ function SharedCalendarActions({ user, route, onNavigate }) {
 }
 
 function HeaderTitleRow({ user, roleLabel, handlers, visibility, isShared }) {
+=======
+function HeaderTopRow({ user, roleLabel, handlers, visibility }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <div className={styles.headerTop}>
       <h1 className={styles.username}>{user?.username || "guest"}</h1>
       <span className={styles.rolePill}>{roleLabel}</span>
+<<<<<<< HEAD
       {!isShared && <HeaderAction visibility={visibility} handlers={handlers} user={user} />}
+=======
+      {visibility.canEditProfile
+        ? <PrimaryButton className={styles.btnEdit} size="small" pill onClick={handlers.onEditProfile}>Edit profile</PrimaryButton>
+        : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 function HeaderMeta({ user, profileData, handlers, visibility, societies, onSocietiesClick, onNavigate }) {
   const { description, roleLabel } = buildHeaderVars(user, profileData);
   const isShared = !visibility.canEditProfile && profileData?.is_shared_with_me && !!onNavigate;
@@ -285,11 +435,41 @@ function DesktopHeader(props) {
         <HeaderMeta user={user} profileData={profileData} handlers={handlers} visibility={visibility} societies={societies} onSocietiesClick={onSocietiesClick} onNavigate={onNavigate} />
         <HeaderInsights badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} onViewAllBadges={onViewAllBadges} persona={persona} peakHour={peakHour} visibility={visibility} />
       </div>
+=======
+function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick }) {
+  const { description, roleLabel, isTeacher } = buildHeaderVars(user, profileData);
+  return (
+    <div className={styles.headerInfo}>
+      <div className={styles.headerTop}>
+        <h1 className={styles.username}>{user?.username || "guest"}</h1>
+        <span className={styles.rolePill}>{roleLabel}</span>
+        {visibility.canEditProfile ? <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
+      </div>
+      {description && <div className={styles.headerSubline}>{description}</div>}
+      <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
+      {(isTeacher && profileData?.email || profileData?.bio) && (
+        <div className={styles.bio}>
+          {isTeacher && profileData?.email && (
+            <div className={styles.teacherEmail}>
+              <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+            </div>
+          )}
+          {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
+        </div>
+      )}
+      {(badges?.length > 0 || persona) && (
+        <div className={styles.headerBadgesPersonaRow}>
+          {badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
+          {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
+        </div>
+      )}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
 function MobileStats({ profileData, handlers, visibility }) {
+<<<<<<< HEAD
   if (!(visibility.canViewModules && visibility.canEditProfile)) return null;
   return <div className={styles.mobileStatsGrid}><div className={styles.mobileStatCard} onClick={handlers.onModulesClick}><span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span><span className={styles.mobileStatLabel}>Modules</span></div></div>;
 }
@@ -307,10 +487,16 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, 
         <div className={styles.mobileActions}><HeaderAction visibility={visibility} handlers={handlers} user={user} mobile /></div>
       </div>
       <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
+=======
+  return (
+    <div className={styles.mobileStatsGrid}>
+      {visibility.canViewModules && visibility.canEditProfile && <div className={`${styles.mobileStatCard} ${styles.glassCard}`} onClick={handlers.onModulesClick}><span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span><span className={styles.mobileStatLabel}>Modules</span></div>}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
+<<<<<<< HEAD
 export default function ProfileHeader(props) {
   const shareUser = buildShareUser(props.user, props.handlers);
   const resolvedPhoto = resolvePhoto(props.user, props.profileData);
@@ -325,6 +511,41 @@ export default function ProfileHeader(props) {
         resolvedPhoto={resolvedPhoto}
         onNavigate={props.onNavigate}
       />
+=======
+
+function MobileHeroSection({ user, profileData, resolvedPhoto, description, roleLabel, isTeacher, visibility, handlers }) {
+  return (
+    <div className={styles.mobileHero}>
+      <div className={styles.mobileAvatar}>{resolvedPhoto ? <img src={resolvedPhoto} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>
+      <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1>
+      <p className={styles.mobileBio}>{description}</p>
+      <span className={styles.mobileRolePill}>{roleLabel}</span>
+      {isTeacher && profileData?.email && <div className={styles.teacherEmail}><a href={`mailto:${profileData.email}`}>{profileData.email}</a></div>}
+      <div className={styles.mobileActions}>{visibility.canEditProfile ? <PrimaryButton className={styles.mobileBtnEdit} size="small" pill onClick={handlers.onEditProfile}>Edit Profile</PrimaryButton> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} />}</div>
+    </div>
+  );
+}
+
+export default function ProfileHeader({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick }) {
+  const { description, roleLabel, isTeacher } = buildHeaderVars(user, profileData);
+  const resolvedUser = { ...user, ...profileData };
+  const resolvedPhoto = getResolvedUserPhoto({
+    ...resolvedUser,
+  }, {
+    allowGeneric: true,
+    seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name,
+  });
+  return (
+    <>
+      <div className={`${styles.header} ${styles.desktopOnly}`}>
+        <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
+        <ProfileHeaderInfo user={{ ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare }} profileData={profileData} handlers={handlers} visibility={visibility} badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} onViewAllBadges={onViewAllBadges} persona={persona} peakHour={peakHour} societies={societies} onNavigate={onNavigate} onSocietiesClick={onSocietiesClick} />
+      </div>
+      <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
+        <MobileHeroSection user={user} profileData={profileData} resolvedPhoto={resolvedPhoto} description={description} roleLabel={roleLabel} isTeacher={isTeacher} visibility={visibility} handlers={handlers} />
+        <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
+      </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </>
   );
 }

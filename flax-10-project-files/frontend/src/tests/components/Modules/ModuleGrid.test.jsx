@@ -1,6 +1,7 @@
 /*
  * Tests for ModuleGrid component.
  */
+<<<<<<< HEAD
 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -13,6 +14,14 @@ vi.mock('../../../components/modules/modules/ModulesCard.jsx', () => ({
         modulesCardMock(props);
         return <div>{props.module.module_name}</div>;
     },
+=======
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
+
+vi.mock('../../../components/Modules/ModulesCard', () => ({
+    default: ({ module }) => <div>{module.module_name}</div>,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }));
 
 describe('ModuleGrid', () => {

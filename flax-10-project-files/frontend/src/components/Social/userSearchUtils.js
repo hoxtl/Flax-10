@@ -5,8 +5,12 @@
 import { searchUsers } from '../../api/userApi';
 
 export function handleErr(label, error, setter) {
+<<<<<<< HEAD
     void label;
     void error;
+=======
+    console.error(label, error);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     setter([]);
 }
 

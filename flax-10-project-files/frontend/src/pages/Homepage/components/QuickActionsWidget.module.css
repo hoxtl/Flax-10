@@ -1,0 +1,209 @@
+/* Quick Actions widget */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.headerIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--widget-icon-bg);
+  border: 1px solid var(--widget-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  flex-shrink: 0;
+  color: var(--widget-accent);
+}
+
+.headerLabel {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  flex: 0;
+}
+
+/* ── Primary card: Start Focus Session ── */
+.primaryCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-radius: 12px;
+  background: var(--color-primary-solid);
+  border: 1px solid var(--color-primary-strong);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* [Sheen gradient removed] */
+
+.primaryCard:hover {
+  background: var(--color-primary-strong);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.primaryCard:hover::before {
+  opacity: 1;
+  animation: quickActionSheen 1.1s ease forwards;
+}
+
+@keyframes quickActionSheen {
+  to {
+    transform: translateX(60%) rotate(8deg);
+  }
+}
+
+.primaryLeft {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.primaryDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-on-primary);
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--color-on-primary);
+}
+
+.primaryIcon {
+  flex-shrink: 0;
+  color: var(--color-on-primary);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.primaryTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.primaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-primary);
+  line-height: 1.2;
+}
+
+.primarySub {
+  font-size: 10px;
+  color: var(--color-on-primary);
+  opacity: 0.7;
+  line-height: 1.2;
+}
+
+.primaryArrow {
+  flex-shrink: 0;
+  color: var(--color-on-primary);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Secondary cards ── */
+.secondaryCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-inner);
+  border: 1px solid var(--widget-border);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.secondaryCard:hover {
+  background: var(--surface-raised);
+  border-color: var(--widget-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* [Sheen gradient removed] */
+
+.secondaryCard:hover::before {
+  opacity: 1;
+  animation: quickActionSheen 1.1s ease forwards;
+}
+
+.secondaryIconAdd {
+  flex-shrink: 0;
+  color: #7bb38e;
+}
+
+.secondaryIconRefresh {
+  flex-shrink: 0;
+  color: #8b7bb8;
+}
+
+.secondaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  flex: 1;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.secondaryArrow {
+  flex-shrink: 0;
+  color: var(--widget-text-tertiary);
+  display: flex;
+  align-items: center;
+}
+
+/* AI pill badge */
+.aiPill {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: var(--color-primary);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

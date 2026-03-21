@@ -1,10 +1,16 @@
 /*
  * Legacy standalone sleep-schedule panel retained for test coverage.
  */
+<<<<<<< HEAD
 
 import SleepSection from "./preferences/SleepSection";
 import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
 import SectionSkeleton from "../common/loading_state/SectionSkeleton";
+=======
+import SleepSection from "./preferences/SleepSection";
+import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
+import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function SleepSchedulePanel({ onSave, isSaving }) {
   const settings = useSleepScheduleSettings();

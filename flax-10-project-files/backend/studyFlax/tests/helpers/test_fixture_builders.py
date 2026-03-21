@@ -1,3 +1,4 @@
+<<<<<<< HEAD:flax-10-project-files/backend/studyFlax/tests/helpers/test_fixture_builders.py
 """
 Shared fixture builders and sample payloads for backend tests.
 """
@@ -59,3 +60,7 @@ def get_sample_tags():
         {"name": name, "color": color, "default_duration": 60}
         for name, color in zip(SAMPLE_TAGS, colors)
     ]
+=======
+"""Re-export fixtures for convenience."""
+from .helpers.fixtures import *
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/backend/studyFlax/tests/fixtures.py

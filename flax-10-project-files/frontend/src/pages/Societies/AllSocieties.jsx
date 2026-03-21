@@ -6,12 +6,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter } from "lucide-react";
 import styles from "./SocietiesPage.module.css";
+<<<<<<< HEAD
 import { ToolbarSortControl } from "../../components/common/page_toolbar/PageToolbar";
 import SearchBar from "../../components/common/search_bar";
 import AnimatedDropdown from "../../components/common/animated_dropdown";
 import { TagsSelector } from "../../components/common/tags_selector/TagsSelector";
 import { BackToTop } from "../../components/pagination/Pagination";
 import BackButton from "../../components/common/back_button/BackButton.jsx";
+=======
+import { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
+import SearchBar from "../../components/common/SearchBar";
+import AnimatedDropdown from "../../components/common/AnimatedDropdown";
+import { TagsSelector } from "../../components/common/TagsSelector/TagsSelector";
+import { BackToTop } from "../../components/Pagination/Pagination";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { SocietyBrowseResults } from "./SocietyBrowseResults";
 import { RATIFICATION_FILTERS, SOCIETY_CATEGORIES } from "./societyFilters";
 import { useSocietyBrowseFilters } from "./useSocietyBrowseFilters";
@@ -36,6 +45,7 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
     );
 }
 
+<<<<<<< HEAD
 function BrowseControls({ filterState, societies, activeCount }) {
     return (
         <div className={styles.browseControls}>
@@ -61,15 +71,28 @@ function BrowseToolbar({ filterState, societies }) {
     );
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function BrowseHeader({ onBack, filterState, societies }) {
     return (
         <>
             <header className={styles.header}><BackButton onClick={onBack} label="Back" /></header>
+<<<<<<< HEAD
             <BrowseToolbar filterState={filterState} societies={societies} />
+=======
+            <div className={styles.browseToolbar}>
+                <div className={styles.browseSearch}><SearchBar value={filterState.search} onChange={filterState.setSearch} placeholder="Search societies..." /></div>
+                <div className={styles.browseControls}>
+                    <SocietyFilterButton filterState={filterState} societies={societies} />
+                    <ToolbarSortControl className={styles.browseSortControl}><SortDropdown value={filterState.sortBy} onChange={filterState.setSortBy} /></ToolbarSortControl>
+                </div>
+            </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </>
     );
 }
 
+<<<<<<< HEAD
 function RatificationPills({ filterState, societies }) {
     return (
         <div className={styles.ratificationOptions}>
@@ -88,6 +111,10 @@ function RatificationPills({ filterState, societies }) {
 
 function SortDropdown({ value, onChange }) {
     return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" align="right" />;
+=======
+function SortDropdown({ value, onChange }) {
+    return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function SocietyFilterButton({ filterState, societies }) {
@@ -119,7 +146,11 @@ function useHoverClose(isOpen, setIsOpen) {
     return {
         onMouseEnter: () => {
             clearTimeout(hoverTimer.current);
+<<<<<<< HEAD
             setIsOpen(true);
+=======
+            if (!isOpen) setIsOpen(true);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         },
         onMouseLeave: () => {
             hoverTimer.current = setTimeout(() => setIsOpen(false), 200);

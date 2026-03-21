@@ -1,6 +1,12 @@
 /**
  * Tests for Timer WrapperComponents (MainSection, PopupSection).
  */
+<<<<<<< HEAD
+=======
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MainSection, PopupSection } from '../../../components/Timer/WrapperComponents';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -31,6 +37,20 @@ vi.mock('../../../components/timer/TimerComponents', () => ({
   SessionStatus: () => <div data-testid="session-status" />,
   TimerControls: () => <div data-testid="timer-controls" />,
   TimerSettings: () => <div data-testid="timer-settings" />,
+<<<<<<< HEAD
+=======
+  SoundSelector: () => <div data-testid="sound-selector" />,
+}));
+vi.mock('../../../components/Timer/TaskInput', () => ({
+  TaskInput: ({ onTaskSelect }) => (
+    <button
+      data-testid="task-select-btn"
+      onClick={() => onTaskSelect?.({ id: 1, title: 'Task', estimated_blocks: 4, list_color: '#ccc' })}
+    >
+      Select task
+    </button>
+  ),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }));
 vi.mock('../../../components/timer/TimerPopups', () => ({
   OvertimePopup: () => <div data-testid="overtime-popup" />,
@@ -93,11 +113,22 @@ describe('MainSection', () => {
     expect(screen.queryByRole('button', { name: 'History' })).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   it('renders the full focus entry button and opens focus mode', () => {
     const onOpenFocus = vi.fn();
     render(<MainSection t={baseT} onOpenHistory={vi.fn()} onOpenFocus={onOpenFocus} isMobile={false} />);
     fireEvent.click(screen.getByRole('button', { name: 'Full Focus Mode ⚡' }));
     expect(onOpenFocus).toHaveBeenCalledTimes(1);
+=======
+  it('calls setTask from sessionStorage timerSuggestedTask on mount', async () => {
+    const t = { ...baseT, setTask: vi.fn() };
+    sessionStorage.setItem('timerSuggestedTask', 'Suggested task');
+    render(<MainSection t={t} onOpenHistory={vi.fn()} isMobile={false} />);
+    await waitFor(() => {
+      expect(t.setTask).toHaveBeenCalledWith('Suggested task');
+    });
+    expect(sessionStorage.getItem('timerSuggestedTask')).toBeNull();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it('applies the chosen task timing from the task picker actions', () => {

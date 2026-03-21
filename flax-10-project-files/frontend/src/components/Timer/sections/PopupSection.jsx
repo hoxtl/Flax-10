@@ -30,15 +30,24 @@ function TimerModals({ t }) {
       {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={isLastSession} />}
       {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
       {t.modal === 'break' && !autoStart && <BreakModal onAction={t.handlers.break} isLastSession={isLastSession} />}
+<<<<<<< HEAD
       {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} />}
+=======
+      {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} distractionCount={t.distractionCount} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       {t.modal === 'endEarly' && <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} elapsedSeconds={currentElapsedSec} goalSeconds={currentGoalSec} />}
     </>
   );
 }
 
+<<<<<<< HEAD
 export function PopupSection({ t, showHistory, onCloseHistory, disabled = false }) {
   useTimerPopupEffects(t);
   if (disabled) return null;
+=======
+export function PopupSection({ t, showHistory, onCloseHistory }) {
+  useTimerPopupEffects(t);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   return (
     <>

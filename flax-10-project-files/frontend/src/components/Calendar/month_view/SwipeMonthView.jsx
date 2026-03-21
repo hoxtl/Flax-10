@@ -2,14 +2,21 @@
  * SwipeMonthView - Month calendar with swipe navigation support.
  * Enables touch and scroll gestures to navigate between months.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/SwipeMonthView.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/SwipeMonthView.jsx
 import { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { getMonthWeeks } from '../utils/dateUtils';
 import { WeekdayHeader } from './WeekdayHeader';
 import { WeekRow } from './WeekRow';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/SwipeMonthView.jsx
 import './month-view.css';
+=======
+import './MonthView.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/SwipeMonthView.jsx
 import styles from './SwipeMonthView.module.css';
 
 const MonthGrid = memo(function MonthGrid({ date, events, readOnly, onDateSelect, onMoreClick, customTags }) {
@@ -47,7 +54,10 @@ function useMonthNavigation(selectedDate, dispatch) {
 }
 
 /** Month view with swipe/scroll navigation between months. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/month_view/SwipeMonthView.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/MonthView/SwipeMonthView.jsx
 export function SwipeMonthView({ readOnly: propReadOnly, customTags }) {
   const { selectedDate, events, readOnly: contextReadOnly } = useCalendar();
   const dispatch = useCalendarDispatch();

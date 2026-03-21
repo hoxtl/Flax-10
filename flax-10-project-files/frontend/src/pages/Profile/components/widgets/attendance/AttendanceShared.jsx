@@ -1,16 +1,23 @@
+<<<<<<< HEAD
 /**
  * Shared attendance widget primitives.
  */
 
 import SegmentDetailPanel from "../../../../attendance/components/SegmentDetailPanel";
+=======
+import SegmentDetailPanel from "../../../../Attendance/components/SegmentDetailPanel";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { PieChart } from "@mui/x-charts/PieChart";
 import widgetStyles from "../ProfileWidgets.module.css";
 import attendanceStyles from "../ProfileAttendance.module.css";
 
 const styles = { ...widgetStyles, ...attendanceStyles };
 
+<<<<<<< HEAD
 const ATT_BTN_STYLE = { pointerEvents: "auto", position: "relative", zIndex: 1 };
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function getPieItemLabel(item, dataIndex, data) {
   return item?.label ?? data[dataIndex]?.label;
 }
@@ -60,6 +67,7 @@ export function AttendanceWarningBadge({ attendancePct }) {
   );
 }
 
+<<<<<<< HEAD
 function handleDonutClick(event) {
   event.stopPropagation();
 }
@@ -84,18 +92,62 @@ export function CompactOverallDonut({ overallData, onSegmentClick }) {
   return (
     <div className={styles.compactAttendanceDonut} onClick={handleDonutClick}>
       <CompactDonutLayout canvasClassName={styles.compactDonutCanvas} chart="overall" data={overallData} chartProps={chartProps} legendTone="soft" onSegmentClick={onSegmentClick} />
+=======
+export function CompactOverallDonut({ overallData, onSegmentClick }) {
+  if (!overallData.length) return <p className={styles.compactAttendanceEmpty}>No attendance records yet.</p>;
+  return (
+    <div className={styles.compactAttendanceDonut} onClick={(event) => event.stopPropagation()}>
+      <div className={styles.compactDonutRow}>
+        <div className={styles.compactDonutCanvas}>
+          <DonutChart
+            data={overallData}
+            width={240}
+            height={210}
+            margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            innerRadius={38}
+            outerRadius={84}
+            cornerRadius={4}
+            onSelect={(label) => label && onSegmentClick({ chart: "overall", label })}
+          />
+        </div>
+        <CompactLegend items={overallData} tone="soft" />
+      </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
 
 export function CompactByTypeDonut({ byTypeData, onSegmentClick }) {
   if (!byTypeData.length) return null;
+<<<<<<< HEAD
   const chartProps = { width: 244, height: 188, margin: { top: 8, bottom: 4, left: 8, right: 8 }, innerRadius: 34, outerRadius: 76, cornerRadius: 3 };
   return (
     <div className={styles.compactByTypeSection} onClick={handleDonutClick}>
       <div className={styles.compactByTypeTitle}>By Type</div>
       <div className={styles.compactByTypeDonut}>
         <CompactDonutLayout canvasClassName={styles.compactByTypeCanvas} chart="byType" data={byTypeData} chartProps={chartProps} onSegmentClick={onSegmentClick} />
+=======
+
+  return (
+    <div className={styles.compactByTypeSection} onClick={(event) => event.stopPropagation()}>
+      <div className={styles.compactByTypeTitle}>By Type</div>
+      <div className={styles.compactByTypeDonut}>
+        <div className={styles.compactDonutRow}>
+          <div className={styles.compactByTypeCanvas}>
+            <DonutChart
+              data={byTypeData}
+              width={244}
+              height={188}
+              margin={{ top: 8, bottom: 4, left: 8, right: 8 }}
+              innerRadius={34}
+              outerRadius={76}
+              cornerRadius={3}
+              onSelect={(label) => label && onSegmentClick({ chart: "byType", label })}
+            />
+          </div>
+          <CompactLegend items={byTypeData} />
+        </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </div>
     </div>
   );
@@ -110,23 +162,39 @@ export function CompactAttHeader({ onNavigate }) {
         className={`${styles.heatmapLinkBtn} ${styles.compactAttAnalysisBtn}`}
         onClick={(event) => {
           event.stopPropagation();
+<<<<<<< HEAD
           triggerAttendanceNavigation(onNavigate);
         }}
         style={ATT_BTN_STYLE}
       >
         View attendance details
+=======
+          triggerAnalyticsNavigation(onNavigate);
+        }}
+        style={{ pointerEvents: "auto", position: "relative", zIndex: 1 }}
+      >
+        View full analytics
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </button>
     </div>
   );
 }
 
+<<<<<<< HEAD
 function triggerAttendanceNavigation(onNavigate) {
+=======
+function triggerAnalyticsNavigation(onNavigate) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   if (typeof onNavigate === "function") {
     onNavigate();
     return;
   }
 
+<<<<<<< HEAD
   window.dispatchEvent(new CustomEvent("navigate", { detail: "attendance" }));
+=======
+  window.dispatchEvent(new CustomEvent("navigate", { detail: "analytics" }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export function SegmentDetailPanelWrapper({ selectedSegment, events, onToggleStatus, onClose }) {

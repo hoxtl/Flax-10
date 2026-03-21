@@ -1,10 +1,16 @@
 /*
  * Tests for ModulesCard component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModulesCard from '../../../components/modules/modules/ModulesCard';
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ModulesCard from '../../../components/Modules/Modules/ModulesCard';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(() => false),
@@ -13,10 +19,16 @@ vi.mock('../../../components/modules/utils/moduleUtils', () => ({
     formatDuration: vi.fn(() => '1h'),
     getDepartment: vi.fn(() => "King's College London"),
     getCourse: vi.fn(() => null),
+<<<<<<< HEAD
     normaliseModuleCode: vi.fn((code) => code),
 }));
 
 vi.mock('../../../components/modules/modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+=======
+}));
+
+vi.mock('../../../components/Modules/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const module = {
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',

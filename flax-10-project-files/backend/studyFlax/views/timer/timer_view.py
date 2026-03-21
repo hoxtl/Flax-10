@@ -10,16 +10,20 @@ from studyFlax.models.timer.session_model import StudySession
 from studyFlax.serialisers.timer.timer_serialisers import StudySessionSerializer
 
 
+<<<<<<< HEAD
 def _user_study_sessions(user):
     return StudySession.objects.filter(user=user).order_by("-end_time")
 
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class StudySessionViewSet(viewsets.ModelViewSet):
     """API endpoint that allows study sessions to be viewed or edited."""
 
     serializer_class = StudySessionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+<<<<<<< HEAD
     def _study_sessions(self):
         return _user_study_sessions(self.request.user)
 
@@ -30,6 +34,12 @@ class StudySessionViewSet(viewsets.ModelViewSet):
         self._create_study_session(serializer)
 
     def _create_study_session(self, serializer):
+=======
+    def get_queryset(self):
+        return StudySession.objects.filter(user=self.request.user).order_by("-end_time")
+
+    def perform_create(self, serializer):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         serializer.save(user=self.request.user)
         task_id = self.request.data.get("task_id")
         self._increment_task_completed_blocks(task_id)
@@ -43,11 +53,20 @@ class StudySessionViewSet(viewsets.ModelViewSet):
             completed_blocks=db_models.F("completed_blocks") + 1
         )
 
+<<<<<<< HEAD
     def _deleted_session_response(self, deleted_count):
+=======
+    @action(detail=False, methods=["delete"])
+    def clear_history(self, request):
+        """Delete all study sessions for the current user."""
+
+        deleted_count, _ = self.get_queryset().delete()
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         return Response(
             {"message": f"Successfully deleted {deleted_count} sessions."},
             status=status.HTTP_200_OK,
         )
+<<<<<<< HEAD
 
     @action(detail=False, methods=["delete"])
     def clear_history(self, request):
@@ -57,3 +76,5 @@ class StudySessionViewSet(viewsets.ModelViewSet):
     def _clear_history_result(self):
         deleted_count, _ = self.get_queryset().delete()
         return self._deleted_session_response(deleted_count)
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

@@ -31,7 +31,11 @@ vi.mock('../../../components/calendar/event_modal/EventModal', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/event_popover/EventPopover', () => ({
+=======
+vi.mock('../../../components/Calendar/EventPopover/EventPopover', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     EventPopover: ({ event, onClose, actions }) => (
         <div data-testid="event-popup">
             <span>{event?.title}</span>
@@ -175,6 +179,19 @@ describe('EventPopups', () => {
         expect(screen.queryByText('Leave Module')).not.toBeInTheDocument();
         expect(screen.queryByText('Edit')).not.toBeInTheDocument();
         expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    });
+
+    it('hides Leave Module action when module leave is disabled', () => {
+        useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
+        useEventPopup.mockReturnValue({
+            popupEvent: { id: 4, title: 'Module Event', source: 'module', tag: null, module: 'CS3001' },
+            popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 },
+            closePopup: vi.fn(),
+            readOnly: false,
+        });
+        getEventType.mockReturnValue('module');
+        render(<EventPopups allowModuleLeave={false} />);
+        expect(screen.queryByText('Leave Module')).not.toBeInTheDocument();
     });
 
     it('hides Leave Module action when module leave is disabled', () => {

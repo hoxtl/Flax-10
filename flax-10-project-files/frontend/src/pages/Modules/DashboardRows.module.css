@@ -10,7 +10,11 @@
     border-radius: 14px;
     border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
     border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+<<<<<<< HEAD
     background: var(--modules-inline-surface, var(--surface-inner, var(--panel)));
+=======
+    background: var(--surface-inner, var(--panel));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     padding: 0.55rem 0.85rem;
     transition: border-color 0.2s ease;
 }
@@ -19,6 +23,7 @@
     border-color: var(--text);
 }
 
+<<<<<<< HEAD
 :global([data-mode="dark"]) .deadlineRow {
     background: color-mix(in srgb, var(--modules-inline-surface, var(--surface-inner)) 90%, var(--surface-card) 10%);
     border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--border) 82%);
@@ -33,11 +38,16 @@
 
 .rowOverdue {
     background: color-mix(in srgb, var(--danger) 8%, var(--modules-inline-surface, var(--surface-card)));
+=======
+.rowOverdue {
+    background: color-mix(in srgb, var(--danger) 6%, var(--surface-card));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border-color: color-mix(in srgb, var(--danger) 25%, var(--border));
     border-left-color: var(--home-urgency-danger);
 }
 
 .rowCritical {
+<<<<<<< HEAD
     background: color-mix(in srgb, var(--warning, orange) 7%, var(--modules-inline-surface, var(--surface-card)));
     border-left-color: var(--home-urgency-warning);
 }
@@ -46,6 +56,12 @@
     background: color-mix(in srgb, var(--warning, orange) 10%, var(--modules-inline-surface, var(--surface-card)));
 }
 
+=======
+    background: color-mix(in srgb, var(--warning, orange) 5%, var(--surface-card));
+    border-left-color: var(--home-urgency-warning);
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .rowUrgentGlow {
     border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
     box-shadow:
@@ -69,6 +85,7 @@
 }
 
 .moduleCodePill {
+<<<<<<< HEAD
     --chip-padding: 0.14rem 0.56rem;
     --chip-font-size: 0.62rem;
     --chip-font-weight: 800;
@@ -104,6 +121,41 @@
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.08),
         0 8px 16px rgba(0, 0, 0, 0.18);
+=======
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid var(--modules-chip-border-strong);
+    background: var(--modules-chip-bg-strong);
+    color: var(--modules-chip-fg);
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.moduleCodePill:hover {
+    background: var(--modules-accent-ink);
+    color: var(--modules-accent-on-solid);
+}
+
+.typePill {
+    display: inline-flex;
+    align-items: center;
+    border: 0.5px solid var(--modules-chip-border);
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .deadlineTitle {
@@ -128,6 +180,7 @@
     color: var(--modules-due-future);
 }
 
+<<<<<<< HEAD
 .widgetRowMeta {
     display: inline-flex;
     align-items: center;
@@ -218,6 +271,8 @@
     outline-offset: 2px;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 /* --- Priority pills (matches TaskCard) --- */
 .priorityPill {
     display: inline-flex;
@@ -226,7 +281,11 @@
     padding: 0.15rem 0.45rem;
     border-radius: 999px;
     border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+<<<<<<< HEAD
     box-shadow: inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+=======
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     font-size: 0.6rem;
     font-weight: 700;
     white-space: nowrap;
@@ -282,7 +341,11 @@
     border-radius: 14px;
     border: 0.5px solid color-mix(in srgb, var(--text) 20%, var(--border));
     border-left: 4px solid color-mix(in srgb, var(--deadline-row-accent, var(--home-urgency-neutral)) 55%, var(--home-urgency-neutral-soft, var(--border)));
+<<<<<<< HEAD
     background: var(--modules-inline-surface, var(--surface-inner, var(--panel)));
+=======
+    background: var(--surface-inner, var(--panel));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     padding: 0.55rem 0.85rem;
     transition: border-color 0.2s ease;
 }
@@ -291,6 +354,7 @@
     border-color: var(--text);
 }
 
+<<<<<<< HEAD
 :global([data-mode="dark"]) .readingRow {
     background: color-mix(in srgb, var(--modules-inline-surface, var(--surface-inner)) 90%, var(--surface-card) 10%);
     border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--border) 82%);
@@ -303,6 +367,8 @@
     border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border) 78%);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .readingRowClickable {
     cursor: pointer;
 }

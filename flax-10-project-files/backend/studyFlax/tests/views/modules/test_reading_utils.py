@@ -1,14 +1,22 @@
+<<<<<<< HEAD
 """
 Tests for reading utilities.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from datetime import timedelta
 
 from django.utils import timezone
 
 from studyFlax.models import Module, Reading, Task
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from studyFlax.utils.reading_utils import (
     DEFAULT_PAGE_TIME,
     estimated_blocks_per_page,
@@ -25,6 +33,10 @@ def _make_teacher():
     user.save(update_fields=["role"])
     return user
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _make_module(teacher):
     now = timezone.now()
     return Module.objects.create(
@@ -35,6 +47,10 @@ def _make_module(teacher):
         end_time=now + timedelta(hours=1),
     )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, estimated_minutes=None):
     return Reading.objects.create(
         module=module,
@@ -47,7 +63,10 @@ def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, est
 
 
 class ReadingUtilsTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests reading utils."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.teacher = _make_teacher()

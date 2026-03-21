@@ -1,10 +1,8 @@
 """
 Model for user notifications with type, action URL, and read status.
 """
-
 from django.db import models
 from studyFlax.models.auth.user_model import User
-
 
 NOTIFICATION_TYPES = [
     ('general', 'General'),
@@ -15,12 +13,9 @@ NOTIFICATION_TYPES = [
     ('ratification_approved', 'Ratification Approved'),
     ('ratification_rejected', 'Ratification Rejected'),
     ('meeting_suggestion', 'Meeting Suggestion'),
-    ('module_deleted', 'Module Deleted'),
-    ('module_updated', 'Module Updated'),
 ]
 
 class Notification(models.Model):
-    """Notification shown to a user in the app."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', null=True, blank=True)
     title = models.CharField(max_length=200)
     message = models.TextField(blank=True)
@@ -32,7 +27,6 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        """Metadata for notification."""
         ordering = ['-created_at']
 
     def __str__(self):

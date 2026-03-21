@@ -5,7 +5,10 @@ Shared recurrence and date-range utilities for calendar expansion.
 import calendar
 from datetime import timedelta
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def is_time_overlap(event_start, event_end, view_start, view_end):
     """Return True if two time ranges overlap."""
     return event_start < view_end and event_end > view_start

@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
+<<<<<<< HEAD
 import * as utils from '../../../../../components/society/hooks/utils/societyHookUtils';
+=======
+import * as utils from '../../../../../components/Society/hooks/utils/societyHookUtils';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('societyHookUtils', () => {
     it('normalizeIsoTime', () => {
@@ -52,6 +56,7 @@ describe('societyHookUtils', () => {
         expect(res.evData.description).toBe('Body');
     });
 
+<<<<<<< HEAD
     it('normalises announcement/event payloads when optional fields are falsy', () => {
         expect(utils.transformAnnouncementData({ title: 'Ann', content: '', tag: 0 }).ann.tag).toBeNull();
         expect(utils.transformAnnouncementData({ title: 'Ann', content: '', tag: 0 }).evData.tag).toBeNull();
@@ -66,6 +71,8 @@ describe('societyHookUtils', () => {
         ).toEqual(expect.objectContaining({ tag: null, recurrence: 'none', announcement: null }));
     });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     it('transformLegacyEventData with all fields', () => {
         const data = { title: 'T', date: '2025-01-01', startTime: '09:00', endTime: '10:00',
             description: 'Desc', location: 'Place', allDay: true, tag: '5', recurrence: 'weekly' };

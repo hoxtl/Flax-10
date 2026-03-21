@@ -1,7 +1,10 @@
 /*
  * Manual schedule event list.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from '../shared/scheduleFormStyles';
 
 export function ManualScheduleEventList({ events, filteredEvents, selected, toggle }) {

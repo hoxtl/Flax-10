@@ -1,7 +1,10 @@
 /*
  * Local UI state for account course-request interactions.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from "react";
 import { getCachedPendingRequest } from "./accountCourseRequests";
 

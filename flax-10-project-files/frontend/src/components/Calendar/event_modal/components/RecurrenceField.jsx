@@ -1,6 +1,11 @@
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/event_modal/components/RecurrenceField.jsx
 import AnimatedDropdown from '../../../common/animated_dropdown';
 import './recurrence-field.css';
+=======
+import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import './RecurrenceField.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/EventModal/components/RecurrenceField.jsx
 
 const FREQUENCY_OPTIONS = [
     { value: 'none', label: 'None' },

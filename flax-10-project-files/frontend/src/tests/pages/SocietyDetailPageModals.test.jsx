@@ -1,152 +1,135 @@
-/**
- * Verifies the modal props forwarded by SocietyDetailPage.
- */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import SocietyDetailPage from '../../pages/Societies/SocietyDetailPage';
+import { useSocietyDetail } from '../../components/Society/hooks/useSocietyDetail';
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-
-import { mergeNested } from "../utils/testBuilderUtils";
-import { buildPageData } from "./societyDetailPageTestUtils";
-
-const useSocietyPageDataMock = vi.fn();
-
-vi.mock("../../pages/societies/useSocietyDetailPageState", () => ({
-  useSocietyPageData: (...args) => useSocietyPageDataMock(...args),
-  useSocietyInit: vi.fn(),
+vi.mock('../../components/Society/hooks/useSocietyDetail', () => ({
+    useSocietyDetail: vi.fn(),
+}));
+vi.mock('../../components/Society/hooks/useChangeTracker', () => ({
+    useChangeTracker: vi.fn(() => ({
+        trackEvent: vi.fn(),
+        trackAnnouncement: vi.fn(),
+    })),
+}));
+vi.mock('../../components/Society/hooks/useSocietySubscription', () => ({
+    useSocietySubscription: () => ({ isSubscribed: false, toggleSubscription: vi.fn() }),
+}));
+vi.mock('../../components/Society/hooks/useUnreportSociety', () => ({
+    useUnreportSociety: () => vi.fn(),
 }));
 
-vi.mock("../../components/society/society_detail/SocietyHero", () => ({
-  default: () => <div>hero</div>,
+// Mock Modals
+vi.mock('../../components/Society/SocietyDetail/imageHandlers/CoverImageModal', () => ({
+    default: ({ onClose, onUpdate }) => (
+        <div data-testid="cover-modal">
+            <button onClick={onClose}>Close</button>
+            <button onClick={() => onUpdate(['img1'])}>Save</button>
+        </div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/imageHandlers/ImageGalleryModal', () => ({
+    default: ({ onClose }) => (
+        <div data-testid="gallery-modal">
+            Gallery Modal Mock
+            <button onClick={onClose}>Close</button>
+        </div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/SettingsModal', () => ({
+    default: ({ onClose, onDelete }) => (
+        <div data-testid="settings-modal"><button onClick={onClose}>Close</button><button onClick={onDelete}>Delete</button></div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/ReportSocietyModal', () => ({
+    default: ({ onClose, onReportSuccess }) => (
+        <div data-testid="report-modal"><button onClick={onClose}>Close</button><button onClick={onReportSuccess}>Success</button></div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/MemberDirectoryModal', () => ({
+    default: ({ onClose }) => <div data-testid="members-modal"><button onClick={onClose}>Close</button></div>,
+}));
+vi.mock('../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal', () => ({
+    default: ({ onClose, onSubmit, onDelete }) => (
+        <div data-testid="announce-modal">
+            <button onClick={onClose}>Close</button>
+            <button onClick={() => onSubmit({ id: 1, title: 'A' }, null)}>Submit</button>
+            <button onClick={() => onSubmit({ id: 1, title: 'A' }, { id: 2, pinned: true })}>Conflict</button>
+            <button onClick={() => onDelete(1)}>Delete</button>
+        </div>
+    ),
 }));
 
-vi.mock("../../components/society/society_detail/SocietyInfo", () => ({
-  default: () => <div>info</div>,
+// Mock Hero/Info just enough to trigger modals
+vi.mock('../../components/Society/SocietyDetail/SocietyHero', () => ({
+    default: ({ society, onUpdateName, onImageClick, onEditImages }) => (
+        <div data-testid="hero">
+            <span>{society?.name || 'Hero Mock'}</span>
+            <button onClick={() => onUpdateName?.('New Name')}>update-name</button>
+            <button onClick={() => onImageClick(0)}>Gallery</button>
+            <button onClick={onEditImages}>Cover</button>
+        </div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/SocietyInfo', () => ({
+    default: ({ onViewMembers }) => (
+        <div><button onClick={onViewMembers}>Members</button></div>
+    ),
+}));
+vi.mock('../../components/Society/SocietyDetail/tabs/SocietyTabs', () => ({
+    default: ({ onEditAnnouncement }) => (
+        <div><button onClick={() => onEditAnnouncement({ id: 1 })}>Edit Ann</button></div>
+    ),
 }));
 
-vi.mock("../../components/society/society_detail/tabs/SocietyTabs", () => ({
-  default: () => <div>tabs</div>,
-}));
+const mockSoc = { id: 1, name: 'Soc', role: 'admin', images: [], announcements: [], tags: [] };
 
-vi.mock("../../components/society/society_detail/SocietySidebar", () => ({
-  default: () => <div>sidebar</div>,
-}));
+describe('SocietyDetailPage Modals', () => {
+    let mockData;
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockData = {
+            society: mockSoc, loading: false, updateSociety: vi.fn(), updateLocalSociety: vi.fn(),
+            deleteSociety: vi.fn().mockResolvedValue({}), fetchMembers: vi.fn(),
+            updateAnnouncement: vi.fn(), addAnnouncement: vi.fn(), deleteAnnouncement: vi.fn()
+        };
+        useSocietyDetail.mockReturnValue(mockData);
+    });
 
-vi.mock("../../components/society/society_detail/image_handlers/CoverImageModal", () => ({
-  default: ({ images }) => <div data-testid="cover-modal">{images.length}</div>,
-}));
+    it('manages gallery modal', () => {
+        render(<MemoryRouter><SocietyDetailPage societyId={1} /></MemoryRouter>);
+        fireEvent.click(screen.getByText('Gallery'));
+        expect(screen.getByTestId('gallery-modal')).toBeTruthy();
+        fireEvent.click(screen.getByText('Close'));
+        expect(screen.queryByTestId('gallery-modal')).toBeNull();
+    });
 
-vi.mock("../../components/society/society_detail/image_handlers/ImageGalleryModal", () => ({
-  default: ({ images, initialIndex }) => (
-    <div data-testid="gallery-modal">
-      <span>{images.length}</span>
-      <span>{initialIndex}</span>
-    </div>
-  ),
-}));
+    it('EditableName: clicking update-name calls updateSociety', async () => {
+        render(<MemoryRouter><SocietyDetailPage societyId={1} /></MemoryRouter>);
+        fireEvent.click(screen.getByText('update-name'));
+        expect(mockData.updateSociety).toHaveBeenCalledWith({ name: 'New Name' });
+    });
 
-vi.mock("../../components/society/society_detail/SettingsModal", () => ({
-  default: ({ members, ratificationStatus, isRatified, isAdmin }) => (
-    <div data-testid="settings-modal">
-      <span>{members.length}</span>
-      <span>{ratificationStatus}</span>
-      <span>{String(isRatified)}</span>
-      <span>{String(isAdmin)}</span>
-    </div>
-  ),
-}));
+    it('manages cover modal', () => {
+        render(<MemoryRouter><SocietyDetailPage societyId={1} /></MemoryRouter>);
+        fireEvent.click(screen.getByText('Cover'));
+        fireEvent.click(screen.getByText('Save'));
+        expect(mockData.updateSociety).toHaveBeenCalledWith({ images: ['img1'], image: 'img1' });
+    });
 
-vi.mock("../../components/society/society_detail/ReportSocietyModal", () => ({
-  default: ({ society }) => <div data-testid="report-modal">{society.name}</div>,
-}));
-
-vi.mock("../../components/society/society_detail/MemberDirectoryModal", () => ({
-  default: ({ societyName, isAdmin }) => (
-    <div data-testid="members-modal">
-      <span>{societyName}</span>
-      <span>{String(isAdmin)}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal", () => ({
-  default: ({ societyId, tags = [] }) => (
-    <div data-testid="announcement-modal">
-      <span>{societyId}</span>
-      <span>{tags.join(",")}</span>
-    </div>
-  ),
-}));
-
-vi.mock("../../components/common/back_button/BackButton.jsx", () => ({
-  default: ({ label }) => <button type="button">{label}</button>,
-}));
-
-import SocietyDetailPage from "../../pages/societies/SocietyDetailPage";
-
-const modalDataDefaults = {
-  society: {
-    name: "Drama Society",
-    role: "editor",
-    is_admin: true,
-    images: [{ url: "cover-1" }, { url: "cover-2" }],
-    tags: ["arts", "events"],
-    ratification_status: "pending",
-    is_ratified: false,
-  },
-  members: [{ id: 1 }, { id: 2 }],
-  modals: {
-    showSettings: true,
-    showReportModal: true,
-    galleryOpen: { index: 1 },
-    showCoverModal: true,
-    showMembersModal: true,
-    editingAnnouncement: { id: 9 },
-  },
-};
-
-function buildData(overrides = {}) {
-  return buildPageData(mergeNested(modalDataDefaults, overrides, ["society", "modals"]));
-}
-
-describe("SocietyDetailPage modal props", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("passes the expected image, member, and announcement data into open modals", () => {
-    useSocietyPageDataMock.mockReturnValue(buildData());
-    render(
-      <MemoryRouter>
-        <SocietyDetailPage societyId={55} onBack={vi.fn()} />
-      </MemoryRouter>,
-    );
-
-    expect(screen.getByTestId("settings-modal")).toHaveTextContent("2");
-    expect(screen.getByTestId("settings-modal")).toHaveTextContent("pending");
-    expect(screen.getByTestId("gallery-modal")).toHaveTextContent("2");
-    expect(screen.getByTestId("gallery-modal")).toHaveTextContent("1");
-    expect(screen.getByTestId("cover-modal")).toHaveTextContent("2");
-    expect(screen.getByTestId("report-modal")).toHaveTextContent("Drama Society");
-    expect(screen.getByTestId("members-modal")).toHaveTextContent("Drama Society");
-    expect(screen.getByTestId("members-modal")).toHaveTextContent("true");
-    expect(screen.getByTestId("announcement-modal")).toHaveTextContent("55");
-    expect(screen.getByTestId("announcement-modal")).toHaveTextContent("arts,events");
-  });
-
-  it("marks member directory as non-admin when the society role is not elevated", () => {
-    useSocietyPageDataMock.mockReturnValue(buildData({
-      society: { role: "member", is_admin: false },
-    }));
-
-    render(
-      <MemoryRouter>
-        <SocietyDetailPage societyId={3} onBack={vi.fn()} />
-      </MemoryRouter>,
-    );
-
-    expect(screen.getByTestId("members-modal")).toHaveTextContent("false");
-    fireEvent.click(screen.getByTitle("Report Society"));
-    expect(screen.queryByTitle("Settings")).not.toBeInTheDocument();
-  });
+    it('manages announcement modal workflows', () => {
+        render(<MemoryRouter><SocietyDetailPage societyId={1} /></MemoryRouter>);
+        fireEvent.click(screen.getByText('Edit Ann'));
+        fireEvent.click(screen.getByText('Submit'));
+        expect(mockData.updateAnnouncement).toHaveBeenCalled();
+        
+        fireEvent.click(screen.getByText('Edit Ann'));
+        fireEvent.click(screen.getByText('Conflict'));
+        expect(mockData.updateAnnouncement).toHaveBeenCalledTimes(3); // Conflict + Update
+        
+        fireEvent.click(screen.getByText('Edit Ann'));
+        fireEvent.click(screen.getByText('Delete'));
+        expect(mockData.deleteAnnouncement).toHaveBeenCalled();
+    });
 });

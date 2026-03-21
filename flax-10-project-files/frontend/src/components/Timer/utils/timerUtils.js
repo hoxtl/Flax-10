@@ -36,7 +36,11 @@ export const useNotificationPermission = () => {
 };
 
 function handleCompletion(timer, startNext, notify, onWorkComplete) {
+<<<<<<< HEAD
     if (timer.mode === 'work') return handleWorkCompletion(timer, startNext, notify, onWorkComplete);
+=======
+    if (timer.mode === 'work') return handleWorkCompletion(timer, startNext, notify);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if (notify) notify("Break Over!", "Time to get back to work!", { url: 'timer' });
 }
 

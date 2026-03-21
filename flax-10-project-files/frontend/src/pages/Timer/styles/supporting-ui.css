@@ -2,6 +2,37 @@
  * Timer page styles chunk.
  */
 
+<<<<<<< HEAD
+=======
+.presetGoalDivider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0.1rem 0;
+}
+
+.dailyGoalWidget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.dailyGoalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dailyGoalLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .goalReachedStats .summaryLabel {
     font-size: 0.74rem;
     color: var(--text-secondary);

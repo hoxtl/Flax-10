@@ -1,12 +1,20 @@
 /*
  * SocietyBrowseResults renders paginated browse results and empty states.
  */
+<<<<<<< HEAD
 
 import SocietyCard from "../../components/society/SocietyCard";
 import gridStyles from "../../components/common/card/CardGrid.module.css";
 import EmptyState from "../../components/common/empty_state/EmptyState";
 import SearchEmptyState from "../../components/common/search_empty_state/SearchEmptyState";
 import { Pagination } from "../../components/pagination/Pagination";
+=======
+import SocietyCard from "../../components/Society/SocietyCard";
+import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import EmptyState from "../../components/common/EmptyState/EmptyState";
+import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
+import { Pagination } from "../../components/Pagination/Pagination";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { usePagination } from "../../hooks/usePagination";
 
 const PAGE_SIZE = 15;

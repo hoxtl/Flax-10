@@ -8,8 +8,11 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 
+<<<<<<< HEAD
 User = get_user_model()
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class EmailUtilsTest(TestCase):
     """Tests for email utils."""
 

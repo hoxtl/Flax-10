@@ -2,12 +2,20 @@
  * Modal for showing and interacting with a list of users.
  */
 
+<<<<<<< HEAD
 import PrimaryButton from '../common/primary_button/PrimaryButton';
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/generic_summary_modal/GenericSummaryModal';
 import SearchEmptyState from '../common/search_empty_state/SearchEmptyState';
 import SummaryItem from '../common/generic_summary_modal/SummaryItem';
 import UserAvatar from '../common/user_avatar/UserAvatar';
+=======
+import ShareButton from './ShareButton';
+import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
+import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
+import SummaryItem from '../common/GenericSummaryModal/SummaryItem';
+import UserAvatar from '../common/UserAvatar/UserAvatar';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 
 function getCurrentUser() {
@@ -34,6 +42,7 @@ function formatName(user) {
     return (fn || ln) ? `${fn} ${ln}`.trim() : user.username;
 }
 
+<<<<<<< HEAD
 function buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction) {
     return (user, index) => (
         <UserListItem
@@ -51,10 +60,20 @@ function buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarC
 function UserListItem({ user, currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction }) {
     const isSelf = isCurrentUser(user, currentUser);
     const rightAction = isSelf ? null : buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction);
+=======
+function buildRenderItem(currentUser, onUserClick, onUserUpdate) {
+    return (user, index) => <UserListItem key={user.id || user.username || index} user={user} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />;
+}
+
+function UserListItem({ user, currentUser, onUserClick, onUserUpdate }) {
+    const isSelf = isCurrentUser(user, currentUser);
+    const rightAction = isSelf ? null : <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
     return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
 }
 
+<<<<<<< HEAD
 function CalendarActionButton({ user, onUserCalendarClick }) {
     return (
         <PrimaryButton pill size="small" variant="primary" onClick={(e) => { e.stopPropagation(); onUserCalendarClick?.(user); }}>
@@ -80,6 +99,27 @@ export default function UserListModal({ title, users, onClose, onUserClick, onUs
         <GenericSummaryModal isOpen={true} onClose={onClose} title={title}
             emptyContent={<UserListEmpty emptyHint={emptyHint} />}
             items={sortUsers(users, currentUser)} renderItem={renderItem}
+=======
+export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
+    if (!users) return null;
+    const currentUser = getCurrentUser();
+    const items = sortUsers(users, currentUser);
+    const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate);
+    return (
+        <GenericSummaryModal
+            isOpen={true}
+            onClose={onClose}
+            title={title}
+            emptyContent={
+                <SearchEmptyState
+                    itemLabel="users"
+                    title="No users found"
+                    hint="No one is sharing with you yet."
+                />
+            }
+            items={items}
+            renderItem={renderItem}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         />
     );
 }

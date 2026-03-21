@@ -10,11 +10,18 @@ from rest_framework import status
 
 from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
 from studyFlax.models.auth.user_settings_model import UserSettings
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_superuser, authed_client
 
 
 class CourseChangeRequestTest(TestCase):
     """Tests course change request."""
+=======
+from studyFlax.tests.helpers.factories import make_user, make_superuser, authed_client
+
+
+class CourseChangeRequestTest(TestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.admin = make_superuser()
         self.user = make_user('cc_user')
@@ -146,6 +153,7 @@ class CourseChangeRequestTest(TestCase):
         url = f'/api/admin/course-change-requests/{req.pk}/resolve/'
         response = authed_client(self.admin).post(url, {'decision': 'reject'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+<<<<<<< HEAD
 
 
 class CourseChangeServiceUnitTest(TestCase):
@@ -175,3 +183,5 @@ class CourseChangeServiceUnitTest(TestCase):
             user=self.user, requested_course='Math', current_course='Physics', status='approved',
         )
         self.assertIsNone(pending_request_response(req))
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

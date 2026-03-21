@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../../../components/society/hooks/useCarouselNavigation';
+=======
+import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from '../../../../components/Society/hooks/useCarouselNavigation';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('useCarouselNavigation', () => {
     it('starts at initialIndex', () => {
@@ -45,6 +49,7 @@ describe('useCarouselGestures', () => {
         expect(mockEl.removeEventListener).toHaveBeenCalled();
     });
 
+<<<<<<< HEAD
     it('triggers next for large right-to-left swipes', () => {
         const handlers = {};
         const mockEl = {
@@ -94,6 +99,8 @@ describe('useCarouselGestures', () => {
         expect(next).not.toHaveBeenCalled();
     });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     it('handles null ref gracefully', () => {
         const ref = { current: null };
         expect(() => renderHook(() => useCarouselGestures(ref, { prev: vi.fn(), next: vi.fn() }))).not.toThrow();

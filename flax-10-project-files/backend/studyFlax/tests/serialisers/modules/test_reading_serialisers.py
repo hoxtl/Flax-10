@@ -1,15 +1,23 @@
+<<<<<<< HEAD
 """
 Tests for reading serialisers.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from datetime import timedelta
 
 from django.utils import timezone
 from rest_framework import status
 
 from studyFlax.models import Module, Reading
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from studyFlax.serialisers.modules.reading_serialisers import ReadingSummarySerialiser
 
 
@@ -19,6 +27,10 @@ def _make_teacher():
     user.save(update_fields=["role"])
     return user
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _make_module(teacher):
     now = timezone.now()
     return Module.objects.create(
@@ -29,6 +41,10 @@ def _make_module(teacher):
         end_time=now + timedelta(hours=1),
     )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, estimated_minutes=None):
     return Reading.objects.create(
         module=module,
@@ -41,7 +57,10 @@ def _make_reading(module, title="Chapter 1", start=1, end=20, deadline=None, est
 
 
 class ReadingSerialiserTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests reading serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.teacher = _make_teacher()
@@ -114,7 +133,10 @@ class ReadingSerialiserTests(BaseTestCase):
 
 
 class ReadingSummarySerialiserTest(BaseTestCase):
+<<<<<<< HEAD
     """Tests reading summary serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_summary_page_count(self):
         teacher = _make_teacher()
         module = _make_module(teacher)

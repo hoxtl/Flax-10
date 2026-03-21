@@ -5,7 +5,11 @@
   .planTimelineConflictPopoverTitle {
     font-size: 0.72rem;
     font-weight: 700;
+<<<<<<< HEAD
     color: var(--home-timeline-card-title);
+=======
+    color: #2D2D2D;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     margin: 0 0 2px;
   }
   .planTimelineConflictPopoverBtn {
@@ -196,12 +200,20 @@
     position: relative;
   }
   .planTimelineFreeWindowDashed {
+<<<<<<< HEAD
+=======
+    border: 1.5px dashed rgba(132, 169, 140, 0.45);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border-radius: 8px;
     background: rgba(132, 169, 140, 0.04);
     box-shadow: none;
   }
   .planTimelineFreeWindowDashed:hover {
     background: rgba(132, 169, 140, 0.08);
+<<<<<<< HEAD
+=======
+    border-color: rgba(132, 169, 140, 0.65);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     animation: planTimelineGapPulse 2s ease-in-out infinite;
   }
   @keyframes planTimelineGapPulse {
@@ -282,7 +294,11 @@
     right: 0;
     margin-top: 4px;
     padding: 10px 12px;
+<<<<<<< HEAD
     background: var(--widget-card-bg-glass);
+=======
+    background: #F9F8F6;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     border: 1px solid rgba(210, 180, 140, 0.55);
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);

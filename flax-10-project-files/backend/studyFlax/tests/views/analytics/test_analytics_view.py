@@ -9,8 +9,12 @@ from django.utils import timezone
 from datetime import timedelta
 from studyFlax.models.timer.theme_session_model import ThemeSession
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_user, make_session, authed_client
 
+=======
+from studyFlax.tests.helpers.factories import make_user, make_session, authed_client
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class AnalyticsSummaryViewTest(TestCase):
     """Tests for the analytics summary endpoint."""

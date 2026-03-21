@@ -1,10 +1,16 @@
 /*
  * Tests for DeadlineModal component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DeadlineModal from '../../../components/modules/deadlines/DeadlineModal';
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import DeadlineModal from '../../../components/Modules/Deadlines/DeadlineModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 // Const values for the test Modal
 const mockModal = {

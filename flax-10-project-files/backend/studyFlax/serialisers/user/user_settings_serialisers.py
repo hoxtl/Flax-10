@@ -5,7 +5,10 @@ Serialisers for user settings and preferences.
 from rest_framework import serializers
 from studyFlax.models.auth.user_settings_model import UserSettings
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 class UserSettingsSerialiser(serializers.ModelSerializer):
     """Serialiser for user application settings."""
 
@@ -21,7 +24,10 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
         return value
 
     class Meta:
+<<<<<<< HEAD
         """Metadata for user settings serialiser."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         model = UserSettings
         fields = [
             'theme',

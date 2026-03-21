@@ -13,6 +13,7 @@
     max-width: 372px;
     display: flex;
     flex-direction: column;
+<<<<<<< HEAD
     height: 500px;
     max-height: 80vh;
     overflow: hidden;
@@ -31,6 +32,18 @@
     flex-direction: column;
     overflow: hidden;
     gap: 16px;
+=======
+    max-height: 74vh;
+    overflow: visible;
+}
+
+.modalContent {
+    overflow: visible;
+}
+
+.content {
+    overflow: visible;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .list {
@@ -38,8 +51,11 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+<<<<<<< HEAD
     overflow-y: auto;
     padding-bottom: 4px;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .item {
@@ -108,6 +124,7 @@
     background: color-mix(in srgb, var(--danger) 15%, transparent);
     color: var(--danger);
     border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+<<<<<<< HEAD
 }
 
 .actions .deleteDisabled,
@@ -122,6 +139,39 @@
 .addTagButton {
     margin-top: 0;
     flex-shrink: 0;
+=======
+}
+
+.actions .deleteDisabled,
+.actions .deleteDisabled:hover {
+    opacity: 0.45;
+    cursor: not-allowed;
+    color: var(--text-secondary);
+    border-color: color-mix(in srgb, var(--border) 78%, transparent);
+    background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+}
+
+.addTagButton {
+    margin-top: 16px;
+}
+
+.addBtn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
+    color: color-mix(in srgb, var(--text) 96%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.addBtn:hover {
+    background: color-mix(in srgb, var(--primary) 100%, var(--surface-raised));
+    border-color: color-mix(in srgb, var(--primary) 75%, var(--border));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* Form Styles */
@@ -129,7 +179,10 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+<<<<<<< HEAD
     overflow-y: auto;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .form label {

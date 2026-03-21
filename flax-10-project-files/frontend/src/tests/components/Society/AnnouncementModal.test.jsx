@@ -4,8 +4,13 @@
 
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+<<<<<<< HEAD
 import AnnouncementModal from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal';
 import styles from '../../../components/society/society_detail/tabs/announcement_tab/AnnouncementModal.module.css';
+=======
+import AnnouncementModal from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal';
+import styles from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal.module.css';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const fetchSocietyEventMock = vi.fn();
 const confirmMock = vi.fn();
@@ -16,7 +21,11 @@ const existingPinnedAnnouncement = { id: 1, title: 'Pinned Existing', pinned: tr
 vi.mock('../../../api/societyApi', () => ({ fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args) }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => confirmMock }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/society/society_detail/tabs/announcement_tab/announcementModalHelpers', () => ({
+=======
+vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   MAX_IMAGES: 2,
   getInitialForm: (a) => ({
     id: a?.id, title: a?.title || '', content: a?.content || '', tag: a?.tag || '', images: a?.images || [],
@@ -26,6 +35,7 @@ vi.mock('../../../components/society/society_detail/tabs/announcement_tab/announ
   handleFileSelect: (...args) => handleFileSelectMock(...args),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/event_modal/components/TimeRow', () => ({
   TimeRow: ({ update }) => (
     <div>
@@ -39,10 +49,18 @@ vi.mock('../../../components/calendar/event_modal/components/RecurrenceField', (
   RecurrenceField: ({ onChange }) => <button onClick={() => onChange('weekly')}>set-weekly</button>,
 }));
 vi.mock('../../../components/calendar/event_modal/components/FormField', () => ({
+=======
+vi.mock('../../../components/Calendar/EventModal/components/TimeRow', () => ({ TimeRow: () => <div>time-row</div> }));
+vi.mock('../../../components/Calendar/EventModal/components/RecurrenceField', () => ({
+  RecurrenceField: ({ onChange }) => <button onClick={() => onChange('weekly')}>set-weekly</button>,
+}));
+vi.mock('../../../components/Calendar/EventModal/components/FormField', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   FormField: ({ label, value, onChange, type }) => type === 'textarea'
     ? <textarea aria-label={label} value={value} onChange={onChange} />
     : <input aria-label={label} value={value} onChange={onChange} />,
 }));
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/event_modal/components/TagField', () => ({
   TagField: ({ value, onChange }) => <input aria-label="Tag" value={value} onChange={onChange} />,
 }));
@@ -50,6 +68,15 @@ vi.mock('../../../components/common/standard_modal/StandardModal', () => ({
   default: ({ title, children, onClose }) => <div><h2>{title}</h2><button onClick={onClose}>close-modal</button>{children}</div>,
 }));
 vi.mock('../../../components/common/confirm_modal/ConfirmModal', () => ({
+=======
+vi.mock('../../../components/Calendar/EventModal/components/TagField', () => ({
+  TagField: ({ value, onChange }) => <input aria-label="Tag" value={value} onChange={onChange} />,
+}));
+vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+  default: ({ title, children, onClose }) => <div><h2>{title}</h2><button onClick={onClose}>close-modal</button>{children}</div>,
+}));
+vi.mock('../../../components/common/ConfirmModal/ConfirmModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   default: ({ title, message, onConfirm, onCancel }) => (
     <div><h3>{title}</h3><p>{message}</p><button onClick={onConfirm}>confirm-delete</button><button onClick={() => onCancel?.()}>cancel-delete</button></div>
   ),
@@ -80,11 +107,14 @@ describe('AnnouncementModal', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
   it('renders safely with default optional props', () => {
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Add Announcement' })).toBeInTheDocument();
   });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   it('triggers file input when clicking add image button', () => {
     const { container } = render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} announcements={[]} />);
     const input = container.querySelector('input[type="file"]');
@@ -123,6 +153,10 @@ describe('AnnouncementModal', () => {
   });
 
   it('handles image add/remove and load failure', async () => {
+<<<<<<< HEAD
+=======
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     fetchSocietyEventMock.mockRejectedValueOnce(new Error('load failed'));
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()}
       announcement={{ id: 10, title: 'Edit', content: 'x', event_id: 12, images: ['a.jpg'] }} societyId={6} announcements={[]} />);
@@ -143,6 +177,7 @@ describe('AnnouncementModal', () => {
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 
+<<<<<<< HEAD
   it('closes the delete confirm modal without deleting when cancellation is chosen', async () => {
     const onDelete = vi.fn();
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} onDelete={onDelete}
@@ -156,6 +191,8 @@ describe('AnnouncementModal', () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   it('submit with no pinned conflict calls onSubmit', () => {
     const onSubmit = vi.fn();
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={onSubmit} announcement={{ id: 3, title: 'New Pin', content: '', pinned: true }} announcements={[]} />);
@@ -180,6 +217,7 @@ describe('AnnouncementModal', () => {
     fireEvent.change(screen.getByLabelText('Title *'), { target: { value: 'T' } });
     fireEvent.click(screen.getByLabelText('Also add as event'));
     expect(screen.getByText('time-row')).toBeTruthy();
+<<<<<<< HEAD
     fireEvent.click(screen.getByText('set-start-time'));
     fireEvent.click(screen.getByText('set-end-time'));
     fireEvent.click(screen.getByText('set-weekly'));
@@ -190,5 +228,10 @@ describe('AnnouncementModal', () => {
       start_time: '2026-03-09T10:00',
       end_time: '2026-03-09T11:00',
     }));
+=======
+    fireEvent.click(screen.getByText('set-weekly'));
+    fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ addAsEvent: true, recurrence: 'weekly' }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 });

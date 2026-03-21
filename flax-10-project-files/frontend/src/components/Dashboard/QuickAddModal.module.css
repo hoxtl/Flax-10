@@ -93,8 +93,11 @@
   color: #6b7280;
   font-size: 13px;
 }
+<<<<<<< HEAD
 
 .emptyMsg {
   text-align: center;
   color: var(--color-gray-500);
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

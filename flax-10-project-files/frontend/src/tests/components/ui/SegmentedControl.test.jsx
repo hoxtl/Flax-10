@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import { SegmentedControl } from '../../../components/common/segmented_control/SegmentedControl';
+=======
+import { SegmentedControl } from '../../../components/common/SegmentedControl/SegmentedControl';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const MockIcon = () => <svg data-testid="icon" />;
 

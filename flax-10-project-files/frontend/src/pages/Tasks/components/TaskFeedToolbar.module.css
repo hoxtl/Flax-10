@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 /* Task feed toolbar styles. */
+=======
+/*
+ * TaskFeed toolbar styles: search, sort dropdown, and filter panel.
+ */
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .toolbarStrip {
   background: transparent;
   border-radius: 0 0 10px 10px;
@@ -37,6 +44,7 @@
   width: 100%;
 }
 .searchInput {
+<<<<<<< HEAD
   padding-right: 34px;
 }
 .searchClear {
@@ -59,6 +67,25 @@
   color: var(--widget-text-primary);
   background: var(--hover);
 }
+=======
+    padding-right: 34px;
+}
+.searchClear {
+    position: absolute;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--widget-text-tertiary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+.searchClear:hover { color: var(--widget-text-primary); background: var(--hover); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 .sortWrap {
   position: relative;
@@ -239,7 +266,11 @@
 }
 
 .filterTabActive {
+<<<<<<< HEAD
   background: var(--primary, #7b6751);
+=======
+  background: var(--primary, #7B6751);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   color: var(--color-card);
 }
 

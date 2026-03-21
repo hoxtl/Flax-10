@@ -1,7 +1,10 @@
 /*
  * Hook for managing module sorting, filtering, and pagination.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from 'react';
 import { applyFiltersAndSort } from '../utils/moduleUtils.js';
 

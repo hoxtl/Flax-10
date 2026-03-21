@@ -19,7 +19,10 @@ from .helpers import (
 )
 from .notification_helpers import build_update_notification
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def society_list(request):
@@ -30,7 +33,10 @@ def society_list(request):
 def get_societies(request):
     societies = Society.objects.all()
     data = build_society_list_data(societies, request)
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return Response(data)
 
 def build_society_list_data(societies, request):
@@ -40,11 +46,15 @@ def build_society_list_data(societies, request):
         membership = get_membership(request.user, society)
         society_data['is_member'] = membership is not None
         society_data['is_admin'] = membership.is_admin if membership else False
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         result.append(society_data)
     return result
 
 def create_society(request):
+<<<<<<< HEAD
     payload, errors, status_code = create_society_result(request)
 
     if errors:
@@ -52,23 +62,34 @@ def create_society(request):
     return Response(payload, status=status_code)
 
 def create_society_result(request):
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     data = request.data.copy()
     if not data.get('admin_emails'):
         data['admin_emails'] = request.user.email
     serialiser = SocietyListSerialiser(data=data, context={'request': request})
     if not serialiser.is_valid():
+<<<<<<< HEAD
         return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
 
     society = serialiser.save()
     handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
     return serialiser.data, None, status.HTTP_201_CREATED
+=======
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    society = serialiser.save()
+    handle_image_urls(society, request.data)
+    SocietyMembership.objects.create(user=request.user, society=society, role='admin')
+    return Response(serialiser.data, status=status.HTTP_201_CREATED)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def publish_changes(request, society_id):
     society = get_society_or_404(society_id)
     if not society:
+<<<<<<< HEAD
 
         return society_not_found_response()
     permission_response = _publish_permission_error(request.user, society)
@@ -86,3 +107,12 @@ def _publish_changes_result(society, changes):
     notification = build_update_notification(society, changes)
     notify_society_members(society, notification)
     return {'status': 'published'}
+=======
+        return society_not_found_response()
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+    changes = request.data
+    notification = build_update_notification(society, changes)
+    notify_society_members(society, notification)
+    return Response({'status': 'published'})
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

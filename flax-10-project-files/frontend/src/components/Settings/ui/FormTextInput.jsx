@@ -1,8 +1,12 @@
 /*
  * Text input element used by settings form controls.
  */
+<<<<<<< HEAD
 
 import TextInput from "../../common/text_input/TextInput";
+=======
+import TextInput from "../../common/TextInput/TextInput";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export default function FormTextInput(props) {
   const { type, id, name, value, onChange, required, maxLength, autoComplete } = props;

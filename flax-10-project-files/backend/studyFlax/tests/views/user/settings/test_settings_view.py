@@ -11,10 +11,16 @@ from studyFlax.models.auth.user_settings_model import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
 from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.views.user.settings_view import user_settings_view as legacy_user_settings_view
+<<<<<<<< HEAD:flax-10-project-files/backend/studyFlax/tests/views/user/settings/test_settings_view.py
 from studyFlax.tests.helpers.test_model_builders import make_user, make_module
 from rest_framework.test import force_authenticate
 
 
+========
+from studyFlax.tests.helpers.factories import make_user, make_module
+from rest_framework.test import force_authenticate
+
+>>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/backend/studyFlax/tests/views/user/test_settings_view.py
 class UserSettingsViewTest(TestCase):
     """Tests for user_settings_view (GET/PATCH /api/settings/)."""
 
@@ -298,7 +304,11 @@ class UserSettingsSerializerTests(TestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
         updated = serializer.save()
         self.assertEqual(updated.preferred_study_minutes_per_day, 180)
+<<<<<<<< HEAD:flax-10-project-files/backend/studyFlax/tests/views/user/settings/test_settings_view.py
 
+========
+        
+>>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/backend/studyFlax/tests/views/user/test_settings_view.py
     def test_patch_updates_preferred_study_minutes(self):
         response = self.client.patch(
             '/api/settings/',

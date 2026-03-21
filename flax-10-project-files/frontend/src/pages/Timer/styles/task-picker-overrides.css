@@ -9,13 +9,17 @@
     background: var(--primary-strong) !important;
     color: #fff !important;
     border-color: var(--primary-strong) !important;
+<<<<<<< HEAD
     width: 100% !important;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .taskPickBtn:hover {
     filter: brightness(1.06) !important;
 }
 
+<<<<<<< HEAD
 :global([data-mode="dark"]) .taskPickBtn {
     background: linear-gradient(
         180deg,
@@ -37,12 +41,15 @@
     ) !important;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 /* ── Task actions row: clear task right-aligned ── */
 .taskInputActions {
     justify-content: center !important;
 }
 
 .taskInputActionsRow {
+<<<<<<< HEAD
     display: grid !important;
     width: 100% !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -51,6 +58,17 @@
 
 .taskClearBtn {
     margin-left: 0 !important;
+=======
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+}
+
+.taskClearBtn {
+    margin-left: auto !important;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Task picker toolbar: uniform control sizing ────── */
@@ -78,6 +96,7 @@
 }
 
 .taskPickSortWrap {
+<<<<<<< HEAD
     flex: 0 0 170px !important;
     min-width: 170px !important;
 }
@@ -99,6 +118,18 @@
     width: 100% !important;
     min-height: 42px !important;
     justify-content: center !important;
+=======
+    flex-shrink: 0 !important;
+    min-width: 120px !important;
+}
+
+.taskPickSortWrap > div > button {
+    height: 36px !important;
+    padding: 0 0.6rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 10px !important;
+    border: 1px solid var(--border) !important;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Exit Focus Button ───────────────────────────────── */
@@ -161,6 +192,18 @@
     border-color: var(--primary-strong) !important;
 }
 
+<<<<<<< HEAD
+=======
+.leaveNudgeReggie {
+    color: var(--primary-strong) !important;
+    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card)) !important;
+    border: 1.5px solid color-mix(in srgb, var(--primary) 22%, transparent) !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 0.8rem !important;
+    font-weight: 600 !important;
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 /* ── End Session Modal: enhanced ────────────────────── */
 
 .endSessionModal {
@@ -219,6 +262,7 @@
     border: 2px solid #000 !important;
 }
 
+<<<<<<< HEAD
 .taskPickDropdown {
     max-height: min(67vh, 620px) !important;
 }
@@ -230,13 +274,21 @@
     height: auto !important;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .taskPickList {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.42rem !important;
+<<<<<<< HEAD
     max-height: min(37vh, 340px) !important;
     overflow-y: auto !important;
     padding: 0.7rem 1rem 0.82rem !important;
+=======
+    max-height: 520px !important;
+    overflow-y: auto !important;
+    padding: 0.7rem 1rem 1.15rem !important;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .taskPickList::-webkit-scrollbar {
@@ -300,11 +352,14 @@
     color: var(--text) !important;
 }
 
+<<<<<<< HEAD
 .taskPickFiltersBar {
     gap: 0.72rem !important;
     padding-bottom: 0.75rem !important;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .taskPickSingleLine {
     display: flex !important;
     align-items: center !important;
@@ -383,8 +438,11 @@
     gap: 0.35rem;
 }
 
+<<<<<<< HEAD
 @media (max-width: 720px) {
     .taskInputActionsRow {
         grid-template-columns: 1fr !important;
     }
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

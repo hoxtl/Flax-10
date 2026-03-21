@@ -1,7 +1,10 @@
 from .analytics_view import get_analytics_summary, get_progress_data
 from .theme_view import log_theme_session, get_theme_stats
 from .ai_view import get_ai_insights, ai_chat
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 __all__ = [
     'get_analytics_summary',

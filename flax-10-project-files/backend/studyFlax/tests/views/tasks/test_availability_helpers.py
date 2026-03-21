@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for task availability helpers.
 """
+=======
+"""Tests for availability helper branches."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from datetime import timedelta
 from unittest.mock import MagicMock
@@ -13,8 +17,13 @@ from studyFlax.models.groupwork.groupwork_model import (
     MeetingResponse,
     MeetingSuggestion,
 )
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):

@@ -7,7 +7,10 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from studyFlax.models.society import Society, SocietyMembership
 from studyFlax.models.notifications.notification_model import Notification
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 

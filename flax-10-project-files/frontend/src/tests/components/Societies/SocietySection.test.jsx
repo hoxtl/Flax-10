@@ -100,6 +100,10 @@ describe('SocietySection', () => {
                 pagination={{ currentPage: 1, totalPages: 2, onPageChange: vi.fn() }}
             />
         );
+<<<<<<< HEAD
         expect(screen.getAllByRole('button', { name: /→/ }).length).toBeGreaterThan(0);
+=======
+        expect(screen.getAllByRole('button', { name: /Next/ }).length).toBeGreaterThan(0);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

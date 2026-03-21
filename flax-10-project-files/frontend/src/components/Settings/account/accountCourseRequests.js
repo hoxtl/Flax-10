@@ -1,7 +1,10 @@
 /*
  * Course-change request helpers for the account form.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { KCL_DEPARTMENTS } from "../../../lib/kclCourses";
 
 const COURSE_REQUEST_CACHE_KEY = "course_change_pending_request";

@@ -1,7 +1,11 @@
 /* ── Shared glass card (used across all widgets) ── */
 .glassCard {
   position: relative;
+<<<<<<< HEAD
   background: var(--surface-card);
+=======
+  background: #ffffff;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   border: 1px solid var(--surface-glass-card-border);
   border-radius: 16px;
   overflow: hidden;
@@ -10,6 +14,7 @@
 }
 
 [data-mode="dark"] .glassCard {
+<<<<<<< HEAD
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%) 0%,
@@ -20,6 +25,14 @@
     0 16px 34px rgba(0,0,0,0.3),
     0 26px 58px rgba(0,0,0,0.22),
     inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+=======
+  background: var(--color-card);
+  border-color: var(--color-border-base);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.3),
+    0 8px 32px rgba(0,0,0,0.2),
+    inset 0 1px 0 color-mix(in srgb, var(--color-primary-strong) 8%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .glassCard:hover {
@@ -29,23 +42,37 @@
 
 [data-mode="dark"] .glassCard:hover {
   box-shadow:
+<<<<<<< HEAD
     0 18px 40px rgba(0,0,0,0.34),
     0 30px 62px rgba(0,0,0,0.26),
     inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+=======
+    0 4px 16px rgba(0,0,0,0.4),
+    0 16px 48px rgba(0,0,0,0.3),
+    inset 0 1px 0 color-mix(in srgb, var(--color-primary-strong) 12%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .glassCard::before {
   content: '';
   position: absolute;
   inset: 0;
+<<<<<<< HEAD
   background: linear-gradient(135deg, color-mix(in srgb, white 18%, transparent) 0%, transparent 60%);
+=======
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   pointer-events: none;
   border-radius: inherit;
 }
 
 [data-mode="dark"] .glassCard::before {
   background: linear-gradient(135deg,
+<<<<<<< HEAD
     color-mix(in srgb, var(--color-highlight) 8%, transparent) 0%,
+=======
+    color-mix(in srgb, var(--color-primary-strong) 10%, transparent) 0%,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     transparent 60%);
 }
 
@@ -54,7 +81,15 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+<<<<<<< HEAD
   color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+=======
+  color: #212121;
+}
+
+[data-mode="dark"] .cardLabel {
+  color: var(--text);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Widget Layout ── */
@@ -72,7 +107,11 @@
 }
 
 [data-mode="dark"] .widgetHeader {
+<<<<<<< HEAD
   border-bottom-color: color-mix(in srgb, var(--color-highlight) 14%, var(--color-border-base) 86%);
+=======
+  border-bottom-color: var(--color-border-base);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .widgetTitleArea {
@@ -120,18 +159,27 @@
 }
 
 [data-mode="dark"] .personaLeft {
+<<<<<<< HEAD
   border-right-color: color-mix(in srgb, var(--color-highlight) 14%, var(--color-border-base) 86%);
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--surface-inner) 88%, var(--color-primary) 12%) 0%,
     color-mix(in srgb, var(--surface-card) 92%, var(--color-bg) 8%) 100%
   );
+=======
+  border-right-color: var(--color-border-base);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .personaEmoji {
   font-size: 30px;
   line-height: 1;
+<<<<<<< HEAD
   font-family: var(--font-body), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+=======
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .personaLabel {
@@ -208,10 +256,21 @@
 }
 
 .dnaLegendLabelDark {
+<<<<<<< HEAD
   color: var(--text);
   font-weight: 600;
 }
 
+=======
+  color: #212121;
+  font-weight: 600;
+}
+
+[data-mode="dark"] .dnaLegendLabelDark {
+  color: var(--text);
+}
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .dnaLegendPct {
   font-size: 11px;
   font-weight: 600;
@@ -258,12 +317,15 @@
   pointer-events: none;
 }
 
+<<<<<<< HEAD
 [data-mode="dark"] .heatmapLinkBtn {
   background: color-mix(in srgb, var(--color-highlight) 18%, var(--surface-inner));
   border-color: color-mix(in srgb, var(--color-highlight) 32%, var(--color-border-base));
   color: color-mix(in srgb, white 84%, var(--color-highlight) 16%);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .miniHeatmap {
   display: flex;
   gap: 8px;

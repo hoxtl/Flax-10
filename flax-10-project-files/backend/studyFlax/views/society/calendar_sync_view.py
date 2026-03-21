@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from studyFlax.models.society import SocietyCalendarSync
 from .helpers import get_society_or_404, get_membership, society_not_found_response
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def sync_status(request, society_id):
@@ -29,8 +28,11 @@ def sync_calendar(request, society_id):
         return Response({'error': 'Must be a member to sync'}, status=status.HTTP_403_FORBIDDEN)
     sync, created = SocietyCalendarSync.objects.get_or_create(user=request.user, society=society)
 
+<<<<<<< HEAD
     return Response({'is_synced': True, 'created': created}, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def unsync_calendar(request, society_id):

@@ -1,7 +1,10 @@
 /*
  * Auto schedule helpers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getAutoScheduleError(deadlines) {
   return deadlines.length ? null : 'No upcoming deadlines to auto-schedule.';
 }

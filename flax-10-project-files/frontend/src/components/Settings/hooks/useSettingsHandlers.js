@@ -1,6 +1,7 @@
 /*
  * Save handlers for the settings feature.
  */
+<<<<<<< HEAD
 
 import {
   saveAccount,
@@ -22,6 +23,28 @@ function createActions(state) {
     setBannerMessage,
   } = state;
 
+=======
+import {
+  saveAccount,
+  saveAddress,
+  savePassword,
+  savePreferences,
+  saveSleepWindow,
+  saveStudyTime,
+  saveWeekPreference,
+  saveWorktimePreference,
+} from "./settingsHandlerHelpers";
+import useSettingsState from "./useSettingsState";
+
+function createActions(state) {
+  const {
+    setHomeAddressError,
+    setIsSaving,
+    setPasswordError,
+    setBannerMessage,
+  } = state;
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return {
     setHomeAddressError,
     setIsSaving,

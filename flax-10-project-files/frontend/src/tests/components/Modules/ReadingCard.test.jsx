@@ -1,6 +1,7 @@
 /*
  * Tests for ReadingCard component.
  */
+<<<<<<< HEAD
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
@@ -11,6 +12,17 @@ vi.mock('../../../components/calendar/utils/dateUtils', () => ({
 }));
 
 vi.mock('../../../components/modules/deadlines/DeadlineCard.module.css', () => ({ default: { } }));
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import ReadingCard from '../../../components/Modules/Readings/ReadingCard';
+
+vi.mock('../../../components/Calendar/utils/dateUtils', () => ({
+    formatDate: vi.fn(() => '13 Apr 2026'),
+}));
+
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard.module.css', () => ({ default: { } }));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const reading = {
     id: 1, title: 'Module Handbook', chapter: 'Ch.1',
@@ -62,7 +74,13 @@ describe('ReadingCard', () => {
         const onDelete = vi.fn();
         render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={onDelete}  />);
         fireEvent.click(screen.getByText('Delete'));
+<<<<<<< HEAD
         fireEvent.click(screen.getAllByText('Delete')[1]);
         expect(onDelete).toHaveBeenCalled();
     });
 });
+=======
+        expect(onDelete).toHaveBeenCalled();
+    });
+});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

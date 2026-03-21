@@ -16,7 +16,6 @@ from .helpers import (
     handle_image_urls
 )
 
-
 @api_view(['GET', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def society_detail(request, society_id):
@@ -43,6 +42,7 @@ def get_society_detail(request, society):
 
 def update_society(request, society):
     """Update a society's details (admin only)."""
+<<<<<<< HEAD
     permission_response = _society_detail_admin_error(request.user, society)
     if permission_response:
 
@@ -56,6 +56,10 @@ def _society_detail_admin_error(user, society):
     return permission_denied_response()
 
 def _updated_society_response(request, society):
+=======
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     serialiser = SocietyDetailSerialiser(society, data=request.data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -88,15 +92,21 @@ def _notify_admins_of_report(society, reason):
     """Send a report notification to all superusers."""
     User = get_user_model()
     Notification.objects.bulk_create([
+<<<<<<< HEAD
 
         Notification(
             user=admin_user, title=f"New report for {society.name}",
 
+=======
+        Notification(
+            user=admin_user, title=f"New report for {society.name}",
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             message=f"Reason: {reason}", notification_type='society_report',
             action_url='admin', society_id=society.id,
         )
         for admin_user in User.objects.filter(is_superuser=True)
     ])
+<<<<<<< HEAD
 
 def _remove_society_report(society, user):
     SocietyReport.objects.filter(society=society, reporter=user).delete()
@@ -146,6 +156,8 @@ def _society_report_success_result(user, society, reason):
     _notify_admins_of_report(society, reason)
     response = _report_submitted_response()
     return response.data, None, response.status_code
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 @api_view(['POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
@@ -155,6 +167,19 @@ def report_society(request, society_id):
     if not society:
         return society_not_found_response()
     if request.method == 'DELETE':
+<<<<<<< HEAD
         _remove_society_report(society, request.user)
         return _report_removed_response()
     return _submit_society_report(request, society)
+=======
+        SocietyReport.objects.filter(society=society, reporter=request.user).delete()
+        return Response({'message': 'Report removed successfully'}, status=status.HTTP_200_OK)
+    reason = request.data.get('reason')
+    if not reason or not reason.strip():
+        return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
+    SocietyReport.objects.get_or_create(
+        society=society, reporter=request.user, defaults={'reason': reason.strip()},
+    )
+    _notify_admins_of_report(society, reason.strip())
+    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

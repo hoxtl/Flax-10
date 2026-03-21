@@ -11,6 +11,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/animated_dropdown', () => ({
   default: ({ placeholder, onChange, onOpenChange }) => (
     <div>
@@ -21,6 +22,13 @@ vi.mock('../../../components/common/animated_dropdown', () => ({
         {`${placeholder}-open`}
       </button>
     </div>
+=======
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+  default: ({ placeholder, onChange }) => (
+    <button onClick={() => onChange('changed')}>
+      {placeholder}
+    </button>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   ),
 }));
 

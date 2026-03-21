@@ -1,7 +1,11 @@
 /* Tests for CreateListModal component rendering and list creation */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+<<<<<<< HEAD
 import CreateListModal from "../../../pages/tasks/components/CreateListModal";
+=======
+import CreateListModal from "../../../pages/Tasks/components/CreateListModal";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe("CreateListModal", () => {
   it("renders title and input", () => {

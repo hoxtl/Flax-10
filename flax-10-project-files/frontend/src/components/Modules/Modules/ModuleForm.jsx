@@ -1,14 +1,21 @@
 /*
  * Form for creating and editing modules with department and course selection.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useMemo } from 'react';
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { serialiseModule } from '../utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from '../utils/moduleHelpers';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+<<<<<<< HEAD
 import AnimatedDropdown from '../../common/animated_dropdown/AnimatedDropdown';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
+=======
+import AnimatedDropdown from '../../common/AnimatedDropdown/AnimatedDropdown';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './ModuleForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 
@@ -46,6 +53,7 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
     return (
         <form onSubmit={onSubmit} className={styles.form}>
+<<<<<<< HEAD
             <div className={styles.topRow}>
                 <DepartmentCourseFields form_data={form_data} errors={errors} onChange={onChange} is_editing={is_editing} />
             </div>
@@ -54,6 +62,12 @@ function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmi
             <div className={styles.timeRow}>
                 <TimeFields form_data={form_data} errors={errors} onChange={onChange} />
             </div>
+=======
+            <DepartmentCourseFields form_data={form_data} errors={errors} onChange={onChange} />
+            <NameFields form_data={form_data} errors={errors} is_editing={is_editing} onChange={onChange} />
+            <DescriptionLocationFields form_data={form_data} onChange={onChange} />
+            <TimeFields form_data={form_data} errors={errors} onChange={onChange} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <RecurringCheckbox checked={form_data.is_recurring} onChange={(v) => onChange('is_recurring', v)} />
             {errors.submit && <div className={styles.submitError}>{errors.submit}</div>}
             <FormActions submitting={submitting} is_editing={is_editing} onCancel={onCancel} />
@@ -92,6 +106,7 @@ function CourseDropdown({ value, error, department, onChange }) {
     );
 }
 
+<<<<<<< HEAD
 function LockedField({ label, value }) {
     return (
         <FormGroup label={label}>
@@ -116,10 +131,25 @@ function DepartmentCourseFields({ form_data, errors, onChange, is_editing }) {
             <CourseDropdown value={form_data.course} error={errors.course} department={form_data.department} onChange={onChange} />
             <FormGroup label="Module Code" error={errors.module_code} required>
                 <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., 5CCS2SEG" />
+=======
+function DepartmentCourseFields({ form_data, errors, onChange }) {
+    return (<><DepartmentDropdown value={form_data.department} error={errors.department} onChange={onChange} /><CourseDropdown value={form_data.course} error={errors.course} department={form_data.department} onChange={onChange} /></>);
+}
+
+function NameFields({ form_data, errors, is_editing, onChange }) {
+    return (
+        <>
+            <FormGroup label="Module Code" error={errors.module_code} required>
+                <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., 5CCS2SEG" disabled={is_editing} />
+            </FormGroup>
+            <FormGroup label="Module Name" error={errors.module_name} required>
+                <input type="text" className={getInput(errors.module_name, styles)} value={form_data.module_name} onChange={(e) => onChange('module_name', e.target.value)} placeholder="e.g., Software Engineering" />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             </FormGroup>
         </>
     );
 }
+<<<<<<< HEAD
 
 function ModuleNameField({ form_data, errors, onChange }) {
     return (
@@ -128,6 +158,8 @@ function ModuleNameField({ form_data, errors, onChange }) {
         </FormGroup>
     );
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function DescriptionLocationFields({ form_data, onChange }) {
     return (
         <>
@@ -144,10 +176,17 @@ function DescriptionLocationFields({ form_data, onChange }) {
 function TimeFields({ form_data, errors, onChange }) {
     return (
         <>
+<<<<<<< HEAD
             <FormGroup label="Start date and time of lecture" error={errors.start_time} required>
                 <DateTimePicker value={form_data.start_time} onChange={val => onChange('start_time', val)} placeholder="Pick date & time" />
             </FormGroup>
             <FormGroup label="End date and end time of lecture" error={errors.end_time} required>
+=======
+            <FormGroup label="First Lecture Date & Time" error={errors.start_time} required>
+                <DateTimePicker value={form_data.start_time} onChange={val => onChange('start_time', val)} placeholder="Pick date & time" />
+            </FormGroup>
+            <FormGroup label="Lecture End Time" error={errors.end_time} required>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
                 <DateTimePicker value={form_data.end_time} onChange={val => onChange('end_time', val)} placeholder="Pick date & time" />
             </FormGroup>
         </>
@@ -185,13 +224,22 @@ function FormActions({ submitting, is_editing, onCancel }) {
     const submit_text = submitting ? 'Saving...' : (is_editing ? 'Update Module' : 'Create Module');
     return (
         <div className={styles.formActions}>
+<<<<<<< HEAD
             <PrimaryButton type="button" variant="secondary" onClick={onCancel} disabled={submitting}>Cancel</PrimaryButton>
             <PrimaryButton type="submit" disabled={submitting}>{submit_text}</PrimaryButton>
+=======
+            <button type="button" className={styles.cancelButton} onClick={onCancel} disabled={submitting}>Cancel</button>
+            <button type="submit" className={styles.submitButton} disabled={submitting}>{submit_text}</button>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         </div>
     );
 }
 
+<<<<<<< HEAD
 export default function ModuleForm({ module, onSuccess, onCancel, hideHeader = false }) {
+=======
+export default function ModuleForm({ module, onSuccess, onCancel }) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const is_editing = !!module;
     const [form_data, setFormData] = useState(() => getInitialFormData(module));
     const [errors, setErrors] = useState({});
@@ -200,7 +248,11 @@ export default function ModuleForm({ module, onSuccess, onCancel, hideHeader = f
     const on_submit = (e) => handleSubmit(e, is_editing, module, form_data, setErrors, setSubmitting, onSuccess);
     return (
         <div className={styles.formContainer}>
+<<<<<<< HEAD
             {!hideHeader && <FormHeader is_editing={is_editing} />}
+=======
+            <FormHeader is_editing={is_editing} />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <FormBody form_data={form_data} errors={errors} submitting={submitting} is_editing={is_editing} onChange={on_change} onSubmit={on_submit} onCancel={onCancel} />
         </div>
     );

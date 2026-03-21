@@ -2,10 +2,23 @@
  * Leave timer and end-early confirmation modals.
  */
 
+<<<<<<< HEAD
 import { motion, useReducedMotion } from 'framer-motion';
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import StandardModal from '../../common/standard_modal/StandardModal';
+=======
+import { useMemo } from 'react';
+import styles from '../../../pages/Timer/TimerPage.module.css';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../common/StandardModal/StandardModal';
+
+const LEAVE_SESSION_NUDGES = [
+  'Strand campus is still bustling. Give this block 10 more minutes.',
+  'Even the Maughan library guards do not give up this early.',
+  'You are already in motion. A short break beats a full quit.',
+];
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
   const safeTotal = Math.max(1, Number(sessionTotalSeconds || 0));
@@ -15,6 +28,7 @@ function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
   return { minutesLeft, progressPct, minutesLabel: `${minutesLeft} min${minutesLeft === 1 ? '' : 's'}` };
 }
 
+<<<<<<< HEAD
 function getProgressAnimation(reduceMotion, width) {
   if (reduceMotion) return { style: { width }, initial: false, animate: undefined, transition: undefined };
   return { style: undefined, initial: { width: 0, opacity: 0.55 }, animate: { width, opacity: 1 }, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } };
@@ -30,6 +44,18 @@ function LeaveProgress({ progressPct, minutesLeft }) {
         <motion.span className={styles.leaveNudgeProgressFill} style={anim.style} initial={anim.initial} animate={anim.animate} transition={anim.transition} />
       </div>
       <div className={styles.leaveNudgeProgressMeta}><span>{progressPct}% complete</span><span>{minutesLeft}m left</span></div>
+=======
+function LeaveProgress({ progressPct, minutesLeft }) {
+  return (
+    <div className={styles.leaveNudgeProgressCard}>
+      <div className={styles.leaveNudgeProgressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPct}>
+        <span className={styles.leaveNudgeProgressFill} style={{ width: `${progressPct}%` }} />
+      </div>
+      <div className={styles.leaveNudgeProgressMeta}>
+        <span>{progressPct}% complete</span>
+        <span>{minutesLeft}m left</span>
+      </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
@@ -50,12 +76,20 @@ function LeaveActions({ onCancel, onExit, onTakeBreak, onPause }) {
 
 export function LeaveTimerModal({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds = 0, sessionTotalSeconds = 0 }) {
   const state = buildLeaveState(timeLeftSeconds, sessionTotalSeconds);
+<<<<<<< HEAD
+=======
+  const encouragement = useMemo(() => LEAVE_SESSION_NUDGES[Math.floor(Math.random() * LEAVE_SESSION_NUDGES.length)], []);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
   return (
     <StandardModal title="Hold on, you're doing great!" subtitle="Are you sure you want to end your focus session early?" onClose={onCancel} size="sm" modalClassName={styles.leaveNudgeModal} contentClassName={styles.leaveNudgeModalContent}>
       <div className={styles.leaveNudgeBody}>
         <div className={styles.leaveNudgeLoss}>You are <span className={styles.leaveNudgeMinutes}>{state.minutesLabel}</span> away from finishing this session. If you quit now, this progress will not be added to your daily goal.</div>
         <LeaveProgress progressPct={state.progressPct} minutesLeft={state.minutesLeft} />
+<<<<<<< HEAD
+=======
+        <div className={styles.leaveNudgeReggie}>🦁 {encouragement}</div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         <LeaveActions onCancel={onCancel} onExit={onExit} onTakeBreak={onTakeBreak} onPause={onPause} />
       </div>
     </StandardModal>

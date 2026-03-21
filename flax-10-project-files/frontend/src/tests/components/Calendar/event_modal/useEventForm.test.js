@@ -1,9 +1,16 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/useEventForm.test.js
 import { useEventForm } from '../../../../components/calendar/event_modal/useEventForm';
 import * as FormUtilsModule from '../../../../components/calendar/utils/formUtils';
 import * as UserServiceModule from '../../../../api/userApi';
 import * as SleepWarningModule from '../../../../components/settings/hooks/useSleepWarning';
+=======
+import { useEventForm } from '../../../../components/Calendar/EventModal/useEventForm';
+import * as FormUtilsModule from '../../../../components/Calendar/utils/formUtils';
+import * as UserServiceModule from '../../../../api/userApi';
+import * as SleepWarningModule from '../../../../components/Settings/hooks/useSleepWarning';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/tests/components/Calendar/EventModal/useEventForm.test.js
 
 const mockEvents = [];
 const mockActions = { addEvent: vi.fn(), editEvent: vi.fn(), removeEvent: vi.fn(), addException: vi.fn() };
@@ -36,10 +43,13 @@ vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => vi.fn(),
 }));
 
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/useEventForm.test.js
 vi.mock('../../../../context/ToastContext', () => ({
     useToast: () => toastMock,
 }));
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/tests/components/Calendar/EventModal/useEventForm.test.js
 vi.mock('../../../../api/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
@@ -198,7 +208,11 @@ describe('useEventForm', () => {
             useEventForm(null, onClose, { customSubmit })
         );
         await act(async () => { });
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/useEventForm.test.js
         await act(async () => {
+=======
+        act(() => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/tests/components/Calendar/EventModal/useEventForm.test.js
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(result.current.error).toBe('Title is required');
@@ -214,7 +228,11 @@ describe('useEventForm', () => {
             useEventForm(null, onClose, { customSubmit })
         );
         await act(async () => { });
+<<<<<<< HEAD:flax-10-project-files/frontend/src/tests/components/Calendar/event_modal/useEventForm.test.js
         await act(async () => {
+=======
+        act(() => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/tests/components/Calendar/EventModal/useEventForm.test.js
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(customSubmit).toHaveBeenCalledWith(result.current.form);

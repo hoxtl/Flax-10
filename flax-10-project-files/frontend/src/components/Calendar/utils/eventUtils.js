@@ -2,11 +2,17 @@
  * eventUtils - Event type detection, filtering, and transformation utilities.
  * Handles recurring event IDs, read-only detection, and view-based filtering.
  */
+<<<<<<< HEAD
 
 import { overlapsDay } from './dateUtils';
 
 /** Extracts the base event ID from a recurring event instance ID. */
 
+=======
+import { overlapsDay } from './dateUtils';
+
+/** Extracts the base event ID from a recurring event instance ID. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function extractBaseEventId(id, event = null) {
     if (event?._baseId !== undefined) return event._baseId;
     if (typeof id === 'string' && id.includes('_')) {
@@ -22,7 +28,10 @@ export function extractBaseEventId(id, event = null) {
 }
 
 /** Checks if an event has recurrence configuration. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function hasRecurrence(event) {
     if (!event) return false;
     const hasDetails = !!event.recurrence_details;
@@ -32,15 +41,22 @@ export function hasRecurrence(event) {
 }
 
 /** Returns true if the event cannot be edited (module, society, or timetable). */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function isReadOnlyEvent(event) {
     return getEventType(event) !== 'personal';
 }
 
+<<<<<<< HEAD
 const FIXED_TAG_NAMES = new Set(['deadline', 'exam', 'assignment', 'lab', 'practical', 'lecture']);
 
 /** Returns the event source type: 'personal', 'society', 'module', or 'timetable'. */
 
+=======
+/** Returns the event source type: 'personal', 'society', 'module', or 'timetable'. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getEventType(event) {
     if (!event) return 'personal';
     if (event.source === 'society') return 'society';
@@ -84,7 +100,10 @@ function filterWeekEvents(events, selectedDate) {
 }
 
 /** Filters events to those visible in the current view's date range. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getVisibleEventsInView(events, selectedDate, viewMode) {
     if (!events?.length) return [];
     if (viewMode === 'month') return filterMonthEvents(events, selectedDate);
@@ -94,13 +113,19 @@ export function getVisibleEventsInView(events, selectedDate, viewMode) {
 }
 
 /** Sorts events by start time in ascending order. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function sortByStartTime(events) {
     return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
 /** Returns true if the event spans a full day (midnight to midnight). */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function isAllDay(event) {
     if (event.all_day || event.is_all_day) return true;
     const start = new Date(event.start_time);

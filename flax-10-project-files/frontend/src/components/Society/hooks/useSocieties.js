@@ -1,7 +1,10 @@
 /*
  * useSocieties loads and mutates the societies collection for the browse pages.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect, useCallback } from "react";
 import { fetchSocieties, createSociety, addCollaborator, requestRatification } from "../../../api/societyApi";
 

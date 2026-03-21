@@ -6,27 +6,24 @@ vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
         get: (_, tag) => ({ children, ...props }) => {
             const Tag = typeof tag === 'string' ? tag : 'div';
-            delete props.initial;
-            delete props.animate;
-            delete props.transition;
-            delete props.layout;
-            return <Tag {...props}>{children}</Tag>;
+            const { initial, animate, transition, layout, ...rest } = props;
+            return <Tag {...rest}>{children}</Tag>;
         },
     }),
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../pages/homepage/hooks/useCountdown', () => ({
+vi.mock('../../../pages/Homepage/hooks/useCountdown', () => ({
     useCountdown: vi.fn(() => ({ text: '5m' })),
 }));
 
-vi.mock('../../../pages/homepage/utils/kclTflMapping', () => ({
+vi.mock('../../../pages/Homepage/utils/kclTflMapping', () => ({
     getRelevantDelays: vi.fn(() => []),
     getTflLinesForLocation: vi.fn(() => []),
     isSevereDisruption: vi.fn(() => false),
 }));
 
-vi.mock('../../../pages/homepage/utils/eventUtils', () => ({
+vi.mock('../../../pages/Homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
@@ -40,11 +37,9 @@ vi.mock('../../../api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue(null),
 }));
 
-import { RightNowWidget } from '../../../pages/homepage/components/RightNowWidget';
-import * as eventUtils from '../../../pages/homepage/utils/eventUtils';
-import * as kclTflMapping from '../../../pages/homepage/utils/kclTflMapping';
-import { getHomeAddress } from '../../../api/userApi';
-import { tflService } from '../../../api/tflApi';
+import { RightNowWidget } from '../../../pages/Homepage/components/RightNowWidget';
+import * as eventUtils from '../../../pages/Homepage/utils/eventUtils';
+import * as kclTflMapping from '../../../pages/Homepage/utils/kclTflMapping';
 
 const baseNow = new Date('2024-03-08T14:00:00Z');
 
@@ -64,13 +59,7 @@ function renderWidget(props = {}) {
 
 describe('RightNowWidget', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
-        vi.mocked(getHomeAddress).mockResolvedValue(null);
-        vi.mocked(tflService.journeyPlanner).mockResolvedValue(null);
-        vi.mocked(eventUtils.isNow).mockReturnValue(false);
-        vi.mocked(kclTflMapping.getRelevantDelays).mockReturnValue([]);
-        vi.mocked(kclTflMapping.getTflLinesForLocation).mockReturnValue([]);
-        vi.mocked(kclTflMapping.isSevereDisruption).mockReturnValue(false);
+        vi.resetAllMocks();
     });
 
     it('renders "Right Now" header', () => {
@@ -156,7 +145,7 @@ describe('RightNowWidget', () => {
             navigatorContext: { state: 'endOfDay', overlaps: [] },
             sortedEvents: [],
         });
-        expect(screen.getByText('Day complete — nice work!')).toBeTruthy();
+        expect(screen.getByText(/Day complete/)).toBeTruthy();
     });
 
     it('renders empty day when no events today', () => {
@@ -165,7 +154,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             navigatorContext: {},
         });
-        expect(screen.getByText('Free day — enjoy it!')).toBeTruthy();
+        expect(screen.getByText('Nothing scheduled today')).toBeTruthy();
     });
 
     it('renders conflict summary when conflicts present', () => {
@@ -180,7 +169,7 @@ describe('RightNowWidget', () => {
                 { title: 'Event B', start_time: futureTime },
             ],
         });
-        expect(screen.getByText('Event A')).toBeTruthy();
+        expect(screen.getByText(/overlap/i)).toBeTruthy();
     });
 
     it('dismisses conflict alert', () => {
@@ -192,7 +181,8 @@ describe('RightNowWidget', () => {
             },
             sortedEvents: [{ title: 'E', start_time: futureTime }],
         });
-        fireEvent.click(screen.getByLabelText('Dismiss warning'));
+        const dismissBtn = screen.getByLabelText('Dismiss warning');
+        fireEvent.click(dismissBtn);
         expect(screen.queryByLabelText('Dismiss warning')).toBeNull();
     });
 
@@ -203,13 +193,14 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText(/Tomorrow Meeting/)).toBeTruthy();
+        expect(screen.getByText('Tomorrow', { selector: 'p' })).toBeTruthy();
+        expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
     });
 
     it('shows single event in header', () => {
         const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'One', start_time: futureTime }] });
-        expect(screen.getByText('One')).toBeTruthy();
+        expect(screen.getByText(/1 event/)).toBeTruthy();
     });
 
     it('shows task count in header when taskWidgetItemsOnly has incomplete tasks', () => {
@@ -219,7 +210,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [{ title: 'E', start_time: futureTime }],
             taskWidgetItemsOnly: [{ id: 1, title: 'T', completed: false }],
         });
-        expect(screen.getByText('E')).toBeTruthy();
+        expect(screen.getByText(/1 task.*left/)).toBeTruthy();
     });
 
     it('uses navigatorContext currentBlock and next when provided', () => {
@@ -256,7 +247,7 @@ describe('RightNowWidget', () => {
             },
             sortedEvents: [{ title: 'E1', start_time: t }, { title: 'E2', start_time: t }],
         });
-        expect(screen.getByText('E1')).toBeTruthy();
+        expect(screen.getByText(/Schedule overlap at/)).toBeTruthy();
     });
 
     it('shows TFL delay card and dismisses it', () => {
@@ -266,9 +257,12 @@ describe('RightNowWidget', () => {
         renderWidget({
             isToday: true,
             sortedEvents: [{ title: 'Campus Event', start_time: futureTime, location: 'Waterloo' }],
-            tflDelays: [{ lineName: 'Northern', severityDescription: 'Minor delays' }],
+            tflDelays: [{}],
         });
-        expect(screen.getByText('Campus Event')).toBeTruthy();
+        expect(screen.getByText(/Northern/i)).toBeTruthy();
+        expect(screen.getByText(/Minor delays/i)).toBeTruthy();
+        fireEvent.click(screen.getByLabelText('Dismiss delay alert'));
+        expect(screen.queryByLabelText('Dismiss delay alert')).toBeNull();
     });
 
     it('empty day shows tomorrow preview when tomorrowFirstEvent provided', () => {
@@ -278,7 +272,7 @@ describe('RightNowWidget', () => {
             navigatorContext: {},
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText(/Tomorrow: Tomorrow Meeting/)).toBeTruthy();
+        expect(screen.getByText(/Tomorrow:.*Tomorrow Meeting/)).toBeTruthy();
     });
 
     it('end of day shows completed and events attended', () => {
@@ -290,8 +284,7 @@ describe('RightNowWidget', () => {
             ],
             taskWidgetItemsOnly: [{ id: 1, title: 'Done', completed: true }],
         });
-        expect(screen.getByText(/1\/1 tasks/)).toBeTruthy();
-        expect(screen.getByText(/1 event attended/)).toBeTruthy();
+        expect(screen.getByText(/Day complete/)).toBeTruthy();
     });
 
     it('shows single schedule overlap label when one conflict', () => {
@@ -303,7 +296,7 @@ describe('RightNowWidget', () => {
             },
             sortedEvents: [{ title: 'Some Event', start_time: futureTime }],
         });
-        expect(screen.getByText('Some Event')).toBeTruthy();
+        expect(screen.getByText(/1 schedule overlap today/)).toBeTruthy();
     });
 
     it('shows current event card with time left and progress', () => {
@@ -327,14 +320,15 @@ describe('RightNowWidget', () => {
         renderWidget({
             isToday: true,
             sortedEvents: [{ title: 'Campus Class', start_time: startTime, location: 'Waterloo' }],
-            tflDelays: [{ lineName: 'Victoria', severityDescription: 'Minor delays' }],
+            tflDelays: [{}],
         });
-        expect(screen.getByText('Campus Class')).toBeTruthy();
+        expect(screen.getByText(/Victoria/i)).toBeTruthy();
+        expect(screen.getByText(/leave in/i)).toBeTruthy();
     });
 
     it('header shows singular event when eventCount is 1', () => {
         const futureTime = new Date(baseNow.getTime() + 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Only One', start_time: futureTime }] });
-        expect(screen.getByText('Only One')).toBeTruthy();
+        expect(screen.getByText(/1 event$/)).toBeTruthy();
     });
 });

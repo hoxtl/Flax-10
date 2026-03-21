@@ -11,7 +11,11 @@ from rest_framework.test import APIClient
 
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.tasks.task_model import Task
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_task, make_task_list, make_user
+=======
+from studyFlax.tests.helpers.factories import make_task, make_task_list, make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 class TaskListViewTest(TestCase):

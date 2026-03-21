@@ -9,12 +9,21 @@ import {
   fetchAdminUsers,
   banUser,
   unbanUser,
+<<<<<<< HEAD
+=======
+  fetchTeacherRequests,
+  resolveTeacherRequest,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   fetchReportedSocieties,
   dismissReport,
   banReportedSociety,
   fetchPendingRatifications,
   approveRatification,
   rejectRatification,
+<<<<<<< HEAD
+=======
+  requestTeacherRole,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   fetchCourseChangeRequests,
   resolveCourseChangeRequest,
   requestCourseChange,
@@ -63,6 +72,42 @@ describe("adminApi – users", () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe("adminApi – teacher requests", () => {
+  it("fetchTeacherRequests calls /admin/teacher-requests/", () => {
+    fetchApi.mockResolvedValue([]);
+    fetchTeacherRequests();
+    expect(fetchApi).toHaveBeenCalledWith("/admin/teacher-requests/");
+  });
+
+  it("resolveTeacherRequest calls correct endpoint with POST", () => {
+    fetchApi.mockResolvedValue({});
+    resolveTeacherRequest(3, "approve");
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/admin/teacher-requests/3/resolve/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("resolveTeacherRequest sends decision in body", () => {
+    fetchApi.mockResolvedValue({});
+    resolveTeacherRequest(3, "reject");
+    const body = JSON.parse(fetchApi.mock.calls[0][1].body);
+    expect(body).toEqual({ decision: "reject" });
+  });
+
+  it("requestTeacherRole calls /request-teacher-role/ with POST", () => {
+    fetchApi.mockResolvedValue({});
+    requestTeacherRole();
+    expect(fetchApi).toHaveBeenCalledWith(
+      "/request-teacher-role/",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 describe("adminApi – reported societies", () => {
   it("fetchReportedSocieties calls /admin/reported-societies/", () => {
     fetchApi.mockResolvedValue([]);

@@ -2,7 +2,11 @@
  * Attendance segment detail list.
  */
 
+<<<<<<< HEAD
 import PrimaryButton from "../../../components/common/primary_button/PrimaryButton";
+=======
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { formatAttendanceDetailDate } from "../utils/attendanceEventDate";
 import styles from "./AttendanceDetailPanel.module.css";
 

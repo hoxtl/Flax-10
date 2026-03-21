@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useCallback } from 'react';
+<<<<<<< HEAD
 import ConfirmModal from '../components/common/confirm_modal/ConfirmModal';
+=======
+import ConfirmModal from '../components/common/ConfirmModal/ConfirmModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const ConfirmContext = createContext(null);
 

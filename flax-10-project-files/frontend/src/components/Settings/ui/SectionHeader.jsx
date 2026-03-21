@@ -1,8 +1,12 @@
 /*
  * Section heading block used in settings forms.
  */
+<<<<<<< HEAD
 
 import styles from "../../../pages/settings/Settings.module.css";
+=======
+import styles from "../../../pages/Settings/Settings.module.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export default function SectionHeader({ title, description }) {
   return (

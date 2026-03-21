@@ -8,7 +8,10 @@ from datetime import timedelta
 from django.db import IntegrityError
 from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class ModuleModelTests(TestCase):
     """Test suite for Module model."""

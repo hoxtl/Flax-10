@@ -42,7 +42,11 @@ vi.mock('../../../components/common/search_bar/SearchBar', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 import UserSearch, { useSearchInit, FilterSection } from '../../../components/social/UserSearch';
+=======
+import UserSearch, { useSearchInit, FilterSection } from '../../../components/Social/UserSearch';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { searchUsers } from '../../../api/userApi';
 import { fetchSocieties } from '../../../api/societyApi';
@@ -187,6 +191,10 @@ describe('UserSearch', () => {
     });
 
     it('handles society init errors without crashing', async () => {
+<<<<<<< HEAD
+=======
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
         render(<UserSearch onUserSelect={vi.fn()} />);
 

@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 /*
  * Atomic hooks for profile data, events, modals, and task count.
  */
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { loadTaskCount, tryLoadEvents, tryLoadProfile } from "./profileDataLoaders";

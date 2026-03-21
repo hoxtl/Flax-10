@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 from studyFlax.models import Notification
 from studyFlax.serialisers import NotificationSerialiser
 
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def notification_list(request):
@@ -22,8 +21,11 @@ def get_notifications(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     serialiser = NotificationSerialiser(notifications, many=True)
 
+<<<<<<< HEAD
     return Response(serialiser.data)
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def create_notification(request):
     serialiser = NotificationSerialiser(data=request.data)
     if not serialiser.is_valid():

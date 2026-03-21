@@ -2,6 +2,10 @@
  * Timer feature file.
  */
 
+<<<<<<< HEAD
+=======
+import { useState } from 'react';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './MiniTimer.module.css';
 import { formatTime } from './TimerComponents';
 import { useTimerContext } from '../../context/TimerContext';

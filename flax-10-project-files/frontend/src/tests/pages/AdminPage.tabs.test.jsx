@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
+<<<<<<< HEAD
 function stripMotionProps(props) {
   const cleanProps = { ...props };
   delete cleanProps.layoutId;
@@ -18,6 +19,12 @@ function stripMotionProps(props) {
 vi.mock("framer-motion", () => ({
   motion: new Proxy({}, {
     get: () => ({ children, ...props }) => <div {...stripMotionProps(props)}>{children}</div>,
+=======
+vi.mock("framer-motion", () => ({
+  motion: new Proxy({}, {
+    get: (_, tag) => ({ children, layoutId, initial, animate, exit, transition, variants, whileHover, whileTap, layout, ...rest }) =>
+      <div {...rest}>{children}</div>,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   }),
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
@@ -26,6 +33,11 @@ vi.mock("../../api/adminApi", () => ({
   fetchAdminUsers: vi.fn(),
   banUser: vi.fn(),
   unbanUser: vi.fn(),
+<<<<<<< HEAD
+=======
+  fetchTeacherRequests: vi.fn(),
+  resolveTeacherRequest: vi.fn(),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   fetchReportedSocieties: vi.fn(),
   dismissReport: vi.fn(),
   banReportedSociety: vi.fn(),
@@ -36,6 +48,7 @@ vi.mock("../../api/adminApi", () => ({
   resolveCourseChangeRequest: vi.fn(),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../pages/admin/AdminPage.module.css", () => ({ default: {} }));
 vi.mock("../../components/pagination/Pagination", () => ({
   Pagination: ({ currentPage, totalPages, onPageChange }) =>
@@ -64,11 +77,25 @@ import AdminPage from "../../pages/admin/AdminPage";
 
 function setupDefaultMocks() {
   api.fetchAdminUsers.mockResolvedValue([]);
+=======
+vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
+vi.mock("../../components/Pagination/Pagination", () => ({
+  Pagination: () => null,
+}));
+
+import * as api from "../../api/adminApi";
+import AdminPage from "../../pages/Admin/AdminPage";
+
+function setupDefaultMocks() {
+  api.fetchAdminUsers.mockResolvedValue([]);
+  api.fetchTeacherRequests.mockResolvedValue([]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   api.fetchReportedSocieties.mockResolvedValue([]);
   api.fetchPendingRatifications.mockResolvedValue([]);
   api.fetchCourseChangeRequests.mockResolvedValue([]);
 }
 
+<<<<<<< HEAD
 function buildRatification(index) {
   return {
     id: index + 1,
@@ -103,6 +130,8 @@ function buildCourseRequest(index) {
   };
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 beforeEach(() => {
   vi.clearAllMocks();
   setupDefaultMocks();
@@ -111,9 +140,15 @@ beforeEach(() => {
 describe("AdminPage – Ratifications tab", () => {
   it("shows empty state when no ratifications", async () => {
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() =>
       expect(screen.getByText(/No societies awaiting ratification/i)).toBeTruthy(),
+=======
+    fireEvent.click(screen.getByText(/Ratifications/));
+    await waitFor(() =>
+      expect(screen.getByText(/No societies are awaiting/i)).toBeTruthy(),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     );
   });
 
@@ -122,7 +157,11 @@ describe("AdminPage – Ratifications tab", () => {
       { id: 10, name: "Chess Club", member_count: 5 },
     ]);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
+=======
+    fireEvent.click(screen.getByText(/Ratifications/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => expect(screen.getByText("Chess Club")).toBeTruthy());
     expect(screen.getByText("✓ Approve")).toBeTruthy();
     expect(screen.getByText("✗ Reject")).toBeTruthy();
@@ -134,7 +173,11 @@ describe("AdminPage – Ratifications tab", () => {
     ]);
     api.approveRatification.mockResolvedValue({});
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
+=======
+    fireEvent.click(screen.getByText(/Ratifications/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Chess Club"));
     fireEvent.click(screen.getByText("✓ Approve"));
     await waitFor(() =>
@@ -149,7 +192,11 @@ describe("AdminPage – Ratifications tab", () => {
     ]);
     api.rejectRatification.mockResolvedValue({});
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
+=======
+    fireEvent.click(screen.getByText(/Ratifications/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Drama Club"));
     fireEvent.click(screen.getByText("✗ Reject"));
     await waitFor(() =>
@@ -157,6 +204,7 @@ describe("AdminPage – Ratifications tab", () => {
     );
     await waitFor(() => expect(screen.queryByText("Drama Club")).toBeNull());
   });
+<<<<<<< HEAD
 
   it("paginates ratifications after 10 rows", async () => {
     api.fetchPendingRatifications.mockResolvedValue(
@@ -172,13 +220,68 @@ describe("AdminPage – Ratifications tab", () => {
     expect(screen.queryByText("Society 21")).toBeNull();
     fireEvent.click(screen.getByText("Next →"));
     await waitFor(() => expect(screen.getByText("Society 21")).toBeTruthy());
+=======
+});
+
+describe("AdminPage – Teacher Requests tab", () => {
+  it("shows empty state when no requests", async () => {
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() =>
+      expect(screen.getByText(/No pending teacher/i)).toBeTruthy(),
+    );
+  });
+
+  it("renders pending teacher with approve and reject buttons", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      { id: 5, username: "jane", first_name: "Jane", last_name: "Doe", email: "j@d.com", role: "pending_teacher" },
+    ]);
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
+    expect(screen.getByText("✓ Approve")).toBeTruthy();
+    expect(screen.getByText("✗ Reject")).toBeTruthy();
+  });
+
+  it("calls resolveTeacherRequest approve and removes row", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      { id: 5, username: "jane", first_name: "Jane", last_name: "Doe", email: "j@d.com", role: "pending_teacher" },
+    ]);
+    api.resolveTeacherRequest.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => screen.getByText("Jane Doe"));
+    fireEvent.click(screen.getByText("✓ Approve"));
+    await waitFor(() =>
+      expect(api.resolveTeacherRequest).toHaveBeenCalledWith(5, "approve"),
+    );
+    await waitFor(() => expect(screen.queryByText("Jane Doe")).toBeNull());
+  });
+
+  it("calls resolveTeacherRequest reject and removes row", async () => {
+    api.fetchTeacherRequests.mockResolvedValue([
+      { id: 6, username: "tom", first_name: "Tom", last_name: "X", email: "t@x.com", role: "pending_teacher" },
+    ]);
+    api.resolveTeacherRequest.mockResolvedValue({});
+    render(<AdminPage />);
+    fireEvent.click(screen.getByText(/Teacher Requests/));
+    await waitFor(() => screen.getByText("Tom X"));
+    fireEvent.click(screen.getByText("✗ Reject"));
+    await waitFor(() =>
+      expect(api.resolveTeacherRequest).toHaveBeenCalledWith(6, "reject"),
+    );
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 });
 
 describe("AdminPage – Reported Societies tab", () => {
   it("shows empty state when no reports", async () => {
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() =>
       expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
     );
@@ -189,7 +292,11 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 20, society_id: 55, society_name: "Bad Club", reporter_username: "alice", reason: "Inappropriate" },
     ]);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => expect(screen.getByText("Bad Club")).toBeTruthy());
     expect(screen.getByText("Ban")).toBeTruthy();
     expect(screen.getByText("Dismiss")).toBeTruthy();
@@ -200,7 +307,11 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 21, society_id: 56, society_name: "Test Club", reporter_username: "reporter1", reason: "Spam" },
     ]);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => expect(screen.getByText(/reporter1/)).toBeTruthy());
   });
 
@@ -210,7 +321,11 @@ describe("AdminPage – Reported Societies tab", () => {
     ]);
     api.dismissReport.mockResolvedValue(undefined);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Bad Club"));
     fireEvent.click(screen.getByText("Dismiss"));
     await waitFor(() => expect(api.dismissReport).toHaveBeenCalledWith(20));
@@ -224,7 +339,11 @@ describe("AdminPage – Reported Societies tab", () => {
     api.banReportedSociety.mockResolvedValue({});
     vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Bad Club"));
     fireEvent.click(screen.getByText("Ban"));
     await waitFor(() =>
@@ -241,7 +360,11 @@ describe("AdminPage – Reported Societies tab", () => {
     api.banReportedSociety.mockResolvedValue({});
     vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getAllByText("Bad Club"));
     fireEvent.click(screen.getAllByText("Ban")[0]);
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
@@ -255,13 +378,18 @@ describe("AdminPage – Reported Societies tab", () => {
     const navListener = vi.fn();
     window.addEventListener("navigate", navListener);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
+=======
+    fireEvent.click(screen.getByText(/Reported Societies/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Row Club"));
     fireEvent.click(screen.getByText("Row Club"));
     await waitFor(() => expect(navListener).toHaveBeenCalled());
     expect(navListener.mock.calls[0][0].detail).toBe("societies_77");
     window.removeEventListener("navigate", navListener);
   });
+<<<<<<< HEAD
 
   it("paginates reported societies after 10 rows", async () => {
     api.fetchReportedSocieties.mockResolvedValue(
@@ -278,15 +406,25 @@ describe("AdminPage – Reported Societies tab", () => {
     fireEvent.click(screen.getByText("Next →"));
     await waitFor(() => expect(screen.getByText("Reported Society 21")).toBeTruthy());
   });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });
 
 describe("AdminPage – Course Change Requests tab", () => {
   it("shows empty state when no requests", async () => {
     api.fetchCourseChangeRequests.mockResolvedValue([]);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
     await waitFor(() =>
       expect(screen.getByText(/No course switch requests/i)).toBeTruthy(),
+=======
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/No pending course change requests/i),
+      ).toBeTruthy(),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     );
   });
 
@@ -300,7 +438,11 @@ describe("AdminPage – Course Change Requests tab", () => {
       },
     ]);
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
+=======
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
     expect(screen.getByText(/Physics.*Chemistry/)).toBeTruthy();
   });
@@ -316,7 +458,11 @@ describe("AdminPage – Course Change Requests tab", () => {
     ]);
     api.resolveCourseChangeRequest.mockResolvedValue({ status: "approved" });
     render(<AdminPage />);
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
+=======
+    fireEvent.click(screen.getByText(/Course Change Requests/));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     await waitFor(() => screen.getByText("Bob Smith"));
     fireEvent.click(screen.getByText("✓ Approve"));
     await waitFor(() =>
@@ -324,6 +470,7 @@ describe("AdminPage – Course Change Requests tab", () => {
     );
     await waitFor(() => expect(screen.queryByText("Bob Smith")).toBeNull());
   });
+<<<<<<< HEAD
 
   it("paginates course change requests after 10 rows", async () => {
     api.fetchCourseChangeRequests.mockResolvedValue(
@@ -340,4 +487,6 @@ describe("AdminPage – Course Change Requests tab", () => {
     fireEvent.click(screen.getByText("Next →"));
     await waitFor(() => expect(screen.getByText("Student21 Example")).toBeTruthy());
   });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

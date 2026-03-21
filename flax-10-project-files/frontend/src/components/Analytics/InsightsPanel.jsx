@@ -5,13 +5,29 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+<<<<<<< HEAD
 import { buildMarkdownComponents } from '../common/markdown/buildMarkdownComponents.jsx';
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './AIInsightsTab.module.css';
 
 const FADE = { initial: { opacity: 0 }, animate: { opacity: 1 } };
 const MotionDiv = motion.div;
 
+<<<<<<< HEAD
 const MARKDOWN_COMPONENTS = buildMarkdownComponents(styles);
+=======
+const MARKDOWN_COMPONENTS = {
+  h1: ({ children }) => <h1 className={styles.mdH1}>{children}</h1>,
+  h2: ({ children }) => <h2 className={styles.mdH2}>{children}</h2>,
+  h3: ({ children }) => <h3 className={styles.mdH3}>{children}</h3>,
+  p: ({ children }) => <p className={styles.mdP}>{children}</p>,
+  li: ({ children }) => <li className={styles.mdLi}>{children}</li>,
+  ul: ({ children }) => <ul className={styles.mdUl}>{children}</ul>,
+  ol: ({ children }) => <ol className={styles.mdOl}>{children}</ol>,
+  strong: ({ children }) => <strong className={styles.mdStrong}>{children}</strong>,
+};
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const EMPTY_TEXT = {
   full: {

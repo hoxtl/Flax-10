@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * Admin actions for managing users, reports, ratifications, and course changes.
+=======
+ * Admin actions for managing users, teacher requests, reports, and society ratification.
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
  */
 
 import { fetchApi } from "./client";
@@ -21,6 +25,15 @@ export const banUser = (userId, reason) =>
 export const unbanUser = (userId) =>
   postJson(`/admin/users/${userId}/ban/`, { action: "unban" });
 
+<<<<<<< HEAD
+=======
+// ── Teacher requests ──────────────────────────────────────────────────────────
+export const fetchTeacherRequests = () => fetchApi("/admin/teacher-requests/");
+
+export const resolveTeacherRequest = (userId, decision) =>
+  postJson(`/admin/teacher-requests/${userId}/resolve/`, { decision });
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 // ── Reported societies ────────────────────────────────────────────────────────
 export const fetchReportedSocieties = () =>
   fetchApi("/admin/reported-societies/");
@@ -41,6 +54,13 @@ export const approveRatification = (societyId) =>
 export const rejectRatification = (societyId) =>
   postJson(`/societies/${societyId}/ratification/reject/`, {});
 
+<<<<<<< HEAD
+=======
+// ── Teacher role request (for regular users) ──────────────────────────────────
+export const requestTeacherRole = (reason = "") =>
+  postJson("/request-teacher-role/", { reason });
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 // ── Course change requests ────────────────────────────────────────────────────
 export const fetchCourseChangeRequests = () =>
   fetchApi("/admin/course-change-requests/");
@@ -56,3 +76,9 @@ export const getMyCourseChangeRequest = () =>
 
 export const cancelCourseChangeRequest = () =>
   fetchApi("/course-change/my-request/", { method: "DELETE" });
+<<<<<<< HEAD
+=======
+
+export const cancelTeacherRoleRequest = () =>
+  postJson("/cancel-teacher-role/", {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

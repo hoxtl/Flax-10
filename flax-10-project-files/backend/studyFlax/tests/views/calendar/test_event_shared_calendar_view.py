@@ -5,8 +5,12 @@ Backend tests for shared calendar event visibility.
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
+<<<<<<< HEAD
 from ...helpers.test_case_support import BaseEventTestCase
 
+=======
+from ..base import BaseEventTestCase
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 

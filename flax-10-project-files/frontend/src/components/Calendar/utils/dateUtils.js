@@ -4,7 +4,10 @@
  */
 
 /** Returns array of 7 dates representing the week containing the given date. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getWeekDays(date) {
     const start = getStartOfWeek(date);
     return Array.from({ length: 7 }, (_, i) => addDays(start, i));

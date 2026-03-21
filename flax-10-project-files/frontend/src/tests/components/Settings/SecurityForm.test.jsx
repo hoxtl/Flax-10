@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+<<<<<<< HEAD
 import SecurityForm from '../../../components/settings/SecurityForm';
+=======
+import SecurityForm from '../../../components/Settings/SecurityForm';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 describe('SecurityForm', () => {
     it('renders password fields', () => {

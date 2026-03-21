@@ -18,6 +18,8 @@ function EnrolmentsHint() {
 
 import PrimaryButton from "../common/primary_button/PrimaryButton";
 
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+
 export default function SuccessScreen({ major, onComplete }) {
   return (
     <motion.div key="success" initial={{ opacity: 0, scale: 0.96 }}

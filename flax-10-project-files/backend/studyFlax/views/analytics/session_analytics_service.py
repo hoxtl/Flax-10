@@ -7,7 +7,10 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def get_session_dates(sessions):
     """Return sorted unique session end dates."""
     return sorted(set(s.end_time.date() for s in sessions))
@@ -25,6 +28,10 @@ def compute_streaks_from_dates(dates):
     return active, longest
 
 def compute_streaks(sessions):
+<<<<<<< HEAD
+=======
+    """Return (current_streak, longest_streak) from sessions."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return compute_streaks_from_dates(get_session_dates(sessions))
 
 def compute_peak_hour(sessions):
@@ -35,6 +42,10 @@ def compute_peak_hour(sessions):
     return max(totals, key=totals.get) if totals else 0
 
 def compute_average_duration(sessions):
+<<<<<<< HEAD
+=======
+    """Return average duration in minutes."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if not sessions:
         return 0
     return sum(s.duration for s in sessions) / len(sessions)

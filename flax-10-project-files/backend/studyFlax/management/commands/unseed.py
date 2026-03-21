@@ -14,23 +14,19 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError, connection
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
 
 TABLES = [
     'studyFlax_calendarevent', 'studyFlax_tag', 'studyFlax_category',
     'studyFlax_recurrencerule', 'studyFlax_usersettings', 'studyFlax_notification',
-    'studyFlax_timetablesource', 'studyFlax_eventattendance', 'studyFlax_calendarshare',
-    'studyFlax_schedule', 'studyFlax_scheduleeventallocation',
+    'studyFlax_timetablesource',
     'studyFlax_society', 'studyFlax_societymembership', 'studyFlax_societytag',
-    'studyFlax_societyevent', 'studyFlax_societyimage', 'studyFlax_societyannouncement',
-    'studyFlax_societyannouncementimage', 'studyFlax_societyreport', 'studyFlax_societycalendarsync',
+    'studyFlax_societyevent', 'studyFlax_societyimage',
     'studyFlax_deadline', 'studyFlax_enrollment', 'studyFlax_module',
     'studyFlax_groupproject', 'studyFlax_groupmembership',
     'studyFlax_meetingsuggestion', 'studyFlax_meetingresponse',
     'studyFlax_studysession', 'studyFlax_themesession',
-    'studyFlax_reading', 'studyFlax_task', 'studyFlax_tasklist',
-    'studyFlax_coursechangerequest',
+    'studyFlax_reading',
     'studyFlax_user',
 ]
 
@@ -44,7 +40,6 @@ def get_superuser_data():
     ]
 
 def truncate_tables(cursor, tables, stdout):
-    """Truncate the supplied tables and echo each cleared table name."""
     # Truncate in a single statement so PostgreSQL acquires the table locks
     # in one consistent pass instead of deadlocking halfway through.
     quoted_tables = ', '.join(f'"{table}"' for table in tables)
@@ -71,8 +66,6 @@ def _attempt_restore(payload):
         return (payload.get("username", "?"), str(exc))
 
 def restore_superusers(superusers_data, stdout):
-    """Restore preserved superusers after the database wipe completes."""
-    del stdout
     if not superusers_data:
         return []
     results = [_attempt_restore(_build_superuser_payload(d)) for d in superusers_data]
@@ -106,25 +99,18 @@ def _print_success_footer(stdout, style):
     stdout.write("")
 
 def confirm_truncate(stdout):
-    """Prompt for confirmation before wiping the seeded tables."""
-    for line in _confirm_truncate_lines():
-        stdout.write(line)
+    div = "─" * 40
+    stdout.write("")
+    stdout.write(div)
+    stdout.write("  ⚠️   python manage.py unseed")
+    stdout.write(div)
+    stdout.write("")
+    stdout.write(f"  This will wipe {len(TABLES)} tables and reset all sequences.")
+    stdout.write("  Superusers will be preserved and restored after.")
+    stdout.write("")
     answer = input("  Type 'yes' to confirm: ")
     stdout.write("")
     return answer == 'yes'
-
-def _confirm_truncate_lines():
-    div = "─" * 40
-    return [
-        "",
-        div,
-        "  ⚠️   python manage.py unseed",
-        div,
-        "",
-        f"  This will wipe {len(TABLES)} tables and reset all sequences.",
-        "  Superusers will be preserved and restored after.",
-        "",
-    ]
 
 class Command(BaseCommand):
     """Clears all application data and resets database sequences."""
@@ -133,28 +119,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         superusers_data = get_superuser_data()
-        self._warn_on_empty_superusers(superusers_data)
-        if not self._confirmed():
-            return
-        self._clear_tables()
-        self._restore_superusers(superusers_data)
-
-    def _warn_on_empty_superusers(self, superusers_data):
         if not superusers_data:
             self.stdout.write(self.style.WARNING("  No superusers found - database will be completely emptied."))
-
-    def _confirmed(self):
-        if confirm_truncate(self.stdout):
-            return True
-        self.stdout.write("  Cancelled.")
-        return False
-
-    def _clear_tables(self):
+        if not confirm_truncate(self.stdout):
+            self.stdout.write("  Cancelled.")
+            return
         self.stdout.write("  Clearing tables...")
         with connection.cursor() as cursor:
             truncate_tables(cursor, TABLES, self.stdout)
-
-    def _restore_superusers(self, superusers_data):
         self.stdout.write("\n  Restoring superusers...")
         failed_restores = restore_superusers(superusers_data, self.stdout)
         _print_restore_results(superusers_data, failed_restores, self.stdout, self.style)

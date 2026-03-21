@@ -8,7 +8,10 @@ from datetime import timedelta
 from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.modules.deadline_model import Deadline
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class DeadlineModelTests(TestCase):
     """Test suite for Deadline model."""

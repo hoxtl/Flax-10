@@ -57,6 +57,7 @@
 }
 
 @keyframes slideUpFade {
+<<<<<<< HEAD
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -65,6 +66,10 @@
     opacity: 1;
     transform: translateY(0);
   }
+=======
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .attendanceWarning {
@@ -79,12 +84,18 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+<<<<<<< HEAD
   box-shadow: 0 0 12px rgba(239, 83, 80, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
+=======
+  box-shadow: 0 0 12px rgba(239,83,80,0.25);
+  border: 1px solid rgba(255,255,255,0.2);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   animation: warningPulse 2s infinite ease-in-out;
 }
 
 @keyframes warningPulse {
+<<<<<<< HEAD
   0%,
   100% {
     box-shadow: 0 0 8px rgba(239, 83, 80, 0.25);
@@ -94,6 +105,10 @@
     box-shadow: 0 0 15px rgba(239, 83, 80, 0.45);
     transform: scale(1.02);
   }
+=======
+  0%, 100% { box-shadow: 0 0 8px rgba(239,83,80,0.25); transform: scale(1); }
+  50% { box-shadow: 0 0 15px rgba(239,83,80,0.45); transform: scale(1.02); }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* ── Compact Attendance Tile ── */
@@ -148,7 +163,11 @@
 .compactLegendList {
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   gap: 12px;
+=======
+  gap: 14px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   width: max-content;
   min-width: 0;
   align-items: flex-start;
@@ -164,14 +183,22 @@
 .compactLegendLabel {
   display: inline-flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 8px;
   font-size: 12px;
   font-weight: 460;
   color: color-mix(in srgb, var(--text) 78%, var(--text-secondary) 22%);
+=======
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   line-height: 1.25;
 }
 
 .compactLegendLabelSoft {
+<<<<<<< HEAD
   color: color-mix(in srgb, var(--text) 66%, var(--text-secondary) 34%);
   font-weight: 430;
 }
@@ -179,6 +206,15 @@
 .compactLegendDot {
   width: 9px;
   height: 9px;
+=======
+  color: color-mix(in srgb, var(--text) 74%, var(--text-secondary) 26%);
+  font-weight: 470;
+}
+
+.compactLegendDot {
+  width: 10px;
+  height: 10px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -283,8 +319,12 @@
 }
 
 .focusHeatmapCardInteractive:focus-visible {
+<<<<<<< HEAD
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--color-primary) 28%, transparent);
+=======
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .heatmapLinkBtn {
@@ -328,6 +368,7 @@
 
 @media (max-width: 640px) {
   .compactDonutRow {
+<<<<<<< HEAD
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
     gap: 10px;
@@ -342,5 +383,14 @@
 
   .compactLegendRow {
     justify-content: center;
+=======
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .compactLegendList {
+    min-width: 0;
+    align-items: center;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   }
 }

@@ -31,7 +31,10 @@ export const QuickAddMock = ({ onClose, onSelectType, initialView }) => (
     <button onClick={() => onSelectType("task", null)}>Add Task</button>
     <button onClick={() => onSelectType("create_module", null)}>Add Module</button>
     <button onClick={() => onSelectType("add_deadline", { id: 1, module_code: "CS101" })}>Add Deadline</button>
+<<<<<<< HEAD
     <button onClick={() => onSelectType("add_reading", { id: 2, module_code: "CS102" })}>Add Reading</button>
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   </div>
 );
 
@@ -50,6 +53,7 @@ export const DeadlineModalMock = ({ onClose }) => (
   <div data-testid="deadline-modal"><button onClick={onClose}>Close Deadline Modal</button></div>
 );
 
+<<<<<<< HEAD
 export const ReadingModalMock = ({ onClose }) => (
   <div data-testid="reading-modal"><button onClick={onClose}>Close Reading Modal</button></div>
 );
@@ -61,6 +65,12 @@ export const LeaveTimerMock = ({ onCancel, onPause, onExit, onTakeBreak, timeLef
     <button onClick={onCancel}>Stay</button>
     <button onClick={onPause}>Pause and Leave</button>
     <button onClick={onTakeBreak}>Take a 5m Break instead</button>
+=======
+export const LeaveTimerMock = ({ onCancel, onPause, onExit }) => (
+  <div data-testid="leave-timer-modal">
+    <button onClick={onCancel}>Stay</button>
+    <button onClick={onPause}>Pause and Leave</button>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     <button onClick={onExit}>Exit Timer</button>
   </div>
 );

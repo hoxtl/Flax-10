@@ -45,7 +45,10 @@ describe('useCalendarEvents', () => {
       events: [{ id: 1 }],
       selectedDate,
       viewMode: 'month',
+<<<<<<< HEAD
       sharedCalendarUserId: null,
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
     useCalendarDispatchMock.mockReturnValue(dispatch);
     getDateRangeForViewMock.mockReturnValue({ start: '2026-03-01', end: '2026-03-31' });

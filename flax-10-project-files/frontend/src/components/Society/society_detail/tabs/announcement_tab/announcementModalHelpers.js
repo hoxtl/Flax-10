@@ -2,8 +2,12 @@
  * Utility functions for managing the AnnouncementModal form state,
  * validation, and image processing.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/announcement_tab/announcementModalHelpers.js
 
 import { validateEventTimes } from '../../../../calendar/utils/dateValidation';
+=======
+import { validateEventTimes } from '../../../../Calendar/utils/dateValidation';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers.js
 
 export const MAX_IMAGES = 5;
 
@@ -33,9 +37,13 @@ function mapAnnouncementToForm(base, announcement) {
 
 export function getImageList(ann) {
     const raw = Array.isArray(ann?.images) ? ann.images : (ann?.image ? [ann.image] : []);
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/announcement_tab/announcementModalHelpers.js
     return raw
         .map(img => (img && typeof img === 'object' ? img.url || null : img))
         .filter(Boolean);
+=======
+    return raw.map(img => (typeof img === 'object' && img.url) ? img.url : img).filter(Boolean);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers.js
 }
 
 export function validateForm(form) {

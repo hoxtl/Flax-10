@@ -1,7 +1,10 @@
 /*
  * useChangeTracker records edit-mode changes made to society content.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useCallback } from "react";
 
 const EMPTY_CHANGES = {

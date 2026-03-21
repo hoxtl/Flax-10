@@ -2,7 +2,11 @@
  * Reusable user search result and filter item components.
  */
 
+<<<<<<< HEAD
 import UserAvatar from '../common/user_avatar/UserAvatar';
+=======
+import UserAvatar from '../common/UserAvatar/UserAvatar';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { styles } from './userSearchShared';
 
 function getDisplayName(user) {
@@ -35,7 +39,11 @@ export function UserResultItem({ user, onSelect, compact }) {
     const compactClass = compact ? styles.compactUserItem : '';
     return (
         <div className={`${styles.userItem} ${styles.userResultItem} ${compactClass}`} onClick={onSelect}>
+<<<<<<< HEAD
             <UserAvatar user={user} avatarOnly size={compact ? 42 : 44} allowGenericFallback />
+=======
+            <UserAvatar user={user} avatarOnly />
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
             <div className={styles.userNameDetails}>
                 {!compact && <span className={styles.userFullName}>{displayName}</span>}
                 <span className={styles.userHandle}>{compact ? user.username : `@${user.username}`}</span>

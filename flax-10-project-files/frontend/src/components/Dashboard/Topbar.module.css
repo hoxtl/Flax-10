@@ -225,9 +225,12 @@
 :root[data-mode="dark"] .navGroupTriggerActive {
   background: var(--feature-tint);
 }
+<<<<<<< HEAD
 
 .dropdownLabelRow {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

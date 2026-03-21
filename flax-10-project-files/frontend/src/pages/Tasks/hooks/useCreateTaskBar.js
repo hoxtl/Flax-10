@@ -4,10 +4,17 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
+<<<<<<< HEAD
 import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userApi";
 import { POMODORO_BLOCK_MINUTES, runQuickAdd } from "../utils/createTaskBarUtils";
+=======
+import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+import { getUserSettings } from "../../../api/userApi";
+import { runQuickAdd } from "../utils/createTaskBarUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 
 function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
@@ -27,7 +34,11 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const cardRef = useRef(null);
   const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
   const [pageCount, setPageCount] = useState(null);
+<<<<<<< HEAD
   return { sortedLists, title, setTitle, estimatedMinutes, setEstimatedMinutes, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
+=======
+  return { sortedLists, title, setTitle, estimatedBlocks, setEstimatedBlocks, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function useEnrolledModulesEffect(setEnrolledModules) {

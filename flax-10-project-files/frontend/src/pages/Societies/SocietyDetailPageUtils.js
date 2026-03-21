@@ -12,6 +12,7 @@ function extractUrl(item) {
     return typeof url === 'string' ? url.trim() : null;
 }
 
+<<<<<<< HEAD
 export function getAvailablePhotos(society) {
     const coverUrls = new Set(getImageUrls(society?.images));
     const available = [];
@@ -25,6 +26,8 @@ export function getAvailablePhotos(society) {
     return available;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function scrollContentToTop() {
     const scrollable = findScrollableParent();
     if (scrollable) scrollable.scrollTop = 0;

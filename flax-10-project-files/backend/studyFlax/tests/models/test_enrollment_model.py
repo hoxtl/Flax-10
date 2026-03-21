@@ -9,7 +9,10 @@ from django.db import IntegrityError
 from studyFlax.models.auth.user_model import User
 from studyFlax.models.modules.module_model import Module
 from studyFlax.models.modules.enrollment_model import Enrollment
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class EnrollmentModelTests(TestCase):
     """Test suite for Enrollment model."""

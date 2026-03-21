@@ -2,9 +2,14 @@
  * AboutTab displays and edits the general information about a society,
  * including its biography and administrator contact emails.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/AboutTab.jsx
 
 import { useState } from "react";
 import PrimaryButton from "../../../common/primary_button/PrimaryButton";
+=======
+import { useState } from "react";
+import PrimaryButton from "../../../common/PrimaryButton/PrimaryButton";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tabs/AboutTab.jsx
 import styles from "./tabs.module.css";
 
 const isValidEmail = (email) => {
@@ -44,7 +49,10 @@ function AdminEmails({ emails }) {
 }
 
 /** Editor interface for updating society bio and admin emails. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/tabs/AboutTab.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/tabs/AboutTab.jsx
 function AboutEditor({ about, emails, onUpdate }) {
     const vals = useAboutForm(about, emails);
     const handlers = getAboutHandlers(onUpdate, vals);

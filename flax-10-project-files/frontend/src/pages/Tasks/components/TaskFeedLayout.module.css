@@ -1,9 +1,10 @@
-/**
+/*
  * TaskFeed layout styles: main feed container, header, sub-header, create row,
  * toolbar strip, sections wrapper, and add button.
  */
 
 .feed {
+<<<<<<< HEAD
   flex: 1;
   min-width: 0;
   display: flex;
@@ -131,6 +132,28 @@
   width: 100%;
   margin-bottom: 10px;
   flex-shrink: 0;
+=======
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: clamp(var(--space-5), 2vw, var(--space-8)) clamp(var(--space-4), 2.5vw, var(--space-8)) var(--space-10);
+    position: relative;
+    background: var(--bg);
+}
+
+.subHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+    background: var(--bg);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 10px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .inlineBanner {
@@ -139,20 +162,35 @@
 }
 
 .createRow {
-  position: relative;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  margin-bottom: 2px;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    margin-bottom: 2px;
 }
 
 .createRow .createBarWrap {
-  flex: 1;
-  min-width: 0;
-  overflow: visible;
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
 }
+
+.subHeader .createBarWrap {
+    width: 100%;
+}
+
+.subHeaderSpacer {
+    flex: 1;
+    min-width: 0;
+}
+
+.fullPlanBtn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+<<<<<<< HEAD
 
 .subHeader .createBarWrap {
   width: 100%;
@@ -167,6 +205,8 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 .createBarWrap {
   width: 100%;
@@ -174,11 +214,19 @@
 }
 
 .subHeader .toolbar {
+<<<<<<< HEAD
   border-bottom: none;
   padding: 4px 0;
   display: flex;
   align-items: center;
   gap: 10px;
+=======
+    border-bottom: none;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .quickAddDivider {
@@ -202,6 +250,7 @@
 }
 
 @media (max-width: 980px) {
+<<<<<<< HEAD
   .feed {
     padding: var(--space-5) var(--space-4) var(--space-8);
   }
@@ -218,10 +267,25 @@
   .filterPanelWrap {
     justify-self: start;
   }
+=======
+    .toolbar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .toolbar .searchWrap {
+        min-width: 0;
+    }
+
+    .sortWrap,
+    .filterPanelWrap {
+        justify-self: start;
+    }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 /* Layout-only — button appearance comes from PrimaryButton */
 .addBtn {
+<<<<<<< HEAD
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -292,4 +356,42 @@
   .sections {
     gap: 10px;
   }
+=======
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.sectionsWrap {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+    margin-top: 14px;
+}
+
+.sections {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: sectionsFadeIn 0.35s ease;
+}
+
+@keyframes sectionsFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+}
+
+@media (max-width: 768px) {
+    .feed {
+        padding-top: var(--space-5);
+        padding-bottom: var(--space-8);
+    }
 }

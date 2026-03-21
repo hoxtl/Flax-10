@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../../api/userApi';
+<<<<<<< HEAD
 import * as geocodeApi from '../../api/geocodeApi';
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const mockFetch = (data, ok = true) => {
     const jsonStr = JSON.stringify(data);

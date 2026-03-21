@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
+<<<<<<< HEAD
 vi.mock('../../../components/society/society_detail/tabs/AboutTab', () => ({
+=======
+vi.mock('../../../components/Society/SocietyDetail/tabs/AboutTab', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ about, onUpdate }) => (
         <div data-testid="about-tab">
             {about || 'About'}
@@ -10,7 +14,11 @@ vi.mock('../../../components/society/society_detail/tabs/AboutTab', () => ({
     ),
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/society/society_detail/tabs/calendar_tab/CalendarTab', () => ({
+=======
+vi.mock('../../../components/Society/SocietyDetail/tabs/calendarTab/CalendarTab', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ onViewAnnouncement }) => (
         <div data-testid="calendar-tab">
             <button data-testid="view-ann" onClick={() => onViewAnnouncement?.(5)}>View Ann</button>

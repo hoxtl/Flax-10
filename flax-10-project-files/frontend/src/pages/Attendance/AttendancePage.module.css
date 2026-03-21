@@ -106,6 +106,7 @@
   overflow: hidden;
 }
 
+<<<<<<< HEAD
 .attendanceTabsWrap {
   flex: 1;
   min-height: 0;
@@ -134,6 +135,18 @@
 .tabBadge {
   display: inline-flex;
   align-items: center;
+=======
+.tabLabelWithBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   justify-content: center;
   min-width: 18px;
   height: 18px;
@@ -169,8 +182,11 @@
   .listCol {
     min-height: 400px;
   }
+<<<<<<< HEAD
 
   .attendanceTabsWrap {
     padding: 10px 10px 0;
   }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

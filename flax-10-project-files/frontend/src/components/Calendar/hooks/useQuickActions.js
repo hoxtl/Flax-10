@@ -2,11 +2,18 @@
  * useQuickActions - Quick action buttons for module/society events.
  * Provides Leave (module) and Unsync (society) actions for external events.
  */
+<<<<<<< HEAD
 
 import { useTags } from '../../../context/TagContext';
 import { useNotify } from '../../notifications/hooks/useNotify';
 import { useCalendarEvents } from './useCalendarEvents';
 import { useModuleDisenrollment } from '../../modules/hooks/useModuleDisenrollment';
+=======
+import { useTags } from '../../../context/TagContext';
+import { useNotify } from '../../Notifications/hooks/useNotify';
+import { useCalendarEvents } from './useCalendarEvents';
+import { useModuleDisenrollment } from '../../Modules/hooks/useModuleDisenrollment';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getEventType } from '../utils/eventUtils';
 import { unsyncCalendar } from '../../../api/societyApi';
 
@@ -18,7 +25,10 @@ async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
 }
 
 /** Hook returning quick action config for module/society events. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useQuickActions(event) {
     const { loadEvents } = useCalendarEvents();
     const { refreshTags } = useTags();

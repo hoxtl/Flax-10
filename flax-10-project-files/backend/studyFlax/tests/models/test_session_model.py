@@ -6,7 +6,10 @@ from django.test import TestCase
 from django.utils import timezone
 from studyFlax.models.auth.user_model import User
 from studyFlax.models.timer.session_model import StudySession
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 class StudySessionModelTest(TestCase):
     """Tests for study session model."""

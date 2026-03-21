@@ -1,17 +1,30 @@
 """
+<<<<<<< HEAD
 Enrollment views for listing, creating, and deleting module enrolments.
 """
 
 from django.shortcuts import get_object_or_404
+=======
+Views for listing, creating, and deleting module enrolments.
+"""
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+<<<<<<< HEAD
 from rest_framework.response import Response
 
 from studyFlax.models import CalendarEvent, Enrollment
 from studyFlax.serialisers import EnrollmentSerialiser
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_module, is_core_module
 
+=======
+from django.shortcuts import get_object_or_404
+from studyFlax.views.modules.enrollment_logic import enroll_user_in_module, is_core_module
+from studyFlax.models import Enrollment, CalendarEvent
+from studyFlax.serialisers import EnrollmentSerialiser
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -43,7 +56,11 @@ def enrollment_detail(request, enrollment_id):
 
 def delete_enrollment(request, enrollment):
     if enrollment.student != request.user:
+<<<<<<< HEAD
         return Response({"error": "You can only unenrol yourself."}, status=status.HTTP_403_FORBIDDEN)
+=======
+        return Response( {"error": "You can only unenrol yourself."}, status = status.HTTP_403_FORBIDDEN)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if is_core_module(request.user, enrollment.module):
         return Response({"error": "You cannot leave a module that is part of your core course."}, status=status.HTTP_403_FORBIDDEN)
     _remove_enrollment_calendar_events(request.user, enrollment.module)

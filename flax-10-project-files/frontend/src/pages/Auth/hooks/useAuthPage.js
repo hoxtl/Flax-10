@@ -64,6 +64,7 @@ export function useAuthPage(initialSignIn = true) {
   const [loading, setLoading] = useState(false);
   const { signUpData, updateSignUpField, signInData, updateSignInField } = useAuthFormData();
   const handlers = useAuthHandlers(signUpData, signInData, setError, setLoading, toggle);
+<<<<<<< HEAD
 
   return {
     signIn,
@@ -75,4 +76,7 @@ export function useAuthPage(initialSignIn = true) {
     updateSignInField,
     ...handlers,
   };
+=======
+  return { signIn, error, loading, signUpData, updateSignUpField, signInData, updateSignInField, ...handlers };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

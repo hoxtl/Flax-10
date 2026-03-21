@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for society views.
 """
+=======
+"""Tests for society list and detail endpoints."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -9,17 +13,27 @@ from rest_framework.test import APIClient
 
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import (
+=======
+from studyFlax.tests.helpers.factories import (
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     make_society,
     make_society_admin,
 )
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 
 class SocietyListViewTest(TestCase):
+<<<<<<< HEAD
     """Tests society list view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="testuser", email="test@example.com", password="pass")
@@ -45,7 +59,10 @@ class SocietyListViewTest(TestCase):
 
 
 class SocietyDetailViewTest(TestCase):
+<<<<<<< HEAD
     """Tests society detail view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="admin", email="admin@example.com", password="pass")

@@ -200,6 +200,7 @@ describe('SocietyInfo', () => {
         rerender(<SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} />);
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
+<<<<<<< HEAD
 
     it('initialises an empty bio editor value when the bio is null', () => {
         render(<SocietyInfo society={{ ...baseSociety, bio: null }} editMode onUpdateSociety={vi.fn()} />);
@@ -213,4 +214,6 @@ describe('SocietyInfo', () => {
         fireEvent.click(screen.getByTestId('edit-category'));
         expect(screen.getByTestId('category-selector')).toBeInTheDocument();
     });
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 });

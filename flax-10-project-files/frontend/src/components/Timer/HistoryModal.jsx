@@ -8,7 +8,11 @@ import * as historyUtils from './utils/historyUtils';
 import { groupHistoryByBlock, formatDate, formatTimeRange, formatDuration } from './utils/historyFormatter';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
+<<<<<<< HEAD
 import StandardModal from '../common/standard_modal/StandardModal';
+=======
+import StandardModal from '../common/StandardModal/StandardModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const StatsRow = ({ block }) => {
     const completedCount = block.sessions.filter(s => s.status !== 'Incomplete').length;

@@ -9,6 +9,29 @@ from studyFlax.models.society import (
 )
 from studyFlax.serialisers.common import build_profile_photo_url
 
+class HasReportedMixin:
+    """Adds a get_has_reported method for society serialisers."""
+
+    def get_has_reported(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.reports.filter(reporter=request.user).exists()
+        return False
+
+class SilentNotificationMixin:
+    """Skips notifications on create/update when context has skip_notification."""
+
+    def create(self, validated_data):
+        instance = self.Meta.model(**validated_data)
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        if self.context.get('skip_notification'):
+            instance._skip_notification = True
+        return super().update(instance, validated_data)
 
 class HasReportedMixin:
     """Adds a get_has_reported method for society serialisers."""
@@ -69,7 +92,10 @@ class SocietyMembershipSerialiser(serializers.ModelSerializer):
         return build_profile_photo_url(obj.user.profile_photo, self.context.get('request'))
 
 class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for society list."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     member_count = serializers.IntegerField(read_only=True)
     cover_image = serializers.SerializerMethodField()
     has_reported = serializers.SerializerMethodField()
@@ -86,7 +112,10 @@ class SocietyListSerialiser(HasReportedMixin, serializers.ModelSerializer):
         return first_img.url if first_img else None
 
 class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for society announcement."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     images = SocietyAnnouncementImageSerialiser(many=True, read_only=True)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
     event_id = serializers.SerializerMethodField()
@@ -104,7 +133,10 @@ class SocietyAnnouncementSerialiser(SilentNotificationMixin, serializers.ModelSe
         ]
 
 class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for society event."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     tag_data = SocietyTagSerialiser(source='tag', read_only=True)
 
     def to_representation(self, instance):
@@ -162,7 +194,10 @@ def get_society_color(society_id):
     return SOCIETY_COLORS[society_id % len(SOCIETY_COLORS)]
 
 class SocietyDetailSerialiser(HasReportedMixin, serializers.ModelSerializer):
+<<<<<<< HEAD
     """Serialiser for society detail."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     member_count = serializers.IntegerField(read_only=True)
     tags = SocietyTagSerialiser(many=True, read_only=True)
     images = SocietyImageSerialiser(many=True, read_only=True)

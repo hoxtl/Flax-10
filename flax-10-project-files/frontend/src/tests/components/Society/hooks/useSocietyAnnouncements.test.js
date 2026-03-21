@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { useSocietyAnnouncements } from '../../../../components/society/hooks/useSocietyAnnouncements';
+=======
+import { useSocietyAnnouncements } from '../../../../components/Society/hooks/useSocietyAnnouncements';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import * as api from '../../../../api/societyApi';
 
 vi.mock('../../../../api/societyApi', () => ({
@@ -44,7 +48,11 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('updateAnnouncement and setEventId coverage', async () => {
+<<<<<<< HEAD
         mockSoc.announcements = [{ id: 10, title: 'Old', event_id: 100 }, { id: 99, title: 'Keep', event_id: null }];
+=======
+        mockSoc.announcements = [{ id: 10, title: 'Old', event_id: 100 }];
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         const updated = { id: 10, title: 'New', event_id: 100 };
         api.updateAnnouncement.mockResolvedValue(updated);
         const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
@@ -54,7 +62,10 @@ describe('useSocietyAnnouncements', () => {
         });
         expect(api.updateAnnouncement).toHaveBeenCalledWith(mockId, 10, { title: 'New' }, false);
         expect(mockSoc.announcements[0].title).toBe('New');
+<<<<<<< HEAD
         expect(mockSoc.announcements[1].title).toBe('Keep');
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
         // Test handleSync path where addAsEvent is false but event_id exists (deleteLinked)
         const updatedNoEvent = { id: 10, title: 'A', event_id: 100 }; // The updated object returned from API
@@ -68,6 +79,10 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('deleteAnnouncement covers deletion and sync error', async () => {
+<<<<<<< HEAD
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         mockSoc.announcements = [{ id: 10, title: 'A', event_id: 100 }];
         api.fetchSociety.mockResolvedValue({ announcements: [{ id: 10, event_id: 100 }] });
         eventOps.deleteEvent.mockRejectedValue(new Error('fail'));
@@ -78,8 +93,14 @@ describe('useSocietyAnnouncements', () => {
             await result.current.deleteAnnouncement(10);
         });
         expect(api.deleteAnnouncement).toHaveBeenCalledWith(mockId, 10, false);
+<<<<<<< HEAD
         expect(eventOps.deleteEvent).toHaveBeenCalledWith(100, true);
         expect(mockSoc.announcements).toHaveLength(0);
+=======
+        expect(spy).toHaveBeenCalledWith('Failed to delete linked event:', expect.any(Error));
+        expect(mockSoc.announcements).toHaveLength(0);
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('handleSync update branch coverage', async () => {
@@ -97,10 +118,15 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('handleSync catch branch coverage', async () => {
+<<<<<<< HEAD
+=======
+        const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         api.createAnnouncement.mockResolvedValue({ id: 10 });
         eventOps.addEvent.mockRejectedValue(new Error('sync fail'));
         const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
         await act(async () => { await result.current.addAnnouncement({ addAsEvent: true }); });
+<<<<<<< HEAD
         expect(api.createAnnouncement).toHaveBeenCalledWith(mockId, { addAsEvent: true }, false);
         expect(eventOps.addEvent).toHaveBeenCalled();
     });
@@ -117,5 +143,9 @@ describe('useSocietyAnnouncements', () => {
 
         expect(eventOps.deleteEvent).not.toHaveBeenCalled();
         expect(api.deleteAnnouncement).toHaveBeenCalledWith(mockId, 11, false);
+=======
+        expect(spy).toHaveBeenCalledWith('Failed to sync event:', expect.any(Error));
+        spy.mockRestore();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

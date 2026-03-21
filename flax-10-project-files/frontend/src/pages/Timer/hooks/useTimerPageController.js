@@ -4,7 +4,11 @@
 
 import { useCallback } from 'react';
 import useBreakpoint from '../../../hooks/useBreakpoint';
+<<<<<<< HEAD
 import { useNotificationPermission } from '../../../components/timer/utils/timerUtils';
+=======
+import { useNotificationPermission } from '../../../components/Timer/utils/timerUtils';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useTimerPageFlags } from './useTimerPageFlags';
 import {
   useFocusAccent,
@@ -15,7 +19,11 @@ import {
 } from './useTimerPageEffects';
 
 const MIN_FOCUS_SKELETON_MS = 500;
+<<<<<<< HEAD
 const FLAX_FOCUS_ACCENT = 'var(--timer-focus-accent)';
+=======
+const FLAX_FOCUS_ACCENT = '#7a6a56';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useTimerPageController(t, location) {
   const flags = useTimerPageFlags(location);
@@ -34,13 +42,19 @@ export function useTimerPageController(t, location) {
 }
 
 function openFocus(flags) {
+<<<<<<< HEAD
   flags.setShowHistory(false);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   flags.setFocusMode(true);
   flags.setFocusFullscreenPending(true);
 }
 
 function closeTimerOverlays(flags) {
+<<<<<<< HEAD
   flags.setShowHistory(false);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   flags.setFocusMode(false);
   flags.setShowShortcuts(false);
 }

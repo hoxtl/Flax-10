@@ -2,7 +2,10 @@
  * MemberDirectoryModal displays a searchable list of all society members.
  * Admins can remove members from the directory.
  */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Society/society_detail/MemberDirectoryModal.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Society/SocietyDetail/MemberDirectoryModal.jsx
 import { useState, useEffect, useMemo } from "react";
 import GenericSummaryModal from "../../common/generic_summary_modal/GenericSummaryModal";
 import SummaryItem from "../../common/generic_summary_modal/SummaryItem";

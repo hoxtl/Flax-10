@@ -84,11 +84,24 @@ describe('ImageManagerComponents', () => {
 
     render(<ImageGrid images={[]} onDelete={vi.fn()} onPin={vi.fn()} onAdd={onAdd} />);
 
+<<<<<<< HEAD
     const fileInput = document.querySelector('input[type="file"]');
+=======
+    // StandardModal renders via portal, so the input lives under document.body.
+    const fileInput = document.body.querySelector('input[type="file"]');
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, { target: { files: [new File(['x'], 'upload.png', { type: 'image/png' })] } });
 
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith('data:upload.png'));
+<<<<<<< HEAD
+=======
+
+    const backdrop = document.body.querySelector('div[class*="_backdrop"]');
+    expect(backdrop).toBeTruthy();
+    fireEvent.mouseDown(backdrop);
+    expect(onClose).toHaveBeenCalled();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it('ImageGrid pins and deletes correctly', () => {
@@ -133,8 +146,48 @@ describe('ImageManagerComponents', () => {
     const fileInput = document.querySelector('input[type="file"]');
     const clickSpy = vi.spyOn(fileInput, 'click');
 
+<<<<<<< HEAD
     fireEvent.click(screen.getByRole('button', { name: '+' }));
+=======
+    fireEvent.click(screen.getByText('From Photos'));
+    const photoCards = Array.from(document.body.querySelectorAll('div')).filter((node) =>
+      node.style.backgroundImage && node.style.backgroundImage.includes('b.jpg')
+    );
+    expect(photoCards.length).toBeGreaterThan(0);
+    fireEvent.click(photoCards[0]);
+    fireEvent.click(screen.getByText('Add Selected'));
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
     expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('ImageCard index 0 shows Main badge and no pin button', () => {
+    render(<ImageCard src="/img.jpg" index={0} onDelete={vi.fn()} onPin={vi.fn()} />);
+    expect(screen.getByText('★ Main')).toBeTruthy();
+    expect(screen.queryByTitle('Set as main')).toBeNull();
+  });
+
+  it('AddImageView without photos does not show tab selector', () => {
+    render(<AddImageView onClose={vi.fn()} onAdd={vi.fn()} availablePhotos={[]} />);
+    expect(screen.queryByText('From Photos')).toBeNull();
+    expect(screen.queryByText('Upload')).toBeNull();
+  });
+
+  it('performUpload handles empty file gracefully', async () => {
+    const onAdd = vi.fn();
+    const { container } = render(<AddImageView onClose={vi.fn()} onAdd={onAdd} availablePhotos={[]} />);
+    const fileInput = document.body.querySelector('input[type="file"]');
+    expect(fileInput).toBeTruthy();
+    fireEvent.change(fileInput, { target: { files: [] } });
+    expect(onAdd).not.toHaveBeenCalled();
+  });
+
+  it('TabSelector shows both tabs with correct active states', () => {
+    const { container } = render(<AddImageView onClose={vi.fn()} onAdd={vi.fn()} availablePhotos={['a.jpg']} />);
+    const uploadBtn = screen.getByText('Upload');
+    expect(uploadBtn).toBeTruthy();
+    fireEvent.click(screen.getByText('From Photos'));
+    fireEvent.click(screen.getByText('Upload'));
+    expect(screen.getByText('Click to upload image')).toBeTruthy();
   });
 });

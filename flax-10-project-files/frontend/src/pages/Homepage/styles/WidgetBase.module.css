@@ -11,7 +11,11 @@
   height: 36px;
   border-radius: 12px;
   background: var(--widget-icon-bg);
+<<<<<<< HEAD
   border: 1px solid var(--border);
+=======
+  border: 1px solid var(--widget-border);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   display: flex;
   align-items: center;
   justify-content: center;
@@ -40,4 +44,8 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--widget-text-secondary);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

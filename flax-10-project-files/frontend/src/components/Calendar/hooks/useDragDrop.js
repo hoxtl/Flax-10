@@ -2,12 +2,18 @@
  * useDragDrop - Drag and drop hooks for calendar event repositioning.
  * Provides useDrag for draggable sources and useDrop for drop targets.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useRef } from 'react';
 import { parseDropPayload, setupDragStart, handleDragOverEffect } from '../utils/dragUtils';
 
 /** Hook for making an element draggable with event data. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useDrag({ type, data }) {
     const [isDragging, setIsDragging] = useState(false);
     const handlers = createDragHandlers(type, data, setIsDragging);
@@ -35,7 +41,10 @@ function handleDragEnd(e, setIsDragging) {
 }
 
 /** Hook for making an element a drop target that accepts dragged events. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function useDrop({ accept, onDrop }) {
     const [isOver, setIsOver] = useState(false);
     const counter = useRef(0);

@@ -4,8 +4,12 @@
   background: var(--bg);
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   height: 100%;
   min-height: 0;
+=======
+  height: auto;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -21,9 +25,33 @@
 
 .calendar-view-relative-wrapper {
   position: relative;
+<<<<<<< HEAD
+=======
+}
+
+/* Day and Week views — expanded height */
+.calendar-view-relative-wrapper:has(.day-view),
+.calendar-view-relative-wrapper:has(.week-view) {
+  height: calc(100vh - 200px);
+  min-height: 500px;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   display: flex;
   flex-direction: column;
+}
+
+.calendar-view-relative-wrapper:has(.day-view) .day-view,
+.calendar-view-relative-wrapper:has(.week-view) .week-view {
+  flex: 1;
   min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+
+  .calendar-view-relative-wrapper:has(.day-view),
+  .calendar-view-relative-wrapper:has(.week-view) {
+    height: calc(100vh - 180px);
+  }
 }
 
 /* Day and Week views — expanded height */

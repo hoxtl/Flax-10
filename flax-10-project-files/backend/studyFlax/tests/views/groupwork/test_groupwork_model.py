@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 """
 Tests for groupwork model strings.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from datetime import timedelta
 
 from django.utils import timezone
@@ -11,11 +14,18 @@ from studyFlax.models.groupwork.groupwork_model import (
     MeetingResponse,
     MeetingSuggestion,
 )
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 
 
 class GroupworkModelStrTests(BaseTestCase):
     """Tests groupwork model str."""
+=======
+from studyFlax.tests.helpers.base import BaseTestCase
+
+
+class GroupworkModelStrTests(BaseTestCase):
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_group_project_str(self):
         project = GroupProject.objects.create(name="My Project", owner=self.user)
         self.assertEqual(str(project), "My Project")

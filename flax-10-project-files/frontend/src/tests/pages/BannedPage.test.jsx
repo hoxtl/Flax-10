@@ -16,7 +16,7 @@ vi.mock("framer-motion", () => ({
   ),
 }));
 
-vi.mock("../../pages/banned/BannedPage.module.css", () => ({
+vi.mock("../../pages/Banned/BannedPage.module.css", () => ({
   default: {
     page: "page",
     icon: "icon",
@@ -27,7 +27,7 @@ vi.mock("../../pages/banned/BannedPage.module.css", () => ({
   },
 }));
 
-import BannedPage from "../../pages/banned/BannedPage";
+import BannedPage from "../../pages/Banned/BannedPage";
 
 beforeEach(() => {
   localStorage.clear();

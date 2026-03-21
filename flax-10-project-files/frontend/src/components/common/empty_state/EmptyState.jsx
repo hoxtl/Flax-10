@@ -5,7 +5,10 @@
 import styles from "./EmptyState.module.css";
 
 /** Empty state with an icon, title, description, and optional action. */
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/common/empty_state/EmptyState.jsx
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/common/EmptyState/EmptyState.jsx
 export default function EmptyState({ icon = "🔍", title, description, action }) {
   return (
     <div className={styles.wrap}>

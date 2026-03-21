@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import Card from "../../../../components/common/card/Card";
+=======
+import Card from "../../../../components/common/Card/Card";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from "./ProfileWidgets.module.css";
 
 function PersonaHeader({ label, emoji, peakLabel }) {

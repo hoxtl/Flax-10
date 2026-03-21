@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 """
 View for calendar event map data.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,6 +17,10 @@ def _day_window(now):
     end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
     return start, end
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _map_events_queryset(user, now, start_time, end_time):
     return CalendarEvent.objects.filter(
         user=user,
@@ -29,6 +36,10 @@ def _map_events_queryset(user, now, start_time, end_time):
         'start_time', 'end_time', 'priority'
     ).order_by('start_time')
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _serialise_map_event(event):
     return {
         'id': event.id,
@@ -41,6 +52,7 @@ def _serialise_map_event(event):
         'priority': event.priority,
     }
 
+<<<<<<< HEAD
 def _serialise_map_events(events):
     return [_serialise_map_event(event) for event in events]
 
@@ -48,6 +60,19 @@ def _serialise_map_events(events):
 @permission_classes([IsAuthenticated])
 def calendar_events_map_view(request):
     """Retrieve calendar events with a valid location to display on the map for that day."""
+=======
+
+def _serialise_map_events(events):
+    return [_serialise_map_event(event) for event in events]
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def calendar_events_map_view(request):
+    """
+    Retrieve calendar events with a valid location to display on the map for that day.
+    """
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     now = timezone.now()
     start_time, end_time = _day_window(now)
     events = _map_events_queryset(request.user, now, start_time, end_time)

@@ -7,7 +7,10 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 

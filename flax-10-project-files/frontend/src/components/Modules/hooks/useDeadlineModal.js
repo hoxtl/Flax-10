@@ -1,7 +1,10 @@
 /*
  * Hook for managing deadline modal state and CRUD operations.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState, useEffect } from 'react';
 import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../../../api/deadlineApi';
 

@@ -58,6 +58,7 @@
 
 /* === Timer UI enhancement overrides === */
 
+<<<<<<< HEAD
 .fullFocusInlineBtn {
     width: 100%;
     min-height: 48px;
@@ -94,6 +95,30 @@
         color-mix(in srgb, var(--surface-card) 72%, var(--color-bg) 28%)
     ) !important;
     border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 34%, var(--border) 66%) !important;
+=======
+.timerModeRow {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -0.05rem;
+}
+
+.fullFocusInlineBtn {
+    border: 1px solid color-mix(in srgb, var(--focus-accent) 30%, transparent);
+    background: color-mix(in srgb, var(--focus-accent) 12%, transparent);
+    color: color-mix(in srgb, var(--focus-accent) 78%, #000);
+    border-radius: 999px;
+    padding: 0.32rem 0.78rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+}
+
+.fullFocusInlineBtn:hover {
+    background: color-mix(in srgb, var(--focus-accent) 18%, transparent);
+    transform: translateY(-1px);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .focusPageSkeletonCanvas {

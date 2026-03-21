@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import Badge from "../../../../components/common/badge/Badge";
+=======
+import Badge from "../../../../components/common/Badge/Badge";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
 import badgeStyles from "./ProfileBadgesModules.module.css";

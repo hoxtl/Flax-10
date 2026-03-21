@@ -37,7 +37,11 @@ describe('DeadlinesWidget (Homepage)', () => {
   it('renders empty state when no deadlines', () => {
     renderWidget();
     expect(screen.getByText(/No deadlines need attention/i)).toBeInTheDocument();
+<<<<<<< HEAD
     expect(screen.getByRole('link', { name: /go to my modules/i })).toBeInTheDocument();
+=======
+    expect(screen.queryByRole('link', { name: /view my modules/i })).not.toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 
   it('renders deadlines when provided', () => {

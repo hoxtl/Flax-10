@@ -4,11 +4,24 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { fetchSocieties } from '../../api/societyApi';
+<<<<<<< HEAD
 import { useClickOutside } from '../common/hooks/useClickOutside';
 import { ROLE_OPTIONS, YEAR_OPTIONS, allCourses } from './userSearchShared';
 import { fetchUserResults, filterCourses, filterObj, handleErr, toggleArr } from './userSearchUtils';
 
 export { useClickOutside };
+=======
+import { ROLE_OPTIONS, YEAR_OPTIONS, allCourses } from './userSearchShared';
+import { fetchUserResults, filterCourses, filterObj, handleErr, toggleArr } from './userSearchUtils';
+
+export function useClickOutside(ref, onOutside) {
+    useEffect(() => {
+        const handler = (event) => ref.current && !ref.current.contains(event.target) && onOutside();
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [ref, onOutside]);
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useSearchInit(skip) {
     const [allSocieties, setAllSocieties] = useState([]);

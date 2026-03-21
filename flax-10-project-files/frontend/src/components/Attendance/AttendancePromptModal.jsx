@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Attendance prompt modal — KCL branding, progress ring, and animated glow border.
  */
 
@@ -52,6 +53,15 @@ function RingLabel({ pct, color, updating }) {
       <span className={styles.ringSub}>attended</span>
     </div>
   );
+=======
+ * Attendance prompt modal UI.
+ */
+
+import ConfirmModal from "../common/ConfirmModal/ConfirmModal";
+
+export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
+  return <ConfirmModal title="Did you attend?" message={event.title} onConfirm={() => onAnswer(true)} onCancel={onDismiss} onAlternate={() => onAnswer(false)} confirmText="Yes" alternateText="No" cancelText="Dismiss" centerText />;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function AttendanceRing({ pct, updating }) {

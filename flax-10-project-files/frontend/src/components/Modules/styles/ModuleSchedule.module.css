@@ -55,11 +55,14 @@
     overflow-wrap: anywhere;
 }
 
+<<<<<<< HEAD
 .scheduleItemBody {
     min-width: 0;
     flex: 1;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .scheduleValueInlineWrap {
     min-width: 0;
 }
@@ -71,7 +74,10 @@
     min-width: 0;
     width: 100%;
     white-space: nowrap;
+<<<<<<< HEAD
     overflow: hidden;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .scheduleInlinePrimary,
@@ -90,6 +96,7 @@
     white-space: nowrap;
 }
 
+<<<<<<< HEAD
 .scheduleLocationLink {
     color: var(--text);
     font-weight: 600;
@@ -110,6 +117,8 @@
     color: var(--muted);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .recurringBadge {
     margin-top: 0.75rem;
     display: flex;

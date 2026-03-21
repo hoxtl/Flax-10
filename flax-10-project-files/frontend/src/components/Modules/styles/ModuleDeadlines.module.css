@@ -52,12 +52,22 @@
 }
 
 .deadlinesType {
+<<<<<<< HEAD
     --chip-padding: 0.1rem 0.46rem;
     --chip-font-size: 0.66rem;
     --chip-font-weight: 700;
     white-space: nowrap;
     text-transform: none;
     letter-spacing: 0.02em;
+=======
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--primary) 18%, var(--panel));
+    color: var(--flax-brown-strong);
+    padding: 0.12rem 0.48rem;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .deadlineTitle {
@@ -76,12 +86,15 @@
     white-space: nowrap;
 }
 
+<<<<<<< HEAD
 .overdue {
     color: var(--danger);
     background: color-mix(in srgb, var(--danger-bg) 88%, #fff 12%);
     border-color: color-mix(in srgb, var(--danger) 26%, transparent);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .due-soon {
     color: var(--danger);
     background: var(--danger-bg);

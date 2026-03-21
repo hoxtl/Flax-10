@@ -1,9 +1,7 @@
 """
 Model for student societies with ratification status and category metadata.
 """
-
 from django.db import models
-
 
 RATIFICATION_STATUS = [
     ('none', 'Not Requested'),
@@ -18,7 +16,6 @@ VALID_CATEGORIES = [
 ]
 
 class Society(models.Model):
-    """Student society managed within StudyFlax."""
     name = models.CharField(max_length=200)
     bio = models.CharField(max_length=500, blank=True, default="")
     about = models.TextField(blank=True, default="")
@@ -27,11 +24,9 @@ class Society(models.Model):
     is_ratified = models.BooleanField(default=False)
     ratification_status = models.CharField(max_length=20, choices=RATIFICATION_STATUS, default='none')
     admin_emails = models.TextField(blank=True, default="")
-    location = models.CharField(max_length=255, blank=True, default="")
     date_created = models.DateField(auto_now_add=True)
 
     class Meta:
-        """Metadata for society."""
         verbose_name_plural = "societies"
 
     def __str__(self):

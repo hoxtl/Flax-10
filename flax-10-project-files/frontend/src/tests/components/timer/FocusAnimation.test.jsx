@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import FocusAnimation from '../../../components/timer/FocusAnimation';
 
 vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
@@ -7,6 +8,15 @@ vi.mock('../../../pages/timer/TimerPage.module.css', () => ({
 }));
 
 vi.mock('../../../components/timer/TreeAnimation.module.css', () => ({
+=======
+import FocusAnimation from '../../../components/Timer/FocusAnimation';
+
+vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({
+    default: new Proxy({}, { get: (_, key) => key }),
+}));
+
+vi.mock('../../../components/Timer/TreeAnimation.module.css', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: new Proxy({}, { get: (_, key) => key }),
 }));
 

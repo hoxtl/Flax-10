@@ -1,0 +1,148 @@
+.reminder-field {
+    position: relative;
+}
+
+.reminder-dropdown-btn {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.reminder-dropdown-btn:hover {
+    border-color: var(--primary);
+    background: var(--hover);
+}
+
+.reminder-dropdown-btn.open {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.08);
+}
+
+.reminder-dropdown-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    z-index: 200;
+    padding: 6px;
+    min-width: 200px;
+}
+
+/* ── Status bar ──────────────────────────────────────────── */
+.reminder-status {
+    padding: 6px 10px 8px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.reminder-status.granted {
+    color: #22c55e;
+}
+
+.reminder-status.denied {
+    color: #ef4444;
+}
+
+.reminder-enable-btn {
+    display: block;
+    width: calc(100% - 12px);
+    margin: 4px 6px 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    transition: background 0.15s;
+}
+
+.reminder-enable-btn:hover {
+    background: var(--hover);
+}
+
+/* ── Options list ────────────────────────────────────────── */
+.reminder-options-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.reminder-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+    user-select: none;
+}
+
+.reminder-option input[type="checkbox"] {
+    width: auto;
+    flex-shrink: 0;
+}
+
+.reminder-option span {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+    flex: 1;
+}
+
+.reminder-option:hover {
+    background: var(--hover);
+}
+
+.reminder-option.active {
+    background: var(--hover);
+}
+
+
+/* ── Custom reminder row ─────────────────────────────────── */
+.custom-reminder {
+    display: flex;
+    gap: 6px;
+    padding: 6px 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+}
+
+.custom-reminder input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+}
+
+.custom-reminder input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+

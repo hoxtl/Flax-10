@@ -1,7 +1,10 @@
 /*
  * Hook for handling module disenrolment with notifications.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useNotifications } from '../../../context/NotificationContext';
 import { disenrolByModuleId } from '../../../api/moduleApi';
 import { createNotify } from '../utils/notifyHelper';
@@ -12,7 +15,11 @@ function handleSuccess(onSuccess, notify) {
 }
 
 function disenrollFromModule(moduleId, onSuccess, notify) {
+<<<<<<< HEAD
     return disenrolByModuleId(moduleId)
+=======
+    disenrolByModuleId(moduleId)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         .then(() => handleSuccess(onSuccess, notify))
         .catch(err => notify(err.message, 'error'));
 }

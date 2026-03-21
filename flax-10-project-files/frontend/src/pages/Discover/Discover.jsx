@@ -3,8 +3,13 @@
  */
 
 import styles from "./Discover.module.css";
+<<<<<<< HEAD
 import ErrorBoundary from "../../components/common/error_boundary/ErrorBoundary";
 import AppPage from "../../components/common/app_page/AppPage";
+=======
+import ErrorBoundary from "../../components/common/ErrorBoundary/ErrorBoundary";
+import AppPage from "../../components/common/AppPage/AppPage";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { DiscoverSkeleton, DiscoverToolbar, UsersGrid } from "./DiscoverComponents";
 import { useDiscoverSearch } from "./discoverHooks";
 

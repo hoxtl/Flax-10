@@ -60,5 +60,8 @@
 .backBtn:active {
   transform: scale(0.97);
 }
+<<<<<<< HEAD
 
 .backBtnWrapper { display: flex; justify-content: center; }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

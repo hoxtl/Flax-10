@@ -1,7 +1,10 @@
 /*
  * useSocietyBrowseFilters owns search, filter, and sort state for society browsing.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useState } from "react";
 
 const DEFAULT_FILTERS = { ratified: "all", category: [] };

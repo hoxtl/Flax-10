@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * Homepage intelligence display helpers.
  */
@@ -9,6 +10,12 @@ export function getGreeting(name, isTeacher = false) {
   const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
   const displayName = isTeacher && name ? `Dr. ${name}` : name;
   return `Good ${timeOfDay}${displayName ? `, ${displayName}` : ""}.`;
+=======
+export function getGreeting(name) {
+  const h = new Date().getHours();
+  const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
+  return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 export function getTodayLabel() {
@@ -76,6 +83,7 @@ export function formatEventTime(dateLike) {
 
 export function getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDelays, isSevereDisruption }) {
   if (!upcomingEvent?.start_time || !Array.isArray(tflDelays) || tflDelays.length === 0) return null;
+<<<<<<< HEAD
   const relevantDelays = getRelevantDelays(upcomingEvent, tflDelays);
   if (!relevantDelays.length) return null;
   if (!isUpcomingSoon(upcomingEvent, now)) return null;
@@ -111,11 +119,34 @@ function buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption) {
     label: "Travel",
     text: `${primaryDelay?.lineName || "TfL"} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${upcomingEvent.title || "your next class"}.`,
     meta: `${primaryDelay?.severityDescription || "Delays"}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
+=======
+
+  const startMs = new Date(upcomingEvent.start_time).getTime();
+  const minsUntilStart = Math.round((startMs - now.getTime()) / 60000);
+  if (minsUntilStart <= 0 || minsUntilStart > 120) return null;
+
+  const relevantDelays = getRelevantDelays(upcomingEvent, tflDelays);
+  if (!relevantDelays.length) return null;
+
+  const primaryDelay = relevantDelays[0];
+  const lineName = primaryDelay?.lineName || "TfL";
+  const severity = primaryDelay?.severityDescription || "Delays";
+  const severe = relevantDelays.some((delay) => isSevereDisruption(delay?.severityDescription));
+  const eventTime = formatEventTime(upcomingEvent.start_time);
+  const eventTitle = upcomingEvent.title || "your next class";
+  const locationMeta = upcomingEvent.location ? ` · ${upcomingEvent.location}` : "";
+
+  return {
+    label: "Travel",
+    text: `${lineName} line ${severe ? "disruption" : "delays"} — you may be late for your ${eventTime ? `${eventTime} ` : ""}${eventTitle}.`,
+    meta: `${severity}${locationMeta}`,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     tone: "warning",
     iconKey: "Train",
   };
 }
 
+<<<<<<< HEAD
 function buildCurrentContext(currentEvent, sleepWindow) {
   const overlapsSleep = doesEventOverlapSleepWindow(
     sleepWindow?.sleepTime || "23:00",
@@ -154,6 +185,41 @@ function buildUpcomingContext(upcomingEvent) {
 }
 
 function buildIdleContext() {
+=======
+export function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now, getRelevantDelays, isSevereDisruption }) {
+  if (currentEvent) {
+    return {
+      label: "On now",
+      text: `${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
+      meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
+      tone: "neutral",
+      iconKey: "Clock3",
+    };
+  }
+  if (overlaps?.length) {
+    const first = overlaps[0]?.a?.start_time;
+    return {
+      label: "Attention",
+      text: "You have an overlap in today’s plan.",
+      meta: first ? `Conflict at ${formatEventTime(first)}` : null,
+      tone: "warning",
+      iconKey: "AlertTriangle",
+    };
+  }
+  const travelContext = getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDelays, isSevereDisruption });
+  if (travelContext) {
+    return travelContext;
+  }
+  if (upcomingEvent) {
+    return {
+      label: "Up next",
+      text: `${upcomingEvent.title}${upcomingEvent.location ? ` · ${upcomingEvent.location}` : ""}`,
+      meta: upcomingEvent.start_time ? `Starts ${formatEventTime(upcomingEvent.start_time)}` : null,
+      tone: "neutral",
+      iconKey: "Clock3",
+    };
+  }
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return {
     label: "Right now",
     text: "You have breathing room before the next thing starts.",

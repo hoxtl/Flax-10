@@ -1,13 +1,20 @@
+<<<<<<< HEAD
 """
 Tests for timetable parsing.
 """
+=======
+"""Tests for timetable ICS parsing and URL resolution helpers."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timezone as dt_timezone
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 SAMPLE_ICS = """BEGIN:VCALENDAR
@@ -32,7 +39,11 @@ END:VEVENT
 END:VCALENDAR"""
 
 class TimetableParsingTest(TestCase):
+<<<<<<< HEAD
     """Tests timetable parsing."""
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.user = User.objects.create_user(
             username="ttparser", email="ttp@example.com", password="pass"

@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import ByTypeAttendanceChart from "../../../../attendance/components/ByTypeAttendanceChart";
 import OverallAttendanceChart from "../../../../attendance/components/OverallAttendanceChart";
+=======
+import ByTypeAttendanceChart from "../../../../Attendance/components/ByTypeAttendanceChart";
+import OverallAttendanceChart from "../../../../Attendance/components/OverallAttendanceChart";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import widgetStyles from "../ProfileWidgets.module.css";
 import attendanceStyles from "../ProfileAttendance.module.css";
 

@@ -2,11 +2,17 @@
  * recurrenceUtils - Expands recurring calendar events into individual occurrences.
  * Handles daily, weekly, biweekly, monthly, and yearly recurrence patterns.
  */
+<<<<<<< HEAD
 
 import { addDays, addWeeks, addMonths, getStartOfMonth, getEndOfMonth } from './dateUtils';
 
 /** Expands all recurring events within the given view date's month. */
 
+=======
+import { addDays, addWeeks, addMonths, getStartOfMonth, getEndOfMonth } from './dateUtils';
+
+/** Expands all recurring events within the given view date's month. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function expandRecurringEvents(events, viewDate) {
     const { viewStart, viewEnd } = getViewRange(viewDate);
     return events.flatMap(e => expandEvent(e, viewStart, viewEnd));
@@ -32,10 +38,13 @@ function expandEvent(event, viewStart, viewEnd) {
     return generateOccurrences(event, recurrence, viewStart, viewEnd);
 }
 
+<<<<<<< HEAD
 function isSupportedRecurrence(recurrence) {
     return ['daily', 'weekly', 'biweekly', 'monthly', 'yearly'].includes(recurrence);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 function shouldIncludeOccurrence(start, endDate, exceptions) {
     if (endDate && start > endDate) return false;
     const dateStr = start.toISOString().slice(0, 10);

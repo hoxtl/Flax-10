@@ -18,7 +18,11 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
+<<<<<<< HEAD
 vi.mock("../../../components/settings/SettingsUI", () => ({
+=======
+vi.mock("../../../components/Settings/SettingsUI", () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   FormInput: ({ label, name, value, onChange, type = "text", required }) => (
     <div>
       <label htmlFor={name}>{label}</label>
@@ -63,10 +67,17 @@ vi.mock("../../../components/settings/SettingsUI", () => ({
   ),
 }));
 
+<<<<<<< HEAD
 vi.mock("../../../pages/settings/Settings.module.css", () => ({ default: {} }));
 
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import AccountForm from "../../../components/settings/AccountForm";
+=======
+vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
+
+import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import AccountForm from "../../../components/Settings/AccountForm";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const baseUser = {
   first_name: "Alice",

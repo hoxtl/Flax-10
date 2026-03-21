@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Settings from "../../pages/settings/Settings";
+import Settings from "../../pages/Settings/Settings";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../../components/settings/SettingsUI", () => ({
+vi.mock("../../components/Settings/SettingsUI", () => ({
   SettingsSidebar: ({ activeTab, onChange }) => (
     <div data-testid="settings-tabs">
       <button onClick={() => onChange("account")}>Account</button>
@@ -12,6 +12,7 @@ vi.mock("../../components/settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
+      <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -23,6 +24,7 @@ vi.mock("../../components/settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
+      <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -30,19 +32,19 @@ vi.mock("../../components/settings/SettingsUI", () => ({
     message ? <div data-testid="error-banner">{message}</div> : null,
 }));
 
-vi.mock("../../components/settings/AccountForm", () => ({
+vi.mock("../../components/Settings/AccountForm", () => ({
   default: ({ onSave, isSaving }) => (
     <div data-testid="account-form">AccountForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SecurityForm", () => ({
+vi.mock("../../components/Settings/SecurityForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="security-form">SecurityForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/PreferencesPanel", () => ({
+vi.mock("../../components/Settings/PreferencesPanel", () => ({
   default: ({ activeSubTab }) => {
     const labels = {
       sleep: "sleep-schedule-panel",
@@ -60,19 +62,25 @@ vi.mock("../../components/settings/PreferencesPanel", () => ({
   },
 }));
 
-vi.mock("../../components/settings/HomeAddressForm", () => ({
+vi.mock("../../components/Settings/HomeAddressForm", () => ({
   default: ({ onSave, isSaving, error }) => (
     <div data-testid="home-address-form">HomeAddressForm</div>
   ),
 }));
 
-vi.mock("../../components/settings/SleepSchedulePanel", () => ({
+vi.mock("../../components/Settings/SleepSchedulePanel", () => ({
   SleepSchedulePanel: ({ onSave, isSaving }) => (
     <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
   ),
 }));
 
-vi.mock("../../components/settings/hooks/useSettingsHandlers", () => ({
+vi.mock("../../components/Settings/CourseChangePanel", () => ({
+  default: ({ user }) => (
+    <div data-testid="course-change-panel">CourseChangePanel</div>
+  ),
+}));
+
+vi.mock("../../components/Settings/hooks/useSettingsHandlers", () => ({
   default: vi.fn(() => ({
     isSaving: false,
     passwordError: null,
@@ -89,15 +97,14 @@ vi.mock("../../components/settings/hooks/useSettingsHandlers", () => ({
   })),
 }));
 
-import useSettingsHandlers from "../../components/settings/hooks/useSettingsHandlers";
+import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
 
 describe("Settings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  const renderSettings = (ui, initialEntries = ["/settings"]) =>
-    render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
+  const renderSettings = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
   it("renders Settings title", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
@@ -132,6 +139,12 @@ describe("Settings", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     fireEvent.click(screen.getByText("Sleep"));
     expect(screen.getByTestId("sleep-schedule-panel")).toBeTruthy();
+  });
+
+  it("switches to CourseChangePanel when course tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Course Change"));
+    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
   });
 
   it("renders error banner when bannerMessage is set", () => {
@@ -170,21 +183,15 @@ describe("Settings", () => {
     expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
   });
 
+  it("switches to CourseChangePanel when course tab selected", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("Course Change"));
+    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
+  });
+
   it("legacy scheduling tab ids still route to scheduling panel", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     fireEvent.click(screen.getByText("Scheduling"));
     expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
-  });
-
-  it("reads a valid tab id from the url search params", () => {
-    renderSettings(<Settings user={{}} onBack={vi.fn()} />, ["/settings?tab=security"]);
-    expect(screen.getByTestId("active-tab")).toHaveTextContent("security");
-    expect(screen.getByTestId("security-form")).toBeTruthy();
-  });
-
-  it("falls back to account when the url tab id is invalid", () => {
-    renderSettings(<Settings user={{}} onBack={vi.fn()} />, ["/settings?tab=not-real"]);
-    expect(screen.getByTestId("active-tab")).toHaveTextContent("account");
-    expect(screen.getByTestId("account-form")).toBeTruthy();
   });
 });

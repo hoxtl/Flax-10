@@ -24,6 +24,7 @@ vi.mock('../../../components/calendar/week_view/WeekView', () => ({
     WeekView: ({ readOnly }) => <div data-testid="week-view">{`Week View ${String(readOnly)}`}</div>,
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/calendar/month_view/SwipeMonthView', () => ({
     SwipeMonthView: ({ readOnly }) => <div data-testid="month-view">{`Month View ${String(readOnly)}`}</div>,
 }));
@@ -34,6 +35,10 @@ vi.mock('../../../components/calendar/list_view/ListView', () => ({
 
 vi.mock('../../../components/calendar/table_view/TableView', () => ({
     TableView: ({ readOnly }) => <div data-testid="table-view">{`Table View ${String(readOnly)}`}</div>,
+=======
+vi.mock('../../../components/Calendar/MonthView/SwipeMonthView', () => ({
+    SwipeMonthView: () => <div data-testid="month-view">Month View</div>,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }));
 
 import { useCalendar } from '../../../context/CalendarContext';
@@ -64,6 +69,7 @@ describe('Calendar', () => {
         expect(screen.getByText('Day View true')).toBeInTheDocument();
     });
 
+<<<<<<< HEAD
     it('renders the list display mode over grid modes', () => {
         useCalendar.mockReturnValue({ viewMode: 'month', displayMode: 'list', readOnly: true });
         render(<Calendar />);
@@ -81,6 +87,9 @@ describe('Calendar', () => {
         render(<Calendar />);
         expect(useCalendarEvents).toHaveBeenCalled();
     });
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
     it('renders nothing for unknown viewMode', () => {
         useCalendar.mockReturnValue({ viewMode: 'unknown', displayMode: 'grid', readOnly: false });

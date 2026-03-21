@@ -166,7 +166,12 @@ describe('UserListModal', () => {
     const photoUsers = [
       { id: 99, username: 'ricky.curtis', first_name: 'Ricky', last_name: 'Curtis', is_sharing: true, profile_photo_url: 'https://example.com/avatar.jpg' },
     ];
+<<<<<<< HEAD
     render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
     expect(document.body.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
+=======
+    const { container } = render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
+    expect(container.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   });
 });

@@ -1,8 +1,7 @@
 """
 Aggregate fixture data combining users, events, modules, deadlines, and tasks.
 """
-
-from ..users.user_fixtures import (
+from .user_fixtures import (
     category_fixtures,
     tag_fixtures,
     recurrence_fixtures,
@@ -10,7 +9,7 @@ from ..users.user_fixtures import (
     course_to_module_prefixes,
     module_prefix_to_department,
 )
-from ..calendar.event_fixtures import (
+from .event_fixtures import (
     event_title_fixtures,
     breakfast_fixtures,
     lunch_fixtures,
@@ -19,8 +18,8 @@ from ..calendar.event_fixtures import (
     location_fixtures,
     lecture_theatre_fixtures,
 )
-from ..catalogue.module_fixtures import module_fixtures
-from ..catalogue.deadline_fixtures import deadline_fixtures, module_deadline_fixtures
+from .module_fixtures import module_fixtures
+from .deadline_fixtures import deadline_fixtures, module_deadline_fixtures
 
 
 def get_course_prefixes(course):
@@ -176,66 +175,6 @@ task_list_fixtures = (
     ("Home & Admin", "personal", "🏠"),
 )
 
-# Task lists for teacher users — teaching-specific lists use "Teaching - " prefix
-# so the frontend groups them under MY TEACHING. Life lists mirror student defaults.
-teacher_task_list_fixtures = (
-    ("Personal",                   "personal", "🟡"),
-    ("Health",                     "personal", "🏃"),
-    ("Finance",                    "personal", "💰"),
-    ("Home & Admin",               "personal", "🏠"),
-    ("Teaching - University Admin","personal", "🏛️"),
-    ("Teaching - Marking & Grading","personal","📝"),
-    ("Teaching - Research",        "personal", "🔬"),
-)
-
-# Format: (title, description, priority, estimated_blocks, days_from_now, list_name, completed)
-# list_name must match one of teacher_task_list_fixtures
-teacher_personal_task_fixtures = (
-    # University Admin — mix of done and pending
-    ("Go to HR meeting",               "Attend the HR staff meeting — check calendar invite for room and agenda.",          "medium", 1,  1,  "Teaching - University Admin", False),
-    ("Submit module enrolment data",   "Export and submit student enrolment numbers to the registry.",                      "high",   2,  2,  "Teaching - University Admin", False),
-    ("Update module KEATS page",       "Upload this week's lecture slides and any new resources to KEATS.",                 "medium", 1,  2,  "Teaching - University Admin", False),
-    ("Reply to student emails",        "Work through the student email backlog — flag anything that needs escalation.",     "medium", 1,  0,  "Teaching - University Admin", False),
-    ("Book room for office hours",     "Reserve a meeting room for next week's office hours via the room booking portal.",  "low",    1,  3,  "Teaching - University Admin", False),
-    ("Complete staff appraisal form",  "Fill in the annual appraisal form and send to your line manager.",                  "high",   2,  7,  "Teaching - University Admin", False),
-    ("Respond to exam board email",    "Review and respond to the exam board secretary's query.",                           "high",   1,  1,  "Teaching - University Admin", False),
-    ("Send welcome email to students", "Email the module welcome message with KEATS link and office hours schedule.",       "medium", 1,  0,  "Teaching - University Admin", True),
-    ("Submit timetable preferences",   "Fill in the scheduling form for next semester's timetable.",                        "low",    1, -8,  "Teaching - University Admin", True),
-    ("Attend staff induction day",     "Mandatory staff induction — confirm attendance and note room number.",              "high",   1, -3,  "Teaching - University Admin", True),
-
-    # Marking & Grading — some already done
-    ("Grade coursework batch 1",       "Mark the first batch of submitted coursework. Record grades in KEATS.",             "high",   4,  3,  "Teaching - Marking & Grading", False),
-    ("Return feedback to students",    "Upload annotated feedback to KEATS and notify students via announcement.",          "high",   2,  5,  "Teaching - Marking & Grading", False),
-    ("Grade end-of-term exams",        "Complete marking for the exam scripts. Cross-check borderline cases.",              "high",   6,  8,  "Teaching - Marking & Grading", False),
-    ("Second mark spot-check",         "Do a second-mark review on a random 10% sample for moderation purposes.",          "medium", 2,  10, "Teaching - Marking & Grading", False),
-    ("Update gradebook",               "Enter all finalised grades into the official gradebook before the deadline.",       "high",   1,  6,  "Teaching - Marking & Grading", False),
-    ("Mark mid-term quiz",             "Grade the KEATS auto-marked quiz and review any flagged anomalies.",                "medium", 1, -4,  "Teaching - Marking & Grading", True),
-    ("Return essays from last term",   "Upload all marked essays to KEATS with individual feedback comments.",              "high",   3, -7,  "Teaching - Marking & Grading", True),
-    ("Moderate a colleague's marking", "Spot-check 10 scripts for the moderation exercise and complete the report.",       "medium", 2, -2,  "Teaching - Marking & Grading", True),
-
-    # Research — a few completed milestones
-    ("Write literature review section","Draft the literature review section for the current research paper.",               "high",   4,  5,  "Teaching - Research", False),
-    ("Submit conference abstract",     "Finalise and submit the abstract to the upcoming conference by the deadline.",      "high",   2,  4,  "Teaching - Research", False),
-    ("Review journal submission",      "Complete peer review for the assigned journal article.",                            "medium", 3,  9,  "Teaching - Research", False),
-    ("Update research project log",    "Record this week's progress notes and update the shared project tracker.",         "low",    1,  7,  "Teaching - Research", False),
-    ("Apply for research grant",       "Compile supporting documents and submit the grant application before closing date.","high",   4,  14, "Teaching - Research", False),
-    ("Submit ethics approval form",    "Complete and submit the ethics form for the new data collection study.",            "high",   2, -6,  "Teaching - Research", True),
-    ("Present at departmental seminar","Deliver the 20-minute research update to the department.",                          "medium", 2, -10, "Teaching - Research", True),
-
-    # Life tasks
-    ("Morning run",                    "30 min — don't skip it this week.",                                                 "low",    1,  2,  "Health",      False),
-    ("GP appointment",                 "Nothing urgent — just a general check-up.",                                        "low",    1,  5,  "Health",      False),
-    ("Book dentist appointment",       "Overdue — call and book for sometime next month.",                                  "low",    1,  8,  "Health",      False),
-    ("Track spending this week",       "Log all expenses and check you're on budget.",                                     "low",    1,  3,  "Finance",     False),
-    ("Renew railcard",                 "Check expiry date and renew online before it runs out.",                           "low",    1,  10, "Finance",     False),
-    ("Tidy desk and study space",      "A clear space = a clear mind. 15 mins max.",                                       "low",    1,  6,  "Home & Admin",False),
-    ("Plan next week's meals",         "Decide on 3-4 dinners and write a shopping list.",                                 "low",    1,  7,  "Home & Admin",False),
-    ("Weekly review",                  "Go through what you completed and what carried over from last week.",              "medium", 1,  7,  "Personal",    False),
-    ("Plan the week ahead",            "Look at the week's deadlines and block out focused work time.",                    "medium", 1,  0,  "Personal",    False),
-    ("Gym session",                    "Upper body + core.",                                                               "low",    1, -3,  "Health",      True),
-    ("Pay council tax",                "Set up standing order for the new academic year.",                                  "medium", 1, -5,  "Finance",     True),
-)
-
 # Format: (title, description, priority, estimated_blocks, days_from_now, list_name)
 # list_name must match one of the names in task_list_fixtures above
 personal_task_fixtures = (
@@ -317,7 +256,5 @@ __all__ = [
     "MODULE_PILL_COLORS",
     "task_list_fixtures",
     "personal_task_fixtures",
-    "teacher_task_list_fixtures",
-    "teacher_personal_task_fixtures",
     "reading_fixtures",
 ]

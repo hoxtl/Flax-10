@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 Tests for groupwork membership views.
 """
@@ -7,13 +8,21 @@ from unittest.mock import patch
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIRequestFactory
+=======
+from rest_framework import status
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
     GroupProject,
 )
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_case_support import BaseTestCase
 from studyFlax.tests.helpers.test_model_builders import make_user
+=======
+from studyFlax.tests.helpers.base import BaseTestCase
+from studyFlax.tests.helpers.factories import make_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 
 def _make_project(owner, name="Test Project", course_code="CS101"):
@@ -23,7 +32,10 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
 
 
 class GroupProjectMembersTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests group project members."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -64,7 +76,10 @@ class GroupProjectMembersTests(BaseTestCase):
 
 
 class GroupProjectMemberDetailTests(BaseTestCase):
+<<<<<<< HEAD
     """Tests group project member detail."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         super().setUp()
         self.project = _make_project(self.user)
@@ -92,6 +107,7 @@ class GroupProjectMemberDetailTests(BaseTestCase):
         url = f"/api/group-work/projects/{self.project.id}/members/{owner_membership.id}/"
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+<<<<<<< HEAD
 
 
 class GroupworkViewServiceCoverageTest(TestCase):
@@ -121,3 +137,5 @@ class GroupworkViewServiceCoverageTest(TestCase):
         request = APIRequestFactory().get('/')
         result = serialised_project(project, request)
         self.assertEqual(result['name'], 'Svc Project')
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

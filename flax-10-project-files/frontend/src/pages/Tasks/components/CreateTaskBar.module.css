@@ -172,6 +172,7 @@
   font-weight: 600;
 }
 
+<<<<<<< HEAD
 .customDurationInput {
   width: 150px;
   flex-shrink: 0;
@@ -215,6 +216,8 @@
   box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.12);
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 .pageCountInput {
   width: 70px;
   padding: 4px 8px;

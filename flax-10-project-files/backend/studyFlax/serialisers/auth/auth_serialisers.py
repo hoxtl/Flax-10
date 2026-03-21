@@ -13,9 +13,7 @@ from studyFlax.serialisers.common import (
     is_user_sharing_with,
 )
 
-
 class RegistrationUserSerialiser(serializers.Serializer):
-    """Serialiser for registration user."""
     username = serializers.CharField(max_length=150)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
@@ -39,7 +37,6 @@ class RegistrationUserSerialiser(serializers.Serializer):
         return email_value
 
 class UserSerialiser(serializers.ModelSerializer):
-    """Serialiser for user."""
     name = serializers.SerializerMethodField()
     year = serializers.SerializerMethodField()
     major = serializers.SerializerMethodField()
@@ -55,7 +52,6 @@ class UserSerialiser(serializers.ModelSerializer):
     study_streak = serializers.SerializerMethodField(method_name='get_study_hours_this_week')
 
     class Meta:
-        """Metadata for user serialiser."""
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
@@ -72,37 +68,39 @@ class UserSerialiser(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
 
-    def _get_name(self, obj):
+    def get_name(self, obj):
         return format_teacher_name(obj)
 
-    def _get_settings_field(self, obj, field):
+    def get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)
         if not settings:
             return ''
         return getattr(settings, field, '') or ''
 
-    def _get_year(self, obj):
-        return self._get_settings_field(obj, 'year')
+    def get_year(self, obj):
+        return self.get_settings_field(obj, 'year')
 
-    def _get_major(self, obj):
-        return self._get_settings_field(obj, 'major')
+    def get_major(self, obj):
+        return self.get_settings_field(obj, 'major')
 
-    def _get_profile_photo_url(self, obj):
+    def get_profile_photo_url(self, obj):
         return build_profile_photo_url(obj.profile_photo, self.context.get('request'))
 
-    def _get_shared_by_count(self, obj):
+    def get_shared_by_count(self, obj):
+        # People who have shared their calendar with obj
         return obj.shared_with_me.count()
 
-    def _get_shared_with_count(self, obj):
+    def get_shared_with_count(self, obj):
+        # People obj has shared their calendar with
         return obj.sharing_with.count()
 
-    def _get_is_shared_with_me(self, obj):
+    def get_is_shared_with_me(self, obj):
         return is_shared_with_requester(obj, self.context.get('request'))
 
-    def _get_is_sharing(self, obj):
+    def get_is_sharing(self, obj):
         return is_user_sharing_with(obj, self.context.get('request'), allow_self=True)
 
-    def _get_modules(self, obj):
+    def get_modules(self, obj):
         settings = getattr(obj, 'settings', None)
         return getattr(settings, 'modules', []) if settings else []
 
@@ -111,24 +109,10 @@ class UserSerialiser(serializers.ModelSerializer):
             return None
         return 0
 
-    def _get_study_hours_this_week(self, obj):
+    def get_study_hours_this_week(self, obj):
         request = self.context.get('request')
         return self._get_study_stat(request, obj)
 
-
-UserSerialiser.get_name = UserSerialiser._get_name
-UserSerialiser.get_settings_field = UserSerialiser._get_settings_field
-UserSerialiser.get_year = UserSerialiser._get_year
-UserSerialiser.get_major = UserSerialiser._get_major
-UserSerialiser.get_profile_photo_url = UserSerialiser._get_profile_photo_url
-UserSerialiser.get_shared_by_count = UserSerialiser._get_shared_by_count
-UserSerialiser.get_shared_with_count = UserSerialiser._get_shared_with_count
-UserSerialiser.get_is_shared_with_me = UserSerialiser._get_is_shared_with_me
-UserSerialiser.get_is_sharing = UserSerialiser._get_is_sharing
-UserSerialiser.get_modules = UserSerialiser._get_modules
-UserSerialiser.get_study_hours_this_week = UserSerialiser._get_study_hours_this_week
-
 class LoggedUserSerialiser(serializers.Serializer):
-    """Serialiser for logged user."""
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)

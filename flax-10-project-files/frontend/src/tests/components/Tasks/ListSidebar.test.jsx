@@ -7,7 +7,11 @@ vi.mock('../../../pages/tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00', '#0000ff'],
 }));
 
+<<<<<<< HEAD
 vi.mock('../../../components/common/hold_confirm_modal/HoldConfirmModal', () => ({
+=======
+vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     default: ({ holdLabel = 'Hold to Delete', onConfirm, onCancel }) => (
         <div>
             <button type="button" onMouseDown={onConfirm}>
@@ -86,6 +90,7 @@ describe('ListSidebar', () => {
         expect(screen.getByText('Constitutional Law (LW4202)')).toBeTruthy();
     });
 
+<<<<<<< HEAD
     it('renders society lists in a dedicated societies section', () => {
         const lists = [
             { id: 12, name: 'Chess Society Admin', category: 'society', society_name: 'Chess Society' },
@@ -95,6 +100,8 @@ describe('ListSidebar', () => {
         expect(screen.getByText('Chess Society')).toBeTruthy();
     });
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     it('calls onNewList when "+ Add list" is clicked', () => {
         const onNewList = vi.fn();
         render(<ListSidebar {...defaultProps} onNewList={onNewList} />);

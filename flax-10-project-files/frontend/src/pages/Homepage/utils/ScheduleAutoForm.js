@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 /*
  * Auto-schedule form builder for Homepage deadline planning.
  */
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const MINUTES_BY_URGENCY = {
   overdue: 90,
   critical: 75,
@@ -23,17 +26,39 @@ function getUrgencyTier(dueDate) {
 
 export function buildScheduleAutoForm({ deadlines = [] } = {}) {
   if (!Array.isArray(deadlines) || deadlines.length === 0) return null;
+<<<<<<< HEAD
   const prefs = getDeadlinePreferences(deadlines);
   if (!prefs.length) return null;
   return {
     title: `Homepage auto schedule ${new Date().toLocaleDateString('en-GB')}`,
     // Allow the scheduler to adjust existing study blocks beyond the currently visible plan
     clear_existing: true,
+=======
+
+  const prefs = deadlines
+    .filter((d) => d && d.id != null && d.start_due_date)
+    .filter((d) => new Date(d.start_due_date).getTime() >= Date.now())
+    .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date))
+    .map((deadline) => {
+      const tier = getUrgencyTier(deadline.start_due_date) || 'upcoming';
+      return {
+        deadline_id: Number(deadline.id),
+        ideal_minutes_per_day: MINUTES_BY_URGENCY[tier] || 45,
+      };
+    });
+
+  if (!prefs.length) return null;
+
+  return {
+    title: `Homepage auto schedule ${new Date().toLocaleDateString('en-GB')}`,
+    clear_existing: false,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     deadline_preferences: prefs,
   };
 }
 
 export { getUrgencyTier };
+<<<<<<< HEAD
 
 function getDeadlinePreferences(deadlines) {
   return deadlines.filter(isSchedulableDeadline).sort(compareByDueDate).map(buildDeadlinePreference);
@@ -54,3 +79,5 @@ function buildDeadlinePreference(deadline) {
     ideal_minutes_per_day: MINUTES_BY_URGENCY[tier],
   };
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

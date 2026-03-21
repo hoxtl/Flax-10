@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 /**
  * Profile summary loading hook.
  */
+=======
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { fetchApi } from '../../../api/client';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 import { useEffect, useRef, useState } from "react";
 import { fetchApi } from "../../../api/client";
@@ -13,6 +18,7 @@ function useSummaryState() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   return { error, loading, setError, setLoading, setSummary, summary };
 }
 
@@ -32,4 +38,43 @@ export function useProfileSummary(userId) {
   useEffect(() => { loadProfileSummary(userId, summaryRef, state, true); }, [userId]);
   const refetch = () => loadProfileSummary(userId, summaryRef, state, false);
   return { summary: state.summary, loading: state.loading, error: state.error, refetch };
+=======
+  const summaryRef = useRef(null);
+
+  useEffect(() => {
+    summaryRef.current = summary;
+  }, [summary]);
+
+  const load = useCallback(({ showLoading = true } = {}) => {
+    const hasSummary = summaryRef.current !== null;
+    const shouldShowLoading = showLoading || !hasSummary;
+
+    if (shouldShowLoading) {
+      setLoading(true);
+    }
+
+    fetchProfileSummary(userId)
+      .then((nextSummary) => {
+        setSummary(nextSummary);
+        setError(null);
+      })
+      .catch((nextError) => {
+        setError(nextError);
+      })
+      .finally(() => {
+        if (shouldShowLoading) {
+          setLoading(false);
+        }
+      });
+  }, [userId]);
+
+  useEffect(() => { load({ showLoading: true }); }, [load]);
+
+  return {
+    summary,
+    loading,
+    error,
+    refetch: () => load({ showLoading: false }),
+  };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }

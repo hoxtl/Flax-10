@@ -1,9 +1,14 @@
 /*
  * Theme-selection controls used by settings preferences.
  */
+<<<<<<< HEAD
 
 import styles from "../../../pages/settings/Settings.module.css";
 import { THEME_GROUPS } from "../../../context/themeConstants";
+=======
+import styles from "../../../pages/Settings/Settings.module.css";
+import { THEME_GROUPS } from "../../../context/ThemeConstants";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const MODE_OPTIONS = [
   { id: "light", label: "Light" },
@@ -50,10 +55,16 @@ export function ThemeSelector({ value, onChange }) {
 }
 
 function ThemePreview({ type, data }) {
+<<<<<<< HEAD
   const previewVars = { '--tp-bg': data.bg, '--tp-border': data.border, '--tp-text': data.text };
   return (
     <div className={`${styles.themePreview} ${styles.themePreviewColored}`} style={previewVars}>
       <span className={`${styles.swatchTitle} ${styles.swatchTitleColored}`}>{type}</span>
+=======
+  return (
+    <div className={styles.themePreview} style={{ background: data.bg, borderColor: data.border }}>
+      <span className={styles.swatchTitle} style={{ color: data.text }}>{type}</span>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       <div className={styles.swatchGrid}>
         <div className={styles.swatch} style={{ background: data.primary }} />
         <div className={styles.swatch} style={{ background: data.highlight }} />

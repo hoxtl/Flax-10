@@ -4,6 +4,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getEvents } from "../../../api/eventApi";
+<<<<<<< HEAD
 import { getLastPromptShownAt, getSkippedIds, setLastPromptShownAt } from "../attendancePromptStorage";
 import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
 
@@ -16,6 +17,16 @@ async function loadCandidateEvent() {
   const candidate = findCandidateEvent(events, getSkippedIds());
   if (candidate) setLastPromptShownAt();
   return candidate;
+=======
+import { getPromptedIds } from "../attendancePromptStorage";
+import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
+
+const CHECK_INTERVAL_MS = 60 * 1000;
+
+async function loadCandidateEvent() {
+  const events = await getEvents(getDateRangeForPrompt());
+  return findCandidateEvent(events, getPromptedIds());
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 async function refreshCandidateEvent(setEvent) {
@@ -35,9 +46,13 @@ function startCandidatePolling(refresh) {
 export function useCandidateEvent() {
   const [event, setEvent] = useState(null);
   const refresh = useCallback(() => refreshCandidateEvent(setEvent), []);
+<<<<<<< HEAD
   useEffect(() => {
     if (event) return undefined;
     return startCandidatePolling(refresh);
   }, [event, refresh]);
+=======
+  useEffect(() => startCandidatePolling(refresh), [refresh]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return [event, setEvent];
 }

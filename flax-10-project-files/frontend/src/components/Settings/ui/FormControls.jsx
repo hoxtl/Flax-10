@@ -1,14 +1,23 @@
 /*
  * Shared form controls for settings inputs and selects.
  */
+<<<<<<< HEAD
 
 import styles from "../../../pages/settings/Settings.module.css";
 import AnimatedDropdown from "../../common/animated_dropdown";
+=======
+import styles from "../../../pages/Settings/Settings.module.css";
+import AnimatedDropdown from "../../common/AnimatedDropdown";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import FormTextInput from "./FormTextInput";
 
 function RemainingCount({ remaining }) {
   return (
+<<<<<<< HEAD
     <span className={styles.remainingCount}>
+=======
+    <span style={{ color: "var(--muted)", fontSize: "0.9em", marginLeft: "5px" }}>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       ({remaining} characters remaining)
     </span>
   );

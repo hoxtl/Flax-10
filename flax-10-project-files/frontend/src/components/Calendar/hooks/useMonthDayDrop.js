@@ -3,8 +3,13 @@ import { useDrop } from './useDragDrop';
 import { useCalendar } from "../../../context/CalendarContext";
 import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
+<<<<<<< HEAD
 import { hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
 import { applyCalculatedEventMove, handleRecurringMoveChoice, moveSingleOccurrenceToWindow } from "./eventMoveUtils";
+=======
+import { checkOverlapWithConfirm } from "../utils/overlapUtils";
+import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 export function useMonthDayDrop(targetDate) {
     const { events } = useCalendar();

@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { shareCalendar, unshareCalendar } from '../../api/socialApi';
+<<<<<<< HEAD
 import PrimaryButton from '../common/primary_button/PrimaryButton';
+=======
+import styles from './Social.module.css';
+
+function getLabel(loading, isSharing) {
+    if (loading) return '...';
+    return isSharing ? 'Shared' : 'Share Calendar';
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle) {
     setLoading(true);

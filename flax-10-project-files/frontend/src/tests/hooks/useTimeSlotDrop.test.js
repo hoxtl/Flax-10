@@ -17,12 +17,21 @@ vi.mock('../../context/CalendarContext', () => ({
   useEventModal: () => useEventModalMock(),
 }));
 vi.mock('../../context/ConfirmContext', () => ({ useConfirm: () => useConfirmMock() }));
+<<<<<<< HEAD
 vi.mock('../../components/calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
 vi.mock('../../components/calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
 vi.mock('../../components/calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
 vi.mock('../../components/calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
 const isReadOnlyEventMock = vi.fn(() => false);
 vi.mock('../../components/calendar/utils/eventUtils', () => ({
+=======
+vi.mock('../../components/Calendar/hooks/useCalendarEvents', () => ({ useEventActions: () => useEventActionsMock() }));
+vi.mock('../../components/Calendar/hooks/useDragDrop', () => ({ useDrop: (...args) => useDropMock(...args) }));
+vi.mock('../../components/Calendar/calendarConstants', () => ({ SLOT_HEIGHT: 80, getMinuteOffset: (...args) => getMinuteOffsetMock(...args) }));
+vi.mock('../../components/Calendar/utils/overlapUtils', () => ({ checkOverlapWithConfirm: (...args) => checkOverlapWithConfirmMock(...args) }));
+const isReadOnlyEventMock = vi.fn(() => false);
+vi.mock('../../components/Calendar/utils/eventUtils', () => ({
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   isReadOnlyEvent: vi.fn(() => false),
   extractBaseEventId: (...args) => extractBaseEventIdMock(...args),
   hasRecurrence: (...args) => hasRecurrenceMock(...args),

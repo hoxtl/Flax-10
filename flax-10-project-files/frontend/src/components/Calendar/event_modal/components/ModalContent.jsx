@@ -5,7 +5,11 @@
 
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Calendar/event_modal/components/ModalContent.jsx
 import ConfirmModal from '../../../common/confirm_modal/ConfirmModal';
+=======
+import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Calendar/EventModal/components/ModalContent.jsx
 
 /** Top-level modal content that selects the appropriate view and stops click propagation. */
 

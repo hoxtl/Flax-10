@@ -17,7 +17,10 @@ from .auto_scheduler_views import build_auto_schedule
 from .system_tags import get_schedule_tag
 from .schedule_helpers import _overwrite_same_name_schedules, _schedule_queryset
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def _events_for_manual_schedule(user, event_ids):
     schedule_tag = get_schedule_tag()
     return list(
@@ -26,11 +29,19 @@ def _events_for_manual_schedule(user, event_ids):
         .order_by('start_time')
     )
 
+<<<<<<< HEAD
 def _validate_manual_input(data):
     title = (data.get('title') or '').strip()
     if not title:
         return None, Response({'detail': 'title is required for manual schedules.'}, status=status.HTTP_400_BAD_REQUEST)
     requested_event_ids = data.get('event_ids') or []
+=======
+def _validate_manual_request(request):
+    title = (request.data.get('title') or '').strip()
+    if not title:
+        return None, Response({'detail': 'title is required for manual schedules.'}, status=status.HTTP_400_BAD_REQUEST)
+    requested_event_ids = request.data.get('event_ids') or []
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if not isinstance(requested_event_ids, list) or not requested_event_ids:
         return None, Response({'detail': 'event_ids must be a non-empty list.'}, status=status.HTTP_400_BAD_REQUEST)
     return title, None
@@ -58,6 +69,7 @@ def _create_manual_schedule_atomic(user, title, events):
         _create_manual_allocations(schedule, events)
     return schedule, overwritten
 
+<<<<<<< HEAD
 def _invalid_manual_events(events, event_ids):
     return len(events) != len(set(event_ids))
 
@@ -95,11 +107,34 @@ def _schedule_list_response(request):
     if request.data.get('mode') == 'manual':
         return _build_manual_schedule_response(request.user, request.data)
     return build_auto_schedule(request)
+=======
+def _build_manual_schedule(request):
+    title, error_resp = _validate_manual_request(request)
+    if error_resp: return error_resp
+    
+    events = _events_for_manual_schedule(request.user, request.data.get('event_ids'))
+    if len(events) != len(set(request.data.get('event_ids'))):
+        return Response({'detail': 'One or more events are invalid or not tagged as schedule.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    schedule, overwritten = _create_manual_schedule_atomic(request.user, title, events)
+    serialised = ScheduleSerialiser(schedule).data
+    serialised['overwritten'] = overwritten
+    return Response(serialised, status=status.HTTP_201_CREATED)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def schedule_list(request):
+<<<<<<< HEAD
     return _schedule_list_response(request)
+=======
+    if request.method == 'GET':
+        schedules = _schedule_queryset(request.user)
+        return Response(ScheduleSerialiser(schedules, many=True).data)
+    if request.data.get('mode') == 'manual':
+        return _build_manual_schedule(request)
+    return build_auto_schedule(request)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def _handle_schedule_patch(request, schedule):
     title = (request.data.get('title') or '').strip()
@@ -113,16 +148,26 @@ def _handle_schedule_patch(request, schedule):
     payload['overwritten'] = ovr
     return Response(payload)
 
+<<<<<<< HEAD
 def _schedule_detail_response(request, schedule):
+=======
+@api_view(['GET', 'DELETE', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def schedule_detail(request, schedule_id):
+    schedule = get_object_or_404(_schedule_queryset(request.user), id=schedule_id)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if request.method == 'GET':
         return Response(ScheduleSerialiser(schedule).data)
     if request.method == 'PATCH':
         return _handle_schedule_patch(request, schedule)
     schedule.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+<<<<<<< HEAD
 
 @api_view(['GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def schedule_detail(request, schedule_id):
     schedule = get_object_or_404(_schedule_queryset(request.user), id=schedule_id)
     return _schedule_detail_response(request, schedule)
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

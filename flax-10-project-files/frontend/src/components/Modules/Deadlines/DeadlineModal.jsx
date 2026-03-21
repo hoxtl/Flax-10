@@ -1,11 +1,18 @@
 /*
  * Modal for managing module deadlines.
  */
+<<<<<<< HEAD
 
 import { useDeadlineModal } from '../hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
 import StandardModal from '../../common/standard_modal/StandardModal';
+=======
+import { useDeadlineModal } from '../hooks/useDeadlineModal';
+import DeadlineForm from './DeadlineForm';
+import DeadlineCard from './DeadlineCard';
+import StandardModal from '../../common/StandardModal/StandardModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from './DeadlineModal.module.css';
 
 export default function DeadlineModal({ module, onClose, startCreating }) {

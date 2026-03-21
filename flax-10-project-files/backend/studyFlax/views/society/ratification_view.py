@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .helpers import get_society_or_404, is_society_admin, society_not_found_response
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def request_ratification(request, society_id):
@@ -27,8 +26,11 @@ def request_ratification(request, society_id):
 @permission_classes([IsAdminUser])
 def approve_ratification(request, society_id):
 
+<<<<<<< HEAD
     return handle_ratification_decision(society_id, 'approved')
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 

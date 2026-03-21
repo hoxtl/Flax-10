@@ -1,7 +1,10 @@
 /*
  * Manual schedule form.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import styles from '../shared/scheduleFormStyles';
 import { ManualScheduleEventList } from './ManualScheduleEventList';
 import { ManualScheduleFields } from './ManualScheduleFields';

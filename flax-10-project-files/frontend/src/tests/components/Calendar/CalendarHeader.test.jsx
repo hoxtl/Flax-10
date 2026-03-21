@@ -52,10 +52,14 @@ vi.mock('../../../components/calendar/header/calendarHeaderUtils', () => ({
     SearchButton: ({ value, onChange }) => (
         <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
     ),
+<<<<<<< HEAD
     FilterDropdownButton: ({ active, onChange }) => (
         <button type="button" onClick={() => onChange('work')}>Filter {Array.isArray(active) ? active.join(',') : active}</button>
     ),
     ScheduleManagerButton: () => <button type="button">Reschedule my events</button>,
+=======
+    ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }));
 
 vi.mock('../../../components/notifications/hooks/useReminderNotifications', () => ({
@@ -142,6 +146,7 @@ describe('CalendarHeader', () => {
         });
     });
 
+<<<<<<< HEAD
     it('renders reschedule control', () => {
         setup();
         expect(screen.getByText('Reschedule my events')).toBeInTheDocument();
@@ -152,6 +157,11 @@ describe('CalendarHeader', () => {
         expect(screen.queryByText('Reschedule my events')).not.toBeInTheDocument();
         expect(screen.queryByText('+')).not.toBeInTheDocument();
         expect(screen.queryByText('Import timetable')).not.toBeInTheDocument();
+=======
+    it('renders manage schedules control', () => {
+        setup();
+        expect(screen.getByText('Manage schedules')).toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('should open modal on adding event', () => {

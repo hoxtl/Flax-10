@@ -6,7 +6,10 @@ import { motion } from "framer-motion";
 import styles from "./CelebrationEmoji.module.css";
 
 /** Emoji that animates in with a bounce and rotation effect on mount. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export default function CelebrationEmoji({ emoji = "🎉", className = "", size = "2.4rem" }) {
   return (
     <motion.span className={className ? `${styles.emoji} ${className}` : styles.emoji}

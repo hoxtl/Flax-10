@@ -10,7 +10,10 @@ from rest_framework.test import APIClient
 from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 User = get_user_model()
 
 class MembershipViewCoverageTest(TestCase):

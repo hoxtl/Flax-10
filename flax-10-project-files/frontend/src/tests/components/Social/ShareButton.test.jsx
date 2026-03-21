@@ -6,7 +6,11 @@ vi.mock('../../../api/socialApi', () => ({
     unshareCalendar: vi.fn().mockResolvedValue({}),
 }));
 
+<<<<<<< HEAD
 import ShareButton from '../../../components/social/ShareButton';
+=======
+import ShareButton from '../../../components/Social/ShareButton';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { shareCalendar, unshareCalendar } from '../../../api/socialApi';
 
 describe('ShareButton', () => {

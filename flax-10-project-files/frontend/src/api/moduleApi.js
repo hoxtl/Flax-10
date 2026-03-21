@@ -1,7 +1,10 @@
 /*
  * Creates, reads, updates, and deletes modules and enrolments.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import {fetchApi} from './client.js'
 
 export async function getModules() {

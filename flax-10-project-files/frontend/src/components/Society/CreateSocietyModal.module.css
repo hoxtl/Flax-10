@@ -171,8 +171,24 @@
 }
 
 .cancelBtn {
+<<<<<<< HEAD
     min-height: 40px;
     min-width: 92px;
+=======
+    padding: 10px 20px;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--bg, var(--color-card));
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text, #374151);
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    background: var(--hover, #f9fafb);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .createBtn {

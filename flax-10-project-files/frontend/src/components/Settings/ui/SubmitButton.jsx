@@ -1,10 +1,29 @@
 /*
  * Submit button with transient saved-state feedback.
  */
+<<<<<<< HEAD
 
 import styles from "../../../pages/settings/Settings.module.css";
 import PrimaryButton from "../../common/primary_button/PrimaryButton";
 import { useTransientSavedState } from "../../common/hooks/useTransientSavedState";
+=======
+import { useEffect, useState } from "react";
+import styles from "../../../pages/Settings/Settings.module.css";
+import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+
+function useSavedState(saveSignal) {
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    if (!saveSignal) return undefined;
+    setShowSaved(true);
+    const timer = setTimeout(() => setShowSaved(false), 2000);
+    return () => clearTimeout(timer);
+  }, [saveSignal]);
+
+  return showSaved;
+}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function getButtonClassName(hasUnsaved, isSaving, showSaved) {
   const needsSave = hasUnsaved && !isSaving && !showSaved;
@@ -27,7 +46,11 @@ function SubmitActionButton({ isSaving, className, buttonLabel }) {
 
 export default function SubmitButton(props) {
   const { isSaving, label, savingLabel, hasUnsaved = false, saveSignal = 0, savedLabel = "Saved!" } = props;
+<<<<<<< HEAD
   const showSaved = useTransientSavedState(saveSignal);
+=======
+  const showSaved = useSavedState(saveSignal);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const className = getButtonClassName(hasUnsaved, isSaving, showSaved);
   const buttonLabel = getButtonLabel(isSaving, showSaved, label, savingLabel, savedLabel);
 

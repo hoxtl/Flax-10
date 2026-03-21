@@ -8,6 +8,7 @@ from itertools import takewhile
 from django.db.models import Q
 from types import SimpleNamespace
 
+<<<<<<< HEAD
 from django.utils import timezone
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
@@ -17,6 +18,15 @@ MAX_SIMULTANEOUS_OVERLAPS = 2
 def filter_events_by_date_range(queryset, params):
     start = parse_date_param(params.get('start'))
     end = parse_date_param(params.get('end'))
+=======
+from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
+
+MAX_SIMULTANEOUS_OVERLAPS = 3
+
+def filter_events_by_date_range(queryset, params):
+    start = params.get('start')
+    end = params.get('end')
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if not (start or end):
         return queryset
     recurring = Q(recurrence_rule__isnull=False)
@@ -79,7 +89,10 @@ def _future_instances(event, view_start, view_end):
     ]
 
 def _should_stop_generation(start, view_end, rule):
+<<<<<<< HEAD
     """Return whether should stop generation."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     if start is None:
         return True
     if start > view_end:
@@ -143,12 +156,16 @@ def exceeds_overlap_limit(user, start_time, end_time, exclude_id=None):
     return overlap_count(user, start_time, end_time, exclude_id) >= MAX_SIMULTANEOUS_OVERLAPS
 
 def parse_date_param(ds):
+<<<<<<< HEAD
     if not ds:
         return None
     dt = datetime.fromisoformat(ds.replace('Z', '+00:00'))
     if timezone.is_naive(dt):
         return timezone.make_aware(dt)
     return dt
+=======
+    return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def get_next_occurrence(start, frequency, interval, num):
     rule = SimpleNamespace(frequency=frequency, interval=interval)
@@ -158,7 +175,10 @@ def is_exception_date(dt, rule):
     return is_exception(dt, rule)
 
 def should_stop_generating(current, end_date, rule):
+<<<<<<< HEAD
     """Return whether should stop generating."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     return _should_stop_generation(current, end_date, rule)
 
 def get_base_instance(event, rule):

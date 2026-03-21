@@ -13,6 +13,10 @@ from icalendar import Calendar
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
 from studyFlax.models.calendar.timetable_source_model import TimetableSource
 
+class TimetableSyncError(Exception):
+    """Raised when a remote timetable sync cannot be processed."""
+
+SYNC_FAILURE_EXCEPTIONS = (ValueError, KeyError, TypeError, UnicodeDecodeError, HTTPError, URLError, DatabaseError)
 
 class TimetableSyncError(Exception):
     """Raised when a remote timetable sync cannot be processed."""

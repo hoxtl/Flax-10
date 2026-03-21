@@ -48,7 +48,12 @@
 .panelAccount,
 .panelHome,
 .panelSecurity,
+<<<<<<< HEAD
 .panelPreferences {
+=======
+.panelPreferences,
+.panelCourse {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   --panelAccent: color-mix(in srgb, var(--primary) 75%, var(--warning) 25%);
 }
 

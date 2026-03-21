@@ -73,6 +73,10 @@ describe('CreateSocietyModal', () => {
     it('renders the modal with title and subtitle', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         expect(screen.getAllByText('Create Society').length).toBeGreaterThanOrEqual(1);
+<<<<<<< HEAD
+=======
+        expect(screen.getByText('Start your own society')).toBeInTheDocument();
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 
     it('renders the Society Name field', () => {

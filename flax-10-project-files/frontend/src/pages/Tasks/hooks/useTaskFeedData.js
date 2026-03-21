@@ -6,7 +6,11 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getModules } from "../../../api/moduleApi";
 import { normalizeModuleCode } from "../../../utils/moduleCodeUtils";
+<<<<<<< HEAD
 import { buildListItems, groupModuleItems, filterListItems } from "../../../components/timer/task_input/taskInputUtils";
+=======
+import { buildListItems, groupModuleItems, filterListItems } from "../../../components/Timer/taskInput/taskInputUtils";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getHeaderTitle } from "../utils/taskFeedUtils";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { isReadingList, getReadingListLabel } from "../utils/readingListUtils";
@@ -25,7 +29,11 @@ import {
 
 function buildModuleItems(tasks, moduleNameMap) {
   const byCode = new Map();
+<<<<<<< HEAD
   tasks.forEach((task) => {
+=======
+  (tasks || []).forEach((task) => {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     const code = normalizeModuleCode(task.module_code);
     if (!code) return;
     const name = String(task.module_name || moduleNameMap[code] || "").trim();
@@ -138,7 +146,11 @@ function useTaskFeedCollections(searchSourceTasks, filterModuleCodes) {
 }
 
 function useActiveTaskList(activeListId, lists) {
+<<<<<<< HEAD
   return useMemo(() => (activeListId ? lists.find((list) => String(list.id) === String(activeListId)) || null : null), [activeListId, lists]);
+=======
+  return useMemo(() => (activeListId && lists?.length ? lists.find((list) => String(list.id) === String(activeListId)) || null : null), [activeListId, lists]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function buildTodayEmptyCardProps(clearMessage, completedTodayCount, navigate, onPlanTomorrow) {
@@ -184,7 +196,11 @@ function useTaskFeedPresentation({ activeFilter, activeListId, activeModuleCode,
 
 /* Derive task feed state and section data from tasks, lists, and filter options. */
 export default function useTaskFeedData(opts) {
+<<<<<<< HEAD
   const { tasks = [], allTasks = tasks, lists = [], activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
+=======
+  const { tasks, allTasks = tasks, lists, activeFilter, activeListId, activeModuleCode = null, filterListIds = [], onFilterByList, onPlanTomorrow } = opts;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const filterState = useTaskFeedFilterState(filterListIds, onFilterByList);
   const hasSearchQuery = filterState.search.trim().length > 0;
   const moduleNameMap = useTaskFeedModuleNameMap();

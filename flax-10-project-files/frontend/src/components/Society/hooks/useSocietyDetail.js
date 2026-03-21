@@ -1,6 +1,7 @@
 /*
  * useSocietyDetail composes the society detail hooks into a single interface.
  */
+<<<<<<< HEAD
 
 import { useSocietyCore } from './useSocietyCore';
 import { useSocietyTags } from './useSocietyTags';
@@ -12,6 +13,18 @@ import { useSocietyMembership } from './useSocietyMembership';
 const getAnnouncementTitle = (data, id) =>
     data.society?.announcements?.find(a => a.id === id)?.title;
 
+=======
+import { useSocietyCore } from './useSocietyCore';
+import { useSocietyTags } from './useSocietyTags';
+import { useSocietyEvents } from './useSocietyEvents';
+import { useSocietyAnnouncements } from './useSocietyAnnouncements';
+import { useSocietyMembers } from './useSocietyMembers';
+import { useSocietyMembership } from './useSocietyMembership';
+
+const getAnnouncementTitle = (data, id) =>
+    data.society?.announcements?.find(a => a.id === id)?.title;
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 const wrapAnnouncement = (action, fn, tracker, isSilent, titleFn) =>
     (id, d) => {
         tracker?.trackAnnouncement(action, titleFn ? titleFn(id) : d.title);

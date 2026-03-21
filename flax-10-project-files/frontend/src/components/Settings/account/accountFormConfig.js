@@ -1,7 +1,10 @@
 /*
  * Static account-form configuration values.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export const YEAR_OPTIONS = ["Foundation", "Year 1", "Year 2", "Year 3", "Year 4"].map((year) => ({
   value: year,
   label: year,

@@ -1,9 +1,8 @@
 /*
  * Tests for module helper functions.
  */
-
 import { describe, it, expect } from 'vitest';
-import { validateForm, getFormData, updateForm } from '../../components/modules/utils/moduleHelpers';
+import { validateForm, getFormData, updateForm } from '../../components/Modules/utils/moduleHelpers';
 
 describe('moduleHelpers', () => {
     it('getFormData returns default empty form', () => {
@@ -29,14 +28,6 @@ describe('moduleHelpers', () => {
         const form = { module_code: 'CS101', module_name: 'Test', start_time: '2026-03-01T10:00', end_time: '2026-03-01T09:00' };
         const errors = validateForm(form);
         expect(errors.end_time).toBeDefined();
-    });
-
-    it('validateForm returns required errors for empty department, course, and times', () => {
-        const errors = validateForm({ ...getFormData(), module_code: 'CS101', module_name: 'Test' });
-        expect(errors.department).toBe('Department is required');
-        expect(errors.course).toBe('Course is required');
-        expect(errors.start_time).toBe('Start time is required');
-        expect(errors.end_time).toBe('End time is required');
     });
 
     it('validateForm returns no errors for valid form', () => {

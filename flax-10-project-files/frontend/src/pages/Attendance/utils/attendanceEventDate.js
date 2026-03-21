@@ -19,6 +19,7 @@ export function formatAttendanceDetailDate(startTime) {
   if (!startTime) return "";
   return new Date(startTime).toLocaleDateString("en-GB", attendanceDateOptions);
 }
+<<<<<<< HEAD
 
 /** "Monday, 30 March" — used as the date group header in attendance lists. */
 
@@ -44,3 +45,5 @@ export function isEventInPast(startTime) {
   if (!startTime) return false;
   return new Date(startTime) <= new Date();
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

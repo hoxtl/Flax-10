@@ -14,10 +14,16 @@ from studyFlax.models.society.society_model import Society
 from studyFlax.models.society.society_membership_model import SocietyMembership
 from studyFlax.models.society.society_announcement_model import SocietyAnnouncement, SocietyAnnouncementImage
 from studyFlax.models.society.society_tag_model import SocietyTag
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import (
     make_announcement, make_society, make_society_admin, make_society_member,
 )
 
+=======
+from studyFlax.tests.helpers.factories import (
+    make_announcement, make_society, make_society_admin, make_society_member,
+)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 
@@ -48,6 +54,10 @@ class AnnouncementCreateExtendedTest(TestCase):
         self.assertEqual(SocietyAnnouncementImage.objects.filter(announcement=ann).count(), 2)
 
     def test_create_announcement_with_images_key(self):
+<<<<<<< HEAD
+=======
+        """Verify that sending 'images' instead of 'image_urls' also works."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         response = self.client.post(
             f'/api/societies/{self.society.id}/announcements/',
             {

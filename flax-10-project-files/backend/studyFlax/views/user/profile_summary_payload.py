@@ -24,29 +24,50 @@ def get_society_image(society):
     first_image = society.images.first()
     return first_image.url if first_image else None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def resolve_user(request):
     user_id = request.query_params.get('user_id')
     return request.user if not user_id else get_object_or_404(User, id=user_id)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def get_module_count(user):
     if getattr(user, 'role', None) == 'teacher':
         return Module.objects.filter(created_by=user).count()
     return Enrollment.objects.filter(student=user).count()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_societies_list(user):
     memberships = SocietyMembership.objects.filter(user=user).select_related('society')
     if getattr(user, 'role', None) == 'teacher':
         return []
     return [serialise_society(membership.society) for membership in memberships]
 
+<<<<<<< HEAD
 def serialise_society(society):
     return {'id': society.id, 'name': society.name, 'image': get_society_image(society)}
 
+=======
+
+def serialise_society(society):
+    return {'id': society.id, 'name': society.name, 'image': get_society_image(society)}
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_connection_ids(user):
     outgoing = CalendarShare.objects.filter(owner=user).values_list('shared_with_id', flat=True)
     incoming = CalendarShare.objects.filter(shared_with=user).values_list('owner_id', flat=True)
     return set(outgoing).union(incoming)
 
+<<<<<<< HEAD
 def _empty_connections_payload():
     return {'count': 0, 'users': []}
 
@@ -68,18 +89,43 @@ def build_mutual_connections(viewed_user, viewer, request):
 def serialise_connection(user, request):
     return {'id': user.id, 'username': user.username, 'profile_photo_url': build_profile_photo_url(user.profile_photo, request)}
 
+=======
+
+def build_mutual_connections(viewed_user, viewer, request):
+    if not viewer or viewed_user.id == viewer.id:
+        return {'count': 0, 'users': []}
+    mutual_ids = sorted((build_connection_ids(viewer) & build_connection_ids(viewed_user)) - {viewer.id, viewed_user.id})
+    if not mutual_ids:
+        return {'count': 0, 'users': []}
+    users = User.objects.filter(id__in=mutual_ids).only('id', 'username', 'profile_photo').order_by('username')
+    return {'count': len(mutual_ids), 'users': [serialise_connection(user, request) for user in users[:5]]}
+
+
+def serialise_connection(user, request):
+    return {'id': user.id, 'username': user.username, 'profile_photo_url': build_profile_photo_url(user.profile_photo, request)}
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_activity_sparkline(sessions):
     days = [timezone.localdate() - timedelta(days=offset) for offset in range(6, -1, -1)]
     totals_by_day = build_daily_totals(days, sessions)
     max_minutes = max(totals_by_day.values()) if totals_by_day else 0
     return [build_sparkline_point(day, totals_by_day[day], max_minutes) for day in days]
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_daily_totals(days, sessions):
     totals_by_day = {day: 0 for day in days}
     for session in sessions:
         add_session_to_totals(totals_by_day, session)
     return totals_by_day
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def add_session_to_totals(totals_by_day, session):
     if not session.end_time:
         return
@@ -87,14 +133,23 @@ def add_session_to_totals(totals_by_day, session):
     if day in totals_by_day:
         totals_by_day[day] += session.duration
 
+<<<<<<< HEAD
 def build_sparkline_point(day, minutes, max_minutes):
     return {'date': day.isoformat(), 'level': resolve_sparkline_level(minutes, max_minutes)}
 
+=======
+
+def build_sparkline_point(day, minutes, max_minutes):
+    return {'date': day.isoformat(), 'level': resolve_sparkline_level(minutes, max_minutes)}
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def resolve_sparkline_level(minutes, max_minutes):
     if max_minutes <= 0 or minutes <= 0:
         return 0
     return min(4, max(1, math.ceil((minutes / max_minutes) * 4)))
 
+<<<<<<< HEAD
 def _compute_session_stats(sessions_all):
     current_streak, longest_streak = compute_streaks(sessions_all)
     complete_sessions = filter_complete(sessions_all)
@@ -131,6 +186,26 @@ def build_profile_summary(user, sessions_all, sessions_90, request):
     summary.update(_profile_summary_activity(complete))
     summary.update(_profile_summary_social(user, request))
     return summary
+=======
+
+def build_profile_summary(user, sessions_all, sessions_90, request):
+    current_streak, longest_streak = compute_streaks(sessions_all)
+    module_count = get_module_count(user)
+    complete_sessions = filter_complete(sessions_all)
+    _, total_hours, session_count = session_totals(complete_sessions)
+    return {
+        'persona': derive_persona(sessions_90),
+        'streaks': {'current': current_streak, 'longest': longest_streak},
+        'badges': compute_badges(sessions_all, sessions_90, current_streak, longest_streak, module_count, user),
+        'weekly': build_weekly_summary(user, sessions_all),
+        'societies': build_societies_list(user),
+        'total_hours': round(total_hours, 1),
+        'session_count': session_count,
+        'activity_sparkline': build_activity_sparkline(complete_sessions),
+        'mutual_connections': build_mutual_connections(user, request.user, request),
+    }
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def build_weekly_summary(user, sessions_all):
     weekly_hours = get_weekly_study_hours(sessions_all)

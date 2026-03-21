@@ -46,7 +46,15 @@ const ALL_BADGES = [
 
 const CATEGORIES = ['Hours', 'Sessions', 'Streaks', 'Consistency', 'Style', 'Modules', 'Goals'];
 
+<<<<<<< HEAD
 const TIER_COLOR = achievementTierColors;
+=======
+const TIER_COLOR = {
+  gold: { color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)' },
+  silver: { color: '#9CA3AF', bg: 'rgba(156,163,175,0.12)', border: 'rgba(156,163,175,0.35)' },
+  bronze: { color: '#CD7F32', bg: 'rgba(205,127,50,0.12)', border: 'rgba(205,127,50,0.3)' },
+};
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const TIER_LABEL = { gold: '🥇 Gold', silver: '🥈 Silver', bronze: '🥉 Bronze' };
 
@@ -63,10 +71,46 @@ function BadgeTile({ badge, earned }) {
       <span className={styles.tileLabel} style={{ color: earned ? "var(--text)" : "var(--muted)" }}>{badge.label}</span>
       {earned && <span className={styles.tileTier} style={{ color: t.color }}>{TIER_LABEL[badge.tier]}</span>}
       {!earned && <span className={styles.tileLockHint}>{badge.description}</span>}
+<<<<<<< HEAD
+=======
     </div>
   );
 }
 
+function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
+  const progressWidth = totalBadges > 0 ? `${(totalEarned / totalBadges) * 100}%` : "0%";
+  return (
+    <div className={styles.header}>
+      <div>
+        <h2 className={styles.title}>Achievements</h2>
+        <p className={styles.subtitle}>{totalEarned} / {totalBadges} unlocked</p>
+      </div>
+      <div className={styles.progressWrap}>
+        <div className={styles.progressBar} style={{ width: progressWidth }} />
+      </div>
+      <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+    </div>
+  );
+}
+
+function CategorySection({ cat, earnedIds }) {
+  const catBadges = ALL_BADGES.filter(b => b.category === cat);
+  const catEarned = catBadges.filter(b => earnedIds.has(b.id)).length;
+  return (
+    <div className={styles.category}>
+      <div className={styles.catHeader}>
+        <span className={`${styles.catName} ${cat === "Hours" ? styles.catNameEmphasis : ""}`}>{cat}</span>
+        <span className={styles.catCount}>{catEarned}/{catBadges.length}</span>
+      </div>
+      <div className={styles.grid}>
+        {catBadges.map(b => <BadgeTile key={b.id} badge={b} earned={earnedIds.has(b.id)} />)}
+      </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
+    </div>
+  );
+}
+
+<<<<<<< HEAD
 function AchievementsHeader({ totalEarned, totalBadges, onClose }) {
   const progressWidth = totalBadges > 0 ? `${(totalEarned / totalBadges) * 100}%` : "0%";
   return (
@@ -100,6 +144,13 @@ function CategorySection({ cat, earnedIds }) {
 }
 
 function useCloseOnEscape(onClose) {
+=======
+export default function AchievementsModal({ badges, onClose }) {
+  const earnedIds = new Set((badges || []).map(b => b.id));
+  const totalBadges = ALL_BADGES.length;
+  const totalEarned = ALL_BADGES.filter((badge) => earnedIds.has(badge.id)).length;
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   useEffect(() => {
     const handler = (event) => event.key === "Escape" && onClose();
     window.addEventListener("keydown", handler);
@@ -107,6 +158,7 @@ function useCloseOnEscape(onClose) {
   }, [onClose]);
 }
 
+<<<<<<< HEAD
 function AchievementsBody({ earnedIds }) {
   return <div className={styles.body}>{CATEGORIES.map((cat) => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}</div>;
 }
@@ -122,6 +174,8 @@ function countEarnedBadges(earnedIds) {
 export default function AchievementsModal({ badges, onClose }) {
   const earnedIds = buildEarnedIds(badges);
   useCloseOnEscape(onClose);
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return (
     <StandardModal
       onClose={onClose}
@@ -131,8 +185,16 @@ export default function AchievementsModal({ badges, onClose }) {
       modalClassName={styles.modalShell}
       contentClassName={styles.modalContent}
     >
+<<<<<<< HEAD
       <AchievementsHeader totalEarned={countEarnedBadges(earnedIds)} totalBadges={ALL_BADGES.length} onClose={onClose} />
       <AchievementsBody earnedIds={earnedIds} />
+=======
+      <AchievementsHeader totalEarned={totalEarned} totalBadges={totalBadges} onClose={onClose} />
+
+      <div className={styles.body}>
+        {CATEGORIES.map((cat) => <CategorySection key={cat} cat={cat} earnedIds={earnedIds} />)}
+      </div>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </StandardModal>
   );
 }

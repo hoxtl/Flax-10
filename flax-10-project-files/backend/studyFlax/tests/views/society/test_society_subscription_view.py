@@ -1,20 +1,31 @@
+<<<<<<< HEAD
 """
 Tests for society subscription views.
 """
+=======
+"""Tests for society subscription endpoints."""
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+<<<<<<< HEAD
 from studyFlax.tests.helpers.test_model_builders import make_society, make_society_member
 
+=======
+from studyFlax.tests.helpers.factories import make_society, make_society_member
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 User = get_user_model()
 
 
 class ToggleSubscriptionViewTest(TestCase):
+<<<<<<< HEAD
     """Tests toggle subscription view."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username="subuser", email="sub@test.com", password="pass")

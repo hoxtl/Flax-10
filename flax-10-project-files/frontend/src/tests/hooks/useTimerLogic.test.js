@@ -142,6 +142,10 @@ describe('useTimerLogic Hook', () => {
             'My Important Task', // Task
             expect.any(Number), // pause
             expect.any(String), // status
+<<<<<<< HEAD
+=======
+            expect.any(Number), // distractions
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         );
     });
 

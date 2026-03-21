@@ -1,7 +1,10 @@
 /*
  * Tests for ModuleForm component.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
@@ -20,7 +23,11 @@ vi.mock('../../../components/modules/utils/moduleHelpers', () => ({
     updateForm: vi.fn((field, value, form) => ({ ...form, [field]: value })),
 }));
 
+<<<<<<< HEAD
 import ModuleForm from '../../../components/modules/modules/ModuleForm';
+=======
+import ModuleForm from '../../../components/Modules/Modules/ModuleForm';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { validateForm } from '../../../components/modules/utils/moduleHelpers';
 

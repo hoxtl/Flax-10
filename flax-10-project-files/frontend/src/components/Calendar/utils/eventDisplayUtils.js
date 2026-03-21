@@ -2,11 +2,17 @@
  * eventDisplayUtils - Event display logic for all-day and timed events.
  * Determines how events should appear in time grids vs all-day rows.
  */
+<<<<<<< HEAD
 
 import { overlapsDay, startOfDay } from './dateUtils';
 
 /** Returns true if the event should display as an all-day event. */
 
+=======
+import { overlapsDay, startOfDay } from './dateUtils';
+
+/** Returns true if the event should display as an all-day event. */
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function isAllDayEvent(event) {
     if (event.all_day || event.is_all_day || event.allDay) return true;
     return isMidnightAligned(event);
@@ -20,7 +26,10 @@ function isMidnightAligned(event) {
 }
 
 /** Returns true if the event should appear in the hourly time grid. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function shouldShowInTimeGrid(event, day) {
     if (isAllDayEvent(event)) return false;
     return isPartialSegment(event, day);
@@ -43,7 +52,10 @@ export function isFullDay(event, day) {
 }
 
 /** Calculates the visual date range for an all-day event display. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function getAllDayVisualRange(event) {
     const start = new Date(event.start_time);
     const end = new Date(event.end_time);

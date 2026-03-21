@@ -10,7 +10,10 @@ import TaskCard from "./TaskCard";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
+<<<<<<< HEAD
 import { isReadingList } from "../utils/readingListUtils";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { SECTION_SHOW_LIMIT, TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
 
 import styles from "./TaskFeedSections.module.css";
@@ -98,11 +101,18 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
   );
 }
 
+<<<<<<< HEAD
 function ShowMoreButton({ showAll, totalCount, onToggle }) {
   const showAllLabel = `+ Show all ${totalCount}`;
   return (
     <div className={styles.showMoreWrap}>
       <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : showAllLabel}</button>
+=======
+function ShowMoreButton({ showAll, total, onToggle }) {
+  return (
+    <div className={styles.showMoreWrap}>
+      <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : `Show all ${total} →`}</button>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </div>
   );
 }
@@ -118,7 +128,11 @@ function SectionBody({ tasks: visibleTasks, showAll, applyLimit, hiddenCount, em
           </Motion.div>
         ))}
       </AnimatePresence>
+<<<<<<< HEAD
       {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} totalCount={visibleTasks.length + hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
+=======
+      {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} total={visibleTasks.length + hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     </>
   );
 }

@@ -2,9 +2,15 @@
  * Overtime timer modals.
  */
 
+<<<<<<< HEAD
 import styles from '../../../pages/timer/TimerPage.module.css';
 import PrimaryButton from '../../common/primary_button/PrimaryButton';
 import StandardModal from '../../common/standard_modal/StandardModal';
+=======
+import styles from '../../../pages/Timer/TimerPage.module.css';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../common/StandardModal/StandardModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { formatTime } from '../TimerComponents';
 
 function getOvertimeCopy(mode, isLastSession) {
@@ -15,11 +21,14 @@ function getOvertimeCopy(mode, isLastSession) {
   };
 }
 
+<<<<<<< HEAD
 function getActionClassName(mode, isLastSession) {
   if (mode === 'work' && isLastSession) return `${styles.overtimeActionBtn} ${styles.timerControlBtn} ${styles.timerControlBtnStart}`;
   return styles.overtimeActionBtn;
 }
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function OvertimePopup({ mode, time, onAction, isLastSession }) {
   const copy = getOvertimeCopy(mode, isLastSession);
 
@@ -27,7 +36,11 @@ export function OvertimePopup({ mode, time, onAction, isLastSession }) {
     <StandardModal title={copy.title} subtitle={copy.subtitle} onClose={onAction} size="sm" centerText>
       <div className={styles.overtimeContent}>
         <div className={styles.overtimeTime}>{formatTime(time)}</div>
+<<<<<<< HEAD
         <PrimaryButton className={getActionClassName(mode, isLastSession)} variant="primary" size="large" onClick={onAction} pill>{copy.buttonLabel}</PrimaryButton>
+=======
+        <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>{copy.buttonLabel}</PrimaryButton>
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       </div>
     </StandardModal>
   );

@@ -1,7 +1,10 @@
 /*
  * Shared sleep-window helpers.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function isDuringSleepWindow(sleepTime, wakeTime, date = new Date()) {
   const [sleepHours, sleepMinutes] = sleepTime.split(":").map(Number);
   const [wakeHours, wakeMinutes] = wakeTime.split(":").map(Number);
@@ -12,6 +15,7 @@ export function isDuringSleepWindow(sleepTime, wakeTime, date = new Date()) {
     ? totalMinutes >= sleepTotal || totalMinutes < wakeTotal
     : totalMinutes >= sleepTotal && totalMinutes < wakeTotal;
 }
+<<<<<<< HEAD
 
 function generateTimeCheckpoints(start, end) {
   const checkpoints = [];
@@ -32,3 +36,5 @@ export function doesEventOverlapSleepWindow(sleepTime, wakeTime, startDate, endD
   if (end <= start) return isDuringSleepWindow(sleepTime, wakeTime, start);
   return checkRangeForSleepOverlap(sleepTime, wakeTime, start, end);
 }
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

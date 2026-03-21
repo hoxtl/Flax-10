@@ -17,7 +17,10 @@ def _mock_session(end_time, duration):
 
 
 class ComputeAverageDurationTest(TestCase):
+<<<<<<< HEAD
     """Tests compute average duration."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_empty_sessions_returns_zero(self):
         from studyFlax.views.analytics.session_analytics_service import compute_average_duration
         self.assertEqual(compute_average_duration([]), 0)
@@ -34,7 +37,10 @@ class ComputeAverageDurationTest(TestCase):
 
 
 class ComputeRecentActiveDaysTest(TestCase):
+<<<<<<< HEAD
     """Tests compute recent active days."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_session_within_window_counts(self):
         from studyFlax.views.analytics.session_analytics_service import compute_recent_active_days
         s = _mock_session(timezone.now() - timedelta(days=1), 60)
@@ -47,17 +53,29 @@ class ComputeRecentActiveDaysTest(TestCase):
 
     def test_multiple_sessions_same_day_count_as_one(self):
         from studyFlax.views.analytics.session_analytics_service import compute_recent_active_days
+<<<<<<< HEAD
         noon = timezone.now().replace(hour=12, minute=0, second=0, microsecond=0)
         sessions = [_mock_session(noon - timedelta(hours=1), 60), _mock_session(noon - timedelta(hours=2), 30)]
+=======
+        now = timezone.now()
+        sessions = [_mock_session(now - timedelta(hours=1), 60), _mock_session(now - timedelta(hours=2), 30)]
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         self.assertEqual(compute_recent_active_days(sessions, days=7), 1)
 
 
 class ComputeActiveDaysTest(TestCase):
+<<<<<<< HEAD
     """Tests compute active days."""
     def test_multiple_sessions_same_day_count_once(self):
         from studyFlax.views.analytics.session_analytics_service import compute_active_days
         noon = timezone.now().replace(hour=12, minute=0, second=0, microsecond=0)
         sessions = [_mock_session(noon, 60), _mock_session(noon - timedelta(hours=1), 30)]
+=======
+    def test_multiple_sessions_same_day_count_once(self):
+        from studyFlax.views.analytics.session_analytics_service import compute_active_days
+        now = timezone.now()
+        sessions = [_mock_session(now, 60), _mock_session(now - timedelta(hours=1), 30)]
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
         self.assertEqual(compute_active_days(sessions), 1)
 
     def test_sessions_on_different_days(self):
@@ -72,7 +90,10 @@ class ComputeActiveDaysTest(TestCase):
 
 
 class FmtHourTest(TestCase):
+<<<<<<< HEAD
     """Tests fmt hour."""
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     def test_midnight_formats_as_12am(self):
         from studyFlax.views.analytics.session_analytics_service import fmt_hour
         self.assertEqual(fmt_hour(0), '12am')

@@ -1,9 +1,14 @@
 /*
  * CollaboratorList renders selected collaborators and role controls.
  */
+<<<<<<< HEAD
 
 import styles from "./CollaboratorList.module.css";
 import AnimatedDropdown from "../common/animated_dropdown";
+=======
+import styles from "./CollaboratorList.module.css";
+import AnimatedDropdown from "../common/AnimatedDropdown";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const ROLES = [
     { value: "editor", label: "Editor" },

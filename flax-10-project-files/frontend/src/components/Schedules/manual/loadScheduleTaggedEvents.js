@@ -1,7 +1,10 @@
 /*
  * Schedule-tagged event loading.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getEvents } from '../../../api/eventApi';
 
 export async function loadScheduleTaggedEvents(setEvents, setSelected, showToast) {

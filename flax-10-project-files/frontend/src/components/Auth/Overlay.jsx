@@ -3,7 +3,11 @@
  */
 
 import styled from "styled-components";
+<<<<<<< HEAD:flax-10-project-files/frontend/src/components/Auth/Overlay.jsx
 import * as Components from "./AuthComponents";
+=======
+import * as Components from './AuthComponents';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration):flax-10-project-files/frontend/src/components/Authentication/Overlay.jsx
 
 const OverlayTitle = styled.h2`
   font-size: 22px;

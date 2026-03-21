@@ -3,14 +3,21 @@
  */
 
 import { useState, useMemo, useEffect } from "react";
+<<<<<<< HEAD
 import { useSleepWarning } from "../../../components/settings/hooks/useSleepWarning";
+=======
+import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { getUserSettings } from "../../../api/userApi";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";
 import { isReadingList } from "../utils/readingListUtils";
+<<<<<<< HEAD
 import { POMODORO_BLOCK_MINUTES, clampEstimateMinutes, minutesToEstimateBlocks } from "../utils/createTaskBarUtils";
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const ALLOWED_PRIORITIES = new Set(["medium", "high", "urgent"]);
 
@@ -34,7 +41,11 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
   };
 }
 
+<<<<<<< HEAD
 function useAvailableModules(modules = []) {
+=======
+function useAvailableModules(modules) {
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const [loadedModules, setLoadedModules] = useState([]);
   useEffect(() => {
     if (modules.length > 0) return;
@@ -48,13 +59,22 @@ function useAvailableModules(modules = []) {
       .catch(() => { if (!cancelled) setLoadedModules([]); });
     return () => { cancelled = true; };
   }, [modules]);
+<<<<<<< HEAD
   const availableModules = modules.length > 0 ? modules : loadedModules;
+=======
+  const availableModules = (modules || []).length > 0 ? modules : loadedModules;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return useMemo(() => [...availableModules].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")), [availableModules]);
 }
 
 function useCreateTaskModalFormState(props) {
+<<<<<<< HEAD
   const { lists = [], defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
   const sortedLists = useMemo(() => [...lists].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
+=======
+  const { lists, defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
+  const sortedLists = useMemo(() => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   const sortedModules = useAvailableModules(modules);
   const [form, setForm] = useState(() => getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists));
   const [addToSchedule, setAddToSchedule] = useState(false);

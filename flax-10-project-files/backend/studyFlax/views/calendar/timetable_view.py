@@ -7,7 +7,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .timetable_service import sync_timetable, TimetableSyncError
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def validate_source_url(raw):
     url = (raw or "").strip().split()[0] if raw else ""
@@ -38,6 +41,12 @@ def _timetable_import_result(url, user):
     try:
         return _timetable_import_success(url, user)
     except ValueError as exc:
+<<<<<<< HEAD
         return _timetable_import_error(exc)
     except TimetableSyncError:
         return _timetable_import_unavailable()
+=======
+        return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+    except TimetableSyncError:
+        return Response({"detail": "Unable to sync timetable right now."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

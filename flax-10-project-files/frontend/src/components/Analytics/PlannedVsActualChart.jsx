@@ -6,12 +6,21 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useTheme } from '../../context/ThemeContext';
 import { getChartColors, getChartSx } from './utils/chartColors';
 
+<<<<<<< HEAD
 const FLAX_BROWN = 'var(--color-primary)';
 const SAGE_GREEN = 'var(--sage)';
 const FONT_MONO = '"JetBrains Mono", "Roboto Mono", ui-monospace, monospace';
 const CHART_MARGIN = { left: 50, right: 20, top: 20, bottom: 38 };
 const DATE_FORMAT = { weekday: 'short', day: 'numeric' };
 const WARM_COLORS = { textColor: 'var(--chart-warm-text)', gridColor: 'var(--chart-warm-grid)' };
+=======
+const FLAX_BROWN = '#7B6751';
+const SAGE_GREEN = '#8C9A86';
+const FONT_MONO = '"JetBrains Mono", "Roboto Mono", ui-monospace, monospace';
+const CHART_MARGIN = { left: 50, right: 20, top: 20, bottom: 38 };
+const DATE_FORMAT = { weekday: 'short', day: 'numeric' };
+const WARM_COLORS = { textColor: 'rgba(123, 103, 81, 0.7)', gridColor: 'rgba(123, 103, 81, 0.12)' };
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const toDate = (d) => new Date(d.date).toLocaleDateString('en-GB', DATE_FORMAT);
 const toPlanned = (d) => parseFloat(d.planned_hours) || 0;
@@ -43,8 +52,13 @@ const PlannedVsActualChart = ({ data = [], variant }) => {
       xAxis={[{ scaleType: 'band', data: last14.map(toDate), tickLabelStyle: tickStyle }]}
       yAxis={[{ tickLabelStyle: tickStyle, max: Math.ceil(maxVal) + 1 }]}
       series={[
+<<<<<<< HEAD
         { data: last14.map(toPlanned), label: 'Planned (hrs)', color: isWarm ? FLAX_BROWN : 'var(--chart-accent-blue)' },
         { data: last14.map(toActual), label: 'Actual (hrs)', color: isWarm ? SAGE_GREEN : 'var(--chart-study)' },
+=======
+        { data: last14.map(toPlanned), label: 'Planned (hrs)', color: isWarm ? FLAX_BROWN : '#90CAF9' },
+        { data: last14.map(toActual), label: 'Actual (hrs)', color: isWarm ? SAGE_GREEN : '#4CAF50' },
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
       ]}
       height={300}
       margin={CHART_MARGIN}

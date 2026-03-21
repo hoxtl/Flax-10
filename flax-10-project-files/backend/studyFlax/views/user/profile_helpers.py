@@ -25,10 +25,18 @@ def get_module_data(user):
     enrollments = Enrollment.objects.filter(student=user).select_related('module')
     return serialise_module_codes([enrollment.module for enrollment in enrollments])
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def serialise_module_codes(modules):
     module_codes = sorted([module.module_code for module in modules])
     return module_codes, len(module_codes)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def get_event_counts(user):
     now = timezone.now()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -40,13 +48,25 @@ def get_event_counts(user):
         'events_month': count_events_between(all_events, now, today_start + timedelta(days=30)),
     }
 
+<<<<<<< HEAD
 def count_events_between(events, start_time, end_time):
     return events.filter(start_time__gte=start_time, start_time__lt=end_time).count()
 
+=======
+
+def count_events_between(events, start_time, end_time):
+    return events.filter(start_time__gte=start_time, start_time__lt=end_time).count()
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def get_last_session_end(user):
     last_session = StudySession.objects.filter(user=user).exclude(status='Incomplete').only('end_time').first()
     return last_session.end_time if last_session else None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_profile_completion(user):
     checkpoints = get_profile_checkpoints(user)
     completed = sum(1 for checkpoint in checkpoints if checkpoint['complete'])
@@ -54,6 +74,10 @@ def build_profile_completion(user):
     next_checkpoint = next((checkpoint for checkpoint in checkpoints if not checkpoint['complete']), None)
     return build_completion_response(checkpoints, completed, total, next_checkpoint)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def get_profile_checkpoints(user):
     return [
         build_checkpoint('photo_uploaded', 'Photo uploaded', bool(user.profile_photo), 'add a profile photo'),
@@ -63,9 +87,17 @@ def get_profile_checkpoints(user):
         build_checkpoint('calendar_shared', 'Calendar shared', CalendarShare.objects.filter(owner=user).exists(), 'share your calendar'),
     ]
 
+<<<<<<< HEAD
 def build_checkpoint(checkpoint_id, label, complete, next_action):
     return {'id': checkpoint_id, 'label': label, 'complete': complete, 'next_action': next_action}
 
+=======
+
+def build_checkpoint(checkpoint_id, label, complete, next_action):
+    return {'id': checkpoint_id, 'label': label, 'complete': complete, 'next_action': next_action}
+
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_completion_response(checkpoints, completed, total, next_checkpoint):
     return {
         'percentage': round((completed / total) * 100) if total else 100,
@@ -75,6 +107,10 @@ def build_completion_response(checkpoints, completed, total, next_checkpoint):
         'checkpoints': checkpoints,
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def build_profile_response(user, request):
     module_codes, module_count = get_module_data(user)
     user_data = UserSerialiser(user, context={'request': request}).data
@@ -84,6 +120,10 @@ def build_profile_response(user, request):
     user_data['profile_completion'] = build_profile_completion(user)
     return user_data
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def update_username(user, data):
     new_username = data.get('username')
     if not new_username or new_username == user.username:
@@ -93,6 +133,10 @@ def update_username(user, data):
     user.username = new_username
     return None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def update_photo(user, data, files):
     if 'profile_photo' in files:
         user.profile_photo = files['profile_photo']
@@ -100,6 +144,10 @@ def update_photo(user, data, files):
     if data.get('remove_photo') == 'true':
         user.profile_photo = None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def apply_profile_patch(user, data, files):
     error = update_username(user, data)
     if error:
@@ -108,6 +156,10 @@ def apply_profile_patch(user, data, files):
     user.save()
     return None
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 def apply_profile_fields(user, data, files):
     if 'weekly_goal_hours' in data:
         user.weekly_goal_hours = int(data['weekly_goal_hours'])

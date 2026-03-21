@@ -46,8 +46,11 @@
 
 .timerTopRight {
     min-width: 320px;
+<<<<<<< HEAD
     display: flex;
     flex-direction: column;
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 .timerMainCentered {

@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import ConfirmModal from '../../components/common/confirm_modal/ConfirmModal';
+=======
+import ConfirmModal from '../../components/common/ConfirmModal/ConfirmModal';
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 const defaultProps = {
     title: 'Delete item',
@@ -81,6 +85,7 @@ describe('ConfirmModal', () => {
         render(<ConfirmModal {...defaultProps} isDanger={false} confirmText="OK" />);
         const confirmBtn = screen.getByText('OK');
         expect(confirmBtn.className).toContain('primary');
+<<<<<<< HEAD
     });
 
     it('renders centered buttons plus the correct danger and info hints', () => {
@@ -105,5 +110,7 @@ describe('ConfirmModal', () => {
 
         expect(screen.getByText('Helpful hint')).toBeInTheDocument();
         expect(screen.queryByText('This action cannot be undone.')).toBeNull();
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     });
 });

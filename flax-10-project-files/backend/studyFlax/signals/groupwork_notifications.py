@@ -1,13 +1,19 @@
+<<<<<<< HEAD
 """
 Signal handlers for groupwork notifications.
 """
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from studyFlax.models.groupwork.groupwork_model import GroupMembership
 from studyFlax.models.notifications.notification_model import Notification
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @receiver(post_save, sender=GroupMembership)
 def notify_on_added_to_project(sender, instance, created, **kwargs):
     """Notify user when they are added to a group project."""

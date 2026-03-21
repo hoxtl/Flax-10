@@ -4,7 +4,11 @@
  */
 
 import { isSameDay, getStartOfWeek, addDays } from "../utils/dateUtils";
+<<<<<<< HEAD
 import "../calendar-header.css";
+=======
+import "../CalendarHeader.css";
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 function DateCard({ day, isActive, onClick }) {
   const dayName = day.toLocaleDateString("en-US", { weekday: "short" }).charAt(0);
@@ -18,7 +22,10 @@ function DateCard({ day, isActive, onClick }) {
 }
 
 /** Horizontal strip of dates for quick navigation on mobile. */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 export function MobileDateStrip({ selectedDate, dispatch }) {
   const weekStart = getStartOfWeek(selectedDate);
   const weekDays = [...Array(7)].map((_, i) => addDays(weekStart, i));

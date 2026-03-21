@@ -1,7 +1,10 @@
 /*
  * Manual schedule form state.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '../../../context/ToastContext';
 import { filterScheduleEvents, toggleSelectedEventId } from './manualScheduleUtils';

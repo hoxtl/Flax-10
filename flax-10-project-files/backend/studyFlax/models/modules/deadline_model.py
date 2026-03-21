@@ -1,10 +1,8 @@
 """
 Model for module assessment deadlines such as exams, coursework, and quizzes.
 """
-
 from django.db import models
 from .module_model import Module
-
 
 DEADLINE_TYPES = [
     ('exam', 'Exam'),
@@ -14,7 +12,6 @@ DEADLINE_TYPES = [
 ]
 
 class Deadline(models.Model):
-    """Module deadline tracked in the academic calendar."""
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='deadlines')
     title = models.CharField(max_length=200)
     deadline_type = models.CharField(max_length=20, choices=DEADLINE_TYPES)

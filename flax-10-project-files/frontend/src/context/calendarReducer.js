@@ -24,8 +24,11 @@ export const initialState = {
     deleteConfirmEvent: null,
     deleteConfirmType: null, // 'occurrence' or 'all' for recurring
     reloadKey: 0,
+<<<<<<< HEAD
     sharedCalendarUserId: null,
     sharedCalendarName: '',
+=======
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 };
 
 /*
@@ -46,6 +49,7 @@ const handlers = {
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false }),
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
     SET_SEARCH_QUERY: (state, payload) => ({ ...state, searchQuery: payload }),
+<<<<<<< HEAD
     OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, popupReadOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
     CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null, popupReadOnly: false }),
     SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
@@ -54,6 +58,11 @@ const handlers = {
         sharedCalendarUserId: payload?.userId || null,
         sharedCalendarName: payload?.userName || '',
     }),
+=======
+    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, readOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
+    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null }),
+    SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
     OPEN_DELETE_CONFIRM: (state, payload) => ({ ...state, isDeleteConfirmOpen: true, deleteConfirmEvent: payload.event, deleteConfirmType: payload.type || null }),
     CLOSE_DELETE_CONFIRM: (state) => ({ ...state, isDeleteConfirmOpen: false, deleteConfirmEvent: null, deleteConfirmType: null }),
     TRIGGER_RELOAD: (state) => ({ ...state, reloadKey: (state.reloadKey || 0) + 1 }),

@@ -54,7 +54,8 @@ describe('useTimerFlow', () => {
             expect.any(Number),
             expect.any(String),
             expect.any(Number),
-            'Incomplete'
+            'Incomplete',
+            expect.any(Number)
         );
         expect(mockResetTimer).toHaveBeenCalled();
         expect(result.current.modal).toBeNull();
@@ -75,7 +76,8 @@ describe('useTimerFlow', () => {
             expect.any(Number),
             expect.any(String),
             expect.any(Number),
-            'Incomplete'
+            'Incomplete',
+            expect.any(Number)
         );
         expect(mockResetTimer).toHaveBeenCalled();
     });

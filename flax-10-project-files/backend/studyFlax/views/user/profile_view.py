@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from studyFlax.models import User
+<<<<<<< HEAD
 
 from .profile_helpers import apply_profile_patch, build_profile_response
 from .study_session_suggestions import create_study_suggestion, get_target_user, validate_target_user
@@ -15,6 +16,11 @@ from .study_session_suggestions import create_study_suggestion, get_target_user,
 
 def _study_suggestion_success_response():
     return Response({'message': 'Study session suggestion sent'}, status=status.HTTP_201_CREATED)
+=======
+
+from .profile_helpers import apply_profile_patch, build_profile_response, update_username
+from .study_session_suggestions import create_study_suggestion, get_target_user, validate_target_user
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 
 def _missing_target_user_response():
     return Response({'error': 'target_user_id is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -38,11 +44,16 @@ def another_user_profile_view(request, user_id):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     return Response(build_profile_response(user, request))
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def suggest_study_session_view(request):
     target_user_id = request.data.get('target_user_id')
     if not target_user_id:
+<<<<<<< HEAD
         return _missing_target_user_response()
     return _suggest_study_session_response(request, target_user_id)
 
@@ -60,3 +71,12 @@ def _study_suggestion_target(request, target_user_id):
 def _study_suggestion_success(request, target_user):
     create_study_suggestion(target_user, request.user, request.data)
     return _study_suggestion_success_response()
+=======
+        return Response({'error': 'target_user_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+    target_user = get_target_user(target_user_id)
+    error = validate_target_user(target_user, request.user)
+    if error:
+        return error
+    create_study_suggestion(target_user, request.user, request.data)
+    return Response({'message': 'Study session suggestion sent'}, status=status.HTTP_201_CREATED)
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)

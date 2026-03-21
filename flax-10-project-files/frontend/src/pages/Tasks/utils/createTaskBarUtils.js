@@ -2,6 +2,7 @@
  * Create-task-bar quick-add helpers.
  */
 
+<<<<<<< HEAD
 export const POMODORO_BLOCK_MINUTES = 25;
 export const MIN_ESTIMATE_MINUTES = 5;
 export const MAX_ESTIMATE_MINUTES = 240;
@@ -34,13 +35,21 @@ export function getEstimateBlocks(pageCount) {
 export function buildQuickAddPayload(state, taskTitle) {
   const { sortedLists, taskListId, estimatedMinutes, moduleId, defaultDueDate, pageCount } = state;
   const estimatedBlocks = pageCount ? getEstimateBlocks(pageCount) : minutesToEstimateBlocks(estimatedMinutes ?? POMODORO_BLOCK_MINUTES);
+=======
+export function getEstimateBlocks(pageCount) {
+  return Math.max(1, Math.ceil((Number(pageCount) * 2) / 25));
+}
+
+export function buildQuickAddPayload(state, taskTitle) {
+  const { sortedLists, taskListId, estimatedBlocks, moduleId, defaultDueDate, pageCount } = state;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
   return {
     title: taskTitle,
     description: "",
     priority: "medium",
     due_date: defaultDueDate ?? null,
     task_list: taskListId ? Number(taskListId) : (sortedLists[0]?.id ?? null),
-    estimated_blocks: estimatedBlocks,
+    estimated_blocks: pageCount ? getEstimateBlocks(pageCount) : estimatedBlocks,
     module: moduleId ? Number(moduleId) : null,
     page_count: pageCount ? Number(pageCount) : null,
   };

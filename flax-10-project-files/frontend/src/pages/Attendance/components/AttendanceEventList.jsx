@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * Attendance event list renderer — grouped by date header.
  */
 
@@ -32,6 +33,16 @@ export default function AttendanceEventList({ events, renderActions }) {
       ))}
     </div>
   );
+=======
+ * Attendance event list renderer.
+ */
+
+import AttendanceEventInfo from "./AttendanceEventInfo";
+import styles from "./AttendanceList.module.css";
+
+export default function AttendanceEventList({ events, renderActions }) {
+  return <ul className={styles.eventList}>{events.map((event) => <AttendanceEventRow key={event.id} event={event} actions={renderActions(event)} />)}</ul>;
+>>>>>>> cfe262a95 (Merge branch 'main' into devop/deploymentConfiguration)
 }
 
 function AttendanceEventRow({ event, actions }) {
