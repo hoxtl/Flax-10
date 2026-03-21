@@ -47,7 +47,7 @@ describe('ProjectRow', () => {
     expect(screen.queryByText('7 days')).toBeNull();
     expect(screen.getByText('5CCS2SEG')).toBeTruthy();
     expect(screen.getByText('Software Engineering')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'View more details' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Schedule times and view more details' })).toBeTruthy();
     expect(screen.getByLabelText('40% completion')).toBeTruthy();
     expect(screen.queryByText(/tasks done/i)).toBeNull();
     expect(screen.queryByText('JD')).toBeNull();

@@ -3,14 +3,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import GroupTasksTab from '../../../pages/GroupWork/GroupTasksTab';
 
-// Mock the hook directly
 vi.mock('../../../context/ConfirmContext', () => ({
   useConfirm: () => mockConfirm,
+}));
+vi.mock('../../../context/ToastContext', () => ({
+  useToast: () => vi.fn(),
 }));
 
 const mockConfirm = vi.fn();
 
-// Mock sub-components
 vi.mock('../../../pages/GroupWork/components/TaskListView', () => ({
   default: ({ tasks }) => (
     <div data-testid="task-list-view">
@@ -24,16 +25,25 @@ vi.mock('../../../pages/GroupWork/components/TaskTimelineView', () => ({
 vi.mock('../../../pages/GroupWork/components/TaskBoardView', () => ({
   default: () => <div data-testid="task-board-view" />,
 }));
+vi.mock('../../../pages/GroupWork/components/MemberFilter', () => ({
+  default: () => <div data-testid="member-filter" />,
+}));
+vi.mock('../../../pages/GroupWork/components/AddTaskModal', () => ({
+  default: ({ onAdd, onClose }) => (
+    <div data-testid="add-task-modal">
+      <button onClick={() => { onAdd({ title: 'New Seed Task' }); onClose(); }}>Confirm Add</button>
+    </div>
+  ),
+}));
 vi.mock('../../../components/common/AnimatedDropdown', () => ({
   default: () => <div data-testid="animated-dropdown" />,
 }));
-
-// Mock Lucide icons
 vi.mock('lucide-react', () => ({
   List: () => <div data-testid="list-icon" />,
   CalendarIcon: () => <div data-testid="calendar-icon" />,
   Square: () => <div data-testid="square-icon" />,
   ChevronDown: () => <div data-testid="chevron-down-icon" />,
+  Plus: () => <div data-testid="plus-icon" />,
 }));
 
 const mockMembers = [
@@ -80,30 +90,18 @@ describe('GroupTasksTab', () => {
   it('switches between views', async () => {
     renderComponent();
     await waitFor(() => screen.getByText("Task One"));
-    
+
     const timelineBtn = screen.getByText(/Timeline/i);
     fireEvent.click(timelineBtn);
     expect(screen.getByTestId('task-timeline-view')).toBeTruthy();
   });
 
-  it('adds a new task', async () => {
+  it('opens add task modal on button click', async () => {
     renderComponent();
-    await waitFor(() => screen.getByPlaceholderText(/Add a new task.../i));
-    
-    const input = screen.getByPlaceholderText(/Add a new task.../i);
-    const addBtn = screen.getByText(/Add/i);
-    
-    fireEvent.change(input, { target: { value: "New Seed Task" } });
-    
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ id: 3, title: "New Seed Task", status: "todo" }),
-    });
-    
+    await waitFor(() => screen.getByText("Task One"));
+
+    const addBtn = screen.getByText(/Add new task/i);
     fireEvent.click(addBtn);
-    
-    await waitFor(() => {
-      expect(screen.getByText("New Seed Task")).toBeTruthy();
-    });
+    expect(screen.getByTestId('add-task-modal')).toBeTruthy();
   });
 });

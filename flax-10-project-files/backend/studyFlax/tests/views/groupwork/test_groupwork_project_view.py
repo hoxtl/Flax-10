@@ -1,5 +1,7 @@
 from rest_framework import status
+from django.utils import timezone
 
+from studyFlax.models.modules.module_model import Module
 from studyFlax.models.groupwork.groupwork_model import GroupMembership, GroupProject
 from studyFlax.models.tasks.task_model import Task
 from studyFlax.tests.helpers.base import BaseTestCase
@@ -54,6 +56,27 @@ class GroupProjectListTests(BaseTestCase):
         payload = next(project for project in res.data if project["name"] == "Metrics")
         self.assertEqual(payload["task_count"], 2)
         self.assertEqual(payload["completed_task_count"], 1)
+
+    def test_list_projects_prefixes_tutor_names_with_dr(self):
+        teacher = make_user("teacher_gp", "teacher_gp@example.com")
+        teacher.role = "teacher"
+        teacher.first_name = "Hina"
+        teacher.last_name = "Patel"
+        teacher.save(update_fields=["role", "first_name", "last_name"])
+        Module.objects.create(
+            module_code="CS101",
+            module_name="Software Engineering",
+            created_by=teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now(),
+        )
+        _make_project(self.user, "Tutor Project", course_code="CS101")
+
+        res = self.client.get("/api/group-work/projects/")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        payload = next(project for project in res.data if project["name"] == "Tutor Project")
+        self.assertEqual(payload["module_tutor_name"], "Dr. Hina Patel")
 
 
 class GroupProjectDetailTests(BaseTestCase):
