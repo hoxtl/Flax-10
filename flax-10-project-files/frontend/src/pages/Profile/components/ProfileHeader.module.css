@@ -152,4 +152,51 @@
   font-style: italic;
 }
 
+@media (max-width: 768px) {
+  .header {
+    gap: 16px;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+  }
 
+  .avatar {
+    width: 92px;
+    height: 92px;
+    font-size: 34px;
+  }
+
+  .headerInfo {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .headerTop {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .username {
+    font-size: 22px;
+    width: 100%;
+  }
+
+  .headerSubline {
+    margin-top: -2px;
+    font-size: 12px;
+  }
+
+  .stats {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .statButton {
+    font-size: 14px;
+  }
+
+  .btnEdit {
+    margin-left: auto;
+  }
+}
