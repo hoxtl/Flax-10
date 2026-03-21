@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&
 DEBUG = False
 ALLOWED_HOSTS = [os.environ.get("RAILWAY_PUBLIC_DOMAIN")]
 
-CORS_ALLOWED_ORIGINS = os.environ.get("RAILWAY_PUBLIC_DOMAIN", "").split(",")
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ORIGIN", "").split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
