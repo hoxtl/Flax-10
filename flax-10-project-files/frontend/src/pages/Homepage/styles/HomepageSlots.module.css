@@ -2278,3 +2278,8 @@
   }
 }
 
+@media (max-width: 460px) {
+  .scheduleActionGroup > * {
+    flex: 1 1 100%;
+  }
+}
