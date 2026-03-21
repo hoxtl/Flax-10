@@ -246,12 +246,12 @@ describe('Profile', () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    const analyticsLinks = await screen.findAllByText(/View full analytics/i);
+    const analyticsLinks = await screen.findAllByText(/View (attendance details|full analytics)/i);
     fireEvent.click(analyticsLinks[0]);
     if (onNavigate.mock.calls.length === 0) {
       fireEvent.click(analyticsLinks[1]);
     }
-    expect(onNavigate).toHaveBeenCalledWith('analytics');
+    expect(onNavigate).toHaveBeenCalledWith('attendance');
     fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });

@@ -2,6 +2,11 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*_args, **_kwargs):
+        return False
 
 load_dotenv()
 
@@ -117,4 +122,5 @@ EMAIL_HOST_USER = 'StudyFlax@gmail.com'
 EMAIL_HOST_PASSWORD = 'xmgwyxrbevcqlevu'
 DEFAULT_FROM_EMAIL = 'StudyFlax <StudyFlax@gmail.com>'
 
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
