@@ -215,7 +215,10 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
                 console.error('Travel time fetch in module details error: ', error);
             }
         }
-    })
+        if (module.location) {
+            fetchTravelTime();
+        }
+    }, [module.location]);
 
     return (
         <div className={styles.container}>
