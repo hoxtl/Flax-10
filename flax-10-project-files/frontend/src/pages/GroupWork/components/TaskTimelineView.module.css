@@ -2,7 +2,6 @@
     border-radius: 8px;
     padding: 6px 8px;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .timelineCard:hover {
@@ -111,7 +110,6 @@
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
     cursor: grab;
-    transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .unscheduledCard:hover {
@@ -213,7 +211,6 @@
     flex-direction: column;
     gap: 6px;
     background: var(--bg);
-    transition: background 0.2s;
     overflow-y: auto;
 }
 
@@ -247,7 +244,6 @@
     background: var(--border);
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
     padding: 0;
 }
 
@@ -302,7 +298,6 @@
 
 .completionSegment {
     height: 100%;
-    transition: width 0.5s ease-out;
     cursor: pointer;
 }
 

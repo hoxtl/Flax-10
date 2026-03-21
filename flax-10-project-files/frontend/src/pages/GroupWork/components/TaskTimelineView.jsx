@@ -1,7 +1,11 @@
-import React, { useState, useMemo, useRef } from "react";
+/*
+ * GroupWork task timeline view.
+ */
+
+import { useMemo, useRef, useState } from "react";
 import styles from "./TaskTimelineView.module.css";
-import { getPriorityStyle, getUserColor } from "../utils/priorityUtils";
-import { handleDragStartTask, buildToggleAssignee } from "../utils/taskUtils";
+import { getPriorityStyle } from "../utils/priorityUtils";
+import { handleDragStartTask, buildToggleAssignee, filterVisibleAssignees } from "../utils/taskUtils";
 import { 
     getTimelineAnchor, 
     buildWeeks, 
@@ -13,7 +17,7 @@ import TaskAssigneePopup from "./TaskAssigneePopup";
 
 // --- Logic helpers for TaskTimelineView ---
 
-function useDragHandlers(onUpdate, setPage) {
+function useDragHandlers(onUpdate) {
     const onDragOver = (e) => { e.preventDefault(); e.currentTarget.classList.add(styles.timelineCellDropTarget); };
     const onDragLeave = (e) => { e.currentTarget.classList.remove(styles.timelineCellDropTarget); };
     const onDrop = (e, ts) => {
@@ -33,12 +37,6 @@ function useDragHandlers(onUpdate, setPage) {
     return { onDragOver, onDragLeave, onDrop, onDropWidget };
 }
 
-function filterAssignees(assignees, members) {
-  if (!Array.isArray(assignees) || !Array.isArray(members)) return assignees || [];
-  const memberIds = new Set(members.map(m => String(m.user)));
-  return assignees.filter(a => memberIds.has(String(a.id)));
-}
-
 function UnscheduledCard({ t, members }) {
     const style = getPriorityStyle(t.priority);
     return (
@@ -48,7 +46,7 @@ function UnscheduledCard({ t, members }) {
                 <span className={styles.priorityBadge} style={{ color: style.color, backgroundColor: style.backgroundColor }}>
                     {(t.priority || "medium").toUpperCase()}
                 </span>
-                <TaskAvatarStack assignees={filterAssignees(t.assignees_info || [], members)} size={16} />
+                <TaskAvatarStack assignees={filterVisibleAssignees(t.assignees_info || [], members)} size={16} />
             </div>
         </div>
     );
@@ -84,11 +82,11 @@ function TimelineCell({ wk, di, tasks, members, onUpdate, handlers }) {
     return (
         <div className={styles.timelineCell} onDragOver={handlers.onDragOver} onDragLeave={handlers.onDragLeave} onDrop={(e) => handlers.onDrop(e, ts)}>
             {tasks.map(t => (
-              <TimelineCard
+                <TimelineCard
                 key={t.id}
                 task={t}
                 members={members}
-                assignees={filterAssignees(t.assignees_info || [], members)}
+                assignees={filterVisibleAssignees(t.assignees_info || [], members)}
                 onUpdate={onUpdate}
                 onDragStart={handleDragStartTask}
               />
@@ -133,7 +131,7 @@ export default function TaskTimelineView({ tasks, members, onUpdate }) {
     const anchor = useMemo(() => getTimelineAnchor(), []);
     const [page, setPage] = useState(0);
     const { weeks, placed, unscheduled, visible } = useTimelineState(tasks, anchor, page);
-    const handlers = useDragHandlers(onUpdate, setPage);
+    const handlers = useDragHandlers(onUpdate);
 
     return (
         <div className={styles.viewContainer}>

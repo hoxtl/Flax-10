@@ -1,4 +1,8 @@
-import { useState, useEffect } from "react";
+/*
+ * GroupWork availability tab.
+ */
+
+import { useCallback, useEffect, useState } from "react";
 import { Check, X, Star, Trash2 } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
@@ -25,8 +29,8 @@ function AvailabilityFooter() {
     );
 }
 
-function MeetingVoteCount({ count, icon: Icon, title }) {
-    return <span className={styles.voteCount} title={title}><Icon size={14} /> {count}</span>;
+function MeetingVoteCount({ count, title, children }) {
+    return <span className={styles.voteCount} title={title}>{children} {count}</span>;
 }
 
 function MeetingCardActions({ s, currentUserId, onVote, onDelete }) {
@@ -50,9 +54,9 @@ function ProposedMeetingCard({ s, currentUserId, onVote, onDelete }) {
                 <div className={styles.suggestionTitle}>{dateLabel}</div>
                 <div className={styles.suggestionMeta}>Proposed by {s.suggested_by.username}</div>
                 <div className={styles.votes}>
-                    <MeetingVoteCount count={accepted} icon={Check} title={`${accepted} accepted`} />
+                    <MeetingVoteCount count={accepted} title={`${accepted} accepted`}><Check size={14} /></MeetingVoteCount>
                     <span className={styles.voteSeparator}>·</span>
-                    <MeetingVoteCount count={rejected} icon={X} title={`${rejected} rejected`} />
+                    <MeetingVoteCount count={rejected} title={`${rejected} rejected`}><X size={14} /></MeetingVoteCount>
                 </div>
             </div>
             <MeetingCardActions s={s} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />
@@ -117,13 +121,13 @@ function SuggestionModal({ slot, onCancel, onConfirm }) {
 function useAvailabilityData(pid) {
     const [data, setData] = useState({ suggestions: [], active_suggestions: [], current_user_id: null });
     const [loading, setLoading] = useState(true);
-    const fetchAvail = () => {
+    const fetchAvail = useCallback(() => {
         fetch(`/api/group-work/projects/${pid}/availability/`, { headers: getAuthHeaders() })
             .then(res => res.ok ? res.json() : null)
             .then(d => d && setData(d))
             .finally(() => setLoading(false));
-    };
-    useEffect(() => { fetchAvail(); }, [pid]);
+    }, [pid]);
+    useEffect(() => { fetchAvail(); }, [fetchAvail]);
     return { data, fetchAvail, loading };
 }
 

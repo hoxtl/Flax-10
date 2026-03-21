@@ -44,7 +44,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s;
 }
 
 .viewToggleBtn:hover {
@@ -71,7 +70,6 @@
     color: var(--text);
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
     font-family: inherit;
     box-sizing: border-box;
 }
@@ -112,7 +110,6 @@
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
     user-select: none;
     box-sizing: border-box;
 }
@@ -128,7 +125,6 @@
     justify-content: center;
     color: var(--text-secondary);
     margin-left: 8px;
-    transition: transform 0.2s ease;
 }
 
 .filterWrapper:focus-within .filterCustomArrow {
@@ -144,7 +140,6 @@
     color: #fff;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
     font-family: inherit;
     box-sizing: border-box;
     display: flex;

@@ -71,7 +71,6 @@ function useFetchTasks(projectId) {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        setLoading(true);
         fetch(`/api/tasks/?group_project=${projectId}`, { headers: getAuthHeaders() })
             .then(res => res.ok ? res.json() : [])
             .then(data => { setTasks(data); setLoading(false); });
@@ -103,7 +102,7 @@ function useTasks(projectId, members, onStatsUpdate, confirm) {
     const { tasks, setTasks, loading } = useFetchTasks(projectId);
     const { updateTask, deleteTask } = useTaskActions(setTasks, confirm);
     const [newTaskTitle, setNewTaskTitle] = useState("");
-    useEffect(() => { onStatsUpdate?.(calcCompletionSegments(tasks, members)); }, [tasks, members]);
+    useEffect(() => { onStatsUpdate?.(calcCompletionSegments(tasks, members)); }, [tasks, members, onStatsUpdate]);
 
     const addTask = async (e, directTitle, directStatus) => {
         e?.preventDefault?.();
