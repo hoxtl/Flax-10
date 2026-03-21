@@ -201,7 +201,7 @@ function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     const data = useModuleData(module);
-    const [travelTime, setTravelTime] = useState(null);s
+    const [travelTime, setTravelTime] = useState(null);
 
     useEffect(() => {
         async function fetchTravelTime() {
