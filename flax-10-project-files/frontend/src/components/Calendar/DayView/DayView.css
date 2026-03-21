@@ -137,3 +137,7 @@
 .events-layer>* {
     pointer-events: auto;
 }
+
+.day-grid .now-line {
+    left: 0;
+}
