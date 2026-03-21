@@ -10,7 +10,11 @@
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-highlight));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-highlight)
+  );
   color: var(--color-on-primary);
   display: flex;
   align-items: center;
@@ -19,7 +23,8 @@
   font-weight: 600;
   flex-shrink: 0;
   overflow: hidden;
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  box-shadow: 0 8px 32px
+    color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .avatarImage {
@@ -111,7 +116,11 @@
   border-radius: 999px;
   padding: 2px 8px;
   border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
-  background: color-mix(in oklab, var(--primary-soft, var(--panel)) 60%, var(--panel));
+  background: color-mix(
+    in oklab,
+    var(--primary-soft, var(--panel)) 60%,
+    var(--panel)
+  );
   color: var(--primary-700, var(--primary));
   font-size: 11px;
   font-weight: 700;
@@ -143,135 +152,4 @@
   font-style: italic;
 }
 
-.desktopOnly {
-  display: flex;
-}
 
-.mobileOnly {
-  display: none;
-}
-
-.mobileHeaderWrap {
-  flex-direction: column;
-  margin-bottom: 24px;
-}
-
-.mobileHero {
-  position: relative;
-  background-color: var(--color-primary);
-  background-image:
-    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
-    linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary) 100%);
-  background-size: 20px 20px, 20px 20px, 100% 100%;
-  border-radius: 20px;
-  padding: 32px 20px 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--color-on-primary);
-  text-align: center;
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--color-primary) 25%, transparent);
-}
-
-.mobileAvatar {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  border: 4px solid var(--color-on-primary);
-  background: var(--color-card);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: var(--color-primary);
-  overflow: hidden;
-}
-
-.mobileUsername {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 4px;
-  letter-spacing: -0.02em;
-  color: rgba(255,255,255,0.777);
-}
-
-.mobileBio {
-  font-size: 13px;
-  opacity: 0.9;
-  margin: 0 0 8px;
-  font-weight: 500;
-}
-
-.mobileRolePill {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.45);
-  background: rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.95);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  padding: 3px 10px;
-  margin-bottom: 12px;
-}
-
-.mobileActions {
-  display: flex;
-  gap: 10px;
-}
-
-.mobileBtnEdit {
-  min-width: 124px;
-}
-
-.mobileStatsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: -30px;
-  padding: 0 16px;
-  position: relative;
-  z-index: 2;
-}
-
-.mobileStatCard {
-  padding: 12px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  cursor: pointer;
-  position: relative;
-  background: var(--surface-glass-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--surface-glass-card-border);
-  border-radius: 16px;
-  box-shadow: var(--surface-glass-card-shadow);
-}
-
-.mobileStatValue {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
-
-.mobileStatLabel {
-  font-size: 10px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-@media (max-width: 768px) {
-  .desktopOnly { display: none !important; }
-  .mobileOnly { display: flex; }
-  .header { gap: 24px; }
-  .avatar { width: 80px; height: 80px; font-size: 32px; }
-  .username { font-size: 20px; }
-  .stats { gap: 20px; }
-}
