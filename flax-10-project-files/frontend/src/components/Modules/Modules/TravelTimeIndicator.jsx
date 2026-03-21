@@ -1,3 +1,6 @@
+import styles from './TravelTimeIndicator.module.css';
+
+
 export default function TravelTimeIndicator({ duration }) {
     if (!duration) return null;
 
