@@ -186,10 +186,10 @@ function useModuleData(module) {
     };
 }
 
-function MainColumn({ module, sortedDeadlines, nextClass }) {
+function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
     return (
         <div className={styles.mainColumn}>
-            <ScheduleCard module={module} nextClass={nextClass} />
+            <ScheduleCard module={module} nextClass={nextClass} travelTime={travelTime} />
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Assignments</h2><DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} /></article>
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Readings</h2><ReadingsSection readings={module.readings} /></article>
         </div>
