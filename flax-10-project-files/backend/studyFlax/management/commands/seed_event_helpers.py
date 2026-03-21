@@ -42,6 +42,21 @@ def _in_reading_week(dt):
 
 ACADEMIC_TAG_NAMES = {'Lecture', 'Exam'}
 
+WEEKEND_BLOCK_SPECS = [
+    (10, 0, 90, "Gym session"),
+    (11, 0, 60, "Brunch with friends"),
+    (14, 0, 120, "Study session"),
+    (15, 30, 60, "Errands"),
+    (11, 30, 90, "Football practice"),
+    (16, 0, 60, "Library visit"),
+    (9, 30, 60, "Morning run"),
+    (13, 0, 90, "Part-time work"),
+    (17, 0, 90, "Family dinner"),
+    (10, 30, 120, "Volunteering"),
+    (12, 0, 60, "Grocery shopping"),
+    (15, 0, 90, "Gaming with friends"),
+]
+
 def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
@@ -257,6 +272,32 @@ def build_deadlines_for_module(module):
     now = timezone.now()
     results = [_build_single_deadline(module, *t, now, used_offsets, index=i) for i, t in enumerate(templates)]
     return [d for d in results if d is not None]
+
+def build_weekend_events(user, tags, user_rng):
+    """Random weekend blocking events to create realistic mixed availability."""
+    events = []
+    personal_tags = [t for t in tags if (t.user_id == user.id or t.is_default) and t.name not in ACADEMIC_TAG_NAMES]
+    for day_offset in range(SEED_DAYS):
+        dt = SEED_START + timedelta(days=day_offset)
+        if dt.weekday() not in (5, 6):
+            continue
+        if user_rng.random() > 0.45:
+            continue
+        hour, minute, duration, title = user_rng.choice(WEEKEND_BLOCK_SPECS)
+        start = dt.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        tag = user_rng.choice(personal_tags) if personal_tags else None
+        events.append(CalendarEvent(
+            user=user,
+            title=title,
+            description="",
+            start_time=start,
+            end_time=start + timedelta(minutes=duration),
+            location=None,
+            tag=tag,
+            priority='low',
+            recurrence_rule=None,
+        ))
+    return events
 
 def create_deadline_calendar_event(user, deadline):
     """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""

@@ -24,6 +24,7 @@ PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
 MIN_PROJECT_MEMBER_TOTAL = 4
 MAX_PROJECT_MEMBER_TOTAL = 10
+MAX_PROJECTS_PER_STUDENT = 6
 PROJECT_TYPE_TEMPLATES = {
     "technical": ["prototype review", "sprint presentation", "solution walkthrough"],
     "lab": ["research poster", "findings deck", "methods showcase"],
@@ -103,11 +104,14 @@ def _list_seed_modules(student_modules):
     return modules
 
 def _pick_owner_for_module(module, students, module_students, rng):
+    eligible_students = [student for student in students if not _has_reached_project_limit(student)]
+    if not eligible_students:
+        return None
     if module:
-        module_members = module_students.get(module.module_code, [])
+        module_members = [student for student in module_students.get(module.module_code, []) if not _has_reached_project_limit(student)]
         if module_members:
             return rng.choice(module_members)
-    return _pick_owner(students, rng)
+    return _pick_owner(eligible_students, rng)
 
 def _showcase_modules(showcase_student, student_modules, seed_modules):
     if showcase_student:
@@ -255,6 +259,10 @@ def _sync_project_owner_membership(project, owner):
     GroupMembership.objects.filter(project=project, role='owner').exclude(user=owner).update(role='member')
     GroupMembership.objects.update_or_create(project=project, user=owner, defaults={'role': 'owner'})
 
+
+def _has_reached_project_limit(student):
+    return GroupMembership.objects.filter(user=student).count() >= MAX_PROJECTS_PER_STUDENT
+
 def _create_single_project(spec, students, now, rng, index, module_students):
     module = spec["module"]
     owner = _pick_owner_for_module(module, students, module_students, rng)
@@ -316,7 +324,10 @@ def _select_project_cohort(project, students, module_students):
 
 def _add_members_to_project(project, students, rng, showcase_student, module_students):
     cohort = _select_project_cohort(project, students, module_students)
-    potential = [student for student in cohort if student != project.owner]
+    potential = [
+        student for student in cohort
+        if student != project.owner and not _has_reached_project_limit(student)
+    ]
     forced_members = []
     if showcase_student and showcase_student != project.owner and any(student.id == showcase_student.id for student in potential):
         forced_members.append(showcase_student)
@@ -347,6 +358,8 @@ def create_group_memberships(stdout):
     allowed_specs = _build_project_specs(showcase_student, student_modules, seed_modules, timezone.now())
     allowed_keys = {(spec["name"], spec["module"].module_code) for spec in allowed_specs}
     projects = list(GroupProject.objects.filter(course_code__in=[module.module_code for module in _showcase_modules(showcase_student, student_modules, seed_modules)]))
+    allowed_project_ids = [project.id for project in projects if (project.name, project.course_code) in allowed_keys]
+    GroupMembership.objects.filter(project_id__in=allowed_project_ids).exclude(role="owner").delete()
     for project in projects:
         if (project.name, project.course_code) not in allowed_keys:
             continue
@@ -369,6 +382,8 @@ def _create_single_group_task(project, members, due, template, task_index, now, 
     t_title, t_desc, t_priority, t_blocks = template
     status = _get_project_status_pattern(project)[task_index % len(GROUP_TASK_TEMPLATES)]
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
+    has_due_date = not (status == "todo" and task_index >= 3)
+    task_due = _build_task_due_date(due, task_index, now) if has_due_date else None
     task, _ = Task.objects.update_or_create(
         group_project=project,
         title=t_title,
@@ -380,15 +395,18 @@ def _create_single_group_task(project, members, due, template, task_index, now, 
             'status': status,
             'completed': is_completed,
             'completed_at': completed_at,
-            'due_date': _build_task_due_date(due, task_index, now),
+            'due_date': task_due,
         },
     )
-    selected_count = min(len(members), 1 + ((task_index + len(project.name)) % 2))
-    assignees = rng.sample(members, selected_count) if selected_count > 0 else []
+    if is_completed and len(members) > 1:
+        assignees = [members[task_index % len(members)]]
+    else:
+        selected_count = min(len(members), 1 + ((task_index + len(project.name)) % 2))
+        assignees = rng.sample(members, selected_count) if selected_count > 0 else []
     task.assigned_to.set(assignees)
 
 def _seed_tasks_for_project(project, now):
-    members = [m.user for m in project.memberships.all()]
+    members = sorted([m.user for m in project.memberships.all()], key=lambda u: u.username)
     if not members:
         return
     due = project.deadline or (now + timedelta(days=14))
