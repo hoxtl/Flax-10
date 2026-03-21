@@ -132,8 +132,16 @@ export function homePopupHTML(userHome) {
   </div>`;
 }
 
-function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation) {
+async function handleHomeButtonClick(userHome, homePointerRef, mapRef, setStartLocation, setManualStart) {
   setStartLocation({ lng: userHome.lng, lat: userHome.lat });
+  if (userHome.address) {
+    setManualStart(userHome.address)
+  } else {
+    const address = await reverseGeocode(userHome.lat, userHome.lng);
+    if (address) {
+      setManualStart(address);
+    }
+  }
   if (homePointerRef.current?.getPopup().isOpen()) homePointerRef.current.togglePopup();
   mapRef.current?.flyTo({ center: [userHome.lng, userHome.lat], zoom: 15, pitch: 55, duration: 1200 });
 }

@@ -209,10 +209,8 @@ export default function CampusMap() {
   const onGeoSuccess = async ({ coords }) => {
     const loc = { lng: coords.longitude, lat: coords.latitude };
     setStartLocation(loc);
-
     const address = await reverseGeocode(coords.latitude, coords.longitude);
     if (address) { setManualStart(address) };
-
     map.current?.flyTo({ center: [loc.lng, loc.lat], zoom: 15, pitch: 55, duration: 1200 });
     setLocating(false);
   };
