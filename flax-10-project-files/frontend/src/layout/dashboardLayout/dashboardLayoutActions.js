@@ -2,7 +2,7 @@
  * Dashboard action helpers.
  */
 
-import { authService } from "../../api/authService";
+import { authService } from "../../api/authApi";
 import { clearUserData } from "../../components/Authentication/utils/authHelpers";
 
 export async function handleLogoutClick() {
