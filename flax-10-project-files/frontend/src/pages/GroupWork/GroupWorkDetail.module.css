@@ -1,11 +1,25 @@
 .container {
-    padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .empty {
-    text-align: center;
-    margin-top: 48px;
-    color: var(--text-secondary);
+  text-align: center;
+  margin-top: 48px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 12px;
+  }
 }
