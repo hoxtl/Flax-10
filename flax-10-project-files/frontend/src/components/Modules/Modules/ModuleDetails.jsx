@@ -12,6 +12,10 @@ import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
+import TravelTimeIndicator from './TravelTimeIndicator.jsx';
+import { useEffect, useState } from 'react';
+import { getHomeAddress } from '../../../api/userService.js';
+import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -133,7 +137,7 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
     );
 }
 
-function ScheduleCard({ module, nextClass }) {
+function ScheduleCard({ module, nextClass, travelTime }) {
     return (
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Schedule</h2>
@@ -149,6 +153,7 @@ function ScheduleCard({ module, nextClass }) {
                 <ScheduleItem icon="⏱" label="Duration" value={formatDuration(module.start_time, module.end_time) || 'TBA'} className={scheduleStyles.scheduleItemCompact} />
             </div>
             {module.recurrence_rule && <RecurringBadge />}
+            <TravelTimeIndicator duration={travelTime} />
         </article>
     );
 }
@@ -184,10 +189,10 @@ function useModuleData(module) {
     };
 }
 
-function MainColumn({ module, sortedDeadlines, nextClass }) {
+function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
     return (
         <div className={styles.mainColumn}>
-            <ScheduleCard module={module} nextClass={nextClass} />
+            <ScheduleCard module={module} nextClass={nextClass} travelTime={travelTime} />
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Assignments</h2><DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} /></article>
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Readings</h2><ReadingsSection readings={module.readings} /></article>
         </div>
@@ -196,11 +201,30 @@ function MainColumn({ module, sortedDeadlines, nextClass }) {
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     const data = useModuleData(module);
+    const [travelTime, setTravelTime] = useState(null);
+
+    useEffect(() => {
+        async function fetchTravelTime() {
+            try {
+                const homeAddress = await getHomeAddress();
+                const travelInfo = await getTravelTimeModule(homeAddress, module.location);
+                if (travelInfo) {
+                    setTravelTime(travelInfo.duration);
+                }
+            } catch (error) {
+                console.error('Travel time fetch in module details error: ', error);
+            }
+        }
+        if (module.location) {
+            fetchTravelTime();
+        }
+    }, [module.location]);
+
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
             <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getTutorImage(module)} />
-            <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
+            <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
 }
