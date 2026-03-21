@@ -187,4 +187,58 @@
   margin-bottom: 1.5rem;
 }
 
+@media (max-width: 900px) {
+  .page {
+    padding: 1.25rem 1rem;
+  }
 
+  .overviewWrap,
+  .twoCol,
+  .chartsGrid,
+  .card,
+  .chartContainerMin,
+  .insightRow {
+    min-width: 0;
+  }
+
+  .card {
+    overflow: hidden;
+    padding: 0.95rem;
+  }
+
+  .insightRow {
+    gap: 0.7rem;
+  }
+
+  .overviewWrap :global(.MuiChartsWrapper-root),
+  .overviewWrap :global(.MuiChartsSurface-root),
+  .overviewWrap :global(.MuiChartsLegend-root),
+  .overviewWrap :global(svg) {
+    max-width: 100% !important;
+  }
+
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  .skeletonHeader {
+    flex-direction: column;
+  }
+
+  .skeletonSummaryGrid,
+  .skeletonAnalyticsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeletonAnalyticsCardWide {
+    grid-column: auto;
+  }
+}
