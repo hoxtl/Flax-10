@@ -137,7 +137,7 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
     );
 }
 
-function ScheduleCard({ module, nextClass }) {
+function ScheduleCard({ module, nextClass, travelTime }) {
     return (
         <article className={styles.sectionCard}>
             <h2 className={styles.sectionTitle}>Schedule</h2>
