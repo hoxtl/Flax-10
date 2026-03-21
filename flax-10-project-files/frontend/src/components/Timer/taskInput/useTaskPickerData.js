@@ -11,13 +11,16 @@ function useTaskPickerFlags() {
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState(SORT_URGENCY);
   const [search, setSearch] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState(() => {
+    try { return sessionStorage.getItem('timerTaskId'); } catch { return null; }
+  });
   const [recommendedTaskId, setRecommendedTaskId] = useState(null);
   const [filterListIds, setFilterListIds] = useState([]);
   const [filterModuleCodes, setFilterModuleCodes] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilterTab, setActiveFilterTab] = useState('lists');
   const [filterQuery, setFilterQuery] = useState('');
-  return { open, setOpen, loading, setLoading, sortBy, setSortBy, search, setSearch, recommendedTaskId, setRecommendedTaskId, filterListIds, setFilterListIds, filterModuleCodes, setFilterModuleCodes, isFilterOpen, setIsFilterOpen, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery };
+  return { open, setOpen, loading, setLoading, sortBy, setSortBy, search, setSearch, selectedTaskId, setSelectedTaskId, recommendedTaskId, setRecommendedTaskId, filterListIds, setFilterListIds, filterModuleCodes, setFilterModuleCodes, isFilterOpen, setIsFilterOpen, activeFilterTab, setActiveFilterTab, filterQuery, setFilterQuery };
 }
 
 function useTaskDataStore() {

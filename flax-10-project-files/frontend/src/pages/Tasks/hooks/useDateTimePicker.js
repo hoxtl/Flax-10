@@ -1,8 +1,8 @@
-/**
- * Hook for DateTimePicker: state, dropdown position, sync from value, outside-close.
+/*
+ * Date-time picker state, positioning, and change handlers.
  */
 
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { parseIncomingValue, emitChange as emitChangeUtil, calendarDays } from "../utils/dateTimePickerUtils";
 
 function useDateTimePickerState(parsed) {
@@ -27,7 +27,7 @@ function useDateTimePickerDropdownPos(ref, open, timeOnly, setDropdownPos) {
     const spaceBelow = window.innerHeight - rect.bottom;
     const openAbove = spaceBelow < dropdownHeight && rect.top > dropdownHeight;
     setDropdownPos({ top: openAbove ? rect.top - dropdownHeight - gap : rect.bottom + gap, left: rect.left });
-  }, [open, timeOnly]);
+  }, [open, timeOnly, ref, setDropdownPos]);
 }
 
 function useDateTimePickerValueSync(value, timeOnly, setSelDate, setHour, setMinute, setViewY, setViewM) {
@@ -42,7 +42,7 @@ function useDateTimePickerValueSync(value, timeOnly, setSelDate, setHour, setMin
     setMinute(d.getMinutes());
     setViewY(d.getFullYear());
     setViewM(d.getMonth());
-  }, [value, timeOnly]);
+  }, [value, timeOnly, setSelDate, setHour, setMinute, setViewY, setViewM]);
 }
 
 function addOutsideCloseListeners(ref, dropdownRef, setOpen) {
@@ -67,25 +67,31 @@ function useDateTimePickerOutsideClose(open, ref, dropdownRef, setOpen) {
   useEffect(() => {
     if (!open) return;
     return addOutsideCloseListeners(ref, dropdownRef, setOpen);
-  }, [open]);
+  }, [open, ref, dropdownRef, setOpen]);
+}
+
+function selectMonth(direction, viewM, setViewM, setViewY) {
+  if (direction === "prev" && viewM === 0) { setViewY((year) => year - 1); setViewM(11); return; }
+  if (direction === "next" && viewM === 11) { setViewY((year) => year + 1); setViewM(0); return; }
+  return setViewM((month) => month + (direction === "prev" ? -1 : 1));
 }
 
 function useDateTimePickerCallbacks(state, onChange, timeOnly) {
-  const { viewY, viewM, selDate, hour, minute, setSelDate } = state;
-  const emitChange = useCallback((date, h, m) => emitChangeUtil(onChange, timeOnly, date, h, m), [onChange, timeOnly]);
-  const selectDay = useCallback((day) => {
+  const { viewY, viewM, selDate, hour, minute, setSelDate, setHour, setMinute, setViewM, setViewY } = state;
+  const emitChange = (date, nextHour, nextMinute) => emitChangeUtil(onChange, timeOnly, date, nextHour, nextMinute);
+  const selectDay = (day) => {
     const d = new Date(viewY, viewM, day);
     setSelDate(d);
     emitChange(d, hour, minute);
-  }, [viewY, viewM, hour, minute, emitChange]);
-  const changeHour = useCallback((h) => { state.setHour(h); if (selDate) emitChange(selDate, h, state.minute); }, [selDate, state.minute, emitChange]);
-  const changeMinute = useCallback((m) => { state.setMinute(m); if (selDate) emitChange(selDate, state.hour, m); }, [selDate, state.hour, emitChange]);
-  const prevMonth = useCallback(() => { if (state.viewM === 0) { state.setViewY((y) => y - 1); state.setViewM(11); } else state.setViewM((m) => m - 1); }, [state.viewM]);
-  const nextMonth = useCallback(() => { if (state.viewM === 11) { state.setViewY((y) => y + 1); state.setViewM(0); } else state.setViewM((m) => m + 1); }, [state.viewM]);
+  };
+  const changeHour = (nextHour) => { setHour(nextHour); if (selDate) emitChange(selDate, nextHour, minute); };
+  const changeMinute = (nextMinute) => { setMinute(nextMinute); if (selDate) emitChange(selDate, hour, nextMinute); };
+  const prevMonth = () => selectMonth("prev", viewM, setViewM, setViewY);
+  const nextMonth = () => selectMonth("next", viewM, setViewM, setViewY);
   const today = useMemo(() => new Date(), []);
-  const isToday = useCallback((d) => d === today.getDate() && viewM === today.getMonth() && viewY === today.getFullYear(), [viewY, viewM]);
-  const isSel = useCallback((d) => selDate && d === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear(), [selDate, viewY, viewM]);
-  const clearSelection = useCallback(() => { setSelDate(null); onChange?.(""); }, [onChange]);
+  const isToday = (day) => day === today.getDate() && viewM === today.getMonth() && viewY === today.getFullYear();
+  const isSel = (day) => selDate && day === selDate.getDate() && viewM === selDate.getMonth() && viewY === selDate.getFullYear();
+  const clearSelection = () => { setSelDate(null); onChange?.(""); };
   const days = useMemo(() => calendarDays(viewY, viewM), [viewY, viewM]);
   return { selectDay, changeHour, changeMinute, prevMonth, nextMonth, days, isToday, isSel, clearSelection };
 }

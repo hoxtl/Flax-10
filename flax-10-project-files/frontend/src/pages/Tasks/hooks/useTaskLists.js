@@ -1,4 +1,4 @@
-/**
+/*
  * Hook for task lists: load, add, rename, remove, restore, permanently delete.
  */
 
