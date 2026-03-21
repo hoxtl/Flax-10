@@ -1,3 +1,7 @@
+"""
+Schedule CRUD views.
+"""
+
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -11,10 +15,7 @@ from studyFlax.serialisers import ScheduleSerialiser
 
 from .auto_scheduler_views import build_auto_schedule
 from .system_tags import get_schedule_tag
-from .schedule_helpers import (
-    _schedule_queryset,
-    _overwrite_same_name_schedules
-)
+from .schedule_helpers import _overwrite_same_name_schedules, _schedule_queryset
 
 def _events_for_manual_schedule(user, event_ids):
     schedule_tag = get_schedule_tag()
