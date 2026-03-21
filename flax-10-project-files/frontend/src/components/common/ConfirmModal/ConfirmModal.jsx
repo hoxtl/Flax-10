@@ -2,7 +2,7 @@ import StandardModal from "../StandardModal/StandardModal";
 import PrimaryButton from "../PrimaryButton/PrimaryButton";
 import styles from "./ConfirmModal.module.css";
 
-export default function ConfirmModal({ title, message, children, onConfirm, onCancel, onAlternate, confirmText = "Confirm", cancelText = "Cancel", alternateText, isDanger = false, centerText = false, dangerHint = "", infoHint = "", size = "sm", modalClassName = "" }) {
+export default function ConfirmModal({ title, message, children, onConfirm, onCancel, onAlternate, confirmText = "Confirm", cancelText = "Cancel", alternateText, isDanger = false, centerText = false, dangerHint = "", infoHint = "", size = "sm", modalClassName = "", dangerTitle = "Session Progress Will Be Lost", dangerDescription = "Ending now will discard this session progress." }) {
     const confirmVariant = isDanger ? "danger" : "primary";
     const buttonClasses = centerText ? `${styles.buttons} ${styles.buttonsCentered}` : styles.buttons;
     const bodyClasses = `${styles.modalBody} ${isDanger ? styles.modalBodyDanger : ''}`.trim();
@@ -14,8 +14,11 @@ export default function ConfirmModal({ title, message, children, onConfirm, onCa
             <div className={bodyClasses}>
                 {isDanger && (
                     <div className={styles.dangerBadge}>
-                        <span aria-hidden="true">⚠️</span>
-                        <span>Ending now will discard this session progress.</span>
+                        <span className={styles.dangerIcon} aria-hidden="true">!</span>
+                        <div className={styles.dangerText}>
+                            <span className={styles.dangerTitle}>{dangerTitle}</span>
+                            <span className={styles.dangerDescription}>{dangerDescription}</span>
+                        </div>
                     </div>
                 )}
                 {message && <div className={messageClasses}>{message}</div>}
