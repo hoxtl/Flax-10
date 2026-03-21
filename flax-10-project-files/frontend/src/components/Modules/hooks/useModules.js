@@ -1,5 +1,5 @@
 /* Hook for managing modules state, enrolments, and CRUD operations. */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
 import { fetchTasks } from '../../../api/taskService.js';
@@ -117,9 +117,9 @@ export default function useModules() {
   const [enrollments, setEnrollments] = useState([]);
   const [taskCountsByModule, setTaskCountsByModule] = useState({});
   const { addNotification } = useNotifications();
-  const notify = createNotify(addNotification);
+  const notify = useMemo(() => createNotify(addNotification), [addNotification]);
   const confirmFn = useConfirm();
-  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, []);
+  useEffect(() => { loadData(setLoading, setModules, setEnrollments, setTaskCountsByModule, notify); }, [notify]);
   return useModuleActions(
     modules,
     enrollments,

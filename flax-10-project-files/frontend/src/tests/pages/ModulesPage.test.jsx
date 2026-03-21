@@ -227,7 +227,7 @@ describe('ModulesPage', () => {
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
         expect(screen.getByText('Overview')).toBeInTheDocument();
-        expect(screen.getByText('My Enrollments')).toBeInTheDocument();
+        expect(screen.getByText('My Enrolments')).toBeInTheDocument();
         expect(screen.getByText('Upcoming assignment deadlines')).toBeInTheDocument();
     });
 });

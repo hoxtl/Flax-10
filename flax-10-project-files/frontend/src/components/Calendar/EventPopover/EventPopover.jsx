@@ -1,7 +1,4 @@
-/**
- * EventPopover - Positioned popover showing event details.
- * Supports dynamic positioning and action buttons.
- */
+/* Event details popover with dynamic positioning and actions. */
 import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
@@ -80,7 +77,7 @@ function usePopoverPosition(popoverRef, anchorRect, event, viewMode) {
     const obs = new ResizeObserver(update);
     obs.observe(popoverRef.current);
     return () => obs.disconnect();
-  }, [anchorRect, event, viewMode]);
+  }, [anchorRect, event, popoverRef, viewMode]);
   return position;
 }
 
@@ -93,7 +90,7 @@ function usePopoverCloseEvents(popoverRef, onClose) {
     document.addEventListener('mousedown', handle);
     document.addEventListener('keydown', handle);
     return () => { document.removeEventListener('mousedown', handle); document.removeEventListener('keydown', handle); };
-  }, [onClose]);
+  }, [onClose, popoverRef]);
 }
 
 function EventPopoverContent({ event, tag, actions, onClose, readOnly }) {
@@ -130,7 +127,7 @@ function PopoverPortal({ popoverRef, pos, arrowStyle, event, tag, actions, onClo
   );
 }
 
-/** Event details popover with dynamic positioning. */
+/* Event details popover with dynamic positioning. */
 export function EventPopover({ event, anchorRect, onClose, actions, tag, readOnly, viewMode }) {
   const popoverRef = useRef(null);
   const pos = usePopoverPosition(popoverRef, anchorRect, event, viewMode);

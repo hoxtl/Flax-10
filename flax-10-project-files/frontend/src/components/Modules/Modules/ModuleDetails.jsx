@@ -241,7 +241,7 @@ function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
         : <button className={styles.enrollButton} onClick={onEnroll}>Enrol in module</button>;
 }
 
-function DeadlineItem({ deadline, index, moduleCode }) {
+function DeadlineItem({ deadline, index }) {
     const urgency = getUrgencyLabel(deadline.start_due_date);
     return (
         <div className={deadlineStyles.deadlineItem}>
@@ -260,11 +260,11 @@ function DeadlineItem({ deadline, index, moduleCode }) {
     );
 }
 
-function DeadlinesSection({ deadlines, moduleCode }) {
+function DeadlinesSection({ deadlines }) {
     if (!deadlines?.length) return <p className={deadlineStyles.emptyText}>No assignments yet.</p>;
     return (
         <div className={deadlineStyles.deadlinesList}>
-            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} moduleCode={moduleCode} />)}
+            {deadlines.map((d, i) => <DeadlineItem key={d.id} deadline={d} index={i} />)}
         </div>
     );
 }

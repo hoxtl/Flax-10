@@ -18,6 +18,6 @@ export function TimelineGutter({ row, styles, timeLabel }) {
   );
 }
 
-export function TimelineSpineCell({ styles, children = null }) {
-  return <div className={styles.planTimelineSpineCell} aria-hidden>{children}</div>;
+export function TimelineSpineCell({ styles }) {
+  return <div className={styles.planTimelineSpineCell} aria-hidden />;
 }

@@ -1,13 +1,14 @@
 /* Smart nudge banner — surfaces the most urgent deadline or reading due within 7 days. */
 import { useState, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { getDayCount, getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
+import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
 import { createTask } from '../../api/taskService';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
-import { AddToTaskButton } from './ReadingsPanel';
 import dashStyles from './MyModulesDashboard.module.css';
 import rowStyles from './DashboardRows.module.css';
+
 const styles = { ...dashStyles, ...rowStyles };
 
 function deadlineToTask(deadline) {
@@ -118,7 +119,7 @@ function NudgeActions({ nudgeItem, onDeadlineAdded, onReadingAdded }) {
                 <AddDeadlineToTaskButton deadline={nudgeItem.deadline} onAdded={onDeadlineAdded} className={styles.nudgeAddButton} variant="primary" />
             )}
             {nudgeItem.type === 'reading' && nudgeItem.readingId && (
-                <AddToTaskButton readingId={nudgeItem.readingId} onAdded={onReadingAdded} className={styles.nudgeAddButton} variant="primary" />
+                <AddReadingToTasksButton readingId={nudgeItem.readingId} onAdded={onReadingAdded} className={styles.nudgeAddButton} variant="primary" styles={styles} />
             )}
         </div>
     );
@@ -139,8 +140,8 @@ export default function SmartNudge({ deadlines, readings, onReadingAdded }) {
 
     if (!nudgeItem) return null;
     return (
-        <motion.div className={styles.nudgeBanner} key={nudgeItem.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.35 }}>
+        <Motion.div className={styles.nudgeBanner} key={nudgeItem.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.35 }}>
             <NudgeBannerContent nudgeItem={nudgeItem} onDeadlineAdded={handleDeadlineAdded} onReadingAdded={handleReadingAdded} />
-        </motion.div>
+        </Motion.div>
     );
 }

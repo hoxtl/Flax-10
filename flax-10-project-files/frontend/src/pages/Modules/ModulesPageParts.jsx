@@ -8,7 +8,6 @@ import ModuleCourseFilter from '../../components/Modules/Modules/ModuleCourseFil
 import ModuleGrid from '../../components/Modules/Modules/ModuleGrid.jsx';
 import SearchEmptyState from '../../components/common/SearchEmptyState/SearchEmptyState.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
-import styles from './ModulesPage.module.css';
 
 const SORT_OPTIONS = [
     { value: 'name', label: 'A \u2192 Z' },
@@ -44,7 +43,7 @@ export function ModuleToolbar({ search, sorting, isTeacher, isMyModules }) {
     );
 }
 
-export function EnrollmentToolbar({ enrollSearch, setEnrollSearch, enrolledSorting }) {
+export function EnrolmentToolbar({ enrollSearch, setEnrollSearch, enrolledSorting }) {
     return (
         <PageToolbar
             searchSlot={<SearchBar value={enrollSearch} onChange={(q) => { setEnrollSearch(q); enrolledSorting.setCurrentPage(1); }} placeholder="Search your enrolled modules..." />}
@@ -57,7 +56,7 @@ export function EnrollmentToolbar({ enrollSearch, setEnrollSearch, enrolledSorti
     );
 }
 
-export function EnrollmentGrid({ state, enrolledSorting }) {
+export function EnrolmentGrid({ state, enrolledSorting }) {
     const { hook, setViewingModule, setEditingModule, setShowForm, setDeadlineModule, setReadingModule } = state;
     return (
         <ModuleGrid

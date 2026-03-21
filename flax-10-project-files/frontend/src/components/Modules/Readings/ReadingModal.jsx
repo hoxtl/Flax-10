@@ -1,4 +1,4 @@
-/** Modal for managing module readings with create, edit, and delete functionality. */
+/* Modal for managing module readings. */
 import { useReadingModal } from "../hooks/useReadingModal";
 import ReadingForm from "./ReadingForm";
 import ReadingCard from "./ReadingCard";

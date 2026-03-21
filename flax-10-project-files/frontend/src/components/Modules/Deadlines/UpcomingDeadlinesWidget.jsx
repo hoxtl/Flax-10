@@ -1,12 +1,21 @@
 /* Upcoming-deadlines widget with expandable row list */
 import { useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { AlertCircle, Clock } from 'lucide-react';
+import {
+  containerVariants,
+  expandBodyVariants,
+  itemVariants,
+  listVariants,
+} from '../shared/widgetVariants.js';
+import {
+  WidgetHeader,
+  ShowMoreButton,
+} from '../shared/widgetParts.jsx';
 
 import dashStyles from '../../../pages/Modules/MyModulesDashboard.module.css';
 import rowStyles from '../../../pages/Modules/DashboardRows.module.css';
-const styles = { ...dashStyles, ...rowStyles };
 import {
   DEADLINE_TIER_ORDER,
   PRIORITY_PILL,
@@ -16,57 +25,7 @@ import {
   getUrgencyTier,
 } from './upcomingDeadlinesUtils';
 
-const expandBodyVariants = {
-  collapsed: { opacity: 0, height: 0 },
-  expanded: {
-    opacity: 1,
-    height: 'auto',
-    transition: { duration: 0.26, ease: [0.23, 1, 0.32, 1] },
-  },
-};
-
-const listVariants = {
-  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.23, 1, 0.32, 1] } },
-};
-
-const containerVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] } },
-};
-
-function WidgetHeader({ icon: Icon, title, count }) {
-  return (
-    <div className={styles.widgetHeader}>
-      <div className={styles.widgetIconWrap}>
-        <Icon size={17} strokeWidth={1.85} aria-hidden />
-      </div>
-      <span className={styles.widgetTitle}>{title}</span>
-      {count > 0 ? <span className={styles.widgetCount}>{count}</span> : null}
-    </div>
-  );
-}
-
-function ShowMoreButton({ expanded, hiddenCount, onToggle }) {
-  return (
-    <motion.button
-      type="button"
-      className={styles.showMoreBtn}
-      onClick={onToggle}
-      whileTap={{ scale: 0.98 }}
-    >
-      {expanded ? (
-        <><ChevronUp size={14} strokeWidth={2.5} aria-hidden /> Show less</>
-      ) : (
-        <><ChevronDown size={14} strokeWidth={2.5} aria-hidden /> + {hiddenCount} more</>
-      )}
-    </motion.button>
-  );
-}
+const styles = { ...dashStyles, ...rowStyles };
 
 function ModuleCodeButton({ moduleCode, deadline, onSelectModule }) {
   return (
@@ -152,9 +111,9 @@ function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onSelectModu
   const props = buildInteractiveProps(interactiveRows, onSelectDeadline, deadline);
 
   return (
-    <motion.div className={buildRowClassName(tier, tier === 'overdue' || tier === 'critical')} style={buildRowStyle(tier, interactiveRows)} variants={itemVariants} {...props}>
+    <Motion.div className={buildRowClassName(tier, tier === 'overdue' || tier === 'critical')} style={buildRowStyle(tier, interactiveRows)} variants={itemVariants} {...props}>
       <DeadlineRowContent tier={tier} moduleCode={deadline.module_code || ''} deadline={deadline} onSelectModule={onSelectModule} title={deadline.assessment_title || deadline.title || 'Assignment'} pill={PRIORITY_PILL[tier]} dueCls={getDueStatusClass(tier)} daysLabel={getDaysLabel(deadline.start_due_date)} />
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -187,11 +146,11 @@ function ExpandableSection({ expanded, extra, interactiveRows, onSelectDeadline,
   return (
     <AnimatePresence initial={false}>
       {expanded ? (
-        <motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed">
-          <motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
+        <Motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed">
+          <Motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
             <DeadlineList rows={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
-          </motion.div>
-        </motion.div>
+          </Motion.div>
+        </Motion.div>
       ) : null}
     </AnimatePresence>
   );
@@ -213,11 +172,11 @@ function WidgetContent({ sorted, initialShown, expanded, setExpanded, interactiv
 
   return (
     <>
-      <motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants}>
+      <Motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants}>
         <DeadlineList rows={initial} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
         <ExpandableSection expanded={expanded} extra={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
-      </motion.div>
-      {extra.length > 0 ? <ShowMoreButton expanded={expanded} hiddenCount={extra.length} onToggle={() => setExpanded((prev) => !prev)} /> : null}
+      </Motion.div>
+      {extra.length > 0 ? <ShowMoreButton expanded={expanded} hiddenCount={extra.length} onToggle={() => setExpanded((prev) => !prev)} styles={styles} /> : null}
     </>
   );
 }
@@ -234,9 +193,9 @@ export function UpcomingDeadlinesWidget(props) {
   const sorted = useMemo(() => sortDeadlines(deadlines), [deadlines]);
   if (!Array.isArray(deadlines)) return null;
   return (
-    <motion.div className={getWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible">
-      <WidgetHeader icon={AlertCircle} title={title} count={sorted.length} />
+    <Motion.div className={getWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible">
+      <WidgetHeader icon={AlertCircle} title={title} count={sorted.length} styles={styles} />
       <WidgetContent sorted={sorted} initialShown={initialShown} expanded={expanded} setExpanded={setExpanded} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} emptyMessage={emptyMessage} emptySub={emptySub} />
-    </motion.div>
+    </Motion.div>
   );
 }

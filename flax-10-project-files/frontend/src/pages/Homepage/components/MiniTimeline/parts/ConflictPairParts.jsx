@@ -6,7 +6,7 @@ import { AlertTriangle, RotateCw } from "lucide-react";
 import { formatTime } from "../../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../../utils/eventUtils";
 
-export function ConflictCard({ itemRow, styles, isReadOnly, accent, isSleepTime, onContextMenu, onActivate, onMoveTomorrow, canMoveTomorrow }) {
+export function ConflictCard({ itemRow, styles, accent, isSleepTime, onContextMenu, onActivate, onMoveTomorrow, canMoveTomorrow }) {
   const start = itemRow.item.start_time ? formatTime(itemRow.item.start_time) : "";
   const end = itemRow.item.end_time ? formatTime(itemRow.item.end_time) : "";
   const title = stripEmojiFromTitle(itemRow.item.title);

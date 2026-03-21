@@ -1,4 +1,4 @@
-/** Hook for handling module disenrollment with notifications. */
+/* Hook for handling module disenrolment with notifications. */
 import { useNotifications } from '../../../context/NotificationContext';
 import { disenrolByModuleId } from '../../../api/moduleApi';
 import { createNotify } from '../utils/notifyHelper';

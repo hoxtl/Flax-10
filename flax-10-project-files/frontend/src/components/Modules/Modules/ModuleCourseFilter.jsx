@@ -1,6 +1,6 @@
-/** Dropdown filter for modules by course and enrollment status. */
+/* Dropdown filter for modules by course and enrolment status. */
 import { useState, useRef, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
@@ -85,9 +85,9 @@ function CoursesTab({ filterQuery, setFilterQuery, selectedCourses, onToggleCour
 
 function DropdownContent({ filterQuery, setFilterQuery, selectedCourses, onToggleCourse, expanded, toggleExpanded }) {
     return (
-        <motion.div initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className={styles.dropdown} onClick={e => e.stopPropagation()}>
+        <Motion.div initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className={styles.dropdown} onClick={e => e.stopPropagation()}>
             <CoursesTab filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />
-        </motion.div>
+        </Motion.div>
     );
 }
 

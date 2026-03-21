@@ -1,27 +1,27 @@
-/** Form for creating and editing modules with department/course selection. */
-import { useState, useEffect, useMemo } from 'react';
+/* Form for creating and editing modules with department and course selection. */
+import { useState, useMemo } from 'react';
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { serialiseModule } from '../utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from '../utils/moduleHelpers';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import AnimatedDropdown from '../../common/AnimatedDropdown/AnimatedDropdown';
-import styles from './ModuleForm.module.css'
+import styles from './ModuleForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
 
-
-async function saveModule(is_editing, module, form_data) {
+function saveModule(is_editing, module, form_data) {
     const data = serialiseModule(form_data);
-    return is_editing ? await updateModule(module.id, data) : await createModule(data);
+    return is_editing ? updateModule(module.id, data) : createModule(data);
 }
 
 function handleNewForm(field, value, setFormData, setErrors, errors) {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }))
+    if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
 }
 
 function getInput(error, s) {
     return error ? `${s.input} ${s.inputError}` : s.input;
 }
+
 async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubmitting, onSuccess) {
     e.preventDefault();
     const new_errors = validateForm(form_data);
@@ -35,7 +35,9 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
     } catch (err) {
         setErrors({ submit: err.message });
     } finally {
-        setSubmitting(false);}}
+        setSubmitting(false);
+    }
+}
 
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
     return (
@@ -51,6 +53,10 @@ function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmi
     );
 }
 const DEPARTMENT_OPTIONS = Object.keys(KCL_DEPARTMENTS).map(d => ({ value: d, label: d }));
+
+function getInitialFormData(module) {
+    return module ? updateForm(module) : getFormData();
+}
 
 function useCourseOptions(department) {
     return useMemo(() => {
@@ -159,17 +165,15 @@ function FormActions({ submitting, is_editing, onCancel }) {
 
 export default function ModuleForm({ module, onSuccess, onCancel }) {
     const is_editing = !!module;
-    const [form_data, setFormData] = useState(getFormData());
+    const [form_data, setFormData] = useState(() => getInitialFormData(module));
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
-    useEffect(() => { if (module) setFormData(updateForm(module)); }, [module]);
     const on_change = (f, v) => handleNewForm(f, v, setFormData, setErrors, errors);
     const on_submit = (e) => handleSubmit(e, is_editing, module, form_data, setErrors, setSubmitting, onSuccess);
     return (
         <div className={styles.formContainer}>
             <FormHeader is_editing={is_editing} />
-            <FormBody form_data={form_data} errors={errors} submitting={submitting} is_editing={is_editing} 
-            onChange={on_change} onSubmit={on_submit} onCancel={onCancel} />
+            <FormBody form_data={form_data} errors={errors} submitting={submitting} is_editing={is_editing} onChange={on_change} onSubmit={on_submit} onCancel={onCancel} />
         </div>
     );
 }

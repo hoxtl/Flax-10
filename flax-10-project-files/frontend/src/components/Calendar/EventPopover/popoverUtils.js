@@ -1,5 +1,6 @@
+/* Popover positioning helpers for calendar event details. */
 function clampHorizontal(rawLeft, popWidth, winWidth) {
-    return Math.max(16, Math.min(rawLeft, winWidth - popWidth - 16));
+  return Math.max(16, Math.min(rawLeft, winWidth - popWidth - 16));
 }
 
 function positionAboveAnchor(anchorRect, popWidth, popHeight, winWidth) {
@@ -25,7 +26,7 @@ export function calculatePopoverPosition(anchorRect, popWidth, popHeight, winWid
     return { top, left, placement };
 }
 
-/** Calculates arrow position relative to anchor center. */
+/* Calculates arrow position relative to the anchor centre. */
 export function calculateArrowPosition(anchorRect, popoverPos, placement) {
     if (!anchorRect || !popoverPos) return 0;
     if (placement === 'top' || placement === 'bottom') return anchorRect.left + (anchorRect.width / 2) - popoverPos.left - 6;

@@ -17,7 +17,7 @@ import { BackToTop } from '../../components/Pagination/Pagination.jsx';
 import ReadingModal from '../../components/Modules/Readings/ReadingModal.jsx';
 import SkeletonBlock from '../../components/common/LoadingState/SkeletonBlock';
 import MyModulesDashboard from './MyModulesDashboard.jsx';
-import { ModuleToolbar, EnrollmentToolbar, EnrollmentGrid, ModuleResults } from './ModulesPageParts.jsx';
+import { ModuleToolbar, EnrolmentToolbar, EnrolmentGrid, ModuleResults } from './ModulesPageParts.jsx';
 import styles from './ModulesPage.module.css';
 
 function resolveInitialFilter(filterFromUrl, isTeacher) {
@@ -175,6 +175,10 @@ function getViewKey(show_form, viewing_module) {
     return 'modules-list';
 }
 
+function isTestEnvironment() {
+    return import.meta.env.MODE === 'test';
+}
+
 function TestModeContent({ state }) {
     const { show_form, viewing_module, deadline_module, setDeadlineModule } = state;
     if (show_form) return <FormView state={state} />;
@@ -211,7 +215,7 @@ function Modals({ state }) {
 export default function ModulesPage({ initialSearch = '', initialCreate = false }) {
     const state = useModulesPage(initialSearch, initialCreate);
     if (state.hook.loading) return <ModulesSkeleton />;
-    const isTestEnv = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+    const isTestEnv = isTestEnvironment();
     if (isTestEnv) return <TestModeContent state={state} />;
     const viewKey = getViewKey(state.show_form, state.viewing_module);
     return (<><AnimatedContent state={state} viewKey={viewKey} /><Modals state={state} /></>);
@@ -228,7 +232,7 @@ function FormView({ state }) {
     const handleCancel = () => { setShowForm(false); setEditingModule(null); };
     return (
         <div className={styles.container}>
-            <ModuleForm module={editing_module} onSuccess={handleSuccess} onCancel={handleCancel} />
+            <ModuleForm key={editing_module?.id || 'new-module'} module={editing_module} onSuccess={handleSuccess} onCancel={handleCancel} />
         </div>
     );
 }
@@ -275,16 +279,16 @@ function MyModulesTabContent({ state }) {
     );
 }
 
-function MyEnrollmentsTabContent({ state }) {
+function MyEnrolmentsTabContent({ state }) {
     const [enrollSearch, setEnrollSearch] = useState('');
     const enrolledModules = filterModules(state.hook.modules, state.hook.enrollments, enrollSearch, 'enrolled');
     const enrolledSorting = useModuleSorting(enrolledModules);
     return (
         <>
-            <EnrollmentToolbar enrollSearch={enrollSearch} setEnrollSearch={setEnrollSearch} enrolledSorting={enrolledSorting} />
+            <EnrolmentToolbar enrollSearch={enrollSearch} setEnrollSearch={setEnrollSearch} enrolledSorting={enrolledSorting} />
             {enrolledSorting.results.length === 0
                 ? <SearchEmptyState query={enrollSearch} itemLabel="your modules" onClear={() => setEnrollSearch('')} />
-                : <EnrollmentGrid state={state} enrolledSorting={enrolledSorting} />}
+                : <EnrolmentGrid state={state} enrolledSorting={enrolledSorting} />}
             <BackToTop />
         </>
     );
@@ -294,7 +298,7 @@ function MyModulesWithTabs({ state }) {
     const [innerTab, setInnerTab] = useState('overview');
     const tabs = [
         { id: 'overview', icon: '\ud83d\udcca', label: 'Overview', content: <MyModulesTabContent state={state} /> },
-        { id: 'enrollments', icon: '\ud83d\udcda', label: 'My Enrollments', content: <MyEnrollmentsTabContent state={state} /> },
+        { id: 'enrolments', icon: '\ud83d\udcda', label: 'My Enrolments', content: <MyEnrolmentsTabContent state={state} /> },
     ];
     return <Tabs tabs={tabs} activeTab={innerTab} onTabChange={setInnerTab} layoutId="myModulesTabIndicator" tabVariant="heading" />;
 }
@@ -349,7 +353,7 @@ function MainView({ state }) {
     const { is_teacher } = state;
     const { sorting, search } = useMainViewData(state);
     const isStudentMyModules = !is_teacher && search.filter === 'enrolled';
-    const isTestEnv = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+    const isTestEnv = isTestEnvironment();
     const page = <MainViewPage state={state} sorting={sorting} search={search} isStudentMyModules={isStudentMyModules} />;
     if (is_teacher || isTestEnv) return page;
     return (

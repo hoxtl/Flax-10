@@ -1,6 +1,6 @@
 /* My modules dashboard — top-level layout with stats, deadlines, and readings. */
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { getUpcomingDeadlines } from '../../api/deadlineApi';
 import { getSuggestedReadings } from '../../api/readingApi';
 import { UpcomingDeadlinesWidget } from '../../components/Modules/Deadlines/UpcomingDeadlinesWidget';
@@ -62,13 +62,13 @@ export default function MyModulesDashboard({ modules, enrollments }) {
     const { deadlines, readings, handleReadingAdded } = useModuleData();
     const statItems = useStatItems(modules, enrollments, deadlines.length, readings.length);
     return (
-        <motion.div className={styles.dashboard} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
+        <Motion.div className={styles.dashboard} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }}>
             <SmartNudge deadlines={deadlines} readings={readings} onReadingAdded={handleReadingAdded} />
             <StatStrip items={statItems} />
             <div className={styles.widgetRow}>
                 <DeadlinesPanel deadlines={deadlines} />
                 <ReadingsPanel readings={readings} onReadingAdded={handleReadingAdded} />
             </div>
-        </motion.div>
+        </Motion.div>
     );
 }
