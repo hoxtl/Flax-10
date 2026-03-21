@@ -1,69 +1,39 @@
-import React, { useEffect } from "react";
+/*
+ * GroupWork detail page.
+ */
+
 import { useProjectDetail } from "./groupWorkHooks";
 import GroupWorkDetailSkeleton from "./components/GroupWorkDetailSkeleton";
 import ProjectHeader from "./components/ProjectHeader";
 import MembersSection from "./components/MembersSection";
 import AddMemberForm from "./components/AddMemberForm";
 import TabsSection from "./components/TabsSection";
-import BackButton from "./components/BackButton";
+import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import styles from "./GroupWorkDetail.module.css";
 
-function useSyncStats(d, onUpdate) {
-  useEffect(() => {
-    if (!onUpdate || !d.project || d.taskStats.total === undefined) return;
-    
-    const countsMatch = d.project.task_count === d.taskStats.total && 
-                        d.project.completed_task_count === d.taskStats.completed;
-    const membersMatch = (d.project.members || []).length === d.members.length;
-
-    if (countsMatch && membersMatch) return;
-
-    const statsAreValid = d.taskStats.total > 0 || d.project.task_count === 0;
-    if (statsAreValid || !membersMatch) {
-        onUpdate({
-          ...d.project,
-          task_count: d.taskStats.total,
-          completed_task_count: d.taskStats.completed,
-          members: d.members,
-          member_count: d.members.length
-        });
-    }
-  }, [d.taskStats.total, d.taskStats.completed, d.members, d.project, onUpdate]);
+export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
+  const detail = useProjectDetail(projectId, onBack, onDelete, onUpdate);
+  if (detail.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
+  if (!detail.project) return <MissingProjectState onBack={onBack} />;
+  return <ProjectDetailContent detail={detail} projectId={projectId} onBack={onBack} />;
 }
 
-export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
-  const d = useProjectDetail(projectId, onBack, onDelete, onUpdate);
-  useSyncStats(d, onUpdate);
-
-  if (d.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;
-  
-  if (!d.project) {
-    return (
-      <div className={styles.container}>
-        <BackButton onClick={onBack} />
-        <p className={styles.empty}>Project not found.</p>
-      </div>
-    );
-  }
-
+function MissingProjectState({ onBack }) {
   return (
     <div className={styles.container}>
-      <ProjectHeader 
-        project={d.project} 
-        members={d.members} 
-        onPatch={d.patchProject} 
-        taskStats={d.taskStats} 
-        onDelete={d.handleDeleteProject}
-      />
-      <MembersSection members={d.members} onRemove={d.handleRemoveMember} />
-      <AddMemberForm projectId={projectId} onAdded={d.onAdded} />
-      <TabsSection 
-        activeTab={d.activeTab} 
-        setActiveTab={d.setActiveTab} 
-        projectId={projectId} 
-        members={d.members} 
-        onStatsUpdate={d.setTaskStats} 
-      />
+      <BackButton onClick={onBack} label="Back to All Projects" />
+      <p className={styles.empty}>Project not found.</p>
+    </div>
+  );
+}
+
+function ProjectDetailContent({ detail, projectId, onBack }) {
+  return (
+    <div className={styles.container}>
+      <ProjectHeader project={detail.project} members={detail.members} onPatch={detail.patchProject} taskStats={detail.taskStats} onDelete={detail.handleDeleteProject} onBack={onBack} />
+      <MembersSection members={detail.members} onRemove={detail.handleRemoveMember} />
+      <AddMemberForm projectId={projectId} onAdded={detail.onAdded} />
+      <TabsSection activeTab={detail.activeTab} setActiveTab={detail.setActiveTab} projectId={projectId} members={detail.members} onStatsUpdate={detail.setTaskStats} />
     </div>
   );
 }

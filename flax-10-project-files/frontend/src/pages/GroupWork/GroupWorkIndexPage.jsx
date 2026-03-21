@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+/*
+ * GroupWork index page.
+ */
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GroupWorkIndexPage.module.css";
 import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
@@ -10,40 +14,30 @@ import CreateProjectForm from "./components/CreateProjectForm";
 import GroupWorkContent from "./components/GroupWorkContent";
 
 export default function GroupWorkIndexPage() {
-  const { projects, setProjects, loading } = useGroupProjects();
+  const projectId = useSelectedProjectId();
+  return projectId ? <ProjectDetailRoute projectId={projectId} /> : <GroupWorkOverview />;
+}
+
+function ProjectDetailRoute({ projectId }) {
+  const navigate = useNavigate();
+  const goBack = () => navigate("/group-work", { replace: true });
+  return <GroupProjectDetail projectId={projectId} onBack={goBack} onDelete={goBack} onUpdate={undefined} />;
+}
+
+function GroupWorkOverview() {
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
-  const pid = useSelectedProjectId();
-
-  if (pid) {
-    return (
-      <GroupProjectDetail 
-        projectId={pid} 
-        onBack={() => navigate("/group-work")} 
-        onDelete={(id) => setProjects(prev => prev.filter(p => String(p.id) !== String(id)))}
-        onUpdate={(upd) => setProjects(prev => prev.map(p => String(p.id) === String(upd.id) ? { ...p, ...upd } : p))}
-      />
-    );
-  }
-
-  if (loading) return <GroupWorkIndexSkeleton />;
-
-  const onCreated = (p) => setProjects((prev) => [p, ...prev]);
-
+  const data = useGroupProjects();
+  if (data.loading) return <GroupWorkIndexSkeleton />;
   return (
-    <AppPage 
-        className={styles.container} 
-        title="Group work" 
-        subtitle="Create shared projects and link them to your modules."
-    >
-      <GroupWorkStats projects={projects} />
-      <CreateProjectForm onCreated={onCreated} />
-      <GroupWorkContent 
-        projects={projects} 
-        projectListProps={(p) => ({ onClick: () => navigate(`/group-work?project=${p.id}`) })} 
-        filter={filter}
-        setFilter={setFilter}
-      />
+    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
+      <GroupWorkStats projects={data.projects} />
+      <CreateProjectForm onCreated={(project) => prependProject(project, data.setProjects)} />
+      <GroupWorkContent projects={data.projects} projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })} filter={filter} setFilter={setFilter} />
     </AppPage>
   );
+}
+
+function prependProject(project, setProjects) {
+  setProjects((prev) => [project, ...prev]);
 }

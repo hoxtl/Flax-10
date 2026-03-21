@@ -18,12 +18,23 @@
     border: none;
     background: transparent;
     color: var(--text-secondary);
-    transition: all 0.2s ease;
 }
 
 .tabActive {
     background: var(--primary);
     color: white;
+}
+
+.tabPanels {
+    margin-top: 0;
+}
+
+.tabPanel {
+    display: none;
+}
+
+.tabPanelActive {
+    display: block;
 }
 
 .tabContent {
