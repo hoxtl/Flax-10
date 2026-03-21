@@ -2,7 +2,7 @@
  * GroupWork project list content.
  */
 
-import { SegmentedControl } from "../../../components/ui/SegmentedControl";
+import { SegmentedControl } from "../../../components/common/SegmentedControl/SegmentedControl.jsx";
 import ProjectRow from "./ProjectRow";
 import styles from "./GroupWorkContent.module.css";
 
