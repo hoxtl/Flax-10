@@ -1,0 +1,11 @@
+.travelTimeCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--primary) 5%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, var(--border));
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
