@@ -1,4 +1,4 @@
-/**
+/*
  * Helpers for ListSidebar: task counts and smart filters.
  */
 

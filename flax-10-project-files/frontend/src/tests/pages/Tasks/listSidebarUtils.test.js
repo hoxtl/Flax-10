@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks listSidebarUtils: computeListSidebarCounts (listCounts and smartFilters).
  */
 

@@ -1,3 +1,6 @@
+/*
+ * Tests for ModulesPage component.
+ */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
@@ -21,6 +24,7 @@ vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     filterModules: vi.fn((modules) => modules),
     applyFiltersAndSort: vi.fn((modules) => modules),
     getDepartments: vi.fn(() => []),
+    normaliseModuleCode: vi.fn((code) => String(code || '').toUpperCase().replace(/\s+/g, '')),
 }));
 vi.mock('../../components/Modules/Modules/ModuleGrid', () => ({
     default: ({ onManageDeadlines, onEdit }) => (
@@ -226,7 +230,7 @@ describe('ModulesPage', () => {
         render(<MemoryRouter><ModulesPage /></MemoryRouter>);
         expect(screen.getByRole('heading', { name: 'My Modules' })).toBeInTheDocument();
         expect(screen.getByText('Overview')).toBeInTheDocument();
-        expect(screen.getByText('My Enrollments')).toBeInTheDocument();
+        expect(screen.getByText('My Enrolments')).toBeInTheDocument();
         expect(screen.getByText('Upcoming assignment deadlines')).toBeInTheDocument();
     });
 });

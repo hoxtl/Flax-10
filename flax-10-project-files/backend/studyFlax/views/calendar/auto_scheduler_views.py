@@ -3,235 +3,117 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
-from studyFlax.models import CalendarEvent, Deadline, Schedule, Notification, ScheduleEventAllocation
+from studyFlax.models import CalendarEvent, Deadline, Schedule, ScheduleEventAllocation
 from studyFlax.serialisers import AutoScheduleRequestSerialiser, ScheduleSerialiser
 from .system_tags import get_schedule_tag
+from .schedule_helpers import _overwrite_same_name_schedules
 
 def _resolved_preferences(user, payload):
-    settings = getattr(user, 'settings', None)
-
-    wake_time = payload.get('wake_time')
-    sleep_time = payload.get('sleep_time')
-    week_preference = payload.get('week_preference')
-    worktime_preference = payload.get('worktime_preference')
-
-    if settings is not None:
-        wake_time = wake_time or getattr(settings, 'wake_time', None)
-        sleep_time = sleep_time or getattr(settings, 'sleep_time', None)
-        week_preference = week_preference or getattr(settings, 'week_preference', None)
-        worktime_preference = worktime_preference or getattr(settings, 'worktime_preference', None)
-
+    s = getattr(user, 'settings', None)
     return {
-        'wake_time': wake_time,
-        'sleep_time': sleep_time,
-        'worktime_preference': worktime_preference,
-        'week_preference': week_preference,
+        'wake_time': payload.get('wake_time') or getattr(s, 'wake_time', None),
+        'sleep_time': payload.get('sleep_time') or getattr(s, 'sleep_time', None),
+        'week_preference': payload.get('week_preference') or getattr(s, 'week_preference', None),
+        'worktime_preference': payload.get('worktime_preference') or getattr(s, 'worktime_preference', None),
     }
 
-def _resolve_window(current_day, wake_time, sleep_time, worktime_preference):
-    has_sleep_window = bool(wake_time and sleep_time)
+def _get_base_window(day, wake, sleep):
+    if not (wake and sleep):
+        return datetime.combine(day, time(0, 0)), datetime.combine(day + timedelta(days=1), time(0, 0))
+    start = datetime.combine(day, wake)
+    end = datetime.combine(day, sleep)
+    if end <= start: end += timedelta(days=1)
+    return start, end
 
-    if has_sleep_window:
-        window_start = datetime.combine(current_day, wake_time)
-        window_end = datetime.combine(current_day, sleep_time)
-        if window_end <= window_start:
-            window_end += timedelta(days=1)
-    else:
-        window_start = datetime.combine(current_day, time(0, 0))
-        window_end = datetime.combine(current_day + timedelta(days=1), time(0, 0))
+def _apply_worktime_pref(start, end, day, pref):
+    if pref == 'day':
+        return max(start, datetime.combine(day, time(8, 0))), min(end, datetime.combine(day, time(18, 0)))
+    if pref == 'night':
+        return max(start, datetime.combine(day, time(18, 0))), min(end, datetime.combine(day + timedelta(days=1), time(2, 0)))
+    return start, end
 
-    # Highest priority: sleep window boundaries.
-    if has_sleep_window:
-        sleep_window_start = datetime.combine(current_day, wake_time)
-        sleep_window_end = datetime.combine(current_day, sleep_time)
-        if sleep_window_end <= sleep_window_start:
-            sleep_window_end += timedelta(days=1)
-        window_start = max(window_start, sleep_window_start)
-        window_end = min(window_end, sleep_window_end)
+def _resolve_window(day, wake, sleep, pref):
+    start, end = _get_base_window(day, wake, sleep)
+    return _apply_worktime_pref(start, end, day, pref)
 
-    # Next priority: worktime preference narrows the current window.
-    if worktime_preference == 'day':
-        work_window_start = datetime.combine(current_day, time(8, 0))
-        work_window_end = datetime.combine(current_day, time(18, 0))
-        if has_sleep_window:
-            window_start = max(window_start, work_window_start)
-            window_end = min(window_end, work_window_end)
-        else:
-            window_start, window_end = work_window_start, work_window_end
-            
-    elif worktime_preference == 'night':
-        work_window_start = datetime.combine(current_day, time(18, 0))
-        work_window_end = datetime.combine(current_day + timedelta(days=1), time(2, 0))
-        if has_sleep_window:
-            window_start = max(window_start, work_window_start)
-            window_end = min(window_end, work_window_end)
-        else:
-            window_start, window_end = work_window_start, work_window_end
+def _is_allowed_day(day, pref):
+    if pref == 'both': return True
+    is_we = day.weekday() >= 5
+    return is_we if pref == 'weekends' else not is_we
 
-    return window_start, window_end
+def _find_first_gap(busy, start, end, duration):
+    curr, req = start, timedelta(minutes=duration)
+    for b_s, b_e in busy:
+        if b_e <= curr: continue
+        if b_s - curr >= req: return curr, curr + req
+        curr = max(curr, b_e)
+    return (curr, curr + req) if end - curr >= req else (None, None)
 
+def _busy_slots_for_day(user, start, end):
+    busy = CalendarEvent.objects.filter(user=user, start_time__lt=end, end_time__gt=start).order_by('start_time')
+    return [(e.start_time, e.end_time) for e in busy]
 
-def _is_allowed_day(current_day, week_preference):
-    if week_preference == 'both':
-        return True
-    is_weekend = current_day.weekday() >= 5
-    return is_weekend if week_preference == 'weekends' else not is_weekend
+def _validate_auto_request(request):
+    ser = AutoScheduleRequestSerialiser(data=request.data)
+    if not ser.is_valid(): return None, None, Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+    p = ser.validated_data
+    d_map = {i['deadline_id']: i['ideal_minutes_per_day'] for i in p['deadline_preferences']}
+    deadlines = list(Deadline.objects.filter(id__in=d_map.keys(), module__enrollments__student=request.user, start_due_date__gte=timezone.now()).distinct().order_by('start_due_date'))
+    if len(deadlines) != len(d_map):
+        return None, None, Response({'detail': 'Invalid deadlines.'}, status=status.HTTP_400_BAD_REQUEST)
+    return p, d_map, deadlines
 
+def _create_auto_event(user, deadline, start, end, minutes, schedule, tag):
+    event = CalendarEvent.objects.create(
+        user=user, title=f"Study: {deadline.title}",
+        description=f"Auto-scheduled block for {deadline.title}",
+        start_time=start, end_time=end, source='auto_scheduler', tag=tag
+    )
+    ScheduleEventAllocation.objects.create(schedule=schedule, event=event, deadline=deadline, allocated_minutes=minutes)
 
-def _find_first_gap(busy_slots, window_start, window_end, duration_minutes):
-    current = window_start
-    required = timedelta(minutes=duration_minutes)
-    for busy_start, busy_end in busy_slots:
-        if busy_end <= current:
-            continue
-        if busy_start - current >= required:
-            return current, current + required
-        if busy_start <= current < busy_end:
-            current = busy_end
-            continue
-        if busy_start > current:
-            current = max(current, busy_end)
-    if window_end - current >= required:
-        return current, current + required
-    return None, None
+def _allocate_for_deadline(user, deadline, d_minutes, window, schedule, tag, budget):
+    if timezone.localtime(deadline.start_due_date).date() < window[0].date() or budget <= 0:
+        return 0
+    alloc = min(d_minutes, budget)
+    busy = _busy_slots_for_day(user, window[0], window[1])
+    b_s, b_e = _find_first_gap(busy, window[0], window[1], alloc)
+    if b_s:
+        _create_auto_event(user, deadline, b_s, b_e, alloc, schedule, tag)
+        return alloc
+    return 0
 
+def _process_day_allocation(day, user, deadlines, d_map, prefs, schedule, tag, budget):
+    if not _is_allowed_day(day, prefs['week_preference']): return
+    w_s, w_e = _resolve_window(day, prefs['wake_time'], prefs['sleep_time'], prefs['worktime_preference'])
+    w_s, w_e = timezone.make_aware(w_s), timezone.make_aware(w_e)
+    if w_e <= w_s: return
+    rem = min(budget, int((w_e - w_s).total_seconds() // 60))
+    for d in deadlines:
+        rem -= _allocate_for_deadline(user, d, d_map[d.id], (w_s, w_e), schedule, tag, rem)
 
-def _busy_slots_for_day(user, day_start, day_end):
-    busy = CalendarEvent.objects.filter(
-        user=user,
-        start_time__lt=day_end,
-        end_time__gt=day_start,
-    ).order_by('start_time')
-    return [(event.start_time, event.end_time) for event in busy]
-
+def _allocate_deadline_blocks(schedule, user, deadlines, d_map, prefs):
+    tag = get_schedule_tag()
+    curr = timezone.localtime(timezone.now()).date()
+    end = max(timezone.localtime(d.start_due_date).date() for d in deadlines)
+    budget = _daily_budget_minutes(user)
+    while curr <= end:
+        _process_day_allocation(curr, user, deadlines, d_map, prefs, schedule, tag, budget)
+        curr += timedelta(days=1)
 
 def build_auto_schedule(request):
-    serialiser = AutoScheduleRequestSerialiser(data=request.data)
-    if not serialiser.is_valid():
-        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    payload = serialiser.validated_data
-    resolved_preferences = _resolved_preferences(request.user, payload)
-    deadline_map = {item['deadline_id']: item['ideal_minutes_per_day'] for item in payload['deadline_preferences']}
-    deadlines = list(
-        Deadline.objects.filter(
-            id__in=deadline_map.keys(),
-            module__enrollments__student=request.user,
-            start_due_date__gte=timezone.now(),
-        ).distinct().order_by('start_due_date')
-    )
-
-    if len(deadlines) != len(deadline_map):
-        return Response({'detail': 'One or more deadlines are invalid for this user.'}, status=status.HTTP_400_BAD_REQUEST)
-
+    p, d_map, ds = _validate_auto_request(request)
+    if isinstance(ds, Response): return ds
+    prefs = _resolved_preferences(request.user, p)
     with transaction.atomic():
-        if payload.get('clear_existing'):
-            request.user.schedules.all().delete()
-
-        overwritten = _overwrite_same_name_schedules(request.user, payload['title'])
-        schedule = Schedule.objects.create(
-            title=payload['title'],
-            user=request.user,
-            wake_time=resolved_preferences['wake_time'],
-            sleep_time=resolved_preferences['sleep_time'],
-            worktime_preference=resolved_preferences['worktime_preference'],
-            week_preference=resolved_preferences['week_preference'],
-        )
-        schedule.deadline.set(deadlines)
-
-        _allocate_deadline_blocks(schedule, request.user, deadlines, deadline_map, resolved_preferences)
-
-    response_payload = ScheduleSerialiser(schedule).data
-    response_payload['overwritten'] = overwritten
-    return Response(response_payload, status=status.HTTP_201_CREATED)
-
-
-def _allocate_deadline_blocks(schedule, user, deadlines, deadline_map, preferences):
-    schedule_tag = get_schedule_tag()
-    start_date = timezone.localtime(timezone.now()).date()
-    end_date = max(timezone.localtime(deadline.start_due_date).date() for deadline in deadlines)
-    current_day = start_date
-    daily_budget = _daily_budget_minutes(user)
-
-    while current_day <= end_date:
-        if not _is_allowed_day(current_day, preferences['week_preference']):
-            current_day += timedelta(days=1)
-            continue
-
-        window_start, window_end = _resolve_window(
-            current_day,
-            preferences['wake_time'],
-            preferences['sleep_time'],
-            preferences['worktime_preference'],
-        )
-
-        if timezone.is_naive(window_start):
-            window_start = timezone.make_aware(window_start)
-        if timezone.is_naive(window_end):
-            window_end = timezone.make_aware(window_end)
-
-        if window_end <= window_start:
-            current_day += timedelta(days=1)
-            continue
-
-        # Priority order: sleep constraints > worktime preferences > study budget.
-        max_window_minutes = int((window_end - window_start).total_seconds() // 60)
-        remaining_minutes = min(daily_budget, max_window_minutes)
-
-        for deadline in deadlines:
-            deadline_due_date = timezone.localtime(deadline.start_due_date).date()
-            if current_day > deadline_due_date or remaining_minutes <= 0:
-                continue
-
-            requested_minutes = deadline_map[deadline.id]
-            allocation_minutes = min(requested_minutes, remaining_minutes)
-
-            busy = _busy_slots_for_day(user, window_start, window_end)
-            block_start, block_end = _find_first_gap(busy, window_start, window_end, allocation_minutes)
-
-            if block_start and block_end:
-                event = CalendarEvent.objects.create(
-                    user=user,
-                    title=f"Study: {deadline.title}",
-                    description=f"Auto-scheduled work block for {deadline.title}",
-                    start_time=block_start,
-                    end_time=block_end,
-                    source='auto_scheduler',
-                    tag=schedule_tag,
-                )
-                ScheduleEventAllocation.objects.create(
-                    schedule=schedule,
-                    event=event,
-                    deadline=deadline,
-                    allocated_minutes=allocation_minutes,
-                )
-                remaining_minutes -= allocation_minutes
-
-        current_day += timedelta(days=1)
-
-def _notify_schedule_overwrite(user, title):
-    Notification.objects.create(
-        user=user,
-        title='Schedule overwritten',
-        message=f'Your previous schedule "{title}" has been overwritten by a newer one.',
-        notification_type='general',
-    )
-
-
-def _overwrite_same_name_schedules(user, title):
-    existing = list(Schedule.objects.filter(user=user, title=title))
-    if not existing:
-        return False
-
-    for schedule in existing:
-        schedule.delete()
-    _notify_schedule_overwrite(user, title)
-    return True
+        if p.get('clear_existing'): request.user.schedules.all().delete()
+        ovr = _overwrite_same_name_schedules(request.user, p['title'])
+        sch = Schedule.objects.create(title=p['title'], user=request.user, **prefs)
+        sch.deadline.set(ds)
+        _allocate_deadline_blocks(sch, request.user, ds, d_map, prefs)
+    res = ScheduleSerialiser(sch).data
+    res['overwritten'] = ovr
+    return Response(res, status=status.HTTP_201_CREATED)
 
 def _daily_budget_minutes(user):
-    default_budget = 120
-    settings = getattr(user, 'settings', None)
-    if settings is None:
-        return default_budget
-    budget = getattr(settings, 'preferred_study_minutes_per_day', default_budget)
-    return max(1, int(budget))
+    s = getattr(user, 'settings', None)
+    return max(1, int(getattr(s, 'preferred_study_minutes_per_day', 120)))

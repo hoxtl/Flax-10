@@ -3,7 +3,7 @@
  */
 import { useState } from "react";
 
-const DEFAULT_FILTERS = { ratified: "all", category: "all" };
+const DEFAULT_FILTERS = { ratified: "all", category: [] };
 
 export function useSocietyBrowseFilters() {
     const [search, setSearch] = useState("");
@@ -16,6 +16,7 @@ export function useSocietyBrowseFilters() {
         sortBy,
         setSortBy,
         toggleFilter: (type, value) => setFilters((prev) => toggleFilterValue(prev, type, value)),
+        setCategory: (tags) => setFilters((prev) => ({ ...prev, category: tags })),
         clearFilters: () => setFilters(DEFAULT_FILTERS),
     };
 }

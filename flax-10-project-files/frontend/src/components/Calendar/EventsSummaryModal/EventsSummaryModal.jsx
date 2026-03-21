@@ -1,42 +1,42 @@
+/**
+ * EventsSummaryModal - Modal displaying filtered calendar events.
+ * Provides date range filtering with today, week, and month options.
+ */
 import { useState, useEffect } from "react";
 import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
 
-export function EventsSummaryModal({ isOpen, onClose, allEvents, baseDate, isMutualOrSelf }) {
+function formatEventMeta(ev) {
+    const date = new Date(ev.start_time);
+    const dateStr = date.toLocaleDateString('en-GB', DATE_FORMAT);
+    const timeStr = date.toLocaleTimeString('en-GB', TIME_FORMAT);
+    return `${dateStr} at ${timeStr} ${ev.location ? `• ${ev.location}` : ''}`;
+}
+
+function EventItem({ event, index }) {
+    return <SummaryItem key={index} avatar="📅" title={event.title} subtitle={formatEventMeta(event)} />;
+}
+
+function useEventsSummaryState(isOpen) {
     const [range, setRange] = useState('today');
+    useEffect(() => { if (isOpen) setRange('today'); }, [isOpen]);
+    return { range, setRange };
+}
 
-    useEffect(() => {
-        if (isOpen) setRange('today');
-    }, [isOpen]);
-
+/** Modal for viewing events with date range filtering. */
+export function EventsSummaryModal({ isOpen, onClose, allEvents, baseDate, isMutualOrSelf }) {
+    const { range, setRange } = useEventsSummaryState(isOpen);
     if (!isOpen || !isMutualOrSelf) return null;
 
     const filteredEvents = getFilteredEvents(allEvents, range, baseDate);
     const title = `Events - ${getRangeLabel(range)} (${filteredEvents.length})`;
 
-    const formatMeta = (ev) => {
-        const date = new Date(ev.start_time);
-        return `${date.toLocaleDateString('en-GB', DATE_FORMAT)} at ${date.toLocaleTimeString('en-GB', TIME_FORMAT)} ${ev.location ? `• ${ev.location}` : ''}`;
-    };
-
     return (
-        <GenericSummaryModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={title}
+        <GenericSummaryModal isOpen={isOpen} onClose={onClose} title={title}
             emptyMessage="No events found for this period"
             topContent={<RangeButtons range={range} onRangeChange={setRange} />}
-            items={filteredEvents}
-            renderItem={(event, i) => (
-                <SummaryItem
-                    key={i}
-                    avatar="📅"
-                    title={event.title}
-                    subtitle={formatMeta(event)}
-                />
-            )}
-        />
+            items={filteredEvents} renderItem={(event, i) => <EventItem event={event} index={i} />} />
     );
 }
 

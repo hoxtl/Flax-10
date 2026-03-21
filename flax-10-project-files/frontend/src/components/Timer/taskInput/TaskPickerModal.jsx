@@ -38,13 +38,13 @@ function SmartPickButton({ onPickForMe }) {
   return <PrimaryButton variant="primary" pill className={styles.taskPickSmartBtn} onClick={onPickForMe}>✦ Smart Pick — choose a task for me</PrimaryButton>;
 }
 
-function Toolbar({ state, activeFilterCount, onPickForMe }) {
+function Toolbar({ state, filterWrapRef, activeFilterCount, onPickForMe }) {
   return (
     <div className={styles.taskPickFiltersBar}>
       <div className={styles.taskPickToolbarRow}>
         <SearchBar value={state.search} onChange={state.setSearch} placeholder="Search tasks…" className={styles.taskPickSearch} />
         <div className={styles.taskPickSortWrap}><AnimatedDropdown value={state.sortBy} onChange={(value) => changeSort(value, state)} options={SORT_OPTIONS} className={styles.taskPickSortDropdown} /></div>
-        <div ref={state.filterWrapRef}><TaskFeedFilterPanel isOpen={state.isFilterOpen} onToggle={() => state.setIsFilterOpen((value) => !value)} activeFilterCount={activeFilterCount} activeFilterTab={state.activeFilterTab} onTabChange={state.setActiveFilterTab} filterQuery={state.filterQuery} onFilterQueryChange={state.setFilterQuery} visibleListItems={state.visibleListItems} filterListIds={state.filterListIds} onToggleList={(listId) => toggleList(listId, state.setFilterListIds)} groupedVisibleModuleItems={state.groupedModuleItems} moduleGroupKeys={state.moduleGroupKeys} filterModuleCodes={state.filterModuleCodes} onToggleModule={(code) => toggleModule(code, state.setFilterModuleCodes)} onClearAll={() => clearAllFilters(state)} /></div>
+        <TaskFeedFilterPanel containerRef={filterWrapRef} isOpen={state.isFilterOpen} onToggle={() => state.setIsFilterOpen((value) => !value)} activeFilterCount={activeFilterCount} activeFilterTab={state.activeFilterTab} onTabChange={state.setActiveFilterTab} filterQuery={state.filterQuery} onFilterQueryChange={state.setFilterQuery} visibleListItems={state.visibleListItems} filterListIds={state.filterListIds} onToggleList={(listId) => toggleList(listId, state.setFilterListIds)} groupedVisibleModuleItems={state.groupedModuleItems} moduleGroupKeys={state.moduleGroupKeys} filterModuleCodes={state.filterModuleCodes} onToggleModule={(code) => toggleModule(code, state.setFilterModuleCodes)} onClearAll={() => clearAllFilters(state)} />
       </div>
       <SmartPickButton onPickForMe={onPickForMe} />
     </div>
@@ -71,24 +71,24 @@ function clearAllFilters(state) {
   state.setFilterQuery('');
 }
 
-function TaskResults({ state, value, onSelect }) {
-  if (state.loading) return <TaskPickerLoading />;
-  if (state.filteredTasks.length === 0) return <SearchEmptyState query={state.search} itemLabel="tasks" hint={state.search.trim() ? 'Try a different keyword.' : undefined} onClear={state.search.trim() ? () => state.setSearch('') : undefined} />;
-  return <div className={styles.taskPickList}>{state.filteredTasks.map((task) => <TaskPickItem key={task.id} task={task} value={value} recommendedTaskId={state.recommendedTaskId} onSelect={onSelect} />)}</div>;
+function TaskResults({ state, onSelect }) {
+  if (state.loading) return <div className={styles.taskPickResults}><TaskPickerLoading /></div>;
+  if (state.filteredTasks.length === 0) return <div className={styles.taskPickResults}><SearchEmptyState query={state.search} itemLabel="tasks" hint={state.search.trim() ? 'Try a different keyword.' : undefined} onClear={state.search.trim() ? () => state.setSearch('') : undefined} /></div>;
+  return <div className={styles.taskPickResults}><div className={styles.taskPickList}>{state.filteredTasks.map((task) => <TaskPickItem key={task.id} task={task} selectedTaskId={state.selectedTaskId} recommendedTaskId={state.recommendedTaskId} onSelect={onSelect} />)}</div></div>;
 }
 
-export function TaskPickerModal({ state, value, onSelect, onPickForMe }) {
+export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe }) {
   const activeFilterCount = state.filterListIds.length + state.filterModuleCodes.length;
   const backdropClassName = !state.open ? styles.hidden : styles.taskPickBackdrop;
   const modalClassName = !state.open ? styles.hidden : styles.taskPickDropdown;
 
   return (
     <StandardModal onClose={() => state.setOpen(false)} size="md" hideHeader backdropClassName={backdropClassName} modalClassName={modalClassName} contentClassName={styles.taskPickContent}>
-      {state.open && <div onMouseDown={(event) => closeFilterPanel(event, state)}><ModalHeader setOpen={state.setOpen} /><Toolbar state={state} activeFilterCount={activeFilterCount} onPickForMe={onPickForMe} /><TaskResults state={state} value={value} onSelect={onSelect} /></div>}
+      {state.open && <div className={styles.taskPickShell} onMouseDown={(event) => closeFilterPanel(event, state, filterWrapRef)}><ModalHeader setOpen={state.setOpen} /><Toolbar state={state} filterWrapRef={filterWrapRef} activeFilterCount={activeFilterCount} onPickForMe={onPickForMe} /><TaskResults state={state} onSelect={onSelect} /></div>}
     </StandardModal>
   );
 }
 
-function closeFilterPanel(event, state) {
-  if (state.isFilterOpen && state.filterWrapRef.current && !state.filterWrapRef.current.contains(event.target)) state.setIsFilterOpen(false);
+function closeFilterPanel(event, state, filterWrapRef) {
+  if (state.isFilterOpen && filterWrapRef.current && !filterWrapRef.current.contains(event.target)) state.setIsFilterOpen(false);
 }

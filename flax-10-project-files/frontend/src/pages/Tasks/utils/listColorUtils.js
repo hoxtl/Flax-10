@@ -1,6 +1,5 @@
-/**
- * Utilities for resolving list accent colours.
- * Falls back to localStorage then a deterministic palette index.
+/*
+ * Resolve task list accent colours with local storage fallback.
  */
 
 import { FOCUS_BLOCK_COLOURS_HEX } from "../constants/focusBlockColours";
@@ -10,12 +9,11 @@ function getStoredListColor(list) {
   if (!key) return null;
   try {
     return localStorage.getItem(key);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
 
-/** Resolves the display colour for a task list. */
 export function getListColor(list, idx = 0) {
   if (list?.color) return list.color;
   const stored = getStoredListColor(list);

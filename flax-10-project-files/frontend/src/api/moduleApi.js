@@ -1,3 +1,6 @@
+/*
+ * API client for module, deadline, and reading endpoints.
+ */
 import {fetchApi} from './client.js'
 
 export async function getModules() {

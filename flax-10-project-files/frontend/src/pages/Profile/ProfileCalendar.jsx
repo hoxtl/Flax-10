@@ -1,3 +1,7 @@
+/**
+ * ProfileCalendar - Read-only calendar view for user profiles.
+ * Displays monthly calendar with event summary modal.
+ */
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
 import { addMonths, formatMonthYear, isSameMonth } from '../../components/Calendar/utils/dateUtils';
@@ -16,37 +20,34 @@ function useProfileCalendarMode(dispatch) {
     }, [dispatch]);
 }
 
-function CalendarHeaderActions({ selectedDate, setDate, showToday }) {
-    return (
-        <CalendarNav
-            onPrev={() => setDate(addMonths(selectedDate, -1))}
-            onNext={() => setDate(addMonths(selectedDate, 1))}
-            onToday={() => setDate(new Date())}
-            showToday={showToday}
-            selectedDate={selectedDate}
-            onDatePick={setDate}
-            title={formatMonthYear(selectedDate)}
-        />
-    );
+function useProfileNavigation() {
+    const { selectedDate } = useCalendar();
+    const dispatch = useCalendarDispatch();
+    useProfileCalendarMode(dispatch);
+    const setDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+    return { selectedDate, setDate };
 }
 
 function ProfileCalendarHeader() {
-    const { selectedDate } = useCalendar();
-    const dispatch = useCalendarDispatch();
-    const setDate = (date) => dispatch({ type: 'SET_SELECTED_DATE', payload: date });
+    const { selectedDate, setDate } = useProfileNavigation();
     const showToday = !isSameMonth(selectedDate, new Date());
-
-    useProfileCalendarMode(dispatch);
-
     return (
         <div className="calendar-header">
-            <CalendarHeaderActions selectedDate={selectedDate} setDate={setDate} showToday={showToday} />
+            <CalendarNav
+                onPrev={() => setDate(addMonths(selectedDate, -1))}
+                onNext={() => setDate(addMonths(selectedDate, 1))}
+                onToday={() => setDate(new Date())}
+                showToday={showToday}
+                selectedDate={selectedDate}
+                onDatePick={setDate}
+                title={formatMonthYear(selectedDate)}
+            />
             <div className="header-actions" />
         </div>
     );
 }
 
-function useProfileEventsSync(dispatch, allEvents) {
+function useSyncEvents(dispatch, allEvents) {
     useEffect(() => {
         if (dispatch) dispatch({ type: 'SET_EVENTS', payload: allEvents });
     }, [dispatch, allEvents]);
@@ -67,8 +68,7 @@ function SummaryModal({ summaryDate, setSummaryDate, allEvents }) {
 function ProfileCalendarInner({ allEvents }) {
     const [summaryDate, setSummaryDate] = useState(null);
     const dispatch = useCalendarDispatch();
-
-    useProfileEventsSync(dispatch, allEvents);
+    useSyncEvents(dispatch, allEvents);
 
     return (
         <div className="calendar-container profile-calendar">
@@ -80,12 +80,14 @@ function ProfileCalendarInner({ allEvents }) {
     );
 }
 
+
+/** Profile calendar wrapper with context providers. */
 export function ProfileCalendar({ allEvents }) {
-    return (
-        <CalendarProvider>
-            <ResizeHighlightProvider>
-                <ProfileCalendarInner allEvents={allEvents} />
-            </ResizeHighlightProvider>
-        </CalendarProvider>
-    );
+  return (
+    <CalendarProvider>
+      <ResizeHighlightProvider>
+        <ProfileCalendarInner allEvents={allEvents} />
+      </ResizeHighlightProvider>
+    </CalendarProvider>
+  );
 }

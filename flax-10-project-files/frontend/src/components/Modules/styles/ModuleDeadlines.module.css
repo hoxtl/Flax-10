@@ -1,4 +1,4 @@
-/** Styles for module deadlines and readings list items. */
+/* Styles for module deadlines and reading list items. */
 .deadlinesList {
     display: flex;
     flex-direction: column;

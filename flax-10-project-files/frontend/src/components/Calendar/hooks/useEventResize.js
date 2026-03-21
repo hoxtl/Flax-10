@@ -1,3 +1,7 @@
+/**
+ * useEventResize - Event duration resizing via drag handle.
+ * Handles grid snapping, overlap checking, and recurring event confirmation.
+ */
 import { useState, useCallback } from 'react';
 import { useCalendar } from '../../../context/CalendarContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -7,6 +11,7 @@ import { SLOT_HEIGHT, MIN_EVENT_DURATION, pixelsToMinutes, SNAP_INTERVAL } from 
 import { checkOverlapWithConfirm } from '../utils/overlapUtils';
 import { extractBaseEventId, hasRecurrence } from '../utils/eventUtils';
 
+/** Hook for resizing event duration by dragging the bottom handle. */
 export function useEventResize(event, eventRef, editEvent, resizeJustEnded) {
     const { events } = useCalendar();
     const confirmFn = useConfirm();

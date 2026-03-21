@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for CreateListModal: name input, color picker, save, cancel.
  */
 import { describe, it, expect, vi } from "vitest";

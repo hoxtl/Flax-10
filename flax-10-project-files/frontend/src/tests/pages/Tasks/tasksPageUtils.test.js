@@ -1,4 +1,4 @@
-/**
+/*
  * Tests for Tasks tasksPageUtils: getTodayEndISO, getTomorrowEndISO,
  * filterTasksByListAndFilter, buildTasksPageHandlers, buildTasksPageViewProps.
  */

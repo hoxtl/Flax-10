@@ -13,12 +13,14 @@ function openPicker(state) {
 }
 
 function selectTask(task, state, onChange, onTaskSelect) {
+  state.setSelectedTaskId(task.id);
   onChange(task.title);
   state.setOpen(false);
   onTaskSelect?.(task);
 }
 
 function clearTask(state, onChange, onClearTask) {
+  state.setSelectedTaskId(null);
   onChange('');
   onClearTask?.();
   state.setRecommendedTaskId(null);
@@ -57,7 +59,7 @@ function CompactActions({ state, hasTaskValue, onClearTask }) {
 }
 
 export function TaskInput({ value, onChange, onClearTask, onTaskSelect, isSessionActive = false, onOpenFocus }) {
-  const state = useTaskPickerData();
+  const { ref, filterWrapRef, ...pickerState } = useTaskPickerData();
   const isCompact = Boolean(isSessionActive && value);
   const hasTaskValue = Boolean((value || '').trim());
   const inputClassName = `${styles.taskInput} ${value ? styles.taskInputHasValue : ''} ${isCompact ? styles.taskInputCompact : ''}`;
@@ -65,10 +67,10 @@ export function TaskInput({ value, onChange, onClearTask, onTaskSelect, isSessio
   return (
     <div className={styles.taskInputWrap}>
       {value && <div className={styles.currentTaskLabel}>Currently focusing on:</div>}
-      <div className={styles.taskInputContainer} ref={state.ref}>
+      <div className={styles.taskInputContainer} ref={ref}>
         <input type="text" className={inputClassName} placeholder={isCompact ? 'Task in progress' : 'What are you working on? 🎯'} value={value} onChange={(event) => onChange(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && event.target.blur()} />
-        <ActionButtons state={state} hasTaskValue={hasTaskValue} isCompact={isCompact} onClearTask={() => clearTask(state, onChange, onClearTask)} onOpenFocus={onOpenFocus} />
-        <TaskPickerModal state={state} value={value} onSelect={(task) => selectTask(task, state, onChange, onTaskSelect)} onPickForMe={() => pickRecommendedTask(state, onChange, onTaskSelect)} />
+        <ActionButtons state={pickerState} hasTaskValue={hasTaskValue} isCompact={isCompact} onClearTask={() => clearTask(pickerState, onChange, onClearTask)} onOpenFocus={onOpenFocus} />
+        <TaskPickerModal state={pickerState} filterWrapRef={filterWrapRef} onSelect={(task) => selectTask(task, pickerState, onChange, onTaskSelect)} onPickForMe={() => pickRecommendedTask(pickerState, onChange, onTaskSelect)} />
       </div>
     </div>
   );

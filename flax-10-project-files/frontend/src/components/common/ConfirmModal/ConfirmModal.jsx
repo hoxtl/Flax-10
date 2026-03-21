@@ -1,3 +1,7 @@
+/*
+ * Confirm/cancel modal with optional danger styling, alternate action, and hint text.
+ */
+
 import StandardModal from "../StandardModal/StandardModal";
 import PrimaryButton from "../PrimaryButton/PrimaryButton";
 import styles from "./ConfirmModal.module.css";

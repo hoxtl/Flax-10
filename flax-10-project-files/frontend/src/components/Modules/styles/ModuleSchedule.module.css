@@ -1,4 +1,4 @@
-/** Styles for module schedule section with day/time, duration, and location. */
+/* Styles for the module schedule section. */
 .scheduleRow {
     display: flex;
     align-items: flex-start;

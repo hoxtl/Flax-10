@@ -22,14 +22,14 @@ function enrichItemRows(items, getTag, sleepWindow) {
 }
 
 function handleActivate(event, itemRow, onCardClick, onEdit) {
-  if (itemRow.isReadOnly) return;
   const rect = event.currentTarget.getBoundingClientRect();
-  return onCardClick ? onCardClick(itemRow.item, null, rect) : onEdit?.(itemRow.item, itemRow.item.tag);
+  if (onCardClick) return onCardClick(itemRow.item, null, rect);
+  if (!itemRow.isReadOnly) onEdit?.(itemRow.item, itemRow.item.tag);
 }
 
 export function ConflictPairRow({ row, rows, onConflictAutoMove, onPushTomorrow, onCardClick, onEventContextMenu, onEdit, getTag, styles, selectedDate, sleepWindow }) {
   const items = enrichItemRows(row.items, getTag, sleepWindow);
   const { movable, freeRow } = getMovableRows(items, rows, row.endMins);
   const onAutoMove = () => freeRow && movable && onConflictAutoMove && onConflictAutoMove(movable.item, getGapStartDate(selectedDate, freeRow.gapStartMins), new Date(getGapStartDate(selectedDate, freeRow.gapStartMins).getTime() + movable.durationMins * 60000));
-  return <TimelineRowLayout row={row} styles={styles}><TimelineGutter row={row} styles={styles} timeLabel={getConflictTimeLabel(row)} /><TimelineSpineCell styles={styles} /><div className={styles.planTimelineConflictPairWrap}><div className={styles.planTimelineConflictPairCards}>{items.map((itemRow) => <ConflictCard key={itemRow.id} itemRow={itemRow} styles={styles} isReadOnly={itemRow.isReadOnly} accent={itemRow.accent} isSleepTime={itemRow.isSleepTime} onContextMenu={(event) => !itemRow.isReadOnly && (event.preventDefault(), event.stopPropagation(), onEventContextMenu?.(itemRow.item, event.clientX, event.clientY))} onActivate={(event) => handleActivate(event, itemRow, onCardClick, onEdit)} onMoveTomorrow={() => onPushTomorrow?.(itemRow.item)} canMoveTomorrow={!freeRow && onPushTomorrow && !itemRow.isReadOnly} />)}</div><ConflictActions styles={styles} items={items} freeRow={freeRow} movable={movable} onAutoMove={onAutoMove} onEdit={onEdit} /></div></TimelineRowLayout>;
+  return <TimelineRowLayout row={row} styles={styles}><TimelineGutter row={row} styles={styles} timeLabel={getConflictTimeLabel(row)} /><TimelineSpineCell styles={styles} /><div className={styles.planTimelineConflictPairWrap}><div className={styles.planTimelineConflictPairCards}>{items.map((itemRow) => <ConflictCard key={itemRow.id} itemRow={itemRow} styles={styles} accent={itemRow.accent} isSleepTime={itemRow.isSleepTime} onContextMenu={(event) => !itemRow.isReadOnly && (event.preventDefault(), event.stopPropagation(), onEventContextMenu?.(itemRow.item, event.clientX, event.clientY))} onActivate={(event) => handleActivate(event, itemRow, onCardClick, onEdit)} onMoveTomorrow={() => onPushTomorrow?.(itemRow.item)} canMoveTomorrow={!freeRow && onPushTomorrow && !itemRow.isReadOnly} />)}</div><ConflictActions styles={styles} items={items} freeRow={freeRow} movable={movable} onAutoMove={onAutoMove} onEdit={onEdit} /></div></TimelineRowLayout>;
 }

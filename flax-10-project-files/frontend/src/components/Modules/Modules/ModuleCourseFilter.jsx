@@ -1,19 +1,12 @@
-/** Dropdown filter for modules by course and enrollment status. */
+/*
+ * Dropdown filter for modules by course and enrolment status.
+ */
 import { useState, useRef, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
 import styles from './ModuleCourseFilter.module.css';
-
-const TABS = [
-    { value: 'courses', label: 'Courses' },
-];
-
-const ENROLLMENT_OPTIONS = [
-    { value: 'all', label: 'All Modules' },
-    { value: 'enrolled', label: 'My Enrollments' },
-];
 
 function filterCourseGroups(groups, query) {
     if (!query.trim()) return groups;
@@ -57,15 +50,6 @@ function DepartmentGroup({ department, courses, selectedCourses, onToggle, expan
     );
 }
 
-function EnrollmentOption({ option, isActive, onSelect }) {
-    return (
-        <div className={`${styles.item} ${isActive ? styles.itemActive : ''}`} onClick={() => onSelect(option.value)}>
-            <div className={`${styles.radio} ${isActive ? styles.radioChecked : ''}`} />
-            <span className={styles.itemLabel}>{option.label}</span>
-        </div>
-    );
-}
-
 function useClickOutside(ref, onClose) {
     useEffect(() => {
         const handler = (e) => ref.current && !ref.current.contains(e.target) && onClose();
@@ -80,14 +64,6 @@ function FilterButton({ activeCount, isOpen, onClick }) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
             Filter{activeCount > 0 && <span className={styles.badge}>{activeCount}</span>}
         </button>
-    );
-}
-
-function TabButtons({ activeTab, setActiveTab }) {
-    return (
-        <div className={styles.tabs}>
-            {TABS.map(tab => <button key={tab.value} onClick={() => setActiveTab(tab.value)} className={`${styles.tab} ${activeTab === tab.value ? styles.tabActive : ''}`}>{tab.label}</button>)}
-        </div>
     );
 }
 
@@ -109,15 +85,11 @@ function CoursesTab({ filterQuery, setFilterQuery, selectedCourses, onToggleCour
     );
 }
 
-function EnrollmentTab({ filterMode, onFilterModeChange }) {
-    return <div className={styles.listContainer}>{ENROLLMENT_OPTIONS.map(opt => <EnrollmentOption key={opt.value} option={opt} isActive={filterMode === opt.value} onSelect={onFilterModeChange} />)}</div>;
-}
-
 function DropdownContent({ filterQuery, setFilterQuery, selectedCourses, onToggleCourse, expanded, toggleExpanded }) {
     return (
-        <motion.div initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className={styles.dropdown} onClick={e => e.stopPropagation()}>
+        <Motion.div initial={{ opacity: 0, y: -8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.98 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className={styles.dropdown} onClick={e => e.stopPropagation()}>
             <CoursesTab filterQuery={filterQuery} setFilterQuery={setFilterQuery} selectedCourses={selectedCourses} onToggleCourse={onToggleCourse} expanded={expanded} toggleExpanded={toggleExpanded} />
-        </motion.div>
+        </Motion.div>
     );
 }
 
