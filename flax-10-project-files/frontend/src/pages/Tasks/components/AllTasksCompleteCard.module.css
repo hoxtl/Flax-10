@@ -1,3 +1,5 @@
+/* Styles for the all-tasks-complete celebration card. */
+
 .card {
   display: flex;
   flex-direction: column;

@@ -1,3 +1,5 @@
+/* Styles for the quick-add task bar. */
+
 .card {
   display: flex;
   flex-direction: column;
