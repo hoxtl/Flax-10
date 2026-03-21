@@ -8,4 +8,10 @@ export function LocationEditCell({ value, isEditing, onChange, onSave }) {
     const handleChange = (newValue) => {
         onChange(newValue);
     };
+
+    const handleBlur = () => {
+        if (onSave) {
+            onSave();
+        }
+    }
 }
