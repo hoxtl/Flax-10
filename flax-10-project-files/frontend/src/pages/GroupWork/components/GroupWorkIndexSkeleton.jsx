@@ -6,7 +6,7 @@ export default function GroupWorkIndexSkeleton() {
   const SKELETON_ITEMS = [1, 2, 3, 4];
 
   return (
-    <div className={styles.skeletonContainer}>
+    <div className={styles.skeletonContainer} data-testid="groupwork-skeleton">
       <div className={styles.skeletonStats}>
         {SKELETON_ITEMS.map((i) => (
           <SkeletonBlock key={i} className={styles.skeletonStatCard} height="100px" />

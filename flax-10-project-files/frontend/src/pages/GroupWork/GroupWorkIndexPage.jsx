@@ -2,15 +2,14 @@
  * GroupWork index page.
  */
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GroupWorkIndexPage.module.css";
-import { useGroupProjects, useSelectedProjectId } from "./groupWorkHooks";
+import { useGroupProjects, useGroupProjectSort, useSelectedProjectId } from "./groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
 import AppPage from "../../components/common/AppPage/AppPage";
+import { BackToTop } from "../../components/Pagination/Pagination";
 import GroupWorkStats from "./components/GroupWorkStats";
 import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
-import CreateProjectForm from "./components/CreateProjectForm";
 import GroupWorkContent from "./components/GroupWorkContent";
 
 export default function GroupWorkIndexPage() {
@@ -25,16 +24,38 @@ function ProjectDetailRoute({ projectId }) {
 }
 
 function GroupWorkOverview() {
-  const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
   const data = useGroupProjects();
-  if (data.loading) return <GroupWorkIndexSkeleton />;
+  const sorting = useGroupProjectSort();
+  const subtitle = (
+    <>
+      Keep <em>shared project work</em>, <em>module context</em>, <em>team planning</em>, and <em>deadlines</em> in one calm place.
+    </>
+  );
   return (
-    <AppPage className={styles.container} title="Group work" subtitle="Create shared projects and link them to your modules.">
-      <GroupWorkStats projects={data.projects} />
-      <CreateProjectForm onCreated={(project) => prependProject(project, data.setProjects)} />
-      <GroupWorkContent projects={data.projects} projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })} filter={filter} setFilter={setFilter} />
-    </AppPage>
+    <>
+      <AppPage
+        className={styles.container}
+        title="My Group Projects"
+        subtitle={subtitle}
+      >
+        {data.loading ? (
+          <GroupWorkIndexSkeleton />
+        ) : (
+          <>
+            <GroupWorkStats projects={data.projects} />
+            <GroupWorkContent
+              projects={data.projects}
+              projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })}
+              sortBy={sorting.sortBy}
+              setSortBy={sorting.setSortBy}
+              onProjectCreated={(project) => prependProject(project, data.setProjects)}
+            />
+          </>
+        )}
+      </AppPage>
+      <BackToTop />
+    </>
   );
 }
 

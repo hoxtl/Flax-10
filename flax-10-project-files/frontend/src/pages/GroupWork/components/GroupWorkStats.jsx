@@ -2,34 +2,47 @@
  * GroupWork overview stats cards.
  */
 
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
+import { useCountUp } from "../../../hooks/useCountUp";
 import styles from "./GroupWorkStats.module.css";
-import { getCollaboratorCount, getModulesCount, getNextDeadline, getProgressStats } from "../utils/projectStatsUtils";
+import { getNextDeadline, getProgressStats } from "../utils/projectStatsUtils";
 
 export default function GroupWorkStats({ projects }) {
-  if (!projects || projects.length === 0) return null;
-  const progress = getProgressStats(projects);
-  const deadline = getNextDeadline(projects);
-  return (
-    <div className={styles.statsGrid}>
-      <StatsCard title="ACTIVE PROJECTS" value={projects.length} subtitle={buildModulesLabel(projects)} />
-      <StatsCard title="NEXT DEADLINE" value={deadline.project ? deadline.days : "--"} subtitle={deadline.project ? `days — ${deadline.project.name}` : "No upcoming deadlines"} />
-      <StatsCard title="COLLABORATORS" value={getCollaboratorCount(projects)} subtitle="across all projects" />
-      <StatsCard title="OVERALL PROGRESS" value={`${progress.percent}%`} subtitle={`${progress.completed} / ${progress.total} tasks done`} />
-    </div>
-  );
-}
+  const safeProjects = projects || [];
+  const progress = getProgressStats(safeProjects);
+  const deadline = getNextDeadline(safeProjects);
+  const projectCount = safeProjects.length;
+  const projectCountRef = useCountUp(projectCount, 1200);
+  const deadlineCountRef = useCountUp(deadline.project ? deadline.days : 0, 1200);
+  const progressCountRef = useCountUp(progress.percent, 1200);
 
-function StatsCard({ title, value, subtitle }) {
   return (
-    <div className={styles.statCard}>
-      <div className={styles.statHeader}>{title}</div>
-      <div className={styles.statValue}>{value}</div>
-      <div className={styles.statSub}>{subtitle}</div>
-    </div>
+    <StatStrip
+      className={styles.statsStrip}
+      items={[
+        {
+          key: "active-projects",
+          label: "Active projects",
+          value: projectCount,
+          valueRef: projectCountRef,
+        },
+        {
+          key: "next-deadline",
+          label: "Upcoming deadlines",
+          value: deadline.project ? deadline.days : "--",
+          valueRef: deadline.project ? deadlineCountRef : undefined,
+          tooltip: deadline.project ? deadline.project.name : undefined,
+          tone: deadline.project ? "danger" : undefined,
+        },
+        {
+          key: "overall-progress",
+          label: "Overall progress",
+          value: progress.percent,
+          valueRef: progressCountRef,
+          suffix: "%",
+          tone: progress.percent > 0 ? "success" : undefined,
+        },
+      ]}
+    />
   );
-}
-
-function buildModulesLabel(projects) {
-  const count = getModulesCount(projects);
-  return `across ${count} module${count !== 1 ? "s" : ""}`;
 }

@@ -52,7 +52,7 @@ function BrowseHeader({ onBack, filterState, societies }) {
 }
 
 function SortDropdown({ value, onChange }) {
-    return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" />;
+    return <AnimatedDropdown className={styles.sortDropdown} value={value} onChange={onChange} options={SORT_OPTIONS} placeholder="Sort by" align="right" />;
 }
 
 function SocietyFilterButton({ filterState, societies }) {

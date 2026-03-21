@@ -20,7 +20,7 @@ export function CreateProjectInputs({ data, onChange, errors }) {
 
 function ProjectNameField({ value, onChange, error }) {
   return (
-    <FormField label="Project Name" className={styles.inputName} error={error}>
+    <FormField label={<RequiredLabel text="Project name" />} labelClassName={styles.fieldLabel} className={styles.inputName} error={error}>
       <TextInput value={value} onChange={(event) => onChange("name", event.target.value)} placeholder="e.g. Machine Learning Research..." required />
     </FormField>
   );
@@ -28,8 +28,16 @@ function ProjectNameField({ value, onChange, error }) {
 
 function ProjectModuleField({ value, onChange }) {
   return (
-    <FormField label={<OptionalModuleLabel />} className={styles.inputField}>
-      <UserModuleDropdown value={value} onChange={(nextValue) => onChange("course_code", nextValue)} placeholder="Select..." usePortal />
+    <FormField label={<OptionalModuleLabel />} labelClassName={styles.fieldLabel} className={styles.inputField}>
+      <UserModuleDropdown
+        value={value}
+        onChange={(nextValue) => onChange("course_code", nextValue)}
+        placeholder="Select..."
+        className={styles.dropdownWrap}
+        triggerClassName={styles.dropdownTrigger}
+        usePortal
+        allowFlipUpward={false}
+      />
     </FormField>
   );
 }
@@ -40,8 +48,12 @@ function OptionalModuleLabel() {
 
 function ProjectDeadlineField({ value, onChange, error }) {
   return (
-    <FormField label="Deadline" className={styles.inputField} error={error}>
-      <DateTimePicker value={value} onChange={(nextValue) => onChange("deadline", nextValue)} placeholder="dd / mm / yyyy" dateOnly hideIcon triggerClassName={styles.datePickerTrigger} wrapperClassName={styles.datePickerWrap} />
+    <FormField label={<RequiredLabel text="Due date" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
+      <DateTimePicker value={value} onChange={(nextValue) => onChange("deadline", nextValue)} placeholder="Select due date" dateOnly wrapperClassName={styles.datePickerWrap} />
     </FormField>
   );
+}
+
+function RequiredLabel({ text }) {
+  return <>{text} <span className={styles.requiredMark}>*</span></>;
 }
