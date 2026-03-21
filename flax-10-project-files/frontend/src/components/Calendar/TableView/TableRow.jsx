@@ -118,11 +118,22 @@ function DateCell({ event, state, editState, isRowHovered }) {
   );
 }
 
-function LocationCell({ event, state, editState, navState, rowIndex }) {
+function LocationCell({ event, state, editState, navState, rowIndex, isRowHovered }) {
+  const isEditing = state.isEditing('location');
   return (
-    <EditableFieldCell className={styles.locationCell} value={state.isEditing('location') ? editState.cellValue : event.location}
-      isEditing={state.isEditing('location')} onChange={editState.updateValue} onKeyDown={e => navState.handleKeyDown(e, rowIndex, 2)}
-      onEdit={e => state.onEdit(e, 'location')} showEditIcon={!state.isReadOnly && !state.isEditing('location')} />
+    <td className={styles.LocationCell} onClick={e => state.onEdit(e, 'location')}>
+      <div className={styles.cellWrapper}>
+        <LocationEditCell
+          value={isEditing ? editState.cellValue : event.location}
+          isEditing={isEditing}
+          onChange={editState.updateValue}
+          onSave={editState.saveEdit}
+        />
+        {!state.isReadOnly && !isEditing && (
+          <EditIcon show={true} isRowHovered={isRowHovered} />
+        )}
+      </div>
+    </td>
   );
 }
 
