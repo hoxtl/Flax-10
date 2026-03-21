@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCalendarEvents } from '../../../api/calendarService';
+import { getCalendarEvents } from '../../../api/calendarApi';
 
 async function loadCalendarEvents(setEvents) {
   const token = localStorage.getItem('token');

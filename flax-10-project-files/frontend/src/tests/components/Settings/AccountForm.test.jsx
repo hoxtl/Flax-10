@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
-vi.mock("../../../api/userService", () => ({
+vi.mock("../../../api/userApi", () => ({
   getUserProfile: vi.fn(),
 }));
 

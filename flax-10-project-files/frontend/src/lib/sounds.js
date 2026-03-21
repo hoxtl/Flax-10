@@ -1,5 +1,5 @@
-/**
- * Shared sound helpers (chime for timer completion, etc.)
+/*
+ * Plays the completion chime when a focus timer session ends.
  */
 export function playCompletionChime(volume = 0.35) {
   try {

@@ -13,7 +13,7 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../api/analyticsService', () => ({
+vi.mock('../../api/analyticsApi', () => ({
     default: {
         getSummary: vi.fn().mockResolvedValue({
             summary: {
@@ -73,7 +73,7 @@ vi.mock('../../components/Analytics/InsightCards', () => ({
 }));
 
 import AnalyticsPage from '../../pages/Analytics/AnalyticsPage';
-import analyticsService from '../../api/analyticsService';
+import analyticsService from '../../api/analyticsApi';
 
 describe('AnalyticsPage', () => {
     beforeEach(() => {

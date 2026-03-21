@@ -1,3 +1,7 @@
+/*
+ * Shares and unshares calendars between users.
+ */
+
 import { fetchApi } from './client';
 
 export const shareCalendar = async (userId) => {

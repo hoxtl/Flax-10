@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { shareCalendar, unshareCalendar } from '../../api/socialService';
+import { shareCalendar, unshareCalendar } from '../../api/socialApi';
 import styles from './Social.module.css';
 
 function getLabel(loading, isSharing) {

@@ -1,3 +1,7 @@
+/*
+ * Creates, reads, updates, and deletes calendar events.
+ */
+
 import { fetchApi } from "./client";
 
 export async function getEvents(params = {}) {

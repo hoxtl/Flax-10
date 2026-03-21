@@ -38,7 +38,7 @@ vi.mock('../../../context/ThemeContext', () => ({
 }));
 
 // Mock services
-vi.mock('../../../api/analyticsService', () => ({
+vi.mock('../../../api/analyticsApi', () => ({
   default: {
     getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })),
   },
@@ -72,7 +72,7 @@ vi.mock('../../../pages/Profile/AchievementsModal', () => ({
 import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
 import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
 import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
-import analyticsService from '../../../api/analyticsService';
+import analyticsService from '../../../api/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };

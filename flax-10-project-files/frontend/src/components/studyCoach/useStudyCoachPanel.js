@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import analyticsService from "../../api/analyticsService";
+import analyticsService from "../../api/analyticsApi";
 import {
   buildNextMessages,
   createAssistantMessage,

@@ -6,12 +6,12 @@ vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() }),
 }));
 
-vi.mock("../../../../api/userService", () => ({ getUserSettings: vi.fn() }));
+vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn() }));
 vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
 vi.mock("../../../../pages/Tasks/utils/createTaskModalUtils", () => ({ runCreateTaskSave: vi.fn() }));
 
 import { useCreateTaskModal } from "../../../../pages/Tasks/hooks/useCreateTaskModal";
-import { getUserSettings } from "../../../../api/userService";
+import { getUserSettings } from "../../../../api/userApi";
 import { getModules, getEnrollments } from "../../../../api/moduleApi";
 import { runCreateTaskSave } from "../../../../pages/Tasks/utils/createTaskModalUtils";
 

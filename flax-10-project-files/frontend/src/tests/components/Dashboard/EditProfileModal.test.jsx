@@ -4,7 +4,7 @@ import EditProfileModal from '../../../components/Dashboard/EditProfileModal';
 
 const updateUserProfileMock = vi.fn();
 
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
   updateUserProfile: (...args) => updateUserProfileMock(...args),
 }));
 

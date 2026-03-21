@@ -1,5 +1,5 @@
 /*
- * Attendance API client.
+ * Records and retrieves attendance stats and history.
  */
 
 import { fetchApi } from "./client";

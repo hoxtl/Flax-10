@@ -1,11 +1,7 @@
-/**
- * Context-aware completion toast message based on task type.
- * Used when a task is marked complete (Homepage or Tasks page).
- * Calm & Clever rotation: 70% Generic/Motivational, 20% Reflective, 10% Lenny (rare).
- * - Routine (Breakfast/Lunch/Sleep): "Nourished. ☕" (no particle animation for routine).
- * @param {Object} [task] - Task object { title, due_date, module_id, module_code, moduleId, ... }
- * @returns {string} Message for the toast
+/*
+ * Context-aware completion toast messages for task completion.
  */
+
 const GENERIC_MESSAGES = [
   "Focus maintained. One step closer.",
   "Nicely done. Take a deep breath.",
@@ -27,7 +23,6 @@ const LENNY_MESSAGES = [
   "Even Lenny approves of that one.",
 ];
 
-/** When user checks off an overdue task on Tasks page */
 const OVERDUE_MESSAGES = [
   "Caught up. Well recovered.",
   "Better late than never.",
@@ -36,7 +31,6 @@ const OVERDUE_MESSAGES = [
   "Back on track.",
 ];
 
-/** When user checks off a due-today task (not overdue) on Tasks page */
 const DUE_TODAY_MESSAGES = [
   "Done in time. One less for today.",
   "Today's list just got shorter.",
@@ -45,46 +39,35 @@ const DUE_TODAY_MESSAGES = [
   "Right on schedule.",
 ];
 
-/** Weighted random: 70% generic, 20% reflective, 10% Lenny */
-function pickCalmCleverMessage() {
-  const r = Math.random();
-  if (r < 0.7) return GENERIC_MESSAGES[Math.floor(Math.random() * GENERIC_MESSAGES.length)];
-  if (r < 0.9) return REFLECTIVE_MESSAGES[Math.floor(Math.random() * REFLECTIVE_MESSAGES.length)];
-  return LENNY_MESSAGES[Math.floor(Math.random() * LENNY_MESSAGES.length)];
+const ROUTINE_PATTERN = /breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i;
+
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
 }
 
-/**
- * Context-aware completion toast message based on task type and due context.
- * @param {Object} [task] - Task object { title, due_date, ... }
- * @param {{ isOverdue?: boolean, dueStatus?: string }} [context]
- * @returns {string} Message for the toast
- */
-export function getCompletionMessage(task, context = {}) {
-  if (!task || typeof task !== "object") {
-    return pickCalmCleverMessage();
-  }
+/** Weighted random: 70% generic, 20% reflective, 10% Lenny. */
+function pickCalmCleverMessage() {
+  const r = Math.random();
+  if (r < 0.7) return pickRandom(GENERIC_MESSAGES);
+  if (r < 0.9) return pickRandom(REFLECTIVE_MESSAGES);
+  return pickRandom(LENNY_MESSAGES);
+}
 
-  const title = (task.title || "").toLowerCase();
-  const isRoutine = /breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title);
-
-  if (isRoutine) {
-    return "Nourished. ☕";
-  }
-
-  const { isOverdue, dueStatus } = context;
-  if (isOverdue || dueStatus === "overdue") {
-    return OVERDUE_MESSAGES[Math.floor(Math.random() * OVERDUE_MESSAGES.length)];
-  }
-  if (dueStatus === "today") {
-    return DUE_TODAY_MESSAGES[Math.floor(Math.random() * DUE_TODAY_MESSAGES.length)];
-  }
-
+function pickContextualMessage({ isOverdue, dueStatus }) {
+  if (isOverdue || dueStatus === "overdue") return pickRandom(OVERDUE_MESSAGES);
+  if (dueStatus === "today") return pickRandom(DUE_TODAY_MESSAGES);
   return pickCalmCleverMessage();
 }
 
-/** True if task is routine by title (meals/sleep). Used to skip victory sound and particle burst. */
+/** Returns a completion toast message based on task type and due context. */
+export function getCompletionMessage(task, context = {}) {
+  if (!task || typeof task !== "object") return pickCalmCleverMessage();
+  if (isRoutineTask(task)) return "Nourished. ☕";
+  return pickContextualMessage(context);
+}
+
+/** True if task is routine by title (meals/sleep). Used to skip victory sound. */
 export function isRoutineTask(task) {
   if (!task || typeof task !== "object") return false;
-  const title = (task.title || "").toLowerCase();
-  return /breakfast|lunch|sleep|coffee|meal|dinner|brunch|snack/i.test(title);
+  return ROUTINE_PATTERN.test(task.title || "");
 }

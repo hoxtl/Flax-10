@@ -1,3 +1,7 @@
+/*
+ * Picks a stable welcome quote from the user key for the homepage greeting.
+ */
+
 const WELCOME_QUOTES = [
   "Welcome back, you’re right on time.",
   "Take a breath. You’re here now.",

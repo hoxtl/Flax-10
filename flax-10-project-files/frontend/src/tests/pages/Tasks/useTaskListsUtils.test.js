@@ -10,13 +10,13 @@ import {
   permanentlyDeleteListImpl,
 } from "../../../pages/Tasks/utils/useTaskListsUtils";
 
-vi.mock("../../../api/taskService", () => ({
+vi.mock("../../../api/taskApi", () => ({
   createTaskList: vi.fn(),
   updateTaskList: vi.fn(),
   deleteTaskList: vi.fn(),
 }));
 
-import { createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskService";
+import { createTaskList, updateTaskList, deleteTaskList } from "../../../api/taskApi";
 
 describe("useTaskListsUtils", () => {
   beforeEach(() => {

@@ -4,7 +4,7 @@ import { Calendar, Clock3, Train, AlertTriangle, BarChart3, LayoutGrid, Zap, Tre
 import { Link, useNavigate } from "react-router-dom";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
-import { tflService } from "../../../api/tflService";
+import { tflService } from "../../../api/tflApi";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { loadTermConfig } from "../../../lib/termConfig";
 import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";

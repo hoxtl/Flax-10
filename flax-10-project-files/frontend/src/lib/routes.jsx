@@ -1,3 +1,7 @@
+/*
+ * Defines all app routes and their page components for the dashboard.
+ */
+
 import Homepage from "../pages/Homepage/Homepage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
 import SocietiesPage from "../pages/Societies/SocietiesPage";

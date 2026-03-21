@@ -30,7 +30,7 @@ vi.mock('../../../lib/completionMessages', () => ({
     getCompletionMessage: (...args) => getCompletionMessageMock(...args),
     isRoutineTask: (...args) => isRoutineTaskMock(...args),
 }));
-vi.mock('../../../api/userService', () => ({
+vi.mock('../../../api/userApi', () => ({
     getUserSettings: (...args) => getUserSettingsMock(...args),
 }));
 vi.mock('../../../api/readingApi', () => ({

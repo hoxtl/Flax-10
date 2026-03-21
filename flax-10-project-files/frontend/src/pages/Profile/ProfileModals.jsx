@@ -1,10 +1,10 @@
 import styles from "./Profile.module.css";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
-import { fetchTasks } from "../../api/taskService";
+import { fetchTasks } from "../../api/taskApi";
 import { SegmentedControl } from "../../components/common";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT } from "./utils/profileHelpers";
 import { useState, useEffect } from "react";
-import { getSharingWith, getSharedWithMe } from "../../api/socialService";
+import { getSharingWith, getSharedWithMe } from "../../api/socialApi";
 import { getModules } from "../../api/moduleApi";
 import UserListModal from "../../components/Social/UserListModal";
 import GenericSummaryModal from "../../components/common/GenericSummaryModal/GenericSummaryModal";

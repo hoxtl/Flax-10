@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
-import { getUserSettings, updateUserSettings } from "../../../api/userService";
-import { fetchTaskLists } from "../../../api/taskService";
+import { getUserSettings, updateUserSettings } from "../../../api/userApi";
+import { fetchTaskLists } from "../../../api/taskApi";
 
 export function useHomepageState() {
   const [modulesList, setModulesList] = useState([]);

@@ -30,7 +30,7 @@ export function startManualTask(t) {
 }
 
 async function loadOpenTasks() {
-  const { fetchTasks } = await import('../../../api/taskService');
+  const { fetchTasks } = await import('../../../api/taskApi');
   const tasks = await fetchTasks({ completed: false });
   return Array.isArray(tasks) ? tasks.filter((task) => !task.completed && !task.archived) : [];
 }

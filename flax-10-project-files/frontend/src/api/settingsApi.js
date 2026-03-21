@@ -1,18 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-function getAuthHeaders() {
-  const token = localStorage.getItem('token');
-  return { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` };
-}
-
-function getToken() {
-  return localStorage.getItem('token');
-}
+/*
+ * Patches user settings and manages auth tokens in localStorage.
+ */
 
 export async function patchSettings(body) {
-  const response = await fetch(`${API_BASE_URL}/settings/`, {
+  const token = localStorage.getItem('token');
+  const response = await fetch('/api/settings/', {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
     body: JSON.stringify(body),
   });
   const data = await response.json();
@@ -30,5 +24,5 @@ export function clearAuthAndRedirect() {
 }
 
 export function hasToken() {
-  return !!getToken();
+  return !!localStorage.getItem('token');
 }

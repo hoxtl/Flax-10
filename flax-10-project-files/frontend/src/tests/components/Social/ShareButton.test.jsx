@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-vi.mock('../../../api/socialService', () => ({
+vi.mock('../../../api/socialApi', () => ({
     shareCalendar: vi.fn().mockResolvedValue({}),
     unshareCalendar: vi.fn().mockResolvedValue({}),
 }));
 
 import ShareButton from '../../../components/Social/ShareButton';
-import { shareCalendar, unshareCalendar } from '../../../api/socialService';
+import { shareCalendar, unshareCalendar } from '../../../api/socialApi';
 
 describe('ShareButton', () => {
     beforeEach(() => {

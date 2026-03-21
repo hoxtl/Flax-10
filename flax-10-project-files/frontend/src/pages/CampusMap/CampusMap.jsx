@@ -16,7 +16,7 @@ import { CampusQuickNav } from '../../components/CampusMap/CampusQuickNav';
 import { useDisruptions } from './hooks/useDisruptions';
 import { useCalendarEvents } from './hooks/useCalendarEvents';
 import { useHomeAddress } from './hooks/useHomeAddress';
-import { tflService } from '../../api/tflService';
+import { tflService } from '../../api/tflApi';
 import {
   initMapInstance, handleMapLoad, cleanupMap,
   createHomeMarkerEl, homePopupHTML, wireHomeButton,

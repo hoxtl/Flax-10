@@ -2,7 +2,7 @@
  * Task list helpers for merging colours and mutating list data.
  */
 
-import { createTaskList, deleteTaskList, updateTaskList } from "../../../api/taskService";
+import { createTaskList, deleteTaskList, updateTaskList } from "../../../api/taskApi";
 
 function getStoredColorForList(list) {
   if (!list.id || typeof window === "undefined") return null;

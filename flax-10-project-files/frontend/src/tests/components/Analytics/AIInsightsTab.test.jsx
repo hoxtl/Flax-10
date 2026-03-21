@@ -18,7 +18,7 @@ vi.mock('react-markdown', () => ({
 
 vi.mock('remark-gfm', () => ({ default: () => {} }));
 
-vi.mock('../../../api/analyticsService', () => ({
+vi.mock('../../../api/analyticsApi', () => ({
     default: {
         getAiInsights: vi.fn().mockResolvedValue({ insights: 'You study well!' }),
         aiChat: vi.fn().mockResolvedValue({ reply: 'Great question!' }),
@@ -26,7 +26,7 @@ vi.mock('../../../api/analyticsService', () => ({
 }));
 
 import AIInsightsTab, { InsightsPanel, ChatPanel } from '../../../components/Analytics/AIInsightsTab';
-import analyticsService from '../../../api/analyticsService';
+import analyticsService from '../../../api/analyticsApi';
 
 // jsdom doesn't implement scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();

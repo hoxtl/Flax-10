@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import { getUserSettings } from "../../../api/userService";
+import { getUserSettings } from "../../../api/userApi";
 import { runQuickAdd } from "../utils/createTaskBarUtils";
 import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 

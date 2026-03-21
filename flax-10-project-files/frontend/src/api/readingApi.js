@@ -1,3 +1,7 @@
+/*
+ * Manages reading list items for each module and suggested readings.
+ */
+
 import {fetchApi} from './client.js'
 
 export const getReadings = (moduleId) => 
