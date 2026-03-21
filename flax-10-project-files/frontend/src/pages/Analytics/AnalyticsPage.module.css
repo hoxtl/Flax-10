@@ -242,3 +242,41 @@
     grid-column: auto;
   }
 }
+
+
+@media (max-width: 640px) {
+  .analyticsTabs > div:first-child {
+    flex-direction: row !important;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .analyticsTabButton {
+    width: auto !important;
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    border: none !important;
+    border-radius: 8px 8px 0 0;
+    padding-inline: 0.5rem;
+  }
+
+  .analyticsTabButton[data-active="true"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    border-color: transparent !important;
+  }
+
+  .analyticsTabButton[data-active="false"] {
+    color: var(--muted);
+  }
+
+  .aiInsightsLabelFull {
+    display: none;
+  }
+
+  .aiInsightsLabelShort {
+    display: inline;
+  }
+}
