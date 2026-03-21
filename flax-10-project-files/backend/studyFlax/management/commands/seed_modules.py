@@ -336,15 +336,20 @@ def _process_single_module(user, module, tags, now, deadlines_by_module):
     return enrollment, session_events + deadline_events
 
 
+def _collect_module_result(enrollment, module_events, enrollments, events):
+    """Append enrollment (if any) and events to the accumulators."""
+    if enrollment:
+        enrollments.append(enrollment)
+    events.extend(module_events)
+
+
 def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
     """Build all events for a user's enrolled modules."""
     core, extras = get_user_modules(user, modules)
     enrollments, events = [], []
     for module in core + extras:
         enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
-        if enrollment:
-            enrollments.append(enrollment)
-        events.extend(module_events)
+        _collect_module_result(enrollment, module_events, enrollments, events)
     return enrollments, events
 
 def _find_user_tag(user, tags, name):

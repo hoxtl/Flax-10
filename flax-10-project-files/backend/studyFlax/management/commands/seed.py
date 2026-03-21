@@ -78,6 +78,15 @@ def _table_columns(table_name):
         return {column.name for column in connection.introspection.get_table_description(cursor, table_name)}
 
 
+def _apply_legacy_column_fix(table_name):
+    """Apply default and null fix for legacy widget sizes column."""
+    alter_sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
+    update_sql = f'UPDATE "{table_name}" SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
+    with connection.cursor() as cursor:
+        cursor.execute(alter_sql)
+        cursor.execute(update_sql)
+
+
 def _display_role(username, role):
     return 'admin/student' if username == 'johndoe' else role
 
@@ -87,6 +96,52 @@ def _is_already_seeded():
     fixture_usernames = {'johndoe', 'janedoe', 'charlie', 'amiller'}
     existing = set(User.objects.filter(username__in=fixture_usernames).values_list('username', flat=True))
     return len(existing) >= 2
+
+
+def _initial_share_pairs(users, rng):
+    """Build initial round-robin share pairs."""
+    shuffled = users[:]
+    rng.shuffle(shuffled)
+    return {(owner.id, shuffled[(i + 1) % len(shuffled)].id) for i, owner in enumerate(shuffled)}
+
+
+def _find_new_pairs(owner_id, candidates, planned_pairs, limit):
+    """Find new pairs that aren't already planned."""
+    new_pairs = [(owner_id, t.id) for t in candidates if (owner_id, t.id) not in planned_pairs]
+    return new_pairs[:limit]
+
+
+def _add_extra_pairs_for_owner(owner, users, rng, planned_pairs):
+    """Add extra random share pairs for one owner."""
+    candidates = [t for t in users if t.id != owner.id]
+    rng.shuffle(candidates)
+    target_count = rng.randint(0, min(3, len(candidates) - 1))
+    new_pairs = _find_new_pairs(owner.id, candidates, planned_pairs, target_count)
+    planned_pairs.update(new_pairs)
+
+
+def _build_calendar_share_pairs(users):
+    """Build all calendar share pairs for users."""
+    rng = random.Random("studyflax-calendar-shares")
+    planned_pairs = _initial_share_pairs(users, rng)
+    for owner in users:
+        _add_extra_pairs_for_owner(owner, users, rng, planned_pairs)
+    return planned_pairs
+
+
+def _create_share_if_valid(owner, target):
+    """Create share between users if both exist. Returns 1 if created, 0 otherwise."""
+    if not (owner and target):
+        return 0
+    _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
+    return int(was_created)
+
+
+def _create_calendar_shares(users, planned_pairs):
+    """Create CalendarShare objects from pairs."""
+    user_by_id = {u.id: u for u in users}
+    pairs_with_users = [(user_by_id.get(oid), user_by_id.get(tid)) for oid, tid in sorted(planned_pairs)]
+    return sum(_create_share_if_valid(owner, target) for owner, target in pairs_with_users)
 
 
 class Command(BaseCommand):
@@ -128,19 +183,8 @@ class Command(BaseCommand):
         table_name = UserSettings._meta.db_table
         if LEGACY_WIDGET_SIZES_COLUMN not in _table_columns(table_name):
             return
-        self.stdout.write(
-            f"Detected legacy {LEGACY_WIDGET_SIZES_COLUMN} column; enabling seed compatibility..."
-        )
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f'ALTER TABLE "{table_name}" '
-                f'ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
-            )
-            cursor.execute(
-                f'UPDATE "{table_name}" '
-                f'SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb '
-                f'WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
-            )
+        self.stdout.write(f"Detected legacy {LEGACY_WIDGET_SIZES_COLUMN} column; enabling seed compatibility...")
+        _apply_legacy_column_fix(table_name)
 
     def _load_shared_data(self):
         self.users = _seed_user_pool()
@@ -185,50 +229,14 @@ class Command(BaseCommand):
 
     def _seed_calendar_shares(self):
         self.stdout.write("Seeding calendar shares...")
-        users = sorted(
-            User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"),
-            key=lambda user: user.username,
-        )
-        rng = random.Random("studyflax-calendar-shares")
+        users = sorted(User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"), key=lambda u: u.username)
         if len(users) < 2:
             self.stdout.write("  Skipped calendar shares: need at least two non-admin users.")
             return
-        user_by_id = {user.id: user for user in users}
-        shuffled = users[:]
-        rng.shuffle(shuffled)
-        planned_pairs = {
-            (owner.id, shuffled[(index + 1) % len(shuffled)].id)
-            for index, owner in enumerate(shuffled)
-        }
-        for owner in users:
-            candidates = [target for target in users if target.id != owner.id]
-            rng.shuffle(candidates)
-            extra_share_target = rng.randint(0, min(3, len(candidates) - 1))
-            extra_created = 0
-            for target in candidates:
-                pair = (owner.id, target.id)
-                if pair in planned_pairs:
-                    continue
-                planned_pairs.add(pair)
-                extra_created += 1
-                if extra_created >= extra_share_target:
-                    break
-        created = 0
-        for owner_id, target_id in sorted(planned_pairs):
-            owner = user_by_id.get(owner_id)
-            target = user_by_id.get(target_id)
-            if not owner or not target:
-                continue
-            _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
-            created += int(was_created)
-        share_counts = {
-            user.username: sum(1 for owner_id, _ in planned_pairs if owner_id == user.id)
-            for user in users
-        }
-        self.stdout.write(
-            f"  {CalendarShare.objects.count()} total shares ({created} new this run, "
-            f"{min(share_counts.values())}-{max(share_counts.values())} per user)."
-        )
+        planned_pairs = _build_calendar_share_pairs(users)
+        created = _create_calendar_shares(users, planned_pairs)
+        share_counts = {u.username: sum(1 for oid, _ in planned_pairs if oid == u.id) for u in users}
+        self.stdout.write(f"  {CalendarShare.objects.count()} total shares ({created} new, {min(share_counts.values())}-{max(share_counts.values())} per user).")
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")

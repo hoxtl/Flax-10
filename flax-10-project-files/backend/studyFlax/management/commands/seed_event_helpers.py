@@ -135,14 +135,15 @@ def _meal_events_for_day(user, day_offset, tag):
     base = SEED_START + timedelta(days=day_offset)
     return [_meal_event(user, base, day_offset, *spec, tag) for spec in MEAL_SPECS]
 
+def _find_tag_by_name(user_tags, name):
+    """Find a tag by name in a list of tags."""
+    return next((t for t in user_tags if t.name == name), None)
+
+
 def _resolve_meal_tag(user, tags):
+    """Find Meals or Other tag for meal events."""
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    priorities = ('Meals', 'Other')
-    for name in priorities:
-        match = next((t for t in user_tags if t.name == name), None)
-        if match:
-            return match
-    return user_tags[0] if user_tags else None
+    return _find_tag_by_name(user_tags, 'Meals') or _find_tag_by_name(user_tags, 'Other') or (user_tags[0] if user_tags else None)
 
 def build_meal_events(user, tags):
     """Meals (Breakfast, Lunch, Dinner) use Meals/Routine/Wellness tags."""

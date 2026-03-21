@@ -54,15 +54,25 @@ def _get_module_id_for_code(code):
     return module.id if module else None
 
 
+def _resolve_module_id(name):
+    """Resolve module ID from TaskList name."""
+    code = _extract_module_code(name)
+    return _get_module_id_for_code(code) if code else None
+
+
+def _add_module_list(result, tl):
+    """Add a TaskList to result if it maps to a valid module."""
+    module_id = _resolve_module_id(tl.name)
+    if module_id:
+        result[tl.user_id][module_id] = tl
+
+
 def _prefetch_module_lists(students):
     """Fetch module TaskLists grouped by user_id -> module_id -> TaskList."""
     lists = TaskList.objects.filter(user__in=students, category="uni")
     result = defaultdict(dict)
     for tl in lists:
-        code = _extract_module_code(tl.name)
-        module_id = _get_module_id_for_code(code) if code else None
-        if module_id:
-            result[tl.user_id][module_id] = tl
+        _add_module_list(result, tl)
     return result
 
 
@@ -89,11 +99,16 @@ def _student_has_reading_tasks(student):
     return Task.objects.filter(user=student, reading__isnull=False).exists()
 
 
+def _update_student_reading_estimates(student):
+    """Update reading estimates for a student if they have reading tasks."""
+    if _student_has_reading_tasks(student):
+        update_reading_estimates(student)
+
+
 def _update_all_reading_estimates(students):
     """Update reading estimates for all students with tasks."""
     for student in students:
-        if _student_has_reading_tasks(student):
-            update_reading_estimates(student)
+        _update_student_reading_estimates(student)
 
 
 def _create_module_readings(modules, stdout):
