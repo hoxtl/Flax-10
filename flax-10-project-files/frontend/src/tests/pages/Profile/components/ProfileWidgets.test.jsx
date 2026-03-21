@@ -263,6 +263,13 @@ describe('CompactAttendanceTile', () => {
     });
   });
 
+  it('routes the header action to attendance details', () => {
+    const onNavigate = vi.fn();
+    render(<CompactAttendanceTile onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByRole('button', { name: /View attendance details/i }));
+    expect(onNavigate).toHaveBeenCalledWith('attendance');
+  });
+
   it('shows clean by-type labels in the right-hand legend without duplicate loose numbers', () => {
     render(<CompactAttendanceTile onNavigate={vi.fn()} />);
 

@@ -106,23 +106,23 @@ export function CompactAttHeader({ onNavigate }) {
         className={`${styles.heatmapLinkBtn} ${styles.compactAttAnalysisBtn}`}
         onClick={(event) => {
           event.stopPropagation();
-          triggerAnalyticsNavigation(onNavigate);
+          triggerAttendanceNavigation(onNavigate);
         }}
         style={{ pointerEvents: "auto", position: "relative", zIndex: 1 }}
       >
-        View full analytics
+        View attendance details
       </button>
     </div>
   );
 }
 
-function triggerAnalyticsNavigation(onNavigate) {
+function triggerAttendanceNavigation(onNavigate) {
   if (typeof onNavigate === "function") {
     onNavigate();
     return;
   }
 
-  window.dispatchEvent(new CustomEvent("navigate", { detail: "analytics" }));
+  window.dispatchEvent(new CustomEvent("navigate", { detail: "attendance" }));
 }
 
 export function SegmentDetailPanelWrapper({ selectedSegment, events, onToggleStatus, onClose }) {

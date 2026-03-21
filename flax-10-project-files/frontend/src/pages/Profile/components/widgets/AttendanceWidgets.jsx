@@ -39,7 +39,7 @@ export function CompactAttendanceTile({ onNavigate }) {
   return (
     <Card className={`${styles.glassCard} ${styles.compactAttCard}`} variant="glass">
       {data.attendancePct < 50 && <AttendanceWarningBadge attendancePct={data.attendancePct} />}
-      <CompactAttHeader onNavigate={() => onNavigate?.("analytics")} />
+      <CompactAttHeader onNavigate={() => onNavigate?.("attendance")} />
       <CompactOverallDonut overallData={data.overallData} onSegmentClick={setSelectedSegment} />
       <CompactByTypeDonut byTypeData={data.byTypeData} onSegmentClick={setSelectedSegment} />
       <AttendanceDetails
