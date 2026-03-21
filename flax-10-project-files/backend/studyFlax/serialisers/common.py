@@ -9,7 +9,14 @@ def build_profile_photo_url(photo, request):
     """Return the absolute URL for a profile photo, or None."""
     if not photo:
         return None
-    return request.build_absolute_uri(photo.url) if request else photo.url
+    photo_str = str(photo).strip()
+    if photo_str.startswith(("http://", "https://")):
+        return photo_str
+    try:
+        url = photo.url
+    except (ValueError, AttributeError):
+        return None
+    return request.build_absolute_uri(url) if request else url
 
 def ensure_teacher_user(request, error_message: str) -> None:
     """Ensure the request user is a teacher, otherwise raise a ValidationError."""
@@ -22,9 +29,19 @@ def format_teacher_name(user) -> str:
     if not user:
         return "Unknown"
     name = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
-    if getattr(user, "role", None) == "teacher" and not name.startswith("Dr."):
-        return f"Dr. {name}"
+    if getattr(user, "role", None) == "teacher":
+        return format_teacher_display_name(name)
     return name or "Unknown"
+
+
+def format_teacher_display_name(name: str) -> str:
+    """Return a teacher display name with a Dr. prefix when one is missing."""
+    clean = str(name or "").strip()
+    if not clean:
+        return "Unknown"
+    if clean.startswith("Dr."):
+        return clean
+    return f"Dr. {clean}"
 
 
 def is_shared_with_requester(owner, request):

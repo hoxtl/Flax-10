@@ -1,7 +1,7 @@
 /*
  * Toolbar, empty states, and grid components for the modules page.
  */
-import { SegmentedControl } from '../../components/common/SegmentedControl/SegmentedControl.jsx';
+import AnimatedDropdown from '../../components/common/AnimatedDropdown/AnimatedDropdown';
 import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
 import EmptyState from '../../components/common/EmptyState/EmptyState';
@@ -14,7 +14,6 @@ import { Pagination, BackToTop } from '../../components/Pagination/Pagination.js
 const SORT_OPTIONS = [
     { value: 'name', label: 'A \u2192 Z' },
     { value: 'name-desc', label: 'Z \u2192 A' },
-    { value: 'deadlines', label: 'Deadlines' },
 ];
 
 function getSearchPlaceholder(isMyModules) {
@@ -30,7 +29,7 @@ function ToolbarControls({ isTeacher, isMyModules, sorting }) {
                 <ModuleCourseFilter selectedCourses={sorting.selectedCourses || []} onToggleCourse={sorting.toggleCourse || (() => {})} />
             )}
             <ToolbarSortControl>
-                <SegmentedControl value={sorting.sortBy} onChange={sorting.handleNewSort} options={SORT_OPTIONS} />
+                <AnimatedDropdown value={sorting.sortBy} onChange={sorting.handleNewSort} options={SORT_OPTIONS} placeholder="Sort" />
             </ToolbarSortControl>
         </>
     );
@@ -51,7 +50,7 @@ export function EnrolmentToolbar({ enrollSearch, setEnrollSearch, enrolledSortin
             searchSlot={<SearchBar value={enrollSearch} onChange={(q) => { setEnrollSearch(q); enrolledSorting.setCurrentPage(1); }} placeholder="Search your enrolled modules..." />}
             controlsSlot={
                 <ToolbarSortControl>
-                    <SegmentedControl value={enrolledSorting.sortBy} onChange={enrolledSorting.handleNewSort} options={SORT_OPTIONS} />
+                    <AnimatedDropdown value={enrolledSorting.sortBy} onChange={enrolledSorting.handleNewSort} options={SORT_OPTIONS} placeholder="Sort" />
                 </ToolbarSortControl>
             }
         />

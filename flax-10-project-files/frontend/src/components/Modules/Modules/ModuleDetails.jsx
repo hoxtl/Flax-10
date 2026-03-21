@@ -37,7 +37,7 @@ function getUrgencyLabel(dueDate) {
 }
 
 function getUrgencyText(kind) {
-    if (kind === "overdue") return "Overdue";
+    if (kind === "overdue") return "Passed";
     if (kind === "due-soon") return "Due soon";
     if (kind === "this-week") return "This week";
     return "Later";
@@ -130,10 +130,15 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
             <h1 className={heroStyles.moduleTitle}>{module.module_name}</h1>
             <p className={heroStyles.heroSubtext}>{module.description || "No module summary available yet."}</p>
-            <div className={heroStyles.heroMeta}><TutorMetaItem module={module} photo={tutorPhoto} /><EmailMetaItem email={module.created_by_email} /></div>
-            <div className={heroStyles.heroActions}>
-                {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
-                <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+            <div className={heroStyles.heroBottom}>
+                <div className={heroStyles.heroMeta}>
+                    <TutorMetaItem module={module} photo={tutorPhoto} />
+                    <EmailMetaItem email={module.created_by_email} />
+                </div>
+                <div className={heroStyles.heroActions}>
+                    {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
+                    <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                </div>
             </div>
         </section>
     );

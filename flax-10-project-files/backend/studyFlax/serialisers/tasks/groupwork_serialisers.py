@@ -8,7 +8,7 @@ from studyFlax.models.groupwork.groupwork_model import (
     GroupProject,
     GroupMembership,
 )
-from studyFlax.serialisers.common import build_profile_photo_url
+from studyFlax.serialisers.common import build_profile_photo_url, format_teacher_display_name
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
     member_count = serializers.IntegerField(read_only=True)
@@ -16,7 +16,7 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
     completed_task_count = serializers.IntegerField(read_only=True, default=0)
     module_name = serializers.CharField(read_only=True, required=False)
     module_tutor_id = serializers.IntegerField(read_only=True, required=False)
-    module_tutor_name = serializers.CharField(read_only=True, required=False)
+    module_tutor_name = serializers.SerializerMethodField()
     module_tutor_username = serializers.CharField(read_only=True, required=False)
     module_tutor_email = serializers.CharField(read_only=True, required=False)
     module_tutor_profile_photo_url = serializers.SerializerMethodField()
@@ -41,6 +41,9 @@ class GroupProjectSerialiser(serializers.ModelSerializer):
             "members",
             "created_at",
         ]
+
+    def get_module_tutor_name(self, obj):
+        return format_teacher_display_name(getattr(obj, "module_tutor_name", None))
 
     def get_module_tutor_profile_photo_url(self, obj):
         photo = getattr(obj, "module_tutor_profile_photo", None)
