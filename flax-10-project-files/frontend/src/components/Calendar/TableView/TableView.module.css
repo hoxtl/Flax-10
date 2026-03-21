@@ -264,3 +264,13 @@ textarea.cellInput {
   width: 100%;
   min-width: 200px;
 }
+
+.autocompleteCell input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: var(--input-bg);
+  color: var(--text);
+}
