@@ -200,3 +200,30 @@
     margin-left: auto;
   }
 }
+
+@media (max-width: 480px) {
+  .header {
+    gap: 14px;
+  }
+
+  .avatar {
+    width: 84px;
+    height: 84px;
+    font-size: 30px;
+  }
+
+  .headerTop {
+    align-items: flex-start;
+  }
+
+  .rolePill {
+    order: 2;
+    margin-right: 0;
+  }
+
+  .btnEdit {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+}
