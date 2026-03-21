@@ -25,6 +25,18 @@ export function UserJourneySection({
         geocodeStart();
     }, [manualStart]);
 
+    useEffect(() => {
+        async function geocodeDest() {
+            if (manualDestination && manualDestination.trim()) {
+                const coords = await geocodeAddress(manualDestination);
+                setDestCoords(coords);
+            } else {
+                setDestCoords(null);
+            }
+        }
+        geocodeDest();
+    }, [manualDestination]);
+
     const handleStartSelect = async (address) => {
         setManualStart(address);
         const coords = await geocodeAddress(address);
