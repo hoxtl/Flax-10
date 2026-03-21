@@ -88,19 +88,40 @@
   color: var(--muted);
 }
 
-.mobileViewSelect {
-  min-width: 180px;
-  border: 1px solid var(--widget-border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text);
-  padding: 7px 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: inherit;
+.mobileViewDropdown {
+  width: 188px;
+  min-width: 170px;
 }
 
-.mobileViewSelect:focus-visible {
+.mobileViewDropdown > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--widget-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--widget-text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+}
+
+.mobileViewDropdown > button:hover {
+  border-color: var(--primary, #7b6751);
+  background: rgba(107, 83, 68, 0.04);
+}
+
+.mobileViewDropdown > button:focus,
+.mobileViewDropdown > button:focus-visible {
   outline: none;
   border-color: var(--primary, #7b6751);
   box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
@@ -247,7 +268,7 @@
     justify-content: space-between;
   }
 
-  .mobileViewSelect {
+  .mobileViewDropdown {
     flex: 1;
     min-width: 0;
     max-width: 220px;
