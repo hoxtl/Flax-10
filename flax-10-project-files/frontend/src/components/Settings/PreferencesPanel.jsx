@@ -206,9 +206,9 @@ export default function PreferencesPanel({
     setStudyIsSaving(true);
     const safeValue = Math.max(30, Math.min(600, Number(minutesPerDay) || 120));
     try {
-      const ok = await onStudyTimeSave({ preferred_study_minutes_per_day: safeValue });
-      if (!ok) return;
-      const value = String(safeValue);
+      const settings = await onStudyTimeSave({ preferred_study_minutes_per_day: safeValue });
+      if (!settings) return;
+      const value = String(settings.preferred_study_minutes_per_day ?? safeValue);
       setMinutesPerDay(value);
       setInitialMinutesPerDay(value);
       setStudySaveSignal((current) => current + 1);
@@ -221,9 +221,11 @@ export default function PreferencesPanel({
     event.preventDefault();
     setWeekIsSaving(true);
     try {
-      const ok = await onWeekPreferenceSave({ week_preference: weekPreference });
-      if (!ok) return;
-      setInitialWeekPreference(weekPreference);
+      const settings = await onWeekPreferenceSave({ week_preference: weekPreference });
+      if (!settings) return;
+      const value = settings.week_preference || weekPreference;
+      setWeekPreference(value);
+      setInitialWeekPreference(value);
       setWeekSaveSignal((current) => current + 1);
     } finally {
       setWeekIsSaving(false);
@@ -234,9 +236,11 @@ export default function PreferencesPanel({
     event.preventDefault();
     setWorktimeIsSaving(true);
     try {
-      const ok = await onWorktimePreferenceSave({ worktime_preference: worktimePreference });
-      if (!ok) return;
-      setInitialWorktimePreference(worktimePreference);
+      const settings = await onWorktimePreferenceSave({ worktime_preference: worktimePreference });
+      if (!settings) return;
+      const value = settings.worktime_preference || worktimePreference;
+      setWorktimePreference(value);
+      setInitialWorktimePreference(value);
       setWorktimeSaveSignal((current) => current + 1);
     } finally {
       setWorktimeIsSaving(false);
