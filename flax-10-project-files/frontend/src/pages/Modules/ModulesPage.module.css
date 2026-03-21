@@ -1,95 +1,170 @@
 .container {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 .skeletonHeader {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .skeletonHeaderText {
-    display: grid;
-    gap: 0.6rem;
+  display: grid;
+  gap: 0.6rem;
 }
 
-.skeletonTitle { width: 170px; height: 34px; }
-.skeletonSubtitle { width: 280px; height: 14px; }
-.skeletonAction { width: 150px; height: 44px; border-radius: 10px; }
+.skeletonTitle {
+  width: 170px;
+  height: 34px;
+}
+.skeletonSubtitle {
+  width: 280px;
+  height: 14px;
+}
+.skeletonAction {
+  width: 150px;
+  height: 44px;
+  border-radius: 10px;
+}
 
 .skeletonToolbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(150px, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .skeletonSearch,
 .skeletonSelect,
-.skeletonSort { height: 42px; }
-
-.skeletonGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
+.skeletonSort {
+  height: 42px;
 }
 
-.skeletonCard { height: 180px; }
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.skeletonCard {
+  height: 180px;
+}
 /* Layout-only — button appearance comes from PrimaryButton */
 .createButton {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .studentTabs {
-    min-width: 0;
-    width: fit-content;
-    height: 36px;
-    --segmented-solid-bg: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
-    --segmented-solid-border: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border));
-    --segmented-solid-shadow: 0 8px 20px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
-    --segmented-solid-button-fg: var(--text);
-    --segmented-solid-button-hover-bg: color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
-    --segmented-solid-button-hover-fg: var(--text);
-    --segmented-solid-active-bg: var(--modules-accent-ink);
-    --segmented-solid-active-fg: var(--modules-accent-on-solid);
+  min-width: 0;
+  width: fit-content;
+  height: 36px;
+  --segmented-solid-bg: color-mix(
+    in srgb,
+    var(--modules-accent-ink) 12%,
+    var(--surface-card)
+  );
+  --segmented-solid-border: color-mix(
+    in srgb,
+    var(--modules-accent-ink) 22%,
+    var(--border)
+  );
+  --segmented-solid-shadow: 0 8px 20px
+    color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+  --segmented-solid-button-fg: var(--text);
+  --segmented-solid-button-hover-bg: color-mix(
+    in srgb,
+    var(--modules-accent-ink) 10%,
+    transparent
+  );
+  --segmented-solid-button-hover-fg: var(--text);
+  --segmented-solid-active-bg: var(--modules-accent-ink);
+  --segmented-solid-active-fg: var(--modules-accent-on-solid);
+}
+
+.myModulesTabs {
+  min-width: 0;
+}
+
+.myModulesTabButton {
+  min-width: 0;
+}
+
+.enrollmentsLabelShort {
+  display: none;
 }
 
 .toolbarDropdown {
-    flex: 1;
-    min-width: 150px;
+  flex: 1;
+  min-width: 150px;
 }
 .sortDropdown {
-    width: 170px;
-    min-width: 170px;
-    flex: 0 0 170px;
+  width: 170px;
+  min-width: 170px;
+  flex: 0 0 170px;
 }
 @media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
-    .skeletonHeader {
-        flex-direction: column;
-    }
-    .skeletonToolbar,
-    .skeletonGrid {
-        grid-template-columns: 1fr;
-    }
-    .header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .sortDropdown {
-        flex: 1;
-        width: auto;
-        min-width: 0;
-    }
-    .createButton {
-        width: 100%;
-    }
+  .container {
+    padding: 1rem;
+  }
+  .skeletonHeader {
+    flex-direction: column;
+  }
+  .skeletonToolbar,
+  .skeletonGrid {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sortDropdown {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+  }
+  .createButton {
+    width: 100%;
+  }
 
-    .studentTabs {
-        min-width: 0;
-        width: 100%;
-    }
+  .studentTabs {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .myModulesTabs > div:first-child {
+    flex-direction: row !important;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .myModulesTabButton {
+    width: auto !important;
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    border: none !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .myModulesTabButton[data-active="true"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    border-color: transparent !important;
+  }
+
+  .myModulesTabButton[data-active="false"] {
+    color: var(--muted);
+  }
+
+  .enrollmentsLabelFull {
+    display: none;
+  }
+
+  .enrollmentsLabelShort {
+    display: inline;
+  }
 }
