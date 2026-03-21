@@ -180,7 +180,7 @@ class ProfileSummaryHelpersTest(TestCase):
         sessions = []
         for week in range(4):
             for day in range(5):
-                sessions.append(self._make_session(week * 7 + day + 1, duration=300))
+                sessions.append(self._make_session(week * 7 + day + 1, duration=3600))
         self.user.weekly_goal_hours = 1
         self.user.save()
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
@@ -205,9 +205,9 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_get_weekly_study_hours(self):
         from studyFlax.views.user.profile_summary_view import get_weekly_study_hours
 
-        self._make_session(days_ago=1, duration=120)
-        self._make_session(days_ago=2, duration=60)
-        self._make_session(days_ago=3, duration=60)
+        self._make_session(days_ago=1, duration=7200)
+        self._make_session(days_ago=2, duration=3600)
+        self._make_session(days_ago=3, duration=3600)
         sessions = list(StudySession.objects.filter(user=self.user))
         self.assertAlmostEqual(get_weekly_study_hours(sessions), 4.0, places=1)
 
