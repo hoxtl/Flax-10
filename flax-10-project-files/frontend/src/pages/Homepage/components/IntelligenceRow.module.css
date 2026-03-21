@@ -116,7 +116,25 @@
   }
 }
 
+@media (max-width: 767px) {
+  .section {
+    padding: 12px;
+  }
 
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
 
 .header {
   position: relative;
