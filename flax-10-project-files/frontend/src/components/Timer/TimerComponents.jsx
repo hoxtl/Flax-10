@@ -19,14 +19,24 @@ export const formatTime = (seconds) => {
 };
 
 export const TimerDisplay = ({ timeLeft, mode, isOvertime }) => {
+    const timeText = formatTime(timeLeft);
+    const len = timeText.length;
+    // Scale font size based on length to prevent overlap with circular rings
+    // 5 chars (MM:SS) -> 3.5rem
+    // 6 chars (+MM:SS) -> 3.1rem
+    // 7+ chars -> 2.6rem
+    const fontSize = len > 6 ? '2.6rem' : len > 5 ? '3.1rem' : '3.5rem';
+    
     const className = `${styles.timerDisplay} ${mode === 'break' ? styles.break : ''} ${isOvertime ? styles.overtime : ''}`;
-    return <div className={className}>{formatTime(timeLeft)}</div>;
+    return <div className={className} style={{ fontSize }}>{timeText}</div>;
 };
 
+
 const getModeText = (mode, isOvertime, isBreakOvertime) => {
-    if (mode === 'work') return isOvertime ? '🚀 Overtime' : '🔥 Focus Time';
-    return isBreakOvertime ? '⏳ Break Overtime' : '☕ Break Time';
+    if (mode === 'work') return isOvertime ? 'Overtime' : 'Focus';
+    return isBreakOvertime ? 'Break Overtime' : 'Break';
 };
+
 
 export const ModeIndicator = ({ mode, isOvertime, isBreakOvertime }) => (
     <div className={`${styles.modeIndicator} ${mode === 'break' ? styles.break : ''}`}>
@@ -94,24 +104,24 @@ const useBufferedInput = (value, onUpdate, min, onError) => {
     };
 };
 
-const BufferedInput = ({ label, value, ...props }) => {
+const BufferedInput = ({ label, value, disabled, ...props }) => {
     const { local, onChange, onBlur, onKeyDown } = useBufferedInput(value, props.onUpdate, props.min, props.onError);
     return (
         <div className={styles.settingItem}>
             <label className={styles.label}>{label}</label>
-            <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} onFocus={(e) => e.target.select()} />
+            <input type="number" className={styles.input} value={local} onChange={onChange} onBlur={onBlur} onKeyDown={onKeyDown} onFocus={(e) => e.target.select()} disabled={disabled} />
         </div>
     );
 };
 
-export const TimerSettings = ({ work, breakTime, sessions, onUpdate }) => {
+export const TimerSettings = ({ work, breakTime, sessions, onUpdate, disabled }) => {
     const [showError, setShowError] = useState(false);
     return (
         <div className={styles.settingsContainer}>
             <div className={styles.settings}>
-                <BufferedInput label="Work (min)" value={work} min={1} onUpdate={(v) => onUpdate('work', v)} onError={setShowError} />
-                <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} />
-                <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} />
+                <BufferedInput label="Work (min)" value={work} min={1} onUpdate={(v) => onUpdate('work', v)} onError={setShowError} disabled={disabled} />
+                <BufferedInput label="Break (min)" value={breakTime} min={0} onUpdate={(v) => onUpdate('break', v)} disabled={disabled} />
+                <BufferedInput label="Sessions" value={sessions} min={1} onUpdate={(v) => onUpdate('sessions', v)} disabled={disabled} />
             </div>
             {showError && <div className={styles.disclaimer}>* Minimum study time is 1 minute</div>}
         </div>

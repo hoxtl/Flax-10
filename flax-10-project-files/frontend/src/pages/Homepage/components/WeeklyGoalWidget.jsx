@@ -7,6 +7,7 @@
  */
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Target } from "lucide-react";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/WeeklyGoalWidget.module.css";
 
 const GOAL_KEY  = "weeklyStudyGoalHours";
@@ -74,11 +75,11 @@ export default function WeeklyGoalWidget() {
 
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <div className={styles.iconWrap}>
-          <Target size={15} strokeWidth={1.75} aria-hidden />
+      <div className={baseStyles.widgetHeader}>
+        <div className={baseStyles.headerIconWrap}>
+          <Target size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
         </div>
-        <span className={styles.label}>WEEKLY GOAL</span>
+        <span className={baseStyles.headerTitle}>Weekly Goal</span>
       </div>
 
       {editing ? (

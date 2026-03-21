@@ -144,14 +144,22 @@ def _build_new_users(student_count, teacher_count):
 
 def create_random_users(stdout, target_teacher_count=14):
     needed = USER_COUNT - User.objects.count()
-    if needed <= 0:
+    if needed > 0:
+        student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
+        stdout.write(
+            f"Seeding {needed} random users "
+            f"({student_count} students, {teacher_count} teachers)..."
+        )
+        new_users = _build_new_users(student_count, teacher_count)
+        User.objects.bulk_create(new_users, ignore_conflicts=True)
+    else:
         stdout.write("Enough users already exist.")
-        return
-    student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
-    stdout.write(
-        f"Seeding {needed} random users "
-        f"({student_count} students, {teacher_count} teachers)..."
-    )
-    new_users = _build_new_users(student_count, teacher_count)
-    User.objects.bulk_create(new_users, ignore_conflicts=True)
-    UserSettings.objects.bulk_create(build_settings_for_new_users())
+    
+    # Always ensure ALL users have settings
+    stdout.write("Ensuring all users have settings...")
+    new_settings = build_settings_for_new_users()
+    if new_settings:
+        UserSettings.objects.bulk_create(new_settings)
+        stdout.write(f"  Created {len(new_settings)} new UserSettings rows.")
+    else:
+        stdout.write("  All users already have settings.")

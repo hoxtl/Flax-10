@@ -32,31 +32,32 @@
     z-index: 1;
 }
 
-/* Two-column grid: left = timer, right = panel */
-.timerGrid {
+.timerTopSplit {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 1.25rem;
-    width: 100%;
+    grid-template-columns: 1fr 400px;
+    gap: 1.5rem;
     align-items: start;
+    width: 100%;
 }
 
-.timerGridLeft {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+.timerTopLeft {
     min-width: 0;
-    align-self: start;
 }
 
-.timerRightPanel {
+.timerTopRight {
+    min-width: 320px;
+}
+
+.timerMainCentered {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    align-items: center;
+    width: 100%;
+    margin-top: 1rem;
 }
 
-@media (max-width: 900px) {
-    .timerGrid {
+@media (max-width: 1150px) {
+    .timerTopSplit {
         grid-template-columns: 1fr;
     }
 
@@ -69,6 +70,7 @@
         align-items: center;
     }
 }
+
 
 .focusPageSkeleton {
     position: absolute;

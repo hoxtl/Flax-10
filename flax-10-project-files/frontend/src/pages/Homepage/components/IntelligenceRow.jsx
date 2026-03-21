@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap } from "lucide-react";
+import { Calendar, Clock3, Train, AlertTriangle, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
 import { tflService } from "../../../api/tflService";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
@@ -36,28 +37,38 @@ import AttendanceChart from "../../../components/Analytics/AttendanceChart";
 import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
+import { TinyTimelineWidget } from "./TinyTimelineWidget";
+import { updateUserSettings } from "../../../api/userService";
+
 
 const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, section: "Essentials" },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, maxRow: 2, section: "Essentials" },
   { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
-  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 2, section: "Planning" },
-  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 2, section: "Planning" },
-  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, section: "Planning" },
+  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, maxRow: 2, section: "Planning" },
+  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, maxRow: 1, section: "Planning" },
+  { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, maxRow: 2, section: "Planning" },
+  { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minCol: 2, maxCol: 2, minRow: 2, maxRow: 2, section: "Planning" },
+  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
+
   { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },
   { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1, section: "Progress" },
   { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1, section: "Profile" },
-  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, minRow: 2, section: "Analytics" },
   { id: "analyticsInsights", label: "Insights", icon: "💡", col: 1, row: 1, section: "Analytics" },
-  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, section: "Analytics" },
-  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, section: "Analytics" },
+  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsPlannedActual", label: "Planned vs Actual", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, minRow: 2, section: "Analytics" },
+  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, minRow: 2, section: "Analytics" },
   { id: "analyticsThemeUsage", label: "Theme Usage", icon: "🌓", col: 1, row: 1, section: "Analytics" },
 ];
 
-const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks"];
-const STORAGE_KEY = "homepage_widget_layout";
+const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
+const getStorageKeys = (userId) => ({
+  layout: userId ? `homepage_widget_layout_${userId}` : "homepage_widget_layout",
+  sizes: userId ? `homepage_widget_sizes_${userId}` : "homepage_widget_sizes",
+});
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 function useTflDelays() {
@@ -148,75 +159,12 @@ function SemesterProgressWidget() {
   );
 }
 
-function CourseChangeCard({ request, onDismiss }) {
-  const navigate = useNavigate();
-  return (
-    <motion.div
-      className={styles.courseChangeCard}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
-    >
-      <BookOpen size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
-      <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Course change status: pending</span>
-        <span className={styles.courseChangeSub}>
-          Your request to switch
-          {request.requested_course ? <> to <strong>{request.requested_course}</strong></> : null}
-          {" "}is under admin review.
-        </span>
-      </div>
-      <button
-        type="button"
-        className={styles.courseChangeViewBtn}
-        onClick={() => navigate("/settings?tab=account")}
-      >
-        View
-      </button>
-      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
-        &times;
-      </button>
-    </motion.div>
-  );
-}
-
-function TeacherRequestCard({ onDismiss }) {
-  const navigate = useNavigate();
-  return (
-    <motion.div
-      className={styles.courseChangeCard}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1] }}
-    >
-      <GraduationCap size={13} strokeWidth={2} className={styles.courseChangeIcon} aria-hidden />
-      <div className={styles.courseChangeBody}>
-        <span className={styles.courseChangeLabel}>Teacher access status: pending</span>
-        <span className={styles.courseChangeSub}>
-          Your teacher application is under admin review.
-        </span>
-      </div>
-      <button
-        type="button"
-        className={styles.courseChangeViewBtn}
-        onClick={() => navigate("/settings?tab=course")}
-      >
-        View
-      </button>
-      <button type="button" className={styles.courseChangeDismiss} onClick={onDismiss} aria-label="Dismiss">
-        &times;
-      </button>
-    </motion.div>
-  );
-}
-
 export default function IntelligenceRow({
   displayName,
   slot1TodayTasks,
   slot3Urgent,
   slot5Data,
+  slot6Timeline,
   recommendation,
 }) {
   const tflDelays = useTflDelays();
@@ -227,25 +175,60 @@ export default function IntelligenceRow({
   const { profile, loading: profileLoading } = useAuth();
   const [edit, setEdit] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const keys = getStorageKeys(profile?.id);
   const [layout, setLayout] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return DEFAULT_LAYOUT;
-    let parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) return DEFAULT_LAYOUT;
-
-    // Migration: If old IDs exist, replace them with 'hero'
-    const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
-    const hasOld = parsed.some(id => oldIds.includes(id));
-    if (hasOld) {
-      // Remove old IDs and PREPEND 'hero' if not already there
-      const filtered = parsed.filter(id => !oldIds.includes(id));
-      if (!filtered.includes("hero")) {
-        filtered.unshift("hero");
-      }
-      return filtered.filter((id) => CATALOGUE_IDS.has(id));
+    const saved = localStorage.getItem(keys.layout);
+    if (saved) {
+      try {
+        let parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Migration: If old IDs exist, replace them with 'hero'
+          const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
+          const hasOld = parsed.some(id => oldIds.includes(id));
+          if (hasOld) {
+            const filtered = parsed.filter(id => !oldIds.includes(id));
+            if (!filtered.includes("hero")) filtered.unshift("hero");
+            return filtered.filter((id) => CATALOGUE_IDS.has(id));
+          }
+          return parsed.filter((id) => CATALOGUE_IDS.has(id));
+        }
+      } catch (e) { console.error("Failed to parse layout from localStorage", e); }
     }
-    return parsed.filter((id) => CATALOGUE_IDS.has(id));
+    // Fallback to backend settings ONLY if we have them immediately
+    if (profile?.settings?.homepage_widgets?.length) {
+      return profile.settings.homepage_widgets;
+    }
+    return DEFAULT_LAYOUT;
   });
+
+  const [widgetSizes, setWidgetSizes] = useState(() => {
+    const saved = localStorage.getItem(keys.sizes);
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { }
+    }
+    // Fallback to backend settings
+    if (profile?.settings?.homepage_widget_sizes && Object.keys(profile.settings.homepage_widget_sizes).length > 0) {
+      return profile.settings.homepage_widget_sizes;
+    }
+    return {};
+  });
+
+  // Effect to sync state from backend when profile loads if localStorage is empty for this user
+  useEffect(() => {
+    if (profileLoading || !profile?.settings) return;
+    
+    // If we don't have a layout in localStorage for this specific user, use backend layout
+    const userKeys = getStorageKeys(profile.id);
+    const savedLayout = localStorage.getItem(userKeys.layout);
+    
+    if (!savedLayout && profile.settings.homepage_widgets?.length) {
+      setLayout(profile.settings.homepage_widgets);
+      if (profile.settings.homepage_widget_sizes) {
+        setWidgetSizes(profile.settings.homepage_widget_sizes);
+      }
+    }
+  }, [profile, profileLoading]);
+
   const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
   const {
     data: analyticsData,
@@ -255,8 +238,44 @@ export default function IntelligenceRow({
   } = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(layout));
-  }, [layout]);
+    localStorage.setItem(keys.layout, JSON.stringify(layout));
+  }, [layout, keys.layout]);
+
+  useEffect(() => {
+    localStorage.setItem(keys.sizes, JSON.stringify(widgetSizes));
+  }, [widgetSizes, keys.sizes]);
+
+  // Sync to Cloud after 2s of inactivity to debounce
+  useEffect(() => {
+    if (profileLoading || !profile) return;
+    const timer = setTimeout(() => {
+      updateUserSettings({
+        homepage_widgets: layout,
+        homepage_widget_sizes: widgetSizes
+      }).catch(err => console.error("Failed to sync layout to cloud:", err));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [layout, widgetSizes, profile, profileLoading]);
+
+  const setWidgetSize = (id, size) => {
+    setWidgetSizes((prev) => ({
+      ...prev,
+      [id]: size,
+    }));
+  };
+
+  const handleRandomize = () => {
+    // Only shuffle the widgets that are currently on the dashboard
+    const hasHero = layout.includes("hero");
+    const others = layout.filter((id) => id !== "hero");
+    
+    if (others.length <= 1) return; // Nothing much to shuffle
+    
+    const shuffled = [...others].sort(() => 0.5 - Math.random());
+    const newLayout = hasHero ? ["hero", ...shuffled] : shuffled;
+    
+    setLayout(newLayout);
+  };
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -293,7 +312,7 @@ export default function IntelligenceRow({
   const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
   const currentStreak = Number.isFinite(streaks?.current) && streaks.current > 0 ? `${streaks.current}-day streak` : null;
 
-  const renderWidget = (id) => {
+  const renderWidget = (id, { col, row } = {}) => {
     switch (id) {
       case "hero":
         return (
@@ -307,16 +326,24 @@ export default function IntelligenceRow({
             nextStepMeta={nextStepMeta}
             weeklyProgress={weeklyProgress}
             currentStreak={currentStreak}
+            courseChangeRequest={showCourseChange ? courseChangeRequest : null}
+            teacherRequestPending={showTeacherRequest ? teacherRequestPending : null}
+            onDismissCourseChange={() => setShowCourseChange(false)}
+            onDismissTeacherRequest={() => setShowTeacherRequest(false)}
           />
         );
       case "rightNow":
         return <RightNowWidget {...slot5Data} tflDelays={tflDelays} />;
       case "todayTasks":
-        return slot1TodayTasks;
+        return React.isValidElement(slot1TodayTasks) ? React.cloneElement(slot1TodayTasks, { row }) : slot1TodayTasks;
       case "deadlines":
-        return slot3Urgent;
+        return React.isValidElement(slot3Urgent) ? React.cloneElement(slot3Urgent, { row }) : slot3Urgent;
+      case "tinyTimeline":
+        return <TinyTimelineWidget {...slot5Data} row={row} />;
+      case "bigTimeline":
+        return React.isValidElement(slot6Timeline) ? React.cloneElement(slot6Timeline, { row, isWidget: true }) : slot6Timeline;
       case "semesterOverview":
-        return <SemesterOverviewWidget />;
+        return <SemesterOverviewWidget row={row} />;
       case "studyStreak":
         return <StudyStreakWidget />;
       case "weeklyGoal":
@@ -326,7 +353,12 @@ export default function IntelligenceRow({
       case "analyticsSummary":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>SUMMARY CARDS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>SUMMARY</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -341,7 +373,12 @@ export default function IntelligenceRow({
       case "analyticsProductivity":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>PRODUCTIVITY</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>PRODUCTIVITY</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -356,7 +393,12 @@ export default function IntelligenceRow({
       case "analyticsInsights":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>INSIGHTS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Zap size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>INSIGHTS</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.summary ? (
@@ -372,11 +414,16 @@ export default function IntelligenceRow({
       case "analyticsStudyHours":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>STUDY HOURS</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Clock3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>STUDY HOURS</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
-              <StudyHoursChart data={analyticsData.daily_breakdown} />
+              <StudyHoursChart data={analyticsData.daily_breakdown} row={row} />
             ) : (
               <div className={styles.analyticsWidgetEmpty}>No study-hours data yet.</div>
             )}
@@ -385,7 +432,12 @@ export default function IntelligenceRow({
       case "analyticsDailyBreakdown":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>DAILY BREAKDOWN</div>
+             <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <BarChart3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>DAILY BREAKDOWN</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
@@ -398,7 +450,12 @@ export default function IntelligenceRow({
       case "analyticsPlannedActual":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>PLANNED VS ACTUAL</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>PLANNED VS ACTUAL</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : Array.isArray(analyticsProgressData?.daily_progress) && analyticsProgressData.daily_progress.length > 0 ? (
@@ -411,7 +468,12 @@ export default function IntelligenceRow({
       case "analyticsHeatmap":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>FOCUS HEATMAP</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>FOCUS HEATMAP</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsData?.heatmap?.data?.length ? (
@@ -426,7 +488,12 @@ export default function IntelligenceRow({
       case "analyticsThemeUsage":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>THEME USAGE</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>THEME USAGE</span>
+            </div>
             {analyticsLoading ? (
               <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
             ) : analyticsThemeStats?.summary ? (
@@ -439,7 +506,12 @@ export default function IntelligenceRow({
       case "analyticsAttendance":
         return (
           <div className={styles.analyticsWidgetShell}>
-            <div className={styles.analyticsWidgetTitle}>ATTENDANCE</div>
+            <div className={baseStyles.widgetHeader}>
+              <div className={baseStyles.headerIconWrap}>
+                <Presentation size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+              </div>
+              <span className={baseStyles.headerTitle}>ATTENDANCE</span>
+            </div>
             <AttendanceChart />
           </div>
         );
@@ -453,29 +525,16 @@ export default function IntelligenceRow({
       <IntelligenceGrid
         layout={layout}
         setLayout={setLayout}
+        widgetSizes={widgetSizes}
+        setWidgetSize={setWidgetSize}
         edit={edit}
+        setEdit={setEdit}
+        onReset={handleReset}
+        onRandomize={handleRandomize}
         catalogue={CATALOGUE}
         widgetRenderer={renderWidget}
         showAdd={showAdd}
         setShowAdd={setShowAdd}
-        renderAfterHero={() => (
-          <div className={styles.editBar}>
-            {edit && (
-              <button onClick={handleReset} className={styles.editBtn} style={{ marginRight: 8 }}>
-                ↺ Reset Layout
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setEdit(!edit);
-                if (edit) setShowAdd(false);
-              }}
-              className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
-            >
-              {edit ? "✓ Done" : "✏️ Edit Layout"}
-            </button>
-          </div>
-        )}
       />
       {showResetConfirm && (
         <ConfirmModal

@@ -2,7 +2,7 @@
  * Composes timer state with task and modal flow.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNotify } from '../../Notifications/hooks/useNotify';
 import { getProgress } from '../utils/timerUtils';
 import { useTimer } from './useTimer';
@@ -51,7 +51,21 @@ export function useTimerLogic(activeTaskId, _setActiveTaskId, activeTaskMeta) {
   const notify = useNotify();
   const flow = useTimerFlow({ ...t, task, activeTaskId, activeTaskMeta }, notify);
 
+  const prevTaskId = useRef(null);
+  const prevMetaTitle = useRef(null);
+
   useEffect(() => syncTaskTitle(activeTaskMeta, setTask), [activeTaskMeta]);
-  useEffect(() => applyTaskEstimate(t, activeTaskMeta), [activeTaskId, activeTaskMeta, t]);
+  
+  useEffect(() => {
+    const taskIdChanged = activeTaskId !== prevTaskId.current;
+    const metaTitleChanged = activeTaskMeta?.title !== prevMetaTitle.current;
+    
+    if (activeTaskId && (taskIdChanged || metaTitleChanged)) {
+      applyTaskEstimate(t, activeTaskMeta);
+      prevTaskId.current = activeTaskId;
+      prevMetaTitle.current = activeTaskMeta?.title;
+    }
+  }, [activeTaskId, activeTaskMeta, t]);
+
   return buildTimerState(t, flow, task, setTask, activeTaskMeta);
 }

@@ -472,18 +472,15 @@ function main() {
     funcViolations.length + fileViolations.length + nestViolations.length;
 
   console.log(
-    `Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${
-      funcViolations.length
+    `Function Length:  ${funcViolations.length > 0 ? "❌" : "✅"} ${funcViolations.length
     } violation(s) (${regularFunc.length} regular, ${testFunc.length} test)`
   );
   console.log(
-    `File Length:      ${fileViolations.length > 0 ? "❌" : "✅"} ${
-      fileViolations.length
+    `File Length:      ${fileViolations.length > 0 ? "❌" : "✅"} ${fileViolations.length
     } violation(s)`
   );
   console.log(
-    `Nesting Depth:    ${nestViolations.length > 0 ? "❌" : "✅"} ${
-      nestViolations.length
+    `Nesting Depth:    ${nestViolations.length > 0 ? "❌" : "✅"} ${nestViolations.length
     } violation(s) (${regularNest.length} regular, ${testNest.length} test)`
   );
 

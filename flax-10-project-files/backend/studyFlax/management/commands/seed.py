@@ -245,10 +245,10 @@ class Command(BaseCommand):
         )
 
     def _create_tags(self):
+        import itertools
         self.stdout.write("Seeding tags...")
-        for user in self.users:
-            for name, duration in tag_fixtures:
-                self._create_single_tag(name, duration, user)
+        for user, (name, duration) in itertools.product(self.users, tag_fixtures):
+            self._create_single_tag(name, duration, user)
         self._create_module_pill_tags()
 
     def _create_module_pill_tags(self):

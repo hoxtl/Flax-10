@@ -251,7 +251,28 @@
     display: flex;
     flex-direction: column;
     gap: 0.62rem;
+    max-height: 440px;
+    overflow-y: auto;
+    padding-right: 6px;
 }
+
+.rightHistorySections::-webkit-scrollbar {
+    width: 5px;
+}
+
+.rightHistorySections::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.rightHistorySections::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    border-radius: 10px;
+}
+
+.rightHistorySections::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--border) 90%, transparent);
+}
+
 
 .rightHistorySection {
     display: flex;

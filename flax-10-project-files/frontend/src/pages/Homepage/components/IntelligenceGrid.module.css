@@ -2,6 +2,7 @@
   padding: 8px 16px 24px;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
 }
 
 .bentoGrid {
@@ -183,8 +184,13 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .addSheetHandle {
@@ -273,4 +279,123 @@
   font-size: 9px;
   color: var(--text-muted-sage);
   margin-top: 1px;
+}
+
+/* ── Floating Actions ── */
+.gridActions {
+  position: absolute;
+  top: 320px;
+  right: -70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.iconActionBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border-base);
+  background: var(--color-card);
+  color: var(--text-muted-sage);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.iconActionBtn:hover {
+  background: var(--color-highlight-soft);
+  color: var(--text-charcoal);
+  border-color: var(--text-muted-sage);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.editBtnActive {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
+}
+
+/* ── Resize Controls ── */
+.resizeControls {
+  background: #ffffff;
+  border: 1.5px solid var(--color-border-base);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  gap: 3px;
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.resizeGroup {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.resizeBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-charcoal) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0 !important;
+}
+
+.resizeBtn:hover:not(:disabled) {
+  background: var(--color-highlight-soft) !important;
+  color: var(--color-primary) !important;
+}
+
+.resizeBtn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.resizeVal {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-charcoal);
+  min-width: 22px;
+  text-align: center;
+}
+
+.resizeDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--color-border-base);
+  margin: 0 2px;
+}
+
+.widgetWrapper .resizeControls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.widgetWrapper.editMode:hover .resizeControls {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }

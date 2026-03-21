@@ -31,6 +31,7 @@ class UserSettingsSerialiser(serializers.ModelSerializer):
             'sleep_time',
             'wake_time',
             'homepage_widgets',
+            'homepage_widget_sizes',
             'preferred_study_minutes_per_day',
             'week_preference',
             'worktime_preference',

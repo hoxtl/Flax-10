@@ -15,6 +15,7 @@ import { useMemo, useEffect, useState, useCallback } from "react";
 import { CalendarDays } from "lucide-react";
 import { getEvents } from "../../../api/eventApi";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/SemesterOverview.module.css";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -107,6 +108,7 @@ export default function SemesterOverviewWidget({
   numWeeks        = 12,
   readingWeekIndices = [],  // 0-based, e.g. [4] = week 5
   semesterLabel   = "Semester · 2025/26",
+  row             = 2,
 }) {
   const now = new Date();
 
@@ -164,16 +166,12 @@ export default function SemesterOverviewWidget({
   if (loading) {
     return (
       <div className={styles.root}>
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <div className={styles.iconWrap}>
-              <CalendarDays size={16} strokeWidth={1.75} aria-hidden />
-            </div>
-            <div className={styles.titleBlock}>
-              <h3 className={styles.title}>SEMESTER OVERVIEW</h3>
-              <span className={styles.subtitle}>{semesterLabel}</span>
-            </div>
+        <div className={baseStyles.widgetHeader}>
+          <div className={baseStyles.headerIconWrap}>
+            <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
           </div>
+          <span className={baseStyles.headerTitle}>Semester Overview</span>
+          <span className={baseStyles.headerMeta}>{semesterLabel}</span>
         </div>
         <div className={styles.loadingRow}>
           {Array.from({ length: numWeeks }).map((_, i) => (
@@ -185,18 +183,15 @@ export default function SemesterOverviewWidget({
   }
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root} ${row === 1 ? styles.h1 : styles.h2}`}>
       {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <div className={styles.iconWrap}>
-            <CalendarDays size={16} strokeWidth={1.75} aria-hidden />
-          </div>
-          <div className={styles.titleBlock}>
-            <h3 className={styles.title}>SEMESTER OVERVIEW</h3>
-            <span className={styles.subtitle}>{semesterLabel}</span>
-          </div>
+      <div className={baseStyles.widgetHeader}>
+        <div className={baseStyles.headerIconWrap}>
+          <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
         </div>
+        <span className={baseStyles.headerTitle}>Semester Overview</span>
+        <span className={baseStyles.headerMeta}>{semesterLabel}</span>
+        
         <div className={styles.legend}>
           <span className={styles.legendItem}>
             <span className={`${styles.legendDot} ${styles.dotLecture}`} /> Lectures
@@ -213,9 +208,10 @@ export default function SemesterOverviewWidget({
       {/* Week columns */}
       <div className={styles.grid}>
         {weeks.map((w) => {
-          const lh = toHeight(w.lectureCount,  maxLecture);
-          const dh = toHeight(w.deadlineCount, maxDeadline);
-          const eh = toHeight(w.examCount,     maxExam);
+          const maxBarH = row === 1 ? 36 : 84;
+          const lh = toHeight(w.lectureCount,  maxLecture,  maxBarH);
+          const dh = toHeight(w.deadlineCount, maxDeadline, maxBarH);
+          const eh = toHeight(w.examCount,     maxExam,     maxBarH);
 
           return (
             <div

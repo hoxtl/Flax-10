@@ -1,7 +1,8 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Clock3, Train, AlertTriangle, BookOpen, GraduationCap } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
 import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
 
@@ -10,6 +11,51 @@ const ICON_MAP = {
   Train: Train,
   AlertTriangle: AlertTriangle,
 };
+
+function CourseChangeBanner({ request, onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.statusBanner}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+    >
+      <div className={styles.statusBannerContent}>
+        <BookOpen size={14} className={styles.statusBannerIcon} />
+        <p className={styles.statusBannerText}>
+          Course switch pending 
+          {request.requested_course ? <> to <strong>{request.requested_course}</strong></> : null}
+        </p>
+      </div>
+      <div className={styles.statusBannerActions}>
+        <button onClick={() => navigate("/settings?tab=account")} className={styles.statusBannerBtn}>View</button>
+        <button onClick={onDismiss} className={styles.statusBannerClose}>&times;</button>
+      </div>
+    </motion.div>
+  );
+}
+
+function TeacherRequestBanner({ onDismiss }) {
+  const navigate = useNavigate();
+  return (
+    <motion.div
+      className={styles.statusBanner}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+    >
+      <div className={styles.statusBannerContent}>
+        <GraduationCap size={14} className={styles.statusBannerIcon} />
+        <p className={styles.statusBannerText}>Teacher application is under review</p>
+      </div>
+      <div className={styles.statusBannerActions}>
+        <button onClick={() => navigate("/settings?tab=course")} className={styles.statusBannerBtn}>View</button>
+        <button onClick={onDismiss} className={styles.statusBannerClose}>&times;</button>
+      </div>
+    </motion.div>
+  );
+}
 
 export function IntelligenceHero({ 
   displayName, 
@@ -20,18 +66,32 @@ export function IntelligenceHero({
   nextStep,
   nextStepMeta,
   weeklyProgress,
-  currentStreak
+  currentStreak,
+  courseChangeRequest,
+  teacherRequestPending,
+  onDismissCourseChange,
+  onDismissTeacherRequest
 }) {
   const Icon = (liveContext && ICON_MAP[liveContext.iconKey]) || Clock3;
 
   return (
     <div className={styles.premiumCard}>
-      <header className={styles.header}>
+      <AnimatePresence>
+        {courseChangeRequest && (
+          <CourseChangeBanner request={courseChangeRequest} onDismiss={onDismissCourseChange} />
+        )}
+        {teacherRequestPending && (
+          <TeacherRequestBanner onDismiss={onDismissTeacherRequest} />
+        )}
+      </AnimatePresence>
+      <header className={`${styles.header} ${(courseChangeRequest || teacherRequestPending) ? styles.hasBanners : ""}`}>
         {/* Left Col: Greeting & Date */}
         <div className={styles.headerLeft}>
-          <div className={styles.headerDateRow}>
-            <Calendar className={styles.headerDateIcon} size={14} strokeWidth={2.2} aria-hidden />
-            <span className={styles.headerLabel}>{getTodayLabel()}</span>
+          <div className={baseStyles.widgetHeader} style={{ marginBottom: 12 }}>
+            <div className={baseStyles.headerIconWrap}>
+              <Calendar className={baseStyles.headerIcon} size={16} strokeWidth={1.75} aria-hidden />
+            </div>
+            <span className={baseStyles.headerMeta}>{getTodayLabel()}</span>
           </div>
           <h1 className={styles.headerTitle}>{getGreeting(displayName)}</h1>
 

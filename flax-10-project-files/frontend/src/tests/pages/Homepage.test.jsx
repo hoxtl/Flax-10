@@ -235,6 +235,29 @@ vi.mock('../../pages/Homepage/components', () => ({
       <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
     </div>
   ),
+  HomepageTimelineSection: ({
+    onOpenQuickAddSchedule,
+    onTaskToggle,
+    onQuickStart,
+    onConflictAutoMove,
+    onPushTomorrow,
+    onDelete,
+    onReschedule,
+    sortedEvents,
+  }) => (
+    <div data-testid="homepage-timeline-section">
+      <button type="button" onClick={() => onOpenQuickAddSchedule?.('schedule_manual')}>Open manual schedule quick add</button>
+      <button type="button" onClick={() => onOpenQuickAddSchedule?.('schedule_auto')}>Open auto schedule quick add</button>
+      <button type="button" onClick={() => onTaskToggle?.({ id: 1 })}>task-toggle</button>
+      <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1 })}>quick-start</button>
+      <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 })}>conflict-auto-move</button>
+      <button type="button" onClick={() => onPushTomorrow?.({ id: 1 })}>push-tomorrow</button>
+      <button type="button" onClick={() => onDelete?.({ id: 1 })}>timeline-delete</button>
+      <button type="button" onClick={() => onDelete?.({ id: 'ev-1', source: 'task', external_id: 99 })}>timeline-delete-task</button>
+      <button type="button" onClick={() => onReschedule?.({ id: 1 })}>reschedule</button>
+      <div data-testid="mini-timeline">events:{(sortedEvents || []).length}</div>
+    </div>
+  ),
 }));
 
 vi.mock('../../api/taskService', () => ({

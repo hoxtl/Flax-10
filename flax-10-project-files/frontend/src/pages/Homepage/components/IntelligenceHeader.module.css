@@ -17,6 +17,11 @@
   height: 100%;
 }
 
+.header.hasBanners {
+  padding: 20px 34px 26px;
+  gap: 12px;
+}
+
 .header::before {
   content: "";
   position: absolute;
@@ -71,6 +76,10 @@
   color: var(--widget-text-primary);
   margin: 0;
   max-width: none;
+}
+
+.hasBanners .headerTitle {
+  font-size: clamp(2.1rem, 3.6vw, 3.0rem);
 }
 
 .headerRight {
@@ -310,4 +319,84 @@
       0 0 0 6px rgba(192, 113, 78, 0.08),
       0 0 18px rgba(192, 113, 78, 0.5);
   }
+}
+
+/* ── Status Banners (Pending Requests) ── */
+.statusBanner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 18px;
+  background: color-mix(in srgb, var(--widget-accent) 8%, transparent);
+  border-bottom: 1px solid var(--widget-border);
+  backdrop-filter: blur(8px);
+}
+
+.statusBannerContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.statusBannerIcon {
+  color: var(--widget-accent);
+  flex-shrink: 0;
+}
+
+.statusBannerText {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusBannerText strong {
+  font-weight: 800;
+  color: var(--widget-accent);
+}
+
+.statusBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.statusBannerBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--widget-accent);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.statusBannerBtn:hover {
+  text-decoration: underline;
+}
+
+.statusBannerClose {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--widget-text-tertiary);
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.statusBannerClose:hover {
+  opacity: 1;
+  color: var(--widget-text-primary);
 }

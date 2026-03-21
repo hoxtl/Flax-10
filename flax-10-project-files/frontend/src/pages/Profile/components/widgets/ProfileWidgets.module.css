@@ -1,9 +1,7 @@
 /* ── Shared glass card (used across all widgets) ── */
 .glassCard {
   position: relative;
-  background: var(--surface-glass-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: #ffffff;
   border: 1px solid var(--surface-glass-card-border);
   border-radius: 16px;
   overflow: hidden;
@@ -12,7 +10,7 @@
 }
 
 [data-mode="dark"] .glassCard {
-  background: color-mix(in srgb, var(--color-card) 60%, transparent);
+  background: var(--color-card);
   border-color: var(--color-border-base);
   box-shadow:
     0 2px 8px rgba(0,0,0,0.3),

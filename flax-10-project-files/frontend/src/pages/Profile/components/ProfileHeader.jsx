@@ -1,23 +1,37 @@
 import { useState } from "react";
-import widgetStyles from "./widgets/ProfileWidgets.module.css";
-import headerStyles from "./ProfileHeader.module.css";
-import badgeStyles from "./ProfileHeaderBadges.module.css";
+import styles from "../Profile.module.css";
 import { buildInitials, buildFullName } from "../utils/profileHelpers";
 import ShareButton from "../../../components/Social/ShareButton";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
-const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
 
 function buildHeaderDescription(isTeacher, major, year) {
   return isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
 }
 
+function buildHeaderVars(user, profileData) {
+  const role = profileData?.role || user?.role || "student";
+  const fullName = buildFullName(profileData || user);
+  const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
+  const isStudent = !isTeacher && role === "student";
+  const year = isStudent ? (profileData?.year || user?.year || "") : "";
+  const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
+  
+  return {
+    role,
+    isTeacher,
+    description: buildHeaderDescription(isTeacher, major, year),
+    roleLabel: isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student"
+  };
+}
+
 function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
   return (
     <button
+      key={badge.id}
       type="button"
       className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`}
-      onMouseEnter={() => onEnter(badge.id)}
+      onMouseEnter={onEnter}
       onMouseLeave={onLeave}
       onClick={() => canPin && onPinBadge?.(badge.id)}
       title={canPin ? "Tap to pin this badge" : badge.label}
@@ -33,20 +47,40 @@ function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeav
   );
 }
 
-function ProfileBadges({ badges, onViewAll, canPin, pinnedBadgeId, onPinBadge }) {
+function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
-  const allBadges = badges || [];
-  const pinnedBadge = allBadges.find(b => String(b.id) === String(pinnedBadgeId));
-  const topBadges = pinnedBadge
-    ? allBadges.filter(b => String(b.id) !== String(pinnedBadgeId)).slice(0, 3)
-    : allBadges.slice(0, 4);
-  if (!allBadges.length) return null;
-  const props = { canPin, onPinBadge, activeTooltip, onEnter: setActiveTooltip, onLeave: () => setActiveTooltip(null) };
+  const pinnedBadge = badges.find(b => b.id === pinnedBadgeId);
+  const otherBadges = badges.filter(b => b.id !== pinnedBadgeId);
+  const topBadges = otherBadges.slice(0, 3);
+
+  const renderBadge = (badge, { pinned = false } = {}) => (
+    <BadgeButton
+      key={badge.id}
+      badge={badge}
+      canPin={canPin}
+      onPinBadge={onPinBadge}
+      activeTooltip={activeTooltip}
+      onEnter={() => setActiveTooltip(badge.id)}
+      onLeave={() => setActiveTooltip(null)}
+      pinned={pinned}
+    />
+  );
+
   return (
     <div className={styles.headerBadges}>
-      {pinnedBadge && <div className={styles.pinnedBadgeWrap}><BadgeButton badge={pinnedBadge} pinned {...props} /></div>}
-      <div className={styles.headerBadgesMain}>{topBadges.map(b => <BadgeButton key={b.id} badge={b} {...props} />)}</div>
-      {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
+      {pinnedBadge && (
+        <div className={styles.pinnedBadgeWrap}>
+          {renderBadge(pinnedBadge, { pinned: true })}
+        </div>
+      )}
+      <div className={styles.headerBadgesMain}>
+        {topBadges.map(badge => renderBadge(badge))}
+      </div>
+      {onViewAll && (
+        <button className={styles.badgesViewAllLink} onClick={onViewAll}>
+          View All &rarr;
+        </button>
+      )}
     </div>
   );
 }
@@ -92,7 +126,7 @@ function HeaderSocieties({ societies, onNavigate }) {
 
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
-  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak` : null;
+  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? 'pm' : 'am'} peak` : null;
   return (
     <div className={styles.headerPersonaCard}>
       <div className={styles.headerPersonaLeft}>
@@ -128,21 +162,32 @@ function HeaderTopRow({ user, roleLabel, handlers, visibility }) {
 }
 
 function ProfileHeaderInfo({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick }) {
-  const role = profileData?.role || user?.role || "student";
-  const fullName = buildFullName(user);
-  const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
-  const isStudent = !isTeacher && role === "student";
-  const year = isStudent ? (profileData?.year || user?.year || "") : "";
-  const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
-  const description = buildHeaderDescription(isTeacher, major, year);
-  const roleLabel = isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student";
+  const { description, roleLabel, isTeacher } = buildHeaderVars(user, profileData);
   return (
     <div className={styles.headerInfo}>
-      <HeaderTopRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} />
+      <div className={styles.headerTop}>
+        <h1 className={styles.username}>{user?.username || "guest"}</h1>
+        <span className={styles.rolePill}>{roleLabel}</span>
+        {visibility.canEditProfile ? <button className={styles.btnEdit} onClick={handlers.onEditProfile}>Edit profile</button> : <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={n => { user?.setOptimisticShare?.(n); user?.reload?.(); }} />}
+      </div>
       {description && <div className={styles.headerSubline}>{description}</div>}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
-      {(badges?.length > 0 || persona) && <div className={styles.headerBadgesPersonaRow}>{badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}{persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}</div>}
-      <ProfileBioSection isTeacher={isTeacher} email={profileData?.email} bio={profileData?.bio} />
+      {(isTeacher && profileData?.email || profileData?.bio) && (
+        <div className={styles.bio}>
+          {isTeacher && profileData?.email && (
+            <div className={styles.teacherEmail}>
+              <a href={`mailto:${profileData.email}`}>{profileData.email}</a>
+            </div>
+          )}
+          {profileData?.bio && <div className={styles.reminder}>{profileData.bio}</div>}
+        </div>
+      )}
+      {(badges?.length > 0 || persona) && (
+        <div className={styles.headerBadgesPersonaRow}>
+          {badges?.length > 0 && <ProfileBadges badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} canPin={visibility.canEditProfile} onViewAll={onViewAllBadges} />}
+          {persona && <PersonaInlineChip persona={persona} peakHour={peakHour} />}
+        </div>
+      )}
     </div>
   );
 }
@@ -155,15 +200,6 @@ function MobileStats({ profileData, handlers, visibility }) {
   );
 }
 
-function buildHeaderVars(user, profileData) {
-  const role = profileData?.role || user?.role || "student";
-  const fullName = buildFullName(profileData || user);
-  const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
-  const isStudent = !isTeacher && role === "student";
-  const year = isStudent ? (profileData?.year || user?.year || "") : "";
-  const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
-  return { role, isTeacher, description: buildHeaderDescription(isTeacher, major, year), roleLabel: isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student" };
-}
 
 function MobileHeroSection({ user, profileData, resolvedPhoto, description, roleLabel, isTeacher, visibility, handlers }) {
   return (
@@ -181,7 +217,12 @@ function MobileHeroSection({ user, profileData, resolvedPhoto, description, role
 export default function ProfileHeader({ user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onNavigate, onSocietiesClick }) {
   const { description, roleLabel, isTeacher } = buildHeaderVars(user, profileData);
   const resolvedUser = { ...user, ...profileData };
-  const resolvedPhoto = getResolvedUserPhoto({ ...resolvedUser }, { allowGeneric: true, seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name });
+  const resolvedPhoto = getResolvedUserPhoto({
+    ...resolvedUser,
+  }, {
+    allowGeneric: true,
+    seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name,
+  });
   return (
     <>
       <div className={`${styles.header} ${styles.desktopOnly}`}>
