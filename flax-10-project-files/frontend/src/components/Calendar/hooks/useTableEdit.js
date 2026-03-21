@@ -7,10 +7,31 @@ import { updateEvent } from '../../../api/eventApi';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
 import { geocodeAddress } from '../../../api/userService';
 
-function buildUpdatedEvent(event, field, value, tags) {
-    const updated = { ...event };
+async function buildUpdatedEvent(event, field, value, tags) {
+    const updated = {...event };
     if (field === 'title') updated.title = value;
-    if (field === 'location') updated.location = value;
+    if (field === 'location') {
+        updated.location = value;
+        if (value && value.trim()) {
+            try {
+                const coords = await geocodeAddress(value);
+                if (coords) {
+                    updated.location_latitude = coords.latitude;
+                    updated.location_longitude = coords.longitude;
+                    updated.location_validated = true;
+                } else {
+                    updated.location_validated = false;
+                }
+            } catch (error) {
+                console.error('Table edit geocoding failed: ', error);
+                updated.location_validated = false;
+            }
+        } else {
+            updated.location_latitude = null;
+            updated.location_longitude = null;
+            updated.location_validated = false;
+        }
+    }
     if (field === 'description') updated.description = value;
     if (field === 'tag') applyTagUpdate(updated, value, tags);
     return updated;
