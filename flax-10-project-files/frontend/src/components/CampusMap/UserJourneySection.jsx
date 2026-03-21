@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import { geocodeAddress } from '../../api/userApi';
 import styles from './UserJourneySection.module.css';
@@ -12,6 +12,18 @@ export function UserJourneySection({
 }) {
     const [startCoords, setStartCoords] = useState(null);
     const [destCoords, setDestCoords] = useState(null);
+
+    useEffect(() => {
+        async function geocodeStart() {
+            if (manualStart && manualStart.trim()) {
+                const coords = await geocodeAddress(manualStart);
+                setStartCoords(coords);
+            } else {
+                setStartCoords(null);
+            }
+        }
+        geocodeStart();
+    }, [manualStart]);
 
     const handleStartSelect = async (address) => {
         setManualStart(address);
