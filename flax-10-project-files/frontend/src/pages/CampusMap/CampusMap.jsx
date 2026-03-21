@@ -17,7 +17,6 @@ import { useDisruptions } from './hooks/useDisruptions';
 import { useCalendarEvents } from './hooks/useCalendarEvents';
 import { useHomeAddress } from './hooks/useHomeAddress';
 import { tflService } from '../../api/tflService';
-import PageHeader from '../../components/common/PageHeader/PageHeader';
 import {
   initMapInstance, handleMapLoad, cleanupMap,
   createHomeMarkerEl, homePopupHTML, wireHomeButton,
