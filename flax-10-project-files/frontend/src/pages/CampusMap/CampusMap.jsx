@@ -97,8 +97,15 @@ export default function CampusMap() {
     map.current = initMapInstance(mapContainer.current);
     map.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
     map.current.on('load', () => handleMapLoad(map.current, KCL_CAMPUSES, campusMarkers, routeLayerAdded, styles, onCampusMarkerSelect, () => setMapLoaded(true)));
-    map.current.on('click', (e) => {
-      if (!e.originalEvent.defaultPrevented) setStartLocation({ lng: e.lngLat.lng, lat: e.lngLat.lat });
+    map.current.on('click', async (e) => {
+      if (!e.originalEvent.defaultPrevented) {
+        const { lng, lat} = e.lngLat;
+        setStartLocation({ lng, lat });
+        const address = await reverseGeocode(lat, lng);
+        if (address) {
+          setManualStart(address);
+        }
+      }
     });
     return () => cleanupMap(map, campusMarkers, eventMarkers, homePointer, homePopup);
   }, []);
