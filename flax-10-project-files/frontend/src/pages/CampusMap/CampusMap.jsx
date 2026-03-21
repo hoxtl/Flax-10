@@ -255,6 +255,12 @@ export default function CampusMap() {
   const handleSelectCampus = (campus) => {
     setSelectedCampus(campus);
     setManualDestination(campus.name);
+    setCustomDestination({
+      lng: campus.coords[0],
+      lat: campus.coords[1],
+      name: campus.name,
+      address: campus.name
+    });
     flyToCampus(campus);
   };
 
