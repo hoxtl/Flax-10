@@ -96,6 +96,26 @@
   min-width: 0;
 }
 
+@media (max-width: 900px) {
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(.MuiChartsLegend-root),
+  .analyticsWidgetShell :global(svg) {
+    max-width: 100% !important;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsLegend-root) {
+    overflow: hidden;
+  }
+}
+
 
 
 .header {
