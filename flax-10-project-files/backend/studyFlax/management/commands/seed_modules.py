@@ -328,16 +328,23 @@ def _build_user_deadline_events(user, module, tags, deadlines_by_module):
     return events
 
 
+def _process_single_module(user, module, tags, now, deadlines_by_module):
+    """Build enrollment and events for a single module."""
+    enrollment = Enrollment(student=user, module=module) if _should_enroll(user, module) else None
+    session_events = _build_user_session_events(user, module, tags, now)
+    deadline_events = _build_user_deadline_events(user, module, tags, deadlines_by_module)
+    return enrollment, session_events + deadline_events
+
+
 def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
     """Build all events for a user's enrolled modules."""
     core, extras = get_user_modules(user, modules)
-    events = []
-    enrollments = []
+    enrollments, events = [], []
     for module in core + extras:
-        if _should_enroll(user, module):
-            enrollments.append(Enrollment(student=user, module=module))
-        events.extend(_build_user_session_events(user, module, tags, now))
-        events.extend(_build_user_deadline_events(user, module, tags, deadlines_by_module))
+        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
+        if enrollment:
+            enrollments.append(enrollment)
+        events.extend(module_events)
     return enrollments, events
 
 def _find_user_tag(user, tags, name):
@@ -363,22 +370,25 @@ def _prefetch_deadlines_by_module(modules):
     return by_module
 
 
+def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module):
+    """Collect enrollments and events for all users."""
+    all_enrollments, all_events = [], []
+    for user in users:
+        user_tags = _get_user_module_tags(user, tags)
+        enrollments, events = _build_user_module_events(user, modules, user_tags, now, deadlines_by_module)
+        all_enrollments.extend(enrollments)
+        all_events.extend(events)
+    return all_enrollments, all_events
+
+
 @transaction.atomic
 def create_enrollments(modules, tags, stdout):
     """Create enrollments and all module events for all users."""
     stdout.write("Seeding enrollments and module events...")
     now = timezone.now()
     deadlines_by_module = _prefetch_deadlines_by_module(modules)
-    all_enrollments = []
-    all_events = []
     users = list(User.objects.all().select_related('settings'))
-    for user in users:
-        user_tags = _get_user_module_tags(user, tags)
-        enrollments, events = _build_user_module_events(
-            user, modules, user_tags, now, deadlines_by_module
-        )
-        all_enrollments.extend(enrollments)
-        all_events.extend(events)
+    all_enrollments, all_events = _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
     Enrollment.objects.bulk_create(all_enrollments, ignore_conflicts=True, batch_size=500)
     CalendarEvent.objects.bulk_create(all_events, ignore_conflicts=True, batch_size=500)
     stdout.write(f"  Created {len(all_enrollments)} enrollments, {len(all_events)} events.")
