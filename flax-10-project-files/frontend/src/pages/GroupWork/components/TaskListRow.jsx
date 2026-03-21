@@ -6,10 +6,12 @@ import { useRef, useState } from "react";
 import { Check, Calendar, Trash2 } from "lucide-react";
 import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
+import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { getUserColor } from "../utils/priorityUtils";
-import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate } from "../utils/taskUtils";
+import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate, getDueDateStr } from "../utils/taskUtils";
 import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
@@ -42,24 +44,37 @@ function PrioritySelect({ priority, onUpdate, taskId }) {
   return <TaskPriorityPill priority={priority || "medium"} className={styles.priorityPill} />;
 }
 
-function DateCell({ dueDate }) {
-  const label = formatTaskDueDate(dueDate);
+function DateCell({ task, onUpdate }) {
   return (
     <div className={styles.dateCell}>
-      <span className={styles.dateLabel}>
-        <Calendar size={14} />
-        {label || "No due date"}
-      </span>
+      <DateTimePicker
+        value={getDueDateStr(task.due_date)}
+        onChange={(value) => onUpdate(task.id, { due_date: value ? new Date(value).toISOString() : null })}
+        dateOnly
+        triggerClassName={styles.dateLabel}
+        placeholder="No due date"
+      />
     </div>
   );
 }
 
 function ActionCell({ taskId, onDelete }) {
+  const [showConfirm, setShowConfirm] = useState(false);
   return (
     <div className={styles.actionCell}>
-      <button onClick={() => onDelete(taskId)} className={styles.deleteBtn} title="Delete task">
+      <button onClick={() => setShowConfirm(true)} className={styles.deleteBtn} title="Delete task">
         <Trash2 size={16} />
       </button>
+      {showConfirm && (
+        <HoldConfirmModal
+          title="Delete task"
+          warningText="Hold to permanently remove this task."
+          cancelLabel="Keep it"
+          holdLabel="Hold to delete"
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={() => { setShowConfirm(false); onDelete(taskId); }}
+        />
+      )}
     </div>
   );
 }
@@ -103,7 +118,7 @@ export default function TaskListRow({ task, members, onToggle, onUpdate, onDelet
         <TaskRowTitle task={task} onUpdate={onUpdate} />
       </div>
       <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />
-      <DateCell dueDate={task.due_date} />
+      <DateCell task={task} onUpdate={onUpdate} />
       <AssignCell task={task} members={members} onUpdate={onUpdate} />
       <ActionCell taskId={task.id} onDelete={onDelete} />
     </div>

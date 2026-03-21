@@ -105,12 +105,23 @@ function Pagination({ total, current, onChange }) {
     );
 }
 
+function WeekLabel({ label }) {
+    const match = label.match(/^(Week \d+)\s*(\(.*\))?/);
+    if (!match) return <div className={styles.timelineWeekLabel}>{label}</div>;
+    return (
+        <div className={styles.timelineWeekLabel}>
+            <span className={styles.weekNum}>{match[1]}</span>
+            {match[2] && <span className={styles.weekRange}>{match[2]}</span>}
+        </div>
+    );
+}
+
 function TimelineGrid({ visible, days, placed, members, onUpdate, handlers }) {
     return (
         <div className={styles.timelineScrollable}>
             {visible.map(wk => (
                 <div key={wk.id} className={styles.timelineRow}>
-                    <div className={styles.timelineWeekLabel}>{wk.label.replace(" (", "\n(")}</div>
+                    <WeekLabel label={wk.label} />
                     {days.map((_, di) => <TimelineCell key={di} wk={wk} di={di} tasks={placed[wk.id][di] || []} members={members} onUpdate={onUpdate} handlers={handlers} />)}
                 </div>
             ))}

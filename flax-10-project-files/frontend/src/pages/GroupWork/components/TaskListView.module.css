@@ -1,10 +1,33 @@
+/* Task list */
+.taskList {
+    display: flex;
+    flex-direction: column;
+}
+
+.headerRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
+    gap: 16px;
+    padding: 0 0 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.headerCell {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
 /* Task Row grid */
 .taskRow {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
     align-items: center;
     border-bottom: 1px solid var(--border);
-    padding: 16px 0;
+    padding: 9px 0;
     gap: 16px;
 }
 

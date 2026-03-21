@@ -8,87 +8,35 @@
 
 .headerRow {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-}
-
-.addTaskForm {
-    flex: 1;
-    display: flex;
+    margin-bottom: 20px;
     gap: 12px;
-    align-items: center;
+    flex-wrap: wrap;
 }
 
-.viewToggleControl {
-    --segmented-solid-bg: rgba(15, 23, 42, 0.96);
-    --segmented-solid-border: rgba(15, 23, 42, 0.96);
-    --segmented-solid-shadow: 0 18px 34px rgba(15, 23, 42, 0.16);
-    --segmented-solid-button-fg: rgba(226, 232, 240, 0.74);
-    --segmented-solid-button-hover-bg: rgba(255, 255, 255, 0.08);
-    --segmented-solid-button-hover-fg: rgba(248, 250, 252, 0.96);
-    --segmented-solid-active-bg: rgba(248, 250, 252, 0.96);
-    --segmented-solid-active-fg: rgba(15, 23, 42, 0.96);
-    margin-left: 24px;
-}
-
-.taskInput {
-    flex: 1;
-    min-width: 120px;
-    height: 42px;
-    padding: 0 16px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    outline: none;
-    font-family: inherit;
-    box-sizing: border-box;
-}
-
-.taskInput:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--active);
-}
-
-/* Filter Dropdown Styling */
-.filterWrapper {
-    position: relative;
+.headerActions {
     display: flex;
     align-items: center;
-    min-width: 160px;
-    z-index: 50;
-}
-
-.filterWrapper>div {
-    width: 100%;
-}
-
-.memberDropdown {
-    width: 100%;
-}
-
-.memberDropdown :global([class*="dropdownBtn"]) {
-    min-height: 42px;
-    padding: 0 16px;
-    border-radius: 10px;
-    background: var(--hover-light);
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.memberDropdown :global([class*="dropdownBtn"]:hover) {
-    background: var(--hover);
-    border-color: var(--border);
-}
-
-.memberDropdown :global([class*="dropdownBtn"] svg) {
-    color: var(--text-secondary);
+    gap: 8px;
 }
 
 .addBtn {
-    min-height: 42px;
-    padding: 0 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 0.9rem;
     box-shadow: none;
+    font-size: 13px;
+}
+
+.viewToggleControl {
+    margin-left: 4px;
+}
+
+.loadingText {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 12px 0;
 }

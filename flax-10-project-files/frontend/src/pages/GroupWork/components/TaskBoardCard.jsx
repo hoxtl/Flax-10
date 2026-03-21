@@ -31,7 +31,10 @@ function CardFooter({ task, assignees, onUpdate, triggerRef, togglePopup }) {
       <div className={styles.cardDate}>
         <DateTimePicker value={getDueDateStr(task.due_date)} onChange={(value) => onUpdate(task.id, { due_date: value ? new Date(value).toISOString() : null })} dateOnly triggerClassName={styles.dateLabelInteractive} hideIcon placeholder="No due date" />
       </div>
-      <div ref={triggerRef} onClick={togglePopup} style={{ cursor: "pointer" }}><TaskAvatarStack assignees={assignees} size={20} /></div>
+      <div ref={triggerRef} onClick={togglePopup} style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+        <TaskAvatarStack assignees={assignees} size={18} />
+        <span className={styles.addAssigneeBtn}>+</span>
+      </div>
     </div>
   );
 }

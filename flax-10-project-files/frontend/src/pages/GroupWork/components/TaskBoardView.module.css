@@ -19,7 +19,7 @@
 }
 
 .colHeader {
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -54,10 +54,10 @@
 }
 
 .cardList {
-    padding: 16px;
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     overflow-y: auto;
     min-height: 100px;
 }
@@ -65,12 +65,12 @@
 .boardCard {
     background: var(--card-bg);
     border-radius: 12px;
-    padding: 16px;
+    padding: 10px 12px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     cursor: pointer;
 }
 
@@ -171,7 +171,7 @@
 .colDoneText { color: inherit; }
 
 .cardTitle {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text);
     line-height: 1.4;
@@ -183,8 +183,8 @@
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid var(--border);
-    padding-top: 12px;
-    margin-top: 4px;
+    padding-top: 8px;
+    margin-top: 0;
 }
 
 .cardDate {
@@ -366,4 +366,12 @@
 
 .assignItemSelected {
     background: var(--hover);
+}
+
+.addAssigneeBtn {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    line-height: 1;
+    padding: 0 2px;
 }

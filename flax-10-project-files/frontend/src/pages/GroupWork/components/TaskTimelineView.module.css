@@ -186,22 +186,23 @@
     flex: 1;
     display: grid;
     grid-template-columns: 120px repeat(6, 1fr);
-    min-height: 68px;
+    min-height: 110px;
     border-bottom: 1px solid var(--border);
 }
 
 .timelineWeekLabel {
     padding: 12px;
     font-size: 11px;
-    font-weight: 700;
     color: var(--text-secondary);
     background: var(--hover-light);
     border-right: 1px solid var(--border);
     font-family: inherit;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
+    gap: 2px;
 }
 
 .timelineCell {
@@ -303,4 +304,16 @@
 
 .completionSegment:hover {
     filter: brightness(0.9);
+}
+
+.weekNum {
+    font-weight: 800;
+    font-size: 11px;
+    color: var(--text);
+}
+
+.weekRange {
+    font-weight: 500;
+    font-size: 9px;
+    color: var(--muted);
 }
