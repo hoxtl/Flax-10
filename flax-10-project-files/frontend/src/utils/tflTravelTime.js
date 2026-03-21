@@ -15,5 +15,18 @@ export async function getTravelTimeModule(homeAddress, moduleLocation) {
 
         const geocodeRespo = await fetch(geocodeUrl);
         const geocodeData = await geocodeResponse.json();
+
+        if (!geocodeData.features || geocodeData.features.length === 0) {
+            return null;
+        }
+
+        const [moduleLng, moduleLat] = geocodeData.features[0].center;
+
+        const journey = await tflService.journeyPlanner(
+            homeAddress.home_latitude,
+            homeAddress.home_longitude,
+            moduleLat,
+            moduleLng
+        );
     }
 }
