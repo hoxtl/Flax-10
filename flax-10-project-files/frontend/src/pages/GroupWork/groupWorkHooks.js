@@ -1,31 +1,27 @@
+/*
+ * GroupWork data hooks.
+ */
+
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import {
+  deleteGroupProject,
+  deleteProjectMember,
+  fetchGroupProjects,
+  fetchProjectMembers,
+  patchGroupProject,
+} from "./groupWorkApi";
 
-const MIN_SKELETON_MS = 450;
-
-export function getAuthHeaders() {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Token ${token}` } : {};
-}
-
-async function fetchJSON(url) {
-  const h = { "Content-Type": "application/json", ...getAuthHeaders() };
-  const res = await fetch(url, { headers: h });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data || null);
-}
+export { getAuthHeaders } from "./groupWorkApi";
 
 export function useGroupProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const startedAt = Date.now();
-    fetchJSON("/api/group-work/projects/").then(data => {
+    fetchGroupProjects().then((data) => {
       setProjects(data || []);
-      const remaining = Math.max(0, MIN_SKELETON_MS - (Date.now() - startedAt));
-      setTimeout(() => setLoading(false), remaining);
+      setLoading(false);
     });
   }, []);
 
@@ -49,75 +45,77 @@ export function useProject(projectId) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const startedAt = Date.now();
-    fetchJSON("/api/group-work/projects/").then(data => {
-      const found = (data || []).find(i => String(i.id) === String(projectId));
-      setProject(found || null);
-      const remaining = Math.max(0, MIN_SKELETON_MS - (Date.now() - startedAt));
-      setTimeout(() => setLoading(false), remaining);
+    fetchGroupProjects().then((data) => {
+      setProject(findProjectById(data, projectId));
+      setLoading(false);
     });
   }, [projectId]);
 
   return { project, setProject, loading };
 }
 
+function findProjectById(projects, projectId) {
+  return (projects || []).find((item) => String(item.id) === String(projectId)) || null;
+}
+
 export function useProjectMembers(projectId) {
   const [members, setMembers] = useState([]);
 
   useEffect(() => {
-    fetchJSON(`/api/group-work/projects/${projectId}/members/`).then(data => {
-      setMembers(data || []);
-    });
+    fetchProjectMembers(projectId).then((data) => setMembers(data || []));
   }, [projectId]);
 
   return { members, setMembers };
 }
+
 export function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate) {
-  const patchProject = async p => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { 
-        method: "PATCH", 
-        headers: { "Content-Type": "application/json", ...getAuthHeaders() }, 
-        body: JSON.stringify(p) 
-    });
-    if (res.ok) {
-        const updated = await res.json();
-        setProject(updated);
-        if (onUpdate) onUpdate(updated);
-    }
-  };
-  const handleRemoveMember = async mid => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/members/${mid}/`, { 
-        method: "DELETE", 
-        headers: getAuthHeaders() 
-    });
-    if (res.ok) setMembers(prev => prev.filter(i => i.id !== mid));
-  };
-  const handleDeleteProject = async () => {
-    const res = await fetch(`/api/group-work/projects/${projectId}/`, { 
-        method: "DELETE", 
-        headers: getAuthHeaders() 
-    });
-    if (res.ok) {
-        if (onDelete) onDelete(projectId);
-        onBack();
-    }
-  };
+  const patchProject = async (patch) => updateProject(projectId, patch, setProject, onUpdate);
+  const handleRemoveMember = async (membershipId) => removeProjectMember(projectId, membershipId, setMembers);
+  const handleDeleteProject = async () => deleteProject(projectId, onDelete, onBack);
   return { patchProject, handleRemoveMember, handleDeleteProject };
 }
 
+async function updateProject(projectId, patch, setProject, onUpdate) {
+  const updated = await patchGroupProject(projectId, patch);
+  if (!updated) return;
+  setProject(updated);
+  onUpdate?.(updated);
+}
+
+async function removeProjectMember(projectId, membershipId, setMembers) {
+  const response = await deleteProjectMember(projectId, membershipId);
+  if (!response.ok) return;
+  setMembers((prev) => prev.filter((item) => item.id !== membershipId));
+}
+
+async function deleteProject(projectId, onDelete, onBack) {
+  const response = await deleteGroupProject(projectId);
+  if (!response.ok) return false;
+  if (onDelete) await onDelete(projectId);
+  else onBack?.();
+  return true;
+}
+
+function getInitialTaskStats() {
+  return { percent: 0, completed: 0, total: 0, segments: [] };
+}
+
+function addMemberIfMissing(member, setMembers) {
+  setMembers((prev) => (prev.some((item) => item.id === member.id) ? prev : [...prev, member]));
+}
+
 export function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
-  const { project, setProject, loading } = useProject(projectId);
-  const { members, setMembers } = useProjectMembers(projectId);
+  const detail = useProjectState(projectId, onBack, onDelete, onUpdate);
   const initialTab = useSelectedTab();
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [taskStats, setTaskStats] = useState({ percent: 0, completed: 0, total: 0, segments: [] });
-  
+  const [taskStats, setTaskStats] = useState(getInitialTaskStats());
+  return { ...detail, activeTab, setActiveTab, taskStats, setTaskStats };
+}
+
+function useProjectState(projectId, onBack, onDelete, onUpdate) {
+  const { project, setProject, loading } = useProject(projectId);
+  const { members, setMembers } = useProjectMembers(projectId);
   const actions = useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate);
-
-  const onAdded = m => setMembers(p => p.some(i => i.id === m.id) ? p : [...p, m]);
-
-  return { 
-      project, loading, members, activeTab, setActiveTab, taskStats, setTaskStats, 
-      onAdded, ...actions 
-  };
+  const onAdded = (member) => addMemberIfMissing(member, setMembers);
+  return { project, loading, members, onAdded, onBack, ...actions };
 }
