@@ -23,40 +23,37 @@ function ProjectDetailRoute({ projectId }) {
   return <GroupProjectDetail projectId={projectId} onBack={goBack} onDelete={goBack} onUpdate={undefined} />;
 }
 
-function GroupWorkOverview() {
-  const navigate = useNavigate();
-  const data = useGroupProjects();
-  const sorting = useGroupProjectSort();
-  const subtitle = (
-    <>
-      Keep <em>shared project work</em>, <em>module context</em>, <em>team planning</em>, and <em>deadlines</em> in one calm place.
-    </>
-  );
-  return (
-    <>
-      <AppPage
-        className={styles.container}
-        title="My Group Projects"
-        subtitle={subtitle}
-      >
-        {data.loading ? (
-          <GroupWorkIndexSkeleton />
-        ) : (
-          <>
+function GroupWorkPageSubtitle() {
+    return <>Keep <em>shared project work</em>, <em>module context</em>, <em>team planning</em>, and <em>deadlines</em> in one calm place.</>;
+}
+
+function GroupWorkOverviewContent({ data, sorting, navigate }) {
+    return (
+        <>
             <GroupWorkStats projects={data.projects} />
             <GroupWorkContent
-              projects={data.projects}
-              projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })}
-              sortBy={sorting.sortBy}
-              setSortBy={sorting.setSortBy}
-              onProjectCreated={(project) => prependProject(project, data.setProjects)}
+                projects={data.projects}
+                projectListProps={(project) => ({ onClick: () => navigate(`/group-work?project=${project.id}`) })}
+                sortBy={sorting.sortBy}
+                setSortBy={sorting.setSortBy}
+                onProjectCreated={(project) => prependProject(project, data.setProjects)}
             />
-          </>
-        )}
-      </AppPage>
-      <BackToTop />
-    </>
-  );
+        </>
+    );
+}
+
+function GroupWorkOverview() {
+    const navigate = useNavigate();
+    const data = useGroupProjects();
+    const sorting = useGroupProjectSort();
+    return (
+        <>
+            <AppPage className={styles.container} title="My Group Projects" subtitle={<GroupWorkPageSubtitle />}>
+                {data.loading ? <GroupWorkIndexSkeleton /> : <GroupWorkOverviewContent data={data} sorting={sorting} navigate={navigate} />}
+            </AppPage>
+            <BackToTop />
+        </>
+    );
 }
 
 function prependProject(project, setProjects) {

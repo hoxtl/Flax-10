@@ -11,6 +11,7 @@ import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelect
 import UserSearch from "../../../components/Social/UserSearch";
 import { CreateProjectInputs } from "./CreateProjectInputs";
 import { createGroupProject } from "../groupWorkApi";
+import { getStoredViewer } from "./memberAvatarUtils";
 import styles from "./CreateProjectForm.module.css";
 
 const MIN_PROJECT_MEMBER_TOTAL = 5;
@@ -39,39 +40,32 @@ export default function CreateProjectForm({ onCreated, className = "", size = "m
   );
 }
 
-function CreateProjectModal({ formState, onClose }) {
-  return (
-    <StandardModal
-      title="Create project"
-      subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one."
-      subtitleClassName={styles.modalSubtitle}
-      onClose={onClose}
-      size="xl"
-      modalClassName={styles.modalPanel}
-      contentClassName={styles.modalContent}
-    >
-      <form onSubmit={formState.submit} className={styles.modalForm}>
-        <div className={styles.formFields}>
-          <CreateProjectInputs data={formState.form} onChange={formState.change} errors={formState.errors} />
-        </div>
-        <ProjectMembersField
-          members={formState.form.members}
-          error={formState.errors?.members}
-          onAddMember={formState.addMember}
-          onRemoveMember={formState.removeMember}
-        />
-        {formState.errorMessage && <p className={styles.formError}>{formState.errorMessage}</p>}
+function FormActions({ onClose, isSubmitting }) {
+    return (
         <div className={styles.formFooter}>
-          <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={formState.isSubmitting}>
-            Cancel
-          </PrimaryButton>
-          <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={formState.isSubmitting}>
-            {formState.isSubmitting ? "Creating..." : "+ Create project"}
-          </PrimaryButton>
+            <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
+                Cancel
+            </PrimaryButton>
+            <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "+ Create project"}
+            </PrimaryButton>
         </div>
-      </form>
-    </StandardModal>
-  );
+    );
+}
+
+function CreateProjectModal({ formState, onClose }) {
+    return (
+        <StandardModal title="Create project" subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one." subtitleClassName={styles.modalSubtitle} onClose={onClose} size="xl" modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
+            <form onSubmit={formState.submit} className={styles.modalForm}>
+                <div className={styles.formFields}>
+                    <CreateProjectInputs data={formState.form} onChange={formState.change} errors={formState.errors} />
+                </div>
+                <ProjectMembersField members={formState.form.members} error={formState.errors?.members} onAddMember={formState.addMember} onRemoveMember={formState.removeMember} />
+                {formState.errorMessage && <p className={styles.formError}>{formState.errorMessage}</p>}
+                <FormActions onClose={onClose} isSubmitting={formState.isSubmitting} />
+            </form>
+        </StandardModal>
+    );
 }
 
 function closeModal(setIsOpen, reset) {
@@ -190,41 +184,25 @@ function buildProjectPayload(form) {
   };
 }
 
-function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
-  const renderEmptyState = ({ query, clear }) => (
-    <div className={styles.memberSearchEmpty}>
-      <SearchEmptyState
-        query={query}
-        itemLabel="users"
-        title="No teammates found"
-        hint="Try a different name or username."
-        onClear={clear}
-        className={styles.memberSearchEmptyCard}
-        titleClassName={styles.memberSearchEmptyTitle}
-        hintClassName={styles.memberSearchEmptyHint}
-      />
-    </div>
-  );
+function MemberSearchEmptyState({ query, clear }) {
+    return (
+        <div className={styles.memberSearchEmpty}>
+            <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.memberSearchEmptyCard} titleClassName={styles.memberSearchEmptyTitle} hintClassName={styles.memberSearchEmptyHint} />
+        </div>
+    );
+}
 
-  return (
-    <FormField label={<RequiredLabel text="Team members" />} labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
-      <div className={styles.membersPicker}>
-        <p className={styles.membersHint}>Add teammates now so availability, tasks, and voting are ready from the start.</p>
-        <p className={styles.membersHint}>Choose {MIN_TEAMMATE_SELECTION} to {MAX_TEAMMATE_SELECTION} teammates so each project has {MIN_PROJECT_MEMBER_TOTAL} to {MAX_PROJECT_MEMBER_TOTAL} total members.</p>
-        <UserSearch
-          onUserSelect={onAddMember}
-          filterUsers={buildAvailableUserFilter(members)}
-          fullWidth
-          hideFilter
-          renderEmptyState={renderEmptyState}
-          searchPlaceholder="Search users... (/)"
-          openOnEmptyQuery={false}
-          dropdownMode="inline"
-        />
-        <SelectedMemberTags members={members} onRemove={onRemoveMember} />
-      </div>
-    </FormField>
-  );
+function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
+    return (
+        <FormField label={<RequiredLabel text="Team members" />} labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
+            <div className={styles.membersPicker}>
+                <p className={styles.membersHint}>Add teammates now so availability, tasks, and voting are ready from the start.</p>
+                <p className={styles.membersHint}>Choose {MIN_TEAMMATE_SELECTION} to {MAX_TEAMMATE_SELECTION} teammates so each project has {MIN_PROJECT_MEMBER_TOTAL} to {MAX_PROJECT_MEMBER_TOTAL} total members.</p>
+                <UserSearch onUserSelect={onAddMember} filterUsers={buildAvailableUserFilter(members)} fullWidth hideFilter renderEmptyState={(props) => <MemberSearchEmptyState {...props} />} searchPlaceholder="Search users... (/)" openOnEmptyQuery={false} dropdownMode="inline" />
+                <SelectedMemberTags members={members} onRemove={onRemoveMember} />
+            </div>
+        </FormField>
+    );
 }
 
 function SelectedMemberTags({ members, onRemove }) {
@@ -285,15 +263,6 @@ function parseProjectDeadline(value) {
     return new Date(year, month - 1, day);
   }
   return new Date(value);
-}
-
-function getStoredViewer() {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem("user") || "{}");
-  } catch {
-    return {};
-  }
 }
 
 function RequiredLabel({ text }) {
