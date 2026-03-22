@@ -120,12 +120,6 @@ const testHistoryModal = async () => {
     const viewBtn = screen.getByRole('button', { name: /View History/i });
     expect(viewBtn).toBeInTheDocument();
     fireEvent.click(viewBtn);
-    // If it's unexpectedly missing, fall back to history tab.
-    if (!viewBtn) {
-        const historyBtn = screen.getAllByRole('button').find((b) => /history/i.test(b.textContent || ''));
-        if (!historyBtn) throw new Error('No history trigger button found');
-        fireEvent.click(historyBtn);
-    }
     // RTL polling + effects rely on timers under fake-timers.
     act(() => vi.advanceTimersByTime(500));
     expect(mockGetHistory).toHaveBeenCalled();
@@ -150,11 +144,6 @@ const testHistoryModalClose = async () => {
     const viewBtn = screen.getByRole('button', { name: /View History/i });
     expect(viewBtn).toBeInTheDocument();
     fireEvent.click(viewBtn);
-    if (!viewBtn) {
-        const historyBtn = screen.getAllByRole('button').find((b) => /history/i.test(b.textContent || ''));
-        if (!historyBtn) throw new Error('No history trigger button found');
-        fireEvent.click(historyBtn);
-    }
     // RTL polling + effects rely on timers under fake-timers.
     act(() => vi.advanceTimersByTime(500));
     // Flush promise resolutions from HistoryModal's useEffect
