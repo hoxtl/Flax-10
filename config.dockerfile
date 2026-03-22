@@ -22,4 +22,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 COPY flax-10-project-files/backend/ /app/
 COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist/
 
+RUN DATABASE_URL=sqlite:///tmp/dummy.db python manage.py collectstatic --noinput
+
 EXPOSE 8080
+
+CMD ["gunicorn", "Flax10.wsgi:application", "--bind", "0.0.0.0:8080", "--workers", "2"]
