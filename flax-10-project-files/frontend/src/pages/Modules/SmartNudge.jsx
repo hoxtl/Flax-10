@@ -8,10 +8,10 @@ import { AddReadingToTasksButton } from '../../components/Modules/shared/taskBut
 import { createTask } from '../../api/taskApi';
 import { useToast } from '../../context/ToastContext';
 import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
-import dashStyles from './MyModulesDashboard.module.css';
+import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 
-const styles = { ...dashStyles, ...rowStyles };
+const styles = { ...widgetStyles, ...rowStyles };
 
 function deadlineToTask(deadline) {
     const tier = deadline?.start_due_date ? getUrgencyTier(deadline.start_due_date) : 'upcoming';
