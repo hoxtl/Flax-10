@@ -4,7 +4,7 @@
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { KCL_CAMPUSES } from "../../../lib/kclCampuses";
-import { reverseGeocode } from "../../../api/userApi";
+import { reverseGeocode } from "../../../api/geocodeApi";
 import { tflService } from "../../../api/tflApi";
 import { useCalendarEvents } from "./useCalendarEvents";
 import { useCampusMapRefs } from "./useCampusMapRefs";

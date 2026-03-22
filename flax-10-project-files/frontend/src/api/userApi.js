@@ -40,17 +40,6 @@ export function saveHomeAddress(address, latitude, longitude) {
   });
 }
 
-export async function geocodeAddress(address) {
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxToken}&limit=1&country=GB`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('User home geocoding has failed');
-  const data = await response.json();
-  if (!data.features?.length) return null;
-  const [lng, lat] = data.features[0].center;
-  return { latitude: lat, longitude: lng };
-}
-
 function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy) {
   let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
   if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
@@ -65,18 +54,3 @@ export function searchUsers(query, courseFilter = '', societyFilter = '', offset
   return fetchApi(buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy));
 }
 
-function extractPlaceName(data) {
-  if (!data.features?.length) return null;
-  return data.features[0].place_name;
-}
-
-export async function reverseGeocode(latitude, longitude) {
-  try {
-    const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxToken}&types=address,poi,place`;
-    return extractPlaceName(await (await fetch(url)).json());
-  } catch (error) {
-    console.error('Reverse geocoding error: ', error);
-    return null;
-  }
-}

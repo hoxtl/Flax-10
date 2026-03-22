@@ -3,7 +3,7 @@
  */
 import mapboxgl from "mapbox-gl";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
-import { reverseGeocode } from "../../api/userApi";
+import { reverseGeocode } from "../../api/geocodeApi";
 
 const BUILDING_LAYER_PAINT = {
   "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"], 14, 0, 14.5, ["get", "min_height"]],

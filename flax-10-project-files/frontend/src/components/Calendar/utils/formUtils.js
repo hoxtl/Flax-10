@@ -5,7 +5,7 @@
 import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
-import { geocodeAddress } from '../../../api/userApi';
+import { geocodeAddress } from '../../../api/geocodeApi';
 
 /** Creates initial form state from an existing event or defaults. */
 export function getInitialForm(event, options = {}) {

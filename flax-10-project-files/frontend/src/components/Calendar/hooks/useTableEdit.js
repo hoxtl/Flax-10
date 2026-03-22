@@ -5,7 +5,7 @@
 
 import { useCallback, useState } from "react";
 import { updateEvent } from "../../../api/eventApi";
-import { geocodeAddress } from "../../../api/userApi";
+import { geocodeAddress } from "../../../api/geocodeApi";
 import { useCalendarDispatch } from "../../../context/CalendarContext";
 
 function applyFieldUpdate(event, field, value, tags) {

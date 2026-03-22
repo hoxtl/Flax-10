@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
-import { geocodeAddress } from "../../api/userApi";
+import { geocodeAddress } from "../../api/geocodeApi";
 import styles from "./UserJourneySection.module.css";
 
 function useGeocodedLocation(value, setCoords) {
