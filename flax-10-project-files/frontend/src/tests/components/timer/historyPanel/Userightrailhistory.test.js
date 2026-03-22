@@ -69,3 +69,37 @@ describe('useRightRailHistory – initial load', () => {
   });
 });
 
+describe('useRightRailHistory – event listeners', () => {
+  it('refreshes history when timerHistoryUpdated fires', async () => {
+    const { result } = renderHook(() => useRightRailHistory());
+    await act(async () => {});
+    getHistory.mockResolvedValueOnce([...RAW_HISTORY, { id: 'b' }]);
+    await act(async () => { window.dispatchEvent(new Event('timerHistoryUpdated')); });
+    expect(result.current.history).toHaveLength(2);
+  });
+
+  it('refreshes history when historyCleared fires', async () => {
+    const { result } = renderHook(() => useRightRailHistory());
+    await act(async () => {});
+    getHistory.mockResolvedValueOnce([]);
+    await act(async () => { window.dispatchEvent(new Event('historyCleared')); });
+    expect(result.current.history).toEqual([]);
+  });
+
+  it('removes the timerHistoryUpdated listener on unmount', async () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener');
+    const { unmount } = renderHook(() => useRightRailHistory());
+    await act(async () => {});
+    unmount();
+    expect(removeSpy).toHaveBeenCalledWith('timerHistoryUpdated', expect.any(Function));
+  });
+
+  it('removes the historyCleared listener on unmount', async () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener');
+    const { unmount } = renderHook(() => useRightRailHistory());
+    await act(async () => {});
+    unmount();
+    expect(removeSpy).toHaveBeenCalledWith('historyCleared', expect.any(Function));
+  });
+});
+
