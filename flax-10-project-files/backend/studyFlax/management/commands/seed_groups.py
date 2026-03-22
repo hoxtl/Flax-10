@@ -27,8 +27,8 @@ FIXTURE_OWNER_MIN_PROJECTS = 2
 PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
 MIN_PROJECT_MEMBER_TOTAL = 5
-MAX_PROJECT_MEMBER_TOTAL = 8
-MIN_PROJECTS_PER_STUDENT = 5
+MAX_PROJECT_MEMBER_TOTAL = 10
+MIN_PROJECTS_PER_STUDENT = 6
 MAX_PROJECTS_PER_STUDENT = 8
 SEEDED_SUGGESTION_COUNT = 4
 SEEDED_SUGGESTION_WINDOWS = (
@@ -544,18 +544,28 @@ def _ensure_projects_have_minimum_members(projects, students, module_students, m
             needed = MIN_PROJECT_MEMBER_TOTAL - len(member_sets.get(project.id, set()))
             if needed <= 0:
                 continue
-            for member in _ordered_member_candidates(project, students, module_students, membership_counts, rng):
-                if member.id in member_sets.get(project.id, set()):
-                    continue
-                GroupMembership.objects.update_or_create(
-                    project=project,
-                    user=member,
-                    defaults={"role": "member"},
-                )
-                member_sets.setdefault(project.id, set()).add(member.id)
-                membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
-                needed -= 1
-                made_progress = True
+            for allow_over_limit in (False, True):
+                for member in _ordered_member_candidates(
+                    project,
+                    students,
+                    module_students,
+                    membership_counts,
+                    rng,
+                    allow_over_limit=allow_over_limit,
+                ):
+                    if member.id in member_sets.get(project.id, set()):
+                        continue
+                    GroupMembership.objects.update_or_create(
+                        project=project,
+                        user=member,
+                        defaults={"role": "member"},
+                    )
+                    member_sets.setdefault(project.id, set()).add(member.id)
+                    membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
+                    needed -= 1
+                    made_progress = True
+                    if needed <= 0:
+                        break
                 if needed <= 0:
                     break
 
@@ -590,6 +600,46 @@ def _ensure_projects_have_teammates(projects, students, module_students, members
             if needed <= 0:
                 break
 
+def _membership_trim_sort_key(membership, preferred_module_codes, member_sets):
+    project = membership.project
+    return (
+        0 if project.course_code not in preferred_module_codes else 1,
+        -(len(member_sets.get(project.id, set()))),
+        project.deadline or timezone.now() + timedelta(days=3650),
+        project.name,
+    )
+
+def _trim_students_to_project_cap(projects, students, student_modules, membership_counts):
+    allowed_project_ids = [project.id for project in projects]
+    preferred_module_codes = _student_module_codes(student_modules)
+    member_sets = _project_member_sets(projects)
+    for student in students:
+        overflow = membership_counts.get(student.id, 0) - MAX_PROJECTS_PER_STUDENT
+        if overflow <= 0:
+            continue
+        memberships = list(
+            GroupMembership.objects.filter(user=student, project_id__in=allowed_project_ids)
+            .exclude(role="owner")
+            .select_related("project")
+        )
+        memberships.sort(
+            key=lambda membership: _membership_trim_sort_key(
+                membership,
+                preferred_module_codes.get(student.id, set()),
+                member_sets,
+            )
+        )
+        for membership in memberships:
+            if overflow <= 0:
+                break
+            current_members = member_sets.get(membership.project_id, set())
+            if len(current_members) <= MIN_PROJECT_MEMBER_TOTAL:
+                continue
+            membership.delete()
+            current_members.discard(student.id)
+            membership_counts[student.id] = max(membership_counts.get(student.id, 0) - 1, 0)
+            overflow -= 1
+
 def create_group_memberships(stdout):
     stdout.write("Seeding group memberships...")
     rng = random.Random(PROJECT_MEMBER_SEED)
@@ -610,6 +660,7 @@ def create_group_memberships(stdout):
         _top_up_students_to_minimum(projects, students, student_modules, membership_counts, rng)
         _ensure_projects_have_minimum_members(projects, students, module_students, membership_counts, rng)
         _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng)
+        _trim_students_to_project_cap(projects, students, student_modules, membership_counts)
     finally:
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
@@ -629,7 +680,28 @@ def _build_task_due_date(due, task_index, now):
     lead_days = max(0, min(task_index + 1, max((due.date() - now.date()).days, 0)))
     return due - timedelta(days=lead_days)
 
-def _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern):
+def _build_completed_task_assignments(members, status_pattern):
+    completed_indexes = [index for index, status in enumerate(status_pattern) if status == "done"]
+    if not completed_indexes:
+        return {}
+    assignments = {index: [] for index in completed_indexes}
+    for member_index, member in enumerate(members):
+        task_index = completed_indexes[member_index % len(completed_indexes)]
+        assignments[task_index].append(member)
+    return assignments
+
+def _build_task_assignees(members, task_index, status, completed_assignments):
+    if status == "done":
+        assigned = completed_assignments.get(task_index, [])
+        if assigned:
+            return assigned
+    primary = members[task_index % len(members)]
+    if len(members) > 1 and task_index % 2 == 0:
+        secondary = members[(task_index + 1) % len(members)]
+        return [primary, secondary]
+    return [primary]
+
+def _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern, completed_assignments):
     t_title, t_desc, t_priority, t_blocks = template
     status = status_pattern[task_index % len(status_pattern)]
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
@@ -649,12 +721,12 @@ def _create_single_group_task(project, members, due, template, task_index, now, 
             'due_date': task_due,
         },
     )
-    primary = members[task_index % len(members)]
-    if len(members) > 1 and task_index % 2 == 0:
-        secondary = members[(task_index + 1) % len(members)]
-        assignees = [primary, secondary]
-    else:
-        assignees = [primary]
+    assignees = _build_task_assignees(
+        members,
+        task_index,
+        status,
+        completed_assignments,
+    )
     task.assigned_to.set(assignees)
 
 def _seed_tasks_for_project(project, now, project_index):
@@ -664,8 +736,19 @@ def _seed_tasks_for_project(project, now, project_index):
     due = project.deadline or (now + timedelta(days=14))
     rng = random.Random(f"{PROJECT_TASK_SEED}:{project.name}")
     status_pattern = _get_project_status_pattern(project, project_index)
+    completed_assignments = _build_completed_task_assignments(members, status_pattern)
     for task_index, template in enumerate(GROUP_TASK_TEMPLATES):
-        _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern)
+        _create_single_group_task(
+            project,
+            members,
+            due,
+            template,
+            task_index,
+            now,
+            rng,
+            status_pattern,
+            completed_assignments,
+        )
 
 def create_group_tasks(stdout):
     stdout.write("Seeding group tasks with assignments and statuses...")

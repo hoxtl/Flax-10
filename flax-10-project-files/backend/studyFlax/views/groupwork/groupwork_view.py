@@ -24,6 +24,9 @@ from studyFlax.serialisers.tasks.groupwork_serialisers import (
 
 User = get_user_model()
 
+MIN_PROJECT_MEMBER_TOTAL = 5
+MAX_PROJECT_MEMBER_TOTAL = 10
+
 
 def _serialiser_context(request):
     return {"request": request}
@@ -57,8 +60,35 @@ def _validate_member_ids(member_ids):
         return Response({"member_ids": [f"Some selected users were not found: {', '.join(str(member_id) for member_id in missing_ids)}."]}, status=status.HTTP_400_BAD_REQUEST)
     return None
 
+def _validate_project_team_size(member_ids, owner_id=None):
+    filtered_member_ids = [
+        member_id for member_id in (member_ids or [])
+        if owner_id is None or member_id != owner_id
+    ]
+    teammate_total = len(filtered_member_ids)
+    total_members = teammate_total + 1
+    if total_members < MIN_PROJECT_MEMBER_TOTAL:
+        return Response(
+            {
+                "member_ids": [
+                    f"Projects must have at least {MIN_PROJECT_MEMBER_TOTAL} total members."
+                ]
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if total_members > MAX_PROJECT_MEMBER_TOTAL:
+        return Response(
+            {
+                "member_ids": [
+                    f"Projects can have at most {MAX_PROJECT_MEMBER_TOTAL} total members."
+                ]
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    return None
 
-def _validate_project_create_request(data):
+
+def _validate_project_create_request(data, owner_id=None):
     course_code = str(data.get("course_code") or "").strip()
     if not course_code:
         return None, Response({"course_code": ["Select a module for this project."]}, status=status.HTTP_400_BAD_REQUEST)
@@ -66,10 +96,17 @@ def _validate_project_create_request(data):
     if member_ids is None:
         return None, Response({"member_ids": ["Provide member IDs as a list of user IDs."]}, status=status.HTTP_400_BAD_REQUEST)
     if not member_ids:
-        return None, Response({"member_ids": ["Select at least one teammate."]}, status=status.HTTP_400_BAD_REQUEST)
+        teammate_minimum = max(MIN_PROJECT_MEMBER_TOTAL - 1, 1)
+        return None, Response(
+            {"member_ids": [f"Select at least {teammate_minimum} teammates."]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     member_error = _validate_member_ids(member_ids)
     if member_error:
         return None, member_error
+    team_size_error = _validate_project_team_size(member_ids, owner_id=owner_id)
+    if team_size_error:
+        return None, team_size_error
     return member_ids, None
 
 
@@ -130,6 +167,12 @@ def _handle_project_delete(project, user):
     project.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+def _project_member_total(project):
+    return project.memberships.count()
+
+def _reject_project_team_limit(message):
+    return Response({"detail": message}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def group_project_list(request):
@@ -137,7 +180,7 @@ def group_project_list(request):
     if request.method == "GET":
         qs = _project_metrics_queryset().filter(memberships__user=request.user).order_by("-created_at")
         return Response(GroupProjectSerialiser(qs, many=True, context=_serialiser_context(request)).data)
-    member_ids, member_error = _validate_project_create_request(request.data)
+    member_ids, member_error = _validate_project_create_request(request.data, owner_id=request.user.id)
     if member_error:
         return member_error
     serialiser = GroupProjectSerialiser(data=_project_create_payload(request.data), context=_serialiser_context(request))
@@ -168,6 +211,16 @@ def group_project_members(request, project_id):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     user = serialiser.validated_data["user"]
+    if GroupMembership.objects.filter(project=project, user=user).exists():
+        membership = GroupMembership.objects.get(project=project, user=user)
+        return Response(
+            GroupMembershipSerialiser(membership, context=_serialiser_context(request)).data,
+            status=status.HTTP_200_OK,
+        )
+    if _project_member_total(project) >= MAX_PROJECT_MEMBER_TOTAL:
+        return _reject_project_team_limit(
+            f"Projects can have at most {MAX_PROJECT_MEMBER_TOTAL} total members."
+        )
     membership, _ = GroupMembership.objects.get_or_create(
         project=project, user=user,
         defaults={"role": serialiser.validated_data.get("role", "member")},
@@ -203,5 +256,9 @@ def group_project_member_detail(request, project_id, membership_id):
     membership = get_object_or_404(GroupMembership.objects.filter(project=project), id=membership_id)
     if membership.user_id == project.owner_id:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    if _project_member_total(project) <= MIN_PROJECT_MEMBER_TOTAL:
+        return _reject_project_team_limit(
+            f"Projects must keep at least {MIN_PROJECT_MEMBER_TOTAL} total members."
+        )
     membership.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

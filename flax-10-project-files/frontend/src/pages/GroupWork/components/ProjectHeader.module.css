@@ -297,6 +297,12 @@
     padding-left: 0;
 }
 
+.memberCountCopy {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 .teamManageBtn {
     border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
     background: color-mix(in srgb, var(--primary) 8%, var(--surface-card));

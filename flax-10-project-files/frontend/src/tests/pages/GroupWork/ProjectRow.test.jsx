@@ -13,12 +13,13 @@ function buildProject(overrides = {}) {
     module_name: 'Software Engineering',
     task_count: 5,
     completed_task_count: 2,
-    member_count: 4,
+    member_count: 5,
     members: [
       { id: 11, user: 11, user_name: 'janedoe', first_name: 'Jane', last_name: 'Doe' },
       { id: 12, user: 12, user_name: 'mia.gray', first_name: 'Mia', last_name: 'Gray' },
       { id: 13, user: 13, user_name: 'leo.park', first_name: 'Leo', last_name: 'Park' },
       { id: 14, user: 14, user_name: 'ava.reed', first_name: 'Ava', last_name: 'Reed' },
+      { id: 15, user: 15, user_name: 'noah.lee', first_name: 'Noah', last_name: 'Lee' },
     ],
     ...overrides,
   };
@@ -36,7 +37,7 @@ describe('ProjectRow', () => {
     localStorage.clear();
   });
 
-  it('shows the shared countdown format, real module pill, and hides the signed-in user from the collaborator stack', () => {
+  it('shows the shared countdown format, real module pill, and every team member avatar', () => {
     const { container } = render(
       <MemoryRouter>
         <ProjectRow project={buildProject()} onClick={vi.fn()} />
@@ -51,6 +52,13 @@ describe('ProjectRow', () => {
     expect(screen.getByLabelText('40% completion')).toBeTruthy();
     expect(screen.queryByText(/tasks done/i)).toBeNull();
     expect(screen.queryByText('JD')).toBeNull();
+    expect(screen.getByText('5 members')).toBeTruthy();
+    expect(screen.queryByText('+1')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Open Jane Doe profile' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open Mia Gray profile' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open Leo Park profile' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open Ava Reed profile' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Open Noah Lee profile' })).toBeTruthy();
     expect(container.firstChild.className).toContain('projectRowContainerUrgent');
   });
 });

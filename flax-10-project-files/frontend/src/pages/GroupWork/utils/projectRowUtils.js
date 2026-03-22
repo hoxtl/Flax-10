@@ -30,6 +30,11 @@ export function getProjectPercent(project) {
   return total > 0 ? Math.round((completed / total) * 100) : 0;
 }
 
+export function getProjectMemberCount(project) {
+  if (Number.isFinite(Number(project?.member_count))) return Number(project.member_count);
+  return Array.isArray(project?.members) ? project.members.length : 0;
+}
+
 export function formatProjectCountdownText(date) {
   const days = getDaysLeft(date);
   if (days === null) return "";
@@ -119,32 +124,13 @@ export function getProjectMembers(project) {
 }
 
 export function getVisibleMembers(members = []) {
-  const viewer = getStoredViewer();
   const seen = new Set();
   return members.filter((member) => {
     const key = String(member.user ?? member.id ?? member.user_name ?? member.username ?? "");
-    if (!key || seen.has(key) || matchesViewer(member, viewer)) return false;
+    if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
-}
-
-function getStoredViewer() {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem("user") || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function matchesViewer(member, viewer) {
-  if (!viewer || Object.keys(viewer).length === 0) return false;
-  const memberUserId = member.user ?? member.id;
-  const viewerId = viewer.id ?? viewer.user;
-  const memberUsername = (member.user_name || member.username || "").trim().toLowerCase();
-  const viewerUsername = (viewer.username || viewer.user_name || "").trim().toLowerCase();
-  return String(memberUserId || "") === String(viewerId || "") || (memberUsername && viewerUsername && memberUsername === viewerUsername);
 }
 
 function compareCompletion(left, right) {
@@ -159,11 +145,6 @@ function compareMemberCounts(left, right) {
   const memberDiff = getProjectMemberCount(left) - getProjectMemberCount(right);
   if (memberDiff !== 0) return memberDiff;
   return compareCompletion(right, left) || compareDeadlines(left, right) || compareNames(left, right);
-}
-
-function getProjectMemberCount(project) {
-  if (Number.isFinite(Number(project?.member_count))) return Number(project.member_count);
-  return Array.isArray(project?.members) ? project.members.length : 0;
 }
 
 function compareNames(left, right) {
