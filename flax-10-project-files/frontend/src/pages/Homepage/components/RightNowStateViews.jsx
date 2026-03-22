@@ -1,8 +1,12 @@
+/**
+ * Right Now state views.
+ */
+
 import React from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Sun } from "lucide-react";
 import styles from "./RightNowWidget.module.css";
-import { fadeIn, fadeIn as simpleFadeIn } from "./RightNowSubComponents";
+import { fadeIn } from "./RightNowSubComponents";
 import { formatTime } from "../utils/dateFormatUtils";
 
 export const TimerView = ({ timerMode, timerTask, timeLeft, workTime, breakTime, onOpenTimer }) => {

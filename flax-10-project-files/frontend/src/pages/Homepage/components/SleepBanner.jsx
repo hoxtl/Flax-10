@@ -1,3 +1,7 @@
+/*
+ * Late-night nudge banner.
+ */
+
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../../api/userApi';
 import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
@@ -21,13 +25,7 @@ export default function SleepBanner() {
   const [message] = useState(randomMessage);
 
   useEffect(() => {
-    getUserSettings()
-      .then(data => {
-        const sleepTime = data?.sleep_time?.slice(0, 5) || '23:00';
-        const wakeTime  = data?.wake_time?.slice(0, 5)  || '07:00';
-        setShow(isDuringSleepWindow(sleepTime, wakeTime, new Date()));
-      })
-      .catch(() => {});
+    syncSleepBanner(setShow);
   }, []);
 
   if (!show) return null;
@@ -39,4 +37,14 @@ export default function SleepBanner() {
       <button className={styles.dismiss} onClick={() => setShow(false)}>x</button>
     </div>
   );
+}
+
+function syncSleepBanner(setShow) {
+  getUserSettings().then((data) => setShow(shouldShowSleepBanner(data))).catch(() => {});
+}
+
+function shouldShowSleepBanner(data) {
+  const sleepTime = data?.sleep_time?.slice(0, 5) || '23:00';
+  const wakeTime = data?.wake_time?.slice(0, 5) || '07:00';
+  return isDuringSleepWindow(sleepTime, wakeTime, new Date());
 }

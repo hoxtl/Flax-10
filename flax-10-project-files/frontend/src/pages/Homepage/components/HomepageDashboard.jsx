@@ -21,27 +21,11 @@ import { getTaskCategoryColor, getTaskCategoryPillMeta } from "../utils/homepage
 
 export function HomepageDashboard(props) {
   if (props.homeDataLoading) return <HomepageSkeleton />;
+  return <HomepageDashboardContent {...props} />;
+}
 
-  return (
-    <>
-      <div>
-        <HomepageFocusBanner hasTimerSession={props.hasTimerSession} navigate={props.navigate} timeLeft={props.timeLeft} timerMode={props.timerMode} timerTask={props.timerTask} />
-        <SleepBanner />
-        <HomepageDashboardRow {...props} />
-        <HomepageOverlays
-          selectedModulePill={props.modals.selectedModulePill}
-          setSelectedModulePill={props.modals.setSelectedModulePill}
-          enrolledModules={props.state.enrolledModules}
-          selectedDeadline={props.modals.selectedDeadline}
-          setSelectedDeadline={props.modals.setSelectedDeadline}
-          styles={styles}
-        />
-      </div>
-      <BackToTop containerSelector="[data-dashboard-main]" />
-      <HomepageDashboardModals {...props} />
-      <EventPopups />
-    </>
-  );
+function HomepageDashboardContent(props) {
+  return <><div><HomepageFocusBanner hasTimerSession={props.hasTimerSession} navigate={props.navigate} timeLeft={props.timeLeft} timerMode={props.timerMode} timerTask={props.timerTask} /><SleepBanner /><HomepageDashboardRow {...props} /><HomepageOverlays {...getOverlayProps(props)} /></div><BackToTop containerSelector="[data-dashboard-main]" /><HomepageDashboardModals {...props} /><EventPopups /></>;
 }
 
 function HomepageDashboardRow(props) {
@@ -53,6 +37,7 @@ function HomepageDashboardRow(props) {
         slot1TodayTasks={<HomepageTaskSlot {...props} />}
         slot3Urgent={<HomepageDeadlines {...props} />}
         slot5Data={getSlot5Data(props)}
+        timelineProps={getTimelineProps(props)}
         slot6Timeline={<HomepageTimeline {...props} />}
       />
     </div>
@@ -60,30 +45,7 @@ function HomepageDashboardRow(props) {
 }
 
 function HomepageTaskSlot(props) {
-  return (
-    <TaskWidgetSlot
-      styles={taskWidgetStyles}
-      displayName={props.displayName}
-      isToday={isToday(props.selectedDate)}
-      taskWidgetOverdueCount={props.state.taskWidgetOverdueCount}
-      taskWidgetDueTodayCount={props.state.taskWidgetDueTodayCount}
-      taskWidgetSpineCompletedPct={props.state.taskWidgetSpineCompletedPct}
-      taskWidgetItemsOnly={props.state.taskWidgetItemsOnly}
-      taskWidgetList={props.state.taskWidgetList}
-      showAllTaskWidgetTasks={false}
-      setShowAllTaskWidgetTasks={() => {}}
-      getTaskCategoryPill={(task) => getTaskCategoryPillMeta(task, props.taskLists, props.state.enrolledModules, props.getTag)?.label || null}
-      getTaskCategoryColor={(task) => getTaskCategoryColor(task, props.getTag)}
-      handleTaskWidgetComplete={props.handleTaskWidgetComplete}
-      taskWidgetRef={props.taskWidgetRef}
-      hasTimerSession={props.hasTimerSession}
-      onStartFocus={() => props.navigate("/timer", { state: { fromTaskPlay: true } })}
-      taskLists={props.taskLists}
-      onEditTask={props.modals.setRescheduleTask}
-      onDeleteTask={props.deleteTaskAndRefresh}
-      onInlineTaskEdit={props.handleInlineTaskEdit}
-    />
-  );
+  return <TaskWidgetSlot {...getTaskSlotProps(props)} />;
 }
 
 function HomepageDeadlines(props) {
@@ -97,39 +59,7 @@ function HomepageDeadlines(props) {
 }
 
 function HomepageTimeline(props) {
-  return (
-    <HomepageTimelineSection
-      selectedDate={props.selectedDate}
-      handleReplanDay={props.reschedule.handleReplanDay}
-      replanLoading={props.reschedule.replanLoading}
-      missedItems={props.state.missedItems}
-      overdueTasksForNow={props.state.overdueTasksForNow}
-      sortedEvents={props.state.sortedEvents}
-      now={props.now}
-      dayTasks={props.dayTasks}
-      tasksDueToday={props.state.tasksDueToday}
-      suggestableTasks={props.state.suggestableTasks}
-      deadlineSuggestions={props.state.deadlineSuggestions}
-      taskLists={props.taskLists}
-      handleQuickStartGap={props.reschedule.handleQuickStartGap}
-      handleTaskToggle={props.handleTaskToggle}
-      openTimelinePopup={props.openTimelinePopup}
-      openModal={props.openModal}
-      handleConflictAutoMove={props.reschedule.handleConflictAutoMove}
-      handleConflictPushTomorrow={props.reschedule.handleConflictPushTomorrow}
-      handleTimelineDelete={props.reschedule.handleTimelineDelete}
-      handleReschedule={props.reschedule.handleReschedule}
-      getTag={props.getTag}
-      completedEventIds={props.completedEventIds}
-      setCompletedEventIds={props.setCompletedEventIds}
-      onOpenQuickAddSchedule={props.openQuickAddSchedule}
-      hasTimerSession={props.hasTimerSession}
-      timerTask={props.timerTask}
-      timeLeft={props.timeLeft}
-      timerMode={props.timerMode}
-      styles={styles}
-    />
-  );
+  return <HomepageTimelineSection {...getTimelineProps(props)} />;
 }
 
 function getSlot5Data(props) {
@@ -150,34 +80,49 @@ function getSlot5Data(props) {
 }
 
 function HomepageDashboardModals(props) {
-  return (
-    <HomepageModals
-      showCreateTaskModal={props.showCreateTaskModal}
-      setShowCreateTaskModal={props.modals.setShowCreateTaskModal}
-      showCreateListFromTask={props.modals.showCreateListFromTask}
-      setShowCreateListFromTask={props.modals.setShowCreateListFromTask}
-      taskLists={props.taskLists}
-      enrolledModules={props.state.enrolledModules}
-      tags={props.tags}
-      lastCreatedListId={props.modals.lastCreatedListId}
-      setLastCreatedListId={props.modals.setLastCreatedListId}
-      createTask={createTask}
-      refetchTasks={props.refetchTasks}
-      addEvent={props.addEvent}
-      showToast={props.showToast}
-      selectedDate={props.selectedDate}
-      rescheduleTask={props.modals.rescheduleTask}
-      setRescheduleTask={props.modals.setRescheduleTask}
-      updateTask={updateTask}
-      deleteTask={deleteTask}
-      planTimelineReadItem={props.modals.planTimelineReadItem}
-      setPlanTimelineReadItem={props.modals.setPlanTimelineReadItem}
-      handleTimelineDelete={props.reschedule.handleTimelineDelete}
-      openModal={props.openModal}
-      createTaskList={createTaskList}
-      setTaskLists={props.setTaskLists}
-      fetchTaskLists={fetchTaskLists}
-      styles={styles}
-    />
-  );
+  return <HomepageModals {...getModalProps(props)} />;
+}
+
+function getTaskSlotProps(props) {
+  return { ...getTaskSlotData(props), ...getTaskSlotActions(props) };
+}
+
+function getTimelineProps(props) {
+  return { ...getTimelineCoreProps(props), ...getTimelineActionProps(props), styles };
+}
+
+function getModalProps(props) {
+  return { ...getModalStateProps(props), ...getModalActionProps(props), styles };
+}
+
+function getOverlayProps(props) {
+  return { enrolledModules: props.state.enrolledModules, selectedDeadline: props.modals.selectedDeadline, selectedModulePill: props.modals.selectedModulePill, setSelectedDeadline: props.modals.setSelectedDeadline, setSelectedModulePill: props.modals.setSelectedModulePill, styles };
+}
+
+function getTaskPillLabel(task, props) {
+  return getTaskCategoryPillMeta(task, props.taskLists, props.state.enrolledModules, props.getTag)?.label || null;
+}
+
+function getTimelineCoreProps(props) {
+  return { completedEventIds: props.completedEventIds, dayTasks: props.dayTasks, deadlineSuggestions: props.state.deadlineSuggestions, getTag: props.getTag, hasTimerSession: props.hasTimerSession, missedItems: props.state.missedItems, now: props.now, overdueTasksForNow: props.state.overdueTasksForNow, replanLoading: props.reschedule.replanLoading, selectedDate: props.selectedDate, setCompletedEventIds: props.setCompletedEventIds, sortedEvents: props.state.sortedEvents, suggestableTasks: props.state.suggestableTasks, taskLists: props.taskLists, tasksDueToday: props.state.tasksDueToday, timeLeft: props.timeLeft, timerMode: props.timerMode, timerTask: props.timerTask };
+}
+
+function getTimelineActionProps(props) {
+  return { handleConflictAutoMove: props.reschedule.handleConflictAutoMove, handleConflictPushTomorrow: props.reschedule.handleConflictPushTomorrow, handleQuickStartGap: props.reschedule.handleQuickStartGap, handleReplanDay: props.reschedule.handleReplanDay, handleReschedule: props.reschedule.handleReschedule, handleTaskToggle: props.handleTaskToggle, handleTimelineDelete: props.reschedule.handleTimelineDelete, onOpenQuickAddSchedule: props.openQuickAddSchedule, openModal: props.openModal, openTimelinePopup: props.openTimelinePopup };
+}
+
+function getModalStateProps(props) {
+  return { enrolledModules: props.state.enrolledModules, lastCreatedListId: props.modals.lastCreatedListId, planTimelineReadItem: props.modals.planTimelineReadItem, rescheduleTask: props.modals.rescheduleTask, selectedDate: props.selectedDate, setLastCreatedListId: props.modals.setLastCreatedListId, setPlanTimelineReadItem: props.modals.setPlanTimelineReadItem, setRescheduleTask: props.modals.setRescheduleTask, setShowCreateListFromTask: props.modals.setShowCreateListFromTask, setShowCreateTaskModal: props.modals.setShowCreateTaskModal, showCreateListFromTask: props.modals.showCreateListFromTask, showCreateTaskModal: props.modals.showCreateTaskModal, tags: props.tags, taskLists: props.taskLists };
+}
+
+function getModalActionProps(props) {
+  return { addEvent: props.addEvent, createTask, createTaskList, deleteTask, fetchTaskLists, handleTimelineDelete: props.reschedule.handleTimelineDelete, openModal: props.openModal, refetchTasks: props.refetchTasks, setTaskLists: props.setTaskLists, showToast: props.toast.showToast, updateTask };
+}
+
+function getTaskSlotActions(props) {
+  return { getTaskCategoryColor: (task) => getTaskCategoryColor(task, props.getTag), getTaskCategoryPill: (task) => getTaskPillLabel(task, props), handleTaskWidgetComplete: props.handleTaskWidgetComplete, hasTimerSession: props.hasTimerSession, onDeleteTask: props.deleteTaskAndRefresh, onEditTask: props.modals.setRescheduleTask, onInlineTaskEdit: props.handleInlineTaskEdit, onStartFocus: () => props.navigate("/timer", { state: { fromTaskPlay: true } }), setShowAllTaskWidgetTasks: () => {} };
+}
+
+function getTaskSlotData(props) {
+  return { displayName: props.displayName, isToday: isToday(props.selectedDate), showAllTaskWidgetTasks: false, styles: taskWidgetStyles, taskLists: props.taskLists, taskWidgetDueTodayCount: props.state.taskWidgetDueTodayCount, taskWidgetItemsOnly: props.state.taskWidgetItemsOnly, taskWidgetList: props.state.taskWidgetList, taskWidgetOverdueCount: props.state.taskWidgetOverdueCount, taskWidgetRef: props.taskWidgetRef, taskWidgetSpineCompletedPct: props.state.taskWidgetSpineCompletedPct };
 }

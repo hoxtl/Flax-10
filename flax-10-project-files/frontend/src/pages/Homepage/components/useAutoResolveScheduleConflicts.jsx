@@ -8,43 +8,8 @@ const MAX_RELOCATE_OVERLAPS = 3;
 
 export function buildDailyConflictPlans(allEvents, selectedDate, now = new Date()) {
   if (!selectedDate || !(allEvents || []).length) return [];
-
   const sorted = [...allEvents].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  const firstDay = new Date(selectedDate);
-  firstDay.setHours(0, 0, 0, 0);
-  const lastEvent = sorted[sorted.length - 1];
-  const lastDay = new Date(lastEvent.end_time || lastEvent.start_time);
-  lastDay.setHours(0, 0, 0, 0);
-
-  const plans = [];
-  for (let current = new Date(firstDay); current <= lastDay; current.setDate(current.getDate() + 1)) {
-    const day = new Date(current);
-    const dayStart = new Date(day);
-    dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
-    const dayEnd = new Date(day);
-    dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
-
-    const dayEvents = sorted
-      .filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), day))
-      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-
-    if (!dayEvents.length) continue;
-
-    const rows = computePlanTimelineRows(dayEvents, day, dayStart, dayEnd, now, [], [], () => false);
-    const conflictRow = rows.find((row) => row.type === "eventGroup");
-    if (!conflictRow) continue;
-
-    const plan = getConflictResolutionPlan({
-      row: conflictRow,
-      rows,
-      selectedDate: day,
-      canRelocateEvent: (event, start, end) =>
-        canRelocateEventWithoutHittingOverlapLimit(sorted, event, start, end),
-    });
-    if (plan) plans.push({ ...plan, day: new Date(day) });
-  }
-
-  return plans;
+  return getConflictDays(selectedDate, sorted).map((day) => buildDayPlan(day, sorted, now)).filter(Boolean);
 }
 
 export async function resolveConflictPlansBeforeScheduling({
@@ -55,22 +20,7 @@ export async function resolveConflictPlansBeforeScheduling({
   maxIterations = 50,
 }) {
   let events = await getFreshEvents();
-
-  for (let iteration = 0; iteration < maxIterations; iteration += 1) {
-    const plans = buildDailyConflictPlans(events, selectedDate);
-    const nextPlan = plans[0];
-    if (!nextPlan) return events;
-
-    if (nextPlan.type === "auto-arrange") {
-      await onConflictAutoMove(nextPlan.event, nextPlan.start, nextPlan.end, { silent: true });
-    } else {
-      await onPushTomorrow(nextPlan.event, { silent: true });
-    }
-
-    events = await getFreshEvents();
-  }
-
-  return events;
+  return resolveConflicts(events, { getFreshEvents, maxIterations, onConflictAutoMove, onPushTomorrow, selectedDate });
 }
 
 export function useAutoResolveScheduleConflicts({
@@ -81,22 +31,13 @@ export function useAutoResolveScheduleConflicts({
   enabled = true,
 }) {
   const runningRef = useRef(false);
-  const plans = useMemo(
-    () => buildDailyConflictPlans(allEvents, selectedDate),
-    [allEvents, selectedDate]
-  );
+  const plans = useMemo(() => buildDailyConflictPlans(allEvents, selectedDate), [allEvents, selectedDate]);
 
   useEffect(() => {
     if (!enabled || runningRef.current || !plans.length) return;
     const nextPlan = plans[0];
-    if (!nextPlan) return;
-
     runningRef.current = true;
-    const action = nextPlan.type === "auto-arrange"
-      ? onConflictAutoMove?.(nextPlan.event, nextPlan.start, nextPlan.end, { silent: true })
-      : onPushTomorrow?.(nextPlan.event, { silent: true });
-
-    Promise.resolve(action).finally(() => {
+    Promise.resolve(runConflictPlan(nextPlan, onConflictAutoMove, onPushTomorrow)).finally(() => {
       runningRef.current = false;
     });
   }, [enabled, plans, onConflictAutoMove, onPushTomorrow]);
@@ -109,10 +50,66 @@ function eventsOverlapWindow(event, start, end) {
 }
 
 export function canRelocateEventWithoutHittingOverlapLimit(allEvents, eventToMove, start, end) {
-  const overlapCount = (allEvents || []).filter((event) => {
-    if (event?.id === eventToMove?.id) return false;
-    return eventsOverlapWindow(event, start, end);
-  }).length;
-
+  const overlapCount = (allEvents || []).filter((event) => event?.id !== eventToMove?.id).filter((event) => eventsOverlapWindow(event, start, end)).length;
   return overlapCount < MAX_RELOCATE_OVERLAPS;
+}
+
+function getConflictDays(selectedDate, sortedEvents) {
+  const firstDay = startOfDay(selectedDate);
+  const lastDay = startOfDay(new Date(sortedEvents[sortedEvents.length - 1].end_time || sortedEvents[sortedEvents.length - 1].start_time));
+  const days = [];
+  for (let current = new Date(firstDay); current <= lastDay; current.setDate(current.getDate() + 1)) days.push(new Date(current));
+  return days;
+}
+
+function startOfDay(value) {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function buildDayPlan(day, sortedEvents, now) {
+  const dayEvents = getDayEvents(sortedEvents, day);
+  if (!dayEvents.length) return null;
+  const rows = buildTimelineRows(dayEvents, day, now);
+  const conflictRow = rows.find((row) => row.type === "eventGroup");
+  if (!conflictRow) return null;
+  const plan = getConflictResolutionPlan({
+    row: conflictRow,
+    rows,
+    selectedDate: day,
+    canRelocateEvent: (event, start, end) => canRelocateEventWithoutHittingOverlapLimit(sortedEvents, event, start, end),
+  });
+  return plan ? { ...plan, day: new Date(day) } : null;
+}
+
+function getDayEvents(sortedEvents, day) {
+  return sortedEvents.filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), day)).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+}
+
+function buildTimelineRows(dayEvents, day, now) {
+  const dayStart = new Date(day);
+  const dayEnd = new Date(day);
+  dayStart.setHours(DAY_START_HOUR, 0, 0, 0);
+  dayEnd.setHours(DAY_END_HOUR, 0, 0, 0);
+  return computePlanTimelineRows(dayEvents, day, dayStart, dayEnd, now, [], [], () => false);
+}
+
+function runConflictPlan(nextPlan, onConflictAutoMove, onPushTomorrow) {
+  return nextPlan.type === "auto-arrange"
+    ? onConflictAutoMove?.(nextPlan.event, nextPlan.start, nextPlan.end, { silent: true })
+    : onPushTomorrow?.(nextPlan.event, { silent: true });
+}
+
+async function resolveConflicts(initialEvents, options) {
+  if (options.maxIterations <= 0) return initialEvents;
+  const nextPlan = getNextConflictPlan(initialEvents, options.selectedDate);
+  if (!nextPlan) return initialEvents;
+  await runConflictPlan(nextPlan, options.onConflictAutoMove, options.onPushTomorrow);
+  const events = await options.getFreshEvents();
+  return resolveConflicts(events, { ...options, maxIterations: options.maxIterations - 1 });
+}
+
+function getNextConflictPlan(events, selectedDate) {
+  return buildDailyConflictPlans(events, selectedDate)[0] || null;
 }

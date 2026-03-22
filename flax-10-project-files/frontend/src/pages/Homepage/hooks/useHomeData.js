@@ -10,76 +10,11 @@ import { getEvents } from "../../../api/eventApi";
 
 export function useHomeData(selectedDate) {
   const { events, allEvents } = useCalendar();
-  const [allTasks, setAllTasks] = useState([]);
-  const [fallbackDayEvents, setFallbackDayEvents] = useState([]);
-  const [tasksLoading, setTasksLoading] = useState(true);
-  const [eventsLoading, setEventsLoading] = useState(true);
-
-  useEffect(() => {
-    setTasksLoading(true);
-    fetchTasks()
-      .then((data) => setAllTasks(data || []))
-      .catch(() => {})
-      .finally(() => setTasksLoading(false));
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    setEventsLoading(true);
-    const dayStart = new Date(selectedDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
-
-    getEvents({ start: dayStart.toISOString(), end: dayEnd.toISOString() })
-      .then((data) => {
-        if (!cancelled) setFallbackDayEvents(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {
-        if (!cancelled) setFallbackDayEvents([]);
-      })
-      .finally(() => {
-        if (!cancelled) setEventsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedDate]);
-
-  const dayEvents = useMemo(() => {
-    const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
-    const source = Array.isArray(primary) && primary.length > 0 ? primary : (fallbackDayEvents || []);
-    return source.filter((e) =>
-      overlapsDay(new Date(e.start_time), new Date(e.end_time || e.start_time), selectedDate)
-    );
-  }, [allEvents, events, fallbackDayEvents, selectedDate]);
-
-  const dayTasks = useMemo(() => {
-    const incomplete = allTasks.filter((t) => !t.completed);
-    const dayEnd = new Date(selectedDate);
-    dayEnd.setHours(23, 59, 59, 999);
-    const p = { urgent: 0, high: 1, medium: 2, low: 3 };
-    return incomplete
-      .filter((t) => t.due_date && new Date(t.due_date) <= dayEnd)
-      .sort((a, b) => (p[a.priority] ?? 4) - (p[b.priority] ?? 4));
-  }, [allTasks, selectedDate]);
-
-  const removePendingTask = useCallback((id) => {
-    setAllTasks((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
-  const refetchTasks = useCallback(() => {
-    return fetchTasks()
-      .then((data) => {
-        const nextTasks = data || [];
-        setAllTasks(nextTasks);
-        return nextTasks;
-      })
-      .catch(() => {
-        return [];
-      });
-  }, []);
+  const [allTasks, setAllTasks, tasksLoading, refetchTasks] = useHomepageTasks();
+  const [fallbackDayEvents, eventsLoading] = useHomepageDayEvents(selectedDate);
+  const dayEvents = useMemo(() => getDayEvents(allEvents, events, fallbackDayEvents, selectedDate), [allEvents, events, fallbackDayEvents, selectedDate]);
+  const dayTasks = useMemo(() => getDayTasks(allTasks, selectedDate), [allTasks, selectedDate]);
+  const removePendingTask = useCallback((id) => setAllTasks((prev) => prev.filter((task) => task.id !== id)), []);
 
   return {
     dayEvents,
@@ -89,4 +24,69 @@ export function useHomeData(selectedDate) {
     refetchTasks,
     loading: tasksLoading || eventsLoading,
   };
+}
+
+function getDayEvents(allEvents, events, fallbackDayEvents, selectedDate) {
+  const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
+  const source = Array.isArray(primary) && primary.length > 0 ? primary : fallbackDayEvents || [];
+  return source.filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), selectedDate));
+}
+
+function useHomepageTasks() {
+  const [allTasks, setAllTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const refetchTasks = useCallback(() => loadTasks(setAllTasks), []);
+
+  useEffect(() => {
+    setLoading(true);
+    refetchTasks().finally(() => setLoading(false));
+  }, [refetchTasks]);
+
+  return [allTasks, setAllTasks, loading, refetchTasks];
+}
+
+function useHomepageDayEvents(selectedDate) {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => loadDayEvents(selectedDate, setEvents, setLoading), [selectedDate]);
+  return [events, loading];
+}
+
+function getDayTasks(allTasks, selectedDate) {
+  const priorities = { urgent: 0, high: 1, medium: 2, low: 3 };
+  const dayEnd = new Date(selectedDate);
+  dayEnd.setHours(23, 59, 59, 999);
+  return allTasks.filter((task) => !task.completed).filter((task) => task.due_date && new Date(task.due_date) <= dayEnd).sort((left, right) => (priorities[left.priority] ?? 4) - (priorities[right.priority] ?? 4));
+}
+
+function loadTasks(setAllTasks) {
+  return fetchTasks().then((data) => {
+    const nextTasks = data || [];
+    setAllTasks(nextTasks);
+    return nextTasks;
+  }).catch(() => []);
+}
+
+function loadDayEvents(selectedDate, setEvents, setLoading) {
+  let cancelled = false;
+  setLoading(true);
+  getEvents(getEventRange(selectedDate)).then((data) => updateEvents(() => cancelled, setEvents, data)).catch(() => updateEvents(() => cancelled, setEvents, [])).finally(() => {
+    if (!cancelled) setLoading(false);
+  });
+  return () => {
+    cancelled = true;
+  };
+}
+
+function updateEvents(isCancelled, setEvents, data) {
+  if (!isCancelled()) setEvents(Array.isArray(data) ? data : []);
+}
+
+function getEventRange(selectedDate) {
+  const dayStart = new Date(selectedDate);
+  const dayEnd = new Date(selectedDate);
+  dayStart.setHours(0, 0, 0, 0);
+  dayEnd.setHours(23, 59, 59, 999);
+  return { start: dayStart.toISOString(), end: dayEnd.toISOString() };
 }

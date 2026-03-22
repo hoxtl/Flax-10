@@ -1,3 +1,7 @@
+/*
+ * Auto-schedule form builder for Homepage deadline planning.
+ */
+
 const MINUTES_BY_URGENCY = {
   overdue: 90,
   critical: 75,
@@ -19,21 +23,8 @@ function getUrgencyTier(dueDate) {
 
 export function buildScheduleAutoForm({ deadlines = [] } = {}) {
   if (!Array.isArray(deadlines) || deadlines.length === 0) return null;
-
-  const prefs = deadlines
-    .filter((d) => d && d.id != null && d.start_due_date)
-    .filter((d) => new Date(d.start_due_date).getTime() >= Date.now())
-    .sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date))
-    .map((deadline) => {
-      const tier = getUrgencyTier(deadline.start_due_date) || 'upcoming';
-      return {
-        deadline_id: Number(deadline.id),
-        ideal_minutes_per_day: MINUTES_BY_URGENCY[tier] || 45,
-      };
-    });
-
+  const prefs = getDeadlinePreferences(deadlines);
   if (!prefs.length) return null;
-
   return {
     title: `Homepage auto schedule ${new Date().toLocaleDateString('en-GB')}`,
     clear_existing: false,
@@ -42,3 +33,23 @@ export function buildScheduleAutoForm({ deadlines = [] } = {}) {
 }
 
 export { getUrgencyTier };
+
+function getDeadlinePreferences(deadlines) {
+  return deadlines.filter(isSchedulableDeadline).sort(compareByDueDate).map(buildDeadlinePreference);
+}
+
+function isSchedulableDeadline(deadline) {
+  return Boolean(deadline && deadline.id != null && deadline.start_due_date && new Date(deadline.start_due_date).getTime() >= Date.now());
+}
+
+function compareByDueDate(left, right) {
+  return new Date(left.start_due_date) - new Date(right.start_due_date);
+}
+
+function buildDeadlinePreference(deadline) {
+  const tier = getUrgencyTier(deadline.start_due_date) || 'upcoming';
+  return {
+    deadline_id: Number(deadline.id),
+    ideal_minutes_per_day: MINUTES_BY_URGENCY[tier] || 45,
+  };
+}

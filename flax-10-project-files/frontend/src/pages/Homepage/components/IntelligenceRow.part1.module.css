@@ -1,0 +1,343 @@
+/* Split from components/IntelligenceRow.module.css (1/4) */
+/* Intelligence Row — Layout and Edit Bar styles only */
+
+.section {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  background: transparent;
+  min-width: 0;
+}
+
+.editBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.mobileEditBar {
+  display: none;
+}
+
+.editBtn {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.editBtn:hover {
+  background: var(--hover-light);
+  color: var(--text-primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.editBtnActive {
+  background: var(--primary);
+  color: #fff !important;
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+.editBtnActive:hover {
+  background: var(--primary-strong);
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.analyticsWidgetShell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-width: 0;
+}
+
+.analyticsWidgetTitle {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+  margin: 0;
+}
+
+.analyticsWidgetLoading,
+.analyticsWidgetEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--widget-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  min-height: 180px;
+}
+
+.analyticsScrollable {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  padding-bottom: 2px;
+}
+
+.analyticsInsightsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(.MuiChartsLegend-root),
+  .analyticsWidgetShell :global(svg) {
+    max-width: 100% !important;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsLegend-root) {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding: 12px;
+  }
+
+  .mobileEditBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 26px 28px;
+  border: 1px solid var(--widget-border);
+  border-radius: 28px;
+  background: var(--widget-surface-secondary);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.045);
+  overflow: hidden;
+}
+
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at top right,
+      var(--widget-accent-soft),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(255, 255, 255, 0.08),
+      transparent 22%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 52%);
+}
+
+@media (min-width: 768px) {
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(420px, 0.9fr);
+    align-items: stretch;
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+}
+
+.headerLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+}
+
+.headerDateRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerDateIcon {
+  color: var(--widget-text-tertiary);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-size: clamp(2.35rem, 3.9vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  color: var(--widget-text-primary);
+  margin: 0;
+  max-width: none;
+}
+
+.headerRight {
+  display: grid;
+  align-content: start;
+  min-width: 280px;
+}
+
+@media (max-width: 767px) {
+  .headerRight {
+    min-width: 0;
+  }
+}
+
+/* Row that holds statusStrip pill + TFL pill side by side */
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compact Day Progress in greeting header */
+.headerDayProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.headerDayProgressTrack {
+  height: 4px;
+  background: var(--widget-border);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 200px;
+  max-width: 100%;
+}
+
+.headerDayProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #7b6751 0%, #4a3421 100%);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.headerDayProgressMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.headerDayProgressCount {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--widget-text-secondary);
+}
+
+.headerDayProgressOverdue {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #c0714e;
+  letter-spacing: 0.04em;
+}
+
+.headerDayProgressStreak {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  color: #9a8778;
+  letter-spacing: 0.04em;
+}
+
+/* Pills row at the top of the Right Now bento card */
+.rightNowPillsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+/* ── Combined amber alerts container (status strip + TFL) ── */
+.intRowAlertsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.intRowAlertsContainer:has(> *) {
+  background: var(--widget-accent-soft);
+  border-left: 3px solid var(--widget-accent);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.intRowAlertRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.intRowAlertDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #c49a4b;
+}

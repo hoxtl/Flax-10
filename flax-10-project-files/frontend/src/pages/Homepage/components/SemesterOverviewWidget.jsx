@@ -1,17 +1,8 @@
-/**
- * SemesterOverviewWidget — shows the full academic term at a glance.
- * 
- * Data: self-fetches ALL calendar events across the semester date range
- *       using the /api/events/?start=&end= endpoint. Also uses
- *       upcomingDeadlines from Deadlines API for coursework/assessment rows.
- *
- * Each week column shows stacked density bars by type:
- *   🟢 Lectures   (timetable / lecture / seminar / tutorial / lab)
- *   🟠 Deadlines  (from upcomingDeadlines)
- *   🟣 Exams      (events whose title contains "exam" / "assessment")
+/*
+ * Semester overview widget for term pacing and deadline density.
  */
 
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState, useCallback, useRef } from "react";
 import { CalendarDays } from "lucide-react";
 import { getEvents } from "../../../api/eventApi";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
@@ -59,41 +50,7 @@ function classifyEvent(ev) {
 
 function buildWeeks(semStart, numWeeks, readingWeekIndices, events, deadlines, now) {
   const readingSet = new Set(readingWeekIndices);
-  return Array.from({ length: numWeeks }, (_, i) => {
-    const weekStart = addWeeks(semStart, i);
-    const weekEnd   = addWeeks(semStart, i + 1);
-    const isReading = readingSet.has(i);
-
-    let lectureCount  = 0;
-    let examCount     = 0;
-    let deadlineCount = 0;
-
-    (events || []).forEach((ev) => {
-      const t = new Date(ev.start_time || ev.date);
-      if (isNaN(t) || t < weekStart || t >= weekEnd) return;
-      const kind = classifyEvent(ev);
-      if (kind === "lecture") lectureCount++;
-      else if (kind === "exam") examCount++;
-    });
-
-    (deadlines || []).forEach((dl) => {
-      const t = new Date(dl.start_due_date || dl.due_date || dl.date);
-      if (isNaN(t) || t < weekStart || t >= weekEnd) return;
-      deadlineCount++;
-    });
-
-    return {
-      index:         i,
-      label:         isReading ? "RW" : `W${i + 1}`,
-      dateLabel:     fmt(weekStart),
-      isCurrent:     now >= weekStart && now < weekEnd,
-      isPast:        now >= weekEnd,
-      isReading,
-      lectureCount,
-      deadlineCount,
-      examCount,
-    };
-  });
+  return Array.from({ length: numWeeks }, (_, index) => buildWeek(semStart, index, readingSet, events, deadlines, now));
 }
 
 function toHeight(count, maxCount, maxPx = 40, minPx = 4) {
@@ -110,152 +67,213 @@ export default function SemesterOverviewWidget({
   semesterLabel   = "Semester · 2025/26",
   row             = 2,
 }) {
-  const now = new Date();
+  const { now, semStart, semEnd } = useSemesterRange(semesterStart, numWeeks);
+  const { deadlines, events, loading } = useSemesterData(semStart, semEnd);
+  const weeks = useSemesterWeeks({ deadlines, events, now, numWeeks, readingWeekIndices, semStart });
+  const maxima = getWeekMaxima(weeks);
+  const clusterWeeks = getClusterWeeks(weeks, maxima.maxDeadline);
+  if (loading) return <SemesterOverviewLoading numWeeks={numWeeks} semesterLabel={semesterLabel} />;
+  return <SemesterOverviewBody clusterWeeks={clusterWeeks} maxima={maxima} row={row} semesterLabel={semesterLabel} weeks={weeks} />;
+}
 
-  const semStart = useMemo(() => {
-    if (semesterStart) return getMonday(new Date(semesterStart));
-    // Fallback: go back to the Monday ~(numWeeks/2) weeks ago
-    const approx = new Date(now);
-    approx.setDate(approx.getDate() - Math.floor(numWeeks / 2) * 7);
-    return getMonday(approx);
-  }, [semesterStart, numWeeks]);
+function buildWeek(semStart, index, readingSet, events, deadlines, now) {
+  const weekStart = addWeeks(semStart, index);
+  const weekEnd = addWeeks(semStart, index + 1);
+  const counts = getWeekCounts(events, deadlines, weekStart, weekEnd);
+  return {
+    index,
+    label: readingSet.has(index) ? "RW" : `W${index + 1}`,
+    dateLabel: fmt(weekStart),
+    isCurrent: now >= weekStart && now < weekEnd,
+    isPast: now >= weekEnd,
+    isReading: readingSet.has(index),
+    ...counts,
+  };
+}
 
+function getWeekCounts(events, deadlines, weekStart, weekEnd) {
+  return {
+    deadlineCount: countDeadlines(deadlines, weekStart, weekEnd),
+    examCount: countEventsByKind(events, weekStart, weekEnd, "exam"),
+    lectureCount: countEventsByKind(events, weekStart, weekEnd, "lecture"),
+  };
+}
+
+function countEventsByKind(events, weekStart, weekEnd, kind) {
+  return (events || []).filter((event) => isWeekDate(event.start_time || event.date, weekStart, weekEnd)).filter((event) => classifyEvent(event) === kind).length;
+}
+
+function countDeadlines(deadlines, weekStart, weekEnd) {
+  return (deadlines || []).filter((deadline) => isWeekDate(deadline.start_due_date || deadline.due_date || deadline.date, weekStart, weekEnd)).length;
+}
+
+function isWeekDate(value, weekStart, weekEnd) {
+  const time = new Date(value);
+  return !Number.isNaN(time) && time >= weekStart && time < weekEnd;
+}
+
+function useSemesterRange(semesterStart, numWeeks) {
+  const nowRef = useRef(new Date());
+  const now = nowRef.current;
+  const semStart = useMemo(() => getSemesterStart(semesterStart, numWeeks, now), [semesterStart, numWeeks]);
   const semEnd = useMemo(() => addWeeks(semStart, numWeeks), [semStart, numWeeks]);
+  return { now, semStart, semEnd };
+}
 
-  // ── Fetch events for the full semester range ─────────────────────────────
-  const [events,    setEvents]    = useState([]);
+function getSemesterStart(semesterStart, numWeeks, now) {
+  if (semesterStart) return getMonday(new Date(semesterStart));
+  const approx = new Date(now);
+  approx.setDate(approx.getDate() - Math.floor(numWeeks / 2) * 7);
+  return getMonday(approx);
+}
+
+function useSemesterData(semStart, semEnd) {
+  const [events, setEvents] = useState([]);
   const [deadlines, setDeadlines] = useState([]);
-  const [loading,   setLoading]   = useState(true);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const startStr = semStart.toISOString().slice(0, 10);
-      const endStr   = semEnd.toISOString().slice(0, 10);
-
-      const [evData, dlData] = await Promise.all([
-        getEvents({ start: startStr, end: endStr }),
-        getUpcomingDeadlines().catch(() => []),
-      ]);
-
-      setEvents(Array.isArray(evData) ? evData : []);
-      setDeadlines(Array.isArray(dlData) ? dlData : []);
-    } catch {
-      setEvents([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [semStart, semEnd]);
-
+  const [loading, setLoading] = useState(true);
+  const fetchData = useCallback(async () => loadSemesterData(semStart, semEnd, setEvents, setDeadlines, setLoading), [semEnd, semStart]);
   useEffect(() => { fetchData(); }, [fetchData]);
+  return { deadlines, events, loading };
+}
 
-  // ── Build week structure ─────────────────────────────────────────────────
-  const weeks = useMemo(
-    () => buildWeeks(semStart, numWeeks, readingWeekIndices, events, deadlines, now),
-    [semStart, numWeeks, readingWeekIndices, events, deadlines]
-  );
-
-  const maxLecture  = Math.max(...weeks.map((w) => w.lectureCount),  1);
-  const maxDeadline = Math.max(...weeks.map((w) => w.deadlineCount), 1);
-  const maxExam     = Math.max(...weeks.map((w) => w.examCount),     1);
-
-  // Detect heavy deadline weeks (≥ 70% of the busiest deadline week)
-  const clusterWeeks = weeks.filter((w) => w.deadlineCount >= Math.max(maxDeadline * 0.7, 2));
-  const hasCluster   = clusterWeeks.length > 0;
-
-  if (loading) {
-    return (
-      <div className={styles.root}>
-        <div className={baseStyles.widgetHeader}>
-          <div className={baseStyles.headerIconWrap}>
-            <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-          </div>
-          <span className={baseStyles.headerTitle}>Semester Overview</span>
-          <span className={baseStyles.headerMeta}>{semesterLabel}</span>
-        </div>
-        <div className={styles.loadingRow}>
-          {Array.from({ length: numWeeks }).map((_, i) => (
-            <div key={i} className={`${styles.weekCol} ${styles.skeletonCol}`} />
-          ))}
-        </div>
-      </div>
-    );
+async function loadSemesterData(semStart, semEnd, setEvents, setDeadlines, setLoading) {
+  setLoading(true);
+  try {
+    const [events, deadlines] = await fetchSemesterData(semStart, semEnd);
+    setEvents(events);
+    setDeadlines(deadlines);
+  } catch {
+    setEvents([]);
+    setDeadlines([]);
+  } finally {
+    setLoading(false);
   }
+}
 
+async function fetchSemesterData(semStart, semEnd) {
+  const start = semStart.toISOString().slice(0, 10);
+  const end = semEnd.toISOString().slice(0, 10);
+  const [events, deadlines] = await Promise.all([getEvents({ start, end }), getUpcomingDeadlines().catch(() => [])]);
+  return [Array.isArray(events) ? events : [], Array.isArray(deadlines) ? deadlines : []];
+}
+
+function useSemesterWeeks({ deadlines, events, now, numWeeks, readingWeekIndices, semStart }) {
+  return useMemo(() => buildWeeks(semStart, numWeeks, readingWeekIndices, events, deadlines, now), [deadlines, events, now, numWeeks, readingWeekIndices, semStart]);
+}
+
+function getWeekMaxima(weeks) {
+  return {
+    maxDeadline: Math.max(...weeks.map((week) => week.deadlineCount), 1),
+    maxExam: Math.max(...weeks.map((week) => week.examCount), 1),
+    maxLecture: Math.max(...weeks.map((week) => week.lectureCount), 1),
+  };
+}
+
+function getClusterWeeks(weeks, maxDeadline) {
+  return weeks.filter((week) => week.deadlineCount >= Math.max(maxDeadline * 0.7, 2));
+}
+
+function SemesterOverviewLoading({ numWeeks, semesterLabel }) {
   return (
-    <div className={`${styles.root} ${row === 1 ? styles.h1 : styles.h2}`}>
-      {/* Header */}
-      <div className={baseStyles.widgetHeader}>
-        <div className={baseStyles.headerIconWrap}>
-          <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-        </div>
-        <span className={baseStyles.headerTitle}>Semester Overview</span>
-        <span className={baseStyles.headerMeta}>{semesterLabel}</span>
-        
-        <div className={styles.legend}>
-          <span className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles.dotLecture}`} /> Lectures
-          </span>
-          <span className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles.dotDeadline}`} /> Deadlines
-          </span>
-          <span className={styles.legendItem}>
-            <span className={`${styles.legendDot} ${styles.dotExam}`} /> Exams
-          </span>
-        </div>
-      </div>
-
-      {/* Week columns */}
-      <div className={styles.grid}>
-        {weeks.map((w) => {
-          const maxBarH = row === 1 ? 36 : 84;
-          const lh = toHeight(w.lectureCount,  maxLecture,  maxBarH);
-          const dh = toHeight(w.deadlineCount, maxDeadline, maxBarH);
-          const eh = toHeight(w.examCount,     maxExam,     maxBarH);
-
-          return (
-            <div
-              key={w.index}
-              className={[
-                styles.weekCol,
-                w.isCurrent ? styles.currentCol : "",
-                w.isPast    ? styles.pastCol    : "",
-                w.isReading ? styles.readingCol : "",
-              ].filter(Boolean).join(" ")}
-              title={`${w.label}: ${w.lectureCount} lecture${w.lectureCount !== 1 ? "s" : ""}, ${w.deadlineCount} deadline${w.deadlineCount !== 1 ? "s" : ""}, ${w.examCount} exam${w.examCount !== 1 ? "s" : ""}`}
-            >
-              <div className={styles.weekNum}>{w.label}{w.isCurrent ? " ←" : ""}</div>
-              <div className={styles.bars}>
-                {lh > 0 && <div className={`${styles.bar} ${styles.barLecture}`}  style={{ height: lh }} />}
-                {dh > 0 && <div className={`${styles.bar} ${styles.barDeadline}`} style={{ height: dh }} />}
-                {eh > 0 && <div className={`${styles.bar} ${styles.barExam}`}     style={{ height: eh }} />}
-                {!lh && !dh && !eh && w.isReading && (
-                  <div className={`${styles.bar} ${styles.barReading}`} style={{ height: 14 }} />
-                )}
-              </div>
-              <div className={styles.dateLabel}>{w.dateLabel}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Auto-generated cluster warning */}
-      {hasCluster && (
-        <div className={styles.clusterWarning}>
-          <span className={styles.clusterIcon}>⚠️</span>
-          <span>
-            <strong className={styles.clusterHighlight}>
-              Deadline cluster in {clusterWeeks.map((w) => w.label).join("–")}
-            </strong>
-            {" — "}
-            {clusterWeeks.reduce((s, w) => s + w.deadlineCount, 0)} deadline
-            {clusterWeeks.reduce((s, w) => s + w.deadlineCount, 0) !== 1 ? "s" : ""}
-            {clusterWeeks.some((w) => w.examCount > 0) &&
-              ` + ${clusterWeeks.reduce((s, w) => s + w.examCount, 0)} exam${clusterWeeks.reduce((s, w) => s + w.examCount, 0) !== 1 ? "s" : ""}`}
-            . Consider planning revision sessions earlier.
-          </span>
-        </div>
-      )}
+    <div className={styles.root}>
+      <SemesterOverviewHeader semesterLabel={semesterLabel} />
+      <div className={styles.loadingRow}>{Array.from({ length: numWeeks }).map((_, index) => <div key={index} className={`${styles.weekCol} ${styles.skeletonCol}`} />)}</div>
     </div>
   );
+}
+
+function SemesterOverviewBody({ clusterWeeks, maxima, row, semesterLabel, weeks }) {
+  return (
+    <div className={`${styles.root} ${row === 1 ? styles.h1 : styles.h2}`}>
+      <SemesterOverviewHeader semesterLabel={semesterLabel} />
+      <SemesterWeekGrid maxima={maxima} row={row} weeks={weeks} />
+      <SemesterClusterWarning clusterWeeks={clusterWeeks} />
+    </div>
+  );
+}
+
+function SemesterOverviewHeader({ semesterLabel }) {
+  return (
+    <div className={baseStyles.widgetHeader}>
+      <div className={baseStyles.headerIconWrap}>
+        <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+      </div>
+      <span className={baseStyles.headerTitle}>Semester Overview</span>
+      <span className={baseStyles.headerMeta}>{semesterLabel}</span>
+      <SemesterLegend />
+    </div>
+  );
+}
+
+function SemesterLegend() {
+  return (
+    <div className={styles.legend}>
+      <LegendItem className={styles.dotLecture} label="Lectures" />
+      <LegendItem className={styles.dotDeadline} label="Deadlines" />
+      <LegendItem className={styles.dotExam} label="Exams" />
+    </div>
+  );
+}
+
+function LegendItem({ className, label }) {
+  return <span className={styles.legendItem}><span className={`${styles.legendDot} ${className}`} /> {label}</span>;
+}
+
+function SemesterWeekGrid({ maxima, row, weeks }) {
+  return <div className={styles.grid}>{weeks.map((week) => <SemesterWeekColumn key={week.index} maxBarHeight={row === 1 ? 36 : 84} maxima={maxima} week={week} />)}</div>;
+}
+
+function SemesterWeekColumn({ maxBarHeight, maxima, week }) {
+  const heights = getWeekHeights(week, maxima, maxBarHeight);
+  return (
+    <div className={getWeekClassName(week)} title={getWeekTitle(week)}>
+      <div className={styles.weekNum}>{week.label}{week.isCurrent ? " ←" : ""}</div>
+      <SemesterWeekBars heights={heights} isReading={week.isReading} />
+      <div className={styles.dateLabel}>{week.dateLabel}</div>
+    </div>
+  );
+}
+
+function getWeekHeights(week, maxima, maxBarHeight) {
+  return {
+    deadline: toHeight(week.deadlineCount, maxima.maxDeadline, maxBarHeight),
+    exam: toHeight(week.examCount, maxima.maxExam, maxBarHeight),
+    lecture: toHeight(week.lectureCount, maxima.maxLecture, maxBarHeight),
+  };
+}
+
+function getWeekClassName(week) {
+  return [styles.weekCol, week.isCurrent ? styles.currentCol : "", week.isPast ? styles.pastCol : "", week.isReading ? styles.readingCol : ""].filter(Boolean).join(" ");
+}
+
+function getWeekTitle(week) {
+  return `${week.label}: ${week.lectureCount} lecture${week.lectureCount !== 1 ? "s" : ""}, ${week.deadlineCount} deadline${week.deadlineCount !== 1 ? "s" : ""}, ${week.examCount} exam${week.examCount !== 1 ? "s" : ""}`;
+}
+
+function SemesterWeekBars({ heights, isReading }) {
+  return (
+    <div className={styles.bars}>
+      {heights.lecture > 0 ? <div className={`${styles.bar} ${styles.barLecture}`} style={{ height: heights.lecture }} /> : null}
+      {heights.deadline > 0 ? <div className={`${styles.bar} ${styles.barDeadline}`} style={{ height: heights.deadline }} /> : null}
+      {heights.exam > 0 ? <div className={`${styles.bar} ${styles.barExam}`} style={{ height: heights.exam }} /> : null}
+      {!heights.lecture && !heights.deadline && !heights.exam && isReading ? <div className={`${styles.bar} ${styles.barReading}`} style={{ height: 14 }} /> : null}
+    </div>
+  );
+}
+
+function SemesterClusterWarning({ clusterWeeks }) {
+  if (!clusterWeeks.length) return null;
+  return (
+    <div className={styles.clusterWarning}>
+      <span className={styles.clusterIcon}>⚠️</span>
+      <span><strong className={styles.clusterHighlight}>Deadline cluster in {clusterWeeks.map((week) => week.label).join("–")}</strong>{" — "}{getClusterSummary(clusterWeeks)}. Consider planning revision sessions earlier.</span>
+    </div>
+  );
+}
+
+function getClusterSummary(clusterWeeks) {
+  const deadlineCount = clusterWeeks.reduce((sum, week) => sum + week.deadlineCount, 0);
+  const examCount = clusterWeeks.reduce((sum, week) => sum + week.examCount, 0);
+  const examLabel = examCount ? ` + ${examCount} exam${examCount !== 1 ? "s" : ""}` : "";
+  return `${deadlineCount} deadline${deadlineCount !== 1 ? "s" : ""}${examLabel}`;
 }
