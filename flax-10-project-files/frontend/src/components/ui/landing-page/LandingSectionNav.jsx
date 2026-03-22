@@ -18,6 +18,7 @@ function renderNavItem(activeSection, sectionRefs, styles) {
   return function navItem(section, index) {
     return (
       <LandingNavItem
+        key={section.id}
         activeSection={activeSection}
         index={index}
         section={section}
@@ -32,7 +33,7 @@ function LandingNavItem({ activeSection, index, section, sectionRefs, styles }) 
   const isActive = activeSection === index;
 
   return (
-    <div key={section.id} className={styles.navItem}>
+    <div className={styles.navItem}>
       <div className={cx(styles.navLabel, isActive && styles.navLabelActive)}>
         <span className={styles.navDot} />
         {section.badge || `Section ${index + 1}`}
