@@ -131,6 +131,7 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
 DJANGO_VITE = {
   "default": {
-    "dev_mode": False
+    "dev_mode": False,
+    'manifest_path': FRONTEND_DIST_DIR / '.vite' / 'manifest.json',
   }
 }
