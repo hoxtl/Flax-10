@@ -23,3 +23,12 @@ class RecurrenceSerialiserTests(TestCase):
             interval=1,
             count=10
         )
+
+    def test_serializer_contains_all_fields(self):
+        """Test that serializer includes all recurrence fields."""
+        serializer = RecurrenceSerialiser(instance=self.recurrence)
+        data = serializer.data
+        
+        expected_fields = ['id', 'frequency', 'interval', 'end_date', 'count', 'exception_dates']
+        for field in expected_fields:
+            self.assertIn(field, data)
