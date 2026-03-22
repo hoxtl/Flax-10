@@ -12,7 +12,7 @@ vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarDispatch: () => mockDispatch,
 }));
 
-vi.mock('../../../../api/eventApi', () => ({
+vi.mock('../../../../api/calendar/eventApi', () => ({
     updateEvent: vi.fn().mockResolvedValue({}),
 }));
 

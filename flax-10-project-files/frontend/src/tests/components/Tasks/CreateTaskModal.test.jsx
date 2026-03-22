@@ -15,7 +15,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
     ),
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}
@@ -27,11 +27,11 @@ vi.mock('../../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
-vi.mock('../../../components/ui/EstTimeHelpBanner', () => ({
+vi.mock('../../../components/UI/EstTimeHelpBanner', () => ({
     default: () => <div data-testid="est-time-help" />,
 }));
 
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/Common/SleepWarningModal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
@@ -43,7 +43,7 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     })),
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 

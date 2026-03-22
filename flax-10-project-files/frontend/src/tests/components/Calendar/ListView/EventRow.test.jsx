@@ -28,7 +28,7 @@ vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
     getEventTheme: () => ({ color: '#7B6751' }),
 }));
 
-vi.mock('../../../../components/common/Badge/Badge', () => ({
+vi.mock('../../../../components/Common/Badge/Badge', () => ({
     default: ({ children }) => <span data-testid="badge">{children}</span>,
 }));
 

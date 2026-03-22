@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as api from '../../api/tagApi';
+import * as api from '../../api/tags/tagApi';
 import { fetchApi } from '../../api/client';
 
 vi.mock('../../api/client', () => ({

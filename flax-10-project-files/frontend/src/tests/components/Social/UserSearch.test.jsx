@@ -15,11 +15,11 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
     searchUsers: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../api/social/societyApi', () => ({
     fetchSocieties: vi.fn(() => Promise.resolve([])),
 }));
 
@@ -30,7 +30,7 @@ vi.mock('../../../lib/kclCourses', () => ({
     },
 }));
 
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/Common/SearchBar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input
             value={value}
@@ -44,8 +44,8 @@ vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
 
 import UserSearch, { useSearchInit, FilterSection } from '../../../components/Social/UserSearch';
 
-import { searchUsers } from '../../../api/userApi';
-import { fetchSocieties } from '../../../api/societyApi';
+import { searchUsers } from '../../../api/user/userApi';
+import { fetchSocieties } from '../../../api/social/societyApi';
 
 describe('UserSearch', () => {
     beforeEach(() => {

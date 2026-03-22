@@ -47,7 +47,7 @@ vi.mock('../../../components/Society/CategorySelector', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/Common/StandardModal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <span>{title}</span>

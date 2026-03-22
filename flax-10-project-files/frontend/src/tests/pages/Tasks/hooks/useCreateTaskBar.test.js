@@ -2,8 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
-vi.mock("../../../../api/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
-vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn() }));
+vi.mock("../../../../api/modules/moduleApi", () => ({ getModules: vi.fn(), getEnrollments: vi.fn() }));
+vi.mock("../../../../api/user/userApi", () => ({ getUserSettings: vi.fn() }));
 vi.mock("../../../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => true) }));
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() }),
@@ -11,8 +11,8 @@ vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
 vi.mock("../../../../pages/Tasks/utils/createTaskBarUtils", () => ({ runQuickAdd: vi.fn() }));
 
 import useCreateTaskBar from "../../../../pages/Tasks/hooks/useCreateTaskBar";
-import { getModules, getEnrollments } from "../../../../api/moduleApi";
-import { getUserSettings } from "../../../../api/userApi";
+import { getModules, getEnrollments } from "../../../../api/modules/moduleApi";
+import { getUserSettings } from "../../../../api/user/userApi";
 import { runQuickAdd } from "../../../../pages/Tasks/utils/createTaskBarUtils";
 
 describe("useCreateTaskBar", () => {

@@ -21,7 +21,7 @@ vi.mock('framer-motion', () => ({
   ),
 }));
 
-vi.mock('../../../../../api/userApi', () => ({
+vi.mock('../../../../../api/user/userApi', () => ({
   getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
@@ -252,7 +252,7 @@ describe('MiniTimeline', () => {
   });
 
   it('uses fallback sleep window when getUserSettings fails', async () => {
-    const { getUserSettings } = await import('../../../../../api/userApi');
+    const { getUserSettings } = await import('../../../../../api/user/userApi');
     getUserSettings.mockRejectedValueOnce(new Error('network'));
     mockRows = [{ id: 'free', type: 'free', minutes: 45 }];
     renderTL({ suggestableTasks: [{ id: 1, title: 'T', estimated_blocks: 1 }] });
@@ -260,7 +260,7 @@ describe('MiniTimeline', () => {
   });
 
   it('uses sleep_time and wake_time from getUserSettings when provided', async () => {
-    const { getUserSettings } = await import('../../../../../api/userApi');
+    const { getUserSettings } = await import('../../../../../api/user/userApi');
     getUserSettings.mockResolvedValueOnce({ sleep_time: '22:30:00', wake_time: '06:45:00' });
     mockRows = [{ id: 'free', type: 'free', minutes: 30 }];
     renderTL({ suggestableTasks: [] });

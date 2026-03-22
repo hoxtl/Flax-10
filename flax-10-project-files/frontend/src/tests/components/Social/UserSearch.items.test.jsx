@@ -11,15 +11,15 @@ vi.mock('framer-motion', () => ({
     AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../api/userApi', () => ({ searchUsers: vi.fn(() => Promise.resolve([])) }));
-vi.mock('../../../api/societyApi', () => ({ fetchSocieties: vi.fn(() => Promise.resolve([])) }));
+vi.mock('../../../api/user/userApi', () => ({ searchUsers: vi.fn(() => Promise.resolve([])) }));
+vi.mock('../../../api/social/societyApi', () => ({ fetchSocieties: vi.fn(() => Promise.resolve([])) }));
 vi.mock('../../../lib/kclCourses', () => ({
     KCL_DEPARTMENTS: {
         'Natural, Mathematical & Engineering Sciences': ['Computer Science', 'Artificial Intelligence'],
         'Arts & Humanities': ['History'],
     },
 }));
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/Common/SearchBar/SearchBar', () => ({
     default: ({ value, onChange, placeholder, onFocus }) => (
         <input value={value} onChange={e => onChange(e.target.value)}
             placeholder={placeholder} onFocus={onFocus} data-testid="search-bar" />

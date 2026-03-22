@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
-import ScrollToTop from '../../../components/common/ScrollToTop';
+import ScrollToTop from '../../../components/Common/ScrollToTop';
 
 function TestWrapper({ pathname = '/' }) {
     return (

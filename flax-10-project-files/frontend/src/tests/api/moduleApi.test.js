@@ -14,7 +14,7 @@ describe('moduleApi', () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         fetchApi = (await import('../../api/client')).fetchApi;
-        api = await import('../../api/moduleApi');
+        api = await import('../../api/modules/moduleApi');
     });
 
     it('should fetch modules', async () => {

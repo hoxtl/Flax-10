@@ -30,19 +30,19 @@ vi.mock('../../../lib/completionMessages', () => ({
     getCompletionMessage: (...args) => getCompletionMessageMock(...args),
     isRoutineTask: (...args) => isRoutineTaskMock(...args),
 }));
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
     getUserSettings: (...args) => getUserSettingsMock(...args),
 }));
-vi.mock('../../../api/readingApi', () => ({
+vi.mock('../../../api/tasks/readingApi', () => ({
     getReadingSpeed: (...args) => getReadingSpeedMock(...args),
 }));
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/Common/SleepWarningModal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     useSleepWarning: vi.fn(() => sleepWarningState),
 }));
-vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
+vi.mock('../../../components/Common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input data-testid="date-picker" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),

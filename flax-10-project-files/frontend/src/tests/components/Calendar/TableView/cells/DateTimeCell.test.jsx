@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DateTimeCell, formatTimeRange, isAllDay } from '../../../../../components/Calendar/TableView/cells/DateTimeCell';
 import { createMockEvent } from '../../mocks/calendarMocks';
 
-vi.mock('../../../../../components/common/inputs/DateTimePicker', () => ({
+vi.mock('../../../../../components/Common/inputs/DateTimePicker', () => ({
     default: ({ value, onChange }) => <input data-testid="datetime-picker" type="datetime-local" value={value} onChange={e => onChange(e.target.value)} />,
 }));
 

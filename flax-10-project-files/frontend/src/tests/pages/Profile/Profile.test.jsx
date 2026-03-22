@@ -38,13 +38,13 @@ vi.mock('../../../context/ThemeContext', () => ({
 }));
 
 // Mock services
-vi.mock('../../../api/analyticsApi', () => ({
+vi.mock('../../../api/analytics/analyticsApi', () => ({
   default: {
     getSummary: vi.fn(() => Promise.resolve({ heatmap: { data: [] } })),
   },
 }));
 
-vi.mock('../../../api/moduleApi', () => ({
+vi.mock('../../../api/modules/moduleApi', () => ({
   getModules: vi.fn(() => Promise.resolve([])),
 }));
 
@@ -72,7 +72,7 @@ vi.mock('../../../pages/Profile/AchievementsModal', () => ({
 import { useProfileState, useProfileBodyData, useProfileContent } from '../../../pages/Profile/hooks/useProfile';
 import { useProfileSummary } from '../../../pages/Profile/hooks/useProfileSummary';
 import { useProfileVisibility } from '../../../pages/Profile/hooks/useProfileVisibility';
-import analyticsService from '../../../api/analyticsApi';
+import analyticsService from '../../../api/analytics/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };

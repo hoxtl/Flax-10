@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TagEditCell } from '../../../../../components/Calendar/TableView/cells/TagEditCell';
 import { createMockEvent, mockTags } from '../../mocks/calendarMocks';
 
-vi.mock('../../../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select data-testid="tag-dropdown" value={value} onChange={e => onChange(e.target.value)}>
             {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}

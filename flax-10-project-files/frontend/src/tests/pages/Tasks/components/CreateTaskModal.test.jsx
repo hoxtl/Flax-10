@@ -9,10 +9,10 @@ vi.mock("../../../../pages/Tasks/hooks/useCreateTaskModal", () => ({
   useCreateTaskModal: hookMock,
 }));
 
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("../../../../components/Common/inputs/DateTimePicker", () => ({
   default: ({ onChange }) => <button data-testid="dt" onClick={() => onChange("2026-03-10T10:00")}>dt</button>,
 }));
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/Common/SleepWarningModal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 

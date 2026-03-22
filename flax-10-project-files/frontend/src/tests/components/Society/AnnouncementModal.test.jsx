@@ -12,7 +12,7 @@ const validateFormMock = vi.fn();
 const handleFileSelectMock = vi.fn();
 const existingPinnedAnnouncement = { id: 1, title: 'Pinned Existing', pinned: true };
 
-vi.mock('../../../api/societyApi', () => ({ fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args) }));
+vi.mock('../../../api/social/societyApi', () => ({ fetchSocietyEvent: (...args) => fetchSocietyEventMock(...args) }));
 vi.mock('../../../context/ConfirmContext', () => ({ useConfirm: () => confirmMock }));
 
 vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModalHelpers', () => ({
@@ -37,10 +37,10 @@ vi.mock('../../../components/Calendar/EventModal/components/FormField', () => ({
 vi.mock('../../../components/Calendar/EventModal/components/TagField', () => ({
   TagField: ({ value, onChange }) => <input aria-label="Tag" value={value} onChange={onChange} />,
 }));
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/Common/StandardModal/StandardModal', () => ({
   default: ({ title, children, onClose }) => <div><h2>{title}</h2><button onClick={onClose}>close-modal</button>{children}</div>,
 }));
-vi.mock('../../../components/common/ConfirmModal/ConfirmModal', () => ({
+vi.mock('../../../components/Common/ConfirmModal/ConfirmModal', () => ({
   default: ({ title, message, onConfirm, onCancel }) => (
     <div><h3>{title}</h3><p>{message}</p><button onClick={onConfirm}>confirm-delete</button><button onClick={() => onCancel?.()}>cancel-delete</button></div>
   ),

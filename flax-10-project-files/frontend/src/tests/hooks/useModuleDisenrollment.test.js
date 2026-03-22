@@ -9,7 +9,7 @@ vi.mock('../../context/NotificationContext', () => ({
   useNotifications: () => ({ addNotification: addNotificationMock }),
 }));
 
-vi.mock('../../api/moduleApi', () => ({
+vi.mock('../../api/modules/moduleApi', () => ({
   disenrolByModuleId: (...args) => disenrolByModuleIdMock(...args),
 }));
 

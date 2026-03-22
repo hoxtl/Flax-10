@@ -19,14 +19,14 @@ vi.mock('react-markdown', () => ({
 
 vi.mock('remark-gfm', () => ({ default: vi.fn() }));
 
-vi.mock('../../api/analyticsApi', () => ({
+vi.mock('../../api/analytics/analyticsApi', () => ({
     default: {
         aiChat: vi.fn(),
     },
 }));
 
 import FloatingChat from '../../components/FloatingChat';
-import analyticsService from '../../api/analyticsApi';
+import analyticsService from '../../api/analytics/analyticsApi';
 
 describe('FloatingChat', () => {
     beforeEach(() => {

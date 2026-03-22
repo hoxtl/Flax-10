@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TaskInput } from '../../../components/Timer/TimerComponents';
 
 // Keep dropdowns testable (native controls)
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
   default: ({ value, onChange, options }) => (
     <select
       role="combobox"

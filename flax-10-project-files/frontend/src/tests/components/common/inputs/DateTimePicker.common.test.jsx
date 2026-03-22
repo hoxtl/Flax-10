@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import DateTimePicker from '../../../../components/common/inputs/DateTimePicker';
+import DateTimePicker from '../../../../components/Common/inputs/DateTimePicker';
 
 vi.mock(
-  '../../../../components/common/inputs/DateTimePicker.module.css',
+  '../../../../components/Common/inputs/DateTimePicker.module.css',
   () => ({
     default: {
       wrap: 'wrap',
@@ -34,7 +34,7 @@ vi.mock(
   }),
 );
 
-vi.mock('../../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../../components/Common/AnimatedDropdown', () => ({
   default: function MockAnimatedDropdown({ value, onChange, options, placeholder, className }) {
     return (
       <select

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import MemberDirectoryModal from '../../../components/Society/SocietyDetail/MemberDirectoryModal';
 
-vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal', () => ({
+vi.mock('../../../components/Common/GenericSummaryModal/GenericSummaryModal', () => ({
     default: ({ title, subtitle, emptyMessage, topContent, items, renderItem, children }) => {
         const hasItems = items && items.length > 0;
         const listContent = children || (renderItem && items?.map(renderItem));
@@ -16,7 +16,7 @@ vi.mock('../../../components/common/GenericSummaryModal/GenericSummaryModal', ()
         );
     },
 }));
-vi.mock('../../../components/common/GenericSummaryModal/SummaryItem', () => ({
+vi.mock('../../../components/Common/GenericSummaryModal/SummaryItem', () => ({
     default: ({ title, rightAction, onClick }) => (
         <div data-testid="summary-item" onClick={onClick}>
             {title}
@@ -24,12 +24,12 @@ vi.mock('../../../components/common/GenericSummaryModal/SummaryItem', () => ({
         </div>
     ),
 }));
-vi.mock('../../../components/common/SearchBar/SearchBar', () => ({
+vi.mock('../../../components/Common/SearchBar/SearchBar', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input data-testid="search-bar" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
-vi.mock('../../../components/common/UserAvatar/UserAvatar', () => ({
+vi.mock('../../../components/Common/UserAvatar/UserAvatar', () => ({
     default: () => <span data-testid="avatar" />,
 }));
 vi.mock('../../../context/ConfirmContext', () => ({

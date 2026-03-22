@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CreateTaskBar from '../../../pages/Tasks/components/CreateTaskBar';
 
-vi.mock('../../../api/moduleApi', () => ({
+vi.mock('../../../api/modules/moduleApi', () => ({
     getModules: vi.fn().mockResolvedValue([]),
     getEnrollments: vi.fn().mockResolvedValue([]),
 }));
@@ -13,7 +13,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn().mockReturnValue(false),
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 
@@ -25,11 +25,11 @@ vi.mock('../../../components/Settings/hooks/useSleepWarning', () => ({
     })),
 }));
 
-vi.mock('../../../components/common/SleepWarningModal', () => ({
+vi.mock('../../../components/Common/SleepWarningModal', () => ({
     SleepWarningModal: () => <div data-testid="sleep-warning-modal" />,
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

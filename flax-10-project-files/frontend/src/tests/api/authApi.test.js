@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authService } from '../../api/authApi';
+import { authService } from '../../api/auth/authApi';
 
 const mockFetch = (data) => {
     global.fetch = vi.fn().mockResolvedValue({

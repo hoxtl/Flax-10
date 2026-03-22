@@ -3,9 +3,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import SuggestedReadingsSection from "../../../../pages/Tasks/components/SuggestedReadingsSection";
-import { getSuggestedReadings, getReadingSpeed, convertReadingToTask } from "../../../../api/readingApi";
+import { getSuggestedReadings, getReadingSpeed, convertReadingToTask } from "../../../../api/tasks/readingApi";
 
-vi.mock("../../../../api/readingApi", () => ({
+vi.mock("../../../../api/tasks/readingApi", () => ({
   getSuggestedReadings: vi.fn(),
   getReadingSpeed: vi.fn(),
   convertReadingToTask: vi.fn(),

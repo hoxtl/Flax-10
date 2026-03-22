@@ -10,7 +10,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
   default: ({ placeholder, onChange }) => (
     <button onClick={() => onChange('changed')}>
       {placeholder}

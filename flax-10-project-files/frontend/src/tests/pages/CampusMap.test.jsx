@@ -61,20 +61,20 @@ vi.mock('framer-motion', () => ({
     useTransform: vi.fn(() => 0),
 }));
 
-vi.mock('../../api/tflApi', () => ({
+vi.mock('../../api/campus/tflApi', () => ({
     tflService: {
         getTfLDelays: vi.fn().mockResolvedValue([]),
         journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
-vi.mock('../../api/userApi', () => ({
+vi.mock('../../api/user/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
 import CampusMap from '../../pages/CampusMap/CampusMap';
-import { getHomeAddress } from '../../api/userApi';
-import { tflService } from '../../api/tflApi';
+import { getHomeAddress } from '../../api/user/userApi';
+import { tflService } from '../../api/campus/tflApi';
 
 describe('CampusMap', () => {
     beforeEach(() => {

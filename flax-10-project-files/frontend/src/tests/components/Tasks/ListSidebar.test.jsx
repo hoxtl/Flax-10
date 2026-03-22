@@ -7,7 +7,7 @@ vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({
     FOCUS_BLOCK_COLOURS_HEX: ['#ff0000', '#00ff00', '#0000ff'],
 }));
 
-vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal', () => ({
+vi.mock('../../../components/Common/HoldConfirmModal/HoldConfirmModal', () => ({
     default: ({ holdLabel = 'Hold to Delete', onConfirm, onCancel }) => (
         <div>
             <button type="button" onMouseDown={onConfirm}>

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import EstTimeHelpBanner from '../../../components/ui/EstTimeHelpBanner';
+import EstTimeHelpBanner from '../../../components/UI/EstTimeHelpBanner';
 
 vi.mock('framer-motion', () => ({
   motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },

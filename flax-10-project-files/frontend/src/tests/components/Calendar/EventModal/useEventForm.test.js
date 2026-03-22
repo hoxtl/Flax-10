@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useEventForm } from '../../../../components/Calendar/EventModal/useEventForm';
 import * as FormUtilsModule from '../../../../components/Calendar/utils/formUtils';
-import * as UserServiceModule from '../../../../api/userApi';
+import * as UserServiceModule from '../../../../api/user/userApi';
 import * as SleepWarningModule from '../../../../components/Settings/hooks/useSleepWarning';
 
 const mockEvents = [];
@@ -35,7 +35,7 @@ vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: () => vi.fn(),
 }));
 
-vi.mock('../../../../api/userApi', () => ({
+vi.mock('../../../../api/user/userApi', () => ({
     getUserSettings: vi.fn().mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' }),
 }));
 

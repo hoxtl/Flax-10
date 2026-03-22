@@ -9,7 +9,7 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
-vi.mock("../../api/adminApi", () => ({
+vi.mock("../../api/admin/adminApi", () => ({
   fetchAdminUsers: vi.fn(),
   banUser: vi.fn(),
   unbanUser: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock("../../components/Pagination/Pagination", () => ({
   Pagination: () => null,
 }));
 
-import * as api from "../../api/adminApi";
+import * as api from "../../api/admin/adminApi";
 import AdminPage from "../../pages/Admin/AdminPage";
 
 function setupDefaultMocks() {

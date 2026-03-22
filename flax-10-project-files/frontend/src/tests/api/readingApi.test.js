@@ -11,7 +11,7 @@ describe('readingApi', () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         fetchApi =(await import('../../api/client')).fetchApi;
-        api = await import('../../api/readingApi');
+        api = await import('../../api/tasks/readingApi');
     });
 
     it('should get readings for a module', async () => {

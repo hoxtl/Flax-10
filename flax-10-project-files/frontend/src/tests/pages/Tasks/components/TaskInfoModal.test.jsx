@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TaskInfoModal } from "../../../../pages/Tasks/components/TaskInfoModal";
 
-vi.mock("../../../../api/readingApi", () => ({
+vi.mock("../../../../api/tasks/readingApi", () => ({
   getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.7, is_personalised: true }),
 }));
 

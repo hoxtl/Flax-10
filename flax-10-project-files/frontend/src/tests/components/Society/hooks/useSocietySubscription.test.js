@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocietySubscription } from '../../../../components/Society/hooks/useSocietySubscription';
 
-vi.mock('../../../../api/societyApi', () => ({
+vi.mock('../../../../api/social/societyApi', () => ({
     toggleSubscription: vi.fn(() => Promise.resolve()),
 }));
 
@@ -10,7 +10,7 @@ vi.mock('../../../../context/ConfirmContext', () => ({
     useConfirm: vi.fn(() => vi.fn(() => Promise.resolve(true))),
 }));
 
-import { toggleSubscription as apiToggle } from '../../../../api/societyApi';
+import { toggleSubscription as apiToggle } from '../../../../api/social/societyApi';
 import { useConfirm } from '../../../../context/ConfirmContext';
 
 describe('useSocietySubscription', () => {

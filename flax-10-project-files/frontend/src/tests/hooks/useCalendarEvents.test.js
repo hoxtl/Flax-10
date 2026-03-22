@@ -16,7 +16,7 @@ vi.mock('../../context/CalendarContext', () => ({
   useCalendarDispatch: () => useCalendarDispatchMock(),
 }));
 
-vi.mock('../../api/eventApi', () => ({
+vi.mock('../../api/calendar/eventApi', () => ({
   getEvents: (...args) => getEventsMock(...args),
   createEvent: (...args) => createEventMock(...args),
   updateEvent: (...args) => updateEventMock(...args),

@@ -28,7 +28,7 @@ vi.mock('../../lib/routes', () => ({
   ],
 }));
 
-vi.mock('../../api/deadlineApi', () => ({
+vi.mock('../../api/calendar/deadlineApi', () => ({
   getUpcomingDeadlines: vi.fn().mockResolvedValue([]),
 }));
 

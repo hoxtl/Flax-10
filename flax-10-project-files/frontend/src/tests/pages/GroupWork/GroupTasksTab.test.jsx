@@ -35,7 +35,7 @@ vi.mock('../../../pages/GroupWork/components/AddTaskModal', () => ({
     </div>
   ),
 }));
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
   default: () => <div data-testid="animated-dropdown" />,
 }));
 vi.mock('lucide-react', () => ({

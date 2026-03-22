@@ -22,7 +22,7 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
-vi.mock('../../../../api/moduleApi', () => ({
+vi.mock('../../../../api/modules/moduleApi', () => ({
   getModules: vi.fn().mockResolvedValue([
     { module_code: 'CS101', module_name: 'Intro to CS' },
     { module_code: 'MA102', module_name: 'Calculus' },
@@ -349,7 +349,7 @@ describe('ModulesSection', () => {
   });
 
   it('renders module codes and names from API', async () => {
-    const { getModules } = await import('../../../../api/moduleApi');
+    const { getModules } = await import('../../../../api/modules/moduleApi');
     getModules.mockResolvedValue([
       { module_code: 'CS101', module_name: 'Intro to CS' },
     ]);
@@ -374,7 +374,7 @@ describe('ModulesSection', () => {
   });
 
   it('handles getModules returning results array', async () => {
-    const { getModules } = await import('../../../../api/moduleApi');
+    const { getModules } = await import('../../../../api/modules/moduleApi');
     getModules.mockResolvedValue({ results: [{ module_code: 'XY1', module_name: 'Extra' }] });
     render(<ModulesSection modules={['XY1']} />);
     await screen.findByText('Extra');
@@ -382,7 +382,7 @@ describe('ModulesSection', () => {
   });
 
   it('handles getModules reject', async () => {
-    const { getModules } = await import('../../../../api/moduleApi');
+    const { getModules } = await import('../../../../api/modules/moduleApi');
     getModules.mockRejectedValueOnce(new Error('Network error'));
     render(<ModulesSection modules={['CS101']} />);
     expect(screen.getByText('MODULES')).toBeTruthy();

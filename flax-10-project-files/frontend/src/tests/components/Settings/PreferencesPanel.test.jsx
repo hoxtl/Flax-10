@@ -15,7 +15,7 @@ vi.mock('../../../context/ThemeContext', () => ({
   })),
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
   getUserSettings: vi.fn().mockResolvedValue({
     sleep_time: '23:00:00',
     wake_time: '07:00:00',
@@ -26,7 +26,7 @@ vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
   default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
 }));
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
   default: ({ value, onChange, options = [], placeholder = 'dropdown' }) => (
     <select data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)}>
       {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}

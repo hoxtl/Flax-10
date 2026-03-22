@@ -7,7 +7,7 @@ const createDeadlineMock = vi.fn();
 const updateDeadlineMock = vi.fn();
 const deleteDeadlineMock = vi.fn();
 
-vi.mock('../../api/deadlineApi', () => ({
+vi.mock('../../api/calendar/deadlineApi', () => ({
   getDeadlines: (...args) => getDeadlinesMock(...args),
   createDeadline: (...args) => createDeadlineMock(...args),
   updateDeadline: (...args) => updateDeadlineMock(...args),

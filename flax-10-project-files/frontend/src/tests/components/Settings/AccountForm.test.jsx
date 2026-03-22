@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
-vi.mock("../../../api/userApi", () => ({
+vi.mock("../../../api/user/userApi", () => ({
   getUserProfile: vi.fn(),
 }));
 
-vi.mock("../../../api/adminApi", () => ({
+vi.mock("../../../api/admin/adminApi", () => ({
   getMyCourseChangeRequest: vi.fn(),
   requestCourseChange: vi.fn(),
   cancelCourseChangeRequest: vi.fn().mockResolvedValue(null),
@@ -65,7 +65,7 @@ vi.mock("../../../components/Settings/SettingsUI", () => ({
 
 vi.mock("../../../pages/Settings/Settings.module.css", () => ({ default: {} }));
 
-import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { getMyCourseChangeRequest } from "../../../api/admin/adminApi";
 import AccountForm from "../../../components/Settings/AccountForm";
 
 const baseUser = {

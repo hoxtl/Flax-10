@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ReportSocietyModal from '../../../components/Society/SocietyDetail/ReportSocietyModal';
-import * as societyApi from '../../../api/societyApi';
+import * as societyApi from '../../../api/social/societyApi';
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../api/social/societyApi', () => ({
     reportSociety: vi.fn(),
 }));
 

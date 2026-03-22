@@ -41,7 +41,7 @@ vi.mock('react', () => ({
   useEffect: (...args) => useEffectMock(...args),
 }));
 
-vi.mock('../../api/tagApi', () => ({
+vi.mock('../../api/tags/tagApi', () => ({
   getTags: (...args) => getTagsMock(...args),
   createTag: (...args) => createTagMock(...args),
   deleteTag: (...args) => deleteTagMock(...args),

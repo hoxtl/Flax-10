@@ -2,21 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import useSettingsHandlers from '../../components/Settings/hooks/useSettingsHandlers';
 
-vi.mock('../../api/userApi', () => ({
+vi.mock('../../api/user/userApi', () => ({
     updateUserSettings: vi.fn(),
     saveHomeAddress: vi.fn(),
     geocodeAddress: vi.fn(),
 }));
 
-vi.mock('../../api/settingsApi', () => ({
+vi.mock('../../api/user/settingsApi', () => ({
     patchSettings: vi.fn(),
     saveUserToStorage: vi.fn(),
     clearAuthAndRedirect: vi.fn(),
     hasToken: vi.fn(),
 }));
 
-import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/userApi';
-import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/settingsApi';
+import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/user/userApi';
+import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/user/settingsApi';
 
 describe('useSettingsHandlers', () => {
     beforeEach(() => {

@@ -9,12 +9,12 @@ vi.mock('../../context/AuthContext', () => ({
   useAuth: () => useAuthMock(),
 }));
 
-vi.mock('../../api/userApi', () => ({
+vi.mock('../../api/user/userApi', () => ({
   getUserProfile: vi.fn(),
   getAnotherUserProfile: vi.fn(),
 }));
 
-vi.mock('../../api/analyticsApi', () => ({
+vi.mock('../../api/analytics/analyticsApi', () => ({
   getAnalytics: vi.fn(),
 }));
 
@@ -23,7 +23,7 @@ vi.mock('react-router-dom', () => ({
   useParams: () => ({}),
 }));
 
-vi.mock('../../api/eventApi', () => ({
+vi.mock('../../api/calendar/eventApi', () => ({
   getEvents: vi.fn(),
 }));
 
@@ -32,8 +32,8 @@ vi.mock('../../pages/Profile/utils/profileHelpers', () => ({
   getUpcomingCount: vi.fn(() => 0),
 }));
 
-import { getUserProfile, getAnotherUserProfile } from '../../api/userApi';
-import { getEvents } from '../../api/eventApi';
+import { getUserProfile, getAnotherUserProfile } from '../../api/user/userApi';
+import { getEvents } from '../../api/calendar/eventApi';
 import { getFilteredEvents, getUpcomingCount } from '../../pages/Profile/utils/profileHelpers';
 
 const mockProfile = {

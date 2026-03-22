@@ -12,7 +12,7 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
-import { authService } from "../../api/authApi";
+import { authService } from "../../api/auth/authApi";
 import { clearUserData } from "../../components/Authentication/utils/authHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
@@ -53,7 +53,7 @@ vi.mock("../../pages/Tasks/components/CreateTaskModal", async () => {
 vi.mock("../../components/Dashboard/WeekBar", () => ({ default: () => <div data-testid="weekbar" /> }));
 vi.mock("../../components/FloatingChat", () => ({ default: () => <div data-testid="floating-chat" /> }));
 vi.mock("../../components/Pagination/Pagination", () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
-vi.mock("../../api/authApi", () => ({ authService: { logout: vi.fn() } }));
+vi.mock("../../api/auth/authApi", () => ({ authService: { logout: vi.fn() } }));
 vi.mock("../../components/Authentication/utils/authHelpers", () => ({ clearUserData: vi.fn() }));
 vi.mock("react-router-dom", () => ({
   useLocation: vi.fn(() => ({ pathname: "/", search: "", hash: "", state: null, key: "default" })),
@@ -65,11 +65,11 @@ const mockTimerContext = {
 };
 vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
 vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
-vi.mock("../../api/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
-vi.mock("../../api/taskApi", () => ({
+vi.mock("../../api/social/societyApi", () => ({ createSociety: vi.fn().mockResolvedValue({}) }));
+vi.mock("../../api/tasks/taskApi", () => ({
   createTask: vi.fn().mockResolvedValue({}), fetchTaskLists: vi.fn().mockResolvedValue([]),
 }));
-vi.mock("../../api/moduleApi", () => ({
+vi.mock("../../api/modules/moduleApi", () => ({
   getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]),
 }));
 vi.mock("../../components/Modules/utils/moduleUtils", () => ({ isEnrolledIn: vi.fn(() => false) }));
@@ -100,7 +100,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("society creation error is caught and logged", async () => {
-    const { createSociety } = await import("../../api/societyApi");
+    const { createSociety } = await import("../../api/social/societyApi");
     createSociety.mockRejectedValueOnce(new Error("fail"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
@@ -113,7 +113,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("society creation success closes modal", async () => {
-    const { createSociety } = await import("../../api/societyApi");
+    const { createSociety } = await import("../../api/social/societyApi");
     createSociety.mockResolvedValueOnce({});
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
@@ -124,7 +124,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handleSave error is caught", async () => {
-    const { createTask } = await import("../../api/taskApi");
+    const { createTask } = await import("../../api/tasks/taskApi");
     createTask.mockRejectedValueOnce(new Error("fail"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
@@ -233,8 +233,8 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handles non-array API responses", async () => {
-    const { fetchTaskLists, createTask } = await import("../../api/taskApi");
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { fetchTaskLists, createTask } = await import("../../api/tasks/taskApi");
+    const { getModules, getEnrollments } = await import("../../api/modules/moduleApi");
     fetchTaskLists.mockResolvedValueOnce(null);
     getModules.mockResolvedValueOnce("invalid");
     getEnrollments.mockResolvedValueOnce({});
@@ -248,7 +248,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handles fetchTaskLists rejection", async () => {
-    const { fetchTaskLists } = await import("../../api/taskApi");
+    const { fetchTaskLists } = await import("../../api/tasks/taskApi");
     fetchTaskLists.mockRejectedValueOnce(new Error("network error"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
@@ -257,7 +257,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("GlobalTaskModal handles getModules getEnrollments rejection", async () => {
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { getModules, getEnrollments } = await import("../../api/modules/moduleApi");
     getModules.mockRejectedValueOnce(new Error("err"));
     getEnrollments.mockRejectedValueOnce(new Error("err"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
@@ -267,7 +267,7 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("GlobalTaskModal filters modules by isEnrolledIn so enrolledModules is passed to CreateTaskModal", async () => {
-    const { getModules, getEnrollments } = await import("../../api/moduleApi");
+    const { getModules, getEnrollments } = await import("../../api/modules/moduleApi");
     const { isEnrolledIn } = await import("../../components/Modules/utils/moduleUtils");
     getModules.mockResolvedValueOnce([{ id: 1, module_code: "CS101" }, { id: 2, module_code: "CS102" }]);
     getEnrollments.mockResolvedValueOnce([{ module: 1 }]);

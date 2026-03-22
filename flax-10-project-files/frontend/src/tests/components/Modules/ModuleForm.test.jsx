@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-vi.mock('../../../api/moduleApi', () => ({
+vi.mock('../../../api/modules/moduleApi', () => ({
     createModule: vi.fn().mockResolvedValue({ id: 99 }),
     updateModule: vi.fn().mockResolvedValue({ id: 1 }),
 }));
@@ -20,7 +20,7 @@ vi.mock('../../../components/Modules/utils/moduleHelpers', () => ({
 }));
 
 import ModuleForm from '../../../components/Modules/Modules/ModuleForm';
-import { createModule, updateModule } from '../../../api/moduleApi';
+import { createModule, updateModule } from '../../../api/modules/moduleApi';
 import { validateForm } from '../../../components/Modules/utils/moduleHelpers';
 
 const defaultModule = {

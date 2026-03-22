@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/settingsApi';
+import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/user/settingsApi';
 
 describe('settingsApi', () => {
     beforeEach(() => {

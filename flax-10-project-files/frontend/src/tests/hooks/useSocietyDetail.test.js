@@ -15,7 +15,7 @@ vi.mock('../../context/ConfirmContext', () => ({
   useConfirm: () => vi.fn().mockResolvedValue(false),
 }));
 
-vi.mock('../../api/societyApi', () => ({
+vi.mock('../../api/social/societyApi', () => ({
   fetchSociety: vi.fn(),
   updateSociety: vi.fn(),
   createSocietyTag: vi.fn(),
@@ -38,7 +38,7 @@ vi.mock('../../api/societyApi', () => ({
   requestRatification: vi.fn(),
 }));
 
-import * as api from '../../api/societyApi';
+import * as api from '../../api/social/societyApi';
 
 const baseSociety = () => ({
   id: 5,

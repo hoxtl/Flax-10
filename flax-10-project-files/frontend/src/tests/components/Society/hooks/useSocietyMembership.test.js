@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocietyMembership } from '../../../../components/Society/hooks/useSocietyMembership';
-import * as api from '../../../../api/societyApi';
+import * as api from '../../../../api/social/societyApi';
 import { useTags } from '../../../../context/TagContext';
 import { useConfirm } from '../../../../context/ConfirmContext';
 
-vi.mock('../../../../api/societyApi', () => ({
+vi.mock('../../../../api/social/societyApi', () => ({
     joinSociety: vi.fn(),
     leaveSociety: vi.fn(),
     requestRatification: vi.fn(),

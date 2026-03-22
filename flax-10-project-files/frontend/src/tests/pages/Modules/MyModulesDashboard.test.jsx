@@ -6,20 +6,20 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
-import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
-import { createTask } from "../../../api/taskApi";
+import { getUpcomingDeadlines } from "../../../api/calendar/deadlineApi";
+import { getSuggestedReadings, convertReadingToTask } from "../../../api/tasks/readingApi";
+import { createTask } from "../../../api/tasks/taskApi";
 
-vi.mock("../../../api/deadlineApi", () => ({
+vi.mock("../../../api/calendar/deadlineApi", () => ({
   getUpcomingDeadlines: vi.fn(),
 }));
 
-vi.mock("../../../api/readingApi", () => ({
+vi.mock("../../../api/tasks/readingApi", () => ({
   getSuggestedReadings: vi.fn(),
   convertReadingToTask: vi.fn(),
 }));
 
-vi.mock("../../../api/taskApi", () => ({
+vi.mock("../../../api/tasks/taskApi", () => ({
   createTask: vi.fn(),
 }));
 

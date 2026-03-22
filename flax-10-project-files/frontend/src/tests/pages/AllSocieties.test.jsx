@@ -16,13 +16,13 @@ vi.mock('../../components/Tags/BasePill', () => ({
     ),
 }));
 
-vi.mock('../../components/common/SearchBar', () => ({
+vi.mock('../../components/Common/SearchBar', () => ({
     default: ({ value, onChange, placeholder }) => (
         <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
     ),
 }));
 
-vi.mock('../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select
             aria-label={placeholder}

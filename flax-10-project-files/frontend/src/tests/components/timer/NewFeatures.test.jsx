@@ -4,7 +4,7 @@ import { SoundSelector, TaskInput } from '../../../components/Timer/TimerCompone
 import { noiseGenerator } from '../../../components/Timer/utils/noiseUtils';
 
 // Mock AnimatedDropdown to use native select for testability
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={e => onChange(e.target.value)}>
             {(options || []).map(opt => (

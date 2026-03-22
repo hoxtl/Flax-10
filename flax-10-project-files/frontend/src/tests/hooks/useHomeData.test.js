@@ -13,17 +13,17 @@ vi.mock('../../context/CalendarContext', () => ({
     useCalendar: vi.fn(() => ({ events: [], allEvents: [] })),
 }));
 
-vi.mock('../../api/taskApi', () => ({
+vi.mock('../../api/tasks/taskApi', () => ({
     fetchTasks: vi.fn(),
 }));
 
-vi.mock('../../api/eventApi', () => ({
+vi.mock('../../api/calendar/eventApi', () => ({
     getEvents: vi.fn(),
 }));
 
 import { useCalendar } from '../../context/CalendarContext';
-import { fetchTasks } from '../../api/taskApi';
-import { getEvents } from '../../api/eventApi';
+import { fetchTasks } from '../../api/tasks/taskApi';
+import { getEvents } from '../../api/calendar/eventApi';
 
 const today = new Date();
 today.setHours(12, 0, 0, 0);

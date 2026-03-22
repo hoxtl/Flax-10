@@ -11,7 +11,7 @@ describe('deadlineApi', () => {
     beforeEach(async () => {
         vi.clearAllMocks();
         fetchApi = (await import('../../api/client')).fetchApi;
-        api = await import('../../api/deadlineApi');
+        api = await import('../../api/calendar/deadlineApi');
     });
 
     it('should get deadlines', async () => {

@@ -78,7 +78,7 @@ vi.mock('../../../pages/Homepage/components', async () => {
   const { MiniTimelineMock } = await import('./homepageMocks');
   return { MiniTimeline: MiniTimelineMock };
 });
-vi.mock('../../../api/taskApi', () => ({
+vi.mock('../../../api/tasks/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -95,8 +95,8 @@ vi.mock('../../../pages/Homepage/components/PlanReadDetailModal', async () => {
   const { PlanReadDetailModalMock } = await import('./homepageMocks');
   return { PlanReadDetailModal: PlanReadDetailModalMock };
 });
-vi.mock('../../../api/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
-vi.mock('../../../api/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
+vi.mock('../../../api/modules/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
+vi.mock('../../../api/calendar/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
 vi.mock('../../../lib/completionMessages', () => ({ getCompletionMessage: () => 'Nice', isRoutineTask: () => false }));
 vi.mock('../../../lib/sounds', () => ({ playCompletionChime: vi.fn() }));
 vi.mock('react-router-dom', async () => {
@@ -158,7 +158,7 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
-    const mod = await import('../../../api/taskApi');
+    const mod = await import('../../../api/tasks/taskApi');
     mod.fetchTaskLists.mockResolvedValue([{ id: 123, name: 'University' }]);
     // Homepage only fetches task lists when the create task modal is enabled.
     render(<MemoryRouter><Homepage defaultShowCreateTaskModal={true} /></MemoryRouter>);
@@ -229,7 +229,7 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('getTaskCategoryPill returns enrolled module code when task has module_id matching enrolled module', async () => {
-    const { getModules, getEnrollments } = await import('../../../api/moduleApi');
+    const { getModules, getEnrollments } = await import('../../../api/modules/moduleApi');
     getModules.mockResolvedValue([{ id: 10, module_code: 'AB1', module_name: 'Module Alpha' }]);
     getEnrollments.mockResolvedValue([{ module: 10 }]);
     render(<MemoryRouter><Homepage /></MemoryRouter>);
@@ -250,7 +250,7 @@ describe('Homepage – tasks, re-plan & misc', () => {
   });
 
   it('onInlineTaskEdit updates task and refetches', async () => {
-    const { updateTask } = await import('../../../api/taskApi');
+    const { updateTask } = await import('../../../api/tasks/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('inline-edit'));
     await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, expect.objectContaining({ title: 'X' })));

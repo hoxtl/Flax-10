@@ -24,7 +24,7 @@ vi.mock("../../../../pages/Tasks/components/TaskSection", () => ({
 vi.mock("../../../../pages/Tasks/components/SuggestedReadingsSection", () => ({
   default: () => <div data-testid="suggested-readings-section" />,
 }));
-vi.mock("../../../../components/ui/EstTimeHelpBanner", () => ({
+vi.mock("../../../../components/UI/EstTimeHelpBanner", () => ({
   default: () => <div data-testid="est-time-help" />,
 }));
 

@@ -78,7 +78,7 @@ vi.mock('../../../pages/Homepage/components', async () => {
   const { MiniTimelineMock } = await import('./homepageMocks');
   return { MiniTimeline: MiniTimelineMock };
 });
-vi.mock('../../../api/taskApi', () => ({
+vi.mock('../../../api/tasks/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -95,8 +95,8 @@ vi.mock('../../../pages/Homepage/components/PlanReadDetailModal', async () => {
   const { PlanReadDetailModalMock } = await import('./homepageMocks');
   return { PlanReadDetailModal: PlanReadDetailModalMock };
 });
-vi.mock('../../../api/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
-vi.mock('../../../api/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
+vi.mock('../../../api/modules/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
+vi.mock('../../../api/calendar/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
 vi.mock('../../../lib/completionMessages', () => ({ getCompletionMessage: () => 'Nice', isRoutineTask: () => false }));
 vi.mock('../../../lib/sounds', () => ({ playCompletionChime: vi.fn() }));
 vi.mock('react-router-dom', async () => {
@@ -159,7 +159,7 @@ describe('Homepage – render & basic', () => {
   });
 
   it('completes a task via TaskWidgetSlot and shows completion toast path', async () => {
-    const { updateTask } = await import('../../../api/taskApi');
+    const { updateTask } = await import('../../../api/tasks/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('complete-task'));
     await waitFor(() => expect(updateTask).toHaveBeenCalled());
@@ -167,7 +167,7 @@ describe('Homepage – render & basic', () => {
   });
 
   it('shows an error toast when task update fails', async () => {
-    const svc = await import('../../../api/taskApi');
+    const svc = await import('../../../api/tasks/taskApi');
     svc.updateTask.mockRejectedValueOnce(new Error('fail'));
     mockRefetchTasks.mockResolvedValueOnce([{ id: 1, completed: false }]);
     render(<MemoryRouter><Homepage /></MemoryRouter>);

@@ -47,7 +47,7 @@ vi.mock('../../components/Calendar/utils/eventUtils', () => ({
     getVisibleEventsInView: vi.fn(() => []),
 }));
 
-vi.mock('../../api/userApi', () => ({
+vi.mock('../../api/user/userApi', () => ({
     getAnotherUserProfile: (...args) => mockGetAnotherUserProfile(...args),
 }));
 

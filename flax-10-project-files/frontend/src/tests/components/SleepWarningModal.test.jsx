@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SleepWarningModal } from '../../components/common/SleepWarningModal';
+import { SleepWarningModal } from '../../components/Common/SleepWarningModal';
 
 describe('SleepWarningModal', () => {
     const defaultProps = {

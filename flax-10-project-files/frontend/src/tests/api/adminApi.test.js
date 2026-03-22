@@ -22,7 +22,7 @@ import {
   resolveCourseChangeRequest,
   requestCourseChange,
   getMyCourseChangeRequest,
-} from "../../api/adminApi";
+} from "../../api/admin/adminApi";
 
 beforeEach(() => vi.clearAllMocks());
 

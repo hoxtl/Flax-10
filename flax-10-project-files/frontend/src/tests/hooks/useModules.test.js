@@ -9,7 +9,7 @@ vi.mock('../../context/NotificationContext', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
 }));
 
-vi.mock('../../api/moduleApi', () => ({
+vi.mock('../../api/modules/moduleApi', () => ({
     getModules: vi.fn(),
     getEnrollments: vi.fn(),
     enrollInModule: vi.fn(),
@@ -31,7 +31,7 @@ vi.mock('../../context/ConfirmContext', () => ({
 }));
 
 import { useNotifications } from '../../context/NotificationContext';
-import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi';
+import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/modules/moduleApi';
 import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils';
 import { createNotify } from '../../components/Modules/utils/notifyHelper';
 import { useConfirm } from '../../context/ConfirmContext';

@@ -21,7 +21,7 @@ vi.mock('../../components/Society/hooks/useSocietySubscription', () => ({
 vi.mock('../../components/Society/hooks/useUnreportSociety', () => ({
     useUnreportSociety: () => vi.fn(),
 }));
-vi.mock('../../api/societyApi', () => ({
+vi.mock('../../api/social/societyApi', () => ({
     unreportSociety: vi.fn(),
 }));
 

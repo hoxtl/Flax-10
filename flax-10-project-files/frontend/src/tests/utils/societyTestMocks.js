@@ -7,7 +7,7 @@ const mocks = { ...societyApiMocks };
 export { mocks as mockSocietyApi };
 
 export const setupSocietyMocks = () => {
-    vi.mock('../../../../api/societyApi', () => mocks);
+    vi.mock('../../../../api/social/societyApi', () => mocks);
     vi.mock('../../../../context/TagContext', () => ({
         useTags: vi.fn(() => ({ refreshTags: vi.fn() }))
     }));

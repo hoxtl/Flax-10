@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
-import { tflService } from "../../../api/tflApi";
+import { tflService } from "../../../api/campus/tflApi";
 
 const mockMapInstance = {
   on: vi.fn(function (event, cb) {
@@ -53,14 +53,14 @@ vi.mock("mapbox-gl", () => ({
   },
 }));
 
-vi.mock("../../../api/tflApi", () => ({
+vi.mock("../../../api/campus/tflApi", () => ({
   tflService: {
     getTfLDelays: vi.fn().mockResolvedValue([]),
     journeyPlanner: vi.fn().mockResolvedValue(null),
   },
 }));
 
-vi.mock("../../../api/userApi", () => ({
+vi.mock("../../../api/user/userApi", () => ({
   getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 

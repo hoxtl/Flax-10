@@ -63,7 +63,7 @@ vi.mock('../../../components/Calendar/utils/formUtils', () => ({
     deleteRecurrenceOccurrence: vi.fn(),
 }));
 
-vi.mock('../../../api/societyApi', () => ({
+vi.mock('../../../api/social/societyApi', () => ({
     unsyncCalendar: vi.fn(() => Promise.resolve()),
 }));
 
@@ -78,7 +78,7 @@ vi.mock('../../../context/ConfirmContext', () => ({
 import { EventPopups } from '../../../components/Calendar/EventPopups';
 import { useEventModal, useEventPopup } from '../../../context/CalendarContext';
 import { getEventType, hasRecurrence } from '../../../components/Calendar/utils/eventUtils';
-import { unsyncCalendar } from '../../../api/societyApi';
+import { unsyncCalendar } from '../../../api/social/societyApi';
 import { executeDelete, deleteRecurrenceOccurrence } from '../../../components/Calendar/utils/formUtils';
 
 describe('EventPopups', () => {

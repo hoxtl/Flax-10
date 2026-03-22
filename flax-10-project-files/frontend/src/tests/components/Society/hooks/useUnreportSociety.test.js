@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useUnreportSociety } from '../../../../components/Society/hooks/useUnreportSociety';
-import * as api from '../../../../api/societyApi';
+import * as api from '../../../../api/social/societyApi';
 import { useConfirm } from '../../../../context/ConfirmContext';
 
-vi.mock('../../../../api/societyApi', () => ({ unreportSociety: vi.fn() }));
+vi.mock('../../../../api/social/societyApi', () => ({ unreportSociety: vi.fn() }));
 vi.mock('../../../../context/ConfirmContext', () => ({ useConfirm: vi.fn() }));
 
 describe('useUnreportSociety', () => {

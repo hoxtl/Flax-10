@@ -1,13 +1,13 @@
 import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NotificationProvider, useNotifications } from '../../context/NotificationContext';
-import * as api from '../../api/notificationApi';
+import * as api from '../../api/social/notificationApi';
 
 vi.mock('../../context/AuthContext', () => ({
     useAuth: () => ({ refreshProfile: vi.fn() }),
 }));
 
-vi.mock('../../api/notificationApi', () => ({
+vi.mock('../../api/social/notificationApi', () => ({
     fetchNotifications: vi.fn(),
     createNotification: vi.fn(),
     deleteNotification: vi.fn(),

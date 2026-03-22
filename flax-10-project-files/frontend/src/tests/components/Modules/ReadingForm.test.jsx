@@ -6,7 +6,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ReadingForm from '../../../components/Modules/Readings/ReadingForm';
 
 vi.mock('../../../components/Modules/Deadlines/DeadlineForm.module.css', () => ({ default: { } }));
-vi.mock('../../../components/common/inputs/DateTimePicker', () => ({
+vi.mock('../../../components/Common/inputs/DateTimePicker', () => ({
     default: ({onChange, placeholder }) => (
         <input placeholder={placeholder} onChange={e =>onChange(e.target.value)} />
     ),

@@ -27,13 +27,13 @@ vi.mock('../../../pages/Homepage/utils/eventUtils', () => ({
     isNow: vi.fn(() => false),
 }));
 
-vi.mock('../../../api/tflApi', () => ({
+vi.mock('../../../api/campus/tflApi', () => ({
     tflService: {
         journeyPlanner: vi.fn().mockResolvedValue(null),
     },
 }));
 
-vi.mock('../../../api/userApi', () => ({
+vi.mock('../../../api/user/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue(null),
 }));
 

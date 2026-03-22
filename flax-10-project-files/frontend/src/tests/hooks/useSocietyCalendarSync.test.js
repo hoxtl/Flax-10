@@ -8,7 +8,7 @@ const unsyncCalendarMock = vi.fn();
 const useNotifyMock = vi.fn();
 const useTagsMock = vi.fn();
 
-vi.mock('../../api/societyApi', () => ({
+vi.mock('../../api/social/societyApi', () => ({
   getSyncStatus: (...args) => getSyncStatusMock(...args),
   syncCalendar: (...args) => syncCalendarMock(...args),
   unsyncCalendar: (...args) => unsyncCalendarMock(...args),

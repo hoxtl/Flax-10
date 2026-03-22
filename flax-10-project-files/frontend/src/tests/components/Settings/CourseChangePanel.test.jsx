@@ -5,7 +5,7 @@ vi.mock("../../../context/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
-vi.mock("../../../api/adminApi", () => ({
+vi.mock("../../../api/admin/adminApi", () => ({
   requestTeacherRole: vi.fn(),
   cancelTeacherRoleRequest: vi.fn(),
 }));
@@ -17,7 +17,7 @@ vi.mock("../../../lib/kclCourses", () => ({
   },
 }));
 
-import { requestTeacherRole, cancelTeacherRoleRequest } from "../../../api/adminApi";
+import { requestTeacherRole, cancelTeacherRoleRequest } from "../../../api/admin/adminApi";
 import { useAuth } from "../../../context/AuthContext";
 import CourseChangePanel from "../../../components/Settings/CourseChangePanel";
 

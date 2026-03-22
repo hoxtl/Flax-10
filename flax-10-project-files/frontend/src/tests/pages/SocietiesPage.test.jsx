@@ -103,7 +103,7 @@ vi.mock('../../context/ConfirmContext', () => ({
 }));
 
 const unreportSocietyMock = vi.fn();
-vi.mock('../../api/societyApi', () => ({
+vi.mock('../../api/social/societyApi', () => ({
     unreportSociety: (...args) => unreportSocietyMock(...args),
 }));
 

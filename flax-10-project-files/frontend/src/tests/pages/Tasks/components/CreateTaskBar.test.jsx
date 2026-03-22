@@ -9,7 +9,7 @@ vi.mock("../../../../pages/Tasks/hooks/useCreateTaskBar", () => ({
   default: hookMock,
 }));
 
-vi.mock("../../../../components/common/SleepWarningModal", () => ({
+vi.mock("../../../../components/Common/SleepWarningModal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import UserAvatar from '../../../components/common/UserAvatar/UserAvatar';
+import UserAvatar from '../../../components/Common/UserAvatar/UserAvatar';
 
-vi.mock('../../../components/common/UserAvatar/UserAvatar.module.css', () => ({
+vi.mock('../../../components/Common/UserAvatar/UserAvatar.module.css', () => ({
     default: { userInfo: 'userInfo', userNameDetails: 'userNameDetails', userFullName: 'userFullName', userHandle: 'userHandle', avatar: 'avatar' },
 }));
 

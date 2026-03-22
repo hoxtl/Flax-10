@@ -13,7 +13,7 @@ const mockUnsync = vi.fn().mockResolvedValue({});
 vi.mock('../../../../context/TagContext', () => ({ useTags: () => ({ refreshTags: mockRefreshTags }) }));
 vi.mock('../../../../components/Notifications/hooks/useNotify', () => ({ useNotify: () => mockNotify }));
 vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({ useCalendarEvents: () => ({ loadEvents: mockLoadEvents }) }));
-vi.mock('../../../../api/societyApi', () => ({ unsyncCalendar: (...args) => mockUnsync(...args) }));
+vi.mock('../../../../api/social/societyApi', () => ({ unsyncCalendar: (...args) => mockUnsync(...args) }));
 vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({ getEventType: (e) => e?.module ? 'module' : e?.society_id ? 'society' : 'personal' }));
 
 describe('useQuickActions', () => {

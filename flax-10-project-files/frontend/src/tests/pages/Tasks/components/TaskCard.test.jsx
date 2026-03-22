@@ -24,13 +24,13 @@ vi.mock("../../../../lib/completionMessages", () => ({
   getCompletionMessage: () => "Done",
   isRoutineTask: () => false,
 }));
-vi.mock("../../../../api/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
-vi.mock("../../../../api/readingApi", () => ({ getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true }) }));
+vi.mock("../../../../api/user/userApi", () => ({ getUserSettings: vi.fn().mockResolvedValue({ sleep_time: "23:00", wake_time: "07:00" }) }));
+vi.mock("../../../../api/tasks/readingApi", () => ({ getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.6, is_personalised: true }) }));
 vi.mock("../../../../components/Settings/hooks/useSleepWarning", () => ({
   useSleepWarning: () => ({ sleepWarning: false, sleepWarningProps: {}, checkSleepAndRun: (_d, cb) => cb() }),
 }));
-vi.mock("../../../../components/common/SleepWarningModal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
-vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
+vi.mock("../../../../components/Common/SleepWarningModal", () => ({ SleepWarningModal: () => <div data-testid="sleep-warning" /> }));
+vi.mock("../../../../components/Common/inputs/DateTimePicker", () => ({
   default: ({ onChange }) => <button data-testid="due-picker" onClick={() => onChange("2026-03-10T10:00")}>picker</button>,
 }));
 vi.mock("../../../../components/TaskCelebration/CheckBurst", () => ({ CheckBurst: ({ children }) => <>{children}</> }));

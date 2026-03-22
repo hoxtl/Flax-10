@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocietyTags } from '../../../../components/Society/hooks/useSocietyTags';
-import * as api from '../../../../api/societyApi';
+import * as api from '../../../../api/social/societyApi';
 
-vi.mock('../../../../api/societyApi', () => ({
+vi.mock('../../../../api/social/societyApi', () => ({
     createSocietyTag: vi.fn(),
     updateSocietyTag: vi.fn(),
     deleteSocietyTag: vi.fn()

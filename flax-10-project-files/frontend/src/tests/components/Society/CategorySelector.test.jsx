@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CategorySelector, { CategoryDisplay } from '../../../components/Society/CategorySelector';
 
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, placeholder }) => (
         <select aria-label={placeholder} value={value} onChange={e => onChange(e.target.value)}>
             {(options || []).map(opt => (

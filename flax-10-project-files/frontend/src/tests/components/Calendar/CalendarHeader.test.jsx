@@ -4,18 +4,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CalendarHeader } from '../../../components/Calendar/CalendarHeader';
 import * as CalendarContextModule from '../../../context/CalendarContext';
 import { TagProvider } from '../../../context/TagContext';
-import { importTimetable } from '../../../api/timetableApi';
-import { getEvents } from '../../../api/eventApi';
+import { importTimetable } from '../../../api/calendar/timetableApi';
+import { getEvents } from '../../../api/calendar/eventApi';
 
-vi.mock('../../../api/eventApi', () => ({
+vi.mock('../../../api/calendar/eventApi', () => ({
     getEvents: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock('../../../api/timetableApi', () => ({
+vi.mock('../../../api/calendar/timetableApi', () => ({
     importTimetable: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock('../../../api/tagApi', () => ({
+vi.mock('../../../api/tags/tagApi', () => ({
     getTags: vi.fn(() => Promise.resolve([])),
     createTag: vi.fn(),
     deleteTag: vi.fn(),

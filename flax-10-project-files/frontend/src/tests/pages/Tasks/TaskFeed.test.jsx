@@ -22,7 +22,7 @@ vi.mock('lucide-react', () => ({
     Plus: () => <svg data-testid="plus-icon" />,
     Filter: () => <svg data-testid="filter-icon" />,
 }));
-vi.mock('../../../components/ui/EstTimeHelpBanner', () => ({
+vi.mock('../../../components/UI/EstTimeHelpBanner', () => ({
     default: () => <div data-testid="est-time-banner" />,
 }));
 vi.mock('../../../pages/Tasks/components/TaskCard', () => ({
@@ -40,7 +40,7 @@ vi.mock('../../../pages/Tasks/components/CreateTaskBar', () => ({
 vi.mock('../../../pages/Tasks/components/SuggestedReadingsSection', () => ({
     default: () => <div data-testid="suggested-readings-section" />,
 }));
-vi.mock('../../../components/common/AnimatedDropdown', () => ({
+vi.mock('../../../components/Common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options }) => (
         <select value={value} onChange={e => onChange(e.target.value)} data-testid="sort-dropdown">
             {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}

@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSocieties } from '../../components/Society/hooks/useSocieties';
 
-vi.mock('../../api/societyApi', () => ({
+vi.mock('../../api/social/societyApi', () => ({
     fetchSocieties: vi.fn(),
     createSociety: vi.fn(),
     addCollaborator: vi.fn(),
     requestRatification: vi.fn(),
 }));
 
-import { fetchSocieties, createSociety, addCollaborator, requestRatification } from '../../api/societyApi';
+import { fetchSocieties, createSociety, addCollaborator, requestRatification } from '../../api/social/societyApi';
 
 const mockSocieties = [
     { id: 1, name: 'Chess Club' },

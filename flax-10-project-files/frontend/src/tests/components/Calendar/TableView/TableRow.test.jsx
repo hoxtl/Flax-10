@@ -48,7 +48,7 @@ vi.mock('../../../../components/Calendar/TableView/cells/DateTimeCell', () => ({
     DateTimeCell: ({ event }) => <span data-testid="date-cell">{event.start_time}</span>,
 }));
 
-vi.mock('../../../../components/common/ConfirmModal/ConfirmModal', () => ({
+vi.mock('../../../../components/Common/ConfirmModal/ConfirmModal', () => ({
     default: ({ onConfirm, onCancel }) => (
         <div data-testid="confirm-modal">
             <button onClick={onConfirm}>Confirm Delete</button>

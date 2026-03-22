@@ -78,7 +78,7 @@ vi.mock('../../../pages/Homepage/components', async () => {
   const { MiniTimelineMock } = await import('./homepageMocks');
   return { MiniTimeline: MiniTimelineMock };
 });
-vi.mock('../../../api/taskApi', () => ({
+vi.mock('../../../api/tasks/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
   fetchTaskLists: vi.fn().mockResolvedValue([{ id: 123, name: 'University' }]),
   createTaskList: vi.fn(), deleteTask: vi.fn().mockResolvedValue(undefined),
@@ -95,8 +95,8 @@ vi.mock('../../../pages/Homepage/components/PlanReadDetailModal', async () => {
   const { PlanReadDetailModalMock } = await import('./homepageMocks');
   return { PlanReadDetailModal: PlanReadDetailModalMock };
 });
-vi.mock('../../../api/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
-vi.mock('../../../api/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
+vi.mock('../../../api/modules/moduleApi', () => ({ getModules: vi.fn().mockResolvedValue([]), getEnrollments: vi.fn().mockResolvedValue([]) }));
+vi.mock('../../../api/calendar/deadlineApi', () => ({ getUpcomingDeadlines: vi.fn().mockResolvedValue([{ id: 1 }]) }));
 vi.mock('../../../lib/completionMessages', () => ({ getCompletionMessage: () => 'Nice', isRoutineTask: () => false }));
 vi.mock('../../../lib/sounds', () => ({ playCompletionChime: vi.fn() }));
 vi.mock('react-router-dom', async () => {
@@ -129,7 +129,7 @@ describe('Homepage – overlays & event operations', () => {
   });
 
   it('opens module pill overlay and closes it', async () => {
-    const { getModules, getEnrollments } = await import('../../../api/moduleApi');
+    const { getModules, getEnrollments } = await import('../../../api/modules/moduleApi');
     getModules.mockResolvedValue([{ id: 10, module_code: 'AB1', module_name: 'Module A', department: 'Dept', description: 'Desc', module_leader: 'Lead' }]);
     getEnrollments.mockResolvedValue([{ module: 10 }]);
     render(<MemoryRouter><Homepage /></MemoryRouter>);
@@ -198,7 +198,7 @@ describe('Homepage – overlays & event operations', () => {
   });
 
   it('handleTimelineDelete task event deletes task and refetches', async () => {
-    const { deleteTask } = await import('../../../api/taskApi');
+    const { deleteTask } = await import('../../../api/tasks/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete-task'));
     await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(99));
@@ -231,7 +231,7 @@ describe('Homepage – overlays & event operations', () => {
   });
 
   it('handleTaskToggle calls updateTask and refetchTasks', async () => {
-    const { updateTask } = await import('../../../api/taskApi');
+    const { updateTask } = await import('../../../api/tasks/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('task-toggle'));
     await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, { completed: true }));

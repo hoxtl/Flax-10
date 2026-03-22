@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSocietyCalendarSync } from '../../../../components/Society/hooks/useSocietyCalendarSync';
-import * as api from '../../../../api/societyApi';
+import * as api from '../../../../api/social/societyApi';
 import { useNotify } from '../../../../components/Notifications/hooks/useNotify';
 import { useTags } from '../../../../context/TagContext';
 
-vi.mock('../../../../api/societyApi', () => ({
+vi.mock('../../../../api/social/societyApi', () => ({
     getSyncStatus: vi.fn(),
     syncCalendar: vi.fn(),
     unsyncCalendar: vi.fn()

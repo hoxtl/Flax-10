@@ -10,13 +10,13 @@ vi.mock('../../../context/TagContext', () => ({
     })),
 }));
 
-vi.mock('../../../api/moduleApi', () => ({
+vi.mock('../../../api/modules/moduleApi', () => ({
     getModules: vi.fn().mockResolvedValue([
         { id: 1, module_code: 'CS101', module_name: 'Intro to CS' },
     ]),
 }));
 
-vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/Common/StandardModal/StandardModal', () => ({
     default: ({ title, subtitle, onClose, children }) => (
         <div data-testid="standard-modal">
             <h2>{title}</h2>
@@ -141,7 +141,7 @@ describe('QuickAddModal', () => {
     });
 
     it('shows loading or no modules when getModules returns empty', async () => {
-        const { getModules } = await import('../../../api/moduleApi');
+        const { getModules } = await import('../../../api/modules/moduleApi');
         getModules.mockResolvedValueOnce([]);
         renderModal({ isTeacher: true });
         fireEvent.click(screen.getByText('Module'));

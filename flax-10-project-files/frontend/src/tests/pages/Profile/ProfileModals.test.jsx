@@ -28,7 +28,7 @@ vi.mock('../../../components/Social/UserListModal', () => ({
     ),
 }));
 
-vi.mock('../../../api/socialApi', () => ({
+vi.mock('../../../api/social/socialApi', () => ({
     getSharingWith: vi.fn().mockResolvedValue([]),
     getSharedWithMe: vi.fn().mockResolvedValue([]),
 }));
@@ -142,7 +142,7 @@ describe('ProfileModals', () => {
     });
 
     it('renders sharing modal when showSharedWith is true', async () => {
-        const { getSharingWith } = await import('../../../api/socialApi');
+        const { getSharingWith } = await import('../../../api/social/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true } });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
@@ -167,7 +167,7 @@ describe('ProfileModals', () => {
     });
 
     it('renders Shared By modal when showSharedBy is true', async () => {
-        const { getSharedWithMe } = await import('../../../api/socialApi');
+        const { getSharedWithMe } = await import('../../../api/social/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
         renderModals({ state: { showSharedBy: true } });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
@@ -177,7 +177,7 @@ describe('ProfileModals', () => {
 
     it('SocialDataModal handles fetch error', async () => {
         const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        const { getSharingWith } = await import('../../../api/socialApi');
+        const { getSharingWith } = await import('../../../api/social/socialApi');
         getSharingWith.mockRejectedValueOnce(new Error('fetch failed'));
         renderModals({ state: { showSharedWith: true } });
         await waitFor(() => expect(getSharingWith).toHaveBeenCalled());
@@ -196,7 +196,7 @@ describe('ProfileModals', () => {
     it('closes Shared With modal and calls onNavChange when user clicked', async () => {
         const onNavChange = vi.fn();
         const setShowSharedWith = vi.fn();
-        const { getSharingWith } = await import('../../../api/socialApi');
+        const { getSharingWith } = await import('../../../api/social/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true, setShowSharedWith }, onNavChange });
         await waitFor(() => expect(screen.getByTestId('user-list-modal')).toBeTruthy());
@@ -207,7 +207,7 @@ describe('ProfileModals', () => {
 
     it('closes Shared With modal when Close List clicked', async () => {
         const setShowSharedWith = vi.fn();
-        const { getSharingWith } = await import('../../../api/socialApi');
+        const { getSharingWith } = await import('../../../api/social/socialApi');
         getSharingWith.mockResolvedValue([{ id: 2, username: 'bob' }]);
         renderModals({ state: { showSharedWith: true, setShowSharedWith } });
         await waitFor(() => expect(screen.getByText('Close List')).toBeInTheDocument());
@@ -217,7 +217,7 @@ describe('ProfileModals', () => {
 
     it('closes Shared By modal when Close List clicked', async () => {
         const setShowSharedBy = vi.fn();
-        const { getSharedWithMe } = await import('../../../api/socialApi');
+        const { getSharedWithMe } = await import('../../../api/social/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol' }]);
         renderModals({ state: { showSharedBy: true, setShowSharedBy } });
         await waitFor(() => expect(screen.getByText('Close List')).toBeInTheDocument());
@@ -228,7 +228,7 @@ describe('ProfileModals', () => {
     it('opens a shared user calendar from the Sharing With Me modal', async () => {
         const onNavChange = vi.fn();
         const setShowSharedBy = vi.fn();
-        const { getSharedWithMe } = await import('../../../api/socialApi');
+        const { getSharedWithMe } = await import('../../../api/social/socialApi');
         getSharedWithMe.mockResolvedValue([{ id: 3, username: 'carol', first_name: 'Carol', last_name: 'Stone' }]);
         renderModals({ state: { showSharedBy: true, setShowSharedBy }, onNavChange });
         await waitFor(() => expect(screen.getByRole('button', { name: /view calendar/i })).toBeInTheDocument());
