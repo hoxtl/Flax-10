@@ -100,7 +100,6 @@ def resolve_sparkline_level(minutes, max_minutes):
 
 
 def _compute_session_stats(sessions_all):
-    """Compute streaks, totals, and complete sessions from all sessions."""
     current_streak, longest_streak = compute_streaks(sessions_all)
     complete_sessions = filter_complete(sessions_all)
     _, total_hours, session_count = session_totals(complete_sessions)

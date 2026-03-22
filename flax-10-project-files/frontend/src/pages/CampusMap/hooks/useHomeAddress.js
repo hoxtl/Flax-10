@@ -1,3 +1,6 @@
+/**
+ * Home address data hook for the campus map page.
+ */
 import { useState, useEffect } from 'react';
 import { getHomeAddress } from '../../../api/user/userApi';
 

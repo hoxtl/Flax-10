@@ -30,6 +30,3 @@ function checkIsSelf(profileData, currentUser) {
     return profileData.username === currentUser?.username;
 }
 
-export function getVisibilityFlags(profileData, currentUser) {
-    return useProfileVisibility(profileData, currentUser);
-}

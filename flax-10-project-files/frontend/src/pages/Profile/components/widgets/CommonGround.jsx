@@ -1,3 +1,6 @@
+/*
+ * CommonGroundSection widget – shared modules and societies between two users.
+ */
 import Card from "../../../../components/Common/Card/Card";
 import compatStyles from "./ProfileCompat.module.css";
 
@@ -18,37 +21,18 @@ function buildCommonGroundData(viewedModules, viewedSocieties, currentUserModule
   return { sharedModules, sharedSocieties, otherModules, otherSocieties };
 }
 
+function buildModuleCard(data) {
+  if (!data.sharedModules.length && !data.otherModules.length) return null;
+  return { key: "modules", icon: "📚", color: COMMON_GROUND_COLORS.modules, label: "Modules", value: data.sharedModules.length, unit: "in common", subtitle: null };
+}
+
+function buildSocietyCard(data) {
+  if (!data.sharedSocieties.length && !data.otherSocieties.length) return null;
+  return { key: "societies", icon: "👥", color: COMMON_GROUND_COLORS.societies, label: "Societies", value: data.sharedSocieties.length, unit: "in common", subtitle: null };
+}
+
 function buildInsightCards(data) {
-  const { sharedModules, sharedSocieties, otherModules, otherSocieties } = data;
-  const cards = [];
-
-  if (sharedModules.length || otherModules.length) {
-    cards.push({
-      key: "modules",
-      icon: "📚",
-      color: COMMON_GROUND_COLORS.modules,
-      label: "Modules",
-      value: sharedModules.length,
-      unit: "in common",
-      subtitle: null,
-      content: <ModulePills sharedModules={sharedModules} otherModules={otherModules} />,
-    });
-  }
-
-  if (sharedSocieties.length || otherSocieties.length) {
-    cards.push({
-      key: "societies",
-      icon: "👥",
-      color: COMMON_GROUND_COLORS.societies,
-      label: "Societies",
-      value: sharedSocieties.length,
-      unit: "in common",
-      subtitle: null,
-      content: <SocietyPills sharedSocieties={sharedSocieties} otherSocieties={otherSocieties} />,
-    });
-  }
-
-  return cards;
+  return [buildModuleCard(data), buildSocietyCard(data)].filter(Boolean);
 }
 
 function ModulePills({ sharedModules, otherModules, onNavigate }) {
@@ -98,17 +82,18 @@ function CommonGroundInsightCard({ icon, color, label, value, unit, subtitle, co
   );
 }
 
+function buildCardContent(card, data, onNavigate) {
+  if (card.key === "modules") return <ModulePills sharedModules={data.sharedModules} otherModules={data.otherModules} onNavigate={onNavigate} />;
+  return <SocietyPills sharedSocieties={data.sharedSocieties} otherSocieties={data.otherSocieties} onNavigate={onNavigate} />;
+}
+
+function buildCardsWithContent(data, onNavigate) {
+  return buildInsightCards(data).map((card) => ({ ...card, content: buildCardContent(card, data, onNavigate) }));
+}
+
 export function CommonGroundSection({ viewedModules, viewedSocieties, currentUserModules, currentUserSocieties, onNavigate }) {
   const data = buildCommonGroundData(viewedModules, viewedSocieties, currentUserModules, currentUserSocieties);
-  const cards = buildInsightCards({
-    ...data,
-    onNavigate,
-  }).map((card) => ({
-    ...card,
-    content: card.key === "modules"
-      ? <ModulePills sharedModules={data.sharedModules} otherModules={data.otherModules} onNavigate={onNavigate} />
-      : <SocietyPills sharedSocieties={data.sharedSocieties} otherSocieties={data.otherSocieties} onNavigate={onNavigate} />,
-  }));
+  const cards = buildCardsWithContent(data, onNavigate);
   if (!cards.length) return null;
   return (
     <Card className={compatStyles.commonGroundCard}>

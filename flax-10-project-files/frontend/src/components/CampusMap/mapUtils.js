@@ -1,3 +1,6 @@
+/**
+ * Display helpers for campus map transport and events.
+ */
 export const PRIORITY_COLORS = {
   urgent: '#FF4444',
   high: '#FF8800',

@@ -1,3 +1,6 @@
+/*
+ * CompatibilityScore widget – study time match, sparkline, and study-together CTA.
+ */
 import compatStyles from "./ProfileCompat.module.css";
 import { motion } from "framer-motion";
 import { useCountUp } from "../../../../hooks/useCountUp";
@@ -31,16 +34,11 @@ const MotionCircle = motion.circle;
 function CompatRing({ total }) {
   const radius = 44;
   const circumference = 2 * Math.PI * radius;
-  const progress = Math.max(0, Math.min(100, total));
-  const dashOffset = circumference - (progress / 100) * circumference;
+  const dashOffset = circumference - (Math.max(0, Math.min(100, total)) / 100) * circumference;
   return (
     <svg viewBox="0 0 120 120" className={compatStyles.compatRing} aria-hidden="true">
       <circle className={compatStyles.compatRingTrack} cx="60" cy="60" r={radius} />
-      <MotionCircle
-        className={compatStyles.compatRingProgress}
-        cx="60"
-        cy="60"
-        r={radius}
+      <MotionCircle className={compatStyles.compatRingProgress} cx="60" cy="60" r={radius}
         style={{ strokeDasharray: circumference }}
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: dashOffset }}
@@ -50,30 +48,30 @@ function CompatRing({ total }) {
   );
 }
 
+function buildRhythmTextForMatch(total) {
+  if (total >= 75) return "Your focus windows line up really well";
+  if (total >= 50) return "You tend to study around similar hours";
+  return "There are a few overlapping study windows";
+}
+
+function buildRhythmTextForMismatch(total) {
+  if (total >= 60) return "You still have some overlap in your routine";
+  if (total >= 40) return "Different study rhythms, but a few shared windows";
+  return "Very different study rhythms";
+}
+
+function buildCompatDetailText(total, sharedModuleCount, viewedTime, currentTime) {
+  const rhythmText = viewedTime === currentTime ? buildRhythmTextForMatch(total) : buildRhythmTextForMismatch(total);
+  const sharedLabel = sharedModuleCount > 0 ? `${sharedModuleCount} module${sharedModuleCount > 1 ? "s" : ""} in common` : null;
+  return [rhythmText, sharedLabel].filter(Boolean).join(" · ");
+}
+
 function CompatHero({ total, sharedModuleCount, viewedTime, currentTime }) {
   const pctRef = useCountUp(total, 1200);
-  const hasMatchingTimes = viewedTime === currentTime;
-  const sharedLabel = sharedModuleCount > 0 ? `${sharedModuleCount} module${sharedModuleCount > 1 ? "s" : ""} in common` : null;
-  const rhythmText = hasMatchingTimes
-    ? total >= 75
-      ? "Your focus windows line up really well"
-      : total >= 50
-        ? "You tend to study around similar hours"
-        : "There are a few overlapping study windows"
-    : total >= 60
-      ? "You still have some overlap in your routine"
-      : total >= 40
-        ? "Different study rhythms, but a few shared windows"
-        : "Very different study rhythms";
-  const detailText = [
-    rhythmText,
-    sharedLabel,
-  ].filter(Boolean).join(" · ");
+  const detailText = buildCompatDetailText(total, sharedModuleCount, viewedTime, currentTime);
   return (
     <div className={compatStyles.compatHero}>
-      <div className={compatStyles.compatRingWrap}>
-        <CompatRing total={total} />
-      </div>
+      <div className={compatStyles.compatRingWrap}><CompatRing total={total} /></div>
       <div className={compatStyles.compatHeroContent}>
         <p className={compatStyles.compatHeroLabel}>Similar study times</p>
         <div className={compatStyles.compatHeroValueRow}>
