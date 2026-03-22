@@ -105,6 +105,30 @@ const USERS = [
   },
 ];
 
+function buildUser(index) {
+  return {
+    id: index + 1,
+    username: `user${index + 1}`,
+    email: `u${index + 1}@mail.com`,
+    first_name: `User${index + 1}`,
+    last_name: "Test",
+    role: "student",
+    is_active: true,
+    is_staff: false,
+    is_superuser: false,
+  };
+}
+
+function buildManyUsers() {
+  return Array.from({ length: 21 }, (_, index) => buildUser(index));
+}
+
+function expectUserButton(name) {
+  return waitFor(() =>
+    expect(screen.getAllByRole("button", { name }).length).toBeGreaterThan(0),
+  );
+}
+
 function setupDefaultMocks() {
   api.fetchAdminUsers.mockResolvedValue(USERS);
   api.fetchTeacherRequests.mockResolvedValue([]);
@@ -222,36 +246,16 @@ describe("AdminPage – Users tab", () => {
   });
 
   it("paginates users list when there are more than 20 users", async () => {
-    const manyUsers = Array.from({ length: 21 }, (_, i) => ({
-      id: i + 1,
-      username: `user${i + 1}`,
-      email: `u${i + 1}@mail.com`,
-      first_name: `User${i + 1}`,
-      last_name: "Test",
-      role: "student",
-      is_active: true,
-      is_staff: false,
-      is_superuser: false,
-    }));
-    api.fetchAdminUsers.mockResolvedValue(manyUsers);
-
+    api.fetchAdminUsers.mockResolvedValue(buildManyUsers());
     render(<AdminPage />);
-    await waitFor(() =>
-      expect(screen.getAllByRole("button", { name: /User1 Test/i }).length).toBeGreaterThan(0),
-    );
+    await expectUserButton(/User1 Test/i);
     expect(screen.queryByRole("button", { name: /User11 Test/i })).toBeNull();
-
     fireEvent.click(screen.getByText("Next →"));
-    await waitFor(() =>
-      expect(screen.getAllByRole("button", { name: /User11 Test/i }).length).toBeGreaterThan(0),
-    );
+    await expectUserButton(/User11 Test/i);
     expect(screen.queryByRole("button", { name: /User1 Test/i })).toBeNull();
     expect(screen.queryByRole("button", { name: /User21 Test/i })).toBeNull();
-
     fireEvent.click(screen.getByText("Next →"));
-    await waitFor(() =>
-      expect(screen.getAllByRole("button", { name: /User21 Test/i }).length).toBeGreaterThan(0),
-    );
+    await expectUserButton(/User21 Test/i);
   });
 
   it("shows empty state when search has no matches", async () => {
