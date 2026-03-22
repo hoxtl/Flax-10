@@ -1,0 +1,204 @@
+.slotList {
+  background: var(--bg);
+}
+
+.slotRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.slotRow:last-child {
+  border-bottom: none;
+}
+
+.timeLabel {
+  width: 128px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bestTimeStar {
+  color: #d7ab4c;
+}
+
+.memberList {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.avatarCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: transform 0.12s ease;
+}
+
+.avatarCircle:hover {
+  transform: scale(1.08);
+}
+
+.avatarCircleFree {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.16);
+}
+
+.avatarCircleBusy {
+  border-color: var(--border);
+  opacity: 0.56;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.avatarStatus {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--bg);
+}
+
+.avatarStatusFree {
+  background: #22c55e;
+  color: #fff;
+}
+
+.avatarStatusBusy {
+  background: #ef4444;
+  color: #fff;
+}
+
+.proposePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.proposePill:hover {
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.scoreLabel {
+  width: 84px;
+  text-align: right;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.scoreLabelHighlight {
+  color: #355f43;
+}
+
+.footer {
+  padding: 12px 24px;
+  background: var(--hover-light);
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footerDot {
+  color: #22c55e;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 820px) {
+  .header,
+  .meetingCards,
+  .meetingCardsEmpty,
+  .footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .meetingToggle {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .meetingToggleButton {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .suggestionCard,
+  .slotRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .suggestionActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .timeLabel,
+  .scoreLabel {
+    width: 100%;
+    text-align: left;
+  }
+
+  .memberList {
+    width: 100%;
+  }
+}
