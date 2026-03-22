@@ -105,7 +105,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-FRONTEND_DIST_DIR = BASE_DIR.parent / 'frontend' / 'dist'
+FRONTEND_DIST_DIR = BASE_DIR / 'frontend' / 'dist'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
