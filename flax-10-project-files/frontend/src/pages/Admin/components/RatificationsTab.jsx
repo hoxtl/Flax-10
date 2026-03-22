@@ -3,14 +3,12 @@
  */
 
 import { fetchPendingRatifications, approveRatification, rejectRatification } from "../../../api/adminApi";
-import { ADMIN_LIST_PAGE_SIZE, EMPTY_MESSAGES } from "../constants";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
-import { usePaginatedItems } from "../hooks/usePaginatedItems";
 import { navigateToSociety } from "../utils/adminNavigation";
-import AdminPagination from "./AdminPagination";
 import { ListActions, AnimatedList, ListInfo, ListRow } from "./AdminList";
-import { CardHeader, EmptyMessage, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
+import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 import styles from "../AdminPage.module.css";
 
 function DecisionButtons({ busy, onApprove, onReject }) {
@@ -35,25 +33,19 @@ function RatificationRow({ busy, item, onDecide }) {
   );
 }
 
-function RatificationsContent({ busy, items, onDecide, pagination }) {
-  return (
-    <>
-      <AdminPagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={pagination.setCurrentPage} />
-      <AnimatedList items={pagination.pageItems} renderItem={(item) => <RatificationRow key={item.id} item={item} busy={busy} onDecide={onDecide} />} />
-    </>
-  );
+function RatificationsContent({ busy, items, onDecide }) {
+  return <AnimatedList items={items} renderItem={(item) => <RatificationRow key={item.id} item={item} busy={busy} onDecide={onDecide} />} />;
 }
 
 export default function RatificationsTab() {
   const { error, items, loading, setError, setItems } = useAsyncList(fetchPendingRatifications, "Failed to load ratifications.");
-  const pagination = usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
   const { busy, run } = useAsyncAction(setError);
   const decide = (id, action) => run(id, () => resolveRatification(id, action), () => setItems((current) => current.filter((item) => item.id !== id)));
   return (
     <SectionCard>
       <CardHeader title="Society Ratifications" count={items.length} />
       <ErrorMessage message={error} />
-      {loading ? <LoadingSpinner /> : items.length ? <RatificationsContent items={items} busy={busy} onDecide={decide} pagination={pagination} /> : <EmptyMessage>{EMPTY_MESSAGES.ratifications}</EmptyMessage>}
+      {loading ? <LoadingSpinner /> : items.length ? <RatificationsContent items={items} busy={busy} onDecide={decide} /> : <SearchEmptyState title="No societies awaiting ratification" hint="New society ratification requests will appear here." />}
     </SectionCard>
   );
 }
