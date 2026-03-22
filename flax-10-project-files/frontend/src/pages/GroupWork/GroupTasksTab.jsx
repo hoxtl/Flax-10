@@ -33,7 +33,7 @@ function TaskViewSwitcher({ currentView, setTaskView }) {
 
 function TaskContent({ taskView, tasks, members, onToggle, onUpdate, onDelete, onAddCol }) {
     if (taskView === "list") return <TaskListView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />;
-    if (taskView === "timeline") return <TaskTimelineView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} />;
+    if (taskView === "timeline") return <TaskTimelineView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />;
     if (taskView === "board") return <TaskBoardView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} onAdd={onAddCol} />;
     return null;
 }
@@ -112,6 +112,11 @@ export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }
         if (completed) showToast("Task completed!", { icon: "🎉", variant: "success" });
     }
 
+    async function handleDelete(id) {
+        await deleteTask(id);
+        showToast("Task deleted", { variant: "error", icon: "🗑️" });
+    }
+
     async function handleAdd({ title, due_date, assigned_to }) {
         await addTask(title, { due_date, assigned_to });
     }
@@ -135,7 +140,7 @@ export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }
                     members={members}
                     onToggle={handleToggle}
                     onUpdate={updateTask}
-                    onDelete={deleteTask}
+                    onDelete={handleDelete}
                     onAddCol={(t, s) => addTask(t, { status: s })}
                 />
             )}

@@ -207,6 +207,22 @@
     word-break: break-word;
 }
 
+.cardTitleInput {
+    width: 100%;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 4px 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    resize: none;
+    box-sizing: border-box;
+    line-height: 1.4;
+}
+
 .cardFooter {
     display: flex;
     justify-content: space-between;

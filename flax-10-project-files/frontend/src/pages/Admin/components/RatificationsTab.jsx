@@ -28,7 +28,7 @@ function resolveRatification(id, action) {
 
 export default function RatificationsTab() {
   const { items, setItems, loading, error, setError } = useAsyncList(fetchPendingRatifications);
-  const { currentPage, setCurrentPage, totalPages, pageItems } = usePaginatedItems(items);
+  const { currentPage, setCurrentPage, totalPages, pageItems } = usePaginatedItems(items, 10);
   const { busy, execute } = useAsyncAction(setError);
   const decide = (id, action) => execute(id, () => resolveRatification(id, action), () => setItems((p) => p.filter((s) => s.id !== id)));
   const pagination = <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />;

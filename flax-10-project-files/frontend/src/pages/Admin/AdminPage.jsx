@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pagination } from "../../components/Pagination/Pagination";
 import BasePill from "../../components/Tags/BasePill";
+import Tabs from "../../components/common/Tabs/Tabs";
+import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import {
   fetchAdminUsers,
   banUser,
@@ -39,14 +41,6 @@ const rowAnim = {
   exit: { opacity: 0, x: 10 },
   transition: { duration: 0.2 },
 };
-
-const TABS = [
-  { id: "users", label: "👤 Users" },
-  { id: "ratifications", label: "🏛️ Ratifications" },
-  { id: "teachers", label: "🎓 Teacher Requests" },
-  { id: "reports", label: "🚩 Reported Societies" },
-  { id: "course-changes", label: "📚 Course Change Requests" },
-];
 
 const PAGE_SIZE = 20;
 
@@ -126,14 +120,6 @@ function matchesAllUserFilters(user, filters) {
 
 function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
-}
-
-function EmptyState({ message }) {
-  return (
-    <motion.p className={styles.empty} {...fadeUp}>
-      {message}
-    </motion.p>
-  );
 }
 
 function LoadingSpinner() {
@@ -296,7 +282,7 @@ function UsersTab({ onNavigate }) {
   );
 
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(filtered);
+    usePaginatedItems(filtered, 10);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -404,7 +390,7 @@ function UsersTab({ onNavigate }) {
         {loading ? (
           <LoadingSpinner />
         ) : filtered.length === 0 ? (
-          <EmptyState message="No users found." />
+          <SearchEmptyState query={search} itemLabel="users" />
         ) : (
           <>
             <Pagination
@@ -631,7 +617,7 @@ function RatificationsTab() {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No societies are awaiting ratification." />
+        <SearchEmptyState title="No societies awaiting ratification" hint="New society ratification requests will appear here." />
       ) : (
         <>
           <Pagination
@@ -740,7 +726,7 @@ function TeacherRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No pending teacher role requests." />
+        <SearchEmptyState title="No pending teacher requests" hint="Teacher role requests from students will appear here." />
       ) : (
         <>
           <Pagination
@@ -878,7 +864,7 @@ function ReportedSocietiesTab() {
       {loading ? (
         <LoadingSpinner />
       ) : reports.length === 0 ? (
-        <EmptyState message="No reported societies — all clear! 🎉" />
+        <SearchEmptyState title="No reported societies" hint="Society reports from users will appear here." />
       ) : (
         <>
           <Pagination
@@ -987,7 +973,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No pending course change requests." />
+        <SearchEmptyState title="No course change requests" hint="Student course change requests will appear here." />
       ) : (
         <>
           <Pagination
@@ -1058,6 +1044,13 @@ function CourseChangeRequestsTab({ onNavigate }) {
 
 function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
+  const tabs = [
+    { id: "users", label: "👤 Users", content: <UsersTab onNavigate={onNavChange} /> },
+    { id: "ratifications", label: "🏛️ Ratifications", content: <RatificationsTab /> },
+    { id: "teachers", label: "🎓 Teacher Requests", content: <TeacherRequestsTab onNavigate={onNavChange} /> },
+    { id: "reports", label: "🚩 Reported Societies", content: <ReportedSocietiesTab /> },
+    { id: "course-changes", label: "📚 Course Change Requests", content: <CourseChangeRequestsTab onNavigate={onNavChange} /> },
+  ];
   return (
     <AppPage
       title={
@@ -1074,41 +1067,7 @@ function AdminPage({ onNavChange, onBack }) {
       onBack={onBack}
       width="xl"
     >
-      <motion.div
-        className={styles.tabBar}
-        {...fadeUp}
-        transition={{ delay: 0.08, duration: 0.28 }}
-      >
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(t.id)}
-          >
-            {t.label}
-            {activeTab === t.id && (
-              <motion.div
-                className={styles.tabUnderline}
-                layoutId="admin-tab-underline"
-              />
-            )}
-          </button>
-        ))}
-      </motion.div>
-
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} {...fadeUp} className={styles.tabContent}>
-          {activeTab === "users" && <UsersTab onNavigate={onNavChange} />}
-          {activeTab === "ratifications" && <RatificationsTab />}
-          {activeTab === "teachers" && (
-            <TeacherRequestsTab onNavigate={onNavChange} />
-          )}
-          {activeTab === "reports" && <ReportedSocietiesTab />}
-          {activeTab === "course-changes" && (
-            <CourseChangeRequestsTab onNavigate={onNavChange} />
-          )}
-        </motion.div>
-      </AnimatePresence>
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
     </AppPage>
   );
 }

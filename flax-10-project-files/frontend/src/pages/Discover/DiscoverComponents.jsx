@@ -95,7 +95,7 @@ function DiscoverToolbarControls({ filterRef, filterState, sortBy, setSortBy }) 
     const toggleFilter = () => filterState.setIsFilterOpen(!filterState.isFilterOpen);
     return (
         <>
-            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggleFilter} props={filterState.props} />
+            <FilterSection fRef={filterRef} isOpen={filterState.isFilterOpen} setOpen={toggleFilter} onOpen={() => filterState.setIsFilterOpen(true)} onClose={() => filterState.setIsFilterOpen(false)} props={filterState.props} />
             <ToolbarSortControl><SegmentedControl value={sortBy} onChange={setSortBy} options={getDiscoverSortOptions()} /></ToolbarSortControl>
         </>
     );

@@ -21,11 +21,7 @@ _USER_PROFILES = {
     "johndoe": {"attend_rate": 0.90, "type_bias": {"Practical/lab": 0.98, "Lecture": 0.88}},
     "janedoe": {"attend_rate": 0.95, "type_bias": {"Lecture": 0.98, "Small group": 0.92}},
     "charlie": {"attend_rate": 0.82, "type_bias": {"Lecture": 0.75, "Other": 0.90}},
-    "riley":   {"attend_rate": 0.88, "type_bias": {"Small group": 0.95, "Lecture": 0.85}},
-    "nina":    {"attend_rate": 0.93, "type_bias": {}},
-    "omar":    {"attend_rate": 0.78, "type_bias": {"Practical/lab": 0.95, "Lecture": 0.70}},
-    "sofia":   {"attend_rate": 0.91, "type_bias": {"Small group": 0.97, "Other": 0.85}},
-    "liamk":   {"attend_rate": 0.85, "type_bias": {"Lecture": 0.80, "Practical/lab": 0.95}},
+    "amiller": {"attend_rate": 0.97, "type_bias": {"Lecture": 0.99, "Small group": 0.95}},
 }
 
 _RANDOM_PROFILES = [

@@ -24,11 +24,20 @@ def _check_slot_free(user_id, user_events, slot_start, slot_end):
     """Return True if the user has no events overlapping the given time slot."""
     return not any(ev.start_time < slot_end and ev.end_time > slot_start for ev in user_events[user_id])
 
+def _get_profile_photo_url(user):
+    """Safely get the user's profile photo URL."""
+    try:
+        if user.profile_photo:
+            return user.profile_photo.url
+    except Exception:
+        pass
+    return None
+
 def _build_member_entry(m, user_events, slot_start, slot_end):
     """Build a single member availability entry dict for a time slot."""
     is_free = _check_slot_free(m.user.id, user_events, slot_start, slot_end)
     initials = (m.user.first_name[:1] + m.user.last_name[:1]).upper() if m.user.first_name and m.user.last_name else m.user.username[:2].upper()
-    return {"id": m.user.id, "name": m.user.username, "is_free": is_free, "has_data": True, "initials": initials}
+    return {"id": m.user.id, "name": m.user.username, "username": m.user.username, "is_free": is_free, "has_data": True, "initials": initials, "profile_photo_url": _get_profile_photo_url(m.user)}
 
 def _build_slot_members(memberships, user_events, slot_start, slot_end):
     """Build member availability list and free count for a time slot."""

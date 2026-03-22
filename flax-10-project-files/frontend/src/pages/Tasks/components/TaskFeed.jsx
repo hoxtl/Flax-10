@@ -417,6 +417,7 @@ export default function TaskFeed(props) {
       <PageHeader
         title={data.headerTitle}
         subtitle={taskFeedSubtitle}
+        details={<span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.72rem", fontWeight: 600, color: "var(--text-secondary)", background: "var(--hover-light)", border: "1px solid var(--border)", borderRadius: 999, padding: "3px 10px", marginTop: 4 }}>✦ Right click to edit or delete a task</span>}
         compact
       />
       <TaskFeedSubHeader

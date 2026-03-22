@@ -21,7 +21,7 @@ PROJECT_OWNER_SEED = "studyflax-group-project-owners"
 PROJECT_MEMBER_SEED = "studyflax-group-project-members"
 PROJECT_TASK_SEED = "studyflax-group-project-tasks"
 PROJECT_SHOWCASE_USERNAME = "janedoe"
-FIXTURE_USERNAMES = ["janedoe", "charlie", "riley", "nina", "omar", "sofia", "liamk"]
+FIXTURE_USERNAMES = ["janedoe", "charlie"]
 PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
 MIN_PROJECT_MEMBER_TOTAL = 4
@@ -52,7 +52,6 @@ PROJECT_TASK_STATUS_PATTERNS = (
 def _get_student_pool():
     return list(
         User.objects.filter(role='student')
-        .exclude(username='johndoe')
         .order_by('username')
     )
 
@@ -279,9 +278,9 @@ def _create_single_project(spec, students, now, rng, index, module_students):
     _sync_project_owner_membership(project, owner)
 
 def _build_project_specs(showcase_student, student_modules, seed_modules, now):
-    modules = _showcase_modules(showcase_student, student_modules, seed_modules)
+    # Use all modules from all students so every user gets projects seeded
     specs = []
-    for module in modules:
+    for module in seed_modules:
         specs.extend(_build_module_project_specs(module, now))
     return _uniquify_project_spec_names(specs)
 
@@ -298,8 +297,14 @@ def _uniquify_project_spec_names(specs):
             continue
         candidate = _build_topic_project_name(spec["module"], index)
         variant_index = 1
+        max_template_variants = 30
         while candidate in used_names:
-            candidate = _build_topic_project_name(spec["module"], index + variant_index)
+            if variant_index > max_template_variants:
+                # Fall back to numeric suffix to guarantee uniqueness
+                base = _build_topic_project_name(spec["module"], index)
+                candidate = f"{base} {variant_index - max_template_variants}"
+            else:
+                candidate = _build_topic_project_name(spec["module"], index + variant_index)
             variant_index += 1
         spec["name"] = candidate
         used_names.add(candidate)
@@ -329,9 +334,11 @@ def _add_members_to_project(project, students, rng, showcase_student, module_stu
         student for student in cohort
         if student != project.owner and not _has_reached_project_limit(student)
     ]
-    forced_members = []
-    if showcase_student and showcase_student != project.owner and any(student.id == showcase_student.id for student in potential):
-        forced_members.append(showcase_student)
+    # Force all fixture students (not just janedoe) into eligible projects
+    fixture_set = set(FIXTURE_USERNAMES)
+    forced_members = [
+        s for s in potential if s.username in fixture_set
+    ]
     max_total = min(MAX_PROJECT_MEMBER_TOTAL, 1 + len(potential))
     if max_total <= 1:
         target_total = 1
@@ -358,7 +365,7 @@ def create_group_memberships(stdout):
     seed_modules = _list_seed_modules(student_modules)
     allowed_specs = _build_project_specs(showcase_student, student_modules, seed_modules, timezone.now())
     allowed_keys = {(spec["name"], spec["module"].module_code) for spec in allowed_specs}
-    projects = list(GroupProject.objects.filter(course_code__in=[module.module_code for module in _showcase_modules(showcase_student, student_modules, seed_modules)]))
+    projects = list(GroupProject.objects.filter(course_code__in=[module.module_code for module in seed_modules]))
     allowed_project_ids = [project.id for project in projects if (project.name, project.course_code) in allowed_keys]
     GroupMembership.objects.filter(project_id__in=allowed_project_ids).exclude(role="owner").delete()
     from studyFlax.signals.groupwork_notifications import notify_on_added_to_project
@@ -386,7 +393,8 @@ def _build_task_due_date(due, task_index, now):
 
 def _create_single_group_task(project, members, due, template, task_index, now, rng):
     t_title, t_desc, t_priority, t_blocks = template
-    status = _get_project_status_pattern(project)[task_index % len(GROUP_TASK_TEMPLATES)]
+    pattern = _get_project_status_pattern(project)
+    status = pattern[task_index % len(pattern)]
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
     has_due_date = not (status == "todo" and task_index >= 3)
     task_due = _build_task_due_date(due, task_index, now) if has_due_date else None
@@ -404,11 +412,12 @@ def _create_single_group_task(project, members, due, template, task_index, now, 
             'due_date': task_due,
         },
     )
-    if is_completed and len(members) > 1:
-        assignees = [members[task_index % len(members)]]
+    primary = members[task_index % len(members)]
+    if len(members) > 1 and task_index % 2 == 0:
+        secondary = members[(task_index + 1) % len(members)]
+        assignees = [primary, secondary]
     else:
-        selected_count = min(len(members), 1 + ((task_index + len(project.name)) % 2))
-        assignees = rng.sample(members, selected_count) if selected_count > 0 else []
+        assignees = [primary]
     task.assigned_to.set(assignees)
 
 def _seed_tasks_for_project(project, now):
@@ -425,3 +434,46 @@ def create_group_tasks(stdout):
     now = timezone.now()
     for project in GroupProject.objects.all():
         _seed_tasks_for_project(project, now)
+
+def _seed_busy_events_for_member(member, project_id, now):
+    from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+    member_rng = random.Random(f"avail-busy-{project_id}-{member.username}")
+    num_busy = member_rng.randint(1, 3)
+    hours_pool = [9, 10, 11, 13, 14, 15, 16]
+    for i in range(num_busy):
+        day_offset = member_rng.randint(0, 6)
+        hour = member_rng.choice(hours_pool)
+        start = (now + timedelta(days=day_offset)).replace(hour=hour, minute=0, second=0, microsecond=0)
+        end = start + timedelta(hours=1)
+        CalendarEvent.objects.get_or_create(
+            user=member,
+            title="Busy",
+            start_time=start,
+            defaults={"end_time": end, "source": "seed_availability"},
+        )
+
+def _seed_meeting_suggestions_for_project(project, members, now):
+    from studyFlax.models.groupwork.groupwork_model import MeetingSuggestion
+    non_owners = [m for m in members if m != project.owner][:2]
+    for idx, suggester in enumerate(non_owners):
+        hour = [10, 14][idx % 2]
+        start = (now + timedelta(days=idx + 1)).replace(hour=hour, minute=0, second=0, microsecond=0)
+        end = start + timedelta(hours=1)
+        MeetingSuggestion.objects.get_or_create(
+            project=project,
+            suggested_by=suggester,
+            start_time=start,
+            defaults={"end_time": end},
+        )
+
+def seed_group_availability(stdout):
+    stdout.write("Seeding group availability data (busy events + meeting suggestions)...")
+    now = timezone.now()
+    for project in GroupProject.objects.prefetch_related("memberships__user").all():
+        members = [m.user for m in project.memberships.select_related("user").all()]
+        if len(members) < 2:
+            continue
+        for member in members:
+            _seed_busy_events_for_member(member, project.id, now)
+        _seed_meeting_suggestions_for_project(project, members, now)
+    stdout.write("Done seeding group availability.")

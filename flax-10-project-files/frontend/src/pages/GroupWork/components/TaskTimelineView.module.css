@@ -61,9 +61,9 @@
 
 .unscheduledWidget {
   flex: 0 0 260px;
-  background: var(--hover-light);
+  background: color-mix(in srgb, #ef4444 6%, #ffffff 94%);
   border-radius: 16px;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, #ef4444 20%, var(--border) 80%);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -72,8 +72,23 @@
 
 .widgetHeader {
   padding: 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--hover-light);
+  border-bottom: 1px solid color-mix(in srgb, #ef4444 18%, var(--border) 82%);
+  background: color-mix(in srgb, #ef4444 9%, #ffffff 91%);
+}
+
+.unscheduledCardInput {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 8px;
+  box-sizing: border-box;
 }
 
 .widgetTitle {
@@ -82,6 +97,30 @@
   color: var(--text);
   margin: 0;
   font-family: inherit;
+}
+
+.rightClickTip {
+  font-size: 10px;
+  font-weight: 600;
+  color: color-mix(in srgb, #ef4444 60%, var(--text-secondary) 40%);
+  opacity: 0.8;
+  margin-top: 4px;
+  display: block;
+}
+
+.timelineCardInput {
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  padding: 2px 6px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 4px;
+  box-sizing: border-box;
 }
 
 .widgetCount {
@@ -355,6 +394,14 @@
     font-size: 10px;
     padding: 8px;
   }
+}
+
+.allScheduledMsg {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 16px 0;
+  font-style: italic;
 }
 
 .weekNum {

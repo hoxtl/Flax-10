@@ -54,9 +54,10 @@ export function getMemberColor(member, members = []) {
 }
 
 export function getPhotoUrl(member) {
+  const username = member?.user_name || member?.username;
   return getResolvedUserPhoto({
     id: member?.user ?? member?.id,
-    username: member?.user_name || member?.username,
+    username,
     first_name: member?.first_name,
     last_name: member?.last_name,
     name: member?.name || getDisplayName(member),
@@ -65,7 +66,7 @@ export function getPhotoUrl(member) {
     profile_photo: member?.profile_photo,
     avatar: member?.avatar,
   }, {
-    seed: getMemberKey(member),
+    seed: username || getMemberKey(member),
     allowGeneric: true,
   });
 }

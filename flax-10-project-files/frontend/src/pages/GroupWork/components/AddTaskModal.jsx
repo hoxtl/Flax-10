@@ -5,6 +5,7 @@
 import { useState } from "react";
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "./memberAvatarUtils";
 import styles from "./AddTaskModal.module.css";
@@ -61,12 +62,12 @@ export default function AddTaskModal({ members = [], onAdd, onClose }) {
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Due date</label>
-            <input
-              type="date"
+            <DateTimePicker
+              dateOnly
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className={styles.input}
-              required
+              onChange={setDueDate}
+              placeholder="Pick a due date"
+              triggerClassName={styles.input}
             />
           </div>
         </div>

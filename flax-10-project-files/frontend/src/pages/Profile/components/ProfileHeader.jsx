@@ -49,15 +49,9 @@ function HeaderAction({ visibility, handlers, user, mobile = false }) {
 function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
   if (visibility.canEditProfile || !profileData?.is_shared_with_me || !onNavigate) return null;
   return (
-    <PrimaryButton
-      className={styles.sharedCalendarPill}
-      size="small"
-      variant="secondary"
-      pill
-      onClick={() => onNavigate(buildSharedCalendarRoute(user, profileData))}
-    >
+    <span className={styles.sharedCalendarIndicator}>
       Shared calendar with me
-    </PrimaryButton>
+    </span>
   );
 }
 
@@ -240,37 +234,48 @@ function ProfileBioSection({ bio }) {
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
 }
 
-function SharedPlanningTip({ visibility }) {
-  if (visibility.canEditProfile) return null;
-  return (
-    <span className={styles.sharedPlanningTip}>
-      <span className={styles.sharedPlanningTipLabel}>Tip</span>
-      Share calendars with each other to spot free spaces and slot in study or meeting times.
-    </span>
-  );
-}
 
-function HeaderTitleRow({ user, profileData, roleLabel, handlers, visibility, onNavigate }) {
+function HeaderTitleRow({ user, roleLabel, handlers, visibility, isShared }) {
   return (
     <div className={styles.headerTop}>
       <h1 className={styles.username}>{user?.username || "guest"}</h1>
       <span className={styles.rolePill}>{roleLabel}</span>
-      <SharedCalendarPill user={user} profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
-      <HeaderAction visibility={visibility} handlers={handlers} user={user} />
+      {!isShared && <HeaderAction visibility={visibility} handlers={handlers} user={user} />}
     </div>
   );
 }
 
 function HeaderMeta({ user, profileData, handlers, visibility, societies, onSocietiesClick, onNavigate }) {
   const { description, roleLabel } = buildHeaderVars(user, profileData);
+  const isShared = !visibility.canEditProfile && profileData?.is_shared_with_me && !!onNavigate;
+  const route = isShared ? buildSharedCalendarRoute(user, profileData) : null;
   return (
     <>
-      <HeaderTitleRow user={user} profileData={profileData} roleLabel={roleLabel} handlers={handlers} visibility={visibility} onNavigate={onNavigate} />
+      <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} isShared={isShared} />
       {description && <div className={styles.headerSubline}>{description}</div>}
-      <div className={styles.emailTipRow}>
-        <ContactEmail email={profileData?.email} />
-        <SharedPlanningTip visibility={visibility} />
-      </div>
+      {!visibility.canEditProfile && (
+        <span className={styles.sharedPlanningTip}>
+          <span className={styles.sharedPlanningTipLabel}>Tip</span>
+          Compare free slots to find times that work for both of you.
+        </span>
+      )}
+      {isShared && (
+        <div className={styles.calendarActionsGroup}>
+          <div className={styles.calendarActionsRow}>
+            <span className={styles.sharedCalendarIndicator}>Shared calendar with me</span>
+            <ShareButton
+              userId={user?.id}
+              initialIsSharing={user?.is_sharing}
+              onToggle={(v) => { user?.setOptimisticShare?.(v); user?.reload?.(); }}
+              shareVariant="secondary"
+              sharedVariant="secondary"
+            />
+          </div>
+          <PrimaryButton className={styles.viewCalendarPill} size="small" pill onClick={() => onNavigate(route)}>
+            View their calendar
+          </PrimaryButton>
+        </div>
+      )}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
       <ProfileBioSection bio={profileData?.bio} />
     </>
@@ -309,10 +314,6 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, 
         <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1>
         <p className={styles.mobileBio}>{description}</p>
         <span className={styles.mobileRolePill}>{roleLabel}</span>
-        <div className={styles.emailTipRow}>
-          {profileData?.email && <div className={styles.teacherEmail}><a href={`mailto:${profileData.email}`}>{profileData.email}</a></div>}
-          <SharedPlanningTip visibility={visibility} />
-        </div>
         <SharedCalendarPill user={user} profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
         <div className={styles.mobileActions}><HeaderAction visibility={visibility} handlers={handlers} user={user} mobile /></div>
       </div>

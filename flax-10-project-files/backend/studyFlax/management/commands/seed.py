@@ -22,6 +22,8 @@ from studyFlax.models import (
     Module, Enrollment, Deadline, Reading, UserSettings,
     Society, CalendarShare,
 )
+from studyFlax.models.auth.course_change_request_model import CourseChangeRequest
+from studyFlax.models.society.society_report_model import SocietyReport
 from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.models.groupwork.groupwork_model import GroupProject
@@ -38,7 +40,7 @@ from .seed_events import create_events_for_users
 from .seed_modules import create_modules, create_deadlines, create_enrollments
 from .seed_tasks import create_tasks
 from .seed_groups import (
-    create_group_projects, create_group_memberships, create_group_tasks,
+    create_group_projects, create_group_memberships, create_group_tasks, seed_group_availability,
 )
 from .seed_sessions import create_study_sessions
 from .seed_societies import (
@@ -47,6 +49,7 @@ from .seed_societies import (
 )
 from .seed_readings import create_readings
 from .seed_attendance import seed_attendance
+from .seed_admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
@@ -226,6 +229,12 @@ class Command(BaseCommand):
         students = list(User.objects.filter(role='student'))
         create_readings(self.modules, students, self.stdout)
         seed_attendance(self.stdout)
+        self._seed_admin_data()
+
+    def _seed_admin_data(self):
+        seed_teacher_requests(self.stdout)
+        seed_course_change_requests(self.stdout)
+        seed_society_reports(self.stdout)
 
     def _seed_societies_and_groups(self):
         create_societies(self.stdout)
@@ -236,16 +245,55 @@ class Command(BaseCommand):
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
+        seed_group_availability(self.stdout)
         Notification.objects.filter(title="Added to Group Project").delete()
         self.stdout.write(f"  \u2713  {'Group projects':<14} {GroupProject.objects.count():,}")
 
     def _seed_calendar_shares(self):
-        users = sorted(User.objects.filter(role__in=["student", "teacher"]).exclude(username="johndoe"), key=lambda u: u.username)
+        fixture_names = {"janedoe", "charlie", "johndoe"}
+        users = sorted(User.objects.filter(role__in=["student", "teacher"]), key=lambda u: u.username)
         if len(users) < 2:
             return
-        planned_pairs = _build_calendar_share_pairs(users)
-        _create_calendar_shares(users, planned_pairs)
+        non_fixture = [u for u in users if u.username not in fixture_names]
+        planned_pairs = _build_calendar_share_pairs(non_fixture)
+        _create_calendar_shares(non_fixture, planned_pairs)
+        self._seed_shares_with_fixtures(users, fixture_names)
         self.stdout.write(f"  \u2713  {'Shares':<14} {CalendarShare.objects.count():,}")
+
+    def _seed_shares_with_fixtures(self, all_users, fixture_names):
+        """Everyone except 5 random users shares their calendar with each fixture user.
+        Also, each fixture user shares their calendar with ~half the other users.
+        And every non-fixture user gets ~5 random viewers of their calendar."""
+        fixture_users = {u.username: u for u in all_users if u.username in fixture_names}
+        non_fixture = [u for u in all_users if u.username not in fixture_names]
+
+        # Everyone → fixture users (inbound shares)
+        for username, target in fixture_users.items():
+            rng = random.Random(f"studyflax-{username}-shares-v2")
+            potential = [u for u in all_users if u.username != target.username]
+            shuffled = potential[:]
+            rng.shuffle(shuffled)
+            non_sharers = {u.username for u in shuffled[:5]}
+            for sharer in potential:
+                if sharer.username not in non_sharers:
+                    CalendarShare.objects.get_or_create(owner=sharer, shared_with=target)
+
+        # Fixture users → random others (outbound shares so others can see fixture calendars)
+        for username, owner in fixture_users.items():
+            rng = random.Random(f"studyflax-{username}-outbound-v1")
+            potential = [u for u in all_users if u.username != owner.username]
+            shuffled = potential[:]
+            rng.shuffle(shuffled)
+            for viewer in shuffled[:len(shuffled) // 2]:
+                CalendarShare.objects.get_or_create(owner=owner, shared_with=viewer)
+
+        # Non-fixture users → each gets ~5 random viewers
+        for user in non_fixture:
+            rng = random.Random(f"studyflax-{user.username}-viewers-v1")
+            pool = [u for u in all_users if u.username != user.username]
+            rng.shuffle(pool)
+            for viewer in pool[:5]:
+                CalendarShare.objects.get_or_create(owner=user, shared_with=viewer)
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")

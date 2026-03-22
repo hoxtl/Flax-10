@@ -3,10 +3,11 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, X, Star, Trash2 } from "lucide-react";
+import { Check, X, Star, Trash2, Plus } from "lucide-react";
 import { getAuthHeaders } from "./groupWorkHooks";
 import { useConfirm } from "../../context/ConfirmContext";
-import { getUserColor } from "./utils/priorityUtils";
+import Tooltip from "../../components/common/Tooltip/Tooltip";
+import { getPhotoUrl } from "./components/memberAvatarUtils";
 import styles from "./AvailabilityTab.module.css";
 
 // --- Sub-components ---
@@ -14,8 +15,8 @@ import styles from "./AvailabilityTab.module.css";
 function AvailabilityHeader() {
     return (
         <div className={styles.header}>
-            <h3 className={styles.title}>Best times to meet</h3>
-            <p className={styles.subtitle}>Click a slot below to suggest it to the group.</p>
+            <h3 className={styles.title}>Propose meeting timings with your team</h3>
+            <p className={styles.subtitle}>Click a slot or use the propose button to suggest it to the group.</p>
         </div>
     );
 }
@@ -76,27 +77,46 @@ function ProposedMeetings({ suggestions, currentUserId, onVote, onDelete }) {
     );
 }
 
-function MemberAvatar({ m }) {
-    const color = getUserColor(m.id);
-    const st = m.is_free ? { backgroundColor: color, borderColor: color } : {};
+function MemberAvatarPhoto({ m }) {
+    const photoUrl = getPhotoUrl({ user: m.id, user_name: m.name, username: m.name, profile_photo_url: m.profile_photo_url });
+    const navigateToProfile = (e) => {
+        e.stopPropagation();
+        window.dispatchEvent(new CustomEvent("navigate", { detail: `profile_${m.id}` }));
+    };
+
     return (
-        <div className={`${styles.avatar} ${m.is_free ? styles.avatarFree : styles.avatarBusy}`} style={st} title={`${m.name} is ${m.is_free ? 'free' : 'busy'}`}>
-            <span className={styles.avatarName}>{m.initials}</span>
-            <span className={styles.statusIcon}>{m.is_free ? <Check size={10} strokeWidth={3} /> : <X size={10} strokeWidth={3} />}</span>
-        </div>
+        <Tooltip content={`@${m.name}${m.is_free ? ' · free' : ' · busy'}`} position="top">
+            <div
+                className={`${styles.avatarCircle} ${m.is_free ? styles.avatarCircleFree : styles.avatarCircleBusy}`}
+                onClick={navigateToProfile}
+                title={m.name}
+            >
+                {photoUrl ? (
+                    <img src={photoUrl} alt={m.name} className={styles.avatarImg} />
+                ) : (
+                    <span className={styles.avatarFallback}>{m.initials}</span>
+                )}
+                <span className={`${styles.avatarStatus} ${m.is_free ? styles.avatarStatusFree : styles.avatarStatusBusy}`}>
+                    {m.is_free ? <Check size={8} strokeWidth={3} /> : <X size={8} strokeWidth={3} />}
+                </span>
+            </div>
+        </Tooltip>
     );
 }
 
 function SlotRow({ slot, onClick }) {
     const isBest = slot.free_count === slot.total_count;
     return (
-        <div className={styles.slotRow} onClick={onClick} style={{ cursor: 'pointer' }}>
+        <div className={styles.slotRow}>
             <div className={styles.timeLabel}>
                 {slot.label}
                 {isBest && <Star size={14} className={styles.bestTimeStar} fill="currentColor" />}
             </div>
-            <div className={styles.memberList}>{slot.members.map(m => <MemberAvatar key={m.id} m={m} />)}</div>
+            <div className={styles.memberList}>{slot.members.map(m => <MemberAvatarPhoto key={m.id} m={m} />)}</div>
             <div className={`${styles.scoreLabel} ${isBest ? styles.scoreLabelHighlight : ""}`}>{slot.free_count}/{slot.total_count} free</div>
+            <button className={styles.proposePill} onClick={onClick}>
+                <Plus size={11} strokeWidth={2.5} /> Propose
+            </button>
         </div>
     );
 }

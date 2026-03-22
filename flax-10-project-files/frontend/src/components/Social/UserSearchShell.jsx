@@ -40,9 +40,9 @@ export function GlobalSearchBar({
     );
 }
 
-export function FilterSection({ fRef, isOpen, setOpen, props }) {
+export function FilterSection({ fRef, isOpen, setOpen, onOpen, onClose, props }) {
     return (
-        <div ref={fRef} className={styles.relativeContainer}>
+        <div ref={fRef} className={styles.relativeContainer} onMouseEnter={onOpen} onMouseLeave={onClose}>
             <button onClick={setOpen} className={styles.filterBtn}><FilterIcon /> Filter</button>
             <AnimatePresence>{isOpen && <FilterDropdownMotion {...props} />}</AnimatePresence>
         </div>

@@ -81,9 +81,36 @@
   flex-shrink: 0;
 }
 
-.sharedCalendarPill {
-  flex-shrink: 0;
+.calendarActionsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+  align-self: flex-start;
+}
+
+.calendarActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sharedCalendarIndicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--border));
+  background: var(--panel);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.viewCalendarPill {
+  width: 100%;
 }
 
 .stats {
