@@ -6,6 +6,7 @@ import random
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
 from django.utils import timezone
 
 from studyFlax.models.tasks.task_model import Task
@@ -49,10 +50,15 @@ def _add_members_to_project(project, students):
         GroupMembership.objects.get_or_create(project=project, user=m, defaults={'role': 'member'})
 
 def create_group_memberships(stdout):
-    projects = list(GroupProject.objects.all())
-    students = list(User.objects.filter(username__in=FIXTURE_USERNAMES))
-    for project in projects:
-        _add_members_to_project(project, students)
+    from studyFlax.signals.groupwork_notifications import notify_on_added_to_project
+    post_save.disconnect(notify_on_added_to_project, sender=GroupMembership)
+    try:
+        projects = list(GroupProject.objects.all())
+        students = list(User.objects.filter(username__in=FIXTURE_USERNAMES))
+        for project in projects:
+            _add_members_to_project(project, students)
+    finally:
+        post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
 def _pick_status():
     statuses = ['todo', 'in_progress', 'done']

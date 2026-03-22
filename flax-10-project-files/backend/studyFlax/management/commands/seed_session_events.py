@@ -12,6 +12,7 @@ from studyFlax.models import CalendarEvent
 from studyFlax.fixtures.data_fixtures import lecture_theatre_fixtures
 
 SEED_START = datetime(2026, 1, 15, tzinfo=dt_timezone.utc)
+SEED_END = datetime(2026, 6, 14, tzinfo=dt_timezone.utc)
 READING_WEEK_START = datetime(2026, 2, 23).date()
 READING_WEEK_END = datetime(2026, 2, 27).date()
 
@@ -96,10 +97,10 @@ def _week_sessions(module, week_start):
     return sessions
 
 
-def _teaching_weeks(start_date, now, reading_start, reading_end):
-    """Return list of teaching week start dates, excluding reading week."""
-    weeks_back = int((now - start_date).days / 7)
-    all_weeks = [start_date + timedelta(weeks=w) for w in range(weeks_back + 1)]
+def _teaching_weeks(start_date, end_date, reading_start, reading_end):
+    """Return list of teaching week start dates between start_date and end_date, excluding reading week."""
+    total_weeks = int((end_date - start_date).days / 7) + 1
+    all_weeks = [start_date + timedelta(weeks=w) for w in range(total_weeks)]
     return [w for w in all_weeks if not (reading_start <= w.date() <= reading_end)]
 
 
@@ -126,11 +127,9 @@ def build_session_event(user, session, tag):
 
 
 def build_module_sessions(module, now):
-    """Build all session dicts for a module across teaching weeks."""
-    weeks = _teaching_weeks(SEED_START, now, READING_WEEK_START, READING_WEEK_END)
+    """Build all session dicts for a module across teaching weeks up to SEED_END."""
+    weeks = _teaching_weeks(SEED_START, SEED_END, READING_WEEK_START, READING_WEEK_END)
     sessions = []
     for week in weeks:
-        week_sessions = _week_sessions(module, week)
-        past_sessions = [s for s in week_sessions if s['start'] < now]
-        sessions.extend(past_sessions)
+        sessions.extend(_week_sessions(module, week))
     return sessions

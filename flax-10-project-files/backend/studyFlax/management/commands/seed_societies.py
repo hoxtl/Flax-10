@@ -3,7 +3,9 @@ Orchestrates creation of societies, memberships, events and images.
 """
 
 import random
-from datetime import timedelta
+from datetime import date, timedelta
+
+SOCIETY_RECURRENCE_END = date(2026, 6, 30)
 
 from django.contrib.auth import get_user_model
 
@@ -43,7 +45,7 @@ def _build_event_defaults(desc, start, end, recurrence, tags):
         'description': desc, 'location': random.choice(location_fixtures),
         'start_time': start, 'end_time': end,
         'recurrence': recurrence or 'none',
-        'recurrence_end_date': (start + timedelta(days=90)).date() if recurrence else None,
+        'recurrence_end_date': SOCIETY_RECURRENCE_END if recurrence else None,
         'tag': random.choice(tags) if tags else None,
     }
 

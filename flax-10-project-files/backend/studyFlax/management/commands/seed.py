@@ -22,6 +22,7 @@ from studyFlax.models import (
     Module, Enrollment, Deadline, Reading, UserSettings,
     Society, CalendarShare,
 )
+from studyFlax.models.notifications.notification_model import Notification
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.models.groupwork.groupwork_model import GroupProject
 from studyFlax.models.calendar.event_attendance_model import EventAttendance
@@ -235,6 +236,7 @@ class Command(BaseCommand):
         create_group_projects(self.stdout)
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
+        Notification.objects.filter(title="Added to Group Project").delete()
         self.stdout.write(f"  \u2713  {'Group projects':<14} {GroupProject.objects.count():,}")
 
     def _seed_calendar_shares(self):
