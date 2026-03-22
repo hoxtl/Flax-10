@@ -16,13 +16,7 @@ function AppearanceForm({ theme, onChange, isSaving, hasUnsaved, saveSignal }) {
       <div className={styles.formGroup} style={{ marginTop: "16px" }}>
         <ThemeGridSelector value={theme.theme} onChange={(nextTheme) => onChange({ ...theme, theme: nextTheme })} />
       </div>
-      <SubmitButton
-        isSaving={isSaving}
-        label="Save Appearance"
-        savingLabel="Saving..."
-        hasUnsaved={hasUnsaved}
-        saveSignal={saveSignal}
-      />
+      <SubmitButton isSaving={isSaving} label="Save Appearance" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
     </div>
   );
 }
