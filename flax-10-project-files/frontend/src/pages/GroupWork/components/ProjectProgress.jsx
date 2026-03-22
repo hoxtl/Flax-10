@@ -9,33 +9,26 @@ import { useCountUp } from "../../../hooks/useCountUp";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import styles from "./ProjectProgress.module.css";
 
+function buildSegmentStyle(segment, hoveredSeg, hoveredKey) {
+    return {
+        background: segment.color || (segment.id === "unassigned" ? "#c0b8b0" : "#7BB38E"),
+        opacity: hoveredSeg && hoveredSeg !== hoveredKey ? 0.65 : 1,
+    };
+}
+
 function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
-  return segments.map((segment, index) => <ProgressSegment key={segment.id ?? index} segment={segment} index={index} segments={segments} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} />);
+    return segments.map((segment, index) => <ProgressSegment key={segment.id ?? index} segment={segment} index={index} segments={segments} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} />);
 }
 
 function ProgressSegment({ segment, index, segments, hoveredSeg, setHoveredSeg }) {
-  const hoveredKey = segment.id ?? index;
-  return (
-    <motion.div
-      style={{ height: "100%", flex: "0 0 auto", zIndex: segments.length - index }}
-      initial={{ width: "0%" }}
-      animate={{ width: `${segment.percentage}%` }}
-      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <Tooltip content={segment.tooltip || segment.name} wrapperClassName={styles.segmentTooltipWrap}>
-        <div
-          className={styles.progressSegment}
-          style={{
-            background: segment.color || (segment.id === "unassigned" ? "#c0b8b0" : "#7BB38E"),
-            opacity: hoveredSeg && hoveredSeg !== hoveredKey ? 0.65 : 1,
-          }}
-          onMouseEnter={() => setHoveredSeg(hoveredKey)}
-          onMouseLeave={() => setHoveredSeg(null)}
-          aria-label={`${segment.name} segment`}
-        />
-      </Tooltip>
-    </motion.div>
-  );
+    const hoveredKey = segment.id ?? index;
+    return (
+        <motion.div style={{ height: "100%", flex: "0 0 auto", zIndex: segments.length - index }} initial={{ width: "0%" }} animate={{ width: `${segment.percentage}%` }} transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}>
+            <Tooltip content={segment.tooltip || segment.name} wrapperClassName={styles.segmentTooltipWrap}>
+                <div className={styles.progressSegment} style={buildSegmentStyle(segment, hoveredSeg, hoveredKey)} onMouseEnter={() => setHoveredSeg(hoveredKey)} onMouseLeave={() => setHoveredSeg(null)} aria-label={`${segment.name} segment`} />
+            </Tooltip>
+        </motion.div>
+    );
 }
 
 export default function ProjectProgress({ taskStats }) {
