@@ -1,16 +1,3 @@
-"""
-Django management command for seeding the database.
-
-Run with::
-
-    python manage.py seed
-
-Creates fixture users, random users, categories, tags, recurrence rules,
-calendar events, modules, deadlines, enrolments, study sessions and theme
-sessions.  All operations are idempotent — running the command on an
-already-seeded database will not produce duplicates.
-"""
-
 import random
 
 from django.contrib.auth import get_user_model
@@ -49,7 +36,7 @@ from .seed_societies import (
 )
 from .seed_readings import create_readings
 from .seed_attendance import seed_attendance
-from .seed_admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
+from .seed_support.seed_admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
@@ -147,6 +134,48 @@ def _create_calendar_shares(users, planned_pairs):
     pairs_with_users = [(user_by_id.get(oid), user_by_id.get(tid)) for oid, tid in sorted(planned_pairs)]
     return sum(_create_share_if_valid(owner, target) for owner, target in pairs_with_users)
 
+
+def _inbound_sharers_for_fixture(all_users, username, target):
+    """Yield users who share their calendar inbound to target, excluding 5 random non-sharers."""
+    rng = random.Random(f"studyflax-{username}-shares-v2")
+    potential = [u for u in all_users if u.username != target.username]
+    shuffled = potential[:]
+    rng.shuffle(shuffled)
+    non_sharers = {u.username for u in shuffled[:5]}
+    for sharer in [u for u in potential if u.username not in non_sharers]:
+        CalendarShare.objects.get_or_create(owner=sharer, shared_with=target)
+
+def _seed_inbound_shares(all_users, fixture_users):
+    """Share every user's calendar with each fixture user, excluding 5 random non-sharers."""
+    for username, target in fixture_users.items():
+        _inbound_sharers_for_fixture(all_users, username, target)
+
+def _outbound_sharers_for_fixture(all_users, username, owner):
+    """Share owner's calendar with ~half the other users."""
+    rng = random.Random(f"studyflax-{username}-outbound-v1")
+    potential = [u for u in all_users if u.username != owner.username]
+    shuffled = potential[:]
+    rng.shuffle(shuffled)
+    for viewer in shuffled[:len(shuffled) // 2]:
+        CalendarShare.objects.get_or_create(owner=owner, shared_with=viewer)
+
+def _seed_outbound_shares(all_users, fixture_users):
+    """Share each fixture user's calendar with ~half of all other users."""
+    for username, owner in fixture_users.items():
+        _outbound_sharers_for_fixture(all_users, username, owner)
+
+def _viewers_for_user(all_users, user):
+    """Give user ~5 random viewers of their calendar."""
+    rng = random.Random(f"studyflax-{user.username}-viewers-v1")
+    pool = [u for u in all_users if u.username != user.username]
+    rng.shuffle(pool)
+    for viewer in pool[:5]:
+        CalendarShare.objects.get_or_create(owner=user, shared_with=viewer)
+
+def _seed_viewer_shares(all_users, non_fixture):
+    """Give each non-fixture user ~5 random viewers of their calendar."""
+    for user in non_fixture:
+        _viewers_for_user(all_users, user)
 
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset."""
@@ -266,34 +295,9 @@ class Command(BaseCommand):
         And every non-fixture user gets ~5 random viewers of their calendar."""
         fixture_users = {u.username: u for u in all_users if u.username in fixture_names}
         non_fixture = [u for u in all_users if u.username not in fixture_names]
-
-        # Everyone → fixture users (inbound shares)
-        for username, target in fixture_users.items():
-            rng = random.Random(f"studyflax-{username}-shares-v2")
-            potential = [u for u in all_users if u.username != target.username]
-            shuffled = potential[:]
-            rng.shuffle(shuffled)
-            non_sharers = {u.username for u in shuffled[:5]}
-            for sharer in potential:
-                if sharer.username not in non_sharers:
-                    CalendarShare.objects.get_or_create(owner=sharer, shared_with=target)
-
-        # Fixture users → random others (outbound shares so others can see fixture calendars)
-        for username, owner in fixture_users.items():
-            rng = random.Random(f"studyflax-{username}-outbound-v1")
-            potential = [u for u in all_users if u.username != owner.username]
-            shuffled = potential[:]
-            rng.shuffle(shuffled)
-            for viewer in shuffled[:len(shuffled) // 2]:
-                CalendarShare.objects.get_or_create(owner=owner, shared_with=viewer)
-
-        # Non-fixture users → each gets ~5 random viewers
-        for user in non_fixture:
-            rng = random.Random(f"studyflax-{user.username}-viewers-v1")
-            pool = [u for u in all_users if u.username != user.username]
-            rng.shuffle(pool)
-            for viewer in pool[:5]:
-                CalendarShare.objects.get_or_create(owner=user, shared_with=viewer)
+        _seed_inbound_shares(all_users, fixture_users)
+        _seed_outbound_shares(all_users, fixture_users)
+        _seed_viewer_shares(all_users, non_fixture)
 
     def _create_recurrence_rules(self):
         self.stdout.write("Seeding recurrence rules...")

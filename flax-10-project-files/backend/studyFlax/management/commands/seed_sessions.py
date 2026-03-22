@@ -7,7 +7,7 @@ from django.db import transaction
 
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.timer.theme_session_model import ThemeSession
-from .seed_session_helpers import build_study_sessions_for_user, build_theme_sessions_for_user
+from .seed_support.seed_session_helpers import build_study_sessions_for_user, build_theme_sessions_for_user
 
 User = get_user_model()
 

@@ -9,7 +9,7 @@ from django.db import transaction
 from studyFlax.models import Module, Reading, Enrollment
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.utils.reading_utils import update_reading_estimates
-from .seed_reading_helpers import build_readings_for_module, build_reading_tasks_for_user
+from .seed_support.seed_reading_helpers import build_readings_for_module, build_reading_tasks_for_user
 
 
 def _build_all_readings(modules):

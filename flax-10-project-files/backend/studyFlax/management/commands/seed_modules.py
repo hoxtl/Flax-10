@@ -14,7 +14,7 @@ from studyFlax.fixtures.data_fixtures import (
     course_to_module_prefixes,
 )
 from studyFlax.fixtures.user_fixtures import module_prefix_to_department
-from .seed_helpers import (
+from .seed_support.seed_helpers import (
     PRIOR_UNIVERSITIES,
     PHD_UNIVERSITIES,
     build_settings_for_new_users,
@@ -24,7 +24,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from studyFlax.models import CalendarEvent
-from .seed_event_helpers import (
+from .seed_support.seed_event_helpers import (
     build_module_event, get_user_modules, build_deadlines_for_module,
     build_deadline_event,
 )
