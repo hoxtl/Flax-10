@@ -164,20 +164,18 @@ def _random_theme():
     return random.choice(['light', 'dark'])
 
 
-PINNED_WIDGETS = ["deadlines", "todayTasks", "bigTimeline"]
+CORE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]
 OPTIONAL_WIDGETS = [
     "rightNow", "tinyTimeline", "semesterOverview", "studyStreak", "weeklyGoal", "photo",
     "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
-    "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",
-    "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
+    "analyticsHeatmap", "analyticsAttendance",
 ]
 
 
 def _select_widgets():
-    """Select random widgets for homepage."""
-    shuffled = OPTIONAL_WIDGETS[:]
-    random.shuffle(shuffled)
-    return ["hero"] + PINNED_WIDGETS + shuffled[:random.randint(2, 5)]
+    """Seed core widgets plus one random optional widget after the timeline."""
+    extra = random.choice(OPTIONAL_WIDGETS)
+    return CORE_WIDGETS + [extra]
 
 
 def _widget_size(widget_id):

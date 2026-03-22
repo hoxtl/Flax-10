@@ -77,6 +77,12 @@
     white-space: nowrap;
 }
 
+.overdue {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger-bg) 88%, #fff 12%);
+    border-color: color-mix(in srgb, var(--danger) 26%, transparent);
+}
+
 .due-soon {
     color: var(--danger);
     background: var(--danger-bg);

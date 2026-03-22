@@ -1,3 +1,7 @@
+.tooltipWrap {
+  display: inline-flex;
+}
+
 .themeToggle {
   background: transparent;
   border: none;

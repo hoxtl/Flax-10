@@ -19,8 +19,8 @@
 }
 
 .colHeader {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
 }
 
 .colTitleWrapper {
@@ -54,24 +54,24 @@
 }
 
 .cardList {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  min-height: 100px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    min-height: 100px;
 }
 
 .boardCard {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  cursor: pointer;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
 }
 
 .boardCardActive {
@@ -200,20 +200,36 @@
 }
 
 .cardTitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
-  word-break: break-word;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.cardTitleInput {
+    width: 100%;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 4px 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    resize: none;
+    box-sizing: border-box;
+    line-height: 1.4;
 }
 
 .cardFooter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid var(--border);
-  padding-top: 12px;
-  margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 0;
 }
 
 .cardDate {
@@ -422,4 +438,12 @@
   .boardCard {
     padding: 12px;
   }
+}
+
+.addAssigneeBtn {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    line-height: 1;
+    padding: 0 2px;
 }

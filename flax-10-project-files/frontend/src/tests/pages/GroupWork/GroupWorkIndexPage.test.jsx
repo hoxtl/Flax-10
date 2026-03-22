@@ -12,6 +12,7 @@ vi.mock('react-router-dom', () => ({
 vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
   getAuthHeaders: () => ({}),
   useGroupProjects: vi.fn(),
+  useGroupProjectSort: vi.fn(() => ({ sortBy: 'deadline', setSortBy: vi.fn() })),
   useSelectedProjectId: vi.fn(),
 }));
 
@@ -33,6 +34,6 @@ describe('GroupWorkIndexPage', () => {
     render(<GroupWorkIndexPage />);
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
     // Skeleton uses AppPage and renders the title even while loading.
-    expect(screen.getByText('Group work')).toBeTruthy();
+    expect(screen.getByText('My Group Projects')).toBeTruthy();
   });
 });

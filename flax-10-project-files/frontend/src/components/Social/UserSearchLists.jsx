@@ -134,15 +134,16 @@ function SocietyList({ societies, filterQuery, querySelected, onToggle, expanded
     return <GroupedSocietyList societies={societies} querySelected={querySelected} onToggle={onToggle} expanded={expanded} toggleSection={toggleSection} />;
 }
 
-export function SearchDropdown({ loading, query, setQuery, userResults, onUserSelect, compact, renderEmptyState }) {
+export function SearchDropdown({ loading, query, setQuery, userResults, onUserSelect, compact, renderEmptyState, dropdownMode = "overlay" }) {
     const showEmpty = !loading && userResults.length === 0;
     const customEmptyState = renderEmptyState?.({
         query,
         clear: () => setQuery(""),
     });
     if (compact && showEmpty && !query) return null;
+    const modeClass = dropdownMode === "inline" ? styles.searchDropdownInline : "";
     return (
-        <div className={`${styles.searchDropdownContainer} ${compact ? styles.compactDropdown : ''}`}>
+        <div className={`${styles.searchDropdownContainer} ${compact ? styles.compactDropdown : ''} ${modeClass}`}>
             {loading && <EmptySearchText {...SEARCH_EMPTY_CONFIG.loading} />}
             {showEmpty && query && (customEmptyState || <EmptySearchText {...SEARCH_EMPTY_CONFIG.users} />)}
             {showEmpty && !query && <EmptySearchText {...SEARCH_EMPTY_CONFIG.start} />}

@@ -19,12 +19,14 @@ export function GlobalSearchBar({
     fullWidth,
     compact,
     renderEmptyState,
+    placeholder = "Search users...",
+    dropdownMode = "overlay",
 }) {
     const widthClass = fullWidth ? styles.fullWidthSearch : '';
     const searchClass = fullWidth ? styles.searchBarFull : styles.searchBarContainer;
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer} ${widthClass}`} ref={containerRef}>
-            <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder="Search users..." className={searchClass} />
+            <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder={placeholder} className={searchClass} />
             {showDropdown && (
                 <SearchDropdown
                     loading={loading}
@@ -34,15 +36,16 @@ export function GlobalSearchBar({
                     onUserSelect={handleSelect}
                     compact={compact}
                     renderEmptyState={renderEmptyState}
+                    dropdownMode={dropdownMode}
                 />
             )}
         </div>
     );
 }
 
-export function FilterSection({ fRef, isOpen, setOpen, props }) {
+export function FilterSection({ fRef, isOpen, setOpen, onOpen, onClose, props }) {
     return (
-        <div ref={fRef} className={styles.relativeContainer}>
+        <div ref={fRef} className={styles.relativeContainer} onMouseEnter={onOpen} onMouseLeave={onClose}>
             <button onClick={setOpen} className={styles.filterBtn}><FilterIcon /> Filter</button>
             <AnimatePresence>{isOpen && <FilterDropdownMotion {...props} />}</AnimatePresence>
         </div>

@@ -22,6 +22,10 @@
   max-width: none;
 }
 
+.backRow {
+  margin-bottom: var(--space-4);
+}
+
 .toolbar {
   margin-bottom: var(--space-6);
 }

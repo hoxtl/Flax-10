@@ -32,8 +32,9 @@ def build_readings_for_module(module):
     for i, (s, c, st, en) in enumerate(examples):
         offset = READING_DAY_OFFSETS[i % len(READING_DAY_OFFSETS)]
         deadline = now + timedelta(days=offset)
-        title = f"{module.module_name}: {s}"
-        results.append(_build_single_reading(module, title, c, st, en, deadline))
+        r = _build_single_reading(module, s, c, st, en, deadline)
+        if r:
+            results.append(r)
     return results
 
 

@@ -3,6 +3,20 @@
     align-items: center;
 }
 
+.avatarButton {
+    border: none;
+    background: transparent;
+    padding: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.avatarButton:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
 .avatar {
     border-radius: 50%;
     color: #fff;

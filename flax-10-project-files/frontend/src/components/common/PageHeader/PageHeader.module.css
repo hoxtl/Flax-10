@@ -92,6 +92,13 @@
   color: color-mix(in srgb, var(--color-primary, var(--primary)) 72%, white 28%);
 }
 
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
 .action {
   display: flex;
   align-items: center;

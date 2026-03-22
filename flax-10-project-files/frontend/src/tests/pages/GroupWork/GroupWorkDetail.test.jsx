@@ -1,98 +1,66 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import GroupProjectDetail from '../../../pages/GroupWork/GroupWorkDetail';
 
-// Mock the hook directly
-vi.mock('../../../context/ConfirmContext', () => ({
-  useConfirm: () => vi.fn(),
-}));
-
-// Mock hooks
 vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
-  getAuthHeaders: () => ({}),
-  useProject: vi.fn(),
-  useProjectMembers: vi.fn(),
-  useSelectedTab: vi.fn(),
+  useProjectDetail: vi.fn(),
 }));
 
-// Mock sub-components to avoid context issues
-vi.mock('../../../pages/GroupWork/GroupTasksTab', () => ({
-  default: () => <div data-testid="group-tasks-tab" />,
-}));
-vi.mock('../../../pages/GroupWork/AvailabilityTab', () => ({
-  default: () => <div data-testid="availability-tab" />,
+vi.mock('../../../pages/GroupWork/components/ProjectHeader', () => ({
+  default: ({ project }) => <div data-testid="project-header">{project.name}</div>,
 }));
 
-import { useProject, useProjectMembers, useSelectedTab } from '../../../pages/GroupWork/groupWorkHooks';
+vi.mock('../../../pages/GroupWork/components/TabsSection', () => ({
+  default: ({ activeTab }) => <div data-testid="tabs-section">{activeTab}</div>,
+}));
 
-const mockProject = {
-  id: 1,
-  name: "Detailed Project",
-  course_code: "DP101",
-  deadline: "2026-12-31T23:59:59Z",
+import { useProjectDetail } from '../../../pages/GroupWork/groupWorkHooks';
+
+const detailState = {
+  loading: false,
+  project: { id: 1, name: 'Detailed Project' },
+  members: [
+    { id: 101, user_name: 'Owner User' },
+    { id: 102, user_name: 'Member User' },
+  ],
+  patchProject: vi.fn(),
+  taskStats: { percent: 0, completed: 0, total: 0, segments: [] },
+  handleDeleteProject: vi.fn(),
+  handleRemoveMember: vi.fn(),
+  onAdded: vi.fn(),
+  activeTab: 'tasks',
+  setActiveTab: vi.fn(),
+  setTaskStats: vi.fn(),
 };
 
-const mockMembers = [
-  { id: 101, user: 1, user_name: "Owner User", role: "owner" },
-  { id: 102, user: 2, user_name: "Member User", role: "member" },
-];
-
-global.fetch = vi.fn();
-
 function renderComponent(props = {}) {
-  return render(
-    <GroupProjectDetail projectId={1} onBack={vi.fn()} {...props} />
-  );
+  return render(<GroupProjectDetail projectId={1} onBack={vi.fn()} {...props} />);
 }
 
 describe('GroupWorkDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useProject.mockReturnValue({ project: mockProject, loading: false });
-    useProjectMembers.mockReturnValue({ members: mockMembers, setMembers: vi.fn(), loading: false });
-    useSelectedTab.mockReturnValue("tasks");
+    useProjectDetail.mockReturnValue(detailState);
   });
 
-  it('renders project details', () => {
+  it('renders the project detail sections', () => {
     renderComponent();
-    expect(screen.getByDisplayValue("Detailed Project")).toBeTruthy();
-    expect(screen.getByDisplayValue("DP101")).toBeTruthy();
-    expect(screen.getByText(/Owner User/i)).toBeTruthy();
-    expect(screen.getByText(/Member User/i)).toBeTruthy();
+    expect(screen.getByTestId('project-header')).toHaveTextContent('Detailed Project');
+    expect(screen.getByTestId('tabs-section')).toHaveTextContent('tasks');
   });
 
-  it('shows the skeleton shimmer while loading', () => {
-    useProject.mockReturnValue({ project: null, loading: true });
+  it('shows the skeleton while loading', () => {
+    useProjectDetail.mockReturnValue({ ...detailState, loading: true, project: null });
     renderComponent();
     expect(screen.getByTestId('groupwork-skeleton')).toBeTruthy();
   });
 
-  it('switches tabs', () => {
+  it('shows the missing project state when the project is unavailable', () => {
+    useProjectDetail.mockReturnValue({ ...detailState, project: null, loading: false });
     renderComponent();
-    const availabilityTab = screen.getByText("Availability");
-    fireEvent.click(availabilityTab);
-    expect(availabilityTab.className).toContain('tabActive');
-  });
-
-  it('adds a member', async () => {
-    renderComponent();
-    const input = screen.getByPlaceholderText(/Add member by user ID/i);
-    const addBtn = screen.getByText(/Add/i);
-    
-    fireEvent.change(input, { target: { value: "3" } });
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ id: 103, user: 3, user_name: "New Member", role: "member" }),
-    });
-    
-    fireEvent.click(addBtn);
-    
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("/members/"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
+    expect(screen.getByText('This group project isn’t available right now.')).toBeTruthy();
+    expect(screen.getByText('It may have been removed, or you may no longer have access to it.')).toBeTruthy();
+    expect(screen.getByText('Back to My Group Projects')).toBeTruthy();
   });
 });

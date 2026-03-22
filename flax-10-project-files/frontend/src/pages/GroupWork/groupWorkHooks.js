@@ -28,6 +28,11 @@ export function useGroupProjects() {
   return { projects, setProjects, loading };
 }
 
+export function useGroupProjectSort(defaultValue = "due-date") {
+  const [sortBy, setSortBy] = useState(defaultValue);
+  return { sortBy, setSortBy };
+}
+
 export function useSelectedProjectId() {
   const location = useLocation();
   const params = new URLSearchParams(location.search || "");

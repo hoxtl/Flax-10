@@ -9,6 +9,29 @@
     gap: var(--space-4);
 }
 
+.warningBanner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, #d97706 10%, #fffbeb);
+    border: 1px solid color-mix(in srgb, #d97706 28%, transparent);
+    border-radius: 8px;
+}
+
+.warningBannerIcon {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.warningBannerText {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #92400e;
+    line-height: 1.5;
+}
+
 .warning {
     font-style: italic;
     color: var(--primary-strong);

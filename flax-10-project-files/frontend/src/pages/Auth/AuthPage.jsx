@@ -88,7 +88,7 @@ export default function AuthPage({ initialSignIn = true }) {
           "Calendar",
           "Tasks",
           "Deadlines",
-          "Group Study",
+          "Group Projects",
           "Uni Map",
           "Analytics",
           "Venio Insights",

@@ -38,7 +38,7 @@ function HoldButton({ holdLabel, holdProgress, startHold, stopHold }) {
 
 /** Modal that requires holding a button for a set duration to confirm a destructive action. */
 export default function HoldConfirmModal({
-  title, warningText,
+  title, warningText, warningBanner,
   cancelLabel = 'Keep It', holdLabel = 'Hold to Delete',
   holdDuration = 2000, onConfirm, onCancel,
 }) {
@@ -46,6 +46,12 @@ export default function HoldConfirmModal({
   return (
     <StandardModal title={title} onClose={onCancel} size="sm" modalClassName={styles.modal}>
       <div className={styles.body}>
+        {warningBanner && (
+          <div className={styles.warningBanner}>
+            <span className={styles.warningBannerIcon} aria-hidden>⚠️</span>
+            <span className={styles.warningBannerText}>{warningBanner}</span>
+          </div>
+        )}
         {warningText && <p className={styles.warning}>{warningText}</p>}
         <div className={styles.buttons}>
           <PrimaryButton variant="primary" pill onClick={onCancel}>{cancelLabel}</PrimaryButton>

@@ -95,6 +95,14 @@
   margin-left: auto;
 }
 
+.readingCaption {
+    margin: -0.2rem 0 0.05rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--modules-accent-ink);
+    font-style: italic;
+}
+
 .widgetList {
   display: flex;
   flex-direction: column;

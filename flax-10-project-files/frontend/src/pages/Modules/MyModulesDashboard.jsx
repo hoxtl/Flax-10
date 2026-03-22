@@ -23,6 +23,8 @@ import { useToast } from "../../context/ToastContext";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import StatStrip from "../../components/common/StatStrip/StatStrip";
 import { TaskInfoModal } from "../Tasks/components/TaskInfoModal";
+import SmartNudge from "./SmartNudge";
+import ReadingsPanel from "./ReadingsPanel";
 import styles from "./MyModulesDashboard.module.css";
 
 const DEADLINES_INITIAL_SHOWN = 4;
@@ -278,200 +280,16 @@ function ReadingRow({ reading, isMostUrgent, onReadingAdded, onSelect }) {
   );
 }
 
-function ReadingsPanel({ readings, onReadingAdded }) {
-  const [expanded, setExpanded] = useState(false);
-  const [selectedReading, setSelectedReading] = useState(null);
-  const sorted = useMemo(() => {
-    const list = [...(readings || [])];
-    list.sort((a, b) => {
-      const aDate = a.deadline || a.due_date || "9999";
-      const bDate = b.deadline || b.due_date || "9999";
-      return new Date(aDate).getTime() - new Date(bDate).getTime();
-    });
-    return list;
-  }, [readings]);
-
-  const initial = sorted.slice(0, READINGS_INITIAL_SHOWN);
-  const extra = sorted.slice(READINGS_INITIAL_SHOWN);
-  const hiddenCount = extra.length;
-
-  return (
-    <motion.div
-      className={styles.widget}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <WidgetHeader
-        icon={BookOpen}
-        title="Reading List"
-        count={sorted.length}
-      />
-      {sorted.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyMessage}>No readings assigned</p>
-          <p className={styles.emptySub}>
-            Your reading list will appear here when tutors add materials.
-          </p>
-        </div>
-      ) : (
-        <>
-          <motion.div
-            className={styles.widgetList}
-            initial="hidden"
-            animate="visible"
-            variants={listVariants}
-          >
-            {initial.map((r, idx) => (
-              <ReadingRow
-                key={r.id}
-                reading={r}
-                isMostUrgent={idx === 0}
-                onReadingAdded={onReadingAdded}
-                onSelect={setSelectedReading}
-              />
-            ))}
-            <AnimatePresence initial={false}>
-              {expanded && (
-                <motion.div
-                  className={styles.expandableRows}
-                  variants={expandBodyVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                >
-                  <motion.div
-                    className={styles.expandableRowsInner}
-                    initial="hidden"
-                    animate="visible"
-                    variants={listVariants}
-                  >
-                    {extra.map((r) => (
-                      <ReadingRow
-                        key={r.id}
-                        reading={r}
-                        isMostUrgent={false}
-                        onReadingAdded={onReadingAdded}
-                        onSelect={setSelectedReading}
-                      />
-                    ))}
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-          {hiddenCount > 0 && (
-            <ShowMoreButton
-              expanded={expanded}
-              hiddenCount={hiddenCount}
-              onToggle={() => setExpanded((p) => !p)}
-            />
-          )}
-        </>
-      )}
-      {selectedReading && (
-        <TaskInfoModal
-          task={readingToTask(selectedReading)}
-          listName={selectedReading.module_name || null}
-          onClose={() => setSelectedReading(null)}
-        />
-      )}
-    </motion.div>
-  );
-}
-
-function SmartNudge({ deadlines, readings, onReadingAdded }) {
-  const [dismissed, setDismissed] = useState(new Set());
-  const nudgeItem = useMemo(() => {
-    const items = [];
-    for (const d of deadlines || []) {
-      if (!d.start_due_date) continue;
-      const days = getDayCount(d.start_due_date);
-      if (days >= 0 && days <= 7) {
-        items.push({
-          type: "deadline",
-          title: d.assessment_title || d.title,
-          code: d.module_code,
-          days,
-          deadline: d,
-          id: `d-${d.id}`,
-        });
-      }
-    }
-    for (const r of readings || []) {
-      const due = r.deadline || r.due_date;
-      if (!due) continue;
-      const days = getDayCount(due);
-      if (days >= 0 && days <= 7) {
-        items.push({
-          type: "reading",
-          title: r.title,
-          code: r.module_code,
-          days,
-          readingId: r.id,
-          id: `r-${r.id}`,
-        });
-      }
-    }
-    items.sort((a, b) => a.days - b.days);
-    return items.find((i) => !dismissed.has(i.id)) || null;
-  }, [deadlines, readings, dismissed]);
-
-  const handleReadingAdded = useCallback(
-    (readingId) => {
-      setDismissed((prev) => new Set(prev).add(`r-${readingId}`));
-      onReadingAdded?.(readingId);
-    },
-    [onReadingAdded],
-  );
-
-  const handleDeadlineAdded = useCallback((deadlineId) => {
-    setDismissed((prev) => new Set(prev).add(`d-${deadlineId}`));
-  }, []);
-
-  if (!nudgeItem) return null;
-  const label =
-    nudgeItem.days === 0
-      ? "today"
-      : nudgeItem.days === 1
-        ? "tomorrow"
-        : `in ${nudgeItem.days} days`;
-  return (
-    <motion.div
-      className={styles.nudgeBanner}
-      key={nudgeItem.id}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.35 }}
-    >
-      <span className={styles.nudgeIcon}>⚡</span>
-      <span className={styles.nudgeText}>
-        <strong>
-          {nudgeItem.code ? `${nudgeItem.code}: ` : ""}
-          {nudgeItem.title}
-        </strong>{" "}
-        is due {label} — focus on it this week.
-      </span>
-      <div className={styles.nudgeActions}>
-        {nudgeItem.type === "deadline" && nudgeItem.deadline && (
-          <AddDeadlineToTaskButton
-            deadline={nudgeItem.deadline}
-            onAdded={handleDeadlineAdded}
-            className={styles.nudgeAddButton}
-            variant="primary"
-          />
-        )}
-        {nudgeItem.type === "reading" && nudgeItem.readingId && (
-          <AddToTaskButton
-            readingId={nudgeItem.readingId}
-            onAdded={handleReadingAdded}
-            className={styles.nudgeAddButton}
-            variant="primary"
-          />
-        )}
-      </div>
-    </motion.div>
-  );
+function useStatItems(modules, enrollments, deadlineCount, readingCount) {
+    const enrolledCount = useMemo(() => countEnrolled(modules, enrollments), [modules, enrollments]);
+    const enrolledRef = useCountUp(enrolledCount, 1200);
+    const deadlinesRef = useCountUp(deadlineCount, 1200);
+    const readingsRef = useCountUp(readingCount, 1200);
+    return [
+        { key: 'enrolled-modules', label: 'Enrolled modules', value: enrolledCount, valueRef: enrolledRef },
+        { key: 'upcoming-deadlines', label: 'Upcoming assignment deadlines', value: deadlineCount, valueRef: deadlinesRef, tone: deadlineCount > 0 ? 'danger' : undefined },
+        { key: 'readings-to-do', label: 'Readings to do', value: readingCount, valueRef: readingsRef },
+    ];
 }
 
 export default function MyModulesDashboard({ modules, enrollments }) {

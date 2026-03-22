@@ -1,11 +1,50 @@
+/* Task list */
+.taskList {
+    display: flex;
+    flex-direction: column;
+}
+
+.emptyStateCard {
+    margin-top: 18px;
+    padding: 2.75rem 1.5rem 2.45rem;
+    border-radius: 20px;
+    box-shadow: none;
+}
+
+.emptyStateTitle {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.emptyStateHint {
+    max-width: 30rem;
+}
+
+.headerRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
+    gap: 16px;
+    padding: 0 0 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.headerCell {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    text-align: center;
+}
+
 /* Task Row grid */
 .taskRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
-  gap: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding: 9px 0;
+    gap: 16px;
 }
 
 .taskRow:last-child {
@@ -49,21 +88,10 @@
   min-width: 0;
 }
 
-/* Priority Select */
-.prioritySelect {
-  border: none;
-  border-radius: 20px;
-  padding: 6px 4px;
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  text-align: center;
-  width: 100%;
-  letter-spacing: 0.05em;
-  margin-right: 12px;
+
+.priorityPill {
+    justify-self: center;
+    width: 100%;
 }
 
 /* Date Cell */
@@ -76,24 +104,19 @@
 }
 
 .dateLabel {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: var(--hover-light);
-  border-radius: 8px;
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.dateLabel:hover {
-  background: rgba(143, 121, 105, 0.1);
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f8f7f4;
+    border-radius: 12px;
+    width: 100%;
+    border: 1px solid color-mix(in srgb, var(--border) 92%, #ffffff 8%);
+    white-space: nowrap;
 }
 
 /* Assign Cell */

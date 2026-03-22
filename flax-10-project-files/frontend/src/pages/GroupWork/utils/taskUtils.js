@@ -11,8 +11,10 @@ export function buildToggleAssignee(assignees, taskId, onUpdate) {
 
 export function filterVisibleAssignees(assignees, members) {
   if (!Array.isArray(assignees) || !Array.isArray(members)) return assignees || [];
-  const memberIds = new Set(members.map((member) => String(member.user)));
-  return assignees.filter((assignee) => memberIds.has(String(assignee.id)));
+  const memberByUserId = Object.fromEntries(members.map((m) => [String(m.user), m]));
+  return assignees
+    .filter((assignee) => memberByUserId[String(assignee.id)])
+    .map((assignee) => ({ ...memberByUserId[String(assignee.id)], id: assignee.id }));
 }
 
 export function handleDragStartTask(e, taskId) {
@@ -22,6 +24,13 @@ export function handleDragStartTask(e, taskId) {
 export function getDueDateStr(due_date) {
   if (!due_date) return "";
   return new Date(due_date).toISOString().slice(0, 10);
+}
+
+export function formatTaskDueDate(dueDate) {
+  if (!dueDate) return "";
+  const date = new Date(dueDate);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 export function getDeadlineLabel(deadline) {

@@ -36,8 +36,6 @@ User = get_user_model()
 
 FIXED_TEACHER_DEPARTMENTS = {
     "amiller": {"Arts & Humanities"},
-    "srahwan": {"Nursing, Midwifery & Palliative Care"},
-    "hpatel": {"Natural, Mathematical & Engineering Sciences"},
 }
 MAX_MODULES_PER_TEACHER = 5
 

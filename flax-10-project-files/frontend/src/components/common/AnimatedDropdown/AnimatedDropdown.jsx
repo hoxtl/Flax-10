@@ -118,9 +118,9 @@ function FlatOptions({ options, value, onSelect, hideCheckmark }) {
   });
 }
 
-function DropdownButton({ selectedLabel, value, isOpen, onClick }) {
+function DropdownButton({ selectedLabel, value, isOpen, onClick, triggerClassName = "" }) {
   return (
-    <motion.button type="button" whileTap={{ scale: 0.99 }} onClick={onClick} className={styles.dropdownBtn}>
+    <motion.button type="button" whileTap={{ scale: 0.99 }} onClick={onClick} className={triggerClassName ? `${styles.dropdownBtn} ${triggerClassName}` : styles.dropdownBtn}>
       <span style={{ color: value ? 'inherit' : 'var(--muted)' }}>{selectedLabel}</span>
       <motion.div animate={{ rotate: isOpen ? 0 : 180 }} transition={chevronRotateTransition}>
         <ChevronDown size={16} />
@@ -279,7 +279,7 @@ function useDropdownRefs() {
   return { containerRef: useRef(null), menuRef: useRef(null), timeoutRef: useRef(null) };
 }
 
-function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLabel, value, isOpen }) {
+function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLabel, value, isOpen, triggerClassName }) {
   if (customTrigger) {
     return (
       <div onClick={handleToggle} style={{ display: 'inline-flex', cursor: openOnHover ? 'default' : 'pointer' }}>
@@ -287,13 +287,13 @@ function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLab
       </div>
     );
   }
-  return <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} />;
+  return <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} triggerClassName={triggerClassName} />;
 }
 
 /** Animated dropdown with optional search and grouped option support. */
 export default function AnimatedDropdown({
   value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className,
-  customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true
+  customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true, triggerClassName = ""
 }) {
   const { containerRef, menuRef, timeoutRef } = useDropdownRefs();
   const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange);
@@ -302,7 +302,7 @@ export default function AnimatedDropdown({
   useClickOutside(containerRef, menuRef, setIsOpen, openOnHover);
   return (
     <div ref={containerRef} className={className} style={{ position: 'relative' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <DropdownTrigger customTrigger={customTrigger} handleToggle={handleToggle} openOnHover={openOnHover} selectedLabel={selectedLabel} value={value} isOpen={isOpen} />
+      <DropdownTrigger customTrigger={customTrigger} handleToggle={handleToggle} openOnHover={openOnHover} selectedLabel={selectedLabel} value={value} isOpen={isOpen} triggerClassName={triggerClassName} />
       <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
         searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder}
         emptyMessage={emptyMessage} openUpward={openUpward} menuMaxHeight={menuMaxHeight}

@@ -49,6 +49,9 @@ function UserSearchLayout({
   hideFilter,
   compact,
   renderEmptyState,
+  searchPlaceholder,
+  openOnEmptyQuery,
+  dropdownMode,
 }) {
   const handleSelect = (user) =>
     handleUserSelect(user, onUserSelect, setIsSearchFocused, searchState);
@@ -56,6 +59,7 @@ function UserSearchLayout({
   const setFocus = () => focusSearch(setIsSearchFocused, filterState);
   const toggleFilter = () => toggleFilterPanel(setIsSearchFocused, filterState);
   const displayResults = getDisplayResults(filterUsers, searchState.userResults);
+  const shouldShowDropdown = filterState.active && (openOnEmptyQuery || Boolean(searchState.query.trim()));
 
   return (
     <div className={`${styles.userSearchWrapper} ${fullWidth ? styles.fullWidthWrapper : ''}`}>
@@ -64,13 +68,15 @@ function UserSearchLayout({
         setQuery={searchState.setQuery}
         setFocus={setFocus}
         containerRef={searchState.containerRef}
-        showDropdown={filterState.active}
+        showDropdown={shouldShowDropdown}
         loading={searchState.loading}
         userResults={displayResults}
         handleSelect={handleSelect}
         fullWidth={fullWidth}
         compact={compact}
         renderEmptyState={renderEmptyState}
+        placeholder={searchPlaceholder}
+        dropdownMode={dropdownMode}
       />
       {!hideFilter && (
         <FilterSection
@@ -91,6 +97,9 @@ export default function UserSearch({
   hideFilter,
   compact,
   renderEmptyState,
+  searchPlaceholder = "Search users...",
+  openOnEmptyQuery = true,
+  dropdownMode = "overlay",
 }) {
   const searchState = useSearchState(hideFilter);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -121,6 +130,9 @@ export default function UserSearch({
       hideFilter={hideFilter}
       compact={compact}
       renderEmptyState={renderEmptyState}
+      searchPlaceholder={searchPlaceholder}
+      openOnEmptyQuery={openOnEmptyQuery}
+      dropdownMode={dropdownMode}
     />
   );
 }

@@ -195,6 +195,12 @@
   border: 1px solid var(--primary);
 }
 
+.dayCellDisabled {
+  color: color-mix(in srgb, var(--muted) 75%, transparent);
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 /* ── Time picker row ──────────────────────────────────────── */
 .timePicker {
   display: flex;

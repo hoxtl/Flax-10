@@ -1,28 +1,29 @@
 .headerSection {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.headerBody {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.topActions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .deleteError {
-  margin: -12px 0 20px;
-  color: var(--danger);
-  font-size: 13px;
-  font-weight: 500;
+    margin: 6px 4px 0;
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.deleteActionWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.topActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .deleteBtn {
@@ -43,121 +44,344 @@
   background: var(--danger-bg);
 }
 
-.nameInput {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 4px 0;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  width: 100%;
-  outline: none;
+.headerCard {
+    padding: 0.85rem 1.35rem 0.8rem;
+    border-radius: var(--card-radius-token);
+    border: var(--card-border);
+    background: var(--surface-card);
+    box-shadow: var(--card-shadow-rest);
 }
 
-.moduleTag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: var(--primary-light);
-  border: 1px solid var(--border);
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 600;
+.headerCopy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.38rem;
 }
 
-.moduleDot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--primary);
+.subtitleRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.4rem;
+    flex-wrap: wrap;
 }
 
-.headerModuleDropdown {
-  display: inline-flex;
-  align-items: center;
+.titleRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.5rem 1.2rem;
 }
 
-/*
-   IMPORTANT: Scope the override to .headerModuleDropdown to only affect the header tag.
-   We target the internal dropdownBtn class from AnimatedDropdown.
-*/
-.headerModuleDropdown :global([class*="dropdownBtn"]) {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  min-height: 0 !important;
-  font-size: inherit !important;
-  color: inherit !important;
-  box-shadow: none !important;
-  width: auto !important;
+.title {
+    margin: 0;
+    font-size: clamp(1.95rem, 3.3vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--text);
+}
+
+.subtitle {
+    margin: 0;
+    max-width: 58rem;
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.headerRightMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.32rem;
+    flex-shrink: 0;
+}
+
+.headerPillRow {
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.modulePillBtn {
+    display: inline-flex;
+    border-radius: 999px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modulePillBtn:hover .modulePillRight {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+}
+
+.modulePillBtn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 999px;
+}
+
+.modulePillRight {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    min-height: 26px;
+    padding: 0.18rem 0.62rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 9%, var(--surface-card));
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.teacherPillBtn {
+    all: unset;
+    cursor: pointer;
+    display: inline-flex;
+    border-radius: 999px;
+}
+
+.teacherPillBtn:hover .teacherPill {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+}
+
+.teacherPillBtn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 999px;
+}
+
+.inlineDeadlineMeta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.52rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding-top: 0.18rem;
+}
+
+.inlineDeadlineDate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text);
+}
+
+.inlineCountdown {
+    display: inline-flex !important;
+    align-items: center;
+    padding: 0 !important;
+}
+
+.inlineDeadlineSeparator {
+    color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
+}
+
+.inlineDeadlineCountdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-secondary);
+}
+
+.detailsPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.metaStack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.62rem;
 }
 
 .metaRow {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.metaItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text-secondary);
+.metaLink {
+    display: inline-flex;
+    text-decoration: none;
 }
 
-.deadlinePill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: white;
-  border: 1px solid var(--border);
+.metaLink:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 999px;
 }
 
-.detailDateTrigger {
-  background: transparent;
-  border: none;
+.modulePill {
+    background: rgba(123, 103, 81, 0.08);
+    color: var(--primary);
+    border-color: rgba(123, 103, 81, 0.18);
+    min-height: 32px;
+}
+
+.moduleCode {
+    font-weight: 700;
+}
+
+.teacherPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    min-height: 26px;
+    padding: 0.18rem 0.62rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 9%, var(--surface-card));
+    color: var(--primary);
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.teacherPillLabel {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--primary) 75%, #ffffff 25%);
+}
+
+.metaIcon {
+    color: var(--muted);
+}
+
+.memberMeta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.58rem;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.memberMetaStack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.memberMetaBody {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.58rem;
+    flex-wrap: wrap;
+}
+
+.memberMetaLabel {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.memberAvatarStrip {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 0;
+}
+
+.teamManageBtn {
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-card));
+    color: var(--primary);
+    border-radius: 999px;
+    min-height: 28px;
+    padding: 0.2rem 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.teamManageBtn:hover {
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
+}
+
+.teamManageBtn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.teamManagerPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(74, 52, 33, 0.12);
+    background: color-mix(in srgb, var(--surface-card) 82%, #ffffff 18%);
+}
+
+.memberTooltipWrap {
+    display: inline-flex;
+}
+
+.memberAvatarButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    margin-right: 0.18rem;
+}
+
+.memberAvatarButton:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
-  .topActions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
+    .headerCard {
+        padding: 1rem 1rem 0.95rem;
+    }
 
-  .deleteBtn {
-    width: 100%;
-    justify-content: center;
-  }
+    .titleRow {
+        grid-template-columns: 1fr;
+    }
 
-  .nameInput {
-    font-size: 24px;
-  }
+    .headerRightMeta {
+        align-items: flex-start;
+    }
 
-  .metaRow {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
+    .headerPillRow {
+        justify-content: flex-start;
+    }
 
-  .deadlinePill {
-    width: 100%;
-  }
-}
+    .title {
+        font-size: 1.95rem;
+    }
 
-@media (max-width: 520px) {
-  .moduleTag {
-    width: 100%;
-    justify-content: flex-start;
-  }
+    .inlineDeadlineMeta {
+        justify-content: flex-start;
+        padding-top: 0;
+        font-size: 0.9rem;
+    }
 
-  .metaItem {
-    width: 100%;
-  }
+    .metaRow {
+        gap: 8px;
+    }
+
+    .memberMeta {
+        width: 100%;
+    }
 }

@@ -12,7 +12,7 @@ export function CreateProjectInputs({ data, onChange, errors }) {
   return (
     <>
       <ProjectNameField value={data.name} onChange={onChange} error={errors?.name} />
-      <ProjectModuleField value={data.course_code} onChange={onChange} />
+      <ProjectModuleField value={data.course_code} onChange={onChange} error={errors?.course_code} />
       <ProjectDeadlineField value={data.deadline} onChange={onChange} error={errors?.deadline} />
     </>
   );
@@ -20,28 +20,43 @@ export function CreateProjectInputs({ data, onChange, errors }) {
 
 function ProjectNameField({ value, onChange, error }) {
   return (
-    <FormField label="Project Name" className={styles.inputName} error={error}>
+    <FormField label={<RequiredLabel text="Project name" />} labelClassName={styles.fieldLabel} className={styles.inputName} error={error}>
       <TextInput value={value} onChange={(event) => onChange("name", event.target.value)} placeholder="e.g. Machine Learning Research..." required />
     </FormField>
   );
 }
 
-function ProjectModuleField({ value, onChange }) {
+function ProjectModuleField({ value, onChange, error }) {
   return (
-    <FormField label={<OptionalModuleLabel />} className={styles.inputField}>
-      <UserModuleDropdown value={value} onChange={(nextValue) => onChange("course_code", nextValue)} placeholder="Select..." usePortal />
+    <FormField label={<RequiredLabel text="Module" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
+      <UserModuleDropdown
+        value={value}
+        onChange={(nextValue) => onChange("course_code", nextValue)}
+        placeholder="Select..."
+        className={styles.dropdownWrap}
+        triggerClassName={styles.dropdownTrigger}
+        usePortal
+        allowFlipUpward={false}
+      />
     </FormField>
   );
-}
-
-function OptionalModuleLabel() {
-  return <>Module <span className={styles.optionalText}>(Optional)</span></>;
 }
 
 function ProjectDeadlineField({ value, onChange, error }) {
   return (
-    <FormField label="Deadline" className={styles.inputField} error={error}>
-      <DateTimePicker value={value} onChange={(nextValue) => onChange("deadline", nextValue)} placeholder="dd / mm / yyyy" dateOnly hideIcon triggerClassName={styles.datePickerTrigger} wrapperClassName={styles.datePickerWrap} />
+    <FormField label={<RequiredLabel text="Due date" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
+      <DateTimePicker
+        value={value}
+        onChange={(nextValue) => onChange("deadline", nextValue)}
+        placeholder="Select due date"
+        dateOnly
+        minDate={new Date()}
+        wrapperClassName={styles.datePickerWrap}
+      />
     </FormField>
   );
+}
+
+function RequiredLabel({ text }) {
+  return <>{text} <span className={styles.requiredMark}>*</span></>;
 }

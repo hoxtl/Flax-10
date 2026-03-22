@@ -6,6 +6,7 @@ import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
 import styles from './ModuleDetails.module.css';
@@ -28,15 +29,15 @@ function getNextDeadline(deadlines = []) {
 }
 
 function getUrgencyLabel(dueDate) {
-    const now = new Date();
-    const diffMs = new Date(dueDate) - now;
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    if (diffDays <= 2) return "due-soon";
-    if (diffDays <= 7) return "this-week";
+    const tier = getUrgencyTier(dueDate);
+    if (tier === "overdue") return "overdue";
+    if (tier === "critical") return "due-soon";
+    if (tier === "urgent") return "this-week";
     return "later";
 }
 
 function getUrgencyText(kind) {
+    if (kind === "overdue") return "Passed";
     if (kind === "due-soon") return "Due soon";
     if (kind === "this-week") return "This week";
     return "Later";
@@ -90,13 +91,14 @@ function TutorName({ id, name }) {
 }
 
 function TutorMetaItem({ module, photo }) {
+    const tutorName = module.created_by_name || "Unknown";
     return (
         <div className={heroStyles.heroMetaItem}>
             <span className={heroStyles.heroMetaLabel}>Tutor</span>
             <div className={heroStyles.tutorInline}>
-                <TutorPhoto photo={photo} name={module.created_by_name || "Tutor"} />
-                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(module.created_by_name)}</span>
-                <TutorName id={module.created_by} name={module.created_by_name} />
+                <TutorPhoto photo={photo} name={tutorName} />
+                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(tutorName)}</span>
+                <TutorName id={module.created_by} name={tutorName} />
             </div>
         </div>
     );
@@ -128,10 +130,15 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
             <h1 className={heroStyles.moduleTitle}>{module.module_name}</h1>
             <p className={heroStyles.heroSubtext}>{module.description || "No module summary available yet."}</p>
-            <div className={heroStyles.heroMeta}><TutorMetaItem module={module} photo={tutorPhoto} /><EmailMetaItem email={module.created_by_email} /></div>
-            <div className={heroStyles.heroActions}>
-                {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
-                <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+            <div className={heroStyles.heroBottom}>
+                <div className={heroStyles.heroMeta}>
+                    <TutorMetaItem module={module} photo={tutorPhoto} />
+                    <EmailMetaItem email={module.created_by_email} />
+                </div>
+                <div className={heroStyles.heroActions}>
+                    {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
+                    <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                </div>
             </div>
         </section>
     );
@@ -306,13 +313,14 @@ function ReadingsSection({ readings }) {
 }
 
 function ReadingRow({ reading, index }) {
+    const cleanTitle = stripModulePrefix(reading.title, reading.module_name);
     return (
         <div className={deadlineStyles.deadlineItem}>
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
                     <span className={deadlineStyles.deadlinesType}>📖 Reading</span>
-                    <span className={deadlineStyles.deadlineTitle}>{reading.title}</span>
+                    <span className={deadlineStyles.deadlineTitle}>{cleanTitle}</span>
                 </div>
                 <span className={deadlineStyles.deadlineDate}>
                     {reading.start_page != null && reading.end_page != null
@@ -323,4 +331,15 @@ function ReadingRow({ reading, index }) {
             </div>
         </div>
     );
+}
+
+function stripModulePrefix(title = "", moduleName = "") {
+    const cleanTitle = String(title || "").trim();
+    const cleanModule = String(moduleName || "").trim();
+    if (!cleanModule) return cleanTitle;
+    const prefix = `${cleanModule}:`;
+    if (cleanTitle.toLowerCase().startsWith(prefix.toLowerCase())) {
+        return cleanTitle.slice(prefix.length).trim();
+    }
+    return cleanTitle;
 }

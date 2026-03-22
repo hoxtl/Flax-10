@@ -17,8 +17,20 @@ from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_e
 
 User = get_user_model()
 
-def _create_society_from_config(data):
-    status = random.choice(['approved', 'pending', 'rejected', 'none'])
+PENDING_RATIFICATION_TARGET = 14
+APPROVED_SOCIETY_TARGET = 24
+
+def _society_status_for_index(index, total):
+    pending_target = min(PENDING_RATIFICATION_TARGET, max(total // 5, 1))
+    approved_target = min(APPROVED_SOCIETY_TARGET, max(total - pending_target, 0))
+    if index < pending_target:
+        return 'pending'
+    if index < pending_target + approved_target:
+        return 'approved'
+    return 'rejected' if (index - pending_target - approved_target) % 2 == 0 else 'none'
+
+def _create_society_from_config(data, index, total):
+    status = _society_status_for_index(index, total)
     defaults = {
         'bio': data['bio'], 'about': data['about'],
         'categories': data.get('categories', []),
@@ -36,8 +48,10 @@ def _seed_society_tags(society, tag_labels):
         SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
 
 def create_societies(stdout):
-    for data in build_society_seed_data():
-        society = _create_society_from_config(data)
+    seed_data = build_society_seed_data()
+    total = len(seed_data)
+    for index, data in enumerate(seed_data):
+        society = _create_society_from_config(data, index, total)
         _seed_society_tags(society, data.get('tags', []))
 
 def _build_event_defaults(desc, start, end, recurrence, tags):

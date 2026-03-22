@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pagination } from "../../components/Pagination/Pagination";
-import BasePill from "../../components/Tags/BasePill";
+import { BackToTop, Pagination } from "../../components/Pagination/Pagination";
+import Badge from "../../components/common/Badge/Badge";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
+import Tabs from "../../components/common/Tabs/Tabs";
+import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import {
   fetchAdminUsers,
   banUser,
@@ -40,15 +43,8 @@ const rowAnim = {
   transition: { duration: 0.2 },
 };
 
-const TABS = [
-  { id: "users", label: "👤 Users" },
-  { id: "ratifications", label: "🏛️ Ratifications" },
-  { id: "teachers", label: "🎓 Teacher Requests" },
-  { id: "reports", label: "🚩 Reported Societies" },
-  { id: "course-changes", label: "📚 Course Change Requests" },
-];
-
 const PAGE_SIZE = 20;
+const ADMIN_LIST_PAGE_SIZE = 10;
 
 const USER_FILTER_GROUPS = {
   roles: [
@@ -128,14 +124,6 @@ function SectionCard({ children }) {
   return <div className={styles.card}>{children}</div>;
 }
 
-function EmptyState({ message }) {
-  return (
-    <motion.p className={styles.empty} {...fadeUp}>
-      {message}
-    </motion.p>
-  );
-}
-
 function LoadingSpinner() {
   return (
     <div className={styles.spinnerWrap}>
@@ -171,35 +159,37 @@ function RoleBadge({ role }) {
   );
 }
 
-function SearchBar({ value, onChange, placeholder, className = "" }) {
-  return (
-    <input
-      className={`${styles.search} ${className}`.trim()}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-    />
-  );
-}
-
 function FilterToggleGroup({ label, options, selected, onToggle }) {
+  void label;
   return (
     <div className={styles.filterGroup}>
-      <span className={styles.filterGroupLabel}>{label}</span>
       <div className={styles.filterButtons}>
         {options.map((opt) => {
           const active = selected.includes(opt.value);
           return (
-            <BasePill
+            <FilterPillButton
               key={opt.value}
               label={opt.label}
-              isActive={active}
+              active={active}
               onClick={() => onToggle(opt.value)}
             />
           );
         })}
       </div>
     </div>
+  );
+}
+
+function FilterPillButton({ label, active, onClick }) {
+  return (
+    <button type="button" className={styles.filterPillButton} onClick={onClick}>
+      <Badge
+        tone={active ? "default" : "muted"}
+        className={active ? styles.filterPillBadgeActive : styles.filterPillBadge}
+      >
+        {label}
+      </Badge>
+    </button>
   );
 }
 
@@ -296,7 +286,7 @@ function UsersTab({ onNavigate }) {
   );
 
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(filtered);
+    usePaginatedItems(filtered, 10);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -392,9 +382,11 @@ function UsersTab({ onNavigate }) {
             </div>
             <SearchBar
               className={styles.searchCompact}
+              inputClassName={styles.searchInput}
               value={search}
               onChange={setSearch}
-              placeholder="Search"
+              placeholder="Search users... (/)"
+              showShortcutHint={false}
             />
           </div>
         </div>
@@ -404,7 +396,7 @@ function UsersTab({ onNavigate }) {
         {loading ? (
           <LoadingSpinner />
         ) : filtered.length === 0 ? (
-          <EmptyState message="No users found." />
+          <SearchEmptyState query={search} itemLabel="users" />
         ) : (
           <>
             <Pagination
@@ -582,7 +574,7 @@ function RatificationsTab() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -623,7 +615,7 @@ function RatificationsTab() {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Pending Ratifications{" "}
+          Society Ratifications{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -631,7 +623,7 @@ function RatificationsTab() {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No societies are awaiting ratification." />
+        <SearchEmptyState title="No societies awaiting ratification" hint="New society ratification requests will appear here." />
       ) : (
         <>
           <Pagination
@@ -698,7 +690,7 @@ function TeacherRequestsTab({ onNavigate }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -732,7 +724,7 @@ function TeacherRequestsTab({ onNavigate }) {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Teacher Role Requests{" "}
+          Teacher Switch Requests{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -740,7 +732,7 @@ function TeacherRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No pending teacher role requests." />
+        <SearchEmptyState title="No teacher switch requests" hint="Teacher role requests from students will appear here." />
       ) : (
         <>
           <Pagination
@@ -808,7 +800,7 @@ function ReportedSocietiesTab() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(reports);
+    usePaginatedItems(reports, ADMIN_LIST_PAGE_SIZE);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -878,7 +870,7 @@ function ReportedSocietiesTab() {
       {loading ? (
         <LoadingSpinner />
       ) : reports.length === 0 ? (
-        <EmptyState message="No reported societies — all clear! 🎉" />
+        <SearchEmptyState title="No reported societies" hint="Society reports from users will appear here." />
       ) : (
         <>
           <Pagination
@@ -945,7 +937,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -979,7 +971,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Course Change Requests{" "}
+          Course Switch Requests{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -987,7 +979,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <EmptyState message="No pending course change requests." />
+        <SearchEmptyState title="No course switch requests" hint="Student course change requests will appear here." />
       ) : (
         <>
           <Pagination
@@ -1058,58 +1050,35 @@ function CourseChangeRequestsTab({ onNavigate }) {
 
 function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
+  const tabs = [
+    { id: "users", icon: "👤", label: "Users Overview", content: <UsersTab onNavigate={onNavChange} /> },
+    { id: "ratifications", icon: "🤝", label: "Society Ratifications", content: <RatificationsTab /> },
+    { id: "reports", icon: "🚩", label: "Reported Societies", content: <ReportedSocietiesTab /> },
+    { id: "course-changes", icon: "📚", label: "Course Switch Requests", content: <CourseChangeRequestsTab onNavigate={onNavChange} /> },
+    { id: "teachers", icon: "🧑‍🏫", label: "Teacher Switch Requests", content: <TeacherRequestsTab onNavigate={onNavChange} /> },
+  ];
   return (
-    <AppPage
-      title={
-        <>
-          <span className={styles.adminWord}>Admin</span>
-          <span className={styles.dashboardWord}> Dashboard</span>
-        </>
-      }
-      subtitle={
-        <span className={styles.subtitleText}>
-          Manage users, societies and platform requests
-        </span>
-      }
-      onBack={onBack}
-      width="xl"
-    >
-      <motion.div
-        className={styles.tabBar}
-        {...fadeUp}
-        transition={{ delay: 0.08, duration: 0.28 }}
+    <>
+      <AppPage
+        title={
+          <>
+            <span className={styles.adminWord}>Admin</span>
+            <span className={styles.dashboardWord}> Dashboard</span>
+          </>
+        }
+        subtitle={
+          <span className={styles.subtitleText}>
+            Manage users, societies and platform requests
+          </span>
+        }
+        onBack={onBack}
+        backPlacement="above"
+        width="xl"
       >
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(t.id)}
-          >
-            {t.label}
-            {activeTab === t.id && (
-              <motion.div
-                className={styles.tabUnderline}
-                layoutId="admin-tab-underline"
-              />
-            )}
-          </button>
-        ))}
-      </motion.div>
-
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} {...fadeUp} className={styles.tabContent}>
-          {activeTab === "users" && <UsersTab onNavigate={onNavChange} />}
-          {activeTab === "ratifications" && <RatificationsTab />}
-          {activeTab === "teachers" && (
-            <TeacherRequestsTab onNavigate={onNavChange} />
-          )}
-          {activeTab === "reports" && <ReportedSocietiesTab />}
-          {activeTab === "course-changes" && (
-            <CourseChangeRequestsTab onNavigate={onNavChange} />
-          )}
-        </motion.div>
-      </AnimatePresence>
-    </AppPage>
+        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
+      </AppPage>
+      <BackToTop />
+    </>
   );
 }
 
