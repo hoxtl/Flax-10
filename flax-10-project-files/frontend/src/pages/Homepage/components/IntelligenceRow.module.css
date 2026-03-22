@@ -6,12 +6,17 @@
   margin: 0 auto;
   padding: 16px;
   background: transparent;
+  min-width: 0;
 }
 
 .editBar {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 12px;
+}
+
+.mobileEditBar {
+  display: none;
 }
 
 .editBtn {
@@ -56,6 +61,7 @@
   flex-direction: column;
   gap: 10px;
   height: 100%;
+  min-width: 0;
 }
 
 .analyticsWidgetTitle {
@@ -82,7 +88,8 @@
 
 .analyticsScrollable {
   width: 100%;
-  overflow-x: auto;
+  min-width: 0;
+  overflow-x: hidden;
   padding-bottom: 2px;
 }
 
@@ -90,6 +97,56 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(.MuiChartsLegend-root),
+  .analyticsWidgetShell :global(svg) {
+    max-width: 100% !important;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsLegend-root) {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding: 12px;
+  }
+
+  .mobileEditBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+
+  .analyticsWidgetShell,
+  .analyticsInsightsRow,
+  .analyticsScrollable {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .analyticsWidgetShell :global(.MuiChartsWrapper-root),
+  .analyticsWidgetShell :global(.MuiChartsSurface-root),
+  .analyticsWidgetShell :global(svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .header {
@@ -112,8 +169,16 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at top right, var(--widget-accent-soft), transparent 24%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.08), transparent 22%),
+    radial-gradient(
+      circle at top right,
+      var(--widget-accent-soft),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(255, 255, 255, 0.08),
+      transparent 22%
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 52%);
 }
 
@@ -204,7 +269,7 @@
 
 .headerDayProgressFill {
   height: 100%;
-  background: linear-gradient(90deg, #7B6751 0%, #4A3421 100%);
+  background: linear-gradient(90deg, #7b6751 0%, #4a3421 100%);
   border-radius: 2px;
   transition: width 0.6s ease;
 }
@@ -228,7 +293,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.63rem;
   font-weight: 700;
-  color: #C0714E;
+  color: #c0714e;
   letter-spacing: 0.04em;
 }
 
@@ -261,7 +326,6 @@
   border-radius: 8px;
   padding: 8px 12px;
 }
-
 
 .intRowAlertRow {
   display: flex;
@@ -301,7 +365,9 @@
   border-radius: 4px;
   transition: color 0.12s;
 }
-.intRowAlertDismiss:hover { color: #7a5520; }
+.intRowAlertDismiss:hover {
+  color: #7a5520;
+}
 
 .intRowAlertOverflow {
   font-size: 0.69rem;
@@ -326,7 +392,7 @@
   height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: #7B6751;
+  background: #7b6751;
 }
 
 .statusStripText {
@@ -346,10 +412,13 @@
   background: #dc2626;
   animation: stripConflictGlow 1.6s ease-in-out infinite;
 }
-.statusStripConflict .statusStripText { color: #dc2626; }
+.statusStripConflict .statusStripText {
+  color: #dc2626;
+}
 
 @keyframes stripConflictGlow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
   }
@@ -438,7 +507,9 @@
   transition: color 0.15s;
   margin-top: 1px;
 }
-.tflCardDismiss:hover { color: var(--widget-accent); }
+.tflCardDismiss:hover {
+  color: var(--widget-accent);
+}
 
 /* "+N more lines affected" overflow label */
 .tflOverflow {
@@ -463,15 +534,21 @@
   transition: color 0.15s;
   line-height: 1;
 }
-.statusStripPillDismiss:hover { color: var(--widget-accent); }
+.statusStripPillDismiss:hover {
+  color: var(--widget-accent);
+}
 
 /* Gap variant — sage green */
 .statusStripGap {
   border-color: rgba(22, 163, 74, 0.25);
   background: rgba(220, 252, 231, 0.6);
 }
-.statusStripGap .statusStripDot { background: #16a34a; }
-.statusStripGap .statusStripText { color: #16a34a; }
+.statusStripGap .statusStripDot {
+  background: #16a34a;
+}
+.statusStripGap .statusStripText {
+  color: #16a34a;
+}
 
 /* Active task variant — warm brown */
 .statusStripTask {
@@ -482,16 +559,30 @@
   background: #78716c;
   animation: stripPulse 2s ease-in-out infinite;
 }
-.statusStripTask .statusStripText { color: #44403c; }
+.statusStripTask .statusStripText {
+  color: #44403c;
+}
 
 @keyframes stripPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes intRowPulseTerracotta {
-  0%, 100% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 .headerSubtitle {
@@ -697,8 +788,6 @@
   align-items: flex-start;
 }
 
-
-
 .liveContextCard {
   display: grid;
   gap: 8px;
@@ -747,7 +836,12 @@
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #f0b29d 0%, #c0714e 55%, #b83232 100%);
+  background: radial-gradient(
+    circle at 35% 35%,
+    #f0b29d 0%,
+    #c0714e 55%,
+    #b83232 100%
+  );
   box-shadow:
     0 0 0 4px rgba(192, 113, 78, 0.1),
     0 0 14px rgba(192, 113, 78, 0.42);
@@ -783,7 +877,8 @@
 }
 
 @keyframes liveAlertDotPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow:
       0 0 0 4px rgba(192, 113, 78, 0.1),
@@ -841,17 +936,41 @@
 }
 
 /* Row 1: Right Now (left) | Today's Tasks (right) — equal height */
-.span5 { grid-column: 1; grid-row: 1; }
-.span1 { grid-column: 2; grid-row: 1; }
+.span5 {
+  grid-column: 1;
+  grid-row: 1;
+}
+.span1 {
+  grid-column: 2;
+  grid-row: 1;
+}
 /* Row 2: Deadlines (left) | Focus Windows (right) — equal height */
-.span3 { grid-column: 1; grid-row: 2; }
-.span4 { grid-column: 2; grid-row: 2; }
+.span3 {
+  grid-column: 1;
+  grid-row: 2;
+}
+.span4 {
+  grid-column: 2;
+  grid-row: 2;
+}
 
 @media (max-width: 767px) {
-  .span5 { grid-column: 1 / -1; grid-row: 1; }
-  .span1 { grid-column: 1 / -1; grid-row: 2; }
-  .span3 { grid-column: 1 / -1; grid-row: 3; }
-  .span4 { grid-column: 1 / -1; grid-row: 4; }
+  .span5 {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .span1 {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .span3 {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .span4 {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
 }
 
 .bentoSlot {
@@ -867,8 +986,6 @@
   min-height: 160px;
   opacity: 0;
 }
-
-
 
 /* Widget cards: same base style for all — no colored tints */
 .bentoSlotVariantRightNow {
@@ -904,8 +1021,14 @@
 }
 
 @keyframes intRowCard {
-  0% { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.96); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .bentoSlot.iconPulse .bentoIcon {
@@ -914,8 +1037,15 @@
 }
 
 @keyframes intRowPulseTerracotta {
-  0%, 100% { opacity: 0.9; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 
 .bentoGlow {
@@ -1065,7 +1195,9 @@
   border-radius: 16px;
   background: var(--widget-surface-raised);
   border: 1px solid var(--widget-border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .glanceStat:hover {
@@ -1160,7 +1292,7 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #7A5520;
+  color: #7a5520;
 }
 
 .travelAlertDot,
@@ -1195,19 +1327,28 @@
   background: transparent;
   color: rgba(154, 110, 42, 0.6);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
   padding: 0;
 }
 
 .travelAlertDismiss:hover {
   background: rgba(185, 130, 55, 0.12);
-  color: #7A5520;
+  color: #7a5520;
 }
 
 /* ── Bento grid positions (desktop 2-col layout) ─────────────────── */
 @media (min-width: 1024px) {
-  .posDeadlines      { grid-column: 1; grid-row: 1; }
-  .posTodaysTasks    { grid-column: 2; grid-row: 1; align-self: stretch; }
+  .posDeadlines {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .posTodaysTasks {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+  }
 }
 
 .posTodaysTasks {

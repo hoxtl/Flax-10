@@ -1,6 +1,13 @@
 .addMemberForm {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .addMemberForm {
+    width: 100%;
+    align-items: stretch;
+  }
 }

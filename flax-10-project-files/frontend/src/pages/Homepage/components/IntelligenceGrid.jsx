@@ -24,7 +24,16 @@ const Grip = () => (
   </div>
 );
 
-const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxRow = 4, onResize }) => {
+const ResizeControls = ({
+  id,
+  col,
+  row,
+  minCol = 1,
+  minRow = 1,
+  maxCol = 2,
+  maxRow = 4,
+  onResize,
+}) => {
   const isHero = id === "hero";
   const canGrowWidth = !isHero && col < maxCol;
   const canShrinkWidth = !isHero && col > minCol;
@@ -37,9 +46,15 @@ const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxR
 
   return (
     <div className={styles.resizeControls} onClick={(e) => e.stopPropagation()}>
-      <div className={styles.resizeGroup} style={{ opacity: isHero ? 0.4 : 1, pointerEvents: isHero ? "none" : "auto" }}>
-        <button 
-          className={styles.resizeBtn} 
+      <div
+        className={styles.resizeGroup}
+        style={{
+          opacity: isHero ? 0.4 : 1,
+          pointerEvents: isHero ? "none" : "auto",
+        }}
+      >
+        <button
+          className={styles.resizeBtn}
           onClick={() => canShrinkWidth && onResize(id, { col: col - 1, row })}
           disabled={!canShrinkWidth}
           title={canShrinkWidth ? "Shrink Width" : "Minimum width reached"}
@@ -47,8 +62,8 @@ const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxR
           <Minus size={13} strokeWidth={3} />
         </button>
         <span className={styles.resizeVal}>{col}W</span>
-        <button 
-          className={styles.resizeBtn} 
+        <button
+          className={styles.resizeBtn}
           onClick={() => canGrowWidth && onResize(id, { col: col + 1, row })}
           disabled={!canGrowWidth}
           title="Grow Width"
@@ -58,8 +73,8 @@ const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxR
       </div>
       <div className={styles.resizeDivider} />
       <div className={styles.resizeGroup}>
-        <button 
-          className={styles.resizeBtn} 
+        <button
+          className={styles.resizeBtn}
           onClick={() => canShrinkHeight && onResize(id, { col, row: row - 1 })}
           disabled={!canShrinkHeight}
           title={canShrinkHeight ? "Shrink Height" : "Minimum height reached"}
@@ -67,8 +82,8 @@ const ResizeControls = ({ id, col, row, minCol = 1, minRow = 1, maxCol = 2, maxR
           <Minus size={13} strokeWidth={3} />
         </button>
         <span className={styles.resizeVal}>{row}H</span>
-        <button 
-          className={styles.resizeBtn} 
+        <button
+          className={styles.resizeBtn}
           onClick={() => canGrowHeight && onResize(id, { col, row: row + 1 })}
           disabled={!canGrowHeight}
           title="Grow Height"
@@ -88,7 +103,13 @@ const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
     acc[key].push(widget);
     return acc;
   }, {});
-  const sectionOrder = ["Essentials", "Planning", "Progress", "Profile", "Analytics"];
+  const sectionOrder = [
+    "Essentials",
+    "Planning",
+    "Progress",
+    "Profile",
+    "Analytics",
+  ];
   const orderedSectionKeys = [
     ...sectionOrder.filter((key) => sections[key]?.length),
     ...Object.keys(sections).filter((key) => !sectionOrder.includes(key)),
@@ -100,10 +121,18 @@ const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
       <div className={styles.addSheet}>
         <div className={styles.addSheetHandle} />
         <h3 className={styles.addSheetTitle}>Add Widgets</h3>
-        <p className={styles.addSheetSubtitle}>Tap a widget to add it to your dashboard</p>
-        
+        <p className={styles.addSheetSubtitle}>
+          Tap a widget to add it to your dashboard
+        </p>
+
         {available.length === 0 ? (
-          <div style={{ textAlign: "center", color: "var(--text-muted-sage)", padding: "32px 0" }}>
+          <div
+            style={{
+              textAlign: "center",
+              color: "var(--text-muted-sage)",
+              padding: "32px 0",
+            }}
+          >
             All widgets are already on your dashboard!
           </div>
         ) : (
@@ -124,7 +153,9 @@ const AddSheet = ({ visible, active, catalogue, onAdd, onClose }) => {
                       <span className={styles.addOptionIcon}>{w.icon}</span>
                       <div className={styles.addOptionInfo}>
                         <div className={styles.addOptionLabel}>{w.label}</div>
-                        <div className={styles.addOptionMeta}>{w.col}×{w.row} tile</div>
+                        <div className={styles.addOptionMeta}>
+                          {w.col}×{w.row} tile
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -191,15 +222,17 @@ export default function IntelligenceGrid({
     });
   };
 
+  const handleToggleEdit = () => {
+    setEdit(!edit);
+    if (edit) setShowAdd(false);
+  };
+
   return (
     <div className={styles.gridContainer}>
       {/* Floating Edit Button positioned top-right relative to the grid area */}
       <div className={styles.gridActions}>
         <button
-          onClick={() => {
-            setEdit(!edit);
-            if (edit) setShowAdd(false);
-          }}
+          onClick={handleToggleEdit}
           className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
           title={edit ? "Done" : "Edit Layout"}
           aria-label={edit ? "Done editing layout" : "Edit dashboard layout"}
@@ -208,15 +241,15 @@ export default function IntelligenceGrid({
         </button>
         {edit && (
           <>
-            <button 
-              onClick={onRandomize} 
+            <button
+              onClick={onRandomize}
               className={styles.iconActionBtn}
               title="Shuffle Layout"
             >
               <Shuffle size={16} />
             </button>
-            <button 
-              onClick={onReset} 
+            <button
+              onClick={onReset}
               className={styles.iconActionBtn}
               title="Reset Layout"
             >
@@ -228,54 +261,97 @@ export default function IntelligenceGrid({
 
       <div className={styles.bentoGrid} data-testid="bento-grid">
         {/* Pinned Hero Section inside the grid container */}
-        {layout.includes("hero") && (() => {
-          const w = catalogue.find(item => item.id === "hero");
-          const customSize = widgetSizes["hero"] || {};
-          const row = customSize.row || w?.row || 2;
-          
-          return (
-            <div 
-              className={`${styles.widgetWrapper} ${styles["widget-hero"]} ${edit ? styles.editMode : ""}`}
-              style={{ gridColumn: "1 / -1", gridRow: `span ${row}` }}
-            >
-              {edit && (
-                <div style={{ position: "absolute", bottom: 8, right: 8, zIndex: 30 }}>
-                  <ResizeControls 
-                    id="hero" 
-                    col={2} 
-                    row={row} 
-                    minCol={w?.minCol}
-                    minRow={w?.minRow}
-                    maxCol={w?.maxCol}
-                    maxRow={w?.maxRow}
-                    onResize={setWidgetSize} 
-                  />
-                </div>
-              )}
-              <div className={styles.widgetClip}>
-                <div className={styles.widgetContent}>
-                  {widgetRenderer("hero", { col: 2, row })}
+        {layout.includes("hero") &&
+          (() => {
+            const w = catalogue.find((item) => item.id === "hero");
+            const customSize = widgetSizes["hero"] || {};
+            const row = customSize.row || w?.row || 2;
+
+            return (
+              <div
+                className={`${styles.widgetWrapper} ${styles["widget-hero"]} ${edit ? styles.editMode : ""}`}
+                style={{ gridColumn: "1 / -1", gridRow: `span ${row}` }}
+              >
+                {edit && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 8,
+                      right: 8,
+                      zIndex: 30,
+                    }}
+                  >
+                    <ResizeControls
+                      id="hero"
+                      col={2}
+                      row={row}
+                      minCol={w?.minCol}
+                      minRow={w?.minRow}
+                      maxCol={w?.maxCol}
+                      maxRow={w?.maxRow}
+                      onResize={setWidgetSize}
+                    />
+                  </div>
+                )}
+                <div className={styles.widgetClip}>
+                  <div className={styles.widgetContent}>
+                    {widgetRenderer("hero", { col: 2, row })}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
-        {layout.filter(id => id !== "hero").map((id) => {
-          const w = catalogue.find((item) => item.id === id);
-          if (!w) return null;
-          
-          const customSize = widgetSizes[id] || {};
-          const col = customSize.col || w.col;
-          const row = customSize.row || w.row;
+        <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
+          <div className={styles.mobileActionsBar}>
+            <button
+              onClick={handleToggleEdit}
+              className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
+              title={edit ? "Done" : "Edit Layout"}
+              aria-label={
+                edit ? "Done editing layout" : "Edit dashboard layout"
+              }
+            >
+              {edit ? <Check size={26} /> : <Pencil size={24} />}
+            </button>
+            {edit && (
+              <>
+                <button
+                  onClick={onRandomize}
+                  className={styles.iconActionBtn}
+                  title="Shuffle Layout"
+                >
+                  <Shuffle size={16} />
+                </button>
+                <button
+                  onClick={onReset}
+                  className={styles.iconActionBtn}
+                  title="Reset Layout"
+                >
+                  <RotateCcw size={16} />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
 
-          const content = widgetRenderer(id, { col, row });
-          if (content === null) return null;
+        {layout
+          .filter((id) => id !== "hero")
+          .map((id) => {
+            const w = catalogue.find((item) => item.id === id);
+            if (!w) return null;
 
-          const isDragSrc = dragging === id;
-          const isDragTgt = dragOver === id;
+            const customSize = widgetSizes[id] || {};
+            const col = customSize.col || w.col;
+            const row = customSize.row || w.row;
 
-          const wrapperClass = `
+            const content = widgetRenderer(id, { col, row });
+            if (content === null) return null;
+
+            const isDragSrc = dragging === id;
+            const isDragTgt = dragOver === id;
+
+            const wrapperClass = `
             ${styles.widgetWrapper} 
             ${edit ? styles.editMode : ""} 
             ${isDragSrc ? styles.dragging : ""} 
@@ -283,43 +359,49 @@ export default function IntelligenceGrid({
             ${styles["widget-" + id] || ""}
           `;
 
-          return (
-            <div
-              key={id}
-              draggable={edit}
-              onDragStart={edit ? (e) => onDragStart(e, id) : undefined}
-              onDragEnd={edit ? onDragEnd : undefined}
-              onDragOver={edit ? (e) => onDragOver(e, id) : undefined}
-              onDrop={edit ? (e) => onDrop(e, id) : undefined}
-              className={wrapperClass}
-              data-widget-id={id}
-              style={{
-                gridColumn: `span ${col}`,
-                gridRow: `span ${row}`,
-              }}
-            >
-              {edit && <DelBtn onClick={() => setLayout((prev) => prev.filter((x) => x !== id))} />}
-              {edit && <Grip />}
-              {edit && (
-                <ResizeControls 
-                  id={id} 
-                  col={col} 
-                  row={row} 
-                  minCol={w.minCol}
-                  minRow={w.minRow}
-                  maxCol={w.maxCol}
-                  maxRow={w.maxRow}
-                  onResize={setWidgetSize} 
-                />
-              )}
-              <div className={styles.widgetClip}>
-                <div className={styles.widgetContent}>
-                  <BentoCard>{widgetRenderer(id, { col, row })}</BentoCard>
+            return (
+              <div
+                key={id}
+                draggable={edit}
+                onDragStart={edit ? (e) => onDragStart(e, id) : undefined}
+                onDragEnd={edit ? onDragEnd : undefined}
+                onDragOver={edit ? (e) => onDragOver(e, id) : undefined}
+                onDrop={edit ? (e) => onDrop(e, id) : undefined}
+                className={wrapperClass}
+                data-widget-id={id}
+                style={{
+                  gridColumn: `span ${col}`,
+                  gridRow: `span ${row}`,
+                }}
+              >
+                {edit && (
+                  <DelBtn
+                    onClick={() =>
+                      setLayout((prev) => prev.filter((x) => x !== id))
+                    }
+                  />
+                )}
+                {edit && <Grip />}
+                {edit && (
+                  <ResizeControls
+                    id={id}
+                    col={col}
+                    row={row}
+                    minCol={w.minCol}
+                    minRow={w.minRow}
+                    maxCol={w.maxCol}
+                    maxRow={w.maxRow}
+                    onResize={setWidgetSize}
+                  />
+                )}
+                <div className={styles.widgetClip}>
+                  <div className={styles.widgetContent}>
+                    <BentoCard>{widgetRenderer(id, { col, row })}</BentoCard>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         {edit && (
           <div

@@ -2,10 +2,16 @@
   min-height: 100%;
 }
 
-.tabLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.analyticsTabs {
+  min-width: 0;
+}
+
+.analyticsTabButton {
+  min-width: 0;
+}
+
+.aiInsightsLabelShort {
+  display: none;
 }
 
 .skeletonHeader {
@@ -83,7 +89,6 @@
   height: 280px;
 }
 
-
 .periodToggle {
   display: flex;
   gap: 0.25rem;
@@ -115,7 +120,6 @@
   color: #fff !important;
   box-shadow: var(--shadow-sm);
 }
-
 
 .card {
   background: var(--surface-card);
@@ -188,6 +192,31 @@
     padding: 1.25rem 1rem;
   }
 
+  .overviewWrap,
+  .twoCol,
+  .chartsGrid,
+  .card,
+  .chartContainerMin,
+  .insightRow {
+    min-width: 0;
+  }
+
+  .card {
+    overflow: hidden;
+    padding: 0.95rem;
+  }
+
+  .insightRow {
+    gap: 0.7rem;
+  }
+
+  .overviewWrap :global(.MuiChartsWrapper-root),
+  .overviewWrap :global(.MuiChartsSurface-root),
+  .overviewWrap :global(.MuiChartsLegend-root),
+  .overviewWrap :global(svg) {
+    max-width: 100% !important;
+  }
+
   .twoCol {
     grid-template-columns: 1fr;
   }
@@ -211,5 +240,43 @@
 
   .skeletonAnalyticsCardWide {
     grid-column: auto;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .analyticsTabs > div:first-child {
+    flex-direction: row !important;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .analyticsTabButton {
+    width: auto !important;
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    border: none !important;
+    border-radius: 8px 8px 0 0;
+    padding-inline: 0.5rem;
+  }
+
+  .analyticsTabButton[data-active="true"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    border-color: transparent !important;
+  }
+
+  .analyticsTabButton[data-active="false"] {
+    color: var(--muted);
+  }
+
+  .aiInsightsLabelFull {
+    display: none;
+  }
+
+  .aiInsightsLabelShort {
+    display: inline;
   }
 }

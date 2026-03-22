@@ -1,313 +1,349 @@
 /* Shared Calendar Header Components */
 
 .nav {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 /* Shared 32×32 icon button base */
 .arrowBtn,
 .actionBtn,
 .settingsBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    padding: 0;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    background: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    color: var(--text);
-    transition: all 0.15s;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.15s;
+  flex-shrink: 0;
 }
 
 :root[data-mode="dark"] .arrowBtn,
 :root[data-mode="dark"] .actionBtn,
 :root[data-mode="dark"] .settingsBtn {
-    border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .arrowBtn svg,
 .actionBtn svg,
 .settingsBtn svg {
-    stroke: currentColor;
-    fill: none;
-    width: 18px;
-    height: 18px;
+  stroke: currentColor;
+  fill: none;
+  width: 18px;
+  height: 18px;
 }
 
 .arrowBtn:hover,
 .actionBtn:hover,
 .settingsBtn:hover {
-    background: var(--hover);
+  background: var(--hover);
 }
 
 .todayBtn {
-    padding: 6px 12px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    background: transparent;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--text);
-    transition: all 0.15s;
+  padding: 6px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: transparent;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text);
+  transition: all 0.15s;
 }
 
 :root[data-mode="dark"] .todayBtn {
-    border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .todayBtn:hover {
-    background: var(--hover);
+  background: var(--hover);
 }
 
 .title {
-    margin: 0;
-    margin-left: 8px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
+  margin: 0;
+  margin-left: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 /* Action Menu */
 .actionMenu {
-    position: relative;
+  position: relative;
 }
 
 /* Search */
 .searchContainer {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.searchContainerMobile {
+  width: 100%;
+  justify-content: center;
 }
 
 .searchWrapper {
-    overflow: hidden;
+  overflow: hidden;
+}
+
+.searchWrapperMobile {
+  width: min(540px, 100%);
 }
 
 .searchInner {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
 }
 
 .searchBar {
-    flex: none;
-    min-width: 180px;
+  flex: none;
+  min-width: 180px;
+}
+
+.searchContainerMobile .searchInner {
+  width: min(540px, 100%);
+}
+
+.searchContainerMobile .searchBar {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
 }
 
 .searchBar input {
-    padding: 6px 12px 6px 32px;
-    font-size: 0.85rem;
-    height: 32px;
+  padding: 6px 12px 6px 32px;
+  font-size: 0.85rem;
+  height: 32px;
 }
 
 .searchClose {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.15s;
-    flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  flex-shrink: 0;
 }
 
 .searchClose:hover {
-    background: var(--hover);
-    color: var(--text);
+  background: var(--hover);
+  color: var(--text);
 }
 
 .scheduleDialogBody {
-    min-width: min(100%, 620px);
+  min-width: min(100%, 620px);
 }
 
 .scheduleDialogSubtitle {
-    color: var(--text);
+  color: var(--text);
 }
 
 .scheduleDialogEmpty {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.95rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .scheduleEmptyActions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .scheduleList {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .scheduleCard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 16px;
-    border: 1px solid rgba(74, 52, 33, 0.12);
-    border-radius: 16px;
-    background: #faf9f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(74, 52, 33, 0.12);
+  border-radius: 16px;
+  background: #faf9f7;
 }
 
 :root[data-mode="dark"] .scheduleCard {
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .scheduleInfo {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .scheduleCardTitle {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text);
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .scheduleMeta {
-    margin: 0;
-    font-size: 0.88rem;
-    color: var(--text);
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text);
 }
 
 .scheduleActions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .filterTriggerBtn {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    transition: border-color 0.18s ease, background-color 0.18s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease;
 }
 
 .filterTriggerBtn:hover {
-    border-color: var(--primary);
-    background: var(--hover);
+  border-color: var(--primary);
+  background: var(--hover);
 }
 
 .filterTriggerBtnActive {
-    border-color: color-mix(in srgb, var(--primary) 72%, var(--border));
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 28%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 72%, var(--border));
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--primary) 28%, transparent);
 }
 
 /* Filter badge count */
 .filterBadge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 16px;
-    height: 16px;
-    border-radius: 999px;
-    background: #5D4037;
-    color: #FAF9F6;
-    font-size: 0.6rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 3px;
-    line-height: 1;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #5d4037;
+  color: #faf9f6;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
 }
 
 .filterWrap {
-    position: relative;
+  position: relative;
 }
 
 .filterPopup {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    z-index: 500;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
-    padding: 12px;
-    min-width: 240px;
-    max-width: 300px;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 500;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  padding: 12px;
+  min-width: 240px;
+  max-width: 300px;
 }
 
 .filterPopupHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .filterPopupTitle {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-secondary);
-    font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
 }
 
 .filterManageBtn {
-    background: none;
-    border: none;
-    font-size: 0.72rem;
-    color: var(--primary);
-    cursor: pointer;
-    font-family: var(--font-body);
-    font-weight: 500;
-    padding: 0;
-    transition: opacity 0.12s;
+  background: none;
+  border: none;
+  font-size: 0.72rem;
+  color: var(--primary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 0;
+  transition: opacity 0.12s;
 }
 
 .filterManageBtn:hover {
-    opacity: 0.7;
+  opacity: 0.7;
 }
 
 @media (max-width: 640px) {
-    .scheduleCard {
-        flex-direction: column;
-        align-items: stretch;
-    }
+  .nav {
+    justify-content: center;
+  }
 
-    .scheduleActions {
-        justify-content: stretch;
-    }
+  .scheduleCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scheduleActions {
+    justify-content: stretch;
+  }
+
+  .searchContainerMobile .searchInner {
+    width: 100%;
+  }
+
+  .filterPopup {
+    width: min(300px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+  }
 }
