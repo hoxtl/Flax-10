@@ -64,10 +64,10 @@ class GroupProjectListTests(BaseTestCase):
             )
         self.assertEqual(res.data["member_count"], 5)
 
-    def test_create_project_requires_module(self):
+    def test_create_project_allows_missing_module(self):
         teammates = [
-            make_user(f"module_required_{index}", f"module_required_{index}@example.com")
-            for index in range(4)
+            make_user(f"module_optional_{index}", f"module_optional_{index}@example.com")
+            for index in range(3)
         ]
 
         res = self.client.post(
@@ -76,23 +76,28 @@ class GroupProjectListTests(BaseTestCase):
             format="json",
         )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("course_code", res.data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data["course_code"], "")
 
-    def test_create_project_requires_team_members(self):
+    def test_create_project_allows_empty_team(self):
         res = self.client.post(
             "/api/group-work/projects/",
-            {"name": "Alpha", "course_code": "CS100", "member_ids": []},
+            {"name": "Alpha", "course_code": "CS100"},
             format="json",
         )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("member_ids", res.data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data["member_count"], 1)
+        self.assertTrue(
+            GroupMembership.objects.filter(
+                project_id=res.data["id"], user=self.user, role="owner"
+            ).exists()
+        )
 
-    def test_create_project_requires_minimum_total_team_size(self):
+    def test_create_project_accepts_large_team(self):
         teammates = [
-            make_user("minimum_team_one", "minimum_team_one@example.com"),
-            make_user("minimum_team_two", "minimum_team_two@example.com"),
+            make_user(f"large_team_{index}", f"large_team_{index}@example.com")
+            for index in range(12)
         ]
 
         res = self.client.post(
@@ -101,23 +106,8 @@ class GroupProjectListTests(BaseTestCase):
             format="json",
         )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("at least 5 total members", res.data["member_ids"][0])
-
-    def test_create_project_rejects_more_than_ten_total_members(self):
-        teammates = [
-            make_user(f"max_team_{index}", f"max_team_{index}@example.com")
-            for index in range(10)
-        ]
-
-        res = self.client.post(
-            "/api/group-work/projects/",
-            {"name": "Alpha", "course_code": "CS100", "member_ids": [user.id for user in teammates]},
-            format="json",
-        )
-
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("at most 10 total members", res.data["member_ids"][0])
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data["member_count"], len(teammates) + 1)
 
     def test_create_project_rejects_invalid_member_ids(self):
         res = self.client.post(
@@ -274,8 +264,8 @@ class GroupProjectMembersTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(GroupMembership.objects.filter(project=self.project, user=teammate).exists())
 
-    def test_owner_cannot_add_member_above_max_team_size(self):
-        _add_members(self.project, 9, prefix="full_team")
+    def test_owner_can_add_members_without_limit(self):
+        _add_members(self.project, 12, prefix="growing_team")
         teammate = make_user("overflow_member", "overflow_member@example.com")
 
         res = self.client.post(
@@ -284,18 +274,16 @@ class GroupProjectMembersTests(BaseTestCase):
             format="json",
         )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("at most 10 total members", res.data["detail"])
-        self.assertFalse(GroupMembership.objects.filter(project=self.project, user=teammate).exists())
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(GroupMembership.objects.filter(project=self.project, user=teammate).exists())
 
-    def test_owner_cannot_remove_member_below_min_team_size(self):
-        members = _add_members(self.project, 4, prefix="min_team")
+    def test_owner_can_remove_members_without_minimum(self):
+        members = _add_members(self.project, 2, prefix="min_team")
 
         membership = GroupMembership.objects.get(project=self.project, user=members[0])
         res = self.client.delete(
             f"/api/group-work/projects/{self.project.id}/members/{membership.id}/"
         )
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("at least 5 total members", res.data["detail"])
-        self.assertTrue(GroupMembership.objects.filter(id=membership.id).exists())
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(GroupMembership.objects.filter(id=membership.id).exists())

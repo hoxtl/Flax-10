@@ -12,7 +12,7 @@ export function CreateProjectInputs({ data, onChange, errors }) {
   return (
     <>
       <ProjectNameField value={data.name} onChange={onChange} error={errors?.name} />
-      <ProjectModuleField value={data.course_code} onChange={onChange} error={errors?.course_code} />
+  <ProjectModuleField value={data.course_code} onChange={onChange} error={errors?.course_code} />
       <ProjectDeadlineField value={data.deadline} onChange={onChange} error={errors?.deadline} />
     </>
   );
@@ -28,7 +28,7 @@ function ProjectNameField({ value, onChange, error }) {
 
 function ProjectModuleField({ value, onChange, error }) {
   return (
-    <FormField label={<RequiredLabel text="Module" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
+    <FormField label="Module (optional)" labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
       <UserModuleDropdown
         value={value}
         onChange={(nextValue) => onChange("course_code", nextValue)}

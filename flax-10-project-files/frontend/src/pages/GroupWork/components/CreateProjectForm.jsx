@@ -14,10 +14,7 @@ import { createGroupProject } from "../api/groupWorkApi";
 import { getStoredViewer } from "../utils/memberAvatarUtils";
 import styles from "./CreateProjectForm.module.css";
 
-const MIN_PROJECT_MEMBER_TOTAL = 5;
-const MAX_PROJECT_MEMBER_TOTAL = 10;
-const MIN_TEAMMATE_SELECTION = MIN_PROJECT_MEMBER_TOTAL - 1;
-const MAX_TEAMMATE_SELECTION = MAX_PROJECT_MEMBER_TOTAL - 1;
+
 
 /** Button and modal form for creating a new group project. */
 export default function CreateProjectForm({ onCreated, className = "", size = "medium" }) {
@@ -42,31 +39,31 @@ export default function CreateProjectForm({ onCreated, className = "", size = "m
 }
 
 function FormActions({ onClose, isSubmitting }) {
-    return (
-        <div className={styles.formFooter}>
-            <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
-                Cancel
-            </PrimaryButton>
-            <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "+ Create project"}
-            </PrimaryButton>
-        </div>
-    );
+  return (
+    <div className={styles.formFooter}>
+      <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
+        Cancel
+      </PrimaryButton>
+      <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "+ Create project"}
+      </PrimaryButton>
+    </div>
+  );
 }
 
 function CreateProjectModal({ formState, onClose }) {
-    return (
-        <StandardModal title="Create project" subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one." subtitleClassName={styles.modalSubtitle} onClose={onClose} size="xl" modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
-            <form onSubmit={formState.submit} className={styles.modalForm}>
-                <div className={styles.formFields}>
-                    <CreateProjectInputs data={formState.form} onChange={formState.change} errors={formState.errors} />
-                </div>
-                <ProjectMembersField members={formState.form.members} error={formState.errors?.members} onAddMember={formState.addMember} onRemoveMember={formState.removeMember} />
-                {formState.errorMessage && <p className={styles.formError}>{formState.errorMessage}</p>}
-                <FormActions onClose={onClose} isSubmitting={formState.isSubmitting} />
-            </form>
-        </StandardModal>
-    );
+  return (
+    <StandardModal title="Create project" subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one." subtitleClassName={styles.modalSubtitle} onClose={onClose} size="xl" modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
+      <form onSubmit={formState.submit} className={styles.modalForm}>
+        <div className={styles.formFields}>
+          <CreateProjectInputs data={formState.form} onChange={formState.change} errors={formState.errors} />
+        </div>
+        <ProjectMembersField members={formState.form.members} error={formState.errors?.members} onAddMember={formState.addMember} onRemoveMember={formState.removeMember} />
+        {formState.errorMessage && <p className={styles.formError}>{formState.errorMessage}</p>}
+        <FormActions onClose={onClose} isSubmitting={formState.isSubmitting} />
+      </form>
+    </StandardModal>
+  );
 }
 
 function closeModal(setIsOpen, reset) {
@@ -80,87 +77,72 @@ function useCreateProjectForm(onCreated) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const reset = () => resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
+  const handlers = { setForm, setErrors, setErrorMessage };
   return {
-    form,
-    errors,
-    errorMessage,
-    isSubmitting,
-    reset,
-    change: createChangeHandler(setForm, setErrors, setErrorMessage),
-    addMember: createAddMemberHandler(setForm, setErrors, setErrorMessage),
-    removeMember: createRemoveMemberHandler(setForm, setErrors, setErrorMessage),
-    submit: createSubmitHandler(form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated),
+    form, errors, errorMessage, isSubmitting, reset,
+    change: createChangeHandler(handlers),
+    addMember: createAddMemberHandler(handlers),
+    removeMember: createRemoveMemberHandler(handlers),
+    submit: createSubmitHandler({ ...handlers, setIsSubmitting, form, onCreated }),
   };
 }
 
-function createChangeHandler(setForm, setErrors, setErrorMessage) {
+function createChangeHandler({ setForm, setErrors, setErrorMessage }) {
   return (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({
-      ...prev,
-      [key]:
-        key === "deadline" && isPastProjectDeadline(value)
-          ? "Project due date can't be in the past."
-          : "",
-    }));
+    const error = key === "deadline" && isPastProjectDeadline(value) ? "Project due date can't be in the past." : "";
+    setErrors((prev) => ({ ...prev, [key]: error }));
     setErrorMessage("");
   };
 }
 
-function createAddMemberHandler(setForm, setErrors, setErrorMessage) {
+function createAddMemberHandler({ setForm, setErrors, setErrorMessage }) {
   return (user) => {
     if (!user?.id) return;
     setErrors((prev) => ({ ...prev, members: "" }));
     setErrorMessage("");
-    setForm((prev) => {
-      if (prev.members.some((member) => String(member.id) === String(user.id))) return prev;
-      if (prev.members.length >= MAX_TEAMMATE_SELECTION) {
-        setErrors((current) => ({
-          ...current,
-          members: `You can add up to ${MAX_TEAMMATE_SELECTION} teammates for a maximum of ${MAX_PROJECT_MEMBER_TOTAL} total members.`,
-        }));
-        return prev;
-      }
-      return { ...prev, members: [...prev.members, user] };
-    });
+    setForm((prev) => addMemberToForm(prev, user));
   };
 }
 
-function createRemoveMemberHandler(setForm, setErrors, setErrorMessage) {
+function addMemberToForm(prev, user) {
+  const exists = prev.members.some((m) => String(m.id) === String(user.id));
+  return exists ? prev : { ...prev, members: [...prev.members, user] };
+}
+
+function createRemoveMemberHandler({ setForm, setErrors, setErrorMessage }) {
   return (userId) => {
     setErrors((prev) => ({ ...prev, members: "" }));
     setErrorMessage("");
-    setForm((prev) => ({ ...prev, members: prev.members.filter((member) => String(member.id) !== String(userId)) }));
+    setForm((prev) => ({ ...prev, members: prev.members.filter((m) => String(m.id) !== String(userId)) }));
   };
 }
 
-function createSubmitHandler(form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated) {
+function createSubmitHandler({ form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated }) {
   return async (event) => {
     event.preventDefault();
     const nextErrors = validateProjectForm(form);
     if (Object.keys(nextErrors).length > 0) return showFormErrors(nextErrors, setErrors, setErrorMessage);
     setIsSubmitting(true);
     const created = await createGroupProject(buildProjectPayload(form));
-    if (!created) {
-      setIsSubmitting(false);
-      return setErrorMessage("We couldn't create that project. Please try again.");
-    }
-    onCreated?.(created);
-    resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
+    handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage });
   };
+}
+
+function handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage }) {
+  if (!created) {
+    setIsSubmitting(false);
+    return setErrorMessage("We couldn't create that project. Please try again.");
+  }
+  onCreated?.(created);
+  resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
 }
 
 function validateProjectForm(form) {
   const errors = {};
   if (!form.name.trim()) errors.name = "Project name is required.";
-  if (!String(form.course_code || "").trim()) errors.course_code = "Module is required.";
   if (!form.deadline) errors.deadline = "Due date is required.";
   else if (isPastProjectDeadline(form.deadline)) errors.deadline = "Project due date can't be in the past.";
-  if (!Array.isArray(form.members) || form.members.length < MIN_TEAMMATE_SELECTION) {
-    errors.members = `Add at least ${MIN_TEAMMATE_SELECTION} teammates so each project has ${MIN_PROJECT_MEMBER_TOTAL} total members.`;
-  } else if (form.members.length > MAX_TEAMMATE_SELECTION) {
-    errors.members = `You can add up to ${MAX_TEAMMATE_SELECTION} teammates for a maximum of ${MAX_PROJECT_MEMBER_TOTAL} total members.`;
-  }
   return errors;
 }
 
@@ -177,33 +159,43 @@ function resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting) 
 }
 
 function buildProjectPayload(form) {
-  return {
+  const payload = {
     name: form.name,
-    course_code: form.course_code,
     deadline: form.deadline,
     member_ids: form.members.map((member) => member.id),
   };
+  const courseCode = String(form.course_code || "").trim();
+  if (courseCode) payload.course_code = courseCode;
+  return payload;
 }
 
 function MemberSearchEmptyState({ query, clear }) {
-    return (
-        <div className={styles.memberSearchEmpty}>
-            <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.memberSearchEmptyCard} titleClassName={styles.memberSearchEmptyTitle} hintClassName={styles.memberSearchEmptyHint} />
-        </div>
-    );
+  return (
+    <div className={styles.memberSearchEmpty}>
+      <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.memberSearchEmptyCard} titleClassName={styles.memberSearchEmptyTitle} hintClassName={styles.memberSearchEmptyHint} />
+    </div>
+  );
 }
 
 function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
-    return (
-        <FormField label={<RequiredLabel text="Team members" />} labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
-            <div className={styles.membersPicker}>
-                <p className={styles.membersHint}>Add teammates now so availability, tasks, and voting are ready from the start.</p>
-                <p className={styles.membersHint}>Choose {MIN_TEAMMATE_SELECTION} to {MAX_TEAMMATE_SELECTION} teammates so each project has {MIN_PROJECT_MEMBER_TOTAL} to {MAX_PROJECT_MEMBER_TOTAL} total members.</p>
-                <UserSearch onUserSelect={onAddMember} filterUsers={buildAvailableUserFilter(members)} fullWidth hideFilter renderEmptyState={(props) => <MemberSearchEmptyState {...props} />} searchPlaceholder="Search users... (/)" openOnEmptyQuery={false} dropdownMode="inline" />
-                <SelectedMemberTags members={members} onRemove={onRemoveMember} />
-            </div>
-        </FormField>
-    );
+  return (
+    <FormField label="Team members (optional)" labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
+      <div className={styles.membersPicker}>
+        <p className={styles.membersHint}>Add teammates now so availability, tasks, and voting are ready from the start.</p>
+        <UserSearch
+          onUserSelect={onAddMember}
+          filterUsers={buildAvailableUserFilter(members)}
+          fullWidth
+          hideFilter
+          renderEmptyState={(props) => <MemberSearchEmptyState {...props} />}
+          searchPlaceholder="Search users... (/)"
+          openOnEmptyQuery={false}
+          dropdownMode="inline"
+        />
+        <SelectedMemberTags members={members} onRemove={onRemoveMember} />
+      </div>
+    </FormField>
+  );
 }
 
 function SelectedMemberTags({ members, onRemove }) {
@@ -212,7 +204,7 @@ function SelectedMemberTags({ members, onRemove }) {
     <TagsSelector
       tags={tags}
       selectedTags={tags}
-      emptyHint={`Search and add ${MIN_TEAMMATE_SELECTION} to ${MAX_TEAMMATE_SELECTION} teammates.`}
+      emptyHint="Search for teammates (optional)."
       onSelectionChange={(nextSelected) => syncRemovedMemberTags(tags, nextSelected, onRemove)}
     />
   );
@@ -223,17 +215,20 @@ function buildAvailableUserFilter(selectedMembers) {
   const viewer = getStoredViewer();
   const viewerId = String(viewer.id ?? viewer.user ?? "");
   const viewerUsername = String(viewer.username || viewer.user_name || "").trim().toLowerCase();
+  const context = { selectedIds, viewerId, viewerUsername };
   return (results) => {
     if (!Array.isArray(results)) return [];
-    return results.filter((user) => {
-      const userId = String(user?.id ?? "");
-      const username = String(user?.username || user?.user_name || "").trim().toLowerCase();
-      if (!userId || selectedIds.has(userId)) return false;
-      if (viewerId && userId === viewerId) return false;
-      if (viewerUsername && username && username === viewerUsername) return false;
-      return true;
-    });
+    return results.filter((user) => isUserAvailable(user, context));
   };
+}
+
+function isUserAvailable(user, { selectedIds, viewerId, viewerUsername }) {
+  const userId = String(user?.id ?? "");
+  const username = String(user?.username || user?.user_name || "").trim().toLowerCase();
+  if (!userId || selectedIds.has(userId)) return false;
+  if (viewerId && userId === viewerId) return false;
+  if (viewerUsername && username && username === viewerUsername) return false;
+  return true;
 }
 
 function getSelectedUserLabel(member) {
@@ -267,5 +262,9 @@ function parseProjectDeadline(value) {
 }
 
 function RequiredLabel({ text }) {
-  return <>{text} <span className={styles.requiredMark}>*</span></>;
+  return (
+    <>
+      {text} <span className={styles.requiredMark}>*</span>
+    </>
+  );
 }

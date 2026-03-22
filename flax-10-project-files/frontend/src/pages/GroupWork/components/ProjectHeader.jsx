@@ -11,25 +11,46 @@ import BackButton from "../../../components/common/BackButton/BackButton.jsx";
 import { formatProjectHeadlineDate, getProjectCaption, getProjectDate } from "../utils/projectRowUtils";
 import styles from "./ProjectHeader.module.css";
 
-function ProjectHeaderContent({ project, date, members, teamMembers, onMemberAdded, onMemberRemove }) {
-    return (
-        <div className={styles.headerCard}>
-            <div className={styles.headerCopy}>
-                <div className={styles.titleRow}>
-                    <h1 className={styles.title}>{project.name}</h1>
-                    <div className={styles.headerRightMeta}>
-                        <HeaderDeadlineMeta date={date} />
-                        <div className={styles.headerPillRow}>
-                            <ProjectModulePill project={project} />
-                            <ProjectTeacherMeta project={project} />
-                        </div>
-                    </div>
-                </div>
-                <div className={styles.subtitleRow}><p className={styles.subtitle}>{getProjectCaption(project)}</p></div>
-                <ProjectHeaderMeta project={project} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} />
-            </div>
+function ProjectHeaderContent({ project, date, members, teamMembers, onMemberAdded, onMemberRemove, onDelete }) {
+  return (
+    <div className={styles.headerCard}>
+      <div className={styles.headerCopy}>
+        <ProjectHeaderTitle project={project} date={date} />
+        <ProjectHeaderSubtitle project={project} />
+        <ProjectHeaderMeta
+          project={project}
+          members={members}
+          teamMembers={teamMembers}
+          onMemberAdded={onMemberAdded}
+          onMemberRemove={onMemberRemove}
+          onDeleteProject={onDelete}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ProjectHeaderTitle({ project, date }) {
+  return (
+    <div className={styles.titleRow}>
+      <h1 className={styles.title}>{project.name}</h1>
+      <div className={styles.headerRightMeta}>
+        <HeaderDeadlineMeta date={date} />
+        <div className={styles.headerPillRow}>
+          <ProjectModulePill project={project} />
+          <ProjectTeacherMeta project={project} />
         </div>
-    );
+      </div>
+    </div>
+  );
+}
+
+function ProjectHeaderSubtitle({ project }) {
+  return (
+    <div className={styles.subtitleRow}>
+      <p className={styles.subtitle}>{getProjectCaption(project)}</p>
+    </div>
+  );
 }
 
 /** Header section for a group project, showing title, deadline, members, and delete action. */

@@ -4,20 +4,17 @@
     gap: 12px;
     margin-bottom: 8px;
 }
-
 .deleteError {
     margin: 6px 4px 0;
     color: var(--danger);
     font-size: 13px;
     font-weight: 500;
 }
-
 .deleteActionWrap {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
-
 .topActions {
     display: flex;
     align-items: center;
@@ -25,25 +22,33 @@
     gap: 16px;
     flex-wrap: wrap;
 }
-
 .deleteBtn {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(192, 90, 62, 0.2);
-  background: white;
-  color: var(--danger);
-  font-size: 13px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--border));
+    background: color-mix(in srgb, var(--danger) 6%, var(--surface-card));
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
-
 .deleteBtn:hover {
-  background: var(--danger-bg);
+    background: color-mix(in srgb, var(--danger) 14%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
 }
-
+:global([data-theme="dark"]) .deleteBtn {
+    background: color-mix(in srgb, var(--danger) 22%, rgba(0, 0, 0, 0.6));
+    border-color: color-mix(in srgb, var(--danger) 55%, rgba(255, 255, 255, 0.08));
+    color: #ffe3db;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+:global([data-theme="dark"]) .deleteBtn:hover {
+    background: color-mix(in srgb, var(--danger) 30%, rgba(0, 0, 0, 0.45));
+}
 .headerCard {
     padding: 0.85rem 1.35rem 0.8rem;
     border-radius: var(--card-radius-token);
@@ -51,27 +56,23 @@
     background: var(--surface-card);
     box-shadow: var(--card-shadow-rest);
 }
-
 .headerCopy {
     display: flex;
     flex-direction: column;
     gap: 0.38rem;
 }
-
 .subtitleRow {
     display: flex;
     align-items: flex-start;
     gap: 1.4rem;
     flex-wrap: wrap;
 }
-
 .titleRow {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
     gap: 0.5rem 1.2rem;
 }
-
 .title {
     margin: 0;
     font-size: clamp(1.95rem, 3.3vw, 2.75rem);
@@ -79,7 +80,6 @@
     letter-spacing: -0.03em;
     color: var(--text);
 }
-
 .subtitle {
     margin: 0;
     max-width: 58rem;
@@ -87,7 +87,6 @@
     line-height: 1.45;
     color: var(--text-secondary);
 }
-
 .headerRightMeta {
     display: flex;
     flex-direction: column;
@@ -95,7 +94,6 @@
     gap: 0.32rem;
     flex-shrink: 0;
 }
-
 .headerPillRow {
     display: flex;
     align-items: center;
@@ -103,25 +101,21 @@
     flex-wrap: wrap;
     justify-content: flex-end;
 }
-
 .modulePillBtn {
     display: inline-flex;
     border-radius: 999px;
     text-decoration: none;
     cursor: pointer;
 }
-
 .modulePillBtn:hover .modulePillRight {
     border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
     background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
 }
-
 .modulePillBtn:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 3px;
     border-radius: 999px;
 }
-
 .modulePillRight {
     display: inline-flex;
     align-items: center;
@@ -135,25 +129,21 @@
     font-size: 0.78rem;
     font-weight: 500;
 }
-
 .teacherPillBtn {
     all: unset;
     cursor: pointer;
     display: inline-flex;
     border-radius: 999px;
 }
-
 .teacherPillBtn:hover .teacherPill {
     border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
     background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
 }
-
 .teacherPillBtn:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 3px;
     border-radius: 999px;
 }
-
 .inlineDeadlineMeta {
     display: inline-flex;
     align-items: center;
@@ -165,31 +155,26 @@
     color: var(--text-secondary);
     padding-top: 0.18rem;
 }
-
 .inlineDeadlineDate {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     color: var(--text);
 }
-
 .inlineCountdown {
     display: inline-flex !important;
     align-items: center;
     padding: 0 !important;
 }
-
 .inlineDeadlineSeparator {
     color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
 }
-
 .inlineDeadlineCountdown {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     color: var(--text-secondary);
 }
-
 .detailsPanel {
     display: flex;
     flex-direction: column;
@@ -200,42 +185,35 @@
     background: transparent;
     box-shadow: none;
 }
-
 .metaStack {
     display: flex;
     flex-direction: column;
     gap: 0.62rem;
 }
-
 .metaRow {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
 }
-
 .metaLink {
     display: inline-flex;
     text-decoration: none;
 }
-
 .metaLink:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 3px;
     border-radius: 999px;
 }
-
 .modulePill {
     background: rgba(123, 103, 81, 0.08);
     color: var(--primary);
     border-color: rgba(123, 103, 81, 0.18);
     min-height: 32px;
 }
-
 .moduleCode {
     font-weight: 700;
 }
-
 .teacherPill {
     display: inline-flex;
     align-items: center;
@@ -249,7 +227,6 @@
     font-size: 0.78rem;
     font-weight: 500;
 }
-
 .teacherPillLabel {
     font-size: 0.7rem;
     font-weight: 800;
@@ -257,11 +234,9 @@
     text-transform: uppercase;
     color: color-mix(in srgb, var(--primary) 75%, #ffffff 25%);
 }
-
 .metaIcon {
     color: var(--muted);
 }
-
 .memberMeta {
     display: inline-flex;
     align-items: center;
@@ -269,20 +244,17 @@
     min-width: 0;
     flex-wrap: wrap;
 }
-
 .memberMetaStack {
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
 }
-
 .memberMetaBody {
     display: inline-flex;
     align-items: center;
     gap: 0.58rem;
     flex-wrap: wrap;
 }
-
 .memberMetaLabel {
     font-size: 0.72rem;
     font-weight: 800;
@@ -290,19 +262,16 @@
     text-transform: uppercase;
     color: var(--muted);
 }
-
 .memberAvatarStrip {
     display: inline-flex;
     align-items: center;
     padding-left: 0;
 }
-
 .memberCountCopy {
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-secondary);
 }
-
 .teamManageBtn {
     border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
     background: color-mix(in srgb, var(--primary) 8%, var(--surface-card));
@@ -314,17 +283,14 @@
     font-weight: 600;
     cursor: pointer;
 }
-
 .teamManageBtn:hover {
     background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
     border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
 }
-
 .teamManageBtn:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
-
 .teamManagerPanel {
     display: flex;
     flex-direction: column;
@@ -334,11 +300,9 @@
     border: 1px solid rgba(74, 52, 33, 0.12);
     background: color-mix(in srgb, var(--surface-card) 82%, #ffffff 18%);
 }
-
 .memberTooltipWrap {
     display: inline-flex;
 }
-
 .memberAvatarButton {
     display: inline-flex;
     align-items: center;
@@ -350,43 +314,34 @@
     cursor: pointer;
     margin-right: 0.18rem;
 }
-
 .memberAvatarButton:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
-
 @media (max-width: 768px) {
     .headerCard {
         padding: 1rem 1rem 0.95rem;
     }
-
     .titleRow {
         grid-template-columns: 1fr;
     }
-
     .headerRightMeta {
         align-items: flex-start;
     }
-
     .headerPillRow {
         justify-content: flex-start;
     }
-
     .title {
         font-size: 1.95rem;
     }
-
     .inlineDeadlineMeta {
         justify-content: flex-start;
         padding-top: 0;
         font-size: 0.9rem;
     }
-
     .metaRow {
         gap: 8px;
     }
-
     .memberMeta {
         width: 100%;
     }
