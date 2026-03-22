@@ -6,15 +6,15 @@ import { useState, useEffect, useMemo } from "react";
 import {
   parseIncomingValue, emitDateTimeChange, handleDaySelect, handleHourChange,
   handleMinuteChange, navigateMonth, calendarDays, isBeforeMinDate,
-  getDropdownHeight, getDropdownWidth, clamp,
+  getDropdownHeight, DROPDOWN_WIDTH, clamp,
 } from "./dateTimePickerUtils";
 
-export function computeDropdownPos(rect, timeOnly, dateOnly) {
+function computeDropdownPos(rect, timeOnly, dateOnly) {
   const gap = 8;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const dropH = getDropdownHeight(timeOnly, dateOnly);
-  const dropW = Math.min(getDropdownWidth(), Math.max(220, vw - gap * 2));
+  const dropW = Math.min(DROPDOWN_WIDTH, Math.max(220, vw - gap * 2));
   return {
     top: clamp(rect.bottom + gap, gap, Math.max(gap, vh - dropH - gap)),
     left: clamp(rect.left, gap, Math.max(gap, vw - dropW - gap)),
