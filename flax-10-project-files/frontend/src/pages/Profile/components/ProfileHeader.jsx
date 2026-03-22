@@ -28,6 +28,17 @@ function buildShareUser(user, handlers) {
   return { ...user, reload: handlers.reload, setOptimisticShare: handlers.setOptimisticShare };
 }
 
+function buildSharedCalendarRoute(user, profileData) {
+  const targetUser = profileData || user;
+  if (!targetUser?.id) return "/calendar";
+  const displayName = buildFullName(targetUser);
+  const params = new URLSearchParams({
+    user_id: String(targetUser.id),
+    shared_name: displayName || targetUser.username || "Shared user",
+  });
+  return `/calendar?${params.toString()}`;
+}
+
 function resolvePhoto(user, profileData) {
   const resolvedUser = { ...user, ...profileData };
   return getResolvedUserPhoto(resolvedUser, { allowGeneric: true, seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name });
@@ -36,6 +47,21 @@ function resolvePhoto(user, profileData) {
 function HeaderAction({ visibility, handlers, user, mobile = false }) {
   if (!visibility.canEditProfile) return <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={(nextValue) => { user?.setOptimisticShare?.(nextValue); user?.reload?.(); }} />;
   return <PrimaryButton className={mobile ? styles.mobileBtnEdit : styles.btnEdit} size="small" pill onClick={handlers.onEditProfile}>{mobile ? "Edit Profile" : "Edit profile"}</PrimaryButton>;
+}
+
+function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
+  if (visibility.canEditProfile || !profileData?.is_shared_with_me || !onNavigate) return null;
+  return (
+    <PrimaryButton
+      className={styles.sharedCalendarPill}
+      size="small"
+      variant="secondary"
+      pill
+      onClick={() => onNavigate(buildSharedCalendarRoute(user, profileData))}
+    >
+      Shared calendar with me
+    </PrimaryButton>
+  );
 }
 
 function BadgeTooltip({ badge }) {
@@ -117,11 +143,12 @@ function ProfileStats({ profileData, handlers, visibility, societyCount, onSocie
       {visibility.canViewModules && visibility.canEditProfile && <StatItem value={profileData?.module_count || 0} label="modules" onClick={handlers.onModulesClick} />}
       {visibility.canEditProfile && societyCount > 0 && <StatItem value={societyCount} label="societies" onClick={onSocietiesClick} />}
       {visibility.canViewSharedWith && <StatItem value={profileData?.shared_with_count || 0} label="shared" onClick={handlers.onSharedWithClick} />}
+      {visibility.canViewSharedWith && <StatItem value={profileData?.shared_by_count || 0} label="sharing with me" onClick={handlers.onSharedByClick} />}
     </div>
   );
 }
 
-function TeacherEmail({ email }) {
+function ContactEmail({ email }) {
   if (!email) return null;
   return <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>;
 }
@@ -146,23 +173,37 @@ function ProfileBioSection({ bio }) {
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
 }
 
-function HeaderTitleRow({ user, roleLabel, handlers, visibility }) {
+function SharedPlanningTip({ visibility }) {
+  if (visibility.canEditProfile) return null;
+  return (
+    <span className={styles.sharedPlanningTip}>
+      <span className={styles.sharedPlanningTipLabel}>Tip</span>
+      Share calendars with each other to spot free spaces and slot in study or meeting times.
+    </span>
+  );
+}
+
+function HeaderTitleRow({ user, profileData, roleLabel, handlers, visibility, onNavigate }) {
   return (
     <div className={styles.headerTop}>
       <h1 className={styles.username}>{user?.username || "guest"}</h1>
       <span className={styles.rolePill}>{roleLabel}</span>
+      <SharedCalendarPill user={user} profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
       <HeaderAction visibility={visibility} handlers={handlers} user={user} />
     </div>
   );
 }
 
-function HeaderMeta({ user, profileData, handlers, visibility, societies, onSocietiesClick }) {
-  const { description, isTeacher, roleLabel } = buildHeaderVars(user, profileData);
+function HeaderMeta({ user, profileData, handlers, visibility, societies, onSocietiesClick, onNavigate }) {
+  const { description, roleLabel } = buildHeaderVars(user, profileData);
   return (
     <>
-      <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} />
+      <HeaderTitleRow user={user} profileData={profileData} roleLabel={roleLabel} handlers={handlers} visibility={visibility} onNavigate={onNavigate} />
       {description && <div className={styles.headerSubline}>{description}</div>}
-      {isTeacher && <TeacherEmail email={profileData?.email} />}
+      <div className={styles.emailTipRow}>
+        <ContactEmail email={profileData?.email} />
+        <SharedPlanningTip visibility={visibility} />
+      </div>
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
       <ProfileBioSection bio={profileData?.bio} />
     </>
@@ -175,12 +216,12 @@ function HeaderInsights({ badges, pinnedBadgeId, onPinBadge, onViewAllBadges, pe
 }
 
 function DesktopHeader(props) {
-  const { user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick, resolvedPhoto } = props;
+  const { user, profileData, handlers, visibility, badges, pinnedBadgeId, onPinBadge, onViewAllBadges, persona, peakHour, societies, onSocietiesClick, resolvedPhoto, onNavigate } = props;
   return (
     <div className={`${styles.header} ${styles.desktopOnly}`}>
       <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
       <div className={styles.headerInfo}>
-        <HeaderMeta user={user} profileData={profileData} handlers={handlers} visibility={visibility} societies={societies} onSocietiesClick={onSocietiesClick} />
+        <HeaderMeta user={user} profileData={profileData} handlers={handlers} visibility={visibility} societies={societies} onSocietiesClick={onSocietiesClick} onNavigate={onNavigate} />
         <HeaderInsights badges={badges} pinnedBadgeId={pinnedBadgeId} onPinBadge={onPinBadge} onViewAllBadges={onViewAllBadges} persona={persona} peakHour={peakHour} visibility={visibility} />
       </div>
     </div>
@@ -192,8 +233,8 @@ function MobileStats({ profileData, handlers, visibility }) {
   return <div className={styles.mobileStatsGrid}><div className={styles.mobileStatCard} onClick={handlers.onModulesClick}><span className={styles.mobileStatValue}>{profileData?.module_count || 0}</span><span className={styles.mobileStatLabel}>Modules</span></div></div>;
 }
 
-function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto }) {
-  const { description, isTeacher, roleLabel } = buildHeaderVars(user, profileData);
+function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, onNavigate }) {
+  const { description, roleLabel } = buildHeaderVars(user, profileData);
   return (
     <div className={`${styles.mobileHeaderWrap} ${styles.mobileOnly}`}>
       <div className={styles.mobileHero}>
@@ -201,7 +242,11 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto }
         <h1 className={styles.mobileUsername}>{(profileData || user)?.username || "guest"}</h1>
         <p className={styles.mobileBio}>{description}</p>
         <span className={styles.mobileRolePill}>{roleLabel}</span>
-        {isTeacher && profileData?.email && <div className={styles.teacherEmail}><a href={`mailto:${profileData.email}`}>{profileData.email}</a></div>}
+        <div className={styles.emailTipRow}>
+          {profileData?.email && <div className={styles.teacherEmail}><a href={`mailto:${profileData.email}`}>{profileData.email}</a></div>}
+          <SharedPlanningTip visibility={visibility} />
+        </div>
+        <SharedCalendarPill user={user} profileData={profileData} visibility={visibility} onNavigate={onNavigate} />
         <div className={styles.mobileActions}><HeaderAction visibility={visibility} handlers={handlers} user={user} mobile /></div>
       </div>
       <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
