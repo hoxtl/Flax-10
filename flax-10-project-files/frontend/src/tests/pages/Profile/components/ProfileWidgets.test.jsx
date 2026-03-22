@@ -343,11 +343,9 @@ describe('ModulesSection', () => {
     await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
-  it('shows empty teacher state when no taught modules yet', async () => {
-    render(<ModulesSection modules={[]} role="teacher" onNavigate={vi.fn()} />);
-    await screen.findByText('MODULES I TEACH');
-    // Should show the widget title but no placeholder text
-    expect(screen.queryByText('No teaching modules assigned yet.')).toBeNull();
+  it('returns null for teachers when no taught modules exist yet', async () => {
+    const { container } = render(<ModulesSection modules={[]} role="teacher" onNavigate={vi.fn()} />);
+    await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
   it('renders module codes and names from API', async () => {
@@ -371,7 +369,7 @@ describe('ModulesSection', () => {
 
   it('uses teacher heading for professor profiles', async () => {
     render(<ModulesSection modules={['EC4202']} role="teacher" onNavigate={vi.fn()} />);
-    await screen.findByText('MODULES I TEACH');
+    await screen.findByText('Modules I Teach');
     expect(screen.getByText('EC4202')).toBeTruthy();
   });
 

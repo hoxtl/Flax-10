@@ -111,7 +111,7 @@ function PaginatedGrid({ users, onNavChange, currentPage, totalPages, setCurrent
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
             <div className={gridStyles.grid}>{users.map((user) => <div key={user.id}><UserCard user={user} onNavChange={onNavChange} /></div>)}</div>
             {totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
-            <BackToTop />
+            <BackToTop containerSelector="[data-dashboard-main]" />
         </div>
     );
 }

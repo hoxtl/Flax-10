@@ -79,15 +79,10 @@ export function CalendarHeader() {
     ? VIEW_MODES.filter((m) => m.value !== "week")
     : VIEW_MODES;
 
-  useEffect(() => {
-    if (!isMobile) {
-      setMobileSearchActive(false);
-      return;
-    }
-    if (searchQuery) {
-      setMobileSearchActive(true);
-    }
-  }, [isMobile, searchQuery]);
+function HeaderActions({ state, handlers, isMobile, modes }) {
+  const { searchQuery, filter, viewMode, displayMode, selectedDate, sharedCalendarUserId } = state;
+  const { setSearchQuery, setFilter, setViewMode, setDisplayMode, openModal, setShowImportModal } = handlers;
+  const isSharedCalendar = Boolean(sharedCalendarUserId);
 
   const navigate = (dir) => navigateDate(dispatch, selectedDate, viewMode, dir);
   const jumpToDate = (date) =>
@@ -106,105 +101,27 @@ export function CalendarHeader() {
   const title = getTitle(selectedDate, viewMode);
 
   return (
-    <>
-      <div className="calendar-header-container">
-        {isMobile && (
-          <div className="mobile-title-row">
-            <h2 className="title">{title}</h2>
-          </div>
-        )}
-        <header className="calendar-header">
-          <div className="header-nav-row">
-            <CalendarNav
-              onPrev={() => navigate(-1)}
-              onNext={() => navigate(1)}
-              onToday={() => jumpToDate(getTodayDate())}
-              showToday={showToday}
-              selectedDate={selectedDate}
-              onDatePick={jumpToDate}
-              title={!isMobile ? title : null}
-            />
-          </div>
-          {!isMobile && (
-            <div className="header-center">
-              <ViewSwitcher
-                modes={modes}
-                activeMode={viewMode}
-                onChange={setViewMode}
-              />
-            </div>
-          )}
-          <div className="header-actions">
-            {!isMobile && (
-              <SearchButton
-                value={searchQuery || ""}
-                onChange={setSearchQuery}
-              />
-            )}
-            {isMobile && (
-              <SearchButton
-                isMobile={isMobile}
-                mobileToggleOnly
-                mobileActive={mobileSearchActive}
-                onMobileActiveChange={setMobileSearchActive}
-              />
-            )}
-            <FilterDropdownButton
-              active={filter}
-              onChange={setFilter}
-              isMobile={isMobile}
-            />
-            {isMobile && (
-              <ViewModeButton
-                modes={modes}
-                activeMode={viewMode}
-                onChange={setViewMode}
-                isMobile={isMobile}
-              />
-            )}
-            <ViewSettingsMenu
-              activeMode={displayMode}
-              onViewChange={setDisplayMode}
-              isMobile={isMobile}
-            />
-            <ScheduleManagerButton />
-            <ActionMenu
-              onAddEvent={() => openForView(openModal, viewMode, selectedDate)}
-              onImport={() => setShowImportModal(true)}
-              isMobile={isMobile}
-            />
-          </div>
-        </header>
-        {isMobile && (
-          <div className="header-search-row">
-            <SearchButton
-              value={searchQuery || ""}
-              onChange={setSearchQuery}
-              isMobile={isMobile}
-              mobileActive={mobileSearchActive}
-              onMobileActiveChange={setMobileSearchActive}
-            />
-          </div>
-        )}
-      </div>
-      {viewMode === "day" && (
-        <MobileDateStrip selectedDate={selectedDate} dispatch={dispatch} />
-      )}
-      <TimetableImportModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImport={onImport}
-      />
-    </>
+    <div className="header-actions">
+      <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
+      <FilterDropdownButton active={filter} onChange={setFilter} allowManageTags={!isSharedCalendar} />
+      {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
+      <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
+      {!isSharedCalendar && <ScheduleManagerButton />}
+      {!isSharedCalendar && <ActionMenu onAddEvent={onAdd} onImport={() => setShowImportModal(true)} />}
+    </div>
   );
 }
 
-function MobileDateStrip({ selectedDate, dispatch }) {
-  const weekStart = getStartOfWeek(selectedDate);
-  const weekDays = [...Array(7)].map((_, i) => addDays(weekStart, i));
-  const selectDay = (day) => {
-    dispatch({ type: "SET_SELECTED_DATE", payload: day });
-    dispatch({ type: "SET_VIEW_MODE", payload: "day" });
+function useHeaderState() {
+  const { selectedDate, viewMode, displayMode, searchQuery, filter, sharedCalendarUserId } = useCalendar();
+  const dispatch = useCalendarDispatch();
+  const { openModal } = useEventModal();
+  const [showImportModal, setShowImportModal] = useState(false);
+  
+  const setters = {
+    setSearchQuery: (q) => dispatch({ type: 'SET_SEARCH_QUERY', payload: q }),
+    setFilter: (key) => dispatch({ type: 'SET_FILTER', payload: key }),
+    setShowImportModal: (val) => setShowImportModal(val)
   };
   return (
     <div className="date-strip-wrapper">
@@ -222,18 +139,7 @@ function MobileDateStrip({ selectedDate, dispatch }) {
   );
 }
 
-function DateCard({ day, isActive, onClick }) {
-  return (
-    <button
-      className={`date-card ${isActive ? "active" : ""}`}
-      onClick={onClick}
-    >
-      <span className="day-name">
-        {day.toLocaleDateString("en-US", { weekday: "short" }).charAt(0)}
-      </span>
-      <span className="day-number">{day.getDate()}</span>
-    </button>
-  );
+  return { selectedDate, viewMode, displayMode, searchQuery, filter, sharedCalendarUserId, dispatch, openModal, showImportModal, ...setters };
 }
 
 function navigateDate(dispatch, selectedDate, viewMode, dir) {
@@ -269,10 +175,4 @@ function getTodayDate() {
 function openForView(openModal, viewMode, selectedDate) {
   if (viewMode === "day") openModal(null, null, selectedDate);
   else openModal();
-}
-
-async function reloadEvents(dispatch, selectedDate, viewMode) {
-  const { start, end } = getDateRangeForView(selectedDate, viewMode);
-  const data = await getEvents({ start, end });
-  dispatch({ type: "SET_EVENTS", payload: data });
 }

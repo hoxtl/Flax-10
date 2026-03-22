@@ -20,10 +20,16 @@ from .seed_helpers import (
     build_settings_for_new_users,
     build_users_list,
 )
+from django.db import transaction
+from django.utils import timezone
+
+from studyFlax.models import CalendarEvent
 from .seed_event_helpers import (
-    build_module_event, get_user_modules, build_lecture_events,
-    create_lecture_event, build_deadlines_for_module,
-    create_deadline_calendar_event,
+    build_module_event, get_user_modules, build_deadlines_for_module,
+    build_deadline_event,
+)
+from .seed_session_events import (
+    build_module_sessions, build_session_event, session_tag,
 )
 
 User = get_user_model()
@@ -270,10 +276,8 @@ def _seed_modules_by_specs(specs, department_to_pool, weekly_rule, stdout):
         _seed_single_spec(spec, department_to_pool, weekly_rule, stdout, teacher_load, department_cursor)
 
 def create_modules(stdout):
-    stdout.write("Seeding modules...")
     teachers = _base_teachers()
     if not teachers:
-        stdout.write("  No teachers available, skipping module creation.")
         return
     pool = _department_pool(teachers)
     _ensure_department_coverage(pool, teachers)
@@ -283,12 +287,10 @@ def create_modules(stdout):
     _sync_teacher_departments()
 
 def create_deadlines(modules, stdout):
-    stdout.write("Seeding deadlines...")
     deadlines_to_create = []
     for module in modules:
         deadlines_to_create.extend(build_deadlines_for_module(module))
     Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
-    stdout.write(f"  Created {len(deadlines_to_create)} deadlines.")
 
 def _should_enroll(user, module):
     return not Enrollment.objects.filter(student=user, module=module).exists()
@@ -297,28 +299,95 @@ def _enroll_if_needed(user, module, enrollments):
     if _should_enroll(user, module):
         enrollments.append(Enrollment(student=user, module=module))
 
-def _process_module(user, module, lecture_tag, enrollments):
-    _enroll_if_needed(user, module, enrollments)
-    for u, mod, start, end, tag in build_lecture_events(user, module, lecture_tag):
-        create_lecture_event(u, mod, start, end, tag)
-    for deadline in module.deadlines.all():
-        create_deadline_calendar_event(user, deadline)
+def _deadline_tag(deadline, deadline_tag, exam_tag):
+    """Return Exam tag for exams, Deadline tag for other types."""
+    return exam_tag if deadline.deadline_type == 'exam' else deadline_tag
 
-def _process_user_modules(user, modules, lecture_tag, enrollments):
+
+def _build_user_session_events(user, module, tags, now):
+    """Build unsaved session events for a user's module."""
+    lecture_tag, _, _, schedule_tag = tags
+    events = []
+    for session in build_module_sessions(module, now):
+        tag = session_tag(session, lecture_tag, schedule_tag)
+        events.append(build_session_event(user, session, tag))
+    return events
+
+
+def _build_user_deadline_events(user, module, tags, deadlines_by_module):
+    """Build unsaved deadline events for a user's module."""
+    _, deadline_tag, exam_tag, _ = tags
+    events = []
+    for deadline in deadlines_by_module.get(module.id, []):
+        tag = _deadline_tag(deadline, deadline_tag, exam_tag)
+        events.append(build_deadline_event(user, deadline, tag))
+    return events
+
+
+def _process_single_module(user, module, tags, now, deadlines_by_module):
+    """Build enrollment and events for a single module."""
+    enrollment = Enrollment(student=user, module=module) if _should_enroll(user, module) else None
+    session_events = _build_user_session_events(user, module, tags, now)
+    deadline_events = _build_user_deadline_events(user, module, tags, deadlines_by_module)
+    return enrollment, session_events + deadline_events
+
+
+def _collect_module_result(enrollment, module_events, enrollments, events):
+    """Append enrollment (if any) and events to the accumulators."""
+    if enrollment:
+        enrollments.append(enrollment)
+    events.extend(module_events)
+
+
+def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
+    """Build all events for a user's enrolled modules."""
     core, extras = get_user_modules(user, modules)
-    for module in core:
-        _process_module(user, module, lecture_tag, enrollments)
-    for module in extras:
-        _process_module(user, module, lecture_tag, enrollments)
+    enrollments, events = [], []
+    for module in core + extras:
+        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
+        _collect_module_result(enrollment, module_events, enrollments, events)
+    return enrollments, events
 
-def _lecture_tag_for_user(user, tags):
-    return next((t for t in tags if t.name == 'Lecture' and (t.user_id == user.id or t.is_default)), None)
+def _find_user_tag(user, tags, name):
+    """Find a tag by name for a user, falling back to default tags."""
+    return next((t for t in tags if t.name == name and (t.user_id == user.id or t.is_default)), None)
 
+def _get_user_module_tags(user, tags):
+    """Return (lecture_tag, deadline_tag, exam_tag, schedule_tag) for a user."""
+    return (
+        _find_user_tag(user, tags, 'Lecture'),
+        _find_user_tag(user, tags, 'Deadline'),
+        _find_user_tag(user, tags, 'Exam'),
+        _find_user_tag(user, tags, 'Schedule'),
+    )
+
+def _prefetch_deadlines_by_module(modules):
+    """Prefetch all deadlines grouped by module ID."""
+    from studyFlax.models import Deadline
+    deadlines = Deadline.objects.filter(module__in=modules)
+    by_module = defaultdict(list)
+    for d in deadlines:
+        by_module[d.module_id].append(d)
+    return by_module
+
+
+def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module):
+    """Collect enrollments and events for all users."""
+    all_enrollments, all_events = [], []
+    for user in users:
+        user_tags = _get_user_module_tags(user, tags)
+        enrollments, events = _build_user_module_events(user, modules, user_tags, now, deadlines_by_module)
+        all_enrollments.extend(enrollments)
+        all_events.extend(events)
+    return all_enrollments, all_events
+
+
+@transaction.atomic
 def create_enrollments(modules, tags, stdout):
-    stdout.write("Seeding enrollments and lecture events...")
-    enrollments = []
-    for user in User.objects.all().select_related('settings'):
-        lecture_tag = _lecture_tag_for_user(user, tags)
-        _process_user_modules(user, modules, lecture_tag, enrollments)
-    Enrollment.objects.bulk_create(enrollments, ignore_conflicts=True)
-    stdout.write(f"  Created {len(enrollments)} enrollments.")
+    """Create enrollments and all module events for all users."""
+    now = timezone.now()
+    deadlines_by_module = _prefetch_deadlines_by_module(modules)
+    users = list(User.objects.all().select_related('settings'))
+    all_enrollments, all_events = _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
+    Enrollment.objects.bulk_create(all_enrollments, ignore_conflicts=True, batch_size=500)
+    CalendarEvent.objects.bulk_create(all_events, ignore_conflicts=True, batch_size=500)

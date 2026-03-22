@@ -12,7 +12,7 @@ export default function FloatingChat() {
   return (
     <div className={styles.root}>
       {chat.open && chat.renderWindow()}
-      {chat.showPrompt && <ChatPromptBubble onAsk={chat.openTaskPrompt} onMinimize={chat.minimizePrompt} text={chat.promptText} />}
+      {chat.showPrompt && <ChatPromptBubble onAsk={chat.openPrompt} onMinimize={chat.minimizePrompt} text={chat.promptText} />}
       <FloatingChatFab open={chat.open} minimized={chat.minimized} onClick={chat.toggleFab} />
     </div>
   );

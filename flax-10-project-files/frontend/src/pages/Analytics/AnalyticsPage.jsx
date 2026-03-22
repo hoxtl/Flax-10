@@ -2,17 +2,16 @@
  * Analytics page shell.
  */
 
-import AIInsightsTab from "../../components/Analytics/AIInsightsTab";
-import AppPage from "../../components/common/AppPage/AppPage";
-import Tabs from "../../components/common/Tabs/Tabs";
-import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl";
-import AnalyticsOverview from "./components/AnalyticsOverview";
-import AnalyticsSkeleton from "./components/AnalyticsSkeleton";
-import useAnalyticsOverview from "./hooks/useAnalyticsOverview";
-import { BackToTop } from "../../components/Pagination/Pagination";
-import { PERIODS, TABS } from "./pageConfig";
-import { useAnalyticsPageState } from "./pageState";
-import styles from "./AnalyticsPage.module.css";
+import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
+import AppPage from '../../components/common/AppPage/AppPage';
+import { SegmentedControl, Tabs } from '../../components/common';
+import AnalyticsOverview from './components/AnalyticsOverview';
+import AnalyticsSkeleton from './components/AnalyticsSkeleton';
+import useAnalyticsOverview from './hooks/useAnalyticsOverview';
+import { BackToTop } from '../../components/Pagination/Pagination';
+import { PERIODS, TABS } from './pageConfig';
+import { useAnalyticsPageState } from './pageState';
+import styles from './AnalyticsPage.module.css';
 
 const analyticsSubtitle = (
   <>
@@ -36,17 +35,11 @@ const getTabContent = (loading, period) =>
 const getTabs = (loading, period, data, progressData, themeStats) => [
   {
     ...TABS[0],
-    content: getOverviewContent(loading, data, progressData, themeStats),
+    content: getOverviewContent(loading, data, progressData, themeStats)
   },
   {
     ...TABS[1],
-    label: (
-      <>
-        <span className={styles.aiInsightsLabelFull}>AI Insights</span>
-        <span className={styles.aiInsightsLabelShort}>Insights</span>
-      </>
-    ),
-    content: getTabContent(loading, period),
+    content: getTabContent(loading, period)
   },
 ];
 
@@ -80,15 +73,7 @@ export default function AnalyticsPage() {
     >
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <Tabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        layoutId="analyticsTab"
-        tabVariant="heading"
-        className={styles.analyticsTabs}
-        tabClassName={styles.analyticsTabButton}
-      />
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
       <BackToTop />
     </AppPage>
   );

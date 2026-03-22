@@ -2,7 +2,7 @@
 Views for managing group projects and their memberships.
 """
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -18,9 +18,22 @@ from studyFlax.serialisers.tasks.groupwork_serialisers import (
     GroupMembershipSerialiser,
 )
 
-def _with_member_count(project):
-    """Return the project annotated with its current member count."""
-    return GroupProject.objects.filter(id=project.id).annotate(member_count=Count("memberships")).first()
+def _get_annotated_projects():
+    """Return the base queryset for group projects with all stats annotated."""
+    return GroupProject.objects.annotate(
+        member_count=Count("memberships", distinct=True),
+        task_count=Count("tasks", distinct=True),
+        completed_task_count=Count(
+            "tasks", filter=Q(tasks__status="done"), distinct=True
+        )
+    )
+
+def _get_project_with_stats(project_id, user):
+    """Return a single project with stats, ensuring the user is a member."""
+    return get_object_or_404(
+        _get_annotated_projects().filter(memberships__user=user),
+        id=project_id
+    )
 
 def _handle_project_delete(project, user):
     """Delete the project if the user is the owner, otherwise return 403."""
@@ -34,14 +47,19 @@ def _handle_project_delete(project, user):
 def group_project_list(request):
     """List all group projects for the user, or create a new one."""
     if request.method == "GET":
-        qs = GroupProject.objects.filter(memberships__user=request.user).annotate(member_count=Count("memberships")).order_by("-created_at")
+        qs = _get_annotated_projects().filter(
+            memberships__user=request.user
+        ).order_by("-created_at")
         return Response(GroupProjectSerialiser(qs, many=True).data)
     serialiser = GroupProjectSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     project = serialiser.save(owner=request.user)
     GroupMembership.objects.create(project=project, user=request.user, role="owner")
-    return Response(GroupProjectSerialiser(_with_member_count(project)).data, status=status.HTTP_201_CREATED)
+    return Response(
+        GroupProjectSerialiser(_get_project_with_stats(project.id, request.user)).data,
+        status=status.HTTP_201_CREATED
+    )
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
@@ -72,7 +90,9 @@ def group_project_detail(request, project_id):
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     serialiser.save()
-    return Response(GroupProjectSerialiser(_with_member_count(project)).data)
+    return Response(
+        GroupProjectSerialiser(_get_project_with_stats(project_id, request.user)).data
+    )
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])

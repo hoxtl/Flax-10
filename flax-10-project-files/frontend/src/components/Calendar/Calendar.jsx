@@ -21,7 +21,8 @@ const DISPLAY_VIEWS = { grid: null, list: ListView, table: TableView };
 
 function CalendarView({ viewMode, displayMode }) {
   const View = DISPLAY_VIEWS[displayMode] || GRID_VIEWS[viewMode];
-  return View ? <View /> : null;
+  const { readOnly } = useCalendar();
+  return View ? <View readOnly={readOnly} /> : null;
 }
 
 function CalendarContent() {

@@ -58,20 +58,26 @@ def load_task(request, reading_id):
     reading = get_object_or_404(Reading, id=reading_id)
     return create_reading_task(request.user, reading)
 
+def _find_module_task_list(user, module):
+    """Find task list for a specific module (new or legacy naming)."""
+    new_name = f"{module.module_code} - {module.module_name}"
+    module_list = TaskList.objects.filter(user=user, name=new_name, archived=False).first()
+    if module_list:
+        return module_list
+    return TaskList.objects.filter(
+        user=user, name=f"Reading List - {module.module_name}", archived=False
+    ).first()
+
+
+def _find_generic_reading_list(user):
+    """Find any reading-related task list for the user."""
+    return TaskList.objects.filter(user=user, name__icontains='reading', archived=False).first()
+
+
 def get_reading_list(user, module=None):
     if module:
-        new_name = f"{module.module_code} - {module.module_name}"
-        module_list = TaskList.objects.filter(
-            user=user, name=new_name, archived=False,
-        ).first()
-        if module_list:
-            return module_list
-        legacy = TaskList.objects.filter(
-            user=user, name=f"Reading List - {module.module_name}", archived=False,
-        ).first()
-        if legacy:
-            return legacy
-    return TaskList.objects.filter(user=user, name__icontains='reading', archived=False,).first()
+        return _find_module_task_list(user, module) or _find_generic_reading_list(user)
+    return _find_generic_reading_list(user)
 
 def create_reading_task(user, reading):
     estimated = estimated_time_reading(reading, user)

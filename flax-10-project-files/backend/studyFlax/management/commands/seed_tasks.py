@@ -81,14 +81,16 @@ def _seed_enrollment_tasks(user, task_list, module, now):
         _create_module_task(user, task_list, module, title_tmpl, desc, priority, blocks, days, i, now)
     return len(templates)
 
+def _seed_enrollment_if_listed(user, enrollment, lists_by_module, now):
+    """Seed tasks for an enrollment if it has a task list."""
+    task_list = lists_by_module.get(enrollment.module.id)
+    return _seed_enrollment_tasks(user, task_list, enrollment.module, now) if task_list else 0
+
+
 def _seed_module_tasks(user, lists_by_module, now):
+    """Seed tasks for all user's enrolled modules."""
     enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
-    total = 0
-    for e in enrolled:
-        task_list = lists_by_module.get(e.module.id)
-        if task_list:
-            total += _seed_enrollment_tasks(user, task_list, e.module, now)
-    return total
+    return sum(_seed_enrollment_if_listed(user, e, lists_by_module, now) for e in enrolled)
 
 def _seed_personal_tasks(user, lists_by_name, personal_list, now):
     count = 0
@@ -116,7 +118,6 @@ def _seed_tasks_for_user(user, now):
     return total
 
 def create_tasks(users, stdout):
-    stdout.write("Seeding tasks...")
     now = timezone.now()
     total = sum(_seed_tasks_for_user(user, now) for user in users)
-    stdout.write(f"  Created {total} tasks.")
+    stdout.write(f"  \u2713  {'Tasks':<14} {total:,}")

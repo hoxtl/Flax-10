@@ -110,19 +110,42 @@ function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave }) 
 }
 
 function OtherProfileColumns(props) {
-  const { summary, modules, currentUserModules, currentUserSummary, viewedUsername, role, onNavigate, onSuggestStudySession, suggestionState } = props;
+  const { summary, modules, currentUserModules, currentUserSummary, role, onNavigate, onSuggestStudySession, suggestionState } = props;
   const sharedModuleCount = (modules || []).filter((moduleCode) => (currentUserModules || []).includes(moduleCode)).length;
+  const hasCommonGround = role !== "teacher" && (((modules || []).length > 0) || ((summary?.societies || []).length > 0));
+  const showTeacherInsights = role === "teacher" && (modules?.length > 0 || (summary && currentUserSummary));
   return (
     <div className={styles.singleCol}>
-      <QuickStatsRail totalHours={summary?.total_hours} sessionCount={summary?.session_count} moduleCount={modules?.length || 0} />
-      <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} viewedUsername={viewedUsername} mutualConnections={summary?.mutual_connections} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
-      {role === "teacher" ? <ModulesSection modules={modules} onNavigate={onNavigate} role="teacher" /> : <CommonGroundSection viewedModules={modules} viewedSocieties={summary?.societies} currentUserModules={currentUserModules} currentUserSocieties={currentUserSummary?.societies} viewedUsername={viewedUsername} onNavigate={onNavigate} />}
+      <QuickStatsRail totalHours={summary?.total_hours} sessionCount={summary?.session_count} moduleCount={modules?.length || 0} hideZeroItems={role === "teacher"} />
+      {showTeacherInsights ? (
+        <div className={styles.otherInsightsRow}>
+          <div className={styles.secondaryInsightCell}>
+            <ModulesSection modules={modules} onNavigate={onNavigate} role="teacher" />
+          </div>
+          <div className={styles.compatibilityCell}>
+            <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
+          </div>
+        </div>
+      ) : !hasCommonGround ? (
+        <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
+      ) : (
+        <div className={styles.otherInsightsRow}>
+          {hasCommonGround && (
+            <div className={styles.secondaryInsightCell}>
+              <CommonGroundSection viewedModules={modules} viewedSocieties={summary?.societies} currentUserModules={currentUserModules} currentUserSocieties={currentUserSummary?.societies} onNavigate={onNavigate} />
+            </div>
+          )}
+          <div className={styles.compatibilityCell}>
+            <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function ProfileHome(props) {
-  const { onNavigate, visibility, viewedUserId, modules, role, viewedUsername, onBadgesReady, onPersonaReady, onSocietiesReady } = props;
+  const { onNavigate, visibility, viewedUserId, viewedUser, modules, role, viewedUsername, onBadgesReady, onPersonaReady, onSocietiesReady } = props;
   const { summary, loading, refetch } = useProfileSummary(viewedUserId);
   const analyticsData = useProfileAnalytics(visibility.canViewAnalytics);
   const currentUserSummary = useCurrentUserSummary(visibility.isSelf);
@@ -135,7 +158,7 @@ function ProfileHome(props) {
   useEffect(() => onSocietiesReady?.(summary?.societies || []), [onSocietiesReady, summary?.societies]);
   if (loading) return <ProfileSkeleton blocks={<SkeletonGrid />} />;
   if (visibility.isSelf) return <SelfProfileColumns summary={summary} analyticsData={analyticsData} onNavigate={onNavigate} onGoalSave={(goal) => saveWeeklyGoal(goal, refetch)} />;
-  return <OtherProfileColumns summary={summary} modules={modules} currentUserModules={currentUserModules} currentUserSummary={currentUserSummary} viewedUsername={viewedUsername} role={role} onNavigate={onNavigate} onSuggestStudySession={suggestion.submit} suggestionState={suggestion.state} />;
+  return <OtherProfileColumns summary={summary} modules={modules} currentUserModules={currentUserModules} currentUserSummary={currentUserSummary} viewedUsername={viewedUsername} viewedUser={viewedUser} role={role} onNavigate={onNavigate} onSuggestStudySession={suggestion.submit} suggestionState={suggestion.state} />;
 }
 
 function ProfileHeaderSection({ user, profileData, state, visibility, onNavigate }) {
@@ -143,7 +166,7 @@ function ProfileHeaderSection({ user, profileData, state, visibility, onNavigate
   return (
     <>
       <ProfileHeader user={profileData || user} profileData={profileData} handlers={state.handlers} visibility={visibility} badges={header.badges} pinnedBadgeId={header.pinnedBadgeId} onPinBadge={header.handlePinBadge} onViewAllBadges={header.openAchievements} persona={header.persona} peakHour={header.peakHour} societies={header.societies} onNavigate={onNavigate} onSocietiesClick={header.openSocieties} />
-      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} modules={state.modules} role={profileData?.role || user?.role} viewedUsername={profileData?.username || user?.username} onBadgesReady={header.setBadges} onPersonaReady={header.setPersonaState} onSocietiesReady={header.setSocieties} />
+      <ProfileHome onNavigate={onNavigate} visibility={visibility} viewedUserId={state.viewedUserId} viewedUser={profileData || user} modules={state.modules} role={profileData?.role || user?.role} viewedUsername={profileData?.username || user?.username} onBadgesReady={header.setBadges} onPersonaReady={header.setPersonaState} onSocietiesReady={header.setSocieties} />
       {visibility.canViewCalendar && <SharedCalendarSection events={state.filteredEvents} />}
       {header.showAchievements && <AchievementsModal badges={header.badges} onClose={header.closeAchievements} />}
       {header.showSocieties && <SocietiesModal isOpen societies={header.societies} onClose={header.closeSocieties} onNavigate={onNavigate} />}

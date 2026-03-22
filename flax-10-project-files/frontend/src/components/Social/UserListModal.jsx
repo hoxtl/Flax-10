@@ -2,6 +2,7 @@
  * Modal for showing and interacting with a list of users.
  */
 
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import ShareButton from './ShareButton';
 import GenericSummaryModal from '../common/GenericSummaryModal/GenericSummaryModal';
 import SearchEmptyState from '../common/SearchEmptyState/SearchEmptyState';
@@ -33,22 +34,60 @@ function formatName(user) {
     return (fn || ln) ? `${fn} ${ln}`.trim() : user.username;
 }
 
-function buildRenderItem(currentUser, onUserClick, onUserUpdate) {
-    return (user, index) => <UserListItem key={user.id || user.username || index} user={user} currentUser={currentUser} onUserClick={onUserClick} onUserUpdate={onUserUpdate} />;
+function buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction) {
+    return (user, index) => (
+        <UserListItem
+            key={user.id || user.username || index}
+            user={user}
+            currentUser={currentUser}
+            onUserClick={onUserClick}
+            onUserUpdate={onUserUpdate}
+            onUserCalendarClick={onUserCalendarClick}
+            showCalendarAction={showCalendarAction}
+        />
+    );
 }
 
-function UserListItem({ user, currentUser, onUserClick, onUserUpdate }) {
+function UserListItem({ user, currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction }) {
     const isSelf = isCurrentUser(user, currentUser);
-    const rightAction = isSelf ? null : <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} />;
+    const rightAction = isSelf ? null : buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction);
     const avatarUser = { ...user, profile_photo_url: getResolvedUserPhoto(user, { allowGeneric: true }) };
     return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
 }
 
-export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate }) {
+function buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction) {
+    if (showCalendarAction) {
+        return (
+            <PrimaryButton
+                pill
+                size="small"
+                variant="primary"
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onUserCalendarClick?.(user);
+                }}
+            >
+                View calendar
+            </PrimaryButton>
+        );
+    }
+    return (
+        <ShareButton
+            userId={user.id}
+            initialIsSharing={user.is_sharing}
+            onToggle={onUserUpdate}
+            shareVariant="secondary"
+            sharedVariant="primary"
+            sharedLabel="Shared calendar"
+        />
+    );
+}
+
+export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction = false, emptyHint = "No one is sharing with you yet." }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
     const items = sortUsers(users, currentUser);
-    const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate);
+    const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction);
     return (
         <GenericSummaryModal
             isOpen={true}
@@ -58,7 +97,7 @@ export default function UserListModal({ title, users, onClose, onUserClick, onUs
                 <SearchEmptyState
                     itemLabel="users"
                     title="No users found"
-                    hint="No one is sharing with you yet."
+                    hint={emptyHint}
                 />
             }
             items={items}
