@@ -51,6 +51,12 @@ class ProfileSummaryEndpointTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(response.data['badges']), 0)
 
+    def test_summary_total_hours_uses_seconds_based_duration(self):
+        self._make_session(duration=7200)
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['total_hours'], 2.0)
+
     def test_summary_computes_streaks(self):
         for days in range(3, 0, -1):
             make_session(self.user, duration=60, hours_ago=days * 24)
@@ -209,6 +215,28 @@ class ProfileSummaryEndpointTest(TestCase):
         response = self.client.get('/api/profile/summary/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['societies'], [])
+
+    def test_teacher_profile_summary_includes_totals_when_sessions_exist(self):
+        teacher = User.objects.create_user(
+            username='teach_stats', email='teach_stats@example.com',
+            password='pass', first_name='Alex', last_name='Miller', role='teacher',
+        )
+        self.client.force_authenticate(user=teacher)
+        StudySession.objects.create(
+            user=teacher,
+            start_time=timezone.now() - timedelta(hours=2),
+            end_time=timezone.now(),
+            duration=5400,
+            break_duration=0,
+            pause_duration=0,
+            status='Completed',
+            study_block_id=random.randint(1, 999999),
+            session_count=1,
+        )
+        response = self.client.get('/api/profile/summary/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['session_count'], 1)
+        self.assertEqual(response.data['total_hours'], 1.5)
 
     def _make_session(self, **kwargs):
         return StudySession.objects.create(

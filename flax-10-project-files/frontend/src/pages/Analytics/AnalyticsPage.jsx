@@ -4,7 +4,7 @@
 
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
 import AppPage from '../../components/common/AppPage/AppPage';
-import { TabBar, TabContent, SegmentedControl } from '../../components/common';
+import { SegmentedControl, Tabs } from '../../components/common';
 import AnalyticsOverview from './components/AnalyticsOverview';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
@@ -27,12 +27,10 @@ const getTabContent = (loading, period) => (!loading ? <AIInsightsTab period={pe
 const getTabs = (loading, period, data, progressData, themeStats) => [
   {
     ...TABS[0],
-    label: <span className={styles.tabLabel}><span>{TABS[0].icon}</span> {TABS[0].label}</span>,
     content: getOverviewContent(loading, data, progressData, themeStats)
   },
   {
     ...TABS[1],
-    label: <span className={styles.tabLabel}><span>{TABS[1].icon}</span> {TABS[1].label}</span>,
     content: getTabContent(loading, period)
   },
 ];
@@ -58,10 +56,7 @@ export default function AnalyticsPage() {
       action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}>
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
-      <TabBar tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" variant="heading" />
-      <TabContent activeTab={activeTab}>
-        {tabs.find(t => t.id === activeTab)?.content}
-      </TabContent>
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />
       <BackToTop />
     </AppPage>
   );

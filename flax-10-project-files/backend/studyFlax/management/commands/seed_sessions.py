@@ -46,8 +46,8 @@ def _build_user_sessions(user):
 
 @transaction.atomic
 def create_study_sessions(stdout):
-    """Create study and theme sessions for all students."""
-    students = list(User.objects.filter(role='student'))
+    """Create study and theme sessions for all seeded students and teachers."""
+    students = list(User.objects.filter(role__in=['student', 'teacher']))
     all_study = []
     all_theme = []
     for user in students:

@@ -17,6 +17,12 @@ PERSONAS = [
     {'id': 'marathon', 'label': 'Marathon Runner', 'emoji': '🏃', 'description': 'Long sessions, deep focus. You build momentum and ride it all the way.'},
 ]
 
+SECONDS_PER_HOUR = 3600
+SPRINT_SESSION_SECONDS = 30 * 60
+MARATHON_SESSION_SECONDS = 75 * 60
+SHORT_SESSION_SECONDS = 25 * 60
+LONG_SESSION_SECONDS = 90 * 60
+
 
 def derive_persona(sessions):
     if not sessions:
@@ -30,7 +36,7 @@ def derive_persona(sessions):
         return PERSONAS[1]
     if 12 <= peak_hour < 17:
         return PERSONAS[2]
-    return PERSONAS[4] if avg_duration <= 30 else PERSONAS[5] if avg_duration >= 75 else PERSONAS[2]
+    return PERSONAS[4] if avg_duration <= SPRINT_SESSION_SECONDS else PERSONAS[5] if avg_duration >= MARATHON_SESSION_SECONDS else PERSONAS[2]
 
 
 def collect_session_stats(sessions):
@@ -44,8 +50,8 @@ def filter_complete(sessions):
 
 
 def session_totals(sessions):
-    total_minutes = sum(session.duration for session in sessions)
-    return total_minutes, total_minutes / 60, len(sessions)
+    total_seconds = sum(session.duration for session in sessions)
+    return total_seconds, total_seconds / SECONDS_PER_HOUR, len(sessions)
 
 
 def active_days_last_30(sessions_90):
@@ -102,8 +108,8 @@ def build_time_of_day_badges(early, late, afternoon, session_count):
 
 
 def session_length_badges(sessions_all):
-    short_sessions = sum(1 for session in sessions_all if session.duration <= 25)
-    long_sessions = sum(1 for session in sessions_all if session.duration >= 90)
+    short_sessions = sum(1 for session in sessions_all if session.duration <= SHORT_SESSION_SECONDS)
+    long_sessions = sum(1 for session in sessions_all if session.duration >= LONG_SESSION_SECONDS)
     return build_session_length_badges(short_sessions, long_sessions)
 
 

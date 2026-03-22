@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { shareCalendar, unshareCalendar } from '../../api/socialApi';
-import styles from './Social.module.css';
-
-function getLabel(loading, isSharing) {
-    if (loading) return '...';
-    return isSharing ? 'Shared' : 'Share Calendar';
-}
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 
 async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle) {
     setLoading(true);
@@ -31,6 +26,15 @@ export default function ShareButton({ userId, initialIsSharing, onToggle }) {
         if (!loading) toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle);
     };
 
-    const cls = `${styles.shareButton} ${isSharing ? styles.sharing : ''}`;
-    return <button className={cls} onClick={handleClick} disabled={loading}>{getLabel(loading, isSharing)}</button>;
+    return (
+        <PrimaryButton
+            pill
+            size="small"
+            variant={isSharing ? "secondary" : "primary"}
+            disabled={loading}
+            onClick={handleClick}
+        >
+            {loading ? '...' : isSharing ? 'Shared' : 'Share Calendar'}
+        </PrimaryButton>
+    );
 }

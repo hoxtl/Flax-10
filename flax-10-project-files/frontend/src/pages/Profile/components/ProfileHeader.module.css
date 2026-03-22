@@ -1,12 +1,13 @@
 .header {
   display: flex;
-  gap: 80px;
+  gap: 56px;
   margin-bottom: 32px;
   padding-bottom: 32px;
   border-bottom: none;
 }
 
 .avatar {
+  margin-left: clamp(56px, 8vw, 120px);
   width: 150px;
   height: 150px;
   border-radius: 50%;
@@ -119,8 +120,9 @@
 }
 
 .teacherEmail {
-  margin-top: 4px;
+  margin-top: -8px;
   font-size: 13px;
+  line-height: 1.35;
 }
 
 .teacherEmail a {
@@ -271,7 +273,7 @@
   .desktopOnly { display: none !important; }
   .mobileOnly { display: flex; }
   .header { gap: 24px; }
-  .avatar { width: 80px; height: 80px; font-size: 32px; }
+  .avatar { width: 80px; height: 80px; font-size: 32px; margin-left: 0; }
   .username { font-size: 20px; }
   .stats { gap: 20px; }
 }

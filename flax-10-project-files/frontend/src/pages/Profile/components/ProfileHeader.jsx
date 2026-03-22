@@ -56,16 +56,48 @@ function HeaderBadge({ badge, pinned, canPin, activeTooltip, onEnter, onLeave, o
   );
 }
 
+function buildFeaturedBadge(badges, pinnedBadgeId) {
+  return badges.find((badge) => String(badge.id) === String(pinnedBadgeId)) || null;
+}
+
+function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
+  if (!badge) return null;
+  return (
+    <button
+      type="button"
+      className={styles.featuredBadgeCard}
+      onClick={() => canPin && onPinBadge?.(badge.id)}
+      title={canPin ? "Tap to pin this badge" : badge.label}
+    >
+      <div className={styles.featuredBadgeMain}>
+        <div className={styles.featuredBadgeEmojiWrap}>
+          <span className={styles.featuredBadgeEmoji}>{badge.emoji}</span>
+        </div>
+        <div className={styles.featuredBadgeText}>
+          <p className={styles.featuredBadgeTitle}>{badge.label}</p>
+          {badge.description && <p className={styles.featuredBadgeDesc}>{badge.description}</p>}
+        </div>
+      </div>
+    </button>
+  );
+}
+
 function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
-  const pinnedBadge = badges.find((badge) => badge.id === pinnedBadgeId);
-  const topBadges = badges.filter((badge) => badge.id !== pinnedBadgeId).slice(0, 3);
+  const featuredBadge = buildFeaturedBadge(badges, pinnedBadgeId);
+  const topBadges = badges.filter((badge) => badge.id !== featuredBadge?.id).slice(0, 3);
   const [activeTooltip, setActiveTooltip] = useState(null);
   const renderBadge = (badge, pinned = false) => <HeaderBadge key={badge.id} badge={badge} pinned={pinned} canPin={canPin} onPinBadge={onPinBadge} activeTooltip={activeTooltip} onEnter={() => setActiveTooltip(badge.id)} onLeave={() => setActiveTooltip(null)} />;
   return (
-    <div className={styles.headerBadges}>
-      {pinnedBadge && <div className={styles.pinnedBadgeWrap}>{renderBadge(pinnedBadge, true)}</div>}
-      <div className={styles.headerBadgesMain}>{topBadges.map((badge) => renderBadge(badge))}</div>
-      {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
+    <div className={styles.headerAchievementsRow}>
+      {featuredBadge && <FeaturedBadgeCard badge={featuredBadge} canPin={canPin} onPinBadge={onPinBadge} />}
+      <div className={styles.headerBadgeRail}>
+        <div className={styles.headerBadges}>
+          <div className={styles.headerBadgesMain}>
+            {topBadges.map((badge) => renderBadge(badge))}
+          </div>
+          {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
+        </div>
+      </div>
     </div>
   );
 }
@@ -89,6 +121,11 @@ function ProfileStats({ profileData, handlers, visibility, societyCount, onSocie
   );
 }
 
+function TeacherEmail({ email }) {
+  if (!email) return null;
+  return <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>;
+}
+
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
   const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak` : null;
@@ -104,9 +141,9 @@ function PersonaInlineChip({ persona, peakHour }) {
   );
 }
 
-function ProfileBioSection({ isTeacher, email, bio }) {
-  if (!((isTeacher && email) || bio)) return null;
-  return <div className={styles.bio}>{isTeacher && email && <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>}{bio && <div className={styles.reminder}>{bio}</div>}</div>;
+function ProfileBioSection({ bio }) {
+  if (!bio) return null;
+  return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
 }
 
 function HeaderTitleRow({ user, roleLabel, handlers, visibility }) {
@@ -125,8 +162,9 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
     <>
       <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} />
       {description && <div className={styles.headerSubline}>{description}</div>}
+      {isTeacher && <TeacherEmail email={profileData?.email} />}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
-      <ProfileBioSection isTeacher={isTeacher} email={profileData?.email} bio={profileData?.bio} />
+      <ProfileBioSection bio={profileData?.bio} />
     </>
   );
 }
