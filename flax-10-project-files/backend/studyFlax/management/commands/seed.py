@@ -32,24 +32,24 @@ from studyFlax.fixtures.data_fixtures import (
     category_fixtures, tag_fixtures, recurrence_fixtures,
     MODULE_PILL_COLORS,
 )
-from .seed_users import (
+from .seed_support.users.users import (
     FIXTURE_USERS, ROLE_LABELS,
     create_admin_user, create_fixture_users, create_random_users,
 )
-from .seed_events import create_events_for_users
-from .seed_modules import create_modules, create_deadlines, create_enrollments
-from .seed_tasks import create_tasks
-from .seed_groups import (
+from .seed_support.events.events import create_events_for_users
+from .seed_support.content.modules import create_modules, create_deadlines, create_enrollments
+from .seed_support.content.tasks import create_tasks
+from .seed_support.groups.groups import (
     create_group_projects, create_group_memberships, create_group_tasks, seed_group_availability,
 )
-from .seed_sessions import create_study_sessions
-from .seed_societies import (
+from .seed_support.sessions.sessions import create_study_sessions
+from .seed_support.content.societies import (
     create_societies, create_society_memberships,
     create_society_events, create_society_images,
 )
-from .seed_readings import create_readings
-from .seed_attendance import seed_attendance
-from .seed_admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
+from .seed_support.readings.readings import create_readings
+from .seed_support.events.attendance import seed_attendance
+from .seed_support.users.admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"

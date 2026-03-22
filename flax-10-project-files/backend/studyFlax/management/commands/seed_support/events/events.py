@@ -6,7 +6,7 @@ import random
 from django.db import transaction
 
 from studyFlax.models import CalendarEvent
-from .seed_event_helpers import (
+from .event_helpers import (
     build_events_for_user, build_meal_events, build_today_afternoon_events,
     build_weekend_events,
 )
