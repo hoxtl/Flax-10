@@ -105,3 +105,29 @@ describe('getModuleLabel', () => {
   });
 });
 
+describe('filterVisibleBlocks', () => {
+  it('keeps a block whose duration meets the 300s threshold', () => {
+    expect(filterVisibleBlocks([{ totalDuration: 300, sessions: [] }])).toHaveLength(1);
+  });
+
+  it('keeps a block with a completed session even when duration is below threshold', () => {
+    expect(
+      filterVisibleBlocks([{ totalDuration: 0, sessions: [{ status: 'Complete' }] }])
+    ).toHaveLength(1);
+  });
+
+  it('removes a block that is below threshold and has only incomplete sessions', () => {
+    expect(
+      filterVisibleBlocks([{ totalDuration: 100, sessions: [{ status: 'Incomplete' }] }])
+    ).toHaveLength(0);
+  });
+
+  it('handles a block with no sessions property', () => {
+    expect(filterVisibleBlocks([{ totalDuration: 500 }])).toHaveLength(1);
+  });
+
+  it('returns an empty array for empty input', () => {
+    expect(filterVisibleBlocks([])).toHaveLength(0);
+  });
+});
+
