@@ -14,14 +14,17 @@ async function geocodeModuleLocation(moduleLocation) {
   return { lat, lng };
 }
 
+async function computeJourney(homeAddress, dest) {
+  const journey = await tflService.journeyPlanner(homeAddress.home_latitude, homeAddress.home_longitude, dest.lat, dest.lng);
+  if (!journey) return null;
+  return { duration: journey.duration, legs: journey.legs };
+}
+
 export async function getTravelTimeModule(homeAddress, moduleLocation) {
   if (!homeAddress?.home_latitude || !homeAddress?.home_longitude || !moduleLocation) return null;
   try {
     const dest = await geocodeModuleLocation(moduleLocation);
-    if (!dest) return null;
-    const journey = await tflService.journeyPlanner(homeAddress.home_latitude, homeAddress.home_longitude, dest.lat, dest.lng);
-    if (!journey) return null;
-    return { duration: journey.duration, legs: journey.legs };
+    return dest ? await computeJourney(homeAddress, dest) : null;
   } catch (error) {
     console.error('TfL home-to-module calculation error:', error);
   }
