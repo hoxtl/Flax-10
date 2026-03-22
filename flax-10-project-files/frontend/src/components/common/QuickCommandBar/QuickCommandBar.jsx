@@ -4,43 +4,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  CalendarPlus2, GraduationCap, Timer, Users, Sparkles,
-  Home, Calendar, CheckSquare, MapPin, BarChart2, ClipboardCheck, UserCheck,
-} from "lucide-react";
 
 import styles from "./QuickCommandBar.module.css";
 import SearchEmptyState from "../SearchEmptyState/SearchEmptyState";
+import { buildActionDefs, matchesQuery } from "./commandBarActions";
 
 function isEditableTarget(target) {
   const tag = target?.tagName;
   return tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable === true;
-}
-
-/** Returns the full list of available quick actions. */
-function actionDefs({ onNavChange, onOpenTask }) {
-  const nav = (page) => () => onNavChange?.(page);
-  return [
-    { id: "add-task", title: "Add task", hint: "Open quick task modal", Icon: CalendarPlus2, run: () => onOpenTask?.() },
-    { id: "go-home", title: "Go to Home", hint: "Navigate to home dashboard", Icon: Home, run: nav("home") },
-    { id: "go-calendar", title: "Open Calendar", hint: "View and manage your calendar events", Icon: Calendar, run: nav("calendar") },
-    { id: "go-timer", title: "Start timer", hint: "Jump into focus mode timer", Icon: Timer, run: nav("timer") },
-    { id: "go-tasks", title: "View tasks", hint: "Open your task list", Icon: CheckSquare, run: nav("tasks") },
-    { id: "go-modules", title: "Jump to module", hint: "Open modules or search by module code", Icon: GraduationCap,
-      run: (query) => { const q = String(query || "").trim(); onNavChange?.(q ? `/modules?code=${encodeURIComponent(q)}` : "modules"); } },
-    { id: "go-map", title: "Open campus map", hint: "Navigate the campus map and plan your journey", Icon: MapPin, run: nav("map") },
-    { id: "go-societies", title: "Browse societies", hint: "Explore and join student societies", Icon: Sparkles, run: () => onNavChange?.("/societies?tab=all") },
-    { id: "go-users", title: "Discover users", hint: "Find and connect with other students", Icon: Users, run: nav("users") },
-    { id: "go-group-work", title: "Group Projects", hint: "Track shared project work", Icon: UserCheck, run: nav("group-work") },
-    { id: "go-analytics", title: "View analytics", hint: "See your study statistics and insights", Icon: BarChart2, run: nav("analytics") },
-    { id: "go-attendance", title: "Attendance", hint: "Check your lecture attendance", Icon: ClipboardCheck, run: nav("attendance") },
-  ];
-}
-
-function matches(action, query) {
-  if (!query) return true;
-  const q = query.toLowerCase();
-  return action.title.toLowerCase().includes(q) || action.hint.toLowerCase().includes(q);
 }
 
 function CommandItem({ action, onTrigger }) {
@@ -101,8 +72,8 @@ function CommandShell({ query, setQuery, visible, primary, onTrigger, onClose })
 function useCommandBarState(onNavChange, onOpenTask) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const actions = useMemo(() => actionDefs({ onNavChange, onOpenTask }), [onNavChange, onOpenTask]);
-  const filtered = useMemo(() => actions.filter((a) => matches(a, query)), [actions, query]);
+  const actions = useMemo(() => buildActionDefs({ onNavChange, onOpenTask }), [onNavChange, onOpenTask]);
+  const filtered = useMemo(() => actions.filter((a) => matchesQuery(a, query)), [actions, query]);
   useCommandBarShortcuts(setOpen);
   useEffect(() => { if (!open) setQuery(""); }, [open]);
   return { open, setOpen, query, setQuery, visible: query ? filtered : filtered.slice(0, 6) };
