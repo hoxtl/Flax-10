@@ -13,6 +13,7 @@ import {
   getDropdownPanelMotion,
 } from "../motion/transitions";
 import styles from "./AnimatedDropdown.module.css";
+import { filterFlat, filterGrouped, buildMenuStyle, computeOpenDirection, makeOutsideClickListener } from "./animatedDropdownUtils";
 
 /** Text input with a leading search icon, auto-focused on mount. */
 function SearchInput({ query, setQuery, placeholder }) {
@@ -50,23 +51,6 @@ function EmptyState({ query, emptyMessage }) {
       {query && <span className={styles.emptyQuery}>Try a different search term</span>}
     </motion.div>
   );
-}
-
-function filterGrouped(options, query) {
-  if (!query.trim()) return options;
-  const q = query.toLowerCase();
-  return options
-    .map(group => ({ ...group, options: group.options.filter(o => o.label.toLowerCase().includes(q)) }))
-    .filter(group => group.options.length > 0);
-}
-
-function filterFlat(options, query) {
-  if (!query.trim()) return options;
-  const q = query.toLowerCase();
-  return options.filter(o => {
-    const label = typeof o === 'string' ? o : o.label;
-    return label.toLowerCase().includes(q);
-  });
 }
 
 /** Animated checkmark shown next to the currently selected item. */
@@ -144,17 +128,6 @@ function DropdownContent({
   );
 }
 
-function buildMenuStyle(openUpward, usePortal, coords, menuMaxHeight) {
-  const style = openUpward ? { bottom: '100%', top: 'auto', marginBottom: 4 } : {};
-  if (usePortal && coords) {
-    const top = openUpward ? 'auto' : coords.top + 4;
-    const bottom = openUpward ? window.innerHeight - coords.top + 4 : 'auto';
-    Object.assign(style, { position: 'fixed', top, bottom, left: coords.left, width: 'max-content', minWidth: coords.width, zIndex: 10001, margin: 0 });
-  }
-  if (menuMaxHeight) style.maxHeight = menuMaxHeight;
-  return style;
-}
-
 function DropdownPanel({
   grouped, filteredOptions, value, onSelect,
   searchable, query, setQuery, searchPlaceholder, emptyMessage,
@@ -214,16 +187,6 @@ function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpen
   return { isOpen, setIsOpen: updateOpen, query, setQuery, selectedLabel, handleSelect, handleToggle };
 }
 
-function computeOpenDirection(rect, menuMaxHeight, allowFlipUpward) {
-  const spaceBelow = window.innerHeight - rect.bottom;
-  const spaceAbove = rect.top;
-  const shouldOpenUpward = allowFlipUpward && spaceBelow < menuMaxHeight && spaceAbove > spaceBelow;
-  return {
-    shouldOpenUpward,
-    coords: { top: shouldOpenUpward ? rect.top : rect.bottom, left: rect.left, width: rect.width },
-  };
-}
-
 /** Determines whether the dropdown should open upward based on available viewport space. */
 function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUpward = false) {
   const [openUpward, setOpenUpward] = useState(false);
@@ -243,14 +206,6 @@ function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUp
   }, [isOpen, menuMaxHeight, containerRef, allowFlipUpward]);
 
   return { openUpward, coords };
-}
-
-function makeOutsideClickListener(containerRef, menuRef, setIsOpen) {
-  return (event) => {
-    const isInside = containerRef.current?.contains(event.target);
-    const isInsideMenu = menuRef.current?.contains(event.target);
-    if (!isInside && !isInsideMenu) setIsOpen(false);
-  };
 }
 
 function useClickOutside(containerRef, menuRef, setIsOpen, openOnHover) {
