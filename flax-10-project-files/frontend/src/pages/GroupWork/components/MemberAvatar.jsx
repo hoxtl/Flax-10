@@ -3,7 +3,7 @@
  */
 
 import { getUserColor } from "../utils/priorityUtils";
-import { getDisplayName, getInitials, getPhotoUrl } from "./memberAvatarUtils";
+import { getDisplayName, getInitials, getPhotoUrl } from "../utils/memberAvatarUtils";
 import styles from "./MemberAvatar.module.css";
 
 export default function MemberAvatar({ member, size = 24 }) {

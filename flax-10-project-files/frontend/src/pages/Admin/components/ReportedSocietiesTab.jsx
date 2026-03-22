@@ -3,15 +3,13 @@
  */
 
 import { banReportedSociety, dismissReport, fetchReportedSocieties } from "../../../api/adminApi";
-import styles from "../AdminPage.module.css";
-import { ADMIN_LIST_PAGE_SIZE, EMPTY_MESSAGES } from "../constants";
+import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import styles from "../styles";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
-import { usePaginatedItems } from "../hooks/usePaginatedItems";
 import { navigateToSociety } from "../utils/adminNavigation";
-import AdminPagination from "./AdminPagination";
 import { AnimatedList, ListActions, ListInfo, ListRow } from "./AdminList";
-import { CardHeader, EmptyMessage, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
+import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
 
 function BanDismissButtons({ busy, onBan, onDismiss }) {
   return <><button className={styles.banBtn} disabled={busy} onClick={onBan}>Ban</button><button className={styles.dismissBtn} disabled={busy} onClick={onDismiss}>Dismiss</button></>;
@@ -36,18 +34,12 @@ function ReportRow({ busy, onBan, onDismiss, report }) {
   );
 }
 
-function ReportedSocietiesContent({ busy, onBan, onDismiss, pagination }) {
-  return (
-    <>
-      <AdminPagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={pagination.setCurrentPage} />
-      <AnimatedList items={pagination.pageItems} renderItem={(report) => <ReportRow key={report.id} report={report} busy={busy} onBan={onBan} onDismiss={onDismiss} />} />
-    </>
-  );
+function ReportedSocietiesContent({ busy, items, onBan, onDismiss }) {
+  return <AnimatedList items={items} renderItem={(report) => <ReportRow key={report.id} report={report} busy={busy} onBan={onBan} onDismiss={onDismiss} />} />;
 }
 
 export default function ReportedSocietiesTab() {
   const { error, items, loading, setError, setItems } = useAsyncList(fetchReportedSocieties, "Failed to load reports.");
-  const pagination = usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
   const { busy, run } = useAsyncAction(setError);
   const handleDismiss = (id) => run(id, () => dismissReport(id), () => setItems((current) => current.filter((report) => report.id !== id)), "Failed to dismiss report.");
   const handleBan = (id) => { const reason = window.prompt("Optional reason to send to the society creator:", ""); if (reason === null) return; run(id, () => banReportedSociety(id, reason), () => setItems((current) => removeReportsBySociety(current, id)), "Failed to ban society."); };
@@ -55,7 +47,7 @@ export default function ReportedSocietiesTab() {
     <SectionCard>
       <CardHeader title="Reported Societies" count={items.length} />
       <ErrorMessage message={error} />
-      {loading ? <LoadingSpinner /> : items.length ? <ReportedSocietiesContent busy={busy} onBan={handleBan} onDismiss={handleDismiss} pagination={pagination} /> : <EmptyMessage>{EMPTY_MESSAGES.reports}</EmptyMessage>}
+      {loading ? <LoadingSpinner /> : items.length ? <ReportedSocietiesContent items={items} busy={busy} onBan={handleBan} onDismiss={handleDismiss} /> : <SearchEmptyState title="No reported societies" hint="Society reports from users will appear here." />}
     </SectionCard>
   );
 }

@@ -7,7 +7,7 @@ import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
-import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate }) {
@@ -32,28 +32,25 @@ export default function ProjectRowInfo({ project, members, totalMembers = 0, act
   );
 }
 
-function ProjectTeacherAvatar({ project }) {
-  const fallback = getProjectTeacherInitials(project);
-  const teacherName = getProjectTeacherName(project);
-  if (!project?.module_tutor_id) {
+function TeacherAvatarShell({ fallback }) {
+    return <div className={styles.teacherAvatarShell} aria-hidden="true"><span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span></div>;
+}
+
+function TeacherAvatarButton({ fallback, teacherName, project }) {
     return (
-      <div className={styles.teacherAvatarShell} aria-hidden="true">
-        <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>
-      </div>
+        <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.avatarTooltipWrap}>
+            <button type="button" className={`${styles.teacherAvatarShell} ${styles.teacherAvatarButton}`} onClick={(event) => openTeacherProfile(event, project)} aria-label={`View ${teacherName}'s profile`}>
+                <span className={styles.teacherAvatarFallback}>{fallback}</span>
+            </button>
+        </Tooltip>
     );
-  }
-  return (
-    <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.avatarTooltipWrap}>
-      <button
-        type="button"
-        className={`${styles.teacherAvatarShell} ${styles.teacherAvatarButton}`}
-        onClick={(event) => openTeacherProfile(event, project)}
-        aria-label={`View ${teacherName}'s profile`}
-      >
-        <span className={styles.teacherAvatarFallback}>{fallback}</span>
-      </button>
-    </Tooltip>
-  );
+}
+
+function ProjectTeacherAvatar({ project }) {
+    const fallback = getProjectTeacherInitials(project);
+    const teacherName = getProjectTeacherName(project);
+    if (!project?.module_tutor_id) return <TeacherAvatarShell fallback={fallback} />;
+    return <TeacherAvatarButton fallback={fallback} teacherName={teacherName} project={project} />;
 }
 
 export function ProjectModuleBadge({ project }) {

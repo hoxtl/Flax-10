@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from "react";
+/*
+ * GroupWork tasks tab with list, timeline, and board views.
+ */
+
+import { useState, useEffect } from "react";
 import { List, CalendarIcon, Square, Plus } from "lucide-react";
-import { getAuthHeaders } from "./groupWorkHooks";
+import { getAuthHeaders } from "./hooks/groupWorkHooks";
 import { useToast } from "../../context/ToastContext";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl.jsx";
@@ -13,22 +17,13 @@ import { calcCompletionSegments } from "./utils/taskStatsUtils";
 import { sortTasks } from "./utils/taskUtils";
 import styles from "./GroupTasksTab.module.css";
 
-// --- Sub-components ---
-
 function TaskViewSwitcher({ currentView, setTaskView }) {
     const views = [
         { value: "list", icon: List, label: "List" },
         { value: "timeline", icon: CalendarIcon, label: "Timeline" },
         { value: "board", icon: Square, label: "Kanban" },
     ];
-    return (
-        <SegmentedControl
-            className={styles.viewToggleControl}
-            options={views}
-            value={currentView}
-            onChange={setTaskView}
-        />
-    );
+    return <SegmentedControl className={styles.viewToggleControl} options={views} value={currentView} onChange={setTaskView} />;
 }
 
 function TaskContent({ taskView, tasks, members, onToggle, onUpdate, onDelete, onAddCol }) {
@@ -37,8 +32,6 @@ function TaskContent({ taskView, tasks, members, onToggle, onUpdate, onDelete, o
     if (taskView === "board") return <TaskBoardView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} onAdd={onAddCol} />;
     return null;
 }
-
-// --- Logic Hook ---
 
 function useFetchTasks(projectId) {
     const [tasks, setTasks] = useState([]);
@@ -86,8 +79,6 @@ function useTasks(projectId, members, onStatsUpdate) {
     return { tasks, loading, addTask, updateTask, deleteTask };
 }
 
-// --- Main Component ---
-
 function useTaskTabState(tasks, filterUsers) {
     const filtered = filterUsers.length > 0
         ? tasks.filter(t => (t.assignees_info || []).some(a => filterUsers.includes(String(a.id))))
@@ -95,62 +86,51 @@ function useTaskTabState(tasks, filterUsers) {
     return sortTasks(filtered);
 }
 
+function useGroupTaskHandlers(showToast, taskActions, setFilterUsers) {
+    const handleToggle = async (id, completed) => {
+        await taskActions.updateTask(id, { completed });
+        if (completed) showToast("Task completed!", { icon: "🎉", variant: "success" });
+    };
+    const handleDelete = async (id) => {
+        await taskActions.deleteTask(id);
+        showToast("Task deleted", { variant: "error", icon: "🗑️" });
+    };
+    const handleAdd = async ({ title, due_date, assigned_to }) => taskActions.addTask(title, { due_date, assigned_to });
+    const toggleFilter = (userId) => setFilterUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
+    return { handleToggle, handleDelete, handleAdd, toggleFilter };
+}
+
+function TasksTabHeader({ taskView, setTaskView, members, filterUsers, onToggle, onAddClick }) {
+    return (
+        <div className={styles.headerRow}>
+            <TaskViewSwitcher currentView={taskView} setTaskView={setTaskView} />
+            <div className={styles.headerActions}>
+                <PrimaryButton pill size="small" className={styles.addBtn} onClick={onAddClick}>
+                    <Plus size={15} strokeWidth={2.5} />
+                    Add new task
+                </PrimaryButton>
+                <MemberFilter members={members} selectedUsers={filterUsers} onToggle={onToggle} />
+            </div>
+        </div>
+    );
+}
+
+/** Tasks tab with list, timeline, and board views for a group project. */
 export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const showToast = useToast();
-    const { tasks, loading, addTask, updateTask, deleteTask } = useTasks(projectId, members, onStatsUpdate);
+    const taskActions = useTasks(projectId, members, onStatsUpdate);
     const [filterUsers, setFilterUsers] = useState([]);
     const [taskView, setTaskView] = useState("list");
     const [showAddModal, setShowAddModal] = useState(false);
-    const sortedTasks = useTaskTabState(tasks, filterUsers);
-
-    function toggleFilter(userId) {
-        setFilterUsers(prev => prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]);
-    }
-
-    async function handleToggle(id, completed) {
-        await updateTask(id, { completed });
-        if (completed) showToast("Task completed!", { icon: "🎉", variant: "success" });
-    }
-
-    async function handleDelete(id) {
-        await deleteTask(id);
-        showToast("Task deleted", { variant: "error", icon: "🗑️" });
-    }
-
-    async function handleAdd({ title, due_date, assigned_to }) {
-        await addTask(title, { due_date, assigned_to });
-    }
-
+    const sortedTasks = useTaskTabState(taskActions.tasks, filterUsers);
+    const handlers = useGroupTaskHandlers(showToast, taskActions, setFilterUsers);
     return (
-        <div style={{ marginTop: 24 }}>
-            <div className={styles.headerRow}>
-                <TaskViewSwitcher currentView={taskView} setTaskView={setTaskView} />
-                <div className={styles.headerActions}>
-                    <PrimaryButton pill size="small" className={styles.addBtn} onClick={() => setShowAddModal(true)}>
-                        <Plus size={15} strokeWidth={2.5} />
-                        Add new task
-                    </PrimaryButton>
-                    <MemberFilter members={members} selectedUsers={filterUsers} onToggle={toggleFilter} />
-                </div>
-            </div>
-            {loading ? <p className={styles.loadingText}>Loading tasks...</p> : (
-                <TaskContent
-                    taskView={taskView}
-                    tasks={sortedTasks}
-                    members={members}
-                    onToggle={handleToggle}
-                    onUpdate={updateTask}
-                    onDelete={handleDelete}
-                    onAddCol={(t, s) => addTask(t, { status: s })}
-                />
+        <div className={styles.tabBody}>
+            <TasksTabHeader taskView={taskView} setTaskView={setTaskView} members={members} filterUsers={filterUsers} onToggle={handlers.toggleFilter} onAddClick={() => setShowAddModal(true)} />
+            {taskActions.loading ? <p className={styles.loadingText}>Loading tasks...</p> : (
+                <TaskContent taskView={taskView} tasks={sortedTasks} members={members} onToggle={handlers.handleToggle} onUpdate={taskActions.updateTask} onDelete={handlers.handleDelete} onAddCol={(t, s) => taskActions.addTask(t, { status: s })} />
             )}
-            {showAddModal && (
-                <AddTaskModal
-                    members={members}
-                    onAdd={handleAdd}
-                    onClose={() => setShowAddModal(false)}
-                />
-            )}
+            {showAddModal && <AddTaskModal members={members} onAdd={handlers.handleAdd} onClose={() => setShowAddModal(false)} />}
         </div>
     );
 }

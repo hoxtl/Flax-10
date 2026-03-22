@@ -10,11 +10,13 @@ import StandardModal from "../../../components/common/StandardModal/StandardModa
 import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelector";
 import UserSearch from "../../../components/Social/UserSearch";
 import { CreateProjectInputs } from "./CreateProjectInputs";
-import { createGroupProject } from "../groupWorkApi";
+import { createGroupProject } from "../api/groupWorkApi";
+import { getStoredViewer } from "../utils/memberAvatarUtils";
 import styles from "./CreateProjectForm.module.css";
 
 
 
+/** Button and modal form for creating a new group project. */
 export default function CreateProjectForm({ onCreated, className = "", size = "medium" }) {
   const [isOpen, setIsOpen] = useState(false);
   const formState = useCreateProjectForm((project) => {
@@ -36,36 +38,29 @@ export default function CreateProjectForm({ onCreated, className = "", size = "m
   );
 }
 
+function FormActions({ onClose, isSubmitting }) {
+  return (
+    <div className={styles.formFooter}>
+      <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
+        Cancel
+      </PrimaryButton>
+      <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "+ Create project"}
+      </PrimaryButton>
+    </div>
+  );
+}
+
 function CreateProjectModal({ formState, onClose }) {
   return (
-    <StandardModal
-      title="Create project"
-      subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one."
-      subtitleClassName={styles.modalSubtitle}
-      onClose={onClose}
-      size="xl"
-      modalClassName={styles.modalPanel}
-      contentClassName={styles.modalContent}
-    >
+    <StandardModal title="Create project" subtitle="Start a shared project, connect it to a module, invite teammates, and keep the deadline clear from day one." subtitleClassName={styles.modalSubtitle} onClose={onClose} size="xl" modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
       <form onSubmit={formState.submit} className={styles.modalForm}>
         <div className={styles.formFields}>
           <CreateProjectInputs data={formState.form} onChange={formState.change} errors={formState.errors} />
         </div>
-        <ProjectMembersField
-          members={formState.form.members}
-          error={formState.errors?.members}
-          onAddMember={formState.addMember}
-          onRemoveMember={formState.removeMember}
-        />
+        <ProjectMembersField members={formState.form.members} error={formState.errors?.members} onAddMember={formState.addMember} onRemoveMember={formState.removeMember} />
         {formState.errorMessage && <p className={styles.formError}>{formState.errorMessage}</p>}
-        <div className={styles.formFooter}>
-          <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={formState.isSubmitting}>
-            Cancel
-          </PrimaryButton>
-          <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={formState.isSubmitting}>
-            {formState.isSubmitting ? "Creating..." : "+ Create project"}
-          </PrimaryButton>
-        </div>
+        <FormActions onClose={onClose} isSubmitting={formState.isSubmitting} />
       </form>
     </StandardModal>
   );
@@ -175,22 +170,15 @@ function buildProjectPayload(form) {
   return payload;
 }
 
-function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
-  const renderEmptyState = ({ query, clear }) => (
+function MemberSearchEmptyState({ query, clear }) {
+  return (
     <div className={styles.memberSearchEmpty}>
-      <SearchEmptyState
-        query={query}
-        itemLabel="users"
-        title="No teammates found"
-        hint="Try a different name or username."
-        onClear={clear}
-        className={styles.memberSearchEmptyCard}
-        titleClassName={styles.memberSearchEmptyTitle}
-        hintClassName={styles.memberSearchEmptyHint}
-      />
+      <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.memberSearchEmptyCard} titleClassName={styles.memberSearchEmptyTitle} hintClassName={styles.memberSearchEmptyHint} />
     </div>
   );
+}
 
+function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
   return (
     <FormField label="Team members (optional)" labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
       <div className={styles.membersPicker}>
@@ -200,7 +188,7 @@ function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
           filterUsers={buildAvailableUserFilter(members)}
           fullWidth
           hideFilter
-          renderEmptyState={renderEmptyState}
+          renderEmptyState={(props) => <MemberSearchEmptyState {...props} />}
           searchPlaceholder="Search users... (/)"
           openOnEmptyQuery={false}
           dropdownMode="inline"
@@ -271,11 +259,10 @@ function parseProjectDeadline(value) {
   return new Date(value);
 }
 
-function getStoredViewer() {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem("user") || "{}");
-  } catch {
-    return {};
-  }
+function RequiredLabel({ text }) {
+  return (
+    <>
+      {text} <span className={styles.requiredMark}>*</span>
+    </>
+  );
 }

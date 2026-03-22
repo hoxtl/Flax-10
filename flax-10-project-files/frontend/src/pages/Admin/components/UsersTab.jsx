@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import SearchBar from "../../../components/common/SearchBar/SearchBar";
 import { fetchAdminUsers, banUser, unbanUser } from "../../../api/adminApi";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 import { USER_FILTER_GROUPS, USER_LIST_PAGE_SIZE } from "../constants";
 import { usePaginatedItems } from "../hooks/usePaginatedItems";
 import { FilterToggleGroup } from "./AdminFilters";

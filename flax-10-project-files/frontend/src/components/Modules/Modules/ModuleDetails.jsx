@@ -14,9 +14,7 @@ import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
-import { useEffect, useState } from 'react';
-import { getHomeAddress } from '../../../api/userApi.js';
-import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
+import { useModuleTravelTime } from './useModuleTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -208,24 +206,7 @@ function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     const data = useModuleData(module);
-    const [travelTime, setTravelTime] = useState(null);
-
-    useEffect(() => {
-        async function fetchTravelTime() {
-            try {
-                const homeAddress = await getHomeAddress();
-                const travelInfo = await getTravelTimeModule(homeAddress, module.location);
-                if (travelInfo) {
-                    setTravelTime(travelInfo.duration);
-                }
-            } catch (error) {
-                console.error('Travel time fetch in module details error: ', error);
-            }
-        }
-        if (module.location) {
-            fetchTravelTime();
-        }
-    }, [module.location]);
+    const travelTime = useModuleTravelTime(module.location);
 
     return (
         <div className={styles.container}>

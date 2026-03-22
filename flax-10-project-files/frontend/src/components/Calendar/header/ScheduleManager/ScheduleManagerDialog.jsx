@@ -62,7 +62,11 @@ function useDialogFields() {
 
 function useResetOnClose(open, state) {
   const resetters = createResetters(state.setEditingId, state.setRenameDraft, state.setRemoveId, state.setIsSaving, state.setIsDeleting);
-  useEffect(() => !open && resetDialogState(resetters), [open, resetters]);
+  useEffect(() => {
+    if (!open) {
+      resetDialogState(resetters);
+    }
+  }, [open, resetters]);
 }
 
 function createResetters(

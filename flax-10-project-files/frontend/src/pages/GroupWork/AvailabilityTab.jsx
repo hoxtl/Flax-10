@@ -2,50 +2,58 @@
  * GroupWork availability tab.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Clock3, Plus, Star, Trash2, X } from "lucide-react";
 import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import Tooltip from "../../components/common/Tooltip/Tooltip";
 import { useConfirm } from "../../context/ConfirmContext";
-import { getAuthHeaders } from "./groupWorkHooks";
-import { getPhotoUrl } from "./components/memberAvatarUtils";
+import { getPhotoUrl } from "./utils/memberAvatarUtils";
+import { useAvailability } from "./hooks/useAvailability";
+import { formatSuggestionDateLabel, getMemberStatuses, getTeamSize, getSuggestionCount, getCurrentUserStatus } from "./utils/availabilityUtils";
 import styles from "./AvailabilityTab.module.css";
+import meetingStyles from "./AvailabilityMeetingCards.module.css";
 
 const RESPONSE_META = {
-    accepted: { label: "Accepted", Icon: Check, countClassName: styles.acceptedCount, avatarClassName: styles.responseAccepted },
-    rejected: { label: "Rejected", Icon: X, countClassName: styles.rejectedCount, avatarClassName: styles.responseRejected },
-    pending: { label: "Pending", Icon: Clock3, countClassName: styles.pendingCount, avatarClassName: styles.responsePending },
+    accepted: { label: "Accepted", Icon: Check, countClassName: meetingStyles.acceptedCount, avatarClassName: meetingStyles.responseAccepted },
+    rejected: { label: "Rejected", Icon: X, countClassName: meetingStyles.rejectedCount, avatarClassName: meetingStyles.responseRejected },
+    pending: { label: "Pending", Icon: Clock3, countClassName: meetingStyles.pendingCount, avatarClassName: meetingStyles.responsePending },
 };
 
-function formatSuggestionDateLabel(value) {
-    const date = new Date(value);
-    const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
-    const day = date.toLocaleDateString("en-GB", { day: "numeric" });
-    const month = date.toLocaleDateString("en-GB", { month: "short" });
-    const time = date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
-    return `${weekday} ${day} ${month}, ${time}`;
+function useSortedSuggestions(active_suggestions) {
+    return useMemo(() => {
+        const all = [...(active_suggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
+        return { confirmedSuggestions: all.filter((s) => s.is_confirmed), proposedSuggestions: all.filter((s) => !s.is_confirmed) };
+    }, [active_suggestions]);
 }
 
-function getMemberStatuses(suggestion) {
-    return Array.isArray(suggestion?.member_statuses) ? suggestion.member_statuses : [];
+function useMeetingView(proposedSuggestions, confirmedSuggestions) {
+    const [activeMeetingView, setActiveMeetingView] = useState("proposed");
+    const [hasChosenMeetingView, setHasChosenMeetingView] = useState(false);
+    useEffect(() => {
+        if (hasChosenMeetingView) return;
+        if (!proposedSuggestions.length && confirmedSuggestions.length > 0) setActiveMeetingView("confirmed");
+    }, [confirmedSuggestions.length, hasChosenMeetingView, proposedSuggestions.length]);
+    const onViewChange = (nextView) => { setHasChosenMeetingView(true); setActiveMeetingView(nextView); };
+    return { activeMeetingView, onViewChange };
 }
 
-function getTeamSize(suggestion) {
-    return Number(suggestion?.team_size || getMemberStatuses(suggestion).length || 0);
+function MeetingToggleButton({ isActive, label, count, onClick }) {
+    return (
+        <button type="button" className={`${styles.meetingToggleButton} ${isActive ? styles.meetingToggleButtonActive : ""}`} onClick={onClick}>
+            <span>{label}</span>
+            <span className={styles.meetingToggleCount}>{count}</span>
+        </button>
+    );
 }
 
-function getSuggestionCount(suggestion, status) {
-    const field = `${status}_count`;
-    if (typeof suggestion?.[field] === "number") return suggestion[field];
-    return getMemberStatuses(suggestion).filter((member) => member.status === status).length;
-}
-
-function getCurrentUserStatus(suggestion, currentUserId) {
-    const memberStatus = getMemberStatuses(suggestion).find((member) => member.id === currentUserId);
-    if (memberStatus?.status) return memberStatus.status;
-    if (suggestion?.suggested_by?.id === currentUserId) return "accepted";
-    return "pending";
+function MeetingViewToggle({ activeView, onViewChange, proposedCount, confirmedCount }) {
+    return (
+        <div className={styles.meetingToggle}>
+            <MeetingToggleButton isActive={activeView === "proposed"} label="Proposed slots" count={proposedCount} onClick={() => onViewChange("proposed")} />
+            <MeetingToggleButton isActive={activeView === "confirmed"} label="Confirmed meeting slots" count={confirmedCount} onClick={() => onViewChange("confirmed")} />
+        </div>
+    );
 }
 
 function AvailabilityHeader({ hasMeetingCards, activeView, onViewChange, proposedCount, confirmedCount }) {
@@ -55,36 +63,8 @@ function AvailabilityHeader({ hasMeetingCards, activeView, onViewChange, propose
                 <h3 className={styles.title}>Propose meeting timings with your team</h3>
                 <p className={styles.subtitle}>Click a slot or use the propose button to suggest it to the group.</p>
             </div>
-            {hasMeetingCards ? (
-                <div className={styles.meetingToggle}>
-                    <MeetingToggleButton
-                        isActive={activeView === "proposed"}
-                        label="Proposed slots"
-                        count={proposedCount}
-                        onClick={() => onViewChange("proposed")}
-                    />
-                    <MeetingToggleButton
-                        isActive={activeView === "confirmed"}
-                        label="Confirmed meeting slots"
-                        count={confirmedCount}
-                        onClick={() => onViewChange("confirmed")}
-                    />
-                </div>
-            ) : null}
+            {hasMeetingCards ? <MeetingViewToggle activeView={activeView} onViewChange={onViewChange} proposedCount={proposedCount} confirmedCount={confirmedCount} /> : null}
         </div>
-    );
-}
-
-function MeetingToggleButton({ isActive, label, count, onClick }) {
-    return (
-        <button
-            type="button"
-            className={`${styles.meetingToggleButton} ${isActive ? styles.meetingToggleButtonActive : ""}`}
-            onClick={onClick}
-        >
-            <span>{label}</span>
-            <span className={styles.meetingToggleCount}>{count}</span>
-        </button>
     );
 }
 
@@ -102,65 +82,62 @@ function MeetingCountPill({ suggestion, status }) {
     const count = getSuggestionCount(suggestion, status);
     const Icon = meta.Icon;
     return (
-        <span className={`${styles.countPill} ${meta.countClassName}`}>
+        <span className={`${meetingStyles.countPill} ${meta.countClassName}`}>
             <Icon size={12} />
             {count}
         </span>
     );
 }
 
-function MeetingCardActions({ suggestion, currentUserId, onVote, onDelete }) {
+function VoteButtons({ suggestion, currentUserId, onVote }) {
     const currentStatus = getCurrentUserStatus(suggestion, currentUserId);
     return (
-        <div className={styles.suggestionActions}>
-            <button
-                type="button"
-                onClick={() => onVote(suggestion.id, "accepted")}
-                className={`${styles.acceptBtn} ${currentStatus === "accepted" ? styles.meetingActionActive : ""}`}
-                aria-label="Accept meeting suggestion"
-            >
+        <>
+            <button type="button" onClick={() => onVote(suggestion.id, "accepted")} className={`${meetingStyles.acceptBtn} ${currentStatus === "accepted" ? meetingStyles.meetingActionActive : ""}`} aria-label="Accept meeting suggestion">
                 <Check size={18} />
             </button>
-            <button
-                type="button"
-                onClick={() => onVote(suggestion.id, "rejected")}
-                className={`${styles.rejectBtn} ${currentStatus === "rejected" ? styles.meetingActionActive : ""}`}
-                aria-label="Reject meeting suggestion"
-            >
+            <button type="button" onClick={() => onVote(suggestion.id, "rejected")} className={`${meetingStyles.rejectBtn} ${currentStatus === "rejected" ? meetingStyles.meetingActionActive : ""}`} aria-label="Reject meeting suggestion">
                 <X size={18} />
             </button>
-            {suggestion.suggested_by.id === currentUserId ? (
-                <button
-                    type="button"
-                    onClick={() => onDelete(suggestion.id)}
-                    className={styles.deleteBtn}
-                    aria-label="Delete meeting suggestion"
-                >
-                    <Trash2 size={18} />
-                </button>
-            ) : null}
+        </>
+    );
+}
+
+function DeleteButton({ suggestion, currentUserId, onDelete }) {
+    if (suggestion.suggested_by.id !== currentUserId) return null;
+    return (
+        <button type="button" onClick={() => onDelete(suggestion.id)} className={meetingStyles.deleteBtn} aria-label="Delete meeting suggestion">
+            <Trash2 size={18} />
+        </button>
+    );
+}
+
+function MeetingCardActions({ suggestion, currentUserId, onVote, onDelete }) {
+    return (
+        <div className={meetingStyles.suggestionActions}>
+            <VoteButtons suggestion={suggestion} currentUserId={currentUserId} onVote={onVote} />
+            <DeleteButton suggestion={suggestion} currentUserId={currentUserId} onDelete={onDelete} />
+        </div>
+    );
+}
+
+function ResponseAvatarContent({ photoUrl, member, meta }) {
+    const Icon = meta.Icon;
+    return (
+        <div className={`${meetingStyles.responseAvatar} ${meta.avatarClassName}`}>
+            {photoUrl ? <img src={photoUrl} alt={member.username} className={styles.avatarImg} /> : <span className={styles.avatarFallback}>{member.initials}</span>}
+            <span className={meetingStyles.responseBadge}><Icon size={10} strokeWidth={2.5} /></span>
         </div>
     );
 }
 
 function MemberStatusAvatar({ member }) {
     const meta = RESPONSE_META[member.status] || RESPONSE_META.pending;
-    const Icon = meta.Icon;
     const photoUrl = getPhotoUrl({ user: member.id, username: member.username, name: member.name, profile_photo_url: member.profile_photo_url });
     const tooltip = `@${member.username} · ${meta.label.toLowerCase()}${member.is_suggester ? " · proposed this slot" : ""}`;
-
     return (
         <Tooltip content={tooltip} position="top">
-            <div className={`${styles.responseAvatar} ${meta.avatarClassName}`}>
-                {photoUrl ? (
-                    <img src={photoUrl} alt={member.username} className={styles.avatarImg} />
-                ) : (
-                    <span className={styles.avatarFallback}>{member.initials}</span>
-                )}
-                <span className={styles.responseBadge}>
-                    <Icon size={10} strokeWidth={2.5} />
-                </span>
-            </div>
+            <ResponseAvatarContent photoUrl={photoUrl} member={member} meta={meta} />
         </Tooltip>
     );
 }
@@ -169,29 +146,35 @@ function MemberStatusStack({ suggestion }) {
     const memberStatuses = getMemberStatuses(suggestion);
     if (!memberStatuses.length) return null;
     return (
-        <div className={styles.responseStack}>
+        <div className={meetingStyles.responseStack}>
             {memberStatuses.map((member) => <MemberStatusAvatar key={member.id} member={member} />)}
         </div>
     );
 }
 
-function ProposedMeetingCard({ suggestion, currentUserId, onVote, onDelete }) {
+function ProposedMeetingMeta({ suggestion }) {
     const teamSize = getTeamSize(suggestion);
     return (
-        <div className={styles.suggestionCard}>
-            <div className={styles.suggestionMain}>
-                <div className={styles.suggestionTopRow}>
-                    <div className={styles.suggestionTitle}>{formatSuggestionDateLabel(suggestion.start)}</div>
-                    <div className={styles.countRow}>
-                        <MeetingCountPill suggestion={suggestion} status="accepted" />
-                        <MeetingCountPill suggestion={suggestion} status="rejected" />
-                        <MeetingCountPill suggestion={suggestion} status="pending" />
-                    </div>
+        <div className={meetingStyles.suggestionMain}>
+            <div className={meetingStyles.suggestionTopRow}>
+                <div className={meetingStyles.suggestionTitle}>{formatSuggestionDateLabel(suggestion.start)}</div>
+                <div className={meetingStyles.countRow}>
+                    <MeetingCountPill suggestion={suggestion} status="accepted" />
+                    <MeetingCountPill suggestion={suggestion} status="rejected" />
+                    <MeetingCountPill suggestion={suggestion} status="pending" />
                 </div>
-                <div className={styles.suggestionMeta}>Proposed by {suggestion.suggested_by.username}</div>
-                <div className={styles.suggestionSubtext}>{teamSize} team members tracking this slot</div>
-                <MemberStatusStack suggestion={suggestion} />
             </div>
+            <div className={meetingStyles.suggestionMeta}>Proposed by {suggestion.suggested_by.username}</div>
+            <div className={meetingStyles.suggestionSubtext}>{teamSize} team members tracking this slot</div>
+            <MemberStatusStack suggestion={suggestion} />
+        </div>
+    );
+}
+
+function ProposedMeetingCard({ suggestion, currentUserId, onVote, onDelete }) {
+    return (
+        <div className={meetingStyles.suggestionCard}>
+            <ProposedMeetingMeta suggestion={suggestion} />
             <MeetingCardActions suggestion={suggestion} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />
         </div>
     );
@@ -200,19 +183,35 @@ function ProposedMeetingCard({ suggestion, currentUserId, onVote, onDelete }) {
 function ConfirmedMeetingCard({ suggestion, index }) {
     const teamSize = getTeamSize(suggestion);
     return (
-        <div className={`${styles.suggestionCard} ${styles.confirmedCard}`}>
-            <div className={styles.suggestionMain}>
-                <div className={styles.suggestionTopRow}>
-                    <div className={styles.confirmedTitleRow}>
-                        <span className={styles.confirmedLabel}>Meeting {index + 1}</span>
-                        <span className={styles.suggestionTitle}>{formatSuggestionDateLabel(suggestion.start)}</span>
+        <div className={`${meetingStyles.suggestionCard} ${meetingStyles.confirmedCard}`}>
+            <div className={meetingStyles.suggestionMain}>
+                <div className={meetingStyles.suggestionTopRow}>
+                    <div className={meetingStyles.confirmedTitleRow}>
+                        <span className={meetingStyles.confirmedLabel}>Meeting {index + 1}</span>
+                        <span className={meetingStyles.suggestionTitle}>{formatSuggestionDateLabel(suggestion.start)}</span>
                     </div>
-                    <span className={styles.confirmedPill}>All users attending</span>
+                    <span className={meetingStyles.confirmedPill}>All users attending</span>
                 </div>
-                <div className={styles.suggestionMeta}>Confirmed from {suggestion.suggested_by.username}&apos;s proposal</div>
-                <div className={styles.suggestionSubtext}>All {teamSize} members accepted this timing.</div>
+                <div className={meetingStyles.suggestionMeta}>Confirmed from {suggestion.suggested_by.username}&apos;s proposal</div>
+                <div className={meetingStyles.suggestionSubtext}>All {teamSize} members accepted this timing.</div>
                 <MemberStatusStack suggestion={suggestion} />
             </div>
+        </div>
+    );
+}
+
+function ConfirmedCardList({ items }) {
+    return (
+        <div className={meetingStyles.meetingCards}>
+            {items.map((suggestion, index) => <ConfirmedMeetingCard key={suggestion.id} suggestion={suggestion} index={index} />)}
+        </div>
+    );
+}
+
+function ProposedCardList({ items, currentUserId, onVote, onDelete }) {
+    return (
+        <div className={meetingStyles.meetingCards}>
+            {items.map((suggestion) => <ProposedMeetingCard key={suggestion.id} suggestion={suggestion} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />)}
         </div>
     );
 }
@@ -220,33 +219,31 @@ function ConfirmedMeetingCard({ suggestion, index }) {
 function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggestions, currentUserId, onVote, onDelete }) {
     const isConfirmedView = activeView === "confirmed";
     const items = isConfirmedView ? confirmedSuggestions : proposedSuggestions;
-
     if (!items.length) {
         return (
-            <div className={styles.meetingCardsEmpty}>
+            <div className={meetingStyles.meetingCardsEmpty}>
                 <SearchEmptyState
                     title={isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet"}
                     hint={isConfirmedView ? "Once every teammate accepts a proposal, it will appear here." : "Choose a suggested time below or propose one to get things started."}
-                    className={styles.meetingCardsEmptyState}
+                    className={meetingStyles.meetingCardsEmptyState}
                 />
             </div>
         );
     }
+    if (isConfirmedView) return <ConfirmedCardList items={items} />;
+    return <ProposedCardList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />;
+}
 
+function AvatarImage({ src, name }) {
+    if (src) return <img src={src} alt={name} className={styles.avatarImg} />;
+    return null;
+}
+
+function StatusBadge({ isFree }) {
     return (
-        <div className={styles.meetingCards}>
-            {isConfirmedView
-                ? items.map((suggestion, index) => <ConfirmedMeetingCard key={suggestion.id} suggestion={suggestion} index={index} />)
-                : items.map((suggestion) => (
-                    <ProposedMeetingCard
-                        key={suggestion.id}
-                        suggestion={suggestion}
-                        currentUserId={currentUserId}
-                        onVote={onVote}
-                        onDelete={onDelete}
-                    />
-                ))}
-        </div>
+        <span className={`${styles.avatarStatus} ${isFree ? styles.avatarStatusFree : styles.avatarStatusBusy}`}>
+            {isFree ? <Check size={8} strokeWidth={3} /> : <X size={8} strokeWidth={3} />}
+        </span>
     );
 }
 
@@ -256,22 +253,12 @@ function MemberAvatarPhoto({ member }) {
         event.stopPropagation();
         window.dispatchEvent(new CustomEvent("navigate", { detail: `profile_${member.id}` }));
     };
-
     return (
         <Tooltip content={`@${member.name}${member.is_free ? " · free" : " · busy"}`} position="top">
-            <div
-                className={`${styles.avatarCircle} ${member.is_free ? styles.avatarCircleFree : styles.avatarCircleBusy}`}
-                onClick={navigateToProfile}
-                title={member.name}
-            >
-                {photoUrl ? (
-                    <img src={photoUrl} alt={member.name} className={styles.avatarImg} />
-                ) : (
-                    <span className={styles.avatarFallback}>{member.initials}</span>
-                )}
-                <span className={`${styles.avatarStatus} ${member.is_free ? styles.avatarStatusFree : styles.avatarStatusBusy}`}>
-                    {member.is_free ? <Check size={8} strokeWidth={3} /> : <X size={8} strokeWidth={3} />}
-                </span>
+            <div className={`${styles.avatarCircle} ${member.is_free ? styles.avatarCircleFree : styles.avatarCircleBusy}`} onClick={navigateToProfile} title={member.name}>
+                <AvatarImage src={photoUrl} name={member.name} />
+                {!photoUrl && <span className={styles.avatarFallback}>{member.initials}</span>}
+                <StatusBadge isFree={member.is_free} />
             </div>
         </Tooltip>
     );
@@ -307,138 +294,39 @@ function SuggestionModal({ slot, onCancel, onConfirm }) {
     );
 }
 
-function useAvailabilityData(projectId) {
-    const [data, setData] = useState({
-        suggestions: [],
-        active_suggestions: [],
-        current_user_id: null,
-        project_members: [],
-        team_size: 0,
-    });
-    const [loading, setLoading] = useState(true);
-
-    const fetchAvail = useCallback(() => {
-        setLoading(true);
-        fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() })
-            .then((res) => (res.ok ? res.json() : null))
-            .then((payload) => {
-                if (payload) setData(payload);
-            })
-            .finally(() => setLoading(false));
-    }, [projectId]);
-
-    useEffect(() => {
-        fetchAvail();
-    }, [fetchAvail]);
-
-    return { data, fetchAvail, loading };
+function AvailabilitySlotSection({ suggestions, suggestingSlot, setSuggestingSlot, onConfirm }) {
+    return (
+        <>
+            <div className={styles.slotList}>
+                {suggestions.map((slot) => <SlotRow key={slot.start} slot={slot} onClick={() => setSuggestingSlot(slot)} />)}
+            </div>
+            <SuggestionModal slot={suggestingSlot} onCancel={() => setSuggestingSlot(null)} onConfirm={onConfirm} />
+            <AvailabilityFooter />
+        </>
+    );
 }
 
-function useSuggestionActions(projectId, fetchAvail, confirm) {
-    const onSuggest = async (slot) => {
-        const end = new Date(new Date(slot.start).getTime() + 3600000).toISOString();
-        const res = await fetch(`/api/group-work/projects/${projectId}/suggestions/`, {
-            method: "POST",
-            headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ start_time: slot.start, end_time: end }),
-        });
-        if (res.ok) fetchAvail();
-    };
-    const onDelete = (id) => fetch(`/api/group-work/suggestions/${id}/`, { method: "DELETE", headers: getAuthHeaders() }).then((res) => res.ok && fetchAvail());
-    const handleDelete = async (id) => {
-        const config = { title: "Delete Suggestion", message: "Delete this meeting suggestion?", confirmText: "Delete", isDanger: true };
-        if (await confirm(config)) onDelete(id);
-    };
-    return { onSuggest, handleDelete };
-}
-
-function useAvailabilityActions(projectId, fetchAvail, confirm) {
-    const { onSuggest, handleDelete } = useSuggestionActions(projectId, fetchAvail, confirm);
-    const handleVote = async (id, status) => {
-        const res = await fetch(`/api/group-work/suggestions/${id}/respond/`, {
-            method: "POST",
-            headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
-            body: JSON.stringify({ status }),
-        });
-        if (res.ok) fetchAvail();
-    };
-    return { handleSuggestTime: onSuggest, handleDelete, handleVote };
-}
-
-function useAvailability(projectId, confirm) {
-    const { data, fetchAvail, loading } = useAvailabilityData(projectId);
-    const actions = useAvailabilityActions(projectId, fetchAvail, confirm);
-    const [suggestingSlot, setSuggestingSlot] = useState(null);
-    const suggest = (slot) => actions.handleSuggestTime(slot).then(() => setSuggestingSlot(null));
-    return { ...data, loading, suggestingSlot, setSuggestingSlot, ...actions, handleSuggestTime: suggest };
-}
-
-export default function AvailabilityTab({ projectId }) {
-    const confirm = useConfirm();
-    const {
-        suggestions,
-        active_suggestions,
-        current_user_id,
-        loading,
-        suggestingSlot,
-        setSuggestingSlot,
-        handleSuggestTime,
-        handleDelete,
-        handleVote,
-    } = useAvailability(projectId, confirm);
-
-    const { proposedSuggestions, confirmedSuggestions } = useMemo(() => {
-        const allSuggestions = [...(active_suggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
-        return {
-            confirmedSuggestions: allSuggestions.filter((suggestion) => suggestion.is_confirmed),
-            proposedSuggestions: allSuggestions.filter((suggestion) => !suggestion.is_confirmed),
-        };
-    }, [active_suggestions]);
-
-    const [activeMeetingView, setActiveMeetingView] = useState("proposed");
-    const [hasChosenMeetingView, setHasChosenMeetingView] = useState(false);
-
-    useEffect(() => {
-        if (hasChosenMeetingView) return;
-        if (!proposedSuggestions.length && confirmedSuggestions.length > 0) setActiveMeetingView("confirmed");
-    }, [confirmedSuggestions.length, hasChosenMeetingView, proposedSuggestions.length]);
-
-    if (loading) return <div className={styles.loading}>Analyzing member calendars...</div>;
-
+function AvailabilityBody({ availability, viewState, sorted }) {
+    const { suggestions, current_user_id, suggestingSlot, setSuggestingSlot, handleSuggestTime, handleDelete, handleVote } = availability;
+    const { proposedSuggestions, confirmedSuggestions } = sorted;
+    const { activeMeetingView, onViewChange } = viewState;
     const hasMeetingCards = proposedSuggestions.length > 0 || confirmedSuggestions.length > 0;
     const showSlotSuggestions = activeMeetingView !== "confirmed";
-
     return (
         <div className={styles.container}>
-            <AvailabilityHeader
-                hasMeetingCards={hasMeetingCards}
-                activeView={activeMeetingView}
-                onViewChange={(nextView) => {
-                    setHasChosenMeetingView(true);
-                    setActiveMeetingView(nextView);
-                }}
-                proposedCount={proposedSuggestions.length}
-                confirmedCount={confirmedSuggestions.length}
-            />
-            {hasMeetingCards ? (
-                <MeetingCardsSection
-                    activeView={activeMeetingView}
-                    proposedSuggestions={proposedSuggestions}
-                    confirmedSuggestions={confirmedSuggestions}
-                    currentUserId={current_user_id}
-                    onVote={handleVote}
-                    onDelete={handleDelete}
-                />
-            ) : null}
-            {showSlotSuggestions ? (
-                <>
-                    <div className={styles.slotList}>
-                        {suggestions.map((slot) => <SlotRow key={slot.start} slot={slot} onClick={() => setSuggestingSlot(slot)} />)}
-                    </div>
-                    <SuggestionModal slot={suggestingSlot} onCancel={() => setSuggestingSlot(null)} onConfirm={handleSuggestTime} />
-                    <AvailabilityFooter />
-                </>
-            ) : null}
+            <AvailabilityHeader hasMeetingCards={hasMeetingCards} activeView={activeMeetingView} onViewChange={onViewChange} proposedCount={proposedSuggestions.length} confirmedCount={confirmedSuggestions.length} />
+            {hasMeetingCards ? <MeetingCardsSection activeView={activeMeetingView} proposedSuggestions={proposedSuggestions} confirmedSuggestions={confirmedSuggestions} currentUserId={current_user_id} onVote={handleVote} onDelete={handleDelete} /> : null}
+            {showSlotSuggestions ? <AvailabilitySlotSection suggestions={suggestions} suggestingSlot={suggestingSlot} setSuggestingSlot={setSuggestingSlot} onConfirm={handleSuggestTime} /> : null}
         </div>
     );
+}
+
+/** Availability tab for proposing and voting on meeting slots. */
+export default function AvailabilityTab({ projectId }) {
+    const confirm = useConfirm();
+    const availability = useAvailability(projectId, confirm);
+    const sorted = useSortedSuggestions(availability.active_suggestions);
+    const viewState = useMeetingView(sorted.proposedSuggestions, sorted.confirmedSuggestions);
+    if (availability.loading) return <div className={styles.loading}>Analysing member calendars...</div>;
+    return <AvailabilityBody availability={availability} viewState={viewState} sorted={sorted} />;
 }

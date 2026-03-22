@@ -12,7 +12,7 @@ import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile, getStoredViewer } from "../utils/memberAvatarUtils";
 import styles from "./ProjectHeader.module.css";
 
 export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove, onDeleteProject }) {
@@ -62,36 +62,62 @@ export function ProjectTeacherMeta({ project }) {
   );
 }
 
+function currentUserIsOwner(members) {
+  const viewer = getStoredViewer();
+  const viewerId = String(viewer.id ?? viewer.user ?? "");
+  if (!viewerId) return false;
+  return members.some((m) => String(m.user ?? "") === viewerId && m.role === "owner");
+}
+
+function TeamAvatarStrip({ members }) {
+  return (
+    <div className={styles.memberAvatarStrip}>
+      {members.map((member, index) => (
+        <Tooltip key={member.id ?? member.user ?? member.user_name ?? index} content={getDisplayName(member)} wrapperClassName={styles.memberTooltipWrap}>
+          <button
+            type="button"
+            className={styles.memberAvatarButton}
+            style={{ zIndex: 10 - index }}
+            aria-label={`Open ${getDisplayName(member)} profile`}
+            onClick={(event) => openMemberProfile(event, member)}
+          >
+            <MemberAvatar member={member} size={22} />
+          </button>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+
+function TeamManagementPanel({ project, teamMembers, onMemberAdded, onMemberRemove, canManageTeam, isEditing, removalFlow }) {
+  if (!canManageTeam || !isEditing) return null;
+  return (
+    <div className={styles.teamManagerPanel}>
+      <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
+      <MembersSection
+        members={teamMembers}
+        onRemove={removalFlow.handleRemove}
+        canRemove={canManageTeam}
+        allowOwnerRemove={removalFlow.allowOwnerRemove}
+      />
+      {removalFlow.ownerModal}
+    </div>
+  );
+}
+
 function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDeleteProject }) {
   const [isEditing, setIsEditing] = useState(false);
   const canManageTeam = currentUserIsOwner(teamMembers);
   const teamCount = Math.max(teamMembers.length, getProjectMemberCount(project));
   const removalFlow = useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject);
   if (!members.length && !teamMembers.length) return null;
-
   return (
     <div className={styles.memberMetaStack}>
       <div className={styles.memberMeta}>
         <span className={styles.memberMetaLabel}>Team</span>
         <div className={styles.memberMetaBody}>
-          <div className={styles.memberAvatarStrip}>
-            {members.map((member, index) => (
-              <Tooltip key={member.id ?? member.user ?? member.user_name ?? index} content={getDisplayName(member)} wrapperClassName={styles.memberTooltipWrap}>
-                <button
-                  type="button"
-                  className={styles.memberAvatarButton}
-                  style={{ zIndex: 10 - index }}
-                  aria-label={`Open ${getDisplayName(member)} profile`}
-                  onClick={(event) => openMemberProfile(event, member)}
-                >
-                  <MemberAvatar member={member} size={22} />
-                </button>
-              </Tooltip>
-            ))}
-          </div>
-          <span className={styles.memberCountCopy}>
-            {teamCount} member{teamCount === 1 ? "" : "s"}
-          </span>
+          <TeamAvatarStrip members={members} />
+          <span className={styles.memberCountCopy}>{teamCount} member{teamCount === 1 ? "" : "s"}</span>
           {canManageTeam ? (
             <button type="button" className={styles.teamManageBtn} onClick={() => setIsEditing((current) => !current)}>
               {isEditing ? "Done" : "Edit team"}
@@ -99,65 +125,50 @@ function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMe
           ) : null}
         </div>
       </div>
-      {canManageTeam && isEditing ? (
-        <div className={styles.teamManagerPanel}>
-          <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
-          <MembersSection
-            members={teamMembers}
-            onRemove={removalFlow.handleRemove}
-            canRemove={canManageTeam}
-            allowOwnerRemove={removalFlow.allowOwnerRemove}
-          />
-          {removalFlow.ownerModal}
-        </div>
-      ) : null}
+      <TeamManagementPanel
+        project={project}
+        teamMembers={teamMembers}
+        onMemberAdded={onMemberAdded}
+        onMemberRemove={onMemberRemove}
+        canManageTeam={canManageTeam}
+        isEditing={isEditing}
+        removalFlow={removalFlow}
+      />
     </div>
   );
 }
 
-function currentUserIsOwner(members) {
-  if (typeof window === "undefined") return false;
-  try {
-    const viewer = JSON.parse(window.localStorage.getItem("user") || "{}");
-    const viewerId = String(viewer.id ?? viewer.user ?? "");
-    if (!viewerId) return false;
-    return members.some((member) => String(member.user ?? "") === viewerId && member.role === "owner");
-  } catch {
-    return false;
+  function useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject) {
+    const [showOwnerModal, setShowOwnerModal] = useState(false);
+    const soloOwnerId = getSoloOwnerId(teamMembers);
+    const handleRemove = (memberId) => {
+      if (soloOwnerId && String(memberId) === String(soloOwnerId)) {
+        setShowOwnerModal(true);
+        return;
+      }
+      onMemberRemove(memberId);
+    };
+    const closeModal = () => setShowOwnerModal(false);
+    const confirmOwnerRemoval = async () => {
+      closeModal();
+      await onDeleteProject?.();
+    };
+    const ownerModal = showOwnerModal ? (
+      <HoldConfirmModal
+        title="Delete project"
+        warningBanner="You're the only member in this project."
+        warningText="Removing yourself deletes the project for everyone."
+        cancelLabel="Keep project"
+        holdLabel="Hold to delete"
+        onCancel={closeModal}
+        onConfirm={confirmOwnerRemoval}
+      />
+    ) : null;
+    return { handleRemove, ownerModal, allowOwnerRemove: Boolean(soloOwnerId) };
   }
-}
 
-function useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject) {
-  const [showOwnerModal, setShowOwnerModal] = useState(false);
-  const soloOwnerId = getSoloOwnerId(teamMembers);
-  const handleRemove = (memberId) => {
-    if (soloOwnerId && String(memberId) === String(soloOwnerId)) {
-      setShowOwnerModal(true);
-      return;
-    }
-    onMemberRemove(memberId);
-  };
-  const closeModal = () => setShowOwnerModal(false);
-  const confirmOwnerRemoval = async () => {
-    closeModal();
-    await onDeleteProject?.();
-  };
-  const ownerModal = showOwnerModal ? (
-    <HoldConfirmModal
-      title="Delete project"
-      warningBanner="You're the only member in this project."
-      warningText="Removing yourself deletes the project for everyone."
-      cancelLabel="Keep project"
-      holdLabel="Hold to delete"
-      onCancel={closeModal}
-      onConfirm={confirmOwnerRemoval}
-    />
-  ) : null;
-  return { handleRemove, ownerModal, allowOwnerRemove: Boolean(soloOwnerId) };
-}
-
-function getSoloOwnerId(members) {
-  if (members.length !== 1) return null;
-  const [member] = members;
-  return member?.role === "owner" ? member.id : null;
-}
+  function getSoloOwnerId(members) {
+    if (members.length !== 1) return null;
+    const [member] = members;
+    return member?.role === "owner" ? member.id : null;
+  }

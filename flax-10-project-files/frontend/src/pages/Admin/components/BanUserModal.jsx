@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 
 function BanModalContent({ onCancel, onConfirm, reason, setReason, user }) {
   return (

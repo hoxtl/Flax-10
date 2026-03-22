@@ -1,6 +1,10 @@
+/*
+ * GroupWork project members section.
+ */
+
 import React from "react";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./MembersSection.module.css";
 
 function MemberPill({ member, onRemove, canRemove, allowOwnerRemove }) {

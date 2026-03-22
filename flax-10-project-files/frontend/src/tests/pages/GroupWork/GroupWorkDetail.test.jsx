@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import GroupProjectDetail from '../../../pages/GroupWork/GroupWorkDetail';
 
-vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
+vi.mock('../../../pages/GroupWork/hooks/groupWorkHooks', () => ({
   useProjectDetail: vi.fn(),
 }));
 
@@ -15,7 +15,7 @@ vi.mock('../../../pages/GroupWork/components/TabsSection', () => ({
   default: ({ activeTab }) => <div data-testid="tabs-section">{activeTab}</div>,
 }));
 
-import { useProjectDetail } from '../../../pages/GroupWork/groupWorkHooks';
+import { useProjectDetail } from '../../../pages/GroupWork/hooks/groupWorkHooks';
 
 const detailState = {
   loading: false,

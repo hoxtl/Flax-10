@@ -1,6 +1,11 @@
+/*
+ * Timeline layout helpers for the GroupWork task timeline view.
+ */
+
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
+/** Returns the Monday of the current week at midnight as the timeline anchor date. */
 export function getTimelineAnchor() {
     const now = new Date();
     const day = now.getDay() || 7;
@@ -13,8 +18,8 @@ export function getTimelineAnchor() {
 function buildWeek(offset, anchor) {
     const start = new Date(anchor.getTime() + offset * WEEK_MS);
     const end = new Date(start.getTime() + 5 * DAY_MS);
-    const sStr = start.toLocaleString('en-US', { month: 'short', day: 'numeric' });
-    const eStr = end.toLocaleString('en-US', { month: 'short', day: 'numeric' });
+    const sStr = start.toLocaleString("en-GB", { month: "short", day: "numeric" });
+    const eStr = end.toLocaleString("en-GB", { month: "short", day: "numeric" });
     return {
         id: offset,
         label: `Week ${offset + 1} (${sStr}–${eStr})`,
@@ -23,6 +28,7 @@ function buildWeek(offset, anchor) {
     };
 }
 
+/** Builds an array of 9 consecutive week descriptors starting from the anchor date. */
 export function buildWeeks(anchor) {
     return [0, 1, 2, 3, 4, 5, 6, 7, 8].map(o => buildWeek(o, anchor));
 }
@@ -36,6 +42,7 @@ function placeSingleTask(t, weeks, layout) {
     if (di < 6) layout[wk.id][di].push(t);
 }
 
+/** Places each task into the correct week and day slot of the layout grid. */
 export function placeTasksIntoWeeks(tasks, weeks) {
     const layout = {};
     weeks.forEach(wk => { layout[wk.id] = [[], [], [], [], [], []]; });

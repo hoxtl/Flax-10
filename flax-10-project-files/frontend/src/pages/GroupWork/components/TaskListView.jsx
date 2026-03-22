@@ -6,26 +6,24 @@ import SearchEmptyState from "../../../components/common/SearchEmptyState/Search
 import TaskListRow from "./TaskListRow";
 import styles from "./TaskListView.module.css";
 
-export default function TaskListView({ tasks, members, onToggle, onUpdate, onDelete }) {
-  if (tasks.length === 0) {
+function TaskListHeader() {
     return (
-      <SearchEmptyState
-        title="No tasks yet"
-        hint="Add your first task to start assigning work and tracking progress."
-        className={styles.emptyStateCard}
-      />
+        <div className={styles.headerRow}>
+            <span className={styles.headerCell}>Task</span>
+            <span className={styles.headerCell}>Priority</span>
+            <span className={styles.headerCell}>Due date</span>
+            <span className={styles.headerCell}>Assignee</span>
+            <span />
+        </div>
     );
-  }
-  return (
-    <div className={styles.taskList}>
-      <div className={styles.headerRow}>
-        <span className={styles.headerCell}>Task</span>
-        <span className={styles.headerCell}>Priority</span>
-        <span className={styles.headerCell}>Due date</span>
-        <span className={styles.headerCell}>Assignee</span>
-        <span />
-      </div>
-      {tasks.map((task) => <TaskListRow key={task.id} task={task} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />)}
-    </div>
-  );
+}
+
+export default function TaskListView({ tasks, members, onToggle, onUpdate, onDelete }) {
+    if (tasks.length === 0) return <SearchEmptyState title="No tasks yet" hint="Add your first task to start assigning work and tracking progress." className={styles.emptyStateCard} />;
+    return (
+        <div className={styles.taskList}>
+            <TaskListHeader />
+            {tasks.map((task) => <TaskListRow key={task.id} task={task} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />)}
+        </div>
+    );
 }
