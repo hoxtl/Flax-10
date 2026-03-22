@@ -32,3 +32,21 @@ class RecurrenceSerialiserTests(TestCase):
         expected_fields = ['id', 'frequency', 'interval', 'end_date', 'count', 'exception_dates']
         for field in expected_fields:
             self.assertIn(field, data)
+
+    def test_serializer_with_all_fields(self):
+        """Test serializer with all recurrence fields populated."""
+        recurrence = RecurrenceRule.objects.create(
+            frequency='DAILY',
+            interval=2,
+            end_date=timezone.now().date() + timedelta(days=30),
+            count=15,
+            exception_dates=['2024-12-25', '2024-01-01']
+        )
+        
+        serializer = RecurrenceSerialiser(instance=recurrence)
+        data = serializer.data
+        
+        self.assertEqual(data['frequency'], 'DAILY')
+        self.assertEqual(data['interval'], 2)
+        self.assertEqual(data['count'], 15)
+        self.assertIsNotNone(data['end_date'])
