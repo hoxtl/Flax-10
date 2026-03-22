@@ -9,7 +9,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-vi.mock('../../../pages/GroupWork/groupWorkHooks', () => ({
+vi.mock('../../../pages/GroupWork/hooks/groupWorkHooks', () => ({
   getAuthHeaders: () => ({}),
   useGroupProjects: vi.fn(),
   useGroupProjectSort: vi.fn(() => ({ sortBy: 'deadline', setSortBy: vi.fn() })),
@@ -20,7 +20,7 @@ vi.mock('../../../pages/GroupWork/GroupWorkDetail', () => ({
   default: () => <div data-testid="groupwork-detail" />,
 }));
 
-import { useGroupProjects, useSelectedProjectId } from '../../../pages/GroupWork/groupWorkHooks';
+import { useGroupProjects, useSelectedProjectId } from '../../../pages/GroupWork/hooks/groupWorkHooks';
 
 describe('GroupWorkIndexPage', () => {
   beforeEach(() => {

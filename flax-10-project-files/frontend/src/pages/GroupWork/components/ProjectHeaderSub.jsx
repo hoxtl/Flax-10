@@ -1,14 +1,15 @@
 /*
- * GroupWork project header actions.
+ * GroupWork project header delete action.
  */
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import { useToast } from "../../../context/ToastContext";
 import styles from "./ProjectHeader.module.css";
 
-function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal }) {
+function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, showToast }) {
     return (
         <HoldConfirmModal
             title="Delete project"
@@ -17,12 +18,14 @@ function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal }) {
             cancelLabel="Keep project"
             holdLabel="Hold to delete"
             onCancel={() => setShowDeleteModal(false)}
-            onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal)}
+            onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast)}
         />
     );
 }
 
+/** Delete action button and hold-to-confirm modal for a group project. */
 export default function ProjectDeleteAction({ onDelete }) {
+    const showToast = useToast();
     const [deleteError, setDeleteError] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     return (
@@ -34,7 +37,7 @@ export default function ProjectDeleteAction({ onDelete }) {
                 </PrimaryButton>
                 {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
             </div>
-            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={setDeleteError} setShowDeleteModal={setShowDeleteModal} />}
+            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={setDeleteError} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
         </>
     );
 }
@@ -44,8 +47,9 @@ function openDeleteModal(setDeleteError, setShowDeleteModal) {
     setShowDeleteModal(true);
 }
 
-async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal) {
+async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast) {
     if (await onDelete()) {
+        showToast("Project deleted.");
         setShowDeleteModal(false);
         return;
     }

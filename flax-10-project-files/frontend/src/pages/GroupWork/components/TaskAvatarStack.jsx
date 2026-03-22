@@ -3,7 +3,7 @@
  */
 
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./TaskAvatarStack.module.css";
 
 function OverflowBadge({ count, size }) {
