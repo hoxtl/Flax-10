@@ -43,16 +43,19 @@ function isActiveConflict(pair, nowMs) {
 /** Find overlapping event pairs in sorted events. Returns [{ a, b, overlapStart, overlapEnd }]. */
 export function getOverlappingPairs(sortedEvents) {
   if (!sortedEvents?.length) return [];
-  const pairs = [];
   const sorted = getSortedEvents(sortedEvents);
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const current = sorted[i];
-    const next = sorted[i + 1];
-    const currentEnd = new Date(current.end_time || current.start_time).getTime();
-    const nextStart = new Date(next.start_time).getTime();
-    if (currentEnd > nextStart) pairs.push(buildOverlapPair(current, next));
-  }
-  return pairs;
+  return sorted.slice(0, -1).flatMap((current, index) => getOverlapPair(current, sorted[index + 1]));
+}
+
+function getOverlapPair(current, next) {
+  if (!next || !isOverlappingPair(current, next)) return [];
+  return [buildOverlapPair(current, next)];
+}
+
+function isOverlappingPair(current, next) {
+  const currentEnd = new Date(current.end_time || current.start_time).getTime();
+  const nextStart = new Date(next.start_time).getTime();
+  return currentEnd > nextStart;
 }
 
 /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps. */

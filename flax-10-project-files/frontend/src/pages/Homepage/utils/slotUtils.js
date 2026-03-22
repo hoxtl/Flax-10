@@ -40,15 +40,8 @@ export function getNextFreeSlotToday(events, selectedDate, durationMins) {
   const now = new Date();
   if (now >= dayEnd) return null;
   const dayEvents = getDayEvents(events, selectedDate);
-  let cursor = Math.max(now.getTime(), dayStart.getTime());
-  for (const event of dayEvents) {
-    const slot = getGapSlot(event, cursor, durationMins);
-    if (slot) return slot;
-    cursor = getEventEnd(event, cursor);
-  }
-  const remainingMins = (dayEnd.getTime() - cursor) / 60000;
-  if (remainingMins >= durationMins) return buildWindow(cursor, durationMins);
-  return null;
+  const cursor = getCursorAfterEvents(dayEvents, Math.max(now.getTime(), dayStart.getTime()), durationMins);
+  return getRemainingSlot(cursor, dayEnd, durationMins);
 }
 
 /** All free windows (gaps) from now to end of day. Returns [{ start, end, minutes }]. */
@@ -86,4 +79,20 @@ function pushWindowBeforeEvent(event, cursor, windows) {
 function addWindow(windows, startMs, endMs) {
   const minutes = Math.round((endMs - startMs) / 60000);
   if (minutes >= 15) windows.push(buildWindow(startMs, minutes));
+}
+
+function getCursorAfterEvents(dayEvents, initialCursor, durationMins) {
+  let cursor = initialCursor;
+  for (const event of dayEvents) cursor = getNextCursor(event, cursor, durationMins);
+  return cursor;
+}
+
+function getRemainingSlot(cursor, dayEnd, durationMins) {
+  const remainingMins = (dayEnd.getTime() - cursor) / 60000;
+  return remainingMins >= durationMins ? buildWindow(cursor, durationMins) : null;
+}
+
+function getNextCursor(event, cursor, durationMins) {
+  const slot = getGapSlot(event, cursor, durationMins);
+  return slot ? slot.start.getTime() : getEventEnd(event, cursor);
 }
