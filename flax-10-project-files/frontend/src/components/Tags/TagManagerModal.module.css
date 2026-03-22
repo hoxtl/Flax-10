@@ -1,3 +1,7 @@
+/*
+ * Styles for the tag manager modal.
+ */
+
 .modalBackdrop {
     background: color-mix(in srgb, #000 52%, transparent);
     backdrop-filter: blur(3px);
@@ -118,24 +122,6 @@
 .addTagButton {
     margin-top: 0;
     flex-shrink: 0;
-}
-
-.addBtn {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
-    color: color-mix(in srgb, var(--text) 96%, transparent);
-    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-}
-
-.addBtn:hover {
-    background: color-mix(in srgb, var(--primary) 100%, var(--surface-raised));
-    border-color: color-mix(in srgb, var(--primary) 75%, var(--border));
 }
 
 /* Form Styles */
