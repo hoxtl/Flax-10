@@ -125,3 +125,9 @@ class CalendarEventCreateSerialiserTests(TestCase):
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': 'bad-json{'}
         event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
         self.assertIsNone(event.recurrence_rule)
+
+    def test_null_recurrence(self):
+        """Test null recurrence."""
+        data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': None}
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        self.assertIsNone(event.recurrence_rule)
