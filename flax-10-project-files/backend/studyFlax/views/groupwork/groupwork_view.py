@@ -64,10 +64,9 @@ def _validate_project_create_request(data):
     member_ids = _normalise_member_ids(data.get("member_ids", []))
     if member_ids is None:
         return None, Response({"member_ids": ["Provide member IDs as a list of user IDs."]}, status=status.HTTP_400_BAD_REQUEST)
-    if member_ids:
-        member_error = _validate_member_ids(member_ids)
-        if member_error:
-            return None, member_error
+    member_error = _validate_member_ids(member_ids) if member_ids else None
+    if member_error:
+        return None, member_error
     return member_ids, None
 
 
