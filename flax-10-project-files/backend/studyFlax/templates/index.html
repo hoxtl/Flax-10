@@ -1,19 +1,14 @@
+{% load django_vite %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flax 10</title>
-    {% for css_file in entry_css %}
-    <link rel="stylesheet" href="{{ css_file }}" />
-    {% endfor %}
+    {% vite_hmr_client %}
+    {% vite_asset 'src/main.jsx' %}
   </head>
   <body>
     <div id="root"></div>
-	{% if entry_js %}
-    <script type="module" src="{{ entry_js }}"></script>
-    {% else %}
-    <p>The frontend bundle is unavailable. Run the frontend build and collect static assets.</p>
-    {% endif %}
   </body>
 </html>

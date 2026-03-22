@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_vite',
     'rest_framework',
     'studyFlax',
     'rest_framework.authtoken',
@@ -123,5 +124,10 @@ EMAIL_HOST_USER = 'StudyFlax@gmail.com'
 EMAIL_HOST_PASSWORD = 'xmgwyxrbevcqlevu'
 DEFAULT_FROM_EMAIL = 'StudyFlax <StudyFlax@gmail.com>'
 
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+
+DJANGO_VITE = {
+  "default": {
+    "dev_mode": False
+  }
+}
