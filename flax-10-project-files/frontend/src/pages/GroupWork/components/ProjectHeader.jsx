@@ -11,7 +11,7 @@ import BackButton from "../../../components/common/BackButton/BackButton.jsx";
 import { formatProjectHeadlineDate, getProjectCaption, getProjectDate } from "../utils/projectRowUtils";
 import styles from "./ProjectHeader.module.css";
 
-export default function ProjectHeader({ project, members, onDelete, onBack }) {
+export default function ProjectHeader({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDelete, onBack }) {
   const date = getProjectDate(project.deadline);
 
   return (
@@ -36,7 +36,13 @@ export default function ProjectHeader({ project, members, onDelete, onBack }) {
           <div className={styles.subtitleRow}>
             <p className={styles.subtitle}>{getProjectCaption(project)}</p>
           </div>
-          <ProjectHeaderMeta project={project} members={members} />
+          <ProjectHeaderMeta
+            project={project}
+            members={members}
+            teamMembers={teamMembers}
+            onMemberAdded={onMemberAdded}
+            onMemberRemove={onMemberRemove}
+          />
         </div>
       </div>
 

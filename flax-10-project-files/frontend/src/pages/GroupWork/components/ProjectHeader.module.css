@@ -267,6 +267,20 @@
     align-items: center;
     gap: 0.58rem;
     min-width: 0;
+    flex-wrap: wrap;
+}
+
+.memberMetaStack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.memberMetaBody {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.58rem;
+    flex-wrap: wrap;
 }
 
 .memberMetaLabel {
@@ -281,6 +295,38 @@
     display: inline-flex;
     align-items: center;
     padding-left: 0;
+}
+
+.teamManageBtn {
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface-card));
+    color: var(--primary);
+    border-radius: 999px;
+    min-height: 28px;
+    padding: 0.2rem 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.teamManageBtn:hover {
+    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
+}
+
+.teamManageBtn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.teamManagerPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(74, 52, 33, 0.12);
+    background: color-mix(in srgb, var(--surface-card) 82%, #ffffff 18%);
 }
 
 .memberTooltipWrap {
