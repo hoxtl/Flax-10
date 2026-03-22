@@ -12,7 +12,7 @@ export function CreateProjectInputs({ data, onChange, errors }) {
   return (
     <>
       <ProjectNameField value={data.name} onChange={onChange} error={errors?.name} />
-      <ProjectModuleField value={data.course_code} onChange={onChange} />
+      <ProjectModuleField value={data.course_code} onChange={onChange} error={errors?.course_code} />
       <ProjectDeadlineField value={data.deadline} onChange={onChange} error={errors?.deadline} />
     </>
   );
@@ -26,9 +26,9 @@ function ProjectNameField({ value, onChange, error }) {
   );
 }
 
-function ProjectModuleField({ value, onChange }) {
+function ProjectModuleField({ value, onChange, error }) {
   return (
-    <FormField label={<OptionalModuleLabel />} labelClassName={styles.fieldLabel} className={styles.inputField}>
+    <FormField label={<RequiredLabel text="Module" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
       <UserModuleDropdown
         value={value}
         onChange={(nextValue) => onChange("course_code", nextValue)}
@@ -42,14 +42,17 @@ function ProjectModuleField({ value, onChange }) {
   );
 }
 
-function OptionalModuleLabel() {
-  return <>Module <span className={styles.optionalText}>(Optional)</span></>;
-}
-
 function ProjectDeadlineField({ value, onChange, error }) {
   return (
     <FormField label={<RequiredLabel text="Due date" />} labelClassName={styles.fieldLabel} className={styles.inputField} error={error}>
-      <DateTimePicker value={value} onChange={(nextValue) => onChange("deadline", nextValue)} placeholder="Select due date" dateOnly wrapperClassName={styles.datePickerWrap} />
+      <DateTimePicker
+        value={value}
+        onChange={(nextValue) => onChange("deadline", nextValue)}
+        placeholder="Select due date"
+        dateOnly
+        minDate={new Date()}
+        wrapperClassName={styles.datePickerWrap}
+      />
     </FormField>
   );
 }

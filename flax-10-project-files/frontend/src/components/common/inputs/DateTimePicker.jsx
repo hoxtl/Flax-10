@@ -59,6 +59,19 @@ function getDisplayValue(date, timeOnly, dateOnly) {
   return formatDisplay(date);
 }
 
+function startOfDay(value) {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function isBeforeMinDate(value, minDate) {
+  if (!value || !minDate) return false;
+  const parsedMinDate = new Date(minDate);
+  if (Number.isNaN(parsedMinDate.getTime())) return false;
+  return startOfDay(value).getTime() < startOfDay(parsedMinDate).getTime();
+}
+
 function calendarDays(year, month) {
   const first = new Date(year, month, 1).getDay();
   const total = new Date(year, month + 1, 0).getDate();
@@ -315,7 +328,7 @@ function useDateTimeHandlers(
   return { selectDay, changeHour, changeMinute, prevMonth, nextMonth };
 }
 
-function useDerivedCalendarState(viewY, viewM, selDate) {
+function useDerivedCalendarState(viewY, viewM, selDate, minDate) {
   const days = calendarDays(viewY, viewM);
   const today = new Date();
   const isToday = (d) =>
@@ -327,7 +340,8 @@ function useDerivedCalendarState(viewY, viewM, selDate) {
     d === selDate.getDate() &&
     viewM === selDate.getMonth() &&
     viewY === selDate.getFullYear();
-  return { days, isToday, isSel };
+  const isDisabled = (d) => isBeforeMinDate(new Date(viewY, viewM, d), minDate);
+  return { days, isToday, isSel, isDisabled };
 }
 
 function PickerTrigger({
@@ -378,6 +392,7 @@ function PickerPortal({
   days,
   isToday,
   isSel,
+  isDisabled,
   selectDay,
   hour,
   minute,
@@ -399,6 +414,7 @@ function PickerPortal({
       days={days}
       isToday={isToday}
       isSel={isSel}
+      isDisabled={isDisabled}
       selectDay={selectDay}
       hour={hour}
       minute={minute}
@@ -421,6 +437,7 @@ export default function DateTimePicker({
   triggerClassName,
   wrapperClassName,
   hideIcon,
+  minDate = null,
 }) {
   const {
     open,
@@ -468,10 +485,11 @@ export default function DateTimePicker({
       dateOnly,
       onChange,
     );
-  const { days, isToday, isSel } = useDerivedCalendarState(
+  const { days, isToday, isSel, isDisabled } = useDerivedCalendarState(
     viewY,
     viewM,
     selDate,
+    minDate,
   );
   return (
     <div className={`${styles.wrap} ${wrapperClassName || ""}`} ref={ref}>
@@ -501,6 +519,7 @@ export default function DateTimePicker({
         days={days}
         isToday={isToday}
         isSel={isSel}
+        isDisabled={isDisabled}
         selectDay={selectDay}
         hour={hour}
         minute={minute}
@@ -539,6 +558,7 @@ const DropdownPanel = forwardRef(function DropdownPanel(
     days,
     isToday,
     isSel,
+    isDisabled,
     selectDay,
     hour,
     minute,
@@ -567,6 +587,7 @@ const DropdownPanel = forwardRef(function DropdownPanel(
           days={days}
           isToday={isToday}
           isSel={isSel}
+          isDisabled={isDisabled}
           selectDay={handleDaySelect}
         />
       )}
@@ -600,13 +621,14 @@ function CalendarHeader({ viewM, viewY, prevMonth, nextMonth }) {
   );
 }
 
-function DayCell({ day, index, isToday, isSel, selectDay }) {
-  const cls = `${styles.dayCell} ${!day ? styles.dayCellEmpty : ""} ${day && isToday(day) ? styles.dayCellToday : ""} ${day && isSel(day) ? styles.dayCellSel : ""}`;
+function DayCell({ day, index, isToday, isSel, isDisabled, selectDay }) {
+  const disabled = !day || isDisabled(day);
+  const cls = `${styles.dayCell} ${!day ? styles.dayCellEmpty : ""} ${day && isToday(day) ? styles.dayCellToday : ""} ${day && isSel(day) ? styles.dayCellSel : ""} ${disabled && day ? styles.dayCellDisabled : ""}`;
   return (
     <button
       key={index}
       type="button"
-      disabled={!day}
+      disabled={disabled}
       onClick={() => day && selectDay(day)}
       className={cls}
     >
@@ -623,6 +645,7 @@ function CalendarSection({
   days,
   isToday,
   isSel,
+  isDisabled,
   selectDay,
 }) {
   return (
@@ -646,6 +669,7 @@ function CalendarSection({
             index={i}
             isToday={isToday}
             isSel={isSel}
+            isDisabled={isDisabled}
             selectDay={selectDay}
           />
         ))}

@@ -4,19 +4,35 @@
     box-shadow: none;
 }
 
+.modalPanel {
+    width: min(860px, 96vw);
+    max-height: min(94vh, 920px);
+}
+
 .modalContent {
-    padding-right: 2px;
+    padding-right: 4px;
+    padding-bottom: 10px;
+    overflow: visible !important;
+}
+
+.modalSubtitle {
+    color: var(--text);
+    font-weight: 500;
 }
 
 .modalForm {
     display: grid;
-    gap: 14px;
+    gap: 16px;
 }
 
 .formFields {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
     gap: 14px;
+}
+
+.membersField {
+    min-width: 0;
 }
 
 .inputName {
@@ -42,7 +58,7 @@
     text-transform: none;
     letter-spacing: 0;
     font-size: 0.85em;
-    color: var(--muted, #9a8778);
+    color: var(--muted);
 }
 
 .requiredMark {
@@ -59,7 +75,7 @@
     padding: var(--input-padding);
     border: var(--input-border);
     border-radius: var(--dropdown-radius);
-    background: #ffffff;
+    background: var(--surface-raised);
     color: var(--text);
     font: inherit;
     font-size: var(--text-base);
@@ -87,12 +103,45 @@
     max-width: none;
 }
 
+.membersPicker {
+    display: grid;
+    gap: 6px;
+}
+
+.membersHint {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.memberSearchEmpty {
+    margin-top: 2px;
+}
+
+.memberSearchEmptyCard {
+    margin: 0;
+    padding: 0.85rem 0.8rem;
+    border-radius: 14px;
+    box-shadow: none;
+    min-height: 104px;
+}
+
+.memberSearchEmptyTitle {
+    font-size: 0.92rem;
+}
+
+.memberSearchEmptyHint {
+    font-size: 0.79rem;
+}
+
 .formFooter {
     display: flex;
     align-items: center;
     gap: 10px;
     justify-content: flex-end;
     flex-wrap: wrap;
+    margin-top: 4px;
 }
 
 .formError {
