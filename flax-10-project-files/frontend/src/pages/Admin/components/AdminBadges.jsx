@@ -2,7 +2,7 @@
  * Shared admin badges.
  */
 
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 
 const ROLE_BADGE_STYLES = {
   pending_teacher: styles.badgePending,
