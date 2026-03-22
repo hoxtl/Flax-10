@@ -65,6 +65,24 @@ describe('UserListModal', () => {
     expect(onUserUpdate).toHaveBeenCalledWith(2, true);
   });
 
+  it('renders a View calendar action when requested and calls onUserCalendarClick', () => {
+    const onUserCalendarClick = vi.fn();
+    render(
+      <UserListModal
+        title="People"
+        users={users}
+        onClose={vi.fn()}
+        showCalendarAction
+        onUserCalendarClick={onUserCalendarClick}
+      />
+    );
+
+    fireEvent.click(screen.getAllByText(/view calendar/i)[0]);
+
+    expect(screen.queryByTestId('share-2')).not.toBeInTheDocument();
+    expect(onUserCalendarClick).toHaveBeenCalledWith(expect.objectContaining({ id: 3, username: 'cara' }));
+  });
+
   it('closes on overlay and close button clicks, but not modal content click', () => {
     const onClose = vi.fn();
     const { container } = render(<UserListModal title="People" users={users} onClose={onClose} />);
@@ -83,9 +101,9 @@ describe('UserListModal', () => {
     expect(onClose).toHaveBeenCalledTimes(2);
   });
 
-  it('renders avatar fallback from username when first_name is empty', () => {
+  it('renders the user row when first_name is empty', () => {
     render(<UserListModal title="People" users={users} onClose={vi.fn()} />);
-    expect(screen.getByText('c')).toBeInTheDocument();
+    expect(screen.getByText('Clark')).toBeInTheDocument();
   });
 
   it('treats matching username as current user even when id differs', () => {
@@ -148,7 +166,7 @@ describe('UserListModal', () => {
     const photoUsers = [
       { id: 99, username: 'ricky.curtis', first_name: 'Ricky', last_name: 'Curtis', is_sharing: true, profile_photo_url: 'https://example.com/avatar.jpg' },
     ];
-    const { container } = render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
-    expect(container.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
+    render(<UserListModal title="People" users={photoUsers} onClose={vi.fn()} />);
+    expect(document.body.querySelector('img[src=\"https://example.com/avatar.jpg\"]')).toBeTruthy();
   });
 });

@@ -45,6 +45,7 @@ describe('useCalendarEvents', () => {
       events: [{ id: 1 }],
       selectedDate,
       viewMode: 'month',
+      sharedCalendarUserId: null,
     });
     useCalendarDispatchMock.mockReturnValue(dispatch);
     getDateRangeForViewMock.mockReturnValue({ start: '2026-03-01', end: '2026-03-31' });
@@ -72,6 +73,21 @@ describe('useCalendarEvents', () => {
 
     await waitFor(() => {
       expect(dispatch).toHaveBeenCalledWith({ type: 'SET_ERROR', payload: 'boom' });
+    });
+  });
+
+  it('loads shared calendar events with the viewed user id when present', async () => {
+    useCalendarMock.mockReturnValue({
+      events: [{ id: 1 }],
+      selectedDate: new Date(2026, 2, 9).toISOString(),
+      viewMode: 'month',
+      sharedCalendarUserId: '42',
+    });
+
+    renderHook(() => useCalendarEvents());
+
+    await waitFor(() => {
+      expect(getEventsMock).toHaveBeenCalledWith({ start: '2026-03-01', end: '2026-03-31', user_id: '42' });
     });
   });
 

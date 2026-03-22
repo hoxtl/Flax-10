@@ -52,6 +52,9 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     SearchButton: ({ value, onChange }) => (
         <input placeholder="Search" value={value} onChange={e => onChange(e.target.value)} />
     ),
+    FilterDropdownButton: ({ active, onChange }) => (
+        <button type="button" onClick={() => onChange('work')}>Filter {Array.isArray(active) ? active.join(',') : active}</button>
+    ),
     ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
 }));
 
@@ -126,6 +129,13 @@ describe('CalendarHeader', () => {
     it('renders manage schedules control', () => {
         setup();
         expect(screen.getByText('Manage schedules')).toBeInTheDocument();
+    });
+
+    it('hides add and schedule actions when viewing a shared calendar', () => {
+        setup({ ...defaultState, sharedCalendarUserId: '44', sharedCalendarName: 'Jane Doe' });
+        expect(screen.queryByText('Manage schedules')).not.toBeInTheDocument();
+        expect(screen.queryByText('+')).not.toBeInTheDocument();
+        expect(screen.queryByText('Import timetable')).not.toBeInTheDocument();
     });
 
     it('should open modal on adding event', () => {
@@ -249,9 +259,9 @@ describe('CalendarHeader', () => {
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
     });
 
-    it('hides Today button when in month view and selected month is current month', () => {
+    it('hides Today button when the selected date is today', () => {
         const now = new Date();
-        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), 15), viewMode: 'month' });
+        setup({ selectedDate: new Date(now.getFullYear(), now.getMonth(), now.getDate()), viewMode: 'month' });
         expect(screen.queryByText('Today')).not.toBeInTheDocument();
     });
 
