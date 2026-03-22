@@ -15,33 +15,13 @@ async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle
     }
 }
 
-export default function ShareButton({
-    userId,
-    initialIsSharing,
-    onToggle,
-    shareVariant = "primary",
-    sharedVariant = "secondary",
-    shareLabel = "Share Calendar",
-    sharedLabel = "Shared",
-}) {
+export default function ShareButton({ userId, initialIsSharing, onToggle, shareVariant = "primary", sharedVariant = "secondary", shareLabel = "Share Calendar", sharedLabel = "Shared" }) {
     const [isSharing, setIsSharing] = useState(initialIsSharing);
     const [loading, setLoading] = useState(false);
-
     useEffect(() => { setIsSharing(initialIsSharing); }, [initialIsSharing]);
-
-    const handleClick = (e) => {
-        e.stopPropagation();
-        if (!loading) toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle);
-    };
-
+    const handleClick = (e) => { e.stopPropagation(); if (!loading) toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle); };
     return (
-        <PrimaryButton
-            pill
-            size="small"
-            variant={isSharing ? sharedVariant : shareVariant}
-            disabled={loading}
-            onClick={handleClick}
-        >
+        <PrimaryButton pill size="small" variant={isSharing ? sharedVariant : shareVariant} disabled={loading} onClick={handleClick}>
             {loading ? '...' : isSharing ? sharedLabel : shareLabel}
         </PrimaryButton>
     );
