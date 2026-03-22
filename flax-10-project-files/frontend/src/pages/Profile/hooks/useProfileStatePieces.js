@@ -1,3 +1,6 @@
+/*
+ * Atomic hooks for profile data, events, modals, and task count.
+ */
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { loadTaskCount, tryLoadEvents, tryLoadProfile } from "./profileDataLoaders";

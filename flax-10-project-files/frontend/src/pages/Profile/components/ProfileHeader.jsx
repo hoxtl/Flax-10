@@ -1,3 +1,6 @@
+/*
+ * Profile header component – avatar, stats, badges, persona, and calendar sharing.
+ */
 import { useState } from "react";
 import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";
@@ -55,24 +58,7 @@ function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
   );
 }
 
-function BadgeTooltip({ badge }) {
-  return (
-    <div className={styles.badgeTooltip}>
-      <span className={styles.badgeTooltipLabel}>{badge.label}</span>
-      <span className={styles.badgeTooltipDesc}>{badge.description}</span>
-    </div>
-  );
-}
-
-function BadgeButton({
-  badge,
-  canPin,
-  onPinBadge,
-  activeTooltip,
-  onEnter,
-  onLeave,
-  pinned,
-}) {
+function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
   return (
     <button
       type="button"
@@ -93,23 +79,12 @@ function BadgeButton({
   );
 }
 
-function buildFeaturedBadge(badges, pinnedBadgeId) {
-  return badges.find((badge) => String(badge.id) === String(pinnedBadgeId)) || null;
-}
-
 function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
   if (!badge) return null;
   return (
-    <button
-      type="button"
-      className={styles.featuredBadgeCard}
-      onClick={() => canPin && onPinBadge?.(badge.id)}
-      title={canPin ? "Tap to pin this badge" : badge.label}
-    >
+    <button type="button" className={styles.featuredBadgeCard} onClick={() => canPin && onPinBadge?.(badge.id)} title={canPin ? "Tap to pin this badge" : badge.label}>
       <div className={styles.featuredBadgeMain}>
-        <div className={styles.featuredBadgeEmojiWrap}>
-          <span className={styles.featuredBadgeEmoji}>{badge.emoji}</span>
-        </div>
+        <div className={styles.featuredBadgeEmojiWrap}><span className={styles.featuredBadgeEmoji}>{badge.emoji}</span></div>
         <div className={styles.featuredBadgeText}>
           <p className={styles.featuredBadgeTitle}>{badge.label}</p>
           {badge.description && <p className={styles.featuredBadgeDesc}>{badge.description}</p>}
@@ -119,39 +94,38 @@ function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
   );
 }
 
+function resolveBadgeLists(allBadges, pinnedBadgeId) {
+  const pinnedBadge = allBadges.find((b) => String(b.id) === String(pinnedBadgeId));
+  const topBadges = pinnedBadge
+    ? allBadges.filter((b) => String(b.id) !== String(pinnedBadgeId)).slice(0, 3)
+    : allBadges.slice(0, 4);
+  return { featuredBadge: pinnedBadge || null, topBadges };
+}
+
+function BadgeRail({ topBadges, onViewAll, canPin, onPinBadge, activeTooltip, onEnter, onLeave }) {
+  const tooltipProps = { canPin, onPinBadge, activeTooltip, onEnter, onLeave };
+  return (
+    <div className={styles.headerBadgeRail}>
+      <div className={styles.headerBadges}>
+        <div className={styles.headerBadgesMain}>
+          {topBadges.map((badge) => <BadgeButton key={badge.id} badge={badge} pinned={false} {...tooltipProps} />)}
+        </div>
+        {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
+      </div>
+    </div>
+  );
+}
+
 function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const allBadges = badges || [];
-  const pinnedBadge = allBadges.find(
-    (b) => String(b.id) === String(pinnedBadgeId),
-  );
-  const featuredBadge = pinnedBadge || null;
-  const topBadges = pinnedBadge
-    ? allBadges
-        .filter((b) => String(b.id) !== String(pinnedBadgeId))
-        .slice(0, 3)
-    : allBadges.slice(0, 4);
   if (!allBadges.length) return null;
-  const props = {
-    canPin,
-    onPinBadge,
-    activeTooltip,
-    onEnter: setActiveTooltip,
-    onLeave: () => setActiveTooltip(null),
-  };
+  const { featuredBadge, topBadges } = resolveBadgeLists(allBadges, pinnedBadgeId);
+  const tooltipProps = { canPin, onPinBadge, activeTooltip, onEnter: setActiveTooltip, onLeave: () => setActiveTooltip(null) };
   return (
     <div className={styles.headerAchievementsRow}>
       {featuredBadge && <FeaturedBadgeCard badge={featuredBadge} canPin={canPin} onPinBadge={onPinBadge} />}
-      <div className={styles.headerBadgeRail}>
-        <div className={styles.headerBadges}>
-          <div className={styles.headerBadgesMain}>
-            {topBadges.map((badge) => (
-              <BadgeButton key={badge.id} badge={badge} pinned={false} {...props} />
-            ))}
-          </div>
-          {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
-        </div>
-      </div>
+      <BadgeRail topBadges={topBadges} onViewAll={onViewAll} {...tooltipProps} />
     </div>
   );
 }
@@ -203,26 +177,20 @@ function ContactEmail({ email }) {
   return <div className={styles.teacherEmail}><a href={`mailto:${email}`}>{email}</a></div>;
 }
 
+function buildPeakLabel(peakHour) {
+  if (peakHour == null) return null;
+  return `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`;
+}
+
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
-  const peakLabel =
-    peakHour != null
-      ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`
-      : null;
+  const peakLabel = buildPeakLabel(peakHour);
   return (
     <div className={styles.headerPersonaCard}>
       <div className={styles.headerPersonaLeft}>
-        <span
-          className={styles.headerPersonaEmoji}
-          role="img"
-          aria-label={persona.label}
-        >
-          {persona.emoji}
-        </span>
+        <span className={styles.headerPersonaEmoji} role="img" aria-label={persona.label}>{persona.emoji}</span>
         <span className={styles.headerPersonaName}>{persona.label}</span>
-        {peakLabel && (
-          <span className={styles.headerPersonaPeak}>{peakLabel}</span>
-        )}
+        {peakLabel && <span className={styles.headerPersonaPeak}>{peakLabel}</span>}
       </div>
       <p className={styles.headerPersonaDesc}>{persona.description}</p>
     </div>
@@ -234,6 +202,28 @@ function ProfileBioSection({ bio }) {
   return <div className={styles.bio}><div className={styles.reminder}>{bio}</div></div>;
 }
 
+function SharedPlanningTip() {
+  return (
+    <span className={styles.sharedPlanningTip}>
+      <span className={styles.sharedPlanningTipLabel}>Tip</span>
+      Compare free slots to find times that work for both of you.
+    </span>
+  );
+}
+
+function SharedCalendarActions({ user, route, onNavigate }) {
+  return (
+    <div className={styles.calendarActionsGroup}>
+      <div className={styles.calendarActionsRow}>
+        <span className={styles.sharedCalendarIndicator}>Shared calendar with me</span>
+        <ShareButton userId={user?.id} initialIsSharing={user?.is_sharing} onToggle={(v) => { user?.setOptimisticShare?.(v); user?.reload?.(); }} shareVariant="secondary" sharedVariant="secondary" />
+      </div>
+      <PrimaryButton className={styles.viewCalendarPill} size="small" pill onClick={() => onNavigate(route)}>
+        View their calendar
+      </PrimaryButton>
+    </div>
+  );
+}
 
 function HeaderTitleRow({ user, roleLabel, handlers, visibility, isShared }) {
   return (
@@ -253,29 +243,8 @@ function HeaderMeta({ user, profileData, handlers, visibility, societies, onSoci
     <>
       <HeaderTitleRow user={user} roleLabel={roleLabel} handlers={handlers} visibility={visibility} isShared={isShared} />
       {description && <div className={styles.headerSubline}>{description}</div>}
-      {!visibility.canEditProfile && (
-        <span className={styles.sharedPlanningTip}>
-          <span className={styles.sharedPlanningTipLabel}>Tip</span>
-          Compare free slots to find times that work for both of you.
-        </span>
-      )}
-      {isShared && (
-        <div className={styles.calendarActionsGroup}>
-          <div className={styles.calendarActionsRow}>
-            <span className={styles.sharedCalendarIndicator}>Shared calendar with me</span>
-            <ShareButton
-              userId={user?.id}
-              initialIsSharing={user?.is_sharing}
-              onToggle={(v) => { user?.setOptimisticShare?.(v); user?.reload?.(); }}
-              shareVariant="secondary"
-              sharedVariant="secondary"
-            />
-          </div>
-          <PrimaryButton className={styles.viewCalendarPill} size="small" pill onClick={() => onNavigate(route)}>
-            View their calendar
-          </PrimaryButton>
-        </div>
-      )}
+      {!visibility.canEditProfile && <SharedPlanningTip />}
+      {isShared && <SharedCalendarActions user={user} route={route} onNavigate={onNavigate} />}
       <ProfileStats profileData={profileData} handlers={handlers} visibility={visibility} societyCount={societies?.length || 0} onSocietiesClick={onSocietiesClick} />
       <ProfileBioSection bio={profileData?.bio} />
     </>

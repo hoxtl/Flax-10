@@ -1,3 +1,6 @@
+/**
+ * Campus map route card styles.
+ */
 .emptyState {
   display: flex;
   flex-direction: column;
