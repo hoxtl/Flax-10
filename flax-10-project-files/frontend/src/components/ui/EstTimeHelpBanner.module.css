@@ -1,4 +1,6 @@
-/* EstTimeHelpBanner — Flax-themed helper banner */
+/**
+ * Est-time help banner styles.
+ */
 
 .banner {
   display: flex;
@@ -132,4 +134,3 @@
   background: rgba(255, 255, 255, 0.3);
   color: var(--color-card);
 }
-
