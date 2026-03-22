@@ -4,7 +4,7 @@
 
 import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 import UserSearch from "../../../components/Social/UserSearch";
-import { addProjectMember } from "../groupWorkApi";
+import { addProjectMember } from "../api/groupWorkApi";
 import styles from "./AddMemberForm.module.css";
 
 const MAX_PROJECT_MEMBER_TOTAL = 10;

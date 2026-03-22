@@ -10,8 +10,8 @@ import StandardModal from "../../../components/common/StandardModal/StandardModa
 import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelector";
 import UserSearch from "../../../components/Social/UserSearch";
 import { CreateProjectInputs } from "./CreateProjectInputs";
-import { createGroupProject } from "../groupWorkApi";
-import { getStoredViewer } from "./memberAvatarUtils";
+import { createGroupProject } from "../api/groupWorkApi";
+import { getStoredViewer } from "../utils/memberAvatarUtils";
 import styles from "./CreateProjectForm.module.css";
 
 const MIN_PROJECT_MEMBER_TOTAL = 5;
@@ -19,6 +19,7 @@ const MAX_PROJECT_MEMBER_TOTAL = 10;
 const MIN_TEAMMATE_SELECTION = MIN_PROJECT_MEMBER_TOTAL - 1;
 const MAX_TEAMMATE_SELECTION = MAX_PROJECT_MEMBER_TOTAL - 1;
 
+/** Button and modal form for creating a new group project. */
 export default function CreateProjectForm({ onCreated, className = "", size = "medium" }) {
   const [isOpen, setIsOpen] = useState(false);
   const formState = useCreateProjectForm((project) => {

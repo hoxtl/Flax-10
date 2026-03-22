@@ -7,7 +7,7 @@ import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
-import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null }) {

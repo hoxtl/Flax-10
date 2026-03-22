@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName } from "./memberAvatarUtils";
+import { getDisplayName } from "../utils/memberAvatarUtils";
 import FilterButton from "../../../components/common/FilterButton/FilterButton";
 import styles from "./MemberFilter.module.css";
 
