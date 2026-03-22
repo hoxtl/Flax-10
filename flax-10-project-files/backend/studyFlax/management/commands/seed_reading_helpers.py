@@ -24,18 +24,16 @@ def _build_single_reading(module, title, chapter, start, end, deadline):
     )
 
 
+def _build_reading_for_index(module, i, example, now):
+    s, c, st, en = example
+    offset = READING_DAY_OFFSETS[i % len(READING_DAY_OFFSETS)]
+    return _build_single_reading(module, s, c, st, en, now + timedelta(days=offset))
+
 def build_readings_for_module(module):
     """Return unsaved Reading instances for a module."""
     now = timezone.now()
     examples = random.sample(reading_fixtures, min(3, len(reading_fixtures)))
-    results = []
-    for i, (s, c, st, en) in enumerate(examples):
-        offset = READING_DAY_OFFSETS[i % len(READING_DAY_OFFSETS)]
-        deadline = now + timedelta(days=offset)
-        r = _build_single_reading(module, s, c, st, en, deadline)
-        if r:
-            results.append(r)
-    return results
+    return [_build_reading_for_index(module, i, ex, now) for i, ex in enumerate(examples)]
 
 
 def _reading_task_fields(user, reading, task_list, completed):
