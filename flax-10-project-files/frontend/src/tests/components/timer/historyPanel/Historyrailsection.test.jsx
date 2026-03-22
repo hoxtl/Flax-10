@@ -81,4 +81,36 @@ describe('HistoryRailSection', () => {
     render(<HistoryRailSection group={makeGroup([makeBlock({ totalBreak: 0 })])} />);
     expect(screen.queryByText(/break/)).toBeNull();
   });
-})
+
+  it('shows "—" when time range is unavailable', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock({ startTime: undefined, endTime: undefined })])} />);
+    expect(screen.getByText('—')).toBeTruthy();
+  });
+
+  it('shows "0m" when duration is missing', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock({ totalDuration: undefined })])} />);
+    expect(screen.getByText('0m')).toBeTruthy();
+  });
+
+  it('renders the first of multiple cards', () => {
+    const group = makeGroup([makeBlock({ id: '1', task: 'Task A' }), makeBlock({ id: '2', task: 'Task B' })]);
+    render(<HistoryRailSection group={group} />);
+    expect(screen.getByText('Task A')).toBeTruthy();
+  });
+
+  it('renders the second of multiple cards', () => {
+    const group = makeGroup([makeBlock({ id: '1', task: 'Task A' }), makeBlock({ id: '2', task: 'Task B' })]);
+    render(<HistoryRailSection group={group} />);
+    expect(screen.getByText('Task B')).toBeTruthy();
+  });
+
+  it('renders no list items for an empty entries list', () => {
+    const { container } = render(<HistoryRailSection group={makeGroup([])} />);
+    expect(container.querySelectorAll('li')).toHaveLength(0);
+  });
+
+  it('shows "0/1 sessions" when the sessions array is empty', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock({ sessions: [] })])} />);
+    expect(screen.getByText('0/1 sessions')).toBeTruthy();
+  });
+});
