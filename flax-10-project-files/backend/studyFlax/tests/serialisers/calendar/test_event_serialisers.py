@@ -121,3 +121,12 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertIsNone(data['location_latitude'])
         self.assertIsNone(data['location_longitude'])
         self.assertEqual(data['location_validated'], False)
+
+    def test_serializer_with_tag_details(self):
+        """Test that tag_details and tag_name are included."""
+        serializer = CalendarEventSerialiser(instance=self.event)
+        data = serializer.data
+        
+        self.assertIn('tag_details', data)
+        self.assertIn('tag_name', data)
+        self.assertEqual(data['tag_name'], 'Test Tag')
