@@ -7,6 +7,7 @@ import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
@@ -14,7 +15,7 @@ import MemberAvatar from "./MemberAvatar";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectHeader.module.css";
 
-export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove }) {
+export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove, onDeleteProject }) {
   return (
     <div className={styles.metaStack}>
       <ProjectMembersMeta
@@ -23,6 +24,7 @@ export function ProjectHeaderMeta({ project, members, teamMembers = [], onMember
         teamMembers={teamMembers}
         onMemberAdded={onMemberAdded}
         onMemberRemove={onMemberRemove}
+        onDeleteProject={onDeleteProject}
       />
     </div>
   );
@@ -60,10 +62,11 @@ export function ProjectTeacherMeta({ project }) {
   );
 }
 
-function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove }) {
+function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDeleteProject }) {
   const [isEditing, setIsEditing] = useState(false);
   const canManageTeam = currentUserIsOwner(teamMembers);
   const teamCount = Math.max(teamMembers.length, getProjectMemberCount(project));
+  const removalFlow = useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject);
   if (!members.length && !teamMembers.length) return null;
 
   return (
@@ -99,7 +102,13 @@ function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMe
       {canManageTeam && isEditing ? (
         <div className={styles.teamManagerPanel}>
           <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
-          <MembersSection members={teamMembers} onRemove={onMemberRemove} canRemove={canManageTeam} />
+          <MembersSection
+            members={teamMembers}
+            onRemove={removalFlow.handleRemove}
+            canRemove={canManageTeam}
+            allowOwnerRemove={removalFlow.allowOwnerRemove}
+          />
+          {removalFlow.ownerModal}
         </div>
       ) : null}
     </div>
@@ -116,4 +125,39 @@ function currentUserIsOwner(members) {
   } catch {
     return false;
   }
+}
+
+function useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject) {
+  const [showOwnerModal, setShowOwnerModal] = useState(false);
+  const soloOwnerId = getSoloOwnerId(teamMembers);
+  const handleRemove = (memberId) => {
+    if (soloOwnerId && String(memberId) === String(soloOwnerId)) {
+      setShowOwnerModal(true);
+      return;
+    }
+    onMemberRemove(memberId);
+  };
+  const closeModal = () => setShowOwnerModal(false);
+  const confirmOwnerRemoval = async () => {
+    closeModal();
+    await onDeleteProject?.();
+  };
+  const ownerModal = showOwnerModal ? (
+    <HoldConfirmModal
+      title="Delete project"
+      warningBanner="You're the only member in this project."
+      warningText="Removing yourself deletes the project for everyone."
+      cancelLabel="Keep project"
+      holdLabel="Hold to delete"
+      onCancel={closeModal}
+      onConfirm={confirmOwnerRemoval}
+    />
+  ) : null;
+  return { handleRemove, ownerModal, allowOwnerRemove: Boolean(soloOwnerId) };
+}
+
+function getSoloOwnerId(members) {
+  if (members.length !== 1) return null;
+  const [member] = members;
+  return member?.role === "owner" ? member.id : null;
 }

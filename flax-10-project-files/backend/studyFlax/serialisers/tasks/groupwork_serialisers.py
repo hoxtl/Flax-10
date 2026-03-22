@@ -11,6 +11,7 @@ from studyFlax.models.groupwork.groupwork_model import (
 from studyFlax.serialisers.common import build_profile_photo_url, format_teacher_display_name
 
 class GroupProjectSerialiser(serializers.ModelSerializer):
+    course_code = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     member_count = serializers.IntegerField(read_only=True)
     task_count = serializers.IntegerField(read_only=True, default=0)
     completed_task_count = serializers.IntegerField(read_only=True, default=0)

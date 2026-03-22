@@ -13,10 +13,7 @@ import { CreateProjectInputs } from "./CreateProjectInputs";
 import { createGroupProject } from "../groupWorkApi";
 import styles from "./CreateProjectForm.module.css";
 
-const MIN_PROJECT_MEMBER_TOTAL = 5;
-const MAX_PROJECT_MEMBER_TOTAL = 10;
-const MIN_TEAMMATE_SELECTION = MIN_PROJECT_MEMBER_TOTAL - 1;
-const MAX_TEAMMATE_SELECTION = MAX_PROJECT_MEMBER_TOTAL - 1;
+
 
 export default function CreateProjectForm({ onCreated, className = "", size = "medium" }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -117,17 +114,9 @@ function createAddMemberHandler(setForm, setErrors, setErrorMessage) {
     if (!user?.id) return;
     setErrors((prev) => ({ ...prev, members: "" }));
     setErrorMessage("");
-    setForm((prev) => {
-      if (prev.members.some((member) => String(member.id) === String(user.id))) return prev;
-      if (prev.members.length >= MAX_TEAMMATE_SELECTION) {
-        setErrors((current) => ({
-          ...current,
-          members: `You can add up to ${MAX_TEAMMATE_SELECTION} teammates for a maximum of ${MAX_PROJECT_MEMBER_TOTAL} total members.`,
-        }));
-        return prev;
-      }
-      return { ...prev, members: [...prev.members, user] };
-    });
+    setForm((prev) => (prev.members.some((member) => String(member.id) === String(user.id))
+      ? prev
+      : { ...prev, members: [...prev.members, user] }));
   };
 }
 
@@ -158,14 +147,8 @@ function createSubmitHandler(form, setForm, setErrors, setErrorMessage, setIsSub
 function validateProjectForm(form) {
   const errors = {};
   if (!form.name.trim()) errors.name = "Project name is required.";
-  if (!String(form.course_code || "").trim()) errors.course_code = "Module is required.";
   if (!form.deadline) errors.deadline = "Due date is required.";
   else if (isPastProjectDeadline(form.deadline)) errors.deadline = "Project due date can't be in the past.";
-  if (!Array.isArray(form.members) || form.members.length < MIN_TEAMMATE_SELECTION) {
-    errors.members = `Add at least ${MIN_TEAMMATE_SELECTION} teammates so each project has ${MIN_PROJECT_MEMBER_TOTAL} total members.`;
-  } else if (form.members.length > MAX_TEAMMATE_SELECTION) {
-    errors.members = `You can add up to ${MAX_TEAMMATE_SELECTION} teammates for a maximum of ${MAX_PROJECT_MEMBER_TOTAL} total members.`;
-  }
   return errors;
 }
 
@@ -182,12 +165,14 @@ function resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting) 
 }
 
 function buildProjectPayload(form) {
-  return {
+  const payload = {
     name: form.name,
-    course_code: form.course_code,
     deadline: form.deadline,
     member_ids: form.members.map((member) => member.id),
   };
+  const courseCode = String(form.course_code || "").trim();
+  if (courseCode) payload.course_code = courseCode;
+  return payload;
 }
 
 function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
@@ -207,10 +192,9 @@ function ProjectMembersField({ members, error, onAddMember, onRemoveMember }) {
   );
 
   return (
-    <FormField label={<RequiredLabel text="Team members" />} labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
+    <FormField label="Team members (optional)" labelClassName={styles.fieldLabel} className={styles.membersField} error={error}>
       <div className={styles.membersPicker}>
         <p className={styles.membersHint}>Add teammates now so availability, tasks, and voting are ready from the start.</p>
-        <p className={styles.membersHint}>Choose {MIN_TEAMMATE_SELECTION} to {MAX_TEAMMATE_SELECTION} teammates so each project has {MIN_PROJECT_MEMBER_TOTAL} to {MAX_PROJECT_MEMBER_TOTAL} total members.</p>
         <UserSearch
           onUserSelect={onAddMember}
           filterUsers={buildAvailableUserFilter(members)}
@@ -233,7 +217,7 @@ function SelectedMemberTags({ members, onRemove }) {
     <TagsSelector
       tags={tags}
       selectedTags={tags}
-      emptyHint={`Search and add ${MIN_TEAMMATE_SELECTION} to ${MAX_TEAMMATE_SELECTION} teammates.`}
+      emptyHint="Search for teammates (optional)."
       onSelectionChange={(nextSelected) => syncRemovedMemberTags(tags, nextSelected, onRemove)}
     />
   );
@@ -294,8 +278,4 @@ function getStoredViewer() {
   } catch {
     return {};
   }
-}
-
-function RequiredLabel({ text }) {
-  return <>{text} <span className={styles.requiredMark}>*</span></>;
 }

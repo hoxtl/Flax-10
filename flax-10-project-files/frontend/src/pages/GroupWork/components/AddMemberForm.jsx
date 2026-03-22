@@ -7,8 +7,6 @@ import UserSearch from "../../../components/Social/UserSearch";
 import { addProjectMember } from "../groupWorkApi";
 import styles from "./AddMemberForm.module.css";
 
-const MAX_PROJECT_MEMBER_TOTAL = 10;
-
 export default function AddMemberForm({ projectId, members = [], onAdded }) {
   const renderEmptyState = ({ query, clear }) => (
     <div className={styles.inlineEmptyState}>
@@ -24,16 +22,6 @@ export default function AddMemberForm({ projectId, members = [], onAdded }) {
       />
     </div>
   );
-
-  if (members.length >= MAX_PROJECT_MEMBER_TOTAL) {
-    return (
-      <div className={styles.addMemberForm}>
-        <p className={styles.inlineEmptyHint}>
-          This team already has {MAX_PROJECT_MEMBER_TOTAL} members, which is the maximum allowed.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.addMemberForm}>

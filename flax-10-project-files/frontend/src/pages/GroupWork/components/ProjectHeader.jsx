@@ -42,6 +42,7 @@ export default function ProjectHeader({ project, members, teamMembers, onMemberA
             teamMembers={teamMembers}
             onMemberAdded={onMemberAdded}
             onMemberRemove={onMemberRemove}
+            onDeleteProject={onDelete}
           />
         </div>
       </div>
