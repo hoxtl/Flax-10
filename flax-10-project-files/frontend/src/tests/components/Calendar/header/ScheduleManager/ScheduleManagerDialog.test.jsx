@@ -108,4 +108,53 @@ describe('ScheduleManagerDialog', () => {
         expect(onClose).toHaveBeenCalled();
         window.removeEventListener('quick-add:open', listener);
     });
+
+    it('enters and exits rename mode', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
+        expect(screen.getByTestId('input')).toHaveValue('Schedule 1');
+
+        fireEvent.click(screen.getByText('Cancel'));
+        await waitFor(() => expect(screen.queryByTestId('input')).toBeNull());
+    });
+
+    it('validates and saves rename', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        renameSchedule.mockResolvedValue({ event_allocations: [] });
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
+        
+        // Empty name
+        fireEvent.change(screen.getByTestId('input'), { target: { value: '   ' } });
+        fireEvent.click(screen.getByText('Save'));
+        expect(mockToast).toHaveBeenCalledWith('Enter a name.', { variant: 'error' });
+
+        // Valid name
+        fireEvent.change(screen.getByTestId('input'), { target: { value: 'New Name' } });
+        fireEvent.click(screen.getByText('Save'));
+
+        await waitFor(() => {
+            expect(renameSchedule).toHaveBeenCalledWith(1, 'New Name');
+            expect(screen.getByText('New Name')).toBeTruthy();
+        });
+    });
+
+    it('handles rename error', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        renameSchedule.mockRejectedValue(new Error('Rename failed'));
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => fireEvent.click(screen.getAllByText('Rename')[0]));
+        fireEvent.change(screen.getByTestId('input'), { target: { value: 'New' } });
+        fireEvent.click(screen.getByText('Save'));
+
+        await waitFor(() => {
+            expect(mockToast).toHaveBeenCalledWith('Rename failed', { variant: 'error' });
+        });
+    });
+
+
 });
