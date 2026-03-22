@@ -12,8 +12,6 @@ import {
     patchGroupProject,
 } from "../api/groupWorkApi";
 
-export { getAuthHeaders } from "../api/groupWorkApi";
-
 function findProjectById(projects, projectId) {
     return (projects || []).find((item) => String(item.id) === String(projectId)) || null;
 }

@@ -2,19 +2,14 @@
  * GroupWork task timeline view.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { Pencil, Trash2 } from "lucide-react";
-import ctxStyles from "../../Tasks/components/TaskCardContextMenu.module.css";
-import baseStyles from "./TaskTimelineView.module.css";
-import layoutStyles from "./TaskTimelineViewLayout.module.css";
+import { useMemo, useRef, useState } from "react";
+import styles from "./TaskTimelineView.module.css";
 import { getPriorityStyle } from "../utils/priorityUtils";
 import { DAY_MS, buildWeeks, getTimelineAnchor, placeTasksIntoWeeks } from "../utils/taskTimelineUtils";
-import { buildToggleAssignee, filterVisibleAssignees, handleDragStartTask } from "../utils/taskUtils";
+import { buildToggleAssignee, filterVisibleAssignees, handleDragStartTask, saveTaskTitle, startTaskEdit } from "../utils/taskUtils";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
-
-const styles = { ...baseStyles, ...layoutStyles };
+import TaskContextMenu from "./TaskContextMenu";
 
 function dropTaskAtTimestamp(event, onUpdate, ts) {
     event.preventDefault();
@@ -41,25 +36,6 @@ function useDragHandlers(onUpdate) {
         onDrop: (event, ts) => dropTaskAtTimestamp(event, onUpdate, ts),
         onDropWidget: (event) => dropTaskToBacklog(event, onUpdate),
     };
-}
-
-function useContextMenuClose(onClose) {
-    useEffect(() => {
-        document.addEventListener("mousedown", onClose);
-        return () => document.removeEventListener("mousedown", onClose);
-    }, [onClose]);
-}
-
-function GroupTaskContextMenu({ onClose, onDelete, onEditStart, pos, task }) {
-    useContextMenuClose(onClose);
-    return createPortal(
-        <div className={ctxStyles.ctxMenu} style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 10000 }} onMouseDown={(event) => event.stopPropagation()}>
-            <button className={ctxStyles.ctxItem} onClick={() => { onClose(); onEditStart(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>
-            <div className={ctxStyles.ctxDivider} />
-            <button className={`${ctxStyles.ctxItem} ${ctxStyles.ctxItemDanger}`} onClick={() => { onClose(); onDelete(task.id); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
-        </div>,
-        document.body
-    );
 }
 
 function handleInlineEditKeyDown(event, onSave, onCancel) {
@@ -89,31 +65,20 @@ function UnscheduledCardContent({ editing, editTitle, members, saveEdit, setEdit
     );
 }
 
-function saveCardTitle(editTitle, setEditing, task, onUpdate) {
-    const trimmed = editTitle.trim();
-    if (trimmed && trimmed !== task.title) onUpdate(task.id, { title: trimmed });
-    setEditing(false);
-}
-
-function startCardEdit(setEditing, setEditTitle, title) {
-    setEditing(true);
-    setEditTitle(title);
-}
-
 function UnscheduledCard({ members, onDelete, onUpdate, task }) {
     const style = getPriorityStyle(task.priority);
     const [editing, setEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
     const [ctxMenu, setCtxMenu] = useState(null);
-    const saveEdit = () => saveCardTitle(editTitle, setEditing, task, onUpdate);
-    const handleEditStart = () => startCardEdit(setEditing, setEditTitle, task.title);
+    const saveEdit = () => saveTaskTitle(editTitle, setEditing, task, onUpdate);
+    const handleEditStart = () => startTaskEdit(setEditing, setEditTitle, task.title);
 
     return (
         <>
             <div onContextMenu={(event) => { event.preventDefault(); setCtxMenu({ x: event.clientX, y: event.clientY }); }}>
                 <UnscheduledCardContent task={task} editing={editing} editTitle={editTitle} members={members} saveEdit={saveEdit} setEditTitle={setEditTitle} setEditing={setEditing} style={style} />
             </div>
-            {ctxMenu ? <GroupTaskContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
+            {ctxMenu ? <TaskContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
         </>
     );
 }
@@ -217,15 +182,15 @@ function TimelineCard({ assignees, members, onDelete, onUpdate, task }) {
     const triggerRef = useRef(null);
     const colour = getPriorityStyle(task.priority);
     const toggle = buildToggleAssignee(assignees, task.id, onUpdate);
-    const saveEdit = () => saveCardTitle(editTitle, setEditing, task, onUpdate);
-    const handleEditStart = () => startCardEdit(setEditing, setEditTitle, task.title);
+    const saveEdit = () => saveTaskTitle(editTitle, setEditing, task, onUpdate);
+    const handleEditStart = () => startTaskEdit(setEditing, setEditTitle, task.title);
 
     return (
         <>
             <div draggable onDragStart={(event) => { event.stopPropagation(); handleDragStartTask(event, task.id); }} onContextMenu={(event) => { event.preventDefault(); setCtxMenu({ x: event.clientX, y: event.clientY }); }}>
                 <TimelineCardBody task={task} assignees={assignees} colour={colour} editing={editing} editTitle={editTitle} members={members} saveEdit={saveEdit} setEditTitle={setEditTitle} setEditing={setEditing} setShowPopup={setShowPopup} showPopup={showPopup} toggle={toggle} triggerRef={triggerRef} />
             </div>
-            {ctxMenu ? <GroupTaskContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
+            {ctxMenu ? <TaskContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
         </>
     );
 }

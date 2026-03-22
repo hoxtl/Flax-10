@@ -1,5 +1,6 @@
 import random
 
+from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 
@@ -27,14 +28,7 @@ from studyFlax.management.commands.seed_support.seed_groups_membership import (
     _seed_meeting_suggestions_for_project,
 )
 
-try:
-    from django.core.management.base import BaseCommand
-    _has_base_command = True
-except ImportError:
-    _has_base_command = False
-
-
-def create_group_projects(stdout):
+def create_group_projects():
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
     students = _get_student_pool()
@@ -102,12 +96,11 @@ def seed_group_availability(stdout):
     stdout.write("Done seeding group availability.")
 
 
-if _has_base_command:
-    class Command(BaseCommand):
-        help = "Seed group projects, memberships, tasks, and availability data."
+class Command(BaseCommand):
+    help = "Seed group projects, memberships, tasks, and availability data."
 
-        def handle(self, *args, **options):
-            create_group_projects(self.stdout)
-            create_group_memberships(self.stdout)
-            create_group_tasks(self.stdout)
-            seed_group_availability(self.stdout)
+    def handle(self, *args, **options):
+        create_group_projects()
+        create_group_memberships(self.stdout)
+        create_group_tasks(self.stdout)
+        seed_group_availability(self.stdout)

@@ -1,3 +1,7 @@
+/*
+ * Timeline layout utilities for the GroupWork task timeline view.
+ */
+
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -13,8 +17,8 @@ export function getTimelineAnchor() {
 function buildWeek(offset, anchor) {
     const start = new Date(anchor.getTime() + offset * WEEK_MS);
     const end = new Date(start.getTime() + 5 * DAY_MS);
-    const sStr = start.toLocaleString('en-US', { month: 'short', day: 'numeric' });
-    const eStr = end.toLocaleString('en-US', { month: 'short', day: 'numeric' });
+    const sStr = start.toLocaleString('en-GB', { month: 'short', day: 'numeric' });
+    const eStr = end.toLocaleString('en-GB', { month: 'short', day: 'numeric' });
     return {
         id: offset,
         label: `Week ${offset + 1} (${sStr}–${eStr})`,

@@ -1,3 +1,4 @@
+import itertools
 import random
 
 from django.contrib.auth import get_user_model
@@ -145,10 +146,12 @@ def _inbound_sharers_for_fixture(all_users, username, target):
     for sharer in [u for u in potential if u.username not in non_sharers]:
         CalendarShare.objects.get_or_create(owner=sharer, shared_with=target)
 
+
 def _seed_inbound_shares(all_users, fixture_users):
     """Share every user's calendar with each fixture user, excluding 5 random non-sharers."""
     for username, target in fixture_users.items():
         _inbound_sharers_for_fixture(all_users, username, target)
+
 
 def _outbound_sharers_for_fixture(all_users, username, owner):
     """Share owner's calendar with ~half the other users."""
@@ -159,10 +162,12 @@ def _outbound_sharers_for_fixture(all_users, username, owner):
     for viewer in shuffled[:len(shuffled) // 2]:
         CalendarShare.objects.get_or_create(owner=owner, shared_with=viewer)
 
+
 def _seed_outbound_shares(all_users, fixture_users):
     """Share each fixture user's calendar with ~half of all other users."""
     for username, owner in fixture_users.items():
         _outbound_sharers_for_fixture(all_users, username, owner)
+
 
 def _viewers_for_user(all_users, user):
     """Give user ~5 random viewers of their calendar."""
@@ -171,6 +176,7 @@ def _viewers_for_user(all_users, user):
     rng.shuffle(pool)
     for viewer in pool[:5]:
         CalendarShare.objects.get_or_create(owner=user, shared_with=viewer)
+
 
 def _seed_viewer_shares(all_users, non_fixture):
     """Give each non-fixture user ~5 random viewers of their calendar."""
@@ -271,7 +277,7 @@ class Command(BaseCommand):
         create_society_events(self.stdout)
         create_society_images(self.stdout)
         self.stdout.write(f"  \u2713  {'Societies':<14} {Society.objects.count():,}")
-        create_group_projects(self.stdout)
+        create_group_projects()
         create_group_memberships(self.stdout)
         create_group_tasks(self.stdout)
         seed_group_availability(self.stdout)
@@ -335,7 +341,6 @@ class Command(BaseCommand):
         )
 
     def _create_tags(self):
-        import itertools
         self.stdout.write("Seeding tags...")
         for user, (name, duration) in itertools.product(self.users, tag_fixtures):
             self._create_single_tag(name, duration, user)

@@ -4,7 +4,7 @@
 
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback.js";
 
-const MEMBER_PALETTE = [
+export const MEMBER_PALETTE = [
   "#7BB38E",
   "#9A8CB0",
   "#8A7060",

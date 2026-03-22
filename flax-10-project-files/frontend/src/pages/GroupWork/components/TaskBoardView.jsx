@@ -5,10 +5,7 @@
 import { useMemo, useState } from "react";
 import TaskBoardColumn from "./TaskBoardColumn";
 import { buildBoardColumns } from "../utils/taskBoardUtils";
-import baseStyles from "./TaskBoardView.module.css";
-import popupStyles from "./TaskBoardViewPopup.module.css";
-
-const styles = { ...baseStyles, ...popupStyles };
+import styles from "./TaskBoardView.module.css";
 
 function useBoardAdding(onAdd) {
   const [addingToCol, setAddingToCol] = useState(null);

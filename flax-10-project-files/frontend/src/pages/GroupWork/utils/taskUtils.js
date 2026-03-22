@@ -1,6 +1,20 @@
 /*
  * Shared GroupWork task helpers.
  */
+
+/** Saves an edited task title if it changed, then exits edit mode. */
+export function saveTaskTitle(editTitle, setEditing, task, onUpdate) {
+    const trimmed = editTitle.trim();
+    if (trimmed && trimmed !== task.title) onUpdate(task.id, { title: trimmed });
+    setEditing(false);
+}
+
+/** Enters inline edit mode for a task title. */
+export function startTaskEdit(setEditing, setEditTitle, title) {
+    setEditing(true);
+    setEditTitle(title);
+}
+
 export function buildToggleAssignee(assignees, taskId, onUpdate) {
   return (userId) => {
     const currentIds = assignees.map((assignee) => assignee.id);

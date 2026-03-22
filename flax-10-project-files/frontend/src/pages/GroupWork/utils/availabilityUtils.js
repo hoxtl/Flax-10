@@ -40,8 +40,8 @@ export function getCurrentUserStatus(suggestion, currentUserId) {
     return "pending";
 }
 
-export function splitSuggestions(active_suggestions) {
-    const allSuggestions = [...(active_suggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
+export function splitSuggestions(activeSuggestions) {
+    const allSuggestions = [...(activeSuggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
     return {
         confirmedSuggestions: allSuggestions.filter((s) => s.is_confirmed),
         proposedSuggestions: allSuggestions.filter((s) => !s.is_confirmed),

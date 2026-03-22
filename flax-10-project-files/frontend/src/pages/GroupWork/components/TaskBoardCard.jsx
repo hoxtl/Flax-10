@@ -2,35 +2,15 @@
  * GroupWork task board card.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { Pencil, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
 import DateTimePicker from "../../../components/Common/inputs/DateTimePicker";
-import ctxStyles from "../../Tasks/components/TaskCardContextMenu.module.css";
 import { getPriorityStyle } from "../utils/priorityUtils";
-import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr } from "../utils/taskUtils";
+import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr, saveTaskTitle, startTaskEdit } from "../utils/taskUtils";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
+import TaskContextMenu from "./TaskContextMenu";
 import styles from "./TaskBoardView.module.css";
 
-function useContextMenuClose(onClose) {
-    useEffect(() => {
-        document.addEventListener("mousedown", onClose);
-        return () => document.removeEventListener("mousedown", onClose);
-    }, [onClose]);
-}
-
-function BoardContextMenu({ onClose, onDelete, onEditStart, pos, task }) {
-    useContextMenuClose(onClose);
-    return createPortal(
-        <div className={ctxStyles.ctxMenu} style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 10000 }} onMouseDown={(event) => event.stopPropagation()}>
-            <button className={ctxStyles.ctxItem} onClick={() => { onClose(); onEditStart(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>
-            <div className={ctxStyles.ctxDivider} />
-            <button className={`${ctxStyles.ctxItem} ${ctxStyles.ctxItemDanger}`} onClick={() => { onClose(); onDelete(task.id); }}><Trash2 size={14} strokeWidth={2} /> Delete</button>
-        </div>,
-        document.body
-    );
-}
 
 function CardHeader({ onUpdate, priorityStyle, task }) {
     return (
@@ -94,16 +74,6 @@ function TaskBoardCardBody({ assignees, editing, editTitle, members, onDragStart
     );
 }
 
-function saveEditedTitle(editTitle, setEditing, task, onUpdate) {
-    const trimmed = editTitle.trim();
-    if (trimmed && trimmed !== task.title) onUpdate(task.id, { title: trimmed });
-    setEditing(false);
-}
-
-function startEditing(setEditing, setEditTitle, title) {
-    setEditing(true);
-    setEditTitle(title);
-}
 
 export default function TaskBoardCard({ task, members, onUpdate, onDelete, onDragStart }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
@@ -113,13 +83,13 @@ export default function TaskBoardCard({ task, members, onUpdate, onDelete, onDra
     const triggerRef = useRef(null);
     const assignees = filterVisibleAssignees(task.assignees_info || [], members);
     const priorityStyle = getPriorityStyle(task.priority);
-    const saveEdit = () => saveEditedTitle(editTitle, setEditing, task, onUpdate);
-    const handleEditStart = () => startEditing(setEditing, setEditTitle, task.title);
+    const saveEdit = () => saveTaskTitle(editTitle, setEditing, task, onUpdate);
+    const handleEditStart = () => startTaskEdit(setEditing, setEditTitle, task.title);
 
     return (
         <>
             <TaskBoardCardBody assignees={assignees} editing={editing} editTitle={editTitle} members={members} onDragStart={onDragStart} onUpdate={onUpdate} priorityStyle={priorityStyle} saveEdit={saveEdit} setCtxMenu={setCtxMenu} setEditTitle={setEditTitle} setEditing={setEditing} setShowAssignPopup={setShowAssignPopup} showAssignPopup={showAssignPopup} task={task} triggerRef={triggerRef} />
-            {ctxMenu ? <BoardContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
+            {ctxMenu ? <TaskContextMenu pos={ctxMenu} task={task} onDelete={onDelete} onClose={() => setCtxMenu(null)} onEditStart={handleEditStart} /> : null}
         </>
     );
 }

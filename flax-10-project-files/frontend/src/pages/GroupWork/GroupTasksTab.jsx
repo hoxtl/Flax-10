@@ -7,7 +7,7 @@ import { CalendarIcon, List, Plus, Square } from "lucide-react";
 import PrimaryButton from "../../components/Common/PrimaryButton/PrimaryButton";
 import { SegmentedControl } from "../../components/Common/SegmentedControl/SegmentedControl.jsx";
 import { useToast } from "../../context/ToastContext";
-import { getAuthHeaders } from "./hooks/groupWorkHooks";
+import { getAuthHeaders } from "./api/groupWorkApi";
 import AddTaskModal from "./components/AddTaskModal";
 import MemberFilter from "./components/MemberFilter";
 import TaskBoardView from "./components/TaskBoardView";
@@ -28,7 +28,7 @@ function TaskViewSwitcher({ currentView, setTaskView }) {
 
 function TaskContent({ members, onAddCol, onDelete, onToggle, onUpdate, taskView, tasks }) {
     if (taskView === "list") return <TaskListView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />;
-    if (taskView === "timeline") return <TaskTimelineView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />;
+    if (taskView === "timeline") return <TaskTimelineView tasks={tasks} members={members} onUpdate={onUpdate} onDelete={onDelete} />;
     if (taskView === "board") return <TaskBoardView tasks={tasks} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} onAdd={onAddCol} />;
     return null;
 }

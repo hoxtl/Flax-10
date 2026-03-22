@@ -1,6 +1,5 @@
-/**
+/*
  * Shared priority helpers for GroupWork task views.
- * Single source of truth for priority colors and styles.
  */
 
 export const PRIORITY_COLORS = {

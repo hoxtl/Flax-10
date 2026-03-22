@@ -1,4 +1,7 @@
-import React from "react";
+/*
+ * Member list section for a group work project.
+ */
+
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./MembersSection.module.css";

@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { getAuthHeaders } from "./groupWorkHooks";
+import { getAuthHeaders } from "../api/groupWorkApi";
 
 const INITIAL_DATA = {
     suggestions: [],
