@@ -42,25 +42,26 @@ async function reloadEvents(dispatch, selectedDate, viewMode) {
 }
 
 function HeaderActions({ state, handlers, isMobile, modes }) {
-  const { searchQuery, filter, viewMode, displayMode, selectedDate } = state;
+  const { searchQuery, filter, viewMode, displayMode, selectedDate, sharedCalendarUserId } = state;
   const { setSearchQuery, setFilter, setViewMode, setDisplayMode, openModal, setShowImportModal } = handlers;
+  const isSharedCalendar = Boolean(sharedCalendarUserId);
 
   const onAdd = () => (viewMode === "day" ? openModal(null, null, selectedDate) : openModal());
 
   return (
     <div className="header-actions">
       <SearchButton value={searchQuery || ''} onChange={setSearchQuery} />
-      <FilterDropdownButton active={filter} onChange={setFilter} />
+      <FilterDropdownButton active={filter} onChange={setFilter} allowManageTags={!isSharedCalendar} />
       {isMobile && <ViewModeButton modes={modes} activeMode={viewMode} onChange={setViewMode} />}
       <ViewSettingsMenu activeMode={displayMode} onViewChange={setDisplayMode} isMobile={isMobile} />
-      <ScheduleManagerButton />
-      <ActionMenu onAddEvent={onAdd} onImport={() => setShowImportModal(true)} />
+      {!isSharedCalendar && <ScheduleManagerButton />}
+      {!isSharedCalendar && <ActionMenu onAddEvent={onAdd} onImport={() => setShowImportModal(true)} />}
     </div>
   );
 }
 
 function useHeaderState() {
-  const { selectedDate, viewMode, displayMode, searchQuery, filter } = useCalendar();
+  const { selectedDate, viewMode, displayMode, searchQuery, filter, sharedCalendarUserId } = useCalendar();
   const dispatch = useCalendarDispatch();
   const { openModal } = useEventModal();
   const [showImportModal, setShowImportModal] = useState(false);
@@ -71,7 +72,7 @@ function useHeaderState() {
     setShowImportModal: (val) => setShowImportModal(val)
   };
 
-  return { selectedDate, viewMode, displayMode, searchQuery, filter, dispatch, openModal, showImportModal, ...setters };
+  return { selectedDate, viewMode, displayMode, searchQuery, filter, sharedCalendarUserId, dispatch, openModal, showImportModal, ...setters };
 }
 
 function useHeaderHandlers(state) {
@@ -123,4 +124,3 @@ export function CalendarHeader() {
     </>
   );
 }
-
