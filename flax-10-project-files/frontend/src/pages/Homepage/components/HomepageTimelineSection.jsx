@@ -64,12 +64,30 @@ function TimelineTrack({ children, styles }) {
 
 function getMiniTimelineProps(props) {
   return {
+    ...getMiniTimelineBaseProps(props),
+    ...getMiniTimelineActionProps(props),
+    ...getMiniTimelineTimerProps(props),
+  };
+}
+
+function getMiniTimelineBaseProps(props) {
+  return {
     completedEventIds: props.completedEventIds,
     dayTasks: props.dayTasks,
     deadlineSuggestions: props.deadlineSuggestions,
     getTag: props.getTag,
-    hasTimerSession: props.hasTimerSession,
     now: props.now,
+    selectedDate: props.selectedDate,
+    sortedEvents: props.sortedEvents,
+    styles: props.styles,
+    suggestableTasks: props.suggestableTasks,
+    taskLists: props.taskLists,
+    tasksDueToday: props.tasksDueToday,
+  };
+}
+
+function getMiniTimelineActionProps(props) {
+  return {
     onCardClick: props.openTimelinePopup,
     onConflictAutoMove: props.handleConflictAutoMove,
     onDelete: props.handleTimelineDelete,
@@ -79,12 +97,12 @@ function getMiniTimelineProps(props) {
     onReschedule: props.handleReschedule,
     onTaskToggle: props.handleTaskToggle,
     onToggleComplete: createToggleHandler(props.setCompletedEventIds),
-    selectedDate: props.selectedDate,
-    sortedEvents: props.sortedEvents,
-    styles: props.styles,
-    suggestableTasks: props.suggestableTasks,
-    taskLists: props.taskLists,
-    tasksDueToday: props.tasksDueToday,
+  };
+}
+
+function getMiniTimelineTimerProps(props) {
+  return {
+    hasTimerSession: props.hasTimerSession,
     timeLeft: props.timeLeft,
     timerMode: props.timerMode,
     timerTask: props.timerTask,
