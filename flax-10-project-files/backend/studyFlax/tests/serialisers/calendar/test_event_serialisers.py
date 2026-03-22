@@ -85,3 +85,12 @@ class CalendarEventSerialiserTests(TestCase):
             module=self.module,
             recurrence_rule=self.recurrence
         )
+
+    def test_serializer_contains_location_fields(self):
+        """Test that serializer includes location coordinate fields."""
+        serializer = CalendarEventSerialiser(instance=self.event)
+        data = serializer.data
+        
+        self.assertIn('location_latitude', data)
+        self.assertIn('location_longitude', data)
+        self.assertIn('location_validated', data)
