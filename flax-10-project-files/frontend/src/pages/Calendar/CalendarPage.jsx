@@ -48,7 +48,8 @@ function SkeletonGrid() {
 
 const calendarSubtitle = (
   <>
-    Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em> organised across your week.
+    Keep your <em>lectures</em>, <em>societies</em>, and <em>life events</em>{" "}
+    organised across your week.
   </>
 );
 
@@ -67,46 +68,45 @@ function getSharedCalendarParams(search = "") {
 
 function useSharedCalendarProfile(userId, fallbackName) {
   const [profile, setProfile] = useState(null);
-
   useEffect(() => {
+    if (!userId) return undefined;
     let isMounted = true;
-    if (!userId) {
-      setProfile(null);
-      return undefined;
-    }
-
-    getAnotherUserProfile(userId)
-      .then((data) => {
-        if (!isMounted) return;
-        setProfile(data || null);
-      })
-      .catch(() => {
-        if (!isMounted) return;
-        setProfile((current) => current || { name: fallbackName, email: "" });
-      });
-
+    loadSharedProfile(userId, fallbackName, setProfile, () => isMounted);
     return () => {
       isMounted = false;
     };
   }, [fallbackName, userId]);
-
   return profile;
 }
 
-function useSharedCalendarState(dispatch) {
-  const location = useLocation();
-  const { userId, userName } = getSharedCalendarParams(location.search);
-  const sharedProfile = useSharedCalendarProfile(userId, userName);
+function loadSharedProfile(userId, fallbackName, setProfile, isMounted) {
+  getAnotherUserProfile(userId)
+    .then((data) => isMounted() && setProfile(data || null))
+    .catch(() => isMounted() && setProfile((current) => current || fallbackProfile(fallbackName)));
+}
 
+function fallbackProfile(name) {
+  return { name, email: "" };
+}
+
+function useSharedCalendarDispatch(dispatch, userId, userName) {
   useEffect(() => {
     dispatch({ type: "SET_SHARED_CALENDAR_VIEW", payload: { userId, userName } });
     dispatch({ type: "SET_READ_ONLY", payload: Boolean(userId) });
-    return () => {
-      dispatch({ type: "SET_SHARED_CALENDAR_VIEW", payload: { userId: null, userName: "" } });
-      dispatch({ type: "SET_READ_ONLY", payload: false });
-    };
+    return () => resetSharedCalendarDispatch(dispatch);
   }, [dispatch, userId, userName]);
+}
 
+function resetSharedCalendarDispatch(dispatch) {
+  dispatch({ type: "SET_SHARED_CALENDAR_VIEW", payload: { userId: null, userName: "" } });
+  dispatch({ type: "SET_READ_ONLY", payload: false });
+}
+
+function useSharedCalendarState(dispatch) {
+  const { search } = useLocation();
+  const { userId, userName } = getSharedCalendarParams(search);
+  const sharedProfile = useSharedCalendarProfile(userId, userName);
+  useSharedCalendarDispatch(dispatch, userId, userName);
   return {
     isSharedCalendar: Boolean(userId),
     sharedCalendarUserId: userId,
@@ -115,9 +115,27 @@ function useSharedCalendarState(dispatch) {
   };
 }
 
-function SharedCalendarBanner({ sharedCalendarName, sharedCalendarEmail }) {
+function SharedCalendarDescription({ sharedCalendarName }) {
   const tipName = sharedCalendarName || "your classmate";
+  return (
+    <p className={styles.sharedCalendarDescription}>
+      Browse <em className={styles.sharedCalendarEmphasis}>busy and free blocks</em>,{" "}
+      <em className={styles.sharedCalendarEmphasis}>compare timings</em>, and use
+      this view to plan around {tipName}&apos;s availability.
+    </p>
+  );
+}
 
+function SharedCalendarContact({ sharedCalendarEmail }) {
+  if (!sharedCalendarEmail) return null;
+  return (
+    <a className={styles.sharedCalendarEmail} href={`mailto:${sharedCalendarEmail}`}>
+      Contact: {sharedCalendarEmail}
+    </a>
+  );
+}
+
+function SharedCalendarBanner({ sharedCalendarName, sharedCalendarEmail }) {
   return (
     <div className={styles.sharedCalendarBanner}>
       <div className={styles.sharedCalendarMeta}>
@@ -128,14 +146,8 @@ function SharedCalendarBanner({ sharedCalendarName, sharedCalendarEmail }) {
           </h1>
           <span className={styles.sharedCalendarModePill}>Read-only mode</span>
         </div>
-        <p className={styles.sharedCalendarDescription}>
-          Browse <em className={styles.sharedCalendarEmphasis}>busy and free blocks</em>, <em className={styles.sharedCalendarEmphasis}>compare timings</em>, and use this view to plan around {tipName}&apos;s availability.
-        </p>
-        {sharedCalendarEmail && (
-          <a className={styles.sharedCalendarEmail} href={`mailto:${sharedCalendarEmail}`}>
-            Contact: {sharedCalendarEmail}
-          </a>
-        )}
+        <SharedCalendarDescription sharedCalendarName={sharedCalendarName} />
+        <SharedCalendarContact sharedCalendarEmail={sharedCalendarEmail} />
       </div>
     </div>
   );
@@ -143,7 +155,11 @@ function SharedCalendarBanner({ sharedCalendarName, sharedCalendarEmail }) {
 
 function CalendarPageSkeleton() {
   return (
-    <div className={styles.page} data-testid="calendar-skeleton" aria-busy="true">
+    <div
+      className={styles.page}
+      data-testid="calendar-skeleton"
+      aria-busy="true"
+    >
       <div className={styles.skeletonStickyHeader}>
         <SkeletonHeader />
       </div>
@@ -176,9 +192,7 @@ function useCalendarPageState() {
 function SharedCalendarBackButton({ sharedCalendarUserId, sharedCalendarName }) {
   const navigate = useNavigate();
   if (!sharedCalendarUserId) return null;
-  const label = sharedCalendarName
-    ? `Back to ${formatPossessive(sharedCalendarName)} profile`
-    : "Back to profile";
+  const label = getSharedBackLabel(sharedCalendarName);
   return (
     <div className={styles.sharedCalendarBackRow}>
       <BackButton
@@ -189,47 +203,69 @@ function SharedCalendarBackButton({ sharedCalendarUserId, sharedCalendarName }) 
   );
 }
 
-function CalendarPageContent({ isSharedCalendar, sharedCalendarUserId, sharedCalendarName, sharedCalendarEmail }) {
+function getSharedBackLabel(sharedCalendarName) {
+  return sharedCalendarName
+    ? `Back to ${formatPossessive(sharedCalendarName)} profile`
+    : "Back to profile";
+}
+
+function getCalendarShellClass(isSharedCalendar) {
+  return isSharedCalendar ? styles.sharedCalendarFrame : styles.calendarFrame;
+}
+
+function SharedCalendarSection({ isSharedCalendar, sharedCalendarEmail, sharedCalendarName }) {
+  if (!isSharedCalendar) return null;
+  return (
+    <SharedCalendarBanner
+      sharedCalendarName={sharedCalendarName}
+      sharedCalendarEmail={sharedCalendarEmail}
+    />
+  );
+}
+
+function CalendarFrame(props) {
+  return (
+    <div className={getCalendarShellClass(props.isSharedCalendar)}>
+      <SharedCalendarSection {...props} />
+      <div className={styles.calendarContainer}>
+        <div className={styles.stickyHeader}>
+          <CalendarHeader />
+        </div>
+        <main className={styles.mainContent}>
+          <Calendar />
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function CalendarPageFooter({ isSharedCalendar }) {
+  return (
+    <>
+      <EventPopups allowModuleLeave={false} />
+      {isSharedCalendar && <BackToTop alwaysVisible />}
+    </>
+  );
+}
+
+function CalendarPageContent(props) {
+  const { isSharedCalendar } = props;
   const title = isSharedCalendar ? null : "Calendar";
   const subtitle = isSharedCalendar ? null : calendarSubtitle;
   return (
     <AppPage title={title} subtitle={subtitle} width="full" className={styles.page}>
-      {isSharedCalendar && (
-        <SharedCalendarBackButton
-          sharedCalendarUserId={sharedCalendarUserId}
-          sharedCalendarName={sharedCalendarName}
-        />
-      )}
-      <div className={isSharedCalendar ? styles.sharedCalendarFrame : styles.calendarFrame}>
-        {isSharedCalendar && (
-          <SharedCalendarBanner
-            sharedCalendarName={sharedCalendarName}
-            sharedCalendarEmail={sharedCalendarEmail}
-          />
-        )}
-        <div className={styles.calendarContainer}>
-          <div className={styles.stickyHeader}>
-            <CalendarHeader />
-          </div>
-          <main className={styles.mainContent}><Calendar /></main>
-        </div>
-      </div>
-      <EventPopups allowModuleLeave={false} />
-      {isSharedCalendar && <BackToTop alwaysVisible />}
+      <SharedCalendarBackButton
+        sharedCalendarUserId={props.sharedCalendarUserId}
+        sharedCalendarName={props.sharedCalendarName}
+      />
+      <CalendarFrame {...props} />
+      <CalendarPageFooter isSharedCalendar={isSharedCalendar} />
     </AppPage>
   );
 }
 
 export default function CalendarPage() {
-  const state = useCalendarPageState();
-  const showSkeleton = state.isLoading && state.allEvents.length === 0;
-  if (showSkeleton) return <CalendarPageSkeleton />;
-  return (
-    <CalendarPageContent
-      isSharedCalendar={state.isSharedCalendar}
-      sharedCalendarUserId={state.sharedCalendarUserId}
-      sharedCalendarName={state.sharedCalendarName}
-      sharedCalendarEmail={state.sharedCalendarEmail}
-    />
-  );
+  const { allEvents, isLoading, ...sharedCalendar } = useCalendarPageState();
+  if (isLoading && allEvents.length === 0) return <CalendarPageSkeleton />;
+  return <CalendarPageContent {...sharedCalendar} />;
 }
