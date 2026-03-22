@@ -179,3 +179,16 @@ class CalendarEventCreateSerialiserTests(TestCase):
         
         self.assertIsNone(updated.recurrence_rule)
         self.assertFalse(RecurrenceRule.objects.filter(id=recurrence_id).exists())
+
+    def test_update_tag(self):
+        """Test updating tag."""
+        event = CalendarEvent.objects.create(
+            user=self.user, title='E', start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1), tag=self.tag
+        )
+        new_tag = Tag.objects.create(user=self.user, name='New', color='#00FF00')
+        
+        update_data = {'title': 'E', 'start_time': event.start_time, 'end_time': event.end_time, 'tag': str(new_tag.id)}
+        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        
+        self.assertEqual(updated.tag.id, new_tag.id)
