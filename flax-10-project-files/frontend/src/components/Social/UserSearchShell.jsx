@@ -4,7 +4,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import SearchBar from '../common/SearchBar/SearchBar';
-import { FilterDropdown, SearchDropdown } from './UserSearchLists';
+import { SearchDropdown } from './UserSearchLists';
+import { FilterDropdown } from './FilterDropdown';
 import { styles } from './userSearchShared';
 
 export function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDropdown, loading, userResults, handleSelect, fullWidth, compact, renderEmptyState, placeholder = "Search users...", dropdownMode = "overlay" }) {
