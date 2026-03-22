@@ -1,3 +1,6 @@
+/*
+ * Async data loaders for profile, events, and tasks.
+ */
 import { fetchTasks } from "../../../api/tasks/taskApi";
 import { getAnotherUserProfile, getUserProfile } from "../../../api/user/userApi";
 import { getEvents } from "../../../api/calendar/eventApi";

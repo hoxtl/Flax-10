@@ -1,3 +1,6 @@
+/**
+ * Reusable location summary chip.
+ */
 import styles from '../../pages/CampusMap/sidebar.module.css';
 
 export function LocationChip({ dotColor, title, subtitle, onClear }) {

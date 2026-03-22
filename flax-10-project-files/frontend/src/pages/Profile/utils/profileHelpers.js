@@ -1,3 +1,6 @@
+/*
+ * Profile utility helpers – event filtering, date ranges, and name formatting.
+ */
 import { getInitials } from "../../../components/Authentication/utils/userUtils";
 
 export const RANGE_OPTIONS = [
