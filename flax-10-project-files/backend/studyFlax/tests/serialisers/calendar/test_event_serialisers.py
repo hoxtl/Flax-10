@@ -80,3 +80,11 @@ class CalendarEventCreateSerialiserTests(TestCase):
         self.assertEqual(event.location_latitude, 51.5118)
         self.assertEqual(event.location_longitude, -0.1161)
         self.assertTrue(event.location_validated)
+
+    def test_create_without_coordinates(self):
+        """Test coordinates default to None."""
+        data = {'title': 'Event', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1)}
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        
+        self.assertIsNone(event.location_latitude)
+        self.assertFalse(event.location_validated)
