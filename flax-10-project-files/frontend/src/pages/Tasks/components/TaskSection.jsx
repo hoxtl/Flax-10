@@ -98,10 +98,11 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
   );
 }
 
-function ShowMoreButton({ showAll, hiddenCount, onToggle }) {
+function ShowMoreButton({ showAll, totalCount, onToggle }) {
+  const showAllLabel = `Show all ${totalCount} →`;
   return (
     <div className={styles.showMoreWrap}>
-      <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : `+ Show ${hiddenCount} more`}</button>
+      <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : showAllLabel}</button>
     </div>
   );
 }
@@ -117,7 +118,7 @@ function SectionBody({ tasks: visibleTasks, showAll, applyLimit, hiddenCount, em
           </Motion.div>
         ))}
       </AnimatePresence>
-      {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} hiddenCount={hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
+      {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} totalCount={visibleTasks.length + hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
     </>
   );
 }

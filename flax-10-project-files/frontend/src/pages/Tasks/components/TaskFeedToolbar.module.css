@@ -1,7 +1,4 @@
-/*
- * TaskFeed toolbar styles: search, sort dropdown, and filter panel.
- */
-
+/* Task feed toolbar styles. */
 .toolbarStrip {
   background: transparent;
   border-radius: 0 0 10px 10px;
@@ -9,7 +6,6 @@
   margin: 0 -2px;
   flex-shrink: 0;
 }
-
 .toolbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
