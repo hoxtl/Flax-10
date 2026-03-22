@@ -74,3 +74,34 @@ describe('getSevenDayFocusSeries', () => {
     expect(getSevenDayFocusSeries(blocks, now)[6].seconds).toBe(1000);
   });
 });
+
+describe('getModuleLabel', () => {
+  it('returns block.module when present', () => {
+    expect(getModuleLabel({ module: 'Maths' })).toBe('Maths');
+  });
+
+  it('returns session.module as the first session fallback', () => {
+    expect(getModuleLabel({ sessions: [{ module: 'Physics' }] })).toBe('Physics');
+  });
+
+  it('returns session.module_code as fallback', () => {
+    expect(getModuleLabel({ sessions: [{ module_code: 'CS101' }] })).toBe('CS101');
+  });
+
+  it('returns session.moduleCode as fallback', () => {
+    expect(getModuleLabel({ sessions: [{ moduleCode: 'PHY202' }] })).toBe('PHY202');
+  });
+
+  it('returns session.list as the last-resort fallback', () => {
+    expect(getModuleLabel({ sessions: [{ list: 'Reading List' }] })).toBe('Reading List');
+  });
+
+  it('returns null when no label fields exist on the session', () => {
+    expect(getModuleLabel({ sessions: [{}] })).toBeNull();
+  });
+
+  it('returns null when sessions is not an array', () => {
+    expect(getModuleLabel({})).toBeNull();
+  });
+});
+
