@@ -103,3 +103,36 @@ describe('useRightRailHistory – event listeners', () => {
   });
 });
 
+describe('useRightRailHistory – modal state', () => {
+  it('setShowClearModal updates the modal flag to true', async () => {
+    const { result } = renderHook(() => useRightRailHistory());
+    await act(async () => {});
+    act(() => result.current.setShowClearModal(true));
+    expect(result.current.showClearModal).toBe(true);
+  });
+});
+
+describe('clearRightRailHistory', () => {
+  it('closes the modal immediately', async () => {
+    const setShowClearModal = vi.fn();
+    await clearRightRailHistory(vi.fn(), setShowClearModal);
+    expect(setShowClearModal).toHaveBeenCalledWith(false);
+  });
+
+  it('calls clearHistory to remove persisted data', async () => {
+    await clearRightRailHistory(vi.fn(), vi.fn());
+    expect(clearHistory).toHaveBeenCalled();
+  });
+
+  it('resets local history state to an empty array', async () => {
+    const setHistory = vi.fn();
+    await clearRightRailHistory(setHistory, vi.fn());
+    expect(setHistory).toHaveBeenCalledWith([]);
+  });
+
+  it('dispatches the historyCleared event on the window', async () => {
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    await clearRightRailHistory(vi.fn(), vi.fn());
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'historyCleared' }));
+  });
+});
