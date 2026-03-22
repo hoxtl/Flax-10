@@ -1,6 +1,3 @@
-"""
-Tests for calendar event serializers with location fields.
-"""
 import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -16,14 +13,14 @@ User = get_user_model()
 
 
 class CalendarEventSerialiserTests(TestCase):
-    """Test CalendarEventSerialiser."""
-
+    """
+    Tests for calendar event serializers with location fields.
+    """
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
         self.tag = Tag.objects.create(user=self.user, name='Tag', color='#FF0000')
 
     def test_includes_location_fields(self):
-        """Test serializer includes all location fields."""
         event = CalendarEvent.objects.create(
             user=self.user, title='Event',
             start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
@@ -37,7 +34,6 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertTrue(data['location_validated'])
 
     def test_null_location_coordinates(self):
-        """Test with null coordinates."""
         event = CalendarEvent.objects.create(
             user=self.user, title='Event',
             start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1)
@@ -49,7 +45,6 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertFalse(data['location_validated'])
 
     def test_includes_tag_and_module_details(self):
-        """Test tag_name, module_name, module_code fields."""
         event = CalendarEvent.objects.create(
             user=self.user, title='Event',
             start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
@@ -64,14 +59,12 @@ class CalendarEventSerialiserTests(TestCase):
 
 
 class CalendarEventCreateSerialiserTests(TestCase):
-    """Test CalendarEventCreateSerialiser."""
 
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
         self.tag = Tag.objects.create(user=self.user, name='Work', color='#0000FF')
 
     def test_create_with_location_coordinates(self):
-        """Test creating event with coordinates."""
         data = {
             'title': 'Meeting', 'start_time': timezone.now(),
             'end_time': timezone.now() + timedelta(hours=1),
@@ -87,7 +80,6 @@ class CalendarEventCreateSerialiserTests(TestCase):
         self.assertTrue(event.location_validated)
 
     def test_create_without_coordinates(self):
-        """Test coordinates default to None."""
         data = {'title': 'Event', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1)}
         serializer = CalendarEventCreateSerialiser(data=data)
         self.assertTrue(serializer.is_valid())
@@ -97,7 +89,6 @@ class CalendarEventCreateSerialiserTests(TestCase):
         self.assertFalse(event.location_validated)
 
     def test_resolve_tag_by_id(self):
-        """Test _resolve_tag with ID."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': str(self.tag.id)}
         serializer = CalendarEventCreateSerialiser(data=data)
         self.assertTrue(serializer.is_valid())
@@ -105,7 +96,6 @@ class CalendarEventCreateSerialiserTests(TestCase):
         self.assertEqual(event.tag.id, self.tag.id)
 
     def test_resolve_tag_by_name_creates_new(self):
-        """Test _resolve_tag creates tag from name."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': 'NewTag'}
         serializer = CalendarEventCreateSerialiser(data=data)
         self.assertTrue(serializer.is_valid())
@@ -114,7 +104,6 @@ class CalendarEventCreateSerialiserTests(TestCase):
         self.assertTrue(event.tag.is_default)
 
     def test_resolve_tag_none(self):
-        """Test _resolve_tag with None/empty."""
         for tag_val in [None, '']:
             data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': tag_val}
             serializer = CalendarEventCreateSerialiser(data=data)
@@ -123,7 +112,6 @@ class CalendarEventCreateSerialiserTests(TestCase):
             self.assertIsNone(event.tag)
 
     def test_create_with_recurrence_dict(self):
-        """Test recurrence as dict."""
         data = {
             'title': 'Recurring', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1),
             'recurrence_rule': {'frequency': 'WEEKLY', 'interval': 1, 'count': 10}
