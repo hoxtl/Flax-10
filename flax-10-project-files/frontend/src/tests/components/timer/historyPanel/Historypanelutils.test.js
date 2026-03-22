@@ -131,3 +131,40 @@ describe('filterVisibleBlocks', () => {
   });
 });
 
+describe('groupBlocksByHorizon', () => {
+  const todayAt10 = () => {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 10).toISOString();
+  };
+  const yesterdayAt10 = () => {
+    const n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1, 10).toISOString();
+  };
+
+  it("places a block with today's date into the Today group", () => {
+    const groups = groupBlocksByHorizon([{ startTime: todayAt10() }]);
+    expect(groups.find((g) => g.label === 'Today')?.entries).toHaveLength(1);
+  });
+
+  it('places a block from yesterday into the Yesterday group', () => {
+    const groups = groupBlocksByHorizon([{ startTime: yesterdayAt10() }]);
+    expect(groups.find((g) => g.label === 'Yesterday')?.entries).toHaveLength(1);
+  });
+
+  it('omits any horizon group that has no entries', () => {
+    const groups = groupBlocksByHorizon([{ startTime: todayAt10() }]);
+    groups.forEach((g) => expect(g.entries.length).toBeGreaterThan(0));
+  });
+
+  it('caps the total number of visible blocks at 24', () => {
+    const blocks = Array.from({ length: 30 }, (_, i) => ({
+      startTime: new Date(Date.now() - i * 60000).toISOString(),
+    }));
+    const total = groupBlocksByHorizon(blocks).reduce((s, g) => s + g.entries.length, 0);
+    expect(total).toBeLessThanOrEqual(24);
+  });
+
+  it('returns an empty array for empty input', () => {
+    expect(groupBlocksByHorizon([])).toHaveLength(0);
+  });
+});
