@@ -32,4 +32,44 @@ describe('WeeklyChart', () => {
     expect(screen.getByText(label)).toBeTruthy();
   });
 
-})
+  it('displays hours formatted to one decimal place', () => {
+    render(<WeeklyChart weeklySeries={makeSeries([3600])} maxWeeklySeconds={3600} />);
+    expect(screen.getByText('1.0h')).toBeTruthy();
+  });
+
+  it('shows 0.0h for a zero-second day', () => {
+    render(<WeeklyChart weeklySeries={makeSeries([0])} maxWeeklySeconds={3600} />);
+    expect(screen.getByText('0.0h')).toBeTruthy();
+  });
+
+  it('clamps bar fill to the minimum 4% for a zero-second day', () => {
+    const { container } = render(
+      <WeeklyChart weeklySeries={makeSeries([0])} maxWeeklySeconds={3600} />
+    );
+    expect(container.querySelector('span[style]').style.height).toBe('4%');
+  });
+
+  it('renders 100% bar height for a day equal to maxWeeklySeconds', () => {
+    const { container } = render(
+      <WeeklyChart weeklySeries={makeSeries([3600])} maxWeeklySeconds={3600} />
+    );
+    expect(container.querySelector('span[style]').style.height).toBe('100%');
+  });
+
+  it('proportionally sizes a bar at 50% for half of maxWeeklySeconds', () => {
+    const { container } = render(
+      <WeeklyChart weeklySeries={makeSeries([1800])} maxWeeklySeconds={3600} />
+    );
+    expect(container.querySelector('span[style]').style.height).toBe('50%');
+  });
+
+  it('renders all 7 hour-value labels for a full week series', () => {
+    render(<WeeklyChart weeklySeries={DEFAULT_SERIES} maxWeeklySeconds={MAX} />);
+    expect(screen.getAllByText(/^\d+\.\d+h$/)).toHaveLength(7);
+  });
+
+  it('renders the chart container without errors when series is empty', () => {
+    const { container } = render(<WeeklyChart weeklySeries={[]} maxWeeklySeconds={60} />);
+    expect(container.querySelector('[role="img"]')).toBeTruthy();
+  });
+});
