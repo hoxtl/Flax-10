@@ -17,6 +17,7 @@ function buildProject(id, deadline, name = `Project ${id}`) {
     id,
     name,
     deadline,
+    created_at: `2026-03-${20 + id}T10:00:00Z`,
     course_code: `CODE${id}`,
     module_name: `Module ${id}`,
     task_count: 4,
@@ -62,6 +63,90 @@ describe('GroupWorkContent', () => {
     const sooner = screen.getByText('Sooner project');
     const later = screen.getByText('Later project');
     expect(sooner.compareDocumentPosition(later) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('sorts projects by most team members when that sort is selected', () => {
+    render(
+      <MemoryRouter>
+        <GroupWorkContent
+          projects={[
+            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Smaller team'), member_count: 3 },
+            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Larger team'), member_count: 7 },
+          ]}
+          projectListProps={() => ({ onClick: vi.fn() })}
+          sortBy="most-members"
+          setSortBy={vi.fn()}
+          onProjectCreated={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    const larger = screen.getByText('Larger team');
+    const smaller = screen.getByText('Smaller team');
+    expect(larger.compareDocumentPosition(smaller) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('sorts projects by least team members when that sort is selected', () => {
+    render(
+      <MemoryRouter>
+        <GroupWorkContent
+          projects={[
+            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Larger team'), member_count: 7 },
+            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Smaller team'), member_count: 3 },
+          ]}
+          projectListProps={() => ({ onClick: vi.fn() })}
+          sortBy="least-members"
+          setSortBy={vi.fn()}
+          onProjectCreated={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    const smaller = screen.getByText('Smaller team');
+    const larger = screen.getByText('Larger team');
+    expect(smaller.compareDocumentPosition(larger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('sorts projects by newest created date when that sort is selected', () => {
+    render(
+      <MemoryRouter>
+        <GroupWorkContent
+          projects={[
+            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Older project'), created_at: '2026-03-10T10:00:00Z' },
+            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Newer project'), created_at: '2026-03-20T10:00:00Z' },
+          ]}
+          projectListProps={() => ({ onClick: vi.fn() })}
+          sortBy="created-desc"
+          setSortBy={vi.fn()}
+          onProjectCreated={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    const newer = screen.getByText('Newer project');
+    const older = screen.getByText('Older project');
+    expect(newer.compareDocumentPosition(older) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('sorts projects by oldest created date when that sort is selected', () => {
+    render(
+      <MemoryRouter>
+        <GroupWorkContent
+          projects={[
+            { ...buildProject(1, '2026-03-29T23:59:00Z', 'Newer project'), created_at: '2026-03-20T10:00:00Z' },
+            { ...buildProject(2, '2026-03-24T23:59:00Z', 'Older project'), created_at: '2026-03-10T10:00:00Z' },
+          ]}
+          projectListProps={() => ({ onClick: vi.fn() })}
+          sortBy="created-asc"
+          setSortBy={vi.fn()}
+          onProjectCreated={vi.fn()}
+        />
+      </MemoryRouter>
+    );
+
+    const older = screen.getByText('Older project');
+    const newer = screen.getByText('Newer project');
+    expect(older.compareDocumentPosition(newer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('uses the shared empty state when there are no projects', () => {

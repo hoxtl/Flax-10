@@ -354,6 +354,25 @@
   --widget-metric-value: var(--text-primary);
   --widget-card-bg-glass: color-mix(in srgb, var(--color-card) 45%, transparent);
   --widget-card-bg-soft: color-mix(in srgb, var(--color-card) 94%, transparent);
+  --groupwork-action-bg: color-mix(in srgb, var(--surface-raised) 94%, transparent);
+  --groupwork-action-border: color-mix(in srgb, var(--primary) 14%, var(--border));
+  --groupwork-action-text: var(--text);
+  --groupwork-action-shadow: var(--shadow-sm);
+  --groupwork-teacher-badge-bg: color-mix(in srgb, var(--modules-inline-surface) 70%, var(--surface-card));
+  --groupwork-teacher-badge-border: color-mix(in srgb, var(--modules-accent-ink) 16%, var(--surface-card));
+  --groupwork-teacher-badge-shadow: 0 8px 22px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+  --groupwork-progress-track: color-mix(in srgb, var(--c-green) 12%, var(--surface-card));
+  --groupwork-progress-fill-start: color-mix(in srgb, var(--c-green) 36%, var(--surface-card));
+  --groupwork-progress-fill-end: color-mix(in srgb, var(--c-green) 50%, var(--surface-card));
+  --tag-selector-row-bg: var(--surface-search);
+  --tag-selector-row-border: var(--border);
+  --tag-selector-pill-bg: var(--panel);
+  --tag-selector-pill-border: color-mix(in srgb, var(--primary) 18%, var(--border));
+  --tag-selector-pill-shadow: var(--shadow-sm);
+  --tag-selector-option-bg: var(--pill-bg);
+  --tag-selector-option-border: color-mix(in srgb, var(--primary) 14%, var(--border));
+  --tag-selector-option-hover-bg: var(--pill-hover);
+  --tag-selector-option-hover-border: color-mix(in srgb, var(--primary) 24%, var(--border));
 
   /* Modules */
   --modules-panel-tint: color-mix(in srgb, var(--color-primary) 5%, var(--surface-card));

@@ -12,6 +12,10 @@ import styles from "./GroupWorkContent.module.css";
 
 const SORT_OPTIONS = [
   { value: "due-date", label: "Due date" },
+  { value: "created-desc", label: "Date created (newest)" },
+  { value: "created-asc", label: "Date created (oldest)" },
+  { value: "most-members", label: "Most team members" },
+  { value: "least-members", label: "Least team members" },
   { value: "most-completed", label: "Most completed" },
   { value: "least-completed", label: "Least completed" },
   { value: "name", label: "A → Z" },

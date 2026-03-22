@@ -66,6 +66,18 @@ export function getProjectTeacherName(project) {
   return project?.module_tutor_name || project?.module_tutor_username || "Module lead";
 }
 
+export function getProjectTeacherInitials(project) {
+  const teacherName = String(getProjectTeacherName(project) || "").trim();
+  const rawParts = teacherName
+    .split(/[\s._-]+/)
+    .map((part) => part.replace(/[^a-z0-9]/gi, ""))
+    .filter(Boolean);
+  const parts = rawParts.filter((part, index) => !(index === 0 && isHonorific(part)));
+  if (parts.length >= 2) return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return "ML";
+}
+
 export function getProjectTeacherEmail(project) {
   return project?.module_tutor_email || "";
 }
@@ -93,6 +105,10 @@ export function openTeacherProfile(event, project) {
 export function compareProjectsBySort(left, right, sortBy) {
   if (sortBy === "name-desc") return compareNames(right, left);
   if (sortBy === "name") return compareNames(left, right);
+  if (sortBy === "created-desc") return compareCreatedDates(right, left);
+  if (sortBy === "created-asc") return compareCreatedDates(left, right);
+  if (sortBy === "most-members") return compareMemberCounts(right, left);
+  if (sortBy === "least-members") return compareMemberCounts(left, right);
   if (sortBy === "most-completed") return compareCompletion(right, left);
   if (sortBy === "least-completed") return compareCompletion(left, right);
   return compareDeadlines(left, right) || compareCompletion(right, left) || compareNames(left, right);
@@ -139,6 +155,17 @@ function compareCompletion(left, right) {
   return compareNames(left, right);
 }
 
+function compareMemberCounts(left, right) {
+  const memberDiff = getProjectMemberCount(left) - getProjectMemberCount(right);
+  if (memberDiff !== 0) return memberDiff;
+  return compareCompletion(right, left) || compareDeadlines(left, right) || compareNames(left, right);
+}
+
+function getProjectMemberCount(project) {
+  if (Number.isFinite(Number(project?.member_count))) return Number(project.member_count);
+  return Array.isArray(project?.members) ? project.members.length : 0;
+}
+
 function compareNames(left, right) {
   return String(left?.name || "").localeCompare(String(right?.name || ""), undefined, { sensitivity: "base" });
 }
@@ -147,10 +174,22 @@ function compareDeadlines(left, right) {
   return getDeadlineValue(left?.deadline) - getDeadlineValue(right?.deadline);
 }
 
+function compareCreatedDates(left, right) {
+  const createdDiff = getCreatedValue(left?.created_at) - getCreatedValue(right?.created_at);
+  if (createdDiff !== 0) return createdDiff;
+  return compareDeadlines(left, right) || compareNames(left, right);
+}
+
 function getDeadlineValue(deadline) {
   if (!deadline) return Number.POSITIVE_INFINITY;
   const parsed = new Date(deadline).getTime();
   return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+}
+
+function getCreatedValue(createdAt) {
+  if (!createdAt) return Number.NEGATIVE_INFINITY;
+  const parsed = new Date(createdAt).getTime();
+  return Number.isNaN(parsed) ? Number.NEGATIVE_INFINITY : parsed;
 }
 
 function getOrdinalSuffix(day) {
@@ -160,4 +199,8 @@ function getOrdinalSuffix(day) {
   if (day % 10 === 2) return "nd";
   if (day % 10 === 3) return "rd";
   return "th";
+}
+
+function isHonorific(part) {
+  return ["dr", "mr", "mrs", "ms", "miss", "prof", "professor"].includes(String(part || "").toLowerCase());
 }

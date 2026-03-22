@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
-import { getProjectTeacherName, getProjectTeacherPhoto, openTeacherProfile } from "../utils/projectRowUtils";
+import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
@@ -26,18 +26,24 @@ export default function ProjectRowInfo({ project, members, action = null }) {
 }
 
 function ProjectTeacherAvatar({ project }) {
+  const fallback = getProjectTeacherInitials(project);
   const teacherName = getProjectTeacherName(project);
-  const photoUrl = getProjectTeacherPhoto(project);
-  const fallback = getTeacherInitial(teacherName);
+  if (!project?.module_tutor_id) {
+    return (
+      <div className={styles.teacherAvatarShell} aria-hidden="true">
+        <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>
+      </div>
+    );
+  }
   return (
-    <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.teacherAvatarTooltipWrap}>
+    <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.avatarTooltipWrap}>
       <button
         type="button"
-        className={styles.teacherAvatarShell}
-        aria-label={`Open ${teacherName}'s profile`}
-        onClick={(e) => openTeacherProfile(e, project)}
+        className={`${styles.teacherAvatarShell} ${styles.teacherAvatarButton}`}
+        onClick={(event) => openTeacherProfile(event, project)}
+        aria-label={`View ${teacherName}'s profile`}
       >
-        {photoUrl ? <img src={photoUrl} alt={teacherName} className={styles.teacherAvatarImage} /> : <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>}
+        <span className={styles.teacherAvatarFallback}>{fallback}</span>
       </button>
     </Tooltip>
   );
@@ -78,8 +84,4 @@ function AvatarItem({ member, index }) {
       </button>
     </Tooltip>
   );
-}
-
-function getTeacherInitial(name) {
-  return String(name || "T").trim().charAt(0).toUpperCase() || "T";
 }

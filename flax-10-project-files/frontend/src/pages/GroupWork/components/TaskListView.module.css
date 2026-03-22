@@ -4,6 +4,22 @@
     flex-direction: column;
 }
 
+.emptyStateCard {
+    margin-top: 18px;
+    padding: 2.75rem 1.5rem 2.45rem;
+    border-radius: 20px;
+    box-shadow: none;
+}
+
+.emptyStateTitle {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.emptyStateHint {
+    max-width: 30rem;
+}
+
 .headerRow {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 100px 120px 160px 48px;
