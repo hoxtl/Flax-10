@@ -1,76 +1,82 @@
 .headerSection {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.headerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .topActions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .deleteError {
-    margin: -12px 0 20px;
-    color: var(--danger);
-    font-size: 13px;
-    font-weight: 500;
+  margin: -12px 0 20px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .deleteBtn {
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(192, 90, 62, 0.2);
-    background: white;
-    color: var(--danger);
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(192, 90, 62, 0.2);
+  background: white;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 .deleteBtn:hover {
-    background: var(--danger-bg);
+  background: var(--danger-bg);
 }
 
 .nameInput {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 4px 0;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    width: 100%;
-    outline: none;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 4px 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  width: 100%;
+  outline: none;
 }
 
 .moduleTag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 10px;
-    border-radius: 999px;
-    background: var(--primary-light);
-    border: 1px solid var(--border);
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .moduleDot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--primary);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
 }
 
 .headerModuleDropdown {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
 }
 
 /*
@@ -78,42 +84,80 @@
    We target the internal dropdownBtn class from AnimatedDropdown.
 */
 .headerModuleDropdown :global([class*="dropdownBtn"]) {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    min-height: 0 !important;
-    font-size: inherit !important;
-    color: inherit !important;
-    box-shadow: none !important;
-    width: auto !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  width: auto !important;
 }
 
 .metaRow {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
 }
 
 .metaItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .deadlinePill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: white;
-    border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid var(--border);
 }
 
 .detailDateTrigger {
-    background: transparent;
-    border: none;
+  background: transparent;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .topActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .deleteBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nameInput {
+    font-size: 24px;
+  }
+
+  .metaRow {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .deadlinePill {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .moduleTag {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .metaItem {
+    width: 100%;
+  }
 }

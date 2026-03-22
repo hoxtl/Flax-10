@@ -1,15 +1,12 @@
-/**
- * Profile page header.
- */
 import { useState } from "react";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import ShareButton from "../../../components/Social/ShareButton";
-import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
-import { buildFullName, buildInitials } from "../utils/profileHelpers";
-import badgeStyles from "./ProfileHeaderBadges.module.css";
+import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";
-
-const styles = { ...headerStyles, ...badgeStyles };
+import badgeStyles from "./ProfileHeaderBadges.module.css";
+import { buildInitials, buildFullName } from "../utils/profileHelpers";
+import ShareButton from "../../../components/Social/ShareButton";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback";
+const styles = { ...widgetStyles, ...headerStyles, ...badgeStyles };
 
 function buildHeaderDescription(isTeacher, major, year) {
   return isTeacher ? `Department: ${major}` : `${year}${year && major ? " · " : ""}${major}`;
@@ -73,11 +70,31 @@ function BadgeTooltip({ badge }) {
   );
 }
 
-function HeaderBadge({ badge, pinned, canPin, activeTooltip, onEnter, onLeave, onPinBadge }) {
+function BadgeButton({
+  badge,
+  canPin,
+  onPinBadge,
+  activeTooltip,
+  onEnter,
+  onLeave,
+  pinned,
+}) {
   return (
-    <button type="button" className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`} onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} title={canPin ? "Tap to pin this badge" : badge.label}>
+    <button
+      type="button"
+      className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`}
+      onMouseEnter={() => onEnter(badge.id)}
+      onMouseLeave={onLeave}
+      onClick={() => canPin && onPinBadge?.(badge.id)}
+      title={canPin ? "Tap to pin this badge" : badge.label}
+    >
       <span className={styles.headerBadgeEmoji}>{badge.emoji}</span>
-      {activeTooltip === badge.id && <BadgeTooltip badge={badge} />}
+      {activeTooltip === badge.id && (
+        <div className={styles.badgeTooltip}>
+          <span className={styles.badgeTooltipLabel}>{badge.label}</span>
+          <span className={styles.badgeTooltipDesc}>{badge.description}</span>
+        </div>
+      )}
     </button>
   );
 }
@@ -112,7 +129,23 @@ function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll })
   const featuredBadge = buildFeaturedBadge(badges, pinnedBadgeId);
   const topBadges = badges.filter((badge) => badge.id !== featuredBadge?.id).slice(0, 3);
   const [activeTooltip, setActiveTooltip] = useState(null);
-  const renderBadge = (badge, pinned = false) => <HeaderBadge key={badge.id} badge={badge} pinned={pinned} canPin={canPin} onPinBadge={onPinBadge} activeTooltip={activeTooltip} onEnter={() => setActiveTooltip(badge.id)} onLeave={() => setActiveTooltip(null)} />;
+  const allBadges = badges || [];
+  const pinnedBadge = allBadges.find(
+    (b) => String(b.id) === String(pinnedBadgeId),
+  );
+  const topBadges = pinnedBadge
+    ? allBadges
+        .filter((b) => String(b.id) !== String(pinnedBadgeId))
+        .slice(0, 3)
+    : allBadges.slice(0, 4);
+  if (!allBadges.length) return null;
+  const props = {
+    canPin,
+    onPinBadge,
+    activeTooltip,
+    onEnter: setActiveTooltip,
+    onLeave: () => setActiveTooltip(null),
+  };
   return (
     <div className={styles.headerAchievementsRow}>
       {featuredBadge && <FeaturedBadgeCard badge={featuredBadge} canPin={canPin} onPinBadge={onPinBadge} />}
@@ -128,16 +161,38 @@ function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll })
   );
 }
 
-function ProfileAvatar({ user, profilePhotoUrl, mobile = false }) {
-  const className = mobile ? styles.mobileAvatar : styles.avatar;
-  return <div className={className}>{profilePhotoUrl ? <img src={profilePhotoUrl} alt="Profile" className={styles.avatarImage} /> : buildInitials(user)}</div>;
+function ProfileAvatar({ user, profilePhotoUrl }) {
+  return (
+    <div className={styles.avatar}>
+      {profilePhotoUrl ? (
+        <img
+          src={profilePhotoUrl}
+          alt="Profile"
+          className={styles.avatarImage}
+        />
+      ) : (
+        buildInitials(user)
+      )}
+    </div>
+  );
 }
 
 function StatItem({ value, label, onClick }) {
-  return <button className={styles.statButton} onClick={onClick}><span className={styles.statValue}>{value}</span> {label}</button>;
+  return (
+    <button className={styles.statButton} onClick={onClick}>
+      <span className={styles.statValue}>{value}</span> {label}
+    </button>
+  );
 }
 
-function ProfileStats({ profileData, handlers, visibility, societyCount, onSocietiesClick }) {
+function ProfileStats({
+  profileData,
+  handlers,
+  visibility,
+  societyCount,
+  onSocietiesClick,
+}) {
+  const { onModulesClick: om, onSharedWithClick: os } = handlers;
   return (
     <div className={styles.stats}>
       {visibility.canViewModules && visibility.canEditProfile && <StatItem value={profileData?.module_count || 0} label="modules" onClick={handlers.onModulesClick} />}
@@ -155,13 +210,24 @@ function ContactEmail({ email }) {
 
 function PersonaInlineChip({ persona, peakHour }) {
   if (!persona) return null;
-  const peakLabel = peakHour != null ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak` : null;
+  const peakLabel =
+    peakHour != null
+      ? `Based on your ${peakHour % 12 || 12}${peakHour >= 12 ? "pm" : "am"} peak`
+      : null;
   return (
     <div className={styles.headerPersonaCard}>
       <div className={styles.headerPersonaLeft}>
-        <span className={styles.headerPersonaEmoji} role="img" aria-label={persona.label}>{persona.emoji}</span>
+        <span
+          className={styles.headerPersonaEmoji}
+          role="img"
+          aria-label={persona.label}
+        >
+          {persona.emoji}
+        </span>
         <span className={styles.headerPersonaName}>{persona.label}</span>
-        {peakLabel && <span className={styles.headerPersonaPeak}>{peakLabel}</span>}
+        {peakLabel && (
+          <span className={styles.headerPersonaPeak}>{peakLabel}</span>
+        )}
       </div>
       <p className={styles.headerPersonaDesc}>{persona.description}</p>
     </div>
@@ -252,15 +318,28 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, 
       <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
     </div>
   );
-}
-
-export default function ProfileHeader(props) {
-  const shareUser = buildShareUser(props.user, props.handlers);
-  const resolvedPhoto = resolvePhoto(props.user, props.profileData);
   return (
-    <>
-      <DesktopHeader {...props} user={shareUser} resolvedPhoto={resolvedPhoto} />
-      <MobileHeader user={shareUser} profileData={props.profileData} handlers={props.handlers} visibility={props.visibility} resolvedPhoto={resolvedPhoto} />
-    </>
+    <div className={styles.header}>
+      <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
+      <ProfileHeaderInfo
+        user={{
+          ...user,
+          reload: handlers.reload,
+          setOptimisticShare: handlers.setOptimisticShare,
+        }}
+        profileData={profileData}
+        handlers={handlers}
+        visibility={visibility}
+        badges={badges}
+        pinnedBadgeId={pinnedBadgeId}
+        onPinBadge={onPinBadge}
+        onViewAllBadges={onViewAllBadges}
+        persona={persona}
+        peakHour={peakHour}
+        societies={societies}
+        onNavigate={onNavigate}
+        onSocietiesClick={onSocietiesClick}
+      />
+    </div>
   );
 }

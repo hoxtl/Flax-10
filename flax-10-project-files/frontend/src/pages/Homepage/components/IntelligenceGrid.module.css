@@ -2,7 +2,7 @@
   padding: 8px 16px 24px;
   max-width: 1200px;
   margin: 0 auto;
-  position: relative;
+  min-width: 0;
 }
 
 .bentoGrid {
@@ -11,19 +11,54 @@
   grid-auto-rows: minmax(9rem, auto);
   gap: 16px;
   align-items: stretch;
+  min-width: 0;
 }
 
 @media (max-width: 767px) {
   .bentoGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-auto-rows: auto;
+    gap: 10px;
+  }
+
+  .widgetWrapper {
+    min-width: 0;
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+
+  .widgetClip,
+  .widgetContent {
+    min-width: 0;
+  }
+
+  .widget-hero,
+  .afterHeroBar {
+    grid-column: 1 / -1 !important;
+  }
+
+  .addWidgetSlot {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gridContainer {
+    padding: 8px 12px 20px;
+  }
+
+  .bentoGrid {
+    gap: 8px;
   }
 }
 
 .widgetWrapper {
   position: relative;
   overflow: visible;
-  transition: border 0.18s, box-shadow 0.18s, opacity 0.15s;
+  transition:
+    border 0.18s,
+    box-shadow 0.18s,
+    opacity 0.15s;
   display: flex;
   flex-direction: column;
 }
@@ -59,7 +94,9 @@
 
 .widgetWrapper.dragOver {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(123, 103, 81, 0.1), 0 8px 32px rgba(0, 0, 0, 0.13);
+  box-shadow:
+    0 0 0 3px rgba(123, 103, 81, 0.1),
+    0 8px 32px rgba(0, 0, 0, 0.13);
 }
 
 .widgetContent {
@@ -75,6 +112,10 @@
   justify-content: flex-end;
   margin-top: -4px;
   margin-bottom: 2px;
+}
+
+.mobileActionsBar {
+  display: none;
 }
 
 .delBtn {
@@ -187,7 +228,6 @@
   from {
     transform: translateY(100%);
   }
-
   to {
     transform: translateY(0);
   }
@@ -398,4 +438,28 @@
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+@media (max-width: 767px) {
+  .gridActions {
+    display: none;
+  }
+
+  .afterHeroBar {
+    justify-content: center;
+    margin: 12px 0;
+  }
+
+  .mobileActionsBar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .widgetWrapper .resizeControls {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
 }

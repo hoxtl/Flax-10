@@ -15,14 +15,22 @@ import styles from './AnalyticsPage.module.css';
 
 const analyticsSubtitle = (
   <>
-    See your <em>study patterns</em>, <em>focus habits</em>, and <em>performance trends</em>.
+    See your <em>study patterns</em>, <em>focus habits</em>, and{" "}
+    <em>performance trends</em>.
   </>
 );
 
 const getOverviewContent = (loading, data, progressData, themeStats) =>
-  (!loading && data ? <AnalyticsOverview data={data} progressData={progressData} themeStats={themeStats} /> : null);
+  !loading && data ? (
+    <AnalyticsOverview
+      data={data}
+      progressData={progressData}
+      themeStats={themeStats}
+    />
+  ) : null;
 
-const getTabContent = (loading, period) => (!loading ? <AIInsightsTab period={period} /> : null);
+const getTabContent = (loading, period) =>
+  !loading ? <AIInsightsTab period={period} /> : null;
 
 const getTabs = (loading, period, data, progressData, themeStats) => [
   {
@@ -44,8 +52,10 @@ function LoadingState({ loading }) {
 }
 
 export default function AnalyticsPage() {
-  const { activeTab, handlePeriodChange, handleTabChange, period } = useAnalyticsPageState();
-  const { data, error, loading, progressData, themeStats } = useAnalyticsOverview(period);
+  const { activeTab, handlePeriodChange, handleTabChange, period } =
+    useAnalyticsPageState();
+  const { data, error, loading, progressData, themeStats } =
+    useAnalyticsOverview(period);
   const tabs = getTabs(loading, period, data, progressData, themeStats);
   return (
     <AppPage
@@ -53,7 +63,14 @@ export default function AnalyticsPage() {
       className={styles.page}
       title="Analytics"
       subtitle={analyticsSubtitle}
-      action={<SegmentedControl options={PERIODS} value={period} onChange={handlePeriodChange} />}>
+      action={
+        <SegmentedControl
+          options={PERIODS}
+          value={period}
+          onChange={handlePeriodChange}
+        />
+      }
+    >
       <ErrorBanner error={error} />
       <LoadingState loading={loading} />
       <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} layoutId="analyticsTab" tabVariant="heading" />

@@ -103,3 +103,29 @@
   height: 20px;
   border-radius: 3px;
 }
+
+@media (max-width: 900px) {
+  .heatmapGrid {
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .gridCell {
+    min-width: 12px;
+    height: 24px;
+  }
+
+  .dayLabel {
+    height: 24px;
+  }
+
+  .hourLabel,
+  .dayLabel,
+  .legendLabel {
+    font-size: 0.66rem;
+  }
+
+  .cellValue {
+    display: none;
+  }
+}

@@ -3,17 +3,17 @@
 import { motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Calendar as CalendarIcon } from "lucide-react";
-import baseStyles from "../styles/WidgetBase.module.css";
 import { MiniTimeline } from "./MiniTimeline";
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
 
 function toggleCompleteHandler(setCompletedEventIds) {
-  return (eventId) => setCompletedEventIds((prev) => {
-    const next = new Set(prev);
-    if (next.has(eventId)) next.delete(eventId);
-    else next.add(eventId);
-    return next;
-  });
+  return (eventId) =>
+    setCompletedEventIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(eventId)) next.delete(eventId);
+      else next.add(eventId);
+      return next;
+    });
 }
 
 function buildTimelineCallbacks(props) {
@@ -32,7 +32,13 @@ function buildTimelineCallbacks(props) {
 
 function buildTimelineProps(props) {
   const { sortedEvents, selectedDate, now, dayTasks, tasksDueToday } = props;
-  const { suggestableTasks, deadlineSuggestions, taskLists, getTag, completedEventIds } = props;
+  const {
+    suggestableTasks,
+    deadlineSuggestions,
+    taskLists,
+    getTag,
+    completedEventIds,
+  } = props;
   const { hasTimerSession, timerTask, timeLeft, timerMode, styles } = props;
   return {
     sortedEvents,
@@ -54,10 +60,18 @@ function buildTimelineProps(props) {
   };
 }
 
-function ReplanButton({ selectedDate, handleReplanDay, replanLoading, missedItems, overdueTasksForNow, styles }) {
+function ReplanButton({
+  selectedDate,
+  handleReplanDay,
+  replanLoading,
+  missedItems,
+  overdueTasksForNow,
+  styles,
+}) {
   if (!isToday(selectedDate) || !handleReplanDay) return null;
 
-  const disabled = replanLoading || (!missedItems?.length && !overdueTasksForNow?.length);
+  const disabled =
+    replanLoading || (!missedItems?.length && !overdueTasksForNow?.length);
   return (
     <Motion.button
       type="button"
@@ -74,7 +88,7 @@ function ReplanButton({ selectedDate, handleReplanDay, replanLoading, missedItem
   );
 }
 
-function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles, isWidget }) {
+function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles }) {
   if (!isToday(selectedDate) || !onOpenQuickAddSchedule) return null;
 
   return (
@@ -84,16 +98,14 @@ function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles, isWidge
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
     >
-      {!isWidget && (
-        <button
-          type="button"
-          className={styles.manualScheduleBtn}
-          onClick={() => onOpenQuickAddSchedule("schedule_manual")}
-          aria-label="Open manual schedule quick add"
-        >
-          Manual Schedule
-        </button>
-      )}
+      <button
+        type="button"
+        className={styles.manualScheduleBtn}
+        onClick={() => onOpenQuickAddSchedule("schedule_manual")}
+        aria-label="Open manual schedule quick add"
+      >
+        Manual Schedule
+      </button>
       <button
         type="button"
         className={styles.autoScheduleBtn}
@@ -107,28 +119,45 @@ function ScheduleActions({ selectedDate, onOpenQuickAddSchedule, styles, isWidge
 }
 
 function TimelineHeader(props) {
-  const { selectedDate, handleReplanDay, replanLoading, missedItems, overdueTasksForNow, onOpenQuickAddSchedule, styles, isWidget } = props;
+  const {
+    selectedDate,
+    handleReplanDay,
+    replanLoading,
+    missedItems,
+    overdueTasksForNow,
+    onOpenQuickAddSchedule,
+    styles,
+    isWidget,
+  } = props;
 
   return (
     <div className={styles.timelineHeader}>
-      {isWidget ? (
-        <div className={baseStyles.widgetHeader} style={{ padding: 0, marginBottom: 0, background: "transparent", border: "none" }}>
-          <div className={baseStyles.headerIconWrap} aria-hidden>
-            <CalendarIcon className={baseStyles.headerIcon} size={16} strokeWidth={1.75} />
-          </div>
-          <h3 className={baseStyles.headerTitle}>Your Plan For Today</h3>
+      <div className={styles.timelineHeaderLeft}>
+        <div className={styles.timelineHeaderIconWrap} aria-hidden>
+          <CalendarIcon size={17} strokeWidth={1.75} />
         </div>
-      ) : (
-        <div className={styles.timelineHeaderLeft}>
-          <div className={styles.timelineHeaderIconWrap} aria-hidden>
-            <CalendarIcon size={17} strokeWidth={1.75} />
-          </div>
-          <h3 className={styles.timelineTitle}>YOUR PLAN FOR THE DAY</h3>
-        </div>
-      )}
+        <h3
+          className={styles.timelineTitle}
+          style={isWidget ? { textTransform: "none" } : undefined}
+        >
+          {isWidget ? "Your Plan For Today" : "YOUR PLAN FOR THE DAY"}
+        </h3>
+      </div>
       <div className={styles.timelineHeaderRight}>
-        <Link to="/calendar" className={styles.timelineHeaderActionLink}>View my calendar →</Link>
-        <ScheduleActions selectedDate={selectedDate} onOpenQuickAddSchedule={onOpenQuickAddSchedule} styles={styles} isWidget={isWidget} />
+        <Link to="/calendar" className={styles.timelineHeaderActionLink}>
+          <span className={styles.timelineCalendarTextFull}>
+            View my calendar →
+          </span>
+          <span className={styles.timelineCalendarTextMedium}>
+            View calendar →
+          </span>
+          <span className={styles.timelineCalendarTextShort}>Calendar →</span>
+        </Link>
+        <ScheduleActions
+          selectedDate={selectedDate}
+          onOpenQuickAddSchedule={onOpenQuickAddSchedule}
+          styles={styles}
+        />
         <ReplanButton
           selectedDate={selectedDate}
           handleReplanDay={handleReplanDay}
