@@ -1,7 +1,10 @@
+/**
+ * Right Now data helpers.
+ */
+
 import React from "react";
 import { isNow } from "../utils/eventUtils";
-import { getTflLinesForLocation } from "../utils/kclTflMapping";
-import { isSevereDisruption } from "../utils/kclTflMapping";
+import { getTflLinesForLocation, isSevereDisruption } from "../utils/kclTflMapping";
 
 export function getTimeLeftBand(minutesLeft) {
   if (minutesLeft == null || minutesLeft < 0) return "over";
