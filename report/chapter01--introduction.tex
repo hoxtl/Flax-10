@@ -1,5 +1,34 @@
 \chapter{Introduction}
 \label{chap:introduction}
-StudyFlax is a time management platform designed for students and teachers at King's College London, helping them organise their academic workload, group commitments, and personal goals in one place. Students who struggle to stay on top of a busy and fragmented schedule gain a clearer, more structured view of their time, reducing stress and allowing them to focus on what matters most: their studies. Teachers are able to use the platform to create and manage modules, providing students with key course information, reading lists, and deadline reminders directly through the system.
 
-StudyFlax is built as a Single Page Application, accessible on both desktop and mobile. The frontend is developed with React, supported by a Django and PostgreSQL backend, with the development environment containerised using Nix Flakes.
+StudyFlax is a time management platform designed for students and teaching staff at
+King's College London. It brings together a student's academic commitments, personal
+schedule, and social engagements into a single, coherent interface, reducing the friction
+of managing multiple disconnected tools. Students who struggle to stay on top of a busy
+and fragmented schedule gain a clearer, more structured view of their time, reducing stress
+and allowing them to focus on what matters most. Teaching staff are able to use the platform
+to create and manage modules, publish reading lists and assignment deadlines, and communicate
+key course information directly to enrolled students without relying on external systems.
+
+The platform covers a broad range of functionality. Students can manage a personal calendar
+with support for recurring events, colour-coded tags, and timetable import via iCalendar
+(\texttt{.ics}) files from KCL's timetabling system. A built-in task manager allows students
+to create to-do lists, log time spent on individual tasks, and link tasks directly to module
+deadlines or study timer sessions. The study timer records Pomodoro-style focus sessions and
+contributes to a streak and weekly study goal that are surfaced on the homepage dashboard.
+An auto-scheduler feature analyses a student's module deadlines and personal settings,
+including sleep schedule and daily study time targets, to automatically generate a revision
+plan in the calendar. The societies module allows students to discover and join KCL
+societies, subscribe to their event feeds, and sync society events directly into their
+personal calendar. A group work module supports collaborative projects, providing shared
+task boards, member availability scheduling, and meeting time suggestions. An analytics
+page provides insight into study habits, session history, and progress towards weekly goals,
+supplemented by an AI study coach powered by the OpenAI API that can answer questions and
+provide personalised feedback based on a student's recorded activity. A campus map,
+built with Mapbox GL and the Transport for London API, helps students plan walking or
+public transport routes to any of the five KCL campuses from their saved home address.
+
+StudyFlax is built as a Single Page Application accessible on both desktop and mobile.
+The frontend is developed with React and Vite, and the backend is a Django REST Framework
+application backed by a PostgreSQL database. The development environment is containerised
+using Nix Flakes and Docker Compose, providing a reproducible setup across the team.
