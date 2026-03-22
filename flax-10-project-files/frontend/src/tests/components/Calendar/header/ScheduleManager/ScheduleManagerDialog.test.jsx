@@ -194,4 +194,13 @@ describe('ScheduleManagerDialog', () => {
             expect(mockToast).toHaveBeenCalledWith('Delete failed', { variant: 'error' });
         });
     });
+
+    it('handles non-array API response', async () => {
+        getSchedules.mockResolvedValue(null);
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => {
+            expect(screen.getByText('⚙️ Auto Schedule')).toBeTruthy();
+        });
+    });
 });
