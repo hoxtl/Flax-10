@@ -64,3 +64,19 @@ class CalendarEventCreateSerialiserTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
         self.tag = Tag.objects.create(user=self.user, name='Work', color='#0000FF')
+
+    def test_create_with_location_coordinates(self):
+        """Test creating event with coordinates."""
+        data = {
+            'title': 'Meeting', 'start_time': timezone.now(),
+            'end_time': timezone.now() + timedelta(hours=1),
+            'location': 'Strand', 'location_latitude': 51.5118,
+            'location_longitude': -0.1161, 'location_validated': True
+        }
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
+        
+        self.assertEqual(event.location_latitude, 51.5118)
+        self.assertEqual(event.location_longitude, -0.1161)
+        self.assertTrue(event.location_validated)
