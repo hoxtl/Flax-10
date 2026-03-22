@@ -21,10 +21,10 @@ import {
     ShowMoreButton,
 } from '../../components/Modules/shared/widgetParts.jsx';
 import { TaskInfoModal } from '../Tasks/components/TaskInfoModal';
-import dashStyles from './MyModulesDashboard.module.css';
+import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 
-const styles = { ...dashStyles, ...rowStyles };
+const styles = { ...widgetStyles, ...rowStyles };
 
 const READINGS_INITIAL_SHOWN = 4;
 
