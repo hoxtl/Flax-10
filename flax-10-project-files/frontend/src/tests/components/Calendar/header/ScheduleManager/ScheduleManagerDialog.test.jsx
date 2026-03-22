@@ -156,5 +156,42 @@ describe('ScheduleManagerDialog', () => {
         });
     });
 
+    it('shows and cancels delete confirmation', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
 
+        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        expect(screen.getByTestId('confirm-modal')).toBeTruthy();
+
+        fireEvent.click(screen.getByTestId('cancel'));
+        await waitFor(() => expect(screen.queryByTestId('confirm-modal')).toBeNull());
+    });
+
+    it('confirms and deletes schedule', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        deleteSchedule.mockResolvedValue({});
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        fireEvent.click(screen.getByTestId('confirm'));
+
+        await waitFor(() => {
+            expect(deleteSchedule).toHaveBeenCalledWith(1);
+            expect(mockToast).toHaveBeenCalledWith('Schedule deleted.');
+            expect(screen.queryByText('Schedule 1')).toBeNull();
+        });
+    });
+
+    it('handles delete error', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        deleteSchedule.mockRejectedValue(new Error('Delete failed'));
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => fireEvent.click(screen.getAllByText('Remove')[0]));
+        fireEvent.click(screen.getByTestId('confirm'));
+
+        await waitFor(() => {
+            expect(mockToast).toHaveBeenCalledWith('Delete failed', { variant: 'error' });
+        });
+    });
 });
