@@ -20,6 +20,6 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY flax-10-project-files/backend/ /app/
-COPY --from=frontend-builder /app/frontend/dist /app/studyFlax/static/
+COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist/
 
 EXPOSE 8080
