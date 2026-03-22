@@ -43,3 +43,24 @@ vi.mock('../../../../../components/common/TextInput/TextInput', () => ({
     ),
 }));
 
+import { getSchedules, renameSchedule, deleteSchedule } from '../../../../../api/scheduleApi';
+import { useToast } from '../../../../../context/ToastContext';
+
+describe('ScheduleManagerDialog', () => {
+    let mockToast;
+    const mockSchedules = [
+        { id: 1, title: 'Schedule 1', event_allocations: [{ id: 1 }] },
+        { id: 2, title: 'Schedule 2', event_allocations: [] },
+    ];
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockToast = vi.fn();
+        useToast.mockReturnValue(mockToast);
+    });
+
+    it('renders nothing when closed', () => {
+        const { container } = render(<ScheduleManagerDialog open={false} onClose={vi.fn()} />);
+        expect(container.firstChild).toBeNull();
+    });
+});
