@@ -50,15 +50,21 @@ async function loadCommute(nextCampus, setCommuteInfo, setLoading, isCancelled) 
 }
 
 async function fetchJourney(campus) {
-  try {
-    const home = await getHomeAddress();
-    const lat = Number(home?.home_latitude);
-    const lng = Number(home?.home_longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-    return await tflService.journeyPlanner(lat, lng, campus.coords[1], campus.coords[0]);
-  } catch {
-    return null;
-  }
+  return getHomeAddress()
+    .then((home) => planJourney(home, campus))
+    .catch(() => null);
+}
+
+function getHomeCoords(home) {
+  const lat = Number(home?.home_latitude);
+  const lng = Number(home?.home_longitude);
+  return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
+}
+
+function planJourney(home, campus) {
+  const homeCoords = getHomeCoords(home);
+  if (!homeCoords) return null;
+  return tflService.journeyPlanner(homeCoords.lat, homeCoords.lng, campus.coords[1], campus.coords[0]);
 }
 
 function useRightNowAlerts() {
