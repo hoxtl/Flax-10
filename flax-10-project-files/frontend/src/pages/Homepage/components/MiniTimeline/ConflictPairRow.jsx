@@ -68,25 +68,38 @@ function isLectureTaggedEvent(item) {
 }
 
 export function getConflictResolutionPlan({ row, rows, selectedDate, canRelocateEvent = () => true }) {
-  const orderedItems = [...(row?.items || [])].sort((a, b) => {
+  const movableCandidates = getMovableCandidates(row);
+  if (!movableCandidates.length) return null;
+  const candidateWithGap = getGapCandidate(movableCandidates, row, rows, selectedDate, canRelocateEvent);
+  if (candidateWithGap) return buildAutoArrangePlan(candidateWithGap, row, rows, selectedDate);
+  return buildTomorrowPlan(movableCandidates, canRelocateEvent);
+}
+
+function getMovableCandidates(row) {
+  return [...getOrderedItems(row)]
+    .reverse()
+    .filter((entry) => !isReadOnlyEvent(entry.item))
+    .filter((entry) => !isLectureTaggedEvent(entry.item));
+}
+
+function getOrderedItems(row) {
+  return [...(row?.items || [])].sort((a, b) => {
     const priorityDiff = getConflictPriorityRank(b.item) - getConflictPriorityRank(a.item);
     if (priorityDiff !== 0) return priorityDiff;
     return new Date(a.item.start_time) - new Date(b.item.start_time);
   });
+}
 
-  const movableCandidates = [...orderedItems].reverse().filter((entry) => !isReadOnlyEvent(entry.item)).filter((entry) => !isLectureTaggedEvent(entry.item));
-  if (!movableCandidates.length) return null;
+function getGapCandidate(movableCandidates, row, rows, selectedDate, canRelocateEvent) {
+  return movableCandidates.find((entry) => canMoveIntoFreeRow(entry, row, rows, selectedDate, canRelocateEvent));
+}
 
-  const candidateWithGap = movableCandidates.find((entry) => {
-    const freeRow = rows.find((freeEntry) => freeEntry.type === "free" && freeEntry.gapStartMins >= row.endMins && freeEntry.minutes >= entry.durationMins);
-    if (!freeRow) return false;
-    const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
-    const end = new Date(start.getTime() + entry.durationMins * 60000);
-    return canRelocateEvent(entry.item, start, end);
-  });
-
-  if (candidateWithGap) return buildAutoArrangePlan(candidateWithGap, row, rows, selectedDate);
-  return buildTomorrowPlan(movableCandidates, canRelocateEvent);
+function canMoveIntoFreeRow(entry, row, rows, selectedDate, canRelocateEvent) {
+  const freeRow = rows.find((freeEntry) => freeEntry.type === "free" && freeEntry.gapStartMins >= row.endMins && freeEntry.minutes >= entry.durationMins);
+  if (!freeRow) return false;
+  const start = getGapStartDate(selectedDate, freeRow.gapStartMins);
+  const end = new Date(start.getTime() + entry.durationMins * 60000);
+  return canRelocateEvent(entry.item, start, end);
 }
 
 function buildAutoArrangePlan(candidateWithGap, row, rows, selectedDate) {

@@ -1,0 +1,360 @@
+/* Split from components/IntelligenceRow.module.css (4/4) */
+.bentoSlot.iconPulse .bentoIcon {
+  color: #dc2626; /* soft red-600 for overdue pulse */
+  animation: intRowPulseTerracotta 2s ease-in-out infinite;
+}
+
+@keyframes intRowPulseTerracotta {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.bentoGlow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  mask-image: radial-gradient(
+    220px 220px at var(--x, 50%) var(--y, 50%),
+    black,
+    transparent
+  );
+  -webkit-mask-image: radial-gradient(
+    220px 220px at var(--x, 50%) var(--y, 50%),
+    black,
+    transparent
+  );
+}
+
+.bentoSlot:hover .bentoGlow {
+  opacity: 1;
+}
+
+.bentoGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  border: 1px solid var(--widget-border);
+}
+
+.bentoContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+.bentoTop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.bentoIconWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.bentoIconWrap.bentoIconOverdue .bentoIcon {
+  color: #dc2626; /* soft red — urgency */
+}
+
+.bentoIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--widget-text-tertiary);
+}
+
+.bentoHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* All widget titles: text-sm font-semibold uppercase tracking-wider text-stone-700 */
+.bentoTitle {
+  font-family: var(--font-body, "Lexend", system-ui, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--widget-text-primary);
+  margin: 0;
+}
+
+/* Secondary stats: text-xs text-stone-400 font-medium */
+.bentoMeta {
+  margin-left: auto;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--widget-text-tertiary);
+}
+
+.bentoBody {
+  flex: 1;
+  min-height: 0;
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--widget-text-secondary);
+}
+
+.bentoCenteredBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--widget-border);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--widget-text-tertiary);
+  opacity: 0.85;
+}
+
+/* ── Today at a Glance strip ─────────────────────────────────────────────── */
+
+.glanceStrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 640px) {
+  .glanceStrip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.glanceStat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--widget-surface-raised);
+  border: 1px solid var(--widget-border);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.glanceStat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glanceStatIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--widget-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--widget-accent);
+  transition: background 0.2s;
+}
+
+.glanceStatBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.glanceStatNum {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--widget-text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.glanceStatLabel {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--widget-text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── TFL Travel Alert Banner ─────────────────────────────────────────────── */
+
+.travelAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--widget-accent-soft);
+  border: 1px solid var(--widget-accent);
+}
+
+.travelAlertLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.travelAlertIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--widget-icon-bg);
+  color: var(--widget-accent);
+}
+
+.travelAlertBody {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.travelAlertLine {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7a5520;
+}
+
+.travelAlertDot,
+.travelAlertSep {
+  font-size: 0.65rem;
+  color: rgba(154, 110, 42, 0.5);
+}
+
+.travelAlertStatus {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: var(--widget-accent);
+}
+
+.travelAlertSuggestion {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--widget-text-secondary);
+}
+
+.travelAlertDismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(154, 110, 42, 0.6);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+  padding: 0;
+}
+
+.travelAlertDismiss:hover {
+  background: rgba(185, 130, 55, 0.12);
+  color: #7a5520;
+}
+
+/* ── Bento grid positions (desktop 2-col layout) ─────────────────── */
+@media (min-width: 1024px) {
+  .posDeadlines {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .posTodaysTasks {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+  }
+}
+
+.posTodaysTasks {
+  min-height: 100%;
+}
+
+/* ── Dark-mode overrides for homepage greeting cards ─────────────────────── */
+:global([data-theme="dark"]) .courseChangeCard {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(200, 180, 150, 0.2);
+  border-left-color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeLabel {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeSub {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn {
+  color: #d4b896;
+  border-color: rgba(200, 180, 150, 0.35);
+}
+
+:global([data-theme="dark"]) .courseChangeViewBtn:hover {
+  background: rgba(200, 180, 150, 0.12);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss {
+  color: rgba(200, 180, 150, 0.5);
+}
+
+:global([data-theme="dark"]) .courseChangeDismiss:hover {
+  color: #c4a46d;
+}
+
+:global([data-theme="dark"]) .courseChangeIcon {
+  color: #c4a46d;
+}
