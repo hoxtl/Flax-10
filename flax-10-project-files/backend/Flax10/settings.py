@@ -13,7 +13,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = [os.environ.get("RAILWAY_PUBLIC_DOMAIN"), "localhost"]
 
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ORIGIN", "").split(",")
@@ -110,8 +110,7 @@ FRONTEND_DIST_DIR = BASE_DIR / 'frontend' / 'dist'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    FRONTEND_DIST_DIR,
-    BASE_DIR / 'studyFlax' / 'static',
+    FRONTEND_DIST_DIR
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -132,7 +131,7 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
 DJANGO_VITE = {
   "default": {
-    "dev_mode": True,
+    "dev_mode": False,
     'manifest_path': FRONTEND_DIST_DIR / '.vite' / 'manifest.json',
   }
 }
