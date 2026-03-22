@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useMemo } from "react";
-import { getSuggestedReadings, getReadingSpeed } from "../../../api/readingApi";
+import { getSuggestedReadings, getReadingSpeed } from "../../../api/tasks/readingApi";
 
 import sectionStyles from "./TaskFeedSections.module.css";
 import { isReadingList, matchesReadingList, getReadingListLabel } from "../utils/readingListUtils";

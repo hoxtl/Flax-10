@@ -15,12 +15,12 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
-import { tflService } from "../../../api/tflApi";
-import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { tflService } from "../../../api/campus/tflApi";
+import { getMyCourseChangeRequest } from "../../../api/admin/adminApi";
 import { loadTermConfig } from "../../../lib/termConfig";
-import { BentoGrid, BentoCard } from "../../../components/ui/bento-grid";
+import { BentoGrid, BentoCard } from "../../../components/UI/bento-grid";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
-import { ConfirmModal } from "../../../components/common";
+import { ConfirmModal } from "../../../components/Common";
 import {
   getLiveContext,
   getNextStep,
@@ -52,7 +52,7 @@ import {
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
-import { updateUserSettings } from "../../../api/userApi";
+import { updateUserSettings } from "../../../api/user/userApi";
 
 const CATALOGUE = [
   {

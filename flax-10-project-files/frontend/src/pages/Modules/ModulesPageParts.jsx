@@ -1,14 +1,14 @@
 /*
  * Toolbar, empty states, and grid components for the modules page.
  */
-import AnimatedDropdown from '../../components/common/AnimatedDropdown/AnimatedDropdown';
-import PageToolbar, { ToolbarSortControl } from '../../components/common/PageToolbar/PageToolbar';
-import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
-import EmptyState from '../../components/common/EmptyState/EmptyState';
-import SearchBar from '../../components/common/SearchBar/SearchBar';
+import AnimatedDropdown from '../../components/Common/AnimatedDropdown/AnimatedDropdown';
+import PageToolbar, { ToolbarSortControl } from '../../components/Common/PageToolbar/PageToolbar';
+import PrimaryButton from '../../components/Common/PrimaryButton/PrimaryButton';
+import EmptyState from '../../components/Common/EmptyState/EmptyState';
+import SearchBar from '../../components/Common/SearchBar/SearchBar';
 import ModuleCourseFilter from '../../components/Modules/Modules/ModuleCourseFilter';
 import ModuleGrid from '../../components/Modules/Modules/ModuleGrid.jsx';
-import SearchEmptyState from '../../components/common/SearchEmptyState/SearchEmptyState.jsx';
+import SearchEmptyState from '../../components/Common/SearchEmptyState/SearchEmptyState.jsx';
 import { Pagination, BackToTop } from '../../components/Pagination/Pagination.jsx';
 
 const SORT_OPTIONS = [

@@ -10,10 +10,10 @@ import CreateTaskBar from "./CreateTaskBar";
 import TaskSection from "./TaskSection";
 import TaskFeedToolbar from "./TaskFeedToolbar";
 import CompletedTasksSection from "./CompletedTasksSection";
-import PageHeader from "../../../components/common/PageHeader/PageHeader";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
+import PageHeader from "../../../components/Common/PageHeader/PageHeader";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../../../components/Common/SearchEmptyState/SearchEmptyState";
+import AnimatedDropdown from "../../../components/Common/AnimatedDropdown";
 
 import layoutStyles from "./TaskFeedLayout.module.css";
 import toolbarStyles from "./TaskFeedToolbar.module.css";

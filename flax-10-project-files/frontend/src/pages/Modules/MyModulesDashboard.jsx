@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpen, ChevronDown, ChevronUp, Clock } from "lucide-react";
-import { getUpcomingDeadlines } from "../../api/deadlineApi";
+import { getUpcomingDeadlines } from "../../api/calendar/deadlineApi";
 import {
   getSuggestedReadings,
   convertReadingToTask,
-} from "../../api/readingApi";
-import { createTask } from "../../api/taskApi";
+} from "../../api/tasks/readingApi";
+import { createTask } from "../../api/tasks/taskApi";
 import { UpcomingDeadlinesWidget } from "../../components/Modules/Deadlines/UpcomingDeadlinesWidget";
 import {
   PRIORITY_PILL,
@@ -20,8 +20,8 @@ import {
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useCountUp } from "../../hooks/useCountUp";
 import { useToast } from "../../context/ToastContext";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
-import StatStrip from "../../components/common/StatStrip/StatStrip";
+import PrimaryButton from "../../components/Common/PrimaryButton/PrimaryButton";
+import StatStrip from "../../components/Common/StatStrip/StatStrip";
 import { TaskInfoModal } from "../Tasks/components/TaskInfoModal";
 import SmartNudge from "./SmartNudge";
 import ReadingsPanel from "./ReadingsPanel";

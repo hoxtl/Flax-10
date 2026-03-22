@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pagination } from "../../../components/Pagination/Pagination";
-import { fetchAdminUsers, banUser, unbanUser } from "../../../api/adminApi";
+import { fetchAdminUsers, banUser, unbanUser } from "../../../api/admin/adminApi";
 import { useAsyncList, usePaginatedItems, toggleArrayValue, matchesAllUserFilters, USER_FILTER_GROUPS, stagger, rowAnim } from "../hooks/useAdminData";
 import { SectionCard, EmptyState, LoadingSpinner, StatusBadge, RoleBadge, SearchBar, FilterToggleGroup, BanModal, CardHeader } from "./AdminUI";
 import styles from "../AdminPage.module.css";

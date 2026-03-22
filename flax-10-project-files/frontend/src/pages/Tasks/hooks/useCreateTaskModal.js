@@ -4,8 +4,8 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import { getUserSettings } from "../../../api/userApi";
-import { getModules, getEnrollments } from "../../../api/moduleApi";
+import { getUserSettings } from "../../../api/user/userApi";
+import { getModules, getEnrollments } from "../../../api/modules/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";

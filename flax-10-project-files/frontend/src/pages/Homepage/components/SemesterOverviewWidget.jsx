@@ -13,8 +13,8 @@
 
 import { useMemo, useEffect, useState, useCallback } from "react";
 import { CalendarDays } from "lucide-react";
-import { getEvents } from "../../../api/eventApi";
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
+import { getEvents } from "../../../api/calendar/eventApi";
+import { getUpcomingDeadlines } from "../../../api/calendar/deadlineApi";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/SemesterOverview.module.css";
 

@@ -3,7 +3,7 @@
  */
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
-import StandardModal from "../../components/common/StandardModal/StandardModal";
+import StandardModal from "../../components/Common/StandardModal/StandardModal";
 
 const ALL_BADGES = [
   // Hours

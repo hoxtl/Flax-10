@@ -1,7 +1,7 @@
 /** Admin tab for managing pending society ratifications. */
 import { motion } from "framer-motion";
 import { Pagination } from "../../../components/Pagination/Pagination";
-import { fetchPendingRatifications, approveRatification, rejectRatification } from "../../../api/adminApi";
+import { fetchPendingRatifications, approveRatification, rejectRatification } from "../../../api/admin/adminApi";
 import { useAsyncList, usePaginatedItems, useAsyncAction, stagger, rowAnim } from "../hooks/useAdminData";
 import { AdminListSection, AnimatedList, ListInfo, ListActions, ApproveRejectButtons } from "./AdminUI";
 import styles from "../AdminPage.module.css";

@@ -16,8 +16,8 @@ import { CampusQuickNav } from "../../components/CampusMap/CampusQuickNav";
 import { useDisruptions } from "./hooks/useDisruptions";
 import { useCalendarEvents } from "./hooks/useCalendarEvents";
 import { useHomeAddress } from "./hooks/useHomeAddress";
-import { reverseGeocode } from "../../api/userApi";
-import { tflService } from "../../api/tflApi";
+import { reverseGeocode } from "../../api/user/userApi";
+import { tflService } from "../../api/campus/tflApi";
 import {
   initMapInstance,
   handleMapLoad,

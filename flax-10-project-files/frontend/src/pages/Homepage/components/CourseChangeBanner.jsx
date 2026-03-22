@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { getMyCourseChangeRequest } from "../../../api/admin/adminApi";
 import styles from "./CourseChangeBanner.module.css";
 
 export default function CourseChangeBanner() {

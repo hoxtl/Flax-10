@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getGreeting } from "../../components/Calendar/utils/dateUtils";
 import WelcomeBackgroundPaths from "../../components/Welcome/WelcomeBackgroundPaths";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../components/Common/PrimaryButton/PrimaryButton";
 
 function pad2(n) { return String(n).padStart(2, "0"); }
 

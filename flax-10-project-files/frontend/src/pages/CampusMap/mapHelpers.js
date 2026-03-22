@@ -1,5 +1,5 @@
 import mapboxgl from 'mapbox-gl';
-import { reverseGeocode } from '../../api/userApi';
+import { reverseGeocode } from '../../api/user/userApi';
 
 const BUILDING_LAYER_PAINT = {
   'fill-extrusion-color': [

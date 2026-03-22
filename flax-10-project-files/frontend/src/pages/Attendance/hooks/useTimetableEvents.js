@@ -2,7 +2,7 @@
  * Timetable attendance events hook.
  */
 
-import { getEvents } from "../../../api/eventApi";
+import { getEvents } from "../../../api/calendar/eventApi";
 import { buildTimetableDateRange, isTimetableEvent } from "../utils/attendanceTimetable";
 import { useAttendanceResource } from "./useAttendanceResource";
 

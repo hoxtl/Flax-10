@@ -2,7 +2,7 @@
  * Attendance stats hook.
  */
 
-import { getAttendanceStats } from "../../../api/attendanceApi";
+import { getAttendanceStats } from "../../../api/social/attendanceApi";
 import { useAttendanceResource } from "./useAttendanceResource";
 
 export function useAttendanceStats() {

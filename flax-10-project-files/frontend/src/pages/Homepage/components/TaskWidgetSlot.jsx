@@ -12,7 +12,7 @@ import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
 import { getModulePillColors } from "./ModulePill";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
-import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
+import InlineTitleField, { useInlineEdit } from "../../../components/Common/InlineTitleField/InlineTitleField";
 
 const VISIBLE_COUNT = 3;
 

@@ -5,18 +5,18 @@
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import AppPage from "../../components/common/AppPage/AppPage";
+import AppPage from "../../components/Common/AppPage/AppPage";
 import { Calendar } from "../../components/Calendar/Calendar";
 import { useCalendar, useCalendarDispatch } from "../../context/CalendarContext";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import BackButton from "../../components/common/BackButton/BackButton";
+import SkeletonBlock from "../../components/Common/LoadingState/SkeletonBlock";
+import BackButton from "../../components/Common/BackButton/BackButton";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import styles from "./CalendarPage.module.css";
 import { CalendarHeader } from "../../components/Calendar/CalendarHeader";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { useEventPopupListener } from "../../components/Calendar/hooks/useEventPopupListener";
 import useBreakpoint from "../../hooks/useBreakpoint";
-import { getAnotherUserProfile } from "../../api/userApi";
+import { getAnotherUserProfile } from "../../api/user/userApi";
 
 function SkeletonHeader() {
   return (

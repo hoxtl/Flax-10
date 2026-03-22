@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
-import DeadlineCountdown from '../../components/common/DeadlineCountdown/DeadlineCountdown';
+import DeadlineCountdown from '../../components/Common/DeadlineCountdown/DeadlineCountdown';
 import {
     TIER_ACCENT,
     getUrgencyTier,

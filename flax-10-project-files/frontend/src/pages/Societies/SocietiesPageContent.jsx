@@ -4,10 +4,10 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import AppPage from "../../components/common/AppPage/AppPage";
-import PageTransition from "../../components/common/PageTransition/PageTransition";
-import Tabs from "../../components/common/Tabs/Tabs";
-import SearchBar from "../../components/common/SearchBar/SearchBar";
+import AppPage from "../../components/Common/AppPage/AppPage";
+import PageTransition from "../../components/Common/PageTransition/PageTransition";
+import Tabs from "../../components/Common/Tabs/Tabs";
+import SearchBar from "../../components/Common/SearchBar/SearchBar";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import CreateSocietyModal from "../../components/Society/CreateSocietyModal";

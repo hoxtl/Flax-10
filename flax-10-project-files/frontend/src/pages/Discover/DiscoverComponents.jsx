@@ -2,18 +2,18 @@
  * Presentational Discover page components.
  */
 
-import PageToolbar, { ToolbarSortControl } from "../../components/common/PageToolbar/PageToolbar";
-import { SegmentedControl } from "../../components/common";
+import PageToolbar, { ToolbarSortControl } from "../../components/Common/PageToolbar/PageToolbar";
+import { SegmentedControl } from "../../components/Common";
 import { Pagination, BackToTop } from "../../components/Pagination/Pagination";
-import UserAvatar from "../../components/common/UserAvatar/UserAvatar";
-import EntityLinkChip from "../../components/common/EntityLinkChip/EntityLinkChip";
+import UserAvatar from "../../components/Common/UserAvatar/UserAvatar";
+import EntityLinkChip from "../../components/Common/EntityLinkChip/EntityLinkChip";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
-import GridCard from "../../components/common/Card/GridCard";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
-import SearchBar from "../../components/common/SearchBar/SearchBar";
-import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
+import GridCard from "../../components/Common/Card/GridCard";
+import gridStyles from "../../components/Common/Card/CardGrid.module.css";
+import EmptyState from "../../components/Common/EmptyState/EmptyState";
+import PrimaryButton from "../../components/Common/PrimaryButton/PrimaryButton";
+import SearchBar from "../../components/Common/SearchBar/SearchBar";
+import SearchEmptyState from "../../components/Common/SearchEmptyState/SearchEmptyState";
 import { FilterSection } from "../../components/Social/UserSearch";
 import styles from "./Discover.module.css";
 import { filterVisibleUsers, getDiscoverSortOptions, getDisplayName, getRoleLabel } from "./discoverHelpers";

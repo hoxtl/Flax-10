@@ -21,7 +21,7 @@ import { Flag } from "lucide-react";
 import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import BackButton from "../../components/Common/BackButton/BackButton.jsx";
 
 import {
     getImageUrls, scrollContentToTop,

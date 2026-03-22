@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import { recordAttendance } from "../../../api/attendanceApi";
+import { recordAttendance } from "../../../api/social/attendanceApi";
 import AttendanceEventList from "./AttendanceEventList";
 import AttendanceListSection from "./AttendanceListSection";
 import AttendanceRecordActions from "./AttendanceRecordActions";

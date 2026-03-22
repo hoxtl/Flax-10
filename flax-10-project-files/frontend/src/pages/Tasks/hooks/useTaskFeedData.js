@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getModules } from "../../../api/moduleApi";
+import { getModules } from "../../../api/modules/moduleApi";
 import { normalizeModuleCode } from "../../../utils/moduleCodeUtils";
 import { buildListItems, groupModuleItems, filterListItems } from "../../../components/Timer/taskInput/taskInputUtils";
 import { getHeaderTitle } from "../utils/taskFeedUtils";

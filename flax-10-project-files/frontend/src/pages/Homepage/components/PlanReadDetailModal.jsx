@@ -1,5 +1,5 @@
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../../components/Common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { formatTime } from "../utils/dateFormatUtils";
 
 export function PlanReadDetailModal({

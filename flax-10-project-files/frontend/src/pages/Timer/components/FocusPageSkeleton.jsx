@@ -3,7 +3,7 @@
  */
 
 import styles from '../TimerPage.module.css';
-import SkeletonBlock from '../../../components/common/LoadingState/SkeletonBlock';
+import SkeletonBlock from '../../../components/Common/LoadingState/SkeletonBlock';
 
 function SkeletonControls() {
   return (

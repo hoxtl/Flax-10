@@ -2,7 +2,7 @@
  * Attendance page view model builders.
  */
 
-import { recordAttendance } from "../../../api/attendanceApi";
+import { recordAttendance } from "../../../api/social/attendanceApi";
 import { buildByTypeChartData, buildOverallChartData, withByTypeColors } from "./attendanceChartData";
 import { buildMarkedEvents, buildUnmarkedEvents } from "./attendanceRecords";
 import { buildSegmentEvents, buildSegmentLabel } from "./attendanceSegments";

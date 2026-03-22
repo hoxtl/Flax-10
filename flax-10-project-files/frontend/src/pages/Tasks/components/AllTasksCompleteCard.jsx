@@ -3,7 +3,7 @@
  */
 
 import styles from "./AllTasksCompleteCard.module.css";
-import CelebrationEmoji from "../../../components/common/motion/CelebrationEmoji";
+import CelebrationEmoji from "../../../components/Common/motion/CelebrationEmoji";
 
 function CtaBlock({ ctaLabel, onCtaClick, children }) {
   const hasButton = ctaLabel != null && typeof onCtaClick === "function";

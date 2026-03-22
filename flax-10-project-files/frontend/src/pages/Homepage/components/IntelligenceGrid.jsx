@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./IntelligenceGrid.module.css";
-import { BentoCard } from "../../../components/ui/bento-grid";
+import { BentoCard } from "../../../components/UI/bento-grid";
 import { Pencil, Check, RotateCcw, Plus, Minus, Shuffle } from "lucide-react";
 
 // Helper for drag animations/logic

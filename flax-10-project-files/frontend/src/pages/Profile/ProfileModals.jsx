@@ -3,13 +3,13 @@
  */
 import { useEffect, useState } from "react";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
-import GenericSummaryModal from "../../components/common/GenericSummaryModal/GenericSummaryModal";
-import SummaryItem from "../../components/common/GenericSummaryModal/SummaryItem";
-import { SegmentedControl } from "../../components/common";
+import GenericSummaryModal from "../../components/Common/GenericSummaryModal/GenericSummaryModal";
+import SummaryItem from "../../components/Common/GenericSummaryModal/SummaryItem";
+import { SegmentedControl } from "../../components/Common";
 import UserListModal from "../../components/Social/UserListModal";
-import { getModules } from "../../api/moduleApi";
-import { getSharedWithMe, getSharingWith } from "../../api/socialApi";
-import { fetchTasks } from "../../api/taskApi";
+import { getModules } from "../../api/modules/moduleApi";
+import { getSharedWithMe, getSharingWith } from "../../api/social/socialApi";
+import { fetchTasks } from "../../api/tasks/taskApi";
 import { DATE_FORMAT, getRangeLabel, RANGE_OPTIONS, TIME_FORMAT } from "./utils/profileHelpers";
 
 function formatEventMeta(event) {

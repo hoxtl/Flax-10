@@ -1,7 +1,7 @@
 /** Admin tab for managing reported societies. */
 import { motion } from "framer-motion";
 import { Pagination } from "../../../components/Pagination/Pagination";
-import { fetchReportedSocieties, dismissReport, banReportedSociety } from "../../../api/adminApi";
+import { fetchReportedSocieties, dismissReport, banReportedSociety } from "../../../api/admin/adminApi";
 import { useAsyncList, usePaginatedItems, useAsyncAction, stagger, rowAnim } from "../hooks/useAdminData";
 import { AdminListSection, AnimatedList, ListInfo, ListActions, BanDismissButtons } from "./AdminUI";
 import styles from "../AdminPage.module.css";

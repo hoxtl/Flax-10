@@ -5,9 +5,9 @@ import { useState, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { getDayCount, getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';
 import { AddReadingToTasksButton } from '../../components/Modules/shared/taskButtons.jsx';
-import { createTask } from '../../api/taskApi';
+import { createTask } from '../../api/tasks/taskApi';
 import { useToast } from '../../context/ToastContext';
-import PrimaryButton from '../../components/common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../../components/Common/PrimaryButton/PrimaryButton';
 import dashStyles from './MyModulesDashboard.module.css';
 import rowStyles from './DashboardRows.module.css';
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ErrorMessage, SettingsSidebar } from "../../components/Settings/SettingsUI";
 import useSettingsHandlers from "../../components/Settings/hooks/useSettingsHandlers";
-import AppPage from "../../components/common/AppPage/AppPage";
+import AppPage from "../../components/Common/AppPage/AppPage";
 import styles from "./Settings.module.css";
 import SettingsPanelContent from "./SettingsPanelContent";
 import { VALID_TABS } from "./settingsPageConfig";

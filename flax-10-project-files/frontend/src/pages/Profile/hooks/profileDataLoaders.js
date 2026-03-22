@@ -1,6 +1,6 @@
-import { fetchTasks } from "../../../api/taskApi";
-import { getAnotherUserProfile, getUserProfile } from "../../../api/userApi";
-import { getEvents } from "../../../api/eventApi";
+import { fetchTasks } from "../../../api/tasks/taskApi";
+import { getAnotherUserProfile, getUserProfile } from "../../../api/user/userApi";
+import { getEvents } from "../../../api/calendar/eventApi";
 
 export async function loadProfile(userId) {
   return userId ? getAnotherUserProfile(userId) : getUserProfile();

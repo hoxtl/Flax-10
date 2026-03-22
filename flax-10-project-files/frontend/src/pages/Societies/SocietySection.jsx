@@ -3,7 +3,7 @@
  * potentially including a specific "Browse" or "Create" action card.
  */
 import styles from "./SocietiesPage.module.css";
-import gridStyles from "../../components/common/Card/CardGrid.module.css";
+import gridStyles from "../../components/Common/Card/CardGrid.module.css";
 import SocietyCard from "../../components/Society/SocietyCard";
 import BrowseCard from "../../components/Society/BrowseCard";
 import CreateCard from "../../components/Society/CreateCard";

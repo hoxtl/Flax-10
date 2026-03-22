@@ -3,7 +3,7 @@
  */
 
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
-import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
+import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/tasks/taskApi";
 import { EventPopups } from "../../../components/Calendar/EventPopups";
 import { BackToTop } from "../../../components/Pagination/Pagination";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";

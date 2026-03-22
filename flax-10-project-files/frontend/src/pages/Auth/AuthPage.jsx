@@ -1,6 +1,6 @@
 import { useAuthPage } from "./hooks/useAuthPage";
 import { useCallback, useMemo } from "react";
-import StudyFlaxLandingPage from "../../components/ui/landing-page";
+import StudyFlaxLandingPage from "../../components/UI/landing-page";
 import styles from "./AuthPage.module.css";
 import * as Components from "../../components/Authentication/AuthComponents";
 import { SignUpForm } from "../../components/Authentication/SignUpForm";
@@ -9,7 +9,7 @@ import { AuthOverlay } from "../../components/Authentication/Overlay";
 import { ErrorMessage } from "../../components/Authentication/ErrorMessage";
 import { AuthFooter } from "../../components/Authentication/AuthBranding";
 import { TestimonialsMarquee } from "../../components/Authentication/TestimonialsMarquee";
-import { PageTransition } from "../../components/common";
+import { PageTransition } from "../../components/Common";
 
 function AuthForms({
   signIn,

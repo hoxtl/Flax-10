@@ -6,7 +6,7 @@ import {
   buildOverallChartData,
   withByTypeColors,
 } from "../../../../Attendance/utils/attendanceChartData";
-import { recordAttendance } from "../../../../../api/attendanceApi";
+import { recordAttendance } from "../../../../../api/social/attendanceApi";
 import {
   buildMarkedEvents,
   buildSegmentEvents,

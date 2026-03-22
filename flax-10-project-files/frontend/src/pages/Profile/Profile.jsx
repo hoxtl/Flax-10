@@ -2,11 +2,11 @@
  * Profile page composition and layout.
  */
 import { useEffect, useMemo, useState } from "react";
-import analyticsService from "../../api/analyticsApi";
+import analyticsService from "../../api/analytics/analyticsApi";
 import { fetchApi } from "../../api/client";
-import BackButton from "../../components/common/BackButton/BackButton.jsx";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
-import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
+import BackButton from "../../components/Common/BackButton/BackButton.jsx";
+import EmptyState from "../../components/Common/EmptyState/EmptyState";
+import ScrollToTop from "../../components/Common/ScrollToTop/ScrollToTop";
 import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";

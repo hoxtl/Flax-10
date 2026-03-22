@@ -2,7 +2,7 @@
  * Attendance segment detail list.
  */
 
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { formatAttendanceDetailDate } from "../utils/attendanceEventDate";
 import styles from "./AttendanceDetailPanel.module.css";
 

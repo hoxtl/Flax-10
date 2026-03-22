@@ -29,7 +29,7 @@ export function RoleBadge({ role }) {
   return <span className={`${styles.badge} ${map[role] || styles.badgeStudent}`}>{role.replace("_", " ")}</span>;
 }
 
-import CommonSearchBar from "../../../components/common/SearchBar/SearchBar";
+import CommonSearchBar from "../../../components/Common/SearchBar/SearchBar";
 
 export function SearchBar(props) {
   return <CommonSearchBar {...props} />;

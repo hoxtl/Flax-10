@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BackToTop, Pagination } from "../../components/Pagination/Pagination";
-import Badge from "../../components/common/Badge/Badge";
-import SearchBar from "../../components/common/SearchBar/SearchBar";
-import Tabs from "../../components/common/Tabs/Tabs";
-import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
+import Badge from "../../components/Common/Badge/Badge";
+import SearchBar from "../../components/Common/SearchBar/SearchBar";
+import Tabs from "../../components/Common/Tabs/Tabs";
+import SearchEmptyState from "../../components/Common/SearchEmptyState/SearchEmptyState";
 import {
   fetchAdminUsers,
   banUser,
@@ -19,9 +19,9 @@ import {
   approveRatification,
   rejectRatification,
   resolveCourseChangeRequest,
-} from "../../api/adminApi";
+} from "../../api/admin/adminApi";
 import styles from "./AdminPage.module.css";
-import AppPage from "../../components/common/AppPage/AppPage";
+import AppPage from "../../components/Common/AppPage/AppPage";
 
 const _ = motion;
 

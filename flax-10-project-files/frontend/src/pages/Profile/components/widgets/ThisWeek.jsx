@@ -3,8 +3,8 @@
  */
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Card from "../../../../components/common/Card/Card";
-import PrimaryButton from "../../../../components/common/PrimaryButton/PrimaryButton";
+import Card from "../../../../components/Common/Card/Card";
+import PrimaryButton from "../../../../components/Common/PrimaryButton/PrimaryButton";
 import widgetStyles from "./ProfileWidgets.module.css";
 import weekStyles from "./ProfileWeekGoal.module.css";
 const styles = { ...widgetStyles, ...weekStyles };

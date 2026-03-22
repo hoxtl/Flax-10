@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getHomeAddress } from '../../../api/userApi';
+import { getHomeAddress } from '../../../api/user/userApi';
 
 function applyHomeData(data, setUserHome) {
   if (!data.home_latitude || !data.home_longitude) return;

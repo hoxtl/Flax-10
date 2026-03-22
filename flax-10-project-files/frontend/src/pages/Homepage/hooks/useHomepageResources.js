@@ -3,9 +3,9 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { getModules, getEnrollments } from "../../../api/moduleApi";
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
-import { fetchTaskLists } from "../../../api/taskApi";
+import { getModules, getEnrollments } from "../../../api/modules/moduleApi";
+import { getUpcomingDeadlines } from "../../../api/calendar/deadlineApi";
+import { fetchTaskLists } from "../../../api/tasks/taskApi";
 
 function getSafeList(value) {
   return Array.isArray(value) ? value : [];

@@ -1,4 +1,4 @@
-import { authService } from "../../../api/authApi";
+import { authService } from "../../../api/auth/authApi";
 import {
   validatePasswords,
   getErrorMessage,

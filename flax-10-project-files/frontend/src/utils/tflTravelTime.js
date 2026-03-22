@@ -2,7 +2,7 @@
  * Calculates TfL travel time from a home address to a module location.
  */
 
-import { tflService } from '../api/tflApi';
+import { tflService } from '../api/campus/tflApi';
 
 async function geocodeModuleLocation(moduleLocation) {
   const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;

@@ -2,13 +2,13 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import AppPage from "../../components/common/AppPage/AppPage";
-import EmptyState from "../../components/common/EmptyState/EmptyState";
+import AppPage from "../../components/Common/AppPage/AppPage";
+import EmptyState from "../../components/Common/EmptyState/EmptyState";
 import PageToolbar, {
   ToolbarSortControl,
-} from "../../components/common/PageToolbar/PageToolbar";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
-import PageTransition from "../../components/common/PageTransition/PageTransition.jsx";
+} from "../../components/Common/PageToolbar/PageToolbar";
+import PrimaryButton from "../../components/Common/PrimaryButton/PrimaryButton";
+import PageTransition from "../../components/Common/PageTransition/PageTransition.jsx";
 import {
   isEnrolledIn,
   filterModules,
@@ -20,17 +20,17 @@ import ModuleDetails from "../../components/Modules/Modules/ModuleDetails.jsx";
 import styles from "./ModulesPage.module.css";
 import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal.jsx";
 import useModuleSorting from "../../components/Modules/hooks/useModuleSorting.js";
-import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl";
-import Tabs from "../../components/common/Tabs/Tabs";
+import { SegmentedControl } from "../../components/Common/SegmentedControl/SegmentedControl";
+import Tabs from "../../components/Common/Tabs/Tabs";
 import ModuleCourseFilter from "../../components/Modules/Modules/ModuleCourseFilter";
 import {
   Pagination,
   BackToTop,
 } from "../../components/Pagination/Pagination.jsx";
-import SearchBar from "../../components/common/SearchBar/SearchBar.jsx";
+import SearchBar from "../../components/Common/SearchBar/SearchBar.jsx";
 import ReadingModal from "../../components/Modules/Readings/ReadingModal.jsx";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState.jsx";
+import SkeletonBlock from "../../components/Common/LoadingState/SkeletonBlock";
+import SearchEmptyState from "../../components/Common/SearchEmptyState/SearchEmptyState.jsx";
 import MyModulesDashboard from "./MyModulesDashboard.jsx";
 
 function usePageState(initialSearch, initialCreate, searchParams) {

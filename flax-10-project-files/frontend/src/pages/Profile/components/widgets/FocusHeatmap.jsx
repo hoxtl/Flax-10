@@ -1,4 +1,4 @@
-import Card from "../../../../components/common/Card/Card";
+import Card from "../../../../components/Common/Card/Card";
 import StudyHeatmap from "../../../../components/Analytics/StudyHeatmap";
 import widgetStyles from "./ProfileWidgets.module.css";
 import attendanceStyles from "./ProfileAttendance.module.css";

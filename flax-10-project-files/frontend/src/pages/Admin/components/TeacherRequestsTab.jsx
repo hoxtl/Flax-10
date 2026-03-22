@@ -1,7 +1,7 @@
 /** Admin tab for managing teacher role requests. */
 import { motion } from "framer-motion";
 import { Pagination } from "../../../components/Pagination/Pagination";
-import { fetchTeacherRequests, resolveTeacherRequest } from "../../../api/adminApi";
+import { fetchTeacherRequests, resolveTeacherRequest } from "../../../api/admin/adminApi";
 import { useAsyncList, usePaginatedItems, useAsyncAction, stagger, rowAnim } from "../hooks/useAdminData";
 import { AdminListSection, AnimatedList, ListInfo, ListActions, ApproveRejectButtons } from "./AdminUI";
 import styles from "../AdminPage.module.css";

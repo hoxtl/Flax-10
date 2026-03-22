@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckSquare, ArrowRight, Target, Clock3, ChevronDown } from "lucide-react";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { getCategoryStyle, getUrgencyMeta } from "./TaskWidgetUtils";
 import styles from "../styles/TaskWidget.module.css";
 

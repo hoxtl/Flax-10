@@ -3,10 +3,10 @@
  */
 
 import { useState, useMemo, useEffect, useRef } from "react";
-import { getModules, getEnrollments } from "../../../api/moduleApi";
+import { getModules, getEnrollments } from "../../../api/modules/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
-import { getUserSettings } from "../../../api/userApi";
+import { getUserSettings } from "../../../api/user/userApi";
 import { runQuickAdd } from "../utils/createTaskBarUtils";
 import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 

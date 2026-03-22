@@ -6,8 +6,8 @@ import { useState, useRef, useEffect } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { getListColor } from "../utils/listColorUtils";
 import { computeListSidebarCounts } from "../utils/listSidebarUtils";
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import EmptyState from "../../../components/Common/EmptyState/EmptyState";
+import HoldConfirmModal from "../../../components/Common/HoldConfirmModal/HoldConfirmModal";
 import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
 import styles from "./ListSidebar.module.css";
 

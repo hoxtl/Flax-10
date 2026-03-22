@@ -3,7 +3,7 @@
  */
 
 import { useCallback } from "react";
-import { createTask, updateTask, deleteTask } from "../../../api/taskApi";
+import { createTask, updateTask, deleteTask } from "../../../api/tasks/taskApi";
 import useTasksLoad from "./useTasksLoad";
 import { recalculatePendingBlocks } from "../utils/readingSpeedUtils";
 

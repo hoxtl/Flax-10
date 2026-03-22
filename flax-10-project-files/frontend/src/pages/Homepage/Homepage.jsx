@@ -23,11 +23,11 @@ import {
   fetchTaskLists,
   createTaskList,
   deleteTask,
-} from "../../api/taskApi";
+} from "../../api/tasks/taskApi";
 import { useTags } from "../../context/TagContext";
 import { extractBaseEventId } from "../../components/Calendar/utils/eventUtils";
-import { getModules, getEnrollments } from "../../api/moduleApi";
-import { getUpcomingDeadlines } from "../../api/deadlineApi";
+import { getModules, getEnrollments } from "../../api/modules/moduleApi";
+import { getUpcomingDeadlines } from "../../api/calendar/deadlineApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { useTimerContext } from "../../context/TimerContext";
 import { useTaskCompletion } from "../../context/TaskCompletionContext";
@@ -67,8 +67,8 @@ import {
 import SleepBanner from "./components/SleepBanner";
 import { EventPopups } from "../../components/Calendar/EventPopups";
 import { BackToTop } from "../../components/Pagination/Pagination";
-import SkeletonBlock from "../../components/common/LoadingState/SkeletonBlock";
-import AppToast from "../../components/common/AppToast/AppToast";
+import SkeletonBlock from "../../components/Common/LoadingState/SkeletonBlock";
+import AppToast from "../../components/Common/AppToast/AppToast";
 
 function HomepageSkeleton() {
   return (

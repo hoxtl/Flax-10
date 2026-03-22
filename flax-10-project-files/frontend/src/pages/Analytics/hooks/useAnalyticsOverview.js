@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import analyticsService from '../../../api/analyticsApi';
+import analyticsService from '../../../api/analytics/analyticsApi';
 
 const EMPTY_STATE = {
   data: null,

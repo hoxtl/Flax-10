@@ -5,13 +5,13 @@
 import { AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import styles from '../TimerPage.module.css';
-import AppPage from '../../../components/common/AppPage/AppPage';
-import BackButton from '../../../components/common/BackButton/BackButton.jsx';
-import PageTransition from '../../../components/common/PageTransition/PageTransition';
-import ScrollToTop from '../../../components/common/ScrollToTop/ScrollToTop';
+import AppPage from '../../../components/Common/AppPage/AppPage';
+import BackButton from '../../../components/Common/BackButton/BackButton.jsx';
+import PageTransition from '../../../components/Common/PageTransition/PageTransition';
+import ScrollToTop from '../../../components/Common/ScrollToTop/ScrollToTop';
 import TodayBanner from '../../../components/Timer/TodayBanner';
 import { MainSection, PopupSection, RightPanel, FocusOverlayContent } from '../../../components/Timer/WrapperComponents';
-import WordLoader from '../../../components/ui/word-loader';
+import WordLoader from '../../../components/UI/word-loader';
 import { FocusPageSkeleton } from './FocusPageSkeleton';
 import { NotificationPrompt } from './NotificationPrompt';
 import { ShortcutsModal } from './ShortcutsModal';

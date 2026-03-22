@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PasswordReset.module.css';
 import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric';
 import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
-import { PageTransition } from '../../components/common';
+import { PageTransition } from '../../components/Common';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 

@@ -4,14 +4,14 @@
 
 import { Clock, Flag, Zap, List, BookOpen, MousePointer2, ClipboardList, X } from "lucide-react";
 
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../../components/Common/StandardModal/StandardModal";
 import { PRIORITY_LABELS, formatDueDate, formatFocusBlocks } from "../utils/taskCardUtils";
 import { isReadingListName } from "../utils/readingListUtils";
 import styles from "./TaskInfoModal.module.css";
 
 import { useState, useEffect } from "react";
-import { getReadingSpeed } from "../../../api/readingApi";
+import { getReadingSpeed } from "../../../api/tasks/readingApi";
 
 function InfoRow({ icon, label, value, full = false }) {
   return (

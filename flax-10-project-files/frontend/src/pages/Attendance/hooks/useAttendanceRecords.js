@@ -2,7 +2,7 @@
  * Attendance records hook.
  */
 
-import { getAttendanceRecords } from "../../../api/attendanceApi";
+import { getAttendanceRecords } from "../../../api/social/attendanceApi";
 import { buildRecordsByEventId } from "../utils/attendanceRecords";
 import { useAttendanceResource } from "./useAttendanceResource";
 

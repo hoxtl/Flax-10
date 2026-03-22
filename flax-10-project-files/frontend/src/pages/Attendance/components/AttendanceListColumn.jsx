@@ -2,7 +2,7 @@
  * Attendance list column.
  */
 
-import { Tabs } from "../../../components/common";
+import { Tabs } from "../../../components/Common";
 import MarkedAttendanceList from "./MarkedAttendanceList";
 import RecordAttendanceList from "./RecordAttendanceList";
 import SegmentDetailPanel from "./SegmentDetailPanel";

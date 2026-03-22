@@ -6,10 +6,10 @@ import { useState } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { FileText, Calendar, Clock, Timer, ChevronDown } from "lucide-react";
 
-import EmptyState from "../../../components/common/EmptyState/EmptyState";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import EmptyState from "../../../components/Common/EmptyState/EmptyState";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 
-import { convertReadingToTask } from "../../../api/readingApi";
+import { convertReadingToTask } from "../../../api/tasks/readingApi";
 
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { SECTION_BODY_ANIM } from "../constants/taskAnimations";

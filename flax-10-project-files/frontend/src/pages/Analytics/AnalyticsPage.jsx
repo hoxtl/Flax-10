@@ -3,8 +3,8 @@
  */
 
 import AIInsightsTab from '../../components/Analytics/AIInsightsTab';
-import AppPage from '../../components/common/AppPage/AppPage';
-import { SegmentedControl, Tabs } from '../../components/common';
+import AppPage from '../../components/Common/AppPage/AppPage';
+import { SegmentedControl, Tabs } from '../../components/Common';
 import AnalyticsOverview from './components/AnalyticsOverview';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';

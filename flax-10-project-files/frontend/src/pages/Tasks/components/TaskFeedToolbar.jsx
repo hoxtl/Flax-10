@@ -5,8 +5,8 @@
 import { X, Filter, List } from "lucide-react";
 import { useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import SearchBar from "../../../components/common/SearchBar";
+import AnimatedDropdown from "../../../components/Common/AnimatedDropdown";
+import SearchBar from "../../../components/Common/SearchBar";
 import TaskFilterPanel from "./TaskFilterPanel";
 import styles from "./TaskFeedToolbar.module.css";
 

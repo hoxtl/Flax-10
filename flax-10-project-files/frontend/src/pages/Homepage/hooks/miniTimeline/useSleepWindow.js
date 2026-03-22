@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { getUserSettings } from "../../../../api/userApi";
+import { getUserSettings } from "../../../../api/user/userApi";
 
 const DEFAULT_SLEEP_WINDOW = { sleepTime: "23:00", wakeTime: "07:00" };
 

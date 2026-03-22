@@ -2,13 +2,13 @@
  * Modal for creating and editing tasks.
  */
 
-import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
-import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
-import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import DateTimePicker from "../../../components/Common/inputs/DateTimePicker";
+import AnimatedDropdown from "../../../components/Common/AnimatedDropdown";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import { SleepWarningModal } from "../../../components/Common/SleepWarningModal";
+import StandardModal from "../../../components/Common/StandardModal/StandardModal";
 import { Trash2, X } from "lucide-react";
-import TextInput from "../../../components/common/TextInput/TextInput";
+import TextInput from "../../../components/Common/TextInput/TextInput";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
 

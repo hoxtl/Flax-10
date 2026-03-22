@@ -10,7 +10,7 @@ import CreateListModal from "./components/CreateListModal";
 import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import useTasksPage from "./hooks/useTasksPage";
-import AppToast from "../../components/common/AppToast/AppToast";
+import AppToast from "../../components/Common/AppToast/AppToast";
 import styles from "./TasksPage.module.css";
 
 function ToastUndo({ onUndo, onClose }) {
