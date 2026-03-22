@@ -88,3 +88,9 @@ class CalendarEventCreateSerialiserTests(TestCase):
         
         self.assertIsNone(event.location_latitude)
         self.assertFalse(event.location_validated)
+
+    def test_resolve_tag_by_id(self):
+        """Test _resolve_tag with ID."""
+        data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': str(self.tag.id)}
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        self.assertEqual(event.tag.id, self.tag.id)
