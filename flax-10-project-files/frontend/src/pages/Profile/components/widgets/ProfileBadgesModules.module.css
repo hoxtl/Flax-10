@@ -392,50 +392,6 @@
   white-space: nowrap;
 }
 
-/* ── Quick Stats Rail ── */
-.quickStatsRail {
-  display: flex;
-  align-items: center;
-  background: var(--surface-glass-card, var(--panel));
-  border: 1px solid var(--surface-glass-card-border, var(--border));
-  border-radius: 14px;
-  padding: 14px 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.quickStatItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  text-align: center;
-}
-
-.quickStatValue {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-}
-
-.quickStatLabel {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.quickStatDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
-  flex-shrink: 0;
-  margin: 0 8px;
-}
-
 @media (max-width: 700px) {
   .teacherModulesGrid {
     grid-template-columns: 1fr;

@@ -119,38 +119,28 @@ function buildSharedCalendarRoute(user) {
   return `/calendar?${params.toString()}`;
 }
 
+const SHARING_TITLES = {
+  sharing_with_me: (n) => n === 1 ? "1 person has shared their calendar events with me" : n > 1 ? `${n} people have shared their calendar events with me` : "People who have shared their calendar events with me",
+  shared_with: (n) => n === 1 ? "1 person can see my calendar events" : n > 1 ? `${n} people can see my calendar events` : "People who can see my calendar events",
+};
+
 function buildSharingTitle(mode, count) {
-  if (mode === "sharing_with_me") {
-    if (count === 1) return "1 person has shared their calendar events with me";
-    if (count > 1) return `${count} people have shared their calendar events with me`;
-    return "People who have shared their calendar events with me";
-  }
-  if (count === 1) return "1 person can see my calendar events";
-  if (count > 1) return `${count} people can see my calendar events`;
-  return "People who can see my calendar events";
+  return (SHARING_TITLES[mode] || SHARING_TITLES.shared_with)(count);
 }
 
-function SocialDataModal({
-  isOpen,
-  onClose,
-  titleMode,
-  fetchFn,
-  userId,
-  onNavChange,
-  onUserUpdate,
-  emptyHint,
-  showCalendarAction = false,
-}) {
+function buildUserOpenHandler(onClose, onNavChange) {
+  return (user) => { onClose(); onNavChange?.(`profile_${user.id}`); };
+}
+
+function buildCalendarOpenHandler(onClose, onNavChange) {
+  return (user) => { onClose(); onNavChange?.(buildSharedCalendarRoute(user)); };
+}
+
+function SocialDataModal({ isOpen, onClose, titleMode, fetchFn, userId, onNavChange, onUserUpdate, emptyHint, showCalendarAction = false }) {
   const users = useSocialUsers(isOpen, userId, fetchFn);
   if (!isOpen) return null;
-  const handleUserOpen = (user) => {
-    onClose();
-    onNavChange?.(`profile_${user.id}`);
-  };
-  const handleCalendarOpen = (user) => {
-    onClose();
-    onNavChange?.(buildSharedCalendarRoute(user));
-  };
+  const handleUserOpen = buildUserOpenHandler(onClose, onNavChange);
+  const handleCalendarOpen = buildCalendarOpenHandler(onClose, onNavChange);
   return (
     <UserListModal
       title={buildSharingTitle(titleMode, users.length)}
@@ -169,31 +159,43 @@ function EditProfileSection({ state }) {
   return <EditProfileModal user={state.profileData} isOpen={state.showEditProfile} onClose={() => state.setShowEditProfile(false)} onSave={state.handleSaveProfile} />;
 }
 
+function SharedWithModal({ userId, state, onNavChange }) {
+  return (
+    <SocialDataModal
+      isOpen={state.showSharedWith}
+      onClose={() => state.setShowSharedWith(false)}
+      titleMode="shared_with"
+      fetchFn={getSharingWith}
+      userId={userId}
+      onNavChange={onNavChange}
+      onUserUpdate={state.reload}
+      emptyHint="No one can see your calendar events yet."
+    />
+  );
+}
+
+function SharedByModal({ userId, state, onNavChange }) {
+  return (
+    <SocialDataModal
+      isOpen={state.showSharedBy}
+      onClose={() => state.setShowSharedBy(false)}
+      titleMode="sharing_with_me"
+      fetchFn={getSharedWithMe}
+      userId={userId}
+      onNavChange={onNavChange}
+      onUserUpdate={state.reload}
+      emptyHint="No one has shared their calendar events with you yet."
+      showCalendarAction
+    />
+  );
+}
+
 function SharingModals({ user, state, onNavChange }) {
   const userId = (state.profileData || user)?.id;
   return (
     <>
-      <SocialDataModal
-        isOpen={state.showSharedWith}
-        onClose={() => state.setShowSharedWith(false)}
-        titleMode="shared_with"
-        fetchFn={getSharingWith}
-        userId={userId}
-        onNavChange={onNavChange}
-        onUserUpdate={state.reload}
-        emptyHint="No one can see your calendar events yet."
-      />
-      <SocialDataModal
-        isOpen={state.showSharedBy}
-        onClose={() => state.setShowSharedBy(false)}
-        titleMode="sharing_with_me"
-        fetchFn={getSharedWithMe}
-        userId={userId}
-        onNavChange={onNavChange}
-        onUserUpdate={state.reload}
-        emptyHint="No one has shared their calendar events with you yet."
-        showCalendarAction
-      />
+      <SharedWithModal userId={userId} state={state} onNavChange={onNavChange} />
+      <SharedByModal userId={userId} state={state} onNavChange={onNavChange} />
     </>
   );
 }

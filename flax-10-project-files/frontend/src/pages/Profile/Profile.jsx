@@ -109,37 +109,46 @@ function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave }) 
   );
 }
 
+function CompatibilityCell({ summary, currentUserSummary, sharedModuleCount, modules, onSuggestStudySession, suggestionState }) {
+  return (
+    <div className={styles.compatibilityCell}>
+      <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
+    </div>
+  );
+}
+
+function TeacherInsightsRow({ modules, onNavigate, ...compatProps }) {
+  return (
+    <div className={styles.otherInsightsRow}>
+      <div className={styles.secondaryInsightCell}><ModulesSection modules={modules} onNavigate={onNavigate} role="teacher" /></div>
+      <CompatibilityCell modules={modules} onNavigate={onNavigate} {...compatProps} />
+    </div>
+  );
+}
+
+function CommonGroundInsightsRow({ modules, summary, currentUserModules, currentUserSummary, onNavigate, ...compatProps }) {
+  return (
+    <div className={styles.otherInsightsRow}>
+      <div className={styles.secondaryInsightCell}>
+        <CommonGroundSection viewedModules={modules} viewedSocieties={summary?.societies} currentUserModules={currentUserModules} currentUserSocieties={currentUserSummary?.societies} onNavigate={onNavigate} />
+      </div>
+      <CompatibilityCell modules={modules} summary={summary} currentUserSummary={currentUserSummary} onNavigate={onNavigate} {...compatProps} />
+    </div>
+  );
+}
+
 function OtherProfileColumns(props) {
   const { summary, modules, currentUserModules, currentUserSummary, role, onNavigate, onSuggestStudySession, suggestionState } = props;
-  const sharedModuleCount = (modules || []).filter((moduleCode) => (currentUserModules || []).includes(moduleCode)).length;
-  const hasCommonGround = role !== "teacher" && (((modules || []).length > 0) || ((summary?.societies || []).length > 0));
+  const sharedModuleCount = (modules || []).filter((mc) => (currentUserModules || []).includes(mc)).length;
+  const hasCommonGround = role !== "teacher" && ((modules || []).length > 0 || (summary?.societies || []).length > 0);
   const showTeacherInsights = role === "teacher" && (modules?.length > 0 || (summary && currentUserSummary));
+  const compatProps = { summary, currentUserSummary, sharedModuleCount, onSuggestStudySession, suggestionState };
   return (
     <div className={styles.singleCol}>
       <QuickStatsRail totalHours={summary?.total_hours} sessionCount={summary?.session_count} moduleCount={modules?.length || 0} hideZeroItems={role === "teacher"} />
-      {showTeacherInsights ? (
-        <div className={styles.otherInsightsRow}>
-          <div className={styles.secondaryInsightCell}>
-            <ModulesSection modules={modules} onNavigate={onNavigate} role="teacher" />
-          </div>
-          <div className={styles.compatibilityCell}>
-            <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
-          </div>
-        </div>
-      ) : !hasCommonGround ? (
-        <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
-      ) : (
-        <div className={styles.otherInsightsRow}>
-          {hasCommonGround && (
-            <div className={styles.secondaryInsightCell}>
-              <CommonGroundSection viewedModules={modules} viewedSocieties={summary?.societies} currentUserModules={currentUserModules} currentUserSocieties={currentUserSummary?.societies} onNavigate={onNavigate} />
-            </div>
-          )}
-          <div className={styles.compatibilityCell}>
-            <CompatibilityScore viewedSummary={summary} currentUserSummary={currentUserSummary} sharedModuleCount={sharedModuleCount} totalModuleCount={Math.max((modules || []).length, 1)} activitySparkline={summary?.activity_sparkline} onSuggestStudySession={onSuggestStudySession} suggestionState={suggestionState} />
-          </div>
-        </div>
-      )}
+      {showTeacherInsights && <TeacherInsightsRow modules={modules} onNavigate={onNavigate} {...compatProps} />}
+      {!showTeacherInsights && !hasCommonGround && <CompatibilityCell modules={modules} onNavigate={onNavigate} {...compatProps} />}
+      {!showTeacherInsights && hasCommonGround && <CommonGroundInsightsRow modules={modules} summary={summary} currentUserModules={currentUserModules} currentUserSummary={currentUserSummary} onNavigate={onNavigate} {...compatProps} />}
     </div>
   );
 }
