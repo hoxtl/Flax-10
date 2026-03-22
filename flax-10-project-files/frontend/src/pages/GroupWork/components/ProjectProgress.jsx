@@ -4,17 +4,22 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import StatStrip from "../../../components/common/StatStrip/StatStrip";
+import StatStrip from "../../../components/Common/StatStrip/StatStrip";
 import { useCountUp } from "../../../hooks/useCountUp";
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Tooltip from "../../../components/Common/Tooltip/Tooltip";
 import styles from "./ProjectProgress.module.css";
 
-function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
-  return segments.map((segment, index) => <ProgressSegment key={segment.id ?? index} segment={segment} index={index} segments={segments} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} />);
+function segmentOpacity(hoveredSeg, hoveredKey) {
+  return hoveredSeg && hoveredSeg !== hoveredKey ? 0.65 : 1;
+}
+
+function SegmentBar({ colour, hoveredKey, hoveredSeg, name, setHoveredSeg }) {
+  return <div className={styles.progressSegment} style={{ background: colour, opacity: segmentOpacity(hoveredSeg, hoveredKey) }} onMouseEnter={() => setHoveredSeg(hoveredKey)} onMouseLeave={() => setHoveredSeg(null)} aria-label={`${name} segment`} />;
 }
 
 function ProgressSegment({ segment, index, segments, hoveredSeg, setHoveredSeg }) {
   const hoveredKey = segment.id ?? index;
+  const colour = segment.color || (segment.id === "unassigned" ? "#c0b8b0" : "#7BB38E");
   return (
     <motion.div
       style={{ height: "100%", flex: "0 0 auto", zIndex: segments.length - index }}
@@ -23,19 +28,25 @@ function ProgressSegment({ segment, index, segments, hoveredSeg, setHoveredSeg }
       transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
     >
       <Tooltip content={segment.tooltip || segment.name} wrapperClassName={styles.segmentTooltipWrap}>
-        <div
-          className={styles.progressSegment}
-          style={{
-            background: segment.color || (segment.id === "unassigned" ? "#c0b8b0" : "#7BB38E"),
-            opacity: hoveredSeg && hoveredSeg !== hoveredKey ? 0.65 : 1,
-          }}
-          onMouseEnter={() => setHoveredSeg(hoveredKey)}
-          onMouseLeave={() => setHoveredSeg(null)}
-          aria-label={`${segment.name} segment`}
-        />
+        <SegmentBar colour={colour} hoveredKey={hoveredKey} hoveredSeg={hoveredSeg} name={segment.name} setHoveredSeg={setHoveredSeg} />
       </Tooltip>
     </motion.div>
   );
+}
+
+function ProgressSegments({ segments, hoveredSeg, setHoveredSeg }) {
+  return segments.map((segment, index) => (
+    <ProgressSegment key={segment.id ?? index} segment={segment} index={index} segments={segments} hoveredSeg={hoveredSeg} setHoveredSeg={setHoveredSeg} />
+  ));
+}
+
+function buildProjectStats(taskStats, percentRef, completedRef, remainingRef) {
+  const remaining = Math.max((taskStats.total || 0) - (taskStats.completed || 0), 0);
+  return [
+    { key: "overall", value: taskStats.percent || 0, suffix: "%", label: "Overall", tone: "accent", valueRef: percentRef },
+    { key: "complete", value: taskStats.completed || 0, label: "Tasks complete", tone: "success", valueRef: completedRef },
+    { key: "remaining", value: remaining, label: "Remaining", tone: "danger", valueRef: remainingRef },
+  ];
 }
 
 export default function ProjectProgress({ taskStats }) {
@@ -54,13 +65,4 @@ export default function ProjectProgress({ taskStats }) {
       </div>
     </div>
   );
-}
-
-function buildProjectStats(taskStats, percentRef, completedRef, remainingRef) {
-  const remaining = Math.max((taskStats.total || 0) - (taskStats.completed || 0), 0);
-  return [
-    { key: "overall", value: taskStats.percent || 0, suffix: "%", label: "Overall", tone: "accent", valueRef: percentRef },
-    { key: "complete", value: taskStats.completed || 0, label: "Tasks complete", tone: "success", valueRef: completedRef },
-    { key: "remaining", value: remaining, label: "Remaining", tone: "danger", valueRef: remainingRef },
-  ];
 }

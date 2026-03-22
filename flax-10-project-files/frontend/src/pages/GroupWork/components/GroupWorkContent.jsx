@@ -2,9 +2,9 @@
  * GroupWork project list content.
  */
 
-import PageToolbar, { ToolbarSortControl } from "../../../components/common/PageToolbar/PageToolbar";
-import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import PageToolbar, { ToolbarSortControl } from "../../../components/Common/PageToolbar/PageToolbar";
+import AnimatedDropdown from "../../../components/Common/AnimatedDropdown";
+import SearchEmptyState from "../../../components/Common/SearchEmptyState/SearchEmptyState";
 import CreateProjectForm from "./CreateProjectForm";
 import ProjectRow from "./ProjectRow";
 import { compareProjectsBySort } from "../utils/projectRowUtils";
@@ -28,6 +28,40 @@ function sortProjects(projects, sortBy) {
   return sorted;
 }
 
+function SortDropdown({ sortBy, setSortBy }) {
+  return (
+    <ToolbarSortControl className={styles.sortControl}>
+      <AnimatedDropdown
+        className={styles.sortDropdownWrap}
+        value={sortBy}
+        onChange={setSortBy}
+        options={SORT_OPTIONS}
+        placeholder="Choose a sort"
+        usePortal
+        triggerClassName={styles.sortDropdownTrigger}
+      />
+    </ToolbarSortControl>
+  );
+}
+
+function ProjectsHeader({ sortBy, setSortBy, onProjectCreated }) {
+  return (
+    <PageToolbar
+      className={styles.projectsHeader}
+      controlsSlot={
+        <div className={styles.projectsHeaderActions}>
+          <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
+          <CreateProjectForm onCreated={onProjectCreated} size="small" className={styles.createButton} />
+        </div>
+      }
+    />
+  );
+}
+
+function ProjectList({ projects, projectListProps }) {
+  return <div className={styles.projectList}>{projects.map((project) => <ProjectRow key={project.id} project={project} {...projectListProps(project)} />)}</div>;
+}
+
 export default function GroupWorkContent({ projects, projectListProps, sortBy, setSortBy, onProjectCreated }) {
   const sortedProjects = sortProjects(projects, sortBy);
   return (
@@ -47,32 +81,4 @@ export default function GroupWorkContent({ projects, projectListProps, sortBy, s
       )}
     </div>
   );
-}
-
-function ProjectsHeader({ sortBy, setSortBy, onProjectCreated }) {
-  return (
-    <PageToolbar
-      className={styles.projectsHeader}
-      controlsSlot={
-        <div className={styles.projectsHeaderActions}>
-          <ToolbarSortControl className={styles.sortControl}>
-            <AnimatedDropdown
-              className={styles.sortDropdownWrap}
-              value={sortBy}
-              onChange={setSortBy}
-              options={SORT_OPTIONS}
-              placeholder="Choose a sort"
-              usePortal
-              triggerClassName={styles.sortDropdownTrigger}
-            />
-          </ToolbarSortControl>
-          <CreateProjectForm onCreated={onProjectCreated} size="small" className={styles.createButton} />
-        </div>
-      }
-    />
-  );
-}
-
-function ProjectList({ projects, projectListProps }) {
-  return <div className={styles.projectList}>{projects.map((project) => <ProjectRow key={project.id} project={project} {...projectListProps(project)} />)}</div>;
 }

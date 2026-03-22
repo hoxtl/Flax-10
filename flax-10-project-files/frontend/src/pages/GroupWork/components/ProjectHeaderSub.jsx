@@ -4,9 +4,34 @@
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import HoldConfirmModal from "../../../components/Common/HoldConfirmModal/HoldConfirmModal";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import styles from "./ProjectHeader.module.css";
+
+function openDeleteModal(setDeleteError, setShowDeleteModal) {
+  setDeleteError("");
+  setShowDeleteModal(true);
+}
+
+async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal) {
+  setShowDeleteModal(false);
+  if (await onDelete()) return;
+  setDeleteError("Only the project owner can delete this project.");
+}
+
+function DeleteModal({ onDelete, setDeleteError, setShowDeleteModal }) {
+  return (
+    <HoldConfirmModal
+      title="Delete project"
+      warningBanner="This will permanently remove the project and all its tasks for every team member."
+      warningText="Hold to permanently delete this shared project and its tasks."
+      cancelLabel="Keep project"
+      holdLabel="Hold to delete"
+      onCancel={() => setShowDeleteModal(false)}
+      onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal)}
+    />
+  );
+}
 
 export default function ProjectDeleteAction({ onDelete }) {
   const [deleteError, setDeleteError] = useState("");
@@ -20,31 +45,7 @@ export default function ProjectDeleteAction({ onDelete }) {
         </PrimaryButton>
         {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
       </div>
-      {showDeleteModal && (
-        <HoldConfirmModal
-          title="Delete project"
-          warningBanner="This will permanently remove the project and all its tasks for every team member."
-          warningText="Hold to permanently delete this shared project and its tasks."
-          cancelLabel="Keep project"
-          holdLabel="Hold to delete"
-          onCancel={() => setShowDeleteModal(false)}
-          onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal)}
-        />
-      )}
+      {showDeleteModal && <DeleteModal onDelete={onDelete} setDeleteError={setDeleteError} setShowDeleteModal={setShowDeleteModal} />}
     </>
   );
-}
-
-function openDeleteModal(setDeleteError, setShowDeleteModal) {
-  setDeleteError("");
-  setShowDeleteModal(true);
-}
-
-async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal) {
-  if (await onDelete()) {
-    setShowDeleteModal(false);
-    return;
-  }
-  setShowDeleteModal(false);
-  setDeleteError("Only the project owner can delete this project.");
 }

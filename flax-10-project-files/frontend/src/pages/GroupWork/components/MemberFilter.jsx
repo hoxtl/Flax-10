@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "./memberAvatarUtils";
-import FilterButton from "../../../components/common/FilterButton/FilterButton";
+import FilterButton from "../../../components/Common/FilterButton/FilterButton";
 import styles from "./MemberFilter.module.css";
 
 function useClickOutside(ref, onClose) {
@@ -33,6 +33,18 @@ function MemberItem({ member, checked, onToggle }) {
   );
 }
 
+function MemberList({ members, selectedUsers, onToggle }) {
+  if (members.length === 0) return <p className={styles.empty}>No members</p>;
+  return members.map((member) => (
+    <MemberItem
+      key={member.user ?? member.id}
+      member={member}
+      checked={selectedUsers.includes(String(member.user))}
+      onToggle={onToggle}
+    />
+  ));
+}
+
 function DropdownContent({ members, selectedUsers, onToggle }) {
   return (
     <Motion.div
@@ -43,18 +55,7 @@ function DropdownContent({ members, selectedUsers, onToggle }) {
       className={styles.dropdown}
       onClick={(e) => e.stopPropagation()}
     >
-      {members.length === 0 ? (
-        <p className={styles.empty}>No members</p>
-      ) : (
-        members.map((member) => (
-          <MemberItem
-            key={member.user ?? member.id}
-            member={member}
-            checked={selectedUsers.includes(String(member.user))}
-            onToggle={onToggle}
-          />
-        ))
-      )}
+      <MemberList members={members} selectedUsers={selectedUsers} onToggle={onToggle} />
     </Motion.div>
   );
 }
@@ -65,25 +66,10 @@ export default function MemberFilter({ members = [], selectedUsers = [], onToggl
   useClickOutside(ref, () => setIsOpen(false));
 
   return (
-    <div
-      ref={ref}
-      className={styles.wrapper}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      <FilterButton
-        activeCount={selectedUsers.length}
-        isOpen={isOpen}
-        onClick={() => setIsOpen((v) => !v)}
-      />
+    <div ref={ref} className={styles.wrapper} onMouseEnter={() => setIsOpen(true)} onMouseLeave={() => setIsOpen(false)}>
+      <FilterButton activeCount={selectedUsers.length} isOpen={isOpen} onClick={() => setIsOpen((v) => !v)} />
       <AnimatePresence>
-        {isOpen && (
-          <DropdownContent
-            members={members}
-            selectedUsers={selectedUsers}
-            onToggle={onToggle}
-          />
-        )}
+        {isOpen && <DropdownContent members={members} selectedUsers={selectedUsers} onToggle={onToggle} />}
       </AnimatePresence>
     </div>
   );

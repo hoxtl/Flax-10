@@ -3,24 +3,17 @@
  */
 
 import { Link } from "react-router-dom";
-import Badge from "../../../components/common/Badge/Badge";
-import Tooltip from "../../../components/common/Tooltip/Tooltip";
+import Badge from "../../../components/Common/Badge/Badge";
+import Tooltip from "../../../components/Common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
 import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowInfo({ project, members, action = null }) {
+function TeacherAvatarShell({ fallback, children }) {
   return (
-    <div className={styles.projectInfoArea}>
-      <ProjectTeacherAvatar project={project} />
-      <div className={styles.projectText}>
-        <div className={styles.projectTitleRow}>
-          <div className={styles.projectName}>{project.name}</div>
-          {action ? <div className={styles.projectTitleAction}>{action}</div> : null}
-        </div>
-        <AvatarStack members={members} />
-      </div>
+    <div className={styles.teacherAvatarShell} aria-hidden="true">
+      {children || <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>}
     </div>
   );
 }
@@ -28,13 +21,7 @@ export default function ProjectRowInfo({ project, members, action = null }) {
 function ProjectTeacherAvatar({ project }) {
   const fallback = getProjectTeacherInitials(project);
   const teacherName = getProjectTeacherName(project);
-  if (!project?.module_tutor_id) {
-    return (
-      <div className={styles.teacherAvatarShell} aria-hidden="true">
-        <span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span>
-      </div>
-    );
-  }
+  if (!project?.module_tutor_id) return <TeacherAvatarShell fallback={fallback} />;
   return (
     <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.avatarTooltipWrap}>
       <button
@@ -61,15 +48,6 @@ export function ProjectModuleBadge({ project }) {
   );
 }
 
-function AvatarStack({ members }) {
-  if (!members.length) return null;
-  return (
-    <div className={styles.avatarStack}>
-      {members.map((member, index) => <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />)}
-    </div>
-  );
-}
-
 function AvatarItem({ member, index }) {
   return (
     <Tooltip content={getDisplayName(member)} wrapperClassName={styles.avatarTooltipWrap}>
@@ -83,5 +61,29 @@ function AvatarItem({ member, index }) {
         <MemberAvatar member={member} size={24} />
       </button>
     </Tooltip>
+  );
+}
+
+function AvatarStack({ members }) {
+  if (!members.length) return null;
+  return (
+    <div className={styles.avatarStack}>
+      {members.map((member, index) => <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />)}
+    </div>
+  );
+}
+
+export default function ProjectRowInfo({ project, members, action = null }) {
+  return (
+    <div className={styles.projectInfoArea}>
+      <ProjectTeacherAvatar project={project} />
+      <div className={styles.projectText}>
+        <div className={styles.projectTitleRow}>
+          <div className={styles.projectName}>{project.name}</div>
+          {action ? <div className={styles.projectTitleAction}>{action}</div> : null}
+        </div>
+        <AvatarStack members={members} />
+      </div>
+    </div>
   );
 }
