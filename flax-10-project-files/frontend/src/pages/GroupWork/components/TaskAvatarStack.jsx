@@ -1,7 +1,7 @@
-/**
- * TaskAvatarStack — shows a stacked row of member avatars (photo or initials).
- * Uses the shared MemberAvatar component.
+/*
+ * Stacked row of member avatars for task assignment display.
  */
+
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./TaskAvatarStack.module.css";
@@ -14,25 +14,29 @@ function OverflowBadge({ count, size }) {
     );
 }
 
+function AvatarItem({ assignee, index, max, size }) {
+    return (
+        <div style={{ marginLeft: index > 0 ? -(size * 0.3) : 0, zIndex: max - index }}>
+            <button
+                type="button"
+                className={styles.avatarButton}
+                title={getDisplayName(assignee)}
+                aria-label={`Open ${getDisplayName(assignee)} profile`}
+                onClick={(event) => openMemberProfile(event, assignee)}
+            >
+                <MemberAvatar member={assignee} size={size} />
+            </button>
+        </div>
+    );
+}
+
 export default function TaskAvatarStack({ assignees, max = 3, size = 20 }) {
     if (!assignees || assignees.length === 0) return null;
     const visible = assignees.slice(0, max);
     const remaining = assignees.length - max;
     return (
         <div className={styles.stack}>
-            {visible.map((a, i) => (
-                <div key={a.id} style={{ marginLeft: i > 0 ? -(size * 0.3) : 0, zIndex: max - i }}>
-                    <button
-                        type="button"
-                        className={styles.avatarButton}
-                        title={getDisplayName(a)}
-                        aria-label={`Open ${getDisplayName(a)} profile`}
-                        onClick={(event) => openMemberProfile(event, a)}
-                    >
-                        <MemberAvatar member={a} size={size} />
-                    </button>
-                </div>
-            ))}
+            {visible.map((a, i) => <AvatarItem key={a.id} assignee={a} index={i} max={max} size={size} />)}
             {remaining > 0 && <OverflowBadge count={remaining} size={size} />}
         </div>
     );

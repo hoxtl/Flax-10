@@ -3,7 +3,7 @@
  */
 
 import { ChevronUp } from "lucide-react";
-import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
+import DeadlineCountdown from "../../../components/Common/DeadlineCountdown/DeadlineCountdown";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRowMeta({ date, dateString, tier, isExpanded }) {

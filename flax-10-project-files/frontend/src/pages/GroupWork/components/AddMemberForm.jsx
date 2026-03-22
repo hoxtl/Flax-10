@@ -2,13 +2,13 @@
  * GroupWork add member form.
  */
 
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import SearchEmptyState from "../../../components/Common/SearchEmptyState/SearchEmptyState";
 import UserSearch from "../../../components/Social/UserSearch";
-import { addProjectMember } from "../groupWorkApi";
+import { addProjectMember } from "../api/groupWorkApi";
 import styles from "./AddMemberForm.module.css";
 
-export default function AddMemberForm({ projectId, members = [], onAdded }) {
-  const renderEmptyState = ({ query, clear }) => (
+function MemberSearchEmpty({ query, clear }) {
+  return (
     <div className={styles.inlineEmptyState}>
       <SearchEmptyState
         query={query}
@@ -19,21 +19,6 @@ export default function AddMemberForm({ projectId, members = [], onAdded }) {
         className={styles.inlineEmptyCard}
         titleClassName={styles.inlineEmptyTitle}
         hintClassName={styles.inlineEmptyHint}
-      />
-    </div>
-  );
-
-  return (
-    <div className={styles.addMemberForm}>
-      <UserSearch
-        onUserSelect={createSelectHandler(projectId, onAdded)}
-        filterUsers={buildAvailableUserFilter(members)}
-        fullWidth
-        hideFilter
-        searchPlaceholder="Search teammates to add..."
-        openOnEmptyQuery={false}
-        dropdownMode="inline"
-        renderEmptyState={renderEmptyState}
       />
     </div>
   );
@@ -52,4 +37,21 @@ function buildAvailableUserFilter(members) {
   return (results) => Array.isArray(results)
     ? results.filter((user) => !existingUserIds.has(String(user?.id ?? "")))
     : [];
+}
+
+export default function AddMemberForm({ projectId, members = [], onAdded }) {
+  return (
+    <div className={styles.addMemberForm}>
+      <UserSearch
+        onUserSelect={createSelectHandler(projectId, onAdded)}
+        filterUsers={buildAvailableUserFilter(members)}
+        fullWidth
+        hideFilter
+        searchPlaceholder="Search teammates to add..."
+        openOnEmptyQuery={false}
+        dropdownMode="inline"
+        renderEmptyState={({ query, clear }) => <MemberSearchEmpty query={query} clear={clear} />}
+      />
+    </div>
+  );
 }

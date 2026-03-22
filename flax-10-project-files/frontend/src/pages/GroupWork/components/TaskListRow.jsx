@@ -4,12 +4,12 @@
 
 import { useRef, useState } from "react";
 import { Check, Calendar, Trash2 } from "lucide-react";
-import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
-import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
-import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import TaskPriorityPill from "../../../components/Common/TaskPriorityPill/TaskPriorityPill";
+import InlineTitleField, { useInlineEdit } from "../../../components/Common/InlineTitleField/InlineTitleField";
+import HoldConfirmModal from "../../../components/Common/HoldConfirmModal/HoldConfirmModal";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
-import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import DateTimePicker from "../../../components/Common/inputs/DateTimePicker";
 import { getUserColor } from "../utils/priorityUtils";
 import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate, getDueDateStr } from "../utils/taskUtils";
 import styles from "./TaskListView.module.css";

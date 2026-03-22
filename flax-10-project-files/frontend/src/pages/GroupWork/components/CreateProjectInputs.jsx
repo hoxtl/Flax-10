@@ -2,10 +2,10 @@
  * GroupWork create project inputs.
  */
 
-import FormField from "../../../components/common/FormField/FormField";
-import TextInput from "../../../components/common/TextInput/TextInput";
+import FormField from "../../../components/Common/FormField/FormField";
+import TextInput from "../../../components/Common/TextInput/TextInput";
 import UserModuleDropdown from "../../../components/Modules/UserModuleDropdown";
-import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import DateTimePicker from "../../../components/Common/inputs/DateTimePicker";
 import styles from "./CreateProjectForm.module.css";
 
 export function CreateProjectInputs({ data, onChange, errors }) {

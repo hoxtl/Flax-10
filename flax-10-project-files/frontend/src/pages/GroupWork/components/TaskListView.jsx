@@ -2,9 +2,20 @@
  * GroupWork task list view.
  */
 
-import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
+import SearchEmptyState from "../../../components/Common/SearchEmptyState/SearchEmptyState";
 import TaskListRow from "./TaskListRow";
 import styles from "./TaskListView.module.css";
+
+const HEADER_CELLS = ["Task", "Priority", "Due date", "Assignee"];
+
+function TaskListHeader() {
+  return (
+    <div className={styles.headerRow}>
+      {HEADER_CELLS.map((label) => <span key={label} className={styles.headerCell}>{label}</span>)}
+      <span />
+    </div>
+  );
+}
 
 export default function TaskListView({ tasks, members, onToggle, onUpdate, onDelete }) {
   if (tasks.length === 0) {
@@ -18,13 +29,7 @@ export default function TaskListView({ tasks, members, onToggle, onUpdate, onDel
   }
   return (
     <div className={styles.taskList}>
-      <div className={styles.headerRow}>
-        <span className={styles.headerCell}>Task</span>
-        <span className={styles.headerCell}>Priority</span>
-        <span className={styles.headerCell}>Due date</span>
-        <span className={styles.headerCell}>Assignee</span>
-        <span />
-      </div>
+      <TaskListHeader />
       {tasks.map((task) => <TaskListRow key={task.id} task={task} members={members} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />)}
     </div>
   );

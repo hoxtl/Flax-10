@@ -2,12 +2,28 @@
  * GroupWork project row.
  */
 
-import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import DeadlineCountdown from "../../../components/Common/DeadlineCountdown/DeadlineCountdown";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
 import { getDaysLeft, getProjectDate, getProjectMembers, getProjectPercent } from "../utils/projectRowUtils";
 import styles from "./ProjectRow.module.css";
+
+function buildContainerClassName(daysLeft) {
+  return [
+    styles.projectRowContainer,
+    daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 ? styles.projectRowContainerUrgent : "",
+    daysLeft !== null && daysLeft < 0 ? styles.projectRowContainerOverdue : "",
+  ].filter(Boolean).join(" ");
+}
+
+function ViewDetailsButton({ onClick }) {
+  return (
+    <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.projectDetailsButton} onClick={onClick}>
+      Schedule times and view more details
+    </PrimaryButton>
+  );
+}
 
 export default function ProjectRow({ project, onClick }) {
   const date = getProjectDate(project.deadline);
@@ -17,15 +33,7 @@ export default function ProjectRow({ project, onClick }) {
   return (
     <div className={buildContainerClassName(daysLeft)}>
       <div className={styles.projectRow}>
-        <ProjectRowInfo
-          project={project}
-          members={members}
-          action={(
-            <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.projectDetailsButton} onClick={onClick}>
-              Schedule times and view more details
-            </PrimaryButton>
-          )}
-        />
+        <ProjectRowInfo project={project} members={members} action={<ViewDetailsButton onClick={onClick} />} />
         <div className={styles.projectMetaArea}>
           <div className={styles.deadlineInfo}>
             <DeadlineCountdown dueDate={date} className={styles.deadlineCountdown} forceClock />
@@ -33,17 +41,7 @@ export default function ProjectRow({ project, onClick }) {
           <ProjectModuleBadge project={project} />
         </div>
       </div>
-      <ProjectRowAccordion
-        percent={percent}
-      />
+      <ProjectRowAccordion percent={percent} />
     </div>
   );
-}
-
-function buildContainerClassName(daysLeft) {
-  return [
-    styles.projectRowContainer,
-    daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 ? styles.projectRowContainerUrgent : "",
-    daysLeft !== null && daysLeft < 0 ? styles.projectRowContainerOverdue : "",
-  ].filter(Boolean).join(" ");
 }

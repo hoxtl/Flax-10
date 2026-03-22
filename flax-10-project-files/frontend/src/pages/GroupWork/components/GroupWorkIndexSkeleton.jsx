@@ -1,5 +1,5 @@
 import React from "react";
-import SkeletonBlock from "../../../components/common/LoadingState/SkeletonBlock";
+import SkeletonBlock from "../../../components/Common/LoadingState/SkeletonBlock";
 import styles from "./GroupWorkIndexSkeleton.module.css";
 
 export default function GroupWorkIndexSkeleton() {

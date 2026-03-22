@@ -2,8 +2,8 @@
  * GroupWork detail loading skeleton.
  */
 
-import SkeletonBlock from "../../../components/common/LoadingState/SkeletonBlock";
-import BackButton from "../../../components/common/BackButton/BackButton.jsx";
+import SkeletonBlock from "../../../components/Common/LoadingState/SkeletonBlock";
+import BackButton from "../../../components/Common/BackButton/BackButton.jsx";
 import styles from "./GroupWorkDetailSkeleton.module.css";
 
 const MEMBER_SLOTS = [0, 1, 2];
