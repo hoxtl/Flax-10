@@ -57,3 +57,10 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertIn('tag_details', data)
         self.assertIn('module_name', data)
         self.assertIn('module_code', data)
+
+class CalendarEventCreateSerialiserTests(TestCase):
+    """Test CalendarEventCreateSerialiser."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
+        self.tag = Tag.objects.create(user=self.user, name='Work', color='#0000FF')
