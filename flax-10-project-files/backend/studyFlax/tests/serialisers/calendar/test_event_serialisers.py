@@ -17,7 +17,6 @@ class RecurrenceSerialiserTests(TestCase):
     """Test RecurrenceSerialiser."""
 
     def setUp(self):
-        """Set up test recurrence rule."""
         self.recurrence = RecurrenceRule.objects.create(
             frequency='WEEKLY',
             interval=1,
@@ -25,7 +24,6 @@ class RecurrenceSerialiserTests(TestCase):
         )
 
     def test_serializer_contains_all_fields(self):
-        """Test that serializer includes all recurrence fields."""
         serializer = RecurrenceSerialiser(instance=self.recurrence)
         data = serializer.data
         
@@ -34,7 +32,6 @@ class RecurrenceSerialiserTests(TestCase):
             self.assertIn(field, data)
 
     def test_serializer_with_all_fields(self):
-        """Test serializer with all recurrence fields populated."""
         recurrence = RecurrenceRule.objects.create(
             frequency='DAILY',
             interval=2,
@@ -50,3 +47,41 @@ class RecurrenceSerialiserTests(TestCase):
         self.assertEqual(data['interval'], 2)
         self.assertEqual(data['count'], 15)
         self.assertIsNotNone(data['end_date'])
+
+
+class CalendarEventSerialiserTests(TestCase):
+    """Test CalendarEventSerialiser with location fields and related data."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.tag = Tag.objects.create(
+            user=self.user,
+            name='Test Tag',
+            color='#FF0000'
+        )
+        self.module = Module.objects.create(
+            module_code='TEST101',
+            module_name='Test Module',
+            created_by=self.user
+        )
+        self.recurrence = RecurrenceRule.objects.create(
+            frequency='WEEKLY',
+            interval=1
+        )
+        self.event = CalendarEvent.objects.create(
+            user=self.user,
+            title='Test Event',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+            location='King\'s College London',
+            location_latitude=51.5118,
+            location_longitude=-0.1161,
+            location_validated=True,
+            tag=self.tag,
+            module=self.module,
+            recurrence_rule=self.recurrence
+        )
