@@ -49,9 +49,9 @@ beforeEach(() => {
 describe("AdminPage – Ratifications tab", () => {
   it("shows empty state when no ratifications", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Ratifications/));
+    fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() =>
-      expect(screen.getByText(/No societies are awaiting/i)).toBeTruthy(),
+      expect(screen.getByText(/No societies awaiting ratification/i)).toBeTruthy(),
     );
   });
 
@@ -60,7 +60,7 @@ describe("AdminPage – Ratifications tab", () => {
       { id: 10, name: "Chess Club", member_count: 5 },
     ]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Ratifications/));
+    fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() => expect(screen.getByText("Chess Club")).toBeTruthy());
     expect(screen.getByText("✓ Approve")).toBeTruthy();
     expect(screen.getByText("✗ Reject")).toBeTruthy();
@@ -72,7 +72,7 @@ describe("AdminPage – Ratifications tab", () => {
     ]);
     api.approveRatification.mockResolvedValue({});
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Ratifications/));
+    fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() => screen.getByText("Chess Club"));
     fireEvent.click(screen.getByText("✓ Approve"));
     await waitFor(() =>
@@ -87,7 +87,7 @@ describe("AdminPage – Ratifications tab", () => {
     ]);
     api.rejectRatification.mockResolvedValue({});
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Ratifications/));
+    fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() => screen.getByText("Drama Club"));
     fireEvent.click(screen.getByText("✗ Reject"));
     await waitFor(() =>
@@ -100,9 +100,9 @@ describe("AdminPage – Ratifications tab", () => {
 describe("AdminPage – Teacher Requests tab", () => {
   it("shows empty state when no requests", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Teacher Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
     await waitFor(() =>
-      expect(screen.getByText(/No pending teacher/i)).toBeTruthy(),
+      expect(screen.getByText(/No teacher switch requests/i)).toBeTruthy(),
     );
   });
 
@@ -111,7 +111,7 @@ describe("AdminPage – Teacher Requests tab", () => {
       { id: 5, username: "jane", first_name: "Jane", last_name: "Doe", email: "j@d.com", role: "pending_teacher" },
     ]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Teacher Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
     expect(screen.getByText("✓ Approve")).toBeTruthy();
     expect(screen.getByText("✗ Reject")).toBeTruthy();
@@ -123,7 +123,7 @@ describe("AdminPage – Teacher Requests tab", () => {
     ]);
     api.resolveTeacherRequest.mockResolvedValue({});
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Teacher Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
     await waitFor(() => screen.getByText("Jane Doe"));
     fireEvent.click(screen.getByText("✓ Approve"));
     await waitFor(() =>
@@ -138,7 +138,7 @@ describe("AdminPage – Teacher Requests tab", () => {
     ]);
     api.resolveTeacherRequest.mockResolvedValue({});
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Teacher Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
     await waitFor(() => screen.getByText("Tom X"));
     fireEvent.click(screen.getByText("✗ Reject"));
     await waitFor(() =>
@@ -150,7 +150,7 @@ describe("AdminPage – Teacher Requests tab", () => {
 describe("AdminPage – Reported Societies tab", () => {
   it("shows empty state when no reports", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() =>
       expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
     );
@@ -161,7 +161,7 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 20, society_id: 55, society_name: "Bad Club", reporter_username: "alice", reason: "Inappropriate" },
     ]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => expect(screen.getByText("Bad Club")).toBeTruthy());
     expect(screen.getByText("Ban")).toBeTruthy();
     expect(screen.getByText("Dismiss")).toBeTruthy();
@@ -172,7 +172,7 @@ describe("AdminPage – Reported Societies tab", () => {
       { id: 21, society_id: 56, society_name: "Test Club", reporter_username: "reporter1", reason: "Spam" },
     ]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => expect(screen.getByText(/reporter1/)).toBeTruthy());
   });
 
@@ -182,7 +182,7 @@ describe("AdminPage – Reported Societies tab", () => {
     ]);
     api.dismissReport.mockResolvedValue(undefined);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getByText("Bad Club"));
     fireEvent.click(screen.getByText("Dismiss"));
     await waitFor(() => expect(api.dismissReport).toHaveBeenCalledWith(20));
@@ -196,7 +196,7 @@ describe("AdminPage – Reported Societies tab", () => {
     api.banReportedSociety.mockResolvedValue({});
     vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getByText("Bad Club"));
     fireEvent.click(screen.getByText("Ban"));
     await waitFor(() =>
@@ -213,7 +213,7 @@ describe("AdminPage – Reported Societies tab", () => {
     api.banReportedSociety.mockResolvedValue({});
     vi.spyOn(window, "prompt").mockReturnValue("Policy breach");
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getAllByText("Bad Club"));
     fireEvent.click(screen.getAllByText("Ban")[0]);
     await waitFor(() => expect(screen.queryByText("Bad Club")).toBeNull());
@@ -227,7 +227,7 @@ describe("AdminPage – Reported Societies tab", () => {
     const navListener = vi.fn();
     window.addEventListener("navigate", navListener);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() => screen.getByText("Row Club"));
     fireEvent.click(screen.getByText("Row Club"));
     await waitFor(() => expect(navListener).toHaveBeenCalled());
@@ -240,11 +240,9 @@ describe("AdminPage – Course Change Requests tab", () => {
   it("shows empty state when no requests", async () => {
     api.fetchCourseChangeRequests.mockResolvedValue([]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Course Change Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
     await waitFor(() =>
-      expect(
-        screen.getByText(/No pending course change requests/i),
-      ).toBeTruthy(),
+      expect(screen.getByText(/No course switch requests/i)).toBeTruthy(),
     );
   });
 
@@ -258,7 +256,7 @@ describe("AdminPage – Course Change Requests tab", () => {
       },
     ]);
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Course Change Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
     await waitFor(() => expect(screen.getByText("Jane Doe")).toBeTruthy());
     expect(screen.getByText(/Physics.*Chemistry/)).toBeTruthy();
   });
@@ -274,7 +272,7 @@ describe("AdminPage – Course Change Requests tab", () => {
     ]);
     api.resolveCourseChangeRequest.mockResolvedValue({ status: "approved" });
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Course Change Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
     await waitFor(() => screen.getByText("Bob Smith"));
     fireEvent.click(screen.getByText("✓ Approve"));
     await waitFor(() =>

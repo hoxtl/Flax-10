@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Pagination } from "../../components/Pagination/Pagination";
-import BasePill from "../../components/Tags/BasePill";
+import { BackToTop, Pagination } from "../../components/Pagination/Pagination";
+import Badge from "../../components/common/Badge/Badge";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
 import Tabs from "../../components/common/Tabs/Tabs";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import {
@@ -43,6 +44,7 @@ const rowAnim = {
 };
 
 const PAGE_SIZE = 20;
+const ADMIN_LIST_PAGE_SIZE = 10;
 
 const USER_FILTER_GROUPS = {
   roles: [
@@ -157,35 +159,37 @@ function RoleBadge({ role }) {
   );
 }
 
-function SearchBar({ value, onChange, placeholder, className = "" }) {
-  return (
-    <input
-      className={`${styles.search} ${className}`.trim()}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-    />
-  );
-}
-
 function FilterToggleGroup({ label, options, selected, onToggle }) {
+  void label;
   return (
     <div className={styles.filterGroup}>
-      <span className={styles.filterGroupLabel}>{label}</span>
       <div className={styles.filterButtons}>
         {options.map((opt) => {
           const active = selected.includes(opt.value);
           return (
-            <BasePill
+            <FilterPillButton
               key={opt.value}
               label={opt.label}
-              isActive={active}
+              active={active}
               onClick={() => onToggle(opt.value)}
             />
           );
         })}
       </div>
     </div>
+  );
+}
+
+function FilterPillButton({ label, active, onClick }) {
+  return (
+    <button type="button" className={styles.filterPillButton} onClick={onClick}>
+      <Badge
+        tone={active ? "default" : "muted"}
+        className={active ? styles.filterPillBadgeActive : styles.filterPillBadge}
+      >
+        {label}
+      </Badge>
+    </button>
   );
 }
 
@@ -378,9 +382,11 @@ function UsersTab({ onNavigate }) {
             </div>
             <SearchBar
               className={styles.searchCompact}
+              inputClassName={styles.searchInput}
               value={search}
               onChange={setSearch}
-              placeholder="Search"
+              placeholder="Search users... (/)"
+              showShortcutHint={false}
             />
           </div>
         </div>
@@ -568,7 +574,7 @@ function RatificationsTab() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -609,7 +615,7 @@ function RatificationsTab() {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Pending Ratifications{" "}
+          Society Ratifications{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -684,7 +690,7 @@ function TeacherRequestsTab({ onNavigate }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -718,7 +724,7 @@ function TeacherRequestsTab({ onNavigate }) {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Teacher Role Requests{" "}
+          Teacher Switch Requests{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -726,7 +732,7 @@ function TeacherRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <SearchEmptyState title="No pending teacher requests" hint="Teacher role requests from students will appear here." />
+        <SearchEmptyState title="No teacher switch requests" hint="Teacher role requests from students will appear here." />
       ) : (
         <>
           <Pagination
@@ -794,7 +800,7 @@ function ReportedSocietiesTab() {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(reports);
+    usePaginatedItems(reports, ADMIN_LIST_PAGE_SIZE);
 
   const navigateToSociety = (societyId) => {
     window.dispatchEvent(
@@ -931,7 +937,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
   const { currentPage, setCurrentPage, totalPages, pageItems } =
-    usePaginatedItems(items);
+    usePaginatedItems(items, ADMIN_LIST_PAGE_SIZE);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -965,7 +971,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
     <SectionCard>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Course Change Requests{" "}
+          Course Switch Requests{" "}
           <span className={styles.count}>({items.length})</span>
         </h2>
       </div>
@@ -973,7 +979,7 @@ function CourseChangeRequestsTab({ onNavigate }) {
       {loading ? (
         <LoadingSpinner />
       ) : items.length === 0 ? (
-        <SearchEmptyState title="No course change requests" hint="Student course change requests will appear here." />
+        <SearchEmptyState title="No course switch requests" hint="Student course change requests will appear here." />
       ) : (
         <>
           <Pagination
@@ -1045,30 +1051,34 @@ function CourseChangeRequestsTab({ onNavigate }) {
 function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
   const tabs = [
-    { id: "users", label: "👤 Users", content: <UsersTab onNavigate={onNavChange} /> },
-    { id: "ratifications", label: "🏛️ Ratifications", content: <RatificationsTab /> },
-    { id: "teachers", label: "🎓 Teacher Requests", content: <TeacherRequestsTab onNavigate={onNavChange} /> },
-    { id: "reports", label: "🚩 Reported Societies", content: <ReportedSocietiesTab /> },
-    { id: "course-changes", label: "📚 Course Change Requests", content: <CourseChangeRequestsTab onNavigate={onNavChange} /> },
+    { id: "users", icon: "👤", label: "Users Overview", content: <UsersTab onNavigate={onNavChange} /> },
+    { id: "ratifications", icon: "🤝", label: "Society Ratifications", content: <RatificationsTab /> },
+    { id: "reports", icon: "🚩", label: "Reported Societies", content: <ReportedSocietiesTab /> },
+    { id: "course-changes", icon: "📚", label: "Course Switch Requests", content: <CourseChangeRequestsTab onNavigate={onNavChange} /> },
+    { id: "teachers", icon: "🧑‍🏫", label: "Teacher Switch Requests", content: <TeacherRequestsTab onNavigate={onNavChange} /> },
   ];
   return (
-    <AppPage
-      title={
-        <>
-          <span className={styles.adminWord}>Admin</span>
-          <span className={styles.dashboardWord}> Dashboard</span>
-        </>
-      }
-      subtitle={
-        <span className={styles.subtitleText}>
-          Manage users, societies and platform requests
-        </span>
-      }
-      onBack={onBack}
-      width="xl"
-    >
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
-    </AppPage>
+    <>
+      <AppPage
+        title={
+          <>
+            <span className={styles.adminWord}>Admin</span>
+            <span className={styles.dashboardWord}> Dashboard</span>
+          </>
+        }
+        subtitle={
+          <span className={styles.subtitleText}>
+            Manage users, societies and platform requests
+          </span>
+        }
+        onBack={onBack}
+        backPlacement="above"
+        width="xl"
+      >
+        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
+      </AppPage>
+      <BackToTop />
+    </>
   );
 }
 
