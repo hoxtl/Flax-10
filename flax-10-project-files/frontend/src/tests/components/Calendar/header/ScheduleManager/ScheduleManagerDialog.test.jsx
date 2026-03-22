@@ -63,4 +63,18 @@ describe('ScheduleManagerDialog', () => {
         const { container } = render(<ScheduleManagerDialog open={false} onClose={vi.fn()} />);
         expect(container.firstChild).toBeNull();
     });
+
+    it('shows loading state then schedules', async () => {
+        getSchedules.mockResolvedValue(mockSchedules);
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+        
+        expect(screen.getByText('Loading schedules…')).toBeTruthy();
+        
+        await waitFor(() => {
+            expect(screen.getByText('Schedule 1')).toBeTruthy();
+            expect(screen.getByText('Schedule 2')).toBeTruthy();
+        });
+    });
+
+
 });
