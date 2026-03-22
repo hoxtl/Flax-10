@@ -94,3 +94,12 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertIn('location_latitude', data)
         self.assertIn('location_longitude', data)
         self.assertIn('location_validated', data)
+
+    def test_serializer_with_valid_coordinates(self):
+        """Test serializer with valid latitude and longitude."""
+        serializer = CalendarEventSerialiser(instance=self.event)
+        data = serializer.data
+        
+        self.assertEqual(data['location_latitude'], 51.5118)
+        self.assertEqual(data['location_longitude'], -0.1161)
+        self.assertEqual(data['location_validated'], True)
