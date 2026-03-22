@@ -131,3 +131,18 @@ class CalendarEventCreateSerialiserTests(TestCase):
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': None}
         event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
         self.assertIsNone(event.recurrence_rule)
+
+    def test_update_location(self):
+        """Test updating location coordinates."""
+        event = CalendarEvent.objects.create(
+            user=self.user, title='Old', start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1)
+        )
+        update_data = {
+            'title': 'New', 'start_time': event.start_time, 'end_time': event.end_time,
+            'location_latitude': 52.0, 'location_longitude': -1.0, 'location_validated': True
+        }
+        serializer = CalendarEventCreateSerialiser(instance=event, data=update_data)
+        updated = serializer.save()
+        
+        self.assertEqual(updated.location_latitude, 52.0)
+        self.assertTrue(updated.location_validated)
