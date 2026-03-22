@@ -1,0 +1,368 @@
+/*
+ * Admin page detail and modal styles.
+ */
+
+.badge {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.badgeActive {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.badgeBanned {
+  display: inline-block;
+  padding: 0.22rem 0.62rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.badgeTeacher {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.badgeStudent {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.badgePending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.staffBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted, #9ca3af);
+  background: var(--bg, #f3f4f6);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.userCard {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 14px;
+  padding: 1.1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.14s;
+}
+
+.userCard:hover {
+  border-color: var(--accent, #6c47ff);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.cardInfoMetaBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.cardProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.userAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-bg, rgba(108, 71, 255, 0.1));
+  color: var(--accent, #6c47ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.nameHandle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text, #111);
+  letter-spacing: -0.2px;
+}
+
+.userHandle {
+  font-size: 0.8rem;
+  color: var(--muted, #6b7280);
+  font-weight: 400;
+}
+
+.metaBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.statusBadge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  border: none;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+}
+
+.active {
+  background: #dcfce7;
+  color: #14532d;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.banned {
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.roleTag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.roleTeacher {
+  background: #7c3aed;
+}
+
+.roleStudent {
+  background: #9ca3af;
+}
+
+.rolePending {
+  background: #fed7aa;
+  color: #b45309;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.banPillBtn,
+.unbanPillBtn,
+.staffPillBadge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    opacity 0.15s,
+    transform 0.12s,
+    box-shadow 0.15s;
+  letter-spacing: -0.1px;
+}
+
+.banPillBtn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.banPillBtn:hover {
+  background: #fecaca;
+}
+
+.unbanPillBtn {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.unbanPillBtn:hover {
+  background: #bbf7d0;
+}
+
+.staffPillBadge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted, #9ca3af);
+  background: var(--bg, #f3f4f6);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  cursor: default;
+}
+
+:global(:root[data-mode="dark"]) .banPillBtn {
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+:global(:root[data-mode="dark"]) .banPillBtn:hover {
+  background: #991b1b;
+}
+
+:global(:root[data-mode="dark"]) .unbanPillBtn {
+  background: #14532d;
+  color: #dcfce7;
+}
+
+:global(:root[data-mode="dark"]) .unbanPillBtn:hover {
+  background: #166534;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  background: var(--surface, #fff);
+  border-radius: 20px;
+  padding: 2rem 2.25rem;
+  width: 400px;
+  max-width: 92vw;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.modalIcon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text, #111);
+  text-align: center;
+}
+
+.modalSub {
+  color: var(--muted, #6b7280);
+  font-size: 0.88rem;
+  margin: 0.25rem 0 0.75rem;
+  text-align: center;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.reasonInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  resize: vertical;
+  background: var(--bg, #f9fafb);
+  color: var(--text, #111);
+  font-family: inherit;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: var(--accent, #6c47ff);
+  box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: min(96vw, 420px);
+    padding: 1.2rem 1rem;
+    border-radius: 16px;
+  }
+
+  .modalTitle {
+    font-size: 1.05rem;
+  }
+
+  .modalSub {
+    font-size: 0.84rem;
+  }
+
+  .reasonInput {
+    font-size: 0.84rem;
+    min-height: 92px;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .badge,
+  .badgeTeacher,
+  .badgeStudent,
+  .badgePending,
+  .badgeActive,
+  .badgeBanned,
+  .staffBadge {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
