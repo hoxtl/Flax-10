@@ -89,14 +89,16 @@
   text-align: center;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
   z-index: 100;
   box-shadow: var(--shadow-md);
 }
 
 .scoreCard[data-tooltip]::before,
 .peakCard[data-tooltip]::before {
-  content: '';
+  content: "";
   position: absolute;
   bottom: calc(100% + 2px);
   left: 50%;
@@ -105,7 +107,9 @@
   border-top-color: var(--text);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
   z-index: 100;
 }
 
@@ -158,4 +162,25 @@
   height: 100%;
   background: var(--primary);
   border-radius: 4px;
+}
+
+@media (max-width: 640px) {
+  .scoreCard,
+  .peakCard {
+    min-width: 0;
+  }
+
+  .scoreRing {
+    width: 84px;
+    height: 84px;
+  }
+
+  .scoreRing svg {
+    width: 84px;
+    height: 84px;
+  }
+
+  .scoreNum {
+    font-size: 1.25rem;
+  }
 }

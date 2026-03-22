@@ -7,6 +7,7 @@ import re
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
 from django.utils import timezone
 
 from studyFlax.models.tasks.task_model import Task
@@ -304,7 +305,6 @@ def _uniquify_project_spec_names(specs):
     return specs
 
 def create_group_projects(stdout):
-    stdout.write("Seeding group projects...")
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
     students = _get_student_pool()
@@ -364,6 +364,15 @@ def create_group_memberships(stdout):
         if (project.name, project.course_code) not in allowed_keys:
             continue
         _add_members_to_project(project, students, rng, showcase_student, module_students)
+    from studyFlax.signals.groupwork_notifications import notify_on_added_to_project
+    post_save.disconnect(notify_on_added_to_project, sender=GroupMembership)
+    try:
+        projects = list(GroupProject.objects.all())
+        students = list(User.objects.filter(username__in=FIXTURE_USERNAMES))
+        for project in projects:
+            _add_members_to_project(project, students)
+    finally:
+        post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
 def _get_project_status_pattern(project):
     pattern_index = sum(ord(char) for char in f"{project.course_code}:{project.name}") % len(PROJECT_TASK_STATUS_PATTERNS)

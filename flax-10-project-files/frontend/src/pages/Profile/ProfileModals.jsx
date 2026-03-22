@@ -102,15 +102,67 @@ function useSocialUsers(isOpen, userId, fetchFn) {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     if (!(isOpen && userId)) return setUsers([]);
-    fetchFn(userId).then((data) => setUsers(data.results || data)).catch(() => setUsers([]));
+    fetchFn(userId)
+      .then((data) => setUsers(data.results || data))
+      .catch((error) => {
+        console.error("Failed to fetch users", error);
+        setUsers([]);
+      });
   }, [fetchFn, isOpen, userId]);
   return users;
 }
 
-function SocialDataModal({ isOpen, onClose, title, fetchFn, userId, onNavChange, onUserUpdate }) {
+function buildSharedCalendarRoute(user) {
+  if (!user?.id) return "/calendar";
+  const displayName = [user.first_name, user.last_name].filter(Boolean).join(" ").trim() || user.username || "Shared user";
+  const params = new URLSearchParams({ user_id: String(user.id), shared_name: displayName });
+  return `/calendar?${params.toString()}`;
+}
+
+function buildSharingTitle(mode, count) {
+  if (mode === "sharing_with_me") {
+    if (count === 1) return "1 person has shared their calendar events with me";
+    if (count > 1) return `${count} people have shared their calendar events with me`;
+    return "People who have shared their calendar events with me";
+  }
+  if (count === 1) return "1 person can see my calendar events";
+  if (count > 1) return `${count} people can see my calendar events`;
+  return "People who can see my calendar events";
+}
+
+function SocialDataModal({
+  isOpen,
+  onClose,
+  titleMode,
+  fetchFn,
+  userId,
+  onNavChange,
+  onUserUpdate,
+  emptyHint,
+  showCalendarAction = false,
+}) {
   const users = useSocialUsers(isOpen, userId, fetchFn);
   if (!isOpen) return null;
-  return <UserListModal title={title} users={users} onClose={onClose} onUserClick={(user) => { onClose(); onNavChange?.(`profile_${user.id}`); }} onUserUpdate={onUserUpdate} />;
+  const handleUserOpen = (user) => {
+    onClose();
+    onNavChange?.(`profile_${user.id}`);
+  };
+  const handleCalendarOpen = (user) => {
+    onClose();
+    onNavChange?.(buildSharedCalendarRoute(user));
+  };
+  return (
+    <UserListModal
+      title={buildSharingTitle(titleMode, users.length)}
+      users={users}
+      emptyHint={emptyHint}
+      showCalendarAction={showCalendarAction}
+      onClose={onClose}
+      onUserClick={handleUserOpen}
+      onUserCalendarClick={showCalendarAction ? handleCalendarOpen : undefined}
+      onUserUpdate={onUserUpdate}
+    />
+  );
 }
 
 function EditProfileSection({ state }) {
@@ -121,8 +173,27 @@ function SharingModals({ user, state, onNavChange }) {
   const userId = (state.profileData || user)?.id;
   return (
     <>
-      <SocialDataModal isOpen={state.showSharedWith} onClose={() => state.setShowSharedWith(false)} title="Sharing With" fetchFn={getSharingWith} userId={userId} onNavChange={onNavChange} onUserUpdate={state.reload} />
-      <SocialDataModal isOpen={state.showSharedBy} onClose={() => state.setShowSharedBy(false)} title="Shared By" fetchFn={getSharedWithMe} userId={userId} onNavChange={onNavChange} onUserUpdate={state.reload} />
+      <SocialDataModal
+        isOpen={state.showSharedWith}
+        onClose={() => state.setShowSharedWith(false)}
+        titleMode="shared_with"
+        fetchFn={getSharingWith}
+        userId={userId}
+        onNavChange={onNavChange}
+        onUserUpdate={state.reload}
+        emptyHint="No one can see your calendar events yet."
+      />
+      <SocialDataModal
+        isOpen={state.showSharedBy}
+        onClose={() => state.setShowSharedBy(false)}
+        titleMode="sharing_with_me"
+        fetchFn={getSharedWithMe}
+        userId={userId}
+        onNavChange={onNavChange}
+        onUserUpdate={state.reload}
+        emptyHint="No one has shared their calendar events with you yet."
+        showCalendarAction
+      />
     </>
   );
 }

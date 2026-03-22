@@ -3,6 +3,7 @@ Orchestrates bulk creation of study sessions and theme sessions.
 """
 
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.timer.theme_session_model import ThemeSession
@@ -29,56 +30,30 @@ PROFILES = {
     'lturner': ('night_owl', 'balanced'),
 }
 
-def _new_study_sessions(user, study_profile):
-    return [
-        s for s in build_study_sessions_for_user(user, study_profile)
-        if not StudySession.objects.filter(
-            user=user, study_block_id=s.study_block_id,
-        ).exists()
-    ]
 
-def _new_theme_sessions(user, theme_profile):
-    return [
-        t for t in build_theme_sessions_for_user(user, theme_profile)
-        if not ThemeSession.objects.filter(
-            user=user, started_at=t.started_at,
-        ).exists()
-    ]
+def _get_profile(username):
+    """Return (study_profile, theme_profile) for a user."""
+    return PROFILES.get(username, ('balanced', 'balanced'))
 
-def _seed_sessions_for_user(username, study_profile, theme_profile):
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return 0, 0
-    study_sessions = _new_study_sessions(user, study_profile)
-    StudySession.objects.bulk_create(study_sessions, ignore_conflicts=True)
-    theme_sessions = _new_theme_sessions(user, theme_profile)
-    ThemeSession.objects.bulk_create(theme_sessions, ignore_conflicts=True)
-    return len(study_sessions), len(theme_sessions)
 
-def _seed_all_students(stdout):
-    """Seed sessions for any students not already processed, if they have no data."""
-    students = User.objects.filter(role='student').exclude(username__in=PROFILES.keys())
-    total_study = 0
-    total_theme = 0
-    for user in students:
-        if not StudySession.objects.filter(user=user).exists():
-            study_sessions = build_study_sessions_for_user(user, 'balanced')
-            StudySession.objects.bulk_create(study_sessions, ignore_conflicts=True)
-            theme_sessions = build_theme_sessions_for_user(user, 'balanced')
-            ThemeSession.objects.bulk_create(theme_sessions, ignore_conflicts=True)
-            total_study += len(study_sessions)
-            total_theme += len(theme_sessions)
-    if total_study > 0:
-        stdout.write(f"  Seeded {total_study} study sessions and {total_theme} theme sessions for {students.count()} additional students.")
+def _build_user_sessions(user):
+    """Build study and theme sessions for a user based on their profile."""
+    study_profile, theme_profile = _get_profile(user.username)
+    study = build_study_sessions_for_user(user, study_profile)
+    theme = build_theme_sessions_for_user(user, theme_profile)
+    return study, theme
 
+
+@transaction.atomic
 def create_study_sessions(stdout):
-    stdout.write("Seeding study sessions and theme sessions...")
-    total_study = 0
-    total_theme = 0
-    for username, (study_profile, theme_profile) in PROFILES.items():
-        study, theme = _seed_sessions_for_user(username, study_profile, theme_profile)
-        total_study += study
-        total_theme += theme
-    stdout.write(f"  Created {total_study} study sessions, {total_theme} theme sessions for fixture users.")
-    _seed_all_students(stdout)
+    """Create study and theme sessions for all seeded students and teachers."""
+    students = list(User.objects.filter(role__in=['student', 'teacher']))
+    all_study = []
+    all_theme = []
+    for user in students:
+        study, theme = _build_user_sessions(user)
+        all_study.extend(study)
+        all_theme.extend(theme)
+    StudySession.objects.bulk_create(all_study, ignore_conflicts=True, batch_size=500)
+    ThemeSession.objects.bulk_create(all_theme, ignore_conflicts=True, batch_size=500)
+    stdout.write(f"  \u2713  {'Sessions':<14} {len(all_study):,} study \u00b7 {len(all_theme):,} theme")

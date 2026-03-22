@@ -2,6 +2,7 @@
  * Attendance list column.
  */
 
+import { Tabs } from "../../../components/common";
 import MarkedAttendanceList from "./MarkedAttendanceList";
 import RecordAttendanceList from "./RecordAttendanceList";
 import SegmentDetailPanel from "./SegmentDetailPanel";
@@ -23,41 +24,42 @@ function AttendanceSegmentPanel({ model }) {
 }
 
 function AttendanceTabbedList({ model }) {
+  const tabs = buildAttendanceTabs(model);
   return (
     <div className={styles.listCol}>
       <div className={styles.listPanel}>
-        <AttendanceTabs model={model} />
-        <AttendanceListContent model={model} />
+        <div className={styles.attendanceTabsWrap}>
+          <Tabs
+            tabs={tabs}
+            activeTab={model.listTab}
+            onTabChange={(id) => id === "record" ? model.showRecordTab() : model.showMarkedTab()}
+            layoutId="attendanceTabIndicator"
+            tabVariant="heading"
+            className={styles.attendanceTabs}
+          />
+        </div>
       </div>
     </div>
   );
 }
-
-import { TabBar } from "../../../components/common";
 
 const TABS = [
   { id: "record", label: "Record attendance" },
   { id: "marked", label: "Marked" }
 ];
 
-function AttendanceTabs({ model }) {
-  const tabs = TABS.map(t => ({
-    ...t,
+function buildAttendanceTabs(model) {
+  return TABS.map((tab) => ({
+    ...tab,
     label: (
-      <div className={styles.tabLabelWithBadge}>
-        {t.label}
-        {t.id === "record" && model.unmarkedEvents.length > 0 && <span className={styles.tabBadge}>{model.unmarkedEvents.length}</span>}
-        {t.id === "marked" && model.markedEvents.length > 0 && <span className={styles.tabBadge}>{model.markedEvents.length}</span>}
-      </div>
-    )
+      <span className={styles.tabLabelWithBadge}>
+        <span>{tab.label}</span>
+        {tab.id === "record" && model.unmarkedEvents.length > 0 && <span className={styles.tabBadge}>{model.unmarkedEvents.length}</span>}
+        {tab.id === "marked" && model.markedEvents.length > 0 && <span className={styles.tabBadge}>{model.markedEvents.length}</span>}
+      </span>
+    ),
+    content: tab.id === "record" ? <RecordTabContent model={model} /> : <MarkedTabContent model={model} />
   }));
-
-  return <TabBar tabs={tabs} activeTab={model.listTab} onTabChange={(id) => id === "record" ? model.showRecordTab() : model.showMarkedTab()} layoutId="attendance-tab-underline" />;
-}
-
-function AttendanceListContent({ model }) {
-  if (model.listTab === "record") return <RecordTabContent model={model} />;
-  return <MarkedTabContent model={model} />;
 }
 
 function RecordTabContent({ model }) {

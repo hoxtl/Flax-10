@@ -76,8 +76,8 @@ import analyticsService from '../../../api/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
-const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', module_count: 3 };
-const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' };
+const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
+const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };
 
 const makeProfileState = (overrides = {}) => ({
   loading: false,
@@ -183,7 +183,7 @@ describe('Profile', () => {
 
   it('renders not found when no profileData', () => {
     useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
-    renderProfile();
+    renderProfile({ user: null });
     expect(screen.getByText('Profile unavailable')).toBeTruthy();
   });
 
@@ -225,6 +225,13 @@ describe('Profile', () => {
     expect(screen.queryByText(/edit profile/i)).toBeNull();
   });
 
+  it('renders a standalone back button above the header when onBack is provided', async () => {
+    const onBack = vi.fn();
+    renderProfile({ onBack, backLabel: 'Go back' });
+    fireEvent.click(screen.getByRole('button', { name: /Go back/i }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
   it('renders profile-home loading skeleton when summary is loading', () => {
     useProfileSummary.mockReturnValue({ summary: null, loading: true, refetch: vi.fn() });
     renderProfile();
@@ -246,12 +253,12 @@ describe('Profile', () => {
     analyticsService.getSummary.mockResolvedValue({ heatmap: { data: Array(7).fill(null).map(() => Array(24).fill(0)) } });
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
     renderProfile({ onNavigate });
-    const analyticsLinks = await screen.findAllByText(/View full analytics/i);
+    const analyticsLinks = await screen.findAllByText(/View (attendance details|full analytics)/i);
     fireEvent.click(analyticsLinks[0]);
     if (onNavigate.mock.calls.length === 0) {
       fireEvent.click(analyticsLinks[1]);
     }
-    expect(onNavigate).toHaveBeenCalledWith('analytics');
+    expect(onNavigate).toHaveBeenCalledWith('attendance');
     fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
   });

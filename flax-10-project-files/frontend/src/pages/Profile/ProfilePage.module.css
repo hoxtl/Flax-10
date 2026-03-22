@@ -4,7 +4,7 @@
 .container {
   max-width: 935px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 16px 20px;
   background: transparent;
 }
 
@@ -17,6 +17,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  margin-bottom: 14px;
   display: flex;
   justify-content: flex-start;
 }
@@ -44,6 +45,34 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.otherInsightsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.22fr) minmax(280px, 0.78fr);
+  gap: 20px;
+  align-items: start;
+  grid-auto-rows: min-content;
+}
+
+.compatibilityCell {
+  min-height: 0;
+  aspect-ratio: auto;
+  align-self: start;
+}
+
+.compatibilityCell > * {
+  height: auto;
+}
+
+.secondaryInsightCell {
+  min-height: 0;
+  aspect-ratio: auto;
+  align-self: start;
+}
+
+.secondaryInsightCell > * {
+  height: auto;
 }
 
 .leftCol {
@@ -191,6 +220,20 @@
   .leftTopMetricsRow,
   .skelBody {
     grid-template-columns: 1fr;
+  }
+
+  .otherInsightsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .compatibilityCell {
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+
+  .secondaryInsightCell {
+    aspect-ratio: auto;
+    min-height: 0;
   }
 }
 

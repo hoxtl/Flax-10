@@ -52,21 +52,21 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_derive_persona_sprint(self):
         from studyFlax.views.user.profile_summary_view import derive_persona
 
-        sessions = [self._make_session(days_ago=index, hour=10, duration=20) for index in range(8, 15)]
+        sessions = [self._make_session(days_ago=index, hour=10, duration=20 * 60) for index in range(8, 15)]
         persona = derive_persona(sessions)
         self.assertEqual(persona['id'], 'sprint')
 
     def test_derive_persona_marathon(self):
         from studyFlax.views.user.profile_summary_view import derive_persona
 
-        sessions = [self._make_session(days_ago=index, hour=10, duration=100) for index in range(8, 15)]
+        sessions = [self._make_session(days_ago=index, hour=10, duration=100 * 60) for index in range(8, 15)]
         persona = derive_persona(sessions)
         self.assertEqual(persona['id'], 'marathon')
 
     def test_compute_badges_hours_milestones(self):
         from studyFlax.views.user.profile_summary_view import compute_badges
 
-        sessions = [self._make_session(i + 1, duration=60, days_ago=i * 24 + 1) for i in range(1, 12)]
+        sessions = [self._make_session(i + 1, duration=3600, days_ago=i * 24 + 1) for i in range(1, 12)]
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
         ids = [badge['id'] for badge in badges]
         self.assertIn('1hr', ids)
@@ -91,7 +91,7 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_compute_badges_50hr_and_100hr_milestones(self):
         from studyFlax.views.user.profile_summary_view import compute_badges
 
-        sessions = [self._make_session(index + 1, days_ago=index + 1, duration=480) for index in range(13)]
+        sessions = [self._make_session(index + 1, days_ago=index + 1, duration=480 * 60) for index in range(13)]
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
         ids = [badge['id'] for badge in badges]
         self.assertIn('50hr', ids)
@@ -100,7 +100,7 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_compute_badges_250hr_and_500hr_milestones(self):
         from studyFlax.views.user.profile_summary_view import compute_badges
 
-        sessions = [self._make_session(index + 1, days_ago=index + 1, duration=310) for index in range(100)]
+        sessions = [self._make_session(index + 1, days_ago=index + 1, duration=310 * 60) for index in range(100)]
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
         ids = [badge['id'] for badge in badges]
         self.assertIn('250hr', ids)
@@ -156,12 +156,12 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_compute_badges_sprint_king_and_deep_focus(self):
         from studyFlax.views.user.profile_summary_view import compute_badges
 
-        short = [self._make_session(index + 1, duration=20) for index in range(10)]
+        short = [self._make_session(index + 1, duration=20 * 60) for index in range(10)]
         short_badges = compute_badges(short, short, 0, 0, 0, self.user)
         short_ids = [badge['id'] for badge in short_badges]
         self.assertIn('sprint_king', short_ids)
 
-        long_session = [self._make_session(index + 20, duration=100) for index in range(10)]
+        long_session = [self._make_session(index + 20, duration=100 * 60) for index in range(10)]
         long_badges = compute_badges(long_session, long_session, 0, 0, 0, self.user)
         long_ids = [badge['id'] for badge in long_badges]
         self.assertIn('deep_focus', long_ids)
@@ -180,7 +180,7 @@ class ProfileSummaryHelpersTest(TestCase):
         sessions = []
         for week in range(4):
             for day in range(5):
-                sessions.append(self._make_session(week * 7 + day + 1, duration=300))
+                sessions.append(self._make_session(week * 7 + day + 1, duration=3600))
         self.user.weekly_goal_hours = 1
         self.user.save()
         badges = compute_badges(sessions, sessions, 0, 0, 0, self.user)
@@ -205,20 +205,20 @@ class ProfileSummaryHelpersTest(TestCase):
     def test_get_weekly_study_hours(self):
         from studyFlax.views.user.profile_summary_view import get_weekly_study_hours
 
-        self._make_session(days_ago=1, duration=120)
-        self._make_session(days_ago=2, duration=60)
-        self._make_session(days_ago=3, duration=60)
+        self._make_session(days_ago=1, duration=7200)
+        self._make_session(days_ago=2, duration=3600)
+        self._make_session(days_ago=3, duration=3600)
         sessions = list(StudySession.objects.filter(user=self.user))
         self.assertAlmostEqual(get_weekly_study_hours(sessions), 4.0, places=1)
 
     def test_persona_fallback_for_medium_late_morning_duration(self):
         from studyFlax.views.user.profile_summary_view import derive_persona
 
-        sessions = [self._make_session(index + 8, hour=10, duration=45) for index in range(7)]
+        sessions = [self._make_session(index + 8, hour=10, duration=45 * 60) for index in range(7)]
         persona = derive_persona(sessions)
         self.assertEqual(persona['id'], 'afternoon_peak')
 
-    def _make_session(self, index=0, status_val='Completed', days_ago=None, hour=10, duration=60, hours_ago=None):
+    def _make_session(self, index=0, status_val='Completed', days_ago=None, hour=10, duration=3600, hours_ago=None):
         if days_ago is None and hours_ago is None:
             days_ago = index
         if hours_ago is not None:
@@ -226,7 +226,7 @@ class ProfileSummaryHelpersTest(TestCase):
         else:
             base_time = timezone.now() - timedelta(days=days_ago)
         end_time = base_time.replace(hour=hour, minute=0, second=0, microsecond=0)
-        start_time = end_time - timedelta(minutes=duration)
+        start_time = end_time - timedelta(seconds=duration)
         return StudySession.objects.create(
             user=self.user,
             start_time=start_time,

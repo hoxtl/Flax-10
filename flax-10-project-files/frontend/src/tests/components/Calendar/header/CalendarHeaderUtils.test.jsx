@@ -189,5 +189,11 @@ describe('CalendarHeaderUtils', () => {
             expect(screen.getByText('Filter by tag')).toBeInTheDocument();
             expect(screen.getByTestId('tags-selector')).toBeInTheDocument();
         });
+
+        it('hides the manage tags action when tag management is disabled', () => {
+            render(<FilterDropdownButton active="all" onChange={vi.fn()} allowManageTags={false} />);
+            fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
+            expect(screen.queryByText(/Manage tags/i)).not.toBeInTheDocument();
+        });
     });
 });

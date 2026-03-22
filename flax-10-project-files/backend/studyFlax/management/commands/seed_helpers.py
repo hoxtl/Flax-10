@@ -159,53 +159,49 @@ def build_users_list(needed, role='student'):
 def _random_year():
     return random.choice(['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4'])
 
+
 def _random_theme():
     return random.choice(['light', 'dark'])
 
-def _build_single_settings(user):
-    is_teacher = getattr(user, 'role', None) == 'teacher'
-    
-    # Pinned widgets — always present, always at the top
-    PINNED = ["deadlines", "todayTasks", "bigTimeline"]
 
-    # Remaining optional widgets (exclude pinned ones)
-    optional_widgets = [
-        "rightNow", "tinyTimeline",
-        "semesterOverview", "studyStreak", "weeklyGoal", "photo",
-        "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
-        "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",
-        "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
-    ]
+PINNED_WIDGETS = ["deadlines", "todayTasks", "bigTimeline"]
+OPTIONAL_WIDGETS = [
+    "rightNow", "tinyTimeline", "semesterOverview", "studyStreak", "weeklyGoal", "photo",
+    "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
+    "analyticsStudyHours", "analyticsHeatmap", "analyticsPlannedActual",
+    "analyticsVenio", "analyticsAttendance", "analyticsThemeUsage"
+]
 
-    # Pick 2-5 additional random widgets
-    shuffled = optional_widgets[:]
+
+def _select_widgets():
+    """Select random widgets for homepage."""
+    shuffled = OPTIONAL_WIDGETS[:]
     random.shuffle(shuffled)
-    selected = ["hero"] + PINNED + shuffled[:random.randint(2, 5)]
+    return ["hero"] + PINNED_WIDGETS + shuffled[:random.randint(2, 5)]
 
-    # Randomize sizes for chosen widgets
-    sizes = {}
-    for widget_id in selected:
-        if widget_id == "hero":
-            continue
-        if widget_id == "bigTimeline":
-            sizes[widget_id] = {"col": 2, "row": 2}
-            continue
-        sizes[widget_id] = {
-            "col": 2 if random.random() > 0.6 else 1,
-            "row": 2 if random.random() > 0.7 else 1
-        }
 
+def _widget_size(widget_id):
+    """Generate random size for a widget."""
+    if widget_id == "bigTimeline":
+        return {"col": 2, "row": 2}
+    return {"col": 2 if random.random() > 0.6 else 1, "row": 2 if random.random() > 0.7 else 1}
+
+
+def _generate_widget_sizes(widgets):
+    """Generate sizes for all widgets except hero."""
+    return {w: _widget_size(w) for w in widgets if w != "hero"}
+
+
+def _build_single_settings(user):
+    """Build UserSettings for a single user."""
+    is_teacher = getattr(user, 'role', None) == 'teacher'
+    widgets = _select_widgets()
     return UserSettings(
-        user=user,
-        theme=_random_theme(),
-        timezone='Europe/London',
+        user=user, theme=_random_theme(), timezone='Europe/London',
         year='' if is_teacher else _random_year(),
         major='' if is_teacher else random.choice(course_fixtures),
-        sleep_time=time(23, 0),
-        wake_time=time(7, 0),
-        mode=_random_theme(),
-        homepage_widgets=selected,
-        homepage_widget_sizes=sizes,
+        sleep_time=time(23, 0), wake_time=time(7, 0), mode=_random_theme(),
+        homepage_widgets=widgets, homepage_widget_sizes=_generate_widget_sizes(widgets),
     )
 
 def build_settings_for_new_users():

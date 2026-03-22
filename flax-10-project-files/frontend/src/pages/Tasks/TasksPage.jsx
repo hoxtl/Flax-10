@@ -1,5 +1,6 @@
-/*
- * Tasks page shell with sidebar, feed, modals, and toast feedback.
+/**
+ * Tasks page: list sidebar, task feed, create modals, toasts.
+ * Uses useTasksPage for state and subcomponents for layout.
  */
 
 import TaskFeed from "./components/TaskFeed";
@@ -31,21 +32,36 @@ function ToastDelete({ onClose }) {
 }
 
 function ToastInfo({ message, onClose }) {
-  return <AppToast message={message} onClose={onClose} variant="success" />;
+  const variant =
+    typeof message === "string" && message.toLowerCase().includes("deleted")
+      ? "success"
+      : "info";
+  return <AppToast message={message} onClose={onClose} variant={variant} />;
 }
 
-function TasksPageToasts({ toastUndo, toastDelete, toastInfo, handleUndoAddTask, setToastUndo, setToastDelete, setToastInfo }) {
+function TasksPageToasts({
+  toastUndo,
+  toastDelete,
+  toastInfo,
+  handleUndoAddTask,
+  setToastUndo,
+  setToastDelete,
+  setToastInfo,
+}) {
   return (
     <AnimatePresence initial={false}>
-      {toastUndo && <ToastUndo onUndo={handleUndoAddTask} onClose={() => setToastUndo(null)} />}
+      {toastUndo && (
+        <ToastUndo
+          onUndo={handleUndoAddTask}
+          onClose={() => setToastUndo(null)}
+        />
+      )}
       {toastDelete && <ToastDelete onClose={() => setToastDelete(false)} />}
-      {toastInfo && <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />}
+      {toastInfo && (
+        <ToastInfo message={toastInfo} onClose={() => setToastInfo(null)} />
+      )}
     </AnimatePresence>
   );
-}
-
-function SkeletonRows({ count, className, step }) {
-  return [...Array(count)].map((_, index) => <div key={index} className={`${styles.skel} ${className}`} style={{ animationDelay: `${index * step}s` }} />);
 }
 
 function TasksSkeleton() {
@@ -53,13 +69,31 @@ function TasksSkeleton() {
     <div className={styles.page} data-testid="tasks-skeleton">
       <div className={styles.skelSidebar}>
         <div className={`${styles.skel} ${styles.skelSidebarTitle}`} />
-        <SkeletonRows count={3} className={styles.skelSidebarRow} step={0.08} />
+        {[...Array(3)].map((_, i) => (
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelSidebarRow}`}
+            style={{ animationDelay: `${i * 0.08}s` }}
+          />
+        ))}
         <div className={styles.skelDivider} />
-        <SkeletonRows count={4} className={styles.skelSidebarRow} step={0.08} />
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelSidebarRow}`}
+            style={{ animationDelay: `${i * 0.08}s` }}
+          />
+        ))}
       </div>
       <div className={styles.skelFeed}>
         <div className={`${styles.skel} ${styles.skelFeedHeader}`} />
-        <SkeletonRows count={5} className={styles.skelTaskRow} step={0.06} />
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className={`${styles.skel} ${styles.skelTaskRow}`}
+            style={{ animationDelay: `${i * 0.06}s` }}
+          />
+        ))}
       </div>
     </div>
   );
@@ -71,11 +105,21 @@ export default function TasksPage() {
   return (
     <div className={styles.page}>
       <ListSidebar {...p.sidebarProps} />
-      <TaskFeed {...p.feedProps} />
+      <TaskFeed {...p.feedProps} sidebarProps={p.sidebarProps} />
       {p.showTaskModal && <CreateTaskModal {...p.taskModalProps} />}
-      <TasksPageToasts toastUndo={p.toastUndo} toastDelete={p.toastDelete} toastInfo={p.toastInfo} handleUndoAddTask={p.handleUndoAddTask} setToastUndo={p.setToastUndo} setToastDelete={p.setToastDelete} setToastInfo={p.setToastInfo} />
+      <TasksPageToasts
+        toastUndo={p.toastUndo}
+        toastDelete={p.toastDelete}
+        toastInfo={p.toastInfo}
+        handleUndoAddTask={p.handleUndoAddTask}
+        setToastUndo={p.setToastUndo}
+        setToastDelete={p.setToastDelete}
+        setToastInfo={p.setToastInfo}
+      />
       {p.showListModal && <CreateListModal {...p.listModalProps} />}
-      {p.showCreateListFromTask && <CreateListModal {...p.createListFromTaskProps} />}
+      {p.showCreateListFromTask && (
+        <CreateListModal {...p.createListFromTaskProps} />
+      )}
       <BackToTop />
     </div>
   );

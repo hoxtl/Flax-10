@@ -17,6 +17,12 @@ PERSONAS = [
     {'id': 'marathon', 'label': 'Marathon Runner', 'emoji': '🏃', 'description': 'Long sessions, deep focus. You build momentum and ride it all the way.'},
 ]
 
+SECONDS_PER_HOUR = 3600
+SPRINT_SESSION_SECONDS = 30 * 60
+MARATHON_SESSION_SECONDS = 75 * 60
+SHORT_SESSION_SECONDS = 25 * 60
+LONG_SESSION_SECONDS = 90 * 60
+
 
 def derive_persona(sessions):
     if not sessions:
@@ -30,7 +36,7 @@ def derive_persona(sessions):
         return PERSONAS[1]
     if 12 <= peak_hour < 17:
         return PERSONAS[2]
-    return PERSONAS[4] if avg_duration <= 30 else PERSONAS[5] if avg_duration >= 75 else PERSONAS[2]
+    return PERSONAS[4] if avg_duration <= SPRINT_SESSION_SECONDS else PERSONAS[5] if avg_duration >= MARATHON_SESSION_SECONDS else PERSONAS[2]
 
 
 def collect_session_stats(sessions):
@@ -44,8 +50,8 @@ def filter_complete(sessions):
 
 
 def session_totals(sessions):
-    total_minutes = sum(session.duration for session in sessions)
-    return total_minutes, total_minutes / 60, len(sessions)
+    total_seconds = sum(session.duration for session in sessions)
+    return total_seconds, total_seconds / SECONDS_PER_HOUR, len(sessions)
 
 
 def active_days_last_30(sessions_90):
@@ -102,8 +108,8 @@ def build_time_of_day_badges(early, late, afternoon, session_count):
 
 
 def session_length_badges(sessions_all):
-    short_sessions = sum(1 for session in sessions_all if session.duration <= 25)
-    long_sessions = sum(1 for session in sessions_all if session.duration >= 90)
+    short_sessions = sum(1 for session in sessions_all if session.duration <= SHORT_SESSION_SECONDS)
+    long_sessions = sum(1 for session in sessions_all if session.duration >= LONG_SESSION_SECONDS)
     return build_session_length_badges(short_sessions, long_sessions)
 
 
@@ -134,7 +140,7 @@ def weekly_goal_badges(sessions_all, user):
 
 def build_weekly_goal_badges(sessions_all, now, weekly_goal, week_minutes):
     earned = []
-    if week_minutes / 60 >= weekly_goal:
+    if week_minutes / 3600 >= weekly_goal:
         earned.append(badge('goal_getter', 'Goal Getter', '🎯', 'Hit your weekly study goal', 'silver'))
     if hit_goal_four_weeks(sessions_all, now, weekly_goal):
         earned.append(badge('consistent_goals', 'Consistent Goals', '📆', 'Hit your weekly goal 4 weeks running', 'gold'))
@@ -148,7 +154,7 @@ def week_minutes(sessions, week_start, week_end):
 def week_hours_for_offset(sessions, now, offset):
     week_start = now - timedelta(days=7 * (offset + 1))
     week_end = now - timedelta(days=7 * offset)
-    return week_minutes(sessions, week_start, week_end) / 60
+    return week_minutes(sessions, week_start, week_end) / 3600
 
 
 def hit_goal_four_weeks(sessions, now, goal):
@@ -180,4 +186,4 @@ def compute_badges(sessions_all, sessions_90, _, longest_streak, module_count, u
 def get_weekly_study_hours(sessions_all):
     week_ago = timezone.now() - timedelta(days=7)
     week_sessions = [session for session in sessions_all if session.end_time >= week_ago]
-    return round(sum(session.duration for session in week_sessions) / 60, 1)
+    return round(sum(session.duration for session in week_sessions) / 3600, 1)

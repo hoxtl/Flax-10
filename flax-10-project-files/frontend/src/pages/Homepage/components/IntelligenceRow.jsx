@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock3, Train, AlertTriangle, BarChart3, LayoutGrid, Zap, TrendingUp, Presentation, HeartPulse } from "lucide-react";
+import {
+  Calendar,
+  Clock3,
+  Train,
+  AlertTriangle,
+  BarChart3,
+  LayoutGrid,
+  Zap,
+  TrendingUp,
+  Presentation,
+  HeartPulse,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
@@ -14,7 +25,7 @@ import {
   getLiveContext,
   getNextStep,
   getCurrentEvent,
-  getUpcomingEvent
+  getUpcomingEvent,
 } from "./IntelligenceUtils";
 
 import { useAuth } from "../../../context/AuthContext";
@@ -34,39 +45,193 @@ import StudyHeatmap from "../../../components/Analytics/StudyHeatmap";
 import PlannedVsActualChart from "../../../components/Analytics/PlannedVsActualChart";
 import ThemeUsageChart from "../../../components/Analytics/ThemeUsageChart";
 import AttendanceChart from "../../../components/Analytics/AttendanceChart";
-import { ConsistencyScore, PeakHoursCard } from "../../../components/Analytics/InsightCards";
+import {
+  ConsistencyScore,
+  PeakHoursCard,
+} from "../../../components/Analytics/InsightCards";
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 import { CompactAttendanceTile } from "../../Profile/components/ProfileWidgets";
 import { TinyTimelineWidget } from "./TinyTimelineWidget";
 import { updateUserSettings } from "../../../api/userApi";
 
-
 const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, maxRow: 2, section: "Essentials" },
-  { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
-  { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, maxRow: 2, section: "Planning" },
-  { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, maxRow: 1, section: "Planning" },
-  { id: "tinyTimeline", label: "Tiny Timeline", icon: "🕒", col: 1, row: 2, maxRow: 2, section: "Planning" },
-  { id: "bigTimeline", label: "Full Timeline", icon: "🗓️", col: 2, row: 2, minCol: 2, maxCol: 2, minRow: 2, maxRow: 2, section: "Planning" },
-  { id: "semesterOverview", label: "Semester Overview", icon: "📅", col: 2, row: 2, minRow: 2, section: "Planning" },
+  {
+    id: "hero",
+    label: "Intelligence Hero",
+    icon: "✨",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    maxRow: 2,
+    section: "Essentials",
+  },
+  {
+    id: "rightNow",
+    label: "Right Now",
+    icon: "⌚",
+    col: 1,
+    row: 2,
+    section: "Essentials",
+  },
+  {
+    id: "deadlines",
+    label: "Deadlines",
+    icon: "⏰",
+    col: 1,
+    row: 1,
+    maxRow: 2,
+    section: "Planning",
+  },
+  {
+    id: "todayTasks",
+    label: "Today's Tasks",
+    icon: "✅",
+    col: 1,
+    row: 1,
+    maxRow: 1,
+    section: "Planning",
+  },
+  {
+    id: "tinyTimeline",
+    label: "Tiny Timeline",
+    icon: "🕒",
+    col: 1,
+    row: 2,
+    maxRow: 2,
+    section: "Planning",
+  },
+  {
+    id: "bigTimeline",
+    label: "Full Timeline",
+    icon: "🗓️",
+    col: 2,
+    row: 2,
+    minCol: 2,
+    maxCol: 2,
+    minRow: 2,
+    maxRow: 2,
+    section: "Planning",
+  },
+  {
+    id: "semesterOverview",
+    label: "Semester Overview",
+    icon: "📅",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Planning",
+  },
 
-  { id: "studyStreak", label: "Study Streak", icon: "🔥", col: 1, row: 1, section: "Progress" },
-  { id: "weeklyGoal", label: "Weekly Goal", icon: "🎯", col: 1, row: 1, section: "Progress" },
-  { id: "photo", label: "Photo", icon: "🖼️", col: 1, row: 1, section: "Profile" },
-  { id: "analyticsProductivity", label: "Productivity", icon: "⚙️", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsInsights", label: "Insights", icon: "💡", col: 1, row: 1, section: "Analytics" },
-  { id: "analyticsDailyBreakdown", label: "Daily Breakdown", icon: "📊", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsStudyHours", label: "Study Hours", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsHeatmap", label: "Focus Heatmap", icon: "🟩", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsPlannedActual", label: "Planned vs Actual", icon: "📈", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsVenio", label: "My Venio Analysis", icon: "🧭", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, minRow: 2, section: "Analytics" },
-  { id: "analyticsThemeUsage", label: "Theme Usage", icon: "🌓", col: 1, row: 1, section: "Analytics" },
+  {
+    id: "studyStreak",
+    label: "Study Streak",
+    icon: "🔥",
+    col: 1,
+    row: 1,
+    section: "Progress",
+  },
+  {
+    id: "weeklyGoal",
+    label: "Weekly Goal",
+    icon: "🎯",
+    col: 1,
+    row: 1,
+    section: "Progress",
+  },
+  {
+    id: "photo",
+    label: "Photo",
+    icon: "🖼️",
+    col: 1,
+    row: 1,
+    section: "Profile",
+  },
+  {
+    id: "analyticsProductivity",
+    label: "Productivity",
+    icon: "⚙️",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsInsights",
+    label: "Insights",
+    icon: "💡",
+    col: 1,
+    row: 1,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsDailyBreakdown",
+    label: "Daily Breakdown",
+    icon: "📊",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsStudyHours",
+    label: "Study Hours",
+    icon: "📈",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsHeatmap",
+    label: "Focus Heatmap",
+    icon: "🟩",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsPlannedActual",
+    label: "Planned vs Actual",
+    icon: "📈",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsVenio",
+    label: "My Venio Analysis",
+    icon: "🧭",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsAttendance",
+    label: "Attendance",
+    icon: "📋",
+    col: 2,
+    row: 2,
+    minRow: 2,
+    section: "Analytics",
+  },
+  {
+    id: "analyticsThemeUsage",
+    label: "Theme Usage",
+    icon: "🌓",
+    col: 1,
+    row: 1,
+    section: "Analytics",
+  },
 ];
 
 const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 const getStorageKeys = (userId) => ({
-  layout: userId ? `homepage_widget_layout_${userId}` : "homepage_widget_layout",
+  layout: userId
+    ? `homepage_widget_layout_${userId}`
+    : "homepage_widget_layout",
   sizes: userId ? `homepage_widget_sizes_${userId}` : "homepage_widget_sizes",
 });
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
@@ -75,10 +240,17 @@ function useTflDelays() {
   const [delays, setDelays] = useState([]);
   useEffect(() => {
     let cancelled = false;
-    tflService.getTfLDelays()
-      .then(data => { if (!cancelled) setDelays(Array.isArray(data) ? data : []); })
-      .catch(() => { if (!cancelled) setDelays([]); });
-    return () => { cancelled = true; };
+    tflService
+      .getTfLDelays()
+      .then((data) => {
+        if (!cancelled) setDelays(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setDelays([]);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
   return delays;
 }
@@ -89,11 +261,16 @@ function useCourseChangePending() {
     getMyCourseChangeRequest()
       .then((data) => {
         const status = String(data?.status || "").toLowerCase();
-        if (status === "pending" || (data?.requested_course && status !== "approved" && status !== "rejected")) {
+        if (
+          status === "pending" ||
+          (data?.requested_course &&
+            status !== "approved" &&
+            status !== "rejected")
+        ) {
           setRequest(data);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
   return request;
 }
@@ -152,7 +329,10 @@ function SemesterProgressWidget() {
         <span className={styles.semesterWidgetValue}>{progress.pct}%</span>
       </div>
       <div className={styles.semesterWidgetTrack} aria-hidden="true">
-        <div className={styles.semesterWidgetFill} style={{ width: `${progress.pct}%` }} />
+        <div
+          className={styles.semesterWidgetFill}
+          style={{ width: `${progress.pct}%` }}
+        />
       </div>
       <span className={styles.semesterWidgetMeta}>{label}</span>
     </div>
@@ -183,16 +363,27 @@ export default function IntelligenceRow({
         let parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           // Migration: If old IDs exist, replace them with 'hero'
-          const oldIds = ["greeting", "stats", "nextMove", "studyPulse", "socialDiscover", "analyticsSummary", "analyticsPlannedActual", "quickActions"];
-          const hasOld = parsed.some(id => oldIds.includes(id));
+          const oldIds = [
+            "greeting",
+            "stats",
+            "nextMove",
+            "studyPulse",
+            "socialDiscover",
+            "analyticsSummary",
+            "analyticsPlannedActual",
+            "quickActions",
+          ];
+          const hasOld = parsed.some((id) => oldIds.includes(id));
           if (hasOld) {
-            const filtered = parsed.filter(id => !oldIds.includes(id));
+            const filtered = parsed.filter((id) => !oldIds.includes(id));
             if (!filtered.includes("hero")) filtered.unshift("hero");
             return filtered.filter((id) => CATALOGUE_IDS.has(id));
           }
           return parsed.filter((id) => CATALOGUE_IDS.has(id));
         }
-      } catch (e) { console.error("Failed to parse layout from localStorage", e); }
+      } catch (e) {
+        console.error("Failed to parse layout from localStorage", e);
+      }
     }
     // Fallback to backend settings ONLY if we have them immediately
     if (profile?.settings?.homepage_widgets?.length) {
@@ -204,10 +395,15 @@ export default function IntelligenceRow({
   const [widgetSizes, setWidgetSizes] = useState(() => {
     const saved = localStorage.getItem(keys.sizes);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { }
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
     }
     // Fallback to backend settings
-    if (profile?.settings?.homepage_widget_sizes && Object.keys(profile.settings.homepage_widget_sizes).length > 0) {
+    if (
+      profile?.settings?.homepage_widget_sizes &&
+      Object.keys(profile.settings.homepage_widget_sizes).length > 0
+    ) {
       return profile.settings.homepage_widget_sizes;
     }
     return {};
@@ -216,11 +412,11 @@ export default function IntelligenceRow({
   // Effect to sync state from backend when profile loads if localStorage is empty for this user
   useEffect(() => {
     if (profileLoading || !profile?.settings) return;
-    
+
     // If we don't have a layout in localStorage for this specific user, use backend layout
     const userKeys = getStorageKeys(profile.id);
     const savedLayout = localStorage.getItem(userKeys.layout);
-    
+
     if (!savedLayout && profile.settings.homepage_widgets?.length) {
       setLayout(profile.settings.homepage_widgets);
       if (profile.settings.homepage_widget_sizes) {
@@ -251,8 +447,8 @@ export default function IntelligenceRow({
     const timer = setTimeout(() => {
       updateUserSettings({
         homepage_widgets: layout,
-        homepage_widget_sizes: widgetSizes
-      }).catch(err => console.error("Failed to sync layout to cloud:", err));
+        homepage_widget_sizes: widgetSizes,
+      }).catch((err) => console.error("Failed to sync layout to cloud:", err));
     }, 2000);
     return () => clearTimeout(timer);
   }, [layout, widgetSizes, profile, profileLoading]);
@@ -268,12 +464,12 @@ export default function IntelligenceRow({
     // Only shuffle the widgets that are currently on the dashboard
     const hasHero = layout.includes("hero");
     const others = layout.filter((id) => id !== "hero");
-    
+
     if (others.length <= 1) return; // Nothing much to shuffle
-    
+
     const shuffled = [...others].sort(() => 0.5 - Math.random());
     const newLayout = hasHero ? ["hero", ...shuffled] : shuffled;
-    
+
     setLayout(newLayout);
   };
 
@@ -282,11 +478,15 @@ export default function IntelligenceRow({
   const handleReset = () => setShowResetConfirm(true);
 
   // Data Processing
-  const eventsCount = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents.length : 0;
+  const eventsCount = Array.isArray(slot5Data?.sortedEvents)
+    ? slot5Data.sortedEvents.length
+    : 0;
   const pendingTasks = Array.isArray(slot5Data?.taskWidgetItemsOnly)
     ? slot5Data.taskWidgetItemsOnly.filter((task) => !task.completed)
     : [];
-  const sortedEvents = Array.isArray(slot5Data?.sortedEvents) ? slot5Data.sortedEvents : [];
+  const sortedEvents = Array.isArray(slot5Data?.sortedEvents)
+    ? slot5Data.sortedEvents
+    : [];
   const bannerNow = slot5Data?.now ?? new Date();
 
   const currentEvent = getCurrentEvent(sortedEvents, bannerNow);
@@ -299,18 +499,24 @@ export default function IntelligenceRow({
     tflDelays,
     now: bannerNow,
     getRelevantDelays,
-    isSevereDisruption
+    isSevereDisruption,
   });
 
   const tasksCount = pendingTasks.length;
   const nextWindowMeta = null;
-  const nextStepTxt = recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
+  const nextStepTxt =
+    recommendation?.text || getNextStep({ tasksCount, nextWindowMeta });
   const nextStepMeta = recommendation?.meta || null;
 
   const weekly = !profileLoading ? profile?.summary?.weekly : null;
   const streaks = !profileLoading ? profile?.summary?.streaks : null;
-  const weeklyProgress = Number.isFinite(weekly?.percentage) ? `${Math.round(weekly.percentage)}% weekly goal` : null;
-  const currentStreak = Number.isFinite(streaks?.current) && streaks.current > 0 ? `${streaks.current}-day streak` : null;
+  const weeklyProgress = Number.isFinite(weekly?.percentage)
+    ? `${Math.round(weekly.percentage)}% weekly goal`
+    : null;
+  const currentStreak =
+    Number.isFinite(streaks?.current) && streaks.current > 0
+      ? `${streaks.current}-day streak`
+      : null;
 
   const renderWidget = (id, { col, row } = {}) => {
     switch (id) {
@@ -327,7 +533,9 @@ export default function IntelligenceRow({
             weeklyProgress={weeklyProgress}
             currentStreak={currentStreak}
             courseChangeRequest={showCourseChange ? courseChangeRequest : null}
-            teacherRequestPending={showTeacherRequest ? teacherRequestPending : null}
+            teacherRequestPending={
+              showTeacherRequest ? teacherRequestPending : null
+            }
             onDismissCourseChange={() => setShowCourseChange(false)}
             onDismissTeacherRequest={() => setShowTeacherRequest(false)}
           />
@@ -335,13 +543,19 @@ export default function IntelligenceRow({
       case "rightNow":
         return <RightNowWidget {...slot5Data} tflDelays={tflDelays} />;
       case "todayTasks":
-        return React.isValidElement(slot1TodayTasks) ? React.cloneElement(slot1TodayTasks, { row }) : slot1TodayTasks;
+        return React.isValidElement(slot1TodayTasks)
+          ? React.cloneElement(slot1TodayTasks, { row })
+          : slot1TodayTasks;
       case "deadlines":
-        return React.isValidElement(slot3Urgent) ? React.cloneElement(slot3Urgent, { row }) : slot3Urgent;
+        return React.isValidElement(slot3Urgent)
+          ? React.cloneElement(slot3Urgent, { row })
+          : slot3Urgent;
       case "tinyTimeline":
         return <TinyTimelineWidget {...slot5Data} row={row} />;
       case "bigTimeline":
-        return React.isValidElement(slot6Timeline) ? React.cloneElement(slot6Timeline, { row, isWidget: true }) : slot6Timeline;
+        return React.isValidElement(slot6Timeline)
+          ? React.cloneElement(slot6Timeline, { row, isWidget: true })
+          : slot6Timeline;
       case "semesterOverview":
         return <SemesterOverviewWidget row={row} />;
       case "studyStreak":
@@ -355,18 +569,27 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <LayoutGrid
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>SUMMARY</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
             ) : analyticsData?.summary ? (
               <div className={styles.analyticsScrollable}>
                 <SummaryCards data={analyticsData} />
               </div>
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No summary data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No summary data yet.
+              </div>
             )}
           </div>
         );
@@ -375,18 +598,30 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <TrendingUp
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>PRODUCTIVITY</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
             ) : analyticsData?.summary ? (
               <div className={styles.analyticsScrollable}>
-                <ProductivityCards data={analyticsData} progressData={analyticsProgressData} />
+                <ProductivityCards
+                  data={analyticsData}
+                  progressData={analyticsProgressData}
+                />
               </div>
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No productivity data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No productivity data yet.
+              </div>
             )}
           </div>
         );
@@ -395,19 +630,28 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <Zap size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <Zap
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>INSIGHTS</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
             ) : analyticsData?.summary ? (
               <div className={styles.analyticsInsightsRow}>
                 <ConsistencyScore data={analyticsData} />
                 <PeakHoursCard data={analyticsData} />
               </div>
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No insights data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No insights data yet.
+              </div>
             )}
           </div>
         );
@@ -416,34 +660,54 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <Clock3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <Clock3
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>STUDY HOURS</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
-            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) &&
+              analyticsData.daily_breakdown.length > 0 ? (
               <StudyHoursChart data={analyticsData.daily_breakdown} row={row} />
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No study-hours data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No study-hours data yet.
+              </div>
             )}
           </div>
         );
       case "analyticsDailyBreakdown":
         return (
           <div className={styles.analyticsWidgetShell}>
-             <div className={baseStyles.widgetHeader}>
+            <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <BarChart3 size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <BarChart3
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>DAILY BREAKDOWN</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
-            ) : Array.isArray(analyticsData?.daily_breakdown) && analyticsData.daily_breakdown.length > 0 ? (
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
+            ) : Array.isArray(analyticsData?.daily_breakdown) &&
+              analyticsData.daily_breakdown.length > 0 ? (
               <DailyBreakdownChart data={analyticsData.daily_breakdown} />
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No daily-breakdown data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No daily-breakdown data yet.
+              </div>
             )}
           </div>
         );
@@ -452,16 +716,28 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <TrendingUp
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>PLANNED VS ACTUAL</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
-            ) : Array.isArray(analyticsProgressData?.daily_progress) && analyticsProgressData.daily_progress.length > 0 ? (
-              <PlannedVsActualChart data={analyticsProgressData.daily_progress} />
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
+            ) : Array.isArray(analyticsProgressData?.daily_progress) &&
+              analyticsProgressData.daily_progress.length > 0 ? (
+              <PlannedVsActualChart
+                data={analyticsProgressData.daily_progress}
+              />
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No planned-vs-actual data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No planned-vs-actual data yet.
+              </div>
             )}
           </div>
         );
@@ -470,16 +746,25 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <LayoutGrid size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <LayoutGrid
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>FOCUS HEATMAP</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
             ) : analyticsData?.heatmap?.data?.length ? (
               <StudyHeatmap heatmapData={analyticsData.heatmap} />
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No focus heatmap data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No focus heatmap data yet.
+              </div>
             )}
           </div>
         );
@@ -490,16 +775,25 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <TrendingUp size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <TrendingUp
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>THEME USAGE</span>
             </div>
             {analyticsLoading ? (
-              <div className={styles.analyticsWidgetLoading}>Loading analytics…</div>
+              <div className={styles.analyticsWidgetLoading}>
+                Loading analytics…
+              </div>
             ) : analyticsThemeStats?.summary ? (
               <ThemeUsageChart themeStats={analyticsThemeStats} />
             ) : (
-              <div className={styles.analyticsWidgetEmpty}>No theme-usage data yet.</div>
+              <div className={styles.analyticsWidgetEmpty}>
+                No theme-usage data yet.
+              </div>
             )}
           </div>
         );
@@ -508,7 +802,12 @@ export default function IntelligenceRow({
           <div className={styles.analyticsWidgetShell}>
             <div className={baseStyles.widgetHeader}>
               <div className={baseStyles.headerIconWrap}>
-                <Presentation size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
+                <Presentation
+                  size={16}
+                  strokeWidth={1.75}
+                  className={baseStyles.headerIcon}
+                  aria-hidden
+                />
               </div>
               <span className={baseStyles.headerTitle}>ATTENDANCE</span>
             </div>
@@ -543,7 +842,10 @@ export default function IntelligenceRow({
           confirmText="Reset"
           cancelText="Cancel"
           isDanger
-          onConfirm={() => { setLayout(DEFAULT_LAYOUT); setShowResetConfirm(false); }}
+          onConfirm={() => {
+            setLayout(DEFAULT_LAYOUT);
+            setShowResetConfirm(false);
+          }}
           onCancel={() => setShowResetConfirm(false)}
         />
       )}

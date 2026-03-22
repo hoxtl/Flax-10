@@ -115,7 +115,6 @@ def _create_single_fixture_user(data, stdout):
     stdout.write(f"  {username:<12} {role}")
 
 def create_fixture_users(stdout):
-    stdout.write("Creating fixture users...")
     role_order = {'admin': 0, 'student': 1, 'teacher': 2}
     ordered_fixtures = sorted(
         FIXTURE_USERS,
@@ -142,24 +141,26 @@ def _build_new_users(student_count, teacher_count):
         new_users.extend(build_users_list(teacher_count, role='teacher'))
     return new_users
 
-def create_random_users(stdout, target_teacher_count=14):
+def _create_users_if_needed(stdout, target_teacher_count):
+    """Create random users if below target count."""
     needed = USER_COUNT - User.objects.count()
-    if needed > 0:
-        student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
-        stdout.write(
-            f"Seeding {needed} random users "
-            f"({student_count} students, {teacher_count} teachers)..."
-        )
-        new_users = _build_new_users(student_count, teacher_count)
-        User.objects.bulk_create(new_users, ignore_conflicts=True)
-    else:
-        stdout.write("Enough users already exist.")
-    
-    # Always ensure ALL users have settings
-    stdout.write("Ensuring all users have settings...")
+    if needed <= 0:
+        return
+    student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
+    new_users = _build_new_users(student_count, teacher_count)
+    User.objects.bulk_create(new_users, ignore_conflicts=True)
+    stdout.write(f"  + {needed} random users")
+
+
+def _ensure_user_settings(stdout):
+    """Ensure all users have settings rows."""
     new_settings = build_settings_for_new_users()
-    if new_settings:
-        UserSettings.objects.bulk_create(new_settings)
-        stdout.write(f"  Created {len(new_settings)} new UserSettings rows.")
-    else:
-        stdout.write("  All users already have settings.")
+    if not new_settings:
+        return
+    UserSettings.objects.bulk_create(new_settings)
+
+
+def create_random_users(stdout, target_teacher_count=14):
+    """Create random users and ensure all have settings."""
+    _create_users_if_needed(stdout, target_teacher_count)
+    _ensure_user_settings(stdout)

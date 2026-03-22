@@ -5,15 +5,18 @@ import { useTags } from '../../../context/TagContext';
 import { TagsSelector } from '../../common/TagsSelector/TagsSelector';
 import TagManagerModal from '../../Tags/TagManagerModal';
 import styles from './CalendarHeaderUtils.module.css';
-function FilterPopup({ tagObjects, selectedTagObjects, onSelectionChange, onManageTags }) {
+function FilterPopup({ tagObjects, selectedTagObjects, onSelectionChange, onManageTags, allowManageTags }) {
     return (
         <motion.div className={styles.filterPopup}
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}>
-            <div className={styles.filterPopupHeader}><span className={styles.filterPopupTitle}>Filter by tag</span>
-                <button type="button" className={styles.filterManageBtn} onClick={onManageTags}>Manage tags…</button>
+            <div className={styles.filterPopupHeader}>
+                <span className={styles.filterPopupTitle}>Filter by tag</span>
+                {allowManageTags && (
+                    <button type="button" className={styles.filterManageBtn} onClick={onManageTags}>Manage tags…</button>
+                )}
             </div>
             <TagsSelector tags={tagObjects} selectedTags={selectedTagObjects} onSelectionChange={onSelectionChange} />
         </motion.div>
@@ -38,7 +41,7 @@ function useFilterAutoClose(ref, setOpen) {
         return () => document.removeEventListener('mousedown', h);
     }, [ref, setOpen]);
 }
-export function FilterDropdownButton({ active, onChange }) {
+export function FilterDropdownButton({ active, onChange, allowManageTags = true }) {
     const { tags } = useTags();
     const [manager, setManager] = useState(false), [open, setOpen] = useState(false), ref = useRef(null);
     const { selectedValues, tagObjects, selectedTagObjects } = useFilterState(active, tags);
@@ -46,15 +49,16 @@ export function FilterDropdownButton({ active, onChange }) {
     const cls = `${styles.filterTriggerBtn} ${(open || selectedValues.length > 0) ? styles.filterTriggerBtnActive : ''}`;
     return (
         <div className={styles.filterWrap} ref={ref} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-            <button className={cls} onClick={() => setOpen(!open)}><Tag size={18} />
+            <button type="button" aria-label="Filter events" className={cls} onClick={() => setOpen(!open)}><Tag size={18} />
                 {selectedValues.length > 0 && <span className={styles.filterBadge}>{selectedValues.length}</span>}
             </button>
             <AnimatePresence>
                 {open && <FilterPopup tagObjects={tagObjects} selectedTagObjects={selectedTagObjects}
                     onSelectionChange={(v) => onChange(v.length ? v.map(t => t.id) : 'all')}
-                    onManageTags={() => { setOpen(false); setManager(true); }} />}
+                    onManageTags={() => { setOpen(false); setManager(true); }}
+                    allowManageTags={allowManageTags} />}
             </AnimatePresence>
-            {manager && <TagManagerModal onClose={() => setManager(false)} />}
+            {manager && allowManageTags && <TagManagerModal onClose={() => setManager(false)} />}
         </div>
     );
 }

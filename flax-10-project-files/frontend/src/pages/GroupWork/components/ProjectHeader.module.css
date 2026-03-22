@@ -27,21 +27,21 @@
 }
 
 .deleteBtn {
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(192, 90, 62, 0.2);
-    background: white;
-    color: var(--danger);
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(192, 90, 62, 0.2);
+  background: white;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 .deleteBtn:hover {
-    background: var(--danger-bg);
+  background: var(--danger-bg);
 }
 
 .headerCard {

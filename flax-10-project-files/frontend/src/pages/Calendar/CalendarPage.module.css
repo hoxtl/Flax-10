@@ -2,6 +2,109 @@
   background-color: var(--bg);
 }
 
+.calendarFrame {
+  min-width: 0;
+}
+
+.sharedCalendarFrame {
+  min-width: 0;
+  border: 1px solid rgba(178, 80, 80, 0.34);
+  border-radius: 28px;
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 249, 0.96), rgba(255, 255, 255, 0.94));
+  box-shadow:
+    0 0 0 1px rgba(178, 80, 80, 0.08),
+    0 18px 48px rgba(178, 80, 80, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.sharedCalendarBackRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-left: 2px;
+}
+
+.sharedCalendarBanner {
+  display: block;
+  margin-bottom: 14px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(178, 80, 80, 0.18);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 247, 0.98), rgba(255, 253, 252, 0.96));
+}
+
+.sharedCalendarMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sharedCalendarEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(136, 72, 72, 0.88);
+}
+
+.sharedCalendarTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sharedCalendarTitle {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: rgba(36, 27, 27, 0.96);
+}
+
+.sharedCalendarModePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(136, 72, 72, 0.96);
+  background: rgba(178, 80, 80, 0.08);
+  border: 1px solid rgba(178, 80, 80, 0.22);
+}
+
+.sharedCalendarDescription {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: rgba(76, 61, 61, 0.92);
+}
+
+.sharedCalendarEmphasis {
+  color: var(--primary);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.sharedCalendarEmail {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(132, 70, 70, 0.96);
+  text-decoration: none;
+}
+
+.sharedCalendarEmail:hover {
+  text-decoration: underline;
+}
+
 .skeletonStickyHeader {
   position: sticky;
   top: 0;
@@ -84,7 +187,57 @@
   border-top-right-radius: 24px;
 }
 
+[data-mode="dark"] .sharedCalendarFrame {
+  background:
+    linear-gradient(180deg, rgba(44, 34, 34, 0.96), rgba(27, 21, 21, 0.96));
+  border-color: rgba(201, 112, 112, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(201, 112, 112, 0.08),
+    0 18px 48px rgba(0, 0, 0, 0.34),
+    0 0 42px rgba(201, 112, 112, 0.12);
+}
+
+[data-mode="dark"] .sharedCalendarBanner {
+  background:
+    linear-gradient(135deg, rgba(58, 42, 42, 0.96), rgba(37, 28, 28, 0.96));
+  border-color: rgba(201, 112, 112, 0.22);
+}
+
+[data-mode="dark"] .sharedCalendarEyebrow,
+[data-mode="dark"] .sharedCalendarModePill,
+[data-mode="dark"] .sharedCalendarTipLabel,
+[data-mode="dark"] .sharedCalendarEmail {
+  color: rgba(239, 195, 195, 0.92);
+}
+
+[data-mode="dark"] .sharedCalendarTitle {
+  color: rgba(255, 244, 244, 0.96);
+}
+
+[data-mode="dark"] .sharedCalendarDescription,
+[data-mode="dark"] .sharedCalendarDescription {
+  color: rgba(234, 224, 224, 0.86);
+}
+
 @media (max-width: 768px) {
+  .sharedCalendarFrame {
+    padding: 10px;
+    border-radius: 22px;
+  }
+
+  .sharedCalendarBackRow {
+    margin-bottom: 10px;
+  }
+
+  .sharedCalendarBanner {
+    padding: 14px 15px;
+    border-radius: 18px;
+  }
+
+  .sharedCalendarTitle {
+    font-size: 1.6rem;
+  }
+
   .filters {
     padding: 8px 12px;
     background: var(--bg);

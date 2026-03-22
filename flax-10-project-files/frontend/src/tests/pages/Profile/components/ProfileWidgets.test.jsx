@@ -263,6 +263,13 @@ describe('CompactAttendanceTile', () => {
     });
   });
 
+  it('routes the header action to attendance details', () => {
+    const onNavigate = vi.fn();
+    render(<CompactAttendanceTile onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByRole('button', { name: /View attendance details/i }));
+    expect(onNavigate).toHaveBeenCalledWith('attendance');
+  });
+
   it('shows clean by-type labels in the right-hand legend without duplicate loose numbers', () => {
     render(<CompactAttendanceTile onNavigate={vi.fn()} />);
 
@@ -336,11 +343,9 @@ describe('ModulesSection', () => {
     await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
-  it('shows empty teacher state when no taught modules yet', async () => {
-    render(<ModulesSection modules={[]} role="teacher" onNavigate={vi.fn()} />);
-    await screen.findByText('MODULES I TEACH');
-    // Should show the widget title but no placeholder text
-    expect(screen.queryByText('No teaching modules assigned yet.')).toBeNull();
+  it('returns null for teachers when no taught modules exist yet', async () => {
+    const { container } = render(<ModulesSection modules={[]} role="teacher" onNavigate={vi.fn()} />);
+    await waitFor(() => expect(container.firstChild).toBeNull());
   });
 
   it('renders module codes and names from API', async () => {
@@ -364,7 +369,7 @@ describe('ModulesSection', () => {
 
   it('uses teacher heading for professor profiles', async () => {
     render(<ModulesSection modules={['EC4202']} role="teacher" onNavigate={vi.fn()} />);
-    await screen.findByText('MODULES I TEACH');
+    await screen.findByText('Modules I Teach');
     expect(screen.getByText('EC4202')).toBeTruthy();
   });
 

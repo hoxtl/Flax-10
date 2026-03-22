@@ -40,7 +40,14 @@ def _in_reading_week(dt):
     d = dt.date() if hasattr(dt, 'date') else dt
     return READING_WEEK_START <= d <= READING_WEEK_END
 
-ACADEMIC_TAG_NAMES = {'Lecture', 'Exam'}
+ACADEMIC_TAG_NAMES = {'Lecture', 'Exam', 'Deadline'}
+
+
+def _personal_tags(user, tags):
+    """Return non-academic tags for personal events."""
+    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
+    return [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
+
 
 WEEKEND_BLOCK_SPECS = [
     (10, 0, 90, "Gym session"),
@@ -61,9 +68,8 @@ def build_event(user, title, tags, day_offset, hour):
     """Construct a single unsaved CalendarEvent for *user*."""
     start = SEED_START.replace(hour=hour, minute=0, second=0) + timedelta(days=day_offset)
     duration = random.choice([60, 90, 120])
-    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    personal_tags = [t for t in user_tags if t.name not in ACADEMIC_TAG_NAMES]
-    tag = random.choice(personal_tags) if personal_tags and random.random() > 0.2 else None
+    personal = _personal_tags(user, tags)
+    tag = random.choice(personal) if personal and random.random() > 0.2 else None
     return CalendarEvent(
         user=user,
         title=title,
@@ -127,8 +133,8 @@ def build_today_afternoon_events(user, tags):
     """Five mock events for today between 14:30 and 20:00."""
     now = timezone.now()
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    tag = random.choice(user_tags) if user_tags else None
+    personal = _personal_tags(user, tags)
+    tag = random.choice(personal) if personal else None
     return [_afternoon_event(user, today, h, m, d, t, tag) for h, m, d, t in AFTERNOON_SLOTS]
 
 def _meal_event(user, base, day_offset, label, fixtures, sh, sm, eh, em, tag):
@@ -144,14 +150,15 @@ def _meal_events_for_day(user, day_offset, tag):
     base = SEED_START + timedelta(days=day_offset)
     return [_meal_event(user, base, day_offset, *spec, tag) for spec in MEAL_SPECS]
 
+def _find_tag_by_name(user_tags, name):
+    """Find a tag by name in a list of tags."""
+    return next((t for t in user_tags if t.name == name), None)
+
+
 def _resolve_meal_tag(user, tags):
+    """Find Meals or Other tag for meal events."""
     user_tags = [t for t in tags if t.user_id == user.id or t.is_default]
-    priorities = ('Meals', 'Other')
-    for name in priorities:
-        match = next((t for t in user_tags if t.name == name), None)
-        if match:
-            return match
-    return user_tags[0] if user_tags else None
+    return _find_tag_by_name(user_tags, 'Meals') or _find_tag_by_name(user_tags, 'Other') or (user_tags[0] if user_tags else None)
 
 def build_meal_events(user, tags):
     """Meals (Breakfast, Lunch, Dinner) use Meals/Routine/Wellness tags."""
@@ -302,16 +309,18 @@ def build_weekend_events(user, tags, user_rng):
 def create_deadline_calendar_event(user, deadline):
     """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""
     CalendarEvent.objects.get_or_create(
+def build_deadline_event(user, deadline, tag=None):
+    """Build an unsaved CalendarEvent for a deadline."""
+    return CalendarEvent(
         user=user,
         title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
         start_time=deadline.start_due_date,
-        defaults={
-            'end_time': deadline.end_due_date or deadline.start_due_date,
-            'location': deadline.location,
-            'description': deadline.description,
-            'priority': 'high',
-            'module': deadline.module,
-            'source': 'module_deadline',
-            'external_id': str(deadline.id),
-        },
+        end_time=deadline.end_due_date or deadline.start_due_date,
+        location=deadline.location,
+        description=deadline.description,
+        priority='high',
+        module=deadline.module,
+        source='module_deadline',
+        external_id=str(deadline.id),
+        tag=tag,
     )

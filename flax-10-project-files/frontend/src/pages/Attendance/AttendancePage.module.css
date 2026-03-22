@@ -106,12 +106,23 @@
   overflow: hidden;
 }
 
+.attendanceTabsWrap {
+  padding: 12px 12px 0;
+}
+
+.attendanceTabs {
+  max-width: 100%;
+}
+
+.attendanceTabs :global(.tabBar) {
+  margin-bottom: 0;
+}
+
 .tabLabelWithBadge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
-
 
 .tabBadge {
   display: inline-flex;
@@ -150,5 +161,9 @@
 
   .listCol {
     min-height: 400px;
+  }
+
+  .attendanceTabsWrap {
+    padding: 10px 10px 0;
   }
 }

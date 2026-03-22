@@ -99,20 +99,26 @@ def resolve_sparkline_level(minutes, max_minutes):
     return min(4, max(1, math.ceil((minutes / max_minutes) * 4)))
 
 
-def build_profile_summary(user, sessions_all, sessions_90, request):
+def _compute_session_stats(sessions_all):
+    """Compute streaks, totals, and complete sessions from all sessions."""
     current_streak, longest_streak = compute_streaks(sessions_all)
-    module_count = get_module_count(user)
     complete_sessions = filter_complete(sessions_all)
     _, total_hours, session_count = session_totals(complete_sessions)
+    return current_streak, longest_streak, complete_sessions, total_hours, session_count
+
+
+def build_profile_summary(user, sessions_all, sessions_90, request):
+    current, longest, complete, total_hours, count = _compute_session_stats(sessions_all)
+    module_count = get_module_count(user)
     return {
         'persona': derive_persona(sessions_90),
-        'streaks': {'current': current_streak, 'longest': longest_streak},
-        'badges': compute_badges(sessions_all, sessions_90, current_streak, longest_streak, module_count, user),
+        'streaks': {'current': current, 'longest': longest},
+        'badges': compute_badges(sessions_all, sessions_90, current, longest, module_count, user),
         'weekly': build_weekly_summary(user, sessions_all),
         'societies': build_societies_list(user),
         'total_hours': round(total_hours, 1),
-        'session_count': session_count,
-        'activity_sparkline': build_activity_sparkline(complete_sessions),
+        'session_count': count,
+        'activity_sparkline': build_activity_sparkline(complete),
         'mutual_connections': build_mutual_connections(user, request.user, request),
     }
 

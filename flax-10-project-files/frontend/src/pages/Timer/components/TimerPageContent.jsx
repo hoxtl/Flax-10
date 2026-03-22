@@ -66,6 +66,25 @@ function isStreakAtRisk(state) {
   return state.streakData !== null && !state.dismissedWarning && (state.streakData.current_streak_days ?? 0) > 0 && (state.streakData.total_sessions ?? 0) === 0 && hour >= 18;
 }
 
+function FocusEntryBackButton({ state, navigate }) {
+  if (!state.fromTaskPlay || state.focusMode) return null;
+  return <BackButton className={styles.focusEntryBackBtn} onClick={() => navigate(-1)} label="Back" />;
+}
+
+function TimerTopSplit({ state }) {
+  return (
+    <div className={styles.timerTopSplit}>
+      <div className={styles.timerTopLeft}>
+        <TodayBanner onStreakData={state.setStreakData} isStudying={Boolean(state.t.isActive && !state.t.isPaused)} />
+        <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
+      </div>
+      <div className={styles.timerTopRight}>
+        <RightPanel t={state.t} />
+      </div>
+    </div>
+  );
+}
+
 function TimerLayout({ state }) {
   const navigate = useNavigate();
   const visibility = state.showPageSkeleton ? { visibility: 'hidden' } : {};
@@ -74,24 +93,13 @@ function TimerLayout({ state }) {
   return (
     <div className={className} style={{ '--focus-accent': state.focusAccent, ...visibility }}>
       <NotificationPrompt permission={state.permission} request={state.request} />
-      {state.fromTaskPlay && !state.focusMode && <BackButton className={styles.focusEntryBackBtn} onClick={() => navigate(-1)} label="Back" />}
+      <FocusEntryBackButton state={state} navigate={navigate} />
       <StreakWarning state={state} />
-      
-      <div className={styles.timerTopSplit}>
-        <div className={styles.timerTopLeft}>
-          <TodayBanner onStreakData={state.setStreakData} isStudying={Boolean(state.t.isActive && !state.t.isPaused)} />
-          <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
-        </div>
-        <div className={styles.timerTopRight}>
-          <RightPanel t={state.t} />
-        </div>
-      </div>
-
+      <TimerTopSplit state={state} />
       <PopupSection t={state.t} showHistory={state.showHistory} onCloseHistory={() => state.setShowHistory(false)} />
     </div>
   );
 }
-
 
 export function TimerPageContent({ state }) {
   const pageClassName = state.fromTaskPlay && state.showFocusTransition ? styles.containerFocusEntering : '';

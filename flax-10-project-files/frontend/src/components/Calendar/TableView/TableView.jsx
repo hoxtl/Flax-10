@@ -3,7 +3,7 @@
  * Displays events in rows with editable columns and keyboard navigation.
  */
 import { useRef, useEffect } from 'react';
-import { useCalendarData } from '../../../context/CalendarContext';
+import { useCalendar, useCalendarData } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 import { useTableEdit } from '../hooks/useTableEdit';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
@@ -43,7 +43,7 @@ function EmptyState() {
     );
 }
 
-function TableBody({ currentItems, editState, navState, viewMode }) {
+function TableBody({ currentItems, editState, navState, viewMode, readOnly }) {
     if (!currentItems.length) return <tbody><EmptyState /></tbody>;
     return (
         <tbody>
@@ -56,6 +56,7 @@ function TableBody({ currentItems, editState, navState, viewMode }) {
                     navState={navState}
                     onCellClick={(eventId, field, value) => editState.startEdit(eventId, field, value)}
                     viewMode={viewMode}
+                    readOnly={readOnly}
                 />
             ))}
         </tbody>
@@ -84,16 +85,18 @@ function useTableViewData(propDate, propEvents) {
 }
 
 /** Spreadsheet-style table view with inline cell editing and pagination. */
-export function TableView({ selectedDate, events }) {
+export function TableView({ selectedDate, events, readOnly = false }) {
     const tableRef = useRef(null);
     const { data, pagination, editState, navState } = useTableViewData(selectedDate, events);
+    const { readOnly: contextReadOnly } = useCalendar();
+    const isReadOnly = readOnly || contextReadOnly;
     useClickOutside(tableRef, editState.saveEdit, !!editState.editingCell);
 
     return (
         <div data-table-view className={styles.container}>
             <table ref={tableRef} className={styles.table}>
                 <TableHeader />
-                <TableBody currentItems={pagination.currentItems} editState={editState} navState={navState} viewMode={data.viewMode} />
+                <TableBody currentItems={pagination.currentItems} editState={editState} navState={navState} viewMode={data.viewMode} readOnly={isReadOnly} />
             </table>
             <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={pagination.setPage} />
             <BackToTop containerSelector={SCROLL_SELECTOR} />
