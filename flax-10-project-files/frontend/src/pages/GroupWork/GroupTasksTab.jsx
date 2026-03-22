@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { List, CalendarIcon, Square, Plus } from "lucide-react";
-import { getAuthHeaders } from "./groupWorkHooks";
+import { getAuthHeaders } from "./hooks/groupWorkHooks";
 import { useToast } from "../../context/ToastContext";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { SegmentedControl } from "../../components/common/SegmentedControl/SegmentedControl.jsx";
@@ -115,6 +115,7 @@ function TasksTabHeader({ taskView, setTaskView, members, filterUsers, onToggle,
     );
 }
 
+/** Tasks tab with list, timeline, and board views for a group project. */
 export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const showToast = useToast();
     const taskActions = useTasks(projectId, members, onStatsUpdate);

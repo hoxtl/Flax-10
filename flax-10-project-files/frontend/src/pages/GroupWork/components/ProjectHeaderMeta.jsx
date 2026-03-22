@@ -11,7 +11,7 @@ import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile, getStoredViewer } from "./memberAvatarUtils";
+import { getDisplayName, openMemberProfile, getStoredViewer } from "../utils/memberAvatarUtils";
 import styles from "./ProjectHeader.module.css";
 
 export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove }) {

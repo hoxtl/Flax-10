@@ -5,7 +5,7 @@
 import { FolderOpen } from "lucide-react";
 import AppPage from "../../components/common/AppPage/AppPage";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
-import { useProjectDetail } from "./groupWorkHooks";
+import { useProjectDetail } from "./hooks/groupWorkHooks";
 import GroupWorkDetailSkeleton from "./components/GroupWorkDetailSkeleton";
 import ProjectHeader from "./components/ProjectHeader";
 import TabsSection from "./components/TabsSection";
@@ -14,6 +14,7 @@ import { BackToTop } from "../../components/Pagination/Pagination";
 import { getVisibleMembers } from "./utils/projectRowUtils";
 import styles from "./GroupWorkDetail.module.css";
 
+/** Detail page for a single group project, showing header, tabs, and tasks. */
 export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
   const detail = useProjectDetail(projectId, onBack, onDelete, onUpdate);
   if (detail.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;

@@ -10,10 +10,11 @@ import {
   fetchGroupProjects,
   fetchProjectMembers,
   patchGroupProject,
-} from "./groupWorkApi";
+} from "../api/groupWorkApi";
 
-export { getAuthHeaders } from "./groupWorkApi";
+export { getAuthHeaders } from "../api/groupWorkApi";
 
+/** Fetches and returns all group projects with a loading flag. */
 export function useGroupProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,23 +29,27 @@ export function useGroupProjects() {
   return { projects, setProjects, loading };
 }
 
+/** Returns the current sort key and a setter for group project sorting. */
 export function useGroupProjectSort(defaultValue = "due-date") {
   const [sortBy, setSortBy] = useState(defaultValue);
   return { sortBy, setSortBy };
 }
 
+/** Reads the selected project ID from the URL search params. */
 export function useSelectedProjectId() {
   const location = useLocation();
   const params = new URLSearchParams(location.search || "");
   return params.get("project");
 }
 
+/** Reads the active tab name from the URL search params, defaulting to "tasks". */
 export function useSelectedTab() {
   const location = useLocation();
   const params = new URLSearchParams(location.search || "");
   return params.get("tab") || "tasks";
 }
 
+/** Fetches a single project by ID from the projects list. */
 export function useProject(projectId) {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +68,7 @@ function findProjectById(projects, projectId) {
   return (projects || []).find((item) => String(item.id) === String(projectId)) || null;
 }
 
+/** Fetches the member list for a project. */
 export function useProjectMembers(projectId) {
   const [members, setMembers] = useState([]);
 
@@ -73,6 +79,7 @@ export function useProjectMembers(projectId) {
   return { members, setMembers };
 }
 
+/** Returns action handlers for updating, removing members from, and deleting a project. */
 export function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate) {
   const patchProject = async (patch) => updateProject(projectId, patch, setProject, onUpdate);
   const handleRemoveMember = async (membershipId) => removeProjectMember(projectId, membershipId, setMembers);
@@ -109,6 +116,7 @@ function addMemberIfMissing(member, setMembers) {
   setMembers((prev) => (prev.some((item) => item.id === member.id) ? prev : [...prev, member]));
 }
 
+/** Aggregates project state, member data, actions, and tab state for the detail page. */
 export function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
   const detail = useProjectState(projectId, onBack, onDelete, onUpdate);
   const initialTab = useSelectedTab();

@@ -8,8 +8,9 @@ import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
 import Tooltip from "../../components/common/Tooltip/Tooltip";
 import { useConfirm } from "../../context/ConfirmContext";
-import { getPhotoUrl } from "./components/memberAvatarUtils";
-import { useAvailability } from "./useAvailability";
+import { getPhotoUrl } from "./utils/memberAvatarUtils";
+import { useAvailability } from "./hooks/useAvailability";
+import { formatSuggestionDateLabel, getMemberStatuses, getTeamSize, getSuggestionCount, getCurrentUserStatus } from "./utils/availabilityUtils";
 import styles from "./AvailabilityTab.module.css";
 import meetingStyles from "./AvailabilityMeetingCards.module.css";
 
@@ -18,36 +19,6 @@ const RESPONSE_META = {
     rejected: { label: "Rejected", Icon: X, countClassName: meetingStyles.rejectedCount, avatarClassName: meetingStyles.responseRejected },
     pending: { label: "Pending", Icon: Clock3, countClassName: meetingStyles.pendingCount, avatarClassName: meetingStyles.responsePending },
 };
-
-function formatSuggestionDateLabel(value) {
-    const date = new Date(value);
-    const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
-    const day = date.toLocaleDateString("en-GB", { day: "numeric" });
-    const month = date.toLocaleDateString("en-GB", { month: "short" });
-    const time = date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false });
-    return `${weekday} ${day} ${month}, ${time}`;
-}
-
-function getMemberStatuses(suggestion) {
-    return Array.isArray(suggestion?.member_statuses) ? suggestion.member_statuses : [];
-}
-
-function getTeamSize(suggestion) {
-    return Number(suggestion?.team_size || getMemberStatuses(suggestion).length || 0);
-}
-
-function getSuggestionCount(suggestion, status) {
-    const field = `${status}_count`;
-    if (typeof suggestion?.[field] === "number") return suggestion[field];
-    return getMemberStatuses(suggestion).filter((member) => member.status === status).length;
-}
-
-function getCurrentUserStatus(suggestion, currentUserId) {
-    const memberStatus = getMemberStatuses(suggestion).find((member) => member.id === currentUserId);
-    if (memberStatus?.status) return memberStatus.status;
-    if (suggestion?.suggested_by?.id === currentUserId) return "accepted";
-    return "pending";
-}
 
 function useSortedSuggestions(active_suggestions) {
     return useMemo(() => {
@@ -350,6 +321,7 @@ function AvailabilityBody({ availability, viewState, sorted }) {
     );
 }
 
+/** Availability tab for proposing and voting on meeting slots. */
 export default function AvailabilityTab({ projectId }) {
     const confirm = useConfirm();
     const availability = useAvailability(projectId, confirm);

@@ -7,7 +7,7 @@ import StandardModal from "../../../components/common/StandardModal/StandardModa
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName } from "./memberAvatarUtils";
+import { getDisplayName } from "../utils/memberAvatarUtils";
 import styles from "./AddTaskModal.module.css";
 
 function MemberCheckItem({ member, checked, onToggle }) {

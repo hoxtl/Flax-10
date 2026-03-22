@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, X } from "lucide-react";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName } from "./memberAvatarUtils";
+import { getDisplayName } from "../utils/memberAvatarUtils";
 import { getUserColor } from "../utils/priorityUtils";
 import { createPopupCoords, shouldShowPopupAbove } from "../utils/taskAssigneeUtils";
 import styles from "./TaskAssigneePopup.module.css";

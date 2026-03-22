@@ -4,7 +4,7 @@
 
 import { useNavigate } from "react-router-dom";
 import styles from "./GroupWorkIndexPage.module.css";
-import { useGroupProjects, useGroupProjectSort, useSelectedProjectId } from "./groupWorkHooks";
+import { useGroupProjects, useGroupProjectSort, useSelectedProjectId } from "./hooks/groupWorkHooks";
 import GroupProjectDetail from "./GroupWorkDetail";
 import AppPage from "../../components/common/AppPage/AppPage";
 import { BackToTop } from "../../components/Pagination/Pagination";
@@ -12,6 +12,7 @@ import GroupWorkStats from "./components/GroupWorkStats";
 import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
 import GroupWorkContent from "./components/GroupWorkContent";
 
+/** Entry point for the GroupWork section, routing between overview and project detail. */
 export default function GroupWorkIndexPage() {
   const projectId = useSelectedProjectId();
   return projectId ? <ProjectDetailRoute projectId={projectId} /> : <GroupWorkOverview />;
