@@ -15,13 +15,24 @@ def _make_project(owner, name="Test Project", course_code="CS101"):
     GroupMembership.objects.create(project=project, user=owner, role="owner")
     return project
 
+def _add_members(project, count, prefix="member"):
+    added = []
+    for index in range(count):
+        user = make_user(f"{prefix}_{index}", f"{prefix}_{index}@example.com")
+        GroupMembership.objects.create(project=project, user=user, role="member")
+        added.append(user)
+    return added
+
 
 class GroupProjectListTests(BaseTestCase):
     def test_create_project(self):
-        teammate = make_user("alpha_teammate", "alpha_teammate@example.com")
+        teammates = [
+            make_user(f"alpha_teammate_{index}", f"alpha_teammate_{index}@example.com")
+            for index in range(4)
+        ]
         res = self.client.post(
             "/api/group-work/projects/",
-            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id]},
+            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id for teammate in teammates]},
             format="json",
         )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -33,34 +44,35 @@ class GroupProjectListTests(BaseTestCase):
         )
 
     def test_create_project_with_member_ids(self):
-        teammate = make_user("teammate", "teammate@example.com")
-        teammate_two = make_user("teammate_two", "teammate_two@example.com")
+        teammates = [
+            make_user(f"teammate_{index}", f"teammate_{index}@example.com")
+            for index in range(4)
+        ]
 
         res = self.client.post(
             "/api/group-work/projects/",
-            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id, teammate_two.id]},
+            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id for teammate in teammates]},
             format="json",
         )
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(
-            GroupMembership.objects.filter(
-                project_id=res.data["id"], user=teammate, role="member"
-            ).exists()
-        )
-        self.assertTrue(
-            GroupMembership.objects.filter(
-                project_id=res.data["id"], user=teammate_two, role="member"
-            ).exists()
-        )
-        self.assertEqual(res.data["member_count"], 3)
+        for teammate in teammates:
+            self.assertTrue(
+                GroupMembership.objects.filter(
+                    project_id=res.data["id"], user=teammate, role="member"
+                ).exists()
+            )
+        self.assertEqual(res.data["member_count"], 5)
 
     def test_create_project_requires_module(self):
-        teammate = make_user("module_required", "module_required@example.com")
+        teammates = [
+            make_user(f"module_required_{index}", f"module_required_{index}@example.com")
+            for index in range(4)
+        ]
 
         res = self.client.post(
             "/api/group-work/projects/",
-            {"name": "Alpha", "member_ids": [teammate.id]},
+            {"name": "Alpha", "member_ids": [teammate.id for teammate in teammates]},
             format="json",
         )
 
@@ -77,6 +89,36 @@ class GroupProjectListTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("member_ids", res.data)
 
+    def test_create_project_requires_minimum_total_team_size(self):
+        teammates = [
+            make_user("minimum_team_one", "minimum_team_one@example.com"),
+            make_user("minimum_team_two", "minimum_team_two@example.com"),
+        ]
+
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Alpha", "course_code": "CS100", "member_ids": [user.id for user in teammates]},
+            format="json",
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("at least 5 total members", res.data["member_ids"][0])
+
+    def test_create_project_rejects_more_than_ten_total_members(self):
+        teammates = [
+            make_user(f"max_team_{index}", f"max_team_{index}@example.com")
+            for index in range(10)
+        ]
+
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Alpha", "course_code": "CS100", "member_ids": [user.id for user in teammates]},
+            format="json",
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("at most 10 total members", res.data["member_ids"][0])
+
     def test_create_project_rejects_invalid_member_ids(self):
         res = self.client.post(
             "/api/group-work/projects/",
@@ -92,12 +134,15 @@ class GroupProjectListTests(BaseTestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_project_rejects_past_deadline(self):
-        teammate = make_user("past_deadline_mate", "past_deadline_mate@example.com")
+        teammates = [
+            make_user(f"past_deadline_mate_{index}", f"past_deadline_mate_{index}@example.com")
+            for index in range(4)
+        ]
         past_date = (timezone.localdate() - timedelta(days=1)).isoformat()
 
         res = self.client.post(
             "/api/group-work/projects/",
-            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id], "deadline": past_date},
+            {"name": "Alpha", "course_code": "CS100", "member_ids": [teammate.id for teammate in teammates], "deadline": past_date},
             format="json",
         )
 
@@ -228,3 +273,29 @@ class GroupProjectMembersTests(BaseTestCase):
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(GroupMembership.objects.filter(project=self.project, user=teammate).exists())
+
+    def test_owner_cannot_add_member_above_max_team_size(self):
+        _add_members(self.project, 9, prefix="full_team")
+        teammate = make_user("overflow_member", "overflow_member@example.com")
+
+        res = self.client.post(
+            f"/api/group-work/projects/{self.project.id}/members/",
+            {"user": teammate.id, "role": "member"},
+            format="json",
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("at most 10 total members", res.data["detail"])
+        self.assertFalse(GroupMembership.objects.filter(project=self.project, user=teammate).exists())
+
+    def test_owner_cannot_remove_member_below_min_team_size(self):
+        members = _add_members(self.project, 4, prefix="min_team")
+
+        membership = GroupMembership.objects.get(project=self.project, user=members[0])
+        res = self.client.delete(
+            f"/api/group-work/projects/{self.project.id}/members/{membership.id}/"
+        )
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("at least 5 total members", res.data["detail"])
+        self.assertTrue(GroupMembership.objects.filter(id=membership.id).exists())

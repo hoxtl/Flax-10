@@ -10,7 +10,7 @@ SOCIETY_RECURRENCE_END = date(2026, 6, 30)
 from django.contrib.auth import get_user_model
 
 from studyFlax.models import (
-    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage,
+    Society, SocietyMembership, SocietyTag, SocietyEvent, SocietyImage, SocietyCalendarSync,
 )
 from studyFlax.fixtures.data_fixtures import location_fixtures
 from studyFlax.fixtures.society_fixtures import build_society_seed_data, build_event_datetime
@@ -107,10 +107,17 @@ def _pick_admin(admin_counts, student_users):
     eligible = [u for u in student_users if admin_counts[u.id] < 3]
     return random.choice(eligible) if eligible else None
 
-def _add_admin_membership(society, admin, admin_counts):
-    SocietyMembership.objects.get_or_create(
-        user=admin, society=society, defaults={'role': 'admin'},
+def _ensure_seed_membership(user, society, role):
+    membership, _ = SocietyMembership.objects.update_or_create(
+        user=user,
+        society=society,
+        defaults={'role': role, 'is_subscribed': True},
     )
+    SocietyCalendarSync.objects.get_or_create(user=user, society=society)
+    return membership
+
+def _add_admin_membership(society, admin, admin_counts):
+    _ensure_seed_membership(admin, society, 'admin')
     society.admin_emails = admin.email
     society.save()
     admin_counts[admin.id] += 1
@@ -120,9 +127,7 @@ def _seed_regular_members(society, admin, member_counts, student_users):
     count = min(random.randint(5, 15), len(eligible))
     members = random.sample(eligible, count)
     for member in members:
-        SocietyMembership.objects.get_or_create(
-            user=member, society=society, defaults={'role': 'member'},
-        )
+        _ensure_seed_membership(member, society, 'member')
         member_counts[member.id] += 1
 
 def _seed_society_members(society, admin_counts, member_counts, student_users):

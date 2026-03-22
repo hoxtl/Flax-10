@@ -7,7 +7,7 @@ import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
 import Tooltip from "../../../components/common/Tooltip/Tooltip";
-import { getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
+import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
@@ -63,6 +63,7 @@ export function ProjectTeacherMeta({ project }) {
 function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove }) {
   const [isEditing, setIsEditing] = useState(false);
   const canManageTeam = currentUserIsOwner(teamMembers);
+  const teamCount = Math.max(teamMembers.length, getProjectMemberCount(project));
   if (!members.length && !teamMembers.length) return null;
 
   return (
@@ -85,6 +86,9 @@ function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMe
               </Tooltip>
             ))}
           </div>
+          <span className={styles.memberCountCopy}>
+            {teamCount} member{teamCount === 1 ? "" : "s"}
+          </span>
           {canManageTeam ? (
             <button type="button" className={styles.teamManageBtn} onClick={() => setIsEditing((current) => !current)}>
               {isEditing ? "Done" : "Edit team"}

@@ -3,17 +3,27 @@
  * Utilizes the useSocietyCalendarSync hook for state management.
  */
 import { useSocietyCalendarSync } from "../../../hooks/useSocietyCalendarSync";
+import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
 import styles from "./SyncButton.module.css";
 
 export default function SyncButton({ societyId, societyName }) {
     const { isSynced, loading, toggleSync } = useSocietyCalendarSync(societyId, societyName);
     const label = getButtonLabel(isSynced, loading);
-    const className = getButtonClass(isSynced, loading);
+    const className = getButtonClass(isSynced);
 
     return (
-        <button className={className} onClick={toggleSync} disabled={loading} title={getTooltip(isSynced)}>
+        <PrimaryButton
+            className={className}
+            variant={isSynced ? "secondary" : "ghost"}
+            size="small"
+            pill
+            onClick={toggleSync}
+            disabled={loading}
+            title={getTooltip(isSynced)}
+            aria-pressed={isSynced}
+        >
             {label}
-        </button>
+        </PrimaryButton>
     );
 }
 
@@ -22,8 +32,7 @@ function getButtonLabel(isSynced, loading) {
     return isSynced ? "✓ Synced" : "Sync to Calendar";
 }
 
-function getButtonClass(isSynced, loading) {
-    if (loading) return `${styles.syncBtn} ${styles.loading}`;
+function getButtonClass(isSynced) {
     return isSynced ? `${styles.syncBtn} ${styles.synced}` : styles.syncBtn;
 }
 

@@ -6,12 +6,13 @@ import DeadlineCountdown from "../../../components/common/DeadlineCountdown/Dead
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
-import { getDaysLeft, getProjectDate, getProjectMembers, getProjectPercent } from "../utils/projectRowUtils";
+import { getDaysLeft, getProjectDate, getProjectMemberCount, getProjectMembers, getProjectPercent } from "../utils/projectRowUtils";
 import styles from "./ProjectRow.module.css";
 
 export default function ProjectRow({ project, onClick }) {
   const date = getProjectDate(project.deadline);
   const members = getProjectMembers(project);
+  const memberCount = getProjectMemberCount(project);
   const daysLeft = getDaysLeft(date);
   const percent = getProjectPercent(project);
   return (
@@ -20,6 +21,7 @@ export default function ProjectRow({ project, onClick }) {
         <ProjectRowInfo
           project={project}
           members={members}
+          totalMembers={memberCount}
           action={(
             <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.projectDetailsButton} onClick={onClick}>
               Schedule times and view more details

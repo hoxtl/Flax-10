@@ -10,7 +10,7 @@ import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } 
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowInfo({ project, members, action = null }) {
+export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null }) {
   return (
     <div className={styles.projectInfoArea}>
       <ProjectTeacherAvatar project={project} />
@@ -19,7 +19,7 @@ export default function ProjectRowInfo({ project, members, action = null }) {
           <div className={styles.projectName}>{project.name}</div>
           {action ? <div className={styles.projectTitleAction}>{action}</div> : null}
         </div>
-        <AvatarStack members={members} />
+        <AvatarStack members={members} totalMembers={totalMembers} />
       </div>
     </div>
   );
@@ -61,11 +61,16 @@ export function ProjectModuleBadge({ project }) {
   );
 }
 
-function AvatarStack({ members }) {
-  if (!members.length) return null;
+function AvatarStack({ members, totalMembers }) {
+  if (!members.length && !totalMembers) return null;
   return (
     <div className={styles.avatarStack}>
-      {members.map((member, index) => <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />)}
+      {members.map((member, index) => (
+        <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />
+      ))}
+      <span className={styles.avatarCountLabel}>
+        {totalMembers || members.length} member{(totalMembers || members.length) === 1 ? "" : "s"}
+      </span>
     </div>
   );
 }
