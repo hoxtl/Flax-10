@@ -33,25 +33,18 @@ const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 export function useIntelligenceDashboard(props) {
-  const profileId = props.profile?.id;
   const [layout, setLayout] = usePersistedLayout(props.profile);
   const [widgetSizes, setWidgetSizes] = usePersistedWidgetSizes(props.profile);
-  const [edit, setEdit] = useState(false);
-  const [showAdd, setShowAdd] = useState(false);
-  const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [showCourseChange, setShowCourseChange] = useState(true);
-  const [showTeacherRequest, setShowTeacherRequest] = useState(true);
+  const ui = useDashboardUiState();
   const tflDelays = useTflDelays();
   const courseChangeRequest = useCourseChangeRequest();
   const teacherRequestPending = props.profile?.role === "pending_teacher";
   const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
   const analytics = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
   const live = useLiveSummary(props, tflDelays);
-
-  useCloudSync(props.profile, props.profileLoading, layout, profileId, widgetSizes);
+  useCloudSync(props.profile, props.profileLoading, layout, widgetSizes);
   useProfileFallback(props.profile, props.profileLoading, setLayout, setWidgetSizes);
-
-  return { analytics, courseChangeRequest: showCourseChange ? courseChangeRequest : null, edit, handleRandomize: () => setLayout(randomizeLayout), handleReset: () => setShowResetConfirm(true), layout, live, setEdit, setLayout, setShowAdd, setShowCourseChange, setShowResetConfirm, setShowTeacherRequest, setWidgetSize: (id, size) => setWidgetSizes((prev) => ({ ...prev, [id]: size })), showAdd, showResetConfirm, teacherRequestPending: showTeacherRequest ? teacherRequestPending : false, tflDelays, widgetSizes };
+  return buildDashboardState(analytics, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes);
 }
 
 function usePersistedLayout(profile) {
@@ -82,8 +75,8 @@ function useProfileFallback(profile, profileLoading, setLayout, setWidgetSizes) 
   useEffect(() => syncProfileSettings(profile, profileLoading, setLayout, setWidgetSizes), [profile, profileLoading, setLayout, setWidgetSizes]);
 }
 
-function useCloudSync(profile, profileLoading, layout, profileId, widgetSizes) {
-  useEffect(() => scheduleCloudSync(profile, profileLoading, layout, profileId, widgetSizes), [layout, profile, profileId, profileLoading, widgetSizes]);
+function useCloudSync(profile, profileLoading, layout, widgetSizes) {
+  useEffect(() => scheduleCloudSync(profile, profileLoading, layout, widgetSizes), [layout, profile, profileLoading, widgetSizes]);
 }
 
 function useLiveSummary(props, tflDelays) {
@@ -163,12 +156,33 @@ function syncProfileSettings(profile, profileLoading, setLayout, setWidgetSizes)
   if (profile.settings.homepage_widget_sizes) setWidgetSizes(profile.settings.homepage_widget_sizes);
 }
 
-function scheduleCloudSync(profile, profileLoading, layout, profileId, widgetSizes) {
-  if (profileLoading || !profileId) return;
+function scheduleCloudSync(profile, profileLoading, layout, widgetSizes) {
+  if (profileLoading || !profile?.id) return;
   const timer = setTimeout(() => {
     updateUserSettings({ homepage_widgets: layout, homepage_widget_sizes: widgetSizes }).catch(() => {});
   }, 2000);
   return () => clearTimeout(timer);
+}
+
+function useDashboardUiState() {
+  const [edit, setEdit] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showCourseChange, setShowCourseChange] = useState(true);
+  const [showTeacherRequest, setShowTeacherRequest] = useState(true);
+  return { edit, setEdit, setShowAdd, setShowCourseChange, setShowResetConfirm, setShowTeacherRequest, showAdd, showCourseChange, showResetConfirm, showTeacherRequest };
+}
+
+function buildDashboardState(analytics, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes) {
+  return { ...getDashboardData(analytics, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes), ...getDashboardActions(setLayout, setWidgetSizes, ui) };
+}
+
+function getDashboardActions(setLayout, setWidgetSizes, ui) {
+  return { handleRandomize: () => setLayout(randomizeLayout), handleReset: () => ui.setShowResetConfirm(true), setEdit: ui.setEdit, setLayout, setShowAdd: ui.setShowAdd, setShowCourseChange: ui.setShowCourseChange, setShowResetConfirm: ui.setShowResetConfirm, setShowTeacherRequest: ui.setShowTeacherRequest, setWidgetSize: (id, size) => setWidgetSizes((prev) => ({ ...prev, [id]: size })) };
+}
+
+function getDashboardData(analytics, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes) {
+  return { analytics, courseChangeRequest: ui.showCourseChange ? courseChangeRequest : null, edit: ui.edit, layout, live, showAdd: ui.showAdd, showResetConfirm: ui.showResetConfirm, teacherRequestPending: ui.showTeacherRequest ? teacherRequestPending : false, tflDelays, widgetSizes };
 }
 
 export function getSemesterProgress(now = new Date()) {
