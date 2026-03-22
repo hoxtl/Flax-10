@@ -33,3 +33,44 @@ describe('getHistoryHorizonLabel', () => {
     expect(getHistoryHorizonLabel('not-a-date', now)).toBe('Earlier');
   });
 });
+
+describe('getSevenDayFocusSeries', () => {
+  const now = new Date(2024, 5, 12, 15, 0, 0);
+  const todayKey = new Date(2024, 5, 12).toISOString().slice(0, 10);
+
+  it('always returns exactly 7 entries', () => {
+    expect(getSevenDayFocusSeries([], now)).toHaveLength(7);
+  });
+
+  it('last entry key equals today in local time', () => {
+    expect(getSevenDayFocusSeries([], now)[6].key).toBe(todayKey);
+  });
+
+  it('accumulates totalDuration into the bucket matching startTime', () => {
+    const block = { startTime: new Date(2024, 5, 12, 10).toISOString(), totalDuration: 3600 };
+    expect(getSevenDayFocusSeries([block], now)[6].seconds).toBe(3600);
+  });
+
+  it('falls back to endTime when startTime is absent', () => {
+    const block = { endTime: new Date(2024, 5, 12, 10).toISOString(), totalDuration: 1800 };
+    expect(getSevenDayFocusSeries([block], now)[6].seconds).toBe(1800);
+  });
+
+  it('ignores a block whose date cannot be parsed', () => {
+    const block = { startTime: 'bad-date', totalDuration: 3600 };
+    expect(getSevenDayFocusSeries([block], now).every((d) => d.seconds === 0)).toBe(true);
+  });
+
+  it('ignores a block that falls outside the 7-day window', () => {
+    const block = { startTime: new Date(2024, 3, 1, 10).toISOString(), totalDuration: 3600 };
+    expect(getSevenDayFocusSeries([block], now).every((d) => d.seconds === 0)).toBe(true);
+  });
+
+  it('accumulates seconds from multiple blocks on the same day', () => {
+    const blocks = [
+      { startTime: new Date(2024, 5, 12, 8).toISOString(), totalDuration: 600 },
+      { startTime: new Date(2024, 5, 12, 10).toISOString(), totalDuration: 400 },
+    ];
+    expect(getSevenDayFocusSeries(blocks, now)[6].seconds).toBe(1000);
+  });
+});
