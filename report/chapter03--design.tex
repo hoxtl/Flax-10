@@ -3,19 +3,31 @@
 
 \defaultInstructions
 
-\begin{length}
-There are no strict length requirements for this chapter.  However, it is important that the writing is clear and concise.  Avoid repeating yourself.  Make sure to clearly signpost evidence for claims.  It should be possible for a reader to understand this chapter without consulting other sources.  It is expected that a typical project needs 3--6 pages, but this can vary considerably from project to project.
-\end{length}
-
-\begin{expectations}
-This chapter provides a conceptual description of how the software system developed by the system works.  Use diagrams to explain your design, but include some text to guide the reader.  It is essential that this chapter includes structural diagram (e.g. a UML class diagram, a component diagram, and/or a deployment diagram).  If you do not use UML diagrams, include a legend for the diagrams.
-
-The design as it is described herein must be an accurate reflection of what the team has built.  This is important: your claims about the design must match what was actually built.  Minor details can be omitted if they are not critical to the design and facilitates readability and understandability.  Make sure all diagrams are legible when this document is printed on A4.  If necessary, provide multiple diagrams with different levels of abstraction.
-\end{expectations}
 
 \section{System Overview}
 
+StudyFlax is a web-based time management application built for students and teaching staff at King's College London. King's College London students typically manage their timetable, assignment deadlines, task lists, and society activities across several separate tools, and keeping track of all of them at once is difficult. The platform brings all of that into a single interface. Teaching staff can also use it to create and manage modules, set deadlines, and publish reading lists, which students then see directly within their own dashboard.
+
+The system is split into two independently deployed parts: a React frontend served via Vite, and a Django backend connected to a PostgreSQL database. The two sides communicate only through a RESTful HTTP API, so neither is coupled to the other's implementation. The backend also connects to several external services: the King's College London timetabling system for importing student schedules, OpenAI for the AI study coach, Mapbox for the campus map, and the Transport for London API for public transport routing. The development environment is containerised using Nix Flakes and Docker Compose, which kept the setup consistent across the whole team.
+
 \section{Architectural Pattern}
+
+The system uses a three-tier architecture, separating the user interface, business logic, and data storage into distinct layers (Figure~\ref{fig:architecture}).
+
+The \textbf{presentation tier} is the React SPA running in the browser. It has no direct access to the database and holds no shared session state with the backend. All data is fetched and submitted through HTTP requests to the REST API.
+
+The \textbf{application tier} is a Django REST Framework (DRF) server that handles all business logic. It exposes a single API namespace at \texttt{/api/}, with endpoints grouped by feature area, for example \texttt{/api/events/}, \texttt{/api/tasks/}, and \texttt{/api/societies/}. Authentication is handled per-request: each request carries a token in the \texttt{Authorization} header, which the server validates using DRF's \texttt{TokenAuthentication} class. This keeps the server stateless.
+
+The \textbf{data tier} is a PostgreSQL database accessed only through Django's ORM. No raw SQL is used anywhere in the codebase. In development, user-uploaded files such as profile photos are written to disk and served through a configured media root.
+
+External services (OpenAI, Mapbox, and the TfL API) are called from the application tier only, never from the frontend. This means API keys stay server-side and the backend can process responses before passing them to the client.
+
+\begin{figure}[h]
+    \centering
+    % TODO: insert three-tier architecture diagram here
+    \caption{Three-tier architecture of StudyFlax.}
+    \label{fig:architecture}
+\end{figure}
 
 \section{Frontend Design}
 \label{sect:frontend}
@@ -32,6 +44,35 @@ API communication is abstracted into a dedicated \texttt{api/} service layer, ke
 Styling uses a combination of CSS Modules and styled-components, with all colour values defined in a central \texttt{variables.css} file. This is described further in Section~\ref{sect:design-decisions}.
 
 \section{Backend Design}
+\label{sect:backend}
+
+The backend is a single Django project (\texttt{Flax10}) with one application (\texttt{studyFlax}). All models, serialisers, views, and business logic sit within this app, with each feature domain organised into its own subdirectory.
+
+\subsection{API Layer}
+
+All API endpoints are registered under \texttt{/api/} and routed through a single URL configuration at \texttt{studyFlax/urls/api\_urls.py}. Most endpoints use plain function-based views with \texttt{@api\_view} decorators, which kept things simple for endpoints that do not need the full CRUD pattern. Two DRF \texttt{ViewSet}s are registered via a \texttt{DefaultRouter}, specifically for study session history and calendar sharing, where the router-generated routes were a better fit.
+
+The API covers the following functional domains: authentication, user profiles and settings, calendar events and timetable import, modules and deadlines, tasks and task lists, study timer sessions, group work projects, societies, notifications, analytics, and admin tools.
+
+\subsection{Models}
+
+Models are split into domain subdirectories under \texttt{studyFlax/models/}: \texttt{auth/}, \texttt{calendar/}, \texttt{modules/}, \texttt{tasks/}, \texttt{timer/}, \texttt{society/}, \texttt{groupwork/}, \texttt{social/}, and \texttt{notifications/}. The \texttt{User} model extends Django's \texttt{AbstractUser}, with added role fields (\texttt{student}, \texttt{teacher}, \texttt{pending\_teacher}), profile fields such as photo, bio, and home address with geocoordinates, and a linked \texttt{UserSettings} model for per-user preferences including theme, daily study targets, and sleep schedule. The custom user model was defined before any initial migrations were run, which was important because retrofitting it afterwards would have required a full database reset.
+
+\subsection{Serialisers}
+
+Each model domain has a corresponding serialiser module under \texttt{studyFlax/serialisers/}. DRF \texttt{ModelSerializer} is used throughout. Where the API response needs to differ from the raw model fields, custom \texttt{validate\_*} methods or \texttt{Serializer\allowbreak{}MethodField}s are added, for example to resolve nested relationships or compute derived values such as reading time estimates.
+
+\subsection{Signals}
+
+Django signals handle side effects that should not be mixed into view logic. When a group work suggestion is responded to, or a society announcement is published, a signal handler creates the relevant \texttt{Notification} record automatically. Notifications are therefore created reliably regardless of what triggered the change.
+
+\subsection{Authentication}
+
+Registration creates a \texttt{User} record and returns a DRF auth token in the same response. Login validates credentials and returns the existing token. Logout deletes the token server-side so it is immediately invalidated. Password reset uses a time-limited token stored in the \texttt{ResetPasswordToken} model, with the reset link sent by email through Django's SMTP backend.
+
+\subsection{Admin}
+
+The backend exposes a set of admin-only API endpoints under \texttt{/api/admin/}, restricted to users with the \texttt{staff} role. These allow administrators to manage user accounts, oversee registered societies, and access platform-wide analytics without going through Django's built-in \texttt{/admin/} panel. Django's default \texttt{/admin/} interface is also available for direct database-level inspection and management during development. Role-based access is enforced at the view level using a custom permission check against the \texttt{is\_staff} flag on the \texttt{User} model.
 
 \section{Data Model/ Entity Relationships}
 
@@ -42,14 +83,14 @@ This section documents the significant design decisions made during development,
 
 \subsection{Custom User Model with Unified Role System}
 
-A custom user model was defined from the outset of the project, extending Django's \texttt{AbstractUser} to incorporate roles (\texttt{student}, \texttt{teacher}, and \texttt{staff}) and profile-specific fields such as profile photo and home address, with study preferences such as year and major stored in a linked \texttt{UserSettings} model. This decision was made early and deliberately, as retrofitting a custom user model after initial migrations would have required resetting the database entirely. The unified model ensures that role-based behaviour --- such as restricting module creation to teachers and administration tools to admins --- is handled consistently through a single identity model rather than through separate profile tables.
+A custom user model was defined from the outset of the project, extending Django's \texttt{AbstractUser} to incorporate roles (\texttt{student}, \texttt{teacher}, and \texttt{staff}) and profile-specific fields such as profile photo and home address, with study preferences such as year and major stored in a linked \texttt{UserSettings} model. This decision was made early and deliberately, as retrofitting a custom user model after initial migrations would have required resetting the database entirely. The unified model ensures that role-based behaviour, such as restricting module creation to teachers and administration tools to admins, is handled consistently through a single identity model rather than through separate profile tables.
 
 \subsection{Token-Based Authentication}
 Token-based authentication was chosen over session-based authentication to keep the backend stateless: the server does not store session data, and each request is authenticated independently via a token passed in the request header. This integrates naturally with a decoupled frontend and backend architecture, where the React frontend and Django REST Framework backend communicate purely through the API with no shared session state.
 
 \subsection{Course-Prefix Mapping for Module Onboarding}
 
-During onboarding, modules are automatically assigned to a student based on their selected major using a course-prefix mapping (e.g.\ selecting Computer Science maps to all modules with the prefix \texttt{6CCS} or \texttt{5CCS}). The alternative --- manual per-user module assignment --- was rejected as it would not scale and would place an unnecessary burden on both users and administrators. The prefix-mapping approach means that as new modules are added to the system, they are automatically surfaced to the correct students without any additional configuration.
+During onboarding, modules are automatically assigned to a student based on their selected major using a course-prefix mapping (e.g.\ selecting Computer Science maps to all modules with the prefix \texttt{6CCS} or \texttt{5CCS}). The alternative of manual per-user module assignment was rejected as it would not scale and would place an unnecessary burden on both users and administrators. The prefix-mapping approach means that as new modules are added to the system, they are automatically surfaced to the correct students without any additional configuration.
 
 \subsection{CSS Variables for Theming}
 
@@ -58,7 +99,7 @@ Colour values are primarily defined as CSS custom properties in a central \textt
 
 \subsection{Tasks as a Standalone Page}
 
-An early version of the application included a To Do sidebar panel that opens from a floating button shown on all pages. This was replaced with a dedicated Tasks page after it became clear that the panel format constrained the feature's functionality. The standalone page allows tasks to be linked to calendar events, completed via study timer sessions, and associated with module deadlines --- interactions that would not have been possible within a sidebar panel. The change also improved cohesion: task management is now a first-class feature rather than an auxiliary widget.
+An early version of the application included a To Do sidebar panel that opens from a floating button shown on all pages. This was replaced with a dedicated Tasks page after it became clear that the panel format constrained the feature's functionality. The standalone page allows tasks to be linked to calendar events, completed via study timer sessions, and associated with module deadlines; these interactions would not have been possible within a sidebar panel. The change also improved cohesion: task management is now a first-class feature rather than an auxiliary widget.
 
 \subsection{Navigation: Sidebar to Top Bar and Bottom Bar}
 The original navigation design used a collapsible sidebar on both desktop and mobile. During development it was observed that opening and closing the sidebar caused the main content area to resize, pushing and rearranging page content. This was replaced with a persistent top navigation bar on desktop and a fixed bottom navigation bar on mobile. This approach eliminates layout shift entirely, provides a more conventional navigation pattern for each platform, and preserves the full viewport width for page content at all times.
@@ -77,10 +118,10 @@ The auto-scheduler feature generates study events based on a student's module de
 
 The system integrates with four external services.
 
-\textbf{OpenAI API} powers the AI study coach feature. When a student requests insights or asks a question through the coach interface, the system constructs a context object from the student's study session history, streak statistics, peak study hours, dark mode usage patterns, and upcoming calendar events, and sends this to the OpenAI API. The response is returned as personalised, data-aware feedback. The integration is conditionally loaded so that the application remains functional if the API is unavailable.
+\textbf{iCalendar (RFC 5545)} format is supported for timetable import. King's College London students can provide their timetable URL, taken from the King's College London timetable website, and the system downloads and parses the \texttt{.ics} file to extract scheduled classes and import them directly into the application's calendar as events.
 
-\textbf{Mapbox GL} is used to render the campus map feature, which displays the five KCL campus locations (Strand, Guy's, Waterloo, St Thomas, and Denmark Hill) and provides journey planning functionality. Students can calculate walking routes to any campus using the Mapbox Directions API, or public transport routes using the TfL Journey Planner API, based on their saved home address.
+\textbf{OpenAI API} powers the AI study coach feature. When a King's College London student requests insights or asks a question through the coach interface, the system constructs a context object from the student's study session history, streak statistics, peak study hours, dark mode usage patterns, and upcoming calendar events, and sends this to the OpenAI API. The response is returned as personalised, data-aware feedback. The integration is conditionally loaded so that the application remains functional if the API is unavailable.
 
-\textbf{iCalendar (RFC 5545)} format is supported for timetable import. Students can provide their KCL timetable URL, and the system downloads and parses the \texttt{.ics} file to extract scheduled classes and import them directly into the application's calendar as events.
+\textbf{Mapbox GL} is used to render the campus map feature, which displays the five King's College London campus locations (Strand, Guy's, Waterloo, St Thomas, and Denmark Hill) and provides journey planning functionality. King's College London students can calculate walking routes to any campus using the Mapbox Directions API, or public transport routes using the TfL Journey Planner API, based on their saved home address.
 
-\textbf{Transport for London (TfL) API} is used alongside Mapbox to provide public transport routing on the campus map, giving students the option to plan their journey to campus by tube, bus, or rail.
+\textbf{Transport for London (TfL) API} is used alongside Mapbox to provide public transport routing on the campus map, giving King's College London students the option to plan their journey to campus by tube, bus, or rail.
