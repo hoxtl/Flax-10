@@ -16,3 +16,20 @@ const makeSeries = (secondsArr) =>
 const DEFAULT_SERIES = makeSeries([0, 1800, 3600, 7200, 0, 5400, 3600]);
 const MAX = 7200;
 
+describe('WeeklyChart', () => {
+  it('renders the "Weekly Summary" heading', () => {
+    render(<WeeklyChart weeklySeries={DEFAULT_SERIES} maxWeeklySeconds={MAX} />);
+    expect(screen.getByText('Weekly Summary')).toBeTruthy();
+  });
+
+  it('renders the accessible chart region with the correct aria-label', () => {
+    render(<WeeklyChart weeklySeries={DEFAULT_SERIES} maxWeeklySeconds={MAX} />);
+    expect(screen.getByRole('img', { name: /Focus hours per day/i })).toBeTruthy();
+  });
+
+  it.each(WEEK_LABELS)('renders the bar column labelled "%s"', (label) => {
+    render(<WeeklyChart weeklySeries={DEFAULT_SERIES} maxWeeklySeconds={MAX} />);
+    expect(screen.getByText(label)).toBeTruthy();
+  });
+
+})
