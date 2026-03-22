@@ -8,13 +8,14 @@ from itertools import takewhile
 from django.db.models import Q
 from types import SimpleNamespace
 
+from django.utils import timezone
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
 MAX_SIMULTANEOUS_OVERLAPS = 3
 
 def filter_events_by_date_range(queryset, params):
-    start = params.get('start')
-    end = params.get('end')
+    start = parse_date_param(params.get('start'))
+    end = parse_date_param(params.get('end'))
     if not (start or end):
         return queryset
     recurring = Q(recurrence_rule__isnull=False)
@@ -140,7 +141,12 @@ def exceeds_overlap_limit(user, start_time, end_time, exclude_id=None):
     return overlap_count(user, start_time, end_time, exclude_id) >= MAX_SIMULTANEOUS_OVERLAPS
 
 def parse_date_param(ds):
-    return datetime.fromisoformat(ds.replace('Z', '+00:00')) if ds else None
+    if not ds:
+        return None
+    dt = datetime.fromisoformat(ds.replace('Z', '+00:00'))
+    if timezone.is_naive(dt):
+        return timezone.make_aware(dt)
+    return dt
 
 def get_next_occurrence(start, frequency, interval, num):
     rule = SimpleNamespace(frequency=frequency, interval=interval)
