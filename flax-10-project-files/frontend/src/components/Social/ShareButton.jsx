@@ -15,7 +15,15 @@ async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle
     }
 }
 
-export default function ShareButton({ userId, initialIsSharing, onToggle }) {
+export default function ShareButton({
+    userId,
+    initialIsSharing,
+    onToggle,
+    shareVariant = "primary",
+    sharedVariant = "secondary",
+    shareLabel = "Share Calendar",
+    sharedLabel = "Shared",
+}) {
     const [isSharing, setIsSharing] = useState(initialIsSharing);
     const [loading, setLoading] = useState(false);
 
@@ -30,11 +38,11 @@ export default function ShareButton({ userId, initialIsSharing, onToggle }) {
         <PrimaryButton
             pill
             size="small"
-            variant={isSharing ? "secondary" : "primary"}
+            variant={isSharing ? sharedVariant : shareVariant}
             disabled={loading}
             onClick={handleClick}
         >
-            {loading ? '...' : isSharing ? 'Shared' : 'Share Calendar'}
+            {loading ? '...' : isSharing ? sharedLabel : shareLabel}
         </PrimaryButton>
     );
 }
