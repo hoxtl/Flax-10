@@ -23,11 +23,9 @@ READING_WEEK_START = datetime(2026, 2, 23).date()
 READING_WEEK_END = datetime(2026, 2, 27).date()
 
 AFTERNOON_SLOTS = [
-    (14, 30, 60, "Review notes"),
-    (15, 30, 30, "Coffee with flatmates"),
-    (16, 30, 45, "Reply to emails"),
-    (17, 45, 60, "Study at library"),
-    (19, 0, 30, "Plan tomorrow"),
+    (12, 30, 30, "Review notes"),
+    (18, 30, 45, "Study at library"),
+    (21, 0, 30, "Plan tomorrow"),
 ]
 
 MEAL_SPECS = [

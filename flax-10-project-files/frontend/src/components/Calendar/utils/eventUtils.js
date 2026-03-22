@@ -33,6 +33,8 @@ export function isReadOnlyEvent(event) {
     return getEventType(event) !== 'personal';
 }
 
+const FIXED_TAG_NAMES = new Set(['deadline', 'exam', 'assignment', 'lab', 'practical', 'lecture']);
+
 /** Returns the event source type: 'personal', 'society', 'module', or 'timetable'. */
 export function getEventType(event) {
     if (!event) return 'personal';
@@ -41,6 +43,8 @@ export function getEventType(event) {
     if (event.source === 'timetable') return 'timetable';
     if (event.module) return 'module';
     if (event.source && event.external_id) return 'timetable';
+    const tagName = (event.tag_name || (typeof event.tag === 'object' ? event.tag?.name : '') || '').toLowerCase().trim();
+    if (tagName && FIXED_TAG_NAMES.has(tagName)) return 'timetable';
     return 'personal';
 }
 

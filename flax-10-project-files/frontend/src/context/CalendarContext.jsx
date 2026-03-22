@@ -102,13 +102,13 @@ export function useEventPopup() {
         return { popupEvent: null, popupAnchorRect: null, readOnly: false, openPopup: () => { }, closePopup: () => { } };
     }
 
-    const { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode, popupViewMode } = context;
+    const { popupEvent, popupAnchorRect, readOnly: contextReadOnly, popupReadOnly, viewMode, popupViewMode } = context;
     const openPopup = (event, anchorRect, readOnlyOverride = null, viewModeOverride = null) => {
         const readOnly = readOnlyOverride === null ? (contextReadOnly || false) : readOnlyOverride;
         dispatch({ type: 'OPEN_POPUP', payload: { event, anchorRect, readOnly, viewModeOverride } });
     };
     const closePopup = () => dispatch({ type: 'CLOSE_POPUP' });
-    return { popupEvent, popupAnchorRect, readOnly: contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
+    return { popupEvent, popupAnchorRect, readOnly: popupReadOnly || contextReadOnly, viewMode: popupViewMode || viewMode, openPopup, closePopup };
 }
 
 export function useEventDelete() {

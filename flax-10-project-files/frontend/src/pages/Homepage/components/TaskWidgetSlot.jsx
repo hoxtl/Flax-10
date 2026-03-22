@@ -5,7 +5,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo, useState, useRef, useCallback } from "react";
-import { CheckSquare, Clock3, Target, ArrowRight, ChevronDown } from "lucide-react";
+import { CheckSquare, ChevronDown } from "lucide-react";
 import baseStyles from "../styles/WidgetBase.module.css";
 import EmptyStateCard from "./EmptyStateCard";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
@@ -232,32 +232,6 @@ export function TaskWidgetSlot({
                 </div>
                 <h3 className={baseStyles.headerTitle}>Today&apos;s Tasks</h3>
                 
-                {!hasTimerSession && incompleteCount > 0 && (
-                  <button
-                    type="button"
-                    className={styles.taskWidgetFocusBtn}
-                    onClick={onStartFocus}
-                  >
-                    Focus now
-                    <ArrowRight size={12} strokeWidth={1.8} aria-hidden />
-                  </button>
-                )}
-              </div>
-
-              <div className={styles.taskWidgetSummaryRow}>
-                <div className={styles.taskWidgetDueTodayPill}>
-                  {taskWidgetDueTodayCount} due today
-                </div>
-                <div className={styles.taskWidgetSummaryPill}>
-                  <Target size={11} strokeWidth={1.8} aria-hidden />
-                  {incompleteCount} in queue
-                </div>
-                {estimatedLeft && (
-                  <div className={styles.taskWidgetSummaryPill}>
-                    <Clock3 size={11} strokeWidth={1.8} aria-hidden />
-                    {estimatedLeft}
-                  </div>
-                )}
               </div>
 
               {/* Task list */}
