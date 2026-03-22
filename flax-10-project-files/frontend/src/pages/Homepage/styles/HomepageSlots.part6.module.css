@@ -1,0 +1,342 @@
+/* Split from styles/HomepageSlots.module.css (6/7) */
+.intRowFocusWindowCard:hover .intRowFocusWindowStartBtn {
+  display: block;
+}
+
+.intRowFocusMore {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  padding: 2px 0;
+}
+
+.intRowFocusMicroStats {
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  color: #8a7d76;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.intRowFocusMicroStatsUp {
+  color: #4a7a57;
+}
+
+.intRowFocusMicroStatsDown {
+  color: #9b4a30;
+}
+
+.intRowFocusMicroStatsSep {
+  color: #c4b8b0;
+}
+
+.intRowFocusFooterLink {
+  display: block;
+  font-family: var(--font-body, "Quicksand", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: auto;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.intRowFocusFooterLink:hover {
+  color: #57534e;
+  text-decoration: underline;
+}
+
+/* ─── Deadlines v2: compact urgency rows ────────────────────────────────── */
+
+.intRowDeadlineList2 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.intRowDeadlineRow2 {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px 7px 13px;
+  border-left: 2px solid #d4c9c2;
+  border-radius: 0 6px 6px 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+.intRowDeadlineRow2:hover {
+  background: rgba(74, 55, 40, 0.04);
+}
+
+/* Urgency: <7 days red, 7–14 amber, 14+ green — border + subtle bg, slightly muted */
+.intRowDeadlineRow2Red {
+  border-left-color: rgba(185, 28, 28, 0.75);
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Red:hover {
+  background: #fef2f2;
+}
+.intRowDeadlineRow2Amber {
+  border-left-color: rgba(217, 119, 6, 0.8);
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Amber:hover {
+  background: #fff7ed;
+}
+.intRowDeadlineRow2Green {
+  border-left-color: rgba(22, 163, 74, 0.8);
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Green:hover {
+  background: #f0fdf4;
+}
+.intRowDeadlineRow2Grey {
+  border-left-color: #d4c9c2;
+  background: transparent;
+}
+
+.intRowDeadline2Line1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intRowDeadline2Pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.intRowDeadline2ModuleCode {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #5a4a3a;
+  background: rgba(74, 55, 40, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intRowDeadline2TypePill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.intRowDeadline2TypePill:hover {
+  opacity: 0.75;
+}
+
+.intRowDeadline2TypePillExam {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.intRowDeadline2TypePillCw {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.intRowDeadline2TypePillPresentation {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+.intRowDeadline2TypePillQuiz {
+  background: #e8f4f0;
+  color: #2d5f50;
+}
+
+.intRowDeadline2Days {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  color: #8a7d76;
+}
+.intRowDeadline2DaysRed {
+  color: #b91c1c;
+}
+.intRowDeadline2DaysAmber {
+  color: #d97706;
+}
+.intRowDeadline2DaysGreen {
+  color: #16a34a;
+}
+.intRowDeadline2DaysGrey {
+  color: #8a7d76;
+}
+
+.intRowDeadline2Title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--widget-text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.intRowDeadline2BarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.intRowDeadline2BarTrack {
+  width: 60px;
+  height: 3px;
+  background: rgba(74, 55, 40, 0.1);
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.intRowDeadline2BarFill {
+  height: 100%;
+  border-radius: 2px;
+  background: #8a7d76;
+  transition: width 0.4s ease;
+}
+.intRowDeadline2BarFillRed {
+  background: #c4574b;
+}
+.intRowDeadline2BarFillAmber {
+  background: #c49a4b;
+}
+.intRowDeadline2BarFillGreen {
+  background: #6b8f71;
+}
+.intRowDeadline2BarFillGrey {
+  background: #8a7d76;
+}
+
+.intRowDeadline2TaskCount {
+  font-size: 0.625rem;
+  color: #8a7d76;
+  white-space: nowrap;
+}
+
+.intRowDeadline2NotStarted {
+  font-size: 0.625rem;
+  color: #c4b8b0;
+  font-style: italic;
+  margin-top: 1px;
+}
+
+/* ─── Day Progress — breakdown + time alloc + nudge ─────────────────────── */
+
+.intRowProgressBreakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9a8778;
+  letter-spacing: 0.02em;
+}
+
+.intRowProgressBreakdownDot {
+  opacity: 0.45;
+}
+
+.intRowProgressBreakdownOverdue {
+  color: #c0714e;
+  font-weight: 700;
+}
+
+.intRowTimeAlloc {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.intRowTimeAllocBar {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(123, 103, 81, 0.08);
+  overflow: hidden;
+  display: flex;
+}
+
+.intRowTimeAllocSegStudy {
+  height: 100%;
+  background: #7b9bad;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegPersonal {
+  height: 100%;
+  background: #84a98c;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocSegOther {
+  height: 100%;
+  background: #a08b72;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intRowTimeAllocLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.intRowTimeAllocLegendItem {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.intRowTimeAllocLegendItem::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.intRowTimeAllocLegendStudy {
+  color: #7b9bad;
+}
+.intRowTimeAllocLegendStudy::before {
+  background: #7b9bad;
+}
+
+.intRowTimeAllocLegendPersonal {
+  color: #5a8a65;
+}
+.intRowTimeAllocLegendPersonal::before {
+  background: #84a98c;
+}
+
+.intRowTimeAllocLegendOther {
+  color: #9a8778;
+}
+.intRowTimeAllocLegendOther::before {
+  background: #a08b72;
+}

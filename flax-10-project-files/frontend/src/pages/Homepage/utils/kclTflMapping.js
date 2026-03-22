@@ -48,14 +48,18 @@ function normalizeLocation(loc) {
 export function getTflLinesForLocation(location) {
   const norm = normalizeLocation(location);
   if (!norm) return [];
+  return Object.entries(LOCATION_TO_LINES).reduce(addMatchingLines(norm), []);
+}
 
-  const lines = new Set();
-  for (const [key, lineList] of Object.entries(LOCATION_TO_LINES)) {
-    if (norm.includes(key) || key.includes(norm)) {
-      lineList.forEach((l) => lines.add(l));
-    }
-  }
-  return [...lines];
+function addMatchingLines(norm) {
+  return (lines, [key, lineList]) => {
+    if (isMatchingLocation(norm, key)) return [...new Set([...lines, ...lineList])];
+    return lines;
+  };
+}
+
+function isMatchingLocation(norm, key) {
+  return norm.includes(key) || key.includes(norm);
 }
 
 /**

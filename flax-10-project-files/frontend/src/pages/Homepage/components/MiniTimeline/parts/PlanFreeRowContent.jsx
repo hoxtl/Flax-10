@@ -96,21 +96,9 @@ function TransitPartialBody({
   onSkipTask,
   onStartTask,
 }) {
-  const from = CAMPUS_DISPLAY[gapContext.prevCampus] || "campus";
-  const to = CAMPUS_DISPLAY[gapContext.nextCampus] || "next campus";
   return (
     <div className={styles.planTimelineGapTransitPartial}>
-      <div className={styles.planTimelineGapTransitPartialTop}>
-        <span className={styles.planTimelineGapTransitIcon} aria-hidden>
-          ↗
-        </span>
-        <span className={styles.planTimelineGapTransitLabel}>
-          {from} → {to} (~{gapContext.transitMins}m)
-        </span>
-        <span className={styles.planTimelineGapTransitPartialFree}>
-          {formatGapDuration(gapContext.freeAfterTransit || 0)} free after
-        </span>
-      </div>
+      <TransitPartialTop styles={styles} gapContext={gapContext} />
       <TransitPartialTask
         styles={styles}
         task={assignedTask}
@@ -123,21 +111,9 @@ function TransitPartialBody({
 
 function PassiveGapBody({ styles, durationLabel, label }) {
   return (
-    <div
-      className={`${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`}
-    >
+    <div className={getPassiveGapClassName(styles)}>
       <span className={styles.planTimelineGapRail} aria-hidden />
-      <div className={styles.planTimelineGapMain}>
-        <span className={styles.planTimelineGapLeadDot} aria-hidden />
-        <span className={styles.planTimelineGapShortDur}>
-          {durationLabel}
-          <span className={styles.planTimelineGapFreeWord}> free</span>
-        </span>
-        <span className={styles.planTimelineGapSeparator} aria-hidden>
-          ·
-        </span>
-        <span className={styles.planTimelineGapNoTasks}>{label}</span>
-      </div>
+      <PassiveGapMain styles={styles} durationLabel={durationLabel} label={label} />
       <span className={styles.planTimelineGapRail} aria-hidden />
     </div>
   );
@@ -169,69 +145,80 @@ export function PlanFreeRowContent({
   onSkipTask,
   onStartTask,
 }) {
-  if (gapContext.type === "transit")
-    return (
-      <TransitBody
-        styles={styles}
-        gapContext={gapContext}
-        durationLabel={durationLabel}
-      />
-    );
-  if (gapContext.type === "transit-partial")
-    return (
-      <TransitPartialBody
-        styles={styles}
-        gapContext={gapContext}
-        assignedTask={assignedTask}
-        onSkipTask={onSkipTask}
-        onStartTask={onStartTask}
-      />
-    );
-  if (gapContext.type === "personal")
-    return (
-      <PassiveGapBody
-        styles={styles}
-        durationLabel={durationLabel}
-        label="Short breather"
-      />
-    );
-  if (gapContext.type === "evening")
-    return (
-      <PassiveGapBody
-        styles={styles}
-        durationLabel={durationLabel}
-        label="Reset"
-      />
-    );
+  const passiveLabel = getPassiveGapLabel(gapContext.type);
+  if (gapContext.type === "transit") return <TransitBody styles={styles} gapContext={gapContext} durationLabel={durationLabel} />;
+  if (gapContext.type === "transit-partial") return <TransitPartialBody styles={styles} gapContext={gapContext} assignedTask={assignedTask} onSkipTask={onSkipTask} onStartTask={onStartTask} />;
+  if (passiveLabel) return <PassiveGapBody styles={styles} durationLabel={durationLabel} label={passiveLabel} />;
+  return <StudyGapBody styles={styles} candidateTask={candidateTask} durationLabel={durationLabel} isBestGap={isBestGap} onSkipTask={onSkipTask} onStartTask={onStartTask} />;
+}
+
+function TransitPartialTop({ styles, gapContext }) {
+  const from = CAMPUS_DISPLAY[gapContext.prevCampus] || "campus";
+  const to = CAMPUS_DISPLAY[gapContext.nextCampus] || "next campus";
   return (
-    <div
-      className={`${styles.planTimelineGapShortWindow} ${candidateTask ? styles.planTimelineGapShortWindowFeatured : ""} ${isBestGap ? styles.planTimelineGapShortWindowBest : ""} ${!candidateTask ? styles.planTimelineGapShortWindowNoActions : ""}`.trim()}
-    >
-      <span className={styles.planTimelineGapRail} aria-hidden />
-      <div className={styles.planTimelineGapMain}>
-        <span className={styles.planTimelineGapLeadDot} aria-hidden />
-        <span className={styles.planTimelineGapShortDur}>
-          {durationLabel}
-          <span className={styles.planTimelineGapFreeWord}> free</span>
-        </span>
-        <span className={styles.planTimelineGapSeparator} aria-hidden>
-          ·
-        </span>
-        <span
-          className={styles.planTimelineGapSuggestionText}
-          title={
-            candidateTask ? withUrgencyEmoji(candidateTask) : "Short breather"
-          }
-        >
-          {candidateTask ? withUrgencyEmoji(candidateTask) : "Short breather"}
-        </span>
-      </div>
-      <StudyActions
-        styles={styles}
-        task={candidateTask}
-        onSkipTask={onSkipTask}
-        onStartTask={onStartTask}
-      />
+    <div className={styles.planTimelineGapTransitPartialTop}>
+      <span className={styles.planTimelineGapTransitIcon} aria-hidden>↗</span>
+      <span className={styles.planTimelineGapTransitLabel}>{from} → {to} (~{gapContext.transitMins}m)</span>
+      <span className={styles.planTimelineGapTransitPartialFree}>{formatGapDuration(gapContext.freeAfterTransit || 0)} free after</span>
     </div>
   );
+}
+
+function PassiveGapMain({ styles, durationLabel, label }) {
+  return (
+    <div className={styles.planTimelineGapMain}>
+      <span className={styles.planTimelineGapLeadDot} aria-hidden />
+      <GapDuration styles={styles} durationLabel={durationLabel} />
+      <span className={styles.planTimelineGapSeparator} aria-hidden>·</span>
+      <span className={styles.planTimelineGapNoTasks}>{label}</span>
+    </div>
+  );
+}
+
+function GapDuration({ styles, durationLabel }) {
+  return (
+    <span className={styles.planTimelineGapShortDur}>
+      {durationLabel}
+      <span className={styles.planTimelineGapFreeWord}> free</span>
+    </span>
+  );
+}
+
+function StudyGapBody({ styles, candidateTask, durationLabel, isBestGap, onSkipTask, onStartTask }) {
+  return (
+    <div className={getStudyGapClassName(styles, candidateTask, isBestGap)}>
+      <span className={styles.planTimelineGapRail} aria-hidden />
+      <StudyGapMain styles={styles} candidateTask={candidateTask} durationLabel={durationLabel} />
+      <StudyActions styles={styles} task={candidateTask} onSkipTask={onSkipTask} onStartTask={onStartTask} />
+    </div>
+  );
+}
+
+function StudyGapMain({ styles, candidateTask, durationLabel }) {
+  return (
+    <div className={styles.planTimelineGapMain}>
+      <span className={styles.planTimelineGapLeadDot} aria-hidden />
+      <GapDuration styles={styles} durationLabel={durationLabel} />
+      <span className={styles.planTimelineGapSeparator} aria-hidden>·</span>
+      <StudyGapSuggestion styles={styles} candidateTask={candidateTask} />
+    </div>
+  );
+}
+
+function StudyGapSuggestion({ styles, candidateTask }) {
+  const suggestion = candidateTask ? withUrgencyEmoji(candidateTask) : "Short breather";
+  return <span className={styles.planTimelineGapSuggestionText} title={suggestion}>{suggestion}</span>;
+}
+
+function getPassiveGapLabel(type) {
+  if (type === "personal") return "Short breather";
+  return type === "evening" ? "Reset" : null;
+}
+
+function getPassiveGapClassName(styles) {
+  return `${styles.planTimelineGapShortWindow} ${styles.planTimelineGapShortWindowNoActions}`;
+}
+
+function getStudyGapClassName(styles, candidateTask, isBestGap) {
+  return `${styles.planTimelineGapShortWindow} ${candidateTask ? styles.planTimelineGapShortWindowFeatured : ""} ${isBestGap ? styles.planTimelineGapShortWindowBest : ""} ${!candidateTask ? styles.planTimelineGapShortWindowNoActions : ""}`.trim();
 }

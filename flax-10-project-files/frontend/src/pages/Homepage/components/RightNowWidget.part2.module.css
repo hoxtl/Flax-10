@@ -1,0 +1,290 @@
+/* Split from components/RightNowWidget.module.css (2/2) */
+.contextCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contextCardIcon {
+  color: var(--widget-text-secondary);
+  flex-shrink: 0;
+}
+
+.contextCardEyebrow {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--widget-text-secondary);
+}
+
+.contextCardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--widget-accent);
+  text-decoration: none;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.contextCardLink:hover {
+  color: var(--widget-accent);
+}
+
+.contextCardTitle {
+  margin: 0;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--widget-text-primary);
+  line-height: 1.3;
+}
+
+.contextCardText {
+  margin: 0;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--widget-text-secondary);
+  line-height: 1.45;
+}
+
+.contextPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.contextPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
+  color: var(--widget-text-secondary);
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Timer session ──────────────────────────────────────────── */
+.timerBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: var(--widget-glass-blur);
+}
+
+.timerBlock .progressTrack {
+  flex-grow: 0;
+  width: 100%;
+}
+
+.timerLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.timerBtn {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--widget-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+  letter-spacing: 0.01em;
+  transition: color 0.15s;
+}
+
+.timerBtn:hover {
+  color: var(--widget-accent);
+  text-decoration: underline;
+}
+
+
+/* ── End of day ─────────────────────────────────────────────── */
+.endOfDayWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.endOfDayTopRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--widget-card-bg-glass);
+  border: 1px solid var(--widget-border);
+  backdrop-filter: var(--widget-glass-blur);
+}
+
+.endOfDayTitle {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--widget-text-primary);
+  margin: 0;
+}
+
+.endOfDaySub {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+.tomorrowSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
+}
+
+.tomorrowLabel {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--widget-text-secondary);
+  margin: 0 0 3px;
+}
+
+.tomorrowFirstTitle {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tomorrowFirstTime {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+  margin: 2px 0 0;
+}
+
+/* ── Empty day ──────────────────────────────────────────────── */
+.emptyDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 8px;
+  gap: 4px;
+  flex: 1;
+}
+
+.emptyDayTitle {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  margin: 8px 0 0;
+}
+
+
+.emptyDayTomorrow {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--widget-text-tertiary);
+  margin: 8px 0 0;
+}
+
+/* ── Non-today / other-day fallbacks ────────────────────────── */
+.upNextTitle {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upNextDetails {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+  margin: 3px 0 0;
+}
+
+.nowEmpty {
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--widget-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.sectionDivider {
+  height: 1px;
+  margin: 0 12px;
+  background: var(--widget-border);
+  opacity: 0.8;
+}
+
+.suggestionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--widget-surface-secondary);
+  border: 1px solid var(--widget-border);
+}
+
+.suggestionText,
+.suggestionSub,
+.emptyDaySubtitle {
+  margin: 0;
+  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+.suggestionText {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--widget-text-primary);
+}
+
+.suggestionSub,
+.emptyDaySubtitle {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--widget-text-tertiary);
+}

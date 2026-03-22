@@ -31,11 +31,7 @@ function ModuleOverlay(props) {
     <div className={props.styles.deadlineDetailOverlay} onClick={() => props.setSelectedModulePill(null)} role="dialog" aria-modal aria-labelledby="module-card-title">
       <div className={props.styles.moduleCardCard} onClick={(event) => event.stopPropagation()}>
         <ModuleOverlayHeader {...props} colors={moduleInfo.colors} code={moduleInfo.code} />
-        <h2 id="module-card-title" className={props.styles.moduleCardCode} style={{ color: moduleInfo.colors.text }}>{moduleInfo.code}</h2>
-        {moduleInfo.name && <p className={props.styles.moduleCardName}>{moduleInfo.name}</p>}
-        {moduleInfo.department && <p className={props.styles.moduleCardDept}>{moduleInfo.department}</p>}
-        {moduleInfo.description && <p className={props.styles.moduleCardDesc}>{truncateText(moduleInfo.description, 120)}</p>}
-        {moduleInfo.leader && <p className={props.styles.moduleCardLeader}>Leader: {moduleInfo.leader}</p>}
+        <ModuleOverlayBody moduleInfo={moduleInfo} styles={props.styles} />
         <div className={props.styles.moduleCardDivider} />
         <Link to={moduleUrl} className={props.styles.moduleCardLink} style={{ background: moduleInfo.colors.text }} onClick={() => props.setSelectedModulePill(null)}>
           View module →
@@ -55,6 +51,18 @@ function ModuleOverlayHeader(props) {
         <X size={14} strokeWidth={2} aria-hidden />
       </button>
     </div>
+  );
+}
+
+function ModuleOverlayBody({ moduleInfo, styles }) {
+  return (
+    <>
+      <h2 id="module-card-title" className={styles.moduleCardCode} style={{ color: moduleInfo.colors.text }}>{moduleInfo.code}</h2>
+      {moduleInfo.name ? <p className={styles.moduleCardName}>{moduleInfo.name}</p> : null}
+      {moduleInfo.department ? <p className={styles.moduleCardDept}>{moduleInfo.department}</p> : null}
+      {moduleInfo.description ? <p className={styles.moduleCardDesc}>{truncateText(moduleInfo.description, 120)}</p> : null}
+      {moduleInfo.leader ? <p className={styles.moduleCardLeader}>Leader: {moduleInfo.leader}</p> : null}
+    </>
   );
 }
 

@@ -1,6 +1,5 @@
-/**
- * Premium module and type pills — consistent design for Right Now, Deadlines, and popups.
- * Module pill: dot + code, palette or hash-based colour. Type pill: lookup-based, no dot.
+/*
+ * Module and type pills for Homepage overlays and widgets.
  */
 
 import { motion } from "framer-motion";
@@ -62,56 +61,62 @@ const pillMotion = {
 };
 
 export function ModulePill({ moduleCode, onClick, asButton = false, className = "" }) {
-  if (!moduleCode) return null;
-  const code = (moduleCode || "").toString().trim();
+  const code = normalizeLabel(moduleCode);
   if (!code) return null;
-  const colors = getModulePillColors(code);
   const displayCode = code.length > 8 ? code.slice(0, 8) : code;
+  const sharedProps = getModulePillProps(code, className);
+  return asButton && onClick
+    ? <ModulePillButton content={<ModulePillContent code={displayCode} colors={getModulePillColors(code)} />} displayCode={displayCode} onClick={onClick} sharedProps={sharedProps} />
+    : <motion.span {...sharedProps}><ModulePillContent code={displayCode} colors={getModulePillColors(code)} /></motion.span>;
+}
 
-  const content = (
-    <>
-      <span className={styles.pillDot} style={{ background: colors.accent }} aria-hidden />
-      <span className={styles.pillCode}>{displayCode}</span>
-    </>
-  );
+export function TypePill({ typeLabel, accentColor: _ignored, className = "" }) {
+  const label = normalizeLabel(typeLabel);
+  if (!label) return null;
+  return <motion.span {...getTypePillProps(label, className)}>{label}</motion.span>;
+}
 
-  const sharedProps = {
+function normalizeLabel(value) {
+  return (value || "").toString().trim();
+}
+
+function getModulePillProps(code, className) {
+  const colors = getModulePillColors(code);
+  return {
     ...pillMotion,
     className: `${styles.modulePill} ${className}`.trim(),
     style: { background: colors.bg, color: colors.text },
   };
-
-  if (asButton && onClick) {
-    return (
-      <motion.button type="button" {...sharedProps} onClick={onClick} aria-label={`View ${displayCode} details`}>
-        {content}
-      </motion.button>
-    );
-  }
-
-  return <motion.span {...sharedProps}>{content}</motion.span>;
 }
 
-export function TypePill({ typeLabel, accentColor: _ignored, className = "" }) {
-  if (!typeLabel) return null;
-  const label = (typeLabel || "").toString().trim();
-  if (!label) return null;
-  const key = label.toUpperCase();
-  const colours = TYPE_COLOURS[key] || TYPE_COLOURS.default;
-
+function ModulePillContent({ code, colors }) {
   return (
-    <motion.span
-      initial={{ opacity: 0, scale: 0.85 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, delay: 0.15 }}
-      className={`${styles.typePill} ${className}`.trim()}
-      style={{
-        background: colours.bg,
-        color: colours.text,
-        border: `1px solid ${colours.border}`,
-      }}
-    >
-      {label}
-    </motion.span>
+    <>
+      <span className={styles.pillDot} style={{ background: colors.accent }} aria-hidden />
+      <span className={styles.pillCode}>{code}</span>
+    </>
   );
+}
+
+function ModulePillButton({ content, displayCode, onClick, sharedProps }) {
+  return (
+    <motion.button type="button" {...sharedProps} onClick={onClick} aria-label={`View ${displayCode} details`}>
+      {content}
+    </motion.button>
+  );
+}
+
+function getTypePillProps(label, className) {
+  const colours = TYPE_COLOURS[label.toUpperCase()] || TYPE_COLOURS.default;
+  return {
+    initial: { opacity: 0, scale: 0.85 },
+    animate: { opacity: 1, scale: 1 },
+    transition: { duration: 0.3, delay: 0.15 },
+    className: `${styles.typePill} ${className}`.trim(),
+    style: {
+      background: colours.bg,
+      color: colours.text,
+      border: `1px solid ${colours.border}`,
+    },
+  };
 }
