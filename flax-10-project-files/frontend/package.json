@@ -51,5 +51,20 @@
     "jsdom": "^28.0.0",
     "vite": "^7.2.4",
     "vitest": "^4.0.18"
+  },
+  "exports": {
+    ".": "./src/main.jsx",
+    "./package.json": "./package.json",
+    "./components/Notifications": "./src/components/Notifications/index.js",
+    "./components/common": "./src/components/common/index.js",
+    "./components/common/AnimatedDropdown": "./src/components/common/AnimatedDropdown/index.js",
+    "./components/common/PasswordStrength": "./src/components/common/PasswordStrength/index.js",
+    "./components/common/ScrollToTop": "./src/components/common/ScrollToTop/index.js",
+    "./components/common/SearchBar": "./src/components/common/SearchBar/index.js",
+    "./components/common/SleepWarningModal": "./src/components/common/SleepWarningModal/index.js",
+    "./pages/Homepage/components": "./src/pages/Homepage/components/index.js",
+    "./pages/Homepage/components/MiniTimeline": "./src/pages/Homepage/components/MiniTimeline/index.js",
+    "./pages/Homepage/utils": "./src/pages/Homepage/utils/index.js",
+    "./pages/Homepage/utils/planTimeline": "./src/pages/Homepage/utils/planTimeline/index.js"
   }
 }
