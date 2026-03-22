@@ -2,6 +2,7 @@
 Views for computing and displaying group project meeting availability.
 """
 
+import itertools
 from datetime import timedelta
 
 from django.shortcuts import get_object_or_404
@@ -33,11 +34,9 @@ def _check_slot_free(user_id, user_events, slot_start, slot_end):
 def _get_profile_photo_url(user):
     """Safely get the user's profile photo URL."""
     try:
-        if user.profile_photo:
-            return user.profile_photo.url
+        return user.profile_photo.url if user.profile_photo else None
     except Exception:
-        pass
-    return None
+        return None
 
 def _build_initials(user):
     """Build a short avatar label for a user."""
@@ -144,27 +143,23 @@ def _get_active_suggestions(project, memberships):
         for s in qs
     ]
 
+def _pick_one_per_day(grouped, ordered_days, layer):
+    """Return slots for one round-robin layer (one per day at this layer depth)."""
+    return [grouped[day][layer] for day in ordered_days if layer < len(grouped[day])]
+
+def _layered_slots(grouped, ordered_days):
+    """Generate slots layer by layer (one per day per layer)."""
+    batches = (_pick_one_per_day(grouped, ordered_days, l) for l in itertools.count())
+    for batch in itertools.takewhile(bool, batches):
+        yield from batch
+
 def _select_diverse_slots(slots, limit=SLOT_LIMIT):
     """Spread recommended slots across the week instead of clustering on one day."""
     grouped = {}
     for slot in sorted(slots, key=lambda entry: (-entry["free_count"], entry["start"])):
         grouped.setdefault(slot["start"][:10], []).append(slot)
     ordered_days = sorted(grouped.keys())
-    selected = []
-    layer = 0
-    while len(selected) < limit:
-        added = False
-        for day_key in ordered_days:
-            day_slots = grouped[day_key]
-            if layer >= len(day_slots):
-                continue
-            selected.append(day_slots[layer])
-            added = True
-            if len(selected) >= limit:
-                break
-        if not added:
-            break
-        layer += 1
+    selected = list(itertools.islice(_layered_slots(grouped, ordered_days), limit))
     return sorted(selected, key=lambda entry: entry["start"])
 
 def _build_availability_response(project, current_user):
