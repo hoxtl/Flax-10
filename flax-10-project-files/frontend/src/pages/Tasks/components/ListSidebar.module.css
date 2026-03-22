@@ -1,18 +1,15 @@
+/*
+ * Task sidebar styles for views, lists, archive actions, and menus.
+ */
+
 .sidebar {
   width: 272px;
   min-width: 272px;
   max-width: 272px;
   flex-shrink: 0;
   border-right: 1px solid var(--widget-border);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--surface-card) 86%, var(--sidebar) 14%) 0%,
-    color-mix(in srgb, var(--surface-card) 78%, var(--panel) 22%) 52%,
-    color-mix(in srgb, var(--surface-card) 72%, var(--sidebar) 28%) 100%
-  );
-  box-shadow:
-    inset -1px 0 0 color-mix(in srgb, var(--widget-border) 86%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--surface-card) 86%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-card) 86%, var(--sidebar) 14%) 0%, color-mix(in srgb, var(--surface-card) 78%, var(--panel) 22%) 52%, color-mix(in srgb, var(--surface-card) 72%, var(--sidebar) 28%) 100%);
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--widget-border) 86%, transparent), inset 0 1px 0 color-mix(in srgb, var(--surface-card) 86%, transparent);
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -42,48 +39,39 @@
   margin-bottom: 0.25rem;
 }
 
-.navItem {
+.navItem,
+.listBtn {
   width: 100%;
   min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
   background: none;
   border: none;
-  border-radius: 12px;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition:
-    background 0.2s ease,
-    transform 0.15s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+}
+
+.navItem {
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   color: var(--text);
   border: 1px solid transparent;
 }
+
 .navItem:hover {
-  background: color-mix(
-    in srgb,
-    var(--surface-card) 72%,
-    var(--hover-light) 28%
-  );
+  background: color-mix(in srgb, var(--surface-card) 72%, var(--hover-light) 28%);
   transform: translateX(2px);
   box-shadow: 0 10px 18px color-mix(in srgb, var(--primary) 8%, transparent);
   border-color: color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
-.navItem:active {
-  transform: scale(0.98);
-}
+.navItem:active { transform: scale(0.98); }
 
 .navActive {
-  background: color-mix(
-    in srgb,
-    var(--surface-card) 62%,
-    var(--sidebar-active) 38%
-  ) !important;
+  background: color-mix(in srgb, var(--surface-card) 62%, var(--sidebar-active) 38%) !important;
   color: var(--primary);
   transform: translateX(2px);
   border-color: color-mix(in srgb, var(--primary) 20%, transparent);
@@ -94,16 +82,11 @@
   color: var(--primary);
   font-weight: 600;
 }
-.navActive .navEmoji {
-  filter: none;
-}
 
-.navDanger .navLabel {
-  color: var(--danger);
-}
-.navDanger .navEmoji {
-  filter: none;
-}
+.navActive .navEmoji,
+.navDanger .navEmoji { filter: none; }
+
+.navDanger .navLabel { color: var(--danger); }
 
 .navEmoji {
   font-size: 0.82rem;
@@ -112,7 +95,8 @@
   text-align: center;
 }
 
-.navLabel {
+.navLabel,
+.listName {
   flex: 1;
   min-width: 0;
   font-family: var(--font-body);
@@ -125,7 +109,8 @@
   letter-spacing: 0.01em;
 }
 
-.navCount {
+.navCount,
+.listCount {
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 500;
@@ -136,7 +121,9 @@
   min-width: 18px;
   text-align: center;
   border: 1px solid color-mix(in srgb, var(--widget-border) 70%, transparent);
+  flex-shrink: 0;
 }
+
 .navCountDanger {
   background: var(--danger-bg);
   color: var(--danger);
@@ -150,29 +137,18 @@
   border-radius: 8px;
   border-left: 3px solid transparent;
   border: 1px solid transparent;
-  transition:
-    background 0.2s ease,
-    border-color 0.25s ease,
-    transform 0.15s ease,
-    box-shadow 0.2s ease;
+  transition: background 0.2s ease, border-color 0.25s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
+
 .listItem:hover {
-  background: color-mix(
-    in srgb,
-    var(--surface-card) 70%,
-    var(--hover-light) 30%
-  );
+  background: color-mix(in srgb, var(--surface-card) 70%, var(--hover-light) 30%);
   transform: translateX(2px);
   border-color: color-mix(in srgb, var(--primary) 12%, transparent);
   box-shadow: 0 10px 18px color-mix(in srgb, var(--primary) 7%, transparent);
 }
 
 .listActive {
-  background: color-mix(
-    in srgb,
-    var(--surface-card) 58%,
-    var(--hover) 42%
-  ) !important;
+  background: color-mix(in srgb, var(--surface-card) 58%, var(--hover) 42%) !important;
   font-weight: 500;
   border-left-color: var(--primary);
   padding-left: 9px;
@@ -180,47 +156,24 @@
   border-color: color-mix(in srgb, var(--primary) 18%, transparent);
   box-shadow: 0 12px 22px color-mix(in srgb, var(--primary) 9%, transparent);
 }
+
 .listActive .listName {
   color: var(--text);
   font-weight: 600;
 }
+
 .listActive .readingListLabel {
   color: var(--text);
   font-weight: 650;
 }
 
-.listBtn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  min-width: 0;
-}
+.listBtn { padding: 8px 12px; }
 
 .listDot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.listName {
-  flex: 1;
-  min-width: 0;
-  font-family: var(--font-body);
-  font-size: 0.97rem;
-  font-weight: 600;
-  color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  letter-spacing: 0.01em;
 }
 
 .readingListLabel {
@@ -238,29 +191,6 @@
   letter-spacing: 0.01em;
 }
 
-.listCount {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
-  background: color-mix(in srgb, var(--surface-card) 72%, var(--border) 28%);
-  border-radius: 9999px;
-  padding: 0.08rem 0.42rem;
-  min-width: 18px;
-  text-align: center;
-  flex-shrink: 0;
-  border: 1px solid color-mix(in srgb, var(--widget-border) 70%, transparent);
-}
-
-.emptyLists {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  color: var(--muted);
-  padding: 0.4rem 0.55rem;
-  margin: 0;
-}
-
-/* ── Create new list button ── */
 .createListBtn {
   width: 100%;
   margin-top: 8px;
@@ -274,19 +204,13 @@
   font-weight: 500;
   cursor: pointer;
   text-align: center;
-  transition:
-    border-color 0.15s,
-    color 0.15s,
-    background 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
+
 .createListBtn:hover {
   color: var(--text);
   border-color: var(--primary);
-  background: color-mix(
-    in srgb,
-    var(--surface-card) 64%,
-    var(--hover-light) 36%
-  );
+  background: color-mix(in srgb, var(--surface-card) 64%, var(--hover-light) 36%);
 }
 
 .renameInput {
@@ -299,7 +223,7 @@
   font-family: inherit;
   font-size: 0.875rem;
   outline: none;
-  margin: 8px 8px;
+  margin: 8px;
 }
 
 .ctxMenu {
@@ -307,24 +231,17 @@
   background: var(--panel, #fffcfa);
   border: 1px solid rgba(74, 52, 33, 0.1);
   border-radius: 12px;
-  box-shadow:
-    0 4px 20px rgba(74, 52, 33, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px rgba(74, 52, 33, 0.1), 0 1px 4px rgba(0, 0, 0, 0.04);
   z-index: 500;
   min-width: 160px;
   overflow: hidden;
   padding: 3px;
   animation: ctxPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 @keyframes ctxPop {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .ctxItem {
@@ -342,31 +259,30 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  transition:
-    background 0.12s,
-    color 0.12s;
+  transition: background 0.12s, color 0.12s;
 }
+
 .ctxItem svg {
   color: var(--muted);
   flex-shrink: 0;
   transition: color 0.12s;
 }
-.ctxItem:hover {
-  background: var(--hover);
-}
-.ctxItem:hover svg {
-  color: var(--text);
-}
+
+.ctxItem:hover { background: var(--hover); }
+
+.ctxItem:hover svg { color: var(--text); }
+
 .ctxDelete {
   color: #c53030;
 }
+
 .ctxDelete svg {
   color: #c53030;
   opacity: 0.7;
 }
-.ctxDelete:hover {
-  background: rgba(197, 48, 48, 0.06);
-}
+
+.ctxDelete:hover { background: rgba(197, 48, 48, 0.06); }
+
 .ctxDelete:hover svg {
   color: #c53030;
   opacity: 1;
@@ -400,9 +316,8 @@
   border-radius: 12px;
   transition: background 0.1s;
 }
-.archiveToggle:hover {
-  background: var(--hover);
-}
+
+.archiveToggle:hover { background: var(--hover); }
 
 .archiveList {
   display: flex;
@@ -437,41 +352,33 @@
   white-space: nowrap;
 }
 
-.restoreBtn {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
-  border: none;
-  border-radius: 9999px;
-  padding: 0.18rem 0.5rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.1s;
-}
-.restoreBtn:hover {
-  background: color-mix(in srgb, var(--primary) 20%, transparent);
-}
-
+.restoreBtn,
 .deletePermanentBtn {
   font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 500;
-  color: #dc2626;
-  background: color-mix(in srgb, #dc2626 10%, transparent);
   border: none;
   border-radius: 9999px;
   padding: 0.18rem 0.5rem;
   cursor: pointer;
   transition: background 0.1s;
 }
-.deletePermanentBtn:hover {
-  background: color-mix(in srgb, #dc2626 20%, transparent);
+
+.restoreBtn {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  flex-shrink: 0;
 }
 
+.restoreBtn:hover { background: color-mix(in srgb, var(--primary) 20%, transparent); }
+
+.deletePermanentBtn {
+  color: #dc2626;
+  background: color-mix(in srgb, #dc2626 10%, transparent);
+}
+
+.deletePermanentBtn:hover { background: color-mix(in srgb, #dc2626 20%, transparent); }
+
 @media (max-width: 900px) {
-  .sidebar {
-    display: none;
-  }
+  .sidebar { display: none; }
 }

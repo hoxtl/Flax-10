@@ -1,3 +1,7 @@
+/*
+ * Core task card styles for row layout, status accents, and actions.
+ */
+
 .card {
   position: relative;
   display: flex;
@@ -8,23 +12,16 @@
   border: none;
   border-left: 3px solid var(--border);
   border-radius: 6px;
-  transition:
-    background 0.1s,
-    border-color 0.2s,
-    opacity 0.2s;
+  transition: background 0.1s, border-color 0.2s, opacity 0.2s;
   overflow: hidden;
 }
 
-.card:hover {
-  background: rgba(123, 103, 81, 0.03);
-}
+.card:hover { background: rgba(123, 103, 81, 0.03); }
 
 .cardAccentUrgent {
   border-left-color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(239, 68, 68, 0.28),
-    0 0 16px rgba(239, 68, 68, 0.22);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.28), 0 0 16px rgba(239, 68, 68, 0.22);
   animation: urgentGlowPulse 1.8s ease-in-out infinite;
 }
 
@@ -35,45 +32,25 @@
   animation: none;
 }
 
-.cardAccentMedium {
-  border-left-color: #fdba74;
-}
+.cardAccentMedium { border-left-color: #fdba74; }
 
 @keyframes urgentGlowPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(239, 68, 68, 0.28),
-      0 0 14px rgba(239, 68, 68, 0.18);
-  }
-
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(239, 68, 68, 0.4),
-      0 0 20px rgba(239, 68, 68, 0.3);
-  }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.28), 0 0 14px rgba(239, 68, 68, 0.18); }
+  50% { box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4), 0 0 20px rgba(239, 68, 68, 0.3); }
 }
 
-.cardDone {
-  opacity: 1;
-}
+.cardDone { opacity: 1; }
 
 .cardCompletedRow {
   opacity: 0.6;
   transition: opacity 0.2s ease;
 }
 
-.cardCompletedRow:hover {
-  opacity: 0.85;
-}
+.cardCompletedRow:hover { opacity: 0.85; }
 
-.cardOverdue {
-  background: var(--danger-bg);
-}
+.cardOverdue { background: var(--danger-bg); }
 
-.cardOverdue:hover {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-}
+.cardOverdue:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
 
 .cardActiveTimer {
   border-left-color: var(--primary);
@@ -82,14 +59,8 @@
 }
 
 @keyframes cardPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent);
-  }
-
-  50% {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent);
-  }
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent); }
+  50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent); }
 }
 
 .check {
@@ -106,21 +77,14 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   box-sizing: border-box;
   padding: 0;
 }
 
 .check:hover {
   border-color: var(--list-color, var(--primary));
-  background: color-mix(
-    in srgb,
-    var(--list-color, var(--primary)) 8%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--list-color, var(--primary)) 8%, transparent);
 }
 
 .checkDone {
@@ -134,18 +98,17 @@
   border-color: #22c55e !important;
 }
 
+.checkBounce { animation: checkBounce 0.4s ease; }
+
 @keyframes checkPop {
-  0% {
-    transform: scale(0.85);
-  }
+  0% { transform: scale(0.85); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
 
-  50% {
-    transform: scale(1.15);
-  }
-
-  100% {
-    transform: scale(1);
-  }
+@keyframes checkBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .checkMark {
@@ -157,15 +120,8 @@
 }
 
 @keyframes checkMarkIn {
-  0% {
-    opacity: 0;
-    transform: scale(0) rotate(-30deg);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
+  0% { opacity: 0; transform: scale(0) rotate(-30deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 
 .content {
@@ -178,9 +134,7 @@
 }
 
 .content:focus,
-.content:focus-visible {
-  outline: none;
-}
+.content:focus-visible { outline: none; }
 
 .actionBar {
   display: flex;
@@ -190,9 +144,7 @@
   margin-left: auto;
   opacity: 0.45;
   transform: translateX(0);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover .actionBar {
@@ -210,9 +162,7 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .actionBarBtn:hover {
@@ -223,9 +173,7 @@
 .actionBarBtnPlay {
   background: transparent !important;
   color: var(--primary, #7b6751);
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .actionBarBtnPlay:hover {
@@ -240,9 +188,7 @@
   transition: transform 0.15s ease;
 }
 
-.actionBarBtnPlay:hover .actionIcon {
-  transform: translateX(2px);
-}
+.actionBarBtnPlay:hover .actionIcon { transform: translateX(2px); }
 
 .actionIcon {
   flex-shrink: 0;
@@ -318,10 +264,6 @@
   border-color: rgba(250, 204, 21, 0.34);
 }
 
-.priorityText_low {
-  color: #854d0e;
-}
-
 .priorityMarks {
   font-size: 0.64rem;
   line-height: 1;
@@ -329,17 +271,11 @@
   margin-right: 4px;
 }
 
-.priorityLabel {
-  line-height: 1;
-}
+.priorityLabel { line-height: 1; }
 
-.titleClickable {
-  cursor: pointer;
-}
+.titleClickable { cursor: pointer; }
 
-.titleClickable:hover {
-  text-decoration: none;
-}
+.titleClickable:hover { text-decoration: none; }
 
 .titleDone {
   text-decoration: line-through;
@@ -347,9 +283,7 @@
   color: var(--c-greige, #b4a490);
 }
 
-.titleDone.titleClickable:hover {
-  text-decoration: line-through;
-}
+.titleDone.titleClickable:hover { text-decoration: line-through; }
 
 .dueLabelCompleted {
   color: var(--muted) !important;
@@ -362,65 +296,9 @@
   padding: 0 1px;
 }
 
-.meta {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-wrap: wrap;
-}
+.duePillIcon { flex-shrink: 0; }
 
-.readingMetaGroup {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    min-width: 0;
-}
-
-.readingMetaPill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    max-width: 100%;
-    padding: 2px 8px;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
-    background: color-mix(in srgb, var(--primary) 6%, transparent);
-    line-height: 1.35;
-}
-
-.readingMetaLabel {
-    font-size: 0.64rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--muted) 80%, var(--text) 20%);
-    white-space: nowrap;
-}
-
-.readingMetaValue {
-    font-size: 0.72rem;
-    font-weight: 650;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.metaDone {
-  opacity: 0.45;
-  filter: saturate(0.3);
-}
-
-.duePillIcon {
-  flex-shrink: 0;
-}
-
-.due_overdue {
-  color: #b91c1c;
-  font-weight: 600;
-}
-
+.due_overdue,
 .due_today {
   color: #b91c1c;
   font-weight: 600;
@@ -434,129 +312,6 @@
 .due_future {
   color: var(--muted);
   font-weight: 400;
-}
-
-.modulePill {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid;
-  white-space: nowrap;
-  line-height: 1.4;
-  color: var(--c-greige, #b4a490);
-  background: rgba(123, 103, 81, 0.06);
-  letter-spacing: 0.02em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-
-.modulePillLink {
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    opacity 0.15s,
-    filter 0.15s;
-}
-
-.modulePillLink:hover {
-  opacity: 0.92;
-  filter: brightness(0.97);
-}
-
-.modulePillLink:active {
-  opacity: 0.88;
-}
-
-.listIndicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  color: var(--text);
-  border: 1px solid;
-  border-radius: 999px;
-  padding: 2px 8px 2px 6px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
-}
-
-.listDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.projectPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid;
-  white-space: nowrap;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.projectPillIcon {
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-.societyPill,
-.peoplePill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid;
-  white-space: nowrap;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-}
-
-.societyPill {
-  color: color-mix(in srgb, var(--text) 90%, var(--muted) 10%);
-  background: color-mix(
-    in srgb,
-    var(--kcl-accent, var(--primary)) 9%,
-    transparent
-  );
-  border-color: color-mix(
-    in srgb,
-    var(--kcl-accent, var(--primary)) 24%,
-    transparent
-  );
-}
-
-.peoplePill {
-  color: color-mix(in srgb, var(--text) 85%, var(--muted) 15%);
-  background: color-mix(in srgb, var(--study, var(--primary)) 10%, transparent);
-  border-color: color-mix(
-    in srgb,
-    var(--study, var(--primary)) 24%,
-    transparent
-  );
-}
-
-.societyPill:hover,
-.peoplePill:hover {
-  filter: brightness(0.98);
 }
 
 @media (max-width: 768px) {
@@ -577,17 +332,9 @@
     white-space: normal;
   }
 
-  .title {
-    font-size: 0.9rem;
-  }
+  .title { font-size: 0.9rem; }
 
-  .meta {
-    gap: 5px;
-  }
-
-  .actionBar {
-    opacity: 1;
-  }
+  .actionBar { opacity: 1; }
 
   .actionBarBtn {
     width: 30px;

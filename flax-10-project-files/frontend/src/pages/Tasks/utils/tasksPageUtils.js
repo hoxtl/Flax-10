@@ -75,9 +75,9 @@ export function buildTasksPageHandlers(state, listsApi, tasksApi) {
   return {
     handleUndoAddTask: () => handleUndoAddTask(state, tasksApi),
     handleDeleteTask: async (taskId) => {
-      await tasksApi.removeTask(taskId);
       state.setToastDelete(true);
       setTimeout(() => state.setToastDelete(false), 3500);
+      await tasksApi.removeTask(taskId);
     },
     handleEditTask: (taskId, data, meta) => handleEditTaskImpl(state, listsApi, tasksApi, taskId, data, meta),
     handleDeleteList: (listId) => handleDeleteListImpl(state, listsApi, listId),
