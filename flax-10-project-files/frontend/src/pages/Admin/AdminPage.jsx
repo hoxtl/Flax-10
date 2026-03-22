@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import Tabs from "../../components/common/Tabs/Tabs";
 import AppPage from "../../components/common/AppPage/AppPage";
-import styles from "./AdminPage.module.css";
+import styles from "./styles";
 import { buildAdminTabs } from "./adminTabs.jsx";
 
 function AdminTitle() {

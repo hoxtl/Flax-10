@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 import { rowAnim, stagger } from "../utils/adminMotion";
 
 export function AnimatedList({ items, renderItem }) {

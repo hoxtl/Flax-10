@@ -3,7 +3,7 @@
  */
 
 import Badge from "../../../components/common/Badge/Badge";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 
 function FilterPillButton({ active, label, onClick }) {
   return (
