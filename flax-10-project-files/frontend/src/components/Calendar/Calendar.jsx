@@ -15,7 +15,7 @@ import { TableView } from "./TableView/TableView";
 import { viewSwapMotion } from "../common";
 import "./Calendar.css";
 
-const MOTION_STYLE = { display: "flex", flexDirection: "column", height: "100%" };
+const MOTION_STYLE = { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 };
 const GRID_VIEWS = { day: DayView, week: WeekView, month: SwipeMonthView };
 const DISPLAY_VIEWS = { grid: null, list: ListView, table: TableView };
 
