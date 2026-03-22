@@ -91,10 +91,8 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
         onToggle={() => onToggleComplete(task.id, task.completed)}
         onDelete={() => onDeleteTask(task.id)}
         onEdit={editHandler}
-        hideDueBadge={hideDueBadge}
-        hideListBadge={hideListBadge}
-        isOverdue={isOverdueSection}
-        searchQuery={searchQuery}
+        hideDueBadge={hideDueBadge} hideListBadge={hideListBadge}
+        isOverdue={isOverdueSection} searchQuery={searchQuery}
       />
     </div>
   );
