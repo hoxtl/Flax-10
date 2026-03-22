@@ -9,7 +9,7 @@ import { useAsyncList } from "../hooks/useAsyncList";
 import { navigateToSociety } from "../utils/adminNavigation";
 import { ListActions, AnimatedList, ListInfo, ListRow } from "./AdminList";
 import { CardHeader, ErrorMessage, LoadingSpinner, SectionCard } from "./AdminSurface";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 
 function DecisionButtons({ busy, onApprove, onReject }) {
   return <><button className={styles.approveBtn} disabled={busy} onClick={onApprove}>✓ Approve</button><button className={styles.rejectBtn} disabled={busy} onClick={onReject}>✗ Reject</button></>;
