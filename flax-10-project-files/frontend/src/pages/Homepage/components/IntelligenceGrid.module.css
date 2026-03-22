@@ -107,7 +107,7 @@
 }
 
 .afterHeroBar {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: flex-end;
   margin-top: -4px;
@@ -446,6 +446,7 @@
   }
 
   .afterHeroBar {
+    display: flex;
     justify-content: center;
     margin: 12px 0;
   }
