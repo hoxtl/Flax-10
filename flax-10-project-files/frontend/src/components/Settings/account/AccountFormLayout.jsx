@@ -13,7 +13,6 @@ function AccountSidebarCard() {
     <SettingsContextCard
       emoji="🧾"
       title="Account setup"
-      body="Keep your profile updated for a personalised experience."
       items={[
         "Accurate first and last name for your timetable display",
         "Correct year and course for relevant recommendations",

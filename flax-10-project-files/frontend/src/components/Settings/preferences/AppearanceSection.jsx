@@ -34,7 +34,6 @@ export default function AppearanceSection({ theme, onChange, isSaving, hasUnsave
       <SettingsContextCard
         emoji="🎨"
         title="Picking a theme"
-        body="Choose a palette that suits your study style:"
         items={[
           "🔥 Warm — cosy, earthy tones for long sessions",
           "❄️ Cool — clean blues and greens for focus",

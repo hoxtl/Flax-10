@@ -4,12 +4,39 @@
 import { useEffect, useState } from "react";
 import { getUserSettings } from "../../api/userApi";
 import { useTheme } from "../../context/ThemeContext";
+import AnimatedDropdown from "../common/AnimatedDropdown";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
+import SettingsContextCard from "./SettingsContextCard";
 import AppearanceSection from "./preferences/AppearanceSection";
 import SleepSection from "./preferences/SleepSection";
 import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
+
+const WEEK_PREFERENCE_OPTIONS = [
+  { value: "both", label: "Weekdays + weekends" },
+  { value: "weekdays", label: "Weekdays only" },
+  { value: "weekends", label: "Weekends only" },
+];
+
+const WORKTIME_PREFERENCE_OPTIONS = [
+  { value: "both", label: "Any time" },
+  { value: "day", label: "Daytime" },
+  { value: "night", label: "Nighttime" },
+];
+
+const STUDY_TIME_OPTIONS = Array.from({ length: 20 }, (_, index) => {
+  const minutes = (index + 1) * 30;
+  return { value: String(minutes), label: formatStudyTimeLabel(minutes) };
+});
+
+function formatStudyTimeLabel(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (!hours) return `${minutes} min`;
+  if (!remainingMinutes) return `${hours} hr${hours === 1 ? "" : "s"}`;
+  return `${hours} hr ${remainingMinutes} min`;
+}
 
 function hasAppearanceChanges(currentAppearance, savedAppearance) {
   return currentAppearance.mode !== savedAppearance.mode || currentAppearance.theme !== savedAppearance.theme;
@@ -63,89 +90,187 @@ function SleepSettingsPanel({ settings, onSleepSave, isSaving }) {
   );
 }
 
-function StudyTimeSection({ minutesPerDay, onMinutesChange, onSubmit, isSaving, hasUnsaved, saveSignal }) {
+function SchedulingDropdownField({ label, value, onChange, options, placeholder }) {
+  return (
+    <div className={styles.formGroup}>
+      <label>{label}</label>
+      <AnimatedDropdown
+        className={styles.schedulingDropdown}
+        value={value}
+        onChange={onChange}
+        options={options}
+        placeholder={placeholder}
+        usePortal
+        allowFlipUpward={false}
+      />
+    </div>
+  );
+}
+
+function SchedulingHint({ children }) {
+  return <p className={styles.schedulingHint}>{children}</p>;
+}
+
+function SchedulingSideCard() {
+  return (
+    <SettingsContextCard
+      className={styles.schedulingInfoCard}
+      emoji="🗓️"
+      title="Scheduling setup"
+      body="These choices guide where auto-planned study blocks land."
+      items={[
+        "Daily target keeps plans realistic.",
+        "Scheduling days decides which days can be used.",
+        "Study time preference leans plans toward day or night.",
+      ]}
+    />
+  );
+}
+
+function StudyTimeSection({ minutesPerDay, onMinutesChange, onSubmit, isSaving, hasUnsaved, saveSignal, compact = false }) {
+  if (compact) {
+    return (
+      <div className={`${styles.settingsTile} ${styles.schedulingCompactTile}`}>
+        <form onSubmit={onSubmit}>
+          <SectionHeader title="Daily study target" description="A soft cap for auto plans." />
+          <SchedulingDropdownField
+            label="Daily study time"
+            value={minutesPerDay}
+            onChange={onMinutesChange}
+            options={STUDY_TIME_OPTIONS}
+            placeholder="Choose a target"
+          />
+          <SchedulingHint>StudyFlax will try to stay within this total each day.</SchedulingHint>
+          <SubmitButton isSaving={isSaving} label="Save target" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.twoColLayout}>
       <div>
         <div className={styles.settingsTile}>
           <form onSubmit={onSubmit}>
-            <SectionHeader title="How much study time do you want each day?" description="StudyFlax will try not to plan more than this amount on a single day." />
-            <div className={styles.formGroup}>
-              <label htmlFor="preferred-study-minutes">Daily study time</label>
-              <input id="preferred-study-minutes" type="number" min={30} max={600} step={30} value={minutesPerDay} onChange={(e) => onMinutesChange(e.target.value)} />
-            </div>
+            <SectionHeader title="Daily study target" description="Set a soft limit for auto plans." />
+            <SchedulingDropdownField
+              label="Daily study time"
+              value={minutesPerDay}
+              onChange={onMinutesChange}
+              options={STUDY_TIME_OPTIONS}
+              placeholder="Choose a target"
+            />
+            <SchedulingHint>StudyFlax will try to stay within this total each day.</SchedulingHint>
             <SubmitButton isSaving={isSaving} label="Save daily study time" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
           </form>
         </div>
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>📚</span>
-        <h3 className={styles.contextCardTitle}>What this changes</h3>
+        <h3 className={styles.contextCardTitle}>Quick guide</h3>
         <ul className={styles.contextCardList}>
-          <li>Higher values allow longer study plans on busy days</li>
-          <li>Lower values keep your schedule lighter and more realistic</li>
+          <li>Higher values allow longer study plans.</li>
+          <li>Lower values keep busy days lighter.</li>
         </ul>
       </div>
     </div>
   );
 }
 
-function WeekPreferenceSection({ weekPreference, onWeekPreferenceChange, onSubmit, isSaving, hasUnsaved, saveSignal }) {
+function WeekPreferenceSection({ weekPreference, onWeekPreferenceChange, onSubmit, isSaving, hasUnsaved, saveSignal, compact = false }) {
+  if (compact) {
+    return (
+      <div className={`${styles.settingsTile} ${styles.schedulingCompactTile}`}>
+        <form onSubmit={onSubmit}>
+          <SectionHeader title="Scheduling days" description="Pick which days can be used." />
+          <SchedulingDropdownField
+            label="Days available for scheduling"
+            value={weekPreference}
+            onChange={onWeekPreferenceChange}
+            options={WEEK_PREFERENCE_OPTIONS}
+            placeholder="Choose days"
+          />
+          <SchedulingHint>Auto plans will stay inside these days.</SchedulingHint>
+          <SubmitButton isSaving={isSaving} label="Save days" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.twoColLayout}>
       <div>
         <div className={styles.settingsTile}>
           <form onSubmit={onSubmit}>
-            <SectionHeader title="Which days should StudyFlax use?" description="Choose whether auto schedules can use weekdays, weekends, or both." />
-            <div className={styles.formGroup}>
-              <label htmlFor="week-preferences">Days available for scheduling</label>
-              <select id="week-preferences" value={weekPreference} onChange={(e) => onWeekPreferenceChange(e.target.value)}>
-                <option value="both">Both weekdays and weekends</option>
-                <option value="weekdays">Weekdays only</option>
-                <option value="weekends">Weekends only</option>
-              </select>
-            </div>
+            <SectionHeader title="Scheduling days" description="Pick weekdays, weekends, or both." />
+            <SchedulingDropdownField
+              label="Days available for scheduling"
+              value={weekPreference}
+              onChange={onWeekPreferenceChange}
+              options={WEEK_PREFERENCE_OPTIONS}
+              placeholder="Choose days"
+            />
+            <SchedulingHint>Auto plans will stay inside these days.</SchedulingHint>
             <SubmitButton isSaving={isSaving} label="Save scheduling days" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
           </form>
         </div>
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>📅</span>
-        <h3 className={styles.contextCardTitle}>What this changes</h3>
+        <h3 className={styles.contextCardTitle}>Quick guide</h3>
         <ul className={styles.contextCardList}>
-          <li>Use weekdays if you want structure during the week</li>
-          <li>Use weekends if you prefer catching up outside class time</li>
+          <li>Weekdays add structure around classes.</li>
+          <li>Weekends leave room for catch-up blocks.</li>
         </ul>
       </div>
     </div>
   );
 }
 
-function WorktimePreferenceSection({ worktimePreference, onWorktimePreferenceChange, onSubmit, isSaving, hasUnsaved, saveSignal }) {
+function WorktimePreferenceSection({ worktimePreference, onWorktimePreferenceChange, onSubmit, isSaving, hasUnsaved, saveSignal, compact = false }) {
+  if (compact) {
+    return (
+      <div className={`${styles.settingsTile} ${styles.schedulingCompactTile}`}>
+        <form onSubmit={onSubmit}>
+          <SectionHeader title="Study time preference" description="Pick when plans should lean." />
+          <SchedulingDropdownField
+            label="Preferred study time"
+            value={worktimePreference}
+            onChange={onWorktimePreferenceChange}
+            options={WORKTIME_PREFERENCE_OPTIONS}
+            placeholder="Choose a time"
+          />
+          <SchedulingHint>Use this to steer plans toward day or night.</SchedulingHint>
+          <SubmitButton isSaving={isSaving} label="Save study time" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.twoColLayout}>
       <div>
         <div className={styles.settingsTile}>
           <form onSubmit={onSubmit}>
-            <SectionHeader title="What time of day works best for study?" description="This tells auto schedules whether to prefer daytime, nighttime, or either." />
-            <div className={styles.formGroup}>
-              <label htmlFor="worktime-preferences">Preferred study time</label>
-              <select id="worktime-preferences" value={worktimePreference} onChange={(e) => onWorktimePreferenceChange(e.target.value)}>
-                <option value="both">Any time (day and night)</option>
-                <option value="day">Daytime only</option>
-                <option value="night">Nighttime only</option>
-              </select>
-            </div>
+            <SectionHeader title="Study time preference" description="Pick daytime, nighttime, or either." />
+            <SchedulingDropdownField
+              label="Preferred study time"
+              value={worktimePreference}
+              onChange={onWorktimePreferenceChange}
+              options={WORKTIME_PREFERENCE_OPTIONS}
+              placeholder="Choose a time"
+            />
+            <SchedulingHint>Use this to steer plans toward day or night.</SchedulingHint>
             <SubmitButton isSaving={isSaving} label="Save study time preference" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} />
           </form>
         </div>
       </div>
       <div className={styles.contextCard}>
         <span className={styles.contextCardEmoji}>⏰</span>
-        <h3 className={styles.contextCardTitle}>What this changes</h3>
+        <h3 className={styles.contextCardTitle}>Quick guide</h3>
         <ul className={styles.contextCardList}>
-          <li>Daytime keeps study blocks in normal waking hours</li>
-          <li>Nighttime is useful if you work better later in the day</li>
+          <li>Daytime keeps blocks in waking hours.</li>
+          <li>Nighttime works better for late focus.</li>
         </ul>
       </div>
     </div>
@@ -291,16 +416,17 @@ export default function PreferencesPanel({
 
 function SchedulingPanel({ studyTimeProps, weekPreferenceProps, worktimeProps }) {
   return (
-    <div>
-      <div className={styles.settingsTile} style={{ marginBottom: "16px" }}>
-        <SectionHeader
-          title="Scheduling"
-          description="These settings guide how auto schedules are created. They do not change your classes or existing events."
-        />
+    <div className={styles.schedulingLayout}>
+      <div className={styles.schedulingPanel}>
+        <StudyTimeSection {...studyTimeProps} compact />
+        <div className={styles.schedulingSplitRow}>
+          <WeekPreferenceSection {...weekPreferenceProps} compact />
+          <WorktimePreferenceSection {...worktimeProps} compact />
+        </div>
       </div>
-      <StudyTimeSection {...studyTimeProps} />
-      <WeekPreferenceSection {...weekPreferenceProps} />
-      <WorktimePreferenceSection {...worktimeProps} />
+      <div className={styles.schedulingAside}>
+        <SchedulingSideCard />
+      </div>
     </div>
   );
 }
