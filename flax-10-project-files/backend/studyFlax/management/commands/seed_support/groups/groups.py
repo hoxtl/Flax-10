@@ -10,7 +10,7 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 
 from studyFlax.models.groupwork.groupwork_model import GroupProject, GroupMembership
-from studyFlax.management.commands.seed_support.seed_groups_projects import (
+from .projects import (
     _build_project_specs,
     _build_project_defaults,
     _create_single_project,
@@ -21,7 +21,7 @@ from studyFlax.management.commands.seed_support.seed_groups_projects import (
     PROJECT_TYPE_TEMPLATES,
     ZERO_PROGRESS_PROJECT_COUNT,
 )
-from studyFlax.management.commands.seed_support.seed_groups_membership import (
+from .membership import (
     _build_enrollment_maps,
     _list_seed_modules,
     _pick_owner_for_module,
@@ -41,11 +41,11 @@ from studyFlax.management.commands.seed_support.seed_groups_membership import (
     MIN_PROJECTS_PER_STUDENT,
     MAX_PROJECTS_PER_STUDENT,
 )
-from studyFlax.management.commands.seed_support.seed_groups_tasks import (
+from .tasks import (
     _seed_tasks_for_project,
     PROJECT_TASK_STATUS_PATTERNS,
 )
-from studyFlax.management.commands.seed_support.seed_groups_availability import (
+from .availability import (
     _seed_busy_events_for_member,
     _seed_meeting_suggestions_for_project,
     SEEDED_SUGGESTION_COUNT,

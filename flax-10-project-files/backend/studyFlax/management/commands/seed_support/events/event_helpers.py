@@ -278,31 +278,26 @@ def build_deadlines_for_module(module):
     results = [_build_single_deadline(module, *t, now, used_offsets, index=i) for i, t in enumerate(templates)]
     return [d for d in results if d is not None]
 
+def _weekend_days(seed_days):
+    return [SEED_START + timedelta(days=d) for d in range(seed_days) if (SEED_START + timedelta(days=d)).weekday() in (5, 6)]
+
+def _build_weekend_event_for_day(user, dt, personal_tags, user_rng):
+    if user_rng.random() > 0.45:
+        return None
+    hour, minute, duration, title = user_rng.choice(WEEKEND_BLOCK_SPECS)
+    start = dt.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    tag = user_rng.choice(personal_tags) if personal_tags else None
+    return CalendarEvent(
+        user=user, title=title, description="",
+        start_time=start, end_time=start + timedelta(minutes=duration),
+        location=None, tag=tag, priority='low', recurrence_rule=None,
+    )
+
 def build_weekend_events(user, tags, user_rng):
     """Random weekend blocking events to create realistic mixed availability."""
-    events = []
     personal_tags = [t for t in tags if (t.user_id == user.id or t.is_default) and t.name not in ACADEMIC_TAG_NAMES]
-    for day_offset in range(SEED_DAYS):
-        dt = SEED_START + timedelta(days=day_offset)
-        if dt.weekday() not in (5, 6):
-            continue
-        if user_rng.random() > 0.45:
-            continue
-        hour, minute, duration, title = user_rng.choice(WEEKEND_BLOCK_SPECS)
-        start = dt.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        tag = user_rng.choice(personal_tags) if personal_tags else None
-        events.append(CalendarEvent(
-            user=user,
-            title=title,
-            description="",
-            start_time=start,
-            end_time=start + timedelta(minutes=duration),
-            location=None,
-            tag=tag,
-            priority='low',
-            recurrence_rule=None,
-        ))
-    return events
+    events = [_build_weekend_event_for_day(user, dt, personal_tags, user_rng) for dt in _weekend_days(SEED_DAYS)]
+    return [e for e in events if e]
 
 def create_deadline_calendar_event(user, deadline):
     """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""

@@ -263,7 +263,7 @@ def _update_project_fields(project, defaults):
     project.save(update_fields=list(defaults.keys()))
 
 def _create_single_project(spec, students, now, rng, index, module_students):
-    from studyFlax.management.commands.seed_support.seed_groups_membership import _pick_owner_for_module
+    from .membership import _pick_owner_for_module
     module = spec["module"]
     owner = _pick_owner_for_module(module, students, module_students, rng)
     if not owner:

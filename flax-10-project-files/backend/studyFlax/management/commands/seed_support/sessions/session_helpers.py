@@ -111,28 +111,18 @@ def _build_single_study_session(user, start, work_mins, break_mins, n_sessions, 
         status=status,
     )
 
+def _build_session_from_hour(user, session_date, hour, config, activity_config):
+    base_mins = int(round(random.choice(config['work_choices']) * activity_config['duration_scale']))
+    work_mins = max(20, base_mins + random.randint(-activity_config['duration_jitter'], activity_config['duration_jitter']))
+    break_mins = (work_mins // 25) * 5
+    start_min = random.randint(0, 3) * 5
+    start = session_date.replace(hour=hour, minute=start_min, second=0, microsecond=0)
+    return _build_single_study_session(user, start, work_mins, break_mins, max(1, work_mins // 25), activity_config['task_labels'])
+
 def _build_day_study_sessions(user, session_date, config, activity_config):
-    min_sessions, max_sessions = activity_config['daily_session_range']
-    count = min(random.randint(min_sessions, max_sessions), len(config['preferred_hours']))
+    count = min(random.randint(*activity_config['daily_session_range']), len(config['preferred_hours']))
     hours = random.sample(config['preferred_hours'], count)
-    sessions = []
-    for hour in hours:
-        base_mins = int(round(random.choice(config['work_choices']) * activity_config['duration_scale']))
-        work_mins = max(20, base_mins + random.randint(-activity_config['duration_jitter'], activity_config['duration_jitter']))
-        break_mins = (work_mins // 25) * 5
-        start_min = random.randint(0, 3) * 5  # start on a 5-min boundary: 0, 5, 10, 15
-        start = session_date.replace(hour=hour, minute=start_min, second=0, microsecond=0)
-        sessions.append(
-            _build_single_study_session(
-                user,
-                start,
-                work_mins,
-                break_mins,
-                max(1, work_mins // 25),
-                activity_config['task_labels'],
-            )
-        )
-    return sessions
+    return [_build_session_from_hour(user, session_date, hour, config, activity_config) for hour in hours]
 
 def build_study_sessions_for_user(user, profile='balanced'):
     """Return realistic StudySession instances for the recent term window."""

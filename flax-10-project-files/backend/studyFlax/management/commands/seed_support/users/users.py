@@ -7,7 +7,7 @@ import random
 from django.contrib.auth import get_user_model
 
 from studyFlax.models import UserSettings
-from .seed_helpers import build_users_list, build_settings_for_new_users
+from ..helpers import build_users_list, build_settings_for_new_users
 
 User = get_user_model()
 
