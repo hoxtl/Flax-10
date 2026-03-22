@@ -28,40 +28,62 @@ import {
 
 export function useHomepageViewModel(props) {
   const { allCalEvents, allTasks, dayEvents, dayTasks, enrollments, getTag, modulesList, now, selectedDate, upcomingDeadlines } = props;
+  const timelineModel = useHomepageTimelineModel({ allCalEvents, dayEvents, dayTasks, getTag, now, selectedDate, upcomingDeadlines });
+  const taskModel = useHomepageTaskModel({ allTasks, now });
   const enrolledModules = useMemo(() => getEnrolledModules(modulesList, enrollments, isEnrolledIn), [enrollments, modulesList]);
+  const homepageRecommendation = useHomepageRecommendation(taskModel.taskWidgetItemsOnly, upcomingDeadlines, selectedDate, timelineModel.sortedEvents);
+  return buildHomepageViewModel(enrolledModules, homepageRecommendation, taskModel, timelineModel);
+}
+
+function useHomepageTimelineModel({ allCalEvents, dayEvents, dayTasks, getTag, now, selectedDate, upcomingDeadlines }) {
   const tomorrowFirstEvent = useMemo(() => getTomorrowFirstEvent(allCalEvents, selectedDate), [allCalEvents, selectedDate]);
   const sortedEvents = useMemo(() => getSortedEvents(dayEvents), [dayEvents]);
   const pastItems = useMemo(() => getPastItems(sortedEvents, now), [now, sortedEvents]);
   const upcomingItems = useMemo(() => getUpcomingItems(sortedEvents, pastItems), [pastItems, sortedEvents]);
   const pastIdsShownInTimeline = useMemo(() => getPastIdsShownInTimeline(pastItems, upcomingItems), [pastItems, upcomingItems]);
   const missedItems = useMemo(() => getMissedItems(selectedDate, pastItems, pastIdsShownInTimeline), [pastIdsShownInTimeline, pastItems, selectedDate]);
-  const tasksDueToday = useMemo(() => getTasksDueToday(allTasks, now), [allTasks, now]);
   const navigatorContext = useMemo(() => getNavigatorData(now, selectedDate, sortedEvents), [now, selectedDate, sortedEvents]);
-  const suggestableTasks = useMemo(() => getSuggestableTasks(dayTasks, upcomingItems), [dayTasks, upcomingItems]);
-  const deadlineSuggestions = useMemo(() => getDeadlineSuggestions(selectedDate, upcomingDeadlines, sortedEvents, Date.now()), [selectedDate, sortedEvents, upcomingDeadlines]);
-  const overdueTasksForNow = useMemo(() => getOverdueTasksForNow(tasksDueToday, getTag, now), [getTag, now, tasksDueToday]);
+  return buildTimelineModel({ getTag, now, selectedDate, upcomingDeadlines, dayTasks, sortedEvents, tomorrowFirstEvent, pastItems, upcomingItems, missedItems, navigatorContext });
+}
+
+function buildTimelineModel({ getTag, now, selectedDate, upcomingDeadlines, dayTasks, sortedEvents, tomorrowFirstEvent, pastItems, upcomingItems, missedItems, navigatorContext }) {
+  const tasksDueToday = getTasksDueToday(dayTasks, now);
+  return {
+    deadlineSuggestions: getDeadlineSuggestions(selectedDate, upcomingDeadlines, sortedEvents, Date.now()),
+    missedItems,
+    navigatorContext,
+    overdueTasksForNow: getOverdueTasksForNow(tasksDueToday, getTag, now),
+    sortedEvents,
+    suggestableTasks: getSuggestableTasks(dayTasks, upcomingItems),
+    tasksDueToday,
+    tomorrowFirstEvent,
+  };
+}
+
+function useHomepageTaskModel({ allTasks, now }) {
   const taskWidgetList = useMemo(() => getTaskWidgetList(allTasks, now), [allTasks, now]);
   const taskWidgetItemsOnly = useMemo(() => taskWidgetList.filter((item) => item.type === "task"), [taskWidgetList]);
   const taskWidgetCompletedCount = useMemo(() => getTaskWidgetCompletedCount(taskWidgetItemsOnly), [taskWidgetItemsOnly]);
-  const todayFreeWindows = useMemo(() => getTodayFreeWindows(selectedDate, sortedEvents), [selectedDate, sortedEvents]);
-  const freeWindowLabel = useMemo(() => getFreeWindowLabel(todayFreeWindows), [todayFreeWindows]);
-  const homepageRecommendation = useMemo(() => getHomepageRecommendation(taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel), [freeWindowLabel, taskWidgetItemsOnly, upcomingDeadlines]);
-
   return {
-    deadlineSuggestions,
-    enrolledModules,
-    homepageRecommendation,
-    missedItems,
-    navigatorContext,
-    overdueTasksForNow,
-    sortedEvents,
-    suggestableTasks,
     taskWidgetDueTodayCount: getTaskWidgetDueTodayCount(taskWidgetItemsOnly, now),
     taskWidgetItemsOnly,
     taskWidgetList,
     taskWidgetOverdueCount: 0,
     taskWidgetSpineCompletedPct: getTaskWidgetSpineCompletedPct(taskWidgetItemsOnly, taskWidgetCompletedCount),
-    tasksDueToday,
-    tomorrowFirstEvent,
+  };
+}
+
+function useHomepageRecommendation(taskWidgetItemsOnly, upcomingDeadlines, selectedDate, sortedEvents) {
+  const todayFreeWindows = useMemo(() => getTodayFreeWindows(selectedDate, sortedEvents), [selectedDate, sortedEvents]);
+  const freeWindowLabel = useMemo(() => getFreeWindowLabel(todayFreeWindows), [todayFreeWindows]);
+  return useMemo(() => getHomepageRecommendation(taskWidgetItemsOnly, upcomingDeadlines, freeWindowLabel), [freeWindowLabel, taskWidgetItemsOnly, upcomingDeadlines]);
+}
+
+function buildHomepageViewModel(enrolledModules, homepageRecommendation, taskModel, timelineModel) {
+  return {
+    ...timelineModel,
+    ...taskModel,
+    enrolledModules,
+    homepageRecommendation,
   };
 }
