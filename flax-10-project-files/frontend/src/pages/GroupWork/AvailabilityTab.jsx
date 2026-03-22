@@ -48,33 +48,6 @@ function getCurrentUserStatus(suggestion, currentUserId) {
     return "pending";
 }
 
-function AvailabilityHeader({ hasMeetingCards, activeView, onViewChange, proposedCount, confirmedCount }) {
-    return (
-        <div className={styles.header}>
-            <div className={styles.headerCopy}>
-                <h3 className={styles.title}>Propose meeting timings with your team</h3>
-                <p className={styles.subtitle}>Click a slot or use the propose button to suggest it to the group.</p>
-            </div>
-            {hasMeetingCards ? (
-                <div className={styles.meetingToggle}>
-                    <MeetingToggleButton
-                        isActive={activeView === "proposed"}
-                        label="Proposed slots"
-                        count={proposedCount}
-                        onClick={() => onViewChange("proposed")}
-                    />
-                    <MeetingToggleButton
-                        isActive={activeView === "confirmed"}
-                        label="Confirmed meeting slots"
-                        count={confirmedCount}
-                        onClick={() => onViewChange("confirmed")}
-                    />
-                </div>
-            ) : null}
-        </div>
-    );
-}
-
 function MeetingToggleButton({ isActive, label, count, onClick }) {
     return (
         <button
@@ -85,6 +58,44 @@ function MeetingToggleButton({ isActive, label, count, onClick }) {
             <span>{label}</span>
             <span className={styles.meetingToggleCount}>{count}</span>
         </button>
+    );
+}
+
+function MeetingToggleRow({ activeView, onViewChange, proposedCount, confirmedCount }) {
+    return (
+        <div className={styles.meetingToggle}>
+            <MeetingToggleButton
+                isActive={activeView === "proposed"}
+                label="Proposed slots"
+                count={proposedCount}
+                onClick={() => onViewChange("proposed")}
+            />
+            <MeetingToggleButton
+                isActive={activeView === "confirmed"}
+                label="Confirmed meeting slots"
+                count={confirmedCount}
+                onClick={() => onViewChange("confirmed")}
+            />
+        </div>
+    );
+}
+
+function AvailabilityHeader({ hasMeetingCards, activeView, onViewChange, proposedCount, confirmedCount }) {
+    return (
+        <div className={styles.header}>
+            <div className={styles.headerCopy}>
+                <h3 className={styles.title}>Propose meeting timings with your team</h3>
+                <p className={styles.subtitle}>Click a slot or use the propose button to suggest it to the group.</p>
+            </div>
+            {hasMeetingCards ? (
+                <MeetingToggleRow
+                    activeView={activeView}
+                    onViewChange={onViewChange}
+                    proposedCount={proposedCount}
+                    confirmedCount={confirmedCount}
+                />
+            ) : null}
+        </div>
     );
 }
 
@@ -109,6 +120,20 @@ function MeetingCountPill({ suggestion, status }) {
     );
 }
 
+function DeleteButton({ suggestion, currentUserId, onDelete }) {
+    if (suggestion.suggested_by.id !== currentUserId) return null;
+    return (
+        <button
+            type="button"
+            onClick={() => onDelete(suggestion.id)}
+            className={styles.deleteBtn}
+            aria-label="Delete meeting suggestion"
+        >
+            <Trash2 size={18} />
+        </button>
+    );
+}
+
 function MeetingCardActions({ suggestion, currentUserId, onVote, onDelete }) {
     const currentStatus = getCurrentUserStatus(suggestion, currentUserId);
     return (
@@ -129,16 +154,7 @@ function MeetingCardActions({ suggestion, currentUserId, onVote, onDelete }) {
             >
                 <X size={18} />
             </button>
-            {suggestion.suggested_by.id === currentUserId ? (
-                <button
-                    type="button"
-                    onClick={() => onDelete(suggestion.id)}
-                    className={styles.deleteBtn}
-                    aria-label="Delete meeting suggestion"
-                >
-                    <Trash2 size={18} />
-                </button>
-            ) : null}
+            <DeleteButton suggestion={suggestion} currentUserId={currentUserId} onDelete={onDelete} />
         </div>
     );
 }
@@ -217,37 +233,48 @@ function ConfirmedMeetingCard({ suggestion, index }) {
     );
 }
 
+function EmptyMeetingCards({ isConfirmedView }) {
+    return (
+        <div className={styles.meetingCardsEmpty}>
+            <SearchEmptyState
+                title={isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet"}
+                hint={isConfirmedView ? "Once every teammate accepts a proposal, it will appear here." : "Choose a suggested time below or propose one to get things started."}
+                className={styles.meetingCardsEmptyState}
+            />
+        </div>
+    );
+}
+
+function ProposedCardsList({ items, currentUserId, onVote, onDelete }) {
+    return items.map((suggestion) => (
+        <ProposedMeetingCard
+            key={suggestion.id}
+            suggestion={suggestion}
+            currentUserId={currentUserId}
+            onVote={onVote}
+            onDelete={onDelete}
+        />
+    ));
+}
+
 function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggestions, currentUserId, onVote, onDelete }) {
     const isConfirmedView = activeView === "confirmed";
     const items = isConfirmedView ? confirmedSuggestions : proposedSuggestions;
 
-    if (!items.length) {
-        return (
-            <div className={styles.meetingCardsEmpty}>
-                <SearchEmptyState
-                    title={isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet"}
-                    hint={isConfirmedView ? "Once every teammate accepts a proposal, it will appear here." : "Choose a suggested time below or propose one to get things started."}
-                    className={styles.meetingCardsEmptyState}
-                />
-            </div>
-        );
-    }
+    if (!items.length) return <EmptyMeetingCards isConfirmedView={isConfirmedView} />;
 
     return (
         <div className={styles.meetingCards}>
             {isConfirmedView
                 ? items.map((suggestion, index) => <ConfirmedMeetingCard key={suggestion.id} suggestion={suggestion} index={index} />)
-                : items.map((suggestion) => (
-                    <ProposedMeetingCard
-                        key={suggestion.id}
-                        suggestion={suggestion}
-                        currentUserId={currentUserId}
-                        onVote={onVote}
-                        onDelete={onDelete}
-                    />
-                ))}
+                : <ProposedCardsList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />}
         </div>
     );
+}
+
+function AvatarPhotoContent({ photoUrl, member }) {
+    if (photoUrl) return <img src={photoUrl} alt={member.name} className={styles.avatarImg} />;
+    return <span className={styles.avatarFallback}>{member.initials}</span>;
 }
 
 function MemberAvatarPhoto({ member }) {
@@ -264,11 +291,7 @@ function MemberAvatarPhoto({ member }) {
                 onClick={navigateToProfile}
                 title={member.name}
             >
-                {photoUrl ? (
-                    <img src={photoUrl} alt={member.name} className={styles.avatarImg} />
-                ) : (
-                    <span className={styles.avatarFallback}>{member.initials}</span>
-                )}
+                <AvatarPhotoContent photoUrl={photoUrl} member={member} />
                 <span className={`${styles.avatarStatus} ${member.is_free ? styles.avatarStatusFree : styles.avatarStatusBusy}`}>
                     {member.is_free ? <Check size={8} strokeWidth={3} /> : <X size={8} strokeWidth={3} />}
                 </span>
@@ -321,15 +344,11 @@ function useAvailabilityData(projectId) {
         setLoading(true);
         fetch(`/api/group-work/projects/${projectId}/availability/`, { headers: getAuthHeaders() })
             .then((res) => (res.ok ? res.json() : null))
-            .then((payload) => {
-                if (payload) setData(payload);
-            })
+            .then((payload) => { if (payload) setData(payload); })
             .finally(() => setLoading(false));
     }, [projectId]);
 
-    useEffect(() => {
-        fetchAvail();
-    }, [fetchAvail]);
+    useEffect(() => { fetchAvail(); }, [fetchAvail]);
 
     return { data, fetchAvail, loading };
 }
@@ -373,28 +392,15 @@ function useAvailability(projectId, confirm) {
     return { ...data, loading, suggestingSlot, setSuggestingSlot, ...actions, handleSuggestTime: suggest };
 }
 
-export default function AvailabilityTab({ projectId }) {
-    const confirm = useConfirm();
-    const {
-        suggestions,
-        active_suggestions,
-        current_user_id,
-        loading,
-        suggestingSlot,
-        setSuggestingSlot,
-        handleSuggestTime,
-        handleDelete,
-        handleVote,
-    } = useAvailability(projectId, confirm);
+function splitSuggestions(active_suggestions) {
+    const allSuggestions = [...(active_suggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
+    return {
+        confirmedSuggestions: allSuggestions.filter((s) => s.is_confirmed),
+        proposedSuggestions: allSuggestions.filter((s) => !s.is_confirmed),
+    };
+}
 
-    const { proposedSuggestions, confirmedSuggestions } = useMemo(() => {
-        const allSuggestions = [...(active_suggestions || [])].sort((left, right) => new Date(left.start) - new Date(right.start));
-        return {
-            confirmedSuggestions: allSuggestions.filter((suggestion) => suggestion.is_confirmed),
-            proposedSuggestions: allSuggestions.filter((suggestion) => !suggestion.is_confirmed),
-        };
-    }, [active_suggestions]);
-
+function useActiveMeetingView(proposedSuggestions, confirmedSuggestions) {
     const [activeMeetingView, setActiveMeetingView] = useState("proposed");
     const [hasChosenMeetingView, setHasChosenMeetingView] = useState(false);
 
@@ -403,7 +409,33 @@ export default function AvailabilityTab({ projectId }) {
         if (!proposedSuggestions.length && confirmedSuggestions.length > 0) setActiveMeetingView("confirmed");
     }, [confirmedSuggestions.length, hasChosenMeetingView, proposedSuggestions.length]);
 
-    if (loading) return <div className={styles.loading}>Analyzing member calendars...</div>;
+    const handleViewChange = (nextView) => {
+        setHasChosenMeetingView(true);
+        setActiveMeetingView(nextView);
+    };
+
+    return { activeMeetingView, handleViewChange };
+}
+
+function SlotSuggestionsSection({ suggestions, suggestingSlot, setSuggestingSlot, handleSuggestTime }) {
+    return (
+        <>
+            <div className={styles.slotList}>
+                {suggestions.map((slot) => <SlotRow key={slot.start} slot={slot} onClick={() => setSuggestingSlot(slot)} />)}
+            </div>
+            <SuggestionModal slot={suggestingSlot} onCancel={() => setSuggestingSlot(null)} onConfirm={handleSuggestTime} />
+            <AvailabilityFooter />
+        </>
+    );
+}
+
+export default function AvailabilityTab({ projectId }) {
+    const confirm = useConfirm();
+    const { suggestions, active_suggestions, current_user_id, loading, suggestingSlot, setSuggestingSlot, handleSuggestTime, handleDelete, handleVote } = useAvailability(projectId, confirm);
+    const { proposedSuggestions, confirmedSuggestions } = useMemo(() => splitSuggestions(active_suggestions), [active_suggestions]);
+    const { activeMeetingView, handleViewChange } = useActiveMeetingView(proposedSuggestions, confirmedSuggestions);
+
+    if (loading) return <div className={styles.loading}>Analysing member calendars...</div>;
 
     const hasMeetingCards = proposedSuggestions.length > 0 || confirmedSuggestions.length > 0;
     const showSlotSuggestions = activeMeetingView !== "confirmed";
@@ -413,10 +445,7 @@ export default function AvailabilityTab({ projectId }) {
             <AvailabilityHeader
                 hasMeetingCards={hasMeetingCards}
                 activeView={activeMeetingView}
-                onViewChange={(nextView) => {
-                    setHasChosenMeetingView(true);
-                    setActiveMeetingView(nextView);
-                }}
+                onViewChange={handleViewChange}
                 proposedCount={proposedSuggestions.length}
                 confirmedCount={confirmedSuggestions.length}
             />
@@ -431,13 +460,12 @@ export default function AvailabilityTab({ projectId }) {
                 />
             ) : null}
             {showSlotSuggestions ? (
-                <>
-                    <div className={styles.slotList}>
-                        {suggestions.map((slot) => <SlotRow key={slot.start} slot={slot} onClick={() => setSuggestingSlot(slot)} />)}
-                    </div>
-                    <SuggestionModal slot={suggestingSlot} onCancel={() => setSuggestingSlot(null)} onConfirm={handleSuggestTime} />
-                    <AvailabilityFooter />
-                </>
+                <SlotSuggestionsSection
+                    suggestions={suggestions}
+                    suggestingSlot={suggestingSlot}
+                    setSuggestingSlot={setSuggestingSlot}
+                    handleSuggestTime={handleSuggestTime}
+                />
             ) : null}
         </div>
     );
