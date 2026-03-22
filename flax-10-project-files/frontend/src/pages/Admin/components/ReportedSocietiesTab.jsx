@@ -4,7 +4,7 @@
 
 import { banReportedSociety, dismissReport, fetchReportedSocieties } from "../../../api/adminApi";
 import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
-import styles from "../AdminPage.module.css";
+import styles from "../styles";
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncList } from "../hooks/useAsyncList";
 import { navigateToSociety } from "../utils/adminNavigation";
