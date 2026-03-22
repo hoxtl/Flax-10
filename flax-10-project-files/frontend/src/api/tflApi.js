@@ -52,22 +52,23 @@ function decodeNextCoord(encoded, index) {
   return { value, index };
 }
 
+function buildDelay(line, status) {
+  return {
+    lineName: line.name,
+    mode: line.modeName,
+    severity: status.statusSeverity,
+    severityDescription: status.statusSeverityDescription,
+    reason: status.reason || 'Service Delay/Disruption',
+    color: LINE_COLOURS[line.id] || '#a5a5a5ff',
+  };
+}
+
+function extractLineDelays(line) {
+  return line.lineStatuses.filter((s) => s.statusSeverity < 10).map((s) => buildDelay(line, s));
+}
+
 function extractDelays(lines) {
-  const delays = [];
-  for (const line of lines) {
-    for (const status of line.lineStatuses) {
-      if (status.statusSeverity >= 10) continue;
-      delays.push({
-        lineName: line.name,
-        mode: line.modeName,
-        severity: status.statusSeverity,
-        severityDescription: status.statusSeverityDescription,
-        reason: status.reason || 'Service Delay/Disruption',
-        color: LINE_COLOURS[line.id] || '#a5a5a5ff',
-      });
-    }
-  }
-  return delays;
+  return lines.flatMap(extractLineDelays);
 }
 
 export const tflService = {
