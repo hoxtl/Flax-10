@@ -3,6 +3,7 @@
  */
 @import "./styles/layout.css";
 @import "./styles/panels.css";
+@import "./styles/scheduling.css";
 @import "./styles/interactive.css";
 @import "./styles/polish-core.css";
 @import "./styles/polish-responsive.css";
