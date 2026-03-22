@@ -72,20 +72,10 @@ function normalizePosition(position) {
 }
 
 function useScrollPositionUpdater(config) {
-  const {
-    calculatedPositions,
-    getScrollableParent,
-    lastScrollTop,
-    sectionRefs,
-    setActiveSection,
-    setScrollProgress,
-    targetTransformRef,
-  } = config;
-
   return useCallback(() => {
     const snapshot = getScrollSnapshot(config);
     applyScrollSnapshot(config, snapshot);
-  }, [calculatedPositions, getScrollableParent, lastScrollTop, sectionRefs, setActiveSection, setScrollProgress, targetTransformRef]);
+  }, [config]);
 }
 
 function getScrollSnapshot(config) {
