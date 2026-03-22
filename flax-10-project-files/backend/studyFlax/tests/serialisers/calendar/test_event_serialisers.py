@@ -161,3 +161,21 @@ class CalendarEventCreateSerialiserTests(TestCase):
         updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
         
         self.assertEqual(updated.recurrence_rule.frequency, 'DAILY')
+
+    def test_delete_recurrence(self):
+        """Test _delete_existing_rule."""
+        recurrence = RecurrenceRule.objects.create(frequency='WEEKLY', interval=1)
+        event = CalendarEvent.objects.create(
+            user=self.user, title='E', start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1), recurrence_rule=recurrence
+        )
+        recurrence_id = recurrence.id
+        
+        update_data = {
+            'title': 'E', 'start_time': event.start_time,
+            'end_time': event.end_time, 'recurrence_rule': None
+        }
+        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        
+        self.assertIsNone(updated.recurrence_rule)
+        self.assertFalse(RecurrenceRule.objects.filter(id=recurrence_id).exists())
