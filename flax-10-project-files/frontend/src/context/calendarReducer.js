@@ -17,6 +17,7 @@ export const initialState = {
     searchQuery: '',
     popupEvent: null,
     popupAnchorRect: null,
+    popupReadOnly: false,
     readOnly: false,
     isDeleteConfirmOpen: false,
     deleteConfirmEvent: null,
@@ -43,8 +44,8 @@ const handlers = {
     CLOSE_MODAL: (state) => ({ ...state, modalEvent: null, modalType: null, modalInitialDate: null, isModalOpen: false }),
     SET_FILTER: (state, payload) => ({ ...state, filter: toggleFilter(state.filter, payload) }),
     SET_SEARCH_QUERY: (state, payload) => ({ ...state, searchQuery: payload }),
-    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, readOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
-    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null }),
+    OPEN_POPUP: (state, payload) => ({ ...state, popupEvent: payload.event, popupAnchorRect: payload.anchorRect, popupReadOnly: payload.readOnly ?? false, popupViewMode: payload.viewModeOverride ?? null }),
+    CLOSE_POPUP: (state) => ({ ...state, popupEvent: null, popupAnchorRect: null, popupViewMode: null, popupReadOnly: false }),
     SET_READ_ONLY: (state, payload) => ({ ...state, readOnly: payload }),
     SET_SHARED_CALENDAR_VIEW: (state, payload) => ({
         ...state,

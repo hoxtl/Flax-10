@@ -279,8 +279,10 @@ export default function Homepage({
   const getTaskCategoryPillMeta = useCallback(
     (task) => {
       const listId = task.task_list != null ? String(task.task_list) : null;
+      const directName = task.list_name || null;
+      if (directName && directName.toLowerCase() !== 'none') return { label: String(directName).trim().slice(0, 20), listId };
       const list = (taskLists || []).find((l) => String(l.id) === listId);
-      if (list?.name)
+      if (list?.name && list.name.toLowerCase() !== 'none')
         return { label: String(list.name).trim().slice(0, 20), listId };
       const modId = task.module_id ?? task.module ?? task.moduleId;
       const mod = (enrolledModules || []).find(

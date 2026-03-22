@@ -4,6 +4,7 @@
  */
 
 import { useRef, useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventResize } from './hooks/useEventResize';
@@ -13,6 +14,7 @@ import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { useEventDelete, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { getEventTheme } from './utils/eventStyleUtils';
+import ctxStyles from '../../pages/Tasks/components/TaskCardContextMenu.module.css';
 import './DraggableEvent.css';
 
 /** Main entry for an event block. Renders as personal (editable) or other (read-only). */
@@ -112,10 +114,10 @@ function EditableEvent({ event, style, minWidthForDetails }) {
 
 function EventContextMenu({ menu, handlers, innerRef }) {
     return (
-        <div ref={innerRef} className="event-ctx-menu" style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 9999 }}>
-            <button className="event-ctx-item" onClick={handlers.handleEdit}>✏️ Edit</button>
-            <div className="event-ctx-divider" />
-            <button className="event-ctx-item event-ctx-delete" onClick={handlers.handleDelete}>🗑 Delete</button>
+        <div ref={innerRef} className={ctxStyles.ctxMenu} style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 9999 }}>
+            <button className={ctxStyles.ctxItem} onClick={handlers.handleEdit}><Pencil size={14} strokeWidth={2} /> Edit</button>
+            <div className={ctxStyles.ctxDivider} />
+            <button className={`${ctxStyles.ctxItem} ${ctxStyles.ctxItemDanger}`} onClick={handlers.handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
         </div>
     );
 }

@@ -16,14 +16,19 @@ function buildHourMark(rowHour) {
   return { type: "hourMark", id: `hour-${rowHour}`, hour: rowHour };
 }
 
-function withHourMark(finalRows, row, lastInjectedHour, prevEventEndMins) {
+function withHourMark(finalRows, row, lastInjectedHour, prevEventEndMins, passedNowMins) {
   const startMins = getStartMins(row);
-  if (startMins == null) return { finalRows: [...finalRows, row], lastInjectedHour, prevEventEndMins: row.type === "event" ? row.endMins : row.type === "now" ? prevEventEndMins : null };
+  if (startMins == null) {
+    const nextPassedNowMins = row.type === "now" ? row.nowMins : passedNowMins;
+    return { finalRows: [...finalRows, row], lastInjectedHour, prevEventEndMins: row.type === "event" ? row.endMins : row.type === "now" ? prevEventEndMins : null, passedNowMins: nextPassedNowMins };
+  }
   const rowHour = DAY_START_HOUR + Math.floor(startMins / 60);
   const adjacentToPrevious = prevEventEndMins != null && prevEventEndMins >= startMins;
-  const nextRows = rowHour !== lastInjectedHour && !adjacentToPrevious ? [...finalRows, buildHourMark(rowHour)] : [...finalRows];
+  const hourStartMins = (rowHour - DAY_START_HOUR) * 60;
+  const hourAlreadyPast = passedNowMins != null && hourStartMins < passedNowMins;
+  const nextRows = rowHour !== lastInjectedHour && !adjacentToPrevious && !hourAlreadyPast ? [...finalRows, buildHourMark(rowHour)] : [...finalRows];
   const nextRow = shouldHideTimeLabel(startMins, rowHour, rowHour) ? { ...row, hideTimeLabel: true } : row;
-  return { finalRows: [...nextRows, nextRow], lastInjectedHour: rowHour, prevEventEndMins: row.type === "event" ? row.endMins : null };
+  return { finalRows: [...nextRows, nextRow], lastInjectedHour: rowHour, prevEventEndMins: row.type === "event" ? row.endMins : null, passedNowMins };
 }
 
 export function insertNowMarker(rows, nowMins) {
@@ -33,9 +38,10 @@ export function insertNowMarker(rows, nowMins) {
 }
 
 export function injectHourMarks(rows) {
-  return rows.reduce((state, row) => withHourMark(state.finalRows, row, state.lastInjectedHour, state.prevEventEndMins), {
+  return rows.reduce((state, row) => withHourMark(state.finalRows, row, state.lastInjectedHour, state.prevEventEndMins, state.passedNowMins), {
     finalRows: [],
     lastInjectedHour: -1,
     prevEventEndMins: null,
+    passedNowMins: null,
   }).finalRows;
 }
