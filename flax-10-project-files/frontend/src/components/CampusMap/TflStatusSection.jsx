@@ -1,3 +1,6 @@
+/**
+ * TfL status section for the campus map sidebar.
+ */
 import { useState } from 'react';
 import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
 import statusStyles from '../../pages/CampusMap/status.module.css';

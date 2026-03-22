@@ -1,3 +1,6 @@
+/**
+ * Starting location section.
+ */
 import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
 import sidebarStyles from '../../pages/CampusMap/sidebar.module.css';
 import { LocationChip } from './LocationChip';
