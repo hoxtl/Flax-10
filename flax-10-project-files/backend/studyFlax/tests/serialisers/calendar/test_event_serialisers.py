@@ -108,3 +108,14 @@ class CalendarEventCreateSerialiserTests(TestCase):
             data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': tag_val}
             event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
             self.assertIsNone(event.tag)
+
+    def test_create_with_recurrence_dict(self):
+        """Test recurrence as dict."""
+        data = {
+            'title': 'Recurring', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1),
+            'recurrence_rule': {'frequency': 'WEEKLY', 'interval': 1, 'count': 10}
+        }
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        
+        self.assertIsNotNone(event.recurrence_rule)
+        self.assertEqual(event.recurrence_rule.frequency, 'WEEKLY')
