@@ -56,4 +56,29 @@ describe('HistoryRailSection', () => {
     render(<HistoryRailSection group={makeGroup([makeBlock({ module: undefined })])} />);
     expect(screen.getByText('General')).toBeTruthy();
   });
+
+  it('shows "Completed" pill when at least one session is complete', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock()])} />);
+    expect(screen.getByText('Completed')).toBeTruthy();
+  });
+
+  it('shows "Partial" pill when all sessions are incomplete', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock({ sessions: [{ status: 'Incomplete' }] })])} />);
+    expect(screen.getByText('Partial')).toBeTruthy();
+  });
+
+  it('renders the completed/total sessions ratio', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock()])} />);
+    expect(screen.getByText('1/2 sessions')).toBeTruthy();
+  });
+
+  it('shows the break pill when totalBreak > 0', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock()])} />);
+    expect(screen.getByText(/break/)).toBeTruthy();
+  });
+
+  it('hides the break pill when totalBreak is 0', () => {
+    render(<HistoryRailSection group={makeGroup([makeBlock({ totalBreak: 0 })])} />);
+    expect(screen.queryByText(/break/)).toBeNull();
+  });
 })
