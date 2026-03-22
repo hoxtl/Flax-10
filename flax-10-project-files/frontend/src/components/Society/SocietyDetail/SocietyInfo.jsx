@@ -3,8 +3,8 @@
  */
 import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
-import Badge from "../../common/Badge/Badge";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import Badge from "../../Common/Badge/Badge";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 

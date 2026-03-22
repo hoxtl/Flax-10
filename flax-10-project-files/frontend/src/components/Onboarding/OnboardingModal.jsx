@@ -4,7 +4,7 @@ import useOnboarding from "./hooks/useOnboarding";
 import OnboardingForm from "./OnboardingForm";
 import SuccessScreen from "./SuccessScreen";
 import styles from "./OnboardingModal.module.css";
-import StandardModal from "../common/StandardModal/StandardModal";
+import StandardModal from "../Common/StandardModal/StandardModal";
 
 function getCourseOptions() {
   return Object.entries(KCL_DEPARTMENTS).map(([dept, courses]) => ({

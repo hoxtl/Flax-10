@@ -52,13 +52,13 @@ function closeWhenOutside(event, ref, setOpen) {
 function useEnrolledModules(setEnrolledModules) {
   useEffect(() => {
     let active = true;
-    import('../../../api/moduleApi').then(({ getModules, getEnrollments }) => Promise.all([getModules(), getEnrollments()]).then(([modules, enrollments]) => active && setEnrolledModules(mapEnrolledModules(modules, enrollments))).catch(() => {}));
+    import('../../../api/modules/moduleApi').then(({ getModules, getEnrollments }) => Promise.all([getModules(), getEnrollments()]).then(([modules, enrollments]) => active && setEnrolledModules(mapEnrolledModules(modules, enrollments))).catch(() => {}));
     return () => { active = false; };
   }, [setEnrolledModules]);
 }
 
 async function fetchTaskPayload() {
-  const taskService = await import('../../../api/taskApi');
+  const taskService = await import('../../../api/tasks/taskApi');
   return Promise.all([taskService.fetchTasks(), taskService.fetchTaskLists()]);
 }
 

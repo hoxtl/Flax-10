@@ -2,7 +2,7 @@
  * Reusable user search result and filter item components.
  */
 
-import UserAvatar from '../common/UserAvatar/UserAvatar';
+import UserAvatar from '../Common/UserAvatar/UserAvatar';
 import { styles } from './userSearchShared';
 
 function getDisplayName(user) {

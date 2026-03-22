@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Tag } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTags } from '../../../context/TagContext';
-import { TagsSelector } from '../../common/TagsSelector/TagsSelector';
+import { TagsSelector } from '../../Common/TagsSelector/TagsSelector';
 import TagManagerModal from '../../Tags/TagManagerModal';
 import styles from './CalendarHeaderUtils.module.css';
 function FilterPopup({ tagObjects, selectedTagObjects, onSelectionChange, onManageTags, allowManageTags }) {

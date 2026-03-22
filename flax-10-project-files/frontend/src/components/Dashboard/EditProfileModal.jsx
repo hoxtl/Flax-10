@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
-import { updateUserProfile } from '../../api/userApi';
+import { updateUserProfile } from '../../api/user/userApi';
 import { getInitials } from '../Authentication/utils/userUtils';
 import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
-import FormField from '../common/FormField/FormField';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../common/StandardModal/StandardModal';
-import TextInput from '../common/TextInput/TextInput';
+import FormField from '../Common/FormField/FormField';
+import PrimaryButton from '../Common/PrimaryButton/PrimaryButton';
+import StandardModal from '../Common/StandardModal/StandardModal';
+import TextInput from '../Common/TextInput/TextInput';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 

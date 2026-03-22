@@ -2,9 +2,9 @@
  * Shared task-conversion actions for module dashboard content.
  */
 import { useState } from 'react';
-import { convertReadingToTask } from '../../../api/readingApi';
+import { convertReadingToTask } from '../../../api/tasks/readingApi';
 import { useToast } from '../../../context/ToastContext';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
 
 async function submitReadingAsTask(readingId, setState, onAdded, toast) {
     setState('loading');

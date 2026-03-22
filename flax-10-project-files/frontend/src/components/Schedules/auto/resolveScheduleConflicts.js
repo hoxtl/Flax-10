@@ -1,7 +1,7 @@
 /*
  * Auto schedule conflict resolution.
  */
-import { getEvents, updateEvent } from '../../../api/eventApi';
+import { getEvents, updateEvent } from '../../../api/calendar/eventApi';
 import { resolveConflictPlansBeforeScheduling } from '../../../pages/Homepage/components/useAutoResolveScheduleConflicts';
 import { getMoveTomorrowWindow } from './autoScheduleUtils';
 

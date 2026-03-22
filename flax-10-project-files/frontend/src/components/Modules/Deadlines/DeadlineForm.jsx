@@ -3,9 +3,9 @@
  */
 import { useState } from 'react';
 import { DEADLINE_TYPES, TYPES_WITH_END_DATE, TYPES_WITH_LOCATION } from '../utils/deadlineUtils.js';
-import AnimatedDropdown from '../../common/AnimatedDropdown';
+import AnimatedDropdown from '../../Common/AnimatedDropdown';
 import styles from './DeadlineForm.module.css';
-import DateTimePicker from '../../common/inputs/DateTimePicker';
+import DateTimePicker from '../../Common/inputs/DateTimePicker';
 const EMPTY_FORM = { title: '', deadline_type: 'coursework', start_due_date: '', end_due_date: '', location: '', description: '' };
 
 function Field({ label, children }) {

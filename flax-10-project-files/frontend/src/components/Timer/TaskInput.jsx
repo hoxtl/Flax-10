@@ -3,7 +3,7 @@
  */
 
 import styles from '../../pages/Timer/TimerPage.module.css';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../Common/PrimaryButton/PrimaryButton';
 import { TaskPickerModal } from './taskInput/TaskPickerModal';
 import { useTaskPickerData } from './taskInput/useTaskPickerData';
 

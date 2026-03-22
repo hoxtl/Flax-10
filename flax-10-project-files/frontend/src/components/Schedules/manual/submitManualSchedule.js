@@ -1,7 +1,7 @@
 /*
  * Manual schedule submission.
  */
-import { createSchedule } from '../../../api/scheduleApi';
+import { createSchedule } from '../../../api/calendar/scheduleApi';
 import { getManualScheduleError } from './manualScheduleUtils';
 
 export async function submitManualSchedule({ title, selected, showToast, onDone }) {

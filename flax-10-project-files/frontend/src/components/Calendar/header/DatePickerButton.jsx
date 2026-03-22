@@ -1,4 +1,4 @@
-import DateTimePicker from '../../common/inputs/DateTimePicker';
+import DateTimePicker from '../../Common/inputs/DateTimePicker';
 import styles from './DatePickerButton.module.css';
 
 export function DatePickerButton({ selectedDate, onDatePick }) {

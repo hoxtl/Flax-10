@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "../../context/ThemeContext";
-import { getAttendanceStats } from "../../api/attendanceApi";
+import { getAttendanceStats } from "../../api/social/attendanceApi";
 import { Link } from "react-router-dom";
 import { getChartColors, getChartSx } from "./utils/chartColors";
-import buttonStyles from "../common/PrimaryButton/PrimaryButton.module.css";
+import buttonStyles from "../Common/PrimaryButton/PrimaryButton.module.css";
 
 const ATTENDED_COLOR = "#5a9e74";
 const MISSED_COLOR = "#c07060";

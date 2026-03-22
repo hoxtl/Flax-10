@@ -2,7 +2,7 @@
  * Teacher-role state and event handlers.
  */
 import { useEffect, useState } from "react";
-import { cancelTeacherRoleRequest } from "../../../api/adminApi";
+import { cancelTeacherRoleRequest } from "../../../api/admin/adminApi";
 import { useAuth } from "../../../context/AuthContext";
 import {
   clearCachedTeacherRequest,

@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback, useRef, useContext } from 'react';
-import * as api from '../api/notificationApi';
+import * as api from '../api/social/notificationApi';
 import { useAuth } from './AuthContext';
 import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
 import { playNotificationSound } from '../components/Notifications/utils/notificationSound';

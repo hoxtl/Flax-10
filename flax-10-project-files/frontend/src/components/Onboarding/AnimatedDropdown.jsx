@@ -1,1 +1,1 @@
-export { default } from "../common/AnimatedDropdown";
+export { default } from "../Common/AnimatedDropdown";

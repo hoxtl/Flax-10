@@ -3,7 +3,7 @@
  */
 import styles from "./ImageManagerComponents.module.css";
 import { ImageGrid } from "./ImageManagerComponents";
-import StandardModal from "../../../common/StandardModal/StandardModal";
+import StandardModal from "../../../Common/StandardModal/StandardModal";
 
 const HintText = () => <p className={styles.hint}>First image is shown on society card. Click ★ to pin.</p>;
 

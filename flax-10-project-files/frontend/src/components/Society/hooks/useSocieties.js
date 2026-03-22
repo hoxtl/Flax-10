@@ -2,7 +2,7 @@
  * useSocieties loads and mutates the societies collection for the browse pages.
  */
 import { useState, useEffect, useCallback } from "react";
-import { fetchSocieties, createSociety, addCollaborator, requestRatification } from "../../../api/societyApi";
+import { fetchSocieties, createSociety, addCollaborator, requestRatification } from "../../../api/social/societyApi";
 
 function toSnakeCase(obj) {
     const result = {};

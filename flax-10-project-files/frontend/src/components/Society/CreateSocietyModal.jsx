@@ -9,10 +9,10 @@ import CollaboratorList from "./CollaboratorList";
 import { RatificationToggle } from "./SocietyDetail/RatificationSection";
 import CoverImageModal from "./SocietyDetail/imageHandlers/CoverImageModal";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
-import { TagsSelector } from "../common/TagsSelector/TagsSelector";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
-import StandardModal from "../common/StandardModal/StandardModal";
-import TextInput from "../common/TextInput/TextInput";
+import { TagsSelector } from "../Common/TagsSelector/TagsSelector";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
+import StandardModal from "../Common/StandardModal/StandardModal";
+import TextInput from "../Common/TextInput/TextInput";
 
 const CATEGORY_TAGS = SOCIETY_CATEGORY_OPTIONS.map(c => ({ id: c.id, label: c.label }));
 

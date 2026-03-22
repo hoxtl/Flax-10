@@ -2,10 +2,10 @@
  * AddCollaboratorModal lets society admins add collaborators to a society.
  */
 import { useState } from "react";
-import Badge from "../common/Badge/Badge";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
-import SearchEmptyState from "../common/SearchEmptyState/SearchEmptyState";
-import StandardModal from "../common/StandardModal/StandardModal";
+import Badge from "../Common/Badge/Badge";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
+import SearchEmptyState from "../Common/SearchEmptyState/SearchEmptyState";
+import StandardModal from "../Common/StandardModal/StandardModal";
 import UserSearch from "../Social/UserSearch";
 import styles from "./AddCollaboratorModal.module.css";
 

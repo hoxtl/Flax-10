@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { getEvents } from "../../../api/eventApi";
+import { getEvents } from "../../../api/calendar/eventApi";
 import { getPromptedIds } from "../attendancePromptStorage";
 import { findCandidateEvent, getDateRangeForPrompt } from "../attendancePromptUtils";
 

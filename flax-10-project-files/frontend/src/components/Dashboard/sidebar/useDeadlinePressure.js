@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
+import { getUpcomingDeadlines } from "../../../api/calendar/deadlineApi";
 import { hasDeadlineWithin48Hours } from "./sidebarUtils";
 
 export default function useDeadlinePressure() {

@@ -1,4 +1,4 @@
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
 import WarningBox from "./WarningBox";
 import styles from "./OnboardingModal.module.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,7 +45,7 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
   );
 }
 
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
 
 /**
  * Collects onboarding fields and confirms course mapping before setup.

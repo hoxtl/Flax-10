@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Globe from "./globe";
 import styles from "./landing-page.module.css";
-import { PrimaryButton } from "../common";
+import { PrimaryButton } from "../Common";
 
 const lerp = (start, end, factor) => start + (end - start) * factor;
 const defaultGlobeConfig = {

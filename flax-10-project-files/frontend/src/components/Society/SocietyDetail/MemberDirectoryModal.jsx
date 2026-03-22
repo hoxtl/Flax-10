@@ -3,10 +3,10 @@
  * Admins can remove members from the directory.
  */
 import { useState, useEffect, useMemo } from "react";
-import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
-import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
-import SearchBar from "../../common/SearchBar/SearchBar";
-import UserAvatar from "../../common/UserAvatar/UserAvatar";
+import GenericSummaryModal from "../../Common/GenericSummaryModal/GenericSummaryModal";
+import SummaryItem from "../../Common/GenericSummaryModal/SummaryItem";
+import SearchBar from "../../Common/SearchBar/SearchBar";
+import UserAvatar from "../../Common/UserAvatar/UserAvatar";
 import { useConfirm } from "../../../context/ConfirmContext";
 import { X } from "lucide-react";
 import { useSearchFilter } from "../../../hooks/useSearchFilter";

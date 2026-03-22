@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import AnimatedDropdown from "../Common/AnimatedDropdown/AnimatedDropdown";
 import useModules from "./hooks/useModules";
 
 export default function UserModuleDropdown({ value, onChange, placeholder = "Select a module...", className, triggerClassName, ...props }) {

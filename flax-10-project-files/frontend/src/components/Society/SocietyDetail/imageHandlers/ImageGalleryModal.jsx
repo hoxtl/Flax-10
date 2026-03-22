@@ -2,7 +2,7 @@
  * ImageGalleryModal renders the fullscreen carousel for society images.
  */
 import { useRef } from "react";
-import StandardModal from "../../../common/StandardModal/StandardModal";
+import StandardModal from "../../../Common/StandardModal/StandardModal";
 import styles from "./ImageGalleryModal.module.css";
 import { useCarouselNavigation, useCarouselGestures, useCarouselKeyboard } from "../../hooks/useCarouselNavigation";
 

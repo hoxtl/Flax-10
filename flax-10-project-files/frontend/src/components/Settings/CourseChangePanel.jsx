@@ -1,4 +1,4 @@
-import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import SectionSkeleton from "../Common/LoadingState/SectionSkeleton";
 import TeacherApplyModal from "./course/TeacherApplyModal";
 import TeacherRoleContent from "./course/TeacherRoleContent";
 import useTeacherRoleSection from "./course/useTeacherRoleSection";

@@ -1,7 +1,7 @@
 /*
  * useSocietyMembership handles joining and leaving societies.
  */
-import * as api from '../../../api/societyApi';
+import * as api from '../../../api/social/societyApi';
 import { useTags } from '../../../context/TagContext';
 import { useConfirm } from '../../../context/ConfirmContext';
 

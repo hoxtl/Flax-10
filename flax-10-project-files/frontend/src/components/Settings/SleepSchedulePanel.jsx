@@ -3,7 +3,7 @@
  */
 import SleepSection from "./preferences/SleepSection";
 import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
-import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import SectionSkeleton from "../Common/LoadingState/SectionSkeleton";
 
 export function SleepSchedulePanel({ onSave, isSaving }) {
   const settings = useSleepScheduleSettings();

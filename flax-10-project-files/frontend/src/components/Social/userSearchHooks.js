@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { fetchSocieties } from '../../api/societyApi';
+import { fetchSocieties } from '../../api/social/societyApi';
 import { ROLE_OPTIONS, YEAR_OPTIONS, allCourses } from './userSearchShared';
 import { fetchUserResults, filterCourses, filterObj, handleErr, toggleArr } from './userSearchUtils';
 

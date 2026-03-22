@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import SearchBar from '../../common/SearchBar/SearchBar';
+import SearchBar from '../../Common/SearchBar/SearchBar';
 import styles from './CalendarHeaderUtils.module.css';
 function ExpandedSearch({ value, onChange, onToggle }) {
     const ref = useRef(null);

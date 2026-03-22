@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from "react";
 import styles from "../../../pages/Settings/Settings.module.css";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
 
 function useSavedState(saveSignal) {
   const [showSaved, setShowSaved] = useState(false);

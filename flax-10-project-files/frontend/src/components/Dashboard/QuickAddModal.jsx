@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import styles from "./QuickAddModal.module.css";
 import { useTags } from "../../context/TagContext";
-import Badge from "../common/Badge/Badge";
-import StandardModal from "../common/StandardModal/StandardModal";
-import { getModules } from "../../api/moduleApi";
+import Badge from "../Common/Badge/Badge";
+import StandardModal from "../Common/StandardModal/StandardModal";
+import { getModules } from "../../api/modules/moduleApi";
 import { ScheduleAutoForm } from "../Schedules/ScheduleForms";
 
 const CORE_TYPES = [

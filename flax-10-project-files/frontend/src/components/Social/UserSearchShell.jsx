@@ -3,7 +3,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import SearchBar from '../common/SearchBar/SearchBar';
+import SearchBar from '../Common/SearchBar/SearchBar';
 import { FilterDropdown, SearchDropdown } from './UserSearchLists';
 import { styles } from './userSearchShared';
 

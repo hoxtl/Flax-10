@@ -2,7 +2,7 @@
  * Hook for managing deadline modal state and CRUD operations.
  */
 import { useState, useEffect } from 'react';
-import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../../../api/deadlineApi';
+import { getDeadlines, createDeadline, updateDeadline, deleteDeadline } from '../../../api/calendar/deadlineApi';
 
 function useDeadlineList(module_id) {
     const [deadlines, setDeadlines] = useState([]);

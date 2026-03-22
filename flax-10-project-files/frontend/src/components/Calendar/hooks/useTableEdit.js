@@ -3,9 +3,9 @@
  * Handles cell selection, value changes, and API persistence.
  */
 import { useState, useCallback } from 'react';
-import { updateEvent } from '../../../api/eventApi';
+import { updateEvent } from '../../../api/calendar/eventApi';
 import { useCalendarDispatch } from '../../../context/CalendarContext';
-import { geocodeAddress } from '../../../api/userApi';
+import { geocodeAddress } from '../../../api/user/userApi';
 
 async function buildUpdatedEvent(event, field, value, tags) {
     const updated = {...event };

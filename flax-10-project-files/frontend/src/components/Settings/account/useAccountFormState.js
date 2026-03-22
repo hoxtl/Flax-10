@@ -2,7 +2,7 @@
  * Account-form state management and request loading.
  */
 import { useEffect, useState } from "react";
-import { getMyCourseChangeRequest } from "../../../api/adminApi";
+import { getMyCourseChangeRequest } from "../../../api/admin/adminApi";
 import { useAuth } from "../../../context/AuthContext";
 import {
   clearCachedPendingRequest,

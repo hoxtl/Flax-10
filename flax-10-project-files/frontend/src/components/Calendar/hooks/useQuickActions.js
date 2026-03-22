@@ -7,7 +7,7 @@ import { useNotify } from '../../Notifications/hooks/useNotify';
 import { useCalendarEvents } from './useCalendarEvents';
 import { useModuleDisenrollment } from '../../Modules/hooks/useModuleDisenrollment';
 import { getEventType } from '../utils/eventUtils';
-import { unsyncCalendar } from '../../../api/societyApi';
+import { unsyncCalendar } from '../../../api/social/societyApi';
 
 async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
     await unsyncCalendar(event.society_id);

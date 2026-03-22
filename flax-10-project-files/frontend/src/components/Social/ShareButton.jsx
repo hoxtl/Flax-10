@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { shareCalendar, unshareCalendar } from '../../api/socialApi';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import { shareCalendar, unshareCalendar } from '../../api/social/socialApi';
+import PrimaryButton from '../Common/PrimaryButton/PrimaryButton';
 
 async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle) {
     setLoading(true);

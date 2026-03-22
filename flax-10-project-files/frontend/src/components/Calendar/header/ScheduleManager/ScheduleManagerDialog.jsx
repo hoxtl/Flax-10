@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { getSchedules, renameSchedule, deleteSchedule } from '../../../../api/scheduleApi';
+import { getSchedules, renameSchedule, deleteSchedule } from '../../../../api/calendar/scheduleApi';
 import { useToast } from '../../../../context/ToastContext';
-import StandardModal from '../../../common/StandardModal/StandardModal';
-import HoldConfirmModal from '../../../common/HoldConfirmModal/HoldConfirmModal';
-import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../../Common/StandardModal/StandardModal';
+import HoldConfirmModal from '../../../Common/HoldConfirmModal/HoldConfirmModal';
+import PrimaryButton from '../../../Common/PrimaryButton/PrimaryButton';
 import { ScheduleCard } from './ScheduleCard';
 import styles from '../CalendarHeaderUtils.module.css';
 function useSchedules(open) {

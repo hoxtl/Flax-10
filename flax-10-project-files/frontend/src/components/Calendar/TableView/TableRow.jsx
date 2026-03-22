@@ -15,7 +15,7 @@ import { getEventTheme } from '../utils/eventStyleUtils';
 import { isSameDay } from '../utils/dateUtils';
 import { useEventActions } from '../hooks/useCalendarEvents';
 import { useQuickActions } from '../hooks/useQuickActions';
-import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+import ConfirmModal from '../../Common/ConfirmModal/ConfirmModal';
 import styles from './TableView.module.css';
 
 function getSourceBadge(event) {

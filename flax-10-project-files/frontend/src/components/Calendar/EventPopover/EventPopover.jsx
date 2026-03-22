@@ -5,8 +5,8 @@ import { Pencil, Trash2, MapPin, Clock, AlignLeft } from 'lucide-react';
 import { calculatePopoverPosition, calculateArrowPosition } from './popoverUtils';
 import { isAllDayEvent } from '../utils/eventDisplayUtils';
 import { formatTimeRange } from '../utils/dateUtils';
-import Badge from '../../common/Badge/Badge';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import Badge from '../../Common/Badge/Badge';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
 import styles from './EventPopover.module.css';
 
 const EVENT_ACCENTS = { module: "var(--sage)", society: "var(--primary)" };

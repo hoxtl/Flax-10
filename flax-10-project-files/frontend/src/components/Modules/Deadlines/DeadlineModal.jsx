@@ -4,7 +4,7 @@
 import { useDeadlineModal } from '../hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';
-import StandardModal from '../../common/StandardModal/StandardModal';
+import StandardModal from '../../Common/StandardModal/StandardModal';
 import styles from './DeadlineModal.module.css';
 
 export default function DeadlineModal({ module, onClose, startCreating }) {

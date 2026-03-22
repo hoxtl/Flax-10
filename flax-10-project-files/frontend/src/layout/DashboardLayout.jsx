@@ -3,7 +3,7 @@
  */
 
 import styles from "./DashboardLayout.module.css";
-import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
+import QuickCommandBar from "../components/Common/QuickCommandBar/QuickCommandBar";
 import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
 import { handleLogoutClick, shouldShowBackToTop } from "./dashboardLayout/dashboardLayoutActions";

@@ -9,11 +9,11 @@ import { TimeRow } from "../../../../Calendar/EventModal/components/TimeRow";
 import { RecurrenceField } from "../../../../Calendar/EventModal/components/RecurrenceField";
 import { FormField } from "../../../../Calendar/EventModal/components/FormField";
 import { TagField } from "../../../../Calendar/EventModal/components/TagField";
-import ConfirmModal from "../../../../common/ConfirmModal/ConfirmModal";
-import StandardModal from "../../../../common/StandardModal/StandardModal";
-import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
+import ConfirmModal from "../../../../Common/ConfirmModal/ConfirmModal";
+import StandardModal from "../../../../Common/StandardModal/StandardModal";
+import PrimaryButton from "../../../../Common/PrimaryButton/PrimaryButton";
 import "../../../../Calendar/EventModal/EventModal.css";
-import { fetchSocietyEvent } from "../../../../../api/societyApi";
+import { fetchSocietyEvent } from "../../../../../api/social/societyApi";
 import { useConfirm } from "../../../../../context/ConfirmContext";
 
 const findPinConflict = (announcements, formId) =>

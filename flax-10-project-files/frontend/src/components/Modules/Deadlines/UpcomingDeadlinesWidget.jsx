@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
-import DeadlineCountdown from '../../common/DeadlineCountdown/DeadlineCountdown';
+import DeadlineCountdown from '../../Common/DeadlineCountdown/DeadlineCountdown';
 import {
   containerVariants,
   expandBodyVariants,

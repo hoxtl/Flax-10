@@ -4,8 +4,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
-import SearchBar from '../../common/SearchBar/SearchBar';
-import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
+import SearchBar from '../../Common/SearchBar/SearchBar';
+import SearchEmptyState from '../../Common/SearchEmptyState/SearchEmptyState';
 import styles from './ModuleCourseFilter.module.css';
 
 function filterCourseGroups(groups, query) {

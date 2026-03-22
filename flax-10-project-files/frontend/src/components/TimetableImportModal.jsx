@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import StandardModal from './common/StandardModal/StandardModal';
-import FormField from './common/FormField/FormField';
-import PrimaryButton from './common/PrimaryButton/PrimaryButton';
-import TextInput from './common/TextInput/TextInput';
+import StandardModal from './Common/StandardModal/StandardModal';
+import FormField from './Common/FormField/FormField';
+import PrimaryButton from './Common/PrimaryButton/PrimaryButton';
+import TextInput from './Common/TextInput/TextInput';
 import styles from './TimetableImportModal.module.css';
 
 async function tryImport(url, onImport) {

@@ -1,7 +1,7 @@
 /*
  * Text input element used by settings form controls.
  */
-import TextInput from "../../common/TextInput/TextInput";
+import TextInput from "../../Common/TextInput/TextInput";
 
 export default function FormTextInput(props) {
   const { type, id, name, value, onChange, required, maxLength, autoComplete } = props;

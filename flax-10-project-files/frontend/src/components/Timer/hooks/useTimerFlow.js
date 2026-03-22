@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useRef, useState } from 'react';
-import { logTaskTime } from '../../../api/taskApi';
+import { logTaskTime } from '../../../api/tasks/taskApi';
 import { playCompletionChime } from '../../../lib/sounds';
 import { saveSession } from '../utils/historyUtils';
 import { useCompletionCheck } from '../utils/timerUtils';

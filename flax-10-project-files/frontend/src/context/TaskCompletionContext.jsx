@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { PartyPopper } from "lucide-react";
-import AppToast from "../components/common/AppToast/AppToast";
+import AppToast from "../components/Common/AppToast/AppToast";
 
 const TaskCompletionContext = createContext(null);
 

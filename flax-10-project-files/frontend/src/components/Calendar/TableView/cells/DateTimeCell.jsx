@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
-import DateTimePicker from '../../../common/inputs/DateTimePicker';
+import DateTimePicker from '../../../Common/inputs/DateTimePicker';
 import { validateEventTimes } from '../../utils/dateValidation';
 import styles from './DateTimeCell.module.css';
 import commonStyles from '../TableView.module.css';

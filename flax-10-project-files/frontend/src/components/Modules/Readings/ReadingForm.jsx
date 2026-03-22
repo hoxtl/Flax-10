@@ -3,7 +3,7 @@
  */
 import {useState} from 'react';
 import styles from '../Deadlines/DeadlineForm.module.css';
-import DateTimePicker from '../../common/inputs/DateTimePicker';
+import DateTimePicker from '../../Common/inputs/DateTimePicker';
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 

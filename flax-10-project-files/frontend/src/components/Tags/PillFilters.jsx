@@ -4,7 +4,7 @@ import styles from "./PillFilters.module.css";
 import { countByType } from "./utils/pillUtils";
 import { useTags } from "../../context/TagContext";
 import TagManagerModal from "./TagManagerModal";
-import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import AnimatedDropdown from "../Common/AnimatedDropdown/AnimatedDropdown";
 
 export default function PillFilters({ active, onChange, items }) {
   const { tags } = useTags();

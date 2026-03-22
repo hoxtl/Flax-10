@@ -15,8 +15,8 @@ import {
   Calendar,
   Clock,
 } from "lucide-react";
-import { SegmentedControl } from "../common";
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import { SegmentedControl } from "../Common";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
 import { APP_ROUTES } from "../../lib/routes";
 import { motion as Motion } from "framer-motion";
 import { useState, useRef } from "react";

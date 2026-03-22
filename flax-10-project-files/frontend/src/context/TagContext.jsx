@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tagApi';
+import { getTags, createTag as apiCreateTag, deleteTag as apiDeleteTag, updateTag as apiUpdateTag } from '../api/tags/tagApi';
 
 const TagContext = createContext(null);
 const NONE_TAG = { id: 'none', label: 'None', icon: '🏷️', color: '#94A3B8' };

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, X } from "lucide-react";
-import dropdownStyles from "../common/AnimatedDropdown/AnimatedDropdown.module.css";
-import FilterCheckbox from "../common/FilterCheckbox/FilterCheckbox";
+import dropdownStyles from "../Common/AnimatedDropdown/AnimatedDropdown.module.css";
+import FilterCheckbox from "../Common/FilterCheckbox/FilterCheckbox";
 import pillStyles from "./MultiSelectDropdown.module.css";
 
 function normalise(opt) {

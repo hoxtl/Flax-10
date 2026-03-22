@@ -2,7 +2,7 @@
  * CollaboratorList renders selected collaborators and role controls.
  */
 import styles from "./CollaboratorList.module.css";
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
 
 const ROLES = [
     { value: "editor", label: "Editor" },

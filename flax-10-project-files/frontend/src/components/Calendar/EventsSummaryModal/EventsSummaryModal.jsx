@@ -3,8 +3,8 @@
  * Provides date range filtering with today, week, and month options.
  */
 import { useState, useEffect } from "react";
-import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
-import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
+import GenericSummaryModal from "../../Common/GenericSummaryModal/GenericSummaryModal";
+import SummaryItem from "../../Common/GenericSummaryModal/SummaryItem";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
 
 function formatEventMeta(ev) {

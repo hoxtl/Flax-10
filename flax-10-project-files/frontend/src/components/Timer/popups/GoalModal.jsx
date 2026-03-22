@@ -4,8 +4,8 @@
 
 import { useState } from 'react';
 import styles from '../../../pages/Timer/TimerPage.module.css';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../../common/StandardModal/StandardModal';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../Common/StandardModal/StandardModal';
 import { formatTime } from '../TimerComponents';
 
 const MOODS = [

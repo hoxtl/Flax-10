@@ -1,7 +1,7 @@
 /*
  * useSocietyTags manages tag CRUD for society detail views.
  */
-import * as api from '../../../api/societyApi';
+import * as api from '../../../api/social/societyApi';
 
 const appendTag = (setSociety, tag) =>
     setSociety(prev => ({ ...prev, tags: [...prev.tags, tag] }));

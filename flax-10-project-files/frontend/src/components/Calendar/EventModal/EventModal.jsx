@@ -5,7 +5,7 @@
 import { useEventForm } from './useEventForm';
 import { useTags } from '../../../context/TagContext';
 import { ModalContent } from './components/ModalContent';
-import StandardModal from '../../common/StandardModal/StandardModal';
+import StandardModal from '../../Common/StandardModal/StandardModal';
 import './EventModal.css';
 
 /** Modal for creating or editing a calendar event. */

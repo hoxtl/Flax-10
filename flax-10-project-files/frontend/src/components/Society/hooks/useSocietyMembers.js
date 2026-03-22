@@ -2,7 +2,7 @@
  * useSocietyMembers manages member and collaborator operations for a society.
  */
 import { useState } from 'react';
-import * as api from '../../../api/societyApi';
+import * as api from '../../../api/social/societyApi';
 
 const adjustMemberCount = (setSociety, delta) =>
     setSociety(prev => ({

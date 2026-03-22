@@ -2,7 +2,7 @@
  * Upcoming deadline loading.
  */
 import { useEffect, useState } from 'react';
-import { getUpcomingDeadlines } from '../../../api/deadlineApi';
+import { getUpcomingDeadlines } from '../../../api/calendar/deadlineApi';
 import { useToast } from '../../../context/ToastContext';
 
 export function useUpcomingDeadlines() {

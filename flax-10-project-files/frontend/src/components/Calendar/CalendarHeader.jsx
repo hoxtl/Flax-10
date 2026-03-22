@@ -10,9 +10,9 @@ import {
   formatMonthYear,
   isSameDay,
 } from "./utils/dateUtils";
-import { importTimetable } from "../../api/timetableApi";
+import { importTimetable } from "../../api/calendar/timetableApi";
 import { getDateRangeForView } from "./hooks/calendarHelpers";
-import { getEvents } from "../../api/eventApi";
+import { getEvents } from "../../api/calendar/eventApi";
 import {
   CalendarNav,
   ViewSwitcher,

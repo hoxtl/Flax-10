@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 
 import { APP_ROUTES } from "./lib/routes";
-import { getUserSettings, getUserProfile } from "./api/userApi";
+import { getUserSettings, getUserProfile } from "./api/user/userApi";
 import { CalendarProvider } from "./context/CalendarContext";
 import { TagProvider } from "./context/TagContext";
 import { NotificationProvider } from "./context/NotificationContext";
@@ -364,7 +364,7 @@ function OnboardingWrapper({ onComplete }) {
   );
 }
 
-import ScrollToTop from "./components/common/ScrollToTop/ScrollToTop";
+import ScrollToTop from "./components/Common/ScrollToTop/ScrollToTop";
 
 function AppScreen({ activeNav, setActiveNav, user }) {
   const location = useLocation();

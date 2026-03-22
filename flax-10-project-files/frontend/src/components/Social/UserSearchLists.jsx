@@ -3,8 +3,8 @@
  */
 
 import React from 'react';
-import EmptyState from '../common/EmptyState/EmptyState';
-import SearchBar from '../common/SearchBar/SearchBar';
+import EmptyState from '../Common/EmptyState/EmptyState';
+import SearchBar from '../Common/SearchBar/SearchBar';
 import { CourseResultItem, RoleResultItem, SocietyResultItem, UserResultItem, YearResultItem } from './UserSearchItems';
 import { FILTER_TABS, SEARCH_EMPTY_CONFIG, styles } from './userSearchShared';
 import { getSocietyCategories, matchCat } from './userSearchUtils';

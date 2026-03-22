@@ -3,8 +3,8 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { useTags } from '../../context/TagContext';
 import { useConfirm } from '../../context/ConfirmContext';
 import { useToast } from '../../context/ToastContext';
-import StandardModal from '../common/StandardModal/StandardModal';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
+import StandardModal from '../Common/StandardModal/StandardModal';
+import PrimaryButton from '../Common/PrimaryButton/PrimaryButton';
 import styles from './TagManagerModal.module.css';
 
 const PROTECTED_TAGS = ['other', 'lecture', 'deadline', 'exam', 'societies', 'schedule'];

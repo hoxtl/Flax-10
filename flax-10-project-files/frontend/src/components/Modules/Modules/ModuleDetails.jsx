@@ -5,17 +5,17 @@ import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/m
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
-import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
+import EntityLinkChip from '../../Common/EntityLinkChip/EntityLinkChip.jsx';
+import { getUrgencyTier } from '../../Common/DeadlineCountdown/deadlineCountdownUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
-import BackButton from '../../common/BackButton/BackButton.jsx';
+import BackButton from '../../Common/BackButton/BackButton.jsx';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
 import { useEffect, useState } from 'react';
-import { getHomeAddress } from '../../../api/userApi.js';
+import { getHomeAddress } from '../../../api/user/userApi.js';
 import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {

@@ -3,7 +3,7 @@
  * Displays tag badge with dropdown editor on click.
  */
 import { Pencil } from 'lucide-react';
-import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import AnimatedDropdown from '../../../Common/AnimatedDropdown';
 import styles from './TagEditCell.module.css';
 
 function TagBadge({ name, color }) {

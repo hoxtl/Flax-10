@@ -11,9 +11,9 @@ import ReadingModal from "../../components/Modules/Readings/ReadingModal";
 import QuickAddModal from "../../components/Dashboard/QuickAddModal";
 import { LeaveTimerModal } from "../../components/Timer/TimerPopups";
 import CreateTaskModal from "../../pages/Tasks/components/CreateTaskModal";
-import { createSociety } from "../../api/societyApi";
-import { createTask, fetchTaskLists } from "../../api/taskApi";
-import { getModules, getEnrollments } from "../../api/moduleApi";
+import { createSociety } from "../../api/social/societyApi";
+import { createTask, fetchTaskLists } from "../../api/tasks/taskApi";
+import { getModules, getEnrollments } from "../../api/modules/moduleApi";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
 import { handlePendingAction } from "./dashboardLayoutActions";
 

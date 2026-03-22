@@ -5,7 +5,7 @@ import { useReadingModal } from "../hooks/useReadingModal";
 import ReadingForm from "./ReadingForm";
 import ReadingCard from "./ReadingCard";
 import styles from '../Deadlines/DeadlineModal.module.css';
-import StandardModal from "../../common/StandardModal/StandardModal";
+import StandardModal from "../../Common/StandardModal/StandardModal";
 
 export default function ReadingModal({ module, onClose}) {
     const modal = useReadingModal(module.id);

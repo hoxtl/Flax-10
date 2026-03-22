@@ -4,7 +4,7 @@
  */
 import styles from "./CategorySelector.module.css";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
-import AnimatedDropdown from "../common/AnimatedDropdown";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
 
 const CATEGORY_DROPDOWN_OPTIONS = [
     { value: '', label: 'Select a category' },

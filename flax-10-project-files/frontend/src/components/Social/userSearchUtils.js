@@ -2,7 +2,7 @@
  * Pure helpers for user search state and filtering.
  */
 
-import { searchUsers } from '../../api/userApi';
+import { searchUsers } from '../../api/user/userApi';
 
 export function handleErr(label, error, setter) {
     console.error(label, error);

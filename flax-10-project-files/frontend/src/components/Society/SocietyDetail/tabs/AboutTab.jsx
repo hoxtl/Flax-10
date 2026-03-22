@@ -3,7 +3,7 @@
  * including its biography and administrator contact emails.
  */
 import { useState } from "react";
-import PrimaryButton from "../../../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../Common/PrimaryButton/PrimaryButton";
 import styles from "./tabs.module.css";
 
 const isValidEmail = (email) => {

@@ -12,8 +12,8 @@ import { useTags } from '../../context/TagContext';
 import { useCalendarEvents, useEventActions } from './hooks/useCalendarEvents';
 import { getEventType, hasRecurrence } from './utils/eventUtils';
 import { executeDelete, deleteRecurrenceOccurrence } from './utils/formUtils';
-import { unsyncCalendar } from '../../api/societyApi';
-import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
+import { unsyncCalendar } from '../../api/social/societyApi';
+import HoldConfirmModal from '../Common/HoldConfirmModal/HoldConfirmModal';
 
 /** Main entry point for calendar popups. */
 export function EventPopups() {

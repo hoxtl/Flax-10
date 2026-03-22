@@ -25,7 +25,7 @@ function SuccessEmoji() {
   );
 }
 
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
 
 export default function SuccessScreen({ major, onComplete }) {
   return (

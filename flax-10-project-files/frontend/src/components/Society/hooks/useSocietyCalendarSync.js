@@ -2,7 +2,7 @@
  * useSocietyCalendarSync keeps society calendar sync state in step with the API.
  */
 import { useState, useEffect } from 'react';
-import { getSyncStatus, syncCalendar, unsyncCalendar } from '../../../api/societyApi';
+import { getSyncStatus, syncCalendar, unsyncCalendar } from '../../../api/social/societyApi';
 import { useNotify } from '../../Notifications/hooks/useNotify';
 import { useTags } from '../../../context/TagContext';
 import { useCalendarDispatch } from '../../../context/CalendarContext';

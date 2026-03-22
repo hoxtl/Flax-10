@@ -4,12 +4,12 @@
 import { User, Lock, MapPin, BookOpen, Paintbrush, Moon, Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import styles from "../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../common/AnimatedDropdown";
-import FormField from "../common/FormField/FormField";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
+import FormField from "../Common/FormField/FormField";
 export { FormField };
-import InlineAlert from "../common/InlineAlert/InlineAlert";
-import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
-import TextInput from "../common/TextInput/TextInput";
+import InlineAlert from "../Common/InlineAlert/InlineAlert";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
+import TextInput from "../Common/TextInput/TextInput";
 import { THEME_GROUPS } from "../../context/ThemeConstants";
 
 const TAB_CONFIG = [

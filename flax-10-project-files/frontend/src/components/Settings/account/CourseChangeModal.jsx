@@ -2,12 +2,12 @@
  * Modal for requesting a course change.
  */
 import { useState } from "react";
-import { requestCourseChange } from "../../../api/adminApi";
+import { requestCourseChange } from "../../../api/admin/adminApi";
 import styles from "../../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../../common/AnimatedDropdown/AnimatedDropdown";
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../common/StandardModal/StandardModal";
+import AnimatedDropdown from "../../Common/AnimatedDropdown/AnimatedDropdown";
+import InlineAlert from "../../Common/InlineAlert/InlineAlert";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../Common/StandardModal/StandardModal";
 import { groupedCourses } from "./accountCourseRequests";
 
 function useCourseRequestForm() {

@@ -3,8 +3,8 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useNotifications } from '../../../context/NotificationContext';
-import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/moduleApi.js';
-import { fetchTasks } from '../../../api/taskApi.js';
+import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../../api/modules/moduleApi.js';
+import { fetchTasks } from '../../../api/tasks/taskApi.js';
 import { isEnrolledIn, getEnrollmentId, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { createNotify } from '../utils/notifyHelper.js';
 import { useConfirm } from '../../../context/ConfirmContext.jsx';

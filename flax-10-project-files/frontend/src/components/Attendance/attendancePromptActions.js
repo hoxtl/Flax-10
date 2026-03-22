@@ -2,7 +2,7 @@
  * Attendance prompt actions.
  */
 
-import { recordAttendance } from "../../api/attendanceApi";
+import { recordAttendance } from "../../api/social/attendanceApi";
 import { setPromptedId } from "./attendancePromptStorage";
 
 export function dismissAttendancePrompt(event, setEvent) {

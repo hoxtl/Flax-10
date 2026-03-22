@@ -1,9 +1,9 @@
 /*
  * Presentational teacher-role states and actions.
  */
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import RequestStatusCard from "../../common/RequestStatusCard/RequestStatusCard";
+import InlineAlert from "../../Common/InlineAlert/InlineAlert";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
+import RequestStatusCard from "../../Common/RequestStatusCard/RequestStatusCard";
 import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader } from "../SettingsUI";

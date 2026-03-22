@@ -2,7 +2,7 @@
  * SocietyCardContent renders the informational content inside a society card.
  */
 import styles from './SocietyCard.module.css';
-import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip';
+import EntityLinkChip from '../Common/EntityLinkChip/EntityLinkChip';
 
 export function SocietyCardContent({ society, hasImage, RatifiedBadge }) {
     const content = <CardInfo society={society} RatifiedBadge={RatifiedBadge} />;

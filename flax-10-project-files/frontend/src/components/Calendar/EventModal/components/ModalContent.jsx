@@ -4,7 +4,7 @@
  */
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
-import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
+import ConfirmModal from '../../../Common/ConfirmModal/ConfirmModal';
 
 /** Top-level modal content that selects the appropriate view and stops click propagation. */
 export function ModalContent(props) {

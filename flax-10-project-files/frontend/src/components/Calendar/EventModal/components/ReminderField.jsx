@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import FilterCheckbox from '../../../common/FilterCheckbox/FilterCheckbox';
-import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
+import FilterCheckbox from '../../../Common/FilterCheckbox/FilterCheckbox';
+import PrimaryButton from '../../../Common/PrimaryButton/PrimaryButton';
 import './ReminderField.css';
 const PRESET = [
     { value: 0, label: 'At time of event' }, { value: 5, label: '5 min before' },

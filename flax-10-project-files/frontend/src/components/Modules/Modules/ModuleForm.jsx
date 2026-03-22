@@ -2,13 +2,13 @@
  * Form for creating and editing modules with department and course selection.
  */
 import { useState, useMemo } from 'react';
-import { createModule, updateModule } from '../../../api/moduleApi';
+import { createModule, updateModule } from '../../../api/modules/moduleApi';
 import { serialiseModule } from '../utils/moduleUtils';
 import { validateForm, getFormData, updateForm } from '../utils/moduleHelpers';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
-import AnimatedDropdown from '../../common/AnimatedDropdown/AnimatedDropdown';
+import AnimatedDropdown from '../../Common/AnimatedDropdown/AnimatedDropdown';
 import styles from './ModuleForm.module.css';
-import DateTimePicker from '../../common/inputs/DateTimePicker';
+import DateTimePicker from '../../Common/inputs/DateTimePicker';
 
 function saveModule(is_editing, module, form_data) {
     const data = serialiseModule(form_data);

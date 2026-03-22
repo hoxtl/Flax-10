@@ -4,8 +4,8 @@
 
 import styles from '../../pages/Timer/TimerPage.module.css';
 import historyStyles from './HistoryModal.module.css';
-import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
-import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
+import PrimaryButton from '../Common/PrimaryButton/PrimaryButton';
+import HoldConfirmModal from '../Common/HoldConfirmModal/HoldConfirmModal';
 import { HistoryRailSection } from './historyPanel/HistoryRailSection';
 import { WeeklyChart } from './historyPanel/WeeklyChart';
 import { clearRightRailHistory, useRightRailHistory } from './historyPanel/useRightRailHistory';

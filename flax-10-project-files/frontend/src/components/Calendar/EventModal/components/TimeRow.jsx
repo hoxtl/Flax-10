@@ -1,5 +1,5 @@
-import DateTimePicker from '../../../common/inputs/DateTimePicker';
-import AnimatedDropdown from '../../../common/AnimatedDropdown';
+import DateTimePicker from '../../../Common/inputs/DateTimePicker';
+import AnimatedDropdown from '../../../Common/AnimatedDropdown';
 import { getDisplayValue, handleToggle, handleDatePickerChange, handleDateOnlyPickerChange } from './timeRowHelpers';
 import './TimeRow.css';
 

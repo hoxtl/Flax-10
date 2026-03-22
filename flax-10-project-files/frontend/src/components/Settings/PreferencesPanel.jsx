@@ -2,10 +2,10 @@
  * Preferences panel for appearance, sleep, and scheduling settings.
  */
 import { useEffect, useState } from "react";
-import { getUserSettings } from "../../api/userApi";
+import { getUserSettings } from "../../api/user/userApi";
 import { useTheme } from "../../context/ThemeContext";
-import AnimatedDropdown from "../common/AnimatedDropdown";
-import SectionSkeleton from "../common/LoadingState/SectionSkeleton";
+import AnimatedDropdown from "../Common/AnimatedDropdown";
+import SectionSkeleton from "../Common/LoadingState/SectionSkeleton";
 import styles from "../../pages/Settings/Settings.module.css";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 import SettingsContextCard from "./SettingsContextCard";

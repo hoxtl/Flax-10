@@ -12,7 +12,7 @@ import { WeekView } from "./WeekView/WeekView";
 import { SwipeMonthView } from "./MonthView/SwipeMonthView";
 import { ListView } from "./ListView/ListView";
 import { TableView } from "./TableView/TableView";
-import { viewSwapMotion } from "../common";
+import { viewSwapMotion } from "../Common";
 import "./Calendar.css";
 
 const MOTION_STYLE = { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 };

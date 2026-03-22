@@ -12,23 +12,23 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DatePickerButton } from "./DatePickerButton";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import { SegmentedControl } from "../../common/SegmentedControl/SegmentedControl";
-import MultiSelectDropdown from "../../ui/MultiSelectDropdown";
-import AnimatedDropdown from "../../common/AnimatedDropdown";
-import SearchBar from "../../common/SearchBar/SearchBar";
-import { TagsSelector } from "../../common/TagsSelector/TagsSelector";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
+import { SegmentedControl } from "../../Common/SegmentedControl/SegmentedControl";
+import MultiSelectDropdown from "../../UI/MultiSelectDropdown";
+import AnimatedDropdown from "../../Common/AnimatedDropdown";
+import SearchBar from "../../Common/SearchBar/SearchBar";
+import { TagsSelector } from "../../Common/TagsSelector/TagsSelector";
 import styles from "./CalendarHeaderUtils.module.css";
 
 import {
   deleteSchedule,
   getSchedules,
   renameSchedule,
-} from "../../../api/scheduleApi";
+} from "../../../api/calendar/scheduleApi";
 import { useToast } from "../../../context/ToastContext";
-import StandardModal from "../../common/StandardModal/StandardModal";
-import HoldConfirmModal from "../../common/HoldConfirmModal/HoldConfirmModal";
-import TextInput from "../../common/TextInput/TextInput";
+import StandardModal from "../../Common/StandardModal/StandardModal";
+import HoldConfirmModal from "../../Common/HoldConfirmModal/HoldConfirmModal";
+import TextInput from "../../Common/TextInput/TextInput";
 import { useTags } from "../../../context/TagContext";
 import TagManagerModal from "../../Tags/TagManagerModal";
 

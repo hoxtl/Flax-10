@@ -2,11 +2,11 @@
  * Modal for teacher-role applications.
  */
 import { useState } from "react";
-import { requestTeacherRole } from "../../../api/adminApi";
+import { requestTeacherRole } from "../../../api/admin/adminApi";
 import styles from "../../../pages/Settings/Settings.module.css";
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import StandardModal from "../../common/StandardModal/StandardModal";
+import InlineAlert from "../../Common/InlineAlert/InlineAlert";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../Common/StandardModal/StandardModal";
 
 function useTeacherApplicationForm() {
   const [reason, setReason] = useState("");

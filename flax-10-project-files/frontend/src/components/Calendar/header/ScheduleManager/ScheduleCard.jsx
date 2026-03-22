@@ -1,5 +1,5 @@
-import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
-import TextInput from '../../../common/TextInput/TextInput';
+import PrimaryButton from '../../../Common/PrimaryButton/PrimaryButton';
+import TextInput from '../../../Common/TextInput/TextInput';
 import styles from '../CalendarHeaderUtils.module.css';
 function ScheduleInfo({ isEditing, renameDraft, onRenameDraftChange, schedule }) {
     return (

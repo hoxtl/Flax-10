@@ -1,4 +1,4 @@
-import SkeletonBlock from '../common/LoadingState/SkeletonBlock';
+import SkeletonBlock from '../Common/LoadingState/SkeletonBlock';
 import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
 import sidebarStyles from '../../pages/CampusMap/sidebar.module.css';
 const styles = { ...baseStyles, ...sidebarStyles };

@@ -2,7 +2,7 @@
  * Hook for handling module disenrolment with notifications.
  */
 import { useNotifications } from '../../../context/NotificationContext';
-import { disenrolByModuleId } from '../../../api/moduleApi';
+import { disenrolByModuleId } from '../../../api/modules/moduleApi';
 import { createNotify } from '../utils/notifyHelper';
 
 function handleSuccess(onSuccess, notify) {

@@ -1,4 +1,4 @@
-import PrimaryButton from '../../../common/PrimaryButton/PrimaryButton';
+import PrimaryButton from '../../../Common/PrimaryButton/PrimaryButton';
 
 export function ActionButtons({ onDelete }) {
     return (

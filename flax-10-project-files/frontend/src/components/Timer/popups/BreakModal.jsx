@@ -4,8 +4,8 @@
 
 import { useMemo, useState } from 'react';
 import styles from '../../../pages/Timer/TimerPage.module.css';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../../common/StandardModal/StandardModal';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../Common/StandardModal/StandardModal';
 
 const BREAK_SUGGESTIONS = [
   'Stand up and stretch for 2 minutes',

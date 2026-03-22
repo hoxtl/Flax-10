@@ -3,9 +3,9 @@
  * Captures reasoning and submits to the backend.
  */
 import { useState } from "react";
-import StandardModal from "../../common/StandardModal/StandardModal";
+import StandardModal from "../../Common/StandardModal/StandardModal";
 import styles from "./ReportSocietyModal.module.css";
-import { reportSociety } from "../../../api/societyApi";
+import { reportSociety } from "../../../api/social/societyApi";
 
 /** Form for reporting a society with a specific reason. */
 const FormContent = ({ reason, onTextChange, error, submitting }) => (

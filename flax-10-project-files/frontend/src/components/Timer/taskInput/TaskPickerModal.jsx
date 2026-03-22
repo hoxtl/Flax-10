@@ -3,12 +3,12 @@
  */
 
 import styles from '../../../pages/Timer/TimerPage.module.css';
-import SearchBar from '../../common/SearchBar/SearchBar';
-import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
-import SkeletonBlock from '../../common/LoadingState/SkeletonBlock';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import StandardModal from '../../common/StandardModal/StandardModal';
-import AnimatedDropdown from '../../common/AnimatedDropdown';
+import SearchBar from '../../Common/SearchBar/SearchBar';
+import SearchEmptyState from '../../Common/SearchEmptyState/SearchEmptyState';
+import SkeletonBlock from '../../Common/LoadingState/SkeletonBlock';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
+import StandardModal from '../../Common/StandardModal/StandardModal';
+import AnimatedDropdown from '../../Common/AnimatedDropdown';
 import TaskFeedFilterPanel from '../../../pages/Tasks/components/TaskFeedFilterPanel';
 import { SORT_OPTIONS } from './taskInputConstants';
 import { TaskPickItem } from './TaskPickItem';

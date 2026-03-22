@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
-import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+import ConfirmModal from '../../Common/ConfirmModal/ConfirmModal';
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {

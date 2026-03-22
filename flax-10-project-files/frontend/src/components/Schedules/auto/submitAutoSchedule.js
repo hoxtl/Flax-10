@@ -1,7 +1,7 @@
 /*
  * Auto schedule submission.
  */
-import { createSchedule } from '../../../api/scheduleApi';
+import { createSchedule } from '../../../api/calendar/scheduleApi';
 import { buildAutoSchedulePayload, getAutoScheduleError } from './autoScheduleUtils';
 
 export async function submitAutoSchedule({ title, deadlines, showToast, onDone }) {

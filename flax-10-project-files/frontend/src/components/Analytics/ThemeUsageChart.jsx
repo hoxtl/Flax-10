@@ -1,5 +1,5 @@
 import { PieChart } from "@mui/x-charts/PieChart";
-import EmptyState from "../common/EmptyState/EmptyState";
+import EmptyState from "../Common/EmptyState/EmptyState";
 
 const LIGHT_COLOR = "#FFD54F";
 const DARK_COLOR = "#5C6BC0";

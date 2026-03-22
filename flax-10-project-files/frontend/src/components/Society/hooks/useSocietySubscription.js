@@ -1,7 +1,7 @@
 /*
  * useSocietySubscription toggles notification subscriptions for a society.
  */
-import { toggleSubscription as apiToggle } from "../../../api/societyApi";
+import { toggleSubscription as apiToggle } from "../../../api/social/societyApi";
 import { useConfirm } from "../../../context/ConfirmContext";
 
 const confirmUnsub = async (confirm, name) => {

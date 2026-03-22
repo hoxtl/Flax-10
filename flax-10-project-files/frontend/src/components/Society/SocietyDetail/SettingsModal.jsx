@@ -6,9 +6,9 @@ import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
 import CollaboratorList from "../CollaboratorList";
-import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
-import SectionHeader from "../../common/SectionHeader/SectionHeader";
-import StandardModal from "../../common/StandardModal/StandardModal";
+import PrimaryButton from "../../Common/PrimaryButton/PrimaryButton";
+import SectionHeader from "../../Common/SectionHeader/SectionHeader";
+import StandardModal from "../../Common/StandardModal/StandardModal";
 import { RatificationSection } from "./RatificationSection";
 import { useConfirm } from "../../../context/ConfirmContext";
 

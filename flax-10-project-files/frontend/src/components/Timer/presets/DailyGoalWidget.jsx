@@ -44,7 +44,7 @@ function GoalEditor(props) {
 }
 
 function loadStudiedHours(setStudiedHours) {
-  import('../../../api/analyticsApi').then((module) => {
+  import('../../../api/analytics/analyticsApi').then((module) => {
     module.default.getSummary(1).then((result) => setStudiedHours(result?.summary?.total_study_hours ?? 0)).catch(() => setStudiedHours(0));
   });
 }

@@ -2,7 +2,7 @@
  * SocietyCard composes the interactive shell for a society browse card.
  */
 import styles from './SocietyCard.module.css';
-import GridCard from '../common/Card/GridCard';
+import GridCard from '../Common/Card/GridCard';
 import { Flag, BadgeCheck } from "lucide-react";
 import { SocietyCardContent } from "./SocietyCardContent";
 

@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useNotifications } from '../../context/NotificationContext';
 import { playNotificationSound } from './utils/notificationSound';
 import { executeNotificationAction, parseNotificationAction, hasNotificationAction } from './utils/notificationAction';
-import AppToast from '../common/AppToast/AppToast';
+import AppToast from '../Common/AppToast/AppToast';
 
 export function NotificationToast() {
     const { notifications, loading } = useNotifications();

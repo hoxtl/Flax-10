@@ -1,7 +1,7 @@
 /*
  * Schedule-tagged event loading.
  */
-import { getEvents } from '../../../api/eventApi';
+import { getEvents } from '../../../api/calendar/eventApi';
 
 export async function loadScheduleTaggedEvents(setEvents, setSelected, showToast) {
   try {

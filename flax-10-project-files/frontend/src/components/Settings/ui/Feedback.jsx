@@ -1,7 +1,7 @@
 /*
  * Lightweight feedback components for settings forms.
  */
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
+import InlineAlert from "../../Common/InlineAlert/InlineAlert";
 
 export function SuccessBanner({ message }) {
   return <InlineAlert message={message} variant="success" />;

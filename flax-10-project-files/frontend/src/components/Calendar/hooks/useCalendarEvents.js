@@ -4,7 +4,7 @@
  */
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
-import { getEvents, createEvent, updateEvent, deleteEvent, addExceptionDate } from '../../../api/eventApi';
+import { getEvents, createEvent, updateEvent, deleteEvent, addExceptionDate } from '../../../api/calendar/eventApi';
 import { getDateRangeForView } from './calendarHelpers';
 
 function getDateKey(date, viewMode) {

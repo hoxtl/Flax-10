@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import styles from '../Deadlines/DeadlineCard.module.css';
 import {formatDate} from '../../Calendar/utils/dateUtils';
-import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+import ConfirmModal from '../../Common/ConfirmModal/ConfirmModal';
 
 function ReadingCardHeader({ reading }) {
     return (

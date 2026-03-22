@@ -1,7 +1,7 @@
 /*
  * Presentational account form layout.
  */
-import InlineAlert from "../../common/InlineAlert/InlineAlert";
+import InlineAlert from "../../Common/InlineAlert/InlineAlert";
 import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
 import { SectionHeader, SubmitButton } from "../SettingsUI";

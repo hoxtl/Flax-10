@@ -1,5 +1,5 @@
 import styles from '../../pages/CampusMap/CampusMap.module.css';
-import PageHeader from '../../components/common/PageHeader/PageHeader';
+import PageHeader from '../../components/Common/PageHeader/PageHeader';
 
 export function SidebarHeader() {
   return (

@@ -1,5 +1,5 @@
 import * as Components from "./AuthComponents";
-import PasswordStrength from "../common/PasswordStrength";
+import PasswordStrength from "../Common/PasswordStrength";
 
 function NameRow({ formData, updateField, loading }) {
   return (

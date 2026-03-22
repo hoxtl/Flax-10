@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import analyticsService from '../../../api/analyticsApi';
+import analyticsService from '../../../api/analytics/analyticsApi';
 import { getNearestMilestone } from '../utils/milestoneUtils';
 
 function loadGoalHours() {

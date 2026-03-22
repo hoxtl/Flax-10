@@ -1,7 +1,7 @@
 /*
  * Account-form actions for save, request success, and cancellation.
  */
-import { cancelCourseChangeRequest, getMyCourseChangeRequest } from "../../../api/adminApi";
+import { cancelCourseChangeRequest, getMyCourseChangeRequest } from "../../../api/admin/adminApi";
 import {
   clearCachedPendingRequest,
   normaliseCourseRequest,

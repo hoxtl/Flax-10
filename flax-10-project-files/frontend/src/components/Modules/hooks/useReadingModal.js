@@ -2,7 +2,7 @@
  * Hook for managing reading modal state and CRUD operations.
  */
 import { useState, useEffect, useCallback } from 'react';
-import { getReadings, createReading, updateReading, deleteReading } from '../../../api/readingApi';
+import { getReadings, createReading, updateReading, deleteReading } from '../../../api/tasks/readingApi';
 
 function useReadingList(moduleId) {
     const [readings, setReadings] = useState([]);

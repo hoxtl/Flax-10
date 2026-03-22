@@ -1,7 +1,7 @@
 /*
  * useSocietyAnnouncements manages announcement CRUD for a society.
  */
-import * as api from '../../../api/societyApi';
+import * as api from '../../../api/social/societyApi';
 
 /** Helper to update local society state when an announcement's linked event changes. */
 const updateAnnEventState = (setSociety, annId, eventId) => {

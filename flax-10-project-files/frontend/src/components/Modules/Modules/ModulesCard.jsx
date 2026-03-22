@@ -4,9 +4,9 @@
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
-import GridCard from '../../common/Card/GridCard';
-import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
-import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import GridCard from '../../Common/Card/GridCard';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton';
+import EntityLinkChip from '../../Common/EntityLinkChip/EntityLinkChip.jsx';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {

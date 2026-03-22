@@ -2,7 +2,7 @@
  * Shared form controls for settings inputs and selects.
  */
 import styles from "../../../pages/Settings/Settings.module.css";
-import AnimatedDropdown from "../../common/AnimatedDropdown";
+import AnimatedDropdown from "../../Common/AnimatedDropdown";
 import FormTextInput from "./FormTextInput";
 
 function RemainingCount({ remaining }) {

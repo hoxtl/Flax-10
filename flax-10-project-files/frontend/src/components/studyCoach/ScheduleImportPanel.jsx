@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { CalendarPlus, Check } from "lucide-react";
-import { createEvent } from "../../api/eventApi";
+import { createEvent } from "../../api/calendar/eventApi";
 import { useCalendarDispatch } from "../../context/CalendarContext";
 import {
   formatEventTime,
