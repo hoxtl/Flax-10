@@ -31,3 +31,15 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertEqual(data['location_latitude'], 51.5118)
         self.assertEqual(data['location_longitude'], -0.1161)
         self.assertTrue(data['location_validated'])
+
+    def test_null_location_coordinates(self):
+        """Test with null coordinates."""
+        event = CalendarEvent.objects.create(
+            user=self.user, title='Event',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1)
+        )
+        data = CalendarEventSerialiser(instance=event).data
+        
+        self.assertIsNone(data['location_latitude'])
+        self.assertIsNone(data['location_longitude'])
+        self.assertFalse(data['location_validated'])
