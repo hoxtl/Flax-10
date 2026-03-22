@@ -53,6 +53,7 @@ function HomepageDashboardRow(props) {
         slot1TodayTasks={<HomepageTaskSlot {...props} />}
         slot3Urgent={<HomepageDeadlines {...props} />}
         slot5Data={getSlot5Data(props)}
+        timelineProps={getTimelineProps(props)}
         slot6Timeline={<HomepageTimeline {...props} />}
       />
     </div>

@@ -8,6 +8,7 @@ import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceRow.module.css";
 import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";
+import { HomepageTimelineSection } from "./HomepageTimelineSection";
 import SemesterOverviewWidget from "./SemesterOverviewWidget";
 import StudyStreakWidget from "./StudyStreakWidget";
 import WeeklyGoalWidget from "./WeeklyGoalWidget";
@@ -62,6 +63,9 @@ function renderTinyTimeline(props, size) {
 }
 
 function renderBigTimeline(props, size) {
+  if (props.timelineProps) {
+    return <HomepageTimelineSection {...props.timelineProps} row={size.row} isWidget />;
+  }
   return cloneSlot(props.slot6Timeline, size.row, { isWidget: true });
 }
 
