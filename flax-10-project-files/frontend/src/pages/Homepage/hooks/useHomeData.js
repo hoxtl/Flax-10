@@ -12,11 +12,7 @@ export function useHomeData(selectedDate) {
   const { events, allEvents } = useCalendar();
   const [allTasks, setAllTasks, tasksLoading, refetchTasks] = useHomepageTasks();
   const [fallbackDayEvents, eventsLoading] = useHomepageDayEvents(selectedDate);
-  const dayEvents = useMemo(() => {
-    const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
-    const source = Array.isArray(primary) && primary.length > 0 ? primary : fallbackDayEvents || [];
-    return source.filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), selectedDate));
-  }, [allEvents, events, fallbackDayEvents, selectedDate]);
+  const dayEvents = useMemo(() => getDayEvents(allEvents, events, fallbackDayEvents, selectedDate), [allEvents, events, fallbackDayEvents, selectedDate]);
   const dayTasks = useMemo(() => getDayTasks(allTasks, selectedDate), [allTasks, selectedDate]);
   const removePendingTask = useCallback((id) => setAllTasks((prev) => prev.filter((task) => task.id !== id)), []);
 
@@ -28,6 +24,12 @@ export function useHomeData(selectedDate) {
     refetchTasks,
     loading: tasksLoading || eventsLoading,
   };
+}
+
+function getDayEvents(allEvents, events, fallbackDayEvents, selectedDate) {
+  const primary = Array.isArray(allEvents) && allEvents.length > 0 ? allEvents : events;
+  const source = Array.isArray(primary) && primary.length > 0 ? primary : fallbackDayEvents || [];
+  return source.filter((event) => overlapsDay(new Date(event.start_time), new Date(event.end_time || event.start_time), selectedDate));
 }
 
 function useHomepageTasks() {
