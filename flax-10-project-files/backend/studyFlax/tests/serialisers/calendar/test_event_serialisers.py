@@ -1,3 +1,6 @@
+"""
+Tests for calendar event serializers with location fields.
+"""
 import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -10,6 +13,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 User = get_user_model()
+
 
 class CalendarEventSerialiserTests(TestCase):
     """Test CalendarEventSerialiser."""
@@ -58,6 +62,7 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertIn('module_name', data)
         self.assertIn('module_code', data)
 
+
 class CalendarEventCreateSerialiserTests(TestCase):
     """Test CalendarEventCreateSerialiser."""
 
@@ -84,7 +89,9 @@ class CalendarEventCreateSerialiserTests(TestCase):
     def test_create_without_coordinates(self):
         """Test coordinates default to None."""
         data = {'title': 'Event', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1)}
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         
         self.assertIsNone(event.location_latitude)
         self.assertFalse(event.location_validated)
@@ -92,13 +99,17 @@ class CalendarEventCreateSerialiserTests(TestCase):
     def test_resolve_tag_by_id(self):
         """Test _resolve_tag with ID."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': str(self.tag.id)}
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         self.assertEqual(event.tag.id, self.tag.id)
 
     def test_resolve_tag_by_name_creates_new(self):
         """Test _resolve_tag creates tag from name."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': 'NewTag'}
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         self.assertEqual(event.tag.name, 'NewTag')
         self.assertTrue(event.tag.is_default)
 
@@ -106,7 +117,9 @@ class CalendarEventCreateSerialiserTests(TestCase):
         """Test _resolve_tag with None/empty."""
         for tag_val in [None, '']:
             data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': tag_val}
-            event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+            serializer = CalendarEventCreateSerialiser(data=data)
+            self.assertTrue(serializer.is_valid())
+            event = serializer.save(user=self.user)
             self.assertIsNone(event.tag)
 
     def test_create_with_recurrence_dict(self):
@@ -115,25 +128,37 @@ class CalendarEventCreateSerialiserTests(TestCase):
             'title': 'Recurring', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1),
             'recurrence_rule': {'frequency': 'WEEKLY', 'interval': 1, 'count': 10}
         }
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         
         self.assertIsNotNone(event.recurrence_rule)
         self.assertEqual(event.recurrence_rule.frequency, 'WEEKLY')
 
+    def test_create_with_recurrence_json_string(self):
+        recurrence_json = json.dumps({'frequency': 'DAILY', 'interval': 2})
+        data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': recurrence_json}
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
+        
+        self.assertEqual(event.recurrence_rule.frequency, 'DAILY')
+
     def test_invalid_json_recurrence(self):
-        """Test _parse_recurrence_input with invalid JSON."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': 'bad-json{'}
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         self.assertIsNone(event.recurrence_rule)
 
     def test_null_recurrence(self):
-        """Test null recurrence."""
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': None}
-        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        serializer = CalendarEventCreateSerialiser(data=data)
+        self.assertTrue(serializer.is_valid())
+        event = serializer.save(user=self.user)
         self.assertIsNone(event.recurrence_rule)
 
     def test_update_location(self):
-        """Test updating location coordinates."""
         event = CalendarEvent.objects.create(
             user=self.user, title='Old', start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1)
         )
@@ -142,13 +167,13 @@ class CalendarEventCreateSerialiserTests(TestCase):
             'location_latitude': 52.0, 'location_longitude': -1.0, 'location_validated': True
         }
         serializer = CalendarEventCreateSerialiser(instance=event, data=update_data)
+        self.assertTrue(serializer.is_valid())
         updated = serializer.save()
         
         self.assertEqual(updated.location_latitude, 52.0)
         self.assertTrue(updated.location_validated)
 
     def test_update_recurrence(self):
-        """Test _update_existing_rule."""
         recurrence = RecurrenceRule.objects.create(frequency='WEEKLY', interval=1)
         event = CalendarEvent.objects.create(
             user=self.user, title='E', start_time=timezone.now(),
@@ -158,12 +183,13 @@ class CalendarEventCreateSerialiserTests(TestCase):
             'title': 'E', 'start_time': event.start_time, 'end_time': event.end_time,
             'recurrence_rule': {'frequency': 'DAILY', 'interval': 3}
         }
-        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        serializer = CalendarEventCreateSerialiser(instance=event, data=update_data)
+        self.assertTrue(serializer.is_valid())
+        updated = serializer.save()
         
         self.assertEqual(updated.recurrence_rule.frequency, 'DAILY')
 
     def test_delete_recurrence(self):
-        """Test _delete_existing_rule."""
         recurrence = RecurrenceRule.objects.create(frequency='WEEKLY', interval=1)
         event = CalendarEvent.objects.create(
             user=self.user, title='E', start_time=timezone.now(),
@@ -175,13 +201,14 @@ class CalendarEventCreateSerialiserTests(TestCase):
             'title': 'E', 'start_time': event.start_time,
             'end_time': event.end_time, 'recurrence_rule': None
         }
-        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        serializer = CalendarEventCreateSerialiser(instance=event, data=update_data)
+        self.assertTrue(serializer.is_valid())
+        updated = serializer.save()
         
         self.assertIsNone(updated.recurrence_rule)
         self.assertFalse(RecurrenceRule.objects.filter(id=recurrence_id).exists())
 
     def test_update_tag(self):
-        """Test updating tag."""
         event = CalendarEvent.objects.create(
             user=self.user, title='E', start_time=timezone.now(),
             end_time=timezone.now() + timedelta(hours=1), tag=self.tag
@@ -189,6 +216,8 @@ class CalendarEventCreateSerialiserTests(TestCase):
         new_tag = Tag.objects.create(user=self.user, name='New', color='#00FF00')
         
         update_data = {'title': 'E', 'start_time': event.start_time, 'end_time': event.end_time, 'tag': str(new_tag.id)}
-        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        serializer = CalendarEventCreateSerialiser(instance=event, data=update_data)
+        self.assertTrue(serializer.is_valid())
+        updated = serializer.save()
         
         self.assertEqual(updated.tag.id, new_tag.id)
