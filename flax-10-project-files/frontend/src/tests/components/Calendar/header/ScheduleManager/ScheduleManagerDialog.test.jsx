@@ -76,5 +76,36 @@ describe('ScheduleManagerDialog', () => {
         });
     });
 
+    it('shows empty state with Auto Schedule button', async () => {
+        getSchedules.mockResolvedValue([]);
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
 
+        await waitFor(() => {
+            expect(screen.getByText('⚙️ Auto Schedule')).toBeTruthy();
+        });
+    });
+
+    it('handles fetch error', async () => {
+        getSchedules.mockRejectedValue(new Error('Fetch failed'));
+        render(<ScheduleManagerDialog open={true} onClose={vi.fn()} />);
+
+        await waitFor(() => {
+            expect(mockToast).toHaveBeenCalledWith('Fetch failed', { variant: 'error' });
+        });
+    });
+
+    it('opens quick-add on Auto Schedule click', async () => {
+        getSchedules.mockResolvedValue([]);
+        const onClose = vi.fn();
+        const listener = vi.fn();
+        window.addEventListener('quick-add:open', listener);
+
+        render(<ScheduleManagerDialog open={true} onClose={onClose} />);
+
+        await waitFor(() => fireEvent.click(screen.getByText('⚙️ Auto Schedule')));
+
+        expect(listener).toHaveBeenCalled();
+        expect(onClose).toHaveBeenCalled();
+        window.removeEventListener('quick-add:open', listener);
+    });
 });
