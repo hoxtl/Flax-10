@@ -35,7 +35,7 @@
   color: #3e3328;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 580px) {
   .timelineCalendarTextFull {
     display: none;
   }
@@ -45,13 +45,50 @@
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 420px) {
   .timelineCalendarTextMedium {
     display: none;
   }
 
   .timelineCalendarTextShort {
     display: inline;
+  }
+}
+
+@media (max-width: 767px) {
+  .timelineHeaderActionLink {
+    font-size: 11px;
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 767px) {
+  .timelineHeader {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .timelineHeaderLeft {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .timelineHeaderRight {
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .timelineHeaderActionLink {
+    align-self: flex-start;
+  }
+
+  .scheduleActionGroup,
+  .replanActionBtn {
+    display: none !important;
   }
 }
 

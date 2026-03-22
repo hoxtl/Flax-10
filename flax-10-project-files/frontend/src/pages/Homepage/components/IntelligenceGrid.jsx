@@ -182,7 +182,6 @@ export default function IntelligenceGrid({
   showAdd,
   setShowAdd,
   onRandomize,
-  renderAfterHero,
 }) {
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
@@ -223,15 +222,17 @@ export default function IntelligenceGrid({
     });
   };
 
+  const handleToggleEdit = () => {
+    setEdit(!edit);
+    if (edit) setShowAdd(false);
+  };
+
   return (
     <div className={styles.gridContainer}>
       {/* Floating Edit Button positioned top-right relative to the grid area */}
       <div className={styles.gridActions}>
         <button
-          onClick={() => {
-            setEdit(!edit);
-            if (edit) setShowAdd(false);
-          }}
+          onClick={handleToggleEdit}
           className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
           title={edit ? "Done" : "Edit Layout"}
           aria-label={edit ? "Done editing layout" : "Edit dashboard layout"}
@@ -301,11 +302,38 @@ export default function IntelligenceGrid({
             );
           })()}
 
-        {renderAfterHero && (
-          <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
-            {renderAfterHero()}
+        <div className={styles.afterHeroBar} style={{ gridColumn: "1 / -1" }}>
+          <div className={styles.mobileActionsBar}>
+            <button
+              onClick={handleToggleEdit}
+              className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
+              title={edit ? "Done" : "Edit Layout"}
+              aria-label={
+                edit ? "Done editing layout" : "Edit dashboard layout"
+              }
+            >
+              {edit ? <Check size={26} /> : <Pencil size={24} />}
+            </button>
+            {edit && (
+              <>
+                <button
+                  onClick={onRandomize}
+                  className={styles.iconActionBtn}
+                  title="Shuffle Layout"
+                >
+                  <Shuffle size={16} />
+                </button>
+                <button
+                  onClick={onReset}
+                  className={styles.iconActionBtn}
+                  title="Reset Layout"
+                >
+                  <RotateCcw size={16} />
+                </button>
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         {layout
           .filter((id) => id !== "hero")

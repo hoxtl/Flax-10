@@ -390,3 +390,49 @@
     display: none;
   }
 }
+
+@media (max-width: 767px) {
+  .planTimelineGapShortWindow {
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 4px;
+    padding: 6px 8px;
+  }
+
+  .planTimelineGapMain {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .planTimelineGapActions {
+    width: 100%;
+    justify-content: center;
+    padding-left: 0;
+    margin-top: 0;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 620px) {
+  .planTimelineGapActions .planTimelineGapTaskMeta {
+    display: none;
+  }
+
+  .planTimelineGapShortDur {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .planTimelineGapLeadDot,
+  .planTimelineGapFreeWord {
+    display: none;
+  }
+}
+
+@media (max-width: 460px) {
+  .planTimelineGapActions .planTimelineGapStartBtnSm {
+    display: none;
+  }
+}

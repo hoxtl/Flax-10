@@ -114,6 +114,10 @@
   margin-bottom: 2px;
 }
 
+.mobileActionsBar {
+  display: none;
+}
+
 .delBtn {
   position: absolute;
   top: -8px;
@@ -439,6 +443,18 @@
 @media (max-width: 767px) {
   .gridActions {
     display: none;
+  }
+
+  .afterHeroBar {
+    justify-content: center;
+    margin: 12px 0;
+  }
+
+  .mobileActionsBar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .widgetWrapper .resizeControls {

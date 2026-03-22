@@ -834,28 +834,6 @@ export default function IntelligenceRow({
         widgetRenderer={renderWidget}
         showAdd={showAdd}
         setShowAdd={setShowAdd}
-        renderAfterHero={() => (
-          <div className={`${styles.editBar} ${styles.mobileEditBar}`}>
-            {edit && (
-              <button
-                onClick={handleReset}
-                className={styles.editBtn}
-                style={{ marginRight: 8 }}
-              >
-                ↺ Reset Layout
-              </button>
-            )}
-            <button
-              onClick={() => {
-                setEdit(!edit);
-                if (edit) setShowAdd(false);
-              }}
-              className={`${styles.editBtn} ${edit ? styles.editBtnActive : ""}`}
-            >
-              {edit ? "✓ Done" : "✏️ Edit Layout"}
-            </button>
-          </div>
-        )}
       />
       {showResetConfirm && (
         <ConfirmModal

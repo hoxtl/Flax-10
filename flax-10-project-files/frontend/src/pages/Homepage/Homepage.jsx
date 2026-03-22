@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Calendar as CalendarIcon, MapPin, X } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useNavigate, Link } from "react-router-dom";
 
 import {
@@ -55,11 +54,11 @@ import {
   isRoutineOrEventTask,
 } from "./utils/index";
 import { useHomeData } from "./hooks/useHomeData";
-import { MiniTimeline } from "./components";
 import { TaskWidgetSlot } from "./components/TaskWidgetSlot";
 import taskWidgetStyles from "./styles/TaskWidget.module.css";
 import { PlanReadDetailModal } from "./components/PlanReadDetailModal";
 import { DeadlinesWidget } from "./components/DeadlinesWidget";
+import { HomepageTimelineSection } from "./components/HomepageTimelineSection";
 import {
   ModulePill,
   TypePill,
@@ -183,6 +182,8 @@ export default function Homepage({
   const taskWidgetRef = useRef(null);
   const [selectedDeadline, setSelectedDeadline] = useState(null);
   const [selectedModulePill, setSelectedModulePill] = useState(null); // { code, id, name? }
+  const [completedEventIds, setCompletedEventIds] = useState(new Set());
+  const [replanLoading, setReplanLoading] = useState(false);
 
   useEffect(
     () => () => {
@@ -723,6 +724,97 @@ export default function Homepage({
       .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
   }, [tasksDueToday, getTag, now]);
 
+  const handleReplanDay = useCallback(async () => {
+    const missed = (missedItems || []).filter((item) => !isRoutineEvent(item));
+    const overdue = overdueTasksForNow || [];
+
+    if (!missed.length && !overdue.length) {
+      showToast("Nothing to re-plan.");
+      return;
+    }
+
+    const windows = getAllFreeWindowsToday(sortedEvents, selectedDate);
+    if (!windows.length) {
+      showToast("No free windows left today.");
+      return;
+    }
+
+    setReplanLoading(true);
+    try {
+      const winCopies = windows.map((w) => ({
+        start: new Date(w.start),
+        end: new Date(w.end),
+        minutes: w.minutes,
+      }));
+      let assignedCount = 0;
+
+      for (const item of [...missed].sort(
+        (a, b) => new Date(a.start_time) - new Date(b.start_time),
+      )) {
+        const start = new Date(item.start_time);
+        const end = item.end_time
+          ? new Date(item.end_time)
+          : new Date(start.getTime() + 25 * 60000);
+        const durationMins = Math.max(
+          25,
+          Math.round((end - start) / 60000) || 25,
+        );
+        const win = winCopies.find((w) => w.minutes >= durationMins);
+        if (!win) continue;
+
+        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
+        await editEvent(extractBaseEventId(item.id), {
+          start_time: win.start.toISOString(),
+          end_time: slotEnd.toISOString(),
+        });
+
+        win.start = slotEnd;
+        win.minutes -= durationMins;
+        assignedCount += 1;
+      }
+
+      for (const task of overdue) {
+        const durationMins = (task.estimated_blocks || 1) * 25;
+        const win = winCopies.find((w) => w.minutes >= durationMins);
+        if (!win) continue;
+
+        const slotEnd = new Date(win.start.getTime() + durationMins * 60000);
+        await addEvent({
+          title: task.title,
+          description: task.description || "",
+          start_time: win.start.toISOString(),
+          end_time: slotEnd.toISOString(),
+        });
+
+        win.start = slotEnd;
+        win.minutes -= durationMins;
+        assignedCount += 1;
+      }
+
+      await loadEvents();
+      refetchTasks();
+      showToast(
+        assignedCount > 0
+          ? `Re-planned ${assignedCount} items.`
+          : "No items fit.",
+      );
+    } catch {
+      showToast("Couldn't re-plan.");
+    } finally {
+      setReplanLoading(false);
+    }
+  }, [
+    missedItems,
+    overdueTasksForNow,
+    sortedEvents,
+    selectedDate,
+    showToast,
+    editEvent,
+    addEvent,
+    loadEvents,
+    refetchTasks,
+  ]);
+
   /** task-only. Include ONLY due-today tasks. Overdue tasks are shown on the 'Overdue' page. */
   const taskWidgetList = useMemo(() => {
     // We always define "Today" relative to the actual current time (now)
@@ -1022,6 +1114,39 @@ export default function Homepage({
                   tomorrowFirstEvent,
                   taskWidgetItemsOnly,
                 }}
+                slot6Timeline={
+                  <HomepageTimelineSection
+                    selectedDate={selectedDate}
+                    handleReplanDay={handleReplanDay}
+                    replanLoading={replanLoading}
+                    missedItems={missedItems}
+                    overdueTasksForNow={overdueTasksForNow}
+                    sortedEvents={sortedEvents}
+                    now={now}
+                    dayTasks={dayTasks}
+                    tasksDueToday={tasksDueToday}
+                    suggestableTasks={suggestableTasks}
+                    deadlineSuggestions={deadlineSuggestions}
+                    taskLists={taskLists}
+                    handleQuickStartGap={handleQuickStartGap}
+                    handleTaskToggle={handleTaskToggle}
+                    openTimelinePopup={openTimelinePopup}
+                    openModal={openModal}
+                    handleConflictAutoMove={handleConflictAutoMove}
+                    handleConflictPushTomorrow={handleConflictPushTomorrow}
+                    handleTimelineDelete={handleTimelineDelete}
+                    handleReschedule={handleReschedule}
+                    getTag={getTag}
+                    completedEventIds={completedEventIds}
+                    setCompletedEventIds={setCompletedEventIds}
+                    onOpenQuickAddSchedule={openQuickAddSchedule}
+                    hasTimerSession={hasTimerSession}
+                    timerTask={timerTask}
+                    timeLeft={timeLeft}
+                    timerMode={timerMode}
+                    styles={styles}
+                  />
+                }
               />
             </div>
 
@@ -1208,105 +1333,6 @@ export default function Homepage({
             )}
           </div>
 
-          <motion.div
-            className={styles.bentoSpine}
-            id="timeline-section"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-          >
-            <div className={styles.timelineBox}>
-              <div className={styles.timelineHeader}>
-                <div className={styles.timelineHeaderLeft}>
-                  <div className={styles.timelineHeaderIconWrap} aria-hidden>
-                    <CalendarIcon size={17} strokeWidth={1.75} />
-                  </div>
-                  <h3 className={styles.timelineTitle}>
-                    YOUR PLAN FOR THE DAY
-                  </h3>
-                </div>
-                <div className={styles.timelineHeaderRight}>
-                  <Link
-                    to="/calendar"
-                    className={styles.timelineHeaderActionLink}
-                  >
-                    <span className={styles.timelineCalendarTextFull}>
-                      View my calendar →
-                    </span>
-                    <span className={styles.timelineCalendarTextMedium}>
-                      View calendar →
-                    </span>
-                    <span className={styles.timelineCalendarTextShort}>
-                      Calendar →
-                    </span>
-                  </Link>
-                </div>
-              </div>
-              {isToday(selectedDate) && (
-                <motion.div
-                  className={styles.scheduleActionGroup}
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <PrimaryButton
-                    variant="primary"
-                    size="small"
-                    pill
-                    className={styles.manualScheduleBtn}
-                    onClick={() => openQuickAddSchedule("schedule_manual")}
-                    aria-label="Open manual schedule quick add"
-                  >
-                    🧩 Manual Schedule
-                  </PrimaryButton>
-                  <PrimaryButton
-                    variant="ghost"
-                    size="small"
-                    pill
-                    className={styles.autoScheduleBtn}
-                    onClick={() => openQuickAddSchedule("schedule_auto")}
-                    aria-label="Open auto schedule quick add"
-                  >
-                    ⚙️ Auto Schedule
-                  </PrimaryButton>
-                </motion.div>
-              )}
-              <div className={styles.timelineTrack}>
-                <motion.div
-                  className={styles.timelineTrackContent}
-                  layout
-                  initial={false}
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                >
-                  <MiniTimeline
-                    sortedEvents={sortedEvents}
-                    selectedDate={selectedDate}
-                    now={now}
-                    dayTasks={dayTasks}
-                    tasksDueToday={tasksDueToday}
-                    suggestableTasks={suggestableTasks}
-                    deadlineSuggestions={deadlineSuggestions}
-                    taskLists={taskLists}
-                    onQuickStart={handleQuickStartGap}
-                    onTaskToggle={handleTaskToggle}
-                    onCardClick={openTimelinePopup}
-                    onEdit={(ev) => openModal(ev, ev.tag)}
-                    onConflictAutoMove={handleConflictAutoMove}
-                    onPushTomorrow={handleConflictPushTomorrow}
-                    onDelete={handleTimelineDelete}
-                    onReschedule={handleReschedule}
-                    getTag={getTag}
-                    hasTimerSession={hasTimerSession}
-                    timerTask={timerTask}
-                    timeLeft={timeLeft}
-                    timerMode={timerMode}
-                    styles={styles}
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
           <BackToTop containerSelector="[data-dashboard-main]" />
         </>
       )}
