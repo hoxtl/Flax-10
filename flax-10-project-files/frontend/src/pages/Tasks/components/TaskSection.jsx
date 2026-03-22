@@ -10,6 +10,7 @@ import TaskCard from "./TaskCard";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
+import { isReadingList } from "../utils/readingListUtils";
 import { SECTION_SHOW_LIMIT, TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
 
 import styles from "./TaskFeedSections.module.css";
@@ -79,6 +80,7 @@ function SectionEmptyState({ sectionType, emptyMessage, emptySub, emptyCardProps
 
 function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, hideDueBadge, hideListBadge, isOverdueSection, searchQuery }) {
   const list = listMap[String(task.task_list)];
+  const editHandler = !isReadingList(list) && onEditTask ? (data, meta) => onEditTask(task.id, data, meta) : undefined;
   return (
     <div className={styles.taskRow}>
       <TaskCard
@@ -88,7 +90,7 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
         lists={lists}
         onToggle={() => onToggleComplete(task.id, task.completed)}
         onDelete={() => onDeleteTask(task.id)}
-        onEdit={(data, meta) => onEditTask(task.id, data, meta)}
+        onEdit={editHandler}
         hideDueBadge={hideDueBadge}
         hideListBadge={hideListBadge}
         isOverdue={isOverdueSection}
@@ -99,7 +101,7 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
 }
 
 function ShowMoreButton({ showAll, totalCount, onToggle }) {
-  const showAllLabel = `Show all ${totalCount} →`;
+  const showAllLabel = `+ Show all ${totalCount}`;
   return (
     <div className={styles.showMoreWrap}>
       <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : showAllLabel}</button>

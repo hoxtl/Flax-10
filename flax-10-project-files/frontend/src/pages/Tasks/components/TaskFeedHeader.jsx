@@ -6,12 +6,15 @@ import PageHeader from "../../../components/common/PageHeader/PageHeader";
 
 import { taskFeedHintStyle } from "./TaskFeedConstants";
 
-export default function TaskFeedHeader({ title, subtitle }) {
+export default function TaskFeedHeader({ title, subtitle, isReadingList }) {
+  const hint = isReadingList
+    ? "Reading List tasks cannot be edited as they are set by teachers"
+    : "✦ Right click to edit or delete a task";
   return (
     <PageHeader
       title={title}
       subtitle={subtitle}
-      details={<span style={taskFeedHintStyle}>✦ Right click to edit or delete a task</span>}
+      details={<span style={taskFeedHintStyle}>{hint}</span>}
       compact
     />
   );

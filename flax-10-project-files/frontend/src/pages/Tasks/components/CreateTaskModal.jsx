@@ -107,29 +107,6 @@ function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   );
 }
 
-function getBlockLabel(estimatedReadingMinutes) {
-    const blocks = estimatedReadingMinutes ? Math.max(1, Math.round(estimatedReadingMinutes / 25)) : null;
-    return blocks ? `~${estimatedReadingMinutes} min · ${blocks * 25}m block${blocks > 1 ? "s" : ""}` : null;
-}
-
-function CreateTaskModalPageCount({ form, set, isReadingList, estimatedReadingMinutes }) {
-    if (!isReadingList) return null;
-    const blockLabel = getBlockLabel(estimatedReadingMinutes);
-    return (
-        <div className={styles.durationRow}>
-            <div className={styles.rowBlock}>
-                <span className={styles.focusBlocksLabel}>
-                    Page count <span style={{ opacity: 0.5, fontSize: "0.8em" }}>(optional)</span>
-                </span>
-                <input className={`${styles.titleInput} ${styles.pageCountModalInput}`} type="number" min="1"
-                    placeholder="e.g. 38" value={form.page_count ?? ""}
-                    onChange={(e) => set("page_count", e.target.value ? Number(e.target.value) : null)}
-                />
-                {blockLabel && <p className={styles.pageCountHint}>📖 Est. reading time: {blockLabel}</p>}
-            </div>
-        </div>
-    );
-}
 
 function CreateTaskModalCategory({ form, categoryOptions, selectedListColor, handleCategoryChange }) {
   return (
@@ -197,15 +174,14 @@ function CreateTaskModalScheduleRow({ isEditMode, showAddToScheduleToggle, addTo
 }
 
 function CreateTaskModalBody({ state, addToScheduleLabel }) {
-  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList, estimatedReadingMinutes } = state;
+  const { form, set, setForm, categoryOptions, selectedListColor, sortedModules, handleCategoryChange, isEditMode, showAddToScheduleToggle, addToSchedule, setAddToSchedule, isReadingList } = state;
   return (
     <div className={styles.body}>
       <CreateTaskModalTitleDesc form={form} set={set} />
       <CreateTaskModalDateTime form={form} set={set} />
       <CreateTaskModalCategory form={form} categoryOptions={categoryOptions} selectedListColor={selectedListColor} handleCategoryChange={handleCategoryChange} />
       <CreateTaskModalModuleRow form={form} set={set} sortedModules={sortedModules} />
-      <CreateTaskModalPageCount form={form} set={set} isReadingList={isReadingList} estimatedReadingMinutes={estimatedReadingMinutes} />
-      <CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
+<CreateTaskModalDuration form={form} setForm={setForm} isReadingList={isReadingList}/>
       <CreateTaskModalPriority form={form} set={set} />
       <CreateTaskModalScheduleRow isEditMode={isEditMode} showAddToScheduleToggle={showAddToScheduleToggle} addToSchedule={addToSchedule} setAddToSchedule={setAddToSchedule} addToScheduleLabel={addToScheduleLabel} />
     </div>

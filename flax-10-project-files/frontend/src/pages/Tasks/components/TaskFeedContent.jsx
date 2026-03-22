@@ -69,7 +69,7 @@ function FeedListsModal({ props, vm }) {
 export default function TaskFeedContent({ props, vm }) {
   return (
     <div className={styles.feed}>
-      <TaskFeedHeader title={vm.data.headerTitle} subtitle={vm.taskFeedSubtitle} />
+      <TaskFeedHeader title={vm.data.headerTitle} subtitle={vm.taskFeedSubtitle} isReadingList={vm.readingList} />
       <FeedSubHeader props={props} vm={vm} />
       <FeedSections props={props} vm={vm} />
       <FeedListsModal props={props} vm={vm} />
