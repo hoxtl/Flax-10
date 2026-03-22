@@ -13,7 +13,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-(l2qj8!(^0f3qiud=0p%axr83f&70wncfz(yehna)2c&e55ox&'
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = [os.environ.get("RAILWAY_PUBLIC_DOMAIN"), "localhost"]
 
 CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ORIGIN", "").split(",")
@@ -132,7 +132,7 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
 DJANGO_VITE = {
   "default": {
-    "dev_mode": False,
+    "dev_mode": True,
     'manifest_path': FRONTEND_DIST_DIR / '.vite' / 'manifest.json',
   }
 }
