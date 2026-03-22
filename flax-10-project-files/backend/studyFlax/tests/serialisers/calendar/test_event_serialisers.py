@@ -146,3 +146,18 @@ class CalendarEventCreateSerialiserTests(TestCase):
         
         self.assertEqual(updated.location_latitude, 52.0)
         self.assertTrue(updated.location_validated)
+
+    def test_update_recurrence(self):
+        """Test _update_existing_rule."""
+        recurrence = RecurrenceRule.objects.create(frequency='WEEKLY', interval=1)
+        event = CalendarEvent.objects.create(
+            user=self.user, title='E', start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1), recurrence_rule=recurrence
+        )
+        update_data = {
+            'title': 'E', 'start_time': event.start_time, 'end_time': event.end_time,
+            'recurrence_rule': {'frequency': 'DAILY', 'interval': 3}
+        }
+        updated = CalendarEventCreateSerialiser(instance=event, data=update_data).save()
+        
+        self.assertEqual(updated.recurrence_rule.frequency, 'DAILY')
