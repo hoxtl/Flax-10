@@ -23,7 +23,7 @@ import { useHomepageEventBootstrap, useHomepageNow, useHomepageSelection, useTim
 export function useHomepageController(defaultShowCreateTaskModal, defaultPlanTimelineReadItem) {
   const shared = useHomepageShared(defaultShowCreateTaskModal, defaultPlanTimelineReadItem);
   const state = useHomepageDerivedState(shared);
-  const actions = useHomepageActions(createActionProps(shared, state.homeData.refetchTasks));
+  const actions = useHomepageActions(createActionProps(shared));
   const reschedule = useHomepageReschedule(createRescheduleProps(shared, state, actions));
   return buildHomepageController(shared, state, actions, reschedule);
 }
@@ -31,23 +31,9 @@ export function useHomepageController(defaultShowCreateTaskModal, defaultPlanTim
 function useHomepageShared(defaultShowCreateTaskModal, defaultPlanTimelineReadItem) {
   const navigate = useNavigate();
   const toastApi = useToast();
-  const displayName = useHomepageDisplayName();
-  const calendar = useCalendar();
-  const dispatch = useCalendarDispatch();
-  const { loadEvents } = useCalendarEvents();
-  const eventActions = useEventActions();
-  const { openModal } = useEventModal();
-  const { openPopup } = useEventPopup();
-  const tags = useTags();
-  const completion = useTaskCompletion();
-  const timer = useTimerContext();
-  const now = useHomepageNow();
-  const modals = useHomepageModals(defaultShowCreateTaskModal, defaultPlanTimelineReadItem);
-  const resources = useHomepageResources();
-  const toast = useHomepageToast(toastApi);
-  const homeData = useHomeData(calendar.selectedDate);
+  const shared = useHomepageSharedState(defaultShowCreateTaskModal, defaultPlanTimelineReadItem, toastApi);
   const [completedEventIds, setCompletedEventIds] = useState(new Set());
-  return { calendar, completedEventIds, completion, dispatch, displayName, eventActions, homeData, loadEvents, modals, navigate, now, openModal, openPopup, resources, setCompletedEventIds, tags, timer, toast, toastApi };
+  return { ...shared, completedEventIds, navigate, setCompletedEventIds, toastApi };
 }
 
 function useHomepageDerivedState(shared) {
@@ -73,13 +59,13 @@ function buildViewModelProps(shared) {
   };
 }
 
-function createActionProps(shared, refetchTasks) {
+function createActionProps(shared) {
   return {
     addEvent: shared.eventActions.addEvent,
     getTag: shared.tags.getTag,
     loadEvents: shared.loadEvents,
     openPopup: shared.openPopup,
-    refetchTasks,
+    refetchTasks: shared.homeData.refetchTasks,
     removePendingTask: shared.homeData.removePendingTask,
     selectedDate: shared.calendar.selectedDate,
     showCompletionToast: shared.completion.showCompletionToast,
@@ -104,33 +90,42 @@ function createRescheduleProps(shared, state, actions) {
 }
 
 function buildHomepageController(shared, derived, actions, reschedule) {
+  return { ...buildBaseController(shared, derived, reschedule), ...actions };
+}
+
+function useHomepageSharedState(defaultShowCreateTaskModal, defaultPlanTimelineReadItem, toastApi) {
+  const calendar = useCalendar();
   return {
-    addEvent: shared.eventActions.addEvent,
-    breakTime: shared.timer.breakTime,
-    completedEventIds: shared.completedEventIds,
-    dayTasks: shared.homeData.dayTasks,
-    displayName: shared.displayName,
-    getTag: shared.tags.getTag,
-    hasTimerSession: shared.timer.isActive,
-    homeDataLoading: shared.homeData.loading,
-    modals: shared.modals,
-    navigate: shared.navigate,
-    now: shared.now,
-    openModal: shared.openModal,
-    refetchTasks: shared.homeData.refetchTasks,
-    reschedule,
-    selectedDate: shared.calendar.selectedDate,
-    setCompletedEventIds: shared.setCompletedEventIds,
-    setTaskLists: shared.resources.setTaskLists,
-    state: derived.state,
-    tags: shared.tags.tags,
-    taskLists: shared.resources.taskLists,
-    timeLeft: shared.timer.timeLeft,
-    timerMode: shared.timer.mode,
-    timerTask: shared.timer.task,
-    toast: { ...shared.toast, toastApi: shared.toastApi },
-    upcomingDeadlines: shared.resources.upcomingDeadlines,
-    workTime: shared.timer.workTime,
-    ...actions,
+    calendar,
+    completion: useTaskCompletion(),
+    dispatch: useCalendarDispatch(),
+    displayName: useHomepageDisplayName(),
+    eventActions: useEventActions(),
+    homeData: useHomeData(calendar.selectedDate),
+    loadEvents: useCalendarEvents().loadEvents,
+    modals: useHomepageModals(defaultShowCreateTaskModal, defaultPlanTimelineReadItem),
+    now: useHomepageNow(),
+    openModal: useEventModal().openModal,
+    openPopup: useEventPopup().openPopup,
+    resources: useHomepageResources(),
+    tags: useTags(),
+    timer: useTimerContext(),
+    toast: useHomepageToast(toastApi),
   };
+}
+
+function buildBaseController(shared, derived, reschedule) {
+  return { ...getControllerCore(shared, derived, reschedule), ...getControllerTimer(shared), ...getControllerResources(shared) };
+}
+
+function getControllerCore(shared, derived, reschedule) {
+  return { addEvent: shared.eventActions.addEvent, completedEventIds: shared.completedEventIds, dayTasks: shared.homeData.dayTasks, displayName: shared.displayName, getTag: shared.tags.getTag, homeDataLoading: shared.homeData.loading, modals: shared.modals, navigate: shared.navigate, now: shared.now, openModal: shared.openModal, refetchTasks: shared.homeData.refetchTasks, reschedule, selectedDate: shared.calendar.selectedDate, setCompletedEventIds: shared.setCompletedEventIds, setTaskLists: shared.resources.setTaskLists, state: derived.state };
+}
+
+function getControllerResources(shared) {
+  return { tags: shared.tags.tags, taskLists: shared.resources.taskLists, toast: { ...shared.toast, toastApi: shared.toastApi }, upcomingDeadlines: shared.resources.upcomingDeadlines };
+}
+
+function getControllerTimer(shared) {
+  return { breakTime: shared.timer.breakTime, hasTimerSession: shared.timer.isActive, timeLeft: shared.timer.timeLeft, timerMode: shared.timer.mode, timerTask: shared.timer.task, workTime: shared.timer.workTime };
 }
