@@ -7,6 +7,7 @@ import re
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
 from django.db.models.signals import post_save
 from django.utils import timezone
 
@@ -21,12 +22,29 @@ PROJECT_OWNER_SEED = "studyflax-group-project-owners"
 PROJECT_MEMBER_SEED = "studyflax-group-project-members"
 PROJECT_TASK_SEED = "studyflax-group-project-tasks"
 PROJECT_SHOWCASE_USERNAME = "janedoe"
-FIXTURE_USERNAMES = ["janedoe", "charlie"]
+FIXTURE_USERNAMES = ["janedoe", "johndoe", "charlie"]
+FIXTURE_OWNER_MIN_PROJECTS = 2
 PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
-MIN_PROJECT_MEMBER_TOTAL = 4
-MAX_PROJECT_MEMBER_TOTAL = 10
-MAX_PROJECTS_PER_STUDENT = 6
+MIN_PROJECT_MEMBER_TOTAL = 5
+MAX_PROJECT_MEMBER_TOTAL = 8
+MIN_PROJECTS_PER_STUDENT = 5
+MAX_PROJECTS_PER_STUDENT = 8
+SEEDED_SUGGESTION_COUNT = 4
+SEEDED_SUGGESTION_WINDOWS = (
+    (1, 10),
+    (2, 14),
+    (3, 17),
+    (4, 11),
+    (5, 15),
+    (6, 13),
+)
+SEEDED_RESPONSE_PATTERNS = (
+    ("accepted", "accepted", "accepted", "accepted", "accepted"),
+    ("accepted", "accepted", "pending", "accepted", "rejected"),
+    ("accepted", "pending", "accepted", "rejected", "accepted"),
+    ("accepted", "rejected", "accepted", "accepted", "pending"),
+)
 PROJECT_TYPE_TEMPLATES = {
     "technical": ["prototype review", "sprint presentation", "solution walkthrough"],
     "lab": ["research poster", "findings deck", "methods showcase"],
@@ -48,10 +66,12 @@ PROJECT_TASK_STATUS_PATTERNS = (
     ("done", "done", "done", "in_progress", "todo"),
     ("done", "done", "done", "done", "todo"),
 )
+ZERO_PROGRESS_PROJECT_COUNT = 0
 
 def _get_student_pool():
     return list(
-        User.objects.filter(role='student')
+        User.objects.filter(Q(role='student') | Q(username__in=FIXTURE_USERNAMES))
+        .distinct()
         .order_by('username')
     )
 
@@ -310,6 +330,30 @@ def _uniquify_project_spec_names(specs):
         used_names.add(candidate)
     return specs
 
+def _build_seed_project_context(now=None):
+    reference_now = now or timezone.now()
+    students = _get_student_pool()
+    showcase_student = _get_showcase_student(students)
+    student_modules, module_students = _build_enrollment_maps(students)
+    seed_modules = _list_seed_modules(student_modules)
+    specs = _build_project_specs(showcase_student, student_modules, seed_modules, reference_now)
+    allowed_keys = {(spec["name"], spec["module"].module_code) for spec in specs}
+    allowed_codes = [module.module_code for module in seed_modules]
+    projects = [
+        project
+        for project in GroupProject.objects.filter(course_code__in=allowed_codes)
+        if (project.name, project.course_code) in allowed_keys
+    ]
+    return {
+        "students": students,
+        "showcase_student": showcase_student,
+        "student_modules": student_modules,
+        "module_students": module_students,
+        "seed_modules": seed_modules,
+        "allowed_keys": allowed_keys,
+        "projects": projects,
+    }
+
 def create_group_projects(stdout):
     now = timezone.now()
     rng = random.Random(PROJECT_OWNER_SEED)
@@ -320,6 +364,61 @@ def create_group_projects(stdout):
     specs = _build_project_specs(showcase_student, student_modules, seed_modules, now)
     for index, spec in enumerate(specs):
         _create_single_project(spec, students, now, rng, index, module_students)
+    _ensure_fixture_users_own_projects(student_modules, rng)
+
+def _fixture_seed_users(students):
+    usernames = set(FIXTURE_USERNAMES)
+    return [student for student in students if student.username in usernames]
+
+def _ensure_fixture_users_own_projects(student_modules, rng):
+    context = _build_seed_project_context(timezone.now())
+    projects = list(context["projects"])
+    students = context["students"]
+    targets = _fixture_seed_users(students)
+    if not projects or not targets:
+        return
+    target_module_codes = _student_module_codes(student_modules)
+    ownership_counts = {student.id: 0 for student in targets}
+    for project in projects:
+        if project.owner_id in ownership_counts:
+            ownership_counts[project.owner_id] += 1
+    for student in targets:
+        while ownership_counts.get(student.id, 0) < FIXTURE_OWNER_MIN_PROJECTS:
+            candidate = _pick_project_for_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
+            if not candidate:
+                break
+            previous_owner_id = candidate.owner_id
+            candidate.owner = student
+            candidate.save(update_fields=["owner"])
+            _sync_project_owner_membership(candidate, student)
+            ownership_counts[student.id] = ownership_counts.get(student.id, 0) + 1
+            if previous_owner_id in ownership_counts:
+                ownership_counts[previous_owner_id] = max(ownership_counts.get(previous_owner_id, 1) - 1, 0)
+
+def _pick_project_for_fixture_owner(student, projects, target_module_codes, ownership_counts, rng):
+    module_codes = target_module_codes.get(student.id, set())
+    candidates = []
+    for project in projects:
+        if project.owner_id == student.id:
+            continue
+        owner_username = getattr(project.owner, "username", "")
+        owner_is_fixture = owner_username in FIXTURE_USERNAMES
+        owner_has_spare = ownership_counts.get(project.owner_id, 0) > FIXTURE_OWNER_MIN_PROJECTS
+        if owner_is_fixture and not owner_has_spare:
+            continue
+        candidates.append((
+            (
+                0 if project.course_code in module_codes else 1,
+                0 if not owner_is_fixture else 1,
+                ownership_counts.get(project.owner_id, 0),
+                rng.random(),
+            ),
+            project,
+        ))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: item[0])
+    return candidates[0][1]
 
 def _select_project_cohort(project, students, module_students):
     cohort = _dedupe_users(module_students.get(project.course_code, []))
@@ -328,58 +427,197 @@ def _select_project_cohort(project, students, module_students):
     fallback_students = [student for student in students if student.id not in {member.id for member in cohort}]
     return _dedupe_users(cohort + fallback_students)
 
-def _add_members_to_project(project, students, rng, showcase_student, module_students):
+def _build_membership_counts(students, project_ids=None):
+    counts = {student.id: 0 for student in students}
+    memberships = GroupMembership.objects.filter(user__in=students)
+    if project_ids is not None:
+        memberships = memberships.filter(project_id__in=project_ids)
+    rows = memberships.values("user").annotate(total=Count("id"))
+    for row in rows:
+        counts[row["user"]] = row["total"]
+    return counts
+
+def _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=False):
     cohort = _select_project_cohort(project, students, module_students)
-    potential = [
-        student for student in cohort
-        if student != project.owner and not _has_reached_project_limit(student)
-    ]
-    # Force all fixture students (not just janedoe) into eligible projects
-    fixture_set = set(FIXTURE_USERNAMES)
-    forced_members = [
-        s for s in potential if s.username in fixture_set
-    ]
-    max_total = min(MAX_PROJECT_MEMBER_TOTAL, 1 + len(potential))
+    cohort_ids = {student.id for student in cohort}
+    ranked = []
+    for student in _dedupe_users(cohort + students):
+        if student == project.owner:
+            continue
+        current_count = membership_counts.get(student.id, 0)
+        if not allow_over_limit and current_count >= MAX_PROJECTS_PER_STUDENT:
+            continue
+        ranked.append((
+            (
+                0 if current_count < MIN_PROJECTS_PER_STUDENT else 1,
+                0 if student.id in cohort_ids else 1,
+                0 if current_count < MAX_PROJECTS_PER_STUDENT else 1,
+                current_count,
+                rng.random(),
+            ),
+            student,
+        ))
+    ranked.sort(key=lambda item: item[0])
+    return [student for _, student in ranked]
+
+def _add_members_to_project(project, students, rng, showcase_student, module_students, membership_counts):
+    del showcase_student
+    candidate_pool = _ordered_member_candidates(project, students, module_students, membership_counts, rng)
+    max_total = min(MAX_PROJECT_MEMBER_TOTAL, 1 + len(candidate_pool))
     if max_total <= 1:
         target_total = 1
-    elif max_total < MIN_PROJECT_MEMBER_TOTAL:
-        target_total = max_total
     else:
         requested_total = rng.randint(MIN_PROJECT_MEMBER_TOTAL, MAX_PROJECT_MEMBER_TOTAL)
-        target_total = min(requested_total, max_total)
-    member_target = max(target_total - 1, 0)
-    remaining_pool = [student for student in potential if student.id not in {member.id for member in forced_members}]
-    sampled_members = rng.sample(remaining_pool, min(len(remaining_pool), max(0, member_target - len(forced_members)))) if remaining_pool else []
-    members = _dedupe_users(forced_members + sampled_members)
+        minimum_total = min(MIN_PROJECT_MEMBER_TOTAL, max_total)
+        target_total = max(minimum_total, min(requested_total, max_total))
+    members = candidate_pool[:max(target_total - 1, 0)]
     selected_ids = {member.id for member in members}
     GroupMembership.objects.filter(project=project).exclude(user=project.owner).exclude(user_id__in=selected_ids).delete()
-    for m in members:
-        GroupMembership.objects.update_or_create(project=project, user=m, defaults={'role': 'member'})
+    for member in members:
+        GroupMembership.objects.update_or_create(project=project, user=member, defaults={"role": "member"})
+        membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
+
+def _student_module_codes(student_modules):
+    return {
+        student_id: {module.module_code for module in modules if module and module.module_code}
+        for student_id, modules in student_modules.items()
+    }
+
+def _project_member_sets(projects):
+    return {
+        project.id: {membership.user_id for membership in project.memberships.all()}
+        for project in projects
+    }
+
+def _ordered_top_up_projects(student, projects, member_sets, module_codes, rng):
+    ranked = []
+    student_module_codes = module_codes.get(student.id, set())
+    for project in projects:
+        members = member_sets.get(project.id, set())
+        if student.id in members or len(members) >= MAX_PROJECT_MEMBER_TOTAL:
+            continue
+        ranked.append((
+            (
+                0 if project.course_code in student_module_codes else 1,
+                len(members),
+                rng.random(),
+            ),
+            project,
+        ))
+    ranked.sort(key=lambda item: item[0])
+    return [project for _, project in ranked]
+
+def _top_up_students_to_minimum(projects, students, student_modules, membership_counts, rng):
+    module_codes = _student_module_codes(student_modules)
+    member_sets = _project_member_sets(projects)
+    made_progress = True
+    while made_progress:
+        made_progress = False
+        under_assigned = [
+            student for student in students
+            if membership_counts.get(student.id, 0) < MIN_PROJECTS_PER_STUDENT
+        ]
+        under_assigned.sort(key=lambda student: (membership_counts.get(student.id, 0), student.username))
+        for student in under_assigned:
+            candidate_projects = _ordered_top_up_projects(student, projects, member_sets, module_codes, rng)
+            while membership_counts.get(student.id, 0) < MIN_PROJECTS_PER_STUDENT and candidate_projects:
+                project = candidate_projects.pop(0)
+                GroupMembership.objects.update_or_create(
+                    project=project,
+                    user=student,
+                    defaults={"role": "member"},
+                )
+                member_sets.setdefault(project.id, set()).add(student.id)
+                membership_counts[student.id] = membership_counts.get(student.id, 0) + 1
+                made_progress = True
+
+def _ensure_projects_have_minimum_members(projects, students, module_students, membership_counts, rng):
+    member_sets = _project_member_sets(projects)
+    made_progress = True
+    while made_progress:
+        made_progress = False
+        underfilled_projects = sorted(
+            [project for project in projects if len(member_sets.get(project.id, set())) < MIN_PROJECT_MEMBER_TOTAL],
+            key=lambda project: (len(member_sets.get(project.id, set())), project.deadline or timezone.now(), project.name),
+        )
+        for project in underfilled_projects:
+            needed = MIN_PROJECT_MEMBER_TOTAL - len(member_sets.get(project.id, set()))
+            if needed <= 0:
+                continue
+            for member in _ordered_member_candidates(project, students, module_students, membership_counts, rng):
+                if member.id in member_sets.get(project.id, set()):
+                    continue
+                GroupMembership.objects.update_or_create(
+                    project=project,
+                    user=member,
+                    defaults={"role": "member"},
+                )
+                member_sets.setdefault(project.id, set()).add(member.id)
+                membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
+                needed -= 1
+                made_progress = True
+                if needed <= 0:
+                    break
+
+def _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng):
+    member_sets = _project_member_sets(projects)
+    solo_projects = sorted(
+        [project for project in projects if len(member_sets.get(project.id, set())) < 2],
+        key=lambda project: (len(member_sets.get(project.id, set())), project.deadline or timezone.now(), project.name),
+    )
+    for project in solo_projects:
+        needed = 2 - len(member_sets.get(project.id, set()))
+        if needed <= 0:
+            continue
+        for member in _ordered_member_candidates(
+            project,
+            students,
+            module_students,
+            membership_counts,
+            rng,
+            allow_over_limit=True,
+        ):
+            if member.id in member_sets.get(project.id, set()):
+                continue
+            GroupMembership.objects.update_or_create(
+                project=project,
+                user=member,
+                defaults={"role": "member"},
+            )
+            member_sets.setdefault(project.id, set()).add(member.id)
+            membership_counts[member.id] = membership_counts.get(member.id, 0) + 1
+            needed -= 1
+            if needed <= 0:
+                break
 
 def create_group_memberships(stdout):
     stdout.write("Seeding group memberships...")
     rng = random.Random(PROJECT_MEMBER_SEED)
-    students = _get_student_pool()
-    showcase_student = _get_showcase_student(students)
-    student_modules, module_students = _build_enrollment_maps(students)
-    seed_modules = _list_seed_modules(student_modules)
-    allowed_specs = _build_project_specs(showcase_student, student_modules, seed_modules, timezone.now())
-    allowed_keys = {(spec["name"], spec["module"].module_code) for spec in allowed_specs}
-    projects = list(GroupProject.objects.filter(course_code__in=[module.module_code for module in seed_modules]))
-    allowed_project_ids = [project.id for project in projects if (project.name, project.course_code) in allowed_keys]
+    context = _build_seed_project_context(timezone.now())
+    students = context["students"]
+    showcase_student = context["showcase_student"]
+    student_modules = context["student_modules"]
+    module_students = context["module_students"]
+    projects = context["projects"]
+    allowed_project_ids = [project.id for project in projects]
     GroupMembership.objects.filter(project_id__in=allowed_project_ids).exclude(role="owner").delete()
+    membership_counts = _build_membership_counts(students, allowed_project_ids)
     from studyFlax.signals.groupwork_notifications import notify_on_added_to_project
     post_save.disconnect(notify_on_added_to_project, sender=GroupMembership)
     try:
         for project in projects:
-            if (project.name, project.course_code) not in allowed_keys:
-                continue
-            _add_members_to_project(project, students, rng, showcase_student, module_students)
+            _add_members_to_project(project, students, rng, showcase_student, module_students, membership_counts)
+        _top_up_students_to_minimum(projects, students, student_modules, membership_counts, rng)
+        _ensure_projects_have_minimum_members(projects, students, module_students, membership_counts, rng)
+        _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng)
     finally:
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
-def _get_project_status_pattern(project):
-    pattern_index = sum(ord(char) for char in f"{project.course_code}:{project.name}") % len(PROJECT_TASK_STATUS_PATTERNS)
+def _get_project_status_pattern(project, project_index):
+    if project_index < ZERO_PROGRESS_PROJECT_COUNT:
+        return PROJECT_TASK_STATUS_PATTERNS[0]
+    non_zero_count = max(len(PROJECT_TASK_STATUS_PATTERNS) - 1, 1)
+    pattern_index = 1 + (sum(ord(char) for char in f"{project.course_code}:{project.name}") % non_zero_count)
     return PROJECT_TASK_STATUS_PATTERNS[pattern_index]
 
 def _build_completed_fields(status, task_index, now):
@@ -391,10 +629,9 @@ def _build_task_due_date(due, task_index, now):
     lead_days = max(0, min(task_index + 1, max((due.date() - now.date()).days, 0)))
     return due - timedelta(days=lead_days)
 
-def _create_single_group_task(project, members, due, template, task_index, now, rng):
+def _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern):
     t_title, t_desc, t_priority, t_blocks = template
-    pattern = _get_project_status_pattern(project)
-    status = pattern[task_index % len(pattern)]
+    status = status_pattern[task_index % len(status_pattern)]
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
     has_due_date = not (status == "todo" and task_index >= 3)
     task_due = _build_task_due_date(due, task_index, now) if has_due_date else None
@@ -420,31 +657,34 @@ def _create_single_group_task(project, members, due, template, task_index, now, 
         assignees = [primary]
     task.assigned_to.set(assignees)
 
-def _seed_tasks_for_project(project, now):
+def _seed_tasks_for_project(project, now, project_index):
     members = sorted([m.user for m in project.memberships.all()], key=lambda u: u.username)
     if not members:
         return
     due = project.deadline or (now + timedelta(days=14))
     rng = random.Random(f"{PROJECT_TASK_SEED}:{project.name}")
+    status_pattern = _get_project_status_pattern(project, project_index)
     for task_index, template in enumerate(GROUP_TASK_TEMPLATES):
-        _create_single_group_task(project, members, due, template, task_index, now, rng)
+        _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern)
 
 def create_group_tasks(stdout):
     stdout.write("Seeding group tasks with assignments and statuses...")
     now = timezone.now()
-    for project in GroupProject.objects.all():
-        _seed_tasks_for_project(project, now)
+    context = _build_seed_project_context(now)
+    projects = sorted(context["projects"], key=lambda project: (project.course_code, project.name))
+    for project_index, project in enumerate(projects):
+        _seed_tasks_for_project(project, now, project_index)
 
 def _seed_busy_events_for_member(member, project_id, now):
     from studyFlax.models.calendar.calendar_event_model import CalendarEvent
     member_rng = random.Random(f"avail-busy-{project_id}-{member.username}")
-    num_busy = member_rng.randint(1, 3)
-    hours_pool = [9, 10, 11, 13, 14, 15, 16]
+    num_busy = member_rng.randint(2, 4)
+    hours_pool = [9, 10, 11, 12, 13, 14, 15, 16, 17]
     for i in range(num_busy):
         day_offset = member_rng.randint(0, 6)
         hour = member_rng.choice(hours_pool)
         start = (now + timedelta(days=day_offset)).replace(hour=hour, minute=0, second=0, microsecond=0)
-        end = start + timedelta(hours=1)
+        end = start + timedelta(hours=1 if member_rng.random() < 0.75 else 2)
         CalendarEvent.objects.get_or_create(
             user=member,
             title="Busy",
@@ -452,24 +692,47 @@ def _seed_busy_events_for_member(member, project_id, now):
             defaults={"end_time": end, "source": "seed_availability"},
         )
 
+def _seed_meeting_responses_for_suggestion(suggestion, members, suggestion_index):
+    from studyFlax.models.groupwork.groupwork_model import MeetingResponse
+    pattern = SEEDED_RESPONSE_PATTERNS[suggestion_index % len(SEEDED_RESPONSE_PATTERNS)]
+    for member_index, member in enumerate(members):
+        status = pattern[member_index % len(pattern)]
+        if suggestion_index == 0 or member == suggestion.suggested_by:
+            status = "accepted"
+        MeetingResponse.objects.update_or_create(
+            suggestion=suggestion,
+            user=member,
+            defaults={"status": status},
+        )
+
 def _seed_meeting_suggestions_for_project(project, members, now):
     from studyFlax.models.groupwork.groupwork_model import MeetingSuggestion
-    non_owners = [m for m in members if m != project.owner][:2]
-    for idx, suggester in enumerate(non_owners):
-        hour = [10, 14][idx % 2]
-        start = (now + timedelta(days=idx + 1)).replace(hour=hour, minute=0, second=0, microsecond=0)
+
+    if not members:
+        return
+    suggestion_rng = random.Random(f"suggestions-{project.id}-{project.name}")
+    windows = list(SEEDED_SUGGESTION_WINDOWS)
+    suggestion_rng.shuffle(windows)
+    selected_windows = sorted(windows[:SEEDED_SUGGESTION_COUNT], key=lambda item: (item[0], item[1]))
+    suggesters = [member for member in members if member != project.owner] or members
+
+    for idx, (day_offset, hour) in enumerate(selected_windows):
+        suggester = suggesters[idx % len(suggesters)]
+        start = (now + timedelta(days=day_offset)).replace(hour=hour, minute=0, second=0, microsecond=0)
         end = start + timedelta(hours=1)
-        MeetingSuggestion.objects.get_or_create(
+        suggestion, _ = MeetingSuggestion.objects.update_or_create(
             project=project,
             suggested_by=suggester,
             start_time=start,
             defaults={"end_time": end},
         )
+        _seed_meeting_responses_for_suggestion(suggestion, members, idx)
 
 def seed_group_availability(stdout):
     stdout.write("Seeding group availability data (busy events + meeting suggestions)...")
     now = timezone.now()
-    for project in GroupProject.objects.prefetch_related("memberships__user").all():
+    context = _build_seed_project_context(now)
+    for project in context["projects"]:
         members = [m.user for m in project.memberships.select_related("user").all()]
         if len(members) < 2:
             continue
