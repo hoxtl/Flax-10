@@ -1,17 +1,19 @@
-import { useState } from "react";
-
-/**
- * Hook to handle authentication form state when a field is changed
+/*
+ * Shared state helper for auth forms.
  */
 
-export const useAuthForm = (initialState) => {
-    const [formData, setFormData] = useState(initialState);
+import { useState } from "react";
 
-    const updateField = (field) => (e) => {
-        setFormData({...formData, [field]: e.target.value});
-    };
+export function useAuthForm(initialState) {
+  const [formData, setFormData] = useState(initialState);
 
-    const resetForm = () => {setFormData(initialState);};
+  const updateField = (field) => (event) => {
+    setFormData((current) => ({ ...current, [field]: event.target.value }));
+  };
 
-    return {formData, setFormData, updateField, resetForm};
-};
+  const resetForm = () => {
+    setFormData(initialState);
+  };
+
+  return { formData, setFormData, updateField, resetForm };
+}
