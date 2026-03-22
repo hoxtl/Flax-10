@@ -43,3 +43,17 @@ class CalendarEventSerialiserTests(TestCase):
         self.assertIsNone(data['location_latitude'])
         self.assertIsNone(data['location_longitude'])
         self.assertFalse(data['location_validated'])
+
+    def test_includes_tag_and_module_details(self):
+        """Test tag_name, module_name, module_code fields."""
+        event = CalendarEvent.objects.create(
+            user=self.user, title='Event',
+            start_time=timezone.now(), end_time=timezone.now() + timedelta(hours=1),
+            tag=self.tag
+        )
+        data = CalendarEventSerialiser(instance=event).data
+        
+        self.assertEqual(data['tag_name'], 'Tag')
+        self.assertIn('tag_details', data)
+        self.assertIn('module_name', data)
+        self.assertIn('module_code', data)
