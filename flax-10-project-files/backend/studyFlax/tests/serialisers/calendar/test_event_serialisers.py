@@ -119,3 +119,9 @@ class CalendarEventCreateSerialiserTests(TestCase):
         
         self.assertIsNotNone(event.recurrence_rule)
         self.assertEqual(event.recurrence_rule.frequency, 'WEEKLY')
+
+    def test_invalid_json_recurrence(self):
+        """Test _parse_recurrence_input with invalid JSON."""
+        data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'recurrence_rule': 'bad-json{'}
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        self.assertIsNone(event.recurrence_rule)
