@@ -23,6 +23,8 @@ import { useToast } from "../../context/ToastContext";
 import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import StatStrip from "../../components/common/StatStrip/StatStrip";
 import { TaskInfoModal } from "../Tasks/components/TaskInfoModal";
+import SmartNudge from "./SmartNudge";
+import ReadingsPanel from "./ReadingsPanel";
 import styles from "./MyModulesDashboard.module.css";
 
 const DEADLINES_INITIAL_SHOWN = 4;

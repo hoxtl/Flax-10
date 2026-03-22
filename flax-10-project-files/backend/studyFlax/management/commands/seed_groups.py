@@ -21,6 +21,7 @@ PROJECT_OWNER_SEED = "studyflax-group-project-owners"
 PROJECT_MEMBER_SEED = "studyflax-group-project-members"
 PROJECT_TASK_SEED = "studyflax-group-project-tasks"
 PROJECT_SHOWCASE_USERNAME = "janedoe"
+FIXTURE_USERNAMES = ["janedoe", "charlie", "riley", "nina", "omar", "sofia", "liamk"]
 PROJECT_DEADLINE_OFFSETS = (2, 5, 7, 10, 12, 15, 17, 19)
 URGENT_PROJECT_LIMIT = 3
 MIN_PROJECT_MEMBER_TOTAL = 4
@@ -360,17 +361,13 @@ def create_group_memberships(stdout):
     projects = list(GroupProject.objects.filter(course_code__in=[module.module_code for module in _showcase_modules(showcase_student, student_modules, seed_modules)]))
     allowed_project_ids = [project.id for project in projects if (project.name, project.course_code) in allowed_keys]
     GroupMembership.objects.filter(project_id__in=allowed_project_ids).exclude(role="owner").delete()
-    for project in projects:
-        if (project.name, project.course_code) not in allowed_keys:
-            continue
-        _add_members_to_project(project, students, rng, showcase_student, module_students)
     from studyFlax.signals.groupwork_notifications import notify_on_added_to_project
     post_save.disconnect(notify_on_added_to_project, sender=GroupMembership)
     try:
-        projects = list(GroupProject.objects.all())
-        students = list(User.objects.filter(username__in=FIXTURE_USERNAMES))
         for project in projects:
-            _add_members_to_project(project, students)
+            if (project.name, project.course_code) not in allowed_keys:
+                continue
+            _add_members_to_project(project, students, rng, showcase_student, module_students)
     finally:
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 

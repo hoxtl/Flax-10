@@ -126,13 +126,12 @@ function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
 }
 
 function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll }) {
-  const featuredBadge = buildFeaturedBadge(badges, pinnedBadgeId);
-  const topBadges = badges.filter((badge) => badge.id !== featuredBadge?.id).slice(0, 3);
   const [activeTooltip, setActiveTooltip] = useState(null);
   const allBadges = badges || [];
   const pinnedBadge = allBadges.find(
     (b) => String(b.id) === String(pinnedBadgeId),
   );
+  const featuredBadge = pinnedBadge || null;
   const topBadges = pinnedBadge
     ? allBadges
         .filter((b) => String(b.id) !== String(pinnedBadgeId))
@@ -152,7 +151,9 @@ function ProfileBadges({ badges, pinnedBadgeId, onPinBadge, canPin, onViewAll })
       <div className={styles.headerBadgeRail}>
         <div className={styles.headerBadges}>
           <div className={styles.headerBadgesMain}>
-            {topBadges.map((badge) => renderBadge(badge))}
+            {topBadges.map((badge) => (
+              <BadgeButton key={badge.id} badge={badge} pinned={false} {...props} />
+            ))}
           </div>
           {onViewAll && <button className={styles.badgesViewAllLink} onClick={onViewAll}>View All &rarr;</button>}
         </div>
@@ -318,28 +319,22 @@ function MobileHeader({ user, profileData, handlers, visibility, resolvedPhoto, 
       <MobileStats profileData={profileData} handlers={handlers} visibility={visibility} />
     </div>
   );
+}
+
+export default function ProfileHeader(props) {
+  const shareUser = buildShareUser(props.user, props.handlers);
+  const resolvedPhoto = resolvePhoto(props.user, props.profileData);
   return (
-    <div className={styles.header}>
-      <ProfileAvatar user={user} profilePhotoUrl={resolvedPhoto} />
-      <ProfileHeaderInfo
-        user={{
-          ...user,
-          reload: handlers.reload,
-          setOptimisticShare: handlers.setOptimisticShare,
-        }}
-        profileData={profileData}
-        handlers={handlers}
-        visibility={visibility}
-        badges={badges}
-        pinnedBadgeId={pinnedBadgeId}
-        onPinBadge={onPinBadge}
-        onViewAllBadges={onViewAllBadges}
-        persona={persona}
-        peakHour={peakHour}
-        societies={societies}
-        onNavigate={onNavigate}
-        onSocietiesClick={onSocietiesClick}
+    <>
+      <DesktopHeader {...props} user={shareUser} resolvedPhoto={resolvedPhoto} />
+      <MobileHeader
+        user={shareUser}
+        profileData={props.profileData}
+        handlers={props.handlers}
+        visibility={props.visibility}
+        resolvedPhoto={resolvedPhoto}
+        onNavigate={props.onNavigate}
       />
-    </div>
+    </>
   );
 }

@@ -309,6 +309,20 @@ def build_weekend_events(user, tags, user_rng):
 def create_deadline_calendar_event(user, deadline):
     """Create or fetch the CalendarEvent that mirrors *deadline* in a user's calendar."""
     CalendarEvent.objects.get_or_create(
+        user=user,
+        title=f"{deadline.deadline_type.capitalize()}: {deadline.title}",
+        start_time=deadline.start_due_date,
+        defaults={
+            'end_time': deadline.end_due_date or deadline.start_due_date,
+            'location': deadline.location,
+            'description': deadline.description,
+            'priority': 'high',
+            'module': deadline.module,
+            'source': 'module_deadline',
+            'external_id': str(deadline.id),
+        },
+    )
+
 def build_deadline_event(user, deadline, tag=None):
     """Build an unsaved CalendarEvent for a deadline."""
     return CalendarEvent(
