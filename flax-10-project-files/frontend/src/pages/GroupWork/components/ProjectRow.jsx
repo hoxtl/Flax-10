@@ -26,26 +26,32 @@ function ProjectMetaArea({ project, date }) {
 }
 
 export default function ProjectRow({ project, onClick }) {
-  const date = getProjectDate(project.deadline);
-  const members = getProjectMembers(project);
-  const memberCount = getProjectMemberCount(project);
-  const daysLeft = getDaysLeft(date);
-  const percent = getProjectPercent(project);
-
+  const data = getProjectRowData(project);
   return (
-    <div className={buildContainerClassName(daysLeft)}>
+    <div className={buildContainerClassName(data.daysLeft)}>
       <div className={styles.projectRow}>
         <ProjectRowInfo
           project={project}
-          members={members}
-          totalMembers={memberCount}
+          members={data.members}
+          totalMembers={data.memberCount}
           onProjectNavigate={onClick}
         />
-        <ProjectMetaArea project={project} date={date} />
+        <ProjectMetaArea project={project} date={data.date} />
       </div>
-      <ProjectRowAccordion percent={percent} />
+      <ProjectRowAccordion percent={data.percent} />
     </div>
   );
+}
+
+function getProjectRowData(project) {
+  const date = getProjectDate(project.deadline);
+  return {
+    date,
+    members: getProjectMembers(project),
+    memberCount: getProjectMemberCount(project),
+    daysLeft: getDaysLeft(date),
+    percent: getProjectPercent(project),
+  };
 }
 
 function buildContainerClassName(daysLeft) {

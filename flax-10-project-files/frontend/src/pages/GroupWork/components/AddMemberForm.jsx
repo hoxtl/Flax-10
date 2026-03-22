@@ -8,21 +8,6 @@ import { addProjectMember } from "../api/groupWorkApi";
 import styles from "./AddMemberForm.module.css";
 
 export default function AddMemberForm({ projectId, members = [], onAdded }) {
-  const renderEmptyState = ({ query, clear }) => (
-    <div className={styles.inlineEmptyState}>
-      <SearchEmptyState
-        query={query}
-        itemLabel="users"
-        title="No teammates found"
-        hint="Try a different name or username."
-        onClear={clear}
-        className={styles.inlineEmptyCard}
-        titleClassName={styles.inlineEmptyTitle}
-        hintClassName={styles.inlineEmptyHint}
-      />
-    </div>
-  );
-
   return (
     <div className={styles.addMemberForm}>
       <UserSearch
@@ -33,8 +18,16 @@ export default function AddMemberForm({ projectId, members = [], onAdded }) {
         searchPlaceholder="Search teammates to add..."
         openOnEmptyQuery={false}
         dropdownMode="inline"
-        renderEmptyState={renderEmptyState}
+        renderEmptyState={(props) => <AddMemberSearchEmptyState {...props} />}
       />
+    </div>
+  );
+}
+
+function AddMemberSearchEmptyState({ query, clear }) {
+  return (
+    <div className={styles.inlineEmptyState}>
+      <SearchEmptyState query={query} itemLabel="users" title="No teammates found" hint="Try a different name or username." onClear={clear} className={styles.inlineEmptyCard} titleClassName={styles.inlineEmptyTitle} hintClassName={styles.inlineEmptyHint} />
     </div>
   );
 }

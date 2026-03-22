@@ -13,21 +13,19 @@ function MemberPill({ member, onRemove, canRemove, allowOwnerRemove }) {
   const removeLabel = member.role === "owner" ? "Leave project" : "Remove";
   return (
     <div className={styles.memberPill}>
-      <button
-        type="button"
-        className={styles.memberAvatarButton}
-        title={displayName}
-        aria-label={`Open ${displayName} profile`}
-        onClick={(event) => openMemberProfile(event, member)}
-      >
-        <MemberAvatar member={member} size={24} />
-      </button>
+      <MemberAvatarButton member={member} displayName={displayName} />
       <span className={styles.memberName}>{displayName}</span>
-      {member.role === "owner" ? <span className={styles.ownerLabel}>Owner</span> : null}
-      {removeAllowed ? (
-        <button type="button" onClick={() => onRemove(member.id)} className={styles.removeBtn}>{removeLabel}</button>
-      ) : null}
+      {member.role === "owner" && <span className={styles.ownerLabel}>Owner</span>}
+      {removeAllowed && <button type="button" onClick={() => onRemove(member.id)} className={styles.removeBtn}>{removeLabel}</button>}
     </div>
+  );
+}
+
+function MemberAvatarButton({ member, displayName }) {
+  return (
+    <button type="button" className={styles.memberAvatarButton} title={displayName} aria-label={`Open ${displayName} profile`} onClick={(e) => openMemberProfile(e, member)}>
+      <MemberAvatar member={member} size={24} />
+    </button>
   );
 }
 

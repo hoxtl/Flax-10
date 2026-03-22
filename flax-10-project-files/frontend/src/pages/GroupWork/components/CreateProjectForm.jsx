@@ -77,66 +77,65 @@ function useCreateProjectForm(onCreated) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const reset = () => resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
+  const handlers = { setForm, setErrors, setErrorMessage };
   return {
-    form,
-    errors,
-    errorMessage,
-    isSubmitting,
-    reset,
-    change: createChangeHandler(setForm, setErrors, setErrorMessage),
-    addMember: createAddMemberHandler(setForm, setErrors, setErrorMessage),
-    removeMember: createRemoveMemberHandler(setForm, setErrors, setErrorMessage),
-    submit: createSubmitHandler(form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated),
+    form, errors, errorMessage, isSubmitting, reset,
+    change: createChangeHandler(handlers),
+    addMember: createAddMemberHandler(handlers),
+    removeMember: createRemoveMemberHandler(handlers),
+    submit: createSubmitHandler({ ...handlers, setIsSubmitting, form, onCreated }),
   };
 }
 
-function createChangeHandler(setForm, setErrors, setErrorMessage) {
+function createChangeHandler({ setForm, setErrors, setErrorMessage }) {
   return (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({
-      ...prev,
-      [key]:
-        key === "deadline" && isPastProjectDeadline(value)
-          ? "Project due date can't be in the past."
-          : "",
-    }));
+    const error = key === "deadline" && isPastProjectDeadline(value) ? "Project due date can't be in the past." : "";
+    setErrors((prev) => ({ ...prev, [key]: error }));
     setErrorMessage("");
   };
 }
 
-function createAddMemberHandler(setForm, setErrors, setErrorMessage) {
+function createAddMemberHandler({ setForm, setErrors, setErrorMessage }) {
   return (user) => {
     if (!user?.id) return;
     setErrors((prev) => ({ ...prev, members: "" }));
     setErrorMessage("");
-    setForm((prev) => (prev.members.some((member) => String(member.id) === String(user.id))
-      ? prev
-      : { ...prev, members: [...prev.members, user] }));
+    setForm((prev) => addMemberToForm(prev, user));
   };
 }
 
-function createRemoveMemberHandler(setForm, setErrors, setErrorMessage) {
+function addMemberToForm(prev, user) {
+  const exists = prev.members.some((m) => String(m.id) === String(user.id));
+  return exists ? prev : { ...prev, members: [...prev.members, user] };
+}
+
+function createRemoveMemberHandler({ setForm, setErrors, setErrorMessage }) {
   return (userId) => {
     setErrors((prev) => ({ ...prev, members: "" }));
     setErrorMessage("");
-    setForm((prev) => ({ ...prev, members: prev.members.filter((member) => String(member.id) !== String(userId)) }));
+    setForm((prev) => ({ ...prev, members: prev.members.filter((m) => String(m.id) !== String(userId)) }));
   };
 }
 
-function createSubmitHandler(form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated) {
+function createSubmitHandler({ form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated }) {
   return async (event) => {
     event.preventDefault();
     const nextErrors = validateProjectForm(form);
     if (Object.keys(nextErrors).length > 0) return showFormErrors(nextErrors, setErrors, setErrorMessage);
     setIsSubmitting(true);
     const created = await createGroupProject(buildProjectPayload(form));
-    if (!created) {
-      setIsSubmitting(false);
-      return setErrorMessage("We couldn't create that project. Please try again.");
-    }
-    onCreated?.(created);
-    resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
+    handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage });
   };
+}
+
+function handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage }) {
+  if (!created) {
+    setIsSubmitting(false);
+    return setErrorMessage("We couldn't create that project. Please try again.");
+  }
+  onCreated?.(created);
+  resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
 }
 
 function validateProjectForm(form) {
@@ -216,17 +215,20 @@ function buildAvailableUserFilter(selectedMembers) {
   const viewer = getStoredViewer();
   const viewerId = String(viewer.id ?? viewer.user ?? "");
   const viewerUsername = String(viewer.username || viewer.user_name || "").trim().toLowerCase();
+  const context = { selectedIds, viewerId, viewerUsername };
   return (results) => {
     if (!Array.isArray(results)) return [];
-    return results.filter((user) => {
-      const userId = String(user?.id ?? "");
-      const username = String(user?.username || user?.user_name || "").trim().toLowerCase();
-      if (!userId || selectedIds.has(userId)) return false;
-      if (viewerId && userId === viewerId) return false;
-      if (viewerUsername && username && username === viewerUsername) return false;
-      return true;
-    });
+    return results.filter((user) => isUserAvailable(user, context));
   };
+}
+
+function isUserAvailable(user, { selectedIds, viewerId, viewerUsername }) {
+  const userId = String(user?.id ?? "");
+  const username = String(user?.username || user?.user_name || "").trim().toLowerCase();
+  if (!userId || selectedIds.has(userId)) return false;
+  if (viewerId && userId === viewerId) return false;
+  if (viewerUsername && username && username === viewerUsername) return false;
+  return true;
 }
 
 function getSelectedUserLabel(member) {
