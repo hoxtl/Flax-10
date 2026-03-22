@@ -10,13 +10,20 @@ import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } 
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null }) {
+export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate }) {
   return (
     <div className={styles.projectInfoArea}>
       <ProjectTeacherAvatar project={project} />
       <div className={styles.projectText}>
         <div className={styles.projectTitleRow}>
-          <div className={styles.projectName}>{project.name}</div>
+          <button
+            type="button"
+            className={`${styles.projectName} ${styles.projectNameButton}`}
+            onClick={onProjectNavigate}
+            aria-label={`Open ${project.name} project details`}
+          >
+            {project.name}
+          </button>
           {action ? <div className={styles.projectTitleAction}>{action}</div> : null}
         </div>
         <AvatarStack members={members} totalMembers={totalMembers} />

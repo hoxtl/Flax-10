@@ -27,21 +27,34 @@
 }
 
 .deleteBtn {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(192, 90, 62, 0.2);
-  background: white;
-  color: var(--danger);
-  font-size: 13px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--border));
+    background: color-mix(in srgb, var(--danger) 6%, var(--surface-card));
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
 .deleteBtn:hover {
-  background: var(--danger-bg);
+    background: color-mix(in srgb, var(--danger) 14%, var(--surface-card));
+    border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+:global([data-theme="dark"]) .deleteBtn {
+    background: color-mix(in srgb, var(--danger) 22%, rgba(0, 0, 0, 0.6));
+    border-color: color-mix(in srgb, var(--danger) 55%, rgba(255, 255, 255, 0.08));
+    color: #ffe3db;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+:global([data-theme="dark"]) .deleteBtn:hover {
+    background: color-mix(in srgb, var(--danger) 30%, rgba(0, 0, 0, 0.45));
 }
 
 .headerCard {

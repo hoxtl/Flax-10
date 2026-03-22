@@ -137,6 +137,28 @@
     line-height: 1.2;
 }
 
+.projectNameButton {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.projectNameButton:hover {
+    color: var(--primary);
+}
+
+.projectNameButton:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
 .projectCaption {
     margin: 0.18rem 0 0;
     font-size: 0.84rem;
@@ -145,15 +167,6 @@
     max-width: 64ch;
 }
 
-.projectDetailsButton {
-    min-height: 30px;
-    padding: 0.32rem 0.82rem;
-    font-size: 0.73rem;
-    border-color: var(--groupwork-action-border);
-    background: var(--groupwork-action-bg);
-    color: var(--groupwork-action-text);
-    box-shadow: var(--groupwork-action-shadow);
-}
 
 .projectSubRow {
     display: flex;
@@ -312,15 +325,7 @@
         padding: 0 14px 12px;
     }
 
-    .projectDetailsButton {
-        min-height: 28px;
-    }
-
     .accordionSummary {
         display: block;
-    }
-
-    .projectDetailsButton {
-        width: auto;
     }
 }
