@@ -1,3 +1,7 @@
+/*
+ * GroupWork index loading skeleton.
+ */
+
 import React from "react";
 import SkeletonBlock from "../../../components/common/LoadingState/SkeletonBlock";
 import styles from "./GroupWorkIndexSkeleton.module.css";

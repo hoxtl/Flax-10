@@ -1,3 +1,7 @@
+/*
+ * GroupWork project members section.
+ */
+
 import React from "react";
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName, openMemberProfile } from "./memberAvatarUtils";

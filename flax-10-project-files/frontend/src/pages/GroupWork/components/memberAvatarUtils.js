@@ -82,3 +82,12 @@ export function openMemberProfile(event, member) {
   event?.stopPropagation?.();
   window.dispatchEvent(new CustomEvent("navigate", { detail: target }));
 }
+
+export function getStoredViewer() {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem("user") || "{}");
+  } catch {
+    return {};
+  }
+}
