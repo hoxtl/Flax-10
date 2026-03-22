@@ -4,41 +4,17 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import SearchBar from '../common/SearchBar/SearchBar';
-import { FilterDropdown, SearchDropdown } from './UserSearchLists';
+import { SearchDropdown } from './UserSearchLists';
+import { FilterDropdown } from './FilterDropdown';
 import { styles } from './userSearchShared';
 
-export function GlobalSearchBar({
-    query,
-    setQuery,
-    setFocus,
-    containerRef,
-    showDropdown,
-    loading,
-    userResults,
-    handleSelect,
-    fullWidth,
-    compact,
-    renderEmptyState,
-    placeholder = "Search users...",
-    dropdownMode = "overlay",
-}) {
+export function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDropdown, loading, userResults, handleSelect, fullWidth, compact, renderEmptyState, placeholder = "Search users...", dropdownMode = "overlay" }) {
     const widthClass = fullWidth ? styles.fullWidthSearch : '';
     const searchClass = fullWidth ? styles.searchBarFull : styles.searchBarContainer;
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer} ${widthClass}`} ref={containerRef}>
             <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder={placeholder} className={searchClass} />
-            {showDropdown && (
-                <SearchDropdown
-                    loading={loading}
-                    query={query}
-                    setQuery={setQuery}
-                    userResults={userResults}
-                    onUserSelect={handleSelect}
-                    compact={compact}
-                    renderEmptyState={renderEmptyState}
-                    dropdownMode={dropdownMode}
-                />
-            )}
+            {showDropdown && <SearchDropdown loading={loading} query={query} setQuery={setQuery} userResults={userResults} onUserSelect={handleSelect} compact={compact} renderEmptyState={renderEmptyState} dropdownMode={dropdownMode} />}
         </div>
     );
 }

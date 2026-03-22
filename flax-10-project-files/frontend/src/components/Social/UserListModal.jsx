@@ -55,53 +55,31 @@ function UserListItem({ user, currentUser, onUserClick, onUserUpdate, onUserCale
     return <SummaryItem avatar={<UserAvatar user={avatarUser} avatarOnly />} title={formatName(user)} subtitle={`@${user.username}`} onClick={() => onUserClick?.(user)} rightAction={rightAction} />;
 }
 
-function buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction) {
-    if (showCalendarAction) {
-        return (
-            <PrimaryButton
-                pill
-                size="small"
-                variant="primary"
-                onClick={(event) => {
-                    event.stopPropagation();
-                    onUserCalendarClick?.(user);
-                }}
-            >
-                View calendar
-            </PrimaryButton>
-        );
-    }
+function CalendarActionButton({ user, onUserCalendarClick }) {
     return (
-        <ShareButton
-            userId={user.id}
-            initialIsSharing={user.is_sharing}
-            onToggle={onUserUpdate}
-            shareVariant="secondary"
-            sharedVariant="primary"
-            sharedLabel="Shared calendar"
-        />
+        <PrimaryButton pill size="small" variant="primary" onClick={(e) => { e.stopPropagation(); onUserCalendarClick?.(user); }}>
+            View calendar
+        </PrimaryButton>
     );
+}
+
+function buildRightAction(user, onUserUpdate, onUserCalendarClick, showCalendarAction) {
+    if (showCalendarAction) return <CalendarActionButton user={user} onUserCalendarClick={onUserCalendarClick} />;
+    return <ShareButton userId={user.id} initialIsSharing={user.is_sharing} onToggle={onUserUpdate} shareVariant="secondary" sharedVariant="primary" sharedLabel="Shared calendar" />;
+}
+
+function UserListEmpty({ emptyHint }) {
+    return <SearchEmptyState itemLabel="users" title="No users found" hint={emptyHint} />;
 }
 
 export default function UserListModal({ title, users, onClose, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction = false, emptyHint = "No one is sharing with you yet." }) {
     if (!users) return null;
     const currentUser = getCurrentUser();
-    const items = sortUsers(users, currentUser);
     const renderItem = buildRenderItem(currentUser, onUserClick, onUserUpdate, onUserCalendarClick, showCalendarAction);
     return (
-        <GenericSummaryModal
-            isOpen={true}
-            onClose={onClose}
-            title={title}
-            emptyContent={
-                <SearchEmptyState
-                    itemLabel="users"
-                    title="No users found"
-                    hint={emptyHint}
-                />
-            }
-            items={items}
-            renderItem={renderItem}
+        <GenericSummaryModal isOpen={true} onClose={onClose} title={title}
+            emptyContent={<UserListEmpty emptyHint={emptyHint} />}
+            items={sortUsers(users, currentUser)} renderItem={renderItem}
         />
     );
 }
