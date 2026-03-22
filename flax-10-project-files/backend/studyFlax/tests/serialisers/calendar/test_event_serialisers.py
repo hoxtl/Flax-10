@@ -94,3 +94,17 @@ class CalendarEventCreateSerialiserTests(TestCase):
         data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': str(self.tag.id)}
         event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
         self.assertEqual(event.tag.id, self.tag.id)
+
+    def test_resolve_tag_by_name_creates_new(self):
+        """Test _resolve_tag creates tag from name."""
+        data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': 'NewTag'}
+        event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+        self.assertEqual(event.tag.name, 'NewTag')
+        self.assertTrue(event.tag.is_default)
+
+    def test_resolve_tag_none(self):
+        """Test _resolve_tag with None/empty."""
+        for tag_val in [None, '']:
+            data = {'title': 'E', 'start_time': timezone.now(), 'end_time': timezone.now() + timedelta(hours=1), 'tag': tag_val}
+            event = CalendarEventCreateSerialiser(data=data).save(user=self.user)
+            self.assertIsNone(event.tag)
