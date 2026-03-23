@@ -1,0 +1,162 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 8, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal {
+  width: min(400px, 92vw);
+  background: var(--surface-panel, var(--panel));
+  border-radius: var(--modal-radius, 16px);
+  padding: var(--modal-padding, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  overflow: hidden;
+  /* box-shadow is animated by framer-motion */
+}
+
+/* ── Header ───────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl, 1.15rem);
+  font-weight: var(--font-weight-title, 700);
+  color: var(--text);
+  font-family: var(--font-heading, var(--font-body));
+  letter-spacing: -0.01em;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid color-mix(in srgb, var(--primary, #5c4a2a) 14%, transparent);
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+/* ── Progress ring ────────────────────── */
+.ringWrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+}
+
+.ringLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.ringPct {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ringSub {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Event pill ───────────────────────── */
+.eventPill {
+  color: var(--text);
+  font-style: italic;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-size: var(--text-base, 0.9rem);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Buttons ──────────────────────────── */
+.yesNoRow {
+  display: flex;
+  gap: var(--space-3, 12px);
+}
+
+.btn {
+  flex: 1;
+  padding: 0.58rem 1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: var(--text-base, 0.9rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.btnYes {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btnNo {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btnDismiss {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary, var(--muted));
+  font-weight: 500;
+}
+
+.btnDismiss:hover {
+  background: var(--hover);
+  opacity: 1;
+}
