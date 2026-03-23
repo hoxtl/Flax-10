@@ -217,6 +217,40 @@ describe('MonthView', () => {
         expect(screen.getByText('15')).toBeInTheDocument();
     });
 
+    it('renders a zero-duration all-day event in month view', () => {
+        const allDayState = {
+            ...defaultState,
+            events: [
+                {
+                    id: 10,
+                    title: 'All-day note',
+                    start_time: new Date(2026, 1, 15, 0, 0),
+                    end_time: new Date(2026, 1, 15, 0, 0),
+                    all_day: true,
+                },
+            ],
+        };
+        setup(allDayState);
+        expect(screen.getAllByText('All-day note')).toHaveLength(1);
+    });
+
+    it('renders a multi-day all-day event across each visible day', () => {
+        const multiDayState = {
+            ...defaultState,
+            events: [
+                {
+                    id: 11,
+                    title: 'Reading week',
+                    start_time: new Date(2026, 1, 15, 0, 0),
+                    end_time: new Date(2026, 1, 18, 0, 0),
+                    all_day: true,
+                },
+            ],
+        };
+        setup(multiDayState);
+        expect(screen.getAllByText('Reading week')).toHaveLength(3);
+    });
+
     it('uses selectedDate and events props when provided (over context)', () => {
         const propDate = new Date(2026, 3, 10);
         const propEvents = [{ id: 99, title: 'Prop event', start_time: new Date(2026, 3, 10, 9, 0), end_time: new Date(2026, 3, 10, 10, 0) }];

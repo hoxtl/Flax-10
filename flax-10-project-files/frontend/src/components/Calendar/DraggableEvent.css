@@ -40,6 +40,11 @@
     min-width: 0;
 }
 
+.event-content.compact {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
 .event-title {
     font-weight: 700;
     color: var(--text);
@@ -48,6 +53,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.event-title.compact {
+    font-size: 0.62rem;
+    line-height: 1.15;
 }
 
 .event-time {

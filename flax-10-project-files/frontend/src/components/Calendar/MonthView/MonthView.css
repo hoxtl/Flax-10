@@ -119,6 +119,7 @@
     font-weight: 600;
     padding: 1px 2px;
     background-color: transparent;
+    border: none;
     border-radius: 0;
     color: var(--text);
     white-space: nowrap;
@@ -128,6 +129,9 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
 }
 
 /* Dot removed per design review */
@@ -140,6 +144,12 @@
     color: var(--text);
     font-style: italic;
     cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    width: fit-content;
+    font-family: inherit;
 }
 
 .more-events:hover {

@@ -60,6 +60,7 @@ function ConflictEventCell({ event }) {
 
     return (
         <div ref={ref} className={`${styles.conflictCell} ${readOnly ? styles.readOnly : ''}`}
+            data-event-id={event.id}
             onClick={onClick} style={accentColor ? { '--accent': accentColor } : undefined}>
             <EventRowMain event={event} accentColor={accentColor} badges={badges} />
         </div>
@@ -89,6 +90,7 @@ export function EventRow({ event }) {
 
     return (
         <div ref={ref} className={`${styles.eventRow} ${readOnly ? styles.readOnly : ''}`}
+            data-event-id={event.id}
             onClick={onClick} style={accentColor ? { '--accent': accentColor } : undefined}>
             <EventRowMain event={event} accentColor={accentColor} badges={badges} />
         </div>
