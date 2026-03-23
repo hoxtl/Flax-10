@@ -19,19 +19,36 @@ def get_user_lists(user, archived=False):
     """Return task lists for the given user, optionally filtered by archived state."""
     return TaskList.objects.filter(user=user, archived=archived).order_by("created_at")
 
-def get_user_tasks(user, params):
-    """Return all tasks accessible to the user, with optional query param filters applied."""
-    qs = Task.objects.filter(
+def _base_user_tasks(user):
+    return Task.objects.filter(
         Q(user=user) | Q(assigned_to=user) | Q(group_project__memberships__user=user)
     ).distinct()
-    if params.get("group_project"):
-        qs = qs.filter(group_project_id=params["group_project"])
-    if params.get("list"):
-        qs = qs.filter(task_list_id=params["list"])
-    if params.get("module"):
-        qs = qs.filter(module_id=params["module"])
-    if params.get("completed"):
-        qs = qs.filter(completed=params["completed"] == "true")
+
+def _apply_group_project_filter(qs, params):
+    group_project = params.get("group_project")
+    return qs.filter(group_project_id=group_project) if group_project else qs
+
+def _apply_task_list_filter(qs, params):
+    task_list_id = params.get("list")
+    return qs.filter(task_list_id=task_list_id) if task_list_id else qs
+
+def _apply_module_filter(qs, params):
+    module_id = params.get("module")
+    return qs.filter(module_id=module_id) if module_id else qs
+
+def _apply_completed_filter(qs, params):
+    completed = params.get("completed")
+    if completed is None:
+        return qs
+    return qs.filter(completed=completed == "true")
+
+def get_user_tasks(user, params):
+    """Return all tasks accessible to the user, with optional query param filters applied."""
+    qs = _base_user_tasks(user)
+    qs = _apply_group_project_filter(qs, params)
+    qs = _apply_task_list_filter(qs, params)
+    qs = _apply_module_filter(qs, params)
+    qs = _apply_completed_filter(qs, params)
     return qs.order_by("completed", "priority", "due_date")
 
 def _task_event_qs(task: Task):
@@ -156,4 +173,3 @@ def log_task_time(request, task_id):
     if _is_reading_task(task):
         update_reading_estimates(request.user)
     return Response({"time_spent_minutes": task.time_spent_minutes})
-

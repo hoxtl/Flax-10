@@ -81,6 +81,37 @@ def _notify_admins_of_report(society, reason):
         for admin_user in User.objects.filter(is_superuser=True)
     ])
 
+def _remove_society_report(society, user):
+    SocietyReport.objects.filter(society=society, reporter=user).delete()
+
+def _clean_report_reason(request):
+    reason = request.data.get('reason')
+    if not reason or not reason.strip():
+        return None
+    return reason.strip()
+
+def _create_society_report(society, user, reason):
+    SocietyReport.objects.get_or_create(
+        society=society, reporter=user, defaults={'reason': reason},
+    )
+
+def _report_removed_response():
+    return Response({'message': 'Report removed successfully'}, status=status.HTTP_200_OK)
+
+def _report_reason_required_response():
+    return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+def _report_submitted_response():
+    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
+
+def _submit_society_report(request, society):
+    reason = _clean_report_reason(request)
+    if not reason:
+        return _report_reason_required_response()
+    _create_society_report(society, request.user, reason)
+    _notify_admins_of_report(society, reason)
+    return _report_submitted_response()
+
 @api_view(['POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def report_society(request, society_id):
@@ -89,13 +120,6 @@ def report_society(request, society_id):
     if not society:
         return society_not_found_response()
     if request.method == 'DELETE':
-        SocietyReport.objects.filter(society=society, reporter=request.user).delete()
-        return Response({'message': 'Report removed successfully'}, status=status.HTTP_200_OK)
-    reason = request.data.get('reason')
-    if not reason or not reason.strip():
-        return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
-    SocietyReport.objects.get_or_create(
-        society=society, reporter=request.user, defaults={'reason': reason.strip()},
-    )
-    _notify_admins_of_report(society, reason.strip())
-    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
+        _remove_society_report(society, request.user)
+        return _report_removed_response()
+    return _submit_society_report(request, society)
