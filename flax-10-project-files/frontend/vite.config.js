@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import react from '@vitejs/plugin-react'
 import postcssImport from 'postcss-import'
-import patchCssModules from 'vite-css-modules'
+import viteCssModules from 'vite-css-modules'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -19,8 +19,8 @@ export default defineConfig({
     },
   },
   plugins: [
-    patchCssModules(),
-    react()
+    viteCssModules(),
+    react(),
   ],
   server: {
     host: '127.0.0.1',
