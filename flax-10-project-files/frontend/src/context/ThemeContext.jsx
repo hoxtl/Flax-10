@@ -1,11 +1,17 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { fetchApi } from '../api/client';
+/*
+ * Theme mode and palette context.
+ */
+
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { fetchApi } from "../api/client";
 
 const ThemeContext = createContext();
+const VALID_MODES = ["light", "dark"];
+const VALID_THEMES = ["flax", "coral", "rust", "amber", "ocean", "indigo", "teal", "forest", "rose", "lavender", "mint", "sand"];
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within ThemeProvider');
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
   return context;
 }
 
@@ -13,11 +19,11 @@ async function logThemeSession(theme, startedAt) {
   const endedAt = new Date().toISOString();
   if (new Date(endedAt) - new Date(startedAt) < 60000) return;
   try {
-    await fetchApi('/analytics/theme-session/', {
-      method: 'POST',
+    await fetchApi("/analytics/theme-session/", {
+      method: "POST",
       body: JSON.stringify({ theme, started_at: startedAt, ended_at: endedAt }),
     });
-  } catch { /* silently fail */ }
+  } catch {}
 }
 
 function getStored(key, valid, fallback) {
@@ -26,60 +32,53 @@ function getStored(key, valid, fallback) {
 }
 
 function useThemeSession(theme, setThemeState) {
-  const sessionStart = useRef(new Date().toISOString());
   const currentTheme = useRef(theme);
-
-  useEffect(() => {
-    const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, []);
-
-  function applyThemeChange(newTheme) {
-    logThemeSession(currentTheme.current, sessionStart.current);
-    sessionStart.current = new Date().toISOString();
-    currentTheme.current = newTheme;
-    setThemeState(newTheme);
-  }
-
-  return { applyThemeChange };
+  const sessionStart = useRef(new Date().toISOString());
+  useEffect(() => bindThemeUnload(currentTheme, sessionStart), []);
+  return { applyThemeChange: (nextTheme) => applyThemeChange(currentTheme, sessionStart, nextTheme, setThemeState) };
 }
 
-const VALID_MODES = ['light', 'dark'];
-const VALID_THEMES = ['flax', 'coral', 'rust', 'amber', 'ocean', 'indigo', 'teal', 'forest', 'rose', 'lavender', 'mint', 'sand'];
+function bindThemeUnload(currentTheme, sessionStart) {
+  const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
+  window.addEventListener("beforeunload", handleUnload);
+  return () => window.removeEventListener("beforeunload", handleUnload);
+}
+
+function applyThemeChange(currentTheme, sessionStart, nextTheme, setThemeState) {
+  logThemeSession(currentTheme.current, sessionStart.current);
+  currentTheme.current = nextTheme;
+  sessionStart.current = new Date().toISOString();
+  setThemeState(nextTheme);
+}
+
+function useThemePreferences(initialTheme, initialMode) {
+  const [mode, setModeState] = useState(() => initialMode || getStored("mode", VALID_MODES, "light"));
+  const [theme, setThemeState] = useState(() => initialTheme || getStored("colorTheme", VALID_THEMES, "flax"));
+  return { mode, setModeState, theme, setThemeState };
+}
+
+function usePersistedAttribute(attribute, storageKey, value) {
+  useEffect(() => {
+    document.documentElement.setAttribute(attribute, value);
+    localStorage.setItem(storageKey, value);
+  }, [attribute, storageKey, value]);
+}
+
+function isValidChange(nextValue, currentValue, validValues) {
+  return nextValue !== currentValue && validValues.includes(nextValue);
+}
+
+function useThemeControls(mode, setModeState, theme, applyThemeChange) {
+  const setMode = (nextMode) => isValidChange(nextMode, mode, VALID_MODES) && setModeState(nextMode);
+  const setTheme = (nextTheme) => isValidChange(nextTheme, theme, VALID_THEMES) && applyThemeChange(nextTheme);
+  return { setMode, setTheme, toggleMode: () => setMode(mode === "light" ? "dark" : "light") };
+}
 
 export function ThemeProvider({ children, initialTheme, initialMode }) {
-  const [mode, setModeState] = useState(() => initialMode || getStored('mode', VALID_MODES, 'light'));
-  const [theme, setThemeState] = useState(() => initialTheme || getStored('colorTheme', VALID_THEMES, 'flax'));
+  const { mode, setModeState, theme, setThemeState } = useThemePreferences(initialTheme, initialMode);
   const { applyThemeChange } = useThemeSession(theme, setThemeState);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-mode', mode);
-    localStorage.setItem('mode', mode);
-  }, [mode]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('colorTheme', theme);
-  }, [theme]);
-
-  function setMode(newMode) {
-    if (newMode !== mode && VALID_MODES.includes(newMode)) {
-        setModeState(newMode);
-    }
-  }
-
-  const toggleMode = () => setMode(mode === 'light' ? 'dark' : 'light');
-
-  function setTheme(newTheme) {
-    if (newTheme !== theme && VALID_THEMES.includes(newTheme)) {
-        applyThemeChange(newTheme);
-    }
-  }
-
-  return (
-    <ThemeContext.Provider value={{ mode, setMode, toggleMode, theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  const controls = useThemeControls(mode, setModeState, theme, applyThemeChange);
+  usePersistedAttribute("data-mode", "mode", mode);
+  usePersistedAttribute("data-theme", "colorTheme", theme);
+  return <ThemeContext.Provider value={{ mode, theme, ...controls }}>{children}</ThemeContext.Provider>;
 }
