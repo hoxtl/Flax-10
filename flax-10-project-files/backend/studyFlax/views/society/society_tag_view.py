@@ -52,14 +52,24 @@ def society_tag_detail(request, society_id, tag_id):
         return society_not_found_response()
     if not is_society_admin(request.user, society):
         return permission_denied_response()
+    return _society_tag_detail_result(request.method, request.data, society, tag_id)
 
+
+def _society_tag_detail_result(method, data, society, tag_id):
     tag = get_society_object_or_none(SocietyTag, society, tag_id)
     if not tag:
-        return Response({'error': 'Tag not found'}, status=status.HTTP_404_NOT_FOUND)
+        return _society_tag_not_found_response()
+    return _society_tag_detail_response(method, tag, data)
 
-    if request.method == 'DELETE':
+
+def _society_tag_not_found_response():
+    return Response({'error': 'Tag not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+def _society_tag_detail_response(method, tag, data):
+    if method == 'DELETE':
         return delete_tag(tag)
-    return update_tag(tag, request.data)
+    return update_tag(tag, data)
 
 def update_tag(tag, data):
     serialiser = SocietyTagSerialiser(tag, data=data, partial=True)

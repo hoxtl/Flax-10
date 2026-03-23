@@ -49,17 +49,16 @@ def create_event_result(user, data, society, silent):
     serialiser.save(society=society)
     return serialiser.data, None, status.HTTP_201_CREATED
 
-@api_view(['GET', 'PATCH', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def event_detail(request, society_id, event_id):
-    society = get_society_or_404(society_id)
-    if not society:
-        return society_not_found_response()
-    event = get_society_object_or_none(SocietyEvent, society, event_id)
-    if not event:
-        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'GET':
-        return Response(SocietyEventSerialiser(event).data)
+
+def _event_not_found_response():
+    return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+def _event_detail_get_response(event):
+    return Response(SocietyEventSerialiser(event).data)
+
+
+def _event_detail_write_response(request, society, event):
     permission_response = _event_admin_error(request.user, society)
     if permission_response:
         return permission_response
@@ -67,6 +66,23 @@ def event_detail(request, society_id, event_id):
     if request.method == 'DELETE':
         return delete_event(event, silent)
     return update_event(event, request.data, silent)
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def event_detail(request, society_id, event_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    return _event_detail_response(request, society, event_id)
+
+
+def _event_detail_response(request, society, event_id):
+    event = get_society_object_or_none(SocietyEvent, society, event_id)
+    if not event:
+        return _event_not_found_response()
+    if request.method == 'GET':
+        return _event_detail_get_response(event)
+    return _event_detail_write_response(request, society, event)
 
 
 def _event_admin_error(user, society):
@@ -110,19 +126,41 @@ def _society_event_exception_response(request, society_id, event_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
+    return _event_exception_response(request, society, event_id)
+
+
+def _event_exception_response(request, society, event_id):
     event = get_society_object_or_none(SocietyEvent, society, event_id)
     if not event:
-        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+        return _event_not_found_response()
     permission_response = _event_admin_error(request.user, society)
     if permission_response:
         return permission_response
-    date = request.data.get('date')
-    if not date:
-        return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
-    if event.recurrence == 'none':
-        return Response({'error': 'Event has no recurrence'}, status=status.HTTP_400_BAD_REQUEST)
+    date = _event_exception_date(request)
+    if isinstance(date, Response):
+        return date
+    return _event_exception_result(event, date)
+
+
+def _event_exception_result(event, date):
+    recurrence_error = _event_recurrence_error(event)
+    if recurrence_error:
+        return recurrence_error
     _add_exception_date(event, date)
     return Response(SocietyEventSerialiser(event).data)
+
+
+def _event_exception_date(request):
+    date = request.data.get('date')
+    if date:
+        return date
+    return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _event_recurrence_error(event):
+    if event.recurrence == 'none':
+        return Response({'error': 'Event has no recurrence'}, status=status.HTTP_400_BAD_REQUEST)
+    return None
 
 def notify_exception(event, date):
     from studyFlax.signals.society_notifications import notify_society_members

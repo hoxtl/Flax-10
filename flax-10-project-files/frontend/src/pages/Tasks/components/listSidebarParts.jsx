@@ -37,8 +37,14 @@ export function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.style.setProperty("--ctx-top", `${y}px`);
+    ref.current.style.setProperty("--ctx-left", `${x}px`);
+  }, [x, y]);
+
   return (
-    <div ref={ref} className={styles.ctxMenu} style={{ "--ctx-top": y, "--ctx-left": x }}>
+    <div ref={ref} className={styles.ctxMenu}>
       <button className={styles.ctxItem} onClick={() => { onRename(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Rename</button>
       <div className={styles.ctxDivider} />
       <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}><Trash2 size={14} strokeWidth={2} /> Delete list</button>

@@ -70,6 +70,14 @@ def update_module(request, module, user):
 def delete_module(module, user):
     if module.created_by != user:
         return Response({"error": "You can only delete your own modules."}, status=status.HTTP_403_FORBIDDEN)
+    return _delete_module_response(module)
+
+
+def _delete_module_and_notify(module):
     notify_enrolled_students(module)
     module.delete()
+
+
+def _delete_module_response(module):
+    _delete_module_and_notify(module)
     return Response(status=status.HTTP_204_NO_CONTENT)

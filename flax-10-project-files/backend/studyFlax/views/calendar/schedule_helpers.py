@@ -15,12 +15,19 @@ def _notify_schedule_overwrite(user, title):
         notification_type="general",
     )
 
+
+def _existing_schedules(user, title):
+    return list(Schedule.objects.filter(user=user, title=title))
+
+
+def _delete_schedules(schedules):
+    for schedule in schedules:
+        schedule.delete()
+
 def _overwrite_same_name_schedules(user, title):
-    existing = list(Schedule.objects.filter(user=user, title=title))
+    existing = _existing_schedules(user, title)
     if not existing:
         return False
-
-    for schedule in existing:
-        schedule.delete()
+    _delete_schedules(existing)
     _notify_schedule_overwrite(user, title)
     return True

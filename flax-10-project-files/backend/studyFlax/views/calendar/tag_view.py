@@ -41,16 +41,25 @@ def get_tags(user):
 
 def ensure_user_system_tags(user):
     from studyFlax.views.calendar.system_tags import get_lecture_tag, get_deadline_tag
-    from studyFlax.views.calendar.system_tags import get_exam_tag, get_societies_tag, get_schedule_tag
+    from studyFlax.views.calendar.system_tags import get_exam_tag, get_schedule_tag, get_societies_tag
     from studyFlax.views.calendar.system_tags import fix_untagged_deadline_events
-    if has_module_enrollments(user):
-        get_lecture_tag()
-        get_deadline_tag()
-        get_exam_tag()
-        fix_untagged_deadline_events()
+    _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events)
+    _ensure_society_tags(user, get_societies_tag)
+    get_schedule_tag()
+
+
+def _ensure_module_tags(user, get_lecture_tag, get_deadline_tag, get_exam_tag, fix_untagged_deadline_events):
+    if not has_module_enrollments(user):
+        return
+    get_lecture_tag()
+    get_deadline_tag()
+    get_exam_tag()
+    fix_untagged_deadline_events()
+
+
+def _ensure_society_tags(user, get_societies_tag):
     if has_society_syncs(user):
         get_societies_tag()
-    get_schedule_tag()
 
 def has_module_enrollments(user):
     return Enrollment.objects.filter(student=user).exists()

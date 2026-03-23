@@ -40,9 +40,17 @@ def create_announcement(request, society, silent=False):
 
 
 def create_announcement_result(user, data, society, silent=False):
-    if not is_society_admin(user, society):
-        response = permission_denied_response()
-        return None, response.data, response.status_code
+    permission_response = _society_admin_error(user, society)
+    if permission_response:
+        return _permission_error_result(permission_response)
+    return _create_announcement_payload(data, society, silent)
+
+
+def _permission_error_result(permission_response):
+    return None, permission_response.data, permission_response.status_code
+
+
+def _create_announcement_payload(data, society, silent=False):
     context = {'skip_notification': silent}
     serialiser = SocietyAnnouncementSerialiser(data=data, context=context)
     if not serialiser.is_valid():
@@ -59,17 +67,16 @@ def save_announcement_images(announcement, image_urls):
     for i, url in enumerate(image_urls):
         SocietyAnnouncementImage.objects.create(announcement=announcement, url=url, order=i)
 
-@api_view(['GET', 'PATCH', 'DELETE'])
-@permission_classes([IsAuthenticated])
-def announcement_detail(request, society_id, announcement_id):
-    society = get_society_or_404(society_id)
-    if not society:
-        return society_not_found_response()
-    announcement = get_society_object_or_none(SocietyAnnouncement, society, announcement_id)
-    if not announcement:
-        return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'GET':
-        return Response(SocietyAnnouncementSerialiser(announcement).data)
+
+def _announcement_not_found_response():
+    return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+def _announcement_detail_get_response(announcement):
+    return Response(SocietyAnnouncementSerialiser(announcement).data)
+
+
+def _announcement_detail_write_response(request, society, announcement):
     permission_response = _society_admin_error(request.user, society)
     if permission_response:
         return permission_response
@@ -77,6 +84,23 @@ def announcement_detail(request, society_id, announcement_id):
     if request.method == 'DELETE':
         return delete_announcement(announcement, silent)
     return update_announcement(announcement, request.data, silent)
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def announcement_detail(request, society_id, announcement_id):
+    society = get_society_or_404(society_id)
+    if not society:
+        return society_not_found_response()
+    return _announcement_detail_response(request, society, announcement_id)
+
+
+def _announcement_detail_response(request, society, announcement_id):
+    announcement = get_society_object_or_none(SocietyAnnouncement, society, announcement_id)
+    if not announcement:
+        return _announcement_not_found_response()
+    if request.method == 'GET':
+        return _announcement_detail_get_response(announcement)
+    return _announcement_detail_write_response(request, society, announcement)
 
 
 def _society_admin_error(user, society):

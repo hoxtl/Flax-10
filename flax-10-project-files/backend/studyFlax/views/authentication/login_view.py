@@ -33,20 +33,45 @@ def _build_ban_response(candidate, password):
         )
     return None
 
-@api_view(['POST'])
-def login_view(request):
-    """Log in a user, returning a token or an appropriate error response."""
 
+def _auth_failure_response():
+    return Response({'error': 'Credentials are not valid!'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+def _auth_success_response(logged_user, request):
+    token, _ = Token.objects.get_or_create(user=logged_user)
+    return Response({'user': UserSerialiser(logged_user, context={'request': request}).data, 'token': token.key})
+
+
+def _login_input(request):
     user_serialiser = LoggedUserSerialiser(data=request.data)
-    if not user_serialiser.is_valid():
-        return Response(user_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+    if user_serialiser.is_valid():
+        return user_serialiser, None
+    return None, Response(user_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _authenticate_user(user_serialiser):
     username = user_serialiser.validated_data['username']
     password = user_serialiser.validated_data['password']
     ban_response = _build_ban_response(_get_candidate(username), password)
     if ban_response:
-        return ban_response
-    logged_user = authenticate(username=username, password=password)
-    if logged_user is not None:
-        token, _ = Token.objects.get_or_create(user=logged_user)
-        return Response({'user': UserSerialiser(logged_user, context={'request': request}).data, 'token': token.key})
-    return Response({'error': 'Credentials are not valid!'}, status=status.HTTP_401_UNAUTHORIZED)
+        return None, ban_response
+    return authenticate(username=username, password=password), None
+
+@api_view(['POST'])
+def login_view(request):
+    """Log in a user, returning a token or an appropriate error response."""
+
+    return _login_response(request)
+
+
+def _login_response(request):
+    user_serialiser, error_response = _login_input(request)
+    if error_response:
+        return error_response
+    logged_user, auth_error = _authenticate_user(user_serialiser)
+    if auth_error:
+        return auth_error
+    if logged_user is None:
+        return _auth_failure_response()
+    return _auth_success_response(logged_user, request)

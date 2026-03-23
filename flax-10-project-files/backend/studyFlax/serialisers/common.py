@@ -10,14 +10,33 @@ def build_profile_photo_url(photo, request):
 
     if not photo:
         return None
+    absolute_url = _photo_string_url(photo)
+    if absolute_url:
+        return absolute_url
+    url = _safe_photo_url(photo)
+    if not url:
+        return None
+    return _request_photo_url(request, url)
+
+
+def _photo_string_url(photo):
     photo_str = str(photo).strip()
     if photo_str.startswith(("http://", "https://")):
         return photo_str
+    return None
+
+
+def _safe_photo_url(photo):
     try:
-        url = photo.url
+        return photo.url
     except (ValueError, AttributeError):
         return None
-    return request.build_absolute_uri(url) if request else None
+
+
+def _request_photo_url(request, url):
+    if not request:
+        return None
+    return request.build_absolute_uri(url)
 
 def ensure_teacher_user(request, error_message: str) -> None:
     """Ensure the request user is a teacher, otherwise raise a ValidationError."""

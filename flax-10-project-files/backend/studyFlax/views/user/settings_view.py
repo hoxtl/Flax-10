@@ -30,6 +30,22 @@ def apply_settings_updates(settings, data):
     payload = serializer.data
     return Response({**payload, "settings": dict(payload)})
 
+
+def _missing_onboarding_fields_response():
+    return Response({'error': 'year and major are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _save_onboarding_settings(settings, year, major):
+    settings.year, settings.major = year, major
+    settings.save()
+
+
+def _onboarding_response(request, year, major):
+    settings = get_or_create_user_settings(request.user)
+    _save_onboarding_settings(settings, year, major)
+    enrolled_count = enroll_user_in_modules(request.user, get_modules_for_major(major))
+    return Response({'enrolled_modules': enrolled_count, 'year': year, 'major': major})
+
 @api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_settings_view(request):
@@ -44,9 +60,5 @@ def user_settings_view(request):
 def onboarding_view(request):
     year, major = request.data.get('year'), request.data.get('major')
     if not year or not major:
-        return Response({'error': 'year and major are required'}, status=status.HTTP_400_BAD_REQUEST)
-    settings = get_or_create_user_settings(request.user)
-    settings.year, settings.major = year, major
-    settings.save()
-    enrolled_count = enroll_user_in_modules(request.user, get_modules_for_major(major))
-    return Response({'enrolled_modules': enrolled_count, 'year': year, 'major': major})
+        return _missing_onboarding_fields_response()
+    return _onboarding_response(request, year, major)

@@ -50,10 +50,18 @@ def delete_enrollment(request, enrollment):
         return Response({"error": "You can only unenrol yourself."}, status=status.HTTP_403_FORBIDDEN)
     if is_core_module(request.user, enrollment.module):
         return Response({"error": "You cannot leave a module that is part of your core course."}, status=status.HTTP_403_FORBIDDEN)
+    _remove_enrollment_calendar_events(request.user, enrollment.module)
+    return _delete_enrollment_record(enrollment)
+
+
+def _remove_enrollment_calendar_events(user, module):
     CalendarEvent.objects.filter(
-        user=request.user,
-        module=enrollment.module,
+        user=user,
+        module=module,
         source__in=['module_enrollment', 'module_deadline'],
     ).delete()
+
+
+def _delete_enrollment_record(enrollment):
     enrollment.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

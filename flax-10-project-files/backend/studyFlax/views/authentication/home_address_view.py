@@ -35,6 +35,22 @@ def _to_float(value, field_name):
     except (TypeError, ValueError) as exc:
         raise ValidationError({field_name: f"{field_name} must be a valid number."}) from exc
 
+
+def _home_address_success_response(user):
+    return Response({"success": True, "home_address": user.home_address})
+
+
+def _home_address_error_response(exc):
+    return Response({"success": False, "error": exc.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def _update_home_address(user, data):
+    try:
+        _save_home_address(user, data)
+        return _home_address_success_response(user)
+    except ValidationError as exc:
+        return _home_address_error_response(exc)
+
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def home_address_view(request):
@@ -42,8 +58,4 @@ def home_address_view(request):
 
     if request.method == "GET":
         return Response(_get_home_address_data(request.user))
-    try:
-        _save_home_address(request.user, request.data)
-        return Response({"success": True, "home_address": request.user.home_address})
-    except ValidationError as exc:
-        return Response({"success": False, "error": exc.message_dict}, status=status.HTTP_400_BAD_REQUEST)
+    return _update_home_address(request.user, request.data)

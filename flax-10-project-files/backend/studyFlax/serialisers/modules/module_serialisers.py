@@ -9,6 +9,28 @@ from studyFlax.serialisers.calendar.deadline_serialisers import DeadlineSummaryS
 from studyFlax.serialisers.modules.reading_serialisers import ReadingSummarySerialiser
 
 
+def _created_by(obj):
+    return getattr(obj, "created_by", None)
+
+
+def _created_by_email(obj):
+    return getattr(_created_by(obj), "email", None)
+
+
+def _created_by_username(obj):
+    return getattr(_created_by(obj), "username", None)
+
+
+def _created_by_profile_photo(obj):
+    return getattr(_created_by(obj), "profile_photo", None)
+
+
+def _profile_photo_url(photo, request):
+    if not photo:
+        return None
+    return request.build_absolute_uri(photo.url) if request else photo.url
+
+
 class ModuleSerialiser(serializers.ModelSerializer):
     is_recurring = serializers.BooleanField(write_only=True, required=False, default=True)
     deadlines = DeadlineSummarySerialiser(many=True, read_only=True)
@@ -26,12 +48,12 @@ class ModuleSerialiser(serializers.ModelSerializer):
                   'created_by_profile_photo_url', 'created_by_username', 'readings']
         read_only_fields = ['created_by']
 
-    def validate(self, validated_data):
+    def _validate(self, validated_data):
         request = self.context.get('request')
         ensure_teacher_user(request, "Only teachers are allowed to create modules")
         return validated_data
 
-    def create(self, validated_data):
+    def _create(self, validated_data):
         """Create a module, attaching a weekly recurrence rule if requested."""
 
         is_recurring = validated_data.pop('is_recurring', True)
@@ -42,27 +64,25 @@ class ModuleSerialiser(serializers.ModelSerializer):
         validated_data['created_by'] = self.context['request'].user
         return super().create(validated_data)
 
-    def get_created_by_name(self, obj):
+    def _get_created_by_name(self, obj):
         try:
             return format_teacher_name(obj.created_by)
         except Exception:
             return 'Unknown'
 
-    def get_created_by_email(self, obj):
-        try:
-            created_by = obj.created_by
-        except Exception:
-            return None
-        return getattr(created_by, "email", None)
+    def _get_created_by_email(self, obj):
+        return _created_by_email(obj)
 
-    def get_created_by_profile_photo_url(self, obj):
-        created_by = getattr(obj, "created_by", None)
-        profile_photo = getattr(created_by, "profile_photo", None)
-        if not profile_photo:
-            return None
-        request = self.context.get("request")
-        return request.build_absolute_uri(profile_photo.url) if request else profile_photo.url
+    def _get_created_by_profile_photo_url(self, obj):
+        return _profile_photo_url(_created_by_profile_photo(obj), self.context.get("request"))
 
-    def get_created_by_username(self, obj):
-        created_by = getattr(obj, "created_by", None)
-        return getattr(created_by, "username", None)
+    def _get_created_by_username(self, obj):
+        return _created_by_username(obj)
+
+
+ModuleSerialiser.validate = ModuleSerialiser._validate
+ModuleSerialiser.create = ModuleSerialiser._create
+ModuleSerialiser.get_created_by_name = ModuleSerialiser._get_created_by_name
+ModuleSerialiser.get_created_by_email = ModuleSerialiser._get_created_by_email
+ModuleSerialiser.get_created_by_profile_photo_url = ModuleSerialiser._get_created_by_profile_photo_url
+ModuleSerialiser.get_created_by_username = ModuleSerialiser._get_created_by_username
