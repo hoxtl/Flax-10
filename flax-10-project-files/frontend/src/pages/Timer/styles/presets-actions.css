@@ -209,23 +209,6 @@
     opacity: 0.92;
 }
 
-.soundSelectorContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.4rem;
-    width: 100%;
-}
-
-.soundSplitGrid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-    width: 100%;
-    align-items: start;
-}
-
-.soundPaneAmbient,
 .soundPaneStreams {
     min-width: 0;
 }
@@ -234,91 +217,4 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-}
-
-.soundPillsLabel {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text);
-}
-
-.soundPillsRow {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    width: 100%;
-}
-
-.soundPill {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    width: 100%;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--muted);
-    background: var(--hover);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
-    text-align: left;
-}
-
-.soundPill:hover {
-    background: color-mix(in srgb, var(--primary) 8%, var(--hover));
-    color: var(--text);
-    transform: translateY(-1px);
-}
-
-.soundPillActive {
-    background: color-mix(in srgb, var(--primary) 18%, var(--surface-card));
-    color: var(--primary-strong);
-    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
-    font-weight: 700;
-}
-
-.soundPillActive:hover {
-    background: color-mix(in srgb, var(--primary) 24%, var(--surface-card));
-    color: var(--primary-strong);
-}
-
-.soundPillEmoji {
-    font-size: 0.9rem;
-    line-height: 1;
-    flex-shrink: 0;
-}
-
-.soundPillLabel {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.15;
-    display: block;
-}
-
-.soundVolumeRow {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    width: 100%;
-    padding: 0.15rem 0;
-}
-
-.soundVolumeIcon {
-    font-size: 0.7rem;
-    flex-shrink: 0;
-    opacity: 0.6;
-}
-
-.soundControls {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
 }

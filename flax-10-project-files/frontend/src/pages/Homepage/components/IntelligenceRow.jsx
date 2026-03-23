@@ -7,7 +7,7 @@ import { useAuth } from "../../../context/AuthContext";
 import styles from "./IntelligenceRow.module.css";
 import IntelligenceGrid from "./IntelligenceGrid";
 import { renderIntelligenceWidget } from "./IntelligenceWidgetRenderer";
-import { CATALOGUE, getSemesterProgress, useIntelligenceDashboard } from "../hooks/useIntelligenceDashboard";
+import { CATALOGUE, DEFAULT_LAYOUT, getSemesterProgress, useIntelligenceDashboard } from "../hooks/useIntelligenceDashboard";
 
 export default function IntelligenceRow(props) {
   const auth = useAuth();
@@ -43,7 +43,7 @@ function ResetModal({ dashboard }) {
 }
 
 function confirmReset(dashboard) {
-  dashboard.setLayout(["hero", "deadlines", "todayTasks", "bigTimeline"]);
+  dashboard.setLayout(DEFAULT_LAYOUT);
   dashboard.setShowResetConfirm(false);
 }
 

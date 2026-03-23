@@ -2,17 +2,6 @@
  * Timer page styles chunk.
  */
 
-.soundDropdown {
-    min-width: 160px;
-}
-
-.volumeSlider {
-    flex: 1;
-    min-width: 60px;
-    accent-color: var(--primary);
-    height: 4px;
-}
-
 .taskInputContainer {
     margin-bottom: 0;
     width: 100%;

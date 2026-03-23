@@ -170,12 +170,6 @@
     animation: fadeIn 0.2s ease-out;
 }
 
-@media (max-width: 980px) {
-    .soundSplitGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .musicEmbedHeader {
     display: flex;
     align-items: center;

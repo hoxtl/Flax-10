@@ -13,7 +13,6 @@ import SleepBanner from "./SleepBanner";
 import { HomepageModals } from "./HomepageModals";
 import { HomepageOverlays } from "./HomepageOverlays";
 import { HomepageSkeleton } from "./HomepageSkeleton";
-import { HomepageFocusBanner } from "./HomepageFocusBanner";
 import taskWidgetStyles from "../styles/TaskWidget.module.css";
 import styles from "../Homepage.module.css";
 import { HomepageTimelineSection } from ".";
@@ -25,7 +24,7 @@ export function HomepageDashboard(props) {
 }
 
 function HomepageDashboardContent(props) {
-  return <><div><HomepageFocusBanner hasTimerSession={props.hasTimerSession} navigate={props.navigate} timeLeft={props.timeLeft} timerMode={props.timerMode} timerTask={props.timerTask} /><SleepBanner /><HomepageDashboardRow {...props} /><HomepageOverlays {...getOverlayProps(props)} /></div><BackToTop containerSelector="[data-dashboard-main]" /><HomepageDashboardModals {...props} /><EventPopups /></>;
+  return <><div><SleepBanner /><HomepageDashboardRow {...props} /><HomepageOverlays {...getOverlayProps(props)} /></div><BackToTop containerSelector="[data-dashboard-main]" /><HomepageDashboardModals {...props} /><EventPopups /></>;
 }
 
 function HomepageDashboardRow(props) {

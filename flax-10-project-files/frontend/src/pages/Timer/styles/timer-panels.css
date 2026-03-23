@@ -167,11 +167,6 @@
     gap: 0.65rem;
 }
 
-.timerSoundCardInline .soundSelectorContainer {
-    margin-top: 0;
-    gap: 0.4rem;
-}
-
 /* Zoom-in transition when navigating from task Play */
 .focusModeTransition {
     position: fixed;

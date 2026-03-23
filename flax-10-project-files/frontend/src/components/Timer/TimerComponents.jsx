@@ -4,8 +4,6 @@
 
 import { useState, useEffect } from 'react';
 import styles from '../../pages/Timer/TimerPage.module.css';
-import { noiseGenerator } from './utils/noiseUtils';
-export { SoundSelector } from './SoundSelector';
 
 // TaskInput lives in its own file; re-export for any existing imports
 export { TaskInput } from './TaskInput';
@@ -127,21 +125,4 @@ export const TimerSettings = ({ work, breakTime, sessions, onUpdate, disabled })
             {showError && <div className={styles.disclaimer}>* Minimum study time is 1 minute</div>}
         </div>
     );
-};
-
-const applyNoise = (noiseType, volume) => {
-    if (noiseType === 'none') return noiseGenerator.stop();
-    noiseGenerator.play(noiseType);
-    noiseGenerator.setVolume(volume);
-};
-
-export const useAmbientSound = () => {
-    const [noiseType, setNoiseType] = useState('none');
-    const [volume, setVolume] = useState(0.5);
-    useEffect(() => {
-        applyNoise(noiseType, volume);
-        return () => noiseGenerator.stop();
-    }, [noiseType, volume]);
-    const toggle = (value) => setNoiseType((prev) => prev === value ? 'none' : value);
-    return { noiseType, toggle, volume, setVolume };
 };

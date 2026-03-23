@@ -13,7 +13,6 @@ vi.mock('../../../components/Timer/TimerComponents', () => ({
   SessionStatus: () => <div data-testid="session-status" />,
   TimerControls: () => <div data-testid="timer-controls" />,
   TimerSettings: () => <div data-testid="timer-settings" />,
-  SoundSelector: () => <div data-testid="sound-selector" />,
 }));
 vi.mock('../../../components/Timer/TaskInput', () => ({
   TaskInput: ({ onTaskSelect }) => (

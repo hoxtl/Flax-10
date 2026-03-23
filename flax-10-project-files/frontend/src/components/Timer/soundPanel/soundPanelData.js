@@ -1,12 +1,6 @@
 /*
- * Static data for the inline sound panel.
+ * Static data for the timer music stations.
  */
-
-export const AMBIENT_SOUNDS = [
-  { id: 'pink', label: '🌧️ Maughan Library Rain', noiseKey: 'pink' },
-  { id: 'brown', label: '☕ Strand Coffee Shop', noiseKey: 'brown' },
-  { id: 'white', label: '🌬️ Waterloo Wind', noiseKey: 'white' },
-];
 
 export const MUSIC_STATIONS = [
   { id: 'yt-lofi', label: 'Lo-fi Beats', provider: 'youtube', embedUrl: 'https://www.youtube.com/embed/_4kHxtiuML0?autoplay=1', externalUrl: 'https://www.youtube.com/watch?v=_4kHxtiuML0' },

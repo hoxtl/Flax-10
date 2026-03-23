@@ -29,7 +29,7 @@ export const CATALOGUE = [
   { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, minRow: 2, section: "Analytics" },
 ];
 
-const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
+export const DEFAULT_LAYOUT = ["deadlines", "todayTasks", "bigTimeline"];
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 export function useIntelligenceDashboard(props) {
@@ -110,15 +110,25 @@ function getWeeklyProgress(profileLoading, profile) {
 }
 
 function getStorageKeys(userId) {
-  return { layout: userId ? `homepage_widget_layout_${userId}` : "homepage_widget_layout", sizes: userId ? `homepage_widget_sizes_${userId}` : "homepage_widget_sizes" };
+  return {
+    layout: userId ? `homepage_widget_layout_${userId}` : "homepage_widget_layout",
+    sizes: userId ? `homepage_widget_sizes_${userId}` : "homepage_widget_sizes",
+    source: userId ? `homepage_widget_source_${userId}` : "homepage_widget_source",
+  };
 }
 
 function readStoredLayout(profile) {
-  return sanitizeLayout(readStoredValue(getStorageKeys(profile?.id).layout) || profile?.settings?.homepage_widgets || DEFAULT_LAYOUT);
+  const keys = getStorageKeys(profile?.id);
+  const serverLayout = getServerLayout(profile);
+  if (serverLayout && shouldPreferServerSettings(profile, keys)) return serverLayout;
+  return sanitizeLayout(readStoredValue(keys.layout) || serverLayout || DEFAULT_LAYOUT);
 }
 
 function readStoredWidgetSizes(profile) {
-  return readStoredValue(getStorageKeys(profile?.id).sizes) || profile?.settings?.homepage_widget_sizes || {};
+  const keys = getStorageKeys(profile?.id);
+  const serverSizes = getServerWidgetSizes(profile);
+  if (serverSizes && shouldPreferServerSettings(profile, keys)) return serverSizes;
+  return readStoredValue(keys.sizes) || serverSizes || {};
 }
 
 function readStoredValue(storageKey) {
@@ -131,6 +141,30 @@ function readStoredValue(storageKey) {
 
 function writeStoredValue(storageKey, value) {
   localStorage.setItem(storageKey, JSON.stringify(value));
+}
+
+function getServerLayout(profile) {
+  if (!profile?.settings?.homepage_widgets?.length) return null;
+  return sanitizeLayout(profile.settings.homepage_widgets);
+}
+
+function getServerWidgetSizes(profile) {
+  const widgetSizes = profile?.settings?.homepage_widget_sizes;
+  if (!widgetSizes || typeof widgetSizes !== "object") return null;
+  return widgetSizes;
+}
+
+function buildServerSettingsSnapshot(profile) {
+  const layout = getServerLayout(profile);
+  if (!layout) return null;
+  const sizes = Object.fromEntries(Object.entries(getServerWidgetSizes(profile) || {}).sort(([a], [b]) => a.localeCompare(b)));
+  return { layout, sizes };
+}
+
+function shouldPreferServerSettings(profile, storageKeys) {
+  const serverSnapshot = buildServerSettingsSnapshot(profile);
+  if (!serverSnapshot) return false;
+  return JSON.stringify(readStoredValue(storageKeys.source)) !== JSON.stringify(serverSnapshot);
 }
 
 function sanitizeLayout(layout) {
@@ -149,11 +183,12 @@ function isPendingCourseChange(data) {
 }
 
 function syncProfileSettings(profile, profileLoading, setLayout, setWidgetSizes) {
-  if (profileLoading || !profile?.settings) return;
-  if (localStorage.getItem(getStorageKeys(profile.id).layout)) return;
-  if (!profile.settings.homepage_widgets?.length) return;
-  setLayout(profile.settings.homepage_widgets);
-  if (profile.settings.homepage_widget_sizes) setWidgetSizes(profile.settings.homepage_widget_sizes);
+  if (profileLoading || !profile?.settings?.homepage_widgets?.length) return;
+  const storageKeys = getStorageKeys(profile.id);
+  if (!shouldPreferServerSettings(profile, storageKeys)) return;
+  setLayout(sanitizeLayout(profile.settings.homepage_widgets));
+  setWidgetSizes(profile.settings.homepage_widget_sizes || {});
+  writeStoredValue(storageKeys.source, buildServerSettingsSnapshot(profile));
 }
 
 function scheduleCloudSync(profile, profileLoading, layout, widgetSizes) {

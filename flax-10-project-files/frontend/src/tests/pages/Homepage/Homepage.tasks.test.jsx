@@ -114,7 +114,7 @@ beforeEach(() => {
   mockAddEvent.mockResolvedValue(undefined); mockEditEvent.mockResolvedValue(undefined);
   mockRemoveEvent.mockResolvedValue(undefined); mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
-  global.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
+  globalThis.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
 });
 
 describe('Homepage – tasks, re-plan & misc', () => {
@@ -151,10 +151,10 @@ describe('Homepage – tasks, re-plan & misc', () => {
     await waitFor(() => expect(screen.getByText(/No free windows left today/)).toBeInTheDocument());
   });
 
-  it('focus banner shows BREAK when timer mode is break', () => {
-    mockTimerActive = true; mockTimerMode = 'break';
+  it('does not render the top focus banner when a timer session is active', () => {
+    mockTimerActive = true;
     render(<MemoryRouter><Homepage /></MemoryRouter>);
-    expect(screen.getByText('BREAK')).toBeInTheDocument();
+    expect(screen.queryByText('Open timer →')).not.toBeInTheDocument();
   });
 
   it('getTaskCategoryPill returns list name when task has task_list matching list', async () => {
