@@ -79,7 +79,6 @@ export const tflService = {
       if (!response.ok) throw new Error(`TfL API error: ${response.status}`);
       return parseJourney(await response.json(), this.decodeTfLPolyline);
     } catch (error) {
-      console.error('TfL API journeyPlanner error: ', error);
       throw error;
     }
   },
@@ -105,11 +104,10 @@ export const tflService = {
       const modes = ['tube', 'dlr', 'overground', 'elizabeth-line', 'tram'];
       const url = `${TFL_BASE}/Line/Mode/${modes.join(',')}/Status?app_key=${TFL_API_KEY}`;
       const response = await fetch(url);
-      if (response.status === 429) { console.warn('TfL API: Rate limited (429)'); return []; }
+      if (response.status === 429) return [];
       if (!response.ok) throw new Error(`TfL Delays API error: ${response.status}`);
       return extractDelays(await response.json());
-    } catch (error) {
-      console.error('TfL Delay API error: ', error);
+    } catch {
       return [];
     }
   },

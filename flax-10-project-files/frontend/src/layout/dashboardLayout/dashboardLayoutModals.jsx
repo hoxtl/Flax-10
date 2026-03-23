@@ -51,9 +51,7 @@ function useSocietyCreation(setShowSocietyModal) {
     try {
       await createSociety(form);
       setShowSocietyModal(false);
-    } catch (error) {
-      console.error("Failed to create society:", error);
-    }
+    } catch {}
   };
 }
 
@@ -95,9 +93,7 @@ function CreateTaskPanel({ lists, modules, onClose }) {
       await createTask(data);
       onClose();
       window.dispatchEvent(new Event("task-created"));
-    } catch (error) {
-      console.error("Failed to create task:", error);
-    }
+    } catch {}
   };
   return <CreateTaskModal lists={lists} modules={modules} onSave={handleSave} onClose={onClose} />;
 }

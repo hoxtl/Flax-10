@@ -49,7 +49,7 @@ const executeWithConfirm = async (event, handlers, confirmFn) => {
 function handleEventDeletion(handlers, close, confirmFn) {
     return async (event) => {
         try { await executeWithConfirm(event, handlers, confirmFn); }
-        catch (err) { console.error('Deletion failed:', err); }
+        catch {}
         close();
     };
 }

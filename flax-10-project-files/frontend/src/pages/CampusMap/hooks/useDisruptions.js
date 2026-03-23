@@ -9,8 +9,7 @@ async function fetchDisruptions(setDisruptions, setLoading) {
   try {
     const data = await tflService.getTfLDelays();
     setDisruptions(data);
-  } catch (error) {
-    console.error('TfL disruption fetch error: ', error);
+  } catch {
   } finally {
     setLoading(false);
   }

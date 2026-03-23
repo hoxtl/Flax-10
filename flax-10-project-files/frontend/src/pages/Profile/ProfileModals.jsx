@@ -104,8 +104,7 @@ function useSocialUsers(isOpen, userId, fetchFn) {
     if (!(isOpen && userId)) return setUsers([]);
     fetchFn(userId)
       .then((data) => setUsers(data.results || data))
-      .catch((error) => {
-        console.error("Failed to fetch users", error);
+      .catch(() => {
         setUsers([]);
       });
   }, [fetchFn, isOpen, userId]);

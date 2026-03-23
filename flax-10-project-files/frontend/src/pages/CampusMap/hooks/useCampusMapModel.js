@@ -62,7 +62,7 @@ function togglePanel(key, setUi) {
 
 function geolocateSuccess(map, setForm, setSelection, setUi) {
   return async ({ coords }) => {
-    const address = await reverseGeocode(coords.latitude, coords.longitude).catch((error) => console.error("Reverse geocoding failed: ", error));
+    const address = await reverseGeocode(coords.latitude, coords.longitude).catch(() => null);
     if (address) setForm((current) => ({ ...current, manualStart: address })); setSelection((current) => ({ ...current, startLocation: { lat: coords.latitude, lng: coords.longitude } })); map.current?.flyTo({ center: [coords.longitude, coords.latitude], duration: 1200, pitch: 55, zoom: 15 }); setUi((current) => ({ ...current, locating: false }));
   };
 }
@@ -114,7 +114,7 @@ function useRoutes(refs, selection, setRoutes) {
     const destination = getEffectiveDestination(selection.customDestination, selection.selectedCampus); if (!selection.startLocation || !destination || !refs.routeLayerAdded.current) { clearRouteSource(refs.map.current); resetRouteState(setRoutes); return; }
     let active = true; setRoutes((current) => ({ ...current, loadingRoute: true, loadingTflRoute: true, routeError: "", routeInfo: null, tflRouteError: "", tflRouteInfo: null }));
     fetchWalkingRoute(selection.startLocation, destination).then((route) => { if (!active) return; if (!route) { clearRouteSource(refs.map.current); setRoutes((current) => ({ ...current, loadingRoute: false, routeError: "No walking route found between these locations." })); return; } displayRoute(refs.map.current, route); setRoutes((current) => ({ ...current, loadingRoute: false, routeInfo: parseRouteInfo(route) })); }).catch(() => active && setRoutes((current) => ({ ...current, loadingRoute: false, routeError: "Could not calculate the route, please try again..." })));
-    tflService.journeyPlanner(selection.startLocation.lat, selection.startLocation.lng, destination.lat, destination.lng).then((journey) => active && setRoutes((current) => ({ ...current, loadingTflRoute: false, tflRouteError: journey ? "" : "No TfL journey found between the two selected locations...", tflRouteInfo: journey }))).catch((error) => { console.error("Calculate TFL route error: ", error); if (active) setRoutes((current) => ({ ...current, loadingTflRoute: false, tflRouteError: "Failed to calculate TfL route, please try again..." })); });
+    tflService.journeyPlanner(selection.startLocation.lat, selection.startLocation.lng, destination.lat, destination.lng).then((journey) => active && setRoutes((current) => ({ ...current, loadingTflRoute: false, tflRouteError: journey ? "" : "No TfL journey found between the two selected locations...", tflRouteInfo: journey }))).catch(() => { if (active) setRoutes((current) => ({ ...current, loadingTflRoute: false, tflRouteError: "Failed to calculate TfL route, please try again..." })); });
     return () => { active = false; };
   }, [refs.map, refs.routeLayerAdded, selection, setRoutes]);
 }

@@ -10,9 +10,7 @@ async function loadCalendarEvents(setEvents) {
   try {
     const data = await getCalendarEvents();
     setEvents(data.events || []);
-  } catch {
-    console.log('Unable to load calendar events...');
-  }
+  } catch {}
 }
 
 export function useCalendarEvents() {

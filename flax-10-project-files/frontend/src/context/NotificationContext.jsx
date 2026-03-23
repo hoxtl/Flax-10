@@ -33,7 +33,7 @@ function useNotificationLoader() {
         requestPermission();
         api.fetchNotifications()
             .then(setNotifications)
-            .catch(err => console.error('Failed to fetch notifications:', err))
+            .catch(() => {})
             .finally(() => setLoading(false));
     }, []);
 
@@ -76,10 +76,7 @@ function processNewNotifications(fresh, knownIds, setNotifications, refreshProfi
 }
 
 async function pollNotifications(knownIds, setNotifications, refreshProfile) {
-    const fresh = await api.fetchNotifications().catch(err => {
-        console.error('Failed to poll notifications:', err);
-        return null;
-    });
+    const fresh = await api.fetchNotifications().catch(() => null);
     if (fresh) processNewNotifications(fresh, knownIds, setNotifications, refreshProfile);
 }
 
@@ -113,28 +110,28 @@ async function createNotify(notification, set, knownIds) {
         const created = await api.createNotification(notification);
         trackKnownId(knownIds, created.id);
         set(prev => [created, ...prev]);
-    } catch (err) { console.error('Failed to create notification:', err); }
+    } catch {}
 }
 
 async function dismissNotify(id, set) {
     try {
         await api.deleteNotification(id);
         set(prev => prev.filter(n => n.id !== id));
-    } catch (err) { console.error('Failed to delete notification:', err); }
+    } catch {}
 }
 
 async function markAll(set) {
     try {
         await api.markAllNotificationsRead();
         set(prev => prev.map(n => ({ ...n, read: true })));
-    } catch (err) { console.error('Failed to mark all read:', err); }
+    } catch {}
 }
 
 async function clear(set) {
     try {
         await api.clearAllNotifications();
         set([]);
-    } catch (err) { console.error('Failed to clear notifications:', err); }
+    } catch {}
 }
 
 export function useNotifications() {

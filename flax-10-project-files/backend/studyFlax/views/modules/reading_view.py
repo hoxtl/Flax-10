@@ -13,9 +13,7 @@ from studyFlax.serialisers.modules.reading_serialisers import ReadingSerialiser
 from studyFlax.utils.reading_utils import DEFAULT_PAGE_TIME, get_avg_time_per_page
 from studyFlax.views.modules.reading_queries import get_suggested_readings
 from studyFlax.views.modules.reading_task_service import (
-    create_description,
     create_reading_task,
-    task_payload,
 )
 
 

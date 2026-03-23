@@ -32,7 +32,7 @@ export default function useOnboarding() {
   const handleSubmit = async () => {
     if (!year || !major || !confirmed) return;
     setLoading(true);
-    await submitOnboarding(year, major).catch(console.error);
+    await submitOnboarding(year, major).catch(() => {});
     setLoading(false);
     setDone(true);
   };

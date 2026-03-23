@@ -30,8 +30,7 @@ async function loadSyncStatus(societyId, setIsSynced, setLoading) {
     try {
         const { is_synced } = await getSyncStatus(societyId);
         setIsSynced(is_synced);
-    } catch (err) {
-        console.error('Failed to load sync status:', err);
+    } catch {
     } finally {
         setLoading(false);
     }
@@ -42,7 +41,7 @@ async function handleToggle(societyId, isSynced, setIsSynced, setLoading, notify
     try {
         const action = isSynced ? handleUnsync : handleSync;
         await action(societyId, setIsSynced, notify, societyName, refreshTags, reloadCalendar);
-    } catch (err) { console.error('Failed to toggle sync:', err); }
+    } catch {}
     finally { setLoading(false); }
 }
 

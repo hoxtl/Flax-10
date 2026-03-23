@@ -65,7 +65,7 @@ function loadLinkedEvent(announcement, societyId, setForm) {
     if (!announcement?.event_id || !societyId) return;
     fetchSocietyEvent(societyId, announcement.event_id)
         .then(event => setForm(prev => mergeEventData(prev, event)))
-        .catch(e => console.error("Failed to load linked event", e));
+        .catch(() => {});
 }
 
 function mergeEventData(prev, event) {
