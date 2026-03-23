@@ -31,7 +31,9 @@ const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
             updateMemberState(setSociety, true, 1);
             await promptSubscription(confirm, id, setSociety);
             onMembershipChange?.();
-        } catch {}
+        } catch (err) {
+            console.error('Join failed:', err);
+        }
     };
 
 const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
@@ -41,7 +43,9 @@ const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
             updateMemberState(setSociety, false, -1);
             refreshTags();
             onMembershipChange?.();
-        } catch {}
+        } catch (err) {
+            console.error('Leave failed:', err);
+        }
     };
 
 const makeRequestRatification = (id, setSociety) =>
