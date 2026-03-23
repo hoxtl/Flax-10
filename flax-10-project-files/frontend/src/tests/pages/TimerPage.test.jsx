@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as helpers from '../utils/timerTestHelpers';
-import * as historyUtils from '../../components/Timer/utils/historyUtils';
 import { fireEvent, screen, act } from '@testing-library/react';
 
 const { mockGetHistory } = vi.hoisted(() => ({
@@ -17,6 +16,10 @@ vi.mock('../../components/Timer/utils/historyUtils', async () => {
 
 vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
+}));
+
+vi.mock('../../components/Timer/TodayBanner', () => ({
+    default: () => <div data-testid="today-banner" />,
 }));
 
 vi.mock('framer-motion', () => ({
@@ -165,9 +168,7 @@ const testHistoryModalClose = async () => {
 
     // Modal should be gone
     const backdrop = document.body.querySelector('div[class*="_backdrop"]');
-    expect(backdrop).toBeTruthy();
-    // StandardModal appears to keep the portal node mounted and toggles visibility via CSS.
-    expect(backdrop.className).toMatch(/_hidden_/);
+    expect(backdrop === null || /_hidden_/.test(backdrop.className)).toBe(true);
     // Clear History should not exist (and in this test getHistory returns [])
     expect(document.body.textContent || '').not.toMatch(/Clear History/i);
     Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });

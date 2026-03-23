@@ -12,10 +12,9 @@ const AUTO_BREAK_SECONDS = 5 * 60;
 
 function useTimerFlowState() {
   const [modal, setModal] = useState(null);
-  const [distractionCount, setDistractionCount] = useState(0);
   const studyBlockId = useRef(Date.now());
 
-  return { modal, setModal, distractionCount, setDistractionCount, studyBlockId };
+  return { modal, setModal, studyBlockId };
 }
 
 function buildTaskLabel(t) {
@@ -24,9 +23,9 @@ function buildTaskLabel(t) {
   return moduleCode ? `${t.task} - ${moduleCode}` : t.task;
 }
 
-function saveCurrentSession(t, studyBlockId, distractionCount, status) {
+function saveCurrentSession(t, studyBlockId, status) {
   const completed = status === 'Completed' ? t.completedSessions + 1 : t.completedSessions;
-  saveSession(t.totalWork, t.totalBreak, completed, studyBlockId.current, buildTaskLabel(t), t.totalPaused, status, distractionCount);
+  saveSession(t.totalWork, t.totalBreak, completed, studyBlockId.current, buildTaskLabel(t), t.totalPaused, status);
 }
 
 function logActiveTaskMinutes(activeTaskId, totalWork) {
@@ -34,8 +33,7 @@ function logActiveTaskMinutes(activeTaskId, totalWork) {
   logTaskTime(activeTaskId, Math.round(totalWork / 60));
 }
 
-function resetBlockMetrics(t, setDistractionCount) {
-  setDistractionCount(0);
+function resetBlockMetrics(t) {
   t.updateSettings({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
 }
 
@@ -53,7 +51,7 @@ function continueNextSession(t, modal) {
 }
 
 function completeSession(state, t) {
-  saveCurrentSession(t, state.studyBlockId, state.distractionCount, 'Completed');
+  saveCurrentSession(t, state.studyBlockId, 'Completed');
   logActiveTaskMinutes(t.activeTaskId, t.totalWork);
   updateCompletedSession(state, t);
 }
@@ -61,19 +59,18 @@ function completeSession(state, t) {
 function updateCompletedSession(state, t) {
   const next = t.completedSessions + 1;
   t.setCompletedSessions(next);
-  resetBlockMetrics(t, state.setDistractionCount);
+  resetBlockMetrics(t);
   if (next >= t.targetSessions) return showGoalModal(t, state.studyBlockId, state.setModal);
   continueNextSession(t, state.modal);
 }
 
 function resetFlow(state, t) {
   state.setModal(null);
-  state.setDistractionCount(0);
   t.resetTimer();
 }
 
 function finishEarly(state, t) {
-  if (t.totalWork > 0) saveCurrentSession(t, state.studyBlockId, state.distractionCount, 'Incomplete');
+  if (t.totalWork > 0) saveCurrentSession(t, state.studyBlockId, 'Incomplete');
   logActiveTaskMinutes(t.activeTaskId, t.totalWork);
   resetFlow(state, t);
   state.studyBlockId.current = Date.now();
@@ -88,7 +85,6 @@ function launchAutoBreak(state, t) {
 }
 
 function finishAutoBreak(state, startNext) {
-  state.setDistractionCount(0);
   if (state.modal !== 'autoBreak') return;
   startNext();
 }
@@ -107,8 +103,7 @@ function useTimerFlowActions(state, t) {
 export function useTimerFlow(t, notify) {
   const state = useTimerFlowState();
   const actions = useTimerFlowActions(state, t);
-  const addDistraction = useCallback(() => state.setDistractionCount((value) => value + 1), [state]);
 
   useCompletionCheck(t, actions.startNext, notify, actions.onWorkComplete);
-  return { ...state, ...actions, addDistraction, resetTimer: actions.resetTimer };
+  return { ...state, ...actions, resetTimer: actions.resetTimer };
 }

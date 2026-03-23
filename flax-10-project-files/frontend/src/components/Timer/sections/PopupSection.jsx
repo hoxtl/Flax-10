@@ -30,14 +30,15 @@ function TimerModals({ t }) {
       {t.isOvertime && <OvertimePopup mode="work" time={t.timeLeft} onAction={t.handlers.break} isLastSession={isLastSession} />}
       {t.isBreakOvertime && <OvertimePopup mode="break" time={t.timeLeft} onAction={t.handlers.overtimeBreak} />}
       {t.modal === 'break' && !autoStart && <BreakModal onAction={t.handlers.break} isLastSession={isLastSession} />}
-      {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} distractionCount={t.distractionCount} />}
+      {t.modal === 'goal' && <GoalModal sessions={t.completedSessions} workTime={t.blockTotalWork} breakTime={t.blockTotalBreak} onAction={t.handlers.goal} />}
       {t.modal === 'endEarly' && <EndEarlyModal onConfirm={t.handlers.endEarly} onCancel={() => t.setModal(null)} elapsedSeconds={currentElapsedSec} goalSeconds={currentGoalSec} />}
     </>
   );
 }
 
-export function PopupSection({ t, showHistory, onCloseHistory }) {
+export function PopupSection({ t, showHistory, onCloseHistory, disabled = false }) {
   useTimerPopupEffects(t);
+  if (disabled) return null;
 
   return (
     <>

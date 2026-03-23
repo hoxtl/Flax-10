@@ -2,16 +2,9 @@
  * Leave timer and end-early confirmation modals.
  */
 
-import { useMemo } from 'react';
 import styles from '../../../pages/Timer/TimerPage.module.css';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../../common/StandardModal/StandardModal';
-
-const LEAVE_SESSION_NUDGES = [
-  'Strand campus is still bustling. Give this block 10 more minutes.',
-  'Even the Maughan library guards do not give up this early.',
-  'You are already in motion. A short break beats a full quit.',
-];
 
 function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
   const safeTotal = Math.max(1, Number(sessionTotalSeconds || 0));
@@ -51,14 +44,12 @@ function LeaveActions({ onCancel, onExit, onTakeBreak, onPause }) {
 
 export function LeaveTimerModal({ onCancel, onPause, onExit, onTakeBreak, timeLeftSeconds = 0, sessionTotalSeconds = 0 }) {
   const state = buildLeaveState(timeLeftSeconds, sessionTotalSeconds);
-  const encouragement = useMemo(() => LEAVE_SESSION_NUDGES[Math.floor(Math.random() * LEAVE_SESSION_NUDGES.length)], []);
 
   return (
     <StandardModal title="Hold on, you're doing great!" subtitle="Are you sure you want to end your focus session early?" onClose={onCancel} size="sm" modalClassName={styles.leaveNudgeModal} contentClassName={styles.leaveNudgeModalContent}>
       <div className={styles.leaveNudgeBody}>
         <div className={styles.leaveNudgeLoss}>You are <span className={styles.leaveNudgeMinutes}>{state.minutesLabel}</span> away from finishing this session. If you quit now, this progress will not be added to your daily goal.</div>
         <LeaveProgress progressPct={state.progressPct} minutesLeft={state.minutesLeft} />
-        <div className={styles.leaveNudgeReggie}>🦁 {encouragement}</div>
         <LeaveActions onCancel={onCancel} onExit={onExit} onTakeBreak={onTakeBreak} onPause={onPause} />
       </div>
     </StandardModal>

@@ -75,7 +75,7 @@ function TimerTopSplit({ state }) {
   return (
     <div className={styles.timerTopSplit}>
       <div className={styles.timerTopLeft}>
-        <TodayBanner onStreakData={state.setStreakData} isStudying={Boolean(state.t.isActive && !state.t.isPaused)} />
+        <TodayBanner onStreakData={state.setStreakData} />
         <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
       </div>
       <div className={styles.timerTopRight}>
@@ -97,7 +97,7 @@ function TimerLayout({ state }) {
       <FocusEntryBackButton state={state} navigate={navigate} />
       <StreakWarning state={state} />
       <TimerTopSplit state={state} />
-      <PopupSection t={state.t} showHistory={state.showHistory} onCloseHistory={() => state.setShowHistory(false)} />
+      <PopupSection t={state.t} showHistory={state.showHistory} onCloseHistory={() => state.setShowHistory(false)} disabled={state.focusMode} />
     </div>
   );
 }

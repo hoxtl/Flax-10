@@ -4,8 +4,8 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, CheckCircle, XCircle } from "lucide-react";
 import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
 import { useAttendanceStats } from "../../pages/Attendance/hooks/useAttendanceStats";
 import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSummary";
@@ -72,6 +72,64 @@ function AttendanceRing({ pct, updating }) {
   );
 }
 
+function SuccessContent({ attended }) {
+  const color = attended ? "#22c55e" : "#ef4444";
+  const Icon = attended ? CheckCircle : XCircle;
+  const message = attended ? "Attendance recorded!" : "Missed session noted.";
+
+  return (
+    <motion.div
+      className={styles.successContent}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <motion.div
+        style={{ color }}
+        initial={{ scale: 0.4, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 320, damping: 20, delay: 0.08 }}
+      >
+        <Icon size={44} strokeWidth={1.8} />
+      </motion.div>
+      <motion.p
+        className={styles.successMsg}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.22, duration: 0.3 }}
+      >
+        {message}
+      </motion.p>
+    </motion.div>
+  );
+}
+
+function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
+  const meta = formatEventMeta(event);
+  return (
+    <motion.div
+      key="question"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+    >
+      <div className={styles.eventPill}>
+        Did you attend <strong className={styles.eventName}>{event.title}</strong>
+        {meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}
+      </div>
+
+      <div className={styles.yesNoRow} style={{ marginTop: "var(--space-4, 16px)" }}>
+        <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
+        <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
+      </div>
+
+      <PrimaryButton pill variant="secondary" className={styles.btnFlex} style={{ marginTop: "var(--space-4, 16px)" }} onClick={onDismiss} disabled={isAnswered}>Dismiss</PrimaryButton>
+    </motion.div>
+  );
+}
+
 function formatEventMeta(event) {
   if (!event?.start_time) return null;
   const start = new Date(event.start_time);
@@ -113,7 +171,7 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
   }, [answeredWith, overall, basePct]);
 
   async function runAnswer(attended) {
-    const success = await onAnswer(attended, { afterSuccess: refetch });
+    const success = await onAnswer(attended, { afterSuccess: refetch, closeDelayMs: 700 });
     if (!success) {
       setAnsweredWith(null);
       setSubmitError("Could not update attendance. Please try again.");
@@ -127,16 +185,23 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
     timerRef.current = setTimeout(() => { void runAnswer(attended); }, 1200);
   }
 
-  const meta = formatEventMeta(event);
   const isAnswered = answeredWith !== null;
 
   return createPortal(
-    <div className={styles.backdrop} onMouseDown={isAnswered ? undefined : onDismiss}>
+    <motion.div
+      className={styles.backdrop}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
+      onMouseDown={isAnswered ? undefined : onDismiss}
+    >
       <motion.div
         className={styles.modal}
         onMouseDown={e => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.92, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0, ...glowPulse.animate }}
+        exit={{ opacity: 0, scale: 0.9, y: 12 }}
         transition={{
           opacity: { duration: 0.22, ease: "easeOut" },
           scale: { duration: 0.25, ease: [0.23, 1, 0.32, 1] },
@@ -156,21 +221,23 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
 
         <AttendanceRing pct={displayPct} updating={isAnswered} />
 
-        <div className={styles.eventPill}>
-          Did you attend <strong className={styles.eventName}>{event.title}</strong>
-          {meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}
-        </div>
-
-        <div className={styles.yesNoRow}>
-          <PrimaryButton pill className={styles.btnYes} onClick={() => handleAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
-          <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => handleAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
-        </div>
+        <AnimatePresence mode="wait">
+          {isAnswered ? (
+            <SuccessContent key="success" attended={answeredWith} />
+          ) : (
+            <QuestionContent
+              key="question"
+              event={event}
+              isAnswered={isAnswered}
+              onAnswer={handleAnswer}
+              onDismiss={onDismiss}
+            />
+          )}
+        </AnimatePresence>
 
         {submitError && <p className={styles.errorText}>{submitError}</p>}
-
-        <PrimaryButton pill variant="secondary" className={styles.btnFlex} onClick={onDismiss} disabled={isAnswered}>Dismiss</PrimaryButton>
       </motion.div>
-    </div>,
+    </motion.div>,
     document.body
   );
 }

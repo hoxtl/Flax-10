@@ -4,12 +4,12 @@
 
 import { useCallback } from 'react';
 import styles from '../../../pages/Timer/TimerPage.module.css';
-import SessionDots, { LiveStatsRow, ProgressStrip } from '../SessionDots';
+import SessionDots, { LiveStatsRow } from '../SessionDots';
 import { TaskInput } from '../TaskInput';
 import { TimerRing } from '../TimerCircle';
-import { TimerControls, ModeIndicator } from '../TimerComponents';
+import { TimerControls } from '../TimerComponents';
 import { useSuggestedTimerTask } from '../hooks/useSuggestedTimerTask';
-import { clearManualTask, startManualTask, startSuggestedTask } from '../utils/timerTaskActions';
+import { clearManualTask, startManualTask } from '../utils/timerTaskActions';
 import { applyTaskToTimer } from '../utils/presetUtils';
 
 function estimatedFinishTime(t) {
@@ -29,12 +29,11 @@ function TimerTopSection({ t, onOpenFocus }) {
   useSuggestedTimerTask(t);
 
   return (
-      <TaskInput
+    <TaskInput
       value={t.task}
       onChange={t.setTask}
       onClearTask={() => clearManualTask(t)}
       onTaskSelect={(task) => applyTaskToTimer(task, t)}
-      onJustStart={() => startSuggestedTask(t)}
       isSessionActive={Boolean(t.isActive || t.isPaused)}
       onOpenFocus={onOpenFocus}
     />
@@ -81,7 +80,7 @@ export function MainSection({ t, onOpenHistory, onOpenFocus, isMobile }) {
     <div className={styles.timerMainCard}>
       <TimerTopSection t={t} onOpenFocus={onOpenFocus} />
       <TimerInfoSection t={t} onPrimaryStart={onPrimaryStart} />
-      <LiveStatsRow blockTotalWork={t.blockTotalWork} blockTotalBreak={t.blockTotalBreak} totalPaused={t.totalPaused} distractions={t.distractionCount} isActive={t.isActive} isPaused={t.isPaused} onDistract={t.addDistraction} />
+      <LiveStatsRow blockTotalWork={t.blockTotalWork} blockTotalBreak={t.blockTotalBreak} totalPaused={t.totalPaused} isActive={t.isActive} isPaused={t.isPaused} />
       <MobileHistoryButton isMobile={isMobile} onOpenHistory={onOpenHistory} />
     </div>
   );

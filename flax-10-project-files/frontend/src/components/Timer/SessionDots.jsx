@@ -31,22 +31,12 @@ export default function SessionDots({ completedSessions, targetSessions, isActiv
   );
 }
 
-function DistractButton({ isActive, isPaused, onDistract }) {
-  if (!isActive || isPaused) return null;
-  return <button className={styles.distractChip} onClick={onDistract}>+ distracted</button>;
-}
-
 function PausedStat({ totalPaused }) {
   if (totalPaused <= 30) return null;
   return <span className={styles.liveStat}>⏸ <strong>{fmtDuration(totalPaused)}</strong> paused</span>;
 }
 
-function DistractionStat({ distractions }) {
-  if (distractions <= 0) return null;
-  return <span className={styles.liveStat}>⚡ <strong>{distractions}</strong> distraction{distractions !== 1 ? 's' : ''}</span>;
-}
-
-export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, distractions, isActive, isPaused, onDistract }) {
+export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, isActive, isPaused }) {
   const everStarted = isActive || isPaused || blockTotalWork > 0 || blockTotalBreak > 0;
   if (!everStarted) return null;
 
@@ -55,8 +45,6 @@ export function LiveStatsRow({ blockTotalWork, blockTotalBreak, totalPaused, dis
       <span className={styles.liveStat}>🔥 <strong>{blockTotalWork > 0 ? fmtDuration(blockTotalWork) : '—'}</strong> focus</span>
       <span className={styles.liveStat}>☕ <strong>{blockTotalBreak > 0 ? fmtDuration(blockTotalBreak) : '—'}</strong> break</span>
       <PausedStat totalPaused={totalPaused} />
-      <DistractionStat distractions={distractions} />
-      <DistractButton isActive={isActive} isPaused={isPaused} onDistract={onDistract} />
     </div>
   );
 }

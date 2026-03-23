@@ -57,7 +57,7 @@ function getPrimaryButtonCopy(t) {
   return { label: 'Pause', icon: '❚❚' };
 }
 
-export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = true }) {
+export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = true, showControls = true }) {
   const ringState = getRingState(t, 150, 'var(--focus-accent, var(--primary))');
   const isRunning = t.isActive && !t.isPaused;
   const className = `${styles.timerCircleWrap} ${isRunning ? styles.timerCircleActive : ''} ${isRunning && t.workTime >= 60 ? styles.timerCircleDeep : ''}`;
@@ -70,8 +70,8 @@ export default function TimerCircle({ t, onPrimaryStart, showAnimationPicker = t
       <div className={styles.timerCircleContent}>
         <div className={styles.timerCircleAnimClip}><FocusAnimation progress={t.progress / 100} mode={t.mode} isActive={t.isActive} showPicker={showAnimationPicker} /></div>
         <TimerDisplay timeLeft={t.timeLeft} mode={t.mode} isOvertime={ringState.isOvertime} />
-        <CirclePrimaryButton isRunning={isRunning} action={getPrimaryAction(t, onPrimaryStart)} label={copy.label} icon={copy.icon} />
-        <SecondaryButtons t={t} />
+        {showControls ? <CirclePrimaryButton isRunning={isRunning} action={getPrimaryAction(t, onPrimaryStart)} label={copy.label} icon={copy.icon} /> : null}
+        {showControls ? <SecondaryButtons t={t} /> : null}
       </div>
     </div>
   );
@@ -90,4 +90,3 @@ export function TimerRing({ t }) {
     </div>
   );
 }
-

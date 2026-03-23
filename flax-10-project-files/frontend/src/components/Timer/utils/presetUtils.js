@@ -21,26 +21,7 @@ export const BUILT_IN_PRESETS = [
     { id: 'deepwork',  label: 'Deep Work', work: 60, brk: 10, sessions: 3 },
 ];
 
-
-export const CUSTOM_PRESETS_KEY = 'timerCustomPresets';
 export const AUTOSTART_KEY = 'timerAutoStart';
-export const PRESET_USAGE_KEY = 'timerPresetUsage';
-
-export function loadCustomPresets() {
-    try { return JSON.parse(localStorage.getItem(CUSTOM_PRESETS_KEY) || '[]'); } catch { return []; }
-}
-
-export function saveCustomPresets(presets) {
-    try { localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(presets)); } catch {}
-}
-
-export function loadPresetUsage() {
-    try { return JSON.parse(localStorage.getItem(PRESET_USAGE_KEY) || '{}'); } catch { return {}; }
-}
-
-export function savePresetUsage(data) {
-    try { localStorage.setItem(PRESET_USAGE_KEY, JSON.stringify(data)); } catch {}
-}
 
 export function isPresetActive(preset, t) {
     return t.workTime === preset.work && t.breakTime === preset.brk && t.targetSessions === preset.sessions;

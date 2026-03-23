@@ -2,93 +2,6 @@
  * Timer page styles chunk.
  */
 
-.todayBannerDivider {
-    width: 1px;
-    height: 24px;
-    background: var(--border);
-    flex-shrink: 0;
-}
-
-.todayStatChip {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    min-width: 0;
-}
-
-.todayStatValue {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.15;
-}
-
-.todayStatLabel {
-    font-size: 0.65rem;
-    color: var(--muted);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-}
-
-.todayGoalSection {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    flex: 1;
-    min-width: 120px;
-}
-
-.todayGoalBar {
-    height: 5px;
-    background: var(--border);
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.todayGoalFill {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 999px;
-    transition: width 0.6s ease;
-}
-
-.todayGoalMeta {
-    font-size: 0.72rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    white-space: nowrap;
-}
-
-.todayGoalEditBtn {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--primary);
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    text-decoration: underline dotted;
-    text-underline-offset: 2px;
-}
-
-.todayGoalInput {
-    width: 44px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 0.1rem 0.3rem;
-    border: 1px solid var(--primary);
-    border-radius: 4px;
-    color: var(--text);
-    background: var(--surface-card);
-    outline: none;
-    text-align: center;
-}
-
 /* === Preset Panel (right sidebar card) === */
 
 .presetPanelCard {
@@ -339,4 +252,3 @@
     color: var(--text);
     white-space: nowrap;
 }
-

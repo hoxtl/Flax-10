@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import styles from '../../pages/Timer/TimerPage.module.css';
 
 // TaskInput lives in its own file; re-export for any existing imports
@@ -55,12 +56,16 @@ const PauseIndicator = ({ isPaused, totalPaused }) => {
 const PrimaryTimerBtn = ({ isActive, isPaused, onToggle, onPause }) => {
     const label = !isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause');
     const action = !isActive ? onToggle : onPause;
-    return <button className={`${styles.button} ${styles.primary}`} onClick={action}>{label}</button>;
+    return <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnPrimary}`} onClick={action} pill>{label}</PrimaryButton>;
 };
 
 export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, onEndEarly, totalPaused }) => {
     const actns = isActive || isPaused
-        ? <><PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} /><button className={`${styles.button} ${styles.danger}`} onClick={onReset}>Reset</button><button className={`${styles.button} ${styles.danger} ${styles.outline}`} onClick={onEndEarly}>End Early</button></>
+        ? <>
+            <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />
+            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnSecondary}`} variant="secondary" onClick={onReset} pill>Reset</PrimaryButton>
+            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnDanger}`} variant="ghost" onClick={onEndEarly} pill>End Early</PrimaryButton>
+          </>
         : <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
     return (
         <div className={styles.controls}>

@@ -58,28 +58,23 @@
 
 /* === Timer UI enhancement overrides === */
 
-.timerModeRow {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: -0.05rem;
+.fullFocusEntryBtn {
+    min-width: min(100%, 240px);
+    margin-top: 0.15rem;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--focus-accent) 70%, white),
+        color-mix(in srgb, var(--focus-accent) 90%, black)
+    ) !important;
+    border-color: color-mix(in srgb, var(--focus-accent) 44%, transparent) !important;
+    color: white !important;
+    box-shadow:
+        0 16px 30px color-mix(in srgb, var(--focus-accent) 16%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
 }
 
-.fullFocusInlineBtn {
-    border: 1px solid color-mix(in srgb, var(--focus-accent) 30%, transparent);
-    background: color-mix(in srgb, var(--focus-accent) 12%, transparent);
-    color: color-mix(in srgb, var(--focus-accent) 78%, #000);
-    border-radius: 999px;
-    padding: 0.32rem 0.78rem;
-    font-size: 0.74rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.12s;
-}
-
-.fullFocusInlineBtn:hover {
-    background: color-mix(in srgb, var(--focus-accent) 18%, transparent);
-    transform: translateY(-1px);
+.fullFocusEntryBtn:hover:not(:disabled) {
+    filter: brightness(1.04);
 }
 
 .focusPageSkeletonCanvas {

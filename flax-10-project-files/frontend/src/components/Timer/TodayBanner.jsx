@@ -3,58 +3,60 @@
  */
 
 import styles from '../../pages/Timer/TimerPage.module.css';
-import { ProgressBar } from './todayBanner/ProgressBar';
+import StatStrip from '../common/StatStrip/StatStrip';
+import { useCountUp } from '../../hooks/useCountUp';
 import { useTodayBannerData } from './todayBanner/useTodayBannerData';
 
-function MetricSection({ label, value, sub, icon, iconBg, divider = true }) {
-  return (
-    <>
-      <div className={styles.todayMetricSection}>
-        <div className={styles.todayMetricIconWrap} style={{ backgroundColor: iconBg }}>
-          <span className={styles.todayMetricIcon}>{icon}</span>
-        </div>
-        <div className={styles.todayMetricInfo}>
-          <span className={styles.todayMetricLabel}>{label}</span>
-          <span className={styles.todayMetricValue}>{value}</span>
-          {sub && <div className={styles.todayMetricSub}>{sub}</div>}
-        </div>
-      </div>
-      {divider && <div className={styles.todayMetricDivider} />}
-    </>
-  );
+function useTodayBannerItems(state) {
+  const streakRef = useCountUp(state.streak, 1200);
+  const sessionsRef = useCountUp(state.sessions, 1200);
+  const weeklyGoalRef = useCountUp(state.weeklyGoalDays, 1200);
+  const focusHoursRef = useCountUp(state.focusHours, 1200);
+
+  return [
+    {
+      key: 'streak',
+      label: 'Current streak',
+      value: state.streak,
+      valueRef: streakRef,
+      suffix: 'd',
+      meta: 'days in a row',
+      tone: state.streak > 0 ? 'success' : undefined,
+    },
+    {
+      key: 'sessions',
+      label: 'Sessions logged',
+      value: state.sessions,
+      valueRef: sessionsRef,
+      meta: 'last 30 days',
+      tone: state.sessions > 0 ? 'accent' : undefined,
+    },
+    {
+      key: 'weekly-goal',
+      label: 'Weekly goal',
+      value: state.weeklyGoalDays,
+      valueRef: weeklyGoalRef,
+      suffix: ' / 7',
+      meta: 'active days this week',
+      tone: state.weeklyGoalDays >= 7 ? 'success' : undefined,
+    },
+    {
+      key: 'focus-time',
+      label: 'Focus time',
+      value: state.focusHours,
+      valueRef: focusHoursRef,
+      suffix: 'h',
+      meta: 'last 30 days',
+      tone: state.focusHours > 0 ? 'accent' : undefined,
+    },
+  ];
 }
 
-function getWeeklyProgressDays(streak) {
-  const weeklyDays = streak % 7;
-  if (streak > 0 && weeklyDays === 0) return 7;
-  return Math.max(0, Math.min(7, weeklyDays));
-}
-
-function FocusTimeSub({ goalHours, timePct }) {
-  return <div className={styles.todayGoalInlineMeta}>of {goalHours}h · {timePct}%</div>;
-}
-
-function BannerMetrics({ state, isStudying }) {
-  const weeklyProgressDays = getWeeklyProgressDays(state.streak);
-
-  return (
-    <>
-      <MetricSection label="STREAK" value={`${state.streak} day${state.streak !== 1 ? 's' : ''}`} icon="🔥" iconBg="var(--color-banner-streak)" />
-      <MetricSection label="SESSIONS" value={`${state.sessions} / ${state.goalSessions}`} sub={<ProgressBar sessions={state.sessions} goalSessions={state.goalSessions} sessionPct={state.sessionPct} fillAnimating={state.fillAnimating} isStudying={isStudying} activePulseLeft={state.activePulseLeft} tickCount={state.tickCount} />} icon="🎯" iconBg="var(--color-banner-sessions)" />
-      <MetricSection label="WEEKLY GOAL" value={`${weeklyProgressDays} / 7 days`} sub={<ProgressBar sessions={weeklyProgressDays} goalSessions={7} sessionPct={(weeklyProgressDays / 7) * 100} isStudying={false} />} icon="🏆" iconBg="var(--color-banner-goal)" />
-      <MetricSection label="FOCUS TIME" value={state.formattedHours} sub={<FocusTimeSub goalHours={state.goalHours} timePct={state.timePct} />} icon="🕒" iconBg="var(--color-banner-focus)" divider={false} />
-    </>
-  );
-}
-
-export default function TodayBanner({ onStreakData, isStudying = false }) {
+export default function TodayBanner({ onStreakData }) {
   const state = useTodayBannerData(onStreakData);
+  const items = useTodayBannerItems(state);
+
   if (state.loading) return null;
 
-  return (
-    <div className={styles.todayMetricBanner}>
-      <BannerMetrics state={state} isStudying={isStudying} />
-    </div>
-  );
+  return <StatStrip items={items} className={styles.todayMetricBanner} />;
 }
-
