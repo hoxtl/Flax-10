@@ -110,7 +110,8 @@ FRONTEND_DIST_DIR = BASE_DIR / 'frontend' / 'dist'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    FRONTEND_DIST_DIR
+    FRONTEND_DIST_DIR,
+    BASE_DIR / 'backend' / 'studyFlax' / 'fixtures' ,
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
