@@ -161,16 +161,25 @@ def hit_goal_four_weeks(sessions, now, goal):
     return all(week_hours_for_offset(sessions, now, offset) >= goal for offset in range(4))
 
 
+def _badge_groups(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
+    return [
+        hour_badges(total_hours),
+        session_count_badges(session_count),
+        streak_badges(longest_streak),
+        consistency_badges(active_days),
+        time_of_day_badges(sessions_all, session_count),
+        session_length_badges(sessions_all),
+        module_badges(module_count),
+        weekly_goal_badges(sessions_all, user),
+    ]
+
+
 def collect_all_badges(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
     earned = []
-    earned.extend(hour_badges(total_hours))
-    earned.extend(session_count_badges(session_count))
-    earned.extend(streak_badges(longest_streak))
-    earned.extend(consistency_badges(active_days))
-    earned.extend(time_of_day_badges(sessions_all, session_count))
-    earned.extend(session_length_badges(sessions_all))
-    earned.extend(module_badges(module_count))
-    earned.extend(weekly_goal_badges(sessions_all, user))
+    for badge_group in _badge_groups(
+        sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user
+    ):
+        earned.extend(badge_group)
     return earned
 
 
