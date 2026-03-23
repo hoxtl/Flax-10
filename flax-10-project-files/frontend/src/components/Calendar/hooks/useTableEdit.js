@@ -24,8 +24,7 @@ async function applyLocationUpdate(event, value) {
 async function geocodeLocation(value) {
   try {
     return await geocodeAddress(value);
-  } catch (error) {
-    console.error("Table edit geocoding failed:", error);
+  } catch {
     return null;
   }
 }

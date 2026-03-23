@@ -26,9 +26,7 @@ function useTagLoader() {
         try {
             const data = await getTags();
             setTags(data.map(mapBackendTag));
-        } catch (err) {
-            console.error('Failed to fetch tags:', err);
-        }
+        } catch {}
     };
 
     useEffect(() => {
@@ -42,8 +40,7 @@ async function loadInitialTags(setTags, setLoading) {
     try {
         const data = await getTags();
         setTags(data.map(mapBackendTag));
-    } catch (err) {
-        console.error('Failed to fetch tags:', err);
+    } catch {
     } finally {
         setLoading(false);
     }
@@ -68,9 +65,7 @@ async function createTagAction(tag, setTags) {
         const data = { name: tag.label, color: tag.color, icon: tag.icon || '🏷️' };
         const created = await apiCreateTag(data);
         setTags((prev) => [...prev, mapBackendTag(created)]);
-    } catch (err) {
-        console.error('Failed to create tag:', err);
-    }
+    } catch {}
 }
 
 async function deleteTagAction(id, setTags) {
@@ -78,8 +73,7 @@ async function deleteTagAction(id, setTags) {
         await apiDeleteTag(id);
         setTags((prev) => prev.filter((t) => t.id !== id));
         return true;
-    } catch (err) {
-        console.error('Failed to delete tag:', err);
+    } catch {
         return false;
     }
 }
@@ -89,9 +83,7 @@ async function updateTagAction(id, updates, setTags) {
         const backendData = { name: updates.label, color: updates.color, icon: updates.icon };
         const updated = await apiUpdateTag(id, backendData);
         setTags((prev) => prev.map((t) => (t.id === id ? mapBackendTag(updated) : t)));
-    } catch (err) {
-        console.error('Failed to update tag:', err);
-    }
+    } catch {}
 }
 
 function findTag(id, tags) {

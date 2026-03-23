@@ -9,9 +9,7 @@ export function playNotificationSound() {
     try {
         const ctx = getAudioContext();
         playChime(ctx, ctx.currentTime);
-    } catch (err) {
-        console.error('Failed to play notification sound:', err);
-    }
+    } catch {}
 }
 
 function playChime(ctx, time) {

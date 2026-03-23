@@ -65,8 +65,7 @@ async function checkUsernameAvailable(username, currentUsername) {
   if (username === currentUsername) return true;
   try {
     return await fetchUsernameAvailable(username, localStorage.getItem('token'));
-  } catch (err) {
-    console.error('Error checking username:', err);
+  } catch {
     return false;
   }
 }
@@ -86,7 +85,6 @@ async function submitProfileUpdate(formData, onSave, setError, onSaved) {
     await onSave?.();
     onSaved?.();
   } catch (err) {
-    console.error('Failed to update profile:', err);
     setError(err.response?.data?.error || 'Failed to update profile');
   }
 }

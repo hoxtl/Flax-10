@@ -36,3 +36,5 @@ from .tasks import *
 
 # Group work
 from .groupwork.groupwork_model import GroupProject, GroupMembership
+
+_ = (ResetPasswordToken, CourseChangeRequest, ThemeSession, GroupProject, GroupMembership)

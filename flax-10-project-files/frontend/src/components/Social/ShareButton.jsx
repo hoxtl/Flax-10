@@ -8,8 +8,7 @@ async function toggleShare(userId, isSharing, setIsSharing, setLoading, onToggle
         isSharing ? await unshareCalendar(userId) : await shareCalendar(userId);
         setIsSharing(!isSharing);
         onToggle?.(!isSharing);
-    } catch (err) {
-        console.error('Error toggling share status', err);
+    } catch {
     } finally {
         setLoading(false);
     }

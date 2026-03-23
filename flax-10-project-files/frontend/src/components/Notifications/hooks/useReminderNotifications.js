@@ -79,7 +79,7 @@ function getSentReminders() {
 
 function saveSentReminders(set) {
     try { localStorage.setItem('sent_reminders', JSON.stringify([...set])); }
-    catch (e) { console.error('Failed to save sent reminders', e); }
+    catch {}
 }
 
 function getReminderTime(event, minutes) {
