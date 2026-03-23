@@ -1,20 +1,22 @@
 """
-Backend tests for ai views.
+Tests for AI view endpoints and helper utilities.
 """
 
-from django.test import TestCase
-from rest_framework.test import APIClient
-from rest_framework import status
-from django.contrib.auth import get_user_model
-from django.utils import timezone
 from datetime import timedelta
 from unittest.mock import patch, MagicMock
 
-from studyFlax.models.timer.session_model import StudySession
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APIClient
+
 from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+from studyFlax.models.timer.session_model import StudySession
 from studyFlax.models.timer.theme_session_model import ThemeSession
 
 User = get_user_model()
+
 
 def make_user():
     return User.objects.create_user(
@@ -22,16 +24,17 @@ def make_user():
         first_name='AI', last_name='User'
     )
 
+
 def make_session(user, duration=60, status='Completed', days_ago=0):
     now = timezone.now() - timedelta(days=days_ago)
     return StudySession.objects.create(
-        user=user, start_time=now - timedelta(minutes=duration),
-        end_time=now, duration=duration, break_duration=0,
-        pause_duration=0, session_count=1, study_block_id=1, status=status
+        user=user, start_time=now - timedelta(minutes=duration), end_time=now,
+        duration=duration, break_duration=0, pause_duration=0,
+        session_count=1, study_block_id=1, status=status
     )
 
+
 class BuildUserContextTest(TestCase):
-    """Unit tests for _build_user_context."""
 
     def setUp(self):
         self.user = make_user()
@@ -64,21 +67,16 @@ class BuildUserContextTest(TestCase):
 
     def test_build_user_context_with_theme_sessions(self):
         from studyFlax.views.analytics.ai_view import _build_user_context
-        ThemeSession.objects.create(
-            user=self.user, theme='dark', duration_minutes=120,
-            started_at=timezone.now() - timedelta(days=1),
-            ended_at=timezone.now()
-        )
+        ThemeSession.objects.create(user=self.user, theme='dark', duration_minutes=120,
+            started_at=timezone.now() - timedelta(days=1), ended_at=timezone.now())
         context = _build_user_context(self.user, days=30)
         self.assertIn('Dark mode usage:', context)
 
     def test_build_user_context_upcoming_events(self):
         from studyFlax.views.analytics.ai_view import _build_user_context
-        CalendarEvent.objects.create(
-            user=self.user, title='Upcoming Lecture',
+        CalendarEvent.objects.create(user=self.user, title='Upcoming Lecture',
             start_time=timezone.now() + timedelta(days=3),
-            end_time=timezone.now() + timedelta(days=3, hours=1)
-        )
+            end_time=timezone.now() + timedelta(days=3, hours=1))
         context = _build_user_context(self.user, days=30)
         self.assertIn('Upcoming Lecture', context)
 
@@ -94,8 +92,8 @@ class BuildUserContextTest(TestCase):
         context = _build_user_context(self.user, days=30)
         self.assertIn('Peak study hour:', context)
 
+
 class GetAiInsightsViewTest(TestCase):
-    """Tests for get_ai_insights view."""
 
     def setUp(self):
         self.client = APIClient()
@@ -131,7 +129,6 @@ class GetAiInsightsViewTest(TestCase):
         mock_response = MagicMock()
         mock_response.choices[0].message.content = 'You study well!'
         mock_client.chat.completions.create.return_value = mock_response
-
         response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['insights'], 'You study well!')
@@ -145,7 +142,6 @@ class GetAiInsightsViewTest(TestCase):
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
         mock_client.chat.completions.create.side_effect = Exception('API Error')
-
         response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn('API Error', response.data['error'])
@@ -160,13 +156,33 @@ class GetAiInsightsViewTest(TestCase):
         mock_response = MagicMock()
         mock_response.choices[0].message.content = 'Insight'
         mock_client.chat.completions.create.return_value = mock_response
-
         response = self.client.post('/api/analytics/ai-insights/', {'days': 7})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('last 7 days', response.data['contextUsed'])
 
+    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
+    @patch('studyFlax.views.analytics.ai_view.settings')
+    def test_invalid_days_param_returns_400(self, mock_settings):
+        mock_settings.OPENAI_API_KEY = 'test-key'
+        response = self.client.post('/api/analytics/ai-insights/', {'days': 'notanumber'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('days', response.data['error'])
+
+    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
+    @patch('studyFlax.views.analytics.ai_view.OpenAI')
+    @patch('studyFlax.views.analytics.ai_view.settings')
+    def test_incomplete_openai_response_returns_500(self, mock_settings, mock_openai_cls):
+        mock_settings.OPENAI_API_KEY = 'test-key'
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        mock_response = MagicMock()
+        mock_response.choices = []
+        mock_client.chat.completions.create.return_value = mock_response
+        response = self.client.post('/api/analytics/ai-insights/', {'days': 30})
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class AiChatViewTest(TestCase):
-    """Tests for ai_chat view."""
 
     def setUp(self):
         self.client = APIClient()
@@ -208,7 +224,6 @@ class AiChatViewTest(TestCase):
         mock_response = MagicMock()
         mock_response.choices[0].message.content = 'Here is my reply.'
         mock_client.chat.completions.create.return_value = mock_response
-
         response = self.client.post(
             '/api/analytics/ai-chat/',
             {'messages': [{'role': 'user', 'content': 'How am I doing?'}]},
@@ -225,7 +240,6 @@ class AiChatViewTest(TestCase):
         mock_client = MagicMock()
         mock_openai_cls.return_value = mock_client
         mock_client.chat.completions.create.side_effect = Exception('Timeout')
-
         response = self.client.post(
             '/api/analytics/ai-chat/',
             {'messages': [{'role': 'user', 'content': 'Hi'}]},
@@ -253,76 +267,6 @@ class AiChatViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('days', response.data['error'])
 
-
-class AiInsightsInvalidDaysTest(TestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user = make_user()
-        self.client.force_authenticate(user=self.user)
-
-    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
-    @patch('studyFlax.views.analytics.ai_view.settings')
-    def test_invalid_days_param_returns_400(self, mock_settings):
-        mock_settings.OPENAI_API_KEY = 'test-key'
-        response = self.client.post('/api/analytics/ai-insights/', {'days': 'notanumber'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('days', response.data['error'])
-
-
-class OpenAIResponseValidationTest(TestCase):
-    def test_is_openai_response_valid_with_empty_choices(self):
-        from studyFlax.views.analytics.ai_view import _is_openai_response_valid
-        from unittest.mock import MagicMock
-        response = MagicMock()
-        response.choices = []
-        self.assertFalse(_is_openai_response_valid(response))
-
-    def test_is_openai_response_valid_with_no_choices_attr(self):
-        from studyFlax.views.analytics.ai_view import _is_openai_response_valid
-        from unittest.mock import MagicMock
-        response = MagicMock()
-        response.choices = None
-        self.assertFalse(_is_openai_response_valid(response))
-
-    def test_extract_days_with_non_integer_string(self):
-        from studyFlax.views.analytics.ai_view import _extract_days
-        self.assertIsNone(_extract_days('abc'))
-
-    def test_extract_days_with_none_returns_default(self):
-        from studyFlax.views.analytics.ai_view import _extract_days
-        self.assertEqual(_extract_days(None, 30), 30)
-
-    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
-    @patch('studyFlax.views.analytics.ai_view.OpenAI')
-    @patch('studyFlax.views.analytics.ai_view.settings')
-    def test_incomplete_openai_response_returns_500(self, mock_settings, mock_openai_cls):
-        from django.contrib.auth import get_user_model
-        from unittest.mock import MagicMock
-        mock_settings.OPENAI_API_KEY = 'test-key'
-        mock_client = MagicMock()
-        mock_openai_cls.return_value = mock_client
-        mock_response = MagicMock()
-        mock_response.choices = []
-        mock_client.chat.completions.create.return_value = mock_response
-        User = get_user_model()
-        user = User.objects.create_user(username='incomp', email='incomp@example.com', password='pass', first_name='I', last_name='U')
-        client = APIClient()
-        client.force_authenticate(user=user)
-        response = client.post('/api/analytics/ai-insights/', {'days': 30})
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class AiChatIncompleteResponseTest(TestCase):
-    """Test ai_chat returns 500 when OpenAI response has empty choices."""
-
-    def setUp(self):
-        self.client = APIClient()
-        self.user = User.objects.create_user(
-            username='chat_incomp', email='chat_incomp@e.com',
-            password='pass', first_name='C', last_name='I',
-        )
-        self.client.force_authenticate(user=self.user)
-
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
     @patch('studyFlax.views.analytics.ai_view.OpenAI')
     @patch('studyFlax.views.analytics.ai_view.settings')
@@ -341,8 +285,31 @@ class AiChatIncompleteResponseTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class OpenAIResponseValidationTest(TestCase):
+
+    def test_is_openai_response_valid_with_empty_choices(self):
+        from studyFlax.views.analytics.ai_view import _is_openai_response_valid
+        response = MagicMock()
+        response.choices = []
+        self.assertFalse(_is_openai_response_valid(response))
+
+    def test_is_openai_response_valid_with_no_choices_attr(self):
+        from studyFlax.views.analytics.ai_view import _is_openai_response_valid
+        response = MagicMock()
+        response.choices = None
+        self.assertFalse(_is_openai_response_valid(response))
+
+    def test_extract_days_with_non_integer_string(self):
+        from studyFlax.views.analytics.ai_view import _extract_days
+        self.assertIsNone(_extract_days('abc'))
+
+    def test_extract_days_with_none_returns_default(self):
+        from studyFlax.views.analytics.ai_view import _extract_days
+        self.assertEqual(_extract_days(None, 30), 30)
+
+
 class OpenAIImportCoverageTest(TestCase):
-    """Cover the openai import try branch (lines 20-22)."""
+    """Covers the openai import try/except branch."""
 
     def test_openai_import_branch_with_mock_module(self):
         import importlib
@@ -361,7 +328,6 @@ class OpenAIImportCoverageTest(TestCase):
 
 
 class AiScheduleParserTest(TestCase):
-    """Tests for ai_schedule strip_code_fence and parse_schedule_events."""
 
     def test_strip_code_fence_with_json_prefix(self):
         from studyFlax.views.analytics.ai_schedule import strip_code_fence
@@ -391,10 +357,7 @@ class AiChatScheduleExtractionFailureTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(
-            username='sched_fail', email='sched_fail@e.com',
-            password='pass', first_name='S', last_name='F',
-        )
+        self.user = make_user()
         self.client.force_authenticate(user=self.user)
 
     @patch('studyFlax.views.analytics.ai_view.openai_available', True)
