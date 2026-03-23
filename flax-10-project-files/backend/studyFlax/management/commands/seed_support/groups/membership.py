@@ -10,12 +10,12 @@ from django.utils import timezone
 from studyFlax.models.groupwork.groupwork_model import GroupMembership
 from studyFlax.models.modules.enrollment_model import Enrollment
 
-MIN_PROJECT_MEMBER_TOTAL = 5
+MIN_PROJECT_MEMBER_TOTAL = 4
 MAX_PROJECT_MEMBER_TOTAL = 10
-MIN_PROJECTS_PER_STUDENT = 6
+MIN_PROJECTS_PER_STUDENT = 4
 MAX_PROJECTS_PER_STUDENT = 8
 FIXTURE_USERNAMES = ["janedoe", "johndoe", "charlie"]
-FIXTURE_OWNER_MIN_PROJECTS = 2
+FIXTURE_OWNER_MIN_PROJECTS = 3
 
 
 def _add_if_unique(user, seen, unique_users):
@@ -284,6 +284,30 @@ def _fill_solo_project(project, students, module_students, membership_counts, me
     candidates = _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=True)
     made, _ = _fill_from_candidates(project, candidates, needed, member_sets, membership_counts)
     return made
+
+SPREAD_TARGETS = list(range(MIN_PROJECT_MEMBER_TOTAL, MAX_PROJECT_MEMBER_TOTAL + 1))
+
+def _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng):
+    current = len(member_sets.get(project.id, set()))
+    needed = target - current
+    if needed <= 0:
+        return
+    candidates = _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=True)
+    _fill_from_candidates(project, candidates, needed, member_sets, membership_counts)
+
+def ensure_member_count_spread(projects, students, module_students, membership_counts, rng):
+    """Guarantee one project at each member count from MIN to MAX, random counts for the rest."""
+    if not projects:
+        return
+    member_sets = _project_member_sets(projects)
+    sorted_projects = sorted(projects, key=lambda p: len(member_sets.get(p.id, set())))
+    spread_count = len(SPREAD_TARGETS)
+    spread_projects = sorted_projects[:spread_count]
+    for project, target in zip(spread_projects, SPREAD_TARGETS):
+        _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng)
+    for project in sorted_projects[spread_count:]:
+        target = rng.randint(MIN_PROJECT_MEMBER_TOTAL, MAX_PROJECT_MEMBER_TOTAL)
+        _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng)
 
 def _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng):
     member_sets = _project_member_sets(projects)

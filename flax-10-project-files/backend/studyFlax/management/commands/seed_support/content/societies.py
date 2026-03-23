@@ -107,40 +107,47 @@ def _pick_admin(admin_counts, student_users):
     eligible = [u for u in student_users if admin_counts[u.id] < 3]
     return random.choice(eligible) if eligible else None
 
-def _ensure_seed_membership(user, society, role):
+MAX_SYNC_PER_USER = 2
+
+def _ensure_seed_membership(user, society, role, sync_counts):
+    sync_count = sync_counts.get(user.id, 0)
+    enable_sync = sync_count < MAX_SYNC_PER_USER
     membership, _ = SocietyMembership.objects.update_or_create(
         user=user,
         society=society,
-        defaults={'role': role, 'is_subscribed': True},
+        defaults={'role': role, 'is_subscribed': enable_sync},
     )
-    SocietyCalendarSync.objects.get_or_create(user=user, society=society)
+    if enable_sync:
+        SocietyCalendarSync.objects.get_or_create(user=user, society=society)
+        sync_counts[user.id] = sync_count + 1
     return membership
 
-def _add_admin_membership(society, admin, admin_counts):
-    _ensure_seed_membership(admin, society, 'admin')
+def _add_admin_membership(society, admin, admin_counts, sync_counts):
+    _ensure_seed_membership(admin, society, 'admin', sync_counts)
     society.admin_emails = admin.email
     society.save()
     admin_counts[admin.id] += 1
 
-def _seed_regular_members(society, admin, member_counts, student_users):
+def _seed_regular_members(society, admin, member_counts, student_users, sync_counts):
     eligible = [u for u in student_users if u.id != admin.id and member_counts[u.id] < 5]
     count = min(random.randint(5, 15), len(eligible))
     members = random.sample(eligible, count)
     for member in members:
-        _ensure_seed_membership(member, society, 'member')
+        _ensure_seed_membership(member, society, 'member', sync_counts)
         member_counts[member.id] += 1
 
-def _seed_society_members(society, admin_counts, member_counts, student_users):
+def _seed_society_members(society, admin_counts, member_counts, student_users, sync_counts):
     admin = _pick_admin(admin_counts, student_users)
     if not admin:
         return
-    _add_admin_membership(society, admin, admin_counts)
-    _seed_regular_members(society, admin, member_counts, student_users)
+    _add_admin_membership(society, admin, admin_counts, sync_counts)
+    _seed_regular_members(society, admin, member_counts, student_users, sync_counts)
 
 def create_society_memberships(stdout):
     SocietyMembership.objects.filter(user__role='teacher').delete()
     student_users = list(User.objects.filter(role='student'))
     admin_counts = {u.id: 0 for u in student_users}
     member_counts = {u.id: 0 for u in student_users}
+    sync_counts = {u.id: 0 for u in student_users}
     for society in Society.objects.all():
-        _seed_society_members(society, admin_counts, member_counts, student_users)
+        _seed_society_members(society, admin_counts, member_counts, student_users, sync_counts)

@@ -32,6 +32,7 @@ from .membership import (
     _ensure_projects_have_teammates,
     _trim_students_to_project_cap,
     _build_membership_counts,
+    ensure_member_count_spread,
     _fixture_seed_users,
     _pick_project_for_fixture_owner,
     FIXTURE_USERNAMES,
@@ -166,6 +167,7 @@ def _run_membership_seeding(projects, students, showcase_student, student_module
     _ensure_projects_have_minimum_members(projects, students, module_students, membership_counts, rng)
     _ensure_projects_have_teammates(projects, students, module_students, membership_counts, rng)
     _trim_students_to_project_cap(projects, students, student_modules, membership_counts)
+    ensure_member_count_spread(projects, students, module_students, membership_counts, rng)
 
 def create_group_memberships(stdout):
     rng = random.Random(PROJECT_MEMBER_SEED)

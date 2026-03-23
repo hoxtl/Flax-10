@@ -196,7 +196,7 @@ def _resolve_project_deadline(now, index, source_deadline=None):
     return fallback_due
 
 def _project_target_count(module):
-    return 1 + (sum(ord(ch) for ch in module.module_code) % 2)
+    return 1
 
 def _module_project_family(module):
     prefix = module.module_code[:2]
