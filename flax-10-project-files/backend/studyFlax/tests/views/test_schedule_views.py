@@ -242,7 +242,7 @@ class ScheduleViewsTests(BaseTestCase):
         self.assertEqual(len(response.data['event_allocations']), 1)
 
     def _build_schedule_event(self, title, start_offset_days=1, start_offset_hours=0):
-        schedule_tag = Tag.objects.get(name='Schedule')
+        schedule_tag, _ = Tag.objects.get_or_create(name='Schedule', defaults={'is_default': True})
         start = timezone.now() + timedelta(days=start_offset_days, hours=start_offset_hours)
         return CalendarEvent.objects.create(
             user=self.user,
@@ -251,3 +251,62 @@ class ScheduleViewsTests(BaseTestCase):
             end_time=start + timedelta(hours=1),
             tag=schedule_tag,
         )
+
+    def test_manual_schedule_rejects_empty_event_ids(self):
+        response = self.client.post(self.url, {
+            'mode': 'manual', 'title': 'Test', 'event_ids': [],
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('event_ids', response.data['detail'])
+
+    def test_manual_schedule_rejects_untagged_events(self):
+        start = timezone.now() + timedelta(days=1)
+        untagged_event = CalendarEvent.objects.create(
+            user=self.user, title='No tag',
+            start_time=start, end_time=start + timedelta(hours=1),
+        )
+        response = self.client.post(self.url, {
+            'mode': 'manual', 'title': 'Test', 'event_ids': [untagged_event.id],
+        }, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('invalid', response.data['detail'])
+
+    def test_auto_schedule_rejects_invalid_serialiser_data(self):
+        response = self.client.post(self.url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_auto_schedule_rejects_nonexistent_deadline(self):
+        payload = {
+            'title': 'Bad deadline',
+            'deadline_preferences': [{'deadline_id': 99999, 'ideal_minutes_per_day': 30}],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Invalid deadlines', response.data['detail'])
+
+    def test_auto_schedule_with_clear_existing_deletes_old_schedules(self):
+        first_payload = {
+            'title': 'First plan',
+            'deadline_preferences': [{'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30}],
+        }
+        self.client.post(self.url, first_payload, format='json')
+        self.assertEqual(Schedule.objects.filter(user=self.user).count(), 1)
+        second_payload = {
+            'title': 'Fresh start',
+            'clear_existing': True,
+            'deadline_preferences': [{'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30}],
+        }
+        response = self.client.post(self.url, second_payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Schedule.objects.filter(user=self.user).count(), 1)
+
+    def test_auto_schedule_rejects_duplicate_deadline_ids(self):
+        payload = {
+            'title': 'Dup deadlines',
+            'deadline_preferences': [
+                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 30},
+                {'deadline_id': self.deadline.id, 'ideal_minutes_per_day': 60},
+            ],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

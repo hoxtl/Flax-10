@@ -358,3 +358,79 @@ class OpenAIImportCoverageTest(TestCase):
         finally:
             del sys.modules['openai']
             importlib.reload(mod)
+
+
+class AiScheduleParserTest(TestCase):
+    """Tests for ai_schedule strip_code_fence and parse_schedule_events."""
+
+    def test_strip_code_fence_with_json_prefix(self):
+        from studyFlax.views.analytics.ai_schedule import strip_code_fence
+        content = '```json\n[{"title": "Study"}]\n```'
+        result = strip_code_fence(content)
+        self.assertIn('"title"', result)
+
+    def test_strip_code_fence_without_json_prefix(self):
+        from studyFlax.views.analytics.ai_schedule import strip_code_fence
+        content = '```\n[{"title": "Study"}]\n```'
+        result = strip_code_fence(content)
+        self.assertIn('"title"', result)
+
+    def test_parse_schedule_events_returns_empty_for_non_list(self):
+        from studyFlax.views.analytics.ai_schedule import parse_schedule_events
+        result = parse_schedule_events('{"key": "value"}')
+        self.assertEqual(result, [])
+
+    def test_parse_schedule_events_returns_list_on_valid_json(self):
+        from studyFlax.views.analytics.ai_schedule import parse_schedule_events
+        result = parse_schedule_events('[{"title": "Study"}]')
+        self.assertEqual(len(result), 1)
+
+
+class AiChatScheduleExtractionFailureTest(TestCase):
+    """Tests for _extract_schedule_events failure paths (lines 93, 96)."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='sched_fail', email='sched_fail@e.com',
+            password='pass', first_name='S', last_name='F',
+        )
+        self.client.force_authenticate(user=self.user)
+
+    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
+    @patch('studyFlax.views.analytics.ai_view.OpenAI')
+    @patch('studyFlax.views.analytics.ai_view.settings')
+    def test_chat_returns_200_when_schedule_fetch_fails(self, mock_settings, mock_openai_cls):
+        mock_settings.OPENAI_API_KEY = 'test-key'
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        main_response = MagicMock()
+        main_response.choices[0].message.content = 'Study plan reply.'
+        mock_client.chat.completions.create.side_effect = [main_response, Exception('schedule fail')]
+        response = self.client.post(
+            '/api/analytics/ai-chat/',
+            {'messages': [{'role': 'user', 'content': 'Plan my week'}]},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['suggested_events'], [])
+
+    @patch('studyFlax.views.analytics.ai_view.openai_available', True)
+    @patch('studyFlax.views.analytics.ai_view.OpenAI')
+    @patch('studyFlax.views.analytics.ai_view.settings')
+    def test_chat_returns_200_when_schedule_response_incomplete(self, mock_settings, mock_openai_cls):
+        mock_settings.OPENAI_API_KEY = 'test-key'
+        mock_client = MagicMock()
+        mock_openai_cls.return_value = mock_client
+        main_response = MagicMock()
+        main_response.choices[0].message.content = 'Study plan reply.'
+        incomplete = MagicMock()
+        incomplete.choices = []
+        mock_client.chat.completions.create.side_effect = [main_response, incomplete]
+        response = self.client.post(
+            '/api/analytics/ai-chat/',
+            {'messages': [{'role': 'user', 'content': 'Plan my week'}]},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['suggested_events'], [])

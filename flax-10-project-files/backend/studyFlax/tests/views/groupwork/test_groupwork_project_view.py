@@ -287,3 +287,45 @@ class GroupProjectMembersTests(BaseTestCase):
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(GroupMembership.objects.filter(id=membership.id).exists())
+
+
+class GroupProjectViewHelpersTest(BaseTestCase):
+
+    def test_create_project_with_future_deadline_succeeds(self):
+        future = (timezone.localdate() + timedelta(days=7)).isoformat()
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Deadline Project", "deadline": future},
+            format="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_create_project_with_invalid_member_id_string_returns_400(self):
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Bad Members", "member_ids": ["invalid"]},
+            format="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_project_with_nonexistent_member_returns_400(self):
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Ghost Members", "member_ids": [99999]},
+            format="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_validate_member_ids_returns_response_when_none(self):
+        from studyFlax.views.groupwork.groupwork_view import _validate_member_ids
+        result = _validate_member_ids(None)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.status_code, 400)
+
+    def test_create_project_with_non_list_member_ids_returns_400(self):
+        res = self.client.post(
+            "/api/group-work/projects/",
+            {"name": "Bad Type", "member_ids": "not-a-list"},
+            format="json",
+        )
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

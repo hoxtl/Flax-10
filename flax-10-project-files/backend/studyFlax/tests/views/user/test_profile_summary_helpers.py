@@ -238,3 +238,17 @@ class ProfileSummaryHelpersTest(TestCase):
             study_block_id=uuid.uuid4().int % 1000000,
             session_count=1,
         )
+
+
+class AddSessionToTotalsTest(TestCase):
+
+    def test_returns_early_when_session_has_no_end_time(self):
+        from studyFlax.views.user.profile_summary_payload import add_session_to_totals
+        from unittest.mock import MagicMock
+        from django.utils import timezone
+        today = timezone.localdate()
+        totals = {today: 0}
+        session = MagicMock()
+        session.end_time = None
+        add_session_to_totals(totals, session)
+        self.assertEqual(totals[today], 0)

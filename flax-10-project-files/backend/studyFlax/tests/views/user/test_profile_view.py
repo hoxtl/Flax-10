@@ -207,3 +207,50 @@ class ProfileViewCoverageTest(TestCase):
     def test_patch_remove_photo(self):
         response = self.client.patch('/api/profile/', data={'remove_photo': 'true'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class SuggestStudySessionViewTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.sender = User.objects.create_user(
+            username='sender', email='sender@test.com', password='pass'
+        )
+        self.receiver = User.objects.create_user(
+            username='receiver', email='receiver@test.com', password='pass'
+        )
+        self.client.force_authenticate(user=self.sender)
+
+    def test_missing_target_user_id_returns_400(self):
+        response = self.client.post('/api/profile/study-together/', {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('target_user_id', response.data['error'])
+
+    def test_nonexistent_target_user_returns_404(self):
+        response = self.client.post('/api/profile/study-together/', {'target_user_id': 99999})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_success_with_custom_message(self):
+        response = self.client.post('/api/profile/study-together/', {
+            'target_user_id': self.receiver.id,
+            'message': 'Let us study together!',
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Notification.objects.filter(user=self.receiver).exists())
+        notification = Notification.objects.get(user=self.receiver)
+        self.assertEqual(notification.message, 'Let us study together!')
+
+    def test_success_with_slot_times(self):
+        response = self.client.post('/api/profile/study-together/', {
+            'target_user_id': self.receiver.id,
+            'slot_start': '2026-03-24 10:00',
+            'slot_end': '2026-03-24 12:00',
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        notification = Notification.objects.get(user=self.receiver)
+        self.assertIn('suggested a study session from', notification.message)
+
+    def test_invalid_target_user_id_type_returns_404(self):
+        from studyFlax.views.user.study_session_suggestions import get_target_user
+        result = get_target_user('not-a-number')
+        self.assertIsNone(result)

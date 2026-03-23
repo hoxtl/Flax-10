@@ -126,7 +126,7 @@ class AttendanceViewTests(BaseTestCase):
 
     @patch("studyFlax.views.calendar.attendance_view.EventAttendance.objects")
     def test_attendance_records_database_error(self, mock_objects):
-        mock_objects.filter.return_value.values_list.side_effect = DatabaseError("boom")
+        mock_objects.filter.return_value.select_related.side_effect = DatabaseError("boom")
         response = self.client.get("/api/attendance/records/")
         self.assertEqual(response.status_code, 500)
         self.assertIn("unavailable", response.json()["detail"])
