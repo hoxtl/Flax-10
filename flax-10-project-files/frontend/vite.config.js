@@ -2,12 +2,20 @@ import { defineConfig } from 'vite'
 import { readFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import react from '@vitejs/plugin-react'
-
+import postcssImport from 'postcss-import'
+ 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
     manifest: true,
-	emptyOutDir: true,
+    emptyOutDir: true,
+  },
+  css: {
+    postcss: {
+      plugins: [
+        postcssImport(), // resolves @import in .module.css before CSS Modules scoping
+      ],
+    },
   },
   plugins: [react()],
   server: {
