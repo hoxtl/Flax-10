@@ -16,17 +16,7 @@ import {
 import TaskAvatarStack from "./TaskAvatarStack";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskContextMenu from "./TaskContextMenu";
-
-function useCardEdit(task, onUpdate) {
-    const [editing, setEditing] = useState(false);
-    const [editTitle, setEditTitle] = useState(task.title);
-    const saveEdit = () => {
-        const trimmed = editTitle.trim();
-        if (trimmed && trimmed !== task.title) onUpdate(task.id, { title: trimmed });
-        setEditing(false);
-    };
-    return { editing, editTitle, setEditTitle, setEditing, saveEdit };
-}
+import { useTaskTitleEdit } from "./taskCardEditUtils";
 
 function CardEditInput({ editTitle, setEditTitle, saveEdit, setEditing, inputClassName }) {
     return (
@@ -81,7 +71,7 @@ function UnscheduledCardContent({ t, members, editing, editTitle, setEditTitle, 
 
 function UnscheduledCard({ t, members, onDelete, onUpdate }) {
     const [ctxMenu, setCtxMenu] = useState(null);
-    const { editing, editTitle, setEditTitle, setEditing, saveEdit } = useCardEdit(t, onUpdate);
+    const { editing, editTitle, setEditTitle, setEditing, saveEdit } = useTaskTitleEdit(t, onUpdate);
     const handleContextMenu = (e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); };
     return (
         <>
@@ -221,7 +211,7 @@ function buildTimelineCardStyle(c, showPopup) {
 function TimelineCard({ task, members, assignees, onUpdate, onDelete }) {
     const [showPopup, setShowPopup] = useState(false);
     const [ctxMenu, setCtxMenu] = useState(null);
-    const { editing, editTitle, setEditTitle, setEditing, saveEdit } = useCardEdit(task, onUpdate);
+    const { editing, editTitle, setEditTitle, setEditing, saveEdit } = useTaskTitleEdit(task, onUpdate);
     const c = getPriorityStyle(task.priority);
     const toggle = buildToggleAssignee(assignees, task.id, onUpdate);
     const handleContextMenu = (e) => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY }); };

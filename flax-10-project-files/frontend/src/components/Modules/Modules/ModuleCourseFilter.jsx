@@ -2,11 +2,12 @@
  * Dropdown filter for modules by course and enrolment status.
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
+import { useClickOutside } from '../../common/hooks/useClickOutside';
 import styles from './ModuleCourseFilter.module.css';
 
 function filterCourseGroups(groups, query) {
@@ -49,14 +50,6 @@ function DepartmentGroup({ department, courses, selectedCourses, onToggle, expan
             </div>
         </div>
     );
-}
-
-function useClickOutside(ref, onClose) {
-    useEffect(() => {
-        const handler = (e) => ref.current && !ref.current.contains(e.target) && onClose();
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [ref, onClose]);
 }
 
 function FilterButton({ activeCount, isOpen, onClick }) {

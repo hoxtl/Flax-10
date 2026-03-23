@@ -5,20 +5,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import analyticsService from '../../../api/analyticsApi';
 import { getNearestMilestone } from '../utils/milestoneUtils';
+import { listenToTimerHistoryEvents } from '../utils/historyEvents';
 
 function loadGoalHours() {
   return parseFloat(localStorage.getItem('timerDailyGoalHours') || '4');
-}
-
-function listenForHistory(refresh) {
-  window.addEventListener('timerHistoryUpdated', refresh);
-  window.addEventListener('historyCleared', refresh);
-  return () => removeHistoryListeners(refresh);
-}
-
-function removeHistoryListeners(refresh) {
-  window.removeEventListener('timerHistoryUpdated', refresh);
-  window.removeEventListener('historyCleared', refresh);
 }
 
 function loadSummary(days, onSuccess, onError) {
@@ -40,7 +30,7 @@ function useSummaryData(onStreakData) {
   const [monthSummary, setMonthSummary] = useState(null);
   const refresh = useCallback(() => refreshSummaries(setData, setMonthSummary, setLoading, onStreakData), [onStreakData]);
 
-  useEffect(() => listenForHistory(refresh), [refresh]);
+  useEffect(() => listenToTimerHistoryEvents(refresh), [refresh]);
   useEffect(() => {
     refresh();
   }, [refresh]);

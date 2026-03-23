@@ -5,7 +5,8 @@ import { useConfirm } from "../../../context/ConfirmContext";
 import { useEventActions } from "./useCalendarEvents";
 import { getMinuteOffset, SLOT_HEIGHT } from "../calendarConstants";
 import { checkOverlapWithConfirm } from "../utils/overlapUtils";
-import { extractBaseEventId, hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
+import { hasRecurrence, isReadOnlyEvent } from "../utils/eventUtils";
+import { applyCalculatedEventMove, applyEventMoveWindow, handleRecurringMoveChoice, moveSingleOccurrenceToWindow } from "./eventMoveUtils";
 
 export function useTimeSlotDrop(hour, date) {
     const { events } = useCalendar();
@@ -105,17 +106,11 @@ async function moveEventToTime(event, date, startMinutes, addEvent, editEvent, a
 }
 
 async function handleRecurringMove(event, date, startMinutes, addEvent, editEvent, addException, allEvents, confirmFn) {
-    const choice = await confirmFn({
-        title: "Recurring Event",
-        message: "This is a recurring event. How would you like to move it?",
-        confirmText: "Move ALL",
-        cancelText: "Move ONLY this"
-    });
-    if (choice) {
-        await updateAllOccurrences(event, startMinutes, editEvent, allEvents, confirmFn);
-    } else {
-        await moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents, confirmFn);
-    }
+    await handleRecurringMoveChoice(
+        confirmFn,
+        () => updateAllOccurrences(event, startMinutes, editEvent, allEvents, confirmFn),
+        () => moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents, confirmFn),
+    );
 }
 
 async function updateAllOccurrences(event, startMinutes, editEvent, allEvents, confirmFn) {
@@ -124,45 +119,28 @@ async function updateAllOccurrences(event, startMinutes, editEvent, allEvents, c
     newStart.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
     const duration = new Date(event.end_time) - originalStart;
     const newEnd = new Date(newStart.getTime() + duration);
-    const baseEventId = extractBaseEventId(event.id);
-    const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
-    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!(await checkOverlapWithConfirm({ ...event, ...updateData }, others, confirmFn))) return;
-    await editEvent(baseEventId, updateData);
+    await applyEventMoveWindow(event, newStart, newEnd, editEvent, allEvents, confirmFn);
 }
 
 async function moveSingleOccurrence(event, date, startMinutes, addEvent, addException, allEvents, confirmFn) {
-    const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
-    const newEvent = buildNewEvent(event, newStart, newEnd);
-    if (!(await checkOverlapWithConfirm(newEvent, allEvents, confirmFn))) return;
-
-    const baseEventId = extractBaseEventId(event.id);
-    const originalDateStr = getDateString(event.start_time);
-    await addException(baseEventId, originalDateStr);
-    await addEvent(newEvent);
-}
-
-function buildNewEvent(event, newStart, newEnd) {
-    return {
-        title: event.title,
-        description: event.description || '',
-        start_time: newStart.toISOString(),
-        end_time: newEnd.toISOString(),
-        location: event.location || '',
-    };
-}
-
-function getDateString(dateTime) {
-    return new Date(dateTime).toISOString().slice(0, 10);
+    await moveSingleOccurrenceToWindow(
+        event,
+        (currentEvent) => calculateNewTimes(currentEvent, date, startMinutes),
+        addEvent,
+        addException,
+        allEvents,
+        confirmFn,
+    );
 }
 
 async function executeMove(event, date, startMinutes, editEvent, allEvents, confirmFn) {
-    const { newStart, newEnd } = calculateNewTimes(event, date, startMinutes);
-    const baseEventId = extractBaseEventId(event.id);
-    const updateData = { start_time: newStart.toISOString(), end_time: newEnd.toISOString() };
-    const others = allEvents.filter(e => extractBaseEventId(e.id) !== baseEventId);
-    if (!(await checkOverlapWithConfirm({ ...event, ...updateData }, others, confirmFn))) return;
-    await editEvent(baseEventId, updateData);
+    await applyCalculatedEventMove(
+        event,
+        (currentEvent) => calculateNewTimes(currentEvent, date, startMinutes),
+        editEvent,
+        allEvents,
+        confirmFn,
+    );
 }
 
 function calculateNewTimes(event, date, startMinutes) {

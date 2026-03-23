@@ -2,6 +2,8 @@
  * Pure helpers for DateTimePicker: constants, formatting, parsing, and event emission.
  */
 
+import { formatForDateTimeInput } from "../../../utils/dateTimeInput";
+
 export const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 export const DAYS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
@@ -24,7 +26,7 @@ export function getDropdownHeight(timeOnly, dateOnly) {
 
 export const DROPDOWN_WIDTH = 340;
 
-function formatDisplay(date) {
+export function formatDisplay(date) {
   return `${pad(date.getDate())} / ${pad(date.getMonth() + 1)} / ${date.getFullYear()}  ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
@@ -88,6 +90,10 @@ export function emitDateTimeChange(date, h, m, timeOnly, dateOnly, onChange) {
   const d = new Date(date);
   d.setHours(h, m, 0, 0);
   onChange?.(formatOutput(d, timeOnly, dateOnly));
+}
+
+export function formatIncomingForInput(value) {
+  return formatForDateTimeInput(value);
 }
 
 export function handleDaySelect(day, viewY, viewM, setSelDate, emitChange, hour, minute) {

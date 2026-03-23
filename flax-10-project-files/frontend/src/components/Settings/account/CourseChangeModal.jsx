@@ -9,6 +9,7 @@ import AnimatedDropdown from "../../common/AnimatedDropdown/AnimatedDropdown";
 import InlineAlert from "../../common/InlineAlert/InlineAlert";
 import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
 import StandardModal from "../../common/StandardModal/StandardModal";
+import RequestDecisionNotice from "../ui/RequestDecisionNotice";
 import { groupedCourses } from "./accountCourseRequests";
 
 function useCourseRequestForm() {
@@ -52,15 +53,6 @@ function CourseDropdown({ selectedCourse, setSelectedCourse }) {
   return <AnimatedDropdown value={selectedCourse} onChange={setSelectedCourse} options={groupedCourses} grouped searchable usePortal placeholder="Search for a course..." searchPlaceholder="Type to search courses" emptyMessage="No courses found" menuMaxHeight={220} />;
 }
 
-function ModalWarning() {
-  return (
-    <div className={styles.modalWarning}>
-      <span className={styles.modalWarningIcon}>⚠️</span>
-      <span>Your request may be <strong>accepted or rejected</strong>. You'll be notified once a decision is made.</span>
-    </div>
-  );
-}
-
 function SubmitAction({ submitting }) {
   return (
     <div className={styles.formActions}>
@@ -100,7 +92,7 @@ function CourseChangeModalContent({ form, onClose, onSuccess }) {
       <form onSubmit={handleSubmit}>
         <CourseReasonField reason={form.reason} setReason={form.setReason} />
         <CourseSelectionField selectedCourse={form.selectedCourse} setSelectedCourse={form.setSelectedCourse} />
-        <ModalWarning />
+        <RequestDecisionNotice />
         <InlineAlert message={form.error} variant="error" />
         <SubmitAction submitting={form.submitting} />
       </form>

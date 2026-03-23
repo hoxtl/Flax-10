@@ -2,20 +2,13 @@
  * Hover-activated multi-select member filter.
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import MemberAvatar from "./MemberAvatar";
 import { getDisplayName } from "../utils/memberAvatarUtils";
 import FilterButton from "../../../components/common/FilterButton/FilterButton";
+import { useClickOutside } from "../../../components/common/hooks/useClickOutside";
 import styles from "./MemberFilter.module.css";
-
-function useClickOutside(ref, onClose) {
-    useEffect(() => {
-        const handler = (e) => ref.current && !ref.current.contains(e.target) && onClose();
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, [ref, onClose]);
-}
 
 function useMemberFilter() {
     const [isOpen, setIsOpen] = useState(false);

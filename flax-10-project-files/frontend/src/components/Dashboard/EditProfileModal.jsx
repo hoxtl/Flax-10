@@ -7,6 +7,7 @@ import FormField from '../common/FormField/FormField';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';
 import TextInput from '../common/TextInput/TextInput';
+import { useTransientSavedState } from '../common/hooks/useTransientSavedState';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -103,19 +104,6 @@ function buildSubmitHandler(form, user, onSave) {
   };
 }
 
-function useSavedState(saveSignal) {
-  const [showSaved, setShowSaved] = useState(false);
-
-  useEffect(() => {
-    if (!saveSignal) return undefined;
-    setShowSaved(true);
-    const timer = setTimeout(() => setShowSaved(false), 2000);
-    return () => clearTimeout(timer);
-  }, [saveSignal]);
-
-  return showSaved;
-}
-
 function PhotoPreview({ previewUrl, initials }) {
   if (previewUrl) return <img src={previewUrl} alt="Preview" />;
   return <div className={styles.photoPlaceholder}>{initials}</div>;
@@ -163,7 +151,7 @@ function BioField({ bio, setBio }) {
 }
 
 function FormActions({ loading, onClose, saveSignal }) {
-  const showSaved = useSavedState(saveSignal);
+  const showSaved = useTransientSavedState(saveSignal);
   const buttonLabel = loading ? 'Saving...' : showSaved ? '✓ Saved!' : 'Save Changes';
   return (
     <div className={styles.actions}>
