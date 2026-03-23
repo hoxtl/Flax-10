@@ -76,7 +76,7 @@ export function TimePickerRow({ hour, minute, changeHour, changeMinute, timeOnly
 
 export const DropdownPanel = forwardRef(function DropdownPanel({ pos, dateOnly, timeOnly, setOpen, selectDay, ...rest }, ref) {
   const onDaySelect = (day) => { selectDay(day); if (dateOnly) setOpen(false); };
-  const posVars = { '--dp-top': pos.top, '--dp-left': pos.left };
+  const posVars = { '--dp-top': `${pos.top}px`, '--dp-left': `${pos.left}px` };
   return (
     <div ref={ref} className={`${styles.dropdown} ${styles.dropdownPositioned}`} style={posVars}>
       {!timeOnly && <CalendarSection {...rest} selectDay={onDaySelect} />}
