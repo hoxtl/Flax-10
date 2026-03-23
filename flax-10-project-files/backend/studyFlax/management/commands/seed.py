@@ -205,8 +205,11 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("  Seeding database"))
         self.stdout.write(self.style.SUCCESS(div))
         self._ensure_usersettings_seed_compatibility()
+        self.stdout.write("")
+        self.stdout.write("  Users")
         self._seed_users()
         self.stdout.write("")
+        self.stdout.write("  Catalogue")
         self._seed_catalogue()
         self._load_shared_data()
         self._seed_content()
@@ -248,6 +251,8 @@ class Command(BaseCommand):
         self._create_tags()
 
     def _seed_content(self):
+        self.stdout.write("")
+        self.stdout.write("  Events & Content")
         create_events_for_users(self.users, self.tags, self.rules, self.stdout)
         create_modules(self.stdout)
         self.modules = list(Module.objects.all())
@@ -259,12 +264,16 @@ class Command(BaseCommand):
             f"  \u00b7  Enrolments {Enrollment.objects.count():,}"
         )
         create_tasks(self.users, self.stdout)
-        self._seed_societies_and_groups()
-        self._seed_calendar_shares()
         create_study_sessions(self.stdout)
         students = list(User.objects.filter(role='student'))
         create_readings(self.modules, students, self.stdout)
         seed_attendance(self.stdout)
+        self.stdout.write("")
+        self.stdout.write("  Societies & Groups")
+        self._seed_societies_and_groups()
+        self._seed_calendar_shares()
+        self.stdout.write("")
+        self.stdout.write("  Admin")
         self._seed_admin_data()
 
     def _seed_admin_data(self):
@@ -311,12 +320,11 @@ class Command(BaseCommand):
             _seed_viewer_shares_for_user(user, all_users)
 
     def _create_recurrence_rules(self):
-        self.stdout.write("Seeding recurrence rules...")
         for freq, interval in recurrence_fixtures:
             RecurrenceRule.objects.get_or_create(frequency=freq, interval=interval)
+        self.stdout.write(f"  \u2713  {'Recurrence rules':<16} {RecurrenceRule.objects.count():,}")
 
     def _create_categories(self):
-        self.stdout.write("Seeding categories...")
         for name, color, is_default in category_fixtures:
             user = random.choice(self.users) if not is_default and self.users and random.random() > 0.7 else None
             Category.objects.get_or_create(
@@ -324,6 +332,7 @@ class Command(BaseCommand):
                 defaults={'color': color, 'is_default': is_default},
             )
         self.categories = list(Category.objects.all())
+        self.stdout.write(f"  \u2713  {'Categories':<16} {len(self.categories):,}")
 
     def _tag_color(self, name):
         if name in SOFT_TAG_COLORS:
@@ -347,10 +356,10 @@ class Command(BaseCommand):
 
     def _create_tags(self):
         import itertools
-        self.stdout.write("Seeding tags...")
         for user, (name, duration) in itertools.product(self.users, tag_fixtures):
             self._create_single_tag(name, duration, user)
         self._create_module_pill_tags()
+        self.stdout.write(f"  \u2713  {'Tags':<16} {Tag.objects.count():,}")
 
     def _create_module_pill_tags(self):
         for code, pill_color in MODULE_PILL_COLORS.items():
@@ -395,6 +404,7 @@ class Command(BaseCommand):
         """Print a summary of all seeded data."""
 
         div = "\u2500" * 40
+        self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(div))
         self.stdout.write(self.style.SUCCESS("  Seeding complete"))
         self.stdout.write(self.style.SUCCESS(div))

@@ -168,7 +168,6 @@ def _run_membership_seeding(projects, students, showcase_student, student_module
     _trim_students_to_project_cap(projects, students, student_modules, membership_counts)
 
 def create_group_memberships(stdout):
-    stdout.write("Seeding group memberships...")
     rng = random.Random(PROJECT_MEMBER_SEED)
     context = _build_seed_project_context(timezone.now())
     students = context["students"]
@@ -187,7 +186,6 @@ def create_group_memberships(stdout):
         post_save.connect(notify_on_added_to_project, sender=GroupMembership)
 
 def create_group_tasks(stdout):
-    stdout.write("Seeding group tasks with assignments and statuses...")
     now = timezone.now()
     context = _build_seed_project_context(now)
     projects = sorted(context["projects"], key=lambda project: (project.course_code, project.name))
@@ -203,9 +201,7 @@ def _seed_project_availability(project, now):
     _seed_meeting_suggestions_for_project(project, members, now)
 
 def seed_group_availability(stdout):
-    stdout.write("Seeding group availability data (busy events + meeting suggestions)...")
     now = timezone.now()
     context = _build_seed_project_context(now)
     for project in context["projects"]:
         _seed_project_availability(project, now)
-    stdout.write("Done seeding group availability.")
