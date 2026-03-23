@@ -251,7 +251,7 @@ def build_society_dict(name, bio, about, category, tags):
         'name': name, 'bio': bio, 'about': about,
         'categories': [mapped_category], 'tags': tags,
         'events': get_events_for_category(category),
-        'image': f'{os.environ.get('RAILWAY_PUBLIC_DOMAIN')}/static/seed_images/societies/{image}',
+        'image': f'/static/seed_images/societies/{image}',
     }
 
 def get_random_category_image(category):
