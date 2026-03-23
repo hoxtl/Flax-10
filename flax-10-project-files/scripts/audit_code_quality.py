@@ -929,20 +929,78 @@ JS_CONVENTION_PATTERNS = [
 ]
 
 
-def _collect_py_imports(path: Path) -> set[str]:
+def _path_to_module(path: Path, root: Path) -> str:
+    """Convert a Python file path under root to a dotted module path."""
+    relative = path.relative_to(root)
+    parts = list(relative.parts)
+    if parts[-1] == "__init__.py":
+        parts = parts[:-1]
+    else:
+        parts[-1] = Path(parts[-1]).stem
+    return ".".join(parts)
+
+
+def _resolve_relative_module(
+    module: str | None,
+    level: int,
+    current_module: str,
+    is_package_module: bool,
+) -> str | None:
+    """Resolve an ImportFrom module against the current module path."""
+    if level == 0:
+        return module
+
+    package_parts = current_module.split(".")
+    if not package_parts:
+        return module
+    if not is_package_module:
+        package_parts = package_parts[:-1]
+
+    if level > len(package_parts):
+        return module
+
+    base_parts = package_parts[:len(package_parts) - level + 1]
+    if module:
+        base_parts.extend(module.split("."))
+    return ".".join(part for part in base_parts if part)
+
+
+def _collect_py_imports(path: Path, root: Path) -> set[str]:
     """Return set of dotted module names imported by this file."""
     names: set[str] = set()
     try:
         tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
     except Exception:
         return names
+    current_module = _path_to_module(path, root)
+    is_package_module = path.name == "__init__.py"
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
                 names.add(alias.name)
         elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                names.add(node.module)
+            resolved_module = _resolve_relative_module(
+                node.module,
+                node.level,
+                current_module,
+                is_package_module,
+            )
+            if resolved_module:
+                names.add(resolved_module)
+            for alias in node.names:
+                if alias.name == "*":
+                    continue
+                if resolved_module:
+                    names.add(f"{resolved_module}.{alias.name}")
+                elif node.level > 0:
+                    parent_module = _resolve_relative_module(
+                        alias.name,
+                        node.level,
+                        current_module,
+                        is_package_module,
+                    )
+                    if parent_module:
+                        names.add(parent_module)
     return names
 
 
@@ -964,7 +1022,9 @@ def find_unused_py_files(root: Path) -> list[Issue]:
 
     # Seed: convention entry points + test files (tests import source)
     for p in all_files:
-        if p.name in PY_CONVENTION_FILES or is_test(p) or is_data(p):
+        is_management_command = "management/commands" in p.as_posix() and p.name != "__init__.py"
+        is_nested_url_module = "/urls/" in p.as_posix()
+        if p.name in PY_CONVENTION_FILES or is_management_command or is_nested_url_module or is_test(p) or is_data(p):
             reachable.add(p)
             queue.append(p)
 
@@ -974,7 +1034,7 @@ def find_unused_py_files(root: Path) -> list[Issue]:
         if current in visited:
             continue
         visited.add(current)
-        for mod in _collect_py_imports(current):
+        for mod in _collect_py_imports(current, root):
             resolved = _module_to_path(mod, root)
             if resolved and resolved in all_files and resolved not in reachable:
                 reachable.add(resolved)
@@ -1015,12 +1075,12 @@ def _resolve_js_import(raw: str, importer: Path, root: Path) -> Path | None:
                        base.with_suffix(".jsx"),
                        base.with_suffix(".ts"),
                        base.with_suffix(".tsx")]:
-        if candidate.exists():
+        if candidate.is_file():
             return candidate
     # Try index file
     for ext in (".js", ".jsx", ".ts", ".tsx"):
         idx = base / f"index{ext}"
-        if idx.exists():
+        if idx.is_file():
             return idx
     return None
 
