@@ -2,6 +2,7 @@
  * Leave timer and end-early confirmation modals.
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import styles from '../../../pages/Timer/TimerPage.module.css';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../../common/StandardModal/StandardModal';
@@ -15,10 +16,19 @@ function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
 }
 
 function LeaveProgress({ progressPct, minutesLeft }) {
+  const reduceMotion = useReducedMotion();
+  const width = `${progressPct}%`;
+
   return (
     <div className={styles.leaveNudgeProgressCard}>
       <div className={styles.leaveNudgeProgressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPct}>
-        <span className={styles.leaveNudgeProgressFill} style={{ width: `${progressPct}%` }} />
+        <motion.span
+          className={styles.leaveNudgeProgressFill}
+          style={reduceMotion ? { width } : undefined}
+          initial={reduceMotion ? false : { width: 0, opacity: 0.55 }}
+          animate={reduceMotion ? undefined : { width, opacity: 1 }}
+          transition={reduceMotion ? undefined : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        />
       </div>
       <div className={styles.leaveNudgeProgressMeta}>
         <span>{progressPct}% complete</span>

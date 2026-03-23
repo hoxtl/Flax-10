@@ -3,30 +3,26 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskInput } from '../../../components/Timer/TimerComponents';
 
 describe('TaskInput', () => {
-    it('renders with correct value', () => {
-        const onChange = vi.fn();
-        render(<TaskInput value="My Task" onChange={onChange} />);
-        const input = screen.getByPlaceholderText(/What are you working on/i);
-        expect(input.value).toBe('My Task');
+    it('shows the current focus task instead of a text input', () => {
+        render(<TaskInput value="My Task" onChange={vi.fn()} />);
+        expect(screen.getByText('Currently focusing on')).toBeInTheDocument();
+        expect(screen.getByText('My Task')).toBeInTheDocument();
     });
 
-    it('calls onChange when typing', () => {
-        const onChange = vi.fn();
-        render(<TaskInput value="" onChange={onChange} />);
-        const input = screen.getByPlaceholderText(/What are you working on/i);
-
-        fireEvent.change(input, { target: { value: 'T' } });
-        expect(onChange).toHaveBeenCalledWith('T');
+    it('renders matching action buttons for choosing a task and opening full focus', () => {
+        render(<TaskInput value="" onChange={vi.fn()} onOpenFocus={vi.fn()} />);
+        expect(screen.getByRole('button', { name: 'Choose a task to focus' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Full Focus Mode ⚡' })).toBeInTheDocument();
     });
 
-    it('blurs on Enter key', () => {
+    it('clears the selected task through the clear action', () => {
         const onChange = vi.fn();
-        render(<TaskInput value="Task" onChange={onChange} />);
-        const input = screen.getByPlaceholderText(/What are you working on/i);
+        const onClearTask = vi.fn();
+        render(<TaskInput value="Task" onChange={onChange} onClearTask={onClearTask} />);
 
-        const blurSpy = vi.spyOn(input, 'blur');
-        fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
+        fireEvent.click(screen.getByRole('button', { name: 'Clear task' }));
 
-        expect(blurSpy).toHaveBeenCalled();
+        expect(onChange).toHaveBeenCalledWith('');
+        expect(onClearTask).toHaveBeenCalledTimes(1);
     });
 });

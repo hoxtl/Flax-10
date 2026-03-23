@@ -9,6 +9,7 @@
     background: var(--primary-strong) !important;
     color: #fff !important;
     border-color: var(--primary-strong) !important;
+    width: 100% !important;
 }
 
 .taskPickBtn:hover {
@@ -21,15 +22,14 @@
 }
 
 .taskInputActionsRow {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.55rem !important;
+    display: grid !important;
     width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.7rem !important;
 }
 
 .taskClearBtn {
-    margin-left: auto !important;
+    margin-left: 0 !important;
 }
 
 /* ── Task picker toolbar: uniform control sizing ────── */
@@ -57,16 +57,27 @@
 }
 
 .taskPickSortWrap {
-    flex-shrink: 0 !important;
-    min-width: 120px !important;
+    flex: 0 0 170px !important;
+    min-width: 170px !important;
 }
 
-.taskPickSortWrap > div > button {
-    height: 36px !important;
-    padding: 0 0.6rem !important;
-    font-size: 0.82rem !important;
-    border-radius: 10px !important;
-    border: 1px solid var(--border) !important;
+.taskPickSortWrap > div {
+    width: 100% !important;
+}
+
+.taskPickFilterSlot {
+    flex: 0 0 170px !important;
+    min-width: 170px !important;
+}
+
+.taskPickFilterSlot > div {
+    width: 100% !important;
+}
+
+.taskPickFilterSlot > div > button {
+    width: 100% !important;
+    min-height: 42px !important;
+    justify-content: center !important;
 }
 
 /* ── Exit Focus Button ───────────────────────────────── */
@@ -129,15 +140,6 @@
     border-color: var(--primary-strong) !important;
 }
 
-.leaveNudgeReggie {
-    color: var(--primary-strong) !important;
-    background: color-mix(in srgb, var(--primary) 10%, var(--surface-card)) !important;
-    border: 1.5px solid color-mix(in srgb, var(--primary) 22%, transparent) !important;
-    border-radius: 10px !important;
-    padding: 0.6rem 0.8rem !important;
-    font-weight: 600 !important;
-}
-
 /* ── End Session Modal: enhanced ────────────────────── */
 
 .endSessionModal {
@@ -196,13 +198,24 @@
     border: 2px solid #000 !important;
 }
 
+.taskPickDropdown {
+    max-height: min(67vh, 620px) !important;
+}
+
+.taskPickContent,
+.taskPickShell,
+.taskPickResults {
+    flex: 0 0 auto !important;
+    height: auto !important;
+}
+
 .taskPickList {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.42rem !important;
-    max-height: 520px !important;
+    max-height: min(37vh, 340px) !important;
     overflow-y: auto !important;
-    padding: 0.7rem 1rem 1.15rem !important;
+    padding: 0.7rem 1rem 0.82rem !important;
 }
 
 .taskPickList::-webkit-scrollbar {
@@ -264,6 +277,11 @@
 .taskPickItemSelected .taskPickMetaLine,
 .taskPickItemSelected .taskPickMetaSubline {
     color: var(--text) !important;
+}
+
+.taskPickFiltersBar {
+    gap: 0.72rem !important;
+    padding-bottom: 0.75rem !important;
 }
 
 .taskPickSingleLine {
@@ -344,3 +362,8 @@
     gap: 0.35rem;
 }
 
+@media (max-width: 720px) {
+    .taskInputActionsRow {
+        grid-template-columns: 1fr !important;
+    }
+}

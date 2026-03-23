@@ -15,6 +15,11 @@ function getOvertimeCopy(mode, isLastSession) {
   };
 }
 
+function getActionClassName(mode, isLastSession) {
+  if (mode === 'work' && isLastSession) return `${styles.overtimeActionBtn} ${styles.timerControlBtn} ${styles.timerControlBtnStart}`;
+  return styles.overtimeActionBtn;
+}
+
 export function OvertimePopup({ mode, time, onAction, isLastSession }) {
   const copy = getOvertimeCopy(mode, isLastSession);
 
@@ -22,7 +27,7 @@ export function OvertimePopup({ mode, time, onAction, isLastSession }) {
     <StandardModal title={copy.title} subtitle={copy.subtitle} onClose={onAction} size="sm" centerText>
       <div className={styles.overtimeContent}>
         <div className={styles.overtimeTime}>{formatTime(time)}</div>
-        <PrimaryButton className={`${styles.button} ${styles.primary}`} onClick={onAction} pill>{copy.buttonLabel}</PrimaryButton>
+        <PrimaryButton className={getActionClassName(mode, isLastSession)} variant="primary" size="large" onClick={onAction} pill>{copy.buttonLabel}</PrimaryButton>
       </div>
     </StandardModal>
   );

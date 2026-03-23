@@ -26,7 +26,6 @@ function PresetCardView({ preset, active, disabled, onApply }) {
           <span className={styles.presetListItemName}>{preset.label}</span>
           <span className={styles.presetDurationTag}>{getPresetDurationTag(preset)}</span>
         </span>
-        <span className={styles.presetListItemMeta}>{preset.sessions} sessions</span>
       </button>
     </div>
   );

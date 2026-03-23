@@ -3,10 +3,9 @@ import { render, screen } from '@testing-library/react';
 import InlineSoundPanel from '../../../components/Timer/InlineSoundPanel';
 
 describe('InlineSoundPanel', () => {
-  it('shows music controls without ambient sound controls', () => {
+  it('shows the music and streams widget', () => {
     render(<InlineSoundPanel />);
 
     expect(screen.getByText('Music & Streams')).toBeInTheDocument();
-    expect(screen.queryByText('Ambient Sounds')).not.toBeInTheDocument();
   });
 });

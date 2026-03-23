@@ -7,6 +7,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MainSection, PopupSection } from '../../../components/Timer/WrapperComponents';
 
 vi.mock('../../../components/Timer/TreeAnimation', () => ({ default: () => <div data-testid="tree" /> }));
+vi.mock('../../../components/Timer/TaskInput', () => ({
+  TaskInput: ({ onTaskSelect, onOpenFocus, onClearTask }) => (
+    <div data-testid="task-input">
+      <button type="button" onClick={() => onTaskSelect?.({ id: 1, title: 'Task', estimated_blocks: 4, list_color: '#ccc' })}>Choose a task to focus</button>
+      <button type="button" onClick={() => onOpenFocus?.()}>Full Focus Mode ⚡</button>
+      <button type="button" onClick={() => onClearTask?.()}>Clear task</button>
+    </div>
+  ),
+}));
 vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
   default: (props) => {
     const safeProps = { ...props };
@@ -52,6 +61,7 @@ const baseT = {
   setTask: vi.fn(),
   updateTime: vi.fn(),
   setTimeLeft: vi.fn(),
+  setActiveTaskId: vi.fn(),
   setIsActive: vi.fn(),
   togglePause: vi.fn(),
   resetTimer: vi.fn(),
@@ -86,8 +96,32 @@ describe('MainSection', () => {
   it('renders the full focus entry button and opens focus mode', () => {
     const onOpenFocus = vi.fn();
     render(<MainSection t={baseT} onOpenHistory={vi.fn()} onOpenFocus={onOpenFocus} isMobile={false} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Enter Full Focus' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Full Focus Mode ⚡' }));
     expect(onOpenFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies the chosen task timing from the task picker actions', () => {
+    const t = {
+      ...baseT,
+      setTask: vi.fn(),
+      updateTime: vi.fn(),
+      setTimeLeft: vi.fn(),
+      setActiveTaskId: vi.fn(),
+    };
+
+    render(<MainSection t={t} onOpenHistory={vi.fn()} onOpenFocus={vi.fn()} isMobile={false} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Choose a task to focus' }));
+
+    expect(t.setTask).toHaveBeenCalledWith('Task');
+    expect(t.updateTime).toHaveBeenCalledWith('work', 25);
+    expect(t.updateTime).toHaveBeenCalledWith('sessions', 4);
+    expect(t.setTimeLeft).toHaveBeenCalledWith(25 * 60);
+    expect(t.setActiveTaskId).toHaveBeenCalledWith(1, expect.objectContaining({
+      title: 'Task',
+      estimatedBlocks: 4,
+      estimatedSessionCount: 4,
+      estimatedWorkMinutes: 25,
+    }));
   });
 
   it('calls setTask from sessionStorage timerSuggestedTask on mount', async () => {

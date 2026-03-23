@@ -8,11 +8,6 @@
     border-color: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
-.taskInputActionsCompact {
-    justify-content: flex-end;
-    margin-top: 0.35rem;
-}
-
 .taskPickDropdown {
     overflow: hidden;
     display: flex;
