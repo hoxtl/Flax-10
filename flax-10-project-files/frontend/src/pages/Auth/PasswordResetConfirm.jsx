@@ -5,7 +5,7 @@ import AuthHeroGeometric from '../../components/Authentication/AuthHeroGeometric
 import { AuthBrand, AuthFooter } from '../../components/Authentication/AuthBranding';
 import { PageTransition } from '../../components/common';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function useConfirmForm() {
   const [formData, setFormData] = useState({ new_password: '', confirm_password: '' });
