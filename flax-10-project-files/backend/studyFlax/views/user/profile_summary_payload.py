@@ -53,13 +53,25 @@ def build_connection_ids(user):
     return set(outgoing).union(incoming)
 
 
+def _empty_connections_payload():
+    return {'count': 0, 'users': []}
+
+
+def _mutual_connection_ids(viewed_user, viewer):
+    return sorted((build_connection_ids(viewer) & build_connection_ids(viewed_user)) - {viewer.id, viewed_user.id})
+
+
+def _mutual_connection_users(mutual_ids):
+    return User.objects.filter(id__in=mutual_ids).only('id', 'username', 'profile_photo').order_by('username')
+
+
 def build_mutual_connections(viewed_user, viewer, request):
     if not viewer or viewed_user.id == viewer.id:
-        return {'count': 0, 'users': []}
-    mutual_ids = sorted((build_connection_ids(viewer) & build_connection_ids(viewed_user)) - {viewer.id, viewed_user.id})
+        return _empty_connections_payload()
+    mutual_ids = _mutual_connection_ids(viewed_user, viewer)
     if not mutual_ids:
-        return {'count': 0, 'users': []}
-    users = User.objects.filter(id__in=mutual_ids).only('id', 'username', 'profile_photo').order_by('username')
+        return _empty_connections_payload()
+    users = _mutual_connection_users(mutual_ids)
     return {'count': len(mutual_ids), 'users': [serialise_connection(user, request) for user in users[:5]]}
 
 
