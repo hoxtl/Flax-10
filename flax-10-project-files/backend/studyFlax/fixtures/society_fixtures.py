@@ -11,7 +11,7 @@ VALID_CATEGORIES = [
     'social', 'religious', 'volunteering', 'media'
 ]
 
-# Images per category (merged: gaming→social, music/dance→arts, professional→academic)
+# Images per category, with gaming merged into social, music and dance into arts, and professional into academic
 CATEGORY_IMAGES = {
     'sports': ['sports1.jpg', 'sports2.jpg'],
     'cultural': ['cultural1.jpg', 'cultural2.jpg'],

@@ -1,5 +1,5 @@
 /*
- * TagManager.test verifies tag management behavior in society detail tabs.
+ * TagManager.test verifies tag management behaviour in society detail tabs.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';

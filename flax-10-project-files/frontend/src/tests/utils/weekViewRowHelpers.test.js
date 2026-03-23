@@ -98,7 +98,7 @@ describe('calculateEventLayout', () => {
   });
 
   it('handles a multi-day event spanning the full week', () => {
-    // Sun → Sat (all 7 days)
+    // Sunday through Saturday, covering all seven days.
     const event = makeAllDayEvent(1, new Date(2024, 0, 7), new Date(2024, 0, 14));
     const result = calculateEventLayout([event], WEEK);
     expect(result).toHaveLength(1);

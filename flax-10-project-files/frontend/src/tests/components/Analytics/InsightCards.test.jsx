@@ -73,7 +73,7 @@ describe('PeakHoursCard', () => {
 
     it('renders top hours in 12h format', () => {
         render(<PeakHoursCard data={mockData} />);
-        // Hours 9, 10, 11 → 9am, 10am, 11am
+        // Hours 9, 10, and 11 should render as 9am, 10am, and 11am.
         expect(screen.getByText('10am')).toBeTruthy();
     });
 

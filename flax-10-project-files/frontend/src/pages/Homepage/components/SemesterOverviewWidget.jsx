@@ -9,7 +9,7 @@ import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/SemesterOverview.module.css";
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 
 function getMonday(d) {
   const date = new Date(d);
@@ -58,7 +58,7 @@ function toHeight(count, maxCount, maxPx = 40, minPx = 4) {
   return Math.round(minPx + (Math.min(count / Math.max(maxCount, 1), 1)) * (maxPx - minPx));
 }
 
-// ─── component ────────────────────────────────────────────────────────────────
+// Component
 
 export default function SemesterOverviewWidget({
   semesterStart   = null,   // ISO date string — first day of term

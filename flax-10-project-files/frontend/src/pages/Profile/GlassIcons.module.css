@@ -1,6 +1,4 @@
-/* ==========================================================================
-   GlassIcons — ReactBits style, adapted for StudyFlax badge tiles
-   ========================================================================== */
+/* GlassIcons adapted from the ReactBits style for StudyFlax badge tiles. */
 
 .glass-icon-grid {
   display: grid;
@@ -36,7 +34,7 @@
   filter: grayscale(0.4);
 }
 
-/* Back layer — the colored glass square */
+/* Back layer: the coloured glass square */
 .glass-icon-back {
   position: relative;
   width: 56px;
@@ -55,7 +53,7 @@
   overflow: hidden;
 }
 
-/* Shine overlay on back */
+/* Shine overlay on the back layer */
 .glass-icon-back::before {
   content: '';
   position: absolute;
@@ -70,7 +68,7 @@
   pointer-events: none;
 }
 
-/* Front layer — frosted glass over the back */
+/* Front layer: frosted glass over the back */
 .glass-icon-front {
   position: absolute;
   inset: 3px;
@@ -97,7 +95,7 @@
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
 }
 
-/* Label below icon */
+/* Label below the icon */
 .glass-icon-label {
   font-size: 11px;
   font-weight: 600;

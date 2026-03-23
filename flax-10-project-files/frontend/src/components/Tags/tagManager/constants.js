@@ -1,5 +1,5 @@
 /*
- * Constants for tag manager behavior.
+ * Constants for tag manager behaviour.
  */
 
 export const DEFAULT_TAG_FORM = { label: "", color: "#000000" };

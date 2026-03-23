@@ -1,5 +1,5 @@
 /*
- * State and behaviors for the study coach panel.
+ * State and behaviours for the study coach panel.
  */
 
 import { useEffect, useRef, useState } from "react";

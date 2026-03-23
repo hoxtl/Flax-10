@@ -26,11 +26,11 @@ vi.mock('lucide-react', () => ({
 
 import { DeadlinesWidget } from '../../../pages/Homepage/components/DeadlinesWidget';
 
-// Use hour-based offsets to avoid floor() edge cases with days
-const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000);    // 25h from now → days=1 → "Tomorrow"
+// Use hour-based offsets to avoid floor() edge cases with days.
+const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000);    // 25 hours from now resolves to "Tomorrow".
 const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 const threeWeeks = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000);
-const yesterday = new Date(Date.now() - 22 * 60 * 60 * 1000);  // 22h ago → days=-1 → "1d overdue"
+const yesterday = new Date(Date.now() - 22 * 60 * 60 * 1000);  // 22 hours ago resolves to "1d overdue".
 
 const mockDeadlines = [
     { id: 1, assessment_title: 'Essay 1', start_due_date: tomorrow.toISOString(), module_code: 'CS3001', deadline_type: 'coursework' },

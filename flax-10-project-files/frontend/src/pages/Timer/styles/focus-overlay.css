@@ -109,9 +109,7 @@
     margin-top: 0.25rem;
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Full Focus overlay: timer only, perfectly centred
-   ─────────────────────────────────────────────────────────────── */
+/* Full Focus overlay: timer only, perfectly centred */
 .focusOverlay {
     position: fixed;
     inset: 0;
@@ -203,9 +201,7 @@
     }
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Select Task modal (solid / non-glass pass)
-   ─────────────────────────────────────────────────────────────── */
+/* Select Task modal with a solid, non-glass treatment */
 .taskPickDropdown {
     background: var(--surface-card) !important;
     border: 2px solid color-mix(in srgb, var(--border) 88%, transparent) !important;
