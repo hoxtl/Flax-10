@@ -5,7 +5,8 @@
 import { searchUsers } from '../../api/userApi';
 
 export function handleErr(label, error, setter) {
-    console.error(label, error);
+    void label;
+    void error;
     setter([]);
 }
 

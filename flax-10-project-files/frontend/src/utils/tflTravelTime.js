@@ -25,7 +25,5 @@ export async function getTravelTimeModule(homeAddress, moduleLocation) {
   try {
     const dest = await geocodeModuleLocation(moduleLocation);
     return dest ? await computeJourney(homeAddress, dest) : null;
-  } catch (error) {
-    console.error('TfL home-to-module calculation error:', error);
-  }
+  } catch {}
 }

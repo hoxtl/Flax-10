@@ -41,9 +41,7 @@ function syncProfile(setProfile, setUser, data) {
   setUser((current) => mergeStoredUser(current, data));
 }
 
-function logProfileError(error) {
-  console.error("Failed to fetch user profile:", error);
-}
+function logProfileError() {}
 
 function useRefreshProfile(authenticated, setLoading, setProfile, setUser) {
   return useCallback(() => {

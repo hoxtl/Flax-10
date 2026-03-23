@@ -25,8 +25,7 @@ export async function reverseGeocode(latitude, longitude) {
   try {
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${getMapboxToken()}&types=address,poi,place`;
     return extractPlaceName(await (await fetch(url)).json());
-  } catch (error) {
-    console.error('Reverse geocoding error: ', error);
+  } catch {
     return null;
   }
 }

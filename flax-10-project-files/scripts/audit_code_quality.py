@@ -672,6 +672,7 @@ def check_js_dead_code(path: Path, issues: list[Issue]) -> None:
     lines = read_lines(path)
     fstr  = short(rel(path))
     for i, line in enumerate(lines, 1):
+        stripped = line.strip()
         if re.search(r"\bconsole\.(log|warn|error|debug)\b", line):
             issues.append(Issue("Dead Code","CONSOLE_LOG","WARN",fstr,i,
                 f"console.* left in source: {line.strip()[:60]}",
@@ -680,7 +681,7 @@ def check_js_dead_code(path: Path, issues: list[Issue]) -> None:
             issues.append(Issue("Dead Code","COMMENTED_CODE","INFO",fstr,i,
                 f"Possibly commented-out code: {line.strip()[:60]}",
                 "Remove dead code — do not leave it commented out."))
-        if re.search(r"\btodo\b|\bfixme\b|\bhack\b|\bxxx\b", line, re.IGNORECASE):
+        if stripped.startswith("//") and re.search(r"\btodo\b|\bfixme\b|\bhack\b|\bxxx\b", stripped, re.IGNORECASE):
             issues.append(Issue("Dead Code","TODO_COMMENT","INFO",fstr,i,
                 f"TODO/FIXME left in code: {line.strip()[:60]}",
                 "Resolve or remove before submission."))
@@ -819,13 +820,15 @@ def print_py_abs(violations: list[AbsIssue]) -> None:
 # ── JS / grouped sections ─────────────────────────────────────────────────────
 
 SECTION_META = {
-    # category          : (num,  title,                  subtitle)
+    # category          : (num,  title,                        subtitle)
     "Function/Nesting"  : ("4",  "Frontend — Function Length & Nesting",  ">20 lines or >1 control-flow depth"),
     "SRP/Abstraction"   : ("5",  "Frontend — SRP & Abstraction",          "fetch + state + render in same unit"),
     "Styles"            : ("6",  "Frontend — Inline & Hardcoded Styles",  "style={{}} or hardcoded hex/rgb values"),
     "DRY"               : ("7",  "Frontend — DRY",                        "duplicate normalised blocks across source files"),
-    "Dead Code"         : ("8",  "Frontend / Backend — Dead Code",        "console.log, commented-out blocks, unused imports"),
-    "Comments"          : ("9",  "Frontend — Comment Quality",            "banners, American spelling, emojis, arrow text"),
+    "Dead Code"         : ("8",  "Dead Code",                             "console.log, commented-out blocks, unused imports"),
+    "Unused Files"      : ("9",  "Unused Files",                          "files never imported and not a convention entry point"),
+    "Formatting"        : ("10", "Docstring Spacing",                     "exactly one blank line required after every docstring"),
+    "Comments"          : ("11", "Frontend — Comment Quality",            "banners, American spelling, emojis, arrow text"),
 }
 
 def print_issues_by_category(all_issues: list[Issue], show_fix: bool) -> None:
@@ -863,7 +866,8 @@ def print_issues_by_category(all_issues: list[Issue], show_fix: bool) -> None:
 
 def print_summary(
     py_dry: list, py_srp: list, py_abs: list,
-    py_dead: list[Issue], js_issues: list[Issue]
+    py_dead: list[Issue], js_issues: list[Issue],
+    unused: list[Issue], formatting: list[Issue],
 ) -> None:
     divider("═")
     print(f"{C.BOLD}  SUMMARY{C.END}")
@@ -882,7 +886,7 @@ def print_summary(
     row(icon(len(py_abs)), "Backend Single Level of Abstraction", len(py_abs))
 
     cats = defaultdict(int)
-    for iss in py_dead + js_issues:
+    for iss in py_dead + js_issues + unused + formatting:
         cats[iss.category] += 1
 
     for cat, (_, title, _) in SECTION_META.items():
@@ -895,11 +899,279 @@ def print_summary(
     if total == 0:
         print(f"  {C.GREEN}🎉 ALL CHECKS PASSED — no violations found{C.END}")
     else:
-        errors = sum(1 for i in js_issues+py_dead if i.severity == "ERROR")
+        errors = sum(1 for i in js_issues+py_dead+unused+formatting if i.severity == "ERROR")
         print(f"  {C.YELLOW}⚠  {total} total finding(s){C.END}"
               + (f"  ·  {C.RED}{errors} error(s){C.END}" if errors else ""))
     divider("═")
     print()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  UNUSED FILES  (import-graph tracing)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  UNUSED FILES  (import-graph tracing)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Python files loaded by convention — never imported directly
+PY_CONVENTION_FILES = {
+    "apps.py", "admin.py", "signals.py", "tasks.py",
+    "conftest.py", "manage.py", "wsgi.py", "asgi.py",
+    "settings.py", "urls.py", "__init__.py",
+}
+
+# JS files loaded by convention — never imported directly
+JS_CONVENTION_PATTERNS = [
+    r"main\.(jsx?|tsx?)$", r"index\.(jsx?|tsx?)$",
+    r"App\.(jsx?|tsx?)$", r"setupTests\.(js|ts)$",
+    r"vite\.config\.", r"\.config\.(js|ts)$",
+]
+
+
+def _collect_py_imports(path: Path) -> set[str]:
+    """Return set of dotted module names imported by this file."""
+    names: set[str] = set()
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return names
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                names.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                names.add(node.module)
+    return names
+
+
+def _module_to_path(module: str, root: Path) -> Path | None:
+    """Best-effort: convert a dotted import to a filesystem path under root."""
+    parts = module.split(".")
+    candidate = root.joinpath(*parts)
+    if (candidate.with_suffix(".py")).exists():
+        return candidate.with_suffix(".py")
+    if (candidate / "__init__.py").exists():
+        return candidate / "__init__.py"
+    return None
+
+
+def find_unused_py_files(root: Path) -> list[Issue]:
+    all_files = set(iter_py(root))
+    reachable: set[Path] = set()
+    queue: list[Path] = []
+
+    # Seed: convention entry points + test files (tests import source)
+    for p in all_files:
+        if p.name in PY_CONVENTION_FILES or is_test(p) or is_data(p):
+            reachable.add(p)
+            queue.append(p)
+
+    visited: set[Path] = set()
+    while queue:
+        current = queue.pop()
+        if current in visited:
+            continue
+        visited.add(current)
+        for mod in _collect_py_imports(current):
+            resolved = _module_to_path(mod, root)
+            if resolved and resolved in all_files and resolved not in reachable:
+                reachable.add(resolved)
+                queue.append(resolved)
+
+    issues = []
+    for p in sorted(all_files - reachable):
+        if p.name.startswith("_") or is_data(p):
+            continue
+        issues.append(Issue(
+            "Unused Files", "UNUSED_PY_FILE", "WARN",
+            short(rel(p)), 1,
+            "Python file never imported and not a convention entry point",
+            "Delete it or import it where needed.",
+        ))
+    return issues
+
+
+def _collect_js_imports(lines: list[str]) -> set[str]:
+    """Extract relative import paths from JS/JSX source lines."""
+    paths: set[str] = set()
+    import_re = re.compile(r"""from\s+['"](\.[^'"]+)['"]""")
+    require_re = re.compile(r"""require\s*\(\s*['"](\.[^'"]+)['"]\s*\)""")
+    for line in lines:
+        for m in import_re.finditer(line):
+            paths.add(m.group(1))
+        for m in require_re.finditer(line):
+            paths.add(m.group(1))
+    return paths
+
+
+def _resolve_js_import(raw: str, importer: Path, root: Path) -> Path | None:
+    """Resolve a relative JS import to an absolute Path."""
+    base = (importer.parent / raw).resolve()
+    # Try exact match first
+    for candidate in [base,
+                       base.with_suffix(".js"),
+                       base.with_suffix(".jsx"),
+                       base.with_suffix(".ts"),
+                       base.with_suffix(".tsx")]:
+        if candidate.exists():
+            return candidate
+    # Try index file
+    for ext in (".js", ".jsx", ".ts", ".tsx"):
+        idx = base / f"index{ext}"
+        if idx.exists():
+            return idx
+    return None
+
+
+def find_unused_js_files(root: Path) -> list[Issue]:
+    all_files = {p.resolve(): p for p in iter_js(root)}
+    reachable: set[Path] = set()
+    queue: list[Path] = []
+
+    # Seed: convention entry points + test files
+    for resolved, p in all_files.items():
+        is_convention = any(re.search(pat, p.name) for pat in JS_CONVENTION_PATTERNS)
+        if is_convention or is_test(p) or is_data(p):
+            reachable.add(resolved)
+            queue.append(p)
+
+    visited: set[Path] = set()
+    while queue:
+        current = queue.pop()
+        cr = current.resolve()
+        if cr in visited:
+            continue
+        visited.add(cr)
+        lines = read_lines(current)
+        for raw in _collect_js_imports(lines):
+            resolved = _resolve_js_import(raw, current, root)
+            if resolved:
+                rr = resolved.resolve()
+                if rr in all_files and rr not in reachable:
+                    reachable.add(rr)
+                    queue.append(all_files[rr])
+
+    issues = []
+    for resolved, p in sorted(all_files.items(), key=lambda x: str(x[1])):
+        if resolved not in reachable and not is_test(p) and not is_data(p):
+            issues.append(Issue(
+                "Unused Files", "UNUSED_JS_FILE", "WARN",
+                short(rel(p)), 1,
+                "JS/JSX file never imported and not a convention entry point",
+                "Delete it or import it where needed.",
+            ))
+    return issues
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  DOCSTRING SPACING
+# ══════════════════════════════════════════════════════════════════════════════
+
+def check_py_docstring_spacing(root: Path) -> list[Issue]:
+    """
+    Every module/function/class docstring must be followed by exactly one blank
+    line before the next code statement.
+    """
+    issues = []
+    for path in iter_py(root):
+        lines = read_lines(path)
+        if not lines:
+            continue
+        fstr = short(rel(path))
+        tree = parse_py(path)
+        if tree is None:
+            continue
+
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.Module, ast.FunctionDef,
+                                     ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            body = node.body
+            if not body:
+                continue
+            first = body[0]
+            # Check if first statement is a docstring
+            if not (isinstance(first, ast.Expr) and
+                    isinstance(first.value, ast.Constant) and
+                    isinstance(first.value.value, str)):
+                continue
+            # Line index (0-based) of the last line of the docstring
+            doc_end = (getattr(first, "end_lineno", first.lineno)) - 1
+            # Line index of the next statement (if any)
+            if len(body) < 2:
+                continue
+            next_start = body[1].lineno - 1
+
+            # Count blank lines between docstring end and next statement
+            blank_count = 0
+            for li in range(doc_end + 1, next_start):
+                if lines[li].strip() == "":
+                    blank_count += 1
+
+            if blank_count == 0:
+                issues.append(Issue(
+                    "Formatting", "DOCSTRING_NO_BLANK", "WARN",
+                    fstr, doc_end + 1,
+                    f"No blank line after docstring in `{getattr(node, 'name', '<module>')}`",
+                    "Add one blank line after the closing triple-quote.",
+                ))
+            elif blank_count > 1:
+                issues.append(Issue(
+                    "Formatting", "DOCSTRING_EXTRA_BLANK", "WARN",
+                    fstr, doc_end + 1,
+                    f"{blank_count} blank lines after docstring in `{getattr(node, 'name', '<module>')}` (expected 1)",
+                    "Remove extra blank lines — keep exactly one.",
+                ))
+    return issues
+
+
+def check_js_docstring_spacing(path: Path, issues: list[Issue]) -> None:
+    """
+    JSDoc /** ... */ blocks must be followed by exactly one blank line
+    before the next non-empty line.
+    """
+    lines = read_lines(path)
+    if not lines:
+        return
+    fstr = short(rel(path))
+    i = 0
+    while i < len(lines):
+        # Find end of a /** ... */ block
+        if lines[i].strip().startswith("/**") or lines[i].strip() == "/*":
+            # Walk forward to closing */
+            j = i
+            while j < len(lines) and "*/" not in lines[j]:
+                j += 1
+            if j >= len(lines):
+                i = j + 1
+                continue
+            doc_end = j  # 0-based index of closing */ line
+            # Count blank lines after
+            blank_count = 0
+            k = doc_end + 1
+            while k < len(lines) and lines[k].strip() == "":
+                blank_count += 1
+                k += 1
+            if k < len(lines):  # there is a next statement
+                if blank_count == 0:
+                    issues.append(Issue(
+                        "Formatting", "DOCSTRING_NO_BLANK", "WARN",
+                        fstr, doc_end + 1,
+                        "No blank line after /** */ block",
+                        "Add one blank line after the closing */.",
+                    ))
+                elif blank_count > 1:
+                    issues.append(Issue(
+                        "Formatting", "DOCSTRING_EXTRA_BLANK", "WARN",
+                        fstr, doc_end + 1,
+                        f"{blank_count} blank lines after /** */ block (expected 1)",
+                        "Remove extra blank lines — keep exactly one.",
+                    ))
+            i = j + 1
+        else:
+            i += 1
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -925,11 +1197,13 @@ def main() -> None:
     print(f"  {C.DIM}Backend: deep AST analysis  |  Frontend: heuristic analysis{C.END}")
     print(f"  {C.DIM}Checks:  DRY · SRP · Abstraction · Dead Code · Styles · Comments{C.END}\n")
 
-    py_dry_v:  list[DryBlock]   = []
-    py_srp_v:  list[SRPIssue]   = []
-    py_abs_v:  list[AbsIssue]   = []
-    py_dead:   list[Issue]      = []
-    js_issues: list[Issue]      = []
+    py_dry_v:   list[DryBlock]  = []
+    py_srp_v:   list[SRPIssue]  = []
+    py_abs_v:   list[AbsIssue]  = []
+    py_dead:    list[Issue]     = []
+    js_issues:  list[Issue]     = []
+    unused_v:   list[Issue]     = []
+    format_v:   list[Issue]     = []
 
     # ── Backend ──────────────────────────────────────────────────────────────
     if do_backend:
@@ -943,6 +1217,8 @@ def main() -> None:
             py_srp_v = find_py_srp(backend_root)
             py_abs_v = find_py_abstraction(backend_root)
             py_dead  = find_py_dead_code(backend_root)
+            format_v += check_py_docstring_spacing(backend_root)
+            unused_v += find_unused_py_files(backend_root)
 
             print_py_dry(py_dry_v)
             print_py_srp(py_srp_v)
@@ -968,11 +1244,15 @@ def main() -> None:
             if not args.no_dry:
                 check_js_dry(js_files, js_issues)
 
-    # Merge dead code issues
-    all_issues = py_dead + js_issues
+            unused_v += find_unused_js_files(frontend_root)
+            for path in iter_js(frontend_root):
+                check_js_docstring_spacing(path, format_v)
+
+    # Merge all issues
+    all_issues = py_dead + js_issues + unused_v + format_v
     print_issues_by_category(all_issues, show_fix=args.fix_hints)
 
-    print_summary(py_dry_v, py_srp_v, py_abs_v, py_dead, js_issues)
+    print_summary(py_dry_v, py_srp_v, py_abs_v, py_dead, js_issues, unused_v, format_v)
 
     sys.exit(1 if any(i.severity == "ERROR" for i in all_issues) else 0)
 

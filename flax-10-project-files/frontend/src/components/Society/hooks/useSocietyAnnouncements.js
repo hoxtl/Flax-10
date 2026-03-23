@@ -30,9 +30,7 @@ const syncAnnouncement = async (ann, data, eventOps, onIdUpdate) => {
     const evData = { ...data, description: data.content, tag: data.tag || null, announcement: ann.id };
     try {
         await handleLinkedUpdate(ann, evData, eventOps, onIdUpdate);
-    } catch (e) {
-        console.error('Failed to sync event:', e);
-    }
+    } catch {}
 };
 
 /** Hook for managing society announcements and their lifecycle. */
@@ -60,7 +58,7 @@ const deleteLinkedEvent = async (ann, eventOps) => {
     if (!ann?.event_id) return;
     try {
         await eventOps.deleteEvent(ann.event_id, true);
-    } catch (e) { console.error('Failed to delete linked event:', e); }
+    } catch {}
 };
 
 const makeAddAnnouncement = (id, setSociety, eventOps, onIdUpdate) =>

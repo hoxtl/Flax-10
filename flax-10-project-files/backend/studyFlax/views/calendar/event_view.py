@@ -19,7 +19,7 @@ from .event_helpers import (
     parse_date_param,
     expand_recurring_events
 )
-from .timetable_service import sync_timetable_if_needed, TimetableSyncError
+from .timetable_service import sync_timetable_if_needed
 from .society_sync_service import get_synced_society_events
 import logging
 import sys
