@@ -5,16 +5,19 @@
 import { getTaskDurationMinutes, getTasksThatFitWindow } from "../../../lib/focusPlanner";
 
 /** Task duration in minutes: estimated_blocks (Pomodoro blocks) × 25. */
+
 export function taskDurationMins(task) {
   return getTaskDurationMinutes(task);
 }
 
 /** Returns tasks that fit in gapMinutes. Prioritizes due within 48h, then urgency. */
+
 export function getTasksThatFitGap(tasks, gapMinutes) {
   return getTasksThatFitWindow(tasks, gapMinutes);
 }
 
 /** Task is routine (meals/sleep) or event-like (lecture/seminar/tutorial). */
+
 export function isRoutineOrEventTask(task, getTag) {
   if (!task) return false;
   const title = (task.title || "").toLowerCase();
@@ -27,6 +30,7 @@ export function isRoutineOrEventTask(task, getTag) {
 }
 
 /** Seeds by category for Growth by Category: completed only, excluding routine. */
+
 export function calculateSeedsByCategory(tasks, getTag) {
   const completed = (tasks || []).filter((t) => t.completed && !isRoutineOrEventTask(t, getTag));
   let academic = 0;
@@ -40,6 +44,7 @@ export function calculateSeedsByCategory(tasks, getTag) {
 }
 
 /** True if task is routine/event and its due time has passed — treat as "done". */
+
 export function isAutoPassedTask(task, now = new Date(), getTag) {
   if (!isRoutineOrEventTask(task, getTag) || !task.due_date) return false;
   return new Date(task.due_date) < now;

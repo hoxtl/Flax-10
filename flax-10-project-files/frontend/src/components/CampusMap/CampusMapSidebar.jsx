@@ -1,6 +1,7 @@
 /**
  * Campus map sidebar wrapper.
  */
+
 import { motion } from "framer-motion";
 import styles from "../../pages/CampusMap/CampusMap.module.css";
 import { CampusMapSidebarContent } from "./CampusMapSidebarContent";

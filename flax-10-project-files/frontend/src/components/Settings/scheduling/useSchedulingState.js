@@ -1,6 +1,7 @@
 /*
  * Scheduling preferences state and save handlers.
  */
+
 import { useEffect, useState } from "react";
 import { getUserSettings } from "../../../api/userApi";
 

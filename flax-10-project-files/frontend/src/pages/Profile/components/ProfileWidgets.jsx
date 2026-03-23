@@ -1,6 +1,7 @@
 /**
  * Profile widget re-exports.
  */
+
 export { AttendanceWidget, CompactAttendanceTile, CompactStreakTile } from "./widgets/AttendanceWidgets";
 export { BadgesBanner, BadgesSection } from "./widgets/BadgesWidgets";
 export { CommonGroundSection } from "./widgets/CommonGround";

@@ -1,6 +1,7 @@
 /**
  * Profile loading skeleton.
  */
+
 import styles from "../ProfilePage.module.css";
 
 function SkeletonHeader() {

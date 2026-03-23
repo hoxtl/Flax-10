@@ -1,6 +1,7 @@
 /*
  * Shared state container for settings save handlers.
  */
+
 import { useState } from "react";
 
 export default function useSettingsState() {

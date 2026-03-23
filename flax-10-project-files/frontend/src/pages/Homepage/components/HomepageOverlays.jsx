@@ -42,9 +42,10 @@ function ModuleOverlay(props) {
 }
 
 function ModuleOverlayHeader(props) {
+  const colorBarStyle = { background: props.colors.bg, color: props.colors.text };
   return (
     <div className={props.styles.moduleCardHeader}>
-      <div className={props.styles.moduleCardColorBar} style={{ background: props.colors.bg, color: props.colors.text }}>
+      <div className={props.styles.moduleCardColorBar} style={colorBarStyle}>
         {props.code.slice(0, 2)}
       </div>
       <button type="button" className={props.styles.deadlineDetailClose} onClick={() => props.setSelectedModulePill(null)} aria-label="Close">

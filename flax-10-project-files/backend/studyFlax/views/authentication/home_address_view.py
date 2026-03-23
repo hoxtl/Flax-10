@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 
 def _get_home_address_data(user):
     """Return the user's current home address as a dict."""
+
     return {
         "home_address": user.home_address or "",
         "home_latitude": user.home_latitude,
@@ -18,6 +19,7 @@ def _get_home_address_data(user):
 
 def _save_home_address(user, data):
     """Update the user's home address fields from the given data dict."""
+
     user.home_address = data.get("home_address", "")
     user.home_latitude = _to_float(data.get("home_latitude"), "home_latitude")
     user.home_longitude = _to_float(data.get("home_longitude"), "home_longitude")
@@ -25,6 +27,7 @@ def _save_home_address(user, data):
 
 def _to_float(value, field_name):
     """Convert input to float if present, else raise ValidationError."""
+
     if value in (None, ""):
         return None
     try:
@@ -36,6 +39,7 @@ def _to_float(value, field_name):
 @permission_classes([IsAuthenticated])
 def home_address_view(request):
     """Retrieve or update the authenticated user's home address."""
+
     if request.method == "GET":
         return Response(_get_home_address_data(request.user))
     try:

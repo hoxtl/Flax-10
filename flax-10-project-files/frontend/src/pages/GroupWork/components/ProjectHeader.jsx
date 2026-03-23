@@ -54,6 +54,7 @@ function ProjectHeaderSubtitle({ project }) {
 }
 
 /** Header section for a group project, showing title, deadline, members, and delete action. */
+
 export default function ProjectHeader({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDelete, onBack }) {
     const date = getProjectDate(project.deadline);
     return (

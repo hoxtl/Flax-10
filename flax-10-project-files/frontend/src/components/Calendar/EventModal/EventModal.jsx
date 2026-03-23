@@ -2,6 +2,7 @@
  * EventModal - Modal dialog for creating and editing calendar events.
  * Wraps form logic with tag loading and default value handling.
  */
+
 import { useEventForm } from './useEventForm';
 import { useTags } from '../../../context/TagContext';
 import { ModalContent } from './components/ModalContent';
@@ -9,6 +10,7 @@ import StandardModal from '../../common/StandardModal/StandardModal';
 import './EventModal.css';
 
 /** Modal for creating or editing a calendar event. */
+
 export function EventModal({ event, onClose, initialType, initialDate, showReminder = true, customTags = null, onSubmit = null, onDelete = null }) {
     const globalTags = useTags();
     const tags = customTags || globalTags.tags;

@@ -1,6 +1,7 @@
 /*
  * Modal for teacher-role applications.
  */
+
 import { useState } from "react";
 import { requestTeacherRole } from "../../../api/adminApi";
 import styles from "../../../pages/Settings/Settings.module.css";

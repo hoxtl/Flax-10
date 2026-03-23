@@ -5,20 +5,22 @@
 import { getResolvedUserPhoto } from "../../../utils/tutorPhotoFallback.js";
 
 /** Shared colour palette for member avatars and progress segments. */
+
 export const MEMBER_PALETTE = [
-  "#7BB38E",
-  "#9A8CB0",
-  "#8A7060",
-  "#7B9BAD",
-  "#C4A46D",
-  "#C0714E",
-  "#6FA7A2",
-  "#B0899A",
-  "#859C67",
-  "#B3915E",
+  "var(--avatar-1)",
+  "var(--avatar-2)",
+  "var(--avatar-3)",
+  "var(--avatar-4)",
+  "var(--avatar-5)",
+  "var(--avatar-6)",
+  "var(--avatar-7)",
+  "var(--avatar-8)",
+  "var(--avatar-9)",
+  "var(--avatar-10)",
 ];
 
 /** Returns up to two initials for a member. */
+
 export function getInitials(member) {
   if (member.first_name && member.last_name) return `${member.first_name[0]}${member.last_name[0]}`.toUpperCase();
   const name = member.user_name || member.name || member.first_name || "";
@@ -28,17 +30,20 @@ export function getInitials(member) {
 }
 
 /** Returns a display name, preferring first + last name over username or name field. */
+
 export function getDisplayName(member) {
   if (member.first_name) return `${member.first_name} ${member.last_name || ""}`.trim();
   return member.user_name || member.name || "";
 }
 
 /** Returns a stable string key for a member regardless of which ID field is present. */
+
 export function getMemberKey(member) {
   return String(member?.user ?? member?.id ?? member?.user_name ?? member?.username ?? member?.name ?? "");
 }
 
 /** Builds a map from member key to palette colour, preserving member order. */
+
 export function buildMemberColorMap(members = []) {
   const colorMap = {};
   const seen = new Set();
@@ -52,6 +57,7 @@ export function buildMemberColorMap(members = []) {
 }
 
 /** Returns the palette colour assigned to a member within a given member list. */
+
 export function getMemberColor(member, members = []) {
   const key = getMemberKey(member);
   if (!key) return MEMBER_PALETTE[0];
@@ -60,6 +66,7 @@ export function getMemberColor(member, members = []) {
 }
 
 /** Resolves a photo URL for a member, falling back to a generated avatar. */
+
 export function getPhotoUrl(member) {
   const username = member?.user_name || member?.username;
   return getResolvedUserPhoto({
@@ -79,12 +86,14 @@ export function getPhotoUrl(member) {
 }
 
 /** Returns the profile navigation target string for a member, or null if no ID. */
+
 export function getProfileNavTarget(member) {
   const userId = member.user ?? member.id;
   return userId ? `profile_${userId}` : null;
 }
 
 /** Fires a navigate event to open the member's profile page. */
+
 export function openMemberProfile(event, member) {
   const target = getProfileNavTarget(member);
   if (!target) return;
@@ -93,6 +102,7 @@ export function openMemberProfile(event, member) {
 }
 
 /** Returns the currently authenticated viewer's stored user object. */
+
 export function getStoredViewer() {
   if (typeof window === "undefined") return {};
   try {

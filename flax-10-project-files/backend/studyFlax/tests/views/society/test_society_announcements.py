@@ -22,6 +22,7 @@ User = get_user_model()
 
 class AnnouncementCreateExtendedTest(TestCase):
     """Tests for announcement create extended."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='ann_admin', email='annadmin@e.com', password='pass')
@@ -47,6 +48,7 @@ class AnnouncementCreateExtendedTest(TestCase):
 
     def test_create_announcement_with_images_key(self):
         """Verify that sending 'images' instead of 'image_urls' also works."""
+
         response = self.client.post(
             f'/api/societies/{self.society.id}/announcements/',
             {
@@ -91,6 +93,7 @@ class AnnouncementCreateExtendedTest(TestCase):
 
 class AnnouncementDetailExtendedTest(TestCase):
     """Tests for announcement detail extended."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='anndet_admin', email='anndetadmin@e.com', password='pass')

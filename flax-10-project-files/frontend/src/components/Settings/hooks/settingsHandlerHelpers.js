@@ -1,6 +1,7 @@
 /*
  * Shared async helpers for settings save handlers.
  */
+
 import {
   clearAuthAndRedirect,
   hasToken,

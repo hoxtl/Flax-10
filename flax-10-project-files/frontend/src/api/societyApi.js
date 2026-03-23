@@ -1,6 +1,7 @@
 /*
  * Manages societies, members, tags, announcements, events, and calendar sync.
  */
+
 import { fetchApi } from './client';
 
 const BASE = '/societies';

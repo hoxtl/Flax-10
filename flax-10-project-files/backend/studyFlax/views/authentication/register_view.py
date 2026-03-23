@@ -32,6 +32,7 @@ def _build_registration_response(user, request):
 @api_view(['POST'])
 def register_view(request):
     """View method for new user registration."""
+
     user_serialiser = RegistrationUserSerialiser(data=request.data)
     if not user_serialiser.is_valid():
         return Response(user_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)

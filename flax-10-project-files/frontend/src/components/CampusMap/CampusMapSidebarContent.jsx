@@ -1,6 +1,7 @@
 /**
  * Campus map sidebar content.
  */
+
 import styles from "../../pages/CampusMap/CampusMap.module.css";
 import { CalendarEventsSection } from "./CalendarEventsSection";
 import { DestinationSection } from "./DestinationSection";

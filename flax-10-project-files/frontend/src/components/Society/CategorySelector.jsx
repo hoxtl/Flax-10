@@ -2,6 +2,7 @@
  * CategorySelector provides single or multi-select dropdowns/pills
  * for classifying societies into predefined categories.
  */
+
 import styles from "./CategorySelector.module.css";
 import { SOCIETY_CATEGORY_OPTIONS } from "../../pages/Societies/societyFilters";
 import AnimatedDropdown from "../common/AnimatedDropdown";
@@ -26,6 +27,7 @@ function SingleCategorySelector({ value, onChange, label }) {
 }
 
 /** Renders a grid of category pills for multi-selection. */
+
 function MultiCategorySelector({ value = [], onChange, label }) {
     const selected = Array.isArray(value) ? value : [];
     const handleToggle = (id) => onChange(selected.includes(id) ? selected.filter(i => i !== id) : [...selected, id]);

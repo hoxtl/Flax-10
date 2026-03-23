@@ -1,6 +1,7 @@
 /*
  * Reusable filter button with funnel icon, "Filter" label, and active badge.
  */
+
 import styles from "./FilterButton.module.css";
 
 function FunnelIcon() {

@@ -59,7 +59,8 @@ function TaskWidgetBody({ categoryLabel, categoryStyle, edit, styles, task, urge
 
 function CategoryPill({ categoryLabel, categoryStyle, styles }) {
   if (!categoryLabel) return null;
-  return <span className={styles.taskWidgetCategoryPill} style={{ background: categoryStyle.bg, color: categoryStyle.text }}>{categoryLabel}</span>;
+  const pillStyle = { background: categoryStyle.bg, color: categoryStyle.text };
+  return <span className={styles.taskWidgetCategoryPill} style={pillStyle}>{categoryLabel}</span>;
 }
 
 function TaskTitle({ edit, styles, task }) {

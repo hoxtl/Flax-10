@@ -1,6 +1,7 @@
 /**
  * Tests for popoverUtils - popover positioning calculations.
  */
+
 import { describe, it, expect } from 'vitest';
 import { calculatePopoverPosition, calculateArrowPosition } from '../../../../components/Calendar/EventPopover/popoverUtils';
 

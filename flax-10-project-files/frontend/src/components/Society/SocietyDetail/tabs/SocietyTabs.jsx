@@ -1,4 +1,5 @@
 /** SocietyTabs manages navigation between Calendar, About, and Announcements. */
+
 import { TabBar } from "../../../common/TabBar/TabBar";
 import styles from "./SocietyTabs.module.css";
 import CalendarTab from "./calendarTab/CalendarTab";

@@ -1,6 +1,7 @@
 /*
  * Auto schedule form.
  */
+
 import { useState } from 'react';
 import styles from '../shared/scheduleFormStyles';
 import { AutoScheduleSummary } from './AutoScheduleSummary';

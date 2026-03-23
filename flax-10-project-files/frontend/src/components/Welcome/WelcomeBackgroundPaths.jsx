@@ -96,10 +96,11 @@ export default function WelcomeBackgroundPaths() {
   const reduceMotion = useReducedMotion();
   const { x, y } = useParallaxMotion(reduceMotion);
 
+  const parallaxStyle = { x, y };
   return (
     <div className={styles.bg} aria-hidden="true">
       <div className={styles.glow} />
-      <motion.div className={styles.parallax} style={{ x, y }}>
+      <motion.div className={styles.parallax} style={parallaxStyle}>
         <FloatingPaths />
         <FloatingPaths flip={-1} />
       </motion.div>

@@ -31,6 +31,7 @@ def society_detail(request, society_id):
 
 def get_society_detail(request, society):
     """Return a serialised society detail response with membership context."""
+
     data = SocietyDetailSerialiser(society, context={'request': request}).data
     membership = get_membership(request.user, society)
     data['is_member'] = membership is not None
@@ -41,6 +42,7 @@ def get_society_detail(request, society):
 
 def update_society(request, society):
     """Update a society's details (admin only)."""
+
     if not is_society_admin(request.user, society):
         return permission_denied_response()
     serialiser = SocietyDetailSerialiser(society, data=request.data, partial=True)
@@ -53,6 +55,7 @@ def update_society(request, society):
 
 def delete_society(request, society):
     """Delete a society and notify all members (admin only)."""
+
     if not is_society_admin(request.user, society):
         return permission_denied_response()
     delete_society_with_notification(society)
@@ -60,6 +63,7 @@ def delete_society(request, society):
 
 def delete_society_with_notification(society):
     """Delete society with only one notification (no event/announcement spam)."""
+
     from studyFlax.signals.society_notifications import (
         notify_society_deleted, delete_children_silently, _deleting_societies
     )
@@ -71,6 +75,7 @@ def delete_society_with_notification(society):
 
 def _notify_admins_of_report(society, reason):
     """Send a report notification to all superusers."""
+
     User = get_user_model()
     Notification.objects.bulk_create([
         Notification(
@@ -116,6 +121,7 @@ def _submit_society_report(request, society):
 @permission_classes([IsAuthenticated])
 def report_society(request, society_id):
     """Submit or remove a report for a society."""
+
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()

@@ -1,6 +1,7 @@
 /**
  * Campus map state groups.
  */
+
 import { useState } from "react";
 
 const INITIAL_SELECTION = { customDestination: null, selectedCampus: null, startLocation: null };

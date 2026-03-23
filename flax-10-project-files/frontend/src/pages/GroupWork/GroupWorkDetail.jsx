@@ -15,6 +15,7 @@ import { getVisibleMembers } from "./utils/projectRowUtils";
 import styles from "./GroupWorkDetail.module.css";
 
 /** Detail page for a single group project, showing header, tabs, and tasks. */
+
 export default function GroupProjectDetail({ projectId, onBack, onDelete, onUpdate }) {
   const detail = useProjectDetail(projectId, onBack, onDelete, onUpdate);
   if (detail.loading) return <GroupWorkDetailSkeleton onBack={onBack} />;

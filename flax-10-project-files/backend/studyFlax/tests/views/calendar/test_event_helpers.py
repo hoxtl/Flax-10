@@ -16,6 +16,7 @@ from studyFlax.models.timer.theme_session_model import ThemeSession
 
 class EventHelpersCoverageTest(TestCase):
     """Tests for event helpers coverage."""
+
     def test_parse_date_param_returns_datetime(self):
         from studyFlax.views.calendar.event_helpers import parse_date_param
         result = parse_date_param('2026-03-01T10:00:00Z')

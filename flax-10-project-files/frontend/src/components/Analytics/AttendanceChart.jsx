@@ -2,6 +2,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Link } from "react-router-dom";
 
 import buttonStyles from "../common/PrimaryButton/PrimaryButton.module.css";
+import chartStyles from "./Charts.module.css";
 import { useTheme } from "../../context/ThemeContext";
 
 import AttendanceBarChart from "./AttendanceBarChart";
@@ -18,7 +19,7 @@ const viewAllClassName = [
 ].join(" ");
 
 const NoAttendanceMsg = () => (
-  <p style={{ color: "var(--muted)", fontSize: "0.82rem", margin: 0 }}>
+  <p className={chartStyles.noAttendanceMsg}>
     No attendance recorded yet.{" "}
     <Link to="/attendance" style={recordLinkStyle}>Record attendance</Link>
   </p>

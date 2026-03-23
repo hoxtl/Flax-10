@@ -2,8 +2,8 @@
  * Attendance chart config helpers.
  */
 
-export const ATTENDED_COLOR = "#5a9e74";
-export const MISSED_COLOR = "#c07060";
+export const ATTENDED_COLOR = "var(--chart-attended)";
+export const MISSED_COLOR = "var(--chart-missed)";
 export const MUTED_STYLE = { color: "var(--muted)", fontSize: "0.85rem", margin: 0 };
 export const CHART_MARGIN = { left: 40, right: 20, top: 10, bottom: 40 };
 

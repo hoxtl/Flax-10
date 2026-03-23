@@ -1,0 +1,32 @@
+{
+  "MODULE_COLOURS": {
+    "PS4202": { "bg": "#F3F0FF", "text": "#5B4A8A", "accent": "#8B7BB8" },
+    "PS4101": { "bg": "#EDF4FC", "text": "#4A6D8C", "accent": "#7BA3C4" },
+    "IR4101": { "bg": "#FFF6E9", "text": "#8C6D3F", "accent": "#C4A46D" },
+    "EE4303": { "bg": "#EFF7F0", "text": "#4A7C5A", "accent": "#7BB38E" },
+    "EE4202": { "bg": "#FFF0F0", "text": "#8C5A5A", "accent": "#C48B8B" },
+    "FR4101": { "bg": "#FFF4EE", "text": "#8C5D3F", "accent": "#C49070" },
+    "LS4101": { "bg": "#F0F7F2", "text": "#4A7360", "accent": "#7BB396" },
+    "CS3001": { "bg": "#F5F0F0", "text": "#7A5A5A", "accent": "#B38B8B" },
+    "EN4101": { "bg": "#FFF6E9", "text": "#8C6D3F", "accent": "#C4A46D" },
+    "default": { "bg": "#F5F0E8", "text": "#736048", "accent": "#A89279" }
+  },
+  "HASH_PALETTE": [
+    { "bg": "#F3F0FF", "text": "#5B4A8A", "accent": "#8B7BB8" },
+    { "bg": "#EDF4FC", "text": "#4A6D8C", "accent": "#7BA3C4" },
+    { "bg": "#FFF6E9", "text": "#8C6D3F", "accent": "#C4A46D" },
+    { "bg": "#EFF7F0", "text": "#4A7C5A", "accent": "#7BB38E" },
+    { "bg": "#FFF0F0", "text": "#8C5A5A", "accent": "#C48B8B" },
+    { "bg": "#FFF4EE", "text": "#8C5D3F", "accent": "#C49070" },
+    { "bg": "#F5F0F0", "text": "#7A5A5A", "accent": "#B38B8B" }
+  ],
+  "TYPE_COLOURS": {
+    "COURSEWORK":   { "bg": "#F5F0E8", "text": "#736048", "border": "rgba(115,96,72,0.15)" },
+    "EXAM":         { "bg": "#F5EDE8", "text": "#7A5C48", "border": "rgba(122,92,72,0.15)" },
+    "PRESENTATION": { "bg": "#F0EDE8", "text": "#6B6048", "border": "rgba(107,96,72,0.15)" },
+    "LAB":          { "bg": "#EDF0E8", "text": "#5A6B48", "border": "rgba(90,107,72,0.15)" },
+    "REPORT":       { "bg": "#F5F0E8", "text": "#736048", "border": "rgba(115,96,72,0.15)" },
+    "QUIZ":         { "bg": "#F5EDE8", "text": "#7A5C48", "border": "rgba(122,92,72,0.15)" },
+    "default":      { "bg": "#F5F0E8", "text": "#736048", "border": "rgba(115,96,72,0.15)" }
+  }
+}

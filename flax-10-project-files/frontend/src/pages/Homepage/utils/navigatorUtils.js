@@ -41,6 +41,7 @@ function isActiveConflict(pair, nowMs) {
 }
 
 /** Find overlapping event pairs in sorted events. Returns [{ a, b, overlapStart, overlapEnd }]. */
+
 export function getOverlappingPairs(sortedEvents) {
   if (!sortedEvents?.length) return [];
   const sorted = getSortedEvents(sortedEvents);
@@ -59,6 +60,7 @@ function isOverlappingPair(current, next) {
 }
 
 /** Daily Navigator context: task/gap/conflict/endOfDay, currentBlock, nextItem, gapMins, overlaps. */
+
 export function getNavigatorContext(now, selectedDate, sortedEvents, isTodayFn) {
   const defaultCtx = createDefaultContext();
   if (!isTodayFn(selectedDate) || !sortedEvents?.length) return defaultCtx;

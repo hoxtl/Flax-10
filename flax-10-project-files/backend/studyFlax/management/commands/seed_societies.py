@@ -10,6 +10,7 @@ from studyFlax.models.society.society_membership_model import SocietyMembership
 
 def _ensure_seed_membership(user, society, role):
     """Create or update a society membership with notifications and calendar sync enabled."""
+
     membership, _ = SocietyMembership.objects.update_or_create(
         user=user,
         society=society,

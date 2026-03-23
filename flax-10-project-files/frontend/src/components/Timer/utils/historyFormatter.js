@@ -60,6 +60,7 @@ const normalizeSession = (session) => {
 };
 
 /** Initialize a new study block from a session */
+
 const createBlock = (id, s) => ({
     id, sessions: [s], totalDuration: s.duration,
     totalBreak: s.breakDuration || 0,
@@ -69,6 +70,7 @@ const createBlock = (id, s) => ({
 });
 
 /** Aggregate session data into an existing block */
+
 const updateBlock = (b, s) => {
     b.sessions.push(s);
     b.totalDuration += s.duration;
@@ -81,6 +83,7 @@ const updateBlock = (b, s) => {
 };
 
 /** Group sessions by ID and sort by date (newest first) */
+
 export const groupHistoryByBlock = (history) => {
     const blocks = {};
     history.forEach(rawSession => {

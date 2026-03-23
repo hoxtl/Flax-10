@@ -23,6 +23,7 @@ function BackRow({ onBack, backLabel }) {
 }
 
 /** Page shell that wraps content with an optional header and toolbar. */
+
 export default function AppPage({ title, subtitle, action, onBack, backLabel = "Back", backPlacement = "inline", toolbar, width = "xl", className = "", contentClassName = "", children, ...props }) {
   const widthClass = buildWidthClass(width);
   const showBackAboveHeader = onBack && backPlacement === "above";

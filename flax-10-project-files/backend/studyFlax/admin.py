@@ -1,6 +1,7 @@
 """
 Django admin registrations for society and user models.
 """
+
 from django.contrib import admin
 from studyFlax.models.society import (
     Society, SocietyMembership, SocietyTag, SocietyImage,

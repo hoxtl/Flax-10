@@ -61,6 +61,7 @@ def _build_task_assignees(members, task_index, status, completed_assignments):
 
 def _build_task_defaults(template, status, task_index, due, now):
     """Return the defaults dict for Task.objects.update_or_create."""
+
     t_title, t_desc, t_priority, t_blocks = template
     is_completed, completed_at = _build_completed_fields(status, task_index, now)
     has_due_date = not (status == "todo" and task_index >= 3)

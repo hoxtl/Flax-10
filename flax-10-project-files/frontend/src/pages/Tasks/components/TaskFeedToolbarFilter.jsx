@@ -10,6 +10,8 @@ import TaskFilterPanel from "./TaskFilterPanel";
 
 import styles from "./TaskFeedToolbar.module.css";
 
+const FILTER_ORIGIN_STYLE = { originY: 0, originX: 1 };
+
 function useHoverClose(onFilterOpenChange, isFilterOpen) {
   const hoverTimer = useRef(null);
 
@@ -56,7 +58,7 @@ function FilterPanelDialog({ panelProps }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.98 }}
       transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      style={{ originY: 0, originX: 1 }}
+      style={FILTER_ORIGIN_STYLE}
     >
       <TaskFilterPanel {...panelProps} />
     </Motion.div>

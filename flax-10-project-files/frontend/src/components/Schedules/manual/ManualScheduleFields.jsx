@@ -1,6 +1,7 @@
 /*
  * Manual schedule inputs.
  */
+
 import styles from '../shared/scheduleFormStyles';
 
 export function ManualScheduleFields({ title, setTitle, eventSearch, setEventSearch }) {

@@ -7,6 +7,7 @@ import { useEffect } from 'react';
  * @param {{ top: number, bottom: number } | null} anchorRect
  * @param {() => void} onClose
  */
+
 export function useScrollClose(anchorRect, onClose) {
   useEffect(() => {
     if (!anchorRect) return undefined;

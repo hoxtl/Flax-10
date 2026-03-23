@@ -26,7 +26,7 @@ function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptio
 }
 
 function FormTitle() {
-  return <h2 className={styles.title}>You&rsquo;re in the right place <motion.span style={{ display: "inline-block", color: "var(--primary)" }} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>✦</motion.span></h2>;
+  return <h2 className={styles.title}>You&rsquo;re in the right place <motion.span className={styles.starSpan} animate={STAR_ANIMATION} transition={STAR_TRANSITION}>✦</motion.span></h2>;
 }
 
 function FormSubtitle() {

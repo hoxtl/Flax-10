@@ -11,6 +11,7 @@ function advanceTimeSafely() {
 }
 
 /** Renders TimerPage with necessary providers/mocks implicitly handled if needed */
+
 export const renderTimerPage = ({ settle = true } = {}) => {
     const view = render(
         <TimerProvider>
@@ -22,6 +23,7 @@ export const renderTimerPage = ({ settle = true } = {}) => {
 };
 
 /** Renders TimerSettings in isolation */
+
 export const renderTimerSettings = (props) => render(<TimerSettings {...props} />);
 
 export const clickButton = (text) => fireEvent.click(screen.getByText(text));
@@ -45,6 +47,7 @@ export const clickHistory = () => {
 };
 
 /** Wraps vi.advanceTimersByTime in act to handle state updates */
+
 export const advanceTimer = (ms) => act(() => vi.advanceTimersByTime(ms));
 
 export const expectTimer = (time) => expect(screen.getByText(time)).toBeInTheDocument();
@@ -70,6 +73,7 @@ export const updateSettings = (workIndex, value) => {
 };
 
 /** Simulate blur event, optionally changing value first to test validation */
+
 export const blurInput = (index, value) => {
     const existing = screen.queryAllByRole('spinbutton');
     if (!existing.length) {
@@ -86,6 +90,7 @@ export const blurInput = (index, value) => {
 };
 
 /** Mock browser Notification API */
+
 export const mockNotifications = () => {
     const NotificationMock = vi.fn();
     NotificationMock.permission = 'granted';

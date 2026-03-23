@@ -32,6 +32,7 @@ function DaysLabelBadge({ daysLabel, forceClock, tier }) {
 }
 
 /** Deadline countdown pill showing urgency tier and days remaining. */
+
 export default function DeadlineCountdown({ dueDate, className = "", align = "end", showPriority = true, forceClock = false, tier: forcedTier, label }) {
   if (!dueDate && !label) return null;
   const tier = forcedTier || (dueDate ? getUrgencyTier(dueDate) : "distant");

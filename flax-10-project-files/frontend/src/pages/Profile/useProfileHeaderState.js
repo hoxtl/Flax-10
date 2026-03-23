@@ -1,6 +1,7 @@
 /**
  * Profile header interaction state.
  */
+
 import { useState } from "react";
 import { fetchApi } from "../../api/client";
 

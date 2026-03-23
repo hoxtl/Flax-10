@@ -168,6 +168,7 @@ describe('MonthView', () => {
             payload: 'day',
         });
         */
+
     });
 
     it('should show +X more events if too many', () => {

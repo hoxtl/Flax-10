@@ -7,6 +7,7 @@ import { getStartOfWeek, getStartOfMonth, getEndOfMonth, addDays } from '../util
  * Month view = that month (28-31 days)
  * Year view = that year (Jan 1 - Dec 31)
  */
+
 export function getDateRangeForView(date, viewMode) {
     if (viewMode === 'day') return getDayRange(date);
     if (viewMode === 'week') return getWeekRange(date);

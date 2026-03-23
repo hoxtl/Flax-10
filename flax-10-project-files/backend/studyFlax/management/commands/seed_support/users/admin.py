@@ -50,6 +50,7 @@ def _non_fixture_users():
 
 def _promote_to_pending_teacher(user):
     """Set role to pending_teacher if not already set. Returns True if updated."""
+
     if user.role == "pending_teacher":
         return False
     user.role = "pending_teacher"
@@ -69,6 +70,7 @@ def seed_teacher_requests(stdout):
 
 def _create_course_change_if_missing(user, rng):
     """Create a pending course change request if none exists. Returns True if created."""
+
     if CourseChangeRequest.objects.filter(user=user, status="pending").exists():
         return False
     current = rng.choice(COURSES)
@@ -94,6 +96,7 @@ def seed_course_change_requests(stdout):
 
 def _create_society_report_if_missing(society, reporter, reason, pairs_used):
     """Create a society report if not a duplicate pair. Returns True if created."""
+
     if (society.id, reporter.id) in pairs_used:
         return False
     pairs_used.add((society.id, reporter.id))

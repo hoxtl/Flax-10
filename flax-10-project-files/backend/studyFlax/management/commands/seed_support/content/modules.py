@@ -299,11 +299,13 @@ def _enroll_if_needed(user, module, enrollments):
 
 def _deadline_tag(deadline, deadline_tag, exam_tag):
     """Return Exam tag for exams, Deadline tag for other types."""
+
     return exam_tag if deadline.deadline_type == 'exam' else deadline_tag
 
 
 def _build_user_session_events(user, module, tags, now):
     """Build unsaved session events for a user's module."""
+
     lecture_tag, _, _, schedule_tag = tags
     events = []
     for session in build_module_sessions(module, now):
@@ -314,6 +316,7 @@ def _build_user_session_events(user, module, tags, now):
 
 def _build_user_deadline_events(user, module, tags, deadlines_by_module):
     """Build unsaved deadline events for a user's module."""
+
     _, deadline_tag, exam_tag, _ = tags
     events = []
     for deadline in deadlines_by_module.get(module.id, []):
@@ -324,6 +327,7 @@ def _build_user_deadline_events(user, module, tags, deadlines_by_module):
 
 def _process_single_module(user, module, tags, now, deadlines_by_module):
     """Build enrollment and events for a single module."""
+
     enrollment = Enrollment(student=user, module=module) if _should_enroll(user, module) else None
     session_events = _build_user_session_events(user, module, tags, now)
     deadline_events = _build_user_deadline_events(user, module, tags, deadlines_by_module)
@@ -332,6 +336,7 @@ def _process_single_module(user, module, tags, now, deadlines_by_module):
 
 def _collect_module_result(enrollment, module_events, enrollments, events):
     """Append enrollment (if any) and events to the accumulators."""
+
     if enrollment:
         enrollments.append(enrollment)
     events.extend(module_events)
@@ -339,6 +344,7 @@ def _collect_module_result(enrollment, module_events, enrollments, events):
 
 def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
     """Build all events for a user's enrolled modules."""
+
     core, extras = get_user_modules(user, modules)
     enrollments, events = [], []
     for module in core + extras:
@@ -348,10 +354,12 @@ def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
 
 def _find_user_tag(user, tags, name):
     """Find a tag by name for a user, falling back to default tags."""
+
     return next((t for t in tags if t.name == name and (t.user_id == user.id or t.is_default)), None)
 
 def _get_user_module_tags(user, tags):
     """Return (lecture_tag, deadline_tag, exam_tag, schedule_tag) for a user."""
+
     return (
         _find_user_tag(user, tags, 'Lecture'),
         _find_user_tag(user, tags, 'Deadline'),
@@ -361,6 +369,7 @@ def _get_user_module_tags(user, tags):
 
 def _prefetch_deadlines_by_module(modules):
     """Prefetch all deadlines grouped by module ID."""
+
     from studyFlax.models import Deadline
     deadlines = Deadline.objects.filter(module__in=modules)
     by_module = defaultdict(list)
@@ -371,6 +380,7 @@ def _prefetch_deadlines_by_module(modules):
 
 def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module):
     """Collect enrollments and events for all users."""
+
     all_enrollments, all_events = [], []
     for user in users:
         user_tags = _get_user_module_tags(user, tags)
@@ -383,6 +393,7 @@ def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_
 @transaction.atomic
 def create_enrollments(modules, tags, stdout):
     """Create enrollments and all module events for all users."""
+
     now = timezone.now()
     deadlines_by_module = _prefetch_deadlines_by_module(modules)
     users = list(User.objects.all().select_related('settings'))

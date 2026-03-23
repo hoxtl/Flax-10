@@ -5,9 +5,10 @@
 import { Link } from "react-router-dom";
 
 import { ATTENDED_COLOR, MISSED_COLOR, countsStyle, headerStyle, leftGroupStyle, percentageLabelStyle, percentageStyle, viewAllLinkStyle } from "./attendanceChartConfig";
+import chartStyles from "./Charts.module.css";
 
 function SummaryCount({ color, label, textColor, value }) {
-  return <span style={{ fontSize: "0.75rem", color: textColor }}><span style={{ color, fontWeight: 700 }}>{value}</span>{" "}{label}</span>;
+  return <span className={chartStyles.summaryCount} style={{ color: textColor }}><span style={{ color, fontWeight: 700 }}>{value}</span>{" "}{label}</span>;
 }
 
 function SummaryRate({ pct }) {

@@ -1,6 +1,7 @@
 /*
  * Settings sidebar navigation and related tab controls.
  */
+
 import { BookOpen, Clock3, Lock, MapPin, Moon, Paintbrush, User } from "lucide-react";
 import styles from "../../../pages/Settings/Settings.module.css";
 

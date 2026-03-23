@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 /** Returns the full list of available quick actions. */
+
 export function buildActionDefs({ onNavChange, onOpenTask }) {
   const nav = (page) => () => onNavChange?.(page);
   return [
@@ -28,6 +29,7 @@ export function buildActionDefs({ onNavChange, onOpenTask }) {
 }
 
 /** Returns true if the action matches the given query string. */
+
 export function matchesQuery(action, query) {
   if (!query) return true;
   const q = query.toLowerCase();

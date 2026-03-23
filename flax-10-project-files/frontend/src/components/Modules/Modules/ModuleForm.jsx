@@ -1,6 +1,7 @@
 /*
  * Form for creating and editing modules with department and course selection.
  */
+
 import { useState, useMemo } from 'react';
 import { createModule, updateModule } from '../../../api/moduleApi';
 import { serialiseModule } from '../utils/moduleUtils';

@@ -26,11 +26,13 @@ PROFILES = {
 
 def _get_profile(username):
     """Return (study_profile, theme_profile) for a user."""
+
     return PROFILES.get(username, ('balanced', 'balanced'))
 
 
 def _build_user_sessions(user):
     """Build study and theme sessions for a user based on their profile."""
+
     study_profile, theme_profile = _get_profile(user.username)
     study = build_study_sessions_for_user(user, study_profile)
     theme = build_theme_sessions_for_user(user, theme_profile)
@@ -40,6 +42,7 @@ def _build_user_sessions(user):
 @transaction.atomic
 def create_study_sessions(stdout):
     """Create study and theme sessions for all seeded students and teachers."""
+
     students = list(User.objects.filter(role__in=['student', 'teacher']))
     all_study = []
     all_theme = []

@@ -11,14 +11,16 @@ import styles from './EventPopover.module.css';
 
 const EVENT_ACCENTS = { module: "var(--sage)", society: "var(--primary)" };
 
+const makeBadgeStyle = (color) => ({ '--badge-color': color });
+
 function ContextBadge({ event }) {
   if (!event) return null;
   if (event.module_name || event.moduleCode || event.module) {
     const label = event.module_name || event.moduleCode || `Module ${event.module}`;
-    return <Badge className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.module, borderColor: EVENT_ACCENTS.module, color: 'var(--c-white)' }}>{label}</Badge>;
+    return <Badge className={`${styles.contextBadge} ${styles.coloredBadge}`} style={makeBadgeStyle(EVENT_ACCENTS.module)}>{label}</Badge>;
   }
   if (event.society_name || event.society_id) {
-    return <Badge className={styles.contextBadge} style={{ backgroundColor: EVENT_ACCENTS.society, borderColor: EVENT_ACCENTS.society, color: 'var(--c-white)' }}>{event.society_name || 'Society Event'}</Badge>;
+    return <Badge className={`${styles.contextBadge} ${styles.coloredBadge}`} style={makeBadgeStyle(EVENT_ACCENTS.society)}>{event.society_name || 'Society Event'}</Badge>;
   }
   return null;
 }
@@ -38,7 +40,7 @@ function PopoverHeader({ title, tag, actions, onClose, readOnly, event }) {
         <h3 className={styles.title}>{title}</h3>
         <div className={styles.badgeRow}>
           <ContextBadge event={event} />
-          {tag && <Badge className={styles.tagBadge} style={{ backgroundColor: tag.color, borderColor: tag.color, color: 'var(--c-white)' }}>{tag.label}</Badge>}
+          {tag && <Badge className={`${styles.tagBadge} ${styles.coloredBadge}`} style={makeBadgeStyle(tag.color)}>{tag.label}</Badge>}
         </div>
       </div>
       {!readOnly && <div className={styles.actions}>{actions?.map((act, i) => <ActionButton key={i} action={act} onClose={onClose} />)}</div>}
@@ -115,10 +117,11 @@ function getArrowStyle(pos, anchorRect) {
 }
 
 function PopoverPortal({ popoverRef, pos, arrowStyle, event, tag, actions, onClose, readOnly }) {
+  const containerPos = { '--popover-top': pos.top, '--popover-left': pos.left };
   return createPortal(
     <>
       <div className={styles.popoverOverlay} onMouseDown={onClose} />
-      <div ref={popoverRef} className={styles.popoverContainer} style={{ top: pos.top, left: pos.left }}>
+      <div ref={popoverRef} className={styles.popoverContainer} style={containerPos}>
         <div className={`${styles.popoverArrow} ${getArrowClass(pos.placement)}`} style={arrowStyle} />
         <EventPopoverContent event={event} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />
       </div>

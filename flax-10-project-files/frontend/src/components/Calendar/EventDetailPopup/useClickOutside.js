@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 /**
  * Calls `onClose` when the user presses the mouse button down outside the referenced element.
  */
+
 export function useClickOutside(ref, onClose) {
   useEffect(() => {
     if (!ref?.current) return undefined;

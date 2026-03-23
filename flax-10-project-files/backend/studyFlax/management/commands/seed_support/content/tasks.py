@@ -24,6 +24,7 @@ def _create_task_lists(user):
 
 def create_module_reading_lists(user, enrolled_modules):
     """Create a '{module_code} - {module_name}' reading TaskList for each enrolled module."""
+
     lists_by_module = {}
     for module in enrolled_modules:
         name = f"{module.module_code} - {module.module_name}"
@@ -83,12 +84,14 @@ def _seed_enrollment_tasks(user, task_list, module, now):
 
 def _seed_enrollment_if_listed(user, enrollment, lists_by_module, now):
     """Seed tasks for an enrollment if it has a task list."""
+
     task_list = lists_by_module.get(enrollment.module.id)
     return _seed_enrollment_tasks(user, task_list, enrollment.module, now) if task_list else 0
 
 
 def _seed_module_tasks(user, lists_by_module, now):
     """Seed tasks for all user's enrolled modules."""
+
     enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
     return sum(_seed_enrollment_if_listed(user, e, lists_by_module, now) for e in enrolled)
 

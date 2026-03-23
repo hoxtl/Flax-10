@@ -25,6 +25,7 @@ export const viewSwapMotion = {
 };
 
 /** Returns panel entrance/exit motion props, flipping y direction when opening upward. */
+
 export function getDropdownPanelMotion(openUpward = false) {
   const yOffset = openUpward ? 8 : -8;
   return {
@@ -36,6 +37,7 @@ export function getDropdownPanelMotion(openUpward = false) {
 }
 
 /** Returns staggered item entrance motion props based on list index. */
+
 export function getDropdownItemMotion(index = 0) {
   return {
     initial: { opacity: 0, x: -10 },

@@ -363,3 +363,12 @@
   color: var(--c-white);
   filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--primary-strong) 55%, transparent));
 }
+
+.themePreviewColored {
+  background: var(--tp-bg);
+  border-color: var(--tp-border);
+}
+
+.swatchTitleColored {
+  color: var(--tp-text);
+}

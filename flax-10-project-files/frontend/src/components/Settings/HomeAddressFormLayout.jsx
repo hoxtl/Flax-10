@@ -1,6 +1,7 @@
 /*
  * Presentational layout for the home-address form.
  */
+
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import InlineAlert from "../common/InlineAlert/InlineAlert";
 import styles from "../../pages/Settings/Settings.module.css";

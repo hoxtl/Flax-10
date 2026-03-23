@@ -228,6 +228,8 @@
 
 .ctxMenu {
   position: fixed;
+  top: var(--ctx-top);
+  left: var(--ctx-left);
   background: var(--panel, #fffcfa);
   border: 1px solid rgba(74, 52, 33, 0.1);
   border-radius: 12px;

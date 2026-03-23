@@ -132,6 +132,7 @@ function extractUsername(user) {
 }
 
 /** Resolves a user's display photo, falling back to a deterministic avatar. */
+
 export function getResolvedUserPhoto(user, options = {}) {
   if (!user) return null;
   const direct = extractDirectPhoto(user);

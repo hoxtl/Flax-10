@@ -15,6 +15,7 @@ function CancelButton({ cancelling, cancellingLabel, cancelLabel, onCancel }) {
 }
 
 /** Card showing a request's current status with an optional cancel action. */
+
 export default function RequestStatusCard({ icon, title, subtitle, cancelLabel = "Cancel request", cancellingLabel = "Cancelling…", cancelling = false, onCancel, successMessage }) {
   return (
     <div className={styles.card}>

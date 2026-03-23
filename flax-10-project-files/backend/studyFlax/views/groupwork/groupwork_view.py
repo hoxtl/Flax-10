@@ -31,6 +31,7 @@ def _serialiser_context(request):
 
 def _parse_member_id(value):
     """Return int ID or None if value cannot be parsed."""
+
     try:
         return int(value)
     except (TypeError, ValueError):
@@ -38,6 +39,7 @@ def _parse_member_id(value):
 
 def _collect_unique_ids(raw_ids):
     """Return a deduped list of parsed IDs, or None if any value is invalid."""
+
     parsed = [_parse_member_id(v) for v in raw_ids]
     if None in parsed:
         return None
@@ -96,6 +98,7 @@ def _validate_project_deadline(deadline):
 
 def _module_tutor_subqueries(module_base):
     """Return a dict of tutor annotation subqueries for a module queryset."""
+
     return {
         "module_tutor_id": Subquery(module_base.values("created_by_id")[:1]),
         "module_tutor_name": Subquery(
@@ -119,10 +122,12 @@ def _project_metrics_queryset():
 
 def _with_project_metrics(project):
     """Return the project annotated with member, task, and module context."""
+
     return _project_metrics_queryset().filter(id=project.id).first()
 
 def _handle_project_delete(project, user):
     """Delete the project if the user is the owner, otherwise return 403."""
+
     if project.owner_id != user.id:
         return Response(status=status.HTTP_403_FORBIDDEN)
     project.delete()
@@ -132,6 +137,7 @@ def _handle_project_delete(project, user):
 @permission_classes([IsAuthenticated])
 def group_project_list(request):
     """List all group projects for the user, or create a new one."""
+
     if request.method == "GET":
         qs = _project_metrics_queryset().filter(memberships__user=request.user).order_by("-created_at")
         return Response(GroupProjectSerialiser(qs, many=True, context=_serialiser_context(request)).data)
@@ -154,6 +160,7 @@ def group_project_list(request):
 
 def _add_member_to_project(project, request):
     """Handle POST logic for adding a member to a project."""
+
     if project.owner_id != request.user.id:
         return Response({"detail": "Only the project owner can edit team members."}, status=status.HTTP_403_FORBIDDEN)
     serialiser = GroupMembershipSerialiser(data=request.data, context=_serialiser_context(request))
@@ -176,6 +183,7 @@ def _add_member_to_project(project, request):
 @permission_classes([IsAuthenticated])
 def group_project_members(request, project_id):
     """List members of a project, or add a new member."""
+
     project = get_object_or_404(GroupProject.objects.all(), id=project_id, memberships__user=request.user)
     if request.method == "GET":
         memberships = project.memberships.select_related("user").order_by("joined_at")
@@ -186,6 +194,7 @@ def group_project_members(request, project_id):
 @permission_classes([IsAuthenticated])
 def group_project_detail(request, project_id):
     """Update or delete a group project."""
+
     project = get_object_or_404(GroupProject.objects.filter(memberships__user=request.user), id=project_id)
     if request.method == "DELETE":
         return _handle_project_delete(project, request.user)
@@ -202,6 +211,7 @@ def group_project_detail(request, project_id):
 @permission_classes([IsAuthenticated])
 def group_project_member_detail(request, project_id, membership_id):
     """Remove a member from a group project (owner only)."""
+
     project = get_object_or_404(GroupProject.objects.filter(memberships__user=request.user), id=project_id)
     if project.owner_id != request.user.id:
         return Response(status=status.HTTP_403_FORBIDDEN)

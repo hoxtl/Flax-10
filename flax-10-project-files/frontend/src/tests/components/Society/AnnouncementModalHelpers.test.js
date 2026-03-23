@@ -1,6 +1,7 @@
 /**
  * Unit tests for AnnouncementModalHelpers (getInitialForm, validateForm, handleFileSelect).
  */
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   getInitialForm,

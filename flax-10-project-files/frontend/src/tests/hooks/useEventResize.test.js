@@ -1,6 +1,7 @@
 /**
  * Unit tests for event-resize interactions.
  */
+
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useEventResize } from '../../components/Calendar/hooks/useEventResize';

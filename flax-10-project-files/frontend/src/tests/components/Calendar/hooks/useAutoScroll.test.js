@@ -1,6 +1,7 @@
 /**
  * Tests for useAutoScroll - auto-scrolls calendar to current time.
  */
+
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useAutoScroll } from '../../../../components/Calendar/hooks/useAutoScroll';

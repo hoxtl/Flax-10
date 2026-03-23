@@ -2,6 +2,7 @@
  * MemberDirectoryModal displays a searchable list of all society members.
  * Admins can remove members from the directory.
  */
+
 import { useState, useEffect, useMemo } from "react";
 import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
@@ -10,16 +11,16 @@ import UserAvatar from "../../common/UserAvatar/UserAvatar";
 import { useConfirm } from "../../../context/ConfirmContext";
 import { X } from "lucide-react";
 import { useSearchFilter } from "../../../hooks/useSearchFilter";
+import styles from "./MemberDirectoryModal.module.css";
 
 function RoleBadge({ role }) {
-    const style = { backgroundColor: 'var(--primary-light, #fef3c7)', color: 'var(--primary, #d97706)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600' };
-    return <span style={style}>{role}</span>;
+    return <span className={styles.roleBadge}>{role}</span>;
 }
 
 function MemberTitle({ member }) {
     const isAdmin = member.role === 'admin' || member.role === 'editor';
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className={styles.memberTitleRow}>
             {member.username}
             {isAdmin && <RoleBadge role={member.role} />}
         </div>
@@ -27,8 +28,7 @@ function MemberTitle({ member }) {
 }
 
 function RemoveButton({ member, onRemove }) {
-    const style = { background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' };
-    return <button style={style} onClick={(e) => onRemove(member, e)} aria-label="Remove member"><X size={18} /></button>;
+    return <button className={styles.removeBtn} onClick={(e) => onRemove(member, e)} aria-label="Remove member"><X size={18} /></button>;
 }
 
 function useMemberDirectory(members, onFetchMembers, searchQuery) {

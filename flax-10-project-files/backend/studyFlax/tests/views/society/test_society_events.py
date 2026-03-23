@@ -17,6 +17,7 @@ User = get_user_model()
 
 class SocietyEventCreateExtendedTest(TestCase):
     """Tests for society event create extended."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin', email='admin@e.com', password='pass')
@@ -52,6 +53,7 @@ class SocietyEventCreateExtendedTest(TestCase):
 
 class SocietyEventDetailExtendedTest(TestCase):
     """Tests for society event detail extended."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='admin2', email='admin2@e.com', password='pass')
@@ -116,6 +118,7 @@ class SocietyEventDetailExtendedTest(TestCase):
 
 class AddSocietyEventExceptionTest(TestCase):
     """Tests for add society event exception."""
+
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_user(username='excadmin', email='excadmin@e.com', password='pass')

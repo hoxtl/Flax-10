@@ -17,9 +17,11 @@ export function MultiSelectDropdownTrigger(props) {
   return <DefaultTrigger {...props} />;
 }
 
+const CUSTOM_TRIGGER_STYLE = { display: "inline-flex", cursor: "pointer" };
+
 function CustomTrigger({ customTrigger, updateOpen }) {
   return (
-    <div onClick={() => updateOpen((open) => !open)} style={{ display: "inline-flex", cursor: "pointer" }}>
+    <div onClick={() => updateOpen((open) => !open)} style={CUSTOM_TRIGGER_STYLE}>
       {customTrigger}
     </div>
   );

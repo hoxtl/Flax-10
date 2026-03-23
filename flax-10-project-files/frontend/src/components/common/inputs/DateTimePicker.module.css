@@ -253,3 +253,10 @@
 .doneBtn:hover {
   opacity: 0.85;
 }
+
+.dropdownPositioned {
+  position: fixed;
+  top: var(--dp-top);
+  left: var(--dp-left);
+  z-index: 10000;
+}

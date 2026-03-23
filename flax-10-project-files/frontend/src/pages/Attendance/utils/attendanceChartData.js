@@ -2,19 +2,15 @@
  * Attendance chart data builders.
  */
 
-const TYPE_COLOR_MAP = {
-  Lecture: "#D4AF37",
-  "Small group": "#148C7D",
-  "Practical/lab": "#2E5BFF",
-  Other: "#E67E22",
-};
+import chartColors from './attendanceChartColors.json';
 
-const FALLBACK_TYPE_COLORS = ["#D4AF37", "#148C7D", "#2E5BFF", "#E67E22"];
+const TYPE_COLOR_MAP = chartColors.typeColors;
+const FALLBACK_TYPE_COLORS = chartColors.fallbackTypeColors;
 
 export function buildOverallChartData(overall) {
   const attended = overall?.attended ?? 0;
   const missed = overall?.missed ?? 0;
-  return [{ id: 0, value: attended, label: "Attended", color: "#2D8B5A" }, { id: 1, value: missed, label: "Missed", color: "#C0392B" }].filter((entry) => entry.value > 0);
+  return [{ id: 0, value: attended, label: "Attended", color: chartColors.attendedColor }, { id: 1, value: missed, label: "Missed", color: chartColors.missedColor }].filter((entry) => entry.value > 0);
 }
 
 export function getEventTypeLabel(event) {
@@ -23,7 +19,7 @@ export function getEventTypeLabel(event) {
 
 export function buildByTypeChartData(byType) {
   const merged = mergeByNormalizedType(byType);
-  return Object.entries(merged).map(([label, counts]) => ({ id: label, value: (counts.attended || 0) + (counts.missed || 0), label, color: TYPE_COLOR_MAP[label] ?? "#795548" })).filter((entry) => entry.value > 0);
+  return Object.entries(merged).map(([label, counts]) => ({ id: label, value: (counts.attended || 0) + (counts.missed || 0), label, color: TYPE_COLOR_MAP[label] ?? chartColors.fallbackColor })).filter((entry) => entry.value > 0);
 }
 
 export function withByTypeColors(entries) {

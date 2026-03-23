@@ -2,6 +2,7 @@
  * TagEditCell - Tag selection cell for table view.
  * Displays tag badge with dropdown editor on click.
  */
+
 import { Pencil } from 'lucide-react';
 import AnimatedDropdown from '../../../common/AnimatedDropdown';
 import styles from './TagEditCell.module.css';

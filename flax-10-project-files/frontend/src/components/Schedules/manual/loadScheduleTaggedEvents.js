@@ -1,6 +1,7 @@
 /*
  * Schedule-tagged event loading.
  */
+
 import { getEvents } from '../../../api/eventApi';
 
 export async function loadScheduleTaggedEvents(setEvents, setSelected, showToast) {

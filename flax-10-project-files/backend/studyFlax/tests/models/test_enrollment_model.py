@@ -12,6 +12,7 @@ from studyFlax.models.modules.enrollment_model import Enrollment
 
 class EnrollmentModelTests(TestCase):
     """ Test suite for Enrollment model."""
+
     def setUp(self):
         self.teacher = User.objects.create_user(
             username='teacher', email='teacher@test.com',

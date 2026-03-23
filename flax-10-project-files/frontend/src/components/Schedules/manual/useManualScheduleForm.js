@@ -1,6 +1,7 @@
 /*
  * Manual schedule form state.
  */
+
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '../../../context/ToastContext';
 import { filterScheduleEvents, toggleSelectedEventId } from './manualScheduleUtils';

@@ -89,9 +89,10 @@ function TimerLayout({ state }) {
   const navigate = useNavigate();
   const visibility = state.showPageSkeleton ? { visibility: 'hidden' } : {};
   const className = `${styles.timerLayout} ${state.fromTaskPlay ? styles.focusModeContent : ''}`;
+  const timerLayoutStyle = Object.assign({ '--focus-accent': state.focusAccent }, visibility);
 
   return (
-    <div className={className} style={{ '--focus-accent': state.focusAccent, ...visibility }}>
+    <div className={className} style={timerLayoutStyle}>
       <NotificationPrompt permission={state.permission} request={state.request} />
       <FocusEntryBackButton state={state} navigate={navigate} />
       <StreakWarning state={state} />

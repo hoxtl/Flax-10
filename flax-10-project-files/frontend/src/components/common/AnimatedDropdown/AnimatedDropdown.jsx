@@ -16,6 +16,7 @@ import styles from "./AnimatedDropdown.module.css";
 import { filterFlat, filterGrouped, buildMenuStyle, computeOpenDirection, makeOutsideClickListener } from "./animatedDropdownUtils";
 
 /** Text input with a leading search icon, auto-focused on mount. */
+
 function SearchInput({ query, setQuery, placeholder }) {
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); }, []);
@@ -29,6 +30,7 @@ function SearchInput({ query, setQuery, placeholder }) {
 }
 
 /** Animated search icon that wiggles on mount inside the empty state. */
+
 function EmptyIcon() {
   return (
     <motion.div
@@ -42,6 +44,7 @@ function EmptyIcon() {
 }
 
 /** Shown when a search query matches no options. */
+
 function EmptyState({ query, emptyMessage }) {
   return (
     <motion.div className={styles.emptyState}
@@ -54,6 +57,7 @@ function EmptyState({ query, emptyMessage }) {
 }
 
 /** Animated checkmark shown next to the currently selected item. */
+
 function CheckMark() {
   return (
     <motion.div {...checkmarkMotion}>
@@ -188,6 +192,7 @@ function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpen
 }
 
 /** Determines whether the dropdown should open upward based on available viewport space. */
+
 function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUpward = false) {
   const [openUpward, setOpenUpward] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
@@ -236,8 +241,9 @@ function useDropdownRefs() {
 
 function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLabel, value, isOpen, triggerClassName }) {
   if (customTrigger) {
+    const triggerStyle = { display: 'inline-flex', cursor: openOnHover ? 'default' : 'pointer' };
     return (
-      <div onClick={handleToggle} style={{ display: 'inline-flex', cursor: openOnHover ? 'default' : 'pointer' }}>
+      <div onClick={handleToggle} style={triggerStyle}>
         {customTrigger}
       </div>
     );
@@ -246,6 +252,7 @@ function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLab
 }
 
 /** Animated dropdown with optional search and grouped option support. */
+
 export default function AnimatedDropdown({
   value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true, triggerClassName = ""

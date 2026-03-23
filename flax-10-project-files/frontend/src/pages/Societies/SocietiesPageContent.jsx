@@ -1,6 +1,7 @@
 /*
  * SocietiesPageContent renders the societies feature views and modal chrome.
  */
+
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";

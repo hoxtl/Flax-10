@@ -1,12 +1,13 @@
 /*
  * CommonGroundSection widget – shared modules and societies between two users.
  */
+
 import Card from "../../../../components/common/Card/Card";
 import compatStyles from "./ProfileCompat.module.css";
 
 const COMMON_GROUND_COLORS = {
-  modules: "#9aaebe",
-  societies: "#b69f90",
+  modules: "var(--common-ground-modules)",
+  societies: "var(--common-ground-societies)",
 };
 
 function buildCommonGroundData(viewedModules, viewedSocieties, currentUserModules, currentUserSocieties) {

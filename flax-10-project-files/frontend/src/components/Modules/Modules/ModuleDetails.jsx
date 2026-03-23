@@ -1,6 +1,7 @@
 /*
  * Detailed view of a single module with schedule, deadlines, and readings.
  */
+
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';

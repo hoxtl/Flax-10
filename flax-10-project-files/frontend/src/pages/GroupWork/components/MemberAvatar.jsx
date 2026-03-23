@@ -11,5 +11,6 @@ export default function MemberAvatar({ member, size = 24 }) {
   const sizeStyle = { width: size, height: size };
   const name = getDisplayName(member);
   if (photoUrl) return <img src={photoUrl} alt={name} className={styles.avatar} style={sizeStyle} />;
-  return <div className={styles.avatar} style={{ ...sizeStyle, background: getUserColor(member.user ?? member.id) }}>{getInitials(member)}</div>;
+  const avatarStyle = { width: size, height: size, '--avatar-bg': getUserColor(member.user ?? member.id) };
+  return <div className={`${styles.avatar} ${styles.avatarColored}`} style={avatarStyle}>{getInitials(member)}</div>;
 }

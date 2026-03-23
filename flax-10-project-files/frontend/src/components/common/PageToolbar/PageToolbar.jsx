@@ -5,6 +5,7 @@
 import styles from "./PageToolbar.module.css";
 
 /** Sort control label and child slot, used inside a PageToolbar. */
+
 export function ToolbarSortControl({ label = "SORT", children, className = "" }) {
   return (
     <div className={className ? `${styles.sortControl} ${className}` : styles.sortControl}>
@@ -15,6 +16,7 @@ export function ToolbarSortControl({ label = "SORT", children, className = "" })
 }
 
 /** Toolbar with a search slot on the left and control slots on the right. */
+
 export default function PageToolbar({ searchSlot, controlsSlot, className = "" }) {
   return (
     <div className={className ? `${styles.toolbar} ${className}` : styles.toolbar}>

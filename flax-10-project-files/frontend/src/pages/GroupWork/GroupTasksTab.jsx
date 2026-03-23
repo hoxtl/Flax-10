@@ -116,6 +116,7 @@ function TasksTabHeader({ taskView, setTaskView, members, filterUsers, onToggle,
 }
 
 /** Tasks tab with list, timeline, and board views for a group project. */
+
 export default function GroupTasksTab({ projectId, members = [], onStatsUpdate }) {
     const showToast = useToast();
     const taskActions = useTasks(projectId, members, onStatsUpdate);

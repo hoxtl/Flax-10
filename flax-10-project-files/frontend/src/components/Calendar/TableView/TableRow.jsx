@@ -2,6 +2,7 @@
  * TableRow - Editable table row for calendar table view.
  * Supports inline editing with keyboard navigation.
  */
+
 import { useState, useEffect } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
@@ -165,6 +166,7 @@ function TableRowCells({ event, state, editState, navState, rowIndex, tags, them
 }
 
 /** Table row component with inline editing support. */
+
 export function TableRow({ event, rowIndex, editState, navState, onCellClick, viewMode, readOnly = false }) {
   const [isHovered, setIsHovered] = useState(false);
   const state = useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode, readOnly);

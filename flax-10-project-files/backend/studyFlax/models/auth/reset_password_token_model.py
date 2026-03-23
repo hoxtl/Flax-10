@@ -1,6 +1,7 @@
 """
 Model for password reset tokens with expiry and usage tracking.
 """
+
 import secrets
 from django.db import models
 from django.utils import timezone

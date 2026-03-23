@@ -1,0 +1,14 @@
+/* Word loader styles */
+
+.loaderWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+}
+
+.charSpan {
+  position: absolute;
+  display: flex;
+  gap: 0.05em;
+}

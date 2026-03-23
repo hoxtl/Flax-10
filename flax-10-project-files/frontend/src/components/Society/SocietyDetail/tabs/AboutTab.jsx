@@ -2,6 +2,7 @@
  * AboutTab displays and edits the general information about a society,
  * including its biography and administrator contact emails.
  */
+
 import { useState } from "react";
 import PrimaryButton from "../../../common/PrimaryButton/PrimaryButton";
 import styles from "./tabs.module.css";
@@ -43,6 +44,7 @@ function AdminEmails({ emails }) {
 }
 
 /** Editor interface for updating society bio and admin emails. */
+
 function AboutEditor({ about, emails, onUpdate }) {
     const vals = useAboutForm(about, emails);
     const handlers = getAboutHandlers(onUpdate, vals);

@@ -46,6 +46,7 @@ function pickRandom(list) {
 }
 
 /** Weighted random: 70% generic, 20% reflective, 10% Lenny. */
+
 function pickCalmCleverMessage() {
   const r = Math.random();
   if (r < 0.7) return pickRandom(GENERIC_MESSAGES);
@@ -60,6 +61,7 @@ function pickContextualMessage({ isOverdue, dueStatus }) {
 }
 
 /** Returns a completion toast message based on task type and due context. */
+
 export function getCompletionMessage(task, context = {}) {
   if (!task || typeof task !== "object") return pickCalmCleverMessage();
   if (isRoutineTask(task)) return "Nourished. ☕";
@@ -67,6 +69,7 @@ export function getCompletionMessage(task, context = {}) {
 }
 
 /** True if task is routine by title (meals/sleep). Used to skip victory sound. */
+
 export function isRoutineTask(task) {
   if (!task || typeof task !== "object") return false;
   return ROUTINE_PATTERN.test(task.title || "");

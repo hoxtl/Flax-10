@@ -3,6 +3,7 @@
  */
 
 /** Formats a meeting slot start time as a human-readable GB date/time string. */
+
 export function formatSuggestionDateLabel(value) {
     const date = new Date(value);
     const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
@@ -13,16 +14,19 @@ export function formatSuggestionDateLabel(value) {
 }
 
 /** Returns the member_statuses array for a suggestion, or an empty array. */
+
 export function getMemberStatuses(suggestion) {
     return Array.isArray(suggestion?.member_statuses) ? suggestion.member_statuses : [];
 }
 
 /** Returns the team size for a suggestion, falling back to the member status count. */
+
 export function getTeamSize(suggestion) {
     return Number(suggestion?.team_size || getMemberStatuses(suggestion).length || 0);
 }
 
 /** Returns the response count for a given status on a suggestion. */
+
 export function getSuggestionCount(suggestion, status) {
     const field = `${status}_count`;
     if (typeof suggestion?.[field] === "number") return suggestion[field];
@@ -30,6 +34,7 @@ export function getSuggestionCount(suggestion, status) {
 }
 
 /** Returns the current user's response status for a suggestion. */
+
 export function getCurrentUserStatus(suggestion, currentUserId) {
     const memberStatus = getMemberStatuses(suggestion).find((member) => member.id === currentUserId);
     if (memberStatus?.status) return memberStatus.status;

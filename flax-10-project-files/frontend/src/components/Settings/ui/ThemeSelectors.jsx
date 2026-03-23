@@ -1,6 +1,7 @@
 /*
  * Theme-selection controls used by settings preferences.
  */
+
 import styles from "../../../pages/Settings/Settings.module.css";
 import { THEME_GROUPS } from "../../../context/ThemeConstants";
 
@@ -49,9 +50,10 @@ export function ThemeSelector({ value, onChange }) {
 }
 
 function ThemePreview({ type, data }) {
+  const previewVars = { '--tp-bg': data.bg, '--tp-border': data.border, '--tp-text': data.text };
   return (
-    <div className={styles.themePreview} style={{ background: data.bg, borderColor: data.border }}>
-      <span className={styles.swatchTitle} style={{ color: data.text }}>{type}</span>
+    <div className={`${styles.themePreview} ${styles.themePreviewColored}`} style={previewVars}>
+      <span className={`${styles.swatchTitle} ${styles.swatchTitleColored}`}>{type}</span>
       <div className={styles.swatchGrid}>
         <div className={styles.swatch} style={{ background: data.primary }} />
         <div className={styles.swatch} style={{ background: data.highlight }} />

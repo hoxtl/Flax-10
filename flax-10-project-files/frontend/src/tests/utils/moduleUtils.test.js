@@ -1,6 +1,7 @@
 /*
  * Tests for module utility functions.
  */
+
 import { describe, it, expect } from 'vitest';
 import {
     getDepartment, isEnrolledIn, getEnrollmentId, serialiseModule,

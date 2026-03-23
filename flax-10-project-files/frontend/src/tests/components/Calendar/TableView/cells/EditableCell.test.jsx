@@ -1,6 +1,7 @@
 /**
  * Tests for EditableCell - Inline editable cell for table view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EditableCell } from '../../../../../components/Calendar/TableView/cells/EditableCell';

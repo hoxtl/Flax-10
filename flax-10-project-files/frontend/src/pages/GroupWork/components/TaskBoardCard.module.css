@@ -251,3 +251,6 @@
     padding: 12px;
   }
 }
+
+.prioritySelectColored { background-color: var(--ps-bg); color: var(--ps-text); }
+.assigneeFooterBtn { cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }

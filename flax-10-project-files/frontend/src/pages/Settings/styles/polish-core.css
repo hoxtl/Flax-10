@@ -326,3 +326,5 @@
   background: color-mix(in srgb, var(--surface-raised) 92%, var(--surface-warm) 8%);
   border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
 }
+
+.remainingCount { color: var(--muted); font-size: 0.9em; margin-left: 5px; }

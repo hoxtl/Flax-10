@@ -152,9 +152,9 @@ export const Input = styled.input`
 export const Button = styled.button`
   position: relative;
   border-radius: 999px;
-  border: 1.5px solid rgba(74, 52, 33, 0.4);
-  background: linear-gradient(180deg, #5c3f28 0%, #3c2a1a 100%);
-  color: rgba(255, 255, 255, 0.96);
+  border: 1.5px solid var(--auth-btn-border);
+  background: linear-gradient(180deg, var(--auth-btn-gradient-start) 0%, var(--auth-btn-gradient-end) 100%);
+  color: var(--auth-btn-color);
   font-size: 11px;
   font-weight: 700;
   padding: 11px 34px;
@@ -167,8 +167,8 @@ export const Button = styled.button`
   overflow: hidden;
   will-change: transform;
   box-shadow:
-    0 8px 24px rgba(74, 52, 33, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 8px 24px var(--auth-btn-shadow-warm),
+    inset 0 1px 0 var(--auth-btn-inset);
   margin-top: 4px;
 
   &::before {
@@ -178,7 +178,7 @@ export const Button = styled.button`
     background: linear-gradient(
       120deg,
       transparent 35%,
-      rgba(255, 255, 255, 0.28) 50%,
+      var(--auth-btn-sheen) 50%,
       transparent 65%
     );
     transform: translateX(-60%) rotate(8deg);
@@ -199,7 +199,7 @@ export const Button = styled.button`
 
   &:hover:not(:disabled) {
     transform: translateY(-1px) scale(1.01);
-    box-shadow: 0 14px 36px rgba(74, 52, 33, 0.28);
+    box-shadow: 0 14px 36px var(--auth-btn-shadow-warm-hover);
   }
 
   &:active:not(:disabled) {
@@ -207,7 +207,7 @@ export const Button = styled.button`
   }
 
   &:focus {
-    outline: 2px solid rgba(74, 52, 33, 0.28);
+    outline: 2px solid var(--auth-btn-focus-outline);
     outline-offset: 3px;
   }
 

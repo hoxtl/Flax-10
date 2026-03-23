@@ -1,6 +1,7 @@
 /*
  * Shared sleep-window helpers.
  */
+
 export function isDuringSleepWindow(sleepTime, wakeTime, date = new Date()) {
   const [sleepHours, sleepMinutes] = sleepTime.split(":").map(Number);
   const [wakeHours, wakeMinutes] = wakeTime.split(":").map(Number);

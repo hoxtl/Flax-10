@@ -1,6 +1,7 @@
 /*
  * Module card displaying module info, enrolment status, and actions.
  */
+
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';

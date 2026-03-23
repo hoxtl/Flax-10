@@ -1,6 +1,7 @@
 /**
  * Profile feature modals.
  */
+
 import { useEffect, useState } from "react";
 import EditProfileModal from "../../components/Dashboard/EditProfileModal";
 import GenericSummaryModal from "../../components/common/GenericSummaryModal/GenericSummaryModal";
@@ -44,9 +45,11 @@ function ModulesModal({ isOpen, onClose, modules, onNavigate }) {
   return <GenericSummaryModal isOpen={isOpen} onClose={onClose} title="Modules" emptyMessage="No modules found" items={modules} renderItem={(code, index) => <SummaryItem key={index} avatar="📚" title={nameMap[code] ? `${code} – ${nameMap[code]}` : code} subtitle={null} onClick={() => { onClose?.(); onNavigate?.(`modules_${code}`); }} />} />;
 }
 
+const SOCIETY_AVATAR_STYLE = { width: 28, height: 28, borderRadius: "50%", objectFit: "cover" };
+
 function buildSocietyAvatar(society) {
   const imageUrl = society.cover_image || society.image;
-  return imageUrl ? <img src={imageUrl} alt={society.name} style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }} /> : "🏛️";
+  return imageUrl ? <img src={imageUrl} alt={society.name} style={SOCIETY_AVATAR_STYLE} /> : "🏛️";
 }
 
 export function SocietiesModal({ isOpen, onClose, societies, onNavigate }) {

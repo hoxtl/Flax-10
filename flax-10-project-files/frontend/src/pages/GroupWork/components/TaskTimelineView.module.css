@@ -348,3 +348,5 @@
     font-size: 9px;
     color: var(--muted);
 }
+
+.priorityBadgeColored { color: var(--pb-color); background-color: var(--pb-bg); }

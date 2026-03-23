@@ -1,6 +1,7 @@
 /*
  * Presentational layout for the password form.
  */
+
 import PasswordStrength from "../common/PasswordStrength";
 import styles from "../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "./SettingsContextCard";

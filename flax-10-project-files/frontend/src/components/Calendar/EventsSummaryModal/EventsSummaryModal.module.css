@@ -1,0 +1,29 @@
+/* EventsSummaryModal layout and range button styles. */
+
+.rangeBar {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: var(--hover);
+  border-radius: 12px;
+  justify-content: space-between;
+}
+
+.rangeBtn {
+  flex: 1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.rangeBtn.active {
+  background: var(--color-primary);
+  color: var(--c-white);
+  font-weight: 600;
+}

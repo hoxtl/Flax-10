@@ -6,6 +6,7 @@ import { Link, useInRouterContext } from "react-router-dom";
 import styles from "./EntityLinkChip.module.css";
 
 /** Chip that links to a route or triggers an onClick callback. */
+
 export default function EntityLinkChip({ to, onClick, children, className = "", title }) {
   const hasRouter = useInRouterContext();
   const cls = `${styles.chip} ${className}`.trim();

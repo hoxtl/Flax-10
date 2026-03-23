@@ -1,6 +1,7 @@
 /*
  * Modal for managing module deadlines.
  */
+
 import { useDeadlineModal } from '../hooks/useDeadlineModal';
 import DeadlineForm from './DeadlineForm';
 import DeadlineCard from './DeadlineCard';

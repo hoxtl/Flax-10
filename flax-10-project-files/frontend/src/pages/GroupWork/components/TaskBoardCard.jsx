@@ -39,9 +39,10 @@ function CardTitleArea({ editing, editTitle, setEditTitle, saveEdit, setEditing,
 }
 
 function CardHeader({ task, priorityStyle, onUpdate }) {
+    const psVars = { '--ps-bg': priorityStyle.backgroundColor, '--ps-text': priorityStyle.color };
     return (
         <div className={styles.cardHeader}>
-            <select value={(task.priority || "medium").toLowerCase()} onChange={(event) => onUpdate(task.id, { priority: event.target.value })} className={styles.prioritySelect} style={{ backgroundColor: priorityStyle.backgroundColor, color: priorityStyle.color }}>
+            <select value={(task.priority || "medium").toLowerCase()} onChange={(event) => onUpdate(task.id, { priority: event.target.value })} className={`${styles.prioritySelect} ${styles.prioritySelectColored}`} style={psVars}>
                 <option value="urgent">URGENT</option>
                 <option value="high">HIGH</option>
                 <option value="medium">MEDIUM</option>
@@ -57,7 +58,7 @@ function CardFooter({ task, assignees, onUpdate, triggerRef, togglePopup }) {
             <div className={styles.cardDate}>
                 <DateTimePicker value={getDueDateStr(task.due_date)} onChange={(value) => onUpdate(task.id, { due_date: value ? new Date(value).toISOString() : null })} dateOnly triggerClassName={styles.dateLabelInteractive} hideIcon placeholder="No due date" />
             </div>
-            <div ref={triggerRef} onClick={togglePopup} style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            <div ref={triggerRef} onClick={togglePopup} className={styles.assigneeFooterBtn}>
                 <TaskAvatarStack assignees={assignees} size={18} />
                 <span className={styles.addAssigneeBtn}>+</span>
             </div>

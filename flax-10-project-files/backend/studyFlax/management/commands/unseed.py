@@ -37,6 +37,7 @@ SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_
 
 def get_superuser_data():
     """Return serialised superuser records, excluding auth-only and audit fields."""
+
     return [
         {k: v for k, v in u.items() if k in SUPERUSER_RESTORE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()

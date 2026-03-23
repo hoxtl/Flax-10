@@ -1,6 +1,7 @@
 /*
  * Course display and request-status UI for the account form.
  */
+
 import styles from "../../../pages/Settings/Settings.module.css";
 import RequestStatusCard from "../../common/RequestStatusCard/RequestStatusCard";
 

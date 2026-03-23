@@ -9,8 +9,8 @@ export const getChartMargin = (isMobile) =>
   (isMobile ? { left: 28, right: 10, top: 20, bottom: 44 } : CHART_MARGIN);
 
 export const getBreakdownColors = (theme) => ({
-  barColor: theme === "sage" ? "#52796f" : "#4CAF50",
-  breakColor: theme === "sage" ? "rgba(82, 121, 111, 0.6)" : "#FF9800",
+  barColor: theme === "sage" ? "var(--chart-study-sage)" : "var(--chart-study)",
+  breakColor: theme === "sage" ? "var(--chart-study-sage-alpha)" : "var(--chart-break)",
 });
 
 export const getBreakdownAxis = (data, textColor) => [{

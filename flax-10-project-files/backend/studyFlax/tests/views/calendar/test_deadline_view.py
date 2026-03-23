@@ -10,6 +10,7 @@ from ..base import BaseTestCase
 
 class DeadlineViewTests(BaseTestCase):
     """ Tests for Deadline views"""
+
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'
@@ -101,6 +102,7 @@ class DeadlineViewTests(BaseTestCase):
     
     def deadline_payload(self):
         """Build a deadline payload for requests."""
+
         return dict(title='New Deadline', deadline_type='coursework',
             start_due_date=(timezone.now() + timedelta(days=5)).isoformat())
 

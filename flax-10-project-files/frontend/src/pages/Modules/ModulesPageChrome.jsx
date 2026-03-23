@@ -1,6 +1,7 @@
 /*
  * Skeleton, modal, and transition wrappers for the modules page.
  */
+
 import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination.jsx";
 import ModuleForm from "../../components/Modules/Modules/ModuleForm.jsx";

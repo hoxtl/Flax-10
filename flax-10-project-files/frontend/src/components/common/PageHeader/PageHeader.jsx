@@ -7,6 +7,7 @@ import BackButton from "../BackButton/BackButton.jsx";
 import styles from "./PageHeader.module.css";
 
 /** Animated page header used across all main pages. */
+
 export default function PageHeader({ title, subtitle, details, action, onBack, compact = false }) {
   return (
     <motion.div className={`${styles.header} ${compact ? styles.headerCompact : ""}`}

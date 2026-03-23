@@ -1,6 +1,7 @@
 /*
  * Preferences panel for appearance, sleep, and scheduling settings.
  */
+
 import { useEffect, useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";

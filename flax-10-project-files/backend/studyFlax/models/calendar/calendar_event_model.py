@@ -1,6 +1,7 @@
 """
 Model representing a user's calendar event with recurrence, tags, and priority.
 """
+
 from django.db import models
 
 from ..auth.user_model import User

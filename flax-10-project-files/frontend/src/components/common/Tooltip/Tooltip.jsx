@@ -18,9 +18,10 @@ function getFixedStyle(position, rect) {
 
 function TooltipPortal({ content, position, rect, className = "" }) {
   if (!rect || !content) return null;
+  const posStyle = getFixedStyle(position, rect);
   return createPortal(
-    <div className={`${styles.tooltip} ${styles[position]} ${className}`.trim()} role="tooltip"
-      style={{ position: 'fixed', ...getFixedStyle(position, rect) }}>
+    <div className={`${styles.tooltip} ${styles.tooltipFixed} ${styles[position]} ${className}`.trim()} role="tooltip"
+      style={posStyle}>
       {content}
     </div>,
     document.body
@@ -28,6 +29,7 @@ function TooltipPortal({ content, position, rect, className = "" }) {
 }
 
 /** Tooltip that appears on hover, rendered via a portal to avoid clipping. */
+
 export default function Tooltip({ content, children, position = 'top', wrapperClassName = "", className = "" }) {
   const [rect, setRect] = useState(null);
   const wrapperRef = useRef(null);

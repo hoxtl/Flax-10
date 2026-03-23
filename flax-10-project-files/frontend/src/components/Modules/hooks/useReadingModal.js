@@ -1,6 +1,7 @@
 /*
  * Hook for managing reading modal state and CRUD operations.
  */
+
 import { useState, useEffect, useCallback } from 'react';
 import { getReadings, createReading, updateReading, deleteReading } from '../../../api/readingApi';
 

@@ -28,6 +28,8 @@ export function FilterSection({ fRef, isOpen, setOpen, onOpen, onClose, props })
     );
 }
 
+const FILTER_DROPDOWN_STYLE = { originY: 0, originX: 1, position: 'relative', zIndex: 10000 };
+
 function FilterDropdownMotion(props) {
     return (
         <motion.div
@@ -35,7 +37,7 @@ function FilterDropdownMotion(props) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            style={{ originY: 0, originX: 1, position: 'relative', zIndex: 10000 }}
+            style={FILTER_DROPDOWN_STYLE}
         >
             <FilterDropdown {...props} />
         </motion.div>

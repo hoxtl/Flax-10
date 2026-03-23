@@ -2,6 +2,7 @@
  * useQuickActions - Quick action buttons for module/society events.
  * Provides Leave (module) and Unsync (society) actions for external events.
  */
+
 import { useTags } from '../../../context/TagContext';
 import { useNotify } from '../../Notifications/hooks/useNotify';
 import { useCalendarEvents } from './useCalendarEvents';
@@ -17,6 +18,7 @@ async function handleSocietyAction(event, refreshTags, loadEvents, notify) {
 }
 
 /** Hook returning quick action config for module/society events. */
+
 export function useQuickActions(event) {
     const { loadEvents } = useCalendarEvents();
     const { refreshTags } = useTags();

@@ -2,6 +2,7 @@
  * SettingsModal provides administrative controls for a society,
  * including ratification, collaborator management, and deletion.
  */
+
 import { useState, useEffect } from "react";
 import styles from "./SettingsModal.module.css";
 import AddCollaboratorModal from "../AddCollaboratorModal";
@@ -13,6 +14,7 @@ import { RatificationSection } from "./RatificationSection";
 import { useConfirm } from "../../../context/ConfirmContext";
 
 /** Common logic for collaborator management updates. */
+
 async function syncCollaborator(user, members, onUpdate, onAdd) {
   const existing = (members || []).find(m => m.username === user.username);
   if (existing) return onUpdate?.(existing.user, "editor");
@@ -20,6 +22,7 @@ async function syncCollaborator(user, members, onUpdate, onAdd) {
 }
 
 /** Hook to handle settings modal internal state. */
+
 function useSettings(props) {
   const { members, onFetchMembers, onUpdateRole, onAddCollaborator } = props;
   const [showAdd, setShowAdd] = useState(false);

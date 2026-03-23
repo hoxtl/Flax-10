@@ -1,6 +1,7 @@
 /**
  * Tests for TableRow - Editable table row for calendar table view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TableRow } from '../../../../components/Calendar/TableView/TableRow';

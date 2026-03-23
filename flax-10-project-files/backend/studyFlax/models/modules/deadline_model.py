@@ -1,6 +1,7 @@
 """
 Model for module assessment deadlines such as exams, coursework, and quizzes.
 """
+
 from django.db import models
 from .module_model import Module
 

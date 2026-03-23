@@ -1,6 +1,7 @@
 /**
  * Tests for useEventPopupListener - event popup via custom events.
  */
+
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useEventPopupListener } from '../../../../components/Calendar/hooks/useEventPopupListener';

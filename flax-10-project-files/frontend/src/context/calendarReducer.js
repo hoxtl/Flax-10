@@ -2,6 +2,7 @@
     This function is used to handle the calendar reducer.
     It includes the initial state, handlers, and update event function.
 */
+
 export const initialState = {
     events: [],
     selectedDate: new Date(),
@@ -30,6 +31,7 @@ export const initialState = {
 /*
     This function is used to handle the handlers.
 */
+
 const handlers = {
     SET_EVENTS: (state, payload) => ({ ...state, events: payload, isLoading: false }),
     ADD_EVENT: (state, payload) => ({ ...state, events: [...state.events, payload] }),
@@ -72,6 +74,7 @@ function normalizeFilterValues(value) {
  * Toggles the filter state based on the selected payload.
  * Handles switching between 'all' and specific tags, and multi-select logic.
  */
+
 function toggleFilter(filter, payload) {
     if (Array.isArray(payload)) {
         return normalizeFilterValues(payload);

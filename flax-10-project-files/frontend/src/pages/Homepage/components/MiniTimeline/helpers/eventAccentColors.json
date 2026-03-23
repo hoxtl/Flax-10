@@ -1,0 +1,11 @@
+{
+  "lecture": "var(--event-accent-lecture)",
+  "study": "var(--event-accent-study)",
+  "routine": "var(--event-accent-routine)",
+  "wellness": "var(--event-accent-wellness)",
+  "social": "var(--event-accent-social)",
+  "society": "var(--event-accent-society)",
+  "meeting": "var(--event-accent-meeting)",
+  "admin": "var(--event-accent-admin)",
+  "default": "var(--event-accent-default)"
+}

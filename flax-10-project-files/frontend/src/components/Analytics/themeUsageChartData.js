@@ -2,8 +2,8 @@
  * Theme usage chart helpers.
  */
 
-export const LIGHT_COLOR = "#FFD54F";
-export const DARK_COLOR = "#5C6BC0";
+export const LIGHT_COLOR = "var(--chart-accent-amber)";
+export const DARK_COLOR = "var(--chart-accent-indigo)";
 
 export const formatPercentage = (value) => {
   const num = Number(value);

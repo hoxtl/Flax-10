@@ -1,6 +1,7 @@
 """
 Model for user-submitted reports against a society.
 """
+
 from django.db import models
 from .society_model import Society
 from django.conf import settings

@@ -1,13 +1,15 @@
 /**
  * Map helpers for the campus map feature.
  */
+
 import mapboxgl from "mapbox-gl";
 import { KCL_CAMPUSES } from "../../lib/kclCampuses";
 import { reverseGeocode } from "../../api/geocodeApi";
+import mapColors from "./mapLayerColors.json";
 
 const BUILDING_LAYER_PAINT = {
   "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"], 14, 0, 14.5, ["get", "min_height"]],
-  "fill-extrusion-color": ["interpolate", ["linear"], ["get", "height"], 0, "#e8e0d8", 30, "#d4c8bc", 80, "#c0b4a8"],
+  "fill-extrusion-color": ["interpolate", ["linear"], ["get", "height"], 0, mapColors.buildingColors[0], 30, mapColors.buildingColors[1], 80, mapColors.buildingColors[2]],
   "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 14, 0, 14.5, ["get", "height"]],
   "fill-extrusion-opacity": 0.75,
 };
@@ -32,8 +34,8 @@ function add3dBuildingsLayer(map) {
 
 function addRouteLayers(map) {
   map.addSource("route", { data: { features: [], type: "FeatureCollection" }, type: "geojson" });
-  map.addLayer({ id: "route-line", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#FF0000", "line-dasharray": [2, 2], "line-opacity": 0.9, "line-width": 5 }, source: "route", type: "line" });
-  map.addLayer({ id: "route-line-border", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-opacity": 0.3, "line-width": 9 }, source: "route", type: "line" }, "route-line");
+  map.addLayer({ id: "route-line", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": mapColors.routeLineColor, "line-dasharray": [2, 2], "line-opacity": 0.9, "line-width": 5 }, source: "route", type: "line" });
+  map.addLayer({ id: "route-line-border", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": mapColors.routeBorderColor, "line-opacity": 0.3, "line-width": 9 }, source: "route", type: "line" }, "route-line");
 }
 
 function addCampusMarkers(map, markerRef, onCampusMarkerSelect) {

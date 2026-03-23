@@ -15,12 +15,14 @@ from .session_analytics_service import compute_active_days, compute_streaks
 
 def _get_sessions(user, start_date, end_date):
     """Fetch study sessions for the given user and date range."""
+
     return StudySession.objects.filter(
         user=user, end_time__gte=start_date, end_time__lte=end_date,
     )
 
 def _aggregate_totals(sessions):
     """Return dict of aggregated session totals using DB aggregation."""
+
     from django.db.models import Sum, Avg, Max
     agg = sessions.aggregate(
         total_study=Sum('duration'), total_break=Sum('break_duration'),
@@ -30,6 +32,7 @@ def _aggregate_totals(sessions):
 
 def _build_daily_breakdown(sessions):
     """Build sorted daily work/break/session-count breakdown. work and break are in minutes."""
+
     daily = defaultdict(lambda: {'date': '', 'work': 0, 'break': 0, 'sessions': 0})
     for s in sessions:
         key = s.end_time.date().isoformat()
@@ -41,6 +44,7 @@ def _build_daily_breakdown(sessions):
 
 def _build_heatmap(sessions):
     """Build a 7x24 heatmap of study minutes by weekday and hour."""
+
     data = [[0] * 24 for _ in range(7)]
     for s in sessions:
         data[s.end_time.weekday()][s.end_time.hour] += s.duration // 60
@@ -48,6 +52,7 @@ def _build_heatmap(sessions):
 
 def _build_analytics_response(sessions, days):
     """Assemble the full analytics response dict from a sessions queryset."""
+
     totals = _aggregate_totals(sessions)
     current_streak, longest_streak = compute_streaks(list(sessions))
     return {
@@ -65,6 +70,7 @@ def _build_analytics_response(sessions, days):
 @permission_classes([IsAuthenticated])
 def get_analytics_summary(request):
     """Return a full analytics summary: totals, daily breakdown, and heatmap."""
+
     days = int(request.GET.get('days', 30))
     end_date = timezone.now()
     sessions = _get_sessions(request.user, end_date - timedelta(days=days), end_date)
@@ -72,6 +78,7 @@ def get_analytics_summary(request):
 
 def _build_summary_dict(sessions, totals, current_streak, longest_streak):
     """Assemble the summary dict from precomputed values."""
+
     return {
         'total_sessions': sessions.count(),
         'total_study_hours': round(totals['total_study'] / 3600, 1),
@@ -88,10 +95,12 @@ def _build_summary_dict(sessions, totals, current_streak, longest_streak):
 
 def _safe_ratio(numerator, denominator):
     """Return rounded ratio or None if denominator is zero."""
+
     return round(numerator / denominator, 2) if denominator > 0 else None
 
 def _build_actual_by_day(sessions):
     """Aggregate actual study minutes per day from sessions."""
+
     by_day = defaultdict(int)
     for s in sessions:
         by_day[s.end_time.date().isoformat()] += s.duration // 60
@@ -99,6 +108,7 @@ def _build_actual_by_day(sessions):
 
 def _build_planned_by_day(events):
     """Aggregate planned minutes per day from calendar events."""
+
     by_day = defaultdict(int)
     for e in events:
         key = e.start_time.date().isoformat()
@@ -107,6 +117,7 @@ def _build_planned_by_day(events):
 
 def _merge_daily_progress(actual, planned):
     """Merge actual and planned dicts into a sorted progress list."""
+
     all_dates = sorted(set(list(actual.keys()) + list(planned.keys())))
     return [
         {'date': d, 'planned_hours': round(planned.get(d, 0) / 60, 2),
@@ -116,6 +127,7 @@ def _merge_daily_progress(actual, planned):
 
 def _build_progress_response(sessions, events, days):
     """Build the progress response dict from sessions and calendar events."""
+
     actual = _build_actual_by_day(sessions)
     planned = _build_planned_by_day(events)
     total_planned = sum(planned.values())
@@ -134,6 +146,7 @@ def _build_progress_response(sessions, events, days):
 @permission_classes([IsAuthenticated])
 def get_progress_data(request):
     """Return daily planned vs actual study hours and adherence percentage."""
+
     days = int(request.GET.get('days', 30))
     end_date = timezone.now()
     start_date = end_date - timedelta(days=days)

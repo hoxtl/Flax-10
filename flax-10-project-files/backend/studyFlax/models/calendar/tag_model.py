@@ -1,6 +1,7 @@
 """
 Model for event tags with colour, icon, and default duration.
 """
+
 from django.db import models
 
 from ..auth.user_model import User

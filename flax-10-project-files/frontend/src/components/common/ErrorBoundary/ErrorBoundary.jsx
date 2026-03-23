@@ -6,6 +6,7 @@ import React from "react";
 import styles from "./ErrorBoundary.module.css";
 
 /** Catches errors thrown during rendering and displays a retry prompt. */
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

@@ -24,6 +24,7 @@ EMAIL_SEND_ERRORS = (
 
 def _send_reset_email(user_email):
     """Invalidate existing tokens and dispatch a new password reset email."""
+
     user = User.objects.get(email__iexact=user_email)
     ResetPasswordToken.objects.filter(user=user, token_used=False).update(token_used=True)
     new_token = ResetPasswordToken.create_user_token(user)
@@ -48,6 +49,7 @@ def _email_error_response(exc):
 @api_view(['POST'])
 def reset_password_view(request):
     """Send a password reset email if an account with the given address exists."""
+
     serialiser, error_response = _validated_reset_serialiser(request)
     if error_response:
         return error_response

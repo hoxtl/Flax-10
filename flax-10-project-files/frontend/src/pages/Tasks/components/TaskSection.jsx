@@ -19,7 +19,7 @@ function ProgressRing({ progressPct, isOverdue }) {
   const circumference = 2 * Math.PI * 9;
   return (
     <svg className={styles.sectionRing} width="22" height="22" viewBox="0 0 22 22" aria-hidden>
-      <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(123,103,81,0.1)" strokeWidth="2.5" />
+      <circle cx="11" cy="11" r="9" fill="none" className={styles.sectionRingBg} strokeWidth="2.5" />
       <circle cx="11" cy="11" r="9" fill="none"
         className={`${styles.sectionRingFill} ${isOverdue ? styles.sectionRingDanger : ""}`}
         strokeWidth="2.5" strokeLinecap="round"
