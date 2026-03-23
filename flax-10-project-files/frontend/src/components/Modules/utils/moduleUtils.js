@@ -3,6 +3,7 @@
  */
 
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
+import { formatForDateTimeInput } from '../../../utils/dateTimeInput';
 
 const MODULE_PREFIX_TO_DEPARTMENT = {
     CS: "Natural, Mathematical & Engineering Sciences",
@@ -175,11 +176,7 @@ function createDurationString(duration) {
 }
 
 export function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16);
-    const date = typeof d === 'string' ? new Date(d) : d;
-    const offset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - offset);
-    return localDate.toISOString().slice(0, 16);
+    return formatForDateTimeInput(d);
 }
 
 export function filterModules(modules, enrollments, search_query, filter_mode, options = {}) {

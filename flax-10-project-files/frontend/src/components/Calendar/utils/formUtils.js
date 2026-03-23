@@ -7,6 +7,7 @@ import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
 import { geocodeAddress } from '../../../api/geocodeApi';
+import { formatForDateTimeInput } from '../../../utils/dateTimeInput';
 
 /** Creates initial form state from an existing event or defaults. */
 
@@ -180,9 +181,5 @@ function buildBaseEventData(form) {
 }
 
 function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16);
-    const date = typeof d === 'string' ? new Date(d) : d;
-    const offset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - offset);
-    return localDate.toISOString().slice(0, 16);
+    return formatForDateTimeInput(d);
 }
