@@ -348,10 +348,22 @@
 
 .timelineHeaderRight {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.timelineHeaderButton {
+  min-height: 31px;
+  padding: 0.28rem 0.72rem !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.01em;
+  text-transform: none !important;
+  white-space: nowrap;
 }
 
 .timelineHeaderCta {

@@ -1,42 +1,73 @@
 .banner {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  background: rgba(124, 58, 237, 0.08);
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  animation: slideDown 0.3s ease;
+  gap: 0.9rem;
+  padding: 1.08rem 1.45rem;
+  background:
+    radial-gradient(circle at 12% 50%, rgba(255, 230, 173, 0.26), transparent 18%),
+    linear-gradient(135deg, rgba(245, 239, 255, 0.92), rgba(240, 232, 249, 0.9));
+  border: 1px solid rgba(145, 116, 189, 0.28);
+  border-radius: 14px;
+  margin: 1rem 0 1.3rem;
+  box-shadow:
+    0 10px 24px rgba(111, 81, 150, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+.banner > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glow {
+  position: absolute;
+  top: -32%;
+  left: -8%;
+  width: 34%;
+  height: 160%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 241, 176, 0.44) 0%, rgba(255, 241, 176, 0) 72%);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .icon {
-  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: rgba(255, 248, 214, 0.78);
+  box-shadow:
+    0 0 0 1px rgba(232, 198, 118, 0.28),
+    0 6px 14px rgba(232, 198, 118, 0.16);
+  font-size: 1rem;
   flex-shrink: 0;
 }
 
 .message {
   flex: 1;
-  font-size: 0.88rem;
-  color: var(--text-secondary, #94a3b8);
+  font-size: 0.94rem;
+  color: color-mix(in srgb, var(--text-secondary, #64748b) 92%, #5d4f73 8%);
+  line-height: 1.45;
 }
 
 .dismiss {
   background: none;
   border: none;
-  color: var(--text-muted, #64748b);
+  color: color-mix(in srgb, var(--text-muted, #64748b) 82%, #6d5a87 18%);
   cursor: pointer;
   font-size: 0.85rem;
-  padding: 0;
+  padding: 0.15rem 0.25rem;
   flex-shrink: 0;
-  transition: color 0.15s;
+  transition: color 0.15s, transform 0.15s;
 }
 
 .dismiss:hover {
-  color: var(--text-secondary, #94a3b8);
+  color: color-mix(in srgb, var(--text-secondary, #475569) 88%, #4f3f67 12%);
+  transform: scale(1.05);
 }

@@ -3,7 +3,7 @@
  */
 
 import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
-import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
+import { doesEventOverlapSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 import { isLecture } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { getConflictTimeLabel } from "./helpers/conflictRowUtils";
@@ -26,7 +26,17 @@ function getMovableRows(items, rows, rowEndMins) {
 }
 
 function enrichItemRows(items, getTag, sleepWindow) {
-  return items.map((itemRow) => ({ ...itemRow, isReadOnly: isReadOnlyEvent(itemRow.item), accent: getEventAccentColor(itemRow.item.title, getTag?.(itemRow.item.tag)?.name ?? itemRow.item.tag_name ?? ""), isSleepTime: Boolean(itemRow.item.start_time && isDuringSleepWindow(sleepWindow?.sleepTime || "23:00", sleepWindow?.wakeTime || "07:00", new Date(itemRow.item.start_time))) }));
+  return items.map((itemRow) => ({
+    ...itemRow,
+    isReadOnly: isReadOnlyEvent(itemRow.item),
+    accent: getEventAccentColor(itemRow.item.title, getTag?.(itemRow.item.tag)?.name ?? itemRow.item.tag_name ?? ""),
+    isSleepTime: doesEventOverlapSleepWindow(
+      sleepWindow?.sleepTime || "23:00",
+      sleepWindow?.wakeTime || "07:00",
+      itemRow.item.start_time,
+      itemRow.item.end_time,
+    ),
+  }));
 }
 
 function handleActivate(event, itemRow, onCardClick, onEdit) {

@@ -8,7 +8,7 @@
   font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: #c0714e;
+  color: var(--home-timeline-danger);
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -26,9 +26,9 @@
   gap: 4px;
   padding: 4px 10px;
   border-radius: 8px;
-  border: 1px solid rgba(107, 83, 68, 0.35);
+  border: 1px solid var(--home-timeline-ghost-border);
   background: transparent;
-  color: #5d4037;
+  color: var(--home-timeline-accent);
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.7rem;
   font-weight: 600;
@@ -39,8 +39,8 @@
   white-space: nowrap;
 }
 .planTimelineConflictPairBtn:hover:not(:disabled) {
-  background: rgba(107, 83, 68, 0.08);
-  border-color: rgba(107, 83, 68, 0.5);
+  background: var(--home-timeline-ghost-hover);
+  border-color: var(--home-timeline-accent-border);
 }
 .planTimelineConflictPairBtn:disabled {
   opacity: 0.5;
@@ -48,12 +48,12 @@
 }
 
 .planTimelineConflictPairBtnPrimary {
-  border-color: rgba(192, 113, 78, 0.5);
-  color: #8b4e35;
+  border-color: var(--home-timeline-danger-border);
+  color: var(--home-timeline-danger-strong);
 }
 .planTimelineConflictPairBtnPrimary:hover:not(:disabled) {
-  background: rgba(192, 113, 78, 0.08);
-  border-color: rgba(192, 113, 78, 0.6);
+  background: var(--home-timeline-danger-soft);
+  border-color: var(--home-timeline-danger-border);
 }
 
 .planTimelineConflictPairLabel {
@@ -68,7 +68,7 @@
   border: none;
   border-radius: 0;
   background: none;
-  color: #57534e;
+  color: var(--home-timeline-muted);
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 500;
@@ -80,7 +80,7 @@
   max-width: 120px;
 }
 .planTimelineConflictPairLabelBtn:hover {
-  color: #2d2d2d;
+  color: var(--home-timeline-ink);
   text-decoration: underline;
 }
 
@@ -94,7 +94,7 @@
   bottom: 8px;
   width: 3px;
   border-radius: 2px;
-  background: var(--card-accent, #a08b72);
+  background: var(--card-accent, var(--home-timeline-accent));
   opacity: 0.85;
   pointer-events: none;
 }
@@ -105,9 +105,9 @@
   height: 10px;
   min-width: 10px;
   min-height: 10px;
-  background: var(--node-color, #a08b72);
+  background: var(--node-color, var(--home-timeline-accent));
   font-size: 0;
-  box-shadow: 0 0 0 2px #fff;
+  box-shadow: 0 0 0 2px var(--home-timeline-node-ring);
   border: none;
 }
 
@@ -117,9 +117,9 @@
   height: 10px;
   min-width: 10px;
   min-height: 10px;
-  background: #84a98c;
+  background: var(--home-timeline-success);
   font-size: 0;
-  box-shadow: 0 0 0 2px #fff;
+  box-shadow: 0 0 0 2px var(--home-timeline-node-ring);
   border: none;
 }
 
@@ -130,9 +130,20 @@
   gap: 8px;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1.5px solid rgba(132, 169, 140, 0.35);
-  background: rgba(132, 169, 140, 0.06);
+  border: 1.5px solid var(--home-timeline-success-surface-border);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 96%, white 4%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 90%, white 10%)
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 42%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 16%, transparent),
+    0 12px 24px var(--home-timeline-success-surface-shadow);
   position: relative;
+  flex: 1;
+  width: 100%;
 }
 
 .planTimelineGapBestWindowHeader {
@@ -146,7 +157,7 @@
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #3d6645;
+  color: var(--home-timeline-success-strong);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -158,7 +169,7 @@
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 500;
-  color: #84a98c;
+  color: var(--home-timeline-success);
   opacity: 0.85;
   flex-shrink: 0;
   white-space: nowrap;
@@ -172,35 +183,66 @@
   justify-content: center;
   padding: 6px 0;
   border-radius: 8px;
-  border: 1px solid rgba(132, 169, 140, 0.35);
-  background: rgba(132, 169, 140, 0.1);
+  border: 1px solid var(--home-timeline-success-surface-border);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 94%, white 6%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 88%, white 12%)
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    0 10px 18px var(--home-timeline-success-surface-shadow);
   flex-wrap: nowrap;
   min-height: 24px;
   height: 100%;
   box-sizing: border-box;
   width: 100%;
+  flex: 1;
 }
 
 .planTimelineGapShortWindowFeatured {
-  background: rgba(132, 169, 140, 0.14);
-  border-color: rgba(132, 169, 140, 0.45);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 100%, white 0%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 84%, white 16%)
+    ) !important;
+  border-color: var(--home-timeline-success-surface-border);
   border-radius: 8px;
   padding: 6px 10px;
 }
 
 .planTimelineGapShortWindowBest {
-  background: rgba(132, 169, 140, 0.16);
-  border-color: rgba(132, 169, 140, 0.52);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 100%, white 0%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 82%, white 18%)
+    ) !important;
+  border-color: color-mix(in srgb, var(--home-timeline-success-surface-border) 92%, white 8%);
 }
 
 .planTimelineGapShortWindowNoActions {
   text-align: center;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 98%, white 2%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 84%, white 16%)
+    ) !important;
+  border-color: var(--home-timeline-success-surface-border);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    0 10px 18px var(--home-timeline-success-surface-shadow);
 }
 
 .planTimelineGapRail {
   flex: 1;
   min-width: 14px;
-  border-top: 1px dashed rgba(74, 52, 33, 0.08);
+  border-top: 1px dashed var(--home-timeline-divider);
   height: 0;
 }
 
@@ -222,4 +264,3 @@
   flex-shrink: 0;
   padding-left: 8px;
 }
-

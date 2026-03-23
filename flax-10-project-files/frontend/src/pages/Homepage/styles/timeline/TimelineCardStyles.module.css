@@ -94,12 +94,12 @@
   .cardPast::before { opacity: 0.45; }
 
   .cardOverdue {
-    border: 1px solid rgba(196, 119, 80, 0.5);
-    box-shadow: 0 0 0 1px rgba(196, 119, 80, 0.25);
-    background: rgba(255, 247, 237, 0.6);
+    border: 1px solid var(--home-timeline-danger-border);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--home-timeline-danger) 25%, transparent);
+    background: var(--home-timeline-danger-soft);
   }
   .cardOverdue::before {
-    background: #c47750;
+    background: var(--home-timeline-danger);
     opacity: 0.9;
   }
   .overdueBadge {
@@ -108,8 +108,8 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: #b55239;
-    background: rgba(196, 119, 80, 0.15);
+    color: var(--home-timeline-danger-strong);
+    background: var(--home-timeline-danger-soft);
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     margin-right: 0.35rem;
@@ -122,16 +122,16 @@
     padding: 0.2rem 0.4rem;
     font-size: 0.6875rem;
     font-weight: 600;
-    color: #b55239;
-    background: rgba(196, 119, 80, 0.1);
-    border: 1px solid rgba(196, 119, 80, 0.25);
+    color: var(--home-timeline-danger-strong);
+    background: var(--home-timeline-danger-soft);
+    border: 1px solid var(--home-timeline-danger-border);
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
   .cardRescheduleBtn:hover {
-    background: rgba(196, 119, 80, 0.18);
-    border-color: rgba(196, 119, 80, 0.4);
+    background: color-mix(in srgb, var(--home-timeline-danger-soft) 120%, transparent);
+    border-color: var(--home-timeline-danger-border);
   }
 
   .cardWithNowLine { position: relative; }
@@ -207,7 +207,7 @@
   .cardTitle {
     font-size: 15px;
     font-weight: 600;
-    color: var(--restoration-charcoal, #2d352d);
+    color: var(--home-timeline-ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -217,7 +217,7 @@
   .cardActive .cardTitle {
     font-size: 1.05rem;
     font-weight: 800;
-    color: #B55239;
+    color: var(--home-timeline-danger-strong);
   }
 
   .cardSub {
