@@ -16,7 +16,7 @@ def build_profile_photo_url(photo, request):
         url = photo.url
     except (ValueError, AttributeError):
         return None
-    return request.build_absolute_uri(url) if request else url
+    return request.build_absolute_uri(url) if request else None
 
 def ensure_teacher_user(request, error_message: str) -> None:
     """Ensure the request user is a teacher, otherwise raise a ValidationError."""
