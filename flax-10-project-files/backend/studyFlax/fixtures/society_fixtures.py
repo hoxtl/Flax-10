@@ -2,6 +2,7 @@
 Fixture data and helper functions for seeding societies, events, and categories.
 """
 
+import os
 import random
 from datetime import datetime, timedelta
 from django.utils import timezone
