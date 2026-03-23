@@ -46,10 +46,23 @@ def notify_members_on_announcement(sender, instance, created, **kwargs):
 def handle_announcement_delete(sender, instance, **kwargs):
     """Notify members and clean up linked events when an announcement is deleted."""
 
+    _delete_announcement_with_notification(instance)
+
+
+def _delete_announcement_events(instance):
     has_event = instance.events.exists()
     instance.events.all().delete()
+    return has_event
+
+
+def _delete_announcement_with_notification(instance):
+    has_event = _delete_announcement_events(instance)
     if should_skip_notification(instance):
         return
+    _send_removed_announcement_notice(instance, has_event)
+
+
+def _send_removed_announcement_notice(instance, has_event):
     notify_society_members(instance.society, build_delete_notification(instance, has_event))
 
 @receiver(pre_delete, sender=SocietyEvent)
