@@ -28,13 +28,13 @@ class CalendarShareUserSerialiser(serializers.ModelSerializer):
             "profile_photo_url",
         )
 
-    def get_profile_photo_url(self, obj):
+    def _get_profile_photo_url(self, obj):
         return build_profile_photo_url(obj.profile_photo, self.context.get("request"))
 
-    def get_is_sharing(self, obj):
+    def _get_is_sharing(self, obj):
         return is_user_sharing_with(obj, self.context.get("request"))
 
-    def get_is_shared_with_me(self, obj):
+    def _get_is_shared_with_me(self, obj):
         return is_shared_with_requester(obj, self.context.get("request"))
 
 class CalendarShareSerialiser(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
         fields = ("id", "owner", "shared_with", "created_at")
         read_only_fields = ("owner",)
 
-    def validate(self, data):
+    def _validate(self, data):
         """Ensure a user cannot share with themselves."""
 
         request = self.context.get("request")
@@ -53,9 +53,16 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
             raise serializers.ValidationError("You cannot share your calendar with yourself.")
         return data
 
-    def create(self, validated_data):
+    def _create(self, validated_data):
         """Automatically set the owner to the current user."""
 
         request = self.context.get("request")
         validated_data["owner"] = request.user
         return super().create(validated_data)
+
+
+CalendarShareUserSerialiser.get_profile_photo_url = CalendarShareUserSerialiser._get_profile_photo_url
+CalendarShareUserSerialiser.get_is_sharing = CalendarShareUserSerialiser._get_is_sharing
+CalendarShareUserSerialiser.get_is_shared_with_me = CalendarShareUserSerialiser._get_is_shared_with_me
+CalendarShareSerialiser.validate = CalendarShareSerialiser._validate
+CalendarShareSerialiser.create = CalendarShareSerialiser._create
