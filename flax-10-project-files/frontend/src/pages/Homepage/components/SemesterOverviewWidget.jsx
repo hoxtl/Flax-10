@@ -2,12 +2,11 @@
  * Semester overview widget for term pacing and deadline density.
  */
 
-import { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
-import { getEvents } from "../../../api/eventApi";
-import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "../styles/SemesterOverview.module.css";
+import { useSemesterData, useSemesterRange } from "./useSemesterOverviewData";
 
 // Helpers
 
@@ -110,51 +109,6 @@ function countDeadlines(deadlines, weekStart, weekEnd) {
 function isWeekDate(value, weekStart, weekEnd) {
   const time = new Date(value);
   return !Number.isNaN(time) && time >= weekStart && time < weekEnd;
-}
-
-function useSemesterRange(semesterStart, numWeeks) {
-  const nowRef = useRef(new Date());
-  const now = nowRef.current;
-  const semStart = useMemo(() => getSemesterStart(semesterStart, numWeeks, now), [semesterStart, numWeeks]);
-  const semEnd = useMemo(() => addWeeks(semStart, numWeeks), [semStart, numWeeks]);
-  return { now, semStart, semEnd };
-}
-
-function getSemesterStart(semesterStart, numWeeks, now) {
-  if (semesterStart) return getMonday(new Date(semesterStart));
-  const approx = new Date(now);
-  approx.setDate(approx.getDate() - Math.floor(numWeeks / 2) * 7);
-  return getMonday(approx);
-}
-
-function useSemesterData(semStart, semEnd) {
-  const [events, setEvents] = useState([]);
-  const [deadlines, setDeadlines] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const fetchData = useCallback(async () => loadSemesterData(semStart, semEnd, setEvents, setDeadlines, setLoading), [semEnd, semStart]);
-  useEffect(() => { fetchData(); }, [fetchData]);
-  return { deadlines, events, loading };
-}
-
-async function loadSemesterData(semStart, semEnd, setEvents, setDeadlines, setLoading) {
-  setLoading(true);
-  try {
-    const [events, deadlines] = await fetchSemesterData(semStart, semEnd);
-    setEvents(events);
-    setDeadlines(deadlines);
-  } catch {
-    setEvents([]);
-    setDeadlines([]);
-  } finally {
-    setLoading(false);
-  }
-}
-
-async function fetchSemesterData(semStart, semEnd) {
-  const start = semStart.toISOString().slice(0, 10);
-  const end = semEnd.toISOString().slice(0, 10);
-  const [events, deadlines] = await Promise.all([getEvents({ start, end }), getUpcomingDeadlines().catch(() => [])]);
-  return [Array.isArray(events) ? events : [], Array.isArray(deadlines) ? deadlines : []];
 }
 
 function useSemesterWeeks({ deadlines, events, now, numWeeks, readingWeekIndices, semStart }) {
