@@ -45,16 +45,16 @@ class ComputeRecentActiveDaysTest(TestCase):
 
     def test_multiple_sessions_same_day_count_as_one(self):
         from studyFlax.views.analytics.session_analytics_service import compute_recent_active_days
-        now = timezone.now()
-        sessions = [_mock_session(now - timedelta(hours=1), 60), _mock_session(now - timedelta(hours=2), 30)]
+        noon = timezone.now().replace(hour=12, minute=0, second=0, microsecond=0)
+        sessions = [_mock_session(noon - timedelta(hours=1), 60), _mock_session(noon - timedelta(hours=2), 30)]
         self.assertEqual(compute_recent_active_days(sessions, days=7), 1)
 
 
 class ComputeActiveDaysTest(TestCase):
     def test_multiple_sessions_same_day_count_once(self):
         from studyFlax.views.analytics.session_analytics_service import compute_active_days
-        now = timezone.now()
-        sessions = [_mock_session(now, 60), _mock_session(now - timedelta(hours=1), 30)]
+        noon = timezone.now().replace(hour=12, minute=0, second=0, microsecond=0)
+        sessions = [_mock_session(noon, 60), _mock_session(noon - timedelta(hours=1), 30)]
         self.assertEqual(compute_active_days(sessions), 1)
 
     def test_sessions_on_different_days(self):

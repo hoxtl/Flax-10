@@ -138,6 +138,14 @@ class ReadingViewsTests(BaseTestCase):
         )
         self.assertEqual(create_description(reading), 'Reading, Unit, pages. 5-9')
 
+    def test_get_reading_list_without_module_calls_generic_search(self):
+        from studyFlax.models.tasks.task_model import TaskList
+        from studyFlax.views.modules.reading_task_lists import get_reading_list
+        TaskList.objects.create(user=self.teacher, name='My reading notes', archived=False)
+        result = get_reading_list(self.teacher, module=None)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.name, 'My reading notes')
+
     def test_task_payload_format(self):
         reading = Reading.objects.create(
             module=self.module,

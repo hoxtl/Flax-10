@@ -217,3 +217,25 @@ class SocialAndCategoryCoverageTest(TestCase):
         category = Category.objects.create(name='Coverage Category', color='#abcdef', is_default=True)
         self.assertIn('shares with', str(share))
         self.assertEqual(str(category), 'Coverage Category')
+
+
+class CommonSerialiserHelpersTest(TestCase):
+
+    def test_build_profile_photo_url_returns_photo_str_for_http_url(self):
+        from studyFlax.serialisers.common import build_profile_photo_url
+        result = build_profile_photo_url('https://example.com/photo.jpg', None)
+        self.assertEqual(result, 'https://example.com/photo.jpg')
+
+    def test_build_profile_photo_url_returns_none_on_value_error(self):
+        from studyFlax.serialisers.common import build_profile_photo_url
+        from unittest.mock import MagicMock, PropertyMock
+        photo = MagicMock()
+        type(photo).url = PropertyMock(side_effect=ValueError('no file'))
+        photo.__str__ = lambda self: 'some/path.jpg'
+        result = build_profile_photo_url(photo, None)
+        self.assertIsNone(result)
+
+    def test_format_teacher_display_name_returns_clean_when_has_dr_prefix(self):
+        from studyFlax.serialisers.common import format_teacher_display_name
+        result = format_teacher_display_name('Dr. Smith')
+        self.assertEqual(result, 'Dr. Smith')

@@ -177,3 +177,33 @@ class ReportedSocietyAdminTest(TestCase):
         SocietyReport.objects.create(society=society, reporter=r1, reason='a')
         SocietyReport.objects.create(society=society, reporter=r2, reason='b')
         self.assertEqual(self.admin_obj.report_count(society), 2)
+
+
+class ScheduleModelStringTests(TestCase):
+
+    def setUp(self):
+        from studyFlax.models.calendar.schedule_model import Schedule, ScheduleEventAllocation
+        from studyFlax.models.calendar.calendar_event_model import CalendarEvent
+        self.user = User.objects.create_user(
+            username='sched_str', email='sched_str@test.com', password='pass'
+        )
+        self.schedule = Schedule.objects.create(
+            title='My Plan', user=self.user,
+        )
+        self.event = CalendarEvent.objects.create(
+            user=self.user, title='Study block',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        self.allocation = ScheduleEventAllocation.objects.create(
+            schedule=self.schedule, event=self.event,
+        )
+
+    def test_schedule_str(self):
+        self.assertIn('My Plan', str(self.schedule))
+        self.assertIn(self.user.email, str(self.schedule))
+
+    def test_schedule_event_allocation_str(self):
+        result = str(self.allocation)
+        self.assertIn(str(self.schedule.id), result)
+        self.assertIn(str(self.event.id), result)

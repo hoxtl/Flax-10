@@ -164,7 +164,7 @@ def _add_member_to_project(project, request):
         membership = GroupMembership.objects.get(project=project, user=user)
         return Response(
             GroupMembershipSerialiser(membership, context=_serialiser_context(request)).data,
-            status=status.HTTP_200_OK,
+            status=status.HTTP_201_CREATED,
         )
     membership, _ = GroupMembership.objects.get_or_create(
         project=project, user=user,

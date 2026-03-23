@@ -246,3 +246,9 @@ class InternalHelperCoverageTest(TestCase):
             None, timedelta(hours=1), now, now + timedelta(days=1), rule,
         )
         self.assertFalse(result)
+
+    def test_parse_date_param_makes_naive_datetime_aware(self):
+        from studyFlax.views.calendar.event_helpers import parse_date_param
+        result = parse_date_param('2026-03-24T10:00:00')
+        self.assertIsNotNone(result)
+        self.assertTrue(timezone.is_aware(result))

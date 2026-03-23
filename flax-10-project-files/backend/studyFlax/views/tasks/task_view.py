@@ -107,7 +107,7 @@ def task_list_detail(request, list_id):
         return Response(status=status.HTTP_204_NO_CONTENT)
     data = request.data
     if data.get("archived") is False and getattr(task_list, "archived", False):
-        pass
+        task_list.tasks.filter(completed=False).update(completed=True)
     serialiser = TaskListSerialiser(task_list, data=data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)

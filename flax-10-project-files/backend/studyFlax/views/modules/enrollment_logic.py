@@ -2,6 +2,8 @@
 Enrollment business rules for module enrollment flows.
 """
 
+from django.db import OperationalError
+
 from studyFlax.fixtures.data_fixtures import get_course_prefixes
 from studyFlax.models import Enrollment, Module
 from studyFlax.views.modules import enrollment_event_service
@@ -9,7 +11,17 @@ from studyFlax.views.modules import enrollment_event_service
 create_enrollment_events = enrollment_event_service.create_enrollment_events
 logger = enrollment_event_service.logger
 _is_running_tests = enrollment_event_service.is_running_tests
-_safe_create_enrollment_events = enrollment_event_service.safe_create_enrollment_events
+
+
+def _log_create_failure(user, module, exc):
+    if not _is_running_tests():
+        logger.debug("Failed to create events for %s / %s: %s", user, module, exc)
+
+def _safe_create_enrollment_events(user, module):
+    try:
+        create_enrollment_events(user, module)
+    except OperationalError as exc:
+        _log_create_failure(user, module, exc)
 
 
 def _get_major_prefixes(major):
