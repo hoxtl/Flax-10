@@ -17,6 +17,7 @@ READING_DAY_OFFSETS = [1, 5, 14]
 
 def _build_single_reading(module, title, chapter, start, end, deadline):
     """Build an unsaved Reading instance."""
+
     from studyFlax.models import Reading
     return Reading(
         module=module, title=title, chapter=chapter,
@@ -31,6 +32,7 @@ def _build_reading_for_index(module, i, example, now):
 
 def build_readings_for_module(module):
     """Return unsaved Reading instances for a module."""
+
     now = timezone.now()
     examples = random.sample(reading_fixtures, min(3, len(reading_fixtures)))
     return [_build_reading_for_index(module, i, ex, now) for i, ex in enumerate(examples)]
@@ -38,6 +40,7 @@ def build_readings_for_module(module):
 
 def _reading_task_fields(user, reading, task_list, completed):
     """Build field dict for a reading task."""
+
     pages = reading.page_count()
     speed = round(random.uniform(1.2, 2.5), 1)
     completed_at = timezone.now() - timedelta(days=random.randint(1, 14)) if completed else None
@@ -52,6 +55,7 @@ def _reading_task_fields(user, reading, task_list, completed):
 
 def _build_reading_task(user, reading, task_list, completed):
     """Build an unsaved Task for a reading."""
+
     from studyFlax.models.tasks.task_model import Task
     if reading.page_count() <= 0:
         return None
@@ -60,12 +64,14 @@ def _build_reading_task(user, reading, task_list, completed):
 
 def _build_task_for_reading(user, reading, task_list, index):
     """Build a task for a single reading at given index."""
+
     completed = (index == 0)
     return _build_reading_task(user, reading, task_list, completed)
 
 
 def _build_module_reading_tasks(user, module_id, readings, task_list):
     """Build reading tasks for a module's readings."""
+
     if not readings:
         return []
     shuffled = readings[:]
@@ -76,6 +82,7 @@ def _build_module_reading_tasks(user, module_id, readings, task_list):
 
 def build_reading_tasks_for_user(user, module_ids, readings_by_module, task_lists_by_module, default_list):
     """Build all reading tasks for a user's enrolled modules."""
+
     tasks = []
     for module_id in module_ids:
         readings = readings_by_module.get(module_id, [])

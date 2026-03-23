@@ -1,6 +1,7 @@
 """
 Models for task lists and individual tasks with priority, status, and scheduling.
 """
+
 from django.db import models
 
 from studyFlax.models.auth.user_model import User

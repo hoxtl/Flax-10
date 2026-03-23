@@ -16,6 +16,7 @@ class CalendarEventSerialiserTests(TestCase):
     """
     Tests for calendar event serializers with location fields.
     """
+
     def setUp(self):
         self.user = User.objects.create_user(username='test', email='t@t.com', password='pass')
         self.tag = Tag.objects.create(user=self.user, name='Tag', color='#FF0000')

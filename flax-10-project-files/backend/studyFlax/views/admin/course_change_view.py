@@ -18,10 +18,12 @@ from studyFlax.views.user.settings_view import get_or_create_user_settings
 
 def _get_user_settings(user):
     """Return user settings with course-related defaults."""
+
     return get_or_create_user_settings(user, {'major': '', 'year': ''})
 
 def _create_course_change_request(user, requested_course):
     """Validate and create a course change request."""
+
     settings_obj = _get_user_settings(user)
     current_course = settings_obj.major or ''
     if requested_course == current_course:
@@ -34,6 +36,7 @@ def _create_course_change_request(user, requested_course):
 
 def _handle_delete_request(req):
     """Cancel a pending course change request and return the appropriate response."""
+
     if not req or req.status != 'pending':
         return Response({'error': 'No pending request to cancel'}, status=status.HTTP_404_NOT_FOUND)
     req.delete()
@@ -59,6 +62,7 @@ def _notify_course_change_approved(req):
 
 def _apply_approval(req):
     """Update user settings and enrolments when a course change is approved."""
+
     settings_obj = _get_user_settings(req.user)
     old_module_ids = [m.pk for m in get_modules_for_major(settings_obj.major)]
     _clear_existing_enrollments(req.user, old_module_ids)
@@ -68,6 +72,7 @@ def _apply_approval(req):
 
 def _apply_rejection(req):
     """Notify the user that their course change request was rejected."""
+
     Notification.objects.create(
         user=req.user, title='Course change rejected',
         message=f'Your request to change to {req.requested_course} was rejected. You can submit a new request from settings.',
@@ -76,14 +81,17 @@ def _apply_rejection(req):
 
 def _apply_approval_decision(req):
     """Apply approved decision side effects."""
+
     _apply_approval(req)
 
 def _apply_rejection_decision(req):
     """Apply rejected decision side effects."""
+
     _apply_rejection(req)
 
 def _apply_decision(req, decision):
     """Set the request status and apply approval or rejection side-effects."""
+
     req.status = 'approved' if decision == 'approve' else 'rejected'
     req.resolved_at = timezone.now()
     req.save()
@@ -96,6 +104,7 @@ def _apply_decision(req, decision):
 @permission_classes([IsAuthenticated])
 def request_course_change(request):
     """Submit a request to change the user's enrolled course."""
+
     requested_course = (request.data.get('requested_course') or '').strip()
     if not requested_course:
         return Response({'error': 'requested_course is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -111,6 +120,7 @@ def request_course_change(request):
 @permission_classes([IsAuthenticated])
 def my_course_change_request(request):
     """Retrieve or cancel the current user's latest course change request."""
+
     req = CourseChangeRequest.objects.filter(user=request.user).order_by('-created_at').first()
     if request.method == 'DELETE':
         return _handle_delete_request(req)
@@ -120,6 +130,7 @@ def my_course_change_request(request):
 @permission_classes([IsAdminUser])
 def list_course_change_requests(request):
     """List all pending course change requests for admin review."""
+
     qs = CourseChangeRequest.objects.filter(status='pending').select_related('user')
     return Response(CourseChangeRequestSerialiser(qs, many=True).data)
 
@@ -127,6 +138,7 @@ def list_course_change_requests(request):
 @permission_classes([IsAdminUser])
 def resolve_course_change_request(request, request_id):
     """Approve or reject a pending course change request."""
+
     try:
         req = CourseChangeRequest.objects.select_related('user').get(pk=request_id)
     except CourseChangeRequest.DoesNotExist:

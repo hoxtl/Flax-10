@@ -195,6 +195,7 @@ class LegacyUserSettingsViewTests(TestCase):
 
     def call_legacy_view(self, method, url, data=None, format=None):
         """Call legacy view for tests."""
+
         kwargs = {}
         if data is not None:
             kwargs['data'] = data

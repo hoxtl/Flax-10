@@ -50,6 +50,7 @@ def calendar_events_map_view(request):
     """
     Retrieve calendar events with a valid location to display on the map for that day.
     """
+
     now = timezone.now()
     start_time, end_time = _day_window(now)
     events = _map_events_queryset(request.user, now, start_time, end_time)

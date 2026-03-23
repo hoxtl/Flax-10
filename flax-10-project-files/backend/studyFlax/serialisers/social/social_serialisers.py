@@ -47,6 +47,7 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
 
     def validate(self, data):
         """Ensure a user cannot share with themselves."""
+
         request = self.context.get("request")
         if request and request.user == data.get("shared_with"):
             raise serializers.ValidationError("You cannot share your calendar with yourself.")
@@ -54,6 +55,7 @@ class CalendarShareSerialiser(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Automatically set the owner to the current user."""
+
         request = self.context.get("request")
         validated_data["owner"] = request.user
         return super().create(validated_data)

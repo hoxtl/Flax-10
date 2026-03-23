@@ -1,6 +1,7 @@
 """
 Aggregate fixture data combining users, events, modules, deadlines, and tasks.
 """
+
 from .user_fixtures import (
     category_fixtures,
     tag_fixtures,
@@ -24,6 +25,7 @@ from .deadline_fixtures import deadline_fixtures, module_deadline_fixtures
 
 def get_course_prefixes(course):
     """Return module code prefixes mapped to the given course."""
+
     return course_to_module_prefixes.get(course, [])
 
 # Per-module-prefix task templates

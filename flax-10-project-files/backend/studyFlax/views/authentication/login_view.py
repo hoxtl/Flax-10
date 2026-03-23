@@ -13,6 +13,7 @@ User = get_user_model()
 
 def _get_candidate(username):
     """Return the User with this username, or None if not found."""
+
     try:
         return User.objects.get(username=username)
     except User.DoesNotExist:
@@ -20,6 +21,7 @@ def _get_candidate(username):
 
 def _build_ban_response(candidate, password):
     """Return a 403 Response if the account exists but is suspended, else None."""
+
     if candidate and candidate.check_password(password) and not candidate.is_active:
         return Response(
             {
@@ -34,6 +36,7 @@ def _build_ban_response(candidate, password):
 @api_view(['POST'])
 def login_view(request):
     """Log in a user, returning a token or an appropriate error response."""
+
     user_serialiser = LoggedUserSerialiser(data=request.data)
     if not user_serialiser.is_valid():
         return Response(user_serialiser.errors, status=status.HTTP_400_BAD_REQUEST)

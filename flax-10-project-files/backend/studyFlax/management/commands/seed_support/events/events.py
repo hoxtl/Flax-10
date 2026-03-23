@@ -25,6 +25,7 @@ def _seed_events_for_single_user(user, tags, rules):
 
 def _build_all_user_events(user, tags, rules):
     """Build all event types for a single user."""
+
     events = []
     events.extend(build_events_for_user(user, tags, rules, 0))
     events.extend(build_meal_events(user, tags))
@@ -35,6 +36,7 @@ def _build_all_user_events(user, tags, rules):
 @transaction.atomic
 def create_events_for_users(users, tags, rules, stdout):
     """Create personal, meal, and afternoon events for all users."""
+
     all_events = []
     for user in users:
         all_events.extend(_build_all_user_events(user, tags, rules))

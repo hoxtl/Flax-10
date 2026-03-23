@@ -7,10 +7,12 @@ from datetime import timedelta
 
 def is_time_overlap(event_start, event_end, view_start, view_end):
     """Return True if two time ranges overlap."""
+
     return event_start < view_end and event_end > view_start
 
 def add_months(dt, months, max_day=None):
     """Return dt moved by a number of months."""
+
     month = dt.month + months
     year = dt.year + (month - 1) // 12
     month = ((month - 1) % 12) + 1
@@ -21,6 +23,7 @@ def add_months(dt, months, max_day=None):
 
 def add_years(dt, years, max_day=28):
     """Return dt moved by a number of years."""
+
     try:
         return dt.replace(year=dt.year + years)
     except ValueError:
@@ -28,6 +31,7 @@ def add_years(dt, years, max_day=28):
 
 def calc_occurrence(start, frequency, interval, num, monthly_max_day=None):
     """Return the datetime of the num-th recurrence from start."""
+
     delta = interval * num
     if frequency == 'daily':
         return start + timedelta(days=delta)
@@ -41,6 +45,7 @@ def calc_occurrence(start, frequency, interval, num, monthly_max_day=None):
 
 def next_society_occurrence(current, recurrence):
     """Return the next occurrence datetime for a society recurrence string."""
+
     if recurrence == 'daily':
         return current + timedelta(days=1)
     if recurrence == 'weekly':

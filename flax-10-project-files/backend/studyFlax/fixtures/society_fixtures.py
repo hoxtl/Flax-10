@@ -1,6 +1,7 @@
 """
 Fixture data and helper functions for seeding societies, events, and categories.
 """
+
 import random
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -269,6 +270,7 @@ def build_event_datetime(hour, duration_mins, day_of_week=None):
 
 def get_next_occurrence(day_of_week):
     """Get the next date for a given day of week (0=Mon, 6=Sun)."""
+
     today = timezone.now().date()
     if day_of_week is None:
         return today + timedelta(days=7)

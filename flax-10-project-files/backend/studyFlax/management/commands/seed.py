@@ -84,6 +84,7 @@ def _table_columns(table_name):
 
 def _apply_legacy_column_fix(table_name):
     """Apply default and null fix for legacy widget sizes column."""
+
     alter_sql = f'ALTER TABLE "{table_name}" ALTER COLUMN "{LEGACY_WIDGET_SIZES_COLUMN}" SET DEFAULT \'{{}}\'::jsonb;'
     update_sql = f'UPDATE "{table_name}" SET "{LEGACY_WIDGET_SIZES_COLUMN}" = \'{{}}\'::jsonb WHERE "{LEGACY_WIDGET_SIZES_COLUMN}" IS NULL;'
     with connection.cursor() as cursor:
@@ -97,6 +98,7 @@ def _display_role(username, role):
 
 def _is_already_seeded():
     """Check if fixture users exist to detect prior seeding."""
+
     fixture_usernames = {'johndoe', 'janedoe', 'charlie', 'amiller'}
     existing = set(User.objects.filter(username__in=fixture_usernames).values_list('username', flat=True))
     return len(existing) >= 2
@@ -104,6 +106,7 @@ def _is_already_seeded():
 
 def _initial_share_pairs(users, rng):
     """Build initial round-robin share pairs."""
+
     shuffled = users[:]
     rng.shuffle(shuffled)
     return {(owner.id, shuffled[(i + 1) % len(shuffled)].id) for i, owner in enumerate(shuffled)}
@@ -111,12 +114,14 @@ def _initial_share_pairs(users, rng):
 
 def _find_new_pairs(owner_id, candidates, planned_pairs, limit):
     """Find new pairs that aren't already planned."""
+
     new_pairs = [(owner_id, t.id) for t in candidates if (owner_id, t.id) not in planned_pairs]
     return new_pairs[:limit]
 
 
 def _add_extra_pairs_for_owner(owner, users, rng, planned_pairs):
     """Add extra random share pairs for one owner."""
+
     candidates = [t for t in users if t.id != owner.id]
     rng.shuffle(candidates)
     target_count = rng.randint(0, min(3, len(candidates) - 1))
@@ -126,6 +131,7 @@ def _add_extra_pairs_for_owner(owner, users, rng, planned_pairs):
 
 def _build_calendar_share_pairs(users):
     """Build all calendar share pairs for users."""
+
     rng = random.Random("studyflax-calendar-shares")
     planned_pairs = _initial_share_pairs(users, rng)
     for owner in users:
@@ -135,6 +141,7 @@ def _build_calendar_share_pairs(users):
 
 def _create_share_if_valid(owner, target):
     """Create share between users if both exist. Returns 1 if created, 0 otherwise."""
+
     if not (owner and target):
         return 0
     _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
@@ -143,6 +150,7 @@ def _create_share_if_valid(owner, target):
 
 def _create_calendar_shares(users, planned_pairs):
     """Create CalendarShare objects from pairs."""
+
     user_by_id = {u.id: u for u in users}
     pairs_with_users = [(user_by_id.get(oid), user_by_id.get(tid)) for oid, tid in sorted(planned_pairs)]
     return sum(_create_share_if_valid(owner, target) for owner, target in pairs_with_users)
@@ -292,6 +300,7 @@ class Command(BaseCommand):
         """Everyone except 5 random users shares their calendar with each fixture user.
         Also, each fixture user shares their calendar with ~half the other users.
         And every non-fixture user gets ~5 random viewers of their calendar."""
+
         fixture_users = {u.username: u for u in all_users if u.username in fixture_names}
         non_fixture = [u for u in all_users if u.username not in fixture_names]
         for target in fixture_users.values():
@@ -384,6 +393,7 @@ class Command(BaseCommand):
 
     def print_stats(self):
         """Print a summary of all seeded data."""
+
         div = "\u2500" * 40
         self.stdout.write(self.style.SUCCESS(div))
         self.stdout.write(self.style.SUCCESS("  Seeding complete"))

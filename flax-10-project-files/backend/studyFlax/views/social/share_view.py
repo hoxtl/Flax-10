@@ -17,6 +17,7 @@ User = get_user_model()
 
 def _notify_calendar_shared(owner, target_user):
     """Send a notification to the user receiving a calendar share."""
+
     Notification.objects.create(
         user=target_user,
         title="Calendar Shared",
@@ -27,6 +28,7 @@ def _notify_calendar_shared(owner, target_user):
 
 def _get_user_or_404(pk):
     """Return the User with the given pk, or None if not found."""
+
     try:
         return User.objects.get(pk=pk)
     except User.DoesNotExist:
@@ -42,6 +44,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
     @action(detail=True, methods=['post'], url_path='share')
     def share(self, request, pk=None):
         """Share the current user's calendar with another user."""
+
         target_user = _get_user_or_404(pk)
         if not target_user:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -56,6 +59,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
     @action(detail=True, methods=['post'], url_path='unshare')
     def unshare(self, request, pk=None):
         """Stop sharing the current user's calendar with another user."""
+
         target_user = _get_user_or_404(pk)
         if not target_user:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -67,6 +71,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
     @action(detail=True, methods=['get'], url_path='sharing-with')
     def sharing_with(self, request, pk=None):
         """Return users that the specified user has shared their calendar with."""
+
         target_user = _get_user_or_404(pk)
         if not target_user:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -81,6 +86,7 @@ class CalendarShareViewSet(viewsets.GenericViewSet):
     @action(detail=True, methods=['get'], url_path='shared-with-me')
     def shared_with_me(self, request, pk=None):
         """Return users who have shared their calendar with the specified user."""
+
         target_user = _get_user_or_404(pk)
         if not target_user:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)

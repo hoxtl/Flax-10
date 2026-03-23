@@ -17,6 +17,7 @@ from studyFlax.utils.reading_utils import update_reading_estimates
 
 def get_user_lists(user, archived=False):
     """Return task lists for the given user, optionally filtered by archived state."""
+
     return TaskList.objects.filter(user=user, archived=archived).order_by("created_at")
 
 def _base_user_tasks(user):
@@ -44,6 +45,7 @@ def _apply_completed_filter(qs, params):
 
 def get_user_tasks(user, params):
     """Return all tasks accessible to the user, with optional query param filters applied."""
+
     qs = _base_user_tasks(user)
     qs = _apply_group_project_filter(qs, params)
     qs = _apply_task_list_filter(qs, params)
@@ -53,10 +55,12 @@ def get_user_tasks(user, params):
 
 def _task_event_qs(task: Task):
     """Return the queryset of calendar events linked to the given task."""
+
     return CalendarEvent.objects.filter(user=task.user, source="task", external_id=str(task.id))
 
 def _build_task_event_payload(task):
     """Build the calendar event field dict for a task."""
+
     blocks = max(1, int(task.estimated_blocks or 1))
     duration_minutes = max(25, blocks * 25)
     return {
@@ -69,6 +73,7 @@ def _build_task_event_payload(task):
 
 def _upsert_task_event(task, existing_qs, event_payload):
     """Update an existing task calendar event or create a new one."""
+
     if existing_qs.exists():
         existing_qs.update(**event_payload)
         return
@@ -76,6 +81,7 @@ def _upsert_task_event(task, existing_qs, event_payload):
 
 def sync_calendar_event_for_task(task: Task):
     """Ensure the task's calendar event reflects its current due date and state."""
+
     existing_qs = _task_event_qs(task)
     if not (bool(task.due_date) and not task.completed):
         existing_qs.delete()
@@ -86,6 +92,7 @@ def sync_calendar_event_for_task(task: Task):
 @permission_classes([IsAuthenticated])
 def task_list_list(request):
     """List all task lists for the user, or create a new one."""
+
     if request.method == "GET":
         archived = request.query_params.get("archived", "false").lower() == "true"
         lists = get_user_lists(request.user, archived=archived)
@@ -101,6 +108,7 @@ def task_list_list(request):
 @permission_classes([IsAuthenticated])
 def task_list_detail(request, list_id):
     """Update or delete a task list."""
+
     task_list = get_object_or_404(TaskList, id=list_id, user=request.user)
     if request.method == "DELETE":
         task_list.delete()
@@ -118,6 +126,7 @@ def task_list_detail(request, list_id):
 @permission_classes([IsAuthenticated])
 def task_list(request):
     """List all accessible tasks, or create a new one."""
+
     if request.method == "GET":
         tasks = get_user_tasks(request.user, request.query_params)
         return Response(TaskSerialiser(tasks, many=True).data)
@@ -132,6 +141,7 @@ def task_list(request):
 
 def _handle_task_delete(task):
     """Delete a task and its associated calendar event."""
+
     _task_event_qs(task).delete()
     task.delete()
 
@@ -139,6 +149,7 @@ def _handle_task_delete(task):
 @permission_classes([IsAuthenticated])
 def task_detail(request, task_id):
     """Update or delete an individual task."""
+
     task = get_object_or_404(
         Task.objects.filter(Q(user=request.user) | Q(group_project__memberships__user=request.user)).distinct(),
         id=task_id,
@@ -155,12 +166,14 @@ def task_detail(request, task_id):
 
 def _is_reading_task(task):
     """Return True if the task is linked to a reading or has a page count."""
+
     return bool(task.reading_id or task.page_count)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def log_task_time(request, task_id):
     """Log time spent on a task in minutes."""
+
     task = get_object_or_404(
         Task.objects.filter(
             Q(user=request.user) | Q(group_project__memberships__user=request.user)

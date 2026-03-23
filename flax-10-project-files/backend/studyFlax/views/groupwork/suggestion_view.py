@@ -13,6 +13,7 @@ from studyFlax.models.notifications.notification_model import Notification
 
 def _notify_members_of_suggestion(project, suggestion, requester):
     """Notify all project members except the requester of a new meeting suggestion."""
+
     memberships = project.memberships.exclude(user=requester).select_related("user")
     time_str = suggestion.start_time.strftime('%a %d %b at %I:%M %p')
     notifications = [
@@ -31,6 +32,7 @@ def _notify_members_of_suggestion(project, suggestion, requester):
 @permission_classes([IsAuthenticated])
 def create_suggestion(request, project_id):
     """Create a meeting time suggestion and notify all project members."""
+
     project = get_object_or_404(GroupProject.objects.filter(memberships__user=request.user), id=project_id)
     start_time = parse_datetime(request.data.get("start_time") or "")
     end_time = parse_datetime(request.data.get("end_time") or "")
@@ -46,6 +48,7 @@ def create_suggestion(request, project_id):
 @permission_classes([IsAuthenticated])
 def respond_to_suggestion(request, suggestion_id):
     """Record the current user's acceptance or rejection of a meeting suggestion."""
+
     suggestion = get_object_or_404(MeetingSuggestion, id=suggestion_id)
     if not suggestion.project.memberships.filter(user=request.user).exists():
         return Response({"error": "Not a member of this project"}, status=status.HTTP_403_FORBIDDEN)
@@ -61,6 +64,7 @@ def respond_to_suggestion(request, suggestion_id):
 @permission_classes([IsAuthenticated])
 def delete_suggestion(request, suggestion_id):
     """Delete a meeting suggestion (creator only)."""
+
     suggestion = get_object_or_404(MeetingSuggestion, id=suggestion_id)
     if suggestion.suggested_by != request.user:
         return Response({"error": "Only the creator can delete this suggestion"}, status=status.HTTP_403_FORBIDDEN)

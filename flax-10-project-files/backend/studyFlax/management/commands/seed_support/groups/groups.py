@@ -82,6 +82,7 @@ def _pick_owner(students, rng):
 
 def _filter_seed_projects(allowed_codes, allowed_keys):
     """Return only projects that match the seeded specs."""
+
     return [
         project for project in GroupProject.objects.filter(course_code__in=allowed_codes)
         if (project.name, project.course_code) in allowed_keys
@@ -115,6 +116,7 @@ def _count_fixture_ownership(projects, targets):
 
 def _assign_fixture_owner(student, projects, target_module_codes, ownership_counts, rng):
     """Assign one more project to student as owner. Returns True if successful."""
+
     candidate = _pick_project_for_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)
     if not candidate:
         return False
@@ -129,6 +131,7 @@ def _assign_fixture_owner(student, projects, target_module_codes, ownership_coun
 
 def _top_up_fixture_owner(student, projects, target_module_codes, ownership_counts, rng):
     """Ensure student owns at least FIXTURE_OWNER_MIN_PROJECTS projects."""
+
     can_assign = True
     while can_assign and ownership_counts.get(student.id, 0) < FIXTURE_OWNER_MIN_PROJECTS:
         can_assign = _assign_fixture_owner(student, projects, target_module_codes, ownership_counts, rng)

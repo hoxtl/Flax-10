@@ -11,6 +11,7 @@ from studyFlax.models.modules.module_model import Module
 
 class ModuleModelTests(TestCase):
     """ Test suite for Module model."""
+
     def setUp(self):
         self.teacher = User.objects.create_user(
             username='teacher', email='teacher@test.com',

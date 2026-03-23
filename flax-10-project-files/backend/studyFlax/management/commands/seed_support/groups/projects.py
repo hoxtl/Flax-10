@@ -40,6 +40,7 @@ def _normalise_spacing(value):
 
 def _strip_one_prefix(clean, lowered, prefix):
     """Remove a single prefix from clean if it starts with it. Returns (new_clean, new_lowered)."""
+
     prefix_lower = prefix.lower()
     if not lowered.startswith(prefix_lower):
         return clean, lowered
@@ -100,6 +101,7 @@ def _build_topic_project_name(module, index):
 
 def _match_keyword(needle, replacement, clean, lower, module):
     """Return a name if needle is found in lower, else None."""
+
     if needle not in lower:
         return None
     prefix = _normalise_spacing(clean[:lower.index(needle)])
@@ -108,11 +110,13 @@ def _match_keyword(needle, replacement, clean, lower, module):
 
 def _apply_keyword_replacement(clean, lower, module):
     """Return a name using keyword substitution, or None if no keyword matches."""
+
     results = [_match_keyword(n, r, clean, lower, module) for n, r in KEYWORD_REPLACEMENTS]
     return next((r for r in results if r is not None), None)
 
 def _build_short_label_name(clean, module):
     """Return a name for a short (≤2 word) label."""
+
     subject = clean if not _looks_generic_subject(clean) else _module_topic_label(module)
     return _title_case(f"{subject} workshop")
 
@@ -133,6 +137,7 @@ def _project_fallback_names(module):
 
 def _build_deadline_candidate(deadline, module, now, index):
     """Return a (sort_key, deadline, name) tuple for a single deadline."""
+
     days = (deadline.start_due_date.date() - now.date()).days
     name = _derive_collaborative_deadline_name(module, deadline.title, index)
     return (0 if 1 <= days <= 20 else 1, deadline, name)
@@ -150,6 +155,7 @@ def _project_deadline_candidates(module, now):
 
 def _append_fallback_spec(specs, module, fallback_names, fallback_index):
     """Append one fallback spec if its name is not already used. Returns next fallback_index."""
+
     fallback_name = fallback_names[fallback_index % len(fallback_names)]
     if not any(spec["name"] == fallback_name for spec in specs):
         specs.append({"name": fallback_name, "module": module, "source_deadline": None})
@@ -168,6 +174,7 @@ def _build_module_project_specs(module, now):
 
 def _is_valid_source_deadline(source_deadline, now, index):
     """Return True if the source deadline falls in a usable window for this index."""
+
     if not source_deadline:
         return False
     days = (source_deadline.start_due_date.date() - now.date()).days
@@ -177,6 +184,7 @@ def _is_valid_source_deadline(source_deadline, now, index):
 
 def _deadline_from_source(source_deadline, now, index):
     """Return the deadline date from a source deadline offset."""
+
     del now, index
     return source_deadline.start_due_date
 
@@ -227,6 +235,7 @@ def _next_candidate_name(module, index, variant_index, max_variants):
 
 def _find_unique_project_name(used_names, module, index):
     """Find a project name not in used_names by cycling template variants."""
+
     max_template_variants = 30
     variant_index = 1
     candidate = _build_topic_project_name(module, index)

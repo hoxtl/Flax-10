@@ -16,6 +16,7 @@ from studyFlax.serialisers import ModuleSerialiser
 class ModuleViewTests(BaseTestCase):
 
     """Tests for module view."""
+
     def setUp(self):
         super().setUp()
         self.user.role = 'teacher'
@@ -86,6 +87,7 @@ class ModuleViewTests(BaseTestCase):
 
 class ModuleSerialiserTests(TestCase):
     """Tests for module serialiser."""
+
     def setUp(self):
         self.factory = APIRequestFactory()
         self.teacher = User.objects.create_user(
