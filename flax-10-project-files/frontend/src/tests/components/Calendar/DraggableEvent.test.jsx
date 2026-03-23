@@ -9,12 +9,17 @@ vi.mock('../../../components/Calendar/hooks/useDragDrop', () => ({
 }));
 
 vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
-    useEventActions: vi.fn(() => ({ editEvent: vi.fn() })),
+    useEventActions: vi.fn(() => ({ editEvent: vi.fn(), removeEvent: vi.fn(), addException: vi.fn() })),
 }));
 
 vi.mock('../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
+    useEventDelete: vi.fn(() => ({ openDelete: vi.fn() })),
     useEventPopup: vi.fn(() => ({ openPopup: mockOpenPopup, closePopup: vi.fn(), popupEvent: null, popupAnchorRect: null })),
+}));
+
+vi.mock('../../../context/ConfirmContext', () => ({
+    useConfirm: vi.fn(() => vi.fn()),
 }));
 
 const { mockOpenPopup } = vi.hoisted(() => ({ mockOpenPopup: vi.fn() }));
@@ -127,8 +132,8 @@ describe('DraggableEvent', () => {
         getEventType.mockReturnValue('society');
         render(<DraggableEvent event={societyEvent} style={{ height: '60px', width: '100%' }} />);
         const eventEl = screen.getByText('Club Event').closest('[data-event-id]');
-        // Click should not throw
-        expect(() => fireEvent.click(eventEl)).not.toThrow();
+        fireEvent.click(eventEl);
+        expect(mockOpenPopup).toHaveBeenCalledWith(societyEvent, expect.anything(), true);
     });
 
     it('shows society name for society events', () => {
