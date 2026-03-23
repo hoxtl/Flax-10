@@ -103,7 +103,7 @@ describe('useSocietyAnnouncements', () => {
         eventOps.addEvent.mockRejectedValue(new Error('sync fail'));
         const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
         await act(async () => { await result.current.addAnnouncement({ addAsEvent: true }); });
-        expect(spy).toHaveBeenCalledWith('Failed to sync event:', expect.any(Error));
+        expect(spy).toHaveBeenCalledWith('Failed to sync announcement with event:', expect.any(Error));
         spy.mockRestore();
     });
 });

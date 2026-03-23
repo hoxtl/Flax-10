@@ -43,7 +43,7 @@ const NUDGE_DEADLINE = {
   assessment_title: "Renal Physiology KEATS Quiz",
   module_code: "LS4404",
   module_name: "Renal Physiology",
-  start_due_date: "2026-03-23T10:00:00Z",
+  start_due_date: "2026-03-30T10:00:00Z",
   description: "Quiz prep",
 };
 
@@ -121,7 +121,7 @@ describe("MyModulesDashboard", () => {
         title: "Renal Physiology KEATS Quiz",
         module: 42,
         module_code: "LS4404",
-        due_date: "2026-03-23T10:00:00Z",
+        due_date: "2026-03-30T10:00:00Z",
       }));
     });
     expect(toastMock).toHaveBeenCalledWith("Deadline added to tasks!");

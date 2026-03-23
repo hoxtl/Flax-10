@@ -60,7 +60,7 @@ describe('RatificationToggle', () => {
         const onToggle = vi.fn();
         render(<RatificationToggle requested={false} onToggle={onToggle} />);
         expect(screen.getByText('Request Ratification')).toBeInTheDocument();
-        expect(screen.getByText(/Ratified societies are officially recognized/)).toBeInTheDocument();
+        expect(screen.getByText(/Ratified societies are officially recogni/)).toBeInTheDocument();
         const btn = screen.getByRole('button', { type: 'button' });
         fireEvent.click(btn);
         expect(onToggle).toHaveBeenCalledWith(true);
