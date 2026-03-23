@@ -2,9 +2,7 @@
  * Profile page composition and layout.
  */
 
-import { useEffect, useMemo, useState } from "react";
-import analyticsService from "../../api/analyticsApi";
-import { fetchApi } from "../../api/client";
+import { useEffect } from "react";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
@@ -26,6 +24,7 @@ import {
   ThisWeek,
 } from "./components/ProfileWidgets";
 import { useProfileBodyData, useProfileContent, useProfileState } from "./hooks/useProfile";
+import { saveWeeklyGoal, useCurrentUserSummary, usePeakHour, useProfileAnalytics, useSuggestionState } from "./hooks/useProfileInsights";
 import { useProfileSummary } from "./hooks/useProfileSummary";
 import { useProfileVisibility } from "./hooks/useProfileVisibility";
 import ProfileModals, { SocietiesModal } from "./ProfileModals";
@@ -39,50 +38,6 @@ function SkeletonGrid() {
   return ["Persona", "Week", "Dna", "Heatmap"].map((type) => (
     <SkelBlock key={type} className={styles[`skel${type}`]} />
   ));
-}
-
-function useProfileAnalytics(canViewAnalytics) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    if (!canViewAnalytics) return;
-    analyticsService.getSummary(90).then(setData).catch(() => {});
-  }, [canViewAnalytics]);
-  return data;
-}
-
-function computePeakHour(grid) {
-  if (!grid) return null;
-  const totals = Array.from({ length: 24 }, (_, hour) => grid.reduce((sum, row) => sum + (row[hour] || 0), 0));
-  const maxTotal = Math.max(...totals);
-  return maxTotal > 0 ? totals.indexOf(maxTotal) : null;
-}
-
-function useCurrentUserSummary(isSelf) {
-  const [summary, setSummary] = useState(null);
-  useEffect(() => {
-    if (isSelf) return;
-    fetchApi("/profile/summary/").then(setSummary).catch(() => {});
-  }, [isSelf]);
-  return summary;
-}
-
-function useSuggestionState(viewedUserId) {
-  const [state, setState] = useState("idle");
-  const submit = async () => {
-    if (!viewedUserId || state === "sending") return;
-    setState("sending");
-    try {
-      await fetchApi("/profile/study-together/", { method: "POST", body: JSON.stringify({ target_user_id: viewedUserId }) });
-      setState("sent");
-    } catch {
-      setState("error");
-    }
-  };
-  return { state, submit };
-}
-
-function saveWeeklyGoal(goalHours, refetch) {
-  return fetchApi("/profile/", { method: "PATCH", body: JSON.stringify({ weekly_goal_hours: goalHours }) }).then(refetch);
 }
 
 function SharedCalendarSection({ events }) {
@@ -160,7 +115,7 @@ function ProfileHome(props) {
   const analyticsData = useProfileAnalytics(visibility.canViewAnalytics);
   const currentUserSummary = useCurrentUserSummary(visibility.isSelf);
   const { profile: currentUserProfile } = useAuth();
-  const peakHour = useMemo(() => computePeakHour(analyticsData?.heatmap?.data), [analyticsData]);
+  const peakHour = usePeakHour(analyticsData?.heatmap?.data);
   const currentUserModules = currentUserProfile?.modules || [];
   const suggestion = useSuggestionState(viewedUserId);
   useEffect(() => onBadgesReady?.(summary?.badges || []), [onBadgesReady, summary?.badges]);
