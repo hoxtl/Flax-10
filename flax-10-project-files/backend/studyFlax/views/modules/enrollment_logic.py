@@ -13,12 +13,15 @@ logger = enrollment_event_service.logger
 _is_running_tests = enrollment_event_service.is_running_tests
 
 
+def _log_create_failure(user, module, exc):
+    if not _is_running_tests():
+        logger.debug("Failed to create events for %s / %s: %s", user, module, exc)
+
 def _safe_create_enrollment_events(user, module):
     try:
         create_enrollment_events(user, module)
     except OperationalError as exc:
-        if not _is_running_tests():
-            logger.debug("Failed to create events for %s / %s: %s", user, module, exc)
+        _log_create_failure(user, module, exc)
 
 
 def _get_major_prefixes(major):
