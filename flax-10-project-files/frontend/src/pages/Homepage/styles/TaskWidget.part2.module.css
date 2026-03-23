@@ -63,11 +63,15 @@
 }
 
 .taskWidgetCompletedSection {
-  margin-top: 12px;
+  margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid rgba(139, 115, 85, 0.1);
   display: grid;
   gap: 8px;
+}
+
+.taskWidgetCompletedTogglePill {
+  justify-self: center;
 }
 
 .taskWidgetCompletedHeader {
@@ -136,6 +140,7 @@
   padding: 0;
   display: grid;
   gap: 6px;
+  width: 100%;
 }
 
 .taskWidgetCompletedRow {

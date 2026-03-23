@@ -147,7 +147,7 @@ describe('TaskWidgetSlot', () => {
     expect(handleTaskWidgetComplete).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 
-  it('shows Show more when more than 3 incomplete tasks', () => {
+  it('shows Show more when more than 5 incomplete tasks', () => {
     const tasks = Array.from({ length: 7 }, (_, i) => ({
       id: i + 1,
       title: `Task ${i + 1}`,
@@ -157,7 +157,7 @@ describe('TaskWidgetSlot', () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-    expect(screen.getByText(/\+ 4 more/)).toBeTruthy();
+    expect(screen.getByText(/\+ 2 more/)).toBeTruthy();
   });
 
   it('toggles showAll when Show more clicked', () => {
@@ -172,7 +172,7 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: tasks,
       setShowAllTaskWidgetTasks,
     });
-    fireEvent.click(screen.getByText(/\+ 4 more/));
+    fireEvent.click(screen.getByText(/\+ 2 more/));
     // It should navigate instead of calling the old prop
     // Note: useNavigate is mocked in this file at the top-level
     // We need to check if it navigates to /tasks?filter=today

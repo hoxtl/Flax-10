@@ -130,9 +130,57 @@ export function getTaskWidgetList(allTasks, now) {
   todayStart.setHours(0, 0, 0, 0);
   todayEnd.setHours(23, 59, 59, 999);
   const tasks = (allTasks || []).filter((task) => isDueToday(task, todayStart, todayEnd)).map((task) => buildTaskWidgetItem(task, todayEnd));
-  const nextTask = tasks.filter((task) => !task.completed).sort((left, right) => left.sortTime - right.sortTime).find((task) => task.sortTime >= now);
+  const nextTask = tasks.filter((task) => !task.completed).sort((left, right) => left.sortTime - right.sortTime).find((task) => leftAfterNow(task, now));
   if (nextTask) nextTask.taskWidgetStatus = "now";
-  return [...tasks].sort(compareTaskWidgetItems);
+  const sortedTasks = [...tasks].sort(compareTaskWidgetItems);
+  const topPriorityTask = sortedTasks.find((task) => !task.completed);
+  if (topPriorityTask) topPriorityTask.taskWidgetUrgentGlow = true;
+  return sortedTasks;
+}
+
+const TASK_WIDGET_MIN_INCOMPLETE = 5;
+
+export function getTaskWidgetDisplayList(allTasks, now, taskWidgetItemsOnly = []) {
+  const displayList = [...(taskWidgetItemsOnly || [])];
+  const incompleteCount = displayList.filter((task) => !task.completed).length;
+  if (incompleteCount >= TASK_WIDGET_MIN_INCOMPLETE) return displayList;
+  const todayStart = new Date(now);
+  const todayEnd = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  todayEnd.setHours(23, 59, 59, 999);
+  const excludedIds = new Set(displayList.map((task) => String(task.id)));
+  const fillers = buildTaskWidgetFillers(allTasks, todayStart, todayEnd)
+    .filter((task) => !excludedIds.has(String(task.id)))
+    .map((task) => buildTaskWidgetItem(task, todayEnd))
+    .slice(0, TASK_WIDGET_MIN_INCOMPLETE - incompleteCount);
+  return [...displayList, ...fillers].sort(compareTaskWidgetItems);
+}
+
+function buildTaskWidgetFillers(allTasks, todayStart, todayEnd) {
+  const overdue = [];
+  const upcoming = [];
+  for (const task of allTasks || []) {
+    if (!task?.due_date || task.completed) continue;
+    const dueDate = new Date(task.due_date);
+    if (Number.isNaN(dueDate.getTime())) continue;
+    if (dueDate >= todayStart && dueDate <= todayEnd) continue;
+    if (dueDate < todayStart) overdue.push(task);
+    else upcoming.push(task);
+  }
+  overdue.sort(compareRawTasksByDueDate);
+  upcoming.sort(compareRawTasksByDueDate);
+  return [...overdue, ...upcoming];
+}
+
+function compareRawTasksByDueDate(left, right) {
+  const leftTime = new Date(left.due_date).getTime();
+  const rightTime = new Date(right.due_date).getTime();
+  if (leftTime !== rightTime) return leftTime - rightTime;
+  return String(left.title || "").localeCompare(String(right.title || ""));
+}
+
+function leftAfterNow(task, now) {
+  return task.sortTime >= now;
 }
 
 function isDueToday(task, todayStart, todayEnd) {
@@ -142,19 +190,58 @@ function isDueToday(task, todayStart, todayEnd) {
 
 function buildTaskWidgetItem(task, todayEnd) {
   const dueDate = task.due_date ? new Date(task.due_date) : null;
+  const todayStart = new Date(todayEnd);
+  todayStart.setHours(0, 0, 0, 0);
   return {
     type: "task",
     id: `task-${task.id}`,
     sortTime: dueDate || todayEnd,
     endTime: dueDate ? new Date(dueDate.getTime() + (task.estimated_blocks || 1) * 25 * 60000) : todayEnd,
-    taskWidgetStatus: task.completed ? "completed" : "upcoming",
+    taskWidgetStatus: task.completed ? "completed" : (dueDate && dueDate < todayStart ? "overdue" : "upcoming"),
     ...task,
+    priority: normalizeTaskWidgetPriority(task.priority),
   };
 }
 
 function compareTaskWidgetItems(left, right) {
-  const order = { now: 0, upcoming: 1, completed: 2 };
-  return (order[left.taskWidgetStatus] ?? 1) - (order[right.taskWidgetStatus] ?? 1);
+  if (Boolean(left.completed) !== Boolean(right.completed)) {
+    return Number(left.completed) - Number(right.completed);
+  }
+  const overdueRankDiff = getTaskOverdueRank(right) - getTaskOverdueRank(left);
+  if (overdueRankDiff) return overdueRankDiff;
+  if (getTaskOverdueRank(left) > 0 && getTaskOverdueRank(right) > 0) {
+    const overdueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
+    if (overdueDiff) return overdueDiff;
+  }
+  const priorityDiff = getTaskPriorityRank(left.priority) - getTaskPriorityRank(right.priority);
+  if (priorityDiff) return priorityDiff;
+  const dueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
+  if (dueDiff) return dueDiff;
+  return String(left.title || "").localeCompare(String(right.title || ""));
+}
+
+function getTaskOverdueRank(task) {
+  return String(task?.taskWidgetStatus || '').toLowerCase() === 'overdue' ? 1 : 0;
+}
+
+function getTaskPriorityRank(priority) {
+  const order = {
+    urgent: 0,
+    medium: 1,
+    high: 2,
+  };
+  return order[normalizeTaskWidgetPriority(priority)] ?? 3;
+}
+
+function getTaskTimeValue(dateLike) {
+  const value = new Date(dateLike).getTime();
+  return Number.isNaN(value) ? Number.MAX_SAFE_INTEGER : value;
+}
+
+function normalizeTaskWidgetPriority(priority) {
+  const key = String(priority || "").toLowerCase();
+  if (key === "urgent" || key === "high" || key === "medium") return key;
+  return "medium";
 }
 
 export function getTaskWidgetDueTodayCount(taskWidgetItemsOnly, now) {
