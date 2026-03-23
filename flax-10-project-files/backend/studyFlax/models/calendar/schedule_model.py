@@ -33,16 +33,22 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.user.email}'s schedule {self.title}"
 
-    def delete(self, *args, **kwargs):
-        generated_event_ids = list(
+    def _generated_event_ids(self):
+        return list(
             CalendarEvent.objects.filter(
                 schedule_allocations__schedule=self,
                 source='auto_scheduler',
             ).values_list('id', flat=True).distinct()
         )
-        super().delete(*args, **kwargs)
+
+    def _delete_generated_events(self, generated_event_ids):
         if generated_event_ids:
             CalendarEvent.objects.filter(id__in=generated_event_ids).delete()
+
+    def _delete(self, *args, **kwargs):
+        generated_event_ids = self._generated_event_ids()
+        super().delete(*args, **kwargs)
+        self._delete_generated_events(generated_event_ids)
 
 #
 
@@ -57,3 +63,6 @@ class ScheduleEventAllocation(models.Model):
 
     def __str__(self):
         return f"{self.schedule_id}:{self.deadline_id}:{self.event_id}"
+
+
+Schedule.delete = Schedule._delete

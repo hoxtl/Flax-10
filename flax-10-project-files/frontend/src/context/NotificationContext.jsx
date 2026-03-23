@@ -1,12 +1,9 @@
-import { createContext, useState, useEffect, useCallback, useRef, useContext } from 'react';
+import { createContext, useState, useCallback, useRef, useContext } from 'react';
 import * as api from '../api/notificationApi';
 import { useAuth } from './AuthContext';
-import { requestPermission, sendBrowserNotification } from '../components/Notifications/utils/browserNotification';
-import { playNotificationSound } from '../components/Notifications/utils/notificationSound';
-import { parseNotificationAction } from '../components/Notifications/utils/notificationAction';
+import { useNotificationLoader, useNotificationPolling } from './useNotificationData';
 
 const NotificationContext = createContext(null);
-const POLL_INTERVAL = 30000;
 
 export function NotificationProvider({ children }) {
     const { refreshProfile } = useAuth();
@@ -23,73 +20,6 @@ export function NotificationProvider({ children }) {
     };
 
     return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
-}
-
-function useNotificationLoader() {
-    const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        requestPermission();
-        api.fetchNotifications()
-            .then(setNotifications)
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
-
-    return { notifications, setNotifications, loading };
-}
-
-function useNotificationPolling(notifications, setNotifications, knownIds, refreshProfile) {
-    useEffect(() => {
-        notifications.forEach(n => knownIds.current.add(n.id));
-    }, [notifications, knownIds]);
-
-    useEffect(() => {
-        const interval = setInterval(() => pollNotifications(knownIds.current, setNotifications, refreshProfile), POLL_INTERVAL);
-        return () => clearInterval(interval);
-    }, [setNotifications, knownIds, refreshProfile]);
-}
-
-const ROLE_CHANGE_TITLES = new Set([
-    'teacher role approved',
-    'teacher request rejected',
-    'course change approved',
-    'course change rejected',
-]);
-
-function isRoleChangeNotification(notification) {
-    return ROLE_CHANGE_TITLES.has((notification.title || '').toLowerCase());
-}
-
-function processNewNotifications(fresh, knownIds, setNotifications, refreshProfile) {
-    const newOnes = fresh.filter(n => !knownIds.has(n.id));
-    if (newOnes.length === 0) return;
-    let needsSessionRefresh = false;
-    newOnes.forEach(n => {
-        notifyUser(n);
-        knownIds.add(n.id);
-        if (isRoleChangeNotification(n)) needsSessionRefresh = true;
-    });
-    setNotifications(fresh);
-    if (needsSessionRefresh && refreshProfile) refreshProfile();
-}
-
-async function pollNotifications(knownIds, setNotifications, refreshProfile) {
-    const fresh = await api.fetchNotifications().catch(() => null);
-    if (fresh) processNewNotifications(fresh, knownIds, setNotifications, refreshProfile);
-}
-
-function notifyUser(notification) {
-    if (isReminderNotification(notification)) return;
-    const action = parseNotificationAction(notification);
-    const tag = `notification-${notification.id}`;
-    sendBrowserNotification(notification.title, notification.message, tag, action);
-    playNotificationSound();
-}
-
-function isReminderNotification(notification) {
-    return notification.notification_type === 'reminder';
 }
 
 function useNotificationActions(set, knownIds) {

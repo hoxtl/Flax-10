@@ -12,10 +12,19 @@ from studyFlax.models.timer.session_model import StudySession
 from .profile_summary_payload import build_profile_summary, resolve_user
 
 
+def _recent_sessions(sessions_all):
+    cutoff = timezone.now() - timedelta(days=90)
+    return [session for session in sessions_all if session.end_time >= cutoff]
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_summary_view(request):
+    return Response(_profile_summary_payload(request))
+
+
+def _profile_summary_payload(request):
     user = resolve_user(request)
     sessions_all = list(StudySession.objects.filter(user=user))
-    sessions_90 = [session for session in sessions_all if session.end_time >= timezone.now() - timedelta(days=90)]
-    return Response(build_profile_summary(user, sessions_all, sessions_90, request))
+    sessions_90 = _recent_sessions(sessions_all)
+    return build_profile_summary(user, sessions_all, sessions_90, request)

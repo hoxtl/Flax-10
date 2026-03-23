@@ -211,6 +211,10 @@ def _build_availability_response(project, current_user):
     now, start, end = _build_availability_window()
     user_events = _get_user_events([m.user for m in memberships], start, end)
     slots = _build_project_slots(start, now, memberships, user_events)
+    return _availability_payload(project, current_user, memberships, slots)
+
+
+def _availability_payload(project, current_user, memberships, slots):
     return {
         "current_user_id": current_user.id,
         "team_size": len(memberships),

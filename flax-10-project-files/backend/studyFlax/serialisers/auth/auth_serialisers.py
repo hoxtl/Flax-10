@@ -68,39 +68,37 @@ class UserSerialiser(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
 
-    def get_name(self, obj):
+    def _get_name(self, obj):
         return format_teacher_name(obj)
 
-    def get_settings_field(self, obj, field):
+    def _get_settings_field(self, obj, field):
         settings = getattr(obj, 'settings', None)
         if not settings:
             return ''
         return getattr(settings, field, '') or ''
 
-    def get_year(self, obj):
-        return self.get_settings_field(obj, 'year')
+    def _get_year(self, obj):
+        return self._get_settings_field(obj, 'year')
 
-    def get_major(self, obj):
-        return self.get_settings_field(obj, 'major')
+    def _get_major(self, obj):
+        return self._get_settings_field(obj, 'major')
 
-    def get_profile_photo_url(self, obj):
+    def _get_profile_photo_url(self, obj):
         return build_profile_photo_url(obj.profile_photo, self.context.get('request'))
 
-    def get_shared_by_count(self, obj):
-        # People who have shared their calendar with obj
+    def _get_shared_by_count(self, obj):
         return obj.shared_with_me.count()
 
-    def get_shared_with_count(self, obj):
-        # People obj has shared their calendar with
+    def _get_shared_with_count(self, obj):
         return obj.sharing_with.count()
 
-    def get_is_shared_with_me(self, obj):
+    def _get_is_shared_with_me(self, obj):
         return is_shared_with_requester(obj, self.context.get('request'))
 
-    def get_is_sharing(self, obj):
+    def _get_is_sharing(self, obj):
         return is_user_sharing_with(obj, self.context.get('request'), allow_self=True)
 
-    def get_modules(self, obj):
+    def _get_modules(self, obj):
         settings = getattr(obj, 'settings', None)
         return getattr(settings, 'modules', []) if settings else []
 
@@ -109,9 +107,22 @@ class UserSerialiser(serializers.ModelSerializer):
             return None
         return 0
 
-    def get_study_hours_this_week(self, obj):
+    def _get_study_hours_this_week(self, obj):
         request = self.context.get('request')
         return self._get_study_stat(request, obj)
+
+
+UserSerialiser.get_name = UserSerialiser._get_name
+UserSerialiser.get_settings_field = UserSerialiser._get_settings_field
+UserSerialiser.get_year = UserSerialiser._get_year
+UserSerialiser.get_major = UserSerialiser._get_major
+UserSerialiser.get_profile_photo_url = UserSerialiser._get_profile_photo_url
+UserSerialiser.get_shared_by_count = UserSerialiser._get_shared_by_count
+UserSerialiser.get_shared_with_count = UserSerialiser._get_shared_with_count
+UserSerialiser.get_is_shared_with_me = UserSerialiser._get_is_shared_with_me
+UserSerialiser.get_is_sharing = UserSerialiser._get_is_sharing
+UserSerialiser.get_modules = UserSerialiser._get_modules
+UserSerialiser.get_study_hours_this_week = UserSerialiser._get_study_hours_this_week
 
 class LoggedUserSerialiser(serializers.Serializer):
     username = serializers.CharField()

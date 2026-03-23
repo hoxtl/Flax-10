@@ -3,9 +3,9 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import SearchBar from "../../../components/common/SearchBar/SearchBar";
-import { fetchAdminUsers, banUser, unbanUser } from "../../../api/adminApi";
+import { banUser, unbanUser } from "../../../api/adminApi";
 import styles from "../styles";
 import { USER_FILTER_GROUPS, USER_LIST_PAGE_SIZE } from "../constants";
 import { usePaginatedItems } from "../hooks/usePaginatedItems";
@@ -19,6 +19,7 @@ import { banUserState, unbanUserState } from "../utils/userState";
 import { rowAnim, stagger } from "../utils/adminMotion";
 import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 import { navigateToProfile } from "../utils/adminNavigation";
+import { useUsersTabState } from "../hooks/useUsersTabState";
 
 function UserAvatar({ firstName, lastName }) {
   return <div className={styles.userAvatar}>{firstName?.[0]}{lastName?.[0]}</div>;
@@ -126,20 +127,8 @@ function UsersContent({ busy, items, onBan, onNavigate, onUnban, pagination }) {
   );
 }
 
-function useUsersState() {
-  const [banTarget, setBanTarget] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [filters, setFilters] = useState(createEmptyUserFilters());
-  const [search, setSearch] = useState("");
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { setLoading(true); setError(""); fetchAdminUsers().then(setUsers).catch((value) => setError(value?.message || "Failed to load users.")).finally(() => setLoading(false)); }, []);
-  return { banTarget, busy, error, filters, loading, search, setBanTarget, setBusy, setError, setFilters, setSearch, setUsers, users };
-}
-
 export default function UsersTab({ onNavigate }) {
-  const state = useUsersState();
+  const state = useUsersTabState();
   const filteredUsers = useMemo(() => filterUsers(state.users, state.search, state.filters), [state.filters, state.search, state.users]);
   const pagination = usePaginatedItems(filteredUsers, USER_LIST_PAGE_SIZE), hasActive = hasActiveUserFilters(state.filters);
   useEffect(() => { pagination.setCurrentPage(1); }, [pagination.setCurrentPage, state.filters, state.search]);

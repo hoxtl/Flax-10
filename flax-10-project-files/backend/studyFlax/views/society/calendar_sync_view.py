@@ -35,5 +35,10 @@ def unsync_calendar(request, society_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-    deleted, _ = SocietyCalendarSync.objects.filter(user=request.user, society=society).delete()
+    deleted = _delete_sync_record(request.user, society)
     return Response({'is_synced': False, 'deleted': deleted > 0})
+
+
+def _delete_sync_record(user, society):
+    deleted, _ = SocietyCalendarSync.objects.filter(user=user, society=society).delete()
+    return deleted
