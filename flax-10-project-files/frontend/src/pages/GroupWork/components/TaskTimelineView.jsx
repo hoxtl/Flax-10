@@ -193,20 +193,18 @@ export default function TaskTimelineView({ tasks, members, onUpdate, onDelete })
     );
 }
 
+function CardTitleOrEdit({ editing, editTitle, setEditTitle, saveEdit, setEditing, c, task }) {
+    if (editing) return <CardEditInput editTitle={editTitle} setEditTitle={setEditTitle} saveEdit={saveEdit} setEditing={setEditing} inputClassName={cardStyles.timelineCardInput} />;
+    return <div className={cardStyles.cardTitle} style={{ color: c.text }}>{task.title}</div>;
+}
+
 function TimelineCardBody({ task, editing, editTitle, setEditTitle, setEditing, saveEdit, c, showPopup, setShowPopup, members, assignees, toggle, cardStyle }) {
     const triggerRef = useRef(null);
     const fullCardStyle = Object.assign({}, cardStyle, { opacity: task.completed ? 0.6 : 1 });
     const pbVars = { '--pb-color': c.color, '--pb-bg': c.backgroundColor };
     return (
-        <div
-            className={cardStyles.timelineCard}
-            style={fullCardStyle}
-        >
-            {editing ? (
-                <CardEditInput editTitle={editTitle} setEditTitle={setEditTitle} saveEdit={saveEdit} setEditing={setEditing} inputClassName={cardStyles.timelineCardInput} />
-            ) : (
-                <div className={cardStyles.cardTitle} style={{ color: c.text }}>{task.title}</div>
-            )}
+        <div className={cardStyles.timelineCard} style={fullCardStyle}>
+            <CardTitleOrEdit editing={editing} editTitle={editTitle} setEditTitle={setEditTitle} saveEdit={saveEdit} setEditing={setEditing} c={c} task={task} />
             <div className={cardStyles.cardFooter}>
                 <span className={`${cardStyles.cardPriorityBadge} ${cardStyles.cardPriorityBadgeColored}`} style={pbVars}>{task.priority || "MEDIUM"}</span>
                 <div ref={triggerRef} className={cardStyles.avatarTrigger} onClick={(e) => { e.stopPropagation(); setShowPopup(v => !v); }}><TaskAvatarStack assignees={assignees} size={16} max={2} /></div>
