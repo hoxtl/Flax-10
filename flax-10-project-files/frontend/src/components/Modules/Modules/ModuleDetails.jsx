@@ -12,6 +12,7 @@ import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
 import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton.jsx';
+import Tooltip from '../../common/Tooltip/Tooltip.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
@@ -109,7 +110,7 @@ function HeroTop({ module, department, course, is_enrolled }) {
     );
 }
 
-function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnenroll, tutorPhoto }) {
+function HeroSection({ module, department, course, is_enrolled, is_core, onEnroll, onUnenroll, tutorPhoto }) {
     return (
         <section className={heroStyles.hero}>
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
@@ -122,7 +123,7 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
                 </div>
                 <div className={heroStyles.heroActions}>
                     {module.created_by_email && <PrimaryButton variant="secondary" pill onClick={() => window.location.href = `mailto:${module.created_by_email}`}>Email tutor</PrimaryButton>}
-                    <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                    <EnrollmentAction is_enrolled={is_enrolled} is_core={is_core} onEnroll={onEnroll} onUnenroll={onUnenroll} />
                 </div>
             </div>
         </section>
@@ -237,14 +238,14 @@ function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
     );
 }
 
-export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
+export default function ModuleDetails({ module, is_enrolled, is_core, onBack, onEnroll, onUnenroll }) {
     const data = useModuleData(module);
     const travelTime = useModuleTravelTime(module.location);
 
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
-            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} is_core={is_core} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
@@ -254,7 +255,7 @@ function ScheduleItem({ icon, label, value, className = "", valueClassName = "" 
     return (
         <div className={`${scheduleStyles.scheduleItem} ${className}`.trim()}>
             <span className={scheduleStyles.scheduleIcon}>{icon}</span>
-            <div>
+            <div className={scheduleStyles.scheduleItemBody}>
                 <div className={scheduleStyles.scheduleLabel}>{label}</div>
                 <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
@@ -282,10 +283,25 @@ function RecurringBadge() {
     );
 }
 
-function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
-    return is_enrolled
-        ? <PrimaryButton variant="danger" pill onClick={onUnenroll}>Leave module</PrimaryButton>
-        : <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
+function EnrollmentAction({ is_enrolled, is_core, onEnroll, onUnenroll }) {
+    if (!is_enrolled) {
+        return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
+    }
+    const btn = (
+        <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll}
+            disabled={is_core} aria-disabled={is_core}
+            style={is_core ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>
+            Leave module
+        </PrimaryButton>
+    );
+    if (is_core) {
+        return (
+            <Tooltip content="Cannot leave a core course module" position="bottom">
+                <span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{btn}</span>
+            </Tooltip>
+        );
+    }
+    return btn;
 }
 
 function DeadlineItem({ deadline, index }) {

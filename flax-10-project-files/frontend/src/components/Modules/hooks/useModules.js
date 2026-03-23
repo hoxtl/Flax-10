@@ -83,7 +83,11 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify) {
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
   } catch (err) {
-    notify(err.message, 'error');
+    if (/core course|core module/i.test(err.message)) {
+      setEnrollments(prev => prev.map(e => e.module === module.id ? { ...e, is_core: true } : e));
+    } else {
+      notify(err.message, 'error');
+    }
   }
 }
 

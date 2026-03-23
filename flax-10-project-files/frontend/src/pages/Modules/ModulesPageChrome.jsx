@@ -74,11 +74,13 @@ function handleFormCancel(state) {
 }
 
 export function DetailsView({ state }) {
+  const enrollment = state.hook.enrollments.find(e => e.module === state.viewingModule.id);
   return (
     <div className={styles.container}>
       <ModuleDetails
         module={state.viewingModule}
         is_enrolled={isEnrolledIn(state.viewingModule.id, state.hook.enrollments)}
+        is_core={enrollment?.is_core || false}
         is_teacher={state.isTeacher}
         onBack={() => handleBackFromDetails(state)}
         onEnroll={() => state.hook.handleEnrollment(state.viewingModule)}

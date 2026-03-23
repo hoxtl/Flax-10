@@ -305,6 +305,10 @@ def ensure_member_count_spread(projects, students, module_students, membership_c
     spread_projects = sorted_projects[:spread_count]
     for project, target in zip(spread_projects, SPREAD_TARGETS):
         _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng)
+    # Guarantee at least one project reaches MAX even if there are fewer than spread_count projects
+    if not any(len(member_sets.get(p.id, set())) >= MAX_PROJECT_MEMBER_TOTAL for p in projects):
+        best = max(sorted_projects, key=lambda p: len(member_sets.get(p.id, set())))
+        _fill_project_to_target(best, MAX_PROJECT_MEMBER_TOTAL, students, module_students, membership_counts, member_sets, rng)
     for project in sorted_projects[spread_count:]:
         target = rng.randint(MIN_PROJECT_MEMBER_TOTAL, MAX_PROJECT_MEMBER_TOTAL)
         _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng)

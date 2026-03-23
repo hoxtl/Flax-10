@@ -33,9 +33,9 @@ export default function ProjectDeleteAction({ onDelete, isOwner }) {
         <PrimaryButton
             type="button"
             size="small"
-            variant="ghost"
+            variant="danger"
             pill
-            className={`${styles.deleteBtn}${!isOwner ? ` ${styles.deleteBtnDisabled}` : ""}`}
+            className={!isOwner ? styles.deleteBtnDisabled : undefined}
             onClick={isOwner ? () => setShowDeleteModal(true) : undefined}
             disabled={!isOwner}
             aria-disabled={!isOwner}
