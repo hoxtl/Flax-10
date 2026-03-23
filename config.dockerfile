@@ -7,6 +7,16 @@ COPY flax-10-project-files/frontend/package*.json ./
 RUN npm ci
 
 COPY flax-10-project-files/frontend/ ./
+
+ARG VITE_MAPBOX_TOKEN
+ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
+
+ARG VITE_TFL_API_KEY
+ENV VITE_TFL_API_KEY=$VITE_TFL_API_KEY
+
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=$OPENAI_API_KEY
+
 RUN npm run build
 
 FROM python:3.14.3-bookworm AS runtime
