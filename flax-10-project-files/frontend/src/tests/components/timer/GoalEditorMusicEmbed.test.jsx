@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { GoalEditor } from '../../../components/Timer/todayBanner/GoalEditor';
+import { GoalEditor } from '../../../components/Timer/presets/DailyGoalWidget';
 import { MusicEmbed } from '../../../components/Timer/soundPanel/MusicEmbed';
 
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({

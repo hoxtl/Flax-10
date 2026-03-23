@@ -28,6 +28,7 @@ vi.mock("../../api/adminApi", () => ({
 vi.mock("../../pages/Admin/AdminPage.module.css", () => ({ default: {} }));
 vi.mock("../../components/Pagination/Pagination", () => ({
   Pagination: () => null,
+  BackToTop: () => null,
 }));
 
 import * as api from "../../api/adminApi";

@@ -38,7 +38,7 @@ function openGoalEditor(goalHours, setGoalInput, setEditingGoal) {
   setEditingGoal(true);
 }
 
-function GoalEditor(props) {
+export function GoalEditor(props) {
   if (props.editingGoal) return <GoalInput {...props} />;
   return <GoalToggle {...props} />;
 }

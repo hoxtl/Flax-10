@@ -35,6 +35,7 @@ vi.mock('mapbox-gl', () => {
         remove: vi.fn(),
         getPopup: vi.fn(() => mockPopup),
         togglePopup: vi.fn(),
+        getElement: vi.fn(() => document.createElement('div')),
     };
     return {
         default: {

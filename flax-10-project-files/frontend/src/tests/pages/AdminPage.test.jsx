@@ -63,6 +63,7 @@ vi.mock("../../components/Pagination/Pagination", () => ({
         </button>
       </div>
     ) : null,
+  BackToTop: () => null,
 }));
 
 import * as api from "../../api/adminApi";
