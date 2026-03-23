@@ -3,10 +3,14 @@
  */
 
 import { motion as Motion } from "framer-motion";
+import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
+import { ConfirmModal } from "../../../components/common";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { MiniTimeline } from "./MiniTimeline";
+import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 
 const SECTION_ANIMATION = { opacity: 0, y: 30 };
 const SECTION_VISIBLE = { opacity: 1, y: 0 };
@@ -20,42 +24,81 @@ export function HomepageTimelineSection(props) {
 }
 
 function TimelineContent(props) {
-  return <div className={props.styles.timelineBox}><TimelineHeader {...props} /><TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack></div>;
-}
-
-function TimelineHeader(props) {
+  const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
+  if (props.isWidget) {
+    return (
+      <>
+        <TimelineHeader {...props} onOpenRescheduleConfirm={() => setShowRescheduleConfirm(true)} />
+        <TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack>
+        <RescheduleConfirmModal
+          open={showRescheduleConfirm}
+          onCancel={() => setShowRescheduleConfirm(false)}
+          onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)}
+        />
+      </>
+    );
+  }
   return (
-    <div className={props.styles.timelineHeader}>
-      <HeaderTitle isWidget={props.isWidget} styles={props.styles} />
-      <div className={props.styles.timelineHeaderRight}><CalendarLink styles={props.styles} /><ScheduleActions {...props} /><ReplanButton {...props} /></div>
+    <div className={props.styles.timelineBox}>
+      <TimelineHeader {...props} onOpenRescheduleConfirm={() => setShowRescheduleConfirm(true)} />
+      <TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack>
+      <RescheduleConfirmModal
+        open={showRescheduleConfirm}
+        onCancel={() => setShowRescheduleConfirm(false)}
+        onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)}
+      />
     </div>
   );
 }
 
-function HeaderTitle({ isWidget, styles }) {
-  return <div className={styles.timelineHeaderLeft}><div className={styles.timelineHeaderIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div><h3 className={styles.timelineTitle} style={isWidget ? { textTransform: "none" } : undefined}>{isWidget ? "Your Plan For Today" : "YOUR PLAN FOR THE DAY"}</h3></div>;
+function TimelineHeader(props) {
+  return (
+    <div className={widgetStyles.widgetHeader}>
+      <div className={widgetStyles.widgetIconWrap} aria-hidden><CalendarIcon size={17} strokeWidth={1.75} /></div>
+      <span className={widgetStyles.widgetTitle}>Your Plan For Today</span>
+      <div className={props.styles.timelineHeaderRight}><CalendarLink styles={props.styles} /><RescheduleEventsButton {...props} /></div>
+    </div>
+  );
 }
 
 function CalendarLink({ styles }) {
-  return <Link to="/calendar" className={styles.timelineHeaderActionLink}><span className={styles.timelineCalendarTextFull}>View my calendar →</span><span className={styles.timelineCalendarTextMedium}>View calendar →</span><span className={styles.timelineCalendarTextShort}>Calendar →</span></Link>;
+  const navigate = useNavigate();
+  return (
+    <PrimaryButton type="button" size="small" pill className={styles.timelineHeaderButton} onClick={() => navigate("/calendar")}>
+      View my calendar
+    </PrimaryButton>
+  );
 }
 
-function ScheduleActions({ onOpenQuickAddSchedule, selectedDate, styles }) {
-  if (!isToday(selectedDate) || !onOpenQuickAddSchedule) return null;
-  return <Motion.div className={styles.scheduleActionGroup} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}><ActionButton label="Manual Schedule" onClick={() => onOpenQuickAddSchedule("schedule_manual")} styles={styles} variant="manualScheduleBtn" /><ActionButton label="Auto Schedule" onClick={() => onOpenQuickAddSchedule("schedule_auto")} styles={styles} variant="autoScheduleBtn" /></Motion.div>;
+function RescheduleEventsButton({ handleResolveTimelineConflicts, onOpenRescheduleConfirm, resolveConflictsLoading, selectedDate, styles }) {
+  if (!isToday(selectedDate) || !handleResolveTimelineConflicts) return null;
+  return (
+    <Motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+      <PrimaryButton size="small" pill className={styles.timelineHeaderButton} onClick={onOpenRescheduleConfirm || handleResolveTimelineConflicts} aria-label="Reschedule my events" disabled={resolveConflictsLoading}>
+        {resolveConflictsLoading ? "Rescheduling…" : "Reschedule my events"}
+      </PrimaryButton>
+    </Motion.div>
+  );
 }
 
-function ActionButton({ label, onClick, styles, variant }) {
-  return <button type="button" className={styles[variant]} onClick={onClick} aria-label={label}>{label}</button>;
+function RescheduleConfirmModal({ open, onCancel, onConfirm }) {
+  if (!open) return null;
+  return (
+    <ConfirmModal
+      title="Reschedule my events"
+      message="This will clear movable conflicts in your plan and may move personal events to tomorrow if today has no free space left."
+      confirmText="Reschedule now"
+      cancelText="Keep plan"
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+      infoHint="Lectures, societies, exams, and fixed deadlines stay where they are."
+    />
+  );
 }
 
-function ReplanButton({ handleReplanDay, missedItems, overdueTasksForNow, replanLoading, selectedDate, styles }) {
-  if (!isToday(selectedDate) || !handleReplanDay) return null;
-  return <Motion.button type="button" className={styles.manualScheduleBtn} onClick={handleReplanDay} disabled={isReplanDisabled(replanLoading, missedItems, overdueTasksForNow)} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} aria-label="Re-plan overdue and missed items into free windows">{replanLoading ? "Re-planning..." : "Re-plan"}</Motion.button>;
-}
-
-function isReplanDisabled(replanLoading, missedItems, overdueTasksForNow) {
-  return replanLoading || (!missedItems?.length && !overdueTasksForNow?.length);
+async function confirmReschedule(props, setShowRescheduleConfirm) {
+  setShowRescheduleConfirm(false);
+  await props.handleResolveTimelineConflicts?.();
 }
 
 function TimelineTrack({ children, styles }) {

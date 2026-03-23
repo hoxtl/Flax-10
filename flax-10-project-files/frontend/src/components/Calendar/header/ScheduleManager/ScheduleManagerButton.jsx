@@ -1,33 +1,83 @@
 /*
  * ScheduleManagerButton.jsx
- * Trigger button for the schedule manager dialog.
+ * Shared calendar trigger for clearing overlaps in the active day.
  */
 
 import { useState } from "react";
-import { FolderKanban } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { useCalendar } from "../../../../context/CalendarContext";
+import { useToast } from "../../../../context/ToastContext";
+import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
+import Tooltip from "../../../Common/Tooltip/Tooltip";
+import { useEventActions } from "../../hooks/useCalendarEvents";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../Common/RescheduleEvents/rescheduleEventConflicts";
 import styles from "../CalendarHeaderUtils.module.css";
-import { ScheduleManagerDialog } from "./ScheduleManagerDialog";
 
-function TriggerButton({ onClick }) {
+function TriggerButton({ busy, onClick }) {
   return (
-    <button
-      className={styles.settingsBtn}
-      onClick={onClick}
-      title="Manage schedules"
-      aria-label="Manage schedules"
-      type="button"
-    >
-      <FolderKanban size={18} />
-    </button>
+    <Tooltip content="Reschedule my events">
+      <button
+        className={styles.settingsBtn}
+        onClick={onClick}
+        title="Reschedule my events"
+        aria-label="Reschedule my events"
+        type="button"
+        disabled={busy}
+      >
+        <Sparkles size={18} />
+      </button>
+    </Tooltip>
   );
 }
 
 export function ScheduleManagerButton() {
-  const [open, setOpen] = useState(false);
+  const { events, selectedDate } = useCalendar();
+  const { editEvent } = useEventActions();
+  const showToast = useToast();
+  const [busy, setBusy] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  async function handleClick() {
+    const plan = buildConflictResolutionPlan(events, selectedDate);
+    if (!plan.operations.length) {
+      showToast(buildConflictResolutionToastMessage(plan));
+      return;
+    }
+    setBusy(true);
+    try {
+      await applyConflictResolutionPlan(plan, editEvent);
+      showToast(buildConflictResolutionToastMessage(plan), {
+        actionLabel: "Undo",
+        durationMs: 8500,
+        onAction: async () => {
+          await undoConflictResolutionPlan(plan, editEvent);
+          showToast("Undid reschedule.");
+        },
+      });
+    } catch {
+      showToast("Couldn't reschedule your events. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <>
-      <TriggerButton onClick={() => setOpen(true)} />
-      <ScheduleManagerDialog open={open} onClose={() => setOpen(false)} />
+      <TriggerButton busy={busy} onClick={() => setShowConfirm(true)} />
+      {showConfirm ? (
+        <ConfirmModal
+          title="Reschedule my events"
+          message="This will clear movable conflicts in the current day and may move personal events to tomorrow if today has no free window left."
+          confirmText="Reschedule now"
+          cancelText="Keep plan"
+          onConfirm={async () => {
+            setShowConfirm(false);
+            await handleClick();
+          }}
+          onCancel={() => setShowConfirm(false)}
+          infoHint="Lectures, societies, exams, and fixed deadlines stay where they are."
+        />
+      ) : null}
     </>
   );
 }

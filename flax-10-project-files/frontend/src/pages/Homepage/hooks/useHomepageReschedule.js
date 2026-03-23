@@ -5,18 +5,22 @@
 import { useCallback, useState } from "react";
 import { formatTime, getAllFreeWindowsToday, getNextFreeSlotToday, isRoutineEvent } from "../utils/index";
 import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
 
 export function useHomepageReschedule(props) {
   const [replanLoading, setReplanLoading] = useState(false);
+  const [resolveConflictsLoading, setResolveConflictsLoading] = useState(false);
   return {
     handleConflictAutoMove: useConflictAutoMove(props),
     handleConflictPushTomorrow: useConflictPushTomorrow(props),
     handleQuickStartGap: useQuickStartGap(props),
     handleReplanDay: useReplanDay(props, setReplanLoading),
+    handleResolveTimelineConflicts: useResolveTimelineConflicts(props, setResolveConflictsLoading),
     handleReschedule: useReschedule(props),
     handleRescheduleTomorrow: useRescheduleTomorrow(props),
     handleTimelineDelete: useTimelineDelete(props),
     replanLoading,
+    resolveConflictsLoading,
   };
 }
 
@@ -159,6 +163,36 @@ async function deleteTaskEvent(eventObj, props) {
   await props.deleteTask(eventObj.external_id);
   await Promise.all([props.loadEvents(), props.refetchTasks()]);
   props.showToast(`"${eventObj.title}" removed.`);
+}
+
+function useResolveTimelineConflicts(props, setResolveConflictsLoading) {
+  return useCallback(async () => {
+    const plan = buildConflictResolutionPlan(props.sortedEvents, props.selectedDate);
+    if (!plan.operations.length) {
+      props.showToast(buildConflictResolutionToastMessage(plan));
+      return;
+    }
+    setResolveConflictsLoading(true);
+    try {
+      await applyConflictResolutionPlan(plan, props.editEvent);
+      await props.loadEvents?.();
+      props.refetchTasks();
+      props.showToast(buildConflictResolutionToastMessage(plan), {
+        actionLabel: "Undo",
+        durationMs: 8500,
+        onAction: async () => {
+          await undoConflictResolutionPlan(plan, props.editEvent);
+          await props.loadEvents?.();
+          props.refetchTasks();
+          props.showToast("Undid reschedule.");
+        },
+      });
+    } catch {
+      props.showToast("Couldn't reschedule your events. Try again.");
+    } finally {
+      setResolveConflictsLoading(false);
+    }
+  }, [props, setResolveConflictsLoading]);
 }
 
 function useReplanDay(props, setReplanLoading) {

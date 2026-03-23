@@ -27,10 +27,6 @@ function playTaskCompleteSound() {
   } catch {}
 }
 
-function openQuickAdd(view) {
-  window.dispatchEvent(new CustomEvent("quick-add:open", { detail: { view } }));
-}
-
 export function useHomepageActions(props) {
   const taskWidgetRef = useRef(null);
   const handleTaskWidgetComplete = useTaskWidgetComplete(props);
@@ -44,7 +40,6 @@ export function useHomepageActions(props) {
     handleTaskToggle,
     handleTaskWidgetComplete,
     handleInlineTaskEdit,
-    openQuickAddSchedule: openQuickAdd,
     openTimelinePopup,
     taskWidgetRef,
   };
