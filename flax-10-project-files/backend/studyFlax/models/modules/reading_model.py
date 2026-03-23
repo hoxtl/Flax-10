@@ -1,6 +1,7 @@
 """
 Model for reading assignments linked to a module with page range and deadline.
 """
+
 from django.db import models
 from .module_model import Module
 

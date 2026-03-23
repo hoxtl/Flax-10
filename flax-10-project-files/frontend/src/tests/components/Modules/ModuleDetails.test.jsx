@@ -1,6 +1,7 @@
 /*
  * Tests for ModuleDetails component.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
@@ -41,7 +42,7 @@ describe('ModuleDetails', () => {
 
     it('should render enroll button when not enrolled', () => {
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
-        expect(screen.getByText('Enroll in module')).toBeInTheDocument();
+        expect(screen.getByText('Enrol in module')).toBeInTheDocument();
     });
 
     it('should render leave button when enrolled', () => {
@@ -60,7 +61,7 @@ describe('ModuleDetails', () => {
     it('should call onEnroll when enroll button is clicked', () => {
         const onEnroll = vi.fn();
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={onEnroll} onUnenroll={vi.fn()} />);
-        fireEvent.click(screen.getByText('Enroll in module'));
+        fireEvent.click(screen.getByText('Enrol in module'));
         expect(onEnroll).toHaveBeenCalled();
     });
 

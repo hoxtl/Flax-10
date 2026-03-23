@@ -1,3 +1,7 @@
+/**
+ * TfL disruption data hook for the campus map page.
+ */
+
 import { useState, useEffect } from 'react';
 import { tflService } from '../../../api/tflApi';
 
@@ -6,8 +10,7 @@ async function fetchDisruptions(setDisruptions, setLoading) {
   try {
     const data = await tflService.getTfLDelays();
     setDisruptions(data);
-  } catch (error) {
-    console.error('TfL disruption fetch error: ', error);
+  } catch {
   } finally {
     setLoading(false);
   }

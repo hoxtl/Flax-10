@@ -13,15 +13,16 @@ function ModulePillLink({ task }) {
   const moduleColours = getModuleColor(task.module_code);
   const moduleId = task.module_id ?? task.module ?? task.moduleId;
   const to = moduleId ? `/modules?moduleId=${moduleId}` : `/modules?code=${encodeURIComponent(task.module_code)}`;
+  const pillStyle = { color: moduleColours.text, background: "transparent", borderColor: moduleColours.border };
   return (
-    <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={{ color: moduleColours.text, background: "transparent", borderColor: moduleColours.border }} onClick={(event) => event.stopPropagation()} title={`Open ${task.module_code} module`}>
+    <Link to={to} className={`${styles.modulePill} ${styles.modulePillLink}`} style={pillStyle} onClick={(event) => event.stopPropagation()} title={`Open ${task.module_code} module`}>
       {task.module_code}
     </Link>
   );
 }
 
 function ListBadge({ listName, listColour }) {
-  const colour = listColour || "#a89890";
+  const colour = listColour || "var(--task-list-fallback)";
   const style = { "--lc": colour, background: `color-mix(in srgb, ${colour} 8%, transparent)`, borderColor: `color-mix(in srgb, ${colour} 18%, transparent)` };
   return <span className={styles.listIndicator} style={style}><span className={styles.listDot} style={{ background: colour }} />{listName}</span>;
 }

@@ -1,6 +1,7 @@
 /*
  * Schedule form entry points.
  */
+
 import { AutoScheduleForm } from './auto/AutoScheduleForm';
 import { ManualScheduleForm } from './manual/ManualScheduleForm';
 

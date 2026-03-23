@@ -1,0 +1,221 @@
+/* Split from styles/timeline/TimelineCardCore.module.css (2/2) */
+.planTimelineCardTitle {
+  font-family: var(--font-body), "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2d2d2d;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+}
+.planTimelineCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.planTimelineSleepBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+.planTimelineCardDurationPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  font-family:
+    var(--font-mono), "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--home-text-meta, #9ca3af);
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.planTimelineCardNow {
+  background: color-mix(in srgb, var(--study) 8%, var(--panel));
+  border-color: color-mix(in srgb, var(--study) 25%, var(--border));
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 0 0 1px color-mix(in srgb, var(--study) 12%, transparent);
+}
+.planTimelineCardNow:hover {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 0 0 1px color-mix(in srgb, var(--study) 18%, transparent);
+}
+
+@media (max-width: 520px) {
+  .planTimelineCardDurationPill {
+    display: none;
+  }
+}
+
+@media (max-width: 580px) {
+  .planTimelineCardTitle {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+.planTimelineCardPast {
+  opacity: 1;
+  filter: none;
+}
+
+/* Row-level past fade — dims gutter time, dot AND card together */
+.planTimelineRowPast {
+  opacity: 1;
+  filter: none;
+  transition:
+    opacity 0.3s ease,
+    filter 0.3s ease;
+}
+.planTimelineRowPast:hover {
+  opacity: 1;
+  filter: none;
+}
+.planTimelineRowPast .planTimelineCardTitle {
+  color: var(--text);
+}
+.planTimelineRowPast .planTimelineCardTimeSlot,
+.planTimelineRowPast .planTimelineCardDurationPill,
+.planTimelineRowPast .planTimelineModulePill {
+  opacity: 0.7;
+}
+.planTimelineCardOverlap {
+  border-color: #e5e4e2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.planTimelineCardConflict {
+  border: 1px solid #e5e4e2;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  min-width: 0;
+}
+.planTimelineCardConflict:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.planTimelineConflictGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.planTimelineConflictCardWrap {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 50%;
+  overflow: hidden;
+  position: relative;
+}
+.planTimelineTimeConflictBadge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.planTimelineConflictIcon {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.planTimelineRescheduleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.planTimelineRescheduleBtn:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+.planTimelineCardRoutine {
+  transform: none;
+  transform-origin: left center;
+  background: rgba(250, 249, 246, 0.6) !important;
+  border: 1px solid #e5e4e2 !important;
+  width: 100%;
+  min-width: 0;
+}
+.planTimelineCardOverlap .planTimelineModulePill,
+.planTimelineCardOverlap .planTimelineModulePillLink {
+  right: auto;
+}
+.planTimelineCardTagsSlot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px 8px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.planTimelineModulePillLink {
+  flex-shrink: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.planTimelineModulePill {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--home-text-meta, #9ca3af);
+  opacity: 0.6;
+}
+.planTimelineConflictPopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 6px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

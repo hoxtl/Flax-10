@@ -17,6 +17,7 @@ DEFAULT_SETTINGS = {
 
 def get_or_create_user_settings(user, defaults=None):
     """Return persisted user settings with safe defaults."""
+
     payload = DEFAULT_SETTINGS | (defaults or {})
     settings, _ = UserSettings.objects.get_or_create(user=user, defaults=payload)
     return settings

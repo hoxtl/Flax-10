@@ -1,6 +1,7 @@
 /*
  * Manual schedule submission.
  */
+
 import { createSchedule } from '../../../api/scheduleApi';
 import { getManualScheduleError } from './manualScheduleUtils';
 

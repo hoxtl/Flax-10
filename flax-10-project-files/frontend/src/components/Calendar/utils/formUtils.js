@@ -2,12 +2,15 @@
  * formUtils - Event form state management and submission logic.
  * Handles form initialization, validation, and CRUD operations.
  */
+
 import { checkOverlapWithConfirm } from './overlapUtils';
 import { extractBaseEventId, hasRecurrence } from './eventUtils';
 import { validateDateRange } from './dateValidation';
-import { geocodeAddress } from '../../../api/userApi';
+import { geocodeAddress } from '../../../api/geocodeApi';
+import { formatForDateTimeInput } from '../../../utils/dateTimeInput';
 
 /** Creates initial form state from an existing event or defaults. */
+
 export function getInitialForm(event, options = {}) {
     if (event) return getFormFromEvent(event, options);
     return getDefaultForm(options);
@@ -60,6 +63,7 @@ function getDefaultForm(options) {
 }
 
 /** Validates form and submits event with overlap checking. */
+
 export async function validateAndSubmit(e, form, event, actions, onClose, setError, confirmFn, allEvents, forceSave = false) {
     if (e) e.preventDefault();
     const error = validateForm(form);
@@ -126,12 +130,14 @@ async function editSingleOccurrence(event, data, actions, baseId) {
 }
 
 /** Deletes an event (including all recurring instances). */
+
 export async function executeDelete(event, actions) {
     const baseId = extractBaseEventId(event.id, event);
     await actions.removeEvent(baseId);
 }
 
 /** Deletes a single occurrence of a recurring event by adding an exception. */
+
 export async function deleteRecurrenceOccurrence(event, actions) {
     const baseId = extractBaseEventId(event.id, event);
     const dateStr = new Date(event.start_time).toISOString().slice(0, 10);
@@ -175,9 +181,5 @@ function buildBaseEventData(form) {
 }
 
 function formatForInput(d) {
-    if (!d) return new Date().toISOString().slice(0, 16);
-    const date = typeof d === 'string' ? new Date(d) : d;
-    const offset = date.getTimezoneOffset() * 60000;
-    const localDate = new Date(date.getTime() - offset);
-    return localDate.toISOString().slice(0, 16);
+    return formatForDateTimeInput(d);
 }

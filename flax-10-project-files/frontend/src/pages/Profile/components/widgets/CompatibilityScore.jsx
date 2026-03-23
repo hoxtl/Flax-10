@@ -1,4 +1,10 @@
+/*
+ * CompatibilityScore widget – study time match, sparkline, and study-together CTA.
+ */
+
 import compatStyles from "./ProfileCompat.module.css";
+import { motion } from "framer-motion";
+import { useCountUp } from "../../../../hooks/useCountUp";
 
 const PERSONA_TIME_MAP = {
   night_owl: "night", early_bird: "morning", afternoon_peak: "afternoon",
@@ -24,36 +30,58 @@ function computeCompatibility(viewedSummary, currentUserSummary, sharedModuleCou
   return { total: Math.round(moduleScore * 0.5 + timeScore * 0.3 + personaMatch * 0.2), viewedTime, currentTime };
 }
 
+const MotionCircle = motion.circle;
+
 function CompatRing({ total }) {
-  const radius = 30;
-  const circ = 2 * Math.PI * radius;
-  const dash = (Math.min(total, 100) / 100) * circ;
+  const radius = 44;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (Math.max(0, Math.min(100, total)) / 100) * circumference;
   return (
-    <svg width="76" height="76" viewBox="0 0 76 76" className={compatStyles.compatRing}>
-      <circle cx="38" cy="38" r={radius} fill="none" stroke="var(--border)" strokeWidth="6" />
-      <circle
-        cx="38" cy="38" r={radius} fill="none"
-        stroke="var(--color-primary)" strokeWidth="6" strokeLinecap="round"
-        strokeDasharray={`${dash} ${circ - dash}`}
-        strokeDashoffset={circ * 0.25}
-        style={{ transition: "stroke-dasharray 0.8s ease" }}
+    <svg viewBox="0 0 120 120" className={compatStyles.compatRing} aria-hidden="true">
+      <circle className={compatStyles.compatRingTrack} cx="60" cy="60" r={radius} />
+      <MotionCircle className={compatStyles.compatRingProgress} cx="60" cy="60" r={radius}
+        style={{ strokeDasharray: circumference }}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: dashOffset }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       />
     </svg>
   );
 }
 
-function CompatDetails({ total, label, viewedUsername, sharedModuleCount, viewedTime, currentTime }) {
+function buildRhythmTextForMatch(total) {
+  if (total >= 75) return "Your focus windows line up really well";
+  if (total >= 50) return "You tend to study around similar hours";
+  return "There are a few overlapping study windows";
+}
+
+function buildRhythmTextForMismatch(total) {
+  if (total >= 60) return "You still have some overlap in your routine";
+  if (total >= 40) return "Different study rhythms, but a few shared windows";
+  return "Very different study rhythms";
+}
+
+function buildCompatDetailText(total, sharedModuleCount, viewedTime, currentTime) {
+  const rhythmText = viewedTime === currentTime ? buildRhythmTextForMatch(total) : buildRhythmTextForMismatch(total);
+  const sharedLabel = sharedModuleCount > 0 ? `${sharedModuleCount} module${sharedModuleCount > 1 ? "s" : ""} in common` : null;
+  return [rhythmText, sharedLabel].filter(Boolean).join(" · ");
+}
+
+function CompatHero({ total, sharedModuleCount, viewedTime, currentTime }) {
+  const pctRef = useCountUp(total, 1200);
+  const detailText = buildCompatDetailText(total, sharedModuleCount, viewedTime, currentTime);
   return (
-    <div className={compatStyles.compatInfo}>
-      <span className={compatStyles.compatPct}>{total}% match</span>
-      {label !== "Different paths" && (
-        <span className={compatStyles.compatLabel}>{label} with {viewedUsername}</span>
-      )}
-      <span className={compatStyles.compatDetail}>
-        {sharedModuleCount > 0 && `${sharedModuleCount} shared module${sharedModuleCount > 1 ? "s" : ""}`}
-        {sharedModuleCount > 0 && viewedTime === currentTime && " · "}
-        {viewedTime === currentTime && "Similar study times"}
-      </span>
+    <div className={compatStyles.compatHero}>
+      <div className={compatStyles.compatRingWrap}><CompatRing total={total} /></div>
+      <div className={compatStyles.compatHeroContent}>
+        <p className={compatStyles.compatHeroLabel}>Similar study times</p>
+        <div className={compatStyles.compatHeroValueRow}>
+          <span className={compatStyles.compatHeroValue} ref={pctRef}>0</span>
+          <span className={compatStyles.compatHeroUnit}>%</span>
+          <span className={compatStyles.compatHeroMatch}>match</span>
+        </div>
+        {detailText && <p className={compatStyles.compatDetail}>{detailText}</p>}
+      </div>
     </div>
   );
 }
@@ -71,32 +99,6 @@ function StudyTogetherCta({ suggestionState, onSuggestStudySession }) {
     >
       {ctaLabel}
     </button>
-  );
-}
-
-function MutualAvatar({ person, idx }) {
-  return (
-    <div className={compatStyles.mutualAvatarWrap} style={{ zIndex: 10 - idx }}>
-      {person.profile_photo_url
-        ? <img src={person.profile_photo_url} alt={person.username} className={compatStyles.mutualAvatar} />
-        : <div className={compatStyles.mutualAvatarFallback}>{(person.username || "?").slice(0, 1).toUpperCase()}</div>}
-    </div>
-  );
-}
-
-function MutualUsersRow({ mutualConnections }) {
-  const mutualUsers = mutualConnections?.users || [];
-  const mutualCount = mutualConnections?.count || 0;
-  if (!mutualCount) return null;
-  return (
-    <div className={compatStyles.mutualRow}>
-      <div className={compatStyles.mutualAvatars}>
-        {mutualUsers.slice(0, 4).map((person, idx) => (
-          <MutualAvatar key={person.id || person.username} person={person} idx={idx} />
-        ))}
-      </div>
-      <span className={compatStyles.mutualText}>{mutualCount} people you both know</span>
-    </div>
   );
 }
 
@@ -121,12 +123,6 @@ function ActivitySparklineRow({ activitySparkline }) {
   );
 }
 
-function getCompatibilityLabel(total) {
-  if (total >= 75) return "Great match";
-  if (total >= 50) return "Some overlap";
-  return "Different paths";
-}
-
 function buildCompatibilityViewModel(props) {
   const { total, viewedTime, currentTime } = computeCompatibility(
     props.viewedSummary,
@@ -138,36 +134,31 @@ function buildCompatibilityViewModel(props) {
     total,
     viewedTime,
     currentTime,
-    label: getCompatibilityLabel(total),
     showCta: total >= 75 && typeof props.onSuggestStudySession === "function",
   };
 }
 
-function CompatibilityBody({ viewModel, viewedUsername, sharedModuleCount, mutualConnections, activitySparkline, suggestionState, onSuggestStudySession }) {
+function CompatibilityBody({ viewModel, sharedModuleCount, activitySparkline, suggestionState, onSuggestStudySession }) {
   return (
     <>
-      <div className={compatStyles.compatTopRow}>
-        <CompatRing total={viewModel.total} />
-        <CompatDetails total={viewModel.total} label={viewModel.label} viewedUsername={viewedUsername} sharedModuleCount={sharedModuleCount} viewedTime={viewModel.viewedTime} currentTime={viewModel.currentTime} />
-      </div>
+      <CompatHero total={viewModel.total} sharedModuleCount={sharedModuleCount} viewedTime={viewModel.viewedTime} currentTime={viewModel.currentTime} />
       {viewModel.showCta && <StudyTogetherCta suggestionState={suggestionState} onSuggestStudySession={onSuggestStudySession} />}
-      <MutualUsersRow mutualConnections={mutualConnections} />
-      <ActivitySparklineRow activitySparkline={activitySparkline} />
+      <div className={compatStyles.compatBottomRow}>
+        <ActivitySparklineRow activitySparkline={activitySparkline} />
+      </div>
     </>
   );
 }
 
 export function CompatibilityScore(props) {
-  const { viewedSummary, currentUserSummary, sharedModuleCount, totalModuleCount, viewedUsername, mutualConnections, activitySparkline, onSuggestStudySession, suggestionState = "idle" } = props;
+  const { viewedSummary, currentUserSummary, sharedModuleCount, totalModuleCount, activitySparkline, onSuggestStudySession, suggestionState = "idle" } = props;
   if (!viewedSummary || !currentUserSummary) return null;
   const viewModel = buildCompatibilityViewModel({ viewedSummary, currentUserSummary, sharedModuleCount, totalModuleCount, onSuggestStudySession });
   return (
     <div className={compatStyles.compatCard}>
       <CompatibilityBody
         viewModel={viewModel}
-        viewedUsername={viewedUsername}
         sharedModuleCount={sharedModuleCount}
-        mutualConnections={mutualConnections}
         activitySparkline={activitySparkline}
         suggestionState={suggestionState}
         onSuggestStudySession={onSuggestStudySession}

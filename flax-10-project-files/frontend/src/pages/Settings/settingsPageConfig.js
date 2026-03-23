@@ -1,6 +1,7 @@
 /*
  * Settings page tab metadata and panel styling.
  */
+
 import { BookOpen, Clock3, Lock, MapPin, Moon, Palette, User } from "lucide-react";
 
 export const PANEL_META = {

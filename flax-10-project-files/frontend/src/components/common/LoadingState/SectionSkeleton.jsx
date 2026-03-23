@@ -15,6 +15,7 @@ function SkeletonHeader() {
 }
 
 /** Section loading skeleton with configurable row count and optional header and button. */
+
 export default function SectionSkeleton({ label = "Loading section", rows = 3, showHeader = true, showButton = true }) {
   return (
     <div className={styles.wrap} aria-busy="true" aria-label={label}>

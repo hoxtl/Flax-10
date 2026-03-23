@@ -1,5 +1,9 @@
-import styles from '../../pages/CampusMap/routes.module.css';
-import { travelTime, travelDistance } from './mapUtils';
+/**
+ * Walking route card.
+ */
+
+import styles from "../../pages/CampusMap/routes.module.css";
+import { travelDistance, travelTime } from "./mapUtils";
 
 function StepsList({ steps }) {
   return (
@@ -17,31 +21,12 @@ function StepsList({ steps }) {
   );
 }
 
-export function WalkingRouteCard({ routeInfo, instructionMode, onToggleInstructions }) {
+function WalkingRouteDetails({ instructionMode, onToggleInstructions, routeInfo }) {
   return (
-    <div className={styles.modeCard}>
-      <div className={styles.modeCardHeader}>
-        <span className={styles.modeIcon}>🚶</span>
-        <div className={styles.modeInfo}>
-          <span className={styles.modeName}>Walking</span>
-          <span className={styles.modeBadge}>Available now</span>
-        </div>
-      </div>
-      <div className={styles.modeStats}>
-        <div className={styles.modeStat}>
-          <span className={styles.modeStatValue}>{travelTime(routeInfo.duration)}</span>
-          <span className={styles.modeStatLabel}>Duration</span>
-        </div>
-        <div className={styles.modeStatDivider} />
-        <div className={styles.modeStat}>
-          <span className={styles.modeStatValue}>{travelDistance(routeInfo.distance)}</span>
-          <span className={styles.modeStatLabel}>Distance</span>
-        </div>
-      </div>
-      <button className={styles.stepsToggle} onClick={onToggleInstructions}>
-        {instructionMode ? 'Hide' : 'Show'} directions <span>{instructionMode ? '▲' : '▼'}</span>
-      </button>
-      {instructionMode && <StepsList steps={routeInfo.steps} />}
-    </div>
+    <div className={styles.modeCard}><div className={styles.modeCardHeader}><span className={styles.modeIcon}>🚶</span><div className={styles.modeInfo}><span className={styles.modeName}>Walking</span><span className={styles.modeBadge}>Available now</span></div></div><div className={styles.modeStats}><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelTime(routeInfo.duration)}</span><span className={styles.modeStatLabel}>Duration</span></div><div className={styles.modeStatDivider} /><div className={styles.modeStat}><span className={styles.modeStatValue}>{travelDistance(routeInfo.distance)}</span><span className={styles.modeStatLabel}>Distance</span></div></div><button className={styles.stepsToggle} onClick={onToggleInstructions}>{instructionMode ? "Hide" : "Show"} directions <span>{instructionMode ? "▲" : "▼"}</span></button>{instructionMode && <StepsList steps={routeInfo.steps} />}</div>
   );
+}
+
+export function WalkingRouteCard(props) {
+  return <WalkingRouteDetails {...props} />;
 }

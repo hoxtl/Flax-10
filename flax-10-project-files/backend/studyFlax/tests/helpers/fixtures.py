@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 def get_datetime_str(hours_offset=0, days_offset=0):
     """Generate ISO datetime string with offset."""
+
     dt = datetime.now(timezone.utc) + timedelta(
         hours=hours_offset, days=days_offset
     )

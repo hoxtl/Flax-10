@@ -1,6 +1,7 @@
 /**
  * Profile page state composition hooks.
  */
+
 import { getFilteredEvents, getUpcomingCount } from "../utils/profileHelpers";
 import { useEventsData, useModalState, useProfileData, useTaskCountData } from "./useProfileStatePieces";
 

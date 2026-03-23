@@ -1,17 +1,15 @@
 /*
  * Shared async helpers for settings save handlers.
  */
+
 import {
   clearAuthAndRedirect,
   hasToken,
   patchSettings,
   saveUserToStorage,
 } from "../../../api/settingsApi";
-import {
-  geocodeAddress,
-  saveHomeAddress,
-  updateUserSettings,
-} from "../../../api/userApi";
+import { saveHomeAddress, updateUserSettings } from "../../../api/userApi";
+import { geocodeAddress } from "../../../api/geocodeApi";
 
 export function showTemporaryMessage(setter, message, duration = 3000) {
   setter(message);

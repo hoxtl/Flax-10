@@ -1,8 +1,13 @@
-import baseStyles from '../../pages/CampusMap/CampusMap.module.css';
-import routeStyles from '../../pages/CampusMap/routes.module.css';
+/**
+ * Transport mode results section.
+ */
+
+import baseStyles from "../../pages/CampusMap/CampusMap.module.css";
+import routeStyles from "../../pages/CampusMap/routes.module.css";
+import { TflRouteCard } from "./TflRouteCard";
+import { WalkingRouteCard } from "./WalkingRouteCard";
+
 const styles = { ...baseStyles, ...routeStyles };
-import { WalkingRouteCard } from './WalkingRouteCard';
-import { TflRouteCard } from './TflRouteCard';
 
 function EmptyState() {
   return (
@@ -13,53 +18,25 @@ function EmptyState() {
   );
 }
 
-function RouteCards({ routeInfo, tflRouteInfo, tflRouteError, loadingTflRoute, walkingInstructions, tflInstructions, onToggleWalking, onToggleTfl }) {
+function RouteCards(props) {
   return (
     <>
-      <WalkingRouteCard
-        routeInfo={routeInfo}
-        instructionMode={walkingInstructions}
-        onToggleInstructions={onToggleWalking}
-      />
-      <TflRouteCard
-        tflRouteInfo={tflRouteInfo}
-        error={tflRouteError}
-        loading={loadingTflRoute}
-        instructionMode={tflInstructions}
-        onToggleInstructions={onToggleTfl}
-      />
+      <WalkingRouteCard routeInfo={props.routeInfo} instructionMode={props.walkingInstructions} onToggleInstructions={props.onToggleWalking} />
+      <TflRouteCard tflRouteInfo={props.tflRouteInfo} error={props.tflRouteError} loading={props.loadingTflRoute} instructionMode={props.tflInstructions} onToggleInstructions={props.onToggleTfl} />
     </>
   );
 }
 
-export function TransportModesSection({ startLocation, selectedCampus, customDestination, routeInfo, routeError, loadingRoute, tflRouteInfo, tflRouteError, loadingTflRoute, walkingInstructions, tflInstructions, onToggleWalking, onToggleTfl }) {
-  const hasDestination = selectedCampus || customDestination;
-  const showEmpty = !startLocation || !hasDestination;
+function TransportContent(props) {
+  if (!props.startLocation || !(props.selectedCampus || props.customDestination)) return <EmptyState />;
+  if (props.loadingRoute) return <div className={styles.loadingRoute}><span className={styles.spinner} /><span>Calculating route...</span></div>;
+  if (props.routeError) return <div className={styles.routeError}>{props.routeError}</div>;
+  if (!props.routeInfo) return null;
+  return <RouteCards {...props} />;
+}
+
+export function TransportModesSection(props) {
   return (
-    <section className={styles.section}>
-      <div className={styles.sectionLabel}>
-        <span className={styles.stepBadge}>3</span>
-        Transport Modes
-      </div>
-      {showEmpty ? <EmptyState /> : loadingRoute ? (
-        <div className={styles.loadingRoute}>
-          <span className={styles.spinner} />
-          <span>Calculating route…</span>
-        </div>
-      ) : routeError ? (
-        <div className={styles.routeError}>{routeError}</div>
-      ) : routeInfo ? (
-        <RouteCards
-          routeInfo={routeInfo}
-          tflRouteInfo={tflRouteInfo}
-          tflRouteError={tflRouteError}
-          loadingTflRoute={loadingTflRoute}
-          walkingInstructions={walkingInstructions}
-          tflInstructions={tflInstructions}
-          onToggleWalking={onToggleWalking}
-          onToggleTfl={onToggleTfl}
-        />
-      ) : null}
-    </section>
+    <section className={styles.section}><div className={styles.sectionLabel}><span className={styles.stepBadge}>3</span>Transport Modes</div><TransportContent {...props} /></section>
   );
 }

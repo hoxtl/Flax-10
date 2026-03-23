@@ -1,8 +1,12 @@
+/**
+ * Display helpers for campus map transport and events.
+ */
+
 export const PRIORITY_COLORS = {
-  urgent: '#FF4444',
-  high: '#FF8800',
-  medium: '#4488FF',
-  low: '#888888',
+  urgent: 'var(--map-priority-urgent)',
+  high: 'var(--map-priority-high)',
+  medium: 'var(--map-priority-medium)',
+  low: 'var(--map-priority-low)',
 };
 
 export const LEG_MODE_ICONS = {
@@ -28,7 +32,7 @@ export function travelDistance(metres) {
 }
 
 export function getPriorityColor(priority) {
-  return PRIORITY_COLORS[priority] ?? '#4488FF';
+  return PRIORITY_COLORS[priority] ?? 'var(--map-priority-medium)';
 }
 
 export function getLegIcon(mode) {

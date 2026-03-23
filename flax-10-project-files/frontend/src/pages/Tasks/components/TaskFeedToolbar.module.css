@@ -1,7 +1,4 @@
-/*
- * TaskFeed toolbar styles: search, sort dropdown, and filter panel.
- */
-
+/* Task feed toolbar styles. */
 .toolbarStrip {
   background: transparent;
   border-radius: 0 0 10px 10px;
@@ -9,55 +6,67 @@
   margin: 0 -2px;
   flex-shrink: 0;
 }
-
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   width: 100%;
 }
 
+.controlsRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+}
+
 .searchWrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 0;
-    max-width: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  max-width: none;
 }
 .toolbar .searchWrap {
-    min-width: 360px;
-    max-width: none;
+  min-width: 360px;
+  max-width: none;
 }
 .searchField {
-    width: 100%;
+  width: 100%;
 }
 .searchInput {
-    padding-right: 34px;
+  padding-right: 34px;
 }
 .searchClear {
-    position: absolute;
-    right: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: var(--widget-text-tertiary);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: color 0.15s, background 0.15s;
+  position: absolute;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--widget-text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
-.searchClear:hover { color: var(--widget-text-primary); background: var(--hover); }
+.searchClear:hover {
+  color: var(--widget-text-primary);
+  background: var(--hover);
+}
 
 .sortWrap {
   position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
+  min-width: 0;
+  flex: 1;
 }
 
 .sortLabel {
@@ -71,28 +80,30 @@
 }
 
 .sortDropdown {
-    width: 170px;
-    min-width: 170px;
-    flex: 0 0 170px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    padding: 0;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 170px;
+  min-width: 150px;
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .toolbarStrip .sortDropdown:hover {
-    border-color: var(--primary, #7B6751);
+  border-color: var(--primary, #7b6751);
 }
 
 .sortDropdown:focus-within {
-    border-color: var(--primary, #7B6751);
-    box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
+  border-color: var(--primary, #7b6751);
+  box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
 }
 
 .sortDropdown > button {
@@ -110,24 +121,49 @@
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .sortDropdown > button:hover {
-  border-color: var(--primary, #7B6751);
+  border-color: var(--primary, #7b6751);
 }
 
 .sortDropdown > button:focus,
 .sortDropdown > button:focus-visible {
   outline: none;
-  border-color: var(--primary, #7B6751);
+  border-color: var(--primary, #7b6751);
   box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
 }
 
 .filterPanelWrap {
   position: relative;
   flex-shrink: 0;
-  justify-self: end;
+  justify-self: auto;
+}
+
+.viewListsBtn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid var(--widget-border);
+  border-radius: 10px;
+  color: var(--widget-text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.viewListsBtn:hover {
+  border-color: var(--primary, #7b6751);
+  background: rgba(107, 83, 68, 0.04);
 }
 
 .filterBtn {
@@ -143,11 +179,13 @@
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .filterBtn:hover {
-  border-color: var(--primary, #7B6751);
+  border-color: var(--primary, #7b6751);
   background: rgba(107, 83, 68, 0.04);
 }
 
@@ -201,7 +239,7 @@
 }
 
 .filterTabActive {
-  background: var(--primary, #7B6751);
+  background: var(--primary, #7b6751);
   color: var(--color-card);
 }
 
@@ -229,7 +267,7 @@
 }
 
 .filterSearchInput:focus {
-  border-color: var(--primary, #7B6751);
+  border-color: var(--primary, #7b6751);
   box-shadow: 0 0 0 3px rgba(158, 126, 93, 0.1);
 }
 
@@ -281,7 +319,7 @@
 }
 
 .filterItemRow input[type="checkbox"] {
-  accent-color: var(--primary, #7B6751);
+  accent-color: var(--primary, #7b6751);
   margin: 0;
 }
 
@@ -295,7 +333,7 @@
 .filterClearBtn {
   border: none;
   background: none;
-  color: var(--primary, #7B6751);
+  color: var(--primary, #7b6751);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -310,12 +348,52 @@
 @media (max-width: 980px) {
   .toolbar {
     grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
   }
   .toolbar .searchWrap {
     min-width: 0;
   }
-  .sortWrap,
-  .filterPanelWrap {
-    justify-self: start;
+
+  .controlsRow {
+    justify-self: stretch;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .sortWrap {
+    min-width: 0;
+    max-width: 240px;
+  }
+
+  .sortDropdown {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .viewListsBtn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 540px) {
+  .controlsRow {
+    gap: 6px;
+  }
+
+  .sortLabel {
+    display: none;
+  }
+
+  .sortWrap {
+    max-width: none;
+    flex: 1;
+  }
+
+  .filterBtn,
+  .viewListsBtn {
+    font-size: 0.86rem;
+    padding: 7px 10px;
   }
 }

@@ -2,6 +2,7 @@
  * AnnouncementsTab displays a chronological list of society news and updates.
  * Supports pinning, editing, and smooth-scrolling to focused announcements.
  */
+
 import { useState, useEffect, useRef } from "react";
 import styles from "../tabs.module.css";
 import { formatShortDate } from "../../../../Calendar/utils/dateUtils";

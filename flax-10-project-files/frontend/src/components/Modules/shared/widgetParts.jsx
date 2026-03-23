@@ -1,6 +1,7 @@
 /*
  * Shared widget primitives for module dashboard panels.
  */
+
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 

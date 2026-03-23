@@ -1,6 +1,7 @@
 /*
  * Manual schedule event list.
  */
+
 import styles from '../shared/scheduleFormStyles';
 
 export function ManualScheduleEventList({ events, filteredEvents, selected, toggle }) {

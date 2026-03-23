@@ -1,6 +1,7 @@
 /**
  * Tests for CampusMap page.
  */
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
@@ -48,7 +49,7 @@ vi.mock("mapbox-gl", () => ({
         togglePopup: vi.fn(),
       };
     }),
-    LngLatBounds: vi.fn().mockImplementation(function (a, b) { return { extend: vi.fn().mockReturnThis() }; }),
+    LngLatBounds: vi.fn().mockImplementation(function () { return { extend: vi.fn().mockReturnThis() }; }),
     accessToken: "test-token",
   },
 }));
@@ -61,12 +62,12 @@ vi.mock("../../../api/tflApi", () => ({
 }));
 
 vi.mock("../../../api/userApi", () => ({
-  getHomeAddress: vi.fn().mockResolvedValue({}),
+    getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
 vi.mock("framer-motion", () => ({
   motion: {
-    aside: ({ children, initial, animate, drag, dragConstraints, dragElastic, onDragEnd, ...p }) => (
+    aside: ({ children, ...p }) => (
       <aside {...p}>{children}</aside>
     ),
     div: ({ children, ...p }) => <div {...p}>{children}</div>,

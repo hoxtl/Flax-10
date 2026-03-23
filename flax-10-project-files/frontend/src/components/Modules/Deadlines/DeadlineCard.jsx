@@ -1,10 +1,11 @@
 /*
  * Deadline card displaying due date, countdown, and teacher actions.
  */
+
 import { useState } from 'react';
 import { formatFullDateTime } from '../utils/moduleUtils';
 import { getDeadlineCountdown, DEADLINE_LABELS } from "../utils/deadlineUtils.js";
-import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
 import styles from './DeadlineCard.module.css';
 
 export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete }) {
@@ -14,11 +15,9 @@ export default function DeadlineCard({ deadline, is_teacher, onEdit, onDelete })
         <div className={`${styles.card} ${countdown === 'Past due' ? styles.past : ''}`}>
             <DeadlineCardHeader deadline={deadline} countdown={countdown} />
             <DeadlineCardBody deadline={deadline} />
-            {is_teacher && <DeadlineCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} />}
+            {is_teacher && <ModuleItemCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} styles={styles} />}
             {showDeleteConfirm && (
-                <ConfirmModal title="Delete Deadline" message={`Are you sure you want to delete "${deadline.title}"? This action cannot be undone.`}
-                    onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)}
-                    confirmText="Delete" isDanger={true} />
+                <ModuleItemDeleteDialog itemType="Deadline" itemTitle={deadline.title} onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)} />
             )}
         </div>
     );
@@ -43,14 +42,5 @@ function DeadlineCardBody({ deadline }) {
             {deadline.location && <p className={styles.meta}>📍 {deadline.location}</p>}
             {deadline.description && <p className={styles.meta}>📝 {deadline.description}</p>}
         </>
-    );
-}
-
-function DeadlineCardActions({ onEdit, onDelete }) {
-    return (
-        <div className={styles.cardActions}>
-            <button className={styles.editButton} onClick={onEdit}>Edit</button>
-            <button className={styles.deleteButton} onClick={onDelete}>Delete</button>
-        </div>
     );
 }

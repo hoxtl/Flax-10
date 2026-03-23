@@ -35,7 +35,7 @@ export function UserResultItem({ user, onSelect, compact }) {
     const compactClass = compact ? styles.compactUserItem : '';
     return (
         <div className={`${styles.userItem} ${styles.userResultItem} ${compactClass}`} onClick={onSelect}>
-            <UserAvatar user={user} avatarOnly />
+            <UserAvatar user={user} avatarOnly size={compact ? 42 : 44} allowGenericFallback />
             <div className={styles.userNameDetails}>
                 {!compact && <span className={styles.userFullName}>{displayName}</span>}
                 <span className={styles.userHandle}>{compact ? user.username : `@${user.username}`}</span>

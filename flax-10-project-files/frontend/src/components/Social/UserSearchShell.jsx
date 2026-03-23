@@ -4,50 +4,31 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import SearchBar from '../common/SearchBar/SearchBar';
-import { FilterDropdown, SearchDropdown } from './UserSearchLists';
+import { SearchDropdown } from './UserSearchLists';
+import { FilterDropdown } from './FilterDropdown';
 import { styles } from './userSearchShared';
 
-export function GlobalSearchBar({
-    query,
-    setQuery,
-    setFocus,
-    containerRef,
-    showDropdown,
-    loading,
-    userResults,
-    handleSelect,
-    fullWidth,
-    compact,
-    renderEmptyState,
-}) {
+export function GlobalSearchBar({ query, setQuery, setFocus, containerRef, showDropdown, loading, userResults, handleSelect, fullWidth, compact, renderEmptyState, placeholder = "Search users...", dropdownMode = "overlay" }) {
     const widthClass = fullWidth ? styles.fullWidthSearch : '';
     const searchClass = fullWidth ? styles.searchBarFull : styles.searchBarContainer;
     return (
         <div className={`${styles.searchContainer} ${styles.relativeContainer} ${widthClass}`} ref={containerRef}>
-            <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder="Search users..." className={searchClass} />
-            {showDropdown && (
-                <SearchDropdown
-                    loading={loading}
-                    query={query}
-                    setQuery={setQuery}
-                    userResults={userResults}
-                    onUserSelect={handleSelect}
-                    compact={compact}
-                    renderEmptyState={renderEmptyState}
-                />
-            )}
+            <SearchBar value={query} onChange={setQuery} onFocus={setFocus} placeholder={placeholder} className={searchClass} />
+            {showDropdown && <SearchDropdown loading={loading} query={query} setQuery={setQuery} userResults={userResults} onUserSelect={handleSelect} compact={compact} renderEmptyState={renderEmptyState} dropdownMode={dropdownMode} />}
         </div>
     );
 }
 
-export function FilterSection({ fRef, isOpen, setOpen, props }) {
+export function FilterSection({ fRef, isOpen, setOpen, onOpen, onClose, props }) {
     return (
-        <div ref={fRef} className={styles.relativeContainer}>
+        <div ref={fRef} className={styles.relativeContainer} onMouseEnter={onOpen} onMouseLeave={onClose}>
             <button onClick={setOpen} className={styles.filterBtn}><FilterIcon /> Filter</button>
             <AnimatePresence>{isOpen && <FilterDropdownMotion {...props} />}</AnimatePresence>
         </div>
     );
 }
+
+const FILTER_DROPDOWN_STYLE = { originY: 0, originX: 1, position: 'relative', zIndex: 10000 };
 
 function FilterDropdownMotion(props) {
     return (
@@ -56,7 +37,7 @@ function FilterDropdownMotion(props) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            style={{ originY: 0, originX: 1, position: 'relative', zIndex: 10000 }}
+            style={FILTER_DROPDOWN_STYLE}
         >
             <FilterDropdown {...props} />
         </motion.div>

@@ -1,6 +1,7 @@
 /*
  * Tests for ModulesCard component.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModulesCard from '../../../components/Modules/Modules/ModulesCard';

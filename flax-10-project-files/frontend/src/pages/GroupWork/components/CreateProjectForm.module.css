@@ -1,83 +1,147 @@
-.formCard {
-    margin-bottom: 32px;
+.triggerBtn {
+    min-height: 36px;
+    padding-inline: 16px;
+    box-shadow: none;
 }
 
-.sectionHeader {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
+.modalPanel {
+    width: min(860px, 96vw);
+    max-height: min(94vh, 920px);
 }
 
-.sectionTitle {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--text-secondary);
-    white-space: nowrap;
+.modalContent {
+    padding-right: 4px;
+    padding-bottom: 10px;
+    overflow: visible !important;
 }
 
-.sectionLine {
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-    opacity: 0.5;
+.modalSubtitle {
+    color: var(--text);
+    font-weight: 500;
 }
 
-.createProjectForm {
+.modalForm {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
     gap: 16px;
-    align-items: flex-end;
+}
+
+.formFields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: 14px;
+}
+
+.membersField {
+    min-width: 0;
 }
 
 .inputName {
-    grid-column: 1;
+    grid-column: 1 / -1;
 }
 
 .inputField {
     min-width: 0;
 }
 
-.optionalText {
-    font-weight: normal;
-    opacity: 0.6;
+.fieldLabel {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
 }
 
-.datePickerTrigger {
+.optionalText {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.85em;
+    color: var(--muted);
+}
+
+.requiredMark {
+    color: var(--danger);
+}
+
+.dropdownWrap {
     width: 100%;
-    height: 36px;
-    padding: 0 12px;
+}
+
+.dropdownTrigger {
+    width: 100%;
+    min-height: var(--input-height);
+    padding: var(--input-padding);
     border: var(--input-border);
-    border-radius: var(--radius-md);
-    background: var(--surface-search);
+    border-radius: var(--dropdown-radius);
+    background: var(--surface-raised);
     color: var(--text);
     font: inherit;
-    font-size: 13px;
+    font-size: var(--text-base);
     text-align: left;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     cursor: pointer;
     box-sizing: border-box;
     overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.datePickerTrigger:hover {
+.dropdownTrigger:hover {
     border-color: var(--primary);
+}
+
+.dropdownTrigger:focus-visible {
+    outline: none;
+    box-shadow: var(--input-focus-ring);
 }
 
 .datePickerWrap {
     width: 100%;
-    max-width: 180px;
+    max-width: none;
+}
+
+.membersPicker {
+    display: grid;
+    gap: 6px;
+}
+
+.membersHint {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.memberSearchEmpty {
+    margin-top: 2px;
+}
+
+.memberSearchEmptyCard {
+    margin: 0;
+    padding: 0.85rem 0.8rem;
+    border-radius: 14px;
+    box-shadow: none;
+    min-height: 104px;
+}
+
+.memberSearchEmptyTitle {
+    font-size: 0.92rem;
+}
+
+.memberSearchEmptyHint {
+    font-size: 0.79rem;
 }
 
 .formFooter {
-    grid-column: 1 / -1;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     justify-content: flex-end;
-    margin-top: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
 }
 
 .formError {
@@ -87,13 +151,17 @@
     font-weight: 500;
 }
 
+.cancelBtn {
+    min-width: 90px;
+}
+
 .submitBtn {
-    height: 40px;
-    padding: 0 24px;
+    height: 38px;
+    padding: 0 20px;
 }
 
 @media (max-width: 768px) {
-    .createProjectForm {
+    .formFields {
         grid-template-columns: 1fr;
     }
 }

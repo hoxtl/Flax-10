@@ -1,42 +1,18 @@
 .tabsSection {
-    margin-top: 24px;
-}
-
-.tabsRow {
+    margin-top: 10px;
     display: flex;
-    gap: 12px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 15px;
+    flex-direction: column;
+    gap: 18px;
 }
 
-.tab {
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
+.sharedTabs {
+    width: 100%;
 }
 
-.tabActive {
-    background: var(--primary);
-    color: white;
+.sharedTabs :global([class*="tabBar"]) {
+    margin-bottom: 1.25rem;
 }
 
-.tabPanels {
-    margin-top: 0;
-}
-
-.tabPanel {
-    display: none;
-}
-
-.tabPanelActive {
-    display: block;
-}
-
-.tabContent {
-    margin-top: 0;
+.sharedTabs :global([class*="headingTab"]) {
+    padding-inline: 0.2rem;
 }

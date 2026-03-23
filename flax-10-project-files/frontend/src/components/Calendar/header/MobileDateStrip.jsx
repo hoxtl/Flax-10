@@ -18,6 +18,7 @@ function DateCard({ day, isActive, onClick }) {
 }
 
 /** Horizontal strip of dates for quick navigation on mobile. */
+
 export function MobileDateStrip({ selectedDate, dispatch }) {
   const weekStart = getStartOfWeek(selectedDate);
   const weekDays = [...Array(7)].map((_, i) => addDays(weekStart, i));

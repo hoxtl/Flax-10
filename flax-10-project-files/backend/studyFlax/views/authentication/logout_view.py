@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     """View method for user logout."""
+
     try:
         token = request.user.auth_token
     except ObjectDoesNotExist:

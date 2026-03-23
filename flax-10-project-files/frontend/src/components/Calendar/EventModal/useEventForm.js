@@ -2,6 +2,7 @@
  * useEventForm - Form state management for event creation and editing.
  * Handles validation, sleep time warnings, and overlap detection.
  */
+
 import { useState, useEffect } from "react";
 import { useCalendar } from "../../../context/CalendarContext";
 import { useConfirm } from "../../../context/ConfirmContext";
@@ -85,6 +86,7 @@ function createCustomSubmitHandler(form, customSubmit, onClose, setError) {
 }
 
 /** Hook for managing event form state and submission. */
+
 export function useEventForm(event, onClose, options = {}) {
   const calendarContext = useCalendar();
   const confirmFn = useConfirm();

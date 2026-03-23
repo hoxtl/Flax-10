@@ -2,6 +2,7 @@
  * allDayRowHelpers - Layout calculations for all-day events in week view.
  * Handles positioning events across multiple days with row stacking.
  */
+
 import { isSameDay } from '../../utils/dateUtils';
 import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 
@@ -36,6 +37,7 @@ function assignRowsToItems(items) {
 }
 
 /** Calculates layout positions for all-day events across week columns. */
+
 export function calculateEventLayout(events, days) {
     const visibleEvents = events.map(e => mapEventToLayout(e, days)).filter(Boolean);
     visibleEvents.sort(sortByStartAndWidth);

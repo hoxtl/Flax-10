@@ -1,6 +1,7 @@
 """
 Model tracking per-user attendance records for timetable events.
 """
+
 from django.db import models
 
 from ..auth.user_model import User
@@ -8,6 +9,7 @@ from .calendar_event_model import CalendarEvent
 
 class EventAttendance(models.Model):
     """One record per user per timetable event: did they attend?"""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(CalendarEvent, on_delete=models.CASCADE)
     attended = models.BooleanField(default=True)

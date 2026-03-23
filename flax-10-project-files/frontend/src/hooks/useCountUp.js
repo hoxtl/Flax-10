@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
  * Attach the returned ref to the DOM element that should display the number.
  * Mirrors the count-up animation used on the Analytics summary cards.
  */
+
 export function useCountUp(target, duration = 900) {
   const ref = useRef(null);
   useEffect(() => {

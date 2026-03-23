@@ -1,6 +1,7 @@
 /*
  * Presentational account form layout.
  */
+
 import InlineAlert from "../../common/InlineAlert/InlineAlert";
 import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";
@@ -13,7 +14,6 @@ function AccountSidebarCard() {
     <SettingsContextCard
       emoji="🧾"
       title="Account setup"
-      body="Keep your profile updated for a personalised experience."
       items={[
         "Accurate first and last name for your timetable display",
         "Correct year and course for relevant recommendations",

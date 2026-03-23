@@ -1,6 +1,7 @@
 /*
  * useSocietyBrowseFilters owns search, filter, and sort state for society browsing.
  */
+
 import { useState } from "react";
 
 const DEFAULT_FILTERS = { ratified: "all", category: [] };

@@ -1,6 +1,7 @@
 /*
  * useSocietySubscription toggles notification subscriptions for a society.
  */
+
 import { toggleSubscription as apiToggle } from "../../../api/societyApi";
 import { useConfirm } from "../../../context/ConfirmContext";
 
@@ -16,7 +17,7 @@ const makeSubscribe = (societyId, updateLocalSociety) =>
         try {
             await apiToggle(societyId, true);
             updateLocalSociety({ is_subscribed: true });
-        } catch (err) { console.error('Subscription failed:', err); }
+        } catch {}
     };
 
 const doUnsubscribe = async (societyId, updateLocalSociety, confirm, name) => {
@@ -29,7 +30,7 @@ const doUnsubscribe = async (societyId, updateLocalSociety, confirm, name) => {
 const makeUnsubscribe = (societyId, updateLocalSociety, confirm, name) =>
     async () => {
         try { await doUnsubscribe(societyId, updateLocalSociety, confirm, name); }
-        catch (err) { console.error('Unsubscription failed:', err); }
+        catch {}
     };
 
 export function useSocietySubscription(societyId, society, updateLocalSociety) {

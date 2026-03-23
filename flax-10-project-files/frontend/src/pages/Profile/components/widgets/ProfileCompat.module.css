@@ -1,50 +1,135 @@
 /* ── Common Ground ── */
 .commonGroundTitle {
-  font-size: 12px;
-  font-style: italic;
-  color: #5D4037;
-  margin: 6px 0 10px;
-  line-height: 1.4;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--text) 86%, var(--muted) 14%);
+  margin: 0 0 1rem;
+  line-height: 1.55;
+}
+
+.commonGroundCard {
+  background: var(--surface-card);
+  border: var(--card-border);
+  border-radius: var(--card-radius-token);
+  box-shadow: var(--card-shadow-rest);
+  padding: clamp(0.9rem, 1.8vw, 1.05rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.68rem;
+  align-self: start;
+  height: fit-content;
+}
+
+.commonGroundEyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--text) 76%, var(--muted) 24%);
+  margin: 0;
+}
+
+.commonGroundGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.68rem;
+  align-items: start;
 }
 
 .commonGroundPills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding-bottom: 2px;
+  gap: 5px;
 }
 
-.commonSubGroup {
+.commonInsightCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface-card);
+  border: var(--card-border);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--card-radius-token);
+  padding: 0.85rem;
+  box-shadow: var(--card-shadow-rest);
+  height: fit-content;
+}
+
+.commonInsightTop {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.commonInsightIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--card-icon-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.commonInsightEmoji {
+  font-size: 1rem;
+}
+
+.commonInsightBody {
+  min-width: 0;
+}
+
+.commonInsightLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 86%, var(--muted) 14%);
+  margin: 0 0 0.2rem;
+}
+
+.commonInsightValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.commonInsightValue {
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.commonInsightUnit {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.commonInsightSubtitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+  margin: 0.2rem 0 0;
+}
+
+.commonInsightPills {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 8px;
-}
-
-.commonSubGroup:last-child {
-  margin-bottom: 0;
-}
-
-.commonSubHeader {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-  padding-top: 4px;
 }
 
 .sharedPill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
-  background: #212121;
+  background: var(--color-primary);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  border: 1px solid #212121;
+  border: 1px solid var(--color-primary);
   cursor: pointer;
   transition: transform 0.12s ease, opacity 0.12s ease;
   font-family: inherit;
@@ -58,12 +143,12 @@
 .otherPill {
   display: inline-flex;
   align-items: center;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
   background: transparent;
-  border: 1px solid #212121;
-  color: #212121;
-  font-size: 11px;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: transform 0.12s ease, background 0.12s ease;
@@ -72,7 +157,7 @@
 
 .otherPill:hover {
   transform: translateY(-1px);
-  background: rgba(33,33,33,0.06);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 /* ── Compatibility Score ── */
@@ -80,51 +165,108 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 12px;
-  padding: 18px 22px;
-  background: var(--surface-glass-card, var(--panel));
-  border: 1px solid var(--surface-glass-card-border, var(--border));
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  justify-content: flex-start;
+  gap: 0.45rem;
+  padding: clamp(0.95rem, 2vw, 1.1rem);
+  background: var(--surface-card);
+  border: var(--card-border);
+  border-radius: var(--card-radius-token);
+  box-shadow: var(--card-shadow-rest);
+  align-self: start;
+  height: fit-content;
 }
 
-.compatTopRow {
+.compatHero {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.compatRingWrap {
+  width: 108px;
+  height: 108px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .compatRing {
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
 }
 
-.compatInfo {
+.compatRingTrack,
+.compatRingProgress {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.compatRingTrack {
+  stroke: color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+.compatRingProgress {
+  stroke: var(--color-primary);
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.compatHeroContent {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.18rem;
   min-width: 0;
 }
 
-.compatPct {
-  font-size: 20px;
+.compatHeroLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.compatHeroValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.18rem;
+  flex-wrap: wrap;
+}
+
+.compatHeroValue {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.compatHeroUnit {
+  font-size: 1rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 75%, var(--muted) 25%);
+}
+
+.compatHeroMatch {
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--text);
   line-height: 1.1;
 }
 
-.compatLabel {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--color-primary);
-  line-height: 1.3;
+.compatDetail {
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--text) 88%, var(--muted) 12%);
+  line-height: 1.4;
+  font-weight: 600;
+  margin: 0.04rem 0 0;
 }
 
-.compatDetail {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.3;
+.compatBottomRow {
+  display: grid;
+  gap: 8px;
+  margin-top: 0.2rem;
 }
 
 .studyTogetherBtn {
@@ -164,6 +306,11 @@
 
 .mutualAvatarWrap {
   margin-left: -8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: block;
 }
 
 .mutualAvatarWrap:first-child {
@@ -196,9 +343,7 @@
 .mutualText {
   font-size: 12px;
   color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
 }
 
 /* ── Activity Sparkline ── */
@@ -207,12 +352,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 0;
 }
 
 .sparklineLabel {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text);
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -237,4 +385,14 @@
 .sparkDot4 {
   background: var(--color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+@media (max-width: 900px) {
+  .commonGroundGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .compatHero {
+    align-items: center;
+  }
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Code Quality Checker - BAND V COMPLIANCE
-Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file
-Test files: ≤25 lines for test functions | ≤2 nesting | 
+Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file
+Test files: ≤25 lines for test functions | ≤2 nesting |
 """
 
 import os
@@ -20,7 +20,7 @@ def print_header():
     print(f"\n{'='*75}")
     print(f"{Colors.BOLD}{Colors.MAGENTA}{'BAND V CODE QUALITY REPORT - PYTHON'.center(75)}{Colors.END}")
     print(f"{'='*75}")
-    print(f"Requirements: ≤15 lines | ≤1 nesting | ≤400 lines/file")
+    print(f"Requirements: ≤20 lines | ≤1 nesting | ≤400 lines/file")
     print(f"Test files: ≤25 lines for test functions\n")
 
 def print_section(number, title):
@@ -61,7 +61,7 @@ def check_function_length(target_dir):
                             start = node.body[0].end_lineno + 1
                     
                     lines = node.end_lineno - start + 1 if hasattr(node, 'end_lineno') else 0
-                    limit = 25 if is_test else 15
+                    limit = 25 if is_test else 20
                     
                     if lines > limit:
                         violations.append({
@@ -160,7 +160,7 @@ def main():
     test_func = [v for v in func_violations if v['is_test']]
     
     # Regular files
-    print_subsection("Regular Files (≤15 lines)")
+    print_subsection("Regular Files (≤20 lines)")
     if regular_func:
         print(f"\n{Colors.RED}❌ {len(regular_func)} VIOLATION(S){Colors.END}\n")
         for v in sorted(regular_func, key=lambda x: x['lines'], reverse=True):

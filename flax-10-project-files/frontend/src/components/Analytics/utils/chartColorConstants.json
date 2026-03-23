@@ -1,0 +1,14 @@
+{
+  "dark": {
+    "textColor": "rgba(200,184,164,0.85)",
+    "gridColor": "rgba(180,164,144,0.2)"
+  },
+  "light": {
+    "textColor": "rgba(43,30,20,0.55)",
+    "gridColor": "rgba(74,52,33,0.15)"
+  },
+  "warm": {
+    "textColor": "rgba(123, 103, 81, 0.7)",
+    "gridColor": "rgba(123, 103, 81, 0.12)"
+  }
+}

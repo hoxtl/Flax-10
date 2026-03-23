@@ -1,57 +1,24 @@
-import { useState, useMemo } from "react";
-import { Filter } from "lucide-react";
+/*
+ * Filter dropdown and tag manager entrypoint.
+ */
+
+import { useState } from "react";
 import styles from "./PillFilters.module.css";
-import { countByType } from "./utils/pillUtils";
-import { useTags } from "../../context/TagContext";
-import TagManagerModal from "./TagManagerModal";
 import AnimatedDropdown from "../common/AnimatedDropdown/AnimatedDropdown";
+import TagManagerModal from "./TagManagerModal";
+import { usePillFilterOptions } from "./pillFilters/usePillFilterOptions";
+import { FilterTriggerButton } from "./pillFilters/PillFilterControls";
+import { ManageTagsButton } from "./pillFilters/PillFilterControls";
 
-export default function PillFilters({ active, onChange, items }) {
-  const { tags } = useTags();
+export default function PillFilters({ active, items, onChange }) {
   const [showManager, setShowManager] = useState(false);
-  const counts = countByType(items);
-
-  const options = useMemo(() => {
-    const uniqueTags = Array.from(
-      new Map((tags || []).map(t => [t.label.toLowerCase(), t])).values()
-    );
-    return [
-      { value: "all", label: `All (${counts["all"] || 0})` },
-      ...uniqueTags.map(t => ({
-        value: t.label.toLowerCase(),
-        label: `${t.label} (${counts[t.label.toLowerCase()] || 0})`,
-      })),
-    ];
-  }, [tags, counts]);
-
-  const activeLabel = options.find(o => o.value === active)?.label || "Filter";
-
-  const trigger = (
-    <button className={styles.filterTrigger} type="button">
-      <Filter size={15} />
-      <span>{activeLabel}</span>
-    </button>
-  );
+  const { activeLabel, options } = usePillFilterOptions({ active, items });
 
   return (
     <>
       <div className={styles.row}>
-        <AnimatedDropdown
-          customTrigger={trigger}
-          options={options}
-          value={active}
-          onChange={onChange}
-          align="left"
-          className={styles.filterDropdown}
-        />
-        <button
-          className={styles.managerBtn}
-          onClick={() => setShowManager(true)}
-          aria-label="Manage Tags"
-          type="button"
-        >
-          Manage Tags
-        </button>
+        <AnimatedDropdown align="left" className={styles.filterDropdown} customTrigger={<FilterTriggerButton label={activeLabel} />} onChange={onChange} options={options} value={active} />
+        <ManageTagsButton onClick={() => setShowManager(true)} />
       </div>
       {showManager && <TagManagerModal onClose={() => setShowManager(false)} />}
     </>

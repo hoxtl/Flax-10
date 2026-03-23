@@ -30,8 +30,10 @@ export function getTomorrowFirstEvent(allCalEvents, selectedDate) {
 
 export function getTaskCategoryPillMeta(task, taskLists, enrolledModules, getTag) {
   const listId = task.task_list != null ? String(task.task_list) : null;
+  const directName = task.list_name || null;
+  if (directName && directName.toLowerCase() !== 'none') return { label: String(directName).trim().slice(0, 20), listId };
   const list = (taskLists || []).find((item) => String(item.id) === listId);
-  if (list?.name) return { label: String(list.name).trim().slice(0, 20), listId };
+  if (list?.name && list.name.toLowerCase() !== 'none') return { label: String(list.name).trim().slice(0, 20), listId };
   const moduleId = getTaskModuleId(task);
   const module = (enrolledModules || []).find((item) => String(item.id) === String(moduleId));
   if (module) return { label: (module.module_code || module.module_name || `M${module.id}`).toString().trim().slice(0, 8), listId: null };

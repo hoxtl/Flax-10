@@ -24,6 +24,7 @@ def make_member(user, society):
 
 class SocietyHelpersTest(TestCase):
     """Tests for society helpers."""
+
     def setUp(self):
         self.user = make_user()
         self.society = make_society()

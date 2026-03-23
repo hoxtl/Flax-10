@@ -204,7 +204,7 @@ describe('TaskWidgetSlot', () => {
     expect(screen.getByTestId('task-context-menu')).toBeTruthy();
   });
 
-  // This behavior was removed in favor of a redirect
+  // This behaviour was removed in favour of a redirect
   it.skip('shows Show less when showAllTaskWidgetTasks is true', () => {
     const tasks = Array.from({ length: 7 }, (_, i) => ({
       id: i + 1,

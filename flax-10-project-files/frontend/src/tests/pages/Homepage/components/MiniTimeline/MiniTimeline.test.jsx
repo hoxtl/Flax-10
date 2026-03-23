@@ -184,7 +184,7 @@ describe('MiniTimeline', () => {
 
   it('auto-scrolls the NOW row into view on mount', async () => {
     // Auto-scroll was removed from MiniTimeline to avoid scrolling the entire Homepage.
-    // This test documents current behavior: NOW row renders without scrolling on mount.
+    // This test documents current behaviour: NOW row renders without scrolling on mount.
     mockRows = [{ id: 'n1', type: 'now' }];
     renderTL();
     await waitFor(() => expect(screen.getByText('NOW_ROW')).toBeInTheDocument());
@@ -298,4 +298,3 @@ describe('MiniTimeline', () => {
   });
 
 });
-

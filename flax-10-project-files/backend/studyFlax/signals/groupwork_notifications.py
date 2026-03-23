@@ -6,6 +6,7 @@ from studyFlax.models.notifications.notification_model import Notification
 @receiver(post_save, sender=GroupMembership)
 def notify_on_added_to_project(sender, instance, created, **kwargs):
     """Notify user when they are added to a group project."""
+
     if not created:
         return
     

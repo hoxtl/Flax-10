@@ -40,12 +40,14 @@ describe('ThemeToggle', () => {
     it('has correct title in light mode', () => {
         useTheme.mockReturnValue({ mode: 'light', setMode: vi.fn() });
         render(<ThemeToggle />);
-        expect(screen.getByTitle('Switch to dark mode')).toBeTruthy();
+        fireEvent.mouseEnter(screen.getByRole('button', { name: /toggle theme/i }));
+        expect(screen.getByRole('tooltip')).toHaveTextContent('Switch to dark mode');
     });
 
     it('has correct title in dark mode', () => {
         useTheme.mockReturnValue({ mode: 'dark', setMode: vi.fn() });
         render(<ThemeToggle />);
-        expect(screen.getByTitle('Switch to light mode')).toBeTruthy();
+        fireEvent.mouseEnter(screen.getByRole('button', { name: /toggle theme/i }));
+        expect(screen.getByRole('tooltip')).toHaveTextContent('Switch to light mode');
     });
 });

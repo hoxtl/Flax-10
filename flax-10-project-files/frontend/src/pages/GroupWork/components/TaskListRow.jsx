@@ -3,21 +3,24 @@
  */
 
 import { useRef, useState } from "react";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Calendar, Trash2 } from "lucide-react";
+import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
-import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
-import { getPriorityStyle, getUserColor } from "../utils/priorityUtils";
-import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr } from "../utils/taskUtils";
+import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
+import { getUserColor } from "../utils/priorityUtils";
+import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate, getDueDateStr } from "../utils/taskUtils";
 import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
+  const cbVars = { "--cb-bg": color, "--cb-border": isDone ? color : "var(--border)" };
   return (
     <button
       onClick={onToggle}
       className={`${styles.checkbox} ${isDone ? styles.checkboxDone : ""}`}
-      style={{ "--cb-bg": color, "--cb-border": isDone ? color : "var(--border)" }}
+      style={cbVars}
     >
       {isDone && <Check size={14} strokeWidth={3} />}
     </button>
@@ -39,43 +42,40 @@ function AssignCell({ task, members, onUpdate }) {
 }
 
 function PrioritySelect({ priority, onUpdate, taskId }) {
-  const style = getPriorityStyle(priority);
-  return (
-    <select
-      value={priority || "medium"}
-      className={styles.prioritySelect}
-      style={{ backgroundColor: style.backgroundColor, color: style.color }}
-      onChange={(event) => onUpdate(taskId, { priority: event.target.value })}
-    >
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-      <option value="urgent">Urgent</option>
-    </select>
-  );
+  return <TaskPriorityPill priority={priority || "medium"} className={styles.priorityPill} />;
 }
 
-function DateCell({ taskId, dueDate, onUpdate }) {
+function DateCell({ task, onUpdate }) {
   return (
     <div className={styles.dateCell}>
       <DateTimePicker
-        value={getDueDateStr(dueDate)}
-        onChange={(value) => onUpdate(taskId, { due_date: value ? new Date(value).toISOString() : null })}
-        placeholder="Set Date"
+        value={getDueDateStr(task.due_date)}
+        onChange={(value) => onUpdate(task.id, { due_date: value ? new Date(value).toISOString() : null })}
         dateOnly
         triggerClassName={styles.dateLabel}
-        hideIcon
+        placeholder="No due date"
       />
     </div>
   );
 }
 
 function ActionCell({ taskId, onDelete }) {
+  const [showConfirm, setShowConfirm] = useState(false);
   return (
     <div className={styles.actionCell}>
-      <button onClick={() => onDelete(taskId)} className={styles.deleteBtn} title="Delete task">
+      <button onClick={() => setShowConfirm(true)} className={styles.deleteBtn} title="Delete task">
         <Trash2 size={16} />
       </button>
+      {showConfirm && (
+        <HoldConfirmModal
+          title="Delete task"
+          warningText="Hold to permanently remove this task."
+          cancelLabel="Keep it"
+          holdLabel="Hold to delete"
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={() => { setShowConfirm(false); onDelete(taskId); }}
+        />
+      )}
     </div>
   );
 }
@@ -107,7 +107,7 @@ function getTitleStyle(completed) {
 
 function getCheckboxColor(task, members) {
   const assignee = filterVisibleAssignees(task.assignees_info || [], members)[0];
-  return assignee ? getUserColor(assignee.id) : "#8d7355";
+  return assignee ? getUserColor(assignee.id) : "var(--color-groupwork-fallback)";
 }
 
 export default function TaskListRow({ task, members, onToggle, onUpdate, onDelete }) {
@@ -119,7 +119,7 @@ export default function TaskListRow({ task, members, onToggle, onUpdate, onDelet
         <TaskRowTitle task={task} onUpdate={onUpdate} />
       </div>
       <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />
-      <DateCell taskId={task.id} dueDate={task.due_date} onUpdate={onUpdate} />
+      <DateCell task={task} onUpdate={onUpdate} />
       <AssignCell task={task} members={members} onUpdate={onUpdate} />
       <ActionCell taskId={task.id} onDelete={onDelete} />
     </div>

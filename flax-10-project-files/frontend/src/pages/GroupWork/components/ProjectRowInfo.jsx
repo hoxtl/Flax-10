@@ -2,38 +2,97 @@
  * GroupWork project row info section.
  */
 
+import { Link } from "react-router-dom";
+import Badge from "../../../components/common/Badge/Badge";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName } from "./memberAvatarUtils";
+import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } from "../utils/projectRowUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowInfo({ project, members }) {
+export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate }) {
   return (
     <div className={styles.projectInfoArea}>
-      <div className={styles.projectIcon}>{project.name ? project.name.charAt(0).toUpperCase() : "P"}</div>
+      <ProjectTeacherAvatar project={project} />
       <div className={styles.projectText}>
-        <div className={styles.projectName}>{project.name}</div>
-        {project.module_name && <div className={styles.projectModule}>{project.module_name}</div>}
-        <AvatarStack members={members} />
+        <ProjectRowTitle project={project} action={action} onNavigate={onProjectNavigate} />
+        <AvatarStack members={members} totalMembers={totalMembers} />
       </div>
     </div>
   );
 }
 
-function AvatarStack({ members }) {
-  const avatars = members.slice(0, 3);
-  const remaining = members.length > 3 ? members.length - 3 : 0;
+function ProjectRowTitle({ project, action, onNavigate }) {
+  const label = `Open ${project.name} project details`;
+  return (
+    <div className={styles.projectTitleRow}>
+      <button type="button" className={`${styles.projectName} ${styles.projectNameButton}`} onClick={onNavigate} aria-label={label}>
+        {project.name}
+      </button>
+      {action && <div className={styles.projectTitleAction}>{action}</div>}
+    </div>
+  );
+}
+
+function TeacherAvatarShell({ fallback }) {
+    return <div className={styles.teacherAvatarShell} aria-hidden="true"><span className={styles.teacherAvatarFallback} aria-hidden="true">{fallback}</span></div>;
+}
+
+function TeacherAvatarButton({ fallback, teacherName, project }) {
+    return (
+        <Tooltip content={`View ${teacherName}'s profile`} wrapperClassName={styles.avatarTooltipWrap}>
+            <button type="button" className={`${styles.teacherAvatarShell} ${styles.teacherAvatarButton}`} onClick={(event) => openTeacherProfile(event, project)} aria-label={`View ${teacherName}'s profile`}>
+                <span className={styles.teacherAvatarFallback}>{fallback}</span>
+            </button>
+        </Tooltip>
+    );
+}
+
+function ProjectTeacherAvatar({ project }) {
+    const fallback = getProjectTeacherInitials(project);
+    const teacherName = getProjectTeacherName(project);
+    if (!project?.module_tutor_id) return <TeacherAvatarShell fallback={fallback} />;
+    return <TeacherAvatarButton fallback={fallback} teacherName={teacherName} project={project} />;
+}
+
+export function ProjectModuleBadge({ project }) {
+  if (!project.course_code && !project.module_name) return null;
+  return (
+    <Link to={`/modules?code=${encodeURIComponent(project.course_code || "")}`} className={styles.projectModuleLink} aria-label={`Open ${project.module_name || project.course_code} module`}>
+      <Badge className={styles.projectModuleBadge}>
+        {project.course_code ? <span className={styles.projectModuleCode}>{project.course_code}</span> : null}
+        <span>{project.module_name || project.course_code}</span>
+      </Badge>
+    </Link>
+  );
+}
+
+function AvatarStack({ members, totalMembers }) {
+  if (!members.length && !totalMembers) return null;
   return (
     <div className={styles.avatarStack}>
-      {avatars.map((member, index) => <AvatarItem key={member.id} member={member} index={index} />)}
-      {remaining > 0 && <div className={styles.avatarPill}>+{remaining}</div>}
+      {members.map((member, index) => (
+        <AvatarItem key={member.id ?? member.user ?? member.user_name ?? index} member={member} index={index} />
+      ))}
+      <span className={styles.avatarCountLabel}>
+        {totalMembers || members.length} member{(totalMembers || members.length) === 1 ? "" : "s"}
+      </span>
     </div>
   );
 }
 
 function AvatarItem({ member, index }) {
   return (
-    <div className={styles.avatarWrapper} style={{ zIndex: 10 - index }} title={getDisplayName(member)}>
-      <MemberAvatar member={member} size={24} />
-    </div>
+    <Tooltip content={getDisplayName(member)} wrapperClassName={styles.avatarTooltipWrap}>
+      <button
+        type="button"
+        className={styles.avatarWrapper}
+        style={{ zIndex: 10 - index }}
+        aria-label={`Open ${getDisplayName(member)} profile`}
+        onClick={(event) => openMemberProfile(event, member)}
+      >
+        <MemberAvatar member={member} size={24} />
+      </button>
+    </Tooltip>
   );
 }

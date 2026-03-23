@@ -2,9 +2,11 @@
  * eventUtils - Event type detection, filtering, and transformation utilities.
  * Handles recurring event IDs, read-only detection, and view-based filtering.
  */
+
 import { overlapsDay } from './dateUtils';
 
 /** Extracts the base event ID from a recurring event instance ID. */
+
 export function extractBaseEventId(id, event = null) {
     if (event?._baseId !== undefined) return event._baseId;
     if (typeof id === 'string' && id.includes('_')) {
@@ -20,6 +22,7 @@ export function extractBaseEventId(id, event = null) {
 }
 
 /** Checks if an event has recurrence configuration. */
+
 export function hasRecurrence(event) {
     if (!event) return false;
     const hasDetails = !!event.recurrence_details;
@@ -29,11 +32,15 @@ export function hasRecurrence(event) {
 }
 
 /** Returns true if the event cannot be edited (module, society, or timetable). */
+
 export function isReadOnlyEvent(event) {
     return getEventType(event) !== 'personal';
 }
 
+const FIXED_TAG_NAMES = new Set(['deadline', 'exam', 'assignment', 'lab', 'practical', 'lecture']);
+
 /** Returns the event source type: 'personal', 'society', 'module', or 'timetable'. */
+
 export function getEventType(event) {
     if (!event) return 'personal';
     if (event.source === 'society') return 'society';
@@ -41,6 +48,8 @@ export function getEventType(event) {
     if (event.source === 'timetable') return 'timetable';
     if (event.module) return 'module';
     if (event.source && event.external_id) return 'timetable';
+    const tagName = (event.tag_name || (typeof event.tag === 'object' ? event.tag?.name : '') || '').toLowerCase().trim();
+    if (tagName && FIXED_TAG_NAMES.has(tagName)) return 'timetable';
     return 'personal';
 }
 
@@ -48,6 +57,7 @@ export function getEventType(event) {
  * Returns the effective tag identifier for an event, used for filtering and style resolution.
  * Prioritizes 'societies' for society events, then explicit tag names, falling back to 'other'.
  */
+
 export function getEffectiveTagName(event) {
     if (!event) return 'other';
     if (event.source === 'society') return 'societies';
@@ -74,6 +84,7 @@ function filterWeekEvents(events, selectedDate) {
 }
 
 /** Filters events to those visible in the current view's date range. */
+
 export function getVisibleEventsInView(events, selectedDate, viewMode) {
     if (!events?.length) return [];
     if (viewMode === 'month') return filterMonthEvents(events, selectedDate);
@@ -83,11 +94,13 @@ export function getVisibleEventsInView(events, selectedDate, viewMode) {
 }
 
 /** Sorts events by start time in ascending order. */
+
 export function sortByStartTime(events) {
     return [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 }
 
 /** Returns true if the event spans a full day (midnight to midnight). */
+
 export function isAllDay(event) {
     if (event.all_day || event.is_all_day) return true;
     const start = new Date(event.start_time);

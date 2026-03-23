@@ -1,6 +1,7 @@
 /*
  * useSocietyMembership handles joining and leaving societies.
  */
+
 import * as api from '../../../api/societyApi';
 import { useTags } from '../../../context/TagContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -30,7 +31,7 @@ const makeJoinSociety = (id, setSociety, confirm, onMembershipChange) =>
             updateMemberState(setSociety, true, 1);
             await promptSubscription(confirm, id, setSociety);
             onMembershipChange?.();
-        } catch (e) { console.error('Join failed:', e); }
+        } catch {}
     };
 
 const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
@@ -40,7 +41,7 @@ const makeLeaveSociety = (id, setSociety, refreshTags, onMembershipChange) =>
             updateMemberState(setSociety, false, -1);
             refreshTags();
             onMembershipChange?.();
-        } catch (e) { console.error('Leave failed:', e); }
+        } catch {}
     };
 
 const makeRequestRatification = (id, setSociety) =>

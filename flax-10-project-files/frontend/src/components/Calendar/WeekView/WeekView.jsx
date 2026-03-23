@@ -72,6 +72,7 @@ function WeekHeader({ days, onDateSelect, readOnly }) {
 }
 
 /** Week view showing 7 day columns with hourly time grid. */
+
 export function WeekView({ selectedDate: propDate, events: propEvents, onDateSelect, readOnly }) {
   const data = useCalendarData({ selectedDate: propDate, events: propEvents });
   const weekDays = getWeekDays(data.selectedDate);

@@ -1,3 +1,7 @@
+/**
+ * Home address data hook for the campus map page.
+ */
+
 import { useState, useEffect } from 'react';
 import { getHomeAddress } from '../../../api/userApi';
 
@@ -10,9 +14,7 @@ async function fetchHomeAddress(setUserHome) {
   try {
     const data = await getHomeAddress();
     applyHomeData(data, setUserHome);
-  } catch (error) {
-    console.error('User home could not be loaded: ', error);
-  }
+  } catch {}
 }
 
 export function useHomeAddress() {

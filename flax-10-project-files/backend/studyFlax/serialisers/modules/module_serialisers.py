@@ -33,6 +33,7 @@ class ModuleSerialiser(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a module, attaching a weekly recurrence rule if requested."""
+
         is_recurring = validated_data.pop('is_recurring', True)
         if is_recurring:
             from studyFlax.models import RecurrenceRule

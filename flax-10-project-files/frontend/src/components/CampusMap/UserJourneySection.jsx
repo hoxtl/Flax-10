@@ -1,90 +1,33 @@
-import { useState } from "react";
+/**
+ * Custom journey planner section.
+ */
+
+import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
-import { geocodeAddress } from '../../api/userApi';
-import styles from './UserJourneySection.module.css';
+import { geocodeAddress } from "../../api/geocodeApi";
+import styles from "./UserJourneySection.module.css";
 
-export function UserJourneySection({
-    manualStart,
-    setManualStart,
-    manualDestination,
-    setManualDestination,
-    onCalculate,
-}) {
-    const [startCoords, setStartCoords] = useState(null);
-    const [destCoords, setDestCoords] = useState(null);
+function useGeocodedLocation(value, setCoords) {
+  useEffect(() => { let active = true; if (!value.trim()) { setCoords(null); return undefined; } geocodeAddress(value).then((coords) => active && setCoords(coords)); return () => { active = false; }; }, [setCoords, value]);
+}
 
-    const handleStartSelect = async (address) => {
-        setManualStart(address);
-        const coords = await geocodeAddress(address);
-        setStartCoords(coords);
-    };
+function JourneyField({ label, onChange, placeholder, value }) {
+  return (
+    <div className={styles.manualInputGroup}><label className={styles.manualLabel}>{label}</label><LocationAutocomplete value={value} onChange={onChange} placeholder={placeholder} /></div>
+  );
+}
 
-    const handleDestSelect = async (address) => {
-        setManualDestination(address);
-        const coords = await geocodeAddress(address);
-        setDestCoords(coords);
-    };
+function JourneyActions({ canCalculate, hasValue, onClear, onGo }) {
+  return (
+    <div className={styles.manualButtonGroup}><button className={styles.goButton} onClick={onGo} disabled={!canCalculate}>{canCalculate ? "Calculate Route 🚀" : "Enter both locations"}</button>{hasValue && <button className={styles.clearManualButton} onClick={onClear}>Clear</button>}</div>
+  );
+}
 
-    const handleGo = () => {
-        if (startCoords && destCoords) {
-            onCalculate(startCoords, destCoords);
-        }
-    };
-
-    const handleClear = () => {
-        setManualStart("");
-        setManualDestination("");
-        setStartCoords(null);
-        setDestCoords(null);
-    };
-
-    const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
-
-    return (
-        <section className={styles.section}>
-            <div className={styles.sectionLabel}>
-                <span className={styles.searchIcon}>🔍</span>
-                Plan Custom Journey
-            </div>
-
-            <div className={styles.manualJourneyInputs}>
-                <div className={styles.manualInputGroup}>
-                    <label className={styles.manualLabel}>From</label>
-                    <LocationAutocomplete 
-                        value={manualStart}
-                        onChange={handleStartSelect}
-                        placeholder="Enter a starting location"
-                    />
-                </div>
-
-                <div className={styles.manualInputGroup}>
-                    <label className={styles.manualLabel}>To</label>
-                    <LocationAutocomplete 
-                        value={manualDestination}
-                        onChange={handleDestSelect}
-                        placeholder="Enter a destination"
-                    />
-                </div>
-
-                <div className={styles.manualButtonGroup}>
-                    <button
-                        className={styles.goButton}    
-                        onClick={handleGo}
-                        disabled={!canCalculate}
-                    >
-                        {canCalculate ? "Calculate Route 🚀": "Enter both locations"}
-                    </button>
-
-                    {(manualStart || manualDestination) && (
-                        <button
-                            className={styles.clearManualButton}
-                            onClick={handleClear}
-                        >
-                            Clear
-                        </button>
-                    )}
-                </div>
-            </div>
-        </section>
-    );
+export function UserJourneySection({ manualStart, setManualStart, manualDestination, setManualDestination, onCalculate, onClearAll }) {
+  const [startCoords, setStartCoords] = useState(null), [destCoords, setDestCoords] = useState(null), canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
+  useGeocodedLocation(manualStart, setStartCoords); useGeocodedLocation(manualDestination, setDestCoords);
+  const handleClear = () => { setManualStart(""); setManualDestination(""); setStartCoords(null); setDestCoords(null); onClearAll?.(); };
+  return (
+    <section className={styles.section}><div className={styles.sectionLabel}><span className={styles.searchIcon}>🔍</span>Plan Custom Journey</div><div className={styles.manualJourneyInputs}><JourneyField label="From" value={manualStart} onChange={setManualStart} placeholder="Enter a starting location" /><JourneyField label="To" value={manualDestination} onChange={setManualDestination} placeholder="Enter a destination" /><JourneyActions canCalculate={canCalculate} hasValue={manualStart || manualDestination} onClear={handleClear} onGo={() => canCalculate && onCalculate(startCoords, destCoords)} /></div></section>
+  );
 }

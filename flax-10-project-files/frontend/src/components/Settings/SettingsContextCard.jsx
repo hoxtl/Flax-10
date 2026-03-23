@@ -1,6 +1,7 @@
 /*
  * Shared context card used across settings panels.
  */
+
 import styles from "../../pages/Settings/Settings.module.css";
 
 export default function SettingsContextCard({
@@ -8,9 +9,10 @@ export default function SettingsContextCard({
   title,
   body,
   items,
+  className = "",
 }) {
   return (
-    <div className={styles.contextCard}>
+    <div className={`${styles.contextCard} ${className}`.trim()}>
       <span className={styles.contextCardEmoji}>{emoji}</span>
       <h3 className={styles.contextCardTitle}>{title}</h3>
       {body ? <p className={styles.contextCardBody}>{body}</p> : null}

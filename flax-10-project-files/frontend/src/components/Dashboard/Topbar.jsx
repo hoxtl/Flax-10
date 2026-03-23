@@ -44,7 +44,7 @@ function NavDropdownTrigger({ title, isOpen, hasActive, onClick }) {
 
 function parseRouteOption(r) {
   const label = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div className={styles.dropdownLabelRow}>
       <span className={styles.dropdownIcon}>{r.icon}</span>
       <span className={styles.dropdownLabel}>{r.label}</span>
     </div>
@@ -87,7 +87,7 @@ function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChan
 const NAV_SECTIONS = [
   { title: "Plan", ids: ["calendar", "tasks", "timer"] },
   { title: "Study", ids: ["modules", "group-work"] },
-  { title: "My KCL", ids: ["map", "societies", "users"] },
+  { title: "Explore", ids: ["map", "societies", "users"] },
   { title: "My Insights", ids: ["analytics", "attendance"] },
   { title: "Admin", ids: ["admin"] }
 ];

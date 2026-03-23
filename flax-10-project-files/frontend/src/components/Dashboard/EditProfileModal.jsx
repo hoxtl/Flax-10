@@ -1,41 +1,11 @@
-import { useEffect, useState } from 'react';
 import styles from './EditProfileModal.module.css';
-import { updateUserProfile } from '../../api/userApi';
 import { getInitials } from '../Authentication/utils/userUtils';
-import { getResolvedUserPhoto } from '../../utils/tutorPhotoFallback';
 import FormField from '../common/FormField/FormField';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../common/StandardModal/StandardModal';
 import TextInput from '../common/TextInput/TextInput';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-
-function resolveProfilePhoto(user) {
-  return getResolvedUserPhoto(user, {
-    allowGeneric: false,
-    seed: user?.username || user?.id || user?.name,
-  });
-}
-
-function useProfileForm(user) {
-  const [username, setUsername] = useState(user?.username || '');
-  const [bio, setBio] = useState(user?.bio || '');
-  const [profilePhoto, setProfilePhoto] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(resolveProfilePhoto(user));
-  const [removePhoto, setRemovePhoto] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [saveSignal, setSaveSignal] = useState(0);
-  useEffect(() => {
-    setUsername(user?.username || '');
-    setBio(user?.bio || '');
-    setProfilePhoto(null);
-    setPreviewUrl(resolveProfilePhoto(user));
-    setRemovePhoto(false);
-    setError('');
-  }, [user]);
-  return { username, setUsername, bio, setBio, profilePhoto, setProfilePhoto, previewUrl, setPreviewUrl, removePhoto, setRemovePhoto, loading, setLoading, error, setError, saveSignal, setSaveSignal };
-}
+import { useTransientSavedState } from '../common/hooks/useTransientSavedState';
+import { buildEditProfileSubmitHandler, useEditProfileForm } from './useEditProfileForm';
 
 function handlePhotoChange(e, setProfilePhoto, setPreviewUrl, setRemovePhoto) {
   const file = e.target.files[0];
@@ -49,73 +19,6 @@ function handleRemovePhoto(setProfilePhoto, setPreviewUrl, setRemovePhoto) {
   setProfilePhoto(null);
   setPreviewUrl(null);
   setRemovePhoto(true);
-}
-
-async function fetchUsernameAvailable(username, token) {
-  const res = await fetch(`${API_BASE_URL}/check-username/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Token ${token}` },
-    body: JSON.stringify({ username }),
-  });
-  const data = await res.json();
-  return data.available;
-}
-
-async function checkUsernameAvailable(username, currentUsername) {
-  if (username === currentUsername) return true;
-  try {
-    return await fetchUsernameAvailable(username, localStorage.getItem('token'));
-  } catch (err) {
-    console.error('Error checking username:', err);
-    return false;
-  }
-}
-
-function buildFormData(username, bio, profilePhoto, removePhoto) {
-  const formData = new FormData();
-  formData.append('username', username);
-  formData.append('bio', bio);
-  if (profilePhoto) formData.append('profile_photo', profilePhoto);
-  else if (removePhoto) formData.append('remove_photo', 'true');
-  return formData;
-}
-
-async function submitProfileUpdate(formData, onSave, setError, onSaved) {
-  try {
-    await updateUserProfile(formData);
-    await onSave?.();
-    onSaved?.();
-  } catch (err) {
-    console.error('Failed to update profile:', err);
-    setError(err.response?.data?.error || 'Failed to update profile');
-  }
-}
-
-function buildSubmitHandler(form, user, onSave) {
-  const { username, bio, profilePhoto, removePhoto, setLoading, setError, setSaveSignal } = form;
-  return async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    if (username.length < 3) { setError('Username must be at least 3 characters long'); setLoading(false); return; }
-    const isAvailable = await checkUsernameAvailable(username, user?.username);
-    if (!isAvailable) { setError('Username is already taken'); setLoading(false); return; }
-    await submitProfileUpdate(buildFormData(username, bio, profilePhoto, removePhoto), onSave, setError, () => setSaveSignal((count) => count + 1));
-    setLoading(false);
-  };
-}
-
-function useSavedState(saveSignal) {
-  const [showSaved, setShowSaved] = useState(false);
-
-  useEffect(() => {
-    if (!saveSignal) return undefined;
-    setShowSaved(true);
-    const timer = setTimeout(() => setShowSaved(false), 2000);
-    return () => clearTimeout(timer);
-  }, [saveSignal]);
-
-  return showSaved;
 }
 
 function PhotoPreview({ previewUrl, initials }) {
@@ -165,7 +68,7 @@ function BioField({ bio, setBio }) {
 }
 
 function FormActions({ loading, onClose, saveSignal }) {
-  const showSaved = useSavedState(saveSignal);
+  const showSaved = useTransientSavedState(saveSignal);
   const buttonLabel = loading ? 'Saving...' : showSaved ? '✓ Saved!' : 'Save Changes';
   return (
     <div className={styles.actions}>
@@ -191,9 +94,9 @@ function ModalForm({ form, user, onClose, onSubmit }) {
     </form>);}
 
 export default function EditProfileModal({ user, isOpen, onClose, onSave }) {
-  const form = useProfileForm(user);
+  const form = useEditProfileForm(user);
   if (!isOpen) return null;
-  const handleSubmit = buildSubmitHandler(form, user, onSave);
+  const handleSubmit = buildEditProfileSubmitHandler(form, user, onSave);
   return (
     <StandardModal
       title="Edit Profile"

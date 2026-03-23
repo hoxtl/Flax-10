@@ -123,16 +123,6 @@
   position: relative;
 }
 
-.contextCard::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border: 1px dashed color-mix(in srgb, var(--primary) 28%, transparent);
-  border-radius: calc(var(--radius-lg) - 6px);
-  pointer-events: none;
-  opacity: 0.35;
-}
-
 .contextCardEmoji {
   font-size: 18px;
   display: block;
@@ -336,3 +326,5 @@
   background: color-mix(in srgb, var(--surface-raised) 92%, var(--surface-warm) 8%);
   border-color: color-mix(in srgb, var(--primary) 16%, var(--border));
 }
+
+.remainingCount { color: var(--muted); font-size: 0.9em; margin-left: 5px; }

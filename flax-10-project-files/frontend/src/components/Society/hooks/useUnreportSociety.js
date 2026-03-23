@@ -2,6 +2,7 @@
  * Shared hook for handling society unreporting with confirmation.
  * Promotes DRY across the society directory and detail pages.
  */
+
 import { unreportSociety } from "../../../api/societyApi";
 import { useConfirm } from "../../../context/ConfirmContext";
 
@@ -24,7 +25,5 @@ async function performUnreport(id, onUpdateLocal) {
     try {
         await unreportSociety(id);
         onUpdateLocal(id, { has_reported: false });
-    } catch (error) {
-        console.error("Failed to unreport society:", error);
-    }
+    } catch {}
 }

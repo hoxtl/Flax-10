@@ -13,7 +13,7 @@ Higher education can undoubtedly place a lot of strain on students, with many in
 
 The consequences of poor time management are much greater than just a decline in academic performance. There are certain experiences that many students regard as native to student life, such as late night cramming before deadlines, juggling too many commitments, or missing a submission. These experiences can hugely contribute to burnout and stress among students. Flax-10 recognises student wellbeing as a priority, and it is with this in mind that StudyFlax was built.
 
-StudyFlax was developed with this broader context in mind. Its main objective is to provide KCL students with a single platform through which they can manage their academic workload and personal commitments. Students benefit from a system that brings their tasks, calendar, societies, modules, study sessions and much more - altogether in one place. 
+StudyFlax was developed with this broader context in mind. Its main objective is to provide KCL students with a single platform through which they can manage their academic workload and personal commitments. Students benefit from a system that brings their tasks, calendar, societies, modules, study sessions, and much more together in one place.
 A key objective of StudyFlax was for the app to incorporate personalisation; a platform where the user truly feels like the system knows them, rather than being met with generic schedules and suggestions that do not accurately reflect their individual habits and capabilities. StudyFlax incorporates several elements that ensure the application fosters a productive environment, but also motivates students in a way that feels rewarding rather than rigid and impersonal.
 
 Another objective of StudyFlax was to improve the communication between teaching staff and students. For example, teaching staff may have to frequently answer repeated questions from students about module details, reading lists and deadline reminders, these questions could easily be avoided if such a platform existed to directly provide students with the information. 
@@ -24,7 +24,27 @@ Together, these objectives reflect Flax-10's belief that the proper tools to sus
 
 \section{Requirements and specifications}
 \label{sect:requirements}
+\textbf{StudyFlax's Core Requirements}
+ \begin{itemize}
+     \item \textbf{Student Capabilities:} The system provides a unified dashboard where students can track tasks, generate personalized study sessions, view module information, and manage a consolidated calendar.
+ \end{itemize}
+ \begin{itemize}
+     \item \textbf{Administrative Tools:} Teachers can send updates to the syllabus, reading lists, and deadlines directly to students, while society organizers have dedicated tools to manage and promote their events.
+ \end{itemize}
+ \begin{itemize}
+     \item \textbf{System Constraints:} The platform must be intuitive, secure, and responsive. Designed to reduce cognitive load, not add to it.
+ \end{itemize}
 
-\begin{expectations}
-Use this section to provide the requirements and/or specifications for the project.  There are not strict rules on the format you should be using.  You can employ user stories or more conventional descriptions of requirements/specifications.  However, you should be consistent.  Explain how the requirements/specifications derive from the objectives.  If it might not be clear to the reader, identify where the reader can experience the implementation in the system that was delivered.
-\end{expectations}
+The primary goal of StudyFlax is to tackle time management challenges and reduce the pressure of overwhelming academic workload. To achieve this, the system required a set of functional capabilities built around consolidation.
+
+The most critical requirement for students is the aggregation of their academic and personal lives into a single, cohesive interface. Students must be able to create, track, and complete tasks seamlessly. This is most visible on the Homepage and Calendar page, where university timetables, society events, and personal to-do lists are brought together into one unified view.
+
+Beyond basic task tracking, the system was required to intelligently interpret this data in service of personalisation. A core specification was that StudyFlax must suggest and allocate optimal times for study sessions based on a student's habits and upcoming deadlines. This is achieved through the Auto Schedule tool and integrated Focus Timer, which encourage productivity without enforcing rigid, stress inducing schedules.
+
+For the platform to act as a reliable academic safety net, dedicated administrative interfaces were also required. Teaching staff needed tools to broadcast module details, reading lists, and deadline reminders directly into the student's primary workspace, making academic commitments immediately visible. This functionality is centralised within the Modules section of the application.
+
+Extracurricular activities are equally important to a balanced university experience, making society integration a fundamental requirement. Organisers can create and promote events that feed directly into a student's schedule, removing the need to monitor external platforms. This is handled through the Societies page and global Announcements feed.
+
+Underpinning these features are strict non-functional requirements. Usability took the highest priority, the interface was required to be uncluttered and intuitive, particularly in data heavy views like the Calendar and Group Work tracker. Finally, because the platform holds sensitive academic and personal data, secure authentication and rigorous data protection were specified from the outset, ensuring students can trust that their information remains private.
+
+Together, these functional and non-functional requirements form the blueprint for a system designed to support both academic success and student wellbeing.

@@ -2,6 +2,7 @@
  * useCalendarEvents - Event fetching and caching for calendar views.
  * Manages API calls with deduplication to prevent redundant fetches.
  */
+
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { getEvents, createEvent, updateEvent, deleteEvent, addExceptionDate } from '../../../api/eventApi';
@@ -25,12 +26,13 @@ function getWeekNumber(d) {
 const fetchingRef = { current: false, key: null };
 
 /** Hook for loading calendar events based on current view. */
+
 export function useCalendarEvents() {
-  const { events, selectedDate, viewMode, reloadKey } = useCalendar();
+  const { events, selectedDate, viewMode, reloadKey, sharedCalendarUserId } = useCalendar();
   const dispatch = useCalendarDispatch();
   const dateKey = useMemo(() => getDateKey(selectedDate, viewMode), [selectedDate, viewMode]);
-  const stateRef = useRef({ selectedDate, viewMode });
-  stateRef.current = { selectedDate, viewMode };
+  const stateRef = useRef({ selectedDate, viewMode, sharedCalendarUserId });
+  stateRef.current = { selectedDate, viewMode, sharedCalendarUserId };
   const load = useCallback(() => { fetchingRef.key = null; fetchEvents(stateRef.current, dispatch); }, [dispatch]);
   useEffect(() => {
     if (fetchingRef.key === dateKey || fetchingRef.current) return;
@@ -45,8 +47,11 @@ async function fetchEvents(state, dispatch) {
   if (fetchingRef.current) return;
   fetchingRef.current = true;
   const { start, end } = getDateRangeForView(state.selectedDate, state.viewMode);
+  const params = state.sharedCalendarUserId
+    ? { start, end, user_id: state.sharedCalendarUserId }
+    : { start, end };
   try {
-    dispatch({ type: 'SET_EVENTS', payload: await getEvents({ start, end }) });
+    dispatch({ type: 'SET_EVENTS', payload: await getEvents(params) });
   } catch (error) {
     dispatch({ type: 'SET_ERROR', payload: error.message });
   } finally {
@@ -55,16 +60,18 @@ async function fetchEvents(state, dispatch) {
 }
 
 /** Hook providing event CRUD operations with auto-reload. */
+
 export function useEventActions() {
-  const { selectedDate, viewMode } = useCalendar();
+  const { selectedDate, viewMode, sharedCalendarUserId } = useCalendar();
   const dispatch = useCalendarDispatch();
-  const stateRef = useRef({ selectedDate, viewMode, dispatch });
-  stateRef.current = { selectedDate, viewMode, dispatch };
+  const stateRef = useRef({ selectedDate, viewMode, dispatch, sharedCalendarUserId });
+  stateRef.current = { selectedDate, viewMode, dispatch, sharedCalendarUserId };
 
   const reload = useCallback(async () => {
-    const { selectedDate: date, viewMode: mode, dispatch: d } = stateRef.current;
+    const { selectedDate: date, viewMode: mode, dispatch: d, sharedCalendarUserId: viewerUserId } = stateRef.current;
     const { start, end } = getDateRangeForView(date, mode);
-    d({ type: 'SET_EVENTS', payload: await getEvents({ start, end }) });
+    const params = viewerUserId ? { start, end, user_id: viewerUserId } : { start, end };
+    d({ type: 'SET_EVENTS', payload: await getEvents(params) });
   }, []);
 
   return useMemo(() => ({

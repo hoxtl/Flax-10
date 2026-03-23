@@ -1,57 +1,59 @@
 /*
- * GroupWork project header actions and title.
+ * GroupWork project header delete action.
  */
 
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import BackButton from "../../../components/common/BackButton/BackButton.jsx";
-import { useConfirm } from "../../../context/ConfirmContext";
+import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import { useToast } from "../../../context/ToastContext";
 import styles from "./ProjectHeader.module.css";
 
-export default function ProjectHeaderActions({ onBack, onDelete }) {
-  const confirm = useConfirm();
-  const [deleteError, setDeleteError] = useState("");
-  const handleClick = () => handleDeleteClick(confirm, onDelete, setDeleteError);
-  return (
-    <>
-      <div className={styles.topActions}>
-        <BackButton onClick={onBack} label="Back to All Projects" />
-        <button className={styles.deleteBtn} onClick={handleClick}>
-          <Trash2 size={14} />
-          Delete project
-        </button>
-      </div>
-      {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
-    </>
-  );
+function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, showToast }) {
+    return (
+        <HoldConfirmModal
+            title="Delete project"
+            warningBanner="This will permanently remove the project and all its tasks for every team member."
+            warningText="Hold to permanently delete this shared project and its tasks."
+            cancelLabel="Keep project"
+            holdLabel="Hold to delete"
+            onCancel={() => setShowDeleteModal(false)}
+            onConfirm={() => confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast)}
+        />
+    );
 }
 
-async function handleDeleteClick(confirm, onDelete, setDeleteError) {
-  setDeleteError("");
-  if (!await confirmDeleteProject(confirm)) return;
-  if (await onDelete()) return;
-  setDeleteError("Only the project owner can delete this project.");
+/** Delete action button and hold-to-confirm modal for a group project. */
+
+export default function ProjectDeleteAction({ onDelete }) {
+    const showToast = useToast();
+    const [deleteError, setDeleteError] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    return (
+        <>
+            <div className={styles.deleteActionWrap}>
+                <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.deleteBtn} onClick={() => openDeleteModal(setDeleteError, setShowDeleteModal)}>
+                    <Trash2 size={14} />
+                    Delete project
+                </PrimaryButton>
+                {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
+            </div>
+            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={setDeleteError} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
+        </>
+    );
 }
 
-async function confirmDeleteProject(confirm) {
-  return confirm({
-    title: "Delete Project",
-    message: "Delete this project permanently? This action cannot be undone.",
-    confirmText: "Delete",
-    cancelText: "Keep Project",
-    isDanger: true,
-    dangerTitle: "Delete This Project",
-    dangerDescription: "This will permanently remove the project and all of its group work data.",
-    dangerHint: "This removes the project and returns you to all group projects.",
-  });
+function openDeleteModal(setDeleteError, setShowDeleteModal) {
+    setDeleteError("");
+    setShowDeleteModal(true);
 }
 
-export function ProjectHeaderTitle({ name, onPatch }) {
-  const onBlur = (event) => saveTitle(event, name, onPatch);
-  return <input defaultValue={name} onBlur={onBlur} className={styles.nameInput} placeholder="Project Name" />;
-}
-
-function saveTitle(event, name, onPatch) {
-  const value = event.target.value.trim();
-  if (value && value !== name) onPatch({ name: value });
+async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast) {
+    if (await onDelete()) {
+        showToast("Project deleted.");
+        setShowDeleteModal(false);
+        return;
+    }
+    setShowDeleteModal(false);
+    setDeleteError("Only the project owner can delete this project.");
 }

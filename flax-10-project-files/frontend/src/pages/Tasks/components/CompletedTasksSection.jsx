@@ -9,6 +9,7 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import TaskCard from "./TaskCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
+import { isReadingList } from "../utils/readingListUtils";
 import { TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
 
 import styles from "./TaskFeedSections.module.css";
@@ -34,9 +35,10 @@ function CompletedHeader({ count, showDone, onToggle }) {
 
 function CompletedTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask }) {
   const list = listMap[String(task.task_list)];
+  const editHandler = !isReadingList(list) && onEditTask ? (data, meta) => onEditTask(task.id, data, meta) : undefined;
   return (
     <div className={styles.taskRow}>
-      <TaskCard task={task} listName={list?.name} listColor={getListColor(list, list?.idx)} lists={lists} onToggle={() => onToggleComplete(task.id, task.completed)} onDelete={() => onDeleteTask(task.id)} onEdit={(data, meta) => onEditTask(task.id, data, meta)} isCompletedSection />
+      <TaskCard task={task} listName={list?.name} listColor={getListColor(list, list?.idx)} lists={lists} onToggle={() => onToggleComplete(task.id, task.completed)} onDelete={() => onDeleteTask(task.id)} onEdit={editHandler} isCompletedSection />
     </div>
   );
 }

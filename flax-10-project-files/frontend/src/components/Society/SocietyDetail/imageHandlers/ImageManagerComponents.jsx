@@ -2,6 +2,7 @@
  * ImageManagerComponents provides a suite of reusable UI elements for
  * managing society cover photos and gallery images.
  */
+
 import { useRef } from "react";
 import styles from "./ImageManagerComponents.module.css";
 

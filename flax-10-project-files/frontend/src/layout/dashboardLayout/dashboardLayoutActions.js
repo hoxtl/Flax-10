@@ -16,7 +16,7 @@ export async function handleLogoutClick() {
 }
 
 export function shouldShowBackToTop(activeNav) {
-  const hiddenPages = ["home", "map", "modules", "tasks"];
+  const hiddenPages = ["home", "map", "modules", "tasks", "group-work"];
   return !hiddenPages.includes(activeNav);
 }
 

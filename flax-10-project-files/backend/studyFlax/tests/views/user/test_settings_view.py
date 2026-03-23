@@ -195,6 +195,7 @@ class LegacyUserSettingsViewTests(TestCase):
 
     def call_legacy_view(self, method, url, data=None, format=None):
         """Call legacy view for tests."""
+
         kwargs = {}
         if data is not None:
             kwargs['data'] = data
@@ -247,6 +248,8 @@ class UserSettingsSerializerTests(TestCase):
 
     def setUp(self):
         self.user = make_user()
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
 
     def test_major_change_blocked_when_already_set(self):
         settings = UserSettings.objects.create(

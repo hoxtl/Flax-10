@@ -2,6 +2,7 @@
  * TableRow - Editable table row for calendar table view.
  * Supports inline editing with keyboard navigation.
  */
+
 import { useState, useEffect } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import { getEventType, isReadOnlyEvent } from '../utils/eventUtils';
@@ -85,8 +86,8 @@ function EditableFieldCell({ value, isEditing, onChange, onKeyDown, onEdit, show
   );
 }
 
-function useRowEditing(event, editState, onCellClick) {
-  const isReadOnly = isReadOnlyEvent(event);
+function useRowEditing(event, editState, onCellClick, forceReadOnly) {
+  const isReadOnly = forceReadOnly || isReadOnlyEvent(event);
   const isEditing = (field) => editState.editingCell?.eventId === event.id && editState.editingCell?.field === field;
   const onEdit = (e, field) => {
     if (isReadOnly) return;
@@ -96,9 +97,9 @@ function useRowEditing(event, editState, onCellClick) {
   return { isReadOnly, isEditing, onEdit };
 }
 
-function useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode) {
+function useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode, forceReadOnly) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { isReadOnly, isEditing, onEdit } = useRowEditing(event, editState, onCellClick);
+  const { isReadOnly, isEditing, onEdit } = useRowEditing(event, editState, onCellClick, forceReadOnly);
 
   useEffect(() => {
     const field = navState.EDITABLE_COLUMNS[navState.focusedCell?.col];
@@ -165,9 +166,10 @@ function TableRowCells({ event, state, editState, navState, rowIndex, tags, them
 }
 
 /** Table row component with inline editing support. */
-export function TableRow({ event, rowIndex, editState, navState, onCellClick, viewMode }) {
+
+export function TableRow({ event, rowIndex, editState, navState, onCellClick, viewMode, readOnly = false }) {
   const [isHovered, setIsHovered] = useState(false);
-  const state = useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode);
+  const state = useTableRowState(event, rowIndex, editState, navState, onCellClick, viewMode, readOnly);
   const { tags } = useTags();
   const theme = getEventTheme(event, { tags });
   const accentColor = theme.color;

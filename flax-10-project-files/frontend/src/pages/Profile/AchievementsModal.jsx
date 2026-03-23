@@ -1,9 +1,11 @@
 /**
  * Profile achievements catalogue modal.
  */
+
 import { useEffect } from "react";
 import styles from "./AchievementsModal.module.css";
 import StandardModal from "../../components/common/StandardModal/StandardModal";
+import achievementTierColors from "./achievementTierColors.json";
 
 const ALL_BADGES = [
   // Hours
@@ -44,11 +46,7 @@ const ALL_BADGES = [
 
 const CATEGORIES = ['Hours', 'Sessions', 'Streaks', 'Consistency', 'Style', 'Modules', 'Goals'];
 
-const TIER_COLOR = {
-  gold: { color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)' },
-  silver: { color: '#9CA3AF', bg: 'rgba(156,163,175,0.12)', border: 'rgba(156,163,175,0.35)' },
-  bronze: { color: '#CD7F32', bg: 'rgba(205,127,50,0.12)', border: 'rgba(205,127,50,0.3)' },
-};
+const TIER_COLOR = achievementTierColors;
 
 const TIER_LABEL = { gold: '🥇 Gold', silver: '🥈 Silver', bronze: '🥉 Bronze' };
 

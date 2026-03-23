@@ -1,6 +1,7 @@
 /*
  * Section heading block used in settings forms.
  */
+
 import styles from "../../../pages/Settings/Settings.module.css";
 
 export default function SectionHeader({ title, description }) {

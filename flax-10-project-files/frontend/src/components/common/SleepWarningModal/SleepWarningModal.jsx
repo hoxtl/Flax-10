@@ -13,6 +13,7 @@ function formatTime(t) {
 }
 
 /** Confirm modal that warns the user they are working outside their sleep hours. */
+
 export function SleepWarningModal({ sleepTime, wakeTime, onConfirm, onCancel }) {
   return (
     <ConfirmModal

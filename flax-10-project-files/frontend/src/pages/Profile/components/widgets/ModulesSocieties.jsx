@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { getModules } from "../../../../api/moduleApi";
+import Card from "../../../../components/common/Card/Card";
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
 import badgeStyles from "./ProfileBadgesModules.module.css";
+import teachingCardColors from './teachingCardColors.json';
 const styles = { ...widgetStyles, ...badgeStyles };
+const TEACHING_CARD_COLORS = teachingCardColors;
 
 export function useModuleNameMap() {
   const [nameMap, setNameMap] = useState({});
@@ -60,6 +63,44 @@ function SocietyList({ societies, onNavigate }) {
   );
 }
 
+function TeacherModuleCard({ code, name, color, onNavigate }) {
+  return (
+    <button
+      type="button"
+      className={styles.teacherModuleCard}
+      style={{ borderLeftColor: color }}
+      onClick={() => onNavigate?.(`modules_${code}`)}
+    >
+      <div className={styles.teacherModuleIcon} style={{ background: `${color}18`, color }} aria-hidden="true">📚</div>
+      <div className={styles.teacherModuleContent}>
+        <p className={styles.teacherModuleLabel}>Teaching module</p>
+        <div className={styles.teacherModuleCode}>{code}</div>
+        {name && <p className={styles.teacherModuleName}>{name}</p>}
+      </div>
+    </button>
+  );
+}
+
+function TeacherModulesSection({ modules, nameMap, onNavigate }) {
+  if (!modules?.length) return null;
+  return (
+    <Card padding="lg" className={styles.teacherModulesSection}>
+      <p className={styles.teacherModulesEyebrow}>Modules I Teach</p>
+      <div className={styles.teacherModulesGrid}>
+        {modules.map((code, index) => (
+          <TeacherModuleCard
+            key={code}
+            code={code}
+            name={nameMap[code]}
+            color={TEACHING_CARD_COLORS[index % TEACHING_CARD_COLORS.length]}
+            onNavigate={onNavigate}
+          />
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 function TabsAction({ tab, setTab, isTeacher, hasSocieties }) {
   if (!hasSocieties) return null;
   return (
@@ -86,6 +127,7 @@ export function ModulesSocietiesWidget({ modules, societies, onNavigate, role, c
   const hasSocieties = canViewSocieties && societies?.length > 0;
   const [tab, setTab] = useState("modules");
 
+  if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
   if (!modules?.length && !isTeacher) return null;
 
   const title = tab === "modules" ? (isTeacher ? "MODULES I TEACH" : "MODULES") : "SOCIETIES JOINED";
@@ -102,7 +144,8 @@ export function ModulesSocietiesWidget({ modules, societies, onNavigate, role, c
 export function ModulesSection({ modules, onNavigate, role }) {
   const nameMap = useModuleNameMap();
   const isTeacher = role === "teacher";
-  if (!modules?.length && !isTeacher) return null;
+  if (isTeacher) return <TeacherModulesSection modules={modules} nameMap={nameMap} onNavigate={onNavigate} />;
+  if (!modules?.length) return null;
   return (
     <ProfileWidget title={isTeacher ? "MODULES I TEACH" : "MODULES"} className={styles.modulesWidget}>
       {modules?.length > 0 && <ModuleList modules={modules} nameMap={nameMap} onNavigate={onNavigate} />}

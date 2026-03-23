@@ -233,9 +233,7 @@
     color: var(--text-secondary) !important;
 }
 
-/* ───────────────────────────────────────────────────────────────
-   Preset pills: scan-first action modes
-   ─────────────────────────────────────────────────────────────── */
+/* Preset pills for scan-first action modes */
 .presetPanelGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -318,3 +316,7 @@
     transform: translateY(-1px);
 }
 
+.presetCtxMenuPositioned {
+  top: var(--ctx-top);
+  left: var(--ctx-left);
+}

@@ -1,6 +1,7 @@
 /*
  * Preferences panel tests.
  */
+
 import { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
@@ -24,6 +25,14 @@ vi.mock('../../../api/userApi', () => ({
 
 vi.mock('../../../pages/Tasks/components/DateTimePicker', () => ({
   default: ({ value, onChange, placeholder }) => <input data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />,
+}));
+
+vi.mock('../../../components/common/AnimatedDropdown', () => ({
+  default: ({ value, onChange, options = [], placeholder = 'dropdown' }) => (
+    <select data-testid={placeholder} value={value} onChange={(e) => onChange(e.target.value)}>
+      {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+    </select>
+  ),
 }));
 
 import { useTheme } from '../../../context/ThemeContext';
@@ -96,7 +105,7 @@ describe('PreferencesPanel', () => {
   it('submits study-time preference', async () => {
     const onStudyTimeSave = vi.fn().mockResolvedValue(true);
     render(<PreferencesPanel onSave={vi.fn()} onSleepSave={vi.fn()} onStudyTimeSave={onStudyTimeSave} isSaving={false} activeSubTab="studytime" />);
-    const input = await screen.findByLabelText('Daily study time');
+    const input = await screen.findByTestId('Choose a target');
     fireEvent.change(input, { target: { value: '180' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save daily study time' }));
     await waitFor(() => expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 }));

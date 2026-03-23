@@ -1,3 +1,7 @@
+/*
+ * Styles for the tag manager modal.
+ */
+
 .modalBackdrop {
     background: color-mix(in srgb, #000 52%, transparent);
     backdrop-filter: blur(3px);
@@ -9,22 +13,33 @@
     max-width: 372px;
     display: flex;
     flex-direction: column;
-    max-height: 74vh;
-    overflow: visible;
+    height: 500px;
+    max-height: 80vh;
+    overflow: hidden;
 }
 
 .modalContent {
-    overflow: visible;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .content {
-    overflow: visible;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 16px;
 }
 
 .list {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    overflow-y: auto;
+    padding-bottom: 4px;
 }
 
 .item {
@@ -105,25 +120,8 @@
 }
 
 .addTagButton {
-    margin-top: 16px;
-}
-
-.addBtn {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    background: color-mix(in srgb, var(--primary) 86%, var(--surface-raised));
-    color: color-mix(in srgb, var(--text) 96%, transparent);
-    border: 1px solid color-mix(in srgb, var(--primary) 55%, var(--border));
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-}
-
-.addBtn:hover {
-    background: color-mix(in srgb, var(--primary) 100%, var(--surface-raised));
-    border-color: color-mix(in srgb, var(--primary) 75%, var(--border));
+    margin-top: 0;
+    flex-shrink: 0;
 }
 
 /* Form Styles */
@@ -131,6 +129,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    overflow-y: auto;
 }
 
 .form label {

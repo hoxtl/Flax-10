@@ -6,12 +6,12 @@ import styles from './UserAvatar.module.css';
 import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback';
 
 function getInitial(user) {
-  return user.first_name?.[0] || user.username?.[0] || '?';
+  return user.first_name?.[0] || user.name?.[0] || user.username?.[0] || user.user_name?.[0] || '?';
 }
 
 function getFullName(user) {
-  const { first_name = '', last_name = '', username = '' } = user;
-  return (first_name || last_name) ? `${first_name} ${last_name}`.trim() : username;
+  const { first_name = '', last_name = '', username = '', user_name = '', name = '' } = user;
+  return name || ((first_name || last_name) ? `${first_name} ${last_name}`.trim() : (username || user_name));
 }
 
 function AvatarCircle({ initial, photoUrl, size }) {
@@ -21,10 +21,14 @@ function AvatarCircle({ initial, photoUrl, size }) {
 }
 
 /** User avatar with optional full name and username handle. */
-export default function UserAvatar({ user, onClick, avatarOnly = false, size }) {
+
+export default function UserAvatar({ user, onClick, avatarOnly = false, size, allowGenericFallback = false }) {
   if (!user) return null;
   const initial = getInitial(user);
-  const photoUrl = getResolvedUserPhoto(user);
+  const photoUrl = getResolvedUserPhoto(user, {
+    allowGeneric: allowGenericFallback,
+    seed: user.username || user.user_name || user.id || getFullName(user),
+  });
   if (avatarOnly) return <AvatarCircle initial={initial} photoUrl={photoUrl} size={size} />;
   return (
     <div className={styles.userInfo} onClick={onClick}>

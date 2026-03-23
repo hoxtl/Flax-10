@@ -1,6 +1,7 @@
 /**
  * Tests for KCL department/course fixture constants.
  */
+
 import { describe, it, expect } from 'vitest';
 import { KCL_DEPARTMENTS, ALL_KCL_COURSES } from '../../lib/kclCourses';
 

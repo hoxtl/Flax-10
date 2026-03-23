@@ -1,6 +1,7 @@
 /*
  * Tests for ModulesPage component.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
@@ -52,6 +53,9 @@ vi.mock('../../components/Modules/Deadlines/DeadlineModal', () => ({
     default: ({ onClose }) => <div><button onClick={onClose}>CloseModal</button></div>,
 }));
 vi.mock('../../pages/Modules/ModulesPage.module.css', () => ({ default: {} }));
+vi.mock('../../pages/Modules/MyModulesDashboard', () => ({
+    default: () => <div>Upcoming assignment deadlines</div>,
+}));
 
 vi.mock('../../components/common/AnimatedDropdown', () => ({
     default: ({ value, onChange, options, className }) => (

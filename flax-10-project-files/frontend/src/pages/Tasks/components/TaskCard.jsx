@@ -80,7 +80,7 @@ function useTaskContextMenuEffects(menuRef, onClose, setSleepSettings) {
 function ContextMenuMainView({ onEditOpen, onDelete, onClose, lists, setView }) {
   return (
     <>
-      <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>
+      {onEditOpen && <button className={styles.ctxItem} onClick={() => { onEditOpen(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Edit</button>}
       {lists?.length > 0 && <button className={styles.ctxItem} onClick={() => setView("move")}><FolderInput size={14} strokeWidth={2} /> Move to list</button>}
       <button className={styles.ctxItem} onClick={() => setView("due")}><CalendarDays size={14} strokeWidth={2} /> Set due date</button>
       <div className={styles.ctxDivider} />
@@ -130,9 +130,10 @@ export function TaskContextMenu({ task, onEditOpen, onDelete, onEdit, lists, pos
   const menuRef = useRef(null);
   const state = useTaskContextMenuState(task);
   useTaskContextMenuEffects(menuRef, onClose, state.setSleepSettings);
+  const menuPos = { '--ctx-top': pos.y, '--ctx-left': pos.x };
   const menu = (
     <>
-      <div ref={menuRef} className={styles.ctxMenu} style={{ top: pos.y, left: pos.x }} onMouseDown={(e) => e.stopPropagation()}>
+      <div ref={menuRef} className={styles.ctxMenu} style={menuPos} onMouseDown={(e) => e.stopPropagation()}>
         {state.view === "main" && <ContextMenuMainView onEditOpen={onEditOpen} onDelete={onDelete} onClose={onClose} lists={lists} setView={state.setView} />}
         {state.view === "move" && <ContextMenuMoveView task={task} lists={lists} onEdit={onEdit} onClose={onClose} setView={state.setView} />}
         {state.view === "due" && <ContextMenuDueView dueValue={state.dueValue} setDueValue={state.setDueValue} onEdit={onEdit} onClose={onClose} checkSleepAndRun={state.checkSleepAndRun} setView={state.setView} />}
@@ -255,7 +256,7 @@ function TaskCardView(card) {
   const { task, listName, listColor, hideDueBadge, hideListBadge, isCompletedSection, searchQuery, burstPop, checkBounce, handleCheckClick, handleContextMenu, accentCls, due, priorityKey, showPriorityText, isActiveInTimer, setActiveTaskId, nav } = card;
   const cardCls = `${styles.card} ${task.completed ? styles.cardDone : ""} ${task.completed && isCompletedSection ? styles.cardCompletedRow : ""} ${card.isOverdue ? styles.cardOverdue : ""} ${isActiveInTimer ? styles.cardActiveTimer : ""} ${accentCls}`;
   return (
-    <div className={cardCls} style={{ "--list-color": listColor || "#a89890" }} onContextMenu={handleContextMenu} title="Right-click for more options">
+    <div className={cardCls} style={{ "--list-color": listColor || "var(--task-list-fallback)" }} onContextMenu={handleContextMenu} title="Right-click for more options">
       <CheckBurst active={burstPop}>
         <button className={`${styles.check} ${task.completed ? styles.checkDone : ""} ${task.completed && isCompletedSection ? styles.checkDoneCompleted : ""} ${checkBounce ? styles.checkBounce : ""}`} onClick={handleCheckClick} aria-label={task.completed ? "Mark incomplete" : "Mark complete"}>
           {task.completed && <span className={styles.checkMark}>✓</span>}
@@ -272,9 +273,9 @@ export default function TaskCard(props) {
   return (
     <>
       <TaskCardView {...card} />
-      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={() => card.setShowEdit(true)} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
+      {card.ctxMenu && <TaskContextMenu task={card.task} onEditOpen={card.onEdit ? () => card.setShowEdit(true) : undefined} onDelete={card.onDelete} onEdit={card.onEdit} lists={card.lists} pos={card.ctxMenu} onClose={() => card.setCtxMenu(null)} />}
       {card.showInfo && <TaskInfoModal task={card.task} listName={card.listName} onClose={() => card.setShowInfo(false)} />}
-      {card.showEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
+      {card.showEdit && card.onEdit && <EditTaskModal task={card.task} onSave={(data) => card.onEdit(data)} onDelete={card.onDelete} lists={card.lists} onClose={() => card.setShowEdit(false)} />}
     </>
   );
 }

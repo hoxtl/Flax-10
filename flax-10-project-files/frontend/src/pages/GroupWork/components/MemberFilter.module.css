@@ -1,0 +1,95 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 42px;
+  padding: 0 14px;
+  background: var(--hover-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.filterBtn:hover,
+.filterBtnActive {
+  background: var(--hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  z-index: 200;
+  background: var(--panel, var(--surface-card));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.item:hover {
+  background: var(--hover);
+}
+
+.checkbox {
+  cursor: pointer;
+  accent-color: var(--primary);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

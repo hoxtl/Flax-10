@@ -9,6 +9,8 @@
 
 .popoverContainer {
     position: fixed;
+    top: var(--popover-top);
+    left: var(--popover-left);
     width: 260px;
     background: var(--card-bg, #ffffff);
     border-radius: 10px;
@@ -145,4 +147,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.coloredBadge {
+    background-color: var(--badge-color) !important;
+    border-color: var(--badge-color) !important;
+    color: var(--c-white) !important;
 }

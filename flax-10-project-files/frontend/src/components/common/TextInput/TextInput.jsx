@@ -10,6 +10,7 @@ function joinClassNames(...values) {
 }
 
 /** Input or textarea with optional leading/trailing adornment slots. */
+
 const TextInput = forwardRef(function TextInput({ className = "", inputClassName = "", leading = null, trailing = null, multiline = false, ...props }, ref) {
   const Component = multiline ? "textarea" : "input";
   return (

@@ -1,6 +1,7 @@
 /**
  * Tests for DateTimeCell - Date/time display and editing for table view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DateTimeCell, formatTimeRange, isAllDay } from '../../../../../components/Calendar/TableView/cells/DateTimeCell';

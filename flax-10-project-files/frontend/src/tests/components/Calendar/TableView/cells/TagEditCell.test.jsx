@@ -1,6 +1,7 @@
 /**
  * Tests for TagEditCell - Tag selection cell for table view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TagEditCell } from '../../../../../components/Calendar/TableView/cells/TagEditCell';

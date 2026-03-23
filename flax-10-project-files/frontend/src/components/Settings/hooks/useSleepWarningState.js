@@ -1,6 +1,7 @@
 /*
  * State container for sleep warnings.
  */
+
 import { useState } from "react";
 
 export default function useSleepWarningState() {

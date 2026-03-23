@@ -103,3 +103,45 @@
   height: 20px;
   border-radius: 3px;
 }
+
+.noAttendanceMsg {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.summaryCount {
+  font-size: 0.75rem;
+}
+
+.chartCenter {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .heatmapGrid {
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .gridCell {
+    min-width: 12px;
+    height: 24px;
+  }
+
+  .dayLabel {
+    height: 24px;
+  }
+
+  .hourLabel,
+  .dayLabel,
+  .legendLabel {
+    font-size: 0.66rem;
+  }
+
+  .cellValue {
+    display: none;
+  }
+}

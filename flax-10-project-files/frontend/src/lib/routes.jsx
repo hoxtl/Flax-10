@@ -47,7 +47,7 @@ export const APP_ROUTES = [
   },
   {
     id: "group-work",
-    label: "Group Study",
+    label: "Group Projects",
     icon: "🤝",
     path: "/group-work",
     element: <GroupWorkIndexPage />,

@@ -1,6 +1,7 @@
 /*
  * Manual schedule form.
  */
+
 import styles from '../shared/scheduleFormStyles';
 import { ManualScheduleEventList } from './ManualScheduleEventList';
 import { ManualScheduleFields } from './ManualScheduleFields';

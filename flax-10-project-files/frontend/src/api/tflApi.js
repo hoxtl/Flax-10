@@ -2,26 +2,13 @@
  * TfL journey planner and service disruption API client.
  */
 
+import tflLineColors from './tflLineColors.json';
+
 const TFL_API_KEY = import.meta.env.VITE_TFL_API_KEY;
 const TFL_BASE = 'https://api.tfl.gov.uk';
 
-const LINE_COLOURS = {
-  'bakerloo': '#B36305',
-  'central': '#E32017',
-  'circle': '#FFD300',
-  'district': '#00782A',
-  'hammersmith-city': '#F3A9BB',
-  'jubilee': '#A0A5A9',
-  'metropolitan': '#9B0056',
-  'northern': '#000000',
-  'piccadilly': '#003688',
-  'victoria': '#0098D4',
-  'waterloo-city': '#95CDBA',
-  'elizabeth': '#7156A5',
-  'dlr': '#00A4A7',
-  'london-overground': '#EE7C0E',
-  'tram': '#84B817',
-};
+const LINE_COLOURS = tflLineColors.lineColours;
+const FALLBACK_COLOUR = tflLineColors.fallbackColour;
 
 function mapLeg(leg, decoder) {
   return {
@@ -52,22 +39,23 @@ function decodeNextCoord(encoded, index) {
   return { value, index };
 }
 
+function buildDelay(line, status) {
+  return {
+    lineName: line.name,
+    mode: line.modeName,
+    severity: status.statusSeverity,
+    severityDescription: status.statusSeverityDescription,
+    reason: status.reason || 'Service Delay/Disruption',
+    color: LINE_COLOURS[line.id] || FALLBACK_COLOUR,
+  };
+}
+
+function extractLineDelays(line) {
+  return line.lineStatuses.filter((s) => s.statusSeverity < 10).map((s) => buildDelay(line, s));
+}
+
 function extractDelays(lines) {
-  const delays = [];
-  for (const line of lines) {
-    for (const status of line.lineStatuses) {
-      if (status.statusSeverity >= 10) continue;
-      delays.push({
-        lineName: line.name,
-        mode: line.modeName,
-        severity: status.statusSeverity,
-        severityDescription: status.statusSeverityDescription,
-        reason: status.reason || 'Service Delay/Disruption',
-        color: LINE_COLOURS[line.id] || '#a5a5a5ff',
-      });
-    }
-  }
-  return delays;
+  return lines.flatMap(extractLineDelays);
 }
 
 export const tflService = {
@@ -78,7 +66,6 @@ export const tflService = {
       if (!response.ok) throw new Error(`TfL API error: ${response.status}`);
       return parseJourney(await response.json(), this.decodeTfLPolyline);
     } catch (error) {
-      console.error('TfL API journeyPlanner error: ', error);
       throw error;
     }
   },
@@ -104,16 +91,15 @@ export const tflService = {
       const modes = ['tube', 'dlr', 'overground', 'elizabeth-line', 'tram'];
       const url = `${TFL_BASE}/Line/Mode/${modes.join(',')}/Status?app_key=${TFL_API_KEY}`;
       const response = await fetch(url);
-      if (response.status === 429) { console.warn('TfL API: Rate limited (429)'); return []; }
+      if (response.status === 429) return [];
       if (!response.ok) throw new Error(`TfL Delays API error: ${response.status}`);
       return extractDelays(await response.json());
-    } catch (error) {
-      console.error('TfL Delay API error: ', error);
+    } catch {
       return [];
     }
   },
 
   getDelayLineColor(lineId) {
-    return LINE_COLOURS[lineId] || '#a5a5a5ff';
+    return LINE_COLOURS[lineId] || FALLBACK_COLOUR;
   },
 };

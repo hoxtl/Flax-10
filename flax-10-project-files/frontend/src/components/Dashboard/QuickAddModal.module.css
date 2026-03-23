@@ -93,3 +93,8 @@
   color: #6b7280;
   font-size: 13px;
 }
+
+.emptyMsg {
+  text-align: center;
+  color: var(--color-gray-500);
+}

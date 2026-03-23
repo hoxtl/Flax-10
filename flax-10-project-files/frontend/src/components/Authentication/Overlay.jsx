@@ -1,10 +1,14 @@
+/*
+ * Sliding auth overlay actions.
+ */
+
 import styled from "styled-components";
-import * as Components from './AuthComponents';
+import * as Components from "./AuthComponents";
 
 const OverlayTitle = styled.h2`
   font-size: 22px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.96);
+  color: var(--color-white-96);
   margin: 0;
   letter-spacing: -0.2px;
   text-align: center;
@@ -15,7 +19,9 @@ function LeftPanel({ signIn, onToggle }) {
   return (
     <Components.LeftOverlayPanel $signIn={signIn}>
       <OverlayTitle>Already have an account?</OverlayTitle>
-      <Components.GhostButton onClick={() => onToggle(true)}>Sign In</Components.GhostButton>
+      <Components.GhostButton onClick={() => onToggle(true)}>
+        Sign In
+      </Components.GhostButton>
     </Components.LeftOverlayPanel>
   );
 }
@@ -24,12 +30,14 @@ function RightPanel({ signIn, onToggle }) {
   return (
     <Components.RightOverlayPanel $signIn={signIn}>
       <OverlayTitle>Join StudyFlax</OverlayTitle>
-      <Components.GhostButton onClick={() => onToggle(false)}>Sign Up</Components.GhostButton>
+      <Components.GhostButton onClick={() => onToggle(false)}>
+        Sign Up
+      </Components.GhostButton>
     </Components.RightOverlayPanel>
   );
 }
 
-export const AuthOverlay = ({ signIn, onToggle }) => {
+export function AuthOverlay({ signIn, onToggle }) {
   return (
     <Components.OverlayContainer $signIn={signIn}>
       <Components.Overlay $signIn={signIn}>
@@ -38,4 +46,4 @@ export const AuthOverlay = ({ signIn, onToggle }) => {
       </Components.Overlay>
     </Components.OverlayContainer>
   );
-};
+}

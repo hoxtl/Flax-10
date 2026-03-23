@@ -6,6 +6,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import styles from "./InlineTitleField.module.css";
 
 /** Returns state and handlers for managing inline edit mode. */
+
 export function useInlineEdit(initialValue, onSave) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(initialValue);
@@ -39,9 +40,10 @@ function buildKeyHandler(onSave, onCancel) {
 }
 
 function ReadOnlyView({ value, className, style, readOnlyStyles, onStart }) {
+  const combinedStyle = Object.assign({}, readOnlyStyles, style);
   return (
     <span className={`${styles.readOnly} ${className}`} onClick={onStart}
-      title="Click to edit" style={{ ...readOnlyStyles, ...style }}>
+      title="Click to edit" style={combinedStyle}>
       {value}
     </span>
   );
@@ -57,6 +59,7 @@ function EditView({ textareaRef, draft, setDraft, onSave, onCancel, className, s
 }
 
 /** Inline title field that switches between a read-only span and an auto-resizing textarea. */
+
 export default function InlineTitleField({
   value, isEditing, draft, setDraft, onStart, onSave, onCancel,
   className = "", textareaClassName = "", style = {},

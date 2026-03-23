@@ -56,4 +56,4 @@ class ScheduleEventAllocation(models.Model):
         unique_together = ('schedule', 'event')
 
     def __str__(self):
-        return f"{self.shcedule_id}:{self.deadline_id}:{self.event_id}"
+        return f"{self.schedule_id}:{self.deadline_id}:{self.event_id}"

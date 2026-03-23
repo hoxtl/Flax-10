@@ -2,6 +2,7 @@
  * CreateSocietyModal provides the interface for users to establish new societies.
  * Collects basic info, categories, admins, and initial collaborators.
  */
+
 import { useState } from "react";
 import styles from "./CreateSocietyModal.module.css";
 import AddCollaboratorModal from "./AddCollaboratorModal";
@@ -37,6 +38,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
 }
 
 /** Custom hook to manage the creation form state and modal logic. */
+
 function useCreateSocietyForm(onCreate) {
     const [form, setForm] = useState(initialForm());
     const [modals, setModals] = useState({ collab: false, photo: false });

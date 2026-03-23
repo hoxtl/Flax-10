@@ -5,6 +5,7 @@
 import styles from "./EmptyState.module.css";
 
 /** Empty state with an icon, title, description, and optional action. */
+
 export default function EmptyState({ icon = "🔍", title, description, action }) {
   return (
     <div className={styles.wrap}>

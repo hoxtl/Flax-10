@@ -1,0 +1,39 @@
+{
+  "lineColours": {
+    "bakerloo": "#B36305",
+    "central": "#E32017",
+    "circle": "#FFD300",
+    "district": "#00782A",
+    "hammersmith-city": "#F3A9BB",
+    "jubilee": "#A0A5A9",
+    "metropolitan": "#9B0056",
+    "northern": "#000000",
+    "piccadilly": "#003688",
+    "victoria": "#0098D4",
+    "waterloo-city": "#95CDBA",
+    "elizabeth": "#7156A5",
+    "dlr": "#00A4A7",
+    "london-overground": "#EE7C0E",
+    "overground": "#EE7C0E",
+    "tram": "#84B817"
+  },
+  "fallbackColour": "#a5a5a5",
+  "linePillColours": {
+    "bakerloo": { "bg": "#B36305", "text": "#FFFFFF" },
+    "central": { "bg": "#E32017", "text": "#FFFFFF" },
+    "circle": { "bg": "#FFD300", "text": "#1A1A1A" },
+    "district": { "bg": "#00782A", "text": "#FFFFFF" },
+    "hammersmith-city": { "bg": "#F3A9BB", "text": "#1A1A1A" },
+    "jubilee": { "bg": "#A0A5A9", "text": "#FFFFFF" },
+    "metropolitan": { "bg": "#9B0056", "text": "#FFFFFF" },
+    "northern": { "bg": "#000000", "text": "#FFFFFF" },
+    "piccadilly": { "bg": "#003688", "text": "#FFFFFF" },
+    "victoria": { "bg": "#0098D4", "text": "#FFFFFF" },
+    "waterloo-city": { "bg": "#95CDBA", "text": "#1A1A1A" },
+    "elizabeth": { "bg": "#6950A1", "text": "#FFFFFF" },
+    "dlr": { "bg": "#00A4A7", "text": "#FFFFFF" },
+    "overground": { "bg": "#EE7C0E", "text": "#FFFFFF" },
+    "tram": { "bg": "#84B817", "text": "#FFFFFF" }
+  },
+  "fallbackPillColour": { "bg": "#78716c", "text": "#FFFFFF" }
+}

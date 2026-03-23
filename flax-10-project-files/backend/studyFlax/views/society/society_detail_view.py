@@ -31,6 +31,7 @@ def society_detail(request, society_id):
 
 def get_society_detail(request, society):
     """Return a serialised society detail response with membership context."""
+
     data = SocietyDetailSerialiser(society, context={'request': request}).data
     membership = get_membership(request.user, society)
     data['is_member'] = membership is not None
@@ -41,8 +42,20 @@ def get_society_detail(request, society):
 
 def update_society(request, society):
     """Update a society's details (admin only)."""
-    if not is_society_admin(request.user, society):
-        return permission_denied_response()
+
+    permission_response = _society_detail_admin_error(request.user, society)
+    if permission_response:
+        return permission_response
+    return _updated_society_response(request, society)
+
+
+def _society_detail_admin_error(user, society):
+    if is_society_admin(user, society):
+        return None
+    return permission_denied_response()
+
+
+def _updated_society_response(request, society):
     serialiser = SocietyDetailSerialiser(society, data=request.data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -53,6 +66,7 @@ def update_society(request, society):
 
 def delete_society(request, society):
     """Delete a society and notify all members (admin only)."""
+
     if not is_society_admin(request.user, society):
         return permission_denied_response()
     delete_society_with_notification(society)
@@ -60,6 +74,7 @@ def delete_society(request, society):
 
 def delete_society_with_notification(society):
     """Delete society with only one notification (no event/announcement spam)."""
+
     from studyFlax.signals.society_notifications import (
         notify_society_deleted, delete_children_silently, _deleting_societies
     )
@@ -71,6 +86,7 @@ def delete_society_with_notification(society):
 
 def _notify_admins_of_report(society, reason):
     """Send a report notification to all superusers."""
+
     User = get_user_model()
     Notification.objects.bulk_create([
         Notification(
@@ -81,21 +97,55 @@ def _notify_admins_of_report(society, reason):
         for admin_user in User.objects.filter(is_superuser=True)
     ])
 
+def _remove_society_report(society, user):
+    SocietyReport.objects.filter(society=society, reporter=user).delete()
+
+def _clean_report_reason(request):
+    reason = request.data.get('reason')
+    if not reason or not reason.strip():
+        return None
+    return reason.strip()
+
+def _create_society_report(society, user, reason):
+    SocietyReport.objects.get_or_create(
+        society=society, reporter=user, defaults={'reason': reason},
+    )
+
+def _report_removed_response():
+    return Response({'message': 'Report removed successfully'}, status=status.HTTP_200_OK)
+
+def _report_reason_required_response():
+    return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+def _report_submitted_response():
+    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
+
+def _submit_society_report(request, society):
+    payload, errors, status_code = _society_report_result(request, society)
+    if errors:
+        return Response(errors, status=status_code)
+    return Response(payload, status=status_code)
+
+
+def _society_report_result(request, society):
+    reason = _clean_report_reason(request)
+    if not reason:
+        response = _report_reason_required_response()
+        return None, response.data, response.status_code
+    _create_society_report(society, request.user, reason)
+    _notify_admins_of_report(society, reason)
+    response = _report_submitted_response()
+    return response.data, None, response.status_code
+
 @api_view(['POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def report_society(request, society_id):
     """Submit or remove a report for a society."""
+
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
     if request.method == 'DELETE':
-        SocietyReport.objects.filter(society=society, reporter=request.user).delete()
-        return Response({'message': 'Report removed successfully'}, status=status.HTTP_200_OK)
-    reason = request.data.get('reason')
-    if not reason or not reason.strip():
-        return Response({'error': 'Reason is required'}, status=status.HTTP_400_BAD_REQUEST)
-    SocietyReport.objects.get_or_create(
-        society=society, reporter=request.user, defaults={'reason': reason.strip()},
-    )
-    _notify_admins_of_report(society, reason.strip())
-    return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
+        _remove_society_report(society, request.user)
+        return _report_removed_response()
+    return _submit_society_report(request, society)

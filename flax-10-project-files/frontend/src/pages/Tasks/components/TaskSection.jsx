@@ -10,6 +10,7 @@ import TaskCard from "./TaskCard";
 import AllTasksCompleteCard from "./AllTasksCompleteCard";
 import { sortTasks } from "../utils/taskSortUtils";
 import { getListColor } from "../utils/listColorUtils";
+import { isReadingList } from "../utils/readingListUtils";
 import { SECTION_SHOW_LIMIT, TASK_ROW_ANIM, SECTION_BODY_ANIM } from "../constants/taskAnimations";
 
 import styles from "./TaskFeedSections.module.css";
@@ -18,7 +19,7 @@ function ProgressRing({ progressPct, isOverdue }) {
   const circumference = 2 * Math.PI * 9;
   return (
     <svg className={styles.sectionRing} width="22" height="22" viewBox="0 0 22 22" aria-hidden>
-      <circle cx="11" cy="11" r="9" fill="none" stroke="rgba(123,103,81,0.1)" strokeWidth="2.5" />
+      <circle cx="11" cy="11" r="9" fill="none" className={styles.sectionRingBg} strokeWidth="2.5" />
       <circle cx="11" cy="11" r="9" fill="none"
         className={`${styles.sectionRingFill} ${isOverdue ? styles.sectionRingDanger : ""}`}
         strokeWidth="2.5" strokeLinecap="round"
@@ -79,6 +80,7 @@ function SectionEmptyState({ sectionType, emptyMessage, emptySub, emptyCardProps
 
 function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, onEditTask, hideDueBadge, hideListBadge, isOverdueSection, searchQuery }) {
   const list = listMap[String(task.task_list)];
+  const editHandler = !isReadingList(list) && onEditTask ? (data, meta) => onEditTask(task.id, data, meta) : undefined;
   return (
     <div className={styles.taskRow}>
       <TaskCard
@@ -88,20 +90,19 @@ function SectionTaskRow({ task, listMap, lists, onToggleComplete, onDeleteTask, 
         lists={lists}
         onToggle={() => onToggleComplete(task.id, task.completed)}
         onDelete={() => onDeleteTask(task.id)}
-        onEdit={(data, meta) => onEditTask(task.id, data, meta)}
-        hideDueBadge={hideDueBadge}
-        hideListBadge={hideListBadge}
-        isOverdue={isOverdueSection}
-        searchQuery={searchQuery}
+        onEdit={editHandler}
+        hideDueBadge={hideDueBadge} hideListBadge={hideListBadge}
+        isOverdue={isOverdueSection} searchQuery={searchQuery}
       />
     </div>
   );
 }
 
-function ShowMoreButton({ showAll, total, onToggle }) {
+function ShowMoreButton({ showAll, totalCount, onToggle }) {
+  const showAllLabel = `+ Show all ${totalCount}`;
   return (
     <div className={styles.showMoreWrap}>
-      <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : `Show all ${total} →`}</button>
+      <button type="button" className={styles.showMoreBtn} onClick={onToggle}>{showAll ? "Show less ↑" : showAllLabel}</button>
     </div>
   );
 }
@@ -117,7 +118,7 @@ function SectionBody({ tasks: visibleTasks, showAll, applyLimit, hiddenCount, em
           </Motion.div>
         ))}
       </AnimatePresence>
-      {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} total={visibleTasks.length + hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
+      {applyLimit && hiddenCount > 0 && <ShowMoreButton showAll={showAll} totalCount={visibleTasks.length + hiddenCount} onToggle={sectionTaskRowProps.onToggleShowAll} />}
     </>
   );
 }

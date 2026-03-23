@@ -1,0 +1,131 @@
+/*
+ * Mobile drawer item and hamburger styles.
+ */
+
+.mobileDrawerNavItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: color-mix(
+    in srgb,
+    var(--surface-raised, var(--sidebar)) 70%,
+    transparent
+  );
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  cursor: pointer;
+  font-size: 0.93rem;
+  font-weight: 560;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s;
+  overflow: hidden;
+}
+
+.mobileDrawerNavItem:active {
+  background: color-mix(in srgb, var(--hover) 86%, var(--surface-raised));
+  transform: translateY(1px);
+}
+
+.mobileDrawerNavItemActive {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface-raised));
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(74, 52, 33, 0.07);
+}
+
+.mobileDrawerNavIcon {
+  font-size: 19px;
+  flex-shrink: 0;
+  width: 26px;
+  text-align: center;
+}
+
+.mobileDrawerNavLabel {
+  flex: 1;
+  letter-spacing: 0.01em;
+}
+
+.mobileDrawerActivePill {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 58%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.mobileDrawerFooter {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 18px;
+  gap: 6px;
+}
+
+.mobileDrawerFooterBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: color-mix(
+    in srgb,
+    var(--surface-raised, var(--sidebar)) 70%,
+    transparent
+  );
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  cursor: pointer;
+  font-size: 0.93rem;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.15s;
+}
+
+.mobileDrawerFooterBtn:active {
+  background: color-mix(in srgb, var(--hover) 86%, var(--surface-raised));
+  transform: translateY(1px);
+}
+
+.mobileDrawerLogout {
+  color: #dc2626 !important;
+  border-color: color-mix(in srgb, #dc2626 22%, var(--border));
+}
+
+.mobileDrawerLogout:active {
+  background: rgba(220, 38, 38, 0.07) !important;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburgerLine {
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}

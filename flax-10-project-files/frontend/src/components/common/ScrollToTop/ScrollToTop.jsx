@@ -37,6 +37,7 @@ function resetPageScroll(containerSelector) {
 }
 
 /** Resets scroll position to the top on route changes, skipping calendar routes. */
+
 export default function ScrollToTop({ containerSelector }) {
   const { pathname } = useLocation();
   useEffect(() => {

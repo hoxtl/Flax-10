@@ -2,11 +2,13 @@
  * SocietyHero renders the visual header of the society detail page,
  * featuring an image carousel and an editable society name.
  */
+
 import { useState, useRef, useMemo } from "react";
 import styles from "./SocietyHero.module.css";
 import { useCarouselNavigation, useCarouselGestures } from "../hooks/useCarouselNavigation";
 
 /** Visual header carousel for the society detail page. */
+
 export default function SocietyHero({ society, onImageClick, editMode, onEditImages, onUpdateName }) {
     const heroRef = useRef(null);
     const images = useMemo(() => getImages(society), [society]);
@@ -29,6 +31,7 @@ export default function SocietyHero({ society, onImageClick, editMode, onEditIma
 }
 
 /** Handles rendering of contextual controls (arrows or edit layer). */
+
 function HeroControls({ editMode, images, prev, next, onEditImages }) {
     if (editMode) return <EditLayer onClick={onEditImages} />;
     return <HeroArrows total={images.length} prev={prev} next={next} />;
@@ -87,6 +90,7 @@ function HeroContent({ society, imageCount, editMode, onUpdateName }) {
 }
 
 /** Renders a name that becomes an input field in edit mode. */
+
 export function EditableName({ name, editMode, onUpdate }) {
     const [isEditing, setIsEditing] = useState(false);
     const [val, setVal] = useState(name);
@@ -103,6 +107,7 @@ export function EditableName({ name, editMode, onUpdate }) {
 }
 
 /** Inline text input for editing society names. */
+
 function NameInput({ val, setVal, onUpdate, setEditing }) {
     const handleClose = () => { setEditing(false); onUpdate?.(val); };
     return <input className={styles.nameInput} value={val} autoFocus

@@ -58,7 +58,6 @@ function buildNonHumanAvatar(seedKey = "") {
 
 function buildStudentFallback(seedKey = "") {
   const hash = getHash(seedKey);
-  if (hash % 10 === 0) return null;
   if (hash % 4 === 0) return buildNonHumanAvatar(seedKey);
   return buildGenderAvatar(seedKey, "unknown");
 }
@@ -128,16 +127,22 @@ function extractFullName(user) {
   return user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
 }
 
+function extractUsername(user) {
+  return user.username || user.user_name || "";
+}
+
 /** Resolves a user's display photo, falling back to a deterministic avatar. */
+
 export function getResolvedUserPhoto(user, options = {}) {
   if (!user) return null;
   const direct = extractDirectPhoto(user);
   if (direct) return direct;
+  const username = extractUsername(user);
   return getTutorPhotoFallback({
     fullName: extractFullName(user),
-    username: user.username,
+    username,
     role: user.role,
-    seed: options.seed,
+    seed: options.seed || username || user.id || extractFullName(user),
     allowGeneric: Boolean(options.allowGeneric),
   });
 }

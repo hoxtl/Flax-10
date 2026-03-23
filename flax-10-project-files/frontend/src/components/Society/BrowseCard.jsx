@@ -1,6 +1,7 @@
 /*
  * BrowseCard renders a compact society browse card.
  */
+
 import styles from './BrowseCard.module.css';
 import ActionCard from './ActionCard';
 

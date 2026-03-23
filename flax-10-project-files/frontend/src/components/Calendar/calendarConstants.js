@@ -14,6 +14,7 @@ export const PIXELS_PER_SNAP = SLOT_HEIGHT * (SNAP_INTERVAL / 60);
  * Converts a Y pixel position to minutes from midnight.
  * Used when dropping/resizing events to figure out what time they clicked.
  */
+
 export function pixelsToMinutes(pixels) {
     const rawMinutes = (pixels / SLOT_HEIGHT) * 60;
     // Snap down to interval (e.g., 15 min)
@@ -24,6 +25,7 @@ export function pixelsToMinutes(pixels) {
  * Converts minutes from midnight to Y pixel position.
  * Used to position events on the grid.
  */
+
 export function minutesToPixels(minutes) {
     return (minutes / 60) * SLOT_HEIGHT;
 }
@@ -32,6 +34,7 @@ export function minutesToPixels(minutes) {
  * Gets the minute offset within a slot from a mouse Y position.
  * Returns 0-59 based on where in the slot you clicked.
  */
+
 export function getMinuteOffset(mouseY, slotTop) {
     const offsetInSlot = mouseY - slotTop;
     const minuteOffset = (offsetInSlot / SLOT_HEIGHT) * 60;

@@ -7,9 +7,9 @@ import { useMemo } from "react";
 function readDisplayName() {
   try {
     const storedUser = localStorage.getItem("user");
-    if (!storedUser) return null;
-    const user = JSON.parse(storedUser);
-    return (user.first_name || "").trim() || (user.username || "").trim() || null;
+    const user = storedUser ? JSON.parse(storedUser) : null;
+    const firstName = user?.first_name?.trim();
+    return firstName || user?.username?.trim() || null;
   } catch {
     return null;
   }

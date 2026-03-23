@@ -1,5 +1,5 @@
 /*
- * Password strength meter with rule checklist and colour-coded progress bar.
+ * Password strength metre with rule checklist and colour-coded progress bar.
  */
 
 import styles from "./PasswordStrength.module.css";
@@ -39,6 +39,7 @@ function RuleList({ rules, password }) {
 }
 
 /** Visual password strength indicator with a progress bar and rule checklist. */
+
 export default function PasswordStrength({ password, rules = DEFAULT_RULES, title = "Password strength", showOnlyWhenTyping = true }) {
   if (showOnlyWhenTyping && !password) return null;
   const safePassword = password || "";

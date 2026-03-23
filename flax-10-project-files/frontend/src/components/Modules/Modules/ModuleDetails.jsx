@@ -1,21 +1,21 @@
 /*
  * Detailed view of a single module with schedule, deadlines, and readings.
  */
+
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
+import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
+import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
 import deadlineStyles from '../styles/ModuleDeadlines.module.css';
 import TravelTimeIndicator from './TravelTimeIndicator.jsx';
-import { useEffect, useState } from 'react';
-import { getHomeAddress } from '../../../api/userApi.js';
-import { getTravelTimeModule } from '../../../utils/tflTravelTime.js';
+import { useModuleTravelTime } from './useModuleTravelTime.js';
 
 function getSortedDeadlines(deadlines = []) {
     return [...deadlines].sort((a, b) => new Date(a.start_due_date) - new Date(b.start_due_date));
@@ -28,15 +28,15 @@ function getNextDeadline(deadlines = []) {
 }
 
 function getUrgencyLabel(dueDate) {
-    const now = new Date();
-    const diffMs = new Date(dueDate) - now;
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    if (diffDays <= 2) return "due-soon";
-    if (diffDays <= 7) return "this-week";
+    const tier = getUrgencyTier(dueDate);
+    if (tier === "overdue") return "overdue";
+    if (tier === "critical") return "due-soon";
+    if (tier === "urgent") return "this-week";
     return "later";
 }
 
 function getUrgencyText(kind) {
+    if (kind === "overdue") return "Passed";
     if (kind === "due-soon") return "Due soon";
     if (kind === "this-week") return "This week";
     return "Later";
@@ -62,26 +62,9 @@ function getNextClassText(startTime, endTime) {
     return `${day}, ${formatTime(startTime)} - ${formatTime(endTime)}`;
 }
 
-function getTutorImage(moduleData) {
-    return getResolvedUserPhoto({
-        id: moduleData?.created_by,
-        name: moduleData?.created_by_name,
-        role: 'teacher',
-        username: moduleData?.created_by_username,
-        profile_photo_url: moduleData?.created_by_profile_photo_url,
-        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
-    }, { allowGeneric: true });
-}
-
-function handleTutorImageError(e) {
-    e.currentTarget.style.display = "none";
-    const fallback = e.currentTarget.nextElementSibling;
-    if (fallback) fallback.style.display = "inline-flex";
-}
-
 function TutorPhoto({ photo, name }) {
     if (!photo) return null;
-    return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={handleTutorImageError} />;
+    return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={(event) => hideBrokenTutorImage(event, "inline-flex")} />;
 }
 
 function TutorName({ id, name }) {
@@ -90,13 +73,14 @@ function TutorName({ id, name }) {
 }
 
 function TutorMetaItem({ module, photo }) {
+    const tutorName = module.created_by_name || "Unknown";
     return (
         <div className={heroStyles.heroMetaItem}>
             <span className={heroStyles.heroMetaLabel}>Tutor</span>
             <div className={heroStyles.tutorInline}>
-                <TutorPhoto photo={photo} name={module.created_by_name || "Tutor"} />
-                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(module.created_by_name)}</span>
-                <TutorName id={module.created_by} name={module.created_by_name} />
+                <TutorPhoto photo={photo} name={tutorName} />
+                <span className={heroStyles.tutorAvatarFallback} style={photo ? { display: "none" } : undefined}>{getInitials(tutorName)}</span>
+                <TutorName id={module.created_by} name={tutorName} />
             </div>
         </div>
     );
@@ -128,10 +112,15 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
             <h1 className={heroStyles.moduleTitle}>{module.module_name}</h1>
             <p className={heroStyles.heroSubtext}>{module.description || "No module summary available yet."}</p>
-            <div className={heroStyles.heroMeta}><TutorMetaItem module={module} photo={tutorPhoto} /><EmailMetaItem email={module.created_by_email} /></div>
-            <div className={heroStyles.heroActions}>
-                {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
-                <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+            <div className={heroStyles.heroBottom}>
+                <div className={heroStyles.heroMeta}>
+                    <TutorMetaItem module={module} photo={tutorPhoto} />
+                    <EmailMetaItem email={module.created_by_email} />
+                </div>
+                <div className={heroStyles.heroActions}>
+                    {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
+                    <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                </div>
             </div>
         </section>
     );
@@ -201,29 +190,12 @@ function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
 
 export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
     const data = useModuleData(module);
-    const [travelTime, setTravelTime] = useState(null);
-
-    useEffect(() => {
-        async function fetchTravelTime() {
-            try {
-                const homeAddress = await getHomeAddress();
-                const travelInfo = await getTravelTimeModule(homeAddress, module.location);
-                if (travelInfo) {
-                    setTravelTime(travelInfo.duration);
-                }
-            } catch (error) {
-                console.error('Travel time fetch in module details error: ', error);
-            }
-        }
-        if (module.location) {
-            fetchTravelTime();
-        }
-    }, [module.location]);
+    const travelTime = useModuleTravelTime(module.location);
 
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
-            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getTutorImage(module)} />
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
@@ -306,13 +278,14 @@ function ReadingsSection({ readings }) {
 }
 
 function ReadingRow({ reading, index }) {
+    const cleanTitle = stripModulePrefix(reading.title, reading.module_name);
     return (
         <div className={deadlineStyles.deadlineItem}>
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
                     <span className={deadlineStyles.deadlinesType}>📖 Reading</span>
-                    <span className={deadlineStyles.deadlineTitle}>{reading.title}</span>
+                    <span className={deadlineStyles.deadlineTitle}>{cleanTitle}</span>
                 </div>
                 <span className={deadlineStyles.deadlineDate}>
                     {reading.start_page != null && reading.end_page != null
@@ -323,4 +296,15 @@ function ReadingRow({ reading, index }) {
             </div>
         </div>
     );
+}
+
+function stripModulePrefix(title = "", moduleName = "") {
+    const cleanTitle = String(title || "").trim();
+    const cleanModule = String(moduleName || "").trim();
+    if (!cleanModule) return cleanTitle;
+    const prefix = `${cleanModule}:`;
+    if (cleanTitle.toLowerCase().startsWith(prefix.toLowerCase())) {
+        return cleanTitle.slice(prefix.length).trim();
+    }
+    return cleanTitle;
 }

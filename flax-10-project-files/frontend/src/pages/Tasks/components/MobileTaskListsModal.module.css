@@ -1,0 +1,108 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionLabel {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sectionDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.sectionEmpty {
+  margin: 4px 2px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.listWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 52vh;
+  overflow-y: auto;
+}
+
+.listRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.listRow:hover {
+  background: var(--hover);
+}
+
+.listRowActive {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.listDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.listName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listCount {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--pill-bg);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.addListBtn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px dashed var(--muted);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.addListBtn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+  background: var(--hover-light);
+}

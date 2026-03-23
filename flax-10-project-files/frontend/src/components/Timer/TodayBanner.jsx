@@ -39,10 +39,10 @@ function BannerMetrics({ state, isStudying }) {
 
   return (
     <>
-      <MetricSection label="STREAK" value={`${state.streak} day${state.streak !== 1 ? 's' : ''}`} icon="🔥" iconBg="#fff7ed" />
-      <MetricSection label="SESSIONS" value={`${state.sessions} / ${state.goalSessions}`} sub={<ProgressBar sessions={state.sessions} goalSessions={state.goalSessions} sessionPct={state.sessionPct} fillAnimating={state.fillAnimating} isStudying={isStudying} activePulseLeft={state.activePulseLeft} tickCount={state.tickCount} />} icon="🎯" iconBg="#f5f3ff" />
-      <MetricSection label="WEEKLY GOAL" value={`${weeklyProgressDays} / 7 days`} sub={<ProgressBar sessions={weeklyProgressDays} goalSessions={7} sessionPct={(weeklyProgressDays / 7) * 100} isStudying={false} />} icon="🏆" iconBg="#f0fdf4" />
-      <MetricSection label="FOCUS TIME" value={state.formattedHours} sub={<FocusTimeSub goalHours={state.goalHours} timePct={state.timePct} />} icon="🕒" iconBg="#fafaf9" divider={false} />
+      <MetricSection label="STREAK" value={`${state.streak} day${state.streak !== 1 ? 's' : ''}`} icon="🔥" iconBg="var(--color-banner-streak)" />
+      <MetricSection label="SESSIONS" value={`${state.sessions} / ${state.goalSessions}`} sub={<ProgressBar sessions={state.sessions} goalSessions={state.goalSessions} sessionPct={state.sessionPct} fillAnimating={state.fillAnimating} isStudying={isStudying} activePulseLeft={state.activePulseLeft} tickCount={state.tickCount} />} icon="🎯" iconBg="var(--color-banner-sessions)" />
+      <MetricSection label="WEEKLY GOAL" value={`${weeklyProgressDays} / 7 days`} sub={<ProgressBar sessions={weeklyProgressDays} goalSessions={7} sessionPct={(weeklyProgressDays / 7) * 100} isStudying={false} />} icon="🏆" iconBg="var(--color-banner-goal)" />
+      <MetricSection label="FOCUS TIME" value={state.formattedHours} sub={<FocusTimeSub goalHours={state.goalHours} timePct={state.timePct} />} icon="🕒" iconBg="var(--color-banner-focus)" divider={false} />
     </>
   );
 }

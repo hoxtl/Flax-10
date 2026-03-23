@@ -1,6 +1,7 @@
 /**
  * Integration-style tests for Profile rendering and profile actions.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -76,8 +77,8 @@ import analyticsService from '../../../api/analyticsApi';
 import { fetchApi } from '../../../api/client';
 
 const defaultUser = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith' };
-const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', module_count: 3 };
-const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones' };
+const defaultProfileData = { id: 1, username: 'alice', first_name: 'Alice', last_name: 'Smith', year: 'Year 2', major: 'Physics', module_count: 3 };
+const otherProfileData = { id: 2, username: 'bob', first_name: 'Bob', last_name: 'Jones', year: 'Year 3', major: 'Chemistry' };
 
 const makeProfileState = (overrides = {}) => ({
   loading: false,
@@ -183,7 +184,7 @@ describe('Profile', () => {
 
   it('renders not found when no profileData', () => {
     useProfileState.mockReturnValue(makeProfileState({ loading: false, profileData: null }));
-    renderProfile();
+    renderProfile({ user: null });
     expect(screen.getByText('Profile unavailable')).toBeTruthy();
   });
 
@@ -223,6 +224,13 @@ describe('Profile', () => {
     renderProfile({ user: defaultUser, viewedUserId: 2 });
     await waitFor(() => expect(screen.getAllByTestId('share-button').length).toBeGreaterThan(0));
     expect(screen.queryByText(/edit profile/i)).toBeNull();
+  });
+
+  it('renders a standalone back button above the header when onBack is provided', async () => {
+    const onBack = vi.fn();
+    renderProfile({ onBack, backLabel: 'Go back' });
+    fireEvent.click(screen.getByRole('button', { name: /Go back/i }));
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it('renders profile-home loading skeleton when summary is loading', () => {

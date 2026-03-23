@@ -145,7 +145,7 @@ describe('TagManagerModal', () => {
     it('opens emoji picker when emoji button is clicked', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
-        // The emoji preview button shows '😀' when icon is empty
+        // The emoji preview button shows the default face when the icon is empty
         const emojiPreviewBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
         fireEvent.click(emojiPreviewBtn);
         expect(screen.getByTestId('emoji-picker')).toBeTruthy();

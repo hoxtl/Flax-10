@@ -2,26 +2,64 @@
  * GroupWork project row.
  */
 
-import { useState } from "react";
-import ProjectRowInfo from "./ProjectRowInfo";
-import ProjectRowMeta from "./ProjectRowMeta";
+import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
+import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
-import { formatProjectDate, getDaysLeft, getProjectDate, getProjectMembers, getProjectPercent, getProjectTheme } from "../utils/projectRowUtils";
+import {
+  getDaysLeft,
+  getProjectDate,
+  getProjectMemberCount,
+  getProjectMembers,
+  getProjectPercent,
+} from "../utils/projectRowUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRow({ project, onClick }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const date = getProjectDate(project.deadline);
-  const members = getProjectMembers(project);
-  const daysLeft = getDaysLeft(date);
-  const percent = getProjectPercent(project);
+function ProjectMetaArea({ project, date }) {
   return (
-    <div className={styles.projectRowContainer}>
-      <div className={styles.projectRow} onClick={() => setIsExpanded((value) => !value)}>
-        <ProjectRowInfo project={project} members={members} />
-        <ProjectRowMeta dateString={formatProjectDate(date)} daysLeft={daysLeft} theme={getProjectTheme(daysLeft)} percent={percent} isExpanded={isExpanded} />
+    <div className={styles.projectMetaArea}>
+      <div className={styles.deadlineInfo}>
+        <DeadlineCountdown dueDate={date} className={styles.deadlineCountdown} forceClock />
       </div>
-      {isExpanded && <ProjectRowAccordion project={project} percent={percent} completedTasks={project.completed_task_count || 0} totalTasks={project.task_count || 0} memberCount={members.length || project.member_count || 1} onClick={onClick} />}
+      <ProjectModuleBadge project={project} />
     </div>
   );
+}
+
+export default function ProjectRow({ project, onClick }) {
+  const data = getProjectRowData(project);
+  return (
+    <div className={buildContainerClassName(data.daysLeft)}>
+      <div className={styles.projectRow}>
+        <ProjectRowInfo
+          project={project}
+          members={data.members}
+          totalMembers={data.memberCount}
+          onProjectNavigate={onClick}
+        />
+        <ProjectMetaArea project={project} date={data.date} />
+      </div>
+      <ProjectRowAccordion percent={data.percent} />
+    </div>
+  );
+}
+
+function getProjectRowData(project) {
+  const date = getProjectDate(project.deadline);
+  return {
+    date,
+    members: getProjectMembers(project),
+    memberCount: getProjectMemberCount(project),
+    daysLeft: getDaysLeft(date),
+    percent: getProjectPercent(project),
+  };
+}
+
+function buildContainerClassName(daysLeft) {
+  return [
+    styles.projectRowContainer,
+    daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 ? styles.projectRowContainerUrgent : "",
+    daysLeft !== null && daysLeft < 0 ? styles.projectRowContainerOverdue : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }

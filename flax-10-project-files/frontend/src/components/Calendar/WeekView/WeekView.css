@@ -29,7 +29,7 @@
 
 .week-grid {
   display: flex;
-  flex: 1;
+  min-height: 1440px;
   color: var(--text);
   position: relative;
 }
@@ -115,6 +115,7 @@
   border-left: 0.5px solid var(--border, rgba(74, 52, 33, 0.10));
   position: relative;
   flex: 1;
+  min-height: 1440px;
 }
 
 /* Hour cells — ultra-thin lines for clean Apple feel */

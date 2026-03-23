@@ -105,6 +105,30 @@ const USERS = [
   },
 ];
 
+function buildUser(index) {
+  return {
+    id: index + 1,
+    username: `user${index + 1}`,
+    email: `u${index + 1}@mail.com`,
+    first_name: `User${index + 1}`,
+    last_name: "Test",
+    role: "student",
+    is_active: true,
+    is_staff: false,
+    is_superuser: false,
+  };
+}
+
+function buildManyUsers() {
+  return Array.from({ length: 21 }, (_, index) => buildUser(index));
+}
+
+function expectUserButton(name) {
+  return waitFor(() =>
+    expect(screen.getAllByRole("button", { name }).length).toBeGreaterThan(0),
+  );
+}
+
 function setupDefaultMocks() {
   api.fetchAdminUsers.mockResolvedValue(USERS);
   api.fetchTeacherRequests.mockResolvedValue([]);
@@ -121,42 +145,44 @@ beforeEach(() => {
 describe("AdminPage – shell", () => {
   it("renders the admin dashboard heading", () => {
     render(<AdminPage />);
-    expect(screen.getByText("Admin Dashboard")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Admin\s*Dashboard/i })).toBeTruthy();
   });
 
   it("renders all five tab buttons", () => {
     render(<AdminPage />);
-    expect(screen.getByRole("button", { name: /Users/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Ratifications/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Teacher Requests/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Users Overview/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Society Ratifications/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Reported Societies/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Course Change Requests/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Course Switch Requests/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Teacher Switch Requests/i })).toBeTruthy();
   });
 
   it("shows users tab content by default", async () => {
     render(<AdminPage />);
-    await waitFor(() => expect(screen.getByText("Alice Smith")).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Alice Smith/i })).toBeTruthy(),
+    );
   });
 
   it("switches to ratifications tab", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Ratifications/));
+    fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() =>
-      expect(screen.getByText(/No societies are awaiting/i)).toBeTruthy(),
+      expect(screen.getByText(/No societies awaiting ratification/i)).toBeTruthy(),
     );
   });
 
   it("switches to teacher requests tab", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Teacher Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
     await waitFor(() =>
-      expect(screen.getByText(/No pending teacher/i)).toBeTruthy(),
+      expect(screen.getByText(/No teacher switch requests/i)).toBeTruthy(),
     );
   });
 
   it("switches to reported societies tab", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Reported Societies/));
+    fireEvent.click(screen.getByRole("button", { name: /Reported Societies/i }));
     await waitFor(() =>
       expect(screen.getByText(/No reported societies/i)).toBeTruthy(),
     );
@@ -164,11 +190,9 @@ describe("AdminPage – shell", () => {
 
   it("switches to course change requests tab", async () => {
     render(<AdminPage />);
-    fireEvent.click(screen.getByText(/Course Change Requests/));
+    fireEvent.click(screen.getByRole("button", { name: /Course Switch Requests/i }));
     await waitFor(() =>
-      expect(
-        screen.getByText(/No pending course change requests/i),
-      ).toBeTruthy(),
+      expect(screen.getByText(/No course switch requests/i)).toBeTruthy(),
     );
   });
 });
@@ -176,90 +200,84 @@ describe("AdminPage – shell", () => {
 describe("AdminPage – Users tab", () => {
   it("renders all user names", async () => {
     render(<AdminPage />);
-    await waitFor(() => expect(screen.getByText("Alice Smith")).toBeTruthy());
-    expect(screen.getByText("Bob Jones")).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Alice Smith/i })).toBeTruthy(),
+    );
+    expect(screen.getByRole("button", { name: /Bob Jones/i })).toBeTruthy();
   });
 
   it("shows Ban button for active non-staff user", async () => {
     render(<AdminPage />);
-    await waitFor(() => expect(screen.getByText("Ban")).toBeTruthy());
+    await waitFor(() => expect(screen.getAllByText("Ban").length).toBeGreaterThan(0));
   });
 
   it("shows Unban button for inactive user", async () => {
     render(<AdminPage />);
-    await waitFor(() => expect(screen.getByText("Unban")).toBeTruthy());
+    await waitFor(() => expect(screen.getAllByText("Unban").length).toBeGreaterThan(0));
   });
 
   it("shows Staff badge instead of ban button for staff user", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Staff User"));
-    expect(screen.queryAllByText("Ban").length).toBe(1);
+    await waitFor(() => screen.getByRole("button", { name: /Staff User/i }));
+    expect(screen.queryAllByText("Ban").length).toBe(2);
     // Avoid matching the "Staff" filter pill as well.
-    expect(screen.getByText("Staff User")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Staff User/i })).toBeTruthy();
   });
 
   it("filters users by search query", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Alice Smith"));
-    fireEvent.change(screen.getByPlaceholderText(/search/i), {
+    await waitFor(() => screen.getByRole("button", { name: /Alice Smith/i }));
+    fireEvent.change(screen.getByPlaceholderText(/Search users/i), {
       target: { value: "bob" },
     });
-    expect(screen.queryByText("Alice Smith")).toBeNull();
-    expect(screen.getByText("Bob Jones")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Alice Smith/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /Bob Jones/i })).toBeTruthy();
   });
 
   it("filters users by selected status filter", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Alice Smith"));
+    await waitFor(() => screen.getByRole("button", { name: /Alice Smith/i }));
     fireEvent.click(screen.getByRole("button", { name: "Banned" }));
-    await waitFor(() => expect(screen.getByText("Bob Jones")).toBeTruthy());
-    expect(screen.queryByText("Alice Smith")).toBeNull();
-    expect(screen.queryByText("Staff User")).toBeNull();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Bob Jones/i })).toBeTruthy(),
+    );
+    expect(screen.queryByRole("button", { name: /Alice Smith/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Staff User/i })).toBeNull();
   });
 
   it("paginates users list when there are more than 20 users", async () => {
-    const manyUsers = Array.from({ length: 21 }, (_, i) => ({
-      id: i + 1,
-      username: `user${i + 1}`,
-      email: `u${i + 1}@mail.com`,
-      first_name: `User${i + 1}`,
-      last_name: "Test",
-      role: "student",
-      is_active: true,
-      is_staff: false,
-      is_superuser: false,
-    }));
-    api.fetchAdminUsers.mockResolvedValue(manyUsers);
-
+    api.fetchAdminUsers.mockResolvedValue(buildManyUsers());
     render(<AdminPage />);
-    await waitFor(() => expect(screen.getByText("User1 Test")).toBeTruthy());
-    expect(screen.queryByText("User21 Test")).toBeNull();
-
+    await expectUserButton(/User1 Test/i);
+    expect(screen.queryByRole("button", { name: /User11 Test/i })).toBeNull();
     fireEvent.click(screen.getByText("Next →"));
-    await waitFor(() => expect(screen.getByText("User21 Test")).toBeTruthy());
-    expect(screen.queryByText("User1 Test")).toBeNull();
+    await expectUserButton(/User11 Test/i);
+    expect(screen.queryByRole("button", { name: /User1 Test/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /User21 Test/i })).toBeNull();
+    fireEvent.click(screen.getByText("Next →"));
+    await expectUserButton(/User21 Test/i);
   });
 
   it("shows empty state when search has no matches", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Alice Smith"));
-    fireEvent.change(screen.getByPlaceholderText(/search/i), {
+    await waitFor(() => screen.getByRole("button", { name: /Alice Smith/i }));
+    fireEvent.change(screen.getByPlaceholderText(/Search users/i), {
       target: { value: "zzznomatch" },
     });
-    expect(screen.getByText(/No users found/i)).toBeTruthy();
+    expect(screen.getByText(/No users match "zzznomatch"/i)).toBeTruthy();
   });
 
   it("opens ban modal when Ban clicked", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Ban"));
-    fireEvent.click(screen.getByText("Ban"));
+    await waitFor(() => screen.getAllByText("Ban"));
+    fireEvent.click(screen.getAllByText("Ban")[0]);
     expect(screen.getByText(/Ban alice\?/i)).toBeTruthy();
   });
 
   it("closes ban modal when Cancel clicked", async () => {
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Ban"));
-    fireEvent.click(screen.getByText("Ban"));
+    await waitFor(() => screen.getAllByText("Ban"));
+    fireEvent.click(screen.getAllByText("Ban")[0]);
     fireEvent.click(screen.getByText("Cancel"));
     expect(screen.queryByText(/Ban alice\?/i)).toBeNull();
   });
@@ -267,8 +285,8 @@ describe("AdminPage – Users tab", () => {
   it("calls banUser with userId and reason on confirm", async () => {
     api.banUser.mockResolvedValue({});
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Ban"));
-    fireEvent.click(screen.getByText("Ban"));
+    await waitFor(() => screen.getAllByText("Ban"));
+    fireEvent.click(screen.getAllByText("Ban")[0]);
     fireEvent.click(screen.getByText("Ban User"));
     await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(1, ""));
   });
@@ -276,16 +294,18 @@ describe("AdminPage – Users tab", () => {
   it("calls unbanUser with correct userId", async () => {
     api.unbanUser.mockResolvedValue({});
     render(<AdminPage />);
-    await waitFor(() => screen.getByText("Unban"));
-    fireEvent.click(screen.getByText("Unban"));
+    await waitFor(() => screen.getAllByText("Unban"));
+    fireEvent.click(screen.getAllByText("Unban")[0]);
     await waitFor(() => expect(api.unbanUser).toHaveBeenCalledWith(2));
   });
 
   it("calls onNavChange with profile id when name clicked", async () => {
     const onNavChange = vi.fn();
     render(<AdminPage onNavChange={onNavChange} />);
-    await waitFor(() => screen.getByText("Alice Smith"));
-    fireEvent.click(screen.getByText("Alice Smith"));
+    await waitFor(() =>
+      screen.getByRole("button", { name: /Alice Smith/i }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Alice Smith/i }));
     expect(onNavChange).toHaveBeenCalledWith("profile_1");
   });
 

@@ -3,7 +3,7 @@ import { getNearestMilestone } from '../../../components/Timer/utils/milestoneUt
 
 describe('getNearestMilestone', () => {
     it('returns nearest session milestone when sessions is closest', () => {
-        // 8 sessions → 2 away from 10; streak 0 → 3 away; hours 0 → 5 away
+        // Sessions are two away from 10, streak is three away from 3, and hours are five away from 5.
         const result = getNearestMilestone(8, 0, 0);
         expect(result).not.toBeNull();
         expect(result.type).toBe('sessions');
@@ -12,7 +12,7 @@ describe('getNearestMilestone', () => {
     });
 
     it('returns streak milestone when streak is closest', () => {
-        // 8 sessions → 2 away from 10; streak 2 → 1 away from 3; hours 0 → 5 away
+        // Sessions are two away from 10, streak is one away from 3, and hours are five away from 5.
         const result = getNearestMilestone(8, 2, 0);
         expect(result).not.toBeNull();
         expect(result.type).toBe('streak');
@@ -21,7 +21,7 @@ describe('getNearestMilestone', () => {
     });
 
     it('returns hours milestone when hours is closest', () => {
-        // 8 sessions → 2 away from 10; streak 5 → 2 away from 7; hours 4.5 → 0.5 away from 5
+        // Sessions are two away from 10, streak is two away from 7, and hours are 0.5 away from 5.
         const result = getNearestMilestone(8, 5, 4.5);
         expect(result).not.toBeNull();
         expect(result.type).toBe('hours');
@@ -44,8 +44,8 @@ describe('getNearestMilestone', () => {
     });
 
     it('picks the single closest milestone across all three types', () => {
-        // 24 sessions → 1 away from 25; streak 6 → 1 away from 7; hours 9 → 1 away from 10
-        // All three tied at remaining=1 — any one is acceptable
+        // Sessions, streak, and hours are each one away from their next milestone.
+        // All three tie at remaining = 1, so any one is acceptable.
         const result = getNearestMilestone(24, 6, 9);
         expect(result).not.toBeNull();
         expect(result.remaining).toBe(1);

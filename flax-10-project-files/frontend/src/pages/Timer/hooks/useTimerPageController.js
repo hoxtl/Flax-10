@@ -15,7 +15,7 @@ import {
 } from './useTimerPageEffects';
 
 const MIN_FOCUS_SKELETON_MS = 500;
-const FLAX_FOCUS_ACCENT = '#7a6a56';
+const FLAX_FOCUS_ACCENT = 'var(--timer-focus-accent)';
 
 export function useTimerPageController(t, location) {
   const flags = useTimerPageFlags(location);

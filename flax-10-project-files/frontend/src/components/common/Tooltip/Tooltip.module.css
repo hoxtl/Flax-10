@@ -67,3 +67,7 @@
     transform: translateY(-50%);
     border-right-color: #1a1a1a;
 }
+
+.tooltipFixed {
+  position: fixed;
+}

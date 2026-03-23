@@ -15,6 +15,7 @@ function TabButton({ tab, isActive, onClick, layoutId, variant }) {
 }
 
 /** Animated tab bar with a sliding underline indicator. */
+
 export function TabBar({ tabs, activeTab, onTabChange, layoutId = "tab-underline", variant = "default" }) {
   return (
     <motion.div className={`${styles.tabBar} ${styles[variant]}`}
@@ -25,6 +26,7 @@ export function TabBar({ tabs, activeTab, onTabChange, layoutId = "tab-underline
 }
 
 /** Animated content area that transitions between tab panels. */
+
 export function TabContent({ activeTab, children, minHeight = 320 }) {
   return (
     <AnimatePresence mode="wait">

@@ -1,0 +1,240 @@
+/*
+ * Extended semantic and component tokens.
+ */
+
+:root {
+  --surface-warm: color-mix(in srgb, var(--color-sidebar) 60%, var(--color-card));
+  --surface-card-glass: color-mix(in srgb, var(--color-card) 82%, transparent);
+  --surface-hero: linear-gradient(180deg, color-mix(in srgb, var(--color-card) 96%, transparent) 0%, color-mix(in srgb, var(--color-bg) 94%, transparent) 100%);
+  --surface-hero-glow: none;
+  --surface-glass-card: color-mix(in srgb, var(--color-bg) 60%, transparent);
+  --surface-glass-card-border: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --surface-glass-card-shadow:
+    0 2px 8px color-mix(in srgb, var(--color-primary) 6%, transparent),
+    0 8px 32px color-mix(in srgb, var(--color-primary) 4%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-white) 60%, transparent);
+  --surface-glass-card-hover-shadow:
+    0 4px 16px color-mix(in srgb, var(--color-primary) 10%, transparent),
+    0 16px 48px color-mix(in srgb, var(--color-primary) 7%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--c-white) 70%, transparent);
+  --surface-overlay-strong: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+  --surface-report-icon: color-mix(in srgb, var(--c-white) 80%, transparent);
+  --shadow-report-icon: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+
+  /* Premium Aesthetics: Glows & Depth */
+  --premium-glow:
+    radial-gradient(circle at top right, rgba(196, 164, 109, 0.12), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 52%);
+  --widget-glass-blur: blur(8px);
+  /* Day-strip / date navigator dots (semantic) */
+  --dot-lecture: var(--study);
+  --dot-meal: var(--neutral);
+  --dot-health: var(--health);
+  --dot-deadline: var(--urgent);
+  --dot-personal: var(--personal);
+
+  /* Status: aliases to canonical semantic vars */
+  --status-sage: var(--sage);
+  --status-terracotta: var(--danger);
+  --success-bg: color-mix(in srgb, var(--sage) 18%, transparent);
+  --success-text: var(--sage);
+  --error-bg: color-mix(in srgb, var(--danger) 12%, transparent);
+  --error-text: var(--danger);
+  --error-border: color-mix(in srgb, var(--danger) 40%, transparent);
+  --warning-bg: color-mix(in srgb, var(--warning) 10%, transparent);
+  --warning-border: color-mix(in srgb, var(--warning) 35%, transparent);
+  --warning-text: var(--warning);
+  --warning: var(--danger);
+
+  --deadline-urgent-bg: color-mix(in srgb, var(--danger) 10%, transparent);
+  --deadline-urgent-border: var(--danger);
+
+  /* Daily Progress widget */
+  --color-terracotta: #C05A3E;
+  --color-brown-light: var(--color-highlight);
+  --color-error-light: rgba(192, 90, 62, 0.15);
+  --color-sage-dark: #3d5a52;
+  --color-orange-400: #fb923c;
+  --color-slate-400: #94a3b8;
+  --color-sage-primary: var(--sage);
+  --color-sage-glow: rgba(140, 154, 134, 0.5);
+  --color-border-light: rgba(0, 0, 0, 0.08);
+
+  /* Progress wave / growth tank (light) */
+  --growth-tank-deep: var(--color-sage-dark);
+  --growth-tank-fill: var(--sage);
+  /* Timeline current-time line (highlight) */
+  --timeline-now-line: var(--color-highlight);
+  /* Heatmap: cream → sage scale */
+  --heatmap-empty: var(--color-sidebar);
+  --heatmap-low: color-mix(in srgb, var(--color-highlight) 20%, var(--color-bg));
+  --heatmap-mid: color-mix(in srgb, var(--color-highlight) 55%, var(--color-bg));
+  --heatmap-high: var(--color-highlight);
+  --heatmap-full: var(--color-primary);
+
+  /* Topbar: adapts to active theme color */
+  --topbar-bg: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  --topbar-border: rgba(255, 255, 255, 0.18);
+  --search-glass: rgba(255, 255, 255, 0.55);
+
+  /* Unified frame (sidebar + topbar): adapts to active theme */
+  --frame-bg: color-mix(in srgb, var(--color-sidebar) 88%, transparent);
+  --frame-border: rgba(0, 0, 0, 0.06);
+  --frame-blur: 20px;
+  --frame-shadow: 0 10px 28px rgba(74, 52, 33, 0.06);
+
+  --type-display: clamp(2.4rem, 5vw, 4.4rem);
+  --type-page: clamp(1.7rem, 2.7vw, 2.25rem);
+  --type-section: clamp(1.1rem, 1.6vw, 1.35rem);
+  --type-card: 1rem;
+  --type-metric: clamp(1.8rem, 3vw, 2.6rem);
+  --type-body: 0.95rem;
+  --type-supporting: 0.82rem;
+  --type-eyebrow: 0.72rem;
+
+  --now-banner-bg: color-mix(in srgb, var(--color-card) 60%, transparent);
+  --now-banner-bg-idle: color-mix(in srgb, var(--color-bg) 60%, transparent);
+
+  /* Widget-specific semantic variables */
+  --widget-surface: #ffffff;
+  --widget-surface-raised: #FFFCFA;
+  --widget-surface-secondary: rgba(139, 115, 85, 0.03);
+  --widget-border: rgba(139, 115, 85, 0.1);
+  --widget-icon-bg: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
+  --widget-text-primary: var(--text);
+  --widget-text-secondary: var(--text-secondary);
+  --widget-text-tertiary: var(--muted);
+  --widget-accent: var(--primary);
+  --widget-accent-soft: rgba(123, 179, 142, 0.08);
+
+  --widget-gradient-soft: var(--color-bg);
+  --widget-gradient-accent: var(--color-card);
+  --widget-gradient-tomorrow: var(--color-card);
+  --widget-gradient-overdue: color-mix(in srgb, var(--danger) 8%, var(--color-bg));
+  --widget-gradient-critical: color-mix(in srgb, var(--color-highlight) 8%, var(--color-bg));
+
+  --widget-metric-bg: color-mix(in srgb, var(--color-primary) 4%, var(--color-card));
+  --widget-metric-label: var(--text-secondary);
+  --widget-metric-value: var(--text-primary);
+  --widget-card-bg-glass: color-mix(in srgb, var(--color-card) 45%, transparent);
+  --widget-card-bg-soft: color-mix(in srgb, var(--color-card) 94%, transparent);
+  --groupwork-action-bg: color-mix(in srgb, var(--surface-raised) 94%, transparent);
+  --groupwork-action-border: color-mix(in srgb, var(--primary) 14%, var(--border));
+  --groupwork-action-text: var(--text);
+  --groupwork-action-shadow: var(--shadow-sm);
+  --groupwork-teacher-badge-bg: color-mix(in srgb, var(--modules-inline-surface) 70%, var(--surface-card));
+  --groupwork-teacher-badge-border: color-mix(in srgb, var(--modules-accent-ink) 16%, var(--surface-card));
+  --groupwork-teacher-badge-shadow: 0 8px 22px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+  --groupwork-progress-track: color-mix(in srgb, var(--c-green) 12%, var(--surface-card));
+  --groupwork-progress-fill-start: color-mix(in srgb, var(--c-green) 36%, var(--surface-card));
+  --groupwork-progress-fill-end: color-mix(in srgb, var(--c-green) 50%, var(--surface-card));
+  --tag-selector-row-bg: var(--surface-search);
+  --tag-selector-row-border: var(--border);
+  --tag-selector-pill-bg: var(--panel);
+  --tag-selector-pill-border: color-mix(in srgb, var(--primary) 18%, var(--border));
+  --tag-selector-pill-shadow: var(--shadow-sm);
+  --tag-selector-option-bg: var(--pill-bg);
+  --tag-selector-option-border: color-mix(in srgb, var(--primary) 14%, var(--border));
+  --tag-selector-option-hover-bg: var(--pill-hover);
+  --tag-selector-option-hover-border: color-mix(in srgb, var(--primary) 24%, var(--border));
+
+  /* Modules */
+  --modules-panel-tint: color-mix(in srgb, var(--color-primary) 5%, var(--surface-card));
+  --modules-accent-ink: var(--color-primary-strong);
+  --modules-accent-ink-strong: color-mix(in srgb, var(--color-primary-strong) 72%, var(--text) 28%);
+  --modules-accent-on-solid: var(--color-card);
+  --modules-chip-fg: color-mix(in srgb, var(--color-primary) 76%, var(--color-highlight) 24%);
+  --modules-chip-border: color-mix(in srgb, var(--color-highlight) 24%, var(--border));
+  --modules-chip-border-strong: color-mix(in srgb, var(--color-highlight) 34%, var(--border));
+  --modules-chip-bg: color-mix(in srgb, var(--color-highlight) 8%, var(--panel));
+  --modules-chip-bg-strong: color-mix(in srgb, var(--color-highlight) 10%, var(--surface-card));
+  --modules-inline-surface: color-mix(in srgb, var(--modules-accent-ink) 6%, var(--surface-card));
+  --modules-danger-soft: color-mix(in srgb, var(--danger) 8%, transparent);
+  --modules-danger-soft-hover: color-mix(in srgb, var(--danger) 14%, transparent);
+  --modules-error-soft: color-mix(in srgb, var(--danger) 10%, transparent);
+  --modules-error-soft-hover: color-mix(in srgb, var(--danger) 16%, transparent);
+  --modules-footer-link: color-mix(in srgb, var(--text) 62%, var(--text-secondary));
+  --modules-priority-overdue-bg: var(--danger-bg);
+  --modules-priority-overdue-fg: var(--danger);
+  --modules-priority-critical-bg: var(--warning-bg);
+  --modules-priority-critical-fg: var(--warning-text);
+  --modules-priority-urgent-bg: color-mix(in srgb, var(--color-highlight) 16%, transparent);
+  --modules-priority-urgent-fg: color-mix(in srgb, var(--color-highlight) 82%, var(--text) 18%);
+  --modules-due-future: var(--modules-chip-fg);
+  --modules-enrolled-badge-bg: color-mix(in srgb, var(--sage) 15%, var(--surface-card));
+  --modules-enrolled-badge-fg: var(--sage);
+  --modules-enrolled-badge-border: color-mix(in srgb, var(--sage) 30%, var(--border));
+  --modules-accent-line: linear-gradient(to bottom, var(--modules-accent-ink), color-mix(in srgb, var(--modules-accent-ink) 35%, transparent));
+
+  /* Home page: solid background */
+  --bg-home: var(--bg);
+  --bg-home-night: var(--bg);
+
+  /* Master Restoration: Warm-Classy stationary theme */
+  --restoration-bg: var(--color-bg);
+  --restoration-sage: #8C9A86;
+  --restoration-flax: #EEDC82;
+  --restoration-earth: #6B5344;
+  --restoration-terracotta: var(--danger);
+  --restoration-widget-radius: var(--card-radius);
+  --restoration-widget-blur: 12px;
+  --restoration-widget-border: none;
+  --restoration-gold-soft: rgba(238, 220, 130, 0.35);
+  --restoration-coral-border: 1px solid rgba(192, 90, 62, 0.5);
+  --restoration-coral-glow: 0 0 12px rgba(192, 90, 62, 0.2);
+  --restoration-charcoal: var(--primary);
+
+  --divider: #ddd;
+  --text-muted: #888;
+  --scroll-btn-bg: var(--color-primary);
+  --scroll-btn-hover: var(--color-primary-strong);
+  --ai-panel-radius: 28px;
+  --ai-panel-radius-mobile: 24px;
+  --ai-panel-border: var(--border);
+  --ai-panel-shadow: 0 30px 80px rgba(49, 32, 16, 0.12), 0 8px 24px rgba(49, 32, 16, 0.06);
+  --ai-card-title: var(--text);
+  --ai-card-subtitle: var(--text-secondary);
+  --ai-header-border: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --ai-header-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+  --ai-icon-bg: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --ai-icon-fg: var(--color-primary);
+  --ai-empty-icon-fg: var(--color-primary);
+  --ai-empty-text: var(--text-secondary);
+  --ai-button-fg: #ffffff;
+  --ai-button-spinner-track: rgba(255, 255, 255, 0.35);
+  --ai-button-spinner-head: #ffffff;
+  --ai-item-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --ai-item-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --ai-chat-clear-fg: var(--text-secondary);
+  --ai-chat-close-border: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --ai-chat-suggestion-bg: rgba(255, 255, 255, 0.72);
+  --ai-chat-suggestion-border: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --ai-chat-suggestion-hover-bg: #ffffff;
+  --ai-chat-suggestion-hover-border: color-mix(in srgb, var(--color-primary) 28%, transparent);
+  --ai-chat-suggestion-fg: var(--text);
+  --ai-chat-user-bubble-bg: linear-gradient(145deg,
+      var(--color-primary),
+      var(--color-primary-strong));
+  --ai-chat-user-bubble-fg: #ffffff;
+  --ai-chat-user-bubble-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  --ai-chat-ai-bubble-bg: rgba(255, 255, 255, 0.82);
+  --ai-chat-ai-bubble-border: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --ai-chat-ai-bubble-fg: var(--text);
+  --ai-chat-ai-bubble-shadow: none;
+  --ai-chat-dot: var(--text-tertiary);
+  --ai-chat-input-border: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --ai-chat-input-focus-border: color-mix(in srgb, var(--color-primary) 32%, transparent);
+  --ai-chat-input-row-bg: rgba(255, 255, 255, 0.36);
+  --ai-chat-input-bg: rgba(255, 255, 255, 0.78);
+  --ai-chat-input-fg: var(--text);
+  --ai-chat-placeholder: var(--text-tertiary);
+  --ai-chat-send-bg: linear-gradient(145deg, var(--color-primary), var(--color-primary-strong));
+  --ai-chat-send-fg: #ffffff;
+  --ai-chat-send-border: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  --ai-chat-send-shadow: 0 10px 20px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --ai-chat-send-hover-shadow: 0 14px 24px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --ai-markdown-fg: var(--text);
+
+  --select-chevron: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20292.4%20292.4%27%3E%3Cpath%20fill%3D%27%23FFFFFF%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%27/%3E%3C/svg%3E");
+}

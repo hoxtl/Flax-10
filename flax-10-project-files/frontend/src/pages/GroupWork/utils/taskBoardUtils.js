@@ -4,6 +4,8 @@
 
 import styles from "../components/TaskBoardView.module.css";
 
+/** Distributes tasks into the three Kanban columns (To Do, In Progress, Done). */
+
 export function buildBoardColumns(tasks) {
   const columns = { todo: [], in_progress: [], done: [] };
   tasks.forEach((task) => columns[getTaskColumnId(task)].push(task));

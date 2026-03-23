@@ -43,7 +43,7 @@ const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }) => 
       initial={{ scale: 0.92, opacity: 0 }}
       animate={inView ? { scale: 1, opacity: 1 } : { scale: 0.92, opacity: 0 }}
       transition={{ duration: 0.22, delay }}
-      style={{ marginBottom: '0.625rem', cursor: 'default' }}
+      className={styles.animatedItem}
     >
       {children}
     </MotionDiv>

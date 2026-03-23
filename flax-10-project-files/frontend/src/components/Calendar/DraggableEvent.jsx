@@ -4,6 +4,7 @@
  */
 
 import { useRef, useState, useEffect } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useDrag } from './hooks/useDragDrop';
 import { useEventActions } from './hooks/useCalendarEvents';
 import { useEventResize } from './hooks/useEventResize';
@@ -13,9 +14,11 @@ import { useConfirm } from '../../context/ConfirmContext';
 import { useTags } from '../../context/TagContext';
 import { useEventDelete, useEventModal, useEventPopup } from '../../context/CalendarContext';
 import { getEventTheme } from './utils/eventStyleUtils';
+import ctxStyles from '../../pages/Tasks/components/TaskCardContextMenu.module.css';
 import './DraggableEvent.css';
 
 /** Main entry for an event block. Renders as personal (editable) or other (read-only). */
+
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const isPersonal = getEventType(event) === 'personal';
     if (!isPersonal || readOnly) {
@@ -111,11 +114,12 @@ function EditableEvent({ event, style, minWidthForDetails }) {
 }
 
 function EventContextMenu({ menu, handlers, innerRef }) {
+    const menuPos = { '--ctx-top': `${menu.y}px`, '--ctx-left': `${menu.x}px` };
     return (
-        <div ref={innerRef} className="event-ctx-menu" style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 9999 }}>
-            <button className="event-ctx-item" onClick={handlers.handleEdit}>✏️ Edit</button>
-            <div className="event-ctx-divider" />
-            <button className="event-ctx-item event-ctx-delete" onClick={handlers.handleDelete}>🗑 Delete</button>
+        <div ref={innerRef} className={ctxStyles.ctxMenu} style={menuPos}>
+            <button className={ctxStyles.ctxItem} onClick={handlers.handleEdit}><Pencil size={14} strokeWidth={2} /> Edit</button>
+            <div className={ctxStyles.ctxDivider} />
+            <button className={`${ctxStyles.ctxItem} ${ctxStyles.ctxItemDanger}`} onClick={handlers.handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
         </div>
     );
 }
@@ -161,14 +165,11 @@ function TimeDisplay({ event }) {
 }
 
 function buildStyle(baseStyle, theme, resizePreview) {
-    const hex = (theme.color || '#7B6751').replace('#', '');
-    const num = parseInt(hex.length === 3 ? hex.split('').map(c => c + c).join('') : hex, 16);
-    const rgb = `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
-    
-    return { 
-        ...baseStyle, 
+    const eventColor = theme.color || 'var(--color-primary)';
+    return {
+        ...baseStyle,
         height: resizePreview ? `${resizePreview}px` : baseStyle?.height,
-        borderLeftColor: theme.color, 
-        backgroundColor: `rgba(${rgb}, 0.12)` 
+        borderLeftColor: eventColor,
+        backgroundColor: `color-mix(in srgb, ${eventColor} 12%, transparent)`,
     };
 }

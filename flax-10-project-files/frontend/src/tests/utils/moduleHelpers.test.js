@@ -1,6 +1,7 @@
 /*
  * Tests for module helper functions.
  */
+
 import { describe, it, expect } from 'vitest';
 import { validateForm, getFormData, updateForm } from '../../components/Modules/utils/moduleHelpers';
 

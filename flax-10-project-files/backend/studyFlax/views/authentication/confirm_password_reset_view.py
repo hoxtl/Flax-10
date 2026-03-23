@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 def _do_reset(token_str, new_password):
     """Apply the password reset; raise ValueError if the token is invalid."""
+
     token = ResetPasswordToken.objects.get(token=token_str)
     if not token.is_token_valid():
         raise ValueError('expired')
@@ -36,6 +37,7 @@ def _handle_reset_error(exc):
 @api_view(['POST'])
 def confirm_password_reset_view(request):
     """Confirm a token-based password reset and update the user's password."""
+
     serialiser = ResetPasswordConfirmSerialiser(data=request.data)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)

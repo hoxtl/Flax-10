@@ -1,6 +1,7 @@
 /*
  * SocietiesPage wires the societies page state to its presentational layout.
  */
+
 import { useSocietiesPage } from "./societiesPageState";
 import { SocietiesPageContent } from "./SocietiesPageContent";
 

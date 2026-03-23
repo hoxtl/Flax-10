@@ -17,6 +17,12 @@ PERSONAS = [
     {'id': 'marathon', 'label': 'Marathon Runner', 'emoji': '🏃', 'description': 'Long sessions, deep focus. You build momentum and ride it all the way.'},
 ]
 
+SECONDS_PER_HOUR = 3600
+SPRINT_SESSION_SECONDS = 30 * 60
+MARATHON_SESSION_SECONDS = 75 * 60
+SHORT_SESSION_SECONDS = 25 * 60
+LONG_SESSION_SECONDS = 90 * 60
+
 
 def derive_persona(sessions):
     if not sessions:
@@ -30,7 +36,7 @@ def derive_persona(sessions):
         return PERSONAS[1]
     if 12 <= peak_hour < 17:
         return PERSONAS[2]
-    return PERSONAS[4] if avg_duration <= 30 else PERSONAS[5] if avg_duration >= 75 else PERSONAS[2]
+    return PERSONAS[4] if avg_duration <= SPRINT_SESSION_SECONDS else PERSONAS[5] if avg_duration >= MARATHON_SESSION_SECONDS else PERSONAS[2]
 
 
 def collect_session_stats(sessions):
@@ -44,8 +50,8 @@ def filter_complete(sessions):
 
 
 def session_totals(sessions):
-    total_minutes = sum(session.duration for session in sessions)
-    return total_minutes, total_minutes / 60, len(sessions)
+    total_seconds = sum(session.duration for session in sessions)
+    return total_seconds, total_seconds / SECONDS_PER_HOUR, len(sessions)
 
 
 def active_days_last_30(sessions_90):
@@ -102,8 +108,8 @@ def build_time_of_day_badges(early, late, afternoon, session_count):
 
 
 def session_length_badges(sessions_all):
-    short_sessions = sum(1 for session in sessions_all if session.duration <= 25)
-    long_sessions = sum(1 for session in sessions_all if session.duration >= 90)
+    short_sessions = sum(1 for session in sessions_all if session.duration <= SHORT_SESSION_SECONDS)
+    long_sessions = sum(1 for session in sessions_all if session.duration >= LONG_SESSION_SECONDS)
     return build_session_length_badges(short_sessions, long_sessions)
 
 
@@ -155,16 +161,25 @@ def hit_goal_four_weeks(sessions, now, goal):
     return all(week_hours_for_offset(sessions, now, offset) >= goal for offset in range(4))
 
 
+def _badge_groups(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
+    return [
+        hour_badges(total_hours),
+        session_count_badges(session_count),
+        streak_badges(longest_streak),
+        consistency_badges(active_days),
+        time_of_day_badges(sessions_all, session_count),
+        session_length_badges(sessions_all),
+        module_badges(module_count),
+        weekly_goal_badges(sessions_all, user),
+    ]
+
+
 def collect_all_badges(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
     earned = []
-    earned.extend(hour_badges(total_hours))
-    earned.extend(session_count_badges(session_count))
-    earned.extend(streak_badges(longest_streak))
-    earned.extend(consistency_badges(active_days))
-    earned.extend(time_of_day_badges(sessions_all, session_count))
-    earned.extend(session_length_badges(sessions_all))
-    earned.extend(module_badges(module_count))
-    earned.extend(weekly_goal_badges(sessions_all, user))
+    for badge_group in _badge_groups(
+        sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user
+    ):
+        earned.extend(badge_group)
     return earned
 
 

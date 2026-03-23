@@ -2,7 +2,7 @@
  * Dashboard layout modal composition.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { EventModal } from "../../components/Calendar/EventModal/EventModal";
 import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
@@ -12,10 +12,9 @@ import QuickAddModal from "../../components/Dashboard/QuickAddModal";
 import { LeaveTimerModal } from "../../components/Timer/TimerPopups";
 import CreateTaskModal from "../../pages/Tasks/components/CreateTaskModal";
 import { createSociety } from "../../api/societyApi";
-import { createTask, fetchTaskLists } from "../../api/taskApi";
-import { getModules, getEnrollments } from "../../api/moduleApi";
-import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
+import { createTask } from "../../api/taskApi";
 import { handlePendingAction } from "./dashboardLayoutActions";
+import { useDashboardTaskModalOptions } from "./useDashboardTaskModalOptions";
 
 function closeQuickAdd(state) {
   state.setShowQuickAdd(false);
@@ -51,41 +50,12 @@ function useSocietyCreation(setShowSocietyModal) {
     try {
       await createSociety(form);
       setShowSocietyModal(false);
-    } catch (error) {
-      console.error("Failed to create society:", error);
-    }
+    } catch {}
   };
 }
 
-function useTaskModalOptions() {
-  const [lists, setLists] = useState([]);
-  const [modules, setModules] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
-  useEffect(() => { loadTaskLists(setLists); loadModules(setModules); loadEnrollments(setEnrollments); }, []);
-  return { lists, enrolledModules: useEnrolledModules(modules, enrollments) };
-}
-
-function loadTaskLists(setLists) {
-  fetchTaskLists().then((response) => setLists(Array.isArray(response) ? response : [])).catch(() => {});
-}
-
-function loadModules(setModules) {
-  getModules().then((response) => setModules(Array.isArray(response) ? response : [])).catch(() => {});
-}
-
-function loadEnrollments(setEnrollments) {
-  getEnrollments().then((response) => setEnrollments(Array.isArray(response) ? response : [])).catch(() => {});
-}
-
-function useEnrolledModules(modules, enrollments) {
-  return useMemo(
-    () => modules.filter((module) => isEnrolledIn(module.id, enrollments)),
-    [modules, enrollments],
-  );
-}
-
 export function GlobalTaskModal({ onClose }) {
-  const { lists, enrolledModules } = useTaskModalOptions();
+  const { lists, enrolledModules } = useDashboardTaskModalOptions();
   return <CreateTaskPanel lists={lists} modules={enrolledModules} onClose={onClose} />;
 }
 
@@ -95,9 +65,7 @@ function CreateTaskPanel({ lists, modules, onClose }) {
       await createTask(data);
       onClose();
       window.dispatchEvent(new Event("task-created"));
-    } catch (error) {
-      console.error("Failed to create task:", error);
-    }
+    } catch {}
   };
   return <CreateTaskModal lists={lists} modules={modules} onSave={handleSave} onClose={onClose} />;
 }

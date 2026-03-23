@@ -6,6 +6,8 @@ Checks: banner comments | American spelling | emojis | arrow text | excessive de
 
 import os
 import re
+import tokenize
+from io import StringIO
 
 # ANSI Colors
 class Colors:
@@ -152,38 +154,22 @@ def extract_comments(filepath):
     comments = []
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+            code = f.read()
     except Exception:
         return comments
 
-    in_docstring = False
-    docstring_char = None
-
-    for i, line in enumerate(lines):
-        stripped = line.strip()
-        line_num = i + 1
-
-        # Track docstrings (skip them — they are documentation, not comments)
-        if not in_docstring:
-            if stripped.startswith('"""') or stripped.startswith("'''"):
-                docstring_char = stripped[:3]
-                if stripped.count(docstring_char) >= 2:
-                    continue
-                in_docstring = True
+    try:
+        for token in tokenize.generate_tokens(StringIO(code).readline):
+            if token.type != tokenize.COMMENT:
                 continue
-        else:
-            if docstring_char in stripped:
-                in_docstring = False
-            continue
-
-        # Single-line comments
-        if stripped.startswith('#'):
-            text = stripped[1:].strip()
-            comments.append({'line': line_num, 'text': text, 'raw': line})
-        elif '#' in stripped:
-            idx = stripped.index('#')
-            text = stripped[idx + 1:].strip()
-            comments.append({'line': line_num, 'text': text, 'raw': line})
+            text = token.string[1:].strip()
+            comments.append({
+                'line': token.start[0],
+                'text': text,
+                'raw': token.line,
+            })
+    except (tokenize.TokenError, IndentationError, SyntaxError):
+        return comments
 
     return comments
 

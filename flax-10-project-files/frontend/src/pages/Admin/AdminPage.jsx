@@ -1,36 +1,40 @@
-/** Admin dashboard for managing users, societies, and platform requests. */
+/*
+ * Admin dashboard entry point.
+ */
+
 import { useState } from "react";
+import { BackToTop } from "../../components/Pagination/Pagination";
+import Tabs from "../../components/common/Tabs/Tabs";
 import AppPage from "../../components/common/AppPage/AppPage";
-import { TabBar, TabContent } from "../../components/common/TabBar/TabBar";
-import UsersTab from "./components/UsersTab";
-import RatificationsTab from "./components/RatificationsTab";
-import TeacherRequestsTab from "./components/TeacherRequestsTab";
-import ReportedSocietiesTab from "./components/ReportedSocietiesTab";
-import CourseChangeRequestsTab from "./components/CourseChangeRequestsTab";
+import styles from "./styles";
+import { buildAdminTabs } from "./adminTabs.jsx";
 
-const TABS = [
-  { id: "users", label: "👤 Users" },
-  { id: "ratifications", label: "🏛️ Ratifications" },
-  { id: "teachers", label: "🎓 Teacher Requests" },
-  { id: "reports", label: "🚩 Reported Societies" },
-  { id: "course-changes", label: "📚 Course Change Requests" },
-];
+function AdminTitle() {
+  return (
+    <>
+      <span className={styles.adminWord}>Admin</span>
+      <span className={styles.dashboardWord}> Dashboard</span>
+    </>
+  );
+}
 
-function renderTab(activeTab, onNavChange) {
-  if (activeTab === "users") return <UsersTab onNavigate={onNavChange} />;
-  if (activeTab === "ratifications") return <RatificationsTab />;
-  if (activeTab === "teachers") return <TeacherRequestsTab onNavigate={onNavChange} />;
-  if (activeTab === "reports") return <ReportedSocietiesTab />;
-  if (activeTab === "course-changes") return <CourseChangeRequestsTab onNavigate={onNavChange} />;
-  return null;
+function AdminSubtitle() {
+  return (
+    <span className={styles.subtitleText}>
+      Manage users, societies and platform requests
+    </span>
+  );
 }
 
 export default function AdminPage({ onNavChange, onBack }) {
   const [activeTab, setActiveTab] = useState("users");
+  const tabs = buildAdminTabs(onNavChange);
   return (
-    <AppPage title="Admin Dashboard" subtitle="Manage users, societies and platform requests" width="xl">
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
-      <TabContent activeTab={activeTab}>{renderTab(activeTab, onNavChange)}</TabContent>
-    </AppPage>
+    <>
+      <AppPage title={<AdminTitle />} subtitle={<AdminSubtitle />} onBack={onBack} backPlacement="above" width="xl">
+        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} layoutId="admin-tab-underline" />
+      </AppPage>
+      <BackToTop />
+    </>
   );
 }
