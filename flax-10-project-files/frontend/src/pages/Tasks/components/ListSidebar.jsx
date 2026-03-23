@@ -2,43 +2,13 @@
  * Task sidebar with smart filters, lists, archive controls, and confirmations.
  */
 
-import { useState, useRef, useEffect } from "react";
-import { Pencil, Trash2 } from "lucide-react";
 import { getListColor } from "../utils/listColorUtils";
-import { computeListSidebarCounts } from "../utils/listSidebarUtils";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
 import styles from "./ListSidebar.module.css";
-
-function RenameInput({ value, onSave, onCancel }) {
-  const [val, setVal] = useState(value);
-  const ref = useRef(null);
-  useEffect(() => {
-    ref.current?.focus();
-    ref.current?.select();
-  }, []);
-  return (
-    <input ref={ref} className={styles.renameInput} value={val} onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") onSave(val.trim() || value); if (e.key === "Escape") onCancel(); }} onBlur={() => onSave(val.trim() || value)} />
-  );
-}
-
-function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
-  const menuPos = { '--ctx-top': y, '--ctx-left': x };
-  return (
-    <div ref={ref} className={styles.ctxMenu} style={menuPos}>
-      <button className={styles.ctxItem} onClick={() => { onRename(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Rename</button>
-      <div className={styles.ctxDivider} />
-      <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}><Trash2 size={14} strokeWidth={2} /> Delete list</button>
-    </div>
-  );
-}
+import { ListContextMenu, RenameInput } from "./listSidebarParts";
+import { useListSidebarState } from "./useListSidebarState";
 
 function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectList, onSelectFilter }) {
   return (
@@ -137,17 +107,6 @@ function ListSidebarArchive({ archivedLists, showArchived, setShowArchived, onUn
   );
 }
 
-function useListSidebarState(props) {
-  const [ctxMenu, setCtxMenu] = useState(null);
-  const [renamingId, setRenamingId] = useState(null);
-  const [showArchived, setShowArchived] = useState(false);
-  const [deleteListId, setDeleteListId] = useState(null);
-  const [permDeleteId, setPermDeleteId] = useState(null);
-  const { listCounts, smartFilters } = computeListSidebarCounts(props.tasks, props.lists);
-  const handleCtxMenu = (event, listId) => { event.preventDefault(); setCtxMenu({ x: event.clientX, y: event.clientY, listId }); };
-  return { ctxMenu, setCtxMenu, renamingId, setRenamingId, showArchived, setShowArchived, deleteListId, setDeleteListId, permDeleteId, setPermDeleteId, listCounts, smartFilters, handleCtxMenu };
-}
-
 function getSidebarListName(lists, id) {
   return id ? (lists.find((list) => list.id === id)?.name || "this list") : "";
 }
@@ -165,7 +124,7 @@ function ListSidebarDialogs({ props, state }) {
 }
 
 export default function ListSidebar(props) {
-  const state = useListSidebarState(props);
+  const state = useListSidebarState(props.tasks, props.lists);
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sectionLabel}>VIEWS</div>
