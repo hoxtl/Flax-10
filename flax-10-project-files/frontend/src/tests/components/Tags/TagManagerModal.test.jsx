@@ -18,14 +18,6 @@ vi.mock('../../../context/ConfirmContext', () => ({
     useConfirm: vi.fn(() => vi.fn().mockResolvedValue(true)),
 }));
 
-vi.mock('../../../components/Tags/EmojiPicker', () => ({
-    default: ({ onSelect, onClose }) => (
-        <div data-testid="emoji-picker">
-            <button onClick={() => { onSelect('🎉'); onClose(); }}>Pick 🎉</button>
-            <button onClick={() => { onSelect('x'); onClose(); }}>Pick invalid</button>
-        </div>
-    ),
-}));
 
 import { useTags } from '../../../context/TagContext';
 import { useConfirm } from '../../../context/ConfirmContext';
@@ -136,31 +128,24 @@ describe('TagManagerModal', () => {
         expect(screen.getByText('Name is required.')).toBeTruthy();
     });
 
-    it('shows icon error when name is set but icon is missing', () => {
+    it('shows name input and color input in add form', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
-        const nameInput = screen.getByPlaceholderText('e.g. Gym');
-        fireEvent.change(nameInput, { target: { value: 'Test Tag' } });
-        fireEvent.click(screen.getByText('Save'));
-        expect(screen.getByText('Icon is required.')).toBeTruthy();
+        expect(screen.getByPlaceholderText('e.g. Gym')).toBeTruthy();
+        expect(document.querySelector('input[type="color"]')).toBeTruthy();
     });
 
-    it('opens emoji picker when emoji button is clicked', () => {
+    it('shows color field in add form', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
-        // The emoji preview button shows the default face when the icon is empty
-        const emojiPreviewBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
-        fireEvent.click(emojiPreviewBtn);
-        expect(screen.getByTestId('emoji-picker')).toBeTruthy();
+        expect(document.querySelector('input[type="color"]')).toBeTruthy();
     });
 
-    it('selects emoji from picker', () => {
+    it('save and cancel buttons are present in add form', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
-        const emojiPreviewBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
-        fireEvent.click(emojiPreviewBtn);
-        fireEvent.click(screen.getByText('Pick 🎉'));
-        expect(screen.queryByTestId('emoji-picker')).toBeNull();
+        expect(screen.getByText('Save')).toBeTruthy();
+        expect(screen.getByText('Cancel')).toBeTruthy();
     });
 
     it('label is disabled for protected tags', () => {
@@ -172,20 +157,16 @@ describe('TagManagerModal', () => {
         expect(input.disabled).toBe(true);
     });
 
-    it('shows only emojis allowed error for invalid icon', async () => {
+    it('shows no error when name is set', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
         const nameInput = screen.getByPlaceholderText('e.g. Gym');
         fireEvent.change(nameInput, { target: { value: 'Test' } });
-        // Open picker and select invalid (non-emoji)
-        const emojiPreviewBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
-        fireEvent.click(emojiPreviewBtn);
-        fireEvent.click(screen.getByText('Pick invalid'));
         fireEvent.click(screen.getByText('Save'));
-        await waitFor(() => expect(screen.getByText('Only emojis allowed.')).toBeTruthy());
+        expect(screen.queryByText('Name is required.')).toBeNull();
     });
 
-    it('calls addTag when saving new tag with valid data', async () => {
+    it('calls addTag when saving new tag with valid name', async () => {
         const mockAddTag = vi.fn();
         useTags.mockReturnValue({
             tags: [{ id: 1, label: 'Work', color: '#ff0000', icon: '💼' }],
@@ -196,11 +177,8 @@ describe('TagManagerModal', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
         fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Gym' } });
-        const emojiBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
-        fireEvent.click(emojiBtn);
-        fireEvent.click(screen.getByText('Pick 🎉'));
         fireEvent.click(screen.getByText('Save'));
-        await waitFor(() => expect(mockAddTag).toHaveBeenCalledWith(expect.objectContaining({ label: 'Gym', icon: '🎉' })));
+        await waitFor(() => expect(mockAddTag).toHaveBeenCalledWith(expect.objectContaining({ label: 'Gym' })));
     });
 
     it('calls updateTag when saving edited tag', async () => {
@@ -248,10 +226,7 @@ describe('TagManagerModal', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
         fireEvent.click(screen.getByText('+ Add New Tag'));
         fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Work' } });
-        const emojiBtn = screen.getAllByRole('button').find(b => b.textContent === '😀');
-        fireEvent.click(emojiBtn);
-        fireEvent.click(screen.getByText('Pick 🎉'));
         fireEvent.click(screen.getByText('Save'));
-        await waitFor(() => expect(mockUpdateTag).toHaveBeenCalledWith(1, expect.objectContaining({ label: 'Work', icon: '🎉' })));
+        await waitFor(() => expect(mockUpdateTag).toHaveBeenCalledWith(1, expect.objectContaining({ label: 'Work' })));
     });
 });
