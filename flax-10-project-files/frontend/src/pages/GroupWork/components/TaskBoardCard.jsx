@@ -9,30 +9,15 @@ import TaskAvatarStack from "./TaskAvatarStack";
 import TaskContextMenu from "./TaskContextMenu";
 import { getPriorityStyle } from "../utils/priorityUtils";
 import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr } from "../utils/taskUtils";
+import { handleTaskTitleKeyDown, useTaskTitleEdit } from "./taskCardEditUtils";
 import styles from "./TaskBoardCard.module.css";
-
-function useBoardCardEdit(task, onUpdate) {
-    const [editing, setEditing] = useState(false);
-    const [editTitle, setEditTitle] = useState(task.title);
-    const saveEdit = () => {
-        const trimmed = editTitle.trim();
-        if (trimmed && trimmed !== task.title) onUpdate(task.id, { title: trimmed });
-        setEditing(false);
-    };
-    return { editing, setEditing, editTitle, setEditTitle, saveEdit };
-}
-
-function handleCardKeyDown(e, saveEdit, setEditing) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveEdit(); }
-    if (e.key === "Escape") setEditing(false);
-}
 
 function CardTitleArea({ editing, editTitle, setEditTitle, saveEdit, setEditing, title }) {
     if (editing) {
         return (
             <textarea autoFocus className={styles.cardTitleInput} value={editTitle} rows={2}
                 onChange={(e) => setEditTitle(e.target.value)} onBlur={saveEdit}
-                onKeyDown={(e) => handleCardKeyDown(e, saveEdit, setEditing)} />
+                onKeyDown={(e) => handleTaskTitleKeyDown(e, saveEdit, setEditing)} />
         );
     }
     return <div className={styles.cardTitle}>{title}</div>;
@@ -69,7 +54,7 @@ function CardFooter({ task, assignees, onUpdate, triggerRef, togglePopup }) {
 export default function TaskBoardCard({ task, members, onUpdate, onDelete, onDragStart }) {
     const [showAssignPopup, setShowAssignPopup] = useState(false);
     const [ctxMenu, setCtxMenu] = useState(null);
-    const { editing, setEditing, editTitle, setEditTitle, saveEdit } = useBoardCardEdit(task, onUpdate);
+    const { editing, setEditing, editTitle, setEditTitle, saveEdit } = useTaskTitleEdit(task, onUpdate);
     const triggerRef = useRef(null);
     const assignees = filterVisibleAssignees(task.assignees_info || [], members);
     const priorityStyle = getPriorityStyle(task.priority);
