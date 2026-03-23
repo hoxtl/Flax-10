@@ -1,23 +1,25 @@
 /*
- * Attendance prompt modal — custom layout with KCL branding, progress ring, and animated glow border.
+ * Attendance prompt modal — KCL branding, progress ring, and animated glow border.
  */
 
+import { useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
 import { useAttendanceStats } from "../../pages/Attendance/hooks/useAttendanceStats";
 import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSummary";
 import styles from "./AttendancePromptModal.module.css";
 
 function KclLogo() {
   return (
-    <svg width="50" height="38" viewBox="0 0 100 76" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="King's College London">
-      <rect width="100" height="76" rx="3" fill="#C8102E" />
-      <text x="50" y="22" textAnchor="middle" fontFamily="Georgia,'Times New Roman',serif" fontSize="19" fontWeight="bold" fill="white" letterSpacing="1.5">KING'S</text>
-      <text x="50" y="44" textAnchor="middle" fontFamily="Georgia,'Times New Roman',serif" fontSize="15" fontStyle="italic" fill="white" letterSpacing="0.5">College</text>
-      <text x="50" y="62" textAnchor="middle" fontFamily="Georgia,'Times New Roman',serif" fontSize="17" fontWeight="bold" fill="white" letterSpacing="1.5">LONDON</text>
-      <line x1="10" y1="68" x2="90" y2="68" stroke="white" strokeWidth="1.5" />
-      <line x1="10" y1="72" x2="90" y2="72" stroke="white" strokeWidth="1.5" />
+    <svg width="56" height="42" viewBox="0 0 112 84" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="King's College London">
+      <rect width="112" height="84" rx="3" fill="#C8102E" />
+      <text x="56" y="25" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="22" fontWeight="bold" fill="white" letterSpacing="2">KING'S</text>
+      <text x="60" y="48" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="17" fontStyle="italic" fill="white" letterSpacing="0.3">College</text>
+      <text x="56" y="68" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="20" fontWeight="bold" fill="white" letterSpacing="2">LONDON</text>
+      <line x1="9" y1="74" x2="103" y2="74" stroke="white" strokeWidth="1.6" />
+      <line x1="9" y1="79" x2="103" y2="79" stroke="white" strokeWidth="1.6" />
     </svg>
   );
 }
@@ -28,11 +30,14 @@ function ringColor(pct) {
   return "#ef4444";
 }
 
-function AttendanceRing({ pct }) {
+function AttendanceRing({ pct, updating }) {
   const r = 36;
   const circ = 2 * Math.PI * r;
   const offset = circ - (pct / 100) * circ;
   const color = ringColor(pct);
+  const circleTransition = updating
+    ? { duration: 0.7, ease: "easeOut" }
+    : { duration: 1.3, ease: "easeOut", delay: 0.15 };
 
   return (
     <div className={styles.ringWrap}>
@@ -47,7 +52,7 @@ function AttendanceRing({ pct }) {
           strokeDasharray={circ}
           initial={{ strokeDashoffset: circ }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.3, ease: "easeOut", delay: 0.15 }}
+          transition={circleTransition}
           transform="rotate(-90 48 48)"
         />
       </svg>
@@ -57,7 +62,7 @@ function AttendanceRing({ pct }) {
           style={{ color }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.4 }}
+          transition={{ delay: updating ? 0 : 0.6, duration: 0.4 }}
         >
           {pct}%
         </motion.span>
@@ -65,6 +70,15 @@ function AttendanceRing({ pct }) {
       </div>
     </div>
   );
+}
+
+function formatEventMeta(event) {
+  if (!event?.start_time) return null;
+  const start = new Date(event.start_time);
+  const day = start.toLocaleDateString("en-GB", { weekday: "long" });
+  const date = start.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+  const time = start.toLocaleTimeString("en-GB", { hour: "numeric", minute: "2-digit" }).toLowerCase();
+  return { day, date, time };
 }
 
 const glowPulse = {
@@ -75,21 +89,35 @@ const glowPulse = {
       "0 0 0 2px #dc2626, 0 0 18px 5px rgba(220,38,38,0.28), 0 16px 48px rgba(0,0,0,0.28)",
     ],
   },
-  transition: {
-    duration: 2.2,
-    repeat: Infinity,
-    ease: "easeInOut",
-    delay: 0.4,
-  },
+  transition: { duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
 };
 
 export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
   const { stats } = useAttendanceStats();
   const overall = stats?.overall ?? { attended: 0, missed: 0 };
-  const pct = computeAttendancePct(overall);
+  const basePct = computeAttendancePct(overall);
+  const [answeredWith, setAnsweredWith] = useState(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  const displayPct = useMemo(() => {
+    if (answeredWith === true)  return computeAttendancePct({ attended: overall.attended + 1, missed: overall.missed });
+    if (answeredWith === false) return computeAttendancePct({ attended: overall.attended, missed: overall.missed + 1 });
+    return basePct;
+  }, [answeredWith, overall, basePct]);
+
+  function handleAnswer(attended) {
+    if (answeredWith !== null) return;
+    setAnsweredWith(attended);
+    timerRef.current = setTimeout(() => onAnswer(attended), 1200);
+  }
+
+  const meta = formatEventMeta(event);
+  const isAnswered = answeredWith !== null;
 
   return createPortal(
-    <div className={styles.backdrop} onMouseDown={onDismiss}>
+    <div className={styles.backdrop} onMouseDown={isAnswered ? undefined : onDismiss}>
       <motion.div
         className={styles.modal}
         onMouseDown={e => e.stopPropagation()}
@@ -112,16 +140,19 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
           </div>
         </div>
 
-        <AttendanceRing pct={pct} />
+        <AttendanceRing pct={displayPct} updating={isAnswered} />
 
-        <div className={styles.eventPill}>{event.title}</div>
-
-        <div className={styles.yesNoRow}>
-          <button className={`${styles.btn} ${styles.btnYes}`} onClick={() => onAnswer(true)} type="button">Yes</button>
-          <button className={`${styles.btn} ${styles.btnNo}`} onClick={() => onAnswer(false)} type="button">No</button>
+        <div className={styles.eventPill}>
+          Did you attend <strong className={styles.eventName}>{event.title}</strong>
+          {meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}
         </div>
 
-        <button className={`${styles.btn} ${styles.btnDismiss}`} onClick={onDismiss} type="button">Dismiss</button>
+        <div className={styles.yesNoRow}>
+          <PrimaryButton pill className={styles.btnYes} onClick={() => handleAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
+          <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => handleAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
+        </div>
+
+        <PrimaryButton pill variant="secondary" className={styles.btnFlex} onClick={onDismiss} disabled={isAnswered}>Dismiss</PrimaryButton>
       </motion.div>
     </div>,
     document.body

@@ -19,7 +19,6 @@
   flex-direction: column;
   gap: var(--space-4, 16px);
   overflow: hidden;
-  /* box-shadow is animated by framer-motion */
 }
 
 /* ── Header ───────────────────────────── */
@@ -100,15 +99,24 @@
 
 /* ── Event pill ───────────────────────── */
 .eventPill {
-  color: var(--text);
-  font-style: italic;
   background: var(--hover);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.7rem 0.85rem;
+  padding: 0.75rem 0.9rem;
   font-size: var(--text-base, 0.9rem);
+  line-height: 1.55;
+  color: var(--text-secondary, #5a4a3a);
   text-align: center;
-  line-height: 1.4;
+}
+
+.eventName {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.eventMeta {
+  color: var(--text-secondary, #5a4a3a);
 }
 
 /* ── Buttons ──────────────────────────── */
@@ -117,46 +125,23 @@
   gap: var(--space-3, 12px);
 }
 
-.btn {
+/* Make buttons stretch to fill the row */
+.btnFlex {
   flex: 1;
-  padding: 0.58rem 1rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-size: var(--text-base, 0.9rem);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.1s ease;
-  font-family: inherit;
+  width: 100%;
+  justify-content: center;
 }
 
-.btn:hover {
-  opacity: 0.88;
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: translateY(0);
-  opacity: 1;
-}
-
+/* Yes — green override on top of PrimaryButton.primary */
 .btnYes {
-  background: #22c55e;
-  color: #fff;
+  flex: 1;
+  width: 100%;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.98), rgba(22, 163, 74, 0.98)) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+  color: #fff !important;
 }
 
-.btnNo {
-  background: #ef4444;
-  color: #fff;
-}
-
-.btnDismiss {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--text-secondary, var(--muted));
-  font-weight: 500;
-}
-
-.btnDismiss:hover {
-  background: var(--hover);
-  opacity: 1;
+.btnYes:not(:disabled):hover {
+  border-color: rgba(34, 197, 94, 0.55) !important;
 }
