@@ -8,8 +8,8 @@ import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
-import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
+import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
 import scheduleStyles from '../styles/ModuleSchedule.module.css';
@@ -62,26 +62,9 @@ function getNextClassText(startTime, endTime) {
     return `${day}, ${formatTime(startTime)} - ${formatTime(endTime)}`;
 }
 
-function getTutorImage(moduleData) {
-    return getResolvedUserPhoto({
-        id: moduleData?.created_by,
-        name: moduleData?.created_by_name,
-        role: 'teacher',
-        username: moduleData?.created_by_username,
-        profile_photo_url: moduleData?.created_by_profile_photo_url,
-        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
-    }, { allowGeneric: true });
-}
-
-function handleTutorImageError(e) {
-    e.currentTarget.style.display = "none";
-    const fallback = e.currentTarget.nextElementSibling;
-    if (fallback) fallback.style.display = "inline-flex";
-}
-
 function TutorPhoto({ photo, name }) {
     if (!photo) return null;
-    return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={handleTutorImageError} />;
+    return <img className={heroStyles.tutorPhoto} src={photo} alt={`${name} profile`} onError={(event) => hideBrokenTutorImage(event, "inline-flex")} />;
 }
 
 function TutorName({ id, name }) {
@@ -212,7 +195,7 @@ export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, o
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
-            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getTutorImage(module)} />
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
