@@ -5,6 +5,7 @@
 import {useState} from 'react';
 import styles from '../Deadlines/DeadlineForm.module.css';
 import DateTimePicker from '../../common/inputs/DateTimePicker';
+import { buildValidationState, failValidation, ModuleFormActions, ModuleFormField, requireFieldValue } from '../shared/moduleFormParts';
 
 const EMPTY_FORM = { title: '', chapter: '', start_page: '', end_page:'', deadline: '', estimated_minutes: '',};
 
@@ -16,13 +17,48 @@ const buildFormData = (form) => ({
     deadline: form.deadline ? new Date(form.deadline).toISOString() : '',
 })
 
+function hasNegativeChapter(chapter) {
+    return chapter && chapter.trim().startsWith('-');
+}
+
+function hasInvalidPageRange(startPage, endPage) {
+    return Number(endPage) < Number(startPage);
+}
+
+function validateReadingDeadline(form, setError) {
+    return requireFieldValue(form.deadline, "Due date cannot be empty.", setError);
+}
+
+function validateReadingChapter(form, setError) {
+    if (!hasNegativeChapter(form.chapter)) {
+        return true;
+    }
+
+    return failValidation(setError, "Chapter cannot be negative.");
+}
+
+function validateReadingPageRange(form, setError) {
+    if (!hasInvalidPageRange(form.start_page, form.end_page)) {
+        return true;
+    }
+
+    return failValidation(setError, "End page must be greater than or equal to start page.");
+}
+
+function runReadingValidators(form, setError) {
+    const validators = [validateReadingDeadline, validateReadingChapter, validateReadingPageRange];
+    for (const validator of validators) {
+        if (!validator(form, setError)) {
+            return false;
+        }
+    }
+
+    setError('');
+    return true;
+}
+
 function Field({label, children}) {
-    return (
-        <div className = {styles.field}>
-            <label className={styles.label}>{label}</label>
-            {children}
-        </div>
-    );
+    return <ModuleFormField label={label} styles={styles}>{children}</ModuleFormField>;
 }
 
 function TitleField({value, onChange}) {
@@ -79,41 +115,27 @@ function EstimatedMinutesField({value, onChange}) {
     );
 }
 
-function FormActions({ onCancel, isEditing }) {
-    return (
-        <div className={styles.actions}>
-            <button type="button" className={styles.cancelButton} onClick={onCancel}>Cancel</button>
-            <button type="submit" className={styles.submitButton}>{isEditing ? 'Update' : 'Add Reading'}</button>
-        </div>
-    );
-}
-
 function useReadingFormValidation() {
     const [error, setError] = useState('');
-    const validate = (form) => {
-        if (!form.deadline) {
-            setError("Due date cannot be empty.");
-            return false;
-        }
-        if (form.chapter && form.chapter.trim().startsWith('-')) {
-            setError("Chapter cannot be negative."); 
-            return false
-        }
-        if (Number(form.end_page) < Number(form.start_page)) {
-            setError("End page must be greater than or equal to start page.")
-            return false;
-        }
-        setError('');
-        return true;
-    };
-    return {error, validate};
+    const validate = (form) => runReadingValidators(form, setError);
+    return buildValidationState(error, validate);
 }
 
 export default function ReadingForm({ initial, onSubmit, onCancel }) {
     const [form, setForm] = useState(initial || EMPTY_FORM);
     const {error, validate} =  useReadingFormValidation();
-    const onChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
-    const handleSubmit = (e) => { e.preventDefault(); if (validate(form)) onSubmit(buildFormData(form)); };
+    const onChange = (field, value) => {
+        setForm((prev) => ({ ...prev, [field]: value }));
+    };
+    const submitReading = () => {
+        if (validate(form)) {
+            onSubmit(buildFormData(form));
+        }
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        submitReading();
+    };
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
             <TitleField value={form.title} onChange={onChange} />
@@ -122,7 +144,7 @@ export default function ReadingForm({ initial, onSubmit, onCancel }) {
             <DeadlineField value={form.deadline} onChange={onChange} />
             <EstimatedMinutesField value={form.estimated_minutes} onChange={onChange} />
             {error && <div className={styles.error}>{error}</div>}
-            <FormActions onCancel={onCancel} isEditing={!!initial} />
+            <ModuleFormActions onCancel={onCancel} isEditing={!!initial} createLabel="Add Reading" styles={styles} />
         </form>
     );
 }

@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import styles from '../Deadlines/DeadlineCard.module.css';
 import {formatDate} from '../../Calendar/utils/dateUtils';
-import ConfirmModal from '../../common/ConfirmModal/ConfirmModal';
+import { ModuleItemCardActions, ModuleItemDeleteDialog } from '../shared/moduleCardActions';
 
 function ReadingCardHeader({ reading }) {
     return (
@@ -30,26 +30,15 @@ function ReadingCardBody({ reading }) {
     );
 }
 
-function ReadingCardActions({ onEdit, onDelete}) {
-    return (
-        <div className={styles.cardActions}>
-            <button className={styles.editButton} onClick={onEdit}>Edit</button>
-            <button className={styles.deleteButton} onClick={onDelete}>Delete</button>
-        </div>
-    ); 
-}
-
 export default function ReadingCard({ reading, isTeacher, onEdit, onDelete}) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     return (
         <div className={styles.card}>
             <ReadingCardHeader reading={reading}/>
             <ReadingCardBody reading={reading}/>
-            {isTeacher && <ReadingCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} />}
+            {isTeacher && <ModuleItemCardActions onEdit={onEdit} onDelete={() => setShowDeleteConfirm(true)} styles={styles} />}
             {showDeleteConfirm && (
-                <ConfirmModal title="Delete Reading" message={`Are you sure you want to delete "${reading.title}"? This action cannot be undone.`}
-                    onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)}
-                    confirmText="Delete" isDanger={true} />
+                <ModuleItemDeleteDialog itemType="Reading" itemTitle={reading.title} onConfirm={() => { onDelete(); setShowDeleteConfirm(false); }} onCancel={() => setShowDeleteConfirm(false)} />
             )}
         </div>
     );
