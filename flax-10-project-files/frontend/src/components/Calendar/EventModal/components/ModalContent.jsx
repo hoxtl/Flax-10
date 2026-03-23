@@ -2,11 +2,13 @@
  * ModalContent renders the main body of the event modal.
  * Switches between the event form, overlap warning, and sleep warning views.
  */
+
 import { ModalHeader } from './ModalHeader';
 import { EventFormBody } from './EventFormBody';
 import ConfirmModal from '../../../common/ConfirmModal/ConfirmModal';
 
 /** Top-level modal content that selects the appropriate view and stops click propagation. */
+
 export function ModalContent(props) {
     if (props.sleepWarning) {
         return <SleepWarningView settings={props.sleepSettings} onCancel={props.handleCancelSleep} onConfirm={props.handleConfirmSleep} />;

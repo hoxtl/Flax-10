@@ -2,26 +2,13 @@
  * TfL journey planner and service disruption API client.
  */
 
+import tflLineColors from './tflLineColors.json';
+
 const TFL_API_KEY = import.meta.env.VITE_TFL_API_KEY;
 const TFL_BASE = 'https://api.tfl.gov.uk';
 
-const LINE_COLOURS = {
-  'bakerloo': '#B36305',
-  'central': '#E32017',
-  'circle': '#FFD300',
-  'district': '#00782A',
-  'hammersmith-city': '#F3A9BB',
-  'jubilee': '#A0A5A9',
-  'metropolitan': '#9B0056',
-  'northern': '#000000',
-  'piccadilly': '#003688',
-  'victoria': '#0098D4',
-  'waterloo-city': '#95CDBA',
-  'elizabeth': '#7156A5',
-  'dlr': '#00A4A7',
-  'london-overground': '#EE7C0E',
-  'tram': '#84B817',
-};
+const LINE_COLOURS = tflLineColors.lineColours;
+const FALLBACK_COLOUR = tflLineColors.fallbackColour;
 
 function mapLeg(leg, decoder) {
   return {
@@ -59,7 +46,7 @@ function buildDelay(line, status) {
     severity: status.statusSeverity,
     severityDescription: status.statusSeverityDescription,
     reason: status.reason || 'Service Delay/Disruption',
-    color: LINE_COLOURS[line.id] || '#a5a5a5ff',
+    color: LINE_COLOURS[line.id] || FALLBACK_COLOUR,
   };
 }
 
@@ -113,6 +100,6 @@ export const tflService = {
   },
 
   getDelayLineColor(lineId) {
-    return LINE_COLOURS[lineId] || '#a5a5a5ff';
+    return LINE_COLOURS[lineId] || FALLBACK_COLOUR;
   },
 };

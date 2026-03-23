@@ -1,6 +1,7 @@
 /**
  * Countdown to a target time with formatted text and urgency.
  */
+
 import { useState, useEffect } from "react";
 
 function formatCountdownText(msLeft) {

@@ -2,6 +2,7 @@
  * SocietyDetailPage provides the comprehensive view for a single society.
  * Includes hero visuals, detailed info, event calendars, and administration tools.
  */
+
 import { useState, useEffect } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import styles from "./SocietyDetailPage.module.css";
@@ -30,6 +31,7 @@ import {
 } from "./SocietyDetailPageUtils";
 
 /** Manages the active tab and scroll orientation for the detail page. */
+
 function usePageState(initialTab, location) {
     const [params, setParams] = useSearchParams();
     const activeTab = params.get('tab') || initialTab || location.state?.activeTab || "calendar";
@@ -48,6 +50,7 @@ function usePageState(initialTab, location) {
 }
 
 /** Container for all modular visibility states in the detail page. */
+
 function useModalState() {
     const [editingAnnouncement, setEditingAnnouncement] = useState(null);
     const [galleryOpen, setGalleryOpen] = useState(false);
@@ -66,6 +69,7 @@ function useModalState() {
 
 
 /** Aggregates all data and action handlers for the page components. */
+
 function useSocietyPageData(societyId, initialTab, onMembershipChange) {
     const hookData = useSocietyDetail(societyId, onMembershipChange);
     const { society, updateLocalSociety } = hookData;
@@ -160,6 +164,7 @@ export default function SocietyDetailPage({ societyId, onBack, initialTab, onMem
 }
 
 /** Handles one-time initialization effects like scrolling to top. */
+
 function useSocietyInit(activeTabState) {
     useEffect(() => {
         scrollContentToTop();
@@ -168,6 +173,7 @@ function useSocietyInit(activeTabState) {
 }
 
 /** Manages the transition between view and edit modes. */
+
 async function handleToggleEditMode(modals, tracker, publish) {
     if (modals.editMode && tracker.hasChanges()) {
         await publish(tracker.getChangeSummary());
@@ -177,6 +183,7 @@ async function handleToggleEditMode(modals, tracker, publish) {
 }
 
 /** Constructs event operations bound to current editing context. */
+
 function buildEventHandlers(hookData, editMode, trackEvent) {
     const { addEvent, updateEvent, deleteEvent, addException } = hookData;
     return {
@@ -188,6 +195,7 @@ function buildEventHandlers(hookData, editMode, trackEvent) {
 }
 
 /** Constructs announcement operations bound to current editing context. */
+
 function buildAnnouncementHandlers(hookData, editMode, trackAnnouncement) {
     const { addAnnouncement, updateAnnouncement, deleteAnnouncement } = hookData;
     return {
@@ -198,6 +206,7 @@ function buildAnnouncementHandlers(hookData, editMode, trackAnnouncement) {
 }
 
 /** Aggregates all data and action handlers for the page components. */
+
 function buildHandlers(hookData, editMode, changeTracker) {
     const { trackEvent, trackAnnouncement } = changeTracker;
     return {
@@ -211,6 +220,7 @@ function buildHandlers(hookData, editMode, changeTracker) {
 }
 
 /** Toggles the reporting status of the society. */
+
 function ReportButton({ hasReported, onReport, onUnreport }) {
     const style = { color: hasReported ? 'var(--primary)' : 'var(--text-secondary)', padding: '0.4rem', cursor: 'pointer', opacity: hasReported ? 1 : 0.7 };
     const title = hasReported ? "You have reported this society. Click to unreport." : "Report Society";
@@ -222,11 +232,12 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
 }
 
 /** Common header for the detail view including navigation and settings. */
+
 function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
     return (
         <div className={styles.topBar}>
             <BackButton onClick={onBack} label="Back to All Societies" />
-            <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto', alignItems: 'center' }}>
+            <div className={styles.topBarActions}>
                 <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
                 {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}
             </div>
@@ -235,6 +246,7 @@ function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported
 }
 
 /** Simple error display when a society record is missing. */
+
 function NotFound({ onBack }) {
     return (
         <div className={styles.notFound}>

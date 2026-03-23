@@ -37,3 +37,8 @@
     color: var(--text-secondary);
     margin-left: 4px;
 }
+
+.avatarItem {
+  margin-left: var(--avatar-ml);
+  z-index: var(--avatar-z);
+}

@@ -1,6 +1,7 @@
 /**
  * Tests for EventRow - Expandable event row for list view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EventRow } from '../../../../components/Calendar/ListView/EventRow';

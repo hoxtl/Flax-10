@@ -1,6 +1,7 @@
 /*
  * SocietyCardContent renders the informational content inside a society card.
  */
+
 import styles from './SocietyCard.module.css';
 import EntityLinkChip from '../common/EntityLinkChip/EntityLinkChip';
 

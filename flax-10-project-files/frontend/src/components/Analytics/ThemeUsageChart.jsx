@@ -5,6 +5,7 @@
 import { PieChart } from "@mui/x-charts/PieChart";
 
 import EmptyState from "../common/EmptyState/EmptyState";
+import chartStyles from "./Charts.module.css";
 
 import ThemeUsageHeader from "./ThemeUsageHeader";
 import ThemeUsageLegend from "./ThemeUsageLegend";
@@ -12,7 +13,7 @@ import { getBadge, getPieSeries } from "./themeUsageChartData";
 
 function ThemeUsageBody({ summary }) {
   return <>
-    <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+    <div className={chartStyles.chartCenter}>
       <PieChart series={getPieSeries(summary)} height={220} sx={{ "& .MuiChartsLegend-root": { display: "none" } }} />
     </div>
     <ThemeUsageLegend summary={summary} />

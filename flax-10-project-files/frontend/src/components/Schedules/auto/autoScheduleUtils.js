@@ -1,6 +1,7 @@
 /*
  * Auto schedule helpers.
  */
+
 export function getAutoScheduleError(deadlines) {
   return deadlines.length ? null : 'No upcoming deadlines to auto-schedule.';
 }

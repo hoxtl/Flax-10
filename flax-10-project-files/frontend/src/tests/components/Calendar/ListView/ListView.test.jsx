@@ -1,6 +1,7 @@
 /**
  * Tests for ListView - Calendar list view with grouped daily sections.
  */
+
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ListView } from '../../../../components/Calendar/ListView/ListView';

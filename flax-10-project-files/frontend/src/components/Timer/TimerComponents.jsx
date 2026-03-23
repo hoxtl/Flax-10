@@ -11,6 +11,7 @@ export { SoundSelector } from './SoundSelector';
 export { TaskInput } from './TaskInput';
 
 /** Formats seconds to MM:SS */
+
 export const formatTime = (seconds) => {
     const abs = Math.abs(seconds);
     const m = Math.floor(abs / 60).toString().padStart(2, '0');

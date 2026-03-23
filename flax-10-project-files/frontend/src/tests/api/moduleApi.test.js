@@ -1,6 +1,7 @@
 /*
  * Tests for module API client.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../api/client', () => ({

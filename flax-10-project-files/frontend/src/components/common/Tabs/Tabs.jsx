@@ -30,6 +30,7 @@ function TabContent({ activeTab, tabs }) {
 }
 
 /** Tabs component with animated indicator and content transitions. */
+
 export default function Tabs({ tabs, activeTab, onTabChange, layoutId = "tabIndicator", compact = false, className = "", tabClassName = "", tabVariant = "default", middle }) {
   if (!tabs?.length) return null;
   const containerClass = `${styles.container} ${compact ? styles.compact : ""} ${className}`.trim();

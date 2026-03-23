@@ -37,6 +37,7 @@ function useInlineAlertState(message, autoDismiss, onDismiss) {
 }
 
 /** Inline alert that animates in and out, with optional auto-dismiss. */
+
 export default function InlineAlert({ message, variant = "success", autoDismiss = 0, onDismiss, className = "" }) {
   const { visible, exiting, displayMessage } = useInlineAlertState(message, autoDismiss, onDismiss);
   if (!visible) return null;

@@ -1,6 +1,7 @@
 /**
  * Tests for EventPopover - event detail popover component.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventPopover } from '../../../../components/Calendar/EventPopover/EventPopover';

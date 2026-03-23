@@ -2,6 +2,7 @@
  * RatificationSection manages the display and request flow for official society recognition.
  * RatificationToggle allows admins to opt-in during society creation.
  */
+
 import styles from "./RatificationSection.module.css";
 
 export function RatificationSection({ status, isRatified, onRequest }) {
@@ -41,6 +42,7 @@ function RatificationRequest({ onRequest }) {
 }
 
 /** Toggle for requesting ratification during society setup. */
+
 export function RatificationToggle({ requested, onToggle }) {
     return (
         <div className={styles.toggleSection}>

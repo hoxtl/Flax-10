@@ -51,3 +51,9 @@
 .progressBarInner > div:only-child .progressSegment {
     border-radius: 999px;
 }
+
+.segmentWrapper {
+  height: 100%;
+  flex: 0 0 auto;
+  z-index: var(--seg-z);
+}

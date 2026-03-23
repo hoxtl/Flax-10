@@ -1,6 +1,7 @@
 /*
  * Auto schedule summary copy.
  */
+
 import styles from '../shared/scheduleFormStyles';
 
 export function AutoScheduleSummary({ deadlines }) {

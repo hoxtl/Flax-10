@@ -20,6 +20,7 @@ function PickerPortal({ open, dropdownRef, dropdownPos, ...props }) {
 }
 
 /** Date and time picker with an inline calendar and dropdowns for hour and minute. */
+
 export default function DateTimePicker({ value, onChange, placeholder = "Pick date & time", timeOnly = false, dateOnly = false, customTrigger = null, triggerClassName, wrapperClassName, hideIcon, minDate = null }) {
   const { open, setOpen, viewY, setViewY, viewM, setViewM, selDate, setSelDate, hour, setHour, minute, setMinute, dropdownPos, setDropdownPos } = useDateTimePickerState(value, timeOnly, dateOnly);
   const ref = useRef(null);

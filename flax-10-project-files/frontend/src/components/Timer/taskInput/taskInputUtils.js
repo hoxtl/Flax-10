@@ -53,7 +53,7 @@ function buildListMap(lists) {
 }
 
 function addListInfo(task, listMap) {
-  const info = listMap[String(task.task_list)] || { name: 'Other', color: '#94a3b8' };
+  const info = listMap[String(task.task_list)] || { name: 'Other', color: 'var(--color-gray-400)' };
   return { ...task, list_name: info.name, list_color: info.color };
 }
 

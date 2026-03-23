@@ -1,6 +1,7 @@
 /*
  * Modal for requesting a course change.
  */
+
 import { useState } from "react";
 import { requestCourseChange } from "../../../api/adminApi";
 import styles from "../../../pages/Settings/Settings.module.css";

@@ -30,8 +30,9 @@ function ListContextMenu({ x, y, onRename, onDelete, onClose }) {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
+  const menuPos = { '--ctx-top': y, '--ctx-left': x };
   return (
-    <div ref={ref} className={styles.ctxMenu} style={{ top: y, left: x }}>
+    <div ref={ref} className={styles.ctxMenu} style={menuPos}>
       <button className={styles.ctxItem} onClick={() => { onRename(); onClose(); }}><Pencil size={14} strokeWidth={2} /> Rename</button>
       <div className={styles.ctxDivider} />
       <button className={`${styles.ctxItem} ${styles.ctxDelete}`} onClick={() => { onDelete(); onClose(); }}><Trash2 size={14} strokeWidth={2} /> Delete list</button>

@@ -14,7 +14,7 @@ const errorStyle = {
   zIndex: 1000,
   maxWidth: "400px",
   textAlign: "center",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+  boxShadow: "var(--shadow-md)",
   border: "1px solid var(--border)",
 };
 

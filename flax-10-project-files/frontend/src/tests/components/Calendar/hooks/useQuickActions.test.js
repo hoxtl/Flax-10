@@ -1,6 +1,7 @@
 /**
  * Tests for useQuickActions - quick actions for external events.
  */
+
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useQuickActions } from '../../../../components/Calendar/hooks/useQuickActions';

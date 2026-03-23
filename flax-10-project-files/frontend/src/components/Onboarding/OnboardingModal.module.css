@@ -39,3 +39,55 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.starSpan {
+  display: inline-block;
+  color: var(--primary);
+}
+
+.successWrapper {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.successEmoji {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.successBody {
+  color: var(--text);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.warningRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+}
+
+.warningTitle {
+  font-weight: 600;
+  color: var(--warning-text);
+  font-size: 0.83rem;
+}
+
+.warningBody {
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+  color: var(--text);
+  opacity: 0.75;
+}
+
+.confirmLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.8;
+  font-weight: 500;
+}

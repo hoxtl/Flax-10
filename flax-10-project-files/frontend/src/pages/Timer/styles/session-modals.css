@@ -315,3 +315,8 @@
     border-color: color-mix(in srgb, var(--primary) 34%, transparent);
     transform: translateY(-1px);
 }
+
+.presetCtxMenuPositioned {
+  top: var(--ctx-top);
+  left: var(--ctx-left);
+}

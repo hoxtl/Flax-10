@@ -1,6 +1,7 @@
 /*
  * Smart nudge banner for urgent deadlines or readings due within 7 days.
  */
+
 import { useState, useMemo, useCallback } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { getDayCount, getUrgencyTier } from '../../components/Modules/Deadlines/upcomingDeadlinesUtils';

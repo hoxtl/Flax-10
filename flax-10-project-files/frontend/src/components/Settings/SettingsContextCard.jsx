@@ -1,6 +1,7 @@
 /*
  * Shared context card used across settings panels.
  */
+
 import styles from "../../pages/Settings/Settings.module.css";
 
 export default function SettingsContextCard({

@@ -13,6 +13,7 @@ import GroupWorkIndexSkeleton from "./components/GroupWorkIndexSkeleton";
 import GroupWorkContent from "./components/GroupWorkContent";
 
 /** Entry point for the GroupWork section, routing between overview and project detail. */
+
 export default function GroupWorkIndexPage() {
   const projectId = useSelectedProjectId();
   return projectId ? <ProjectDetailRoute projectId={projectId} /> : <GroupWorkOverview />;

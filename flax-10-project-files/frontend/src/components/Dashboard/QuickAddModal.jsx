@@ -7,19 +7,19 @@ import { getModules } from "../../api/moduleApi";
 import { ScheduleAutoForm } from "../Schedules/ScheduleForms";
 
 const CORE_TYPES = [
-  { id: 'event', icon: '📅', label: 'Event', color: '#3b82f6' },
-  { id: 'society', icon: '👨‍👨‍👧‍👧', label: 'Society', color: '#8b5cf6' },
-  { id: 'task', icon: '✅', label: 'Task', color: '#10b981' },
-  { id: 'schedule_auto', icon: '⚙️', label: 'Auto Schedule', color: '#0ea5e9' },
+  { id: 'event', icon: '📅', label: 'Event', color: 'var(--color-light-blue)' },
+  { id: 'society', icon: '👨‍👨‍👧‍👧', label: 'Society', color: 'var(--personal)' },
+  { id: 'task', icon: '✅', label: 'Task', color: 'var(--color-teal)' },
+  { id: 'schedule_auto', icon: '⚙️', label: 'Auto Schedule', color: 'var(--color-sky)' },
 ];
 
 //Unlock when features are implemented
 const LOCK_TYPES = [
-  { id: 'group', icon: '👥', label: 'Group', color: '#cbd5e1', locked: true },
+  { id: 'group', icon: '👥', label: 'Group', color: 'var(--color-muted-slate)', locked: true },
 ];
 
 function tileStyle(item) {
-  if (item.locked) return { backgroundColor: '#f1f5f9', borderColor: '#e2e8f0', cursor: 'not-allowed' };
+  if (item.locked) return { backgroundColor: 'var(--color-bg-muted)', borderColor: 'var(--color-border-light-slate)', cursor: 'not-allowed' };
   return { backgroundColor: `${item.color}15`, borderColor: `${item.color}30` };
 }
 
@@ -27,7 +27,7 @@ function Tile({ item, onClick }) {
   return (
     <button className={styles.tile} onClick={onClick} type="button" style={tileStyle(item)} disabled={item.locked}>
       <span className={styles.icon}>{item.icon}</span>
-      <span className={styles.label} style={{ color: item.locked ? '#94a3b8' : item.color }}>{item.label}</span>
+      <span className={styles.label} style={{ color: item.locked ? 'var(--color-gray-400)' : item.color }}>{item.label}</span>
       {item.locked && <Badge className={styles.badge} tone="muted">Coming Soon</Badge>}
     </button>
   );
@@ -35,7 +35,7 @@ function Tile({ item, onClick }) {
 
 function TypeGrid({ onType, isTeacher }) {
   const types = [...CORE_TYPES];
-  if (isTeacher) types.push({ id: 'module', icon: '📚', label: 'Module', color: '#10b981' });
+  if (isTeacher) types.push({ id: 'module', icon: '📚', label: 'Module', color: 'var(--color-teal)' });
   const allTypes = [...types, ...LOCK_TYPES];
   return (
     <div className={styles.grid}>
@@ -56,9 +56,9 @@ function TagGrid({ tags, onSelect }) {
 
 function ModuleOptsGrid({ onSelect }) {
   const opts = [
-    { id: 'create_module', icon: '✨', label: 'Create New Module', color: '#10b981' },
-    { id: 'add_deadline', icon: '⏰', label: 'Add Deadline', color: '#ef4444' },
-    { id: 'add_reading', icon: '📖', label: 'Add Reading', color: '#f59e0b'},
+    { id: 'create_module', icon: '✨', label: 'Create New Module', color: 'var(--color-teal)' },
+    { id: 'add_deadline', icon: '⏰', label: 'Add Deadline', color: 'var(--color-error)' },
+    { id: 'add_reading', icon: '📖', label: 'Add Reading', color: 'var(--color-amber)' },
   ];
   return (
     <div className={styles.grid}>
@@ -75,11 +75,11 @@ function useTeacherModules() {
 
 function ModulePickerGrid({ onSelect }) {
   const modules = useTeacherModules();
-  if (!modules.length) return <p style={{ textAlign: "center", color: "#6b7280" }}>Loading or no modules found.</p>;
+  if (!modules.length) return <p className={styles.emptyMsg}>Loading or no modules found.</p>;
   return (
     <div className={styles.grid}>
       {modules.map(m => (
-        <Tile key={m.id} item={{ id: m.id, icon: '📔', label: m.module_code, color: '#10b981' }} onClick={() => onSelect(m)} />
+        <Tile key={m.id} item={{ id: m.id, icon: '📔', label: m.module_code, color: 'var(--color-teal)' }} onClick={() => onSelect(m)} />
       ))}
     </div>
   );

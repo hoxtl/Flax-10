@@ -3,6 +3,7 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
+import styles from "../word-loader.module.css";
 
 const charVariants = {
   hidden: { opacity: 0, y: 10 },
@@ -23,7 +24,7 @@ const MotionSpan = motion.span;
 export function WordLoaderCharacters({ index, word }) {
   return (
     <AnimatePresence mode="wait">
-      <MotionSpan key={index} style={{ position: "absolute", display: "flex", gap: "0.05em" }}>
+      <MotionSpan key={index} className={styles.charSpan}>
         {word.split("").map((character, characterIndex) => <WordCharacter key={characterIndex} character={character} index={characterIndex} />)}
       </MotionSpan>
     </AnimatePresence>

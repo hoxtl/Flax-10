@@ -82,6 +82,22 @@
   background: var(--card-icon-surface);
 }
 
+.productivityGrid {
+  grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+}
+
+.iconWrapColored {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--card-icon-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--icon-color) 12%, transparent);
+  color: var(--icon-color);
+}
+
 .icon {
   font-size: 1.1rem;
 }

@@ -1,6 +1,7 @@
 /*
  * Text input element used by settings form controls.
  */
+
 import TextInput from "../../common/TextInput/TextInput";
 
 export default function FormTextInput(props) {

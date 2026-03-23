@@ -9,11 +9,12 @@ function cellOpacity(val, maxVal) {
 }
 
 function HeatmapCell({ val, maxVal, label }) {
+  const cellStyle = { opacity: cellOpacity(val, maxVal) };
   return (
     <div className={styles.heatmapCol}>
       <div
         className={styles.heatmapCell}
-        style={{ opacity: cellOpacity(val, maxVal) }}
+        style={cellStyle}
         title={`${label}: ${(val / 60).toFixed(1)}h`}
       />
       <span className={styles.heatmapDayLabel}>{label}</span>

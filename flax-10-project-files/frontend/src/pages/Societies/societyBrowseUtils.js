@@ -1,6 +1,7 @@
 /*
  * societyBrowseUtils contains pure filtering and sorting helpers for the browse page.
  */
+
 import { matchesCategory } from "./societyFilters";
 
 export function countForFilter(societies, filterId) {

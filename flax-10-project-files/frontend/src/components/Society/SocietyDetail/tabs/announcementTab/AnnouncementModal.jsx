@@ -2,6 +2,7 @@
  * AnnouncementModal provides a comprehensive form for creating and editing society announcements,
  * with optional synchronization to the society's event calendar.
  */
+
 import { useState, useRef, useEffect } from "react";
 import styles from "./AnnouncementModal.module.css";
 import { getInitialForm, validateForm, handleFileSelect, MAX_IMAGES } from "./AnnouncementModalHelpers";

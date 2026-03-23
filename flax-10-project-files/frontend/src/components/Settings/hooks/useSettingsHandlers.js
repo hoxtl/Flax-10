@@ -1,6 +1,7 @@
 /*
  * Save handlers for the settings feature.
  */
+
 import {
   saveAccount,
   saveAddress,

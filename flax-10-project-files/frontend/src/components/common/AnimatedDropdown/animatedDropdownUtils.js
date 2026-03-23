@@ -3,6 +3,7 @@
  */
 
 /** Filters grouped option sets by label, removing empty groups. */
+
 export function filterGrouped(options, query) {
   if (!query.trim()) return options;
   const q = query.toLowerCase();
@@ -12,6 +13,7 @@ export function filterGrouped(options, query) {
 }
 
 /** Filters a flat option list by label. */
+
 export function filterFlat(options, query) {
   if (!query.trim()) return options;
   const q = query.toLowerCase();
@@ -22,6 +24,7 @@ export function filterFlat(options, query) {
 }
 
 /** Builds inline style for the dropdown menu panel. */
+
 export function buildMenuStyle(openUpward, usePortal, coords, menuMaxHeight) {
   const style = openUpward ? { bottom: "100%", top: "auto", marginBottom: 4 } : {};
   if (usePortal && coords) {
@@ -34,6 +37,7 @@ export function buildMenuStyle(openUpward, usePortal, coords, menuMaxHeight) {
 }
 
 /** Determines whether the dropdown should open upward and computes its coords. */
+
 export function computeOpenDirection(rect, menuMaxHeight, allowFlipUpward) {
   const spaceBelow = window.innerHeight - rect.bottom;
   const spaceAbove = rect.top;
@@ -45,6 +49,7 @@ export function computeOpenDirection(rect, menuMaxHeight, allowFlipUpward) {
 }
 
 /** Returns a mousedown listener that closes the dropdown on outside clicks. */
+
 export function makeOutsideClickListener(containerRef, menuRef, setIsOpen) {
   return (event) => {
     const isInside = containerRef.current?.contains(event.target);

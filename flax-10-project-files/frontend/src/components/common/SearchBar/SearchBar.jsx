@@ -31,6 +31,7 @@ function useSlashShortcutRegistration(internalRef, enableSlashShortcut) {
 }
 
 /** Search input that optionally focuses on the "/" key press. */
+
 const SearchBar = forwardRef(function SearchBar({
   value, onChange, placeholder = "Search...", className = "", onFocus, onBlur, inputClassName = "",
   enableSlashShortcut = true, showShortcutHint = true, shortcutHint = "( / )", ...inputProps

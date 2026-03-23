@@ -2,6 +2,7 @@
  * useCalendarEvents - Event fetching and caching for calendar views.
  * Manages API calls with deduplication to prevent redundant fetches.
  */
+
 import { useEffect, useCallback, useRef, useMemo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { getEvents, createEvent, updateEvent, deleteEvent, addExceptionDate } from '../../../api/eventApi';
@@ -25,6 +26,7 @@ function getWeekNumber(d) {
 const fetchingRef = { current: false, key: null };
 
 /** Hook for loading calendar events based on current view. */
+
 export function useCalendarEvents() {
   const { events, selectedDate, viewMode, reloadKey, sharedCalendarUserId } = useCalendar();
   const dispatch = useCalendarDispatch();
@@ -58,6 +60,7 @@ async function fetchEvents(state, dispatch) {
 }
 
 /** Hook providing event CRUD operations with auto-reload. */
+
 export function useEventActions() {
   const { selectedDate, viewMode, sharedCalendarUserId } = useCalendar();
   const dispatch = useCalendarDispatch();

@@ -1,6 +1,7 @@
 /*
  * SocietyInfo renders editable metadata and membership actions for a society.
  */
+
 import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import Badge from "../../common/Badge/Badge";
@@ -9,6 +10,7 @@ import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
 /** Primary metadata and action row for the society detail page. */
+
 export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin, onLeave, canEdit, onToggleEditMode, onViewMembers, isSubscribed, onToggleSubscription }) {
     const categories = society.categories || (society.category ? [society.category] : []);
     return (
@@ -24,6 +26,7 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
 }
 
 /** Displays or edits the society biography. */
+
 function BioSection({ text, editMode, onSave }) {
     const [editing, setEditing] = useState(false);
     if (editing) return <BioEditor initialValue={text || ""} onSave={(value) => saveAndClose(value, onSave, setEditing)} />;

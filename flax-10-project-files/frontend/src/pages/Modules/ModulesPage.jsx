@@ -1,6 +1,7 @@
 /*
  * Modules page entry for browsing, enrolling, and managing course modules.
  */
+
 import { MainView } from "./ModulesPageResults.jsx";
 import {
   AnimatedContent,

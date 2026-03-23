@@ -1,6 +1,7 @@
 /*
  * Legacy standalone sleep-schedule panel retained for test coverage.
  */
+
 import SleepSection from "./preferences/SleepSection";
 import useSleepScheduleSettings from "./preferences/useSleepScheduleSettings";
 import SectionSkeleton from "../common/LoadingState/SectionSkeleton";

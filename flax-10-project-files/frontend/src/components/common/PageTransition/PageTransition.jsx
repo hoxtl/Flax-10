@@ -13,6 +13,7 @@ const PAGE_MOTION = {
 };
 
 /** Wraps page content with a standard entrance and exit animation. */
+
 export default function PageTransition({ children, className, style }) {
   return (
     <motion.div className={className} style={style} {...PAGE_MOTION}>

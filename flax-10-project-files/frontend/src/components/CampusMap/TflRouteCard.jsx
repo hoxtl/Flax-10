@@ -1,6 +1,7 @@
 /**
  * Public transport route card.
  */
+
 import baseStyles from "../../pages/CampusMap/CampusMap.module.css";
 import routeStyles from "../../pages/CampusMap/routes.module.css";
 import { getLegIcon, getLegLabel } from "./mapUtils";

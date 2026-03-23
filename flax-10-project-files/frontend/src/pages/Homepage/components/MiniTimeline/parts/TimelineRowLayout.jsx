@@ -3,8 +3,9 @@
  */
 
 export function TimelineRowLayout({ row, styles, minHeight, children, rowClassName = "" }) {
+  const rowStyle = { marginTop: row.spacingBeforePx || 0, minHeight };
   return (
-    <div className={`${styles.planTimelineRow} ${rowClassName}`.trim()} style={{ marginTop: row.spacingBeforePx || 0, minHeight }}>
+    <div className={`${styles.planTimelineRow} ${rowClassName}`.trim()} style={rowStyle}>
       {children}
     </div>
   );

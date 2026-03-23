@@ -15,11 +15,12 @@ import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate, getDueD
 import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
+  const cbVars = { "--cb-bg": color, "--cb-border": isDone ? color : "var(--border)" };
   return (
     <button
       onClick={onToggle}
       className={`${styles.checkbox} ${isDone ? styles.checkboxDone : ""}`}
-      style={{ "--cb-bg": color, "--cb-border": isDone ? color : "var(--border)" }}
+      style={cbVars}
     >
       {isDone && <Check size={14} strokeWidth={3} />}
     </button>
@@ -106,7 +107,7 @@ function getTitleStyle(completed) {
 
 function getCheckboxColor(task, members) {
   const assignee = filterVisibleAssignees(task.assignees_info || [], members)[0];
-  return assignee ? getUserColor(assignee.id) : "#8d7355";
+  return assignee ? getUserColor(assignee.id) : "var(--color-groupwork-fallback)";
 }
 
 export default function TaskListRow({ task, members, onToggle, onUpdate, onDelete }) {

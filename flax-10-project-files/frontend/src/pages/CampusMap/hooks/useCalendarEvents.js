@@ -1,6 +1,7 @@
 /**
  * Calendar events data hook for the campus map page.
  */
+
 import { useState, useEffect } from 'react';
 import { getCalendarEvents } from '../../../api/calendarApi';
 

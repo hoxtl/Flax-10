@@ -48,7 +48,7 @@
   .detailEmpty     { font-size: var(--home-text-body); color: var(--muted); text-align: center; padding: var(--home-space-md) 0; }
   
   /* Context menu */
-  .contextMenu    { position: fixed; z-index: 300; background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem; min-width: 128px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); }
+  .contextMenu    { position: fixed; top: var(--ctx-top); left: var(--ctx-left); z-index: 300; background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 10px; padding: 0.4rem; min-width: 128px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); }
   .contextIcon   { flex-shrink: 0; color: var(--muted); }
   .contextItem   { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.65rem; background: none; border: none; border-radius: 6px; font-size: var(--home-text-body); font-weight: 500; color: var(--text); cursor: pointer; text-align: left; }
   .contextItem:hover { background: var(--hover); }

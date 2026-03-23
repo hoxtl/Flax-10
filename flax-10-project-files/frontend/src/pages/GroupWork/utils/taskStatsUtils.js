@@ -39,13 +39,14 @@ function buildSegments(userCounts, unassignedCount, total, members) {
             id: "unassigned", name: "Unassigned",
             percentage: (unassignedCount / total) * 100,
             tooltip: `Unassigned: ${unassignedCount} task${unassignedCount !== 1 ? "s" : ""} completed`,
-            color: "#e0e0e0",
+            color: "var(--color-groupwork-progress)",
         });
     }
     return segments;
 }
 
 /** Calculates per-member completion segments for the project progress bar. */
+
 export function calcCompletionSegments(tasks, members) {
     const total = tasks.length;
     if (total === 0) return { percent: 0, completed: 0, total: 0, segments: [] };

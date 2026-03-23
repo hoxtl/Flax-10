@@ -1,6 +1,7 @@
 /**
  * Tests for calendarHelpers - date range calculation utilities.
  */
+
 import { describe, it, expect } from 'vitest';
 import { getDateRangeForView } from '../../../../components/Calendar/hooks/calendarHelpers';
 

@@ -2,6 +2,7 @@
  * SwipeMonthView - Month calendar with swipe navigation support.
  * Enables touch and scroll gestures to navigate between months.
  */
+
 import { useRef, useCallback, useState, useEffect, memo } from 'react';
 import { useCalendar, useCalendarDispatch } from '../../../context/CalendarContext';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
@@ -46,6 +47,7 @@ function useMonthNavigation(selectedDate, dispatch) {
 }
 
 /** Month view with swipe/scroll navigation between months. */
+
 export function SwipeMonthView({ readOnly: propReadOnly, customTags }) {
   const { selectedDate, events, readOnly: contextReadOnly } = useCalendar();
   const dispatch = useCalendarDispatch();

@@ -80,6 +80,7 @@ function useCommandBarState(onNavChange, onOpenTask) {
 }
 
 /** Full-screen command palette for quick navigation and actions. */
+
 export default function QuickCommandBar({ onNavChange, onOpenTask }) {
   const { open, setOpen, query, setQuery, visible } = useCommandBarState(onNavChange, onOpenTask);
   const trigger = (action) => { if (!action) return; action.run(query); setOpen(false); };

@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import styles from "./StandardModal.module.css";
 
 /** Header row with a title, optional subtitle, and a close button. */
+
 export function ModalHeader({ title, subtitle, onClose, centerText, subtitleClassName = "" }) {
   const headerClasses = centerText ? `${styles.header} ${styles.headerCentered}` : styles.header;
   const subtitleClasses = [styles.sub, subtitleClassName].filter(Boolean).join(" ");
@@ -33,6 +34,7 @@ function buildContentClasses(centerText, contentClassName) {
 }
 
 /** Portal modal with configurable header, size, and content area. */
+
 export default function StandardModal({
   title, subtitle, subtitleClassName = "", onClose, children,
   size = "md", backdropClassName = "", modalClassName = "", contentClassName = "",

@@ -1,0 +1,12 @@
+{
+  "typeColors": {
+    "Lecture": "#D4AF37",
+    "Small group": "#148C7D",
+    "Practical/lab": "#2E5BFF",
+    "Other": "#E67E22"
+  },
+  "fallbackTypeColors": ["#D4AF37", "#148C7D", "#2E5BFF", "#E67E22"],
+  "attendedColor": "#2D8B5A",
+  "missedColor": "#C0392B",
+  "fallbackColor": "#795548"
+}

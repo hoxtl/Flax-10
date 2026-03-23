@@ -2,6 +2,7 @@
  * SyncButton allows users to synchronize society events with their personal calendar.
  * Utilizes the useSocietyCalendarSync hook for state management.
  */
+
 import { useSocietyCalendarSync } from "../../../hooks/useSocietyCalendarSync";
 import PrimaryButton from "../../../../common/PrimaryButton/PrimaryButton";
 import styles from "./SyncButton.module.css";

@@ -1,6 +1,7 @@
 /*
  * Main content, tabs, toolbar, and result sections for the modules page.
  */
+
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import AppPage from "../../components/common/AppPage/AppPage";

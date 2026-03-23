@@ -98,6 +98,9 @@
 .sectionRing {
   flex-shrink: 0;
 }
+.sectionRingBg {
+  stroke: var(--task-section-stroke, color-mix(in srgb, var(--primary) 10%, transparent));
+}
 .sectionRingFill {
   stroke: var(--sage, #8c9a86);
   transition: stroke-dasharray 0.5s ease;

@@ -68,6 +68,7 @@ function useScrollToEnd(scrollRef, deps) {
 }
 
 /** Animated tag selector that shows selected tags and available pills. */
+
 export function TagsSelector({ tags = [], selectedTags = [], onSelectionChange, emptyHint = "Select tags to filter…" }) {
   const scrollRef = useRef(null);
   const unselected = tags.filter(t => !selectedTags.some(s => s.id === t.id));

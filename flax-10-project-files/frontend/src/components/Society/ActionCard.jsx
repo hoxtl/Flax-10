@@ -1,6 +1,7 @@
 /*
  * ActionCard renders the call-to-action card used in society grids.
  */
+
 import styles from './ActionCard.module.css';
 
 export default function ActionCard({ onClick, text, children, className = "" }) {

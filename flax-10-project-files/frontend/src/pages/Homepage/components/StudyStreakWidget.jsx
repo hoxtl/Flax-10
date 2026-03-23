@@ -1,6 +1,7 @@
 /*
  * Study streak summary for completed tasks.
  */
+
 import { useState, useEffect, useMemo } from "react";
 import { Flame } from "lucide-react";
 import { fetchApi } from "../../../api/client";

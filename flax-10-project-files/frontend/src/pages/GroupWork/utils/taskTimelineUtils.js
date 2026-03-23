@@ -6,6 +6,7 @@ export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Returns the Monday of the current week at midnight as the timeline anchor date. */
+
 export function getTimelineAnchor() {
     const now = new Date();
     const day = now.getDay() || 7;
@@ -29,6 +30,7 @@ function buildWeek(offset, anchor) {
 }
 
 /** Builds an array of 9 consecutive week descriptors starting from the anchor date. */
+
 export function buildWeeks(anchor) {
     return [0, 1, 2, 3, 4, 5, 6, 7, 8].map(o => buildWeek(o, anchor));
 }
@@ -43,6 +45,7 @@ function placeSingleTask(t, weeks, layout) {
 }
 
 /** Places each task into the correct week and day slot of the layout grid. */
+
 export function placeTasksIntoWeeks(tasks, weeks) {
     const layout = {};
     weeks.forEach(wk => { layout[wk.id] = [[], [], [], [], [], []]; });

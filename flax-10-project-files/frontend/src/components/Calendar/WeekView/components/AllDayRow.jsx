@@ -2,6 +2,7 @@
  * AllDayRow - Displays all-day events spanning multiple days in week view.
  * Renders events as horizontal bars positioned across day columns.
  */
+
 import { useMemo } from 'react';
 import { getAllDayVisualRange } from '../../utils/eventDisplayUtils';
 import { useEventPopup } from '../../../../context/CalendarContext';
@@ -11,6 +12,7 @@ import { getEventTheme } from '../../utils/eventStyleUtils';
 import './AllDayRow.css';
 
 /** Row component displaying all-day events as spanning bars. */
+
 export function AllDayRow({ days, events, readOnly }) {
     const layoutItems = useMemo(() => calculateEventLayout(events, days), [events, days]);
 

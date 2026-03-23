@@ -1,6 +1,7 @@
 /*
  * Local cache helpers for teacher-role requests.
  */
+
 const TEACHER_REQUEST_CACHE_KEY = "teacher_request_pending";
 
 export function getCachedTeacherRequest() {

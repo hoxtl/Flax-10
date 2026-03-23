@@ -44,6 +44,7 @@ function CalendarContent() {
 }
 
 /** Main calendar wrapper with resize highlight provider. */
+
 export function Calendar() {
   return (
     <ResizeHighlightProvider>

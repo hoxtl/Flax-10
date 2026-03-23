@@ -178,6 +178,7 @@ function useListViewState(propDate, propEvents) {
 }
 
 /** Calendar list view showing grouped daily sections. */
+
 export function ListView({ selectedDate: propDate, events: propEvents }) {
   const state = useListViewState(propDate, propEvents);
   if (!state.sortedEvents.length) return <EmptyState />;

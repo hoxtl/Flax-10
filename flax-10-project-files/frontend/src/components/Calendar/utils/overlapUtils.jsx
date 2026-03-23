@@ -15,10 +15,11 @@ export async function checkOverlapWithConfirm(event, allEvents, confirmFn) {
     const overlapping = findOverlappingEvents(event, allEvents);
     if (overlapping.length === 0) return true;
 
+    const overlapListStyle = { paddingLeft: '20px', margin: '0 0 16px 0', fontSize: '0.9em', color: 'var(--text)' };
     const message = (
         <div>
             <p style={{ margin: '0 0 10px 0' }}>This overlaps with existing events:</p>
-            <ul style={{ paddingLeft: '20px', margin: '0 0 16px 0', fontSize: '0.9em', color: 'var(--text, #1f2937)' }}>
+            <ul style={overlapListStyle}>
                 {overlapping.map(e => <li key={e.id}><strong>{e.title}</strong></li>)}
             </ul>
             <p style={{ margin: 0 }}>Do you want to save it anyway?</p>

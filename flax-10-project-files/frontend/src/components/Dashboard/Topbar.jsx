@@ -44,7 +44,7 @@ function NavDropdownTrigger({ title, isOpen, hasActive, onClick }) {
 
 function parseRouteOption(r) {
   const label = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div className={styles.dropdownLabelRow}>
       <span className={styles.dropdownIcon}>{r.icon}</span>
       <span className={styles.dropdownLabel}>{r.label}</span>
     </div>

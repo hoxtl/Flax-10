@@ -1,6 +1,7 @@
 /**
  * Shared refs for the campus map feature.
  */
+
 import { useMemo, useRef } from "react";
 
 function createCampusMapRefs(refs) {

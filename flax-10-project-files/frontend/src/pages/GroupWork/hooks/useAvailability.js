@@ -61,6 +61,7 @@ function useAvailabilityActions(projectId, fetchAvail, confirm) {
 }
 
 /** Provides availability data and actions for proposing and voting on meeting slots. */
+
 export function useAvailability(projectId, confirm) {
     const { data, fetchAvail, loading } = useAvailabilityData(projectId);
     const actions = useAvailabilityActions(projectId, fetchAvail, confirm);

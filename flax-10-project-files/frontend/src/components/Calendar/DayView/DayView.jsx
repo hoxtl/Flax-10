@@ -2,6 +2,7 @@
  * DayView - Single day calendar view with hourly time grid.
  * Displays all-day events in header and timed events in scrollable grid.
  */
+
 import { useRef, useState, useEffect } from "react";
 import { useCalendarData } from "../../../context/CalendarContext";
 import { overlapsDay } from "../utils/dateUtils";
@@ -56,6 +57,7 @@ function DayGrid({ hours, date, events, readOnly }) {
 }
 
 /** Day view component showing hourly time slots with events. */
+
 export function DayView({ selectedDate: propDate, events: propEvents, readOnly }) {
   const data = useCalendarData({ selectedDate: propDate, events: propEvents });
   const { selectedDate, timedEvents, allEvents, scrollRef } = useDayViewData(data.selectedDate, data.events);

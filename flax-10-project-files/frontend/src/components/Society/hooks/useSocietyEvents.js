@@ -1,6 +1,7 @@
 /*
  * useSocietyEvents manages event operations tied to a society.
  */
+
 import * as api from '../../../api/societyApi';
 import { transformEventData } from './utils/societyHookUtils';
 

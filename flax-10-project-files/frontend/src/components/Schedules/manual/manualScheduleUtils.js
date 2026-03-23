@@ -1,6 +1,7 @@
 /*
  * Manual schedule helpers.
  */
+
 export function filterScheduleEvents(events, query) {
   const value = query.trim().toLowerCase();
   return value ? events.filter((event) => matchesScheduleEvent(event, value)) : events;

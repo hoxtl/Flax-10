@@ -30,12 +30,16 @@ function ShapeInner() {
 }
 
 function FloatingShape({ width, height, driftX, driftY, floatDuration }) {
+  const shapeStyle = {
+    '--shape-width': typeof width === 'number' ? `${width}px` : width,
+    '--shape-height': typeof height === 'number' ? `${height}px` : height,
+  };
   return (
     <motion.div
       className={styles.shape}
       animate={FLOAT_ANIMATE(driftX, driftY)}
       transition={FLOAT_TRANSITION(floatDuration)}
-      style={{ width, height }}
+      style={shapeStyle}
     >
       <ShapeInner />
     </motion.div>

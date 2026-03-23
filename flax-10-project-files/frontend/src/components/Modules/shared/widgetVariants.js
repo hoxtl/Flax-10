@@ -1,6 +1,7 @@
 /*
  * Shared motion variants for module dashboard widgets.
  */
+
 export const expandBodyVariants = {
     collapsed: { opacity: 0, height: 0 },
     expanded: {

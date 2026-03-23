@@ -3,6 +3,7 @@ import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
 import { getEventType } from '../utils/eventUtils';
 import { getEventTheme } from '../utils/eventStyleUtils';
+import dotStyles from './EventDot.module.css';
 
 export function EventDot({ e, onEventClick, customTags, readOnly }) {
     const eventType = getEventType(e);
@@ -10,8 +11,8 @@ export function EventDot({ e, onEventClick, customTags, readOnly }) {
     const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType, readOnly);
 
     return (
-        <div className={className} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
-            style={{ backgroundColor: color, color: 'white', borderLeft: 'none' }}
+        <div className={`${className} ${dotStyles.eventDotColored}`} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
+            style={{ '--dot-bg': color }}
             {...(isReadOnly ? {} : dragProps)}>
             {e.title}
         </div>

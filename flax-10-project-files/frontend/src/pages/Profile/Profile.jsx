@@ -1,6 +1,7 @@
 /**
  * Profile page composition and layout.
  */
+
 import { useEffect, useMemo, useState } from "react";
 import analyticsService from "../../api/analyticsApi";
 import { fetchApi } from "../../api/client";

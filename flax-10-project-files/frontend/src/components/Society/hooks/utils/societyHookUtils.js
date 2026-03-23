@@ -1,6 +1,7 @@
 /*
  * societyHookUtils contains small data mappers shared across society hooks.
  */
+
 export const normalizeIsoTime = (time) => {
     if (!time || time.length > 16) return time;
     return `${time}:00`;

@@ -2,6 +2,7 @@
  * useKeyboardNav - Keyboard navigation for table view cells.
  * Supports Enter to save, Escape to cancel, Tab/Shift+Tab to move.
  */
+
 import { useState, useCallback } from 'react';
 
 const EDITABLE_COLUMNS = ['title', 'tag', 'location', 'description'];
@@ -33,6 +34,7 @@ function createKeyDownHandler(onSaveEdit, onCancelEdit, moveNext, movePrev, setF
 }
 
 /** Hook for keyboard navigation between editable table cells. */
+
 export function useKeyboardNav(rowCount, onStartEdit, onSaveEdit, onCancelEdit) {
     const [focusedCell, setFocusedCell] = useState(null);
     const moveNext = useCallback(createMoveNext(rowCount), [rowCount]);

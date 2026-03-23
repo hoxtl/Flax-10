@@ -57,6 +57,7 @@ function StatItem({ item }) {
 }
 
 /** Horizontal row of stats, each with a value, label, and optional colour tone. */
+
 export default function StatStrip({ items = [], className = '', compact = false, bare = false }) {
   if (!items.length) return null;
   return (

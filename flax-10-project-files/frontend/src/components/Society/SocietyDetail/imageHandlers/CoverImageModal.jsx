@@ -1,6 +1,7 @@
 /*
  * CoverImageModal manages reordering, deleting, and adding society images.
  */
+
 import styles from "./ImageManagerComponents.module.css";
 import { ImageGrid } from "./ImageManagerComponents";
 import StandardModal from "../../../common/StandardModal/StandardModal";

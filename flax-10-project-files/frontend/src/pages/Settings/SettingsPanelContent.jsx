@@ -1,6 +1,7 @@
 /*
  * Panel header and body selection for the settings page.
  */
+
 import styles from "./Settings.module.css";
 import AccountForm from "../../components/Settings/AccountForm";
 import CourseChangePanel from "../../components/Settings/CourseChangePanel";

@@ -1,12 +1,15 @@
 /**
  * Shared attendance widget primitives.
  */
+
 import SegmentDetailPanel from "../../../../Attendance/components/SegmentDetailPanel";
 import { PieChart } from "@mui/x-charts/PieChart";
 import widgetStyles from "../ProfileWidgets.module.css";
 import attendanceStyles from "../ProfileAttendance.module.css";
 
 const styles = { ...widgetStyles, ...attendanceStyles };
+
+const ATT_BTN_STYLE = { pointerEvents: "auto", position: "relative", zIndex: 1 };
 
 function getPieItemLabel(item, dataIndex, data) {
   return item?.label ?? data[dataIndex]?.label;
@@ -108,7 +111,7 @@ export function CompactAttHeader({ onNavigate }) {
           event.stopPropagation();
           triggerAttendanceNavigation(onNavigate);
         }}
-        style={{ pointerEvents: "auto", position: "relative", zIndex: 1 }}
+        style={ATT_BTN_STYLE}
       >
         View attendance details
       </button>

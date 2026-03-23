@@ -26,6 +26,8 @@
 
 .shape {
   position: relative;
+  width: var(--shape-width);
+  height: var(--shape-height);
 }
 
 .shapeInner {

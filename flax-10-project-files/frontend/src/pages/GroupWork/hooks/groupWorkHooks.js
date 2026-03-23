@@ -15,6 +15,7 @@ import {
 export { getAuthHeaders } from "../api/groupWorkApi";
 
 /** Fetches and returns all group projects with a loading flag. */
+
 export function useGroupProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,12 +31,14 @@ export function useGroupProjects() {
 }
 
 /** Returns the current sort key and a setter for group project sorting. */
+
 export function useGroupProjectSort(defaultValue = "due-date") {
   const [sortBy, setSortBy] = useState(defaultValue);
   return { sortBy, setSortBy };
 }
 
 /** Reads the selected project ID from the URL search params. */
+
 export function useSelectedProjectId() {
   const location = useLocation();
   const params = new URLSearchParams(location.search || "");
@@ -43,6 +46,7 @@ export function useSelectedProjectId() {
 }
 
 /** Reads the active tab name from the URL search params, defaulting to "tasks". */
+
 export function useSelectedTab() {
   const location = useLocation();
   const params = new URLSearchParams(location.search || "");
@@ -50,6 +54,7 @@ export function useSelectedTab() {
 }
 
 /** Fetches a single project by ID from the projects list. */
+
 export function useProject(projectId) {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,6 +74,7 @@ function findProjectById(projects, projectId) {
 }
 
 /** Fetches the member list for a project. */
+
 export function useProjectMembers(projectId) {
   const [members, setMembers] = useState([]);
 
@@ -80,6 +86,7 @@ export function useProjectMembers(projectId) {
 }
 
 /** Returns action handlers for updating, removing members from, and deleting a project. */
+
 export function useProjectActions(projectId, setProject, setMembers, onBack, onDelete, onUpdate) {
   const patchProject = async (patch) => updateProject(projectId, patch, setProject, onUpdate);
   const handleRemoveMember = async (membershipId) => removeProjectMember(projectId, membershipId, setMembers);
@@ -117,6 +124,7 @@ function addMemberIfMissing(member, setMembers) {
 }
 
 /** Aggregates project state, member data, actions, and tab state for the detail page. */
+
 export function useProjectDetail(projectId, onBack, onDelete, onUpdate) {
   const detail = useProjectState(projectId, onBack, onDelete, onUpdate);
   const initialTab = useSelectedTab();
