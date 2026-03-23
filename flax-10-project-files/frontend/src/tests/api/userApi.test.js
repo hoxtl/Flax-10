@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../../api/userApi';
+import * as geocodeApi from '../../api/geocodeApi';
 
 const mockFetch = (data, ok = true) => {
     const jsonStr = JSON.stringify(data);
@@ -120,7 +121,7 @@ describe('userService', () => {
                     features: [{ center: [-0.127758, 51.507351] }],
                 }),
             });
-            const result = await api.geocodeAddress('London');
+            const result = await geocodeApi.geocodeAddress('London');
             expect(result).toEqual({ latitude: 51.507351, longitude: -0.127758 });
         });
 
@@ -129,13 +130,13 @@ describe('userService', () => {
                 ok: true,
                 json: vi.fn().mockResolvedValue({ features: [] }),
             });
-            const result = await api.geocodeAddress('NowherePlace');
+            const result = await geocodeApi.geocodeAddress('NowherePlace');
             expect(result).toBeNull();
         });
 
         it('throws when geocode fetch fails', async () => {
             global.fetch = vi.fn().mockResolvedValue({ ok: false });
-            await expect(api.geocodeAddress('BadAddress')).rejects.toThrow('geocoding has failed');
+            await expect(geocodeApi.geocodeAddress('BadAddress')).rejects.toThrow('geocoding has failed');
         });
     });
 });
