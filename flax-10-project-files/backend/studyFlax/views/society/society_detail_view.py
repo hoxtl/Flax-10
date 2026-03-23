@@ -43,19 +43,8 @@ def get_society_detail(request, society):
 def update_society(request, society):
     """Update a society's details (admin only)."""
 
-    permission_response = _society_detail_admin_error(request.user, society)
-    if permission_response:
-        return permission_response
-    return _updated_society_response(request, society)
-
-
-def _society_detail_admin_error(user, society):
-    if is_society_admin(user, society):
-        return None
-    return permission_denied_response()
-
-
-def _updated_society_response(request, society):
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
     serialiser = SocietyDetailSerialiser(society, data=request.data, partial=True)
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -121,21 +110,12 @@ def _report_submitted_response():
     return Response({'message': 'Report submitted successfully'}, status=status.HTTP_201_CREATED)
 
 def _submit_society_report(request, society):
-    payload, errors, status_code = _society_report_result(request, society)
-    if errors:
-        return Response(errors, status=status_code)
-    return Response(payload, status=status_code)
-
-
-def _society_report_result(request, society):
     reason = _clean_report_reason(request)
     if not reason:
-        response = _report_reason_required_response()
-        return None, response.data, response.status_code
+        return _report_reason_required_response()
     _create_society_report(society, request.user, reason)
     _notify_admins_of_report(society, reason)
-    response = _report_submitted_response()
-    return response.data, None, response.status_code
+    return _report_submitted_response()
 
 @api_view(['POST', 'DELETE'])
 @permission_classes([IsAuthenticated])

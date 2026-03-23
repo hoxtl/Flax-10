@@ -121,38 +121,6 @@ def _chat_messages(payload):
     return [{'role': 'system', 'content': payload['system_msg']}] + payload['messages']
 
 
-def _insights_payload(user, days, api_key):
-    context = _build_user_context(user, days)
-    response, err = _openai_response_or_error(api_key, build_insight_messages(context))
-    if err:
-        return None, err
-    content, err = _content_or_error(response)
-    if err:
-        return None, err
-    return {'insights': content, 'contextUsed': context}, None
-
-
-def _chat_completion_payload(payload, api_key):
-    response, err = _openai_response_or_error(api_key, _chat_messages(payload), 600)
-    if err:
-        return None, err
-    content, err = _content_or_error(response)
-    if err:
-        return None, err
-    return content, None
-
-
-def _chat_payload(request, api_key):
-    payload, err = _chat_request_or_error(request)
-    if err:
-        return None, err
-    content, err = _chat_completion_payload(payload, api_key)
-    if err:
-        return None, err
-    today_str = timezone.now().strftime('%Y-%m-%d')
-    return {'reply': content, 'suggested_events': _extract_schedule_events(api_key, content, today_str)}, None
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_ai_insights(request):
@@ -162,10 +130,14 @@ def get_ai_insights(request):
     days, err = _days_or_error(request, 30)
     if err:
         return err
-    payload, err = _insights_payload(request.user, days, api_key)
+    context = _build_user_context(request.user, days)
+    response, err = _openai_response_or_error(api_key, build_insight_messages(context))
     if err:
         return err
-    return Response(payload)
+    content, err = _content_or_error(response)
+    if err:
+        return err
+    return Response({'insights': content, 'contextUsed': context})
 
 
 @api_view(['POST'])
@@ -174,7 +146,15 @@ def ai_chat(request):
     api_key, err = _check_openai()
     if err:
         return err
-    payload, err = _chat_payload(request, api_key)
+    payload, err = _chat_request_or_error(request)
     if err:
         return err
-    return Response(payload)
+    response, err = _openai_response_or_error(api_key, _chat_messages(payload), 600)
+    if err:
+        return err
+    content, err = _content_or_error(response)
+    if err:
+        return err
+    today_str = timezone.now().strftime('%Y-%m-%d')
+    suggested_events = _extract_schedule_events(api_key, content, today_str)
+    return Response({'reply': content, 'suggested_events': suggested_events})

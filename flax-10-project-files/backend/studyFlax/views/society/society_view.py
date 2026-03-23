@@ -42,23 +42,16 @@ def build_society_list_data(societies, request):
     return result
 
 def create_society(request):
-    payload, errors, status_code = create_society_result(request)
-    if errors:
-        return Response(errors, status=status_code)
-    return Response(payload, status=status_code)
-
-
-def create_society_result(request):
     data = request.data.copy()
     if not data.get('admin_emails'):
         data['admin_emails'] = request.user.email
     serialiser = SocietyListSerialiser(data=data, context={'request': request})
     if not serialiser.is_valid():
-        return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
+        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
     society = serialiser.save()
     handle_image_urls(society, request.data)
     SocietyMembership.objects.create(user=request.user, society=society, role='admin')
-    return serialiser.data, None, status.HTTP_201_CREATED
+    return Response(serialiser.data, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -66,19 +59,9 @@ def publish_changes(request, society_id):
     society = get_society_or_404(society_id)
     if not society:
         return society_not_found_response()
-    permission_response = _publish_permission_error(request.user, society)
-    if permission_response:
-        return permission_response
-    return Response(_publish_changes_result(society, request.data))
-
-
-def _publish_permission_error(user, society):
-    if is_society_admin(user, society):
-        return None
-    return permission_denied_response()
-
-
-def _publish_changes_result(society, changes):
+    if not is_society_admin(request.user, society):
+        return permission_denied_response()
+    changes = request.data
     notification = build_update_notification(society, changes)
     notify_society_members(society, notification)
-    return {'status': 'published'}
+    return Response({'status': 'published'})

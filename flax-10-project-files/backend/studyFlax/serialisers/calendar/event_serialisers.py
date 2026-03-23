@@ -44,30 +44,19 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         'recurrence_rule', 'reminder_minutes',
         'source', 'external_id', 'is_private']
 
-    def _normalise_create_data(self, validated_data):
+    def create(self, validated_data):
         recurrence_data = validated_data.pop('recurrence_rule', None)
         validated_data['tag'] = self._resolve_tag(validated_data.get('tag'))
         recurrence_rule = self._handle_recurrence(recurrence_data)
-        return validated_data, recurrence_rule
-
-    def create(self, validated_data):
-        validated_data, recurrence_rule = self._normalise_create_data(validated_data)
         event = CalendarEvent.objects.create(recurrence_rule=recurrence_rule, **validated_data)
         return event
 
     def update(self, instance, validated_data):
-        validated_data = self._apply_update_relations(instance, validated_data)
-        return self._save_updated_instance(instance, validated_data)
-
-    def _apply_update_relations(self, instance, validated_data):
         if 'recurrence_rule' in validated_data:
             recurrence_data = validated_data.pop('recurrence_rule')
             instance.recurrence_rule = self._handle_recurrence(recurrence_data, instance.recurrence_rule)
         if 'tag' in validated_data:
             validated_data['tag'] = self._resolve_tag(validated_data.get('tag'))
-        return validated_data
-
-    def _save_updated_instance(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -100,10 +89,7 @@ class CalendarEventCreateSerialiser(serializers.ModelSerializer):
         return None
     
     def _update_existing_rule(self, rule, data):
-        self._apply_rule_updates(rule, data)
-        rule.save()
-        return rule
-
-    def _apply_rule_updates(self, rule, data):
         for key, value in data.items():
             setattr(rule, key, value)
+        rule.save()
+        return rule
