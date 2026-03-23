@@ -1,9 +1,9 @@
 /**
- * KCL campus / location → TFL lines likely needed for commute.
+ * KCL campus or location names mapped to the TFL lines likely needed for a commute.
  * Used to cross-reference next event location with TFL disruptions for smart travel alerts.
  */
 
-/** Location string (normalized) → TFL line names (as returned by TFL API, e.g. "Northern", "Jubilee") */
+/** Normalised location string mapped to TFL line names, as returned by the TFL API. */
 const LOCATION_TO_LINES = {
   strand: ["Northern", "District", "Circle", "Central", "Bakerloo"],
   "kcl strand": ["Northern", "District", "Circle", "Central", "Bakerloo"],
@@ -30,7 +30,7 @@ const LOCATION_TO_LINES = {
   "canary wharf": ["Jubilee", "Elizabeth"],
 };
 
-/** Normalize location for lookup: lowercase, trim, collapse spaces */
+/** Normalise a location for lookup by lowercasing, trimming, and collapsing spaces. */
 function normalizeLocation(loc) {
   if (!loc || typeof loc !== "string") return "";
   return loc
@@ -96,7 +96,7 @@ export const TFL_LINE_COLOURS = {
   tram: "#84B817",
 };
 
-/** Normalize API display name to TFL_LINE_COLOURS key (e.g. "Waterloo & City" → "waterloo-city"). */
+/** Normalise an API display name to a TFL_LINE_COLOURS key, for example "Waterloo & City" to "waterloo-city". */
 function normalizeLineKey(lineName) {
   if (!lineName || typeof lineName !== "string") return "";
   const s = lineName

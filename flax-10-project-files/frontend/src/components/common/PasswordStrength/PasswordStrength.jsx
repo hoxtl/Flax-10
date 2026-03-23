@@ -1,5 +1,5 @@
 /*
- * Password strength meter with rule checklist and colour-coded progress bar.
+ * Password strength metre with rule checklist and colour-coded progress bar.
  */
 
 import styles from "./PasswordStrength.module.css";

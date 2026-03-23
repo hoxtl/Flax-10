@@ -1,5 +1,5 @@
 /**
- * Unit tests for WeekBar rendering and semester week badge behavior.
+ * Unit tests for WeekBar rendering and semester week badge behaviour.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';

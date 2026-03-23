@@ -30,7 +30,7 @@ export const clickStart = () => clickButton('Start');
 export const clickPause = () => clickButton('Pause');
 export const clickReset = () => clickButton('Reset');
 export const clickHistory = () => {
-    // Mobile: "View History 📜" opens HistoryModal.
+    // On mobile, the View History button opens HistoryModal.
     const viewHistory = screen.queryByText(/View History/i);
     if (viewHistory) {
         fireEvent.click(viewHistory);

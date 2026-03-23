@@ -131,7 +131,7 @@ describe('ProfileModals', () => {
     it('calls setEventRange when range button is clicked', () => {
         const setEventRange = vi.fn();
         renderModals({ state: { showEvents: true, setEventRange } });
-        // Click on a specific range label button (not the ✕ close button)
+        // Click a specific range label button rather than the close button
         fireEvent.click(screen.getByText('Today'));
         expect(setEventRange).toHaveBeenCalledWith('today');
     });

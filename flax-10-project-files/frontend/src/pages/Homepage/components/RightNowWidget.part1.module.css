@@ -1,10 +1,7 @@
 /* Split from components/RightNowWidget.module.css (1/2) */
-/* ═══════════════════════════════════════════════════════════════
-   RIGHT NOW widget — redesigned
-   Warm earth-tone palette, clean layout, premium feel.
-═══════════════════════════════════════════════════════════════ */
+/* Right Now widget: redesigned with a warm earth-tone palette. */
 
-/* ── Root ───────────────────────────────────────────────────── */
+/* Root */
 .root {
   display: flex;
   flex-direction: column;
@@ -15,7 +12,7 @@
   box-sizing: border-box;
 }
 
-/* ── Header bar ─────────────────────────────────────────────── */
+/* Header bar */
 .widgetHeader {
   display: flex;
   align-items: center;
@@ -60,7 +57,7 @@
   text-overflow: ellipsis;
 }
 
-/* ── Live clock block (shown in empty + end-of-day states) ─── */
+/* Live clock block shown in empty and end-of-day states */
 .clockBlock {
   display: flex;
   flex-direction: column;
@@ -92,7 +89,7 @@
   margin-top: 2px;
 }
 
-/* ── Active event card ──────────────────────────────────────── */
+/* Active event card */
 .currentEventCard {
   background: var(--surface-raised);
   border-radius: 14px;

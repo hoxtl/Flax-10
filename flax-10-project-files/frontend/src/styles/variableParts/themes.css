@@ -2,11 +2,9 @@
  * Theme color variants.
  */
 
-/* =========================================================================
-   Theme Configurations
-   ========================================================================= */
+/* Theme configurations */
 
-/* 1️⃣ Flax (Warm Paper) */
+/* Theme 1: Flax (Warm Paper) */
 :root[data-theme="flax"][data-mode="light"] {
   --color-bg: #F8F5F2;
   --color-card: #FFFCFA;
@@ -42,11 +40,9 @@
   --glass-bg: rgba(26, 19, 16, 0.65);
 }
 
-/* =========================================================================
-   🔥 WARM THEMES
-   ========================================================================= */
+/* Warm themes */
 
-/* 2️⃣ Coral */
+/* Theme 2: Coral */
 :root[data-theme="coral"][data-mode="light"] {
   --color-bg: #FFF4F2;
   --color-card: #FFFFFF;
@@ -72,7 +68,7 @@
   --home-urgency-warning: #f3a79c;
 }
 
-/* 3️⃣ Rust */
+/* Theme 3: Rust */
 :root[data-theme="rust"][data-mode="light"] {
   --color-bg: #F7F2EF;
   --color-card: #FFFAF8;
@@ -98,7 +94,7 @@
   --home-urgency-warning: #d29a8a;
 }
 
-/* 4️⃣ Amber */
+/* Theme 4: Amber */
 :root[data-theme="amber"][data-mode="light"] {
   --color-bg: #FAF5EF;
   --color-card: #FFFDF8;
@@ -124,11 +120,9 @@
   --color-highlight-soft: #472E16;
 }
 
-/* =========================================================================
-   ❄️ COOL THEMES
-   ========================================================================= */
+/* Cool themes */
 
-/* 5️⃣ Ocean */
+/* Theme 5: Ocean */
 :root[data-theme="ocean"][data-mode="light"] {
   --color-bg: #F3F7FA;
   --color-card: #FFFFFF;
@@ -154,7 +148,7 @@
   --color-highlight-soft: #2E3F50;
 }
 
-/* 6️⃣ Indigo */
+/* Theme 6: Indigo */
 :root[data-theme="indigo"][data-mode="light"] {
   --color-bg: #F3F4FA;
   --color-card: #FFFFFF;
@@ -180,7 +174,7 @@
   --color-highlight-soft: #2A3050;
 }
 
-/* 7️⃣ Teal */
+/* Theme 7: Teal */
 :root[data-theme="teal"][data-mode="light"] {
   --color-bg: #F2F7F7;
   --color-card: #FFFFFF;
@@ -206,7 +200,7 @@
   --color-highlight-soft: #1C3D3D;
 }
 
-/* 8️⃣ Forest */
+/* Theme 8: Forest */
 :root[data-theme="forest"][data-mode="light"] {
   --color-bg: #F2F6F3;
   --color-card: #FFFFFF;
@@ -232,11 +226,9 @@
   --color-highlight-soft: #243228;
 }
 
-/* =========================================================================
-   🌸 SOFT THEMES
-   ========================================================================= */
+/* Soft themes */
 
-/* 9️⃣ Rose */
+/* Theme 9: Rose */
 :root[data-theme="rose"][data-mode="light"] {
   --color-bg: #FAF3F5;
   --color-card: #FFFFFF;
@@ -262,7 +254,7 @@
   --color-highlight-soft: #4E2030;
 }
 
-/* 🔟 Lavender */
+/* Theme 10: Lavender */
 :root[data-theme="lavender"][data-mode="light"] {
   --color-bg: #F5F3F8;
   --color-card: #FFFFFF;
@@ -339,4 +331,3 @@
   --home-urgency-warning: var(--color-primary);
   --color-highlight-soft: #3A3025;
 }
-

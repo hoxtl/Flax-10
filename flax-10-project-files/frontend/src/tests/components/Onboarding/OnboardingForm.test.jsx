@@ -1,5 +1,5 @@
 /**
- * Unit tests for onboarding form behavior.
+ * Unit tests for onboarding form behaviour.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';

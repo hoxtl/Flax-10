@@ -1,6 +1,4 @@
-/* ======================================================
-   StandardModal — Backdrop + Modal Panel
-   ====================================================== */
+/* StandardModal: backdrop and modal panel */
 
 @keyframes backdropIn {
   from {
@@ -112,7 +110,7 @@
   line-height: 1.5;
 }
 
-/* ─── Close button ─────────────────────────────────── */
+/* Close button */
 .close {
   display: inline-flex;
   align-items: center;
