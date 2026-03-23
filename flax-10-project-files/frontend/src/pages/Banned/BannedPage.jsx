@@ -61,7 +61,7 @@ function BannedBackButton() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.42, duration: 0.3 }}
-      style={{ display: 'flex', justifyContent: 'center' }}
+      className={styles.backBtnWrapper}
     >
       <BackButton onClick={handleBackToAuth} label="Back to Sign In" />
     </motion.div>

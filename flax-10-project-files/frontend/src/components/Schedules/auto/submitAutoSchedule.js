@@ -1,6 +1,7 @@
 /*
  * Auto schedule submission.
  */
+
 import { createSchedule } from '../../../api/scheduleApi';
 import { buildAutoSchedulePayload, getAutoScheduleError } from './autoScheduleUtils';
 

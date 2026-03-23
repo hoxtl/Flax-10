@@ -1,6 +1,7 @@
 /*
  * Course-change request helpers for the account form.
  */
+
 import { KCL_DEPARTMENTS } from "../../../lib/kclCourses";
 
 const COURSE_REQUEST_CACHE_KEY = "course_change_pending_request";

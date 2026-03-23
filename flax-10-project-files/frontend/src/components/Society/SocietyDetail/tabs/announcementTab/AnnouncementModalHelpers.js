@@ -2,6 +2,7 @@
  * Utility functions for managing the AnnouncementModal form state,
  * validation, and image processing.
  */
+
 import { validateEventTimes } from '../../../../Calendar/utils/dateValidation';
 
 export const MAX_IMAGES = 5;

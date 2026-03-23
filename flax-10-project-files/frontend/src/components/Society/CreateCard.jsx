@@ -1,6 +1,7 @@
 /*
  * CreateCard renders the entry card for creating a new society.
  */
+
 import ActionCard from './ActionCard';
 import { Plus } from 'lucide-react';
 

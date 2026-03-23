@@ -18,10 +18,12 @@ from .attendance_helpers import get_event_for_attendance, build_attendance_stats
 
 def _internal_error(detail):
     """Return a standard 500 response payload."""
+
     return Response({"detail": detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def _safe_attendance_stats_response(request):
     """Fetch stats and return a Response; return 500 on database failure."""
+
     try:
         records = (
             EventAttendance.objects.filter(user=request.user)
@@ -43,6 +45,7 @@ def _attendance_response(obj, event, created):
 @permission_classes([IsAuthenticated])
 def record_attendance(request):
     """Record or update attendance for a single timetable event."""
+
     event_id = request.data.get("event_id")
     attended = request.data.get("attended", True)
     event, error = get_event_for_attendance(request.user, event_id)
@@ -58,6 +61,7 @@ def record_attendance(request):
 @permission_classes([IsAuthenticated])
 def attendance_stats(request):
     """Return attendance stats for the current user: overall and by event type."""
+
     return _safe_attendance_stats_response(request)
 
 def _attendance_records_queryset(user):
@@ -82,6 +86,7 @@ def _serialise_record(record):
 @permission_classes([IsAuthenticated])
 def attendance_records(request):
     """Return attendance records with full event details for the current user."""
+
     try:
         records = _attendance_records_queryset(request.user)
         return Response([_serialise_record(r) for r in records])

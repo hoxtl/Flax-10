@@ -1,6 +1,7 @@
 /**
  * Campus map page model.
  */
+
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { KCL_CAMPUSES } from "../../../lib/kclCampuses";

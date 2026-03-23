@@ -2,12 +2,14 @@
  * ReportSocietyModal provides a form for users to report societies for review.
  * Captures reasoning and submits to the backend.
  */
+
 import { useState } from "react";
 import StandardModal from "../../common/StandardModal/StandardModal";
 import styles from "./ReportSocietyModal.module.css";
 import { reportSociety } from "../../../api/societyApi";
 
 /** Form for reporting a society with a specific reason. */
+
 const FormContent = ({ reason, onTextChange, error, submitting }) => (
     <div className={styles.container}>
         <textarea className={styles.textarea} placeholder="Reason..." value={reason}

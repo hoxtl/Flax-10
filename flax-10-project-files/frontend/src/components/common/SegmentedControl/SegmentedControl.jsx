@@ -23,6 +23,7 @@ function SegmentButton({ option, isActive, onClick, fill, indicatorId, variant }
 }
 
 /** Segmented control with an animated pill indicator for the active option. */
+
 export function SegmentedControl({ options, value, onChange, className = '', fill = false, variant = 'default' }) {
   const controlId = useId();
   return (

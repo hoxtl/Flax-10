@@ -6,17 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { clearHistory, getHistory } from '../utils/historyUtils';
 import { groupHistoryByBlock } from '../utils/historyFormatter';
 import { filterVisibleBlocks, getSevenDayFocusSeries, groupBlocksByHorizon } from './historyPanelUtils';
-
-function listenToHistoryEvents(refresh) {
-  window.addEventListener('timerHistoryUpdated', refresh);
-  window.addEventListener('historyCleared', refresh);
-  return () => removeHistoryListeners(refresh);
-}
-
-function removeHistoryListeners(refresh) {
-  window.removeEventListener('timerHistoryUpdated', refresh);
-  window.removeEventListener('historyCleared', refresh);
-}
+import { dispatchTimerHistoryCleared, listenToTimerHistoryEvents } from '../utils/historyEvents';
 
 export function useRightRailHistory() {
   const [history, setHistory] = useState([]);
@@ -31,7 +21,7 @@ export function useRightRailHistory() {
   useEffect(() => {
     refresh();
   }, [refresh]);
-  useEffect(() => listenToHistoryEvents(refresh), [refresh]);
+  useEffect(() => listenToTimerHistoryEvents(refresh), [refresh]);
   return { history, setHistory, showClearModal, setShowClearModal, visibleBlocks, groupedByHorizon, weeklySeries, maxWeeklySeconds };
 }
 
@@ -49,5 +39,5 @@ export async function clearRightRailHistory(setHistory, setShowClearModal) {
   setShowClearModal(false);
   await clearHistory();
   setHistory([]);
-  window.dispatchEvent(new Event('historyCleared'));
+  dispatchTimerHistoryCleared();
 }

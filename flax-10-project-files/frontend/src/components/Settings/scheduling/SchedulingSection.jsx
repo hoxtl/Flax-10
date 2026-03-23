@@ -1,6 +1,7 @@
 /*
  * Scheduling preference sections for study time, week, and time-of-day.
  */
+
 import AnimatedDropdown from "../../common/AnimatedDropdown";
 import styles from "../../../pages/Settings/Settings.module.css";
 import SettingsContextCard from "../SettingsContextCard";

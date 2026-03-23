@@ -5,6 +5,7 @@
 import styles from "./GenericSummaryModal.module.css";
 
 /** Clickable or static row within a summary modal list. */
+
 export default function SummaryItem({ avatar, title, subtitle, onClick, rightAction }) {
   const isClickable = Boolean(onClick);
   return (

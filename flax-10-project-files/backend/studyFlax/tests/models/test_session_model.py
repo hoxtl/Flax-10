@@ -9,6 +9,7 @@ from studyFlax.models.timer.session_model import StudySession
 
 class StudySessionModelTest(TestCase):
     """Tests for study session model."""
+
     def setUp(self):
         self.user = User.objects.create_user(
             username='testuser', email='test@example.com', password='password123',

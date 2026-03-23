@@ -1,6 +1,7 @@
 /**
  * Tests for Timer WrapperComponents (MainSection, PopupSection).
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MainSection, PopupSection } from '../../../components/Timer/WrapperComponents';

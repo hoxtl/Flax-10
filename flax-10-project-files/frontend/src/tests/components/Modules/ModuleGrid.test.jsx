@@ -1,6 +1,7 @@
 /*
  * Tests for ModuleGrid component.
  */
+
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';

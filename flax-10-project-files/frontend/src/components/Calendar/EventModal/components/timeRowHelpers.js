@@ -4,6 +4,7 @@
  */
 
 /** Returns a change handler for the DateTimePicker in all-day mode. */
+
 export function handleDateOnlyPickerChange(field, update) {
     return (val) => {
         if (!val) return update(field)({ target: { value: "" } });

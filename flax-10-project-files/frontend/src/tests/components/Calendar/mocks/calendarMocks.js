@@ -2,6 +2,7 @@
  * Shared mocks and fixtures for Calendar component tests.
  * Provides reusable mock factories and test data.
  */
+
 import { vi } from 'vitest';
 
 // Mock event factory

@@ -29,6 +29,7 @@ function ModalBody({ loading, hasItems, listContent, listClasses, emptyContent, 
 }
 
 /** Modal that renders a scrollable list with loading skeleton and empty state support. */
+
 export default function GenericSummaryModal({
   isOpen, onClose, title, subtitle, emptyMessage, emptyIcon, emptyDescription,
   emptyContent, items, renderItem, topContent, children, loading = false,

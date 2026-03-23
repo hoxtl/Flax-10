@@ -2,9 +2,11 @@
  * Hook for handling outside-click and escape-key interactions in the Dashboard panel.
  * Manages closing panel, dropdown menu, and task context menu based on click target.
  */
+
 import { useEffect } from 'react';
 
 /** Attaches mousedown and keydown listeners when open, cleaning up on unmount. */
+
 export function useOutsideClick(open, panelRef, menuRef, taskMenuRef, fabRef, onClose, setMenuOpen, setTaskMenuId) {
     useEffect(() => {
         if (!open) return;

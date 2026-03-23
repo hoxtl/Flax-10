@@ -27,6 +27,7 @@ function buildWindow(startMs, minutes) {
 }
 
 /** True if the given time falls in the sleep window 23:00–06:00. */
+
 export function isNightSlot(startTime) {
   if (!startTime) return false;
   const h = new Date(startTime).getHours();
@@ -34,6 +35,7 @@ export function isNightSlot(startTime) {
 }
 
 /** Next free slot today that fits durationMins; returns { start, end } or null. */
+
 export function getNextFreeSlotToday(events, selectedDate, durationMins) {
   if (!isToday(selectedDate) || durationMins <= 0) return null;
   const { dayStart, dayEnd } = getDayBounds(selectedDate);
@@ -45,6 +47,7 @@ export function getNextFreeSlotToday(events, selectedDate, durationMins) {
 }
 
 /** All free windows (gaps) from now to end of day. Returns [{ start, end, minutes }]. */
+
 export function getAllFreeWindowsToday(events, selectedDate) {
   if (!isToday(selectedDate)) return [];
   const { dayStart, dayEnd } = getDayBounds(selectedDate);

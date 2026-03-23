@@ -48,6 +48,7 @@ function WarningBlock({ warningBanner, warningText }) {
 }
 
 /** Modal that requires holding a button for a set duration to confirm a destructive action. */
+
 export default function HoldConfirmModal({ title, warningText, warningBanner, cancelLabel = 'Keep It', holdLabel = 'Hold to Delete', holdDuration = 2000, onConfirm, onCancel }) {
   const { holdProgress, startHold, stopHold } = useHoldProgress(holdDuration, onConfirm);
   return (

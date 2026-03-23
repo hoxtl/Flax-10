@@ -49,7 +49,7 @@ export function BentoCard({ children, className }) {
       <div ref={cardRef} className={styles.card} onMouseMove={handleMouseMove} onMouseLeave={resetGlow}>
         <div
           className={styles.glow}
-          style={{ "--glow-x": glowPos.x, "--glow-y": glowPos.y }}
+          style={glowPos}
           aria-hidden
         />
         <div className={styles.hoverOverlay} aria-hidden />

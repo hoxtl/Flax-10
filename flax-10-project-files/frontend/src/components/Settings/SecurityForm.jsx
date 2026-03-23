@@ -1,6 +1,7 @@
 /*
  * Password settings form.
  */
+
 import { useState } from "react";
 import SecurityFormLayout from "./SecurityFormLayout";
 

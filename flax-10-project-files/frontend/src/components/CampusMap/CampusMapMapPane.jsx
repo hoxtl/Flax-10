@@ -1,6 +1,7 @@
 /**
  * Campus map map pane.
  */
+
 import styles from "../../pages/CampusMap/CampusMap.module.css";
 import { CampusQuickNav } from "./CampusQuickNav";
 

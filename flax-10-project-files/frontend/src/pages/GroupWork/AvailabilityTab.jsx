@@ -322,6 +322,7 @@ function AvailabilityBody({ availability, viewState, sorted }) {
 }
 
 /** Availability tab for proposing and voting on meeting slots. */
+
 export default function AvailabilityTab({ projectId }) {
     const confirm = useConfirm();
     const availability = useAvailability(projectId, confirm);

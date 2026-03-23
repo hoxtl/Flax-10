@@ -1,6 +1,7 @@
 /**
  * Custom journey planner section.
  */
+
 import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import { geocodeAddress } from "../../api/geocodeApi";

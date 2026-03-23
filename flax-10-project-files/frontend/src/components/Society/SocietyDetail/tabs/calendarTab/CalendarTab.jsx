@@ -1,6 +1,7 @@
 /*
  * CalendarTab adapts the shared calendar UI for a society detail page.
  */
+
 import { useState } from "react";
 import styles from "../tabs.module.css";
 import { MonthView } from "../../../../Calendar/MonthView/MonthView";

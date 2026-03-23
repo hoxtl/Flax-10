@@ -1,6 +1,7 @@
 /*
  * Readings panel with sorted reading list, expand/collapse, and task conversion.
  */
+
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
@@ -25,6 +26,8 @@ import widgetStyles from './DashboardWidgets.module.css';
 import rowStyles from './DashboardRows.module.css';
 
 const styles = { ...widgetStyles, ...rowStyles };
+
+function getReadingRowStyle(tier) { return { '--deadline-row-accent': TIER_ACCENT[tier], cursor: 'pointer' }; }
 
 const READINGS_INITIAL_SHOWN = 4;
 
@@ -81,7 +84,7 @@ function ReadingRow({ reading, isMostUrgent, onReadingAdded, onSelect }) {
     return (
         <Motion.div
             className={rowClassName(tier, urgentGlow)}
-            style={{ '--deadline-row-accent': TIER_ACCENT[tier], cursor: 'pointer' }}
+            style={getReadingRowStyle(tier)}
             variants={itemVariants}
             onClick={() => onSelect?.(reading)}
         >

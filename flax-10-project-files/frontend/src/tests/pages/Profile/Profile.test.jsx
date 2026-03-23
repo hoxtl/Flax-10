@@ -1,6 +1,7 @@
 /**
  * Integration-style tests for Profile rendering and profile actions.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';

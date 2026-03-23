@@ -9,6 +9,7 @@ from studyFlax.utils.reading_utils import update_reading_estimates
 
 def _sync_status_and_completed(validated_data, instance):
     """Synchronise the status and completed fields in validated_data."""
+
     if 'completed' in validated_data and 'status' not in validated_data:
         validated_data['status'] = 'done' if validated_data['completed'] else 'todo'
         return validated_data.get('completed', instance.completed)
@@ -18,6 +19,7 @@ def _sync_status_and_completed(validated_data, instance):
 
 def _update_completed_at(validated_data, completed, instance):
     """Set or clear completed_at based on the completed state."""
+
     if completed is True and not instance.completed_at:
         validated_data['completed_at'] = timezone.now()
         return
@@ -97,6 +99,7 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a task, deriving the completed state from the status."""
+
         status_val = validated_data.get('status', 'todo')
         validated_data['status'] = status_val
         validated_data['completed'] = (status_val == 'done')
@@ -106,6 +109,7 @@ class TaskSerialiser(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Update a task, keeping status, completed, and timestamps in sync."""
+
         completed = _sync_status_and_completed(validated_data, instance)
         _update_completed_at(validated_data, completed, instance)
         updated = super().update(instance, validated_data)

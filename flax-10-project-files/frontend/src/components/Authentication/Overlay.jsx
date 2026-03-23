@@ -8,7 +8,7 @@ import * as Components from "./AuthComponents";
 const OverlayTitle = styled.h2`
   font-size: 22px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.96);
+  color: var(--color-white-96);
   margin: 0;
   letter-spacing: -0.2px;
   text-align: center;

@@ -2,7 +2,6 @@
 Auto scheduler preference helpers.
 """
 
-
 def _resolved_preferences(user, payload):
     settings = getattr(user, "settings", None)
     return {

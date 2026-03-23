@@ -1,6 +1,7 @@
 /*
  * Profile header component – avatar, stats, badges, persona, and calendar sharing.
  */
+
 import { useState } from "react";
 import widgetStyles from "./widgets/ProfileWidgets.module.css";
 import headerStyles from "./ProfileHeader.module.css";

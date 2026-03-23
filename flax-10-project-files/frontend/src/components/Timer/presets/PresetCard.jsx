@@ -25,9 +25,9 @@ function getTooltipText(preset) {
 
 function PresetContextMenu({ ctxMenu, ctxRef, onDelete }) {
   if (!ctxMenu || !onDelete) return null;
-
+  const menuPos = { '--ctx-top': ctxMenu.y, '--ctx-left': ctxMenu.x };
   return (
-    <div ref={ctxRef} className={styles.presetCtxMenu} style={{ top: ctxMenu.y, left: ctxMenu.x }}>
+    <div ref={ctxRef} className={`${styles.presetCtxMenu} ${styles.presetCtxMenuPositioned}`} style={menuPos}>
       <button className={styles.presetCtxDeleteBtn} onClick={onDelete}>🗑 Delete preset</button>
     </div>
   );

@@ -21,6 +21,7 @@ function AvatarCircle({ initial, photoUrl, size }) {
 }
 
 /** User avatar with optional full name and username handle. */
+
 export default function UserAvatar({ user, onClick, avatarOnly = false, size, allowGenericFallback = false }) {
   if (!user) return null;
   const initial = getInitial(user);

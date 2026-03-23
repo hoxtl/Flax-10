@@ -2,16 +2,9 @@
  * Display and formatting utilities for TaskCard components.
  */
 
-const MODULE_COLORS = [
-  { text: "#5a4a3a", bg: "rgba(123,103,81,0.10)",  border: "rgba(123,103,81,0.24)"  },
-  { text: "#615547", bg: "rgba(138,125,118,0.12)", border: "rgba(138,125,118,0.24)" },
-  { text: "#6a5a45", bg: "rgba(150,127,98,0.11)",  border: "rgba(150,127,98,0.25)"  },
-  { text: "#56515b", bg: "rgba(120,112,128,0.10)", border: "rgba(120,112,128,0.24)" },
-  { text: "#4f5a63", bg: "rgba(106,121,133,0.10)", border: "rgba(106,121,133,0.24)" },
-  { text: "#61584f", bg: "rgba(135,123,107,0.10)", border: "rgba(135,123,107,0.24)" },
-  { text: "#5d544a", bg: "rgba(129,116,99,0.10)",  border: "rgba(129,116,99,0.24)"  },
-  { text: "#564f47", bg: "rgba(118,107,95,0.10)",  border: "rgba(118,107,95,0.24)"  },
-];
+import taskCardColors from './taskCardColors.json';
+
+const MODULE_COLORS = taskCardColors;
 
 export const PRIORITY_LABELS = { urgent: "Urgent", high: "High", medium: "Medium" };
 export const PRIORITY_MARKS = { urgent: "❗❗❗", high: "❗❗", medium: "❗" };

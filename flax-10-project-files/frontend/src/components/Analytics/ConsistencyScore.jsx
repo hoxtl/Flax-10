@@ -8,7 +8,7 @@ import styles from './InsightCards.module.css';
 const MotionCircle = motion.circle;
 const MotionSpan = motion.span;
 
-const getColor = (s) => s >= 80 ? '#4CAF50' : s >= 60 ? '#8BC34A' : s >= 40 ? '#FF9800' : '#F44336';
+const getColor = (s) => s >= 80 ? 'var(--chart-study)' : s >= 60 ? 'var(--chart-study-light)' : s >= 40 ? 'var(--chart-break)' : 'var(--chart-accent-red)';
 const getLabel = (s) => s >= 80 ? 'Excellent' : s >= 60 ? 'Good' : s >= 40 ? 'Building' : 'Getting Started';
 
 const getExplanation = (days, total, streak, score) => {

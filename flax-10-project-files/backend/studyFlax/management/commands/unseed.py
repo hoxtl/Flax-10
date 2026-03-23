@@ -37,6 +37,7 @@ SUPERUSER_RESTORE_FIELDS = {'username', 'email', 'first_name', 'last_name', 'is_
 
 def get_superuser_data():
     """Return serialised superuser records, excluding auth-only and audit fields."""
+
     return [
         {k: v for k, v in u.items() if k in SUPERUSER_RESTORE_FIELDS}
         for u in User.objects.filter(is_superuser=True).values()
@@ -102,18 +103,25 @@ def _print_success_footer(stdout, style):
     stdout.write("")
 
 def confirm_truncate(stdout):
-    div = "─" * 40
-    stdout.write("")
-    stdout.write(div)
-    stdout.write("  ⚠️   python manage.py unseed")
-    stdout.write(div)
-    stdout.write("")
-    stdout.write(f"  This will wipe {len(TABLES)} tables and reset all sequences.")
-    stdout.write("  Superusers will be preserved and restored after.")
-    stdout.write("")
+    for line in _confirm_truncate_lines():
+        stdout.write(line)
     answer = input("  Type 'yes' to confirm: ")
     stdout.write("")
     return answer == 'yes'
+
+
+def _confirm_truncate_lines():
+    div = "─" * 40
+    return [
+        "",
+        div,
+        "  ⚠️   python manage.py unseed",
+        div,
+        "",
+        f"  This will wipe {len(TABLES)} tables and reset all sequences.",
+        "  Superusers will be preserved and restored after.",
+        "",
+    ]
 
 class Command(BaseCommand):
     """Clears all application data and resets database sequences."""
@@ -122,14 +130,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         superusers_data = get_superuser_data()
+        self._warn_on_empty_superusers(superusers_data)
+        if not self._confirmed():
+            return
+        self._clear_tables()
+        self._restore_superusers(superusers_data)
+
+    def _warn_on_empty_superusers(self, superusers_data):
         if not superusers_data:
             self.stdout.write(self.style.WARNING("  No superusers found - database will be completely emptied."))
-        if not confirm_truncate(self.stdout):
-            self.stdout.write("  Cancelled.")
-            return
+
+    def _confirmed(self):
+        if confirm_truncate(self.stdout):
+            return True
+        self.stdout.write("  Cancelled.")
+        return False
+
+    def _clear_tables(self):
         self.stdout.write("  Clearing tables...")
         with connection.cursor() as cursor:
             truncate_tables(cursor, TABLES, self.stdout)
+
+    def _restore_superusers(self, superusers_data):
         self.stdout.write("\n  Restoring superusers...")
         failed_restores = restore_superusers(superusers_data, self.stdout)
         _print_restore_results(superusers_data, failed_restores, self.stdout, self.style)

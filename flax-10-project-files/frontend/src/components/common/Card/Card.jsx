@@ -9,6 +9,7 @@ function joinClassNames(...values) {
 }
 
 /** Card container with configurable variant, padding, and optional interactive state. */
+
 export default function Card({ as: Component = "div", children, className = "", variant = "default", padding = "md", interactive = false, ...props }) {
   return (
     <Component className={joinClassNames(

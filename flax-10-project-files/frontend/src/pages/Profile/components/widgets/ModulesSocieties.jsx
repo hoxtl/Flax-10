@@ -4,8 +4,9 @@ import Card from "../../../../components/common/Card/Card";
 import ProfileWidget from "./ProfileWidget";
 import widgetStyles from "./ProfileWidgets.module.css";
 import badgeStyles from "./ProfileBadgesModules.module.css";
+import teachingCardColors from './teachingCardColors.json';
 const styles = { ...widgetStyles, ...badgeStyles };
-const TEACHING_CARD_COLORS = ["#9aaebe", "#b69f90", "#aeb89a", "#c3b39d", "#a8b2a3"];
+const TEACHING_CARD_COLORS = teachingCardColors;
 
 export function useModuleNameMap() {
   const [nameMap, setNameMap] = useState({});

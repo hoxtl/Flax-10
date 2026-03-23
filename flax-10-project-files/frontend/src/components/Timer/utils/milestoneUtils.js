@@ -9,6 +9,7 @@ export const HOURS_MILESTONES   = [5, 10, 25, 50, 100, 200];
 /*
  * Finds the closest upcoming milestone across sessions, streak, and hours.
  */
+
 function findNextMilestone(type, current, milestones, labelBuilder) {
     const target = milestones.find((value) => value > current);
     if (!target) return null;

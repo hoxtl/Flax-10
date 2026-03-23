@@ -2,6 +2,7 @@
  * Shared hook for handling society unreporting with confirmation.
  * Promotes DRY across the society directory and detail pages.
  */
+
 import { unreportSociety } from "../../../api/societyApi";
 import { useConfirm } from "../../../context/ConfirmContext";
 

@@ -2,17 +2,9 @@
  * Shared accent-color helpers for mini timeline event cards.
  */
 
-const EVENT_ACCENTS = {
-  lecture: "#7B9BAD",
-  study: "#9A8CB0",
-  routine: "#B8956A",
-  wellness: "#7BB38E",
-  social: "#C0714E",
-  society: "#C4906A",
-  meeting: "#A08B72",
-  admin: "#C4A46D",
-  default: "#A08B72",
-};
+import eventAccentColors from './eventAccentColors.json';
+
+const EVENT_ACCENTS = eventAccentColors;
 
 const MATCHERS = [
   { key: "lecture", test: ({ title, tagName }) => tagName === "lecture" || /^lecture:/i.test(title) },

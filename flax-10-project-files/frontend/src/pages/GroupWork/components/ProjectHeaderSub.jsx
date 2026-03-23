@@ -24,6 +24,7 @@ function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, show
 }
 
 /** Delete action button and hold-to-confirm modal for a group project. */
+
 export default function ProjectDeleteAction({ onDelete }) {
     const showToast = useToast();
     const [deleteError, setDeleteError] = useState("");

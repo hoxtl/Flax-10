@@ -1,6 +1,7 @@
 /*
  * Account settings form entry point.
  */
+
 import AccountFormContainer from "./account/AccountFormContainer";
 
 export default function AccountForm({ user, onSave, isSaving }) {

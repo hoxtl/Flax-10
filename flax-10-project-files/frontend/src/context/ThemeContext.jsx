@@ -31,24 +31,24 @@ function getStored(key, valid, fallback) {
   return valid.includes(stored) ? stored : fallback;
 }
 
-function useThemeSession(theme, setThemeState) {
-  const currentTheme = useRef(theme);
+function useThemeSession(mode, setModeState) {
+  const currentMode = useRef(mode);
   const sessionStart = useRef(new Date().toISOString());
-  useEffect(() => bindThemeUnload(currentTheme, sessionStart), []);
-  return { applyThemeChange: (nextTheme) => applyThemeChange(currentTheme, sessionStart, nextTheme, setThemeState) };
+  useEffect(() => bindThemeUnload(currentMode, sessionStart), []);
+  return { applyModeChange: (nextMode) => applyThemeChange(currentMode, sessionStart, nextMode, setModeState) };
 }
 
-function bindThemeUnload(currentTheme, sessionStart) {
-  const handleUnload = () => logThemeSession(currentTheme.current, sessionStart.current);
+function bindThemeUnload(currentMode, sessionStart) {
+  const handleUnload = () => logThemeSession(currentMode.current, sessionStart.current);
   window.addEventListener("beforeunload", handleUnload);
   return () => window.removeEventListener("beforeunload", handleUnload);
 }
 
-function applyThemeChange(currentTheme, sessionStart, nextTheme, setThemeState) {
-  logThemeSession(currentTheme.current, sessionStart.current);
-  currentTheme.current = nextTheme;
+function applyThemeChange(currentMode, sessionStart, nextMode, setModeState) {
+  logThemeSession(currentMode.current, sessionStart.current);
+  currentMode.current = nextMode;
   sessionStart.current = new Date().toISOString();
-  setThemeState(nextTheme);
+  setModeState(nextMode);
 }
 
 function useThemePreferences(initialTheme, initialMode) {
@@ -68,16 +68,16 @@ function isValidChange(nextValue, currentValue, validValues) {
   return nextValue !== currentValue && validValues.includes(nextValue);
 }
 
-function useThemeControls(mode, setModeState, theme, applyThemeChange) {
-  const setMode = (nextMode) => isValidChange(nextMode, mode, VALID_MODES) && setModeState(nextMode);
-  const setTheme = (nextTheme) => isValidChange(nextTheme, theme, VALID_THEMES) && applyThemeChange(nextTheme);
+function useThemeControls(mode, applyModeChange, theme, setThemeState) {
+  const setMode = (nextMode) => isValidChange(nextMode, mode, VALID_MODES) && applyModeChange(nextMode);
+  const setTheme = (nextTheme) => isValidChange(nextTheme, theme, VALID_THEMES) && setThemeState(nextTheme);
   return { setMode, setTheme, toggleMode: () => setMode(mode === "light" ? "dark" : "light") };
 }
 
 export function ThemeProvider({ children, initialTheme, initialMode }) {
   const { mode, setModeState, theme, setThemeState } = useThemePreferences(initialTheme, initialMode);
-  const { applyThemeChange } = useThemeSession(theme, setThemeState);
-  const controls = useThemeControls(mode, setModeState, theme, applyThemeChange);
+  const { applyModeChange } = useThemeSession(mode, setModeState);
+  const controls = useThemeControls(mode, applyModeChange, theme, setThemeState);
   usePersistedAttribute("data-mode", "mode", mode);
   usePersistedAttribute("data-theme", "colorTheme", theme);
   return <ThemeContext.Provider value={{ mode, theme, ...controls }}>{children}</ThemeContext.Provider>;

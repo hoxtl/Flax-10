@@ -14,6 +14,7 @@ function resolveTitle(query, title, itemLabel) {
 }
 
 /** Empty state card displayed when a search yields no matching items. */
+
 export default function SearchEmptyState({
   query = "", itemLabel = "items", onClear, title, alwaysShowClear = false,
   hint = "Try a different keyword or check your spelling", clearLabel = "Clear search",

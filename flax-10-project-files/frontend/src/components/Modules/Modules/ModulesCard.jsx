@@ -1,12 +1,13 @@
 /*
  * Module card displaying module info, enrolment status, and actions.
  */
+
 import { isEnrolledIn, formatDuration, formatTime, getDepartment, getCourse, normaliseModuleCode } from '../utils/moduleUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
-import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 import GridCard from '../../common/Card/GridCard';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModulesCard.module.css';
 
 const DEPARTMENT_ACCENTS = {
@@ -104,29 +105,13 @@ function CardBody({ module, enrolled, isCore, isTeacher, onView, onEdit, onDelet
     );
 }
 
-function getTutorImage(moduleData) {
-    return getResolvedUserPhoto({
-        id: moduleData?.created_by,
-        name: moduleData?.created_by_name,
-        role: 'teacher',
-        username: moduleData?.created_by_username,
-        profile_photo_url: moduleData?.created_by_profile_photo_url,
-        seed: moduleData?.created_by_username || moduleData?.created_by || moduleData?.created_by_name,
-    }, { allowGeneric: true });
-}
-
-function handleImageError(e) {
-    e.currentTarget.style.display = 'none';
-    e.currentTarget.nextElementSibling.style.display = 'flex';
-}
-
 function TutorAvatar({ module }) {
-    const src = getTutorImage(module);
+    const src = getModuleTutorPhoto(module);
     const initials = getInitials(module.created_by_name);
     const tutorName = module.created_by_name || 'Tutor';
     return (
         <div className={styles.tutorAvatar} title={tutorName}>
-            {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={handleImageError} />}
+            {src && <img src={src} alt={tutorName} className={styles.tutorAvatarImg} onError={hideBrokenTutorImage} />}
             <span className={styles.tutorAvatarFallback} style={src ? { display: 'none' } : undefined}>{initials}</span>
         </div>
     );

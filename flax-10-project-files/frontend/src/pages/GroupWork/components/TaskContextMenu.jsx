@@ -8,10 +8,11 @@ import { Pencil, Trash2 } from "lucide-react";
 import ctxStyles from "../../Tasks/components/TaskCardContextMenu.module.css";
 
 function ContextMenuPortal({ pos, task, onDelete, onClose, onEditStart }) {
+    const menuPos = { '--ctx-top': pos.y, '--ctx-left': pos.x };
     return (
         <div
             className={ctxStyles.ctxMenu}
-            style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 10000 }}
+            style={menuPos}
             onMouseDown={(e) => e.stopPropagation()}
         >
             <button className={ctxStyles.ctxItem} onClick={() => { onClose(); onEditStart(); }}>

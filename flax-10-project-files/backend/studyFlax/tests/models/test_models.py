@@ -151,6 +151,7 @@ class ModelStringTests(TestCase):
 
 class ReportedSocietyAdminTest(TestCase):
     """Tests for reported society admin."""
+
     def setUp(self):
         self.site = AdminSite()
         self.admin_obj = ReportedSocietyAdmin(ReportedSociety, self.site)

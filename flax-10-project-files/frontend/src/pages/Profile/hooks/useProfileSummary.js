@@ -1,6 +1,7 @@
 /**
  * Profile summary loading hook.
  */
+
 import { useEffect, useRef, useState } from "react";
 import { fetchApi } from "../../../api/client";
 

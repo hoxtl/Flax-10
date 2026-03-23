@@ -225,3 +225,9 @@
 :root[data-mode="dark"] .navGroupTriggerActive {
   background: var(--feature-tint);
 }
+
+.dropdownLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

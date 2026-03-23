@@ -1,6 +1,7 @@
 /*
  * SocietyBrowseResults renders paginated browse results and empty states.
  */
+
 import SocietyCard from "../../components/Society/SocietyCard";
 import gridStyles from "../../components/common/Card/CardGrid.module.css";
 import EmptyState from "../../components/common/EmptyState/EmptyState";

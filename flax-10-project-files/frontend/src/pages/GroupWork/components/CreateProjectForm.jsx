@@ -10,13 +10,14 @@ import StandardModal from "../../../components/common/StandardModal/StandardModa
 import { TagsSelector } from "../../../components/common/TagsSelector/TagsSelector";
 import UserSearch from "../../../components/Social/UserSearch";
 import { CreateProjectInputs } from "./CreateProjectInputs";
-import { createGroupProject } from "../api/groupWorkApi";
 import { getStoredViewer } from "../utils/memberAvatarUtils";
+import { useCreateProjectForm } from "./useCreateProjectForm";
 import styles from "./CreateProjectForm.module.css";
 
 
 
 /** Button and modal form for creating a new group project. */
+
 export default function CreateProjectForm({ onCreated, className = "", size = "medium" }) {
   const [isOpen, setIsOpen] = useState(false);
   const formState = useCreateProjectForm((project) => {
@@ -69,104 +70,6 @@ function CreateProjectModal({ formState, onClose }) {
 function closeModal(setIsOpen, reset) {
   setIsOpen(false);
   reset();
-}
-
-function useCreateProjectForm(onCreated) {
-  const [form, setForm] = useState({ name: "", course_code: "", deadline: "", members: [] });
-  const [errors, setErrors] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const reset = () => resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
-  const handlers = { setForm, setErrors, setErrorMessage };
-  return {
-    form, errors, errorMessage, isSubmitting, reset,
-    change: createChangeHandler(handlers),
-    addMember: createAddMemberHandler(handlers),
-    removeMember: createRemoveMemberHandler(handlers),
-    submit: createSubmitHandler({ ...handlers, setIsSubmitting, form, onCreated }),
-  };
-}
-
-function createChangeHandler({ setForm, setErrors, setErrorMessage }) {
-  return (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    const error = key === "deadline" && isPastProjectDeadline(value) ? "Project due date can't be in the past." : "";
-    setErrors((prev) => ({ ...prev, [key]: error }));
-    setErrorMessage("");
-  };
-}
-
-function createAddMemberHandler({ setForm, setErrors, setErrorMessage }) {
-  return (user) => {
-    if (!user?.id) return;
-    setErrors((prev) => ({ ...prev, members: "" }));
-    setErrorMessage("");
-    setForm((prev) => addMemberToForm(prev, user));
-  };
-}
-
-function addMemberToForm(prev, user) {
-  const exists = prev.members.some((m) => String(m.id) === String(user.id));
-  return exists ? prev : { ...prev, members: [...prev.members, user] };
-}
-
-function createRemoveMemberHandler({ setForm, setErrors, setErrorMessage }) {
-  return (userId) => {
-    setErrors((prev) => ({ ...prev, members: "" }));
-    setErrorMessage("");
-    setForm((prev) => ({ ...prev, members: prev.members.filter((m) => String(m.id) !== String(userId)) }));
-  };
-}
-
-function createSubmitHandler({ form, setForm, setErrors, setErrorMessage, setIsSubmitting, onCreated }) {
-  return async (event) => {
-    event.preventDefault();
-    const nextErrors = validateProjectForm(form);
-    if (Object.keys(nextErrors).length > 0) return showFormErrors(nextErrors, setErrors, setErrorMessage);
-    setIsSubmitting(true);
-    const created = await createGroupProject(buildProjectPayload(form));
-    handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage });
-  };
-}
-
-function handleSubmitResult(created, { setIsSubmitting, onCreated, setForm, setErrors, setErrorMessage }) {
-  if (!created) {
-    setIsSubmitting(false);
-    return setErrorMessage("We couldn't create that project. Please try again.");
-  }
-  onCreated?.(created);
-  resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting);
-}
-
-function validateProjectForm(form) {
-  const errors = {};
-  if (!form.name.trim()) errors.name = "Project name is required.";
-  if (!form.deadline) errors.deadline = "Due date is required.";
-  else if (isPastProjectDeadline(form.deadline)) errors.deadline = "Project due date can't be in the past.";
-  return errors;
-}
-
-function showFormErrors(nextErrors, setErrors, setErrorMessage) {
-  setErrors(nextErrors);
-  setErrorMessage("Please fix the highlighted fields.");
-}
-
-function resetProjectForm(setForm, setErrors, setErrorMessage, setIsSubmitting) {
-  setForm({ name: "", course_code: "", deadline: "", members: [] });
-  setErrors({});
-  setErrorMessage("");
-  setIsSubmitting(false);
-}
-
-function buildProjectPayload(form) {
-  const payload = {
-    name: form.name,
-    deadline: form.deadline,
-    member_ids: form.members.map((member) => member.id),
-  };
-  const courseCode = String(form.course_code || "").trim();
-  if (courseCode) payload.course_code = courseCode;
-  return payload;
 }
 
 function MemberSearchEmptyState({ query, clear }) {
@@ -241,24 +144,6 @@ function syncRemovedMemberTags(currentTags, nextTags, onRemove) {
   currentTags
     .filter((tag) => !nextIds.has(String(tag.id)))
     .forEach((tag) => onRemove(tag.id));
-}
-
-function isPastProjectDeadline(value) {
-  if (!value) return false;
-  const selectedDate = parseProjectDeadline(value);
-  if (Number.isNaN(selectedDate.getTime())) return false;
-  selectedDate.setHours(0, 0, 0, 0);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return selectedDate < today;
-}
-
-function parseProjectDeadline(value) {
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const [year, month, day] = value.split("-").map(Number);
-    return new Date(year, month - 1, day);
-  }
-  return new Date(value);
 }
 
 function RequiredLabel({ text }) {

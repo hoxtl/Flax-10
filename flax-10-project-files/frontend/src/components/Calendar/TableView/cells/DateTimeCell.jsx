@@ -2,6 +2,7 @@
  * DateTimeCell - Date/time display and editing for table view.
  * Shows formatted time range with inline date picker on edit.
  */
+
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 import DateTimePicker from '../../../common/inputs/DateTimePicker';
@@ -94,6 +95,7 @@ function createSaveHandler(state, onSave) {
 }
 
 /** Table cell for viewing and editing event date/time with validation. */
+
 export function DateTimeCell({ event, isReadOnly, onSave, isRowHovered }) {
     const state = useDateTimeEditState(event);
     const handleClick = createClickHandler(event, isReadOnly, state);

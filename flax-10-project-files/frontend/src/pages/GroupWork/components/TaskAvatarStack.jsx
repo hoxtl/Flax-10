@@ -15,8 +15,9 @@ function OverflowBadge({ count, size }) {
 }
 
 function AvatarStackItem({ a, i, size, max }) {
+    const itemStyle = { '--avatar-ml': i > 0 ? `${-(size * 0.3)}px` : '0', '--avatar-z': max - i };
     return (
-        <div style={{ marginLeft: i > 0 ? -(size * 0.3) : 0, zIndex: max - i }}>
+        <div className={styles.avatarItem} style={itemStyle}>
             <button type="button" className={styles.avatarButton} title={getDisplayName(a)} aria-label={`Open ${getDisplayName(a)} profile`} onClick={(event) => openMemberProfile(event, a)}>
                 <MemberAvatar member={a} size={size} />
             </button>

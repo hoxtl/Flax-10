@@ -1,6 +1,7 @@
 /**
  * Tests for ProfileHeader and its subcomponents.
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProfileHeader from '../../../../pages/Profile/components/ProfileHeader';

@@ -1,6 +1,7 @@
 """
 Model for recording individual study sessions with duration and pause tracking.
 """
+
 from django.db import models
 from ..auth.user_model import User
 

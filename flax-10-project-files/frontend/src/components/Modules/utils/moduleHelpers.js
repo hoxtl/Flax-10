@@ -1,6 +1,7 @@
 /*
  * Helper functions for module form state and validation.
  */
+
 import { formatForInput } from './moduleUtils.js';
 
 export function getFormData() {

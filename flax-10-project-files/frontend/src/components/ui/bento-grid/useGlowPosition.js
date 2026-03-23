@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 
-const centerGlow = { x: "50%", y: "50%" };
+const centerGlow = { '--glow-x': "50%", '--glow-y': "50%" };
 
 export function useGlowPosition(cardRef) {
   const [glowPos, setGlowPos] = useState(centerGlow);
@@ -24,7 +24,7 @@ function updateGlowPosition(cardRef, event, setGlowPos) {
 
 function getRelativeGlowPosition(event, rect) {
   return {
-    x: `${((event.clientX - rect.left) / rect.width) * 100}%`,
-    y: `${((event.clientY - rect.top) / rect.height) * 100}%`,
+    '--glow-x': `${((event.clientX - rect.left) / rect.width) * 100}%`,
+    '--glow-y': `${((event.clientY - rect.top) / rect.height) * 100}%`,
   };
 }

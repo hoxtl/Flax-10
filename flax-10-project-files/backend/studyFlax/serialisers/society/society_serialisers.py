@@ -109,6 +109,7 @@ class SocietyEventSerialiser(SilentNotificationMixin, serializers.ModelSerialize
 
 class SocietyEventCalendarSerialiser(serializers.ModelSerializer):
     """Serializer for society events displayed in personal calendar."""
+
     society_name = serializers.CharField(source='society.name', read_only=True)
     society_color = serializers.SerializerMethodField()
     source = serializers.SerializerMethodField()

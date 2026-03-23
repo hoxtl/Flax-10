@@ -9,6 +9,8 @@ import useDateTimePicker from "../hooks/useDateTimePicker";
 import { pad, formatDisplay } from "../utils/dateTimePickerUtils";
 import styles from "./DateTimePicker.module.css";
 
+function getDropdownPosVars(pos) { return { '--dp-top': pos.top, '--dp-left': pos.left }; }
+
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => ({ value: String(i), label: pad(i) }));
@@ -66,7 +68,7 @@ export default function DateTimePicker({ value, onChange, placeholder = "Pick da
     <div className={styles.wrap} ref={ref}>
       <DateTimePickerTrigger open={open} setOpen={setOpen} selDate={selDate} timeOnly={timeOnly} placeholder={placeholder} clearSelection={clearSelection} styles={styles} />
       {open && createPortal(
-        <div ref={dropdownRef} className={styles.dropdown} style={{ position: "fixed", top: dropdownPos.top, left: dropdownPos.left, zIndex: 10000 }}>
+        <div ref={dropdownRef} className={`${styles.dropdown} ${styles.dropdownPortal}`} style={getDropdownPosVars(dropdownPos)}>
           {!timeOnly && <DateTimePickerCalendar viewM={viewM} viewY={viewY} prevMonth={prevMonth} nextMonth={nextMonth} days={days} isToday={isToday} isSel={isSel} selectDay={selectDay} styles={styles} />}
           <DateTimePickerTime hour={hour} minute={minute} changeHour={changeHour} changeMinute={changeMinute} setOpen={setOpen} timeOnly={timeOnly} styles={styles} />
         </div>,

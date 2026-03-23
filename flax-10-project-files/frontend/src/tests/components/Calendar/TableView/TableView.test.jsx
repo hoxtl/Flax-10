@@ -1,6 +1,7 @@
 /**
  * Tests for TableView - Spreadsheet-style calendar view.
  */
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TableView } from '../../../../components/Calendar/TableView/TableView';

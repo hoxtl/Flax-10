@@ -1,6 +1,7 @@
 """
 Model for tracking user requests to change their enrolled course.
 """
+
 from django.db import models
 from .user_model import User
 

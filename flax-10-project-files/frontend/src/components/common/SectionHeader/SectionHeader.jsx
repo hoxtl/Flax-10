@@ -5,6 +5,7 @@
 import styles from "./SectionHeader.module.css";
 
 /** Section header with an optional eyebrow label and right-aligned action. */
+
 export default function SectionHeader({ eyebrow, title, subtitle, action, className = "" }) {
   return (
     <div className={className ? `${styles.header} ${className}` : styles.header}>

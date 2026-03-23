@@ -1,6 +1,7 @@
 /**
  * Quick campus navigation controls.
  */
+
 import styles from '../../pages/CampusMap/sidebar.module.css';
 import { KCL_CAMPUSES } from '../../lib/kclCampuses';
 

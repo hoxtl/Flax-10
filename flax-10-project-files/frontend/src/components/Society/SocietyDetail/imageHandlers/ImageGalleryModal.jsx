@@ -1,6 +1,7 @@
 /*
  * ImageGalleryModal renders the fullscreen carousel for society images.
  */
+
 import { useRef } from "react";
 import StandardModal from "../../../common/StandardModal/StandardModal";
 import styles from "./ImageGalleryModal.module.css";

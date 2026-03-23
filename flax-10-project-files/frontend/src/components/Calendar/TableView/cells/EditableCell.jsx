@@ -2,6 +2,7 @@
  * EditableCell - Inline editable cell for table view.
  * Renders text display or input field based on editing state.
  */
+
 import { useRef, useEffect } from 'react';
 import styles from './EditableCell.module.css';
 
@@ -31,6 +32,7 @@ function TextInput({ inputRef, value, onChange, onKeyDown }) {
 }
 
 /** Renders a cell that switches between display and edit modes. */
+
 export function EditableCell({ value, isEditing, onChange, onKeyDown, isTextarea }) {
     const inputRef = useAutoFocus(isEditing);
     if (!isEditing) return <span className={styles.cellText}>{value || '—'}</span>;

@@ -11,6 +11,7 @@ from studyFlax.models.modules.deadline_model import Deadline
 
 class DeadlineModelTests(TestCase):
     """Test suite for Deadline model."""
+
     def setUp(self):
         self.teacher = User.objects.create_user(
             username='teacher', email='teacher@test.com',

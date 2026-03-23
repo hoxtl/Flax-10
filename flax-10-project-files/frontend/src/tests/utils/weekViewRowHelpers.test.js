@@ -7,6 +7,7 @@ import { calculateEventLayout } from '../../components/Calendar/WeekView/compone
  * Build a week of Date objects starting from the given Monday.
  * Using Sun-Sat to match getStartOfWeek (Sunday = day 0).
  */
+
 function buildWeek(startDate) {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(startDate);
@@ -21,6 +22,7 @@ function buildWeek(startDate) {
  * start and end are Date objects. end is exclusive in terms of the "raw" field,
  * so the visual range calculation in allDayRowHelpers will handle it.
  */
+
 function makeAllDayEvent(id, startDate, endDate) {
   const start = new Date(startDate);
   start.setHours(0, 0, 0, 0);

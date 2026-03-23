@@ -34,6 +34,7 @@ function ConfirmModalButtons({ isDanger, dangerHint, infoHint, centerText, onCan
 }
 
 /** Confirm/cancel modal with optional danger styling and alternate action. */
+
 export default function ConfirmModal({ title, message, children, onConfirm, onCancel, onAlternate, confirmText = "Confirm", cancelText = "Cancel", alternateText, isDanger = false, centerText = false, dangerHint = "", infoHint = "", size = "sm", modalClassName = "", dangerTitle = "Session Progress Will Be Lost", dangerDescription = "Ending now will discard this session progress." }) {
   const confirmVariant = isDanger ? "danger" : "primary";
   const bodyClasses = `${styles.modalBody} ${isDanger ? styles.modalBodyDanger : ""}`.trim();

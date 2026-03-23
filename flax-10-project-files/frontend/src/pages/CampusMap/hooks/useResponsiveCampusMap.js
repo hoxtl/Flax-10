@@ -1,6 +1,7 @@
 /**
  * Responsive campus map UI effects.
  */
+
 import { useEffect } from "react";
 
 const MIN_MAP_SKELETON_MS = 900;

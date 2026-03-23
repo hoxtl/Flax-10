@@ -4,6 +4,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { BRANCH_TIPS } from './treePixels';
+import canvasColors from './focusCanvasColors.json';
+
+const hslaColor = (h, s, l, a) => `hsl${a < 1 ? 'a' : ''}(${h},${s}%,${l}%${a < 1 ? `,${a}` : ''})`;
+const rgbaColor = (rgb, a) => `rgb${a < 1 ? 'a' : ''}(${rgb}${a < 1 ? `,${a}` : ''})`;
 
 function makeLeaf() {
   const tip = BRANCH_TIPS[Math.floor(Math.random() * BRANCH_TIPS.length)];
@@ -21,7 +25,8 @@ function getMotionState(mode, isActive, progress) {
 
 function getGlowColor(state) {
   const opacity = 0.08 + state.progress * 0.28;
-  return state.mode === 'break' ? `rgba(52,211,153,${opacity})` : `rgba(100,220,80,${opacity})`;
+  const rgb = state.mode === 'break' ? canvasColors.glowBreakBase : canvasColors.glowWorkBase;
+  return rgbaColor(rgb, opacity);
 }
 
 function drawGlow(ctx, color) {
@@ -47,9 +52,9 @@ function resetLeaf(leaf) {
 }
 
 function getLeafColor(leaf, state) {
-  if (!state.isActive) return `hsla(${leaf.hue},40%,55%,${leaf.life * 0.35})`;
-  if (state.mode === 'break') return `hsla(130,60%,72%,${leaf.life * 0.7})`;
-  return `hsla(${leaf.hue},85%,65%,${leaf.life * 0.85})`;
+  if (!state.isActive) return hslaColor(leaf.hue, 40, 55, leaf.life * 0.35);
+  if (state.mode === 'break') return hslaColor(130, 60, 72, leaf.life * 0.7);
+  return hslaColor(leaf.hue, 85, 65, leaf.life * 0.85);
 }
 
 function updateLeaf(leaf, state) {
@@ -94,7 +99,7 @@ function renderSparkle(ctx, sparkle, scale, hue, isActive) {
   const alpha = scale * (isActive ? 0.9 : 0.3);
   ctx.save();
   ctx.translate(sparkle.x, sparkle.y);
-  ctx.strokeStyle = `hsla(${hue},90%,80%,${alpha})`;
+  ctx.strokeStyle = hslaColor(hue, 90, 80, alpha);
   ctx.lineWidth = 1.2;
   drawSparkleCross(ctx, size);
   ctx.rotate(Math.PI / 4);

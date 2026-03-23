@@ -1,6 +1,7 @@
 /**
  * Tests for useSwipeNavigation - touch/scroll gesture navigation.
  */
+
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useSwipeNavigation } from '../../../../components/Calendar/hooks/useSwipeNavigation';

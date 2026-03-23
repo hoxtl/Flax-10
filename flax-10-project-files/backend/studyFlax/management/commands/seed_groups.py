@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 
 def _build_completed_task_assignments(members, statuses):
     """Return a mapping of done-task index to members assigned to mark it complete."""
+
     done_indices = [i for i, status in enumerate(statuses) if status == "done"]
     if not done_indices:
         return {}

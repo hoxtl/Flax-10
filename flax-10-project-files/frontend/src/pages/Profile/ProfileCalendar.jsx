@@ -2,6 +2,7 @@
  * ProfileCalendar - Read-only calendar view for user profiles.
  * Displays monthly calendar with event summary modal.
  */
+
 import { useEffect, useState } from "react";
 import { useCalendar, useCalendarDispatch, CalendarProvider } from "../../context/CalendarContext";
 import { addMonths, formatMonthYear, isSameMonth } from "../../components/Calendar/utils/dateUtils";
@@ -82,6 +83,7 @@ function ProfileCalendarInner({ allEvents }) {
 }
 
 /** Profile calendar wrapper with context providers. */
+
 export function ProfileCalendar({ allEvents }) {
   return (
     <CalendarProvider>

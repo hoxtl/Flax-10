@@ -1,6 +1,7 @@
 /**
  * Walking route card.
  */
+
 import styles from "../../pages/CampusMap/routes.module.css";
 import { travelDistance, travelTime } from "./mapUtils";
 

@@ -18,6 +18,7 @@ import ctxStyles from '../../pages/Tasks/components/TaskCardContextMenu.module.c
 import './DraggableEvent.css';
 
 /** Main entry for an event block. Renders as personal (editable) or other (read-only). */
+
 export function DraggableEvent({ event, style, minWidthForDetails = 80, readOnly }) {
     const isPersonal = getEventType(event) === 'personal';
     if (!isPersonal || readOnly) {
@@ -113,8 +114,9 @@ function EditableEvent({ event, style, minWidthForDetails }) {
 }
 
 function EventContextMenu({ menu, handlers, innerRef }) {
+    const menuPos = { '--ctx-top': `${menu.y}px`, '--ctx-left': `${menu.x}px` };
     return (
-        <div ref={innerRef} className={ctxStyles.ctxMenu} style={{ position: 'fixed', top: menu.y, left: menu.x, zIndex: 9999 }}>
+        <div ref={innerRef} className={ctxStyles.ctxMenu} style={menuPos}>
             <button className={ctxStyles.ctxItem} onClick={handlers.handleEdit}><Pencil size={14} strokeWidth={2} /> Edit</button>
             <div className={ctxStyles.ctxDivider} />
             <button className={`${ctxStyles.ctxItem} ${ctxStyles.ctxItemDanger}`} onClick={handlers.handleDelete}><Trash2 size={14} strokeWidth={2} /> Delete</button>
@@ -163,14 +165,11 @@ function TimeDisplay({ event }) {
 }
 
 function buildStyle(baseStyle, theme, resizePreview) {
-    const hex = (theme.color || '#7B6751').replace('#', '');
-    const num = parseInt(hex.length === 3 ? hex.split('').map(c => c + c).join('') : hex, 16);
-    const rgb = `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
-    
-    return { 
-        ...baseStyle, 
+    const eventColor = theme.color || 'var(--color-primary)';
+    return {
+        ...baseStyle,
         height: resizePreview ? `${resizePreview}px` : baseStyle?.height,
-        borderLeftColor: theme.color, 
-        backgroundColor: `rgba(${rgb}, 0.12)` 
+        borderLeftColor: eventColor,
+        backgroundColor: `color-mix(in srgb, ${eventColor} 12%, transparent)`,
     };
 }

@@ -1,6 +1,7 @@
 /**
  * Campus map page entry point.
  */
+
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./CampusMapGlobals.css";
 import mapboxgl from "mapbox-gl";

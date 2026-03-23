@@ -39,6 +39,7 @@ function RuleList({ rules, password }) {
 }
 
 /** Visual password strength indicator with a progress bar and rule checklist. */
+
 export default function PasswordStrength({ password, rules = DEFAULT_RULES, title = "Password strength", showOnlyWhenTyping = true }) {
   if (showOnlyWhenTyping && !password) return null;
   const safePassword = password || "";

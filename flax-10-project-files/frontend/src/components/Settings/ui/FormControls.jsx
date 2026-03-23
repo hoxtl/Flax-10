@@ -1,13 +1,14 @@
 /*
  * Shared form controls for settings inputs and selects.
  */
+
 import styles from "../../../pages/Settings/Settings.module.css";
 import AnimatedDropdown from "../../common/AnimatedDropdown";
 import FormTextInput from "./FormTextInput";
 
 function RemainingCount({ remaining }) {
   return (
-    <span style={{ color: "var(--muted)", fontSize: "0.9em", marginLeft: "5px" }}>
+    <span className={styles.remainingCount}>
       ({remaining} characters remaining)
     </span>
   );

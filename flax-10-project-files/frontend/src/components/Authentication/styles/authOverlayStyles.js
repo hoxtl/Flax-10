@@ -6,18 +6,18 @@ import styled from "styled-components";
 import { Button } from "./authCardStyles";
 
 export const GhostButton = styled(Button)`
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.55);
-  color: rgba(255, 255, 255, 0.95);
+  background: var(--auth-ghost-bg);
+  border-color: var(--auth-ghost-border);
+  color: var(--auth-ghost-color);
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    0 4px 16px var(--auth-ghost-shadow),
+    inset 0 1px 0 var(--auth-ghost-inset);
   backdrop-filter: blur(8px);
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.28);
-    border-color: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background: var(--auth-ghost-hover-bg);
+    border-color: var(--auth-ghost-hover-border);
+    box-shadow: 0 8px 24px var(--auth-ghost-hover-shadow);
   }
 `;
 
@@ -38,10 +38,10 @@ export const OverlayContainer = styled.div`
 `;
 
 export const Overlay = styled.div`
-  background: linear-gradient(150deg, #7a6148 0%, #5c4530 40%, #3c2a1a 100%);
+  background: linear-gradient(150deg, var(--auth-overlay-bg-start) 0%, var(--auth-overlay-bg-mid) 40%, var(--auth-overlay-bg-end) 100%);
   background-repeat: no-repeat;
   background-size: cover;
-  color: #ffffff;
+  color: var(--auth-overlay-color);
   position: relative;
   left: -100%;
   height: 100%;
@@ -56,7 +56,7 @@ export const Overlay = styled.div`
     inset: 0;
     background: radial-gradient(
       ellipse at 70% 30%,
-      rgba(255, 255, 255, 0.06) 0%,
+      var(--auth-overlay-glow) 0%,
       transparent 60%
     );
     pointer-events: none;
@@ -106,6 +106,6 @@ export const Paragraph = styled.p`
   line-height: 20px;
   letter-spacing: 0.3px;
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--auth-para-color);
   max-width: 240px;
 `;

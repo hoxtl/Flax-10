@@ -1,6 +1,7 @@
 /*
  * Task sorting utilities.
  */
+
 import {
   PRIORITY_ORDER,
   compareTaskPriority,

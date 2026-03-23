@@ -1,6 +1,7 @@
 /*
  * Student modules dashboard with stats, deadline overview, and reading queue.
  */
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { getUpcomingDeadlines } from "../../api/deadlineApi";

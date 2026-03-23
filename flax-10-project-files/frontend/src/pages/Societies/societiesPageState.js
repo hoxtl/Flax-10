@@ -1,6 +1,7 @@
 /*
  * societiesPageState centralizes societies page navigation and modal state.
  */
+
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSocieties } from "../../components/Society/hooks/useSocieties";

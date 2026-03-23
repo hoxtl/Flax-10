@@ -21,6 +21,7 @@ User = get_user_model()
 class CalendarShareViewTests(APITestCase):
 
     """Tests for calendar share view."""
+
     def setUp(self):
         self.user1 = User.objects.create_user(username="user1", email="user1@example.com", password="password", first_name="User", last_name="One")
         self.user2 = User.objects.create_user(username="user2", email="user2@example.com", password="password", first_name="User", last_name="Two")
@@ -109,6 +110,7 @@ class CalendarShareViewTests(APITestCase):
 
 class CalendarShareUserSerializerPhotoTest(APITestCase):
     """Tests for calendar share user serializer photo."""
+
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user1 = User.objects.create_user(username='share1', email='share1@example.com', password='pass', first_name='User', last_name='One')
@@ -162,6 +164,7 @@ class CalendarShareUserSerializerPhotoTest(APITestCase):
 
 class CalendarShareSerializerTest(APITestCase):
     """Tests for calendar share serializer."""
+
     def setUp(self):
         self.owner = User.objects.create_user(username='social_owner', email='social_owner@e.com', password='pass')
         self.viewer = User.objects.create_user(username='social_viewer', email='social_viewer@e.com', password='pass')

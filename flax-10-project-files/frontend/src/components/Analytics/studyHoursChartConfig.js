@@ -16,6 +16,6 @@ export const getStudyHoursAxis = (data, textColor) => [{
 }];
 
 export const getStudyHoursSeries = (data) => [
-  { data: data.map((item) => (item.work / 60).toFixed(1)), label: "Study Hours", color: "#4CAF50", curve: "natural" },
-  { data: data.map((item) => (item.break / 60).toFixed(1)), label: "Break Hours", color: "#FF9800", curve: "natural" },
+  { data: data.map((item) => (item.work / 60).toFixed(1)), label: "Study Hours", color: "var(--chart-study)", curve: "natural" },
+  { data: data.map((item) => (item.break / 60).toFixed(1)), label: "Break Hours", color: "var(--chart-break)", curve: "natural" },
 ];

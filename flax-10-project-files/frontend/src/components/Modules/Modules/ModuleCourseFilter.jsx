@@ -1,11 +1,13 @@
 /*
  * Dropdown filter for modules by course and enrolment status.
  */
-import { useState, useRef, useEffect } from 'react';
+
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { KCL_DEPARTMENTS } from '../../../lib/kclCourses';
 import SearchBar from '../../common/SearchBar/SearchBar';
 import SearchEmptyState from '../../common/SearchEmptyState/SearchEmptyState';
+import { useClickOutside } from '../../common/hooks/useClickOutside';
+import { useModuleCourseFilterState } from './useModuleCourseFilterState';
 import styles from './ModuleCourseFilter.module.css';
 
 function filterCourseGroups(groups, query) {
@@ -50,14 +52,6 @@ function DepartmentGroup({ department, courses, selectedCourses, onToggle, expan
     );
 }
 
-function useClickOutside(ref, onClose) {
-    useEffect(() => {
-        const handler = (e) => ref.current && !ref.current.contains(e.target) && onClose();
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [ref, onClose]);
-}
-
 function FilterButton({ activeCount, isOpen, onClick }) {
     return (
         <button onClick={onClick} className={styles.filterBtn} aria-expanded={isOpen} aria-haspopup="dialog">
@@ -94,12 +88,8 @@ function DropdownContent({ filterQuery, setFilterQuery, selectedCourses, onToggl
 }
 
 export default function ModuleCourseFilter({ selectedCourses, onToggleCourse }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [filterQuery, setFilterQuery] = useState('');
-    const [expanded, setExpanded] = useState({});
-    const ref = useRef(null);
+    const { isOpen, setIsOpen, filterQuery, setFilterQuery, expanded, toggleExpanded, ref } = useModuleCourseFilterState();
     useClickOutside(ref, () => setIsOpen(false));
-    const toggleExpanded = (key) => setExpanded(p => ({ ...p, [key]: !p[key] }));
     const activeCount = selectedCourses.length;
     return (
         <div

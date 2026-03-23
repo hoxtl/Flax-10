@@ -26,10 +26,10 @@ function getContributionColor(val, maxVal) {
   if (val == null) return "transparent";
   if (val === 0) return "color-mix(in srgb, var(--border) 60%, transparent)";
   const t = val / maxVal;
-  if (t < 0.25) return "color-mix(in srgb, #5D4037 25%, var(--panel))";
-  if (t < 0.5) return "#8D6E63";
-  if (t < 0.75) return "#6D4C41";
-  return "#5D4037";
+  if (t < 0.25) return "var(--heatmap-low)";
+  if (t < 0.5) return "var(--heatmap-mid)";
+  if (t < 0.75) return "var(--heatmap-high)";
+  return "var(--heatmap-full)";
 }
 
 function buildContributionWeeks(dailyTotals) {
@@ -44,19 +44,17 @@ function buildContributionWeeks(dailyTotals) {
   return weeks;
 }
 
+function ContributionCell({ val, maxVal }) {
+  const cellStyle = { background: getContributionColor(val, maxVal) };
+  return <div className={styles.contributionCell} style={cellStyle} title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""} />;
+}
+
 function ContributionGrid({ weeks, maxVal }) {
   return (
     <div className={styles.contributionGrid}>
       {weeks.map((week, wi) => (
         <div key={wi} className={styles.contributionWeek}>
-          {week.map((val, di) => (
-            <div
-              key={di}
-              className={styles.contributionCell}
-              style={{ background: getContributionColor(val, maxVal) }}
-              title={val != null ? `${Math.round(val / 60 * 10) / 10}h` : ""}
-            />
-          ))}
+          {week.map((val, di) => <ContributionCell key={di} val={val} maxVal={maxVal} />)}
         </div>
       ))}
     </div>

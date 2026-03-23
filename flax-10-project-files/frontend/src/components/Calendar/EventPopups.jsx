@@ -16,6 +16,7 @@ import { unsyncCalendar } from '../../api/societyApi';
 import HoldConfirmModal from '../common/HoldConfirmModal/HoldConfirmModal';
 
 /** Main entry point for calendar popups. */
+
 export function EventPopups() {
   return (
     <>
@@ -97,7 +98,7 @@ function EventPopupContainer() {
 
   const actions = getPopupActions(state.popupEvent, state);
   const tag = (state.popupEvent.source === 'society' && state.popupEvent.tag_name) 
-    ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || '#9E7E5D' }
+    ? { label: state.popupEvent.tag_name, color: state.popupEvent.tag_color || 'var(--color-caramel)' }
     : state.getTag(state.popupEvent.tag);
 
   return (

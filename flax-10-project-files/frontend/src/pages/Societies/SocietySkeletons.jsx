@@ -2,6 +2,7 @@
  * Centralized skeleton components for showing loading states across
  * the society discovery and detail views.
  */
+
 import styles from "./SocietiesPage.module.css";
 import extraStyles from "./SocietiesPageExtras.module.css";
 import detailStyles from "./SocietyDetailPage.module.css";
@@ -9,6 +10,7 @@ import detailStyles from "./SocietyDetailPage.module.css";
 const pageStyles = { ...styles, ...extraStyles };
 
 /** Skeleton for the main societies directory page. */
+
 export function SocietiesSkeleton() {
     return (
         <div className={pageStyles.container}>
@@ -24,6 +26,7 @@ export function SocietiesSkeleton() {
 }
 
 /** Skeleton for the society detail view. */
+
 export function SocietyDetailSkeleton() {
     return (
         <div className={detailStyles.page}>

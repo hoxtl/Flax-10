@@ -33,6 +33,7 @@ def _dedupe_users(users):
 
 def _add_enrollment_to_maps(enrollment, student_modules, module_students):
     """Update both enrollment maps in-place for a single enrollment."""
+
     student_modules.setdefault(enrollment.student_id, []).append(enrollment.module)
     module_students.setdefault(enrollment.module.module_code, []).append(enrollment.student)
 
@@ -116,6 +117,7 @@ def _build_membership_counts(students, project_ids=None):
 
 def _rank_member(student, project, cohort_ids, membership_counts, rng):
     """Return a sort key tuple for ranking a candidate member."""
+
     current_count = membership_counts.get(student.id, 0)
     return (
         0 if current_count < MIN_PROJECTS_PER_STUDENT else 1,
@@ -190,6 +192,7 @@ def _ordered_top_up_projects(student, projects, member_sets, module_codes, rng):
 
 def _top_up_single_student(student, projects, member_sets, module_codes, membership_counts, rng):
     """Top up one student's memberships to the minimum. Returns True if any were added."""
+
     candidate_projects = _ordered_top_up_projects(student, projects, member_sets, module_codes, rng)
     made_progress = False
     while membership_counts.get(student.id, 0) < MIN_PROJECTS_PER_STUDENT and candidate_projects:
@@ -224,6 +227,7 @@ def _top_up_students_to_minimum(projects, students, student_modules, membership_
 
 def _underfilled_projects(projects, member_sets):
     """Return projects that have fewer than the minimum number of members, sorted by fill level."""
+
     return sorted(
         [project for project in projects if len(member_sets.get(project.id, set())) < MIN_PROJECT_MEMBER_TOTAL],
         key=lambda project: (len(member_sets.get(project.id, set())), project.deadline or timezone.now(), project.name),
@@ -231,6 +235,7 @@ def _underfilled_projects(projects, member_sets):
 
 def _try_add_member(member, project, member_sets, membership_counts):
     """Add member to project if not already present. Returns 1 if added, 0 if already a member."""
+
     if member.id in member_sets.get(project.id, set()):
         return 0
     GroupMembership.objects.update_or_create(project=project, user=member, defaults={"role": "member"})
@@ -243,6 +248,7 @@ def _eligible_to_add(member, project, member_sets):
 
 def _fill_from_candidates(project, candidates, needed, member_sets, membership_counts):
     """Add up to `needed` members from candidates. Returns (made_progress, remaining_needed)."""
+
     eligible = [m for m in candidates if _eligible_to_add(m, project, member_sets)]
     added = sum(_try_add_member(m, project, member_sets, membership_counts) for m in eligible[:max(needed, 0)])
     return added > 0, needed - added
@@ -253,6 +259,7 @@ def _fill_project_pass(project, students, module_students, membership_counts, me
 
 def _fill_project_to_minimum(project, students, module_students, membership_counts, member_sets, rng):
     """Fill one project up to the minimum member count. Returns True if any member was added."""
+
     needed = MIN_PROJECT_MEMBER_TOTAL - len(member_sets.get(project.id, set()))
     made_first, remaining = _fill_project_pass(project, students, module_students, membership_counts, member_sets, rng, False, needed)
     made_second, _ = _fill_project_pass(project, students, module_students, membership_counts, member_sets, rng, True, remaining)
@@ -272,6 +279,7 @@ def _ensure_projects_have_minimum_members(projects, students, module_students, m
 
 def _fill_solo_project(project, students, module_students, membership_counts, member_sets, rng):
     """Add members to a solo project until it has at least 2. Returns True if any were added."""
+
     needed = 2 - len(member_sets.get(project.id, set()))
     candidates = _ordered_member_candidates(project, students, module_students, membership_counts, rng, allow_over_limit=True)
     made, _ = _fill_from_candidates(project, candidates, needed, member_sets, membership_counts)
@@ -315,6 +323,7 @@ def _sorted_trimmable_memberships(student, allowed_ids, preferred_codes, member_
 
 def _trim_student_memberships(student, projects, preferred_codes, member_sets, membership_counts, allowed_ids):
     """Trim one student's memberships down to the project cap. Mutates member_sets and membership_counts."""
+
     overflow = membership_counts.get(student.id, 0) - MAX_PROJECTS_PER_STUDENT
     if overflow <= 0:
         return

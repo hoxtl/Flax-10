@@ -1,6 +1,7 @@
 /*
  * CompatibilityScore widget – study time match, sparkline, and study-together CTA.
  */
+
 import compatStyles from "./ProfileCompat.module.css";
 import { motion } from "framer-motion";
 import { useCountUp } from "../../../../hooks/useCountUp";

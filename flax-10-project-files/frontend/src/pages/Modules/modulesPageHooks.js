@@ -1,6 +1,7 @@
 /*
  * State and URL-sync hooks for the modules page.
  */
+
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import useModules from "../../components/Modules/hooks/useModules.js";
