@@ -2,8 +2,6 @@
  * Dashboard layout modal composition.
  */
 
-import { useState } from "react";
-
 import { EventModal } from "../../components/Calendar/EventModal/EventModal";
 import CreateSocietyModal from "../../components/Society/CreateSocietyModal";
 import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal";
@@ -50,7 +48,9 @@ function useSocietyCreation(setShowSocietyModal) {
     try {
       await createSociety(form);
       setShowSocietyModal(false);
-    } catch {}
+    } catch (error) {
+      console.error("Failed to create society:", error);
+    }
   };
 }
 
@@ -65,7 +65,9 @@ function CreateTaskPanel({ lists, modules, onClose }) {
       await createTask(data);
       onClose();
       window.dispatchEvent(new Event("task-created"));
-    } catch {}
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
   };
   return <CreateTaskModal lists={lists} modules={modules} onSave={handleSave} onClose={onClose} />;
 }
@@ -112,7 +114,7 @@ function ReadingGate({ state }) {
 
 export function LeaveTimerActions({ pendingNav, setPendingNav, t, setShowQuickAdd, onNavChange }) {
   const onPause = () => runPauseAction(t, pendingNav, setShowQuickAdd, onNavChange, setPendingNav);
-  const onTakeBreak = () => runTakeBreakAction(t, setPendingNav);
+  const onTakeBreak = () => runTakeBreakAction(t, pendingNav, setShowQuickAdd, onNavChange, setPendingNav);
   const onExit = () => runExitAction(t, pendingNav, setShowQuickAdd, onNavChange, setPendingNav);
   return (
     <LeaveTimerModal
@@ -132,10 +134,11 @@ function runPauseAction(t, pendingNav, setShowQuickAdd, onNavChange, setPendingN
   setPendingNav(null);
 }
 
-function runTakeBreakAction(t, setPendingNav) {
+function runTakeBreakAction(t, pendingNav, setShowQuickAdd, onNavChange, setPendingNav) {
   t.setMode("break");
   t.setTimeLeft(5 * 60);
   t.setIsActive(true);
+  handlePendingAction(pendingNav, setShowQuickAdd, onNavChange);
   setPendingNav(null);
 }
 

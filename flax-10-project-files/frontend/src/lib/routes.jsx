@@ -30,6 +30,7 @@ export const APP_ROUTES = [
     icon: "✔️",
     path: "/attendance",
     element: <AttendancePage />,
+    studentOnly: true,
   },
   {
     id: "timer",
@@ -51,6 +52,7 @@ export const APP_ROUTES = [
     icon: "🤝",
     path: "/group-work",
     element: <GroupWorkIndexPage />,
+    studentOnly: true,
   },
   {
     id: "users",
@@ -69,6 +71,7 @@ export const APP_ROUTES = [
   {
     id: "modules",
     label: "Modules",
+    teacherLabel: "Manage My Modules",
     icon: "📚",
     path: "/modules",
     element: <ModulesPage />,

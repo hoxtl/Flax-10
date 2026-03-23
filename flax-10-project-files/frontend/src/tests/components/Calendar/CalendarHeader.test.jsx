@@ -55,7 +55,7 @@ vi.mock('../../../components/Calendar/header/CalendarHeaderUtils', () => ({
     FilterDropdownButton: ({ active, onChange }) => (
         <button type="button" onClick={() => onChange('work')}>Filter {Array.isArray(active) ? active.join(',') : active}</button>
     ),
-    ScheduleManagerButton: () => <button type="button">Manage schedules</button>,
+    ScheduleManagerButton: () => <button type="button">Reschedule my events</button>,
 }));
 
 vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () => ({
@@ -126,14 +126,14 @@ describe('CalendarHeader', () => {
         });
     });
 
-    it('renders manage schedules control', () => {
+    it('renders reschedule control', () => {
         setup();
-        expect(screen.getByText('Manage schedules')).toBeInTheDocument();
+        expect(screen.getByText('Reschedule my events')).toBeInTheDocument();
     });
 
     it('hides add and schedule actions when viewing a shared calendar', () => {
         setup({ ...defaultState, sharedCalendarUserId: '44', sharedCalendarName: 'Jane Doe' });
-        expect(screen.queryByText('Manage schedules')).not.toBeInTheDocument();
+        expect(screen.queryByText('Reschedule my events')).not.toBeInTheDocument();
         expect(screen.queryByText('+')).not.toBeInTheDocument();
         expect(screen.queryByText('Import timetable')).not.toBeInTheDocument();
     });
@@ -250,13 +250,15 @@ describe('CalendarHeader', () => {
         expect(callArgs.payload.getDate()).toBe(14);
     });
 
-    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view', () => {
+    it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view on mobile', () => {
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 500 });
         setup({ ...defaultState, viewMode: 'day' });
         const dateCards = document.querySelectorAll('.date-card');
         expect(dateCards.length).toBeGreaterThan(0);
         fireEvent.click(dateCards[0]);
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1024 });
     });
 
     it('hides Today button when the selected date is today', () => {

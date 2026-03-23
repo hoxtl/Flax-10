@@ -126,6 +126,40 @@
     letter-spacing: 0.05em !important;
 }
 
+.taskCheckbox {
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--home-task-checkbox-border, var(--widget-border));
+    background: var(--home-task-checkbox-bg, var(--surface-raised, var(--surface-card)));
+    box-shadow: var(--home-task-checkbox-shadow, none);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.taskCheckbox:hover {
+    border-color: color-mix(in srgb, var(--home-urgency-warning) 52%, var(--home-task-checkbox-border, var(--widget-border)));
+    transform: translateY(-1px);
+}
+
+.taskCheckbox:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    outline-offset: 2px;
+}
+
 /* --- Priority pills (matches TaskCard) --- */
 .priorityPill {
     display: inline-flex;

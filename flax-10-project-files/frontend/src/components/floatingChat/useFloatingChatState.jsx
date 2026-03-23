@@ -12,11 +12,12 @@ const MotionDiv = motion.div;
 const HIDDEN_PROMPT = { show: false, message: "", text: "" };
 const TASK_PROMPT_MESSAGE = "Hey! I have a task I need to plan. Can you help me figure out how long it might take? Ask me what the task is and I'll describe it.";
 const MODULE_PROMPT_MESSAGE = "Hey! I'm not sure which modules to pick next semester. I don't really know what I'm into yet — can you ask me some questions about my interests, schedule, and what kind of learning style I prefer to help me figure it out?";
+const TEACHER_MODULE_PROMPT_MESSAGE = "Hey! I need help editing my modules on Flax. Can you walk me through how to update module details like the name, description, location, and schedule? Ask me which module I'm working on and I'll describe what I need to change.";
 const SOCIETY_PROMPT_MESSAGE = "Hey! I want to join some King's societies, but I don't know where to start. Can you ask me a few questions about my interests, personality, time commitment, and whether I want something social, sporty, creative, cultural, or career-focused, then suggest some societies that would suit me?";
 const ANALYTICS_PROMPT_MESSAGE = "Hey! I'm looking at my analytics and I want help understanding what my results actually mean. Can you talk me through the patterns you notice, what seems to be going well, what might need attention, and a few practical changes I could try next?";
 const ROUTE_PROMPTS = [
   { key: "tasks", path: "/tasks", message: TASK_PROMPT_MESSAGE, text: "Not sure how long a task will take? Ask me!" },
-  { key: "modules", path: "/modules", message: MODULE_PROMPT_MESSAGE, text: "Curious about new modules? Let Flax help you pick!" },
+  { key: "modules", path: "/modules", message: MODULE_PROMPT_MESSAGE, text: "Curious about new modules? Let Flax help you pick!", teacherMessage: TEACHER_MODULE_PROMPT_MESSAGE, teacherText: "Need help with editing? Talk to Flax" },
   { key: "societies", path: "/societies", message: SOCIETY_PROMPT_MESSAGE, text: "Don't know what societies to pick? Ask Flax." },
   { key: "analytics", path: "/analytics", message: ANALYTICS_PROMPT_MESSAGE, text: "Need help understanding your results? Ask Flax." },
 ];
@@ -29,20 +30,26 @@ function getSharedCalendarPrompt(search = "") {
   return { key: `shared-calendar-${sharedUserId}`, show: true, message: `Help me write an email to ${sharedName} suggesting three possible meeting times based on their shared calendar. Ask me what we are meeting about, then draft a friendly email I can send.`, text: "Want to draft an email with 3 meeting times? Ask Flax." };
 }
 
-function getRoutePrompt(pathname) {
+function getRoutePrompt(pathname, isTeacher = false) {
   const match = ROUTE_PROMPTS.find((prompt) => pathname.startsWith(prompt.path));
-  return match ? { ...match, show: true } : null;
+  if (!match) return null;
+  return {
+    ...match,
+    show: true,
+    message: isTeacher && match.teacherMessage ? match.teacherMessage : match.message,
+    text: isTeacher && match.teacherText ? match.teacherText : match.text,
+  };
 }
 
-function getPromptContext(location) {
+function getPromptContext(location, isTeacher = false) {
   const sharedPrompt = location.pathname.startsWith("/calendar") ? getSharedCalendarPrompt(location.search) : null;
-  return sharedPrompt || getRoutePrompt(location.pathname) || HIDDEN_PROMPT;
+  return sharedPrompt || getRoutePrompt(location.pathname, isTeacher) || HIDDEN_PROMPT;
 }
 
-export function useFloatingChatState() {
+export function useFloatingChatState(isTeacher = false) {
   const state = useFloatingChatStore();
   const location = useLocation();
-  const promptCtx = getPromptContext(location);
+  const promptCtx = getPromptContext(location, isTeacher);
   useOpenEvent(state.setInitialMessage, state.setOpen);
   useRoutePromptReset(location.pathname, location.search, state.open, state.setInitialMessage);
   useFirstPromptVisit(location, state.setMinimized);

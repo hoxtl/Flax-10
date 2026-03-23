@@ -8,8 +8,8 @@ import { useLocation } from "react-router-dom";
 import { useCalendar, useEventModal } from "../../context/CalendarContext";
 import { useTimerContext } from "../../context/TimerContext";
 import useBreakpoint from "../../hooks/useBreakpoint";
+import { resolveQuickAddModal, shouldBlockTimerNavigation } from "./dashboardLayoutActions";
 import { getStoredUser } from "./dashboardLayoutUser";
-import { resolveQuickAddModal } from "./dashboardLayoutActions";
 
 export function useUserSync() {
   const [user, setUser] = useState(() => getStoredUser());
@@ -38,8 +38,7 @@ export function useModalStates() {
 export function useTimerNav(activeNav, onNavChange, timer) {
   const [pendingNav, setPendingNav] = useState(null);
   const handleNavChange = (nav) => {
-    const shouldPause = activeNav === "timer" && timer.isActive && !timer.isPaused;
-    if (shouldPause && nav !== "timer") return setPendingNav(nav);
+    if (shouldBlockTimerNavigation(activeNav, timer) && nav !== "timer") return setPendingNav(nav);
     return onNavChange?.(nav);
   };
   return { pendingNav, setPendingNav, handleNavChange };

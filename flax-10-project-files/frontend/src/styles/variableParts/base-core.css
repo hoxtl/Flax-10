@@ -243,3 +243,15 @@
   --surface-search: var(--color-bg);
   --surface-raised: var(--color-card);
 }
+
+/* Teacher UI theme — warm pastel rose */
+[data-role="teacher"] {
+  --color-bg: #FDF5F5;
+  --color-card: #FFF8F8;
+  --color-sidebar: #F5ECEC;
+  --color-border-base: rgba(139, 62, 62, 0.10);
+  --color-primary: #8B4A4A;
+  --color-primary-strong: #6B3535;
+  --color-highlight: #C48A8A;
+  --color-highlight-soft: #F0D8D8;
+}
