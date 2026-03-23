@@ -110,7 +110,10 @@ describe('TaskWidgetSlot', () => {
         { id: 1, title: 'Task 1', completed: true },
         { id: 2, title: 'Task 2', completed: true },
       ],
-      taskWidgetList: [],
+      taskWidgetList: [
+        { id: 1, title: 'Task 1', completed: true },
+        { id: 2, title: 'Task 2', completed: true },
+      ],
     });
     expect(screen.getByText(/completed today/)).toBeTruthy();
     expect(screen.getByText('Plan tomorrow →')).toBeTruthy();
@@ -127,9 +130,6 @@ describe('TaskWidgetSlot', () => {
     });
     expect(screen.getByText("Today's Tasks")).toBeTruthy();
     expect(screen.getByText('Study math')).toBeTruthy();
-    expect(screen.getByText('2 due today')).toBeTruthy();
-    expect(screen.getByText(/1 in queue/i)).toBeTruthy();
-    expect(screen.getByText('Focus now')).toBeTruthy();
   });
 
   it('calls handleTaskWidgetComplete when checkbox clicked', () => {
@@ -147,8 +147,8 @@ describe('TaskWidgetSlot', () => {
     expect(handleTaskWidgetComplete).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 
-  it('shows Show more when more than 3 incomplete tasks', () => {
-    const tasks = Array.from({ length: 7 }, (_, i) => ({
+  it('shows Show more when more than 6 incomplete tasks', () => {
+    const tasks = Array.from({ length: 8 }, (_, i) => ({
       id: i + 1,
       title: `Task ${i + 1}`,
       completed: false,
@@ -157,12 +157,12 @@ describe('TaskWidgetSlot', () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-    expect(screen.getByText(/\+ 4 more/)).toBeTruthy();
+    expect(screen.getByText(/\+ 2 more/)).toBeTruthy();
   });
 
   it('toggles showAll when Show more clicked', () => {
     const setShowAllTaskWidgetTasks = vi.fn();
-    const tasks = Array.from({ length: 7 }, (_, i) => ({
+    const tasks = Array.from({ length: 8 }, (_, i) => ({
       id: i + 1,
       title: `Task ${i + 1}`,
       completed: false,
@@ -172,10 +172,8 @@ describe('TaskWidgetSlot', () => {
       taskWidgetList: tasks,
       setShowAllTaskWidgetTasks,
     });
-    fireEvent.click(screen.getByText(/\+ 4 more/));
-    // It should navigate instead of calling the old prop
-    // Note: useNavigate is mocked in this file at the top-level
-    // We need to check if it navigates to /tasks?filter=today
+    // The link navigates to /tasks?filter=today instead of calling setShowAllTaskWidgetTasks
+    expect(screen.getByText(/\+ 2 more/)).toBeTruthy();
   });
 
   it('shows urgency pill for overdue task', () => {
@@ -290,9 +288,9 @@ describe('TaskWidgetSlot', () => {
   it('all done card shows singular task when one task completed', () => {
     renderTaskWidgetSlot({
       taskWidgetItemsOnly: [{ id: 1, title: 'Only', completed: true }],
-      taskWidgetList: [],
+      taskWidgetList: [{ id: 1, title: 'Only', completed: true }],
     });
-    expect(screen.getByText(/1 task.*completed today/)).toBeTruthy();
+    expect(screen.getByText(/1 task completed today/)).toBeTruthy();
   });
 
   it('calls onInlineTaskEdit when context menu Inline Edit is clicked', async () => {

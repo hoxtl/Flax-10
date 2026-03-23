@@ -75,8 +75,8 @@ vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
 vi.mock('../../../pages/Homepage/components', async () => {
-  const { MiniTimelineMock } = await import('./homepageMocks');
-  return { MiniTimeline: MiniTimelineMock };
+  const { MiniTimelineMock, HomepageTimelineSectionMock } = await import('./homepageMocks');
+  return { MiniTimeline: MiniTimelineMock, HomepageTimelineSection: HomepageTimelineSectionMock };
 });
 vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
@@ -174,7 +174,7 @@ describe('Homepage – render & basic', () => {
     fireEvent.click(screen.getByText('complete-task'));
     await waitFor(() => expect(screen.getByText("Couldn't update task.")).toBeTruthy());
     fireEvent.click(screen.getByText('✕'));
-    expect(screen.queryByText("Couldn't update task.")).toBeNull();
+    await waitFor(() => expect(screen.queryByText("Couldn't update task.")).toBeNull());
   });
 
   it('dedupes meal events (e.g., lunch) by day', () => {
