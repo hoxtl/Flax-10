@@ -190,8 +190,9 @@ vi.mock("../../../components/Calendar/EventPopups", () => ({
   EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock("../../../components/Pagination/Pagination", () => ({
-  BackToTop: () => <div data-testid="back-to-top" />,
+vi.mock("../../../components/Common/BackToTop/BackToTop", () => ({
+  __esModule: true,
+  default: () => <div data-testid="back-to-top" />,
 }));
 
 vi.mock("../../../components/Tags/PillFilters", () => ({
@@ -231,10 +232,9 @@ vi.mock("../../../pages/Homepage/components", () => ({
       <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
     </div>
   ),
-  HomepageTimelineSection: ({ onOpenQuickAddSchedule, onTaskToggle, onQuickStart, onConflictAutoMove, onPushTomorrow, onDelete, onReschedule, sortedEvents }) => (
+  HomepageTimelineSection: ({ handleResolveTimelineConflicts, onTaskToggle, onQuickStart, onConflictAutoMove, onPushTomorrow, onDelete, onReschedule, sortedEvents }) => (
     <div data-testid="homepage-timeline-section">
-      <button type="button" onClick={() => onOpenQuickAddSchedule?.("schedule_manual")}>Open manual schedule quick add</button>
-      <button type="button" onClick={() => onOpenQuickAddSchedule?.("schedule_auto")}>Open auto schedule quick add</button>
+      <button type="button" onClick={() => handleResolveTimelineConflicts?.()}>resolve-overlaps</button>
       <button type="button" onClick={() => onTaskToggle?.({ id: 1 })}>task-toggle</button>
       <button type="button" onClick={() => onQuickStart?.(new Date(), 25, { id: 1 })}>quick-start</button>
       <button type="button" onClick={() => onConflictAutoMove?.({ id: 1 })}>conflict-auto-move</button>

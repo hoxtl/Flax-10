@@ -5,7 +5,8 @@
 import { isToday } from "../../../components/Calendar/utils/dateUtils";
 import { createTask, fetchTaskLists, createTaskList, deleteTask, updateTask } from "../../../api/taskApi";
 import { EventPopups } from "../../../components/Calendar/EventPopups";
-import { BackToTop } from "../../../components/Pagination/Pagination";
+import { useAuth } from "../../../context/AuthContext";
+import BackToTop from "../../../components/Common/BackToTop/BackToTop";
 import { TaskWidgetSlot } from "./TaskWidgetSlot";
 import { DeadlinesWidget } from "./DeadlinesWidget";
 import IntelligenceRow from "./IntelligenceRow";
@@ -31,8 +32,10 @@ function HomepageDashboardRow(props) {
   return (
     <div className={styles.intelligenceRowWrap}>
       <IntelligenceRow
+        calendarEvents={props.calendarEvents}
         displayName={props.displayName}
         recommendation={props.state.homepageRecommendation}
+        upcomingDeadlines={props.upcomingDeadlines}
         slot1TodayTasks={<HomepageTaskSlot {...props} />}
         slot3Urgent={<HomepageDeadlines {...props} />}
         slot5Data={getSlot5Data(props)}
@@ -48,11 +51,14 @@ function HomepageTaskSlot(props) {
 }
 
 function HomepageDeadlines(props) {
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
   return (
     <DeadlinesWidget
       deadlines={props.upcomingDeadlines || []}
       onSelectDeadline={props.modals.setSelectedDeadline}
       onSelectModule={props.modals.setSelectedModulePill}
+      isTeacher={isTeacher}
     />
   );
 }
@@ -103,11 +109,11 @@ function getTaskPillLabel(task, props) {
 }
 
 function getTimelineCoreProps(props) {
-  return { completedEventIds: props.completedEventIds, dayTasks: props.dayTasks, deadlineSuggestions: props.state.deadlineSuggestions, getTag: props.getTag, hasTimerSession: props.hasTimerSession, missedItems: props.state.missedItems, now: props.now, overdueTasksForNow: props.state.overdueTasksForNow, replanLoading: props.reschedule.replanLoading, selectedDate: props.selectedDate, setCompletedEventIds: props.setCompletedEventIds, sortedEvents: props.state.sortedEvents, suggestableTasks: props.state.suggestableTasks, taskLists: props.taskLists, tasksDueToday: props.state.tasksDueToday, timeLeft: props.timeLeft, timerMode: props.timerMode, timerTask: props.timerTask };
+  return { completedEventIds: props.completedEventIds, dayTasks: props.dayTasks, deadlineSuggestions: props.state.deadlineSuggestions, getTag: props.getTag, hasTimerSession: props.hasTimerSession, now: props.now, selectedDate: props.selectedDate, setCompletedEventIds: props.setCompletedEventIds, sortedEvents: props.state.sortedEvents, suggestableTasks: props.state.suggestableTasks, taskLists: props.taskLists, tasksDueToday: props.state.tasksDueToday, timeLeft: props.timeLeft, timerMode: props.timerMode, timerTask: props.timerTask };
 }
 
 function getTimelineActionProps(props) {
-  return { handleConflictAutoMove: props.reschedule.handleConflictAutoMove, handleConflictPushTomorrow: props.reschedule.handleConflictPushTomorrow, handleQuickStartGap: props.reschedule.handleQuickStartGap, handleReplanDay: props.reschedule.handleReplanDay, handleReschedule: props.reschedule.handleReschedule, handleTaskToggle: props.handleTaskToggle, handleTimelineDelete: props.reschedule.handleTimelineDelete, onOpenQuickAddSchedule: props.openQuickAddSchedule, openModal: props.openModal, openTimelinePopup: props.openTimelinePopup };
+  return { handleConflictAutoMove: props.reschedule.handleConflictAutoMove, handleConflictPushTomorrow: props.reschedule.handleConflictPushTomorrow, handleQuickStartGap: props.reschedule.handleQuickStartGap, handleResolveTimelineConflicts: props.reschedule.handleResolveTimelineConflicts, handleReschedule: props.reschedule.handleReschedule, handleTaskToggle: props.handleTaskToggle, handleTimelineDelete: props.reschedule.handleTimelineDelete, openModal: props.openModal, openTimelinePopup: props.openTimelinePopup, resolveConflictsLoading: props.reschedule.resolveConflictsLoading };
 }
 
 function getModalStateProps(props) {

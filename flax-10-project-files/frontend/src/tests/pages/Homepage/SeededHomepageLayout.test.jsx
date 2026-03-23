@@ -9,7 +9,7 @@ const { authState } = vi.hoisted(() => ({
       id: 7,
       role: "student",
       settings: {
-        homepage_widgets: ["deadlines", "todayTasks", "bigTimeline"],
+        homepage_widgets: ["hero", "deadlines", "todayTasks", "bigTimeline"],
         homepage_widget_sizes: {},
       },
       summary: {
@@ -64,7 +64,7 @@ describe("SeededHomepageLayout", () => {
       id: 7,
       role: "student",
       settings: {
-        homepage_widgets: ["deadlines", "todayTasks", "bigTimeline"],
+        homepage_widgets: ["hero", "deadlines", "todayTasks", "bigTimeline"],
         homepage_widget_sizes: {},
       },
       summary: {
@@ -74,24 +74,24 @@ describe("SeededHomepageLayout", () => {
     };
   });
 
-  it("uses the seeded three-widget layout", () => {
+  it("uses the seeded hero-first layout", () => {
     renderRow();
-    expect(screen.getByTestId("homepage-layout")).toHaveTextContent("deadlines|todayTasks|bigTimeline");
+    expect(screen.getByTestId("homepage-layout")).toHaveTextContent("hero|deadlines|todayTasks|bigTimeline");
   });
 
   it("replaces stale stored widgets when the server layout changes after reseed", async () => {
     localStorage.setItem("homepage_widget_layout_7", JSON.stringify(["deadlines", "todayTasks", "bigTimeline", "rightNow"]));
     localStorage.setItem("homepage_widget_source_7", JSON.stringify({
-      layout: ["hero", "deadlines", "todayTasks", "bigTimeline", "rightNow"],
+      layout: ["deadlines", "todayTasks", "bigTimeline", "rightNow"],
       sizes: {},
     }));
 
     renderRow();
 
-    expect(screen.getByTestId("homepage-layout")).toHaveTextContent("deadlines|todayTasks|bigTimeline");
+    expect(screen.getByTestId("homepage-layout")).toHaveTextContent("hero|deadlines|todayTasks|bigTimeline");
     await waitFor(() =>
       expect(localStorage.getItem("homepage_widget_source_7")).toBe(JSON.stringify({
-        layout: ["deadlines", "todayTasks", "bigTimeline"],
+        layout: ["hero", "deadlines", "todayTasks", "bigTimeline"],
         sizes: {},
       })),
     );

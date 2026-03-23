@@ -14,13 +14,13 @@ export default function IntelligenceRow(props) {
   const dashboard = useIntelligenceDashboard({ ...props, ...auth });
   return (
     <section className={styles.section}>
-      <IntelligenceGrid {...getGridProps(props, dashboard)} />
+      <IntelligenceGrid {...getGridProps(props, dashboard, auth.profile)} />
       <ResetModal dashboard={dashboard} />
     </section>
   );
 }
 
-function getGridProps(props, dashboard) {
+function getGridProps(props, dashboard, profile) {
   return {
     catalogue: CATALOGUE,
     edit: dashboard.edit,
@@ -32,7 +32,7 @@ function getGridProps(props, dashboard) {
     setShowAdd: dashboard.setShowAdd,
     setWidgetSize: dashboard.setWidgetSize,
     showAdd: dashboard.showAdd,
-    widgetRenderer: (id, size) => renderIntelligenceWidget(id, { ...props, dashboard }, size),
+    widgetRenderer: (id, size) => renderIntelligenceWidget(id, { ...props, dashboard, profile }, size),
     widgetSizes: dashboard.widgetSizes,
   };
 }

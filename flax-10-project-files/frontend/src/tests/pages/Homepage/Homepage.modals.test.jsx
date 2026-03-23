@@ -67,7 +67,7 @@ vi.mock('../../../pages/Homepage/components/DeadlinesWidget', async () => {
 });
 vi.mock('../../../pages/Homepage/components/SleepBanner', () => ({ __esModule: true, default: () => <div data-testid="sleep-banner">sleep</div> }));
 vi.mock('../../../components/Calendar/EventPopups', () => ({ EventPopups: () => <div data-testid="event-popups" /> }));
-vi.mock('../../../components/Pagination/Pagination', () => ({ BackToTop: () => <div data-testid="back-to-top" /> }));
+vi.mock('../../../components/Common/BackToTop/BackToTop', () => ({ __esModule: true, default: () => <div data-testid="back-to-top" /> }));
 vi.mock('../../../components/Tags/PillFilters', () => ({ __esModule: true, default: () => <div data-testid="pill-filters" /> }));
 vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   const actual = await vi.importActual('../../../pages/Tasks/components/TaskCard');

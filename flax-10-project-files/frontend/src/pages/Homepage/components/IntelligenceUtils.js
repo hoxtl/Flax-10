@@ -2,10 +2,13 @@
  * Homepage intelligence display helpers.
  */
 
-export function getGreeting(name) {
+import { doesEventOverlapSleepWindow } from "../../../components/Settings/hooks/useSleepWarning";
+
+export function getGreeting(name, isTeacher = false) {
   const h = new Date().getHours();
   const timeOfDay = h < 12 ? "Morning" : h < 17 ? "Afternoon" : "Evening";
-  return `Good ${timeOfDay}${name ? `, ${name}` : ""}.`;
+  const displayName = isTeacher && name ? `Dr. ${name}` : name;
+  return `Good ${timeOfDay}${displayName ? `, ${displayName}` : ""}.`;
 }
 
 export function getTodayLabel() {
@@ -79,9 +82,9 @@ export function getTravelContext({ upcomingEvent, tflDelays, now, getRelevantDel
   return buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption);
 }
 
-export function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now, getRelevantDelays, isSevereDisruption }) {
+export function getLiveContext({ currentEvent, upcomingEvent, overlaps, tflDelays, now, getRelevantDelays, isSevereDisruption, sleepWindow }) {
   if (currentEvent) {
-    return buildCurrentContext(currentEvent);
+    return buildCurrentContext(currentEvent, sleepWindow);
   }
   if (overlaps?.length) {
     return buildOverlapContext(overlaps);
@@ -113,10 +116,16 @@ function buildTravelContext(upcomingEvent, relevantDelays, isSevereDisruption) {
   };
 }
 
-function buildCurrentContext(currentEvent) {
+function buildCurrentContext(currentEvent, sleepWindow) {
+  const overlapsSleep = doesEventOverlapSleepWindow(
+    sleepWindow?.sleepTime || "23:00",
+    sleepWindow?.wakeTime || "07:00",
+    currentEvent?.start_time,
+    currentEvent?.end_time,
+  );
   return {
     label: "On now",
-    text: `${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
+    text: `${overlapsSleep ? "😴 " : ""}${currentEvent.title}${currentEvent.location ? ` · ${currentEvent.location}` : ""}`,
     meta: currentEvent.end_time ? `Until ${formatEventTime(currentEvent.end_time)}` : null,
     tone: "neutral",
     iconKey: "Clock3",

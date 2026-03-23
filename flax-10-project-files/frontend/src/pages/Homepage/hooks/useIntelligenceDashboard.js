@@ -6,13 +6,15 @@ import { useEffect, useMemo, useState } from "react";
 import { tflService } from "../../../api/tflApi";
 import { getMyCourseChangeRequest } from "../../../api/adminApi";
 import { updateUserSettings } from "../../../api/userApi";
+import useAttendanceStats from "../../../components/Analytics/useAttendanceStats";
+import { getAttendancePercentage } from "../../../components/Analytics/attendanceChartConfig";
 import { loadTermConfig } from "../../../lib/termConfig";
-import { getCurrentEvent, getLiveContext, getNextStep, getUpcomingEvent } from "../components/IntelligenceUtils";
+import { getCurrentEvent, getLiveContext, getUpcomingEvent } from "../components/IntelligenceUtils";
 import { getRelevantDelays, isSevereDisruption } from "../utils/kclTflMapping";
 import useAnalyticsOverview from "../../Analytics/hooks/useAnalyticsOverview";
 
 export const CATALOGUE = [
-  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 2, minRow: 2, maxRow: 2, section: "Essentials" },
+  { id: "hero", label: "Intelligence Hero", icon: "✨", col: 2, row: 1, minRow: 1, maxRow: 1, section: "Essentials" },
   { id: "rightNow", label: "Right Now", icon: "⌚", col: 1, row: 2, section: "Essentials" },
   { id: "deadlines", label: "Deadlines", icon: "⏰", col: 1, row: 1, maxRow: 2, section: "Planning" },
   { id: "todayTasks", label: "Today's Tasks", icon: "✅", col: 1, row: 1, maxRow: 1, section: "Planning" },
@@ -29,7 +31,7 @@ export const CATALOGUE = [
   { id: "analyticsAttendance", label: "Attendance", icon: "📋", col: 2, row: 2, minRow: 2, section: "Analytics" },
 ];
 
-export const DEFAULT_LAYOUT = ["deadlines", "todayTasks", "bigTimeline"];
+export const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
 
 export function useIntelligenceDashboard(props) {
@@ -41,10 +43,11 @@ export function useIntelligenceDashboard(props) {
   const teacherRequestPending = props.profile?.role === "pending_teacher";
   const hasAnalyticsWidgets = layout.some((id) => id.startsWith("analytics"));
   const analytics = useAnalyticsOverview(hasAnalyticsWidgets ? 30 : null);
+  const attendance = useAttendanceSummary();
   const live = useLiveSummary(props, tflDelays);
   useCloudSync(props.profile, props.profileLoading, layout, widgetSizes);
   useProfileFallback(props.profile, props.profileLoading, setLayout, setWidgetSizes);
-  return buildDashboardState(analytics, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes);
+  return buildDashboardState(analytics, attendance, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes);
 }
 
 function usePersistedLayout(profile) {
@@ -83,30 +86,40 @@ function useLiveSummary(props, tflDelays) {
   return useMemo(() => buildLiveSummary(props, tflDelays), [props, tflDelays]);
 }
 
+function useAttendanceSummary() {
+  const { loading, stats } = useAttendanceStats();
+  return { loading, pct: stats?.overall ? getAttendancePercentage(stats.overall) : 0 };
+}
+
 function buildLiveSummary(props, tflDelays) {
   const sortedEvents = Array.isArray(props.slot5Data?.sortedEvents) ? props.slot5Data.sortedEvents : [];
   const pendingTasks = (props.slot5Data?.taskWidgetItemsOnly || []).filter((task) => !task.completed);
   const currentEvent = getCurrentEvent(sortedEvents, props.slot5Data?.now ?? new Date());
   const upcomingEvent = getUpcomingEvent(sortedEvents, props.slot5Data?.now ?? new Date());
+  const sleepWindow = {
+    sleepTime: props.profile?.settings?.sleep_time?.slice?.(0, 5) || "23:00",
+    wakeTime: props.profile?.settings?.wake_time?.slice?.(0, 5) || "07:00",
+  };
   return {
-    currentStreak: getCurrentStreak(props.profileLoading, props.profile),
     eventsCount: sortedEvents.length,
-    liveContext: getLiveContext({ currentEvent, upcomingEvent, overlaps: props.slot5Data?.navigatorContext?.overlaps, tflDelays, now: props.slot5Data?.now ?? new Date(), getRelevantDelays, isSevereDisruption }),
-    nextStep: props.recommendation?.text || getNextStep({ tasksCount: pendingTasks.length, nextWindowMeta: null }),
-    nextStepMeta: props.recommendation?.meta || null,
+    classesCount: countAcademicSessions(sortedEvents),
+    liveContext: getLiveContext({ currentEvent, upcomingEvent, overlaps: props.slot5Data?.navigatorContext?.overlaps, tflDelays, now: props.slot5Data?.now ?? new Date(), getRelevantDelays, isSevereDisruption, sleepWindow }),
     tasksCount: pendingTasks.length,
-    weeklyProgress: getWeeklyProgress(props.profileLoading, props.profile),
   };
 }
 
-function getCurrentStreak(profileLoading, profile) {
-  const current = profileLoading ? null : profile?.summary?.streaks?.current;
-  return Number.isFinite(current) && current > 0 ? `${current}-day streak` : null;
+function countAcademicSessions(events = []) {
+  return events.filter(isAcademicSession).length;
 }
 
-function getWeeklyProgress(profileLoading, profile) {
-  const weekly = profileLoading ? null : profile?.summary?.weekly?.percentage;
-  return Number.isFinite(weekly) ? `${Math.round(weekly)}% weekly goal` : null;
+function isAcademicSession(event) {
+  const source = String(event?.source || "");
+  if (source === "society") return false;
+  const tagName = String(event?.tag_name || event?.tag?.name || "").toLowerCase();
+  const combinedCopy = `${event?.title || ""} ${event?.description || ""}`.toLowerCase();
+  return source === "timetable"
+    || source.startsWith("module_")
+    || ["lecture", "tutorial", "seminar", "practical", "lab", "small group", "smg", "lgt"].some((token) => tagName.includes(token) || combinedCopy.includes(token));
 }
 
 function getStorageKeys(userId) {
@@ -208,16 +221,16 @@ function useDashboardUiState() {
   return { edit, setEdit, setShowAdd, setShowCourseChange, setShowResetConfirm, setShowTeacherRequest, showAdd, showCourseChange, showResetConfirm, showTeacherRequest };
 }
 
-function buildDashboardState(analytics, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes) {
-  return { ...getDashboardData(analytics, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes), ...getDashboardActions(setLayout, setWidgetSizes, ui) };
+function buildDashboardState(analytics, attendance, courseChangeRequest, layout, live, setLayout, teacherRequestPending, tflDelays, ui, widgetSizes, setWidgetSizes) {
+  return { ...getDashboardData(analytics, attendance, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes), ...getDashboardActions(setLayout, setWidgetSizes, ui) };
 }
 
 function getDashboardActions(setLayout, setWidgetSizes, ui) {
   return { handleRandomize: () => setLayout(randomizeLayout), handleReset: () => ui.setShowResetConfirm(true), setEdit: ui.setEdit, setLayout, setShowAdd: ui.setShowAdd, setShowCourseChange: ui.setShowCourseChange, setShowResetConfirm: ui.setShowResetConfirm, setShowTeacherRequest: ui.setShowTeacherRequest, setWidgetSize: (id, size) => setWidgetSizes((prev) => ({ ...prev, [id]: size })) };
 }
 
-function getDashboardData(analytics, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes) {
-  return { analytics, courseChangeRequest: ui.showCourseChange ? courseChangeRequest : null, edit: ui.edit, layout, live, showAdd: ui.showAdd, showResetConfirm: ui.showResetConfirm, teacherRequestPending: ui.showTeacherRequest ? teacherRequestPending : false, tflDelays, widgetSizes };
+function getDashboardData(analytics, attendance, courseChangeRequest, layout, live, teacherRequestPending, tflDelays, ui, widgetSizes) {
+  return { analytics, attendance, courseChangeRequest: ui.showCourseChange ? courseChangeRequest : null, edit: ui.edit, layout, live, showAdd: ui.showAdd, showResetConfirm: ui.showResetConfirm, teacherRequestPending: ui.showTeacherRequest ? teacherRequestPending : false, tflDelays, widgetSizes };
 }
 
 export function getSemesterProgress(now = new Date()) {

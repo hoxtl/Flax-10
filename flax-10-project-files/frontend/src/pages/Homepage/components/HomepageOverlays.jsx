@@ -3,7 +3,8 @@
  */
 
 import { X, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { ModulePill, TypePill, getModulePillColors } from "./ModulePill";
 
 function getModuleInfo(selectedModulePill, enrolledModules) {
@@ -23,6 +24,7 @@ export function HomepageOverlays(props) {
 }
 
 function ModuleOverlay(props) {
+  const navigate = useNavigate();
   if (!props.selectedModulePill) return null;
   const moduleInfo = getModuleInfo(props.selectedModulePill, props.enrolledModules);
   const moduleUrl = moduleInfo.id ? `/modules?moduleId=${moduleInfo.id}` : `/modules?code=${encodeURIComponent(moduleInfo.code)}`;
@@ -33,9 +35,21 @@ function ModuleOverlay(props) {
         <ModuleOverlayHeader {...props} colors={moduleInfo.colors} code={moduleInfo.code} />
         <ModuleOverlayBody moduleInfo={moduleInfo} styles={props.styles} />
         <div className={props.styles.moduleCardDivider} />
-        <Link to={moduleUrl} className={props.styles.moduleCardLink} style={{ background: moduleInfo.colors.text }} onClick={() => props.setSelectedModulePill(null)}>
-          View module →
-        </Link>
+        <div className={props.styles.moduleCardActions}>
+          <PrimaryButton
+            type="button"
+            variant="ghost"
+            size="small"
+            pill
+            className={props.styles.moduleCardLink}
+            onClick={() => {
+              props.setSelectedModulePill(null);
+              navigate(moduleUrl);
+            }}
+          >
+            View module
+          </PrimaryButton>
+        </div>
       </div>
     </div>
   );
@@ -78,7 +92,7 @@ function DeadlineOverlay(props) {
         <DeadlineDate {...props} />
         {props.selectedDeadline.description && <p className={props.styles.deadlineDetailDesc}>{props.selectedDeadline.description}</p>}
         {props.selectedDeadline.location && <DeadlineLocation {...props} />}
-        <DeadlineLink {...props} />
+        <DeadlineActions {...props} />
       </div>
     </div>
   );
@@ -91,6 +105,9 @@ function DeadlineHeader(props) {
         {props.selectedDeadline.module_code && <ModulePill moduleCode={props.selectedDeadline.module_code} />}
         {props.selectedDeadline.deadline_type && <TypePill typeLabel={capitalize(props.selectedDeadline.deadline_type)} accentColor={props.selectedDeadline.module_code ? getModulePillColors(props.selectedDeadline.module_code).accent : undefined} />}
       </div>
+      <button type="button" className={props.styles.deadlineDetailClose} onClick={() => props.setSelectedDeadline(null)} aria-label="Close">
+        <X size={14} strokeWidth={2} aria-hidden />
+      </button>
     </div>
   );
 }
@@ -110,9 +127,27 @@ function DeadlineLocation(props) {
   );
 }
 
-function DeadlineLink(props) {
+function DeadlineActions(props) {
+  const navigate = useNavigate();
   const href = getDeadlineModuleUrl(props.selectedDeadline);
-  return href ? <Link to={href} className={props.styles.deadlineDetailLink} onClick={() => props.setSelectedDeadline(null)}>Go to module →</Link> : null;
+  if (!href) return null;
+  return (
+    <div className={props.styles.deadlineDetailActions}>
+      <PrimaryButton
+        type="button"
+        variant="ghost"
+        size="small"
+        pill
+        className={props.styles.deadlineDetailLink}
+        onClick={() => {
+          props.setSelectedDeadline(null);
+          navigate(href);
+        }}
+      >
+        Go to module
+      </PrimaryButton>
+    </div>
+  );
 }
 
 function getDeadlineModuleUrl(deadline) {

@@ -72,29 +72,25 @@
   color: #a89279;
 }
 
-.deadlineDetailLink {
-  display: inline-flex;
-  align-items: center;
+.deadlineDetailActions,
+.moduleCardActions {
+  display: flex;
   justify-content: center;
-  margin-top: 6px;
-  padding: 8px 18px;
-  border-radius: 9999px;
-  background: rgba(139, 115, 85, 0.07);
-  border: 1px solid rgba(139, 115, 85, 0.14);
-  font-size: 0.8125rem;
+  margin-top: 8px;
+}
+
+.deadlineDetailLink {
+  min-height: 42px;
+  min-width: 150px;
+  padding: 0.45rem 1rem !important;
+  font-size: 0.86rem !important;
   font-weight: 600;
-  color: #736048;
-  text-decoration: none;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
-  align-self: flex-start;
+  color: #736048 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
 }
 .deadlineDetailLink:hover {
-  background: rgba(139, 115, 85, 0.12);
-  color: var(--widget-text-primary);
-  border-color: rgba(139, 115, 85, 0.22);
+  color: var(--widget-text-primary) !important;
 }
 
 /* ─── Module card popup (same overlay as deadline card) ──────────────────── */
@@ -164,26 +160,16 @@
 }
 
 .moduleCardLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 9px 20px;
-  border-radius: 9999px;
-  background: var(--widget-accent);
-  border: none;
-  font-size: 0.8125rem;
+  min-height: 42px;
+  min-width: 150px;
+  padding: 0.45rem 1rem !important;
+  font-size: 0.86rem !important;
   font-weight: 600;
-  color: var(--widget-surface);
-  text-decoration: none;
-  transition:
-    background 0.2s,
-    box-shadow 0.2s;
-  align-self: flex-start;
+  text-transform: none !important;
   cursor: pointer;
 }
 .moduleCardLink:hover {
-  background: #1a0e08;
-  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.18);
+  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.12);
 }
 
 .moduleCardDept {
