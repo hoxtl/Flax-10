@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import PrimaryButton from '../common/PrimaryButton/PrimaryButton';
 import styles from '../../pages/Timer/TimerPage.module.css';
 
@@ -56,21 +57,36 @@ const PauseIndicator = ({ isPaused, totalPaused }) => {
 const PrimaryTimerBtn = ({ isActive, isPaused, onToggle, onPause }) => {
     const label = !isActive ? 'Start' : (isPaused ? 'Resume' : 'Pause');
     const action = !isActive ? onToggle : onPause;
-    return <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnPrimary}`} onClick={action} pill>{label}</PrimaryButton>;
+    const variantClassName = !isActive || isPaused ? styles.timerControlBtnStart : styles.timerControlBtnPause;
+    const size = !isActive || isPaused ? 'large' : 'medium';
+
+    return <PrimaryButton className={`${styles.timerControlBtn} ${variantClassName}`} onClick={action} size={size} pill>{label}</PrimaryButton>;
+};
+
+const BTN_APPEAR = {
+    initial: { opacity: 0, x: -6, scale: 0.9 },
+    animate: { opacity: 1, x: 0, scale: 1 },
+    exit: { opacity: 0, x: -6, scale: 0.9 },
+    transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
 };
 
 export const TimerControls = ({ isActive, isPaused, onToggle, onPause, onReset, onEndEarly, totalPaused }) => {
-    const actns = isActive || isPaused
-        ? <>
-            <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />
-            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnSecondary}`} variant="secondary" onClick={onReset} pill>Reset</PrimaryButton>
-            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnDanger}`} variant="ghost" onClick={onEndEarly} pill>End Early</PrimaryButton>
-          </>
-        : <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />;
     return (
         <div className={styles.controls}>
             <PauseIndicator isPaused={isPaused} totalPaused={totalPaused} />
-            <div className={styles.buttonGroup}>{actns}</div>
+            <div className={styles.buttonGroup}>
+                <PrimaryTimerBtn isActive={isActive} isPaused={isPaused} onToggle={onToggle} onPause={onPause} />
+                <AnimatePresence initial={false}>
+                    {(isActive || isPaused) && <>
+                        <motion.div key="reset-btn" {...BTN_APPEAR} transition={{ ...BTN_APPEAR.transition, delay: 0.04 }}>
+                            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnReset}`} variant="danger" onClick={onReset} pill>Reset</PrimaryButton>
+                        </motion.div>
+                        <motion.div key="end-early-btn" {...BTN_APPEAR} transition={{ ...BTN_APPEAR.transition, delay: 0.09 }}>
+                            <PrimaryButton className={`${styles.timerControlBtn} ${styles.timerControlBtnEndEarly}`} variant="ghost" onClick={onEndEarly} pill>End Early</PrimaryButton>
+                        </motion.div>
+                    </>}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };

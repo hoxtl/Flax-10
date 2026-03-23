@@ -20,7 +20,6 @@ function useTodayBannerItems(state) {
       value: state.streak,
       valueRef: streakRef,
       suffix: 'd',
-      meta: 'days in a row',
       tone: state.streak > 0 ? 'success' : undefined,
     },
     {
@@ -28,7 +27,7 @@ function useTodayBannerItems(state) {
       label: 'Sessions logged',
       value: state.sessions,
       valueRef: sessionsRef,
-      meta: 'last 30 days',
+      tooltip: 'Last 30 days',
       tone: state.sessions > 0 ? 'accent' : undefined,
     },
     {
@@ -37,8 +36,8 @@ function useTodayBannerItems(state) {
       value: state.weeklyGoalDays,
       valueRef: weeklyGoalRef,
       suffix: ' / 7',
-      meta: 'active days this week',
-      tone: state.weeklyGoalDays >= 7 ? 'success' : undefined,
+      tooltip: 'Active days this week',
+      tone: 'accent',
     },
     {
       key: 'focus-time',
@@ -46,7 +45,7 @@ function useTodayBannerItems(state) {
       value: state.focusHours,
       valueRef: focusHoursRef,
       suffix: 'h',
-      meta: 'last 30 days',
+      tooltip: 'Last 30 days',
       tone: state.focusHours > 0 ? 'accent' : undefined,
     },
   ];

@@ -219,11 +219,34 @@
 
 .timerProgressActive {
     filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 50%, transparent));
-    animation: ringPulse 3.5s ease-in-out infinite;
+    animation: ringPulse 3.5s ease-in-out infinite, ringFloat 5.8s ease-in-out infinite;
+}
+
+.timerProgressGuide {
+    opacity: 0.14;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+}
+
+.timerProgressGuideActive {
+    opacity: 0.34;
+    animation: ringGuideOrbit 18s linear infinite;
 }
 
 .timerProgressRing {
-    transition: stroke-dasharray 1s linear, stroke 0.3s ease;
+    transition: stroke-dasharray 0.92s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.3s ease, filter 0.3s ease, transform 0.45s ease;
+    transform-box: fill-box;
+    transform-origin: center;
+    will-change: stroke-dasharray, filter, transform;
+}
+
+@keyframes ringGuideOrbit {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -48;
+    }
 }
 
 @keyframes ringPulse {
@@ -237,6 +260,17 @@
     }
 }
 
+@keyframes ringFloat {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.014);
+    }
+}
+
 @keyframes breathPulse {
     0%,
     100% {
@@ -247,6 +281,18 @@
     50% {
         transform: scale(1.03);
         opacity: 0.5;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .timerCircleActive::before,
+    .timerProgressActive,
+    .timerProgressGuideActive {
+        animation: none !important;
+    }
+
+    .timerProgressRing {
+        transition: stroke 0.3s ease, filter 0.3s ease !important;
     }
 }
 
@@ -348,17 +394,4 @@
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-}
-
-.mainModeLabel {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.02em;
-}
-
-.estimatedFinish {
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-weight: 500;
 }

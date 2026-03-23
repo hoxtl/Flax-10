@@ -18,6 +18,10 @@ vi.mock('../../components/Timer/TreeAnimation', () => ({
     default: ({ progress }) => <div data-testid="tree-anim">Progress: {progress}</div>
 }));
 
+vi.mock('../../components/Timer/FocusAnimation', () => ({
+    default: () => <div data-testid="focus-animation" />,
+}));
+
 vi.mock('../../components/Timer/TodayBanner', () => ({
     default: () => <div data-testid="today-banner" />,
 }));
@@ -211,6 +215,16 @@ describe('TimerPage Integration', () => {
     it('shows the focus page skeleton before the page settles', () => {
         helpers.renderTimerPage({ settle: false });
         expect(screen.getByTestId('focus-page-skeleton')).toBeInTheDocument();
+    });
+
+    it('shows the overtime modal even while full focus mode is open', () => {
+        helpers.renderTimerPage();
+        helpers.updateSettings(0, '1');
+        helpers.clickStart();
+        fireEvent.click(screen.getByRole('button', { name: /full focus mode/i }));
+        helpers.advanceTimer(61000);
+        expect(screen.getByRole('button', { name: /exit focus/i })).toBeInTheDocument();
+        expect(screen.getByText("Time's Up!")).toBeInTheDocument();
     });
 
     it('cycles focus transition messages and hides after 10s', () => {

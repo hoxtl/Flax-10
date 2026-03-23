@@ -34,10 +34,8 @@ function FocusTransition({ show }) {
   );
 }
 
-function FocusOverlay({ state }) {
+function FocusOverlayLayer({ state }) {
   const navigate = useNavigate();
-  if (!state.focusMode) return null;
-
   return (
     <PageTransition className={styles.focusOverlay} style={{ '--focus-accent': state.focusAccent }}>
       <FocusOverlayContent t={state.t} onExitFocus={() => exitFocus(state, navigate)} />
@@ -75,7 +73,6 @@ function TimerTopSplit({ state }) {
   return (
     <div className={styles.timerTopSplit}>
       <div className={styles.timerTopLeft}>
-        <TodayBanner onStreakData={state.setStreakData} />
         <MainSection t={state.t} onOpenHistory={() => state.setShowHistory(true)} onOpenFocus={state.openFocusMode} isMobile={state.isMobile} />
       </div>
       <div className={styles.timerTopRight}>
@@ -96,8 +93,9 @@ function TimerLayout({ state }) {
       <NotificationPrompt permission={state.permission} request={state.request} />
       <FocusEntryBackButton state={state} navigate={navigate} />
       <StreakWarning state={state} />
+      <TodayBanner onStreakData={state.setStreakData} />
       <TimerTopSplit state={state} />
-      <PopupSection t={state.t} showHistory={state.showHistory} onCloseHistory={() => state.setShowHistory(false)} disabled={state.focusMode} />
+      <PopupSection t={state.t} showHistory={!state.focusMode && state.showHistory} onCloseHistory={() => state.setShowHistory(false)} />
     </div>
   );
 }
@@ -110,7 +108,9 @@ export function TimerPageContent({ state }) {
       <ScrollToTop />
       {state.showPageSkeleton && <FocusPageSkeleton />}
       <FocusTransition show={state.showFocusTransition} />
-      <AnimatePresence mode="wait" initial={false}><FocusOverlay state={state} /></AnimatePresence>
+      <AnimatePresence mode="wait" initial={false}>
+        {state.focusMode && <FocusOverlayLayer key="focus-overlay" state={state} />}
+      </AnimatePresence>
       {state.showShortcuts && <ShortcutsModal onClose={() => state.setShowShortcuts(false)} />}
       <TimerLayout state={state} />
     </AppPage>

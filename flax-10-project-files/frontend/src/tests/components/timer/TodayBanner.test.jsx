@@ -60,10 +60,11 @@ describe('TodayBanner', () => {
     const { items } = statStripSpy.mock.calls.at(-1)[0];
     expect(items).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: 'streak', value: 5, suffix: 'd' }),
-      expect.objectContaining({ key: 'sessions', value: 12 }),
-      expect.objectContaining({ key: 'weekly-goal', value: 4, suffix: ' / 7' }),
-      expect.objectContaining({ key: 'focus-time', value: 17.5, suffix: 'h' }),
+      expect.objectContaining({ key: 'sessions', value: 12, tooltip: 'Last 30 days' }),
+      expect.objectContaining({ key: 'weekly-goal', value: 4, suffix: ' / 7', tooltip: 'Active days this week' }),
+      expect.objectContaining({ key: 'focus-time', value: 17.5, suffix: 'h', tooltip: 'Last 30 days' }),
     ]));
+    expect(items.find((item) => item.key === 'streak')?.meta).toBeUndefined();
     expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 5, total_sessions: 2 });
   });
 });

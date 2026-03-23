@@ -50,6 +50,35 @@
     background: color-mix(in srgb, var(--danger) 10%, transparent);
 }
 
+.timerControlBtn {
+    min-width: 132px;
+}
+
+.timerControlBtnStart {
+    background: linear-gradient(180deg, #b7d9b8, #8fc098) !important;
+    border-color: color-mix(in srgb, #8fc098 56%, transparent) !important;
+    color: #193423 !important;
+    padding-inline: 1.6rem !important;
+}
+
+.timerControlBtnPause {
+    background: linear-gradient(180deg, #f0b56f, #df9648) !important;
+    border-color: color-mix(in srgb, #df9648 54%, transparent) !important;
+    color: #4a2f16 !important;
+}
+
+.timerControlBtnReset {
+    background: linear-gradient(180deg, #cf4e4e, #b33d3d) !important;
+    border-color: color-mix(in srgb, #b33d3d 56%, transparent) !important;
+    color: #fff !important;
+}
+
+.timerControlBtnEndEarly {
+    background: color-mix(in srgb, #cf4e4e 12%, var(--surface-card)) !important;
+    border-color: color-mix(in srgb, #cf4e4e 28%, transparent) !important;
+    color: #ab4343 !important;
+}
+
 .settingsContainer {
     display: flex;
     flex-direction: column;
@@ -176,6 +205,11 @@
     color: #f59e0b;
     margin: 0.5rem 0 1rem;
     font-variant-numeric: tabular-nums;
+}
+
+.overtimeActionBtn {
+    min-width: 184px;
+    justify-content: center;
 }
 
 @keyframes slideUp {

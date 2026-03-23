@@ -53,16 +53,16 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.6rem;
     margin-top: 0;
 }
 
 .musicStationsLabel {
-    font-size: 0.68rem;
+    font-size: 0.76rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text);
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--text) 94%, #000);
 }
 
 .musicStationsList {
@@ -74,7 +74,7 @@
 .musicStationsGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.3rem;
+    gap: 0.55rem;
     width: 100%;
 }
 
@@ -84,13 +84,14 @@
     justify-content: space-between;
     gap: 0.3rem;
     width: 100%;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.72rem;
+    min-height: 52px;
+    padding: 0.62rem 0.78rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--muted);
-    background: var(--hover);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md, 8px);
+    background: color-mix(in srgb, var(--surface-card) 94%, var(--hover));
+    border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+    border-radius: 14px;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
     text-align: left;
@@ -110,7 +111,7 @@
     text-overflow: clip;
     line-height: 1.15;
     display: block;
-    font-size: 0.68rem;
+    font-size: 0.76rem;
 }
 
 .musicStationBtn svg {
@@ -162,10 +163,10 @@
 
 .musicEmbedWrap {
     width: 100%;
-    margin-top: 0.35rem;
-    border-radius: var(--radius-lg, 10px);
+    margin-top: 0.2rem;
+    border-radius: 14px;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
     background: var(--surface-card);
     animation: fadeIn 0.2s ease-out;
 }
