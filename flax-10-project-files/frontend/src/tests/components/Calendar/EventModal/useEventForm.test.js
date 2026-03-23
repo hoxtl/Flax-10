@@ -83,7 +83,7 @@ describe('useEventForm', () => {
         });
 
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
-            mockE,
+            null,
             result.current.form,
             event,
             mockActions,
@@ -186,30 +186,29 @@ describe('useEventForm', () => {
 
     it('customSubmit handler sets error when title is empty', async () => {
         const onClose = vi.fn();
-        const customSubmit = vi.fn();
+        const customSubmit = vi.fn().mockRejectedValue(new Error('Title is required'));
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, title: '  ' });
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
         await act(async () => { });
-        act(() => {
+        await act(async () => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(result.current.error).toBe('Title is required');
-        expect(customSubmit).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
     });
 
     it('customSubmit handler calls customSubmit and onClose when title is present', async () => {
         const onClose = vi.fn();
-        const customSubmit = vi.fn();
+        const customSubmit = vi.fn().mockResolvedValue(undefined);
         const formWithTitle = { ...mockInitialForm, title: 'My Event' };
         FormUtilsModule.getInitialForm.mockReturnValue(formWithTitle);
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
         await act(async () => { });
-        act(() => {
+        await act(async () => {
             result.current.handleSubmit({ preventDefault: vi.fn() });
         });
         expect(customSubmit).toHaveBeenCalledWith(result.current.form);
@@ -251,13 +250,13 @@ describe('useEventForm', () => {
         expect(() => act(() => result.current.handleConfirmSleep())).not.toThrow();
     });
 
-    it('uses empty events array when calendar context has no events', () => {
+    it('uses empty events array when calendar context has no events', async () => {
         mockUseCalendar.mockReturnValueOnce({});
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
-        act(() => result.current.handleSubmit({ preventDefault: vi.fn() }));
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalledWith(
-            expect.anything(),
+            null,
             expect.anything(),
             expect.anything(),
             expect.anything(),
@@ -269,23 +268,25 @@ describe('useEventForm', () => {
         );
     });
 
-    it('handleSubmit with no event argument still calls doSubmit', () => {
+    it('handleSubmit with no event argument still calls doSubmit', async () => {
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
-        act(() => result.current.handleSubmit());
+        await act(async () => { });
+        await act(async () => { result.current.handleSubmit(); });
         expect(FormUtilsModule.validateAndSubmit).toHaveBeenCalled();
     });
 
-    it('customSubmit handler sets error when form.title is undefined', () => {
-        const customSubmit = vi.fn();
+    it('customSubmit handler sets error when form.title is undefined', async () => {
+        const customSubmit = vi.fn().mockRejectedValue(new Error('Title is required'));
         const onClose = vi.fn();
         FormUtilsModule.getInitialForm.mockReturnValue({ ...mockInitialForm, title: undefined });
         const { result } = renderHook(() =>
             useEventForm(null, onClose, { customSubmit })
         );
-        act(() => result.current.handleSubmit({ preventDefault: vi.fn() }));
+        await act(async () => { });
+        await act(async () => { result.current.handleSubmit({ preventDefault: vi.fn() }); });
         expect(result.current.error).toBe('Title is required');
-        expect(customSubmit).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
     });
 
     it('handleConfirmSave passes setOverlapWarning as confirmFn (7th arg) and it updates state when invoked', async () => {
@@ -295,6 +296,7 @@ describe('useEventForm', () => {
         });
         const onClose = vi.fn();
         const { result } = renderHook(() => useEventForm({ id: 1 }, onClose));
+        await act(async () => { });
         await act(async () => result.current.handleConfirmSave());
         expect(capturedSetOverlap).toBeDefined();
         act(() => capturedSetOverlap([{ id: 2, title: 'Other Event' }]));

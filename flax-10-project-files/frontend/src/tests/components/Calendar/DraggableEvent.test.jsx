@@ -15,6 +15,7 @@ vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
 vi.mock('../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
     useEventPopup: vi.fn(() => ({ openPopup: mockOpenPopup, closePopup: vi.fn(), popupEvent: null, popupAnchorRect: null })),
+    useEventDelete: vi.fn(() => ({ openDelete: vi.fn(), isDeleteOpen: false, deleteEvent: null, deleteType: null, closeDelete: vi.fn() })),
 }));
 
 const { mockOpenPopup } = vi.hoisted(() => ({ mockOpenPopup: vi.fn() }));
@@ -126,7 +127,7 @@ describe('DraggableEvent', () => {
     it('calls openPopup when read-only event is clicked', () => {
         getEventType.mockReturnValue('society');
         render(<DraggableEvent event={societyEvent} style={{ height: '60px', width: '100%' }} />);
-        const eventEl = screen.getByText('Club Event').closest('[data-event-id]');
+        const eventEl = screen.getByText('Club Event').closest('.draggable-event');
         // Click should not throw
         expect(() => fireEvent.click(eventEl)).not.toThrow();
     });
@@ -158,7 +159,7 @@ describe('DraggableEvent', () => {
     it('does not call openPopup when isDragging', () => {
         vi.mocked(useDragDrop.useDrag).mockReturnValue({ dragProps: {}, isDragging: true });
         render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
-        const eventEl = screen.getByText('Team Meeting').closest('[data-event-id]');
+        const eventEl = screen.getByText('Team Meeting').closest('.draggable-event');
         fireEvent.click(eventEl);
         expect(mockOpenPopup).not.toHaveBeenCalled();
     });
@@ -170,7 +171,7 @@ describe('DraggableEvent', () => {
             resizePreview: null,
         });
         render(<DraggableEvent event={personalEvent} style={{ height: '60px', width: '100%' }} />);
-        const eventEl = screen.getByText('Team Meeting').closest('[data-event-id]');
+        const eventEl = screen.getByText('Team Meeting').closest('.draggable-event');
         fireEvent.click(eventEl);
         expect(mockOpenPopup).not.toHaveBeenCalled();
     });

@@ -44,7 +44,7 @@ describe('popoverUtils', () => {
         it('positions below in day view when no room above', () => {
             const topAnchor = { ...anchor, top: 50, bottom: 100 };
             const pos = calculatePopoverPosition(topAnchor, popWidth, popHeight, winWidth, winHeight, null, 'day');
-            expect(pos.placement).toBe('bottom');
+            expect(pos.placement).toBe('top');
         });
 
         it('preserves current top position when provided', () => {

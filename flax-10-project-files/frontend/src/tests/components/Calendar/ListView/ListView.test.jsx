@@ -30,6 +30,7 @@ vi.mock('../../../../components/Pagination/Pagination', () => ({
 vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
     getEffectiveTagName: (e) => e.tag_name || 'default',
     sortByStartTime: (events) => [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time)),
+    isAllDay: (event) => !!event.all_day,
 }));
 
 describe('ListView', () => {

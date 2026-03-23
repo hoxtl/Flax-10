@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
-const { mockRefreshTags, mockNotify, mockLoadEvents, mockDisenrollFromModule, mockConfirm } = vi.hoisted(() => ({
+const { mockRefreshTags, mockNotify, mockLoadEvents, mockDisenrollFromModule, mockConfirm, mockToast, mockOpenDelete } = vi.hoisted(() => ({
     mockRefreshTags: vi.fn(),
     mockNotify: vi.fn(),
     mockLoadEvents: vi.fn(),
     mockDisenrollFromModule: vi.fn(() => Promise.resolve()),
     mockConfirm: vi.fn(() => Promise.resolve(true)),
+    mockToast: vi.fn(),
+    mockOpenDelete: vi.fn(),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -17,6 +19,7 @@ vi.mock('../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(),
     useEventPopup: vi.fn(),
     useCalendarDispatch: vi.fn(() => vi.fn()),
+    useEventDelete: vi.fn(() => ({ openDelete: mockOpenDelete, isDeleteOpen: false, deleteEvent: null, deleteType: null, closeDelete: vi.fn() })),
 }));
 
 vi.mock('../../../components/Calendar/EventModal/EventModal', () => ({
@@ -73,6 +76,10 @@ vi.mock('../../../components/Modules/hooks/useModuleDisenrollment', () => ({
 
 vi.mock('../../../context/ConfirmContext', () => ({
     useConfirm: () => mockConfirm,
+}));
+
+vi.mock('../../../context/ToastContext', () => ({
+    useToast: () => mockToast,
 }));
 
 import { EventPopups } from '../../../components/Calendar/EventPopups';
@@ -155,7 +162,7 @@ describe('EventPopups', () => {
         expect(screen.getByText('Delete')).toBeTruthy();
     });
 
-    it('shows Leave Module action for module events', () => {
+    it('shows no action buttons for module events', () => {
         useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
         useEventPopup.mockReturnValue({
             popupEvent: { id: 4, title: 'Module Event', source: 'module', tag: null, module: 'CS3001' },
@@ -165,7 +172,9 @@ describe('EventPopups', () => {
         });
         getEventType.mockReturnValue('module');
         render(<EventPopups />);
-        expect(screen.getByText('Leave Module')).toBeTruthy();
+        expect(screen.queryByText('Leave Module')).not.toBeInTheDocument();
+        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     });
 
     it('hides Leave Module action when module leave is disabled', () => {
@@ -224,7 +233,7 @@ describe('EventPopups', () => {
         expect(screen.queryByText('Unsync')).not.toBeInTheDocument();
     });
 
-    it('calls disenrollFromModule and loadEvents when Leave Module is clicked', async () => {
+    it('shows module event popup with no leave action', () => {
         useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
         const mockClosePopup = vi.fn();
         useEventPopup.mockReturnValue({
@@ -235,14 +244,12 @@ describe('EventPopups', () => {
         });
         getEventType.mockReturnValue('module');
         render(<EventPopups />);
-        fireEvent.click(screen.getByText('Leave Module'));
-        await waitFor(() => {
-            expect(mockDisenrollFromModule).toHaveBeenCalledWith('CS3001', mockLoadEvents);
-            expect(mockClosePopup).toHaveBeenCalled();
-        });
+        expect(screen.getByTestId('event-popup')).toBeTruthy();
+        expect(screen.getByText('Module Event')).toBeTruthy();
+        expect(screen.queryByText('Leave Module')).not.toBeInTheDocument();
     });
 
-    it('calls unsyncCalendar, refreshTags, loadEvents, notify when Unsync is clicked', async () => {
+    it('calls unsyncCalendar, refreshTags, loadEvents, toast when Unsync is clicked', async () => {
         useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
         const mockClosePopup = vi.fn();
         useEventPopup.mockReturnValue({
@@ -258,7 +265,7 @@ describe('EventPopups', () => {
             expect(unsyncCalendar).toHaveBeenCalledWith(1);
             expect(mockRefreshTags).toHaveBeenCalled();
             expect(mockLoadEvents).toHaveBeenCalled();
-            expect(mockNotify).toHaveBeenCalledWith('Unsync Successful', 'Calendar for CS Society is now unsynced.');
+            expect(mockToast).toHaveBeenCalledWith('Unsynced CS Society');
             expect(mockClosePopup).toHaveBeenCalled();
         });
     });
@@ -275,15 +282,16 @@ describe('EventPopups', () => {
         render(<EventPopups />);
         fireEvent.click(screen.getByText('Unsync'));
         await waitFor(() => {
-            expect(mockNotify).toHaveBeenCalledWith('Unsync Successful', 'Calendar for this society is now unsynced.');
+            expect(mockToast).toHaveBeenCalledWith('Unsynced society');
         });
     });
 
-    it('recurring delete: choice true calls executeDelete', async () => {
+    it('recurring delete: choice true opens delete confirm for all occurrences', async () => {
         mockConfirm.mockResolvedValueOnce(true);
         useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
+        const evt = { id: 8, title: 'Recurring', source: 'personal', tag: null, rrule: 'FREQ=WEEKLY' };
         useEventPopup.mockReturnValue({
-            popupEvent: { id: 8, title: 'Recurring', source: 'personal', tag: null, rrule: 'FREQ=WEEKLY' },
+            popupEvent: evt,
             popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 },
             closePopup: vi.fn(),
             readOnly: false,
@@ -292,14 +300,15 @@ describe('EventPopups', () => {
         hasRecurrence.mockReturnValue(true);
         render(<EventPopups />);
         fireEvent.click(screen.getByText('Delete'));
-        await waitFor(() => expect(executeDelete).toHaveBeenCalled());
+        await waitFor(() => expect(mockOpenDelete).toHaveBeenCalledWith(evt, 'all'));
     });
 
-    it('recurring delete: choice ALTERNATE calls deleteRecurrenceOccurrence', async () => {
+    it('recurring delete: choice ALTERNATE opens delete confirm for single occurrence', async () => {
         mockConfirm.mockResolvedValueOnce('ALTERNATE');
         useEventModal.mockReturnValue({ isModalOpen: false, openModal: vi.fn(), closeModal: vi.fn() });
+        const evt = { id: 9, title: 'Rec', source: 'personal', tag: null, rrule: 'FREQ=DAILY' };
         useEventPopup.mockReturnValue({
-            popupEvent: { id: 9, title: 'Rec', source: 'personal', tag: null, rrule: 'FREQ=DAILY' },
+            popupEvent: evt,
             popupAnchorRect: { top: 0, left: 0, width: 100, height: 30 },
             closePopup: vi.fn(),
             readOnly: false,
@@ -308,6 +317,6 @@ describe('EventPopups', () => {
         hasRecurrence.mockReturnValue(true);
         render(<EventPopups />);
         fireEvent.click(screen.getByText('Delete'));
-        await waitFor(() => expect(deleteRecurrenceOccurrence).toHaveBeenCalled());
+        await waitFor(() => expect(mockOpenDelete).toHaveBeenCalledWith(evt, 'occurrence'));
     });
 });
