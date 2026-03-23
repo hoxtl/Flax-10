@@ -19,7 +19,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    viteCssModules(),
+    patchCssModules(),
     react(),
   ],
   server: {
