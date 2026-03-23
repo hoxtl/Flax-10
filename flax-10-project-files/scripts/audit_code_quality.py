@@ -672,6 +672,7 @@ def check_js_dead_code(path: Path, issues: list[Issue]) -> None:
     lines = read_lines(path)
     fstr  = short(rel(path))
     for i, line in enumerate(lines, 1):
+        stripped = line.strip()
         if re.search(r"\bconsole\.(log|warn|error|debug)\b", line):
             issues.append(Issue("Dead Code","CONSOLE_LOG","WARN",fstr,i,
                 f"console.* left in source: {line.strip()[:60]}",
@@ -680,7 +681,7 @@ def check_js_dead_code(path: Path, issues: list[Issue]) -> None:
             issues.append(Issue("Dead Code","COMMENTED_CODE","INFO",fstr,i,
                 f"Possibly commented-out code: {line.strip()[:60]}",
                 "Remove dead code — do not leave it commented out."))
-        if re.search(r"\btodo\b|\bfixme\b|\bhack\b|\bxxx\b", line, re.IGNORECASE):
+        if stripped.startswith("//") and re.search(r"\btodo\b|\bfixme\b|\bhack\b|\bxxx\b", stripped, re.IGNORECASE):
             issues.append(Issue("Dead Code","TODO_COMMENT","INFO",fstr,i,
                 f"TODO/FIXME left in code: {line.strip()[:60]}",
                 "Resolve or remove before submission."))
