@@ -7,18 +7,32 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models import User
 
+
+def _username_error(message):
+    return Response({'available': False, 'error': message})
+
+
+def _username_exists(username, user_id):
+    return User.objects.filter(username=username).exclude(id=user_id).exists()
+
+
+def _invalid_username_message(username):
+    if not username:
+        return 'Username is required'
+    if len(username) < 3:
+        return 'Username must be at least 3 characters'
+    return None
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_username(request):
+    return _username_check_response(request)
+
+
+def _username_check_response(request):
     username = request.data.get('username', '').strip()
-    
-    if not username:
-        return Response({'available': False, 'error': 'Username is required'})
-    
-    if len(username) < 3:
-        return Response({'available': False, 'error': 'Username must be at least 3 characters'})
-    
-    # Check if username exists (excluding current user)
-    exists = User.objects.filter(username=username).exclude(id=request.user.id).exists()
-    
+    error_message = _invalid_username_message(username)
+    if error_message:
+        return _username_error(error_message)
+    exists = _username_exists(username, request.user.id)
     return Response({'available': not exists})
