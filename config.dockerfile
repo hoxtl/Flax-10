@@ -7,6 +7,8 @@ COPY flax-10-project-files/frontend/package*.json ./
 RUN npm ci
 
 COPY flax-10-project-files/frontend/ ./
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 FROM python:3.14.3-bookworm AS runtime

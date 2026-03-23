@@ -2,7 +2,7 @@
  * Shared fetch wrapper that injects auth tokens and normalises errors.
  */
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export async function fetchApi(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
