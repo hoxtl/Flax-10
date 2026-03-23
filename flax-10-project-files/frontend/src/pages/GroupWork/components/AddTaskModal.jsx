@@ -51,15 +51,15 @@ function TaskFormActions({ title, dueDate, onClose }) {
     return (
         <div className={styles.actions}>
             <PrimaryButton type="button" variant="ghost" pill onClick={onClose}>Cancel</PrimaryButton>
-            <PrimaryButton type="submit" pill disabled={!title.trim() || !dueDate}>Add task</PrimaryButton>
+            <PrimaryButton type="submit" pill disabled={!title.trim()}>Add task</PrimaryButton>
         </div>
     );
 }
 
 async function submitTask(title, dueDate, assignees, onAdd, onClose) {
     const trimmed = title.trim();
-    if (!trimmed || !dueDate) return;
-    await onAdd({ title: trimmed, due_date: dueDate, assigned_to: assignees });
+    if (!trimmed) return;
+    await onAdd({ title: trimmed, due_date: dueDate || null, assigned_to: assignees });
     onClose();
 }
 
@@ -70,7 +70,7 @@ export default function AddTaskModal({ members = [], onAdd, onClose }) {
     const toggleAssignee = (userId) => setAssignees((prev) => prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]);
     const handleSubmit = (e) => { e.preventDefault(); submitTask(title, dueDate, assignees, onAdd, onClose); };
     return (
-        <StandardModal title="Add new task" onClose={onClose} size="sm">
+        <StandardModal title="Add new task" onClose={onClose} size="md">
             <form onSubmit={handleSubmit} className={styles.form}>
                 <TaskTwoColFields title={title} setTitle={setTitle} dueDate={dueDate} setDueDate={setDueDate} />
                 <TaskAssigneesField members={members} assignees={assignees} onToggle={toggleAssignee} />

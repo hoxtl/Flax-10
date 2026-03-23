@@ -6,7 +6,7 @@ import { FOCUS_BLOCK_COLOURS_HEX } from '../../../pages/Tasks/constants/focusBlo
 import { normalizeModuleCode, getModuleCodePrefix } from '../../../utils/moduleCodeUtils';
 import { isEnrolledIn } from '../../Modules/utils/moduleUtils';
 import { compareTaskDue, compareTaskEstimatedTime, compareTaskPriority, getTaskDurationMinutes } from '../../../lib/focusPlanner';
-import { SORT_ALPHA, SORT_DATE_ADDED, SORT_DUE, SORT_TIME } from './taskInputConstants';
+import { SORT_ALPHA, SORT_ALPHA_DESC, SORT_DATE_ADDED, SORT_DATE_ADDED_ASC, SORT_DUE, SORT_TIME } from './taskInputConstants';
 
 export function getTaskUrgencyTone(task) {
   const raw = task?.due_date || task?.dueDate;
@@ -34,7 +34,9 @@ export function sortTasks(list, sort) {
   if (sort === SORT_TIME) return list.sort(compareTaskEstimatedTime);
   if (sort === SORT_DUE) return list.sort(compareTaskDue);
   if (sort === SORT_ALPHA) return list.sort((left, right) => (left.title || '').localeCompare(right.title || ''));
+  if (sort === SORT_ALPHA_DESC) return list.sort((left, right) => (right.title || '').localeCompare(left.title || ''));
   if (sort === SORT_DATE_ADDED) return list.sort((left, right) => (right.id ?? 0) - (left.id ?? 0));
+  if (sort === SORT_DATE_ADDED_ASC) return list.sort((left, right) => (left.id ?? 0) - (right.id ?? 0));
   return list.sort(compareTaskPriority);
 }
 

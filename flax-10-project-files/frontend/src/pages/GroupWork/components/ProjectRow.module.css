@@ -259,6 +259,21 @@
     margin-top: 0;
 }
 
+.ownerPill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.24);
+    flex-shrink: 0;
+}
+
 .projectAccordion {
     padding: 0 16px 10px;
     background: transparent;
