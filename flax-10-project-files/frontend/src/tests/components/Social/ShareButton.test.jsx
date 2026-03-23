@@ -75,12 +75,11 @@ describe('ShareButton', () => {
     });
 
     it('handles API error without throwing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         shareCalendar.mockRejectedValueOnce(new Error('network error'));
         render(<ShareButton userId={1} initialIsSharing={false} />);
         fireEvent.click(screen.getByRole('button'));
-        await waitFor(() => expect(errSpy).toHaveBeenCalledWith('Error toggling share status', expect.any(Error)));
-        errSpy.mockRestore();
+        await waitFor(() => expect(screen.getByText('Share Calendar')).toBeTruthy());
+        expect(screen.queryByText('Shared')).toBeNull();
     });
 
     it('does not call toggleShare when already loading', async () => {

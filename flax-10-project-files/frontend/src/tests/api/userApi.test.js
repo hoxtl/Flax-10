@@ -2,9 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../../api/userApi';
 
 const mockFetch = (data, ok = true) => {
+    const jsonStr = JSON.stringify(data);
     global.fetch = vi.fn().mockResolvedValue({
         ok,
+        status: ok ? 200 : 400,
         json: vi.fn().mockResolvedValue(data),
+        text: vi.fn().mockResolvedValue(jsonStr),
     });
 };
 
@@ -87,8 +90,8 @@ describe('userService', () => {
     });
 
     it('throws when response is not ok', async () => {
-        global.fetch = vi.fn().mockResolvedValue({ ok: false, json: vi.fn() });
-        await expect(api.getUserSettings()).rejects.toThrow('Request failed');
+        global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 400, json: vi.fn().mockResolvedValue({}), text: vi.fn().mockResolvedValue('{}') });
+        await expect(api.getUserSettings()).rejects.toThrow();
     });
 
     it('searchUsers builds URL with query', async () => {

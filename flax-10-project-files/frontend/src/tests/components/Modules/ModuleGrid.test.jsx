@@ -6,11 +6,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModuleGrid from '../../../components/Modules/Modules/ModuleGrid';
 
-vi.mock('../../../components/Modules/ModulesCard', () => ({
+vi.mock('../../../components/Modules/Modules/ModulesCard.jsx', () => ({
     default: ({ module }) => <div>{module.module_name}</div>,
 }));
-
-vi.mock('../ModuleGrid.module.css', () => ({ default: { grid: 'grid' } }));
 
 describe('ModuleGrid', () => {
     const mockParameters = {
