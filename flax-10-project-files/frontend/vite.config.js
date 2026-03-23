@@ -8,11 +8,6 @@ export default defineConfig({
   build: {
     manifest: true,
 	emptyOutDir: true,
-	rollupOptions: {
-      input: {
-        main: resolve(__dirname, "src/main.jsx"),
-      },
-    },
   },
   plugins: [react()],
   server: {
