@@ -4,6 +4,7 @@
 
 import AppPage from '../../components/common/AppPage/AppPage';
 import { SegmentedControl, Tabs } from '../../components/common';
+import { useAuth } from '../../context/AuthContext';
 import AnalyticsSkeleton from './components/AnalyticsSkeleton';
 import getAnalyticsTabs from './components/AnalyticsPageTabs';
 import useAnalyticsOverview from './hooks/useAnalyticsOverview';
@@ -34,7 +35,9 @@ function PeriodAction({ onChange, period }) {
 export default function AnalyticsPage() {
   const { activeTab, handlePeriodChange, handleTabChange, period } = useAnalyticsPageState();
   const { data, error, loading, progressData, themeStats } = useAnalyticsOverview(period);
-  const tabs = getAnalyticsTabs({ data, loading, period, progressData, themeStats });
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
+  const tabs = getAnalyticsTabs({ data, loading, period, progressData, themeStats, isTeacher });
   return (
     <AppPage
       width="xl"

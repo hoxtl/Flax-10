@@ -5,10 +5,11 @@
 import { getListColor } from "../utils/listColorUtils";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
-import { isReadingList, parseReadingListName } from "../utils/readingListUtils";
+import { isReadingList, isTeachingList, parseReadingListName } from "../utils/readingListUtils";
 import styles from "./ListSidebar.module.css";
 import { ListContextMenu, RenameInput } from "./listSidebarParts";
 import { useListSidebarState } from "./useListSidebarState";
+import { useAuth } from "../../../context/AuthContext";
 
 function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectList, onSelectFilter }) {
   return (
@@ -67,12 +68,16 @@ function ListSection({ label, lists, emptyState, listCounts, activeListId, renam
 }
 
 function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, setRenamingId, onSelectList, onSelectFilter, onRenameList, onCtxMenu }) {
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
   const readingLists = lists.filter(isReadingList);
-  const lifeLists = lists.filter((list) => !isReadingList(list));
+  const teachingLists = lists.filter(isTeachingList);
+  const lifeLists = lists.filter((list) => !isReadingList(list) && !isTeachingList(list));
   const shared = { listCounts, activeListId, renamingId, setRenamingId, onSelectList, onSelectFilter, onRenameList, onCtxMenu };
   return (
     <>
-      <ListSection label="READING LISTS" lists={readingLists} {...shared} />
+      {!isTeacher && <ListSection label="READING LISTS" lists={readingLists} {...shared} />}
+      {isTeacher && <ListSection label="MY TEACHING" lists={teachingLists} emptyState={<EmptyState icon="📋" title="No teaching lists yet" description="Create a list for meetings, planning, or admin." />} {...shared} />}
       <ListSection label="LIFE" lists={lifeLists} emptyState={<EmptyState icon="🗂️" title="No lists yet" description="Create a list to organise your tasks." />} {...shared} />
     </>
   );

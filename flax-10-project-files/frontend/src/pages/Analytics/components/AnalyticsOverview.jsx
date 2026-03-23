@@ -18,13 +18,13 @@ import styles from '../AnalyticsPage.module.css';
 const MotionDiv = motion.div;
 const MotionSection = motion.section;
 
-const getChartItems = (data, progressData, themeStats) => [
+const getChartItems = (data, progressData, themeStats, isTeacher) => [
   { index: 2, title: 'Study Hours', element: <StudyHoursChart data={data.daily_breakdown} /> },
   { index: 3, title: 'Daily Breakdown', element: <DailyBreakdownChart data={data.daily_breakdown} /> },
   getProgressChart(progressData),
   { index: 5, title: 'Focus Heatmap', element: <StudyHeatmap heatmapData={data.heatmap} />, wide: true },
   getThemeChart(themeStats),
-  { index: 7, title: 'Attendance', element: <AttendanceChart /> },
+  !isTeacher ? { index: 7, title: 'Attendance', element: <AttendanceChart /> } : null,
 ].filter(Boolean);
 
 function getProgressChart(progressData) {
@@ -83,22 +83,22 @@ function ChartCard({ title, element, index, wide }) {
   );
 }
 
-function ChartsGrid({ data, progressData, themeStats }) {
+function ChartsGrid({ data, progressData, themeStats, isTeacher }) {
   return (
     <div className={styles.chartsGrid}>
-      {getChartItems(data, progressData, themeStats).map(({ title, element, index, wide }) => (
+      {getChartItems(data, progressData, themeStats, isTeacher).map(({ title, element, index, wide }) => (
         <ChartCard key={title} title={title} element={element} index={index} wide={wide} />
       ))}
     </div>
   );
 }
 
-export default function AnalyticsOverview({ data, progressData, themeStats }) {
+export default function AnalyticsOverview({ data, progressData, themeStats, isTeacher }) {
   return (
     <div className={styles.overviewWrap}>
       <AnimatedSection index={0}><SummaryCards data={data} /></AnimatedSection>
       <InsightsSection data={data} progressData={progressData} />
-      <ChartsGrid data={data} progressData={progressData} themeStats={themeStats} />
+      <ChartsGrid data={data} progressData={progressData} themeStats={themeStats} isTeacher={isTeacher} />
     </div>
   );
 }

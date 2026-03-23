@@ -88,6 +88,13 @@
   align-items: stretch;
 }
 
+.leftTopMetricsRowTeacher {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
 .leftTopSideCol {
   display: flex;
   flex-direction: column;
