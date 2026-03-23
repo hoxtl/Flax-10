@@ -41,11 +41,23 @@ def _create_society_from_config(data, index, total):
     society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
     return society
 
+PASTEL_TAG_COLORS = [
+    '#F4A7B9', '#B8C8F4', '#A8D8B0', '#F9C89A', '#C5B4E3',
+    '#96CEFF', '#F7D090', '#B0D9A8', '#F2C6D0', '#9FD3D3',
+    '#D4B5C8', '#C8E6C9', '#FFD1A8', '#E1BEE7', '#B3E5FC',
+    '#F0F4C3', '#DCEDC8', '#FFDDB3', '#E8EAF6', '#FCE4EC',
+    '#C9E4CA', '#FFE4B5', '#D0E8FF', '#FFD6E0', '#D6EAD0',
+]
+
+def _tag_color_for_label(label):
+    return PASTEL_TAG_COLORS[sum(ord(c) for c in label) % len(PASTEL_TAG_COLORS)]
+
 def _seed_society_tags(society, tag_labels):
-    from faker import Faker
-    f = Faker('en_GB')
     for label in tag_labels:
-        SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
+        SocietyTag.objects.update_or_create(
+            society=society, label=label,
+            defaults={'color': _tag_color_for_label(label)},
+        )
 
 def create_societies(stdout):
     seed_data = build_society_seed_data()

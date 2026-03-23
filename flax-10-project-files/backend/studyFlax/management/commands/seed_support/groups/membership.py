@@ -10,12 +10,12 @@ from django.utils import timezone
 from studyFlax.models.groupwork.groupwork_model import GroupMembership
 from studyFlax.models.modules.enrollment_model import Enrollment
 
-MIN_PROJECT_MEMBER_TOTAL = 4
+MIN_PROJECT_MEMBER_TOTAL = 5
 MAX_PROJECT_MEMBER_TOTAL = 10
 MIN_PROJECTS_PER_STUDENT = 4
 MAX_PROJECTS_PER_STUDENT = 8
 FIXTURE_USERNAMES = ["janedoe", "johndoe", "charlie"]
-FIXTURE_OWNER_MIN_PROJECTS = 3
+FIXTURE_OWNER_MIN_PROJECTS = 2
 
 
 def _add_if_unique(user, seen, unique_users):
@@ -285,7 +285,8 @@ def _fill_solo_project(project, students, module_students, membership_counts, me
     made, _ = _fill_from_candidates(project, candidates, needed, member_sets, membership_counts)
     return made
 
-SPREAD_TARGETS = list(range(MIN_PROJECT_MEMBER_TOTAL, MAX_PROJECT_MEMBER_TOTAL + 1))
+# One project per member count in [5..10], plus an extra 5 and 6 to reach 8 total spread entries
+SPREAD_TARGETS = [5, 5, 6, 6, 7, 8, 9, 10]
 
 def _fill_project_to_target(project, target, students, module_students, membership_counts, member_sets, rng):
     current = len(member_sets.get(project.id, set()))

@@ -170,7 +170,7 @@ def _random_theme():
     return random.choice(['light', 'dark'])
 
 
-CORE_WIDGETS = ["deadlines", "todayTasks", "bigTimeline"]
+CORE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]
 def _select_widgets():
     """Seed only the core homepage widgets."""
 
@@ -180,6 +180,10 @@ def _select_widgets():
 def _widget_size(widget_id):
     """Generate random size for a widget."""
 
+    if widget_id == "hero":
+        return {"col": 2, "row": 1}
+    if widget_id in {"deadlines", "todayTasks"}:
+        return {"col": 1, "row": 1}
     if widget_id == "bigTimeline":
         return {"col": 2, "row": 2}
     return {"col": 2 if random.random() > 0.6 else 1, "row": 2 if random.random() > 0.7 else 1}

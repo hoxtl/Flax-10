@@ -3,6 +3,7 @@ Orchestrates creation of modules, enrolments and deadlines.
 """
 
 from collections import defaultdict
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 
@@ -38,6 +39,10 @@ FIXED_TEACHER_DEPARTMENTS = {
     "amiller": {"Arts & Humanities"},
 }
 MAX_MODULES_PER_TEACHER = 5
+MAX_FIXED_EVENT_OVERLAPS = 2
+FIXED_EVENT_DAY_START_HOUR = 8
+FIXED_EVENT_DAY_END_HOUR = 20
+FIXED_EVENT_SLOT_STEP_MINUTES = 30
 
 def _register_course_prefixes(mapping, course, prefixes):
     for prefix in prefixes:
@@ -325,6 +330,114 @@ def _build_user_deadline_events(user, module, tags, deadlines_by_module):
     return events
 
 
+def _is_seeded_timetable_event(event):
+    return (getattr(event, 'source', '') or '').lower() == 'timetable'
+
+
+def _is_fixed_seed_event(event):
+    source = (getattr(event, 'source', '') or '').lower()
+    return source == 'timetable' or source.startswith('module_') or source == 'society'
+
+
+def _event_day(event):
+    return event.start_time.date()
+
+
+def _event_duration(event):
+    duration = event.end_time - event.start_time
+    return max(duration, timedelta(minutes=30))
+
+
+def _event_sort_key(event):
+    return (event.start_time, -_event_duration(event).total_seconds(), str(event.title or ''))
+
+
+def _event_overlap(event, start_time, end_time):
+    return event.start_time < end_time and event.end_time > start_time
+
+
+def _fits_fixed_overlap_cap(start_time, end_time, existing_events):
+    points = [(start_time, 1), (end_time, -1)]
+    for event in existing_events:
+        if not _event_overlap(event, start_time, end_time):
+            continue
+        points.append((event.start_time, 1))
+        points.append((event.end_time, -1))
+    active = 0
+    for _, delta in sorted(points, key=lambda item: (item[0], 0 if item[1] == -1 else 1)):
+        active += delta
+        if active > MAX_FIXED_EVENT_OVERLAPS:
+            return False
+    return True
+
+
+def _candidate_fixed_slots(event, duration):
+    day_start = event.start_time.replace(
+        hour=FIXED_EVENT_DAY_START_HOUR,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    day_end = event.start_time.replace(
+        hour=FIXED_EVENT_DAY_END_HOUR,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    starts = []
+    cursor = day_start
+    while cursor + duration <= day_end:
+        starts.append(cursor)
+        cursor += timedelta(minutes=FIXED_EVENT_SLOT_STEP_MINUTES)
+    starts.sort(
+        key=lambda candidate: (
+            abs((candidate - event.start_time).total_seconds()),
+            candidate < event.start_time,
+            candidate,
+        )
+    )
+    return starts
+
+
+def _update_timetable_external_id(event, start_time):
+    external_id = getattr(event, 'external_id', None)
+    if not external_id:
+        return
+    prefix, separator, _ = str(external_id).rpartition('-')
+    if prefix and separator:
+        event.external_id = f"{prefix}-{start_time.strftime('%Y%m%dT%H%M')}"
+
+
+def _rebalance_seeded_fixed_events(events):
+    fixed_by_day = defaultdict(list)
+    movable_sessions_by_day = defaultdict(list)
+    for event in events:
+        if _is_seeded_timetable_event(event):
+            movable_sessions_by_day[_event_day(event)].append(event)
+            continue
+        if _is_fixed_seed_event(event):
+            fixed_by_day[_event_day(event)].append(event)
+    for day, day_sessions in movable_sessions_by_day.items():
+        placed = sorted(fixed_by_day.get(day, []), key=_event_sort_key)
+        for session in sorted(day_sessions, key=_event_sort_key):
+            duration = _event_duration(session)
+            start_time = session.start_time
+            end_time = session.end_time
+            if not _fits_fixed_overlap_cap(start_time, end_time, placed):
+                for candidate in _candidate_fixed_slots(session, duration):
+                    candidate_end = candidate + duration
+                    if not _fits_fixed_overlap_cap(candidate, candidate_end, placed):
+                        continue
+                    start_time = candidate
+                    end_time = candidate_end
+                    break
+            session.start_time = start_time
+            session.end_time = end_time
+            _update_timetable_external_id(session, start_time)
+            placed.append(session)
+    return events
+
+
 def _process_single_module(user, module, tags, now, deadlines_by_module):
     """Build enrollment and events for a single module."""
 
@@ -350,7 +463,7 @@ def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
     for module in core + extras:
         enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
         _collect_module_result(enrollment, module_events, enrollments, events)
-    return enrollments, events
+    return enrollments, _rebalance_seeded_fixed_events(events)
 
 def _find_user_tag(user, tags, name):
     """Find a tag by name for a user, falling back to default tags."""
