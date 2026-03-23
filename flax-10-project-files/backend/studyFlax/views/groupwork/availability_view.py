@@ -111,9 +111,7 @@ def _build_member_statuses(suggestion, memberships):
 def _serialise_active_suggestion(suggestion, memberships):
     """Serialise a suggestion with counts and per-member response states."""
     member_statuses = _build_member_statuses(suggestion, memberships)
-    accepted_count = sum(1 for member in member_statuses if member["status"] == "accepted")
-    rejected_count = sum(1 for member in member_statuses if member["status"] == "rejected")
-    pending_count = sum(1 for member in member_statuses if member["status"] == "pending")
+    accepted_count, rejected_count, pending_count = _count_member_statuses(member_statuses)
     team_size = len(member_statuses)
     return {
         "id": suggestion.id,
@@ -128,6 +126,12 @@ def _serialise_active_suggestion(suggestion, memberships):
         "team_size": team_size,
         "is_confirmed": team_size > 0 and accepted_count == team_size,
     }
+
+def _count_member_statuses(member_statuses):
+    accepted_count = sum(1 for member in member_statuses if member["status"] == "accepted")
+    rejected_count = sum(1 for member in member_statuses if member["status"] == "rejected")
+    pending_count = sum(1 for member in member_statuses if member["status"] == "pending")
+    return accepted_count, rejected_count, pending_count
 
 def _get_active_suggestions(project, memberships):
     """Return upcoming meeting suggestions with their responses."""
@@ -155,26 +159,45 @@ def _layered_slots(grouped, ordered_days):
 
 def _select_diverse_slots(slots, limit=SLOT_LIMIT):
     """Spread recommended slots across the week instead of clustering on one day."""
-    grouped = {}
-    for slot in sorted(slots, key=lambda entry: (-entry["free_count"], entry["start"])):
-        grouped.setdefault(slot["start"][:10], []).append(slot)
+    grouped = _group_slots_by_day(slots)
     ordered_days = sorted(grouped.keys())
     selected = list(itertools.islice(_layered_slots(grouped, ordered_days), limit))
     return sorted(selected, key=lambda entry: entry["start"])
 
-def _build_availability_response(project, current_user):
-    """Build the availability response for all project members over 7 days."""
-    memberships = list(project.memberships.select_related("user").order_by("joined_at", "user__username"))
+def _group_slots_by_day(slots):
+    grouped = {}
+    for slot in sorted(slots, key=lambda entry: (-entry["free_count"], entry["start"])):
+        grouped.setdefault(slot["start"][:10], []).append(slot)
+    return grouped
+
+def _build_availability_window():
     now = timezone.now()
     start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    user_events = _get_user_events([m.user for m in memberships], start, start + timedelta(days=7))
+    end = start + timedelta(days=7)
+    return now, start, end
+
+def _project_memberships(project):
+    return list(project.memberships.select_related("user").order_by("joined_at", "user__username"))
+
+def _build_project_members(memberships):
+    return [_build_member_payload(membership.user) for membership in memberships]
+
+def _build_project_slots(start, now, memberships, user_events):
     slots = []
     for i in range(7):
         slots.extend(_get_day_suggestions(start + timedelta(days=i), now, memberships, user_events))
+    return slots
+
+def _build_availability_response(project, current_user):
+    """Build the availability response for all project members over 7 days."""
+    memberships = _project_memberships(project)
+    now, start, end = _build_availability_window()
+    user_events = _get_user_events([m.user for m in memberships], start, end)
+    slots = _build_project_slots(start, now, memberships, user_events)
     return {
         "current_user_id": current_user.id,
         "team_size": len(memberships),
-        "project_members": [_build_member_payload(membership.user) for membership in memberships],
+        "project_members": _build_project_members(memberships),
         "suggestions": _select_diverse_slots(slots),
         "active_suggestions": _get_active_suggestions(project, memberships),
     }
