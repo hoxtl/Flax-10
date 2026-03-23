@@ -97,20 +97,23 @@ describe('TagManagerModal', () => {
 
     it('shows tag edit form when edit button is clicked', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
-        const editBtns = screen.getAllByText('✎');
+        const editBtns = screen.getAllByRole('button', { name: /edit tag/i });
         fireEvent.click(editBtns[0]);
         expect(screen.getByText('Save')).toBeTruthy();
     });
 
     it('shows delete button for non-protected tags', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
-        expect(screen.getByText('🗑')).toBeTruthy();
+        // Only non-protected tags have an enabled delete button
+        const deleteBtns = screen.getAllByRole('button', { name: /delete tag/i }).filter(b => !b.disabled);
+        expect(deleteBtns.length).toBeGreaterThanOrEqual(1);
     });
 
     it('does not show delete button for protected tags (other)', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
-        // 'other' is protected, 'Work' is not. Only one delete button should appear.
-        expect(screen.getAllByText('🗑').length).toBe(1);
+        // 'other' is protected so its delete button is disabled. Only 'Work' has an enabled delete button.
+        const enabledDeleteBtns = screen.getAllByRole('button', { name: /delete tag/i }).filter(b => !b.disabled);
+        expect(enabledDeleteBtns.length).toBe(1);
     });
 
     it('calls deleteTag when delete button is clicked', async () => {
@@ -122,7 +125,7 @@ describe('TagManagerModal', () => {
             deleteTag: mockDeleteTag,
         });
         render(<TagManagerModal onClose={vi.fn()} />);
-        fireEvent.click(screen.getByText('🗑'));
+        fireEvent.click(screen.getByRole('button', { name: /delete tag/i }));
         await waitFor(() => expect(mockDeleteTag).toHaveBeenCalledWith(1));
     });
 
@@ -162,7 +165,7 @@ describe('TagManagerModal', () => {
 
     it('label is disabled for protected tags', () => {
         render(<TagManagerModal onClose={vi.fn()} />);
-        const editBtns = screen.getAllByText('✎');
+        const editBtns = screen.getAllByRole('button', { name: /edit tag/i });
         // Click edit on 'other' (protected)
         fireEvent.click(editBtns[1]);
         const input = screen.getByPlaceholderText('e.g. Gym');
@@ -209,7 +212,7 @@ describe('TagManagerModal', () => {
             deleteTag: vi.fn(),
         });
         render(<TagManagerModal onClose={vi.fn()} />);
-        fireEvent.click(screen.getAllByText('✎')[0]);
+        fireEvent.click(screen.getAllByRole('button', { name: /edit tag/i })[0]);
         fireEvent.change(screen.getByPlaceholderText('e.g. Gym'), { target: { value: 'Work Updated' } });
         fireEvent.click(screen.getByText('Save'));
         await waitFor(() => expect(mockUpdateTag).toHaveBeenCalledWith(1, expect.objectContaining({ label: 'Work Updated' })));
@@ -225,7 +228,7 @@ describe('TagManagerModal', () => {
             deleteTag: mockDeleteTag,
         });
         render(<TagManagerModal onClose={vi.fn()} />);
-        fireEvent.click(screen.getByText('🗑'));
+        fireEvent.click(screen.getByRole('button', { name: /delete tag/i }));
         await waitFor(() => expect(useConfirm).toHaveBeenCalled());
         expect(mockDeleteTag).not.toHaveBeenCalled();
     });

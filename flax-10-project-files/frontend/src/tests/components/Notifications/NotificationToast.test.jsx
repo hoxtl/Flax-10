@@ -53,7 +53,7 @@ describe('NotificationToast', () => {
     expect(playNotificationSoundMock).not.toHaveBeenCalled();
   });
 
-  it('shows a new notification and auto-dismisses it', () => {
+  it('shows a new notification and auto-dismisses it', async () => {
     let state = { notifications: [oldNotification], loading: false };
     useNotificationsMock.mockImplementation(() => state);
 
