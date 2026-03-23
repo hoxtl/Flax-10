@@ -1,11 +1,10 @@
 /* Timeline styles — barrel file importing all timeline sub-stylesheets. */
-
-@import "./styles/TimelineTaskWidget.module.css";
-@import "./styles/TimelineCardCore.module.css";
-@import "./styles/TimelineEventInteraction.module.css";
-@import "./styles/TimelineMiniView.module.css";
-@import "./styles/TimelineStructure.module.css";
-@import "./styles/TimelineCardStyles.module.css";
-@import "./styles/TimelinePastAndMissed.module.css";
-@import "./styles/TimelineGapWindows.module.css";
-@import "./styles/TimelineGapActions.module.css";
+@import "./TimelineTaskWidget.module.css";
+@import "./TimelineCardCore.module.css";
+@import "./TimelineEventInteraction.module.css";
+@import "./TimelineMiniView.module.css";
+@import "./TimelineStructure.module.css";
+@import "./TimelineCardStyles.module.css";
+@import "./TimelinePastAndMissed.module.css";
+@import "./TimelineGapWindows.module.css";
+@import "./TimelineGapActions.module.css";
