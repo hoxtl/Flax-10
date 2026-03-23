@@ -5,7 +5,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
 import { useAttendanceStats } from "../../pages/Attendance/hooks/useAttendanceStats";
 import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSummary";
@@ -105,7 +105,7 @@ function SuccessContent({ attended }) {
   );
 }
 
-function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
+function QuestionContent({ event, isAnswered, onAnswer }) {
   const meta = formatEventMeta(event);
   return (
     <motion.div
@@ -124,8 +124,6 @@ function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
         <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
         <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
       </div>
-
-      <PrimaryButton pill variant="secondary" className={styles.btnFlex} style={{ marginTop: "var(--space-4, 16px)" }} onClick={onDismiss} disabled={isAnswered}>Dismiss</PrimaryButton>
     </motion.div>
   );
 }
@@ -150,7 +148,7 @@ const glowPulse = {
   transition: { duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
 };
 
-export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
+export default function AttendancePromptModal({ event, onAnswer }) {
   const { stats, refetch } = useAttendanceStats();
   const overall = stats?.overall ?? { attended: 0, missed: 0 };
   const basePct = computeAttendancePct(overall);
@@ -194,7 +192,7 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.22 }}
-      onMouseDown={isAnswered ? undefined : onDismiss}
+      onMouseDown={undefined}
     >
       <motion.div
         className={styles.modal}
@@ -211,12 +209,7 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
       >
         <div className={styles.header}>
           <h2 className={styles.title}>Attendance Tracker</h2>
-          <div className={styles.headerActions}>
-            <KclLogo />
-            <button className={styles.closeBtn} onClick={onDismiss} type="button" aria-label="Close">
-              <X size={15} strokeWidth={2.2} />
-            </button>
-          </div>
+          <KclLogo />
         </div>
 
         <AttendanceRing pct={displayPct} updating={isAnswered} />
@@ -230,7 +223,6 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
               event={event}
               isAnswered={isAnswered}
               onAnswer={handleAnswer}
-              onDismiss={onDismiss}
             />
           )}
         </AnimatePresence>

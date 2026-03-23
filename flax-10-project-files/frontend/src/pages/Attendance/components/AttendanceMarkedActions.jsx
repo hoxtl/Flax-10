@@ -1,14 +1,13 @@
 /*
- * Attendance marked-state actions.
+ * Attendance marked-state actions — status badge only, no change allowed.
  */
 
 import styles from "./AttendanceList.module.css";
 
-export default function AttendanceMarkedActions({ event, submittingId, onChange }) {
+export default function AttendanceMarkedActions({ event }) {
   return (
     <span className={styles.eventActions}>
       <AttendanceStatusBadge attended={event.attended} />
-      <button type="button" className={styles.btnChange} onClick={() => onChange(event.id, !event.attended)} disabled={submittingId === event.id} title={event.attended ? "Mark as missed" : "Mark as attended"}>Change</button>
     </span>
   );
 }
