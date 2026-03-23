@@ -93,13 +93,18 @@ const glowPulse = {
 };
 
 export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
-  const { stats } = useAttendanceStats();
+  const { stats, refetch } = useAttendanceStats();
   const overall = stats?.overall ?? { attended: 0, missed: 0 };
   const basePct = computeAttendancePct(overall);
   const [answeredWith, setAnsweredWith] = useState(null);
+  const [submitError, setSubmitError] = useState("");
   const timerRef = useRef(null);
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+  useEffect(() => {
+    setAnsweredWith(null);
+    setSubmitError("");
+  }, [event?.id]);
 
   const displayPct = useMemo(() => {
     if (answeredWith === true)  return computeAttendancePct({ attended: overall.attended + 1, missed: overall.missed });
@@ -107,10 +112,19 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
     return basePct;
   }, [answeredWith, overall, basePct]);
 
+  async function runAnswer(attended) {
+    const success = await onAnswer(attended, { afterSuccess: refetch });
+    if (!success) {
+      setAnsweredWith(null);
+      setSubmitError("Could not update attendance. Please try again.");
+    }
+  }
+
   function handleAnswer(attended) {
     if (answeredWith !== null) return;
+    setSubmitError("");
     setAnsweredWith(attended);
-    timerRef.current = setTimeout(() => onAnswer(attended), 1200);
+    timerRef.current = setTimeout(() => { void runAnswer(attended); }, 1200);
   }
 
   const meta = formatEventMeta(event);
@@ -151,6 +165,8 @@ export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
           <PrimaryButton pill className={styles.btnYes} onClick={() => handleAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
           <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => handleAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
         </div>
+
+        {submitError && <p className={styles.errorText}>{submitError}</p>}
 
         <PrimaryButton pill variant="secondary" className={styles.btnFlex} onClick={onDismiss} disabled={isAnswered}>Dismiss</PrimaryButton>
       </motion.div>

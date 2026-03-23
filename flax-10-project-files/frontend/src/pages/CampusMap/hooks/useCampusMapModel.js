@@ -4,10 +4,8 @@
 
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
-import { KCL_CAMPUSES } from "../../../lib/kclCampuses";
 import { reverseGeocode } from "../../../api/geocodeApi";
 import { tflService } from "../../../api/tflApi";
-import { useCalendarEvents } from "./useCalendarEvents";
 import { useCampusMapRefs } from "./useCampusMapRefs";
 import { useCampusMapState } from "./useCampusMapState";
 import { useDisruptions } from "./useDisruptions";
@@ -82,14 +80,6 @@ function handleJourneyCalculate(manualDestination, map, selectedCampus, setSelec
   };
 }
 
-function handleEventClick(map, selectedCampus, startLocation, setSelection) {
-  return (event) => {
-    const customDestination = { address: event.location, lat: event.latitude, lng: event.longitude, name: event.title }, start = !startLocation && selectedCampus ? { lat: selectedCampus.coords[1], lng: selectedCampus.coords[0] } : startLocation;
-    setSelection((current) => ({ ...current, customDestination, selectedCampus: null, startLocation: start || { lat: event.latitude, lng: event.longitude } }));
-    map.current?.flyTo({ center: [event.longitude, event.latitude], duration: 1200, pitch: 55, zoom: 15 });
-  };
-}
-
 function useMapSetup(refs, setForm, setSelection, setUi) {
   useEffect(() => {
     const mapRef = refs.map, containerRef = refs.mapContainer;
@@ -121,7 +111,7 @@ function useRoutes(refs, selection, setRoutes) {
 }
 
 export function useCampusMapModel() {
-  const refs = useCampusMapRefs(), state = useCampusMapState(), { disruptions, loading: loadingDisruptions } = useDisruptions(), { events: calendarEvents } = useCalendarEvents(), { userHome } = useHomeAddress();
+  const refs = useCampusMapRefs(), state = useCampusMapState(), { disruptions, loading: loadingDisruptions } = useDisruptions(), { userHome } = useHomeAddress();
   useResponsiveCampusMap(state.setUi, state.ui.isMobile); useMapSetup(refs, state.setForm, state.setSelection, state.setUi); useMapResize(state.ui.mapLoaded, state.ui.isMobile, refs.map); useMarkerSync(refs, state.selection, state.setForm, state.setSelection, state.ui, userHome); useRoutes(refs, state.selection, state.setRoutes);
-  return { calendarEvents, clearAllSelections: () => clearAllSelections(refs, state.setForm, state.setRoutes, state.setSelection), clearCustomDestination: () => state.setSelection((current) => ({ ...current, customDestination: null })), disruptions, flyToCampus: (campus) => flyToCampus(refs.map, campus), form: state.form, handleClearCampus: () => clearCampus(refs, state.setForm, state.setRoutes, state.setSelection), handleClearStart: () => clearStart(refs, state.setForm, state.setRoutes, state.setSelection), handleEventClick: handleEventClick(refs.map, state.selection.selectedCampus, state.selection.startLocation, state.setSelection), handleGeolocate: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi), handleSelectCampus: (campus) => selectCampus(refs.map, campus, state.setForm, state.setSelection), handleUserJourneyCalculate: handleJourneyCalculate(state.form.manualDestination, refs.map, state.selection.selectedCampus, state.setSelection), loadingDisruptions, mapContainer: refs.mapContainer, routes: state.routes, selection: state.selection, setManualDestination: (value) => setManualState("manualDestination", value, state.setForm), setManualStart: (value) => setManualState("manualStart", value, state.setForm), showInitialSkeleton: !state.ui.mapLoaded || !state.ui.minSkeletonElapsed, toggleTflInstructions: () => togglePanel("tflInstructions", state.setUi), toggleWalkingInstructions: () => togglePanel("walkingInstructions", state.setUi), ui: state.ui };
+  return { clearAllSelections: () => clearAllSelections(refs, state.setForm, state.setRoutes, state.setSelection), clearCustomDestination: () => state.setSelection((current) => ({ ...current, customDestination: null })), disruptions, flyToCampus: (campus) => flyToCampus(refs.map, campus), form: state.form, handleClearCampus: () => clearCampus(refs, state.setForm, state.setRoutes, state.setSelection), handleClearStart: () => clearStart(refs, state.setForm, state.setRoutes, state.setSelection), handleGeolocate: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi), handleSelectCampus: (campus) => selectCampus(refs.map, campus, state.setForm, state.setSelection), handleUserJourneyCalculate: handleJourneyCalculate(state.form.manualDestination, refs.map, state.selection.selectedCampus, state.setSelection), loadingDisruptions, mapContainer: refs.mapContainer, routes: state.routes, selection: state.selection, setManualDestination: (value) => setManualState("manualDestination", value, state.setForm), setManualStart: (value) => setManualState("manualStart", value, state.setForm), showInitialSkeleton: !state.ui.mapLoaded || !state.ui.minSkeletonElapsed, toggleTflInstructions: () => togglePanel("tflInstructions", state.setUi), toggleWalkingInstructions: () => togglePanel("walkingInstructions", state.setUi), ui: state.ui };
 }

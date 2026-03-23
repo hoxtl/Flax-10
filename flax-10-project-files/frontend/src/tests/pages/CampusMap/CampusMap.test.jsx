@@ -31,10 +31,12 @@ vi.mock("mapbox-gl", () => ({
     Map: MockMap,
     NavigationControl: function MockNav() {},
     Marker: vi.fn().mockImplementation(function Marker() {
+      const element = document.createElement("button");
       return {
         setLngLat: vi.fn().mockReturnThis(),
         setPopup: vi.fn().mockReturnThis(),
         addTo: vi.fn().mockReturnThis(),
+        getElement: vi.fn(() => element),
         getPopup: vi.fn(() => ({ isOpen: vi.fn(() => false), togglePopup: vi.fn() })),
         togglePopup: vi.fn(),
         remove: vi.fn(),
@@ -97,6 +99,11 @@ describe("CampusMap", () => {
     render(<CampusMap />);
     expect(screen.getByText("StudyFlax Map")).toBeInTheDocument();
     expect(screen.getByText("Never be late, plan your journeys!")).toBeInTheDocument();
+  });
+
+  it("does not render the removed events today section", () => {
+    render(<CampusMap />);
+    expect(screen.queryByText("Events Today")).not.toBeInTheDocument();
   });
 
   it("renders TfL Line Status section", async () => {
