@@ -162,11 +162,22 @@ def hit_goal_four_weeks(sessions, now, goal):
 
 
 def _badge_groups(sessions_all, session_count, total_hours, longest_streak, active_days, module_count, user):
+    return _core_badge_groups(total_hours, session_count, longest_streak, active_days) + _activity_badge_groups(
+        sessions_all, session_count, module_count, user
+    )
+
+
+def _core_badge_groups(total_hours, session_count, longest_streak, active_days):
     return [
         hour_badges(total_hours),
         session_count_badges(session_count),
         streak_badges(longest_streak),
         consistency_badges(active_days),
+    ]
+
+
+def _activity_badge_groups(sessions_all, session_count, module_count, user):
+    return [
         time_of_day_badges(sessions_all, session_count),
         session_length_badges(sessions_all),
         module_badges(module_count),
