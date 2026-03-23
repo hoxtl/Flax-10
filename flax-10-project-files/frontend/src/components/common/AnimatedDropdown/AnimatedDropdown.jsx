@@ -2,7 +2,7 @@
  * Animated dropdown with optional search and grouped option support.
  */
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Search } from "lucide-react";
@@ -13,7 +13,7 @@ import {
   getDropdownPanelMotion,
 } from "../motion/transitions";
 import styles from "./AnimatedDropdown.module.css";
-import { filterFlat, filterGrouped, buildMenuStyle, computeOpenDirection, makeOutsideClickListener } from "./animatedDropdownUtils";
+import { buildMenuStyle, getFilteredDropdownOptions, useAnimatedDropdownState } from "./useAnimatedDropdown";
 
 /** Text input with a leading search icon, auto-focused on mount. */
 
@@ -155,7 +155,7 @@ function DropdownMenu({
   searchPlaceholder, emptyMessage, openUpward, menuMaxHeight, hideCheckmark, align,
   usePortal, coords, menuRef
 }) {
-  const filteredOptions = searchable ? (grouped ? filterGrouped(options, query) : filterFlat(options, query)) : options;
+  const filteredOptions = getFilteredDropdownOptions(options, grouped, searchable, query);
   const menu = (
     <AnimatePresence>
       {isOpen && <DropdownPanel grouped={grouped} filteredOptions={filteredOptions} value={value} onSelect={onSelect}
@@ -166,77 +166,6 @@ function DropdownMenu({
   );
   if (usePortal && isOpen) return createPortal(menu, document.body);
   return menu;
-}
-
-function useDropdownOptions(options, grouped) {
-  return grouped
-    ? options.flatMap(g => g.options.map(o => ({ ...o, group: g.label })))
-    : options.map(o => typeof o === 'string' ? { value: o, label: o } : o);
-}
-
-function useDropdownState(opts, grp, ph, val, onChange, hover, forceOpen, onOpenChange) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isCtrl = forceOpen !== undefined;
-  const isOpen = isCtrl ? forceOpen : internalOpen;
-  const updateOpen = (v) => {
-    const next = typeof v === 'function' ? v(isOpen) : v;
-    if (!isCtrl) setInternalOpen(next);
-    if (onOpenChange) onOpenChange(next);
-  };
-  const [query, setQuery] = useState("");
-  const allOptions = useDropdownOptions(opts, grp);
-  const selectedLabel = allOptions.find(o => o.value === val)?.label || ph;
-  const handleSelect = (v) => { onChange(v); updateOpen(false); setQuery(""); };
-  const handleToggle = () => { if (!hover) { updateOpen(!isOpen); setQuery(""); } };
-  return { isOpen, setIsOpen: updateOpen, query, setQuery, selectedLabel, handleSelect, handleToggle };
-}
-
-/** Determines whether the dropdown should open upward based on available viewport space. */
-
-function useOpenDirection(containerRef, isOpen, menuMaxHeight = 260, allowFlipUpward = false) {
-  const [openUpward, setOpenUpward] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
-
-  useEffect(() => {
-    if (!isOpen || !containerRef.current) return;
-    const update = () => {
-      const { shouldOpenUpward, coords: c } = computeOpenDirection(containerRef.current.getBoundingClientRect(), menuMaxHeight, allowFlipUpward);
-      setOpenUpward(shouldOpenUpward);
-      setCoords(c);
-    };
-    update();
-    window.addEventListener('scroll', update, true);
-    window.addEventListener('resize', update);
-    return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
-  }, [isOpen, menuMaxHeight, containerRef, allowFlipUpward]);
-
-  return { openUpward, coords };
-}
-
-function useClickOutside(containerRef, menuRef, setIsOpen, openOnHover) {
-  useEffect(() => {
-    if (openOnHover) return;
-    const listener = makeOutsideClickListener(containerRef, menuRef, setIsOpen);
-    document.addEventListener("mousedown", listener);
-    return () => document.removeEventListener("mousedown", listener);
-  }, [openOnHover, setIsOpen, containerRef, menuRef]);
-}
-
-function useHoverHandlers(openOnHover, setIsOpen, timeoutRef) {
-  const handleMouseEnter = () => {
-    if (!openOnHover) return;
-    clearTimeout(timeoutRef.current);
-    setIsOpen(true);
-  };
-  const handleMouseLeave = () => {
-    if (!openOnHover) return;
-    timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
-  };
-  return { handleMouseEnter, handleMouseLeave };
-}
-
-function useDropdownRefs() {
-  return { containerRef: useRef(null), menuRef: useRef(null), timeoutRef: useRef(null) };
 }
 
 function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLabel, value, isOpen, triggerClassName }) {
@@ -257,11 +186,31 @@ export default function AnimatedDropdown({
   value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className,
   customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true, triggerClassName = ""
 }) {
-  const { containerRef, menuRef, timeoutRef } = useDropdownRefs();
-  const { isOpen, setIsOpen, query, setQuery, selectedLabel, handleSelect, handleToggle } = useDropdownState(options, grouped, placeholder, value, onChange, openOnHover, forceOpen, onOpenChange);
-  const { openUpward, coords } = useOpenDirection(containerRef, isOpen, menuMaxHeight, allowFlipUpward);
-  const { handleMouseEnter, handleMouseLeave } = useHoverHandlers(openOnHover, setIsOpen, timeoutRef);
-  useClickOutside(containerRef, menuRef, setIsOpen, openOnHover);
+  const {
+    containerRef,
+    menuRef,
+    isOpen,
+    query,
+    setQuery,
+    selectedLabel,
+    handleSelect,
+    handleToggle,
+    openUpward,
+    coords,
+    handleMouseEnter,
+    handleMouseLeave,
+  } = useAnimatedDropdownState({
+    options,
+    grouped,
+    placeholder,
+    value,
+    onChange,
+    openOnHover,
+    isOpen: forceOpen,
+    onOpenChange,
+    menuMaxHeight,
+    allowFlipUpward,
+  });
   return (
     <div ref={containerRef} className={className} style={{ position: 'relative' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <DropdownTrigger customTrigger={customTrigger} handleToggle={handleToggle} openOnHover={openOnHover} selectedLabel={selectedLabel} value={value} isOpen={isOpen} triggerClassName={triggerClassName} />

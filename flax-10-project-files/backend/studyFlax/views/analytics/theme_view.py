@@ -29,20 +29,50 @@ def _validate_theme_data(data):
         return None, None, None, 'Invalid datetime values'
     return start, end, theme, None
 
+
+def _theme_duration_minutes(start, end):
+    return max(1, int((end - start).total_seconds() / 60))
+
+
+def _create_theme_session(user, theme, start, end):
+    duration_minutes = _theme_duration_minutes(start, end)
+    ThemeSession.objects.create(
+        user=user,
+        theme=theme,
+        started_at=start,
+        ended_at=end,
+        duration_minutes=duration_minutes,
+    )
+    return duration_minutes
+
+
+def _theme_session_payload(duration_minutes):
+    return {'status': 'logged', 'duration_minutes': duration_minutes}
+
+def _theme_session_result(data, user):
+    start, end, theme, error = _validate_theme_data(data)
+    if error:
+        return None, {'error': error}, status.HTTP_400_BAD_REQUEST
+    duration_minutes = _create_theme_session(user, theme, start, end)
+    return _theme_session_payload(duration_minutes), None, status.HTTP_201_CREATED
+
+
+def _theme_session_response(request):
+    payload, errors, status_code = _theme_session_result(request.data, request.user)
+    if errors:
+        return Response(errors, status=status_code)
+    return Response(payload, status=status_code)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def log_theme_session(request):
+def create_theme_session_view(request):
     """Log a new theme session (light/dark mode usage period)."""
 
-    start, end, theme, error = _validate_theme_data(request.data)
-    if error:
-        return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
-    duration_minutes = max(1, int((end - start).total_seconds() / 60))
-    ThemeSession.objects.create(
-        user=request.user, theme=theme,
-        started_at=start, ended_at=end, duration_minutes=duration_minutes,
-    )
-    return Response({'status': 'logged', 'duration_minutes': duration_minutes}, status=status.HTTP_201_CREATED)
+    return _theme_session_response(request)
+
+
+log_theme_session = create_theme_session_view
 
 def _aggregate_by_hour(sessions):
     """Split sessions into dark/light hourly totals."""
@@ -67,24 +97,45 @@ def _compute_theme_totals(sessions):
     dark = sum(s.duration_minutes for s in sessions if s.theme == 'dark')
     return light, dark, light + dark
 
+
+def _peak_theme_hour(hours):
+    return fmt_hour(max(hours, key=hours.get) if hours else None)
+
+
+def _theme_summary(light, dark, total, dark_hours, light_hours):
+    return {
+        'light_minutes': light,
+        'dark_minutes': dark,
+        'total_minutes': total,
+        'light_percentage': round(light / total * 100, 1) if total else 0,
+        'dark_percentage': round(dark / total * 100, 1) if total else 0,
+        'is_night_owl': _compute_night_owl(dark_hours, dark),
+        'peak_dark_hour': _peak_theme_hour(dark_hours),
+        'peak_light_hour': _peak_theme_hour(light_hours),
+    }
+
 def _build_theme_response(sessions, days):
     """Build the full theme stats response dict."""
 
     light, dark, total = _compute_theme_totals(sessions)
     dark_hours, light_hours = _aggregate_by_hour(sessions)
     return {
-        'summary': {
-            'light_minutes': light, 'dark_minutes': dark, 'total_minutes': total,
-            'light_percentage': round(light / total * 100, 1) if total else 0,
-            'dark_percentage': round(dark / total * 100, 1) if total else 0,
-            'is_night_owl': _compute_night_owl(dark_hours, dark),
-            'peak_dark_hour': fmt_hour(max(dark_hours, key=dark_hours.get) if dark_hours else None),
-            'peak_light_hour': fmt_hour(max(light_hours, key=light_hours.get) if light_hours else None),
-        },
+        'summary': _theme_summary(light, dark, total, dark_hours, light_hours),
         'hourly_dark': [dark_hours.get(h, 0) for h in range(24)],
         'hourly_light': [light_hours.get(h, 0) for h in range(24)],
         'period_days': days,
     }
+
+
+def _theme_sessions(user, days):
+    return ThemeSession.objects.filter(
+        user=user,
+        started_at__gte=timezone.now() - timedelta(days=days),
+    )
+
+
+def _theme_stats_payload(user, days):
+    return _build_theme_response(_theme_sessions(user, days), days)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -92,7 +143,4 @@ def get_theme_stats(request):
     """Return theme usage statistics: summary, hourly breakdown, and night-owl flag."""
 
     days = int(request.GET.get('days', 30))
-    sessions = ThemeSession.objects.filter(
-        user=request.user, started_at__gte=timezone.now() - timedelta(days=days),
-    )
-    return Response(_build_theme_response(sessions, days))
+    return Response(_theme_stats_payload(request.user, days))

@@ -33,16 +33,24 @@ def get_announcements(society):
     return Response(SocietyAnnouncementSerialiser(announcements, many=True).data)
 
 def create_announcement(request, society, silent=False):
-    if not is_society_admin(request.user, society):
-        return permission_denied_response()
+    payload, errors, status_code = create_announcement_result(request.user, request.data, society, silent)
+    if errors:
+        return Response(errors, status=status_code)
+    return Response(payload, status=status_code)
+
+
+def create_announcement_result(user, data, society, silent=False):
+    if not is_society_admin(user, society):
+        response = permission_denied_response()
+        return None, response.data, response.status_code
     context = {'skip_notification': silent}
-    serialiser = SocietyAnnouncementSerialiser(data=request.data, context=context)
+    serialiser = SocietyAnnouncementSerialiser(data=data, context=context)
     if not serialiser.is_valid():
-        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+        return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     announcement = serialiser.save(society=society)
-    save_announcement_images(announcement, get_image_urls(request.data))
+    save_announcement_images(announcement, get_image_urls(data))
     announcement.refresh_from_db()
-    return Response(SocietyAnnouncementSerialiser(announcement).data, status=status.HTTP_201_CREATED)
+    return SocietyAnnouncementSerialiser(announcement).data, None, status.HTTP_201_CREATED
 
 def get_image_urls(data):
     return data.get('images') or data.get('image_urls', [])
@@ -62,24 +70,38 @@ def announcement_detail(request, society_id, announcement_id):
         return Response({'error': 'Announcement not found'}, status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         return Response(SocietyAnnouncementSerialiser(announcement).data)
-    if not is_society_admin(request.user, society):
-        return permission_denied_response()
+    permission_response = _society_admin_error(request.user, society)
+    if permission_response:
+        return permission_response
     silent = is_silent_request(request)
     if request.method == 'DELETE':
         return delete_announcement(announcement, silent)
     return update_announcement(announcement, request.data, silent)
 
+
+def _society_admin_error(user, society):
+    if is_society_admin(user, society):
+        return None
+    return permission_denied_response()
+
 def update_announcement(announcement, data, silent=False):
+    payload, errors, status_code = update_announcement_result(announcement, data, silent)
+    if errors:
+        return Response(errors, status=status_code)
+    return Response(payload)
+
+
+def update_announcement_result(announcement, data, silent=False):
     context = {'skip_notification': silent}
     serialiser = SocietyAnnouncementSerialiser(announcement, data=data, partial=True, context=context)
     if not serialiser.is_valid():
-        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+        return None, serialiser.errors, status.HTTP_400_BAD_REQUEST
     serialiser.save()
     image_urls = get_image_urls(data)
     if 'images' in data or 'image_urls' in data:
         update_announcement_images(announcement, image_urls)
     announcement.refresh_from_db()
-    return Response(SocietyAnnouncementSerialiser(announcement).data)
+    return SocietyAnnouncementSerialiser(announcement).data, None, status.HTTP_200_OK
 
 def update_announcement_images(announcement, image_urls):
     announcement.images.all().delete()
