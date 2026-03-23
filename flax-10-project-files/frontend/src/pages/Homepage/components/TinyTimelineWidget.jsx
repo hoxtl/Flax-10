@@ -6,7 +6,7 @@ import React, { useMemo } from "react";
 import { Clock, Calendar, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import baseStyles from "../styles/WidgetBase.module.css";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "./TinyTimelineWidget.module.css";
 import { formatTime } from "../utils/dateFormatUtils";
 import { isNow } from "../utils/eventUtils";
@@ -49,14 +49,7 @@ function getTypeLabel(event) {
 }
 
 function TinyTimelineHeader() {
-  return (
-    <div className={baseStyles.widgetHeader}>
-      <div className={baseStyles.headerIconWrap}>
-        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>Timeline</span>
-    </div>
-  );
+  return <SharedWidgetHeader icon={Clock} title="Timeline" />;
 }
 
 function EmptyTimelineState() {

@@ -4,7 +4,8 @@
 
 import React from "react";
 import { BarChart3, LayoutGrid, Presentation, TrendingUp, Zap } from "lucide-react";
-import baseStyles from "../styles/WidgetBase.module.css";
+import { getEventType } from "../../../components/Calendar/utils/eventUtils";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "./IntelligenceRow.module.css";
 import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";
@@ -43,7 +44,23 @@ const widgetRegistry = {
 };
 
 function renderHero(props) {
-  return <IntelligenceHero displayName={props.displayName} liveContext={props.dashboard.live.liveContext} eventsCount={props.dashboard.live.eventsCount} tasksCount={props.dashboard.live.tasksCount} nextWindowMeta={null} nextStep={props.dashboard.live.nextStep} nextStepMeta={props.dashboard.live.nextStepMeta} weeklyProgress={props.dashboard.live.weeklyProgress} currentStreak={props.dashboard.live.currentStreak} courseChangeRequest={props.dashboard.courseChangeRequest} teacherRequestPending={props.dashboard.teacherRequestPending} onDismissCourseChange={() => props.dashboard.setShowCourseChange(false)} onDismissTeacherRequest={() => props.dashboard.setShowTeacherRequest(false)} />;
+  const isTeacher = props.profile?.role === "teacher";
+  return (
+    <IntelligenceHero
+      displayName={props.displayName}
+      attendancePct={props.dashboard.attendance.pct}
+      classesCount={props.dashboard.live.classesCount}
+      liveContext={props.dashboard.live.liveContext}
+      tasksCount={props.dashboard.live.tasksCount}
+      deadlinesCount={countUpcomingDeadlines(props.upcomingDeadlines)}
+      upcomingSocietyEventsCount={countUpcomingSocietyEvents(props.calendarEvents?.length ? props.calendarEvents : props.slot5Data?.sortedEvents, props.profile?.summary?.societies, props.slot5Data?.now)}
+      courseChangeRequest={props.dashboard.courseChangeRequest}
+      teacherRequestPending={props.dashboard.teacherRequestPending}
+      onDismissCourseChange={() => props.dashboard.setShowCourseChange(false)}
+      onDismissTeacherRequest={() => props.dashboard.setShowTeacherRequest(false)}
+      isTeacher={isTeacher}
+    />
+  );
 }
 
 function renderRightNow(props) {
@@ -86,7 +103,7 @@ function renderPhoto(props) {
 }
 
 function renderProductivity(props) {
-  return <AnalyticsShell empty="No productivity data yet." icon={TrendingUp} loading={props.dashboard.analytics.loading} title="PRODUCTIVITY">{props.dashboard.analytics.data?.summary ? <div className={styles.analyticsScrollable}><ProductivityCards data={props.dashboard.analytics.data} progressData={props.dashboard.analytics.progressData} /></div> : null}</AnalyticsShell>;
+  return <AnalyticsShell empty="No productivity data yet." icon={TrendingUp} loading={props.dashboard.analytics.loading} title="PRODUCTIVITY">{props.dashboard.analytics.data?.summary ? <div className={styles.analyticsScrollable}><ProductivityCards balanced data={props.dashboard.analytics.data} progressData={props.dashboard.analytics.progressData} /></div> : null}</AnalyticsShell>;
 }
 
 function renderInsights(props) {
@@ -115,12 +132,7 @@ function AnalyticsShell({ children, empty, icon: Icon, loading, title }) {
 }
 
 function AnalyticsHeader({ Icon, title }) {
-  return (
-    <div className={baseStyles.widgetHeader}>
-      <div className={baseStyles.headerIconWrap}><Icon size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden /></div>
-      <span className={baseStyles.headerTitle}>{title}</span>
-    </div>
-  );
+  return <SharedWidgetHeader icon={Icon} title={title} />;
 }
 
 function cloneSlot(slot, row, extraProps = {}) {
@@ -129,4 +141,32 @@ function cloneSlot(slot, row, extraProps = {}) {
 
 function renderUnknown() {
   return null;
+}
+
+function countUpcomingDeadlines(deadlines = []) {
+  return deadlines.filter((deadline) => deadline?.start_due_date).length;
+}
+
+function countUpcomingSocietyEvents(events = [], societies = [], now = new Date()) {
+  const membershipIds = new Set((societies || []).map((society) => society?.society_id ?? society?.id).filter((value) => value != null).map(String));
+  const membershipNames = new Set((societies || []).map((society) => String(society?.name || "").trim().toLowerCase()).filter(Boolean));
+  const start = new Date(now);
+  const end = new Date(now);
+  end.setDate(end.getDate() + 14);
+  return events.filter((event) => isMatchingSocietyEvent(event, membershipIds, membershipNames) && isWithinUpcomingWindow(event, start, end)).length;
+}
+
+function isWithinUpcomingWindow(event, start, end) {
+  if (!event?.start_time) return false;
+  const eventStart = new Date(event.start_time);
+  return eventStart >= start && eventStart <= end;
+}
+
+function isMatchingSocietyEvent(event, membershipIds, membershipNames) {
+  const isSocietyEvent = getEventType(event) === "society" || event?.society_id || event?.society_name;
+  if (!isSocietyEvent) return false;
+  if (membershipIds.size === 0 && membershipNames.size === 0) return true;
+  const societyId = event?.society_id != null ? String(event.society_id) : "";
+  const societyName = String(event?.society_name || "").trim().toLowerCase();
+  return (societyId && membershipIds.has(societyId)) || (societyName && membershipNames.has(societyName));
 }

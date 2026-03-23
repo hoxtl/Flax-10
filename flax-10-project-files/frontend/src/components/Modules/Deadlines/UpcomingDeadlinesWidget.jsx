@@ -7,6 +7,7 @@ import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import DeadlineCountdown from '../../common/DeadlineCountdown/DeadlineCountdown';
+import urgentGlowStyles from '../../Common/UrgentGlow/UrgentGlow.module.css';
 import {
   containerVariants,
   expandBodyVariants,
@@ -90,7 +91,7 @@ function buildRowClassName(tier, urgentGlow) {
   const base = styles.deadlineRow;
   const overdue = tier === 'overdue' ? styles.rowOverdue : '';
   const critical = tier === 'critical' ? styles.rowCritical : '';
-  const glow = urgentGlow ? styles.rowUrgentGlow : '';
+  const glow = urgentGlow ? urgentGlowStyles.urgentGlow : '';
   return `${base} ${overdue} ${critical} ${glow}`.trim();
 }
 
@@ -121,6 +122,7 @@ function DeadlineRow({ deadline, interactiveRows, onSelectDeadline, onSelectModu
   const urgentGlow = tier === 'overdue' || tier === 'critical';
   return (
     <Motion.div
+      layout="position"
       className={buildRowClassName(tier, urgentGlow)}
       style={buildRowStyle(tier, interactiveRows)}
       variants={itemVariants}
@@ -165,7 +167,7 @@ function DeadlineRows({ deadlines, interactiveRows, onSelectDeadline, onSelectMo
 function ExpandedDeadlineRows({ expanded, extra, interactiveRows, onSelectDeadline, onSelectModule }) {
   if (!expanded) return null;
   return (
-    <Motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed">
+    <Motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed" layout>
       <Motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
         <DeadlineRows deadlines={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
       </Motion.div>
@@ -184,7 +186,7 @@ function EmptyWidget({ emptyMessage, emptySub }) {
 
 function DeadlineList({ initial, extra, expanded, interactiveRows, onSelectDeadline, onSelectModule }) {
   return (
-    <Motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants}>
+    <Motion.div className={styles.widgetList} initial="hidden" animate="visible" variants={listVariants} layout>
       <DeadlineRows deadlines={initial} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
       <AnimatePresence initial={false}>
         <ExpandedDeadlineRows expanded={expanded} extra={extra} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
@@ -193,8 +195,8 @@ function DeadlineList({ initial, extra, expanded, interactiveRows, onSelectDeadl
   );
 }
 
-function WidgetBody({ sorted, initial, extra, expanded, setExpanded, emptyMessage, emptySub, interactiveRows, onSelectDeadline, onSelectModule }) {
-  if (sorted.length === 0) return <EmptyWidget emptyMessage={emptyMessage} emptySub={emptySub} />;
+function WidgetBody({ sorted, initial, extra, expanded, setExpanded, emptyMessage, emptySub, interactiveRows, onSelectDeadline, onSelectModule, renderEmpty }) {
+  if (sorted.length === 0) return renderEmpty ? renderEmpty() : <EmptyWidget emptyMessage={emptyMessage} emptySub={emptySub} />;
   return (
     <>
       <DeadlineList initial={initial} extra={extra} expanded={expanded} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
@@ -219,13 +221,13 @@ function useUpcomingDeadlineState(deadlines, initialShown) {
   };
 }
 
-export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, onSelectModule, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm." }) {
+export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, onSelectModule, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm.", renderEmpty = null }) {
   if (!Array.isArray(deadlines)) return null;
   const widgetState = useUpcomingDeadlineState(deadlines, initialShown);
   return (
-    <Motion.div className={buildWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible">
-      <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} styles={styles} />
-      <WidgetBody sorted={widgetState.sorted} initial={widgetState.initial} extra={widgetState.extra} expanded={widgetState.expanded} setExpanded={widgetState.setExpanded} emptyMessage={emptyMessage} emptySub={emptySub} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} />
+    <Motion.div className={buildWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible" layout>
+      {(widgetState.sorted.length > 0 || !renderEmpty) ? <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} styles={styles} /> : null}
+      <WidgetBody sorted={widgetState.sorted} initial={widgetState.initial} extra={widgetState.extra} expanded={widgetState.expanded} setExpanded={widgetState.setExpanded} emptyMessage={emptyMessage} emptySub={emptySub} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} onSelectModule={onSelectModule} renderEmpty={renderEmpty} />
     </Motion.div>
   );
 }

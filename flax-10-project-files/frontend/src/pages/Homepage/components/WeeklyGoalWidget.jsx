@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Target } from "lucide-react";
-import baseStyles from "../styles/WidgetBase.module.css";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "../styles/WeeklyGoalWidget.module.css";
 
 const GOAL_KEY = "weeklyStudyGoalHours";
@@ -64,7 +64,7 @@ function WeeklyGoalCard(props) {
 }
 
 function WeeklyGoalHeader() {
-  return <div className={baseStyles.widgetHeader}><div className={baseStyles.headerIconWrap}><Target size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden /></div><span className={baseStyles.headerTitle}>Weekly Goal</span></div>;
+  return <SharedWidgetHeader icon={Target} title="Weekly Goal" />;
 }
 
 function GoalEditor({ draft, saveGoal, setDraft }) {

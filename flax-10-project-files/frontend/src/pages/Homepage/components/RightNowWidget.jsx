@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clock, Sparkles, Sun } from "lucide-react";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import { formatTime } from "../utils/dateFormatUtils";
 import { useRightNowData } from "../hooks/useRightNowData";
 import {
@@ -15,7 +16,6 @@ import {
   fadeIn,
 } from "./RightNowSubComponents";
 import styles from "./RightNowWidget.module.css";
-import baseStyles from "../styles/WidgetBase.module.css";
 
 function useLiveClock() {
   const [clock, setClock] = useState(() =>
@@ -50,27 +50,8 @@ function timerProgress(totalMinutes, timeLeft) {
 
 function StatusHeader({ liveClock, label = "Right Now" }) {
   return (
-    <motion.div className={baseStyles.widgetHeader} {...fadeIn(0)}>
-      <div className={baseStyles.headerIconWrap}>
-        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>{label}</span>
-      {liveClock && <span className={baseStyles.headerMeta}>{liveClock}</span>}
-    </motion.div>
-  );
-}
-
-function WidgetHeader({ eventCount, taskCount }) {
-  return (
-    <motion.div className={baseStyles.widgetHeader} {...fadeIn(0)}>
-      <div className={baseStyles.headerIconWrap}>
-        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>Right Now</span>
-      <span className={baseStyles.headerMeta}>
-        {eventCount} event{eventCount !== 1 ? "s" : ""}
-        {taskCount > 0 && ` · ${taskCount} task${taskCount !== 1 ? "s" : ""} left`}
-      </span>
+    <motion.div {...fadeIn(0)}>
+      <SharedWidgetHeader icon={Clock} title={label} meta={liveClock} />
     </motion.div>
   );
 }
