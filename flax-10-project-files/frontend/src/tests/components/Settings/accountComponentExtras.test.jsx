@@ -142,7 +142,8 @@ describe("account component extras", () => {
 
   it("renders account form layout and pending-request fetch fallback paths", async () => {
     getMyCourseChangeRequest.mockResolvedValueOnce([{ status: "pending", desired_course: "Physics" }]);
-    const state = renderHook(() => useAccountFormState({ first_name: "Ava", last_name: "Ng", email: "ava@example.com", year: "Year 2", major: "Maths" }));
+    const externalUser = { first_name: "Ava", last_name: "Ng", email: "ava@example.com", year: "Year 2", major: "Maths" };
+    const state = renderHook(() => useAccountFormState(externalUser));
     await waitFor(() => expect(state.result.current.pendingRequest?.requested_course).toBe("Physics"));
 
     const onSubmit = vi.fn((event) => event.preventDefault());

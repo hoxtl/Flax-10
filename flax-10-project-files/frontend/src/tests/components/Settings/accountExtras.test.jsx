@@ -96,7 +96,8 @@ describe("account extras", () => {
     });
     getMyCourseChangeRequest.mockResolvedValueOnce({ status: "approved", requested_course: "Physics" });
 
-    const { result } = renderHook(() => useAccountFormState({ first_name: "Ben", major: "History" }));
+    const externalUser = { first_name: "Ben", major: "History" };
+    const { result } = renderHook(() => useAccountFormState(externalUser));
     await waitFor(() => expect(result.current.currentCourse).toBe("History"));
     expect(result.current.pendingRequest).toBeNull();
   });
