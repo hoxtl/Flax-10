@@ -1,18 +1,13 @@
+/*
+ * Society detail page state hooks.
+ */
 import { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
 import { useSocietyDetail } from "../../components/Society/hooks/useSocietyDetail";
 import { useSocietySubscription } from "../../components/Society/hooks/useSocietySubscription";
 import { useUnreportSociety } from "../../components/Society/hooks/useUnreportSociety";
-import { scrollContentToTop } from "./SocietyDetailPageUtils";
-import {
-  wrapAddAnnouncement,
-  wrapAddEvent,
-  wrapDeleteAnnouncement,
-  wrapDeleteEvent,
-  wrapUpdateAnnouncement,
-  wrapUpdateEvent,
-} from "./SocietyDetailPageUtils";
+import { scrollContentToTop, wrapAddAnnouncement, wrapAddEvent, wrapDeleteAnnouncement, wrapDeleteEvent, wrapUpdateAnnouncement, wrapUpdateEvent } from "./SocietyDetailPageUtils";
 
 function usePageState(initialTab, location) {
   const [params, setParams] = useSearchParams();
@@ -31,31 +26,23 @@ function usePageState(initialTab, location) {
   return { activeTab, focusAnnouncementId: focusId, handleTabChange: setTab };
 }
 
-function useModalState() {
+function useModalCoreState() {
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  return { editingAnnouncement, setEditingAnnouncement, galleryOpen, setGalleryOpen, editMode, setEditMode };
+}
+
+function useModalDialogState() {
   const [showCoverModal, setShowCoverModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
+  return { showCoverModal, setShowCoverModal, showSettings, setShowSettings, showReportModal, setShowReportModal, showMembersModal, setShowMembersModal };
+}
 
-  return {
-    editingAnnouncement,
-    setEditingAnnouncement,
-    galleryOpen,
-    setGalleryOpen,
-    editMode,
-    setEditMode,
-    showCoverModal,
-    setShowCoverModal,
-    showSettings,
-    setShowSettings,
-    showReportModal,
-    setShowReportModal,
-    showMembersModal,
-    setShowMembersModal,
-  };
+function useModalState() {
+  return { ...useModalCoreState(), ...useModalDialogState() };
 }
 
 function buildEventHandlers(hookData, editMode, trackEvent) {

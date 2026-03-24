@@ -1,7 +1,6 @@
-/**
+/*
  * Task widget slot.
  */
-
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
@@ -67,21 +66,21 @@ function TaskWidgetHeader({ count, taskStyles }) {
   const navigate = useNavigate();
   return (
     <div className={`${styles.widgetHeader} ${taskStyles.taskWidgetWidgetHeader}`}>
-      <div className={styles.widgetIconWrap}>
-        <CheckSquare size={17} strokeWidth={1.85} aria-hidden />
-      </div>
+      <div className={styles.widgetIconWrap}><CheckSquare size={17} strokeWidth={1.85} aria-hidden /></div>
       <span className={styles.widgetTitle}>Today&apos;s Tasks</span>
-      <PrimaryButton
-        type="button"
-        size="small"
-        pill
-        onClick={() => navigate("/tasks?filter=today")}
-        className={taskStyles.taskWidgetHeaderButton}
-      >
-        Go to all tasks
-      </PrimaryButton>
+      <PrimaryButton type="button" size="small" pill onClick={() => navigate("/tasks?filter=today")} className={taskStyles.taskWidgetHeaderButton}>Go to all tasks</PrimaryButton>
       {count > 0 && <span className={`${styles.widgetCount} ${taskStyles.taskWidgetHeaderCount}`}>{count}</span>}
     </div>
+  );
+}
+
+function ExpandedTaskRows({ extraTasks, ...props }) {
+  return (
+    <Motion.div className={styles.expandableRows} variants={expandBodyVariants} initial="collapsed" animate="expanded" exit="collapsed">
+      <Motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
+        {extraTasks.map((task) => <TaskListRow key={task.id} task={task} {...props} />)}
+      </Motion.div>
+    </Motion.div>
   );
 }
 
@@ -90,28 +89,9 @@ function TaskWidgetList(props) {
     <Motion.div className={`${styles.widgetList} ${props.styles.taskWidgetWidgetList}`} initial="hidden" animate="visible" variants={listVariants}>
       {props.initialTasks.map((task, index) => <TaskListRow key={task.id} task={task} index={index} {...props} />)}
       <AnimatePresence initial={false}>
-        {props.expanded && (
-          <Motion.div
-            className={styles.expandableRows}
-            variants={expandBodyVariants}
-            initial="collapsed"
-            animate="expanded"
-            exit="collapsed"
-          >
-            <Motion.div className={styles.expandableRowsInner} initial="hidden" animate="visible" variants={listVariants}>
-              {props.extraTasks.map((task) => <TaskListRow key={task.id} task={task} {...props} />)}
-            </Motion.div>
-          </Motion.div>
-        )}
+        {props.expanded && <ExpandedTaskRows extraTasks={props.extraTasks} {...props} />}
       </AnimatePresence>
-      {props.extraTasks.length > 0 && (
-        <ShowMoreButton
-          expanded={props.expanded}
-          hiddenCount={props.extraTasks.length}
-          onToggle={() => props.setExpanded((prev) => !prev)}
-          styles={styles}
-        />
-      )}
+      {props.extraTasks.length > 0 && <ShowMoreButton expanded={props.expanded} hiddenCount={props.extraTasks.length} onToggle={() => props.setExpanded((prev) => !prev)} styles={styles} />}
     </Motion.div>
   );
 }

@@ -1,7 +1,6 @@
-/**
+/*
  * Homepage timeline section.
  */
-
 import { motion as Motion } from "framer-motion";
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -23,32 +22,21 @@ export function HomepageTimelineSection(props) {
   return <Motion.div className={props.styles.bentoSpine} id="timeline-section" initial={SECTION_ANIMATION} whileInView={SECTION_VISIBLE} viewport={SECTION_VIEWPORT} transition={SECTION_TRANSITION}>{content}</Motion.div>;
 }
 
-function TimelineContent(props) {
-  const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
-  if (props.isWidget) {
-    return (
-      <>
-        <TimelineHeader {...props} onOpenRescheduleConfirm={() => setShowRescheduleConfirm(true)} />
-        <TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack>
-        <RescheduleConfirmModal
-          open={showRescheduleConfirm}
-          onCancel={() => setShowRescheduleConfirm(false)}
-          onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)}
-        />
-      </>
-    );
-  }
+function TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm) {
   return (
-    <div className={props.styles.timelineBox}>
+    <>
       <TimelineHeader {...props} onOpenRescheduleConfirm={() => setShowRescheduleConfirm(true)} />
       <TimelineTrack styles={props.styles}><MiniTimeline {...getMiniTimelineProps(props)} /></TimelineTrack>
-      <RescheduleConfirmModal
-        open={showRescheduleConfirm}
-        onCancel={() => setShowRescheduleConfirm(false)}
-        onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)}
-      />
-    </div>
+      <RescheduleConfirmModal open={showRescheduleConfirm} onCancel={() => setShowRescheduleConfirm(false)} onConfirm={() => confirmReschedule(props, setShowRescheduleConfirm)} />
+    </>
   );
+}
+
+function TimelineContent(props) {
+  const [showRescheduleConfirm, setShowRescheduleConfirm] = useState(false);
+  const inner = TimelineInnerContent(props, showRescheduleConfirm, setShowRescheduleConfirm);
+  if (props.isWidget) return inner;
+  return <div className={props.styles.timelineBox}>{inner}</div>;
 }
 
 function TimelineHeader(props) {

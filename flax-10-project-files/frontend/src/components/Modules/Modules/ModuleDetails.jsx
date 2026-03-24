@@ -287,26 +287,16 @@ function RecurringBadge() {
     );
 }
 
+function LeaveModuleButton({ is_core, onUnenroll }) {
+    const btn = <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll} disabled={is_core} aria-disabled={is_core} style={is_core ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>Leave module</PrimaryButton>;
+    if (is_core) return <Tooltip content="Cannot leave a core course module" position="bottom"><span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{btn}</span></Tooltip>;
+    return btn;
+}
+
 function EnrollmentAction({ is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll }) {
     if (isModuleOwner) return null;
-    if (!is_enrolled) {
-        return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
-    }
-    const btn = (
-        <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll}
-            disabled={is_core} aria-disabled={is_core}
-            style={is_core ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>
-            Leave module
-        </PrimaryButton>
-    );
-    if (is_core) {
-        return (
-            <Tooltip content="Cannot leave a core course module" position="bottom">
-                <span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{btn}</span>
-            </Tooltip>
-        );
-    }
-    return btn;
+    if (!is_enrolled) return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
+    return <LeaveModuleButton is_core={is_core} onUnenroll={onUnenroll} />;
 }
 
 function DeadlineItem({ deadline, index }) {

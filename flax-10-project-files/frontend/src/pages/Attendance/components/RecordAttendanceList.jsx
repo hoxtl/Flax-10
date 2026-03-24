@@ -23,46 +23,35 @@ function isAttendanceEvent(event) {
   return ATTENDANCE_PREFIXES.some((prefix) => title.startsWith(prefix));
 }
 
-export default function RecordAttendanceList({ events, onRecorded }) {
+function useRecordAttendanceState(onRecorded) {
   const [submittingId, setSubmittingId] = useState(null);
-  const [successState, setSuccessState] = useState(null); // null | { attended: bool }
+  const [successState, setSuccessState] = useState(null);
   const timerRef = useRef(null);
-
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
-
-  function showSuccess(attended) {
+  const showSuccess = (attended) => {
     setSuccessState({ attended });
     timerRef.current = setTimeout(() => setSuccessState(null), 1500);
-  }
+  };
+  const onRecord = (eventId, attended) => submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess);
+  return { submittingId, successState, onRecord };
+}
 
+function RecordAttendanceContent({ filteredEvents, submittingId, onRecord }) {
+  return (
+    <AttendanceListSection hint="Mark past lectures and seminars as attended or missed. Future events are locked." footer={filteredEvents.length > MAX_RECORD_EVENTS ? "Showing first 20 events." : ""}>
+      <AttendanceEventList events={filteredEvents.slice(0, MAX_RECORD_EVENTS)} renderActions={(event) => <AttendanceRecordActions event={event} submittingId={submittingId} onRecord={onRecord} />} />
+    </AttendanceListSection>
+  );
+}
+
+export default function RecordAttendanceList({ events, onRecorded }) {
+  const { submittingId, successState, onRecord } = useRecordAttendanceState(onRecorded);
   const filteredEvents = events.filter(isAttendanceEvent);
   if (!filteredEvents.length) return null;
-
   return (
     <>
-      <AttendanceListSection
-        hint="Mark past lectures and seminars as attended or missed. Future events are locked."
-        footer={filteredEvents.length > MAX_RECORD_EVENTS ? "Showing first 20 events." : ""}
-      >
-        <AttendanceEventList
-          events={filteredEvents.slice(0, MAX_RECORD_EVENTS)}
-          renderActions={(event) => (
-            <AttendanceRecordActions
-              event={event}
-              submittingId={submittingId}
-              onRecord={(eventId, attended) =>
-                submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess)
-              }
-            />
-          )}
-        />
-      </AttendanceListSection>
-
-      <AnimatePresence>
-        {successState && (
-          <AttendanceSuccessOverlay key="success-overlay" attended={successState.attended} />
-        )}
-      </AnimatePresence>
+      <RecordAttendanceContent filteredEvents={filteredEvents} submittingId={submittingId} onRecord={onRecord} />
+      <AnimatePresence>{successState && <AttendanceSuccessOverlay key="success-overlay" attended={successState.attended} />}</AnimatePresence>
     </>
   );
 }
