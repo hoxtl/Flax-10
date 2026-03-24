@@ -336,4 +336,20 @@ describe("GroupWork pages and header extras", () => {
     expect(toast).toHaveBeenCalledWith("Project deleted.");
     expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
   });
+
+  it("shows the non-owner delete tooltip and supports cancelling the delete modal", async () => {
+    render(
+      <>
+        <ProjectDeleteAction onDelete={vi.fn()} isOwner={false} />
+        <ProjectDeleteAction onDelete={vi.fn()} isOwner />
+      </>,
+    );
+
+    expect(screen.getByText("Only project owner can delete")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Delete project/i })[0]).toBeDisabled();
+
+    fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
+    fireEvent.click(screen.getByText("cancel-hold"));
+    await waitFor(() => expect(screen.queryByText("Delete project")).toBeInTheDocument());
+  });
 });

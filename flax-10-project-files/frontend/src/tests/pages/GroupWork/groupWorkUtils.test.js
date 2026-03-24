@@ -801,4 +801,20 @@ describe('taskStatsUtils – calcCompletionSegments', () => {
     const result = calcCompletionSegments(tasks, members);
     expect(result.segments.length).toBeGreaterThan(0);
   });
+
+  it('splits shared work across multiple assignees and falls back to unknown names', () => {
+    const members = [{ user: '1', user_name: 'alice' }];
+    const tasks = [
+      {
+        status: 'done',
+        assignees_info: [{ id: '1', name: 'alice' }, { id: '2' }],
+      },
+    ];
+    const result = calcCompletionSegments(tasks, members);
+    expect(result.percent).toBe(100);
+    expect(result.segments[0]).toEqual(expect.objectContaining({ id: '1', tasksDone: 1 }));
+    expect(result.segments[1]).toEqual(expect.objectContaining({ id: '2', name: 'Unknown' }));
+    expect(result.segments[0].percentage).toBe(50);
+    expect(result.segments[1].percentage).toBe(50);
+  });
 });
