@@ -30,47 +30,43 @@ function TriggerButton({ busy, onClick }) {
   );
 }
 
+async function executeReschedule(events, selectedDate, editEvent, showToast, setBusy) {
+  const plan = buildConflictResolutionPlan(events, selectedDate);
+  if (!plan.operations.length) {
+    showToast(buildConflictResolutionToastMessage(plan));
+    return;
+  }
+  setBusy(true);
+  try {
+    await applyConflictResolutionPlan(plan, editEvent);
+    showToast(buildConflictResolutionToastMessage(plan));
+  } catch {
+    showToast("Couldn't reschedule your events. Try again.");
+  } finally {
+    setBusy(false);
+  }
+}
+
+function RescheduleConfirmModal({ onConfirm, onCancel }) {
+  return (
+    <ConfirmModal title="Reschedule my events" message="This will clear movable conflicts in the current day and may move personal events to tomorrow if today has no free window left." confirmText="Reschedule now" cancelText="Keep plan" onConfirm={onConfirm} onCancel={onCancel} infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are." />
+  );
+}
+
 export function ScheduleManagerButton() {
   const { events, selectedDate } = useCalendar();
   const { editEvent } = useEventActions();
   const showToast = useToast();
   const [busy, setBusy] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-
-  async function handleClick() {
-    const plan = buildConflictResolutionPlan(events, selectedDate);
-    if (!plan.operations.length) {
-      showToast(buildConflictResolutionToastMessage(plan));
-      return;
-    }
-    setBusy(true);
-    try {
-      await applyConflictResolutionPlan(plan, editEvent);
-      showToast(buildConflictResolutionToastMessage(plan));
-    } catch {
-      showToast("Couldn't reschedule your events. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
+  const handleConfirm = async () => {
+    setShowConfirm(false);
+    await executeReschedule(events, selectedDate, editEvent, showToast, setBusy);
+  };
   return (
     <>
       <TriggerButton busy={busy} onClick={() => setShowConfirm(true)} />
-      {showConfirm ? (
-        <ConfirmModal
-          title="Reschedule my events"
-          message="This will clear movable conflicts in the current day and may move personal events to tomorrow if today has no free window left."
-          confirmText="Reschedule now"
-          cancelText="Keep plan"
-          onConfirm={async () => {
-            setShowConfirm(false);
-            await handleClick();
-          }}
-          onCancel={() => setShowConfirm(false)}
-          infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are."
-        />
-      ) : null}
+      {showConfirm ? <RescheduleConfirmModal onConfirm={handleConfirm} onCancel={() => setShowConfirm(false)} /> : null}
     </>
   );
 }
