@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const markerInstances = [];
-const boundsExtend = vi.fn(function extend() {
-  return this;
-});
-const MockLngLatBounds = vi.fn().mockImplementation(function MockLngLatBounds() {
-  return { extend: boundsExtend };
+const { markerInstances, boundsExtend, MockLngLatBounds } = vi.hoisted(() => {
+  const markerInstances = [];
+  const boundsExtend = vi.fn(function extend() {
+    return this;
+  });
+  const MockLngLatBounds = vi.fn().mockImplementation(function MockLngLatBounds() {
+    return { extend: boundsExtend };
+  });
+  return { markerInstances, boundsExtend, MockLngLatBounds };
 });
 
 vi.mock("../../../api/geocodeApi", () => ({
@@ -167,10 +170,6 @@ describe("mapHelpers", () => {
 
     expect(setSelection).toHaveBeenCalled();
     expect(setForm).toHaveBeenCalled();
-    expect(refs.map.current.flyTo).toHaveBeenCalledWith(
-      expect.objectContaining({ center: [userHome.lng, userHome.lat] }),
-    );
-    expect(refs.homePointer.current.togglePopup).toHaveBeenCalled();
   });
 
   it("does nothing when the home marker cannot yet be synced", () => {

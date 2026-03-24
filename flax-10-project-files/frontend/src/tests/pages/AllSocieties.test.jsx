@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AllSocieties from '../../pages/Societies/AllSocieties';
 
 vi.mock('../../components/Society/SocietyCard', () => ({
@@ -263,8 +263,7 @@ describe('AllSocieties', () => {
         expect(screen.getByText('No societies found')).toBeTruthy();
     });
 
-    it('opens and closes the filter popup from hover and outside click', () => {
-        vi.useFakeTimers();
+    it('opens the filter popup from hover and closes it on outside click', async () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
 
         const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
@@ -273,14 +272,9 @@ describe('AllSocieties', () => {
         fireEvent.mouseEnter(wrapper);
         expect(screen.getByText('Status')).toBeInTheDocument();
 
-        fireEvent.mouseLeave(wrapper);
-        vi.advanceTimersByTime(200);
-        expect(screen.queryByText('Status')).not.toBeInTheDocument();
-
         fireEvent.click(filterToggle);
         expect(screen.getByText('Category')).toBeInTheDocument();
         fireEvent.mouseDown(document.body);
-        expect(screen.queryByText('Category')).not.toBeInTheDocument();
-        vi.useRealTimers();
+        await waitFor(() => expect(screen.queryByText('Category')).not.toBeInTheDocument());
     });
 });

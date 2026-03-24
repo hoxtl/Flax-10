@@ -345,11 +345,12 @@ describe("GroupWork pages and header extras", () => {
       </>,
     );
 
-    expect(screen.getByText("Only project owner can delete")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Delete project/i })[0]).toBeDisabled();
+    const deleteButtons = screen.getAllByRole("button", { name: /Delete project/i });
+    expect(deleteButtons[0].parentElement.parentElement).toHaveAttribute("data-tooltip", "Only project owner can delete");
+    expect(deleteButtons[0]).toBeDisabled();
 
-    fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
+    fireEvent.click(deleteButtons[1]);
     fireEvent.click(screen.getByText("cancel-hold"));
-    await waitFor(() => expect(screen.queryByText("Delete project")).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText("cancel-hold")).not.toBeInTheDocument());
   });
 });

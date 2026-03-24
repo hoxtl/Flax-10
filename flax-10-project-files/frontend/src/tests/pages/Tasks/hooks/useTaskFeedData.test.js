@@ -200,7 +200,7 @@ describe("useTaskFeedData", () => {
 
   it("uses overdue tasks from all tasks when searching in the overdue filter", async () => {
     const overdueDate = "2026-03-07T10:00:00Z";
-    const futureDate = "2026-03-09T10:00:00Z";
+    const futureDate = "2026-04-09T10:00:00Z";
     const tasks = [{ id: 99, title: "Visible subset", completed: false, due_date: futureDate }];
     const allTasks = [
       { id: 1, title: "Overdue task", completed: false, due_date: overdueDate },

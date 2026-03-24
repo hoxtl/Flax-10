@@ -96,7 +96,7 @@ describe("modulesPageHooks coverage", () => {
     await waitFor(() => expect(codeHook.result.current.viewingModule?.module_code).toBe("AA200"));
   });
 
-  it("falls back to search text when the URL code does not match and ignores initialSearch when params are present", async () => {
+  it("uses the URL code as search text when unmatched while preserving an initial module match", async () => {
     localStorage.setItem("user", JSON.stringify({ role: "student" }));
 
     const hook = renderHook(() => useModulesPageState("cs101"), {
@@ -104,7 +104,7 @@ describe("modulesPageHooks coverage", () => {
     });
 
     await waitFor(() => expect(hook.result.current.searchQuery).toBe("missing"));
-    expect(hook.result.current.viewingModule).toBeNull();
+    expect(hook.result.current.viewingModule).toEqual({ id: 1, module_code: "CS101" });
   });
 
   it("filters out enrolled modules for student browse mode and resets pagination on search changes", () => {

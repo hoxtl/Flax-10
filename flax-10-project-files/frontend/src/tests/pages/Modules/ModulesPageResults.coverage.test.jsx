@@ -224,6 +224,8 @@ describe("ModulesPageResults coverage", () => {
         taskCountsByModule: {},
       },
       isTeacher: true,
+      setEditingModule: vi.fn(),
+      setShowForm: vi.fn(),
       setViewingModule: vi.fn(),
       setDeletingModule: vi.fn(),
       setDeadlineModule: vi.fn(),
@@ -238,13 +240,15 @@ describe("ModulesPageResults coverage", () => {
 
     render(<ModuleResults state={state} search={{ query: "", filter: "all" }} sorting={sorting} />);
 
-    expect(screen.getByText("Page 2 / 5")).toBeInTheDocument();
+    expect(screen.getAllByText("Page 2 / 5")).toHaveLength(2);
     fireEvent.click(screen.getByRole("button", { name: "delete" }));
     fireEvent.click(screen.getByRole("button", { name: "edit" }));
     fireEvent.click(screen.getByRole("button", { name: "view" }));
 
     expect(state.setDeletingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
     expect(state.setViewingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
+    expect(state.setEditingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
+    expect(state.setShowForm).toHaveBeenCalledWith(true);
     expect(state.setDeadlineModule).not.toHaveBeenCalled();
   });
 
@@ -278,7 +282,22 @@ describe("ModulesPageResults coverage", () => {
       search: { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() },
       sorting: buildSorting(),
     });
-    render(<MainView state={{ isTeacher: false }} />);
+    render(
+      <MainView
+        state={{
+          isTeacher: false,
+          hook: {
+            enrollments: [],
+            toggleEnrollment: vi.fn(),
+            taskCountsByModule: {},
+          },
+          setViewingModule: vi.fn(),
+          setDeletingModule: vi.fn(),
+          setDeadlineModule: vi.fn(),
+          setReadingModule: vi.fn(),
+        }}
+      />,
+    );
 
     expect(screen.getByTestId("page-transition")).toBeInTheDocument();
 

@@ -28,6 +28,6 @@ describe("TaskFeedSubtitle", () => {
     expect(screen.getByText(/clinical skills/i)).toBeInTheDocument();
 
     rerender(<div>{getTaskFeedSubtitle({ name: "Seminar notes" }, true)}</div>);
-    expect(screen.getByText(/this module/i)).toBeInTheDocument();
+    expect(screen.getByText(/seminar notes/i)).toBeInTheDocument();
   });
 });

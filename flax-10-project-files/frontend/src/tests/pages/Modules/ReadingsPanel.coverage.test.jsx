@@ -139,7 +139,7 @@ describe("ReadingsPanel coverage", () => {
 
     render(<ReadingsPanel readings={readings} onReadingAdded={onReadingAdded} />);
 
-    expect(screen.getByText("Foundations: Chapter 2")).toBeInTheDocument();
+    expect(screen.getByText("Chapter 2")).toBeInTheDocument();
     expect(screen.queryByText("Optional Reading")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Show more (1)" }));
@@ -157,7 +157,7 @@ describe("ReadingsPanel coverage", () => {
     expect(await screen.findByTestId("task-info-modal")).toBeInTheDocument();
     expect(screen.getByTestId("task-page-count")).toHaveTextContent("null");
 
-    fireEvent.click(screen.getByRole("button", { name: "add reading" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "add reading" })[3]);
     expect(onReadingAdded).toHaveBeenCalledWith(3);
   });
 });

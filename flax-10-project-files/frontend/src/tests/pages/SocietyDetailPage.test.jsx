@@ -110,6 +110,14 @@ vi.mock("../../pages/Societies/SocietySkeletons", () => ({
 import SocietyDetailPage from "../../pages/Societies/SocietyDetailPage";
 
 function buildPageData(overrides = {}) {
+  const {
+    society: societyOverrides = {},
+    page: pageOverrides = {},
+    modals: modalOverrides = {},
+    subscription: subscriptionOverrides = {},
+    tracker: trackerOverrides = {},
+    ...rest
+  } = overrides;
   return {
     loading: false,
     society: {
@@ -123,13 +131,13 @@ function buildPageData(overrides = {}) {
       tags: [],
       ratification_status: "approved",
       is_ratified: true,
-      ...overrides.society,
+      ...societyOverrides,
     },
     page: {
       activeTab: "calendar",
       handleTabChange: vi.fn(),
       focusAnnouncementId: null,
-      ...overrides.page,
+      ...pageOverrides,
     },
     modals: {
       showSettings: false,
@@ -146,18 +154,18 @@ function buildPageData(overrides = {}) {
       setEditingAnnouncement: vi.fn(),
       editMode: false,
       setEditMode: vi.fn(),
-      ...overrides.modals,
+      ...modalOverrides,
     },
     subscription: {
       isSubscribed: false,
       toggleSubscription: vi.fn(),
-      ...overrides.subscription,
+      ...subscriptionOverrides,
     },
     tracker: {
       hasChanges: vi.fn(() => false),
       getChangeSummary: vi.fn(() => []),
       resetChanges: vi.fn(),
-      ...overrides.tracker,
+      ...trackerOverrides,
     },
     members: [],
     updateSociety: vi.fn(),
@@ -182,7 +190,7 @@ function buildPageData(overrides = {}) {
     joinSociety: vi.fn(),
     leaveSociety: vi.fn(),
     handleUnreport: vi.fn(),
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -217,16 +225,15 @@ describe("SocietyDetailPage", () => {
 
   it("renders loading and not-found states", () => {
     useSocietyPageDataMock.mockReturnValueOnce(buildPageData({ loading: true }));
-    const { rerender } = renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    const { unmount } = renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
 
     const onBack = vi.fn();
-    useSocietyPageDataMock.mockReturnValueOnce(buildPageData({ society: null }));
-    rerender(
-      <MemoryRouter>
-        <SocietyDetailPage societyId={1} onBack={onBack} />
-      </MemoryRouter>,
-    );
+    unmount();
+    const notFoundData = buildPageData();
+    notFoundData.society = null;
+    useSocietyPageDataMock.mockReturnValue(notFoundData);
+    renderPage(<SocietyDetailPage societyId={1} onBack={onBack} />);
 
     expect(screen.getByText("Society not found.")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Back to Societies"));

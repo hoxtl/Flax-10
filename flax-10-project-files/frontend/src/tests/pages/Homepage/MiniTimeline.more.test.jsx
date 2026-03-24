@@ -170,12 +170,12 @@ describe("MiniTimeline extra coverage", () => {
 
   it("covers quick-start, gap skipping, and read-only context-menu suppression", () => {
     const onQuickStart = vi.fn();
-    useMiniTimelineState.mockReturnValueOnce({
+    useMiniTimelineState.mockReturnValue({
       eventCtxMenu: { eventItem: { id: 5, title: "Read only", readOnly: true }, x: 10, y: 20 },
       setEventCtxMenu: vi.fn(),
       attachNowRow: vi.fn(),
     });
-    useMiniTimelineData.mockReturnValueOnce({
+    useMiniTimelineData.mockReturnValue({
       currentBlock: null,
       rows: [{ id: "gap-1", type: "free", title: "Gap" }],
       gapDeadlineFallbacks: {},

@@ -60,10 +60,13 @@ describe('HomeAddressForm', () => {
         const { container } = render(<HomeAddressForm onSave={onSave} isSaving={false} />);
         const input = await screen.findByPlaceholderText('e.g., 123 Example Street, London, E1 B23');
         fireEvent.change(input, { target: { value: 'lkjhgv' } });
+        await waitFor(() => {
+            expect(input).toHaveValue('lkjhgv');
+        });
         fireEvent.submit(container.querySelector('form'));
         await waitFor(() => {
             expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
-        });
+        }, { timeout: 4000 });
     });
 
     it('renders inline warning for non-lookup save errors', async () => {

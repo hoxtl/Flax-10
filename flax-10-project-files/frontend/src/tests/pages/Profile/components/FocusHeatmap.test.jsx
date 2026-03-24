@@ -48,7 +48,7 @@ describe("FocusHeatmap widgets", () => {
       }),
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /View full analytics/i }));
+    fireEvent.click(screen.getAllByRole("button", { name: /View full analytics/i })[1]);
     expect(onNavigate).toHaveBeenCalledWith("analytics");
 
     fireEvent.keyDown(screen.getByTestId("card"), { key: "Enter", preventDefault: vi.fn() });

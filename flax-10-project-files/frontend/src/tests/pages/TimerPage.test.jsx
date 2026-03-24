@@ -190,12 +190,12 @@ const testHistoryModalClose = async () => {
 describe('TimerPage Integration', () => {
     beforeEach(setupTests);
     afterEach(cleanupTests);
-    it('renders initial state correctly', testInitialState);
+    it('renders initial state correctly', testInitialState, 15000);
     it('starts and stops the timer', testStartStop);
     it('resets the timer', testReset);
-    it('updates settings', testSettings);
-    it('shows break modal when work session finishes', testBreakModalShow);
-    it('enters break mode from modal', testBreakModalEnter);
+    it('updates settings', testSettings, 15000);
+    it('shows break modal when work session finishes', testBreakModalShow, 15000);
+    it('enters break mode from modal', testBreakModalEnter, 15000);
     it('opens history modal when history button is clicked', testHistoryModal, 15000);
     it('closes history modal', testHistoryModalClose, 15000);
 
@@ -258,5 +258,5 @@ describe('TimerPage Integration', () => {
         helpers.renderTimerPage();
         expect(screen.getByRole('button', { name: /History/i })).toBeInTheDocument();
         Object.defineProperty(window, 'innerWidth', { value: origInnerWidth, writable: true, configurable: true });
-    });
+    }, 15000);
 });

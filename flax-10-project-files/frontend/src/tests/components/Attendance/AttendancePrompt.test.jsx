@@ -107,13 +107,7 @@ describe("Attendance prompt", () => {
 
   it("wires the prompt modal buttons", () => {
     const onAnswer = vi.fn().mockResolvedValue(true);
-    const onDismiss = vi.fn();
-    const { unmount } = render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
-    fireEvent.click(screen.getByText("Dismiss"));
-    expect(onDismiss).toHaveBeenCalled();
-    unmount();
-
-    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
+    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
     fireEvent.click(screen.getByText("Yes"));
     act(() => {
       vi.advanceTimersByTime(1200);

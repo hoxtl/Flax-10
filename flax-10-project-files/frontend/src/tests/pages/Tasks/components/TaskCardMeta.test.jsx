@@ -31,12 +31,12 @@ describe("TaskCardMeta", () => {
     );
 
     expect(screen.getByText("Inbox")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open CS101 module/i })).toHaveAttribute("href", "/modules?moduleId=7");
-    expect(screen.getByRole("link", { name: /Open Chess Club/i })).toHaveAttribute("href", "/societies?id=9");
-    expect(screen.getByRole("link", { name: /Open users/i })).toHaveTextContent("3 people");
+    expect(screen.getByTitle("Open CS101 module")).toHaveAttribute("href", "/modules?moduleId=7");
+    expect(screen.getByTitle("Open Chess Club")).toHaveAttribute("href", "/societies?id=9");
+    expect(screen.getByTitle("Open users")).toHaveTextContent("3 people");
     expect(screen.getByText("Final Presentation")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("link", { name: /Open CS101 module/i }));
+    fireEvent.click(screen.getByTitle("Open CS101 module"));
     expect(onParentClick).not.toHaveBeenCalled();
   });
 
@@ -54,9 +54,9 @@ describe("TaskCardMeta", () => {
     );
 
     expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open MA202 module/i })).toHaveAttribute("href", "/modules?code=MA202");
-    expect(screen.getByRole("link", { name: /Open Maths Society/i })).toHaveAttribute("href", "/societies?search=Maths%20Society");
-    expect(screen.getByRole("link", { name: /Open users/i })).toHaveTextContent("2 people");
+    expect(screen.getByTitle("Open MA202 module")).toHaveAttribute("href", "/modules?code=MA202");
+    expect(screen.getByTitle("Open Maths Society")).toHaveAttribute("href", "/societies?search=Maths%20Society");
+    expect(screen.getByTitle("Open users")).toHaveTextContent("2 people");
   });
 
   it("omits people and society pills when counts or names are not usable", () => {
