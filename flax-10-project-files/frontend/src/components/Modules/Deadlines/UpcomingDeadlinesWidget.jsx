@@ -7,15 +7,15 @@ import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import Badge from '../../common/Badge/Badge';
 import DeadlineCountdown from '../../common/DeadlineCountdown/DeadlineCountdown';
-import urgentGlowStyles from '../../Common/UrgentGlow/UrgentGlow.module.css';
+import urgentGlowStyles from '../../common/UrgentGlow/UrgentGlow.module.css';
 import {
   containerVariants,
   expandBodyVariants,
   itemVariants,
   listVariants,
 } from '../shared/widgetVariants.js';
+import WidgetHeader from '../../common/WidgetHeader/WidgetHeader';
 import {
-  WidgetHeader,
   ShowMoreButton,
 } from '../shared/widgetParts.jsx';
 import widgetStyles from "../../../pages/Modules/DashboardWidgets.module.css";
@@ -210,7 +210,7 @@ export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Dead
   if (!Array.isArray(deadlines)) return null;
   return (
     <Motion.div className={buildWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible" layout>
-      {(widgetState.sorted.length > 0 || !renderEmpty) ? <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} styles={styles} /> : null}
+      {(widgetState.sorted.length > 0 || !renderEmpty) ? <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} className={styles.widgetHeader} /> : null}
       <WidgetBody sorted={widgetState.sorted} initial={widgetState.initial} extra={widgetState.extra} expanded={widgetState.expanded} setExpanded={widgetState.setExpanded} emptyMessage={emptyMessage} emptySub={emptySub} interactiveRows={interactiveRows} onSelectDeadline={onSelectDeadline} renderEmpty={renderEmpty} />
     </Motion.div>
   );
