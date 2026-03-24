@@ -46,8 +46,12 @@ def _create_project_for_spec(spec, owner, now):
 
 def _add_demo_members(project, owner, demo_users):
     candidates = [u for u in demo_users if u.id != owner.id]
-    count = random.randint(MIN_MEMBERS_PER_PROJECT, min(MAX_MEMBERS_PER_PROJECT, len(candidates)))
-    members = random.sample(candidates, min(count, len(candidates)))
+    if not candidates:
+        return
+    lower = min(MIN_MEMBERS_PER_PROJECT, len(candidates))
+    upper = min(MAX_MEMBERS_PER_PROJECT, len(candidates))
+    count = random.randint(lower, upper)
+    members = random.sample(candidates, count)
     for member in members:
         GroupMembership.objects.get_or_create(project=project, user=member, defaults={"role": "member"})
 
@@ -68,8 +72,9 @@ def seed_new_user_projects(user, now=None):
         specs = _build_module_project_specs(module, now)
         for spec in specs[:1]:
             project, created = _create_project_for_spec(spec, user, now)
-            if created and demo_users:
-                _add_demo_members(project, user, demo_users)
+            if created:
+                if demo_users:
+                    _add_demo_members(project, user, demo_users)
                 count += 1
             if count >= remaining_slots:
                 return count

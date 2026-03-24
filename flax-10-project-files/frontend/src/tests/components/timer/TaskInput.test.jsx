@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '../../../utils/test-utils';
 import { TaskInput } from '../../../components/Timer/TimerComponents';
 
 // Keep dropdowns testable (native controls)

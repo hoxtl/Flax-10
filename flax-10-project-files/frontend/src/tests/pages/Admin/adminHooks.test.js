@@ -32,6 +32,14 @@ describe('useAsyncAction', () => {
     expect(onSuccess).toHaveBeenCalledWith({ ok: true });
   });
 
+  it('uses the default fallback when a failure has no message', async () => {
+    const setError = vi.fn();
+    const action = () => Promise.reject({});
+    const { result } = renderHook(() => useAsyncAction(setError));
+    await act(async () => { result.current.run('id-1', action, vi.fn()); });
+    expect(setError).toHaveBeenCalledWith('Action failed.');
+  });
+
   it('calls setError with the error message on failure', async () => {
     const setError = vi.fn();
     const action = () => Promise.reject(new Error('Network error'));
@@ -93,6 +101,33 @@ describe('useAsyncList', () => {
     await act(async () => {});
     act(() => { result.current.setItems([{ id: 99 }]); });
     expect(result.current.items).toEqual([{ id: 99 }]);
+  });
+
+  it('exposes setError and clears old errors when a later fetch succeeds', async () => {
+    let shouldFail = true;
+    const makeFetcher = () => vi.fn(() => (
+      shouldFail
+        ? Promise.reject(new Error('Boom'))
+        : Promise.resolve([{ id: 7 }])
+    ));
+
+    const { result, rerender } = renderHook(
+      ({ currentFetcher }) => useAsyncList(currentFetcher, 'Failed.'),
+      { initialProps: { currentFetcher: makeFetcher() } },
+    );
+
+    await act(async () => {});
+    expect(result.current.error).toBe('Boom');
+
+    act(() => { result.current.setError('Manual error'); });
+    expect(result.current.error).toBe('Manual error');
+
+    shouldFail = false;
+    rerender({ currentFetcher: makeFetcher() });
+    await act(async () => {});
+
+    expect(result.current.error).toBe('');
+    expect(result.current.items).toEqual([{ id: 7 }]);
   });
 });
 

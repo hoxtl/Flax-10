@@ -72,7 +72,9 @@ function SuccessContent({ attended }) {
   const message = attended ? "Attendance recorded!" : "Missed session noted.";
   return (
     <motion.div className={styles.successContent} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={successWrapTransition}>
-      <motion.div style={{ color }} initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={successIconTransition}><Icon size={44} strokeWidth={1.8} /></motion.div>
+      <motion.div style={{ color }} initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={successIconTransition}>
+        <Icon size={44} strokeWidth={1.8} />
+      </motion.div>
       <motion.p className={styles.successMsg} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={successTextTransition}>{message}</motion.p>
     </motion.div>
   );
@@ -87,15 +89,23 @@ function formatEventMeta(event) {
   return { day, date, time };
 }
 
-function QuestionContent({ event, isAnswered, onAnswer }) {
+function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
   const meta = formatEventMeta(event);
   return (
     <motion.div key="question" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25, ease: "easeOut" }}>
-      <div className={styles.eventPill}>Did you attend <strong className={styles.eventName}>{event.title}</strong>{meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}</div>
+      <div className={styles.eventPill}>
+        Did you attend <strong className={styles.eventName}>{event.title}</strong>
+        {meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}
+      </div>
       <div className={styles.yesNoRow} style={{ marginTop: "var(--space-4, 16px)" }}>
         <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
         <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
       </div>
+      {typeof onDismiss === "function" && (
+        <button type="button" className={styles.dismissBtn} onClick={onDismiss} disabled={isAnswered}>
+          Dismiss
+        </button>
+      )}
     </motion.div>
   );
 }
@@ -117,25 +127,46 @@ function useAttendancePromptState(event, onAnswer) {
   const [answeredWith, setAnsweredWith] = useState(null);
   const [submitError, setSubmitError] = useState("");
   const timerRef = useRef(null);
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
-  useEffect(() => { setAnsweredWith(null); setSubmitError(""); }, [event?.id]);
+
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
+
+  useEffect(() => {
+    setAnsweredWith(null);
+    setSubmitError("");
+  }, [event?.id]);
+
   const displayPct = useMemo(() => computeDisplayPct(answeredWith, overall, computeAttendancePct(overall)), [answeredWith, overall]);
+
   const runAnswer = async (attended) => {
     const success = await onAnswer(attended, { afterSuccess: refetch, closeDelayMs: 700 });
-    if (!success) { setAnsweredWith(null); setSubmitError("Could not update attendance. Please try again."); }
+    if (!success) {
+      setAnsweredWith(null);
+      setSubmitError("Could not update attendance. Please try again.");
+    }
   };
-  const handleAnswer = (attended) => { if (answeredWith !== null) return; setSubmitError(""); setAnsweredWith(attended); timerRef.current = setTimeout(() => { void runAnswer(attended); }, 1200); };
-  return { answeredWith, submitError, displayPct, handleAnswer };
+
+  const handleAnswer = (attended) => {
+    if (answeredWith !== null) return;
+    setSubmitError("");
+    setAnsweredWith(attended);
+    timerRef.current = setTimeout(() => {
+      void runAnswer(attended);
+    }, 1200);
+  };
+
+  return { answeredWith, displayPct, handleAnswer, submitError };
 }
 
-function ModalContent({ event, answeredWith, displayPct, handleAnswer, submitError }) {
+function ModalContent({ event, answeredWith, displayPct, handleAnswer, onDismiss, submitError }) {
   const isAnswered = answeredWith !== null;
   return (
     <>
       <div className={styles.header}><h2 className={styles.title}>Attendance Tracker</h2><KclLogo /></div>
       <AttendanceRing pct={displayPct} updating={isAnswered} />
       <AnimatePresence mode="wait">
-        {isAnswered ? <SuccessContent key="success" attended={answeredWith} /> : <QuestionContent key="question" event={event} isAnswered={isAnswered} onAnswer={handleAnswer} />}
+        {isAnswered ? <SuccessContent key="success" attended={answeredWith} /> : <QuestionContent key="question" event={event} isAnswered={isAnswered} onAnswer={handleAnswer} onDismiss={onDismiss} />}
       </AnimatePresence>
       {submitError && <p className={styles.errorText}>{submitError}</p>}
     </>
@@ -146,12 +177,12 @@ const modalInitial = { opacity: 0, scale: 0.92, y: 10 };
 const modalExit = { opacity: 0, scale: 0.9, y: 12 };
 const modalTransition = { opacity: { duration: 0.22, ease: "easeOut" }, scale: { duration: 0.25, ease: [0.23, 1, 0.32, 1] }, y: { duration: 0.25 }, boxShadow: glowPulse.transition };
 
-export default function AttendancePromptModal({ event, onAnswer }) {
+export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
   const { answeredWith, submitError, displayPct, handleAnswer } = useAttendancePromptState(event, onAnswer);
   return createPortal(
     <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
       <motion.div className={styles.modal} onMouseDown={e => e.stopPropagation()} initial={modalInitial} animate={{ opacity: 1, scale: 1, y: 0, ...glowPulse.animate }} exit={modalExit} transition={modalTransition}>
-        <ModalContent event={event} answeredWith={answeredWith} displayPct={displayPct} handleAnswer={handleAnswer} submitError={submitError} />
+        <ModalContent event={event} answeredWith={answeredWith} displayPct={displayPct} handleAnswer={handleAnswer} onDismiss={onDismiss} submitError={submitError} />
       </motion.div>
     </motion.div>,
     document.body

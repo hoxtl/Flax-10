@@ -39,8 +39,12 @@ def _cancel_pending_request(user):
     return Response({'message': 'Course change request cancelled.'}, status=status.HTTP_200_OK)
 
 
+def _apply_decision(change_request, decision, get_user_settings):
+    apply_decision(change_request, decision, get_user_settings)
+
+
 def _resolve_course_change_data(change_request, decision):
-    apply_decision(change_request, decision, _get_user_settings)
+    _apply_decision(change_request, decision, _get_user_settings)
     return CourseChangeRequestSerialiser(change_request).data
 
 

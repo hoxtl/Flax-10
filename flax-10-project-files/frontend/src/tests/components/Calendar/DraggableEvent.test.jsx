@@ -14,7 +14,6 @@ vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
 
 vi.mock('../../../context/CalendarContext', () => ({
     useEventModal: vi.fn(() => ({ openModal: vi.fn() })),
-    useEventDelete: vi.fn(() => ({ openDelete: vi.fn() })),
     useEventPopup: vi.fn(() => ({ openPopup: mockOpenPopup, closePopup: vi.fn(), popupEvent: null, popupAnchorRect: null })),
     useEventDelete: vi.fn(() => ({ openDelete: vi.fn(), isDeleteOpen: false, deleteEvent: null, deleteType: null, closeDelete: vi.fn() })),
 }));

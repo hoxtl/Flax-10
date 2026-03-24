@@ -33,7 +33,6 @@ vi.mock('mapbox-gl', () => {
         setPopup: vi.fn().mockReturnThis(),
         addTo: vi.fn().mockReturnThis(),
         remove: vi.fn(),
-        getElement: vi.fn(() => document.createElement('button')),
         getPopup: vi.fn(() => mockPopup),
         togglePopup: vi.fn(),
         getElement: vi.fn(() => document.createElement('div')),
@@ -84,6 +83,14 @@ import { getHomeAddress } from '../../api/userApi';
 import { tflService } from '../../api/tflApi';
 
 describe('CampusMap', () => {
+    function getStartLocationButton() {
+        return screen.getByRole('button', { name: /set start to current location/i });
+    }
+
+    function getDestinationLocationButton() {
+        return screen.getByRole('button', { name: /set destination to current location/i });
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
         // default fetch for directions
@@ -129,9 +136,10 @@ describe('CampusMap', () => {
         expect(screen.getAllByText('Waterloo').length).toBeGreaterThan(0);
     });
 
-    it('renders Set My Current Location button', () => {
+    it('renders current location buttons', () => {
         render(<CampusMap />);
-        expect(screen.getByText(/Set My Current Location/)).toBeTruthy();
+        expect(getStartLocationButton()).toBeTruthy();
+        expect(getDestinationLocationButton()).toBeTruthy();
     });
 
     it('loads home address when available and handles home-address-updated event', async () => {
@@ -163,7 +171,7 @@ describe('CampusMap', () => {
     it('calculates walking route when start location and campus selected', async () => {
         render(<CampusMap />);
 
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
 
         await waitFor(() => {
@@ -184,7 +192,7 @@ describe('CampusMap', () => {
     it('renders TfL error when journeyPlanner returns null', async () => {
         tflService.journeyPlanner.mockResolvedValueOnce(null);
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
 
         await waitFor(() => {
@@ -196,7 +204,7 @@ describe('CampusMap', () => {
     it('shows route error when Mapbox API fails', async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: false });
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText(/Could not calculate the route/i)).toBeTruthy());
     });
@@ -204,7 +212,7 @@ describe('CampusMap', () => {
     it('shows no walking route when API returns empty routes', async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ routes: [] }) });
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText(/No walking route found/i)).toBeTruthy());
     });
@@ -222,7 +230,7 @@ describe('CampusMap', () => {
             }),
         });
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => {
             expect(screen.getByText(/2h 0m/)).toBeTruthy();
@@ -232,7 +240,7 @@ describe('CampusMap', () => {
 
     it('handleClearStart clears start and route', async () => {
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         fireEvent.click(screen.getAllByTitle('Clear')[0]);
@@ -241,7 +249,7 @@ describe('CampusMap', () => {
 
     it('handleClearCampus clears campus and route', async () => {
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         const destinationSection = screen.getByText('Destination').closest('section');
@@ -260,7 +268,7 @@ describe('CampusMap', () => {
             ],
         });
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText(/Public Transport/)).toBeInTheDocument());
         fireEvent.click(screen.getByText(/Show step-by-step directions/));
@@ -271,7 +279,7 @@ describe('CampusMap', () => {
         tflService.journeyPlanner.mockRejectedValueOnce(new Error('err'));
         vi.spyOn(console, 'error').mockImplementation(() => {});
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText(/Failed to calculate TfL route/i)).toBeTruthy());
     });
@@ -297,9 +305,9 @@ describe('CampusMap', () => {
             getCurrentPosition: vi.fn((_s, err) => { errCb = err; }),
         };
         render(<CampusMap />);
-        fireEvent.click(screen.getByText(/Set My Current Location/));
+        fireEvent.click(getStartLocationButton());
         if (errCb) errCb();
-        await waitFor(() => expect(screen.getByText(/Set My Current Location/)).toBeInTheDocument());
+        await waitFor(() => expect(getStartLocationButton()).toBeInTheDocument());
     });
 
     it('campus list click selects and shows address', async () => {

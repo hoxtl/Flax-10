@@ -145,3 +145,31 @@ class CourseChangeRequestTest(TestCase):
         url = f'/api/admin/course-change-requests/{req.pk}/resolve/'
         response = authed_client(self.admin).post(url, {'decision': 'reject'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class CourseChangeServiceUnitTest(TestCase):
+    def setUp(self):
+        self.user = make_user('svc_user')
+
+    def test_handle_request_creation_error_raises_unexpected_exception(self):
+        from studyFlax.views.admin.course_change_service import handle_request_creation_error
+        with self.assertRaises(RuntimeError):
+            handle_request_creation_error(RuntimeError('unexpected'))
+
+    def test_pending_request_response_returns_request_when_pending(self):
+        from studyFlax.views.admin.course_change_service import pending_request_response
+        req = CourseChangeRequest.objects.create(
+            user=self.user, requested_course='Math', current_course='Physics',
+        )
+        self.assertEqual(pending_request_response(req), req)
+
+    def test_pending_request_response_returns_none_for_none(self):
+        from studyFlax.views.admin.course_change_service import pending_request_response
+        self.assertIsNone(pending_request_response(None))
+
+    def test_pending_request_response_returns_none_for_resolved_request(self):
+        from studyFlax.views.admin.course_change_service import pending_request_response
+        req = CourseChangeRequest.objects.create(
+            user=self.user, requested_course='Math', current_course='Physics', status='approved',
+        )
+        self.assertIsNone(pending_request_response(req))

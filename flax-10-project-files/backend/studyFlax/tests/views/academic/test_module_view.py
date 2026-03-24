@@ -248,3 +248,36 @@ class ModuleViewCoverageTest(TestCase):
         self.client.force_authenticate(user=other_teacher)
         response = self.client.delete(f'/api/modules/{self.module.id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ModuleNotificationsTest(TestCase):
+    """Tests for module notification helper branches."""
+
+    def test_notify_module_updated_does_nothing_for_empty_fields(self):
+        from studyFlax.views.modules.module_notifications import notify_module_updated
+        from unittest.mock import MagicMock
+        module = MagicMock()
+        notify_module_updated(module, [])
+
+    def test_format_updated_fields_empty_returns_details(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields([]), 'details')
+
+    def test_format_updated_fields_one_label(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code']), 'module code')
+
+    def test_format_updated_fields_two_labels(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code', 'module_name']), 'module code and module name')
+
+    def test_format_updated_fields_three_labels(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(
+            _format_updated_fields(['module_code', 'module_name', 'description']),
+            'module code, module name, and description',
+        )
+
+    def test_format_updated_fields_four_or_more_returns_details(self):
+        from studyFlax.views.modules.module_notifications import _format_updated_fields
+        self.assertEqual(_format_updated_fields(['module_code', 'module_name', 'description', 'semester']), 'details')

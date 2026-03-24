@@ -1,6 +1,6 @@
 /* Tests for TaskFeed component rendering and user interactions */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "../../../../utils/test-utils";
 import TaskFeed from "../../../../pages/Tasks/components/TaskFeed";
 
 const useTaskFeedDataMock = vi.hoisted(() => vi.fn());

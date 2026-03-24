@@ -13,6 +13,8 @@ from studyFlax.views.tasks.task_view_service import (
     create_task_response,
     delete_task,
     get_accessible_task,
+    get_user_tasks,
+    sync_calendar_event_for_task,
     list_task_lists_response,
     list_tasks_response,
     log_task_time_response,

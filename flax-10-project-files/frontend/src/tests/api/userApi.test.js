@@ -113,6 +113,41 @@ describe('userService', () => {
         expect(url).toContain('year=Year%202');
     });
 
+    it('searchUsers with roleFilter appends role param', async () => {
+        mockFetch({ results: [] });
+        await api.searchUsers('bob', '', '', 0, 20, '', 'admin');
+        const url = global.fetch.mock.calls[0][0];
+        expect(url).toContain('role=admin');
+    });
+
+    it('searchUsers with sortBy name-desc uses -name ordering', async () => {
+        mockFetch({ results: [] });
+        await api.searchUsers('carol', '', '', 0, 20, '', '', 'name-desc');
+        const url = global.fetch.mock.calls[0][0];
+        expect(url).toContain('ordering=-name');
+    });
+
+    it('searchUsers with default sortBy uses name ordering', async () => {
+        mockFetch({ results: [] });
+        await api.searchUsers('dave');
+        const url = global.fetch.mock.calls[0][0];
+        expect(url).toContain('ordering=name');
+    });
+
+    it('getUserSettings unwraps payload.settings when present', async () => {
+        const inner = { theme: 'dark', notifications: true };
+        mockFetch({ settings: inner });
+        const result = await api.getUserSettings();
+        expect(result).toEqual(inner);
+    });
+
+    it('getUserSettings returns payload directly when settings key is absent', async () => {
+        const payload = { theme: 'light' };
+        mockFetch(payload);
+        const result = await api.getUserSettings();
+        expect(result).toEqual(payload);
+    });
+
     describe('geocodeAddress', () => {
         it('returns lat/lng for a valid address', async () => {
             global.fetch = vi.fn().mockResolvedValue({

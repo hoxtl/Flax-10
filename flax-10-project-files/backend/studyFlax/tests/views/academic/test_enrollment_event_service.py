@@ -59,3 +59,29 @@ class LogEnrollmentCreationErrorTest(TestCase):
         exc = OperationalError('DB error')
         log_enrollment_creation_error(self.user, self.module, exc)
         mock_logger.debug.assert_not_called()
+
+
+class EnsureModulesExistTest(TestCase):
+    """Tests for _ensure_modules_exist_for_major in enrollment_logic."""
+
+    def setUp(self):
+        from django.utils import timezone
+        from datetime import timedelta
+        from studyFlax.models.modules.module_model import Module
+        self.teacher = User.objects.create_user(
+            username='enroll_teacher', email='enroll_teacher@test.com', password='pass', role='teacher',
+        )
+        Module.objects.create(
+            module_code='CS4101',
+            module_name='Existing CS Module',
+            created_by=self.teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+
+    def test_skips_existing_module_code(self):
+        from studyFlax.models.modules.module_model import Module
+        from studyFlax.views.modules.enrollment_logic import _ensure_modules_exist_for_major
+        count_before = Module.objects.filter(module_code='CS4101').count()
+        _ensure_modules_exist_for_major(['CS'])
+        self.assertEqual(Module.objects.filter(module_code='CS4101').count(), count_before)

@@ -85,14 +85,14 @@ def validate_user_within_project_limit(user):
 def validate_project_create_input(data):
     member_ids = normalise_member_ids(data.get("member_ids", []))
     if member_ids is None:
-        return None, Response({"member_ids": ["Provide member IDs as a list of user IDs."]}, status=status.HTTP_400_BAD_REQUEST)
+        return None, {"member_ids": ["Provide member IDs as a list of user IDs."]}, status.HTTP_400_BAD_REQUEST
     member_error = validate_member_ids(member_ids) if member_ids else None
     if member_error:
-        return None, member_error
+        return None, member_error.data, member_error.status_code
     limit_error = validate_users_within_project_limit(member_ids)
     if limit_error:
-        return None, limit_error
-    return member_ids, None
+        return None, limit_error.data, limit_error.status_code
+    return member_ids, None, None
 
 
 def project_create_payload(data):
@@ -170,9 +170,9 @@ def project_list_response(request):
 
 
 def create_project_result(data, user, context):
-    member_ids, member_error = validate_project_create_input(data)
+    member_ids, member_error, member_status = validate_project_create_input(data)
     if member_error:
-        return None, member_error, status.HTTP_400_BAD_REQUEST
+        return None, member_error, member_status
     owner_limit_error = validate_user_within_project_limit(user)
     if owner_limit_error:
         return None, owner_limit_error.data, owner_limit_error.status_code
@@ -249,10 +249,12 @@ def update_valid_project_data(project, request, serialiser):
     if deadline_error:
         return None, deadline_error.data, deadline_error.status_code
     serialiser.save()
-    return serialised_project(project, request), None, status.HTTP_200_OK
+    return serialised_project(project, serialiser_context(request)), None, status.HTTP_200_OK
 
 
 def serialised_project(project, context):
+    if not isinstance(context, dict):
+        context = serialiser_context(context)
     return GroupProjectSerialiser(with_project_metrics(project), context=context).data
 
 

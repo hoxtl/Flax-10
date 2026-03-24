@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '../../utils/test-utils';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 vi.mock('framer-motion', () => ({
