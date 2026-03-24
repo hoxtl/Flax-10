@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+<<<<<<< HEAD
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy(
@@ -34,6 +35,8 @@ vi.mock("framer-motion", () => ({
     },
   ),
 }));
+=======
+>>>>>>> 1654fb433 (Write timer and module dashboard tests)
 
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
@@ -168,12 +171,19 @@ describe("MyModulesDashboard", () => {
   it("opens task info modal when a reading row is clicked", async () => {
     getUpcomingDeadlines.mockResolvedValue([]);
     getSuggestedReadings.mockResolvedValue([
-      { id: 5, title: "Intro Chapter", module_name: "CS Intro", module_code: "CS101", deadline: "2026-04-10T00:00:00Z", start_page: 1, end_page: 20 },
+      { id: 5, title: "Intro: Chapter 3", module_name: "Intro", module_code: "CS101", deadline: "2026-04-10T00:00:00Z", start_page: 1, end_page: 20 },
     ]);
     renderDashboard();
+<<<<<<< HEAD
     const readingTitle = await screen.findByText("Intro Chapter");
     fireEvent.click(readingTitle.closest("[class]") || readingTitle);
     expect(screen.getByText("Intro Chapter")).toBeInTheDocument();
+=======
+    const readingTitle = await screen.findByText("Chapter 3");
+    fireEvent.click(readingTitle.closest("[class]") || readingTitle);
+    // TaskInfoModal renders null in test, just verify no error thrown
+    expect(readingTitle).toBeInTheDocument();
+>>>>>>> 1654fb433 (Write timer and module dashboard tests)
   });
 
   it("MyModulesDashboard shows enrolled module count in stats", async () => {
