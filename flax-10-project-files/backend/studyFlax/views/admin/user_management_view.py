@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 User = get_user_model()
+PROTECTED_FIXTURE_USERNAMES = frozenset({'janedoe', 'johndoe', 'charlie', 'amiller'})
 
 
 def serialise_user(user):
@@ -39,11 +40,23 @@ def staff_ban_response():
     return Response({'error': 'Cannot ban staff users'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+def protected_user_ban_response():
+    return Response({'error': 'Cannot ban protected fixture users'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def missing_reason_response():
+    return Response({'error': 'Ban reason is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 def get_user_or_response(user_id):
     try:
         return User.objects.get(id=user_id), None
     except User.DoesNotExist:
         return None, not_found('User not found')
+
+
+def is_protected_fixture_user(user):
+    return (user.username or '').casefold() in PROTECTED_FIXTURE_USERNAMES
 
 
 def apply_ban_action(user, action, reason):
@@ -68,9 +81,15 @@ def ban_user(request, user_id):
     user, error = get_user_or_response(user_id)
     if error:
         return error
-    if user.is_staff:
-        return staff_ban_response()
     action = request.data.get('action', 'ban')
+    reason = (request.data.get('reason') or '').strip()
     if action not in ('ban', 'unban'):
         return invalid_action_response()
-    return apply_ban_action(user, action, request.data.get('reason', ''))
+    if action == 'ban':
+        if not reason:
+            return missing_reason_response()
+        if user.is_staff or user.is_superuser:
+            return staff_ban_response()
+        if is_protected_fixture_user(user):
+            return protected_user_ban_response()
+    return apply_ban_action(user, action, reason)

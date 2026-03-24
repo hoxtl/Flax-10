@@ -18,6 +18,7 @@ import AdminPagination from "./AdminPagination";
 import { filterUsers, getUserRoleValue, toggleArrayValue } from "../utils/userFilters";
 import { banUserState, unbanUserState } from "../utils/userState";
 import { rowAnim, stagger } from "../utils/adminMotion";
+import { isProtectedFixtureUser } from "../utils/protectedUsers";
 import SearchEmptyState from "../../../components/common/SearchEmptyState/SearchEmptyState";
 import { navigateToProfile } from "../utils/adminNavigation";
 import { useUsersTabState } from "../hooks/useUsersTabState";
@@ -34,6 +35,14 @@ function MobileAdminMarker() {
   return <span className={styles.staffPillBadge}>Admin</span>;
 }
 
+function ProtectedMarker() {
+  return <span className={styles.staffBadge}>Protected</span>;
+}
+
+function MobileProtectedMarker() {
+  return <span className={styles.staffPillBadge}>Protected</span>;
+}
+
 function UserNameButton({ onNavigate, user }) {
   return <button className={styles.nameBtn} onClick={() => navigateToProfile(onNavigate, user.id)}>{user.first_name} {user.last_name}<span className={styles.username}>@{user.username}</span></button>;
 }
@@ -48,6 +57,7 @@ function UserTableHeader() {
 
 function UserDesktopActions({ busy, onBan, onUnban, user }) {
   if (user.is_staff || user.is_superuser) return <AdminMarker />;
+  if (user.is_active && isProtectedFixtureUser(user)) return <ProtectedMarker />;
   if (user.is_active) return <UserActionButton className={styles.banBtn} busy={busy} label="Ban" onClick={onBan} />;
   return <UserActionButton className={styles.unbanBtn} busy={busy} label="Unban" onClick={onUnban} />;
 }
@@ -66,6 +76,7 @@ function UserDesktopRow({ busy, onBan, onNavigate, onUnban, user }) {
 
 function UserMobileActions({ busy, onBan, onUnban, user }) {
   if (user.is_staff || user.is_superuser) return <MobileAdminMarker />;
+  if (user.is_active && isProtectedFixtureUser(user)) return <MobileProtectedMarker />;
   if (user.is_active) return <UserActionButton className={styles.banPillBtn} busy={busy} label="Ban" onClick={onBan} />;
   return <UserActionButton className={styles.unbanPillBtn} busy={busy} label="Unban" onClick={onUnban} />;
 }
@@ -131,7 +142,15 @@ export default function UsersTab({ onNavigate }) {
   const pagination = usePaginatedItems(filteredUsers, USER_LIST_PAGE_SIZE);
   useEffect(() => { pagination.setCurrentPage(1); }, [pagination.setCurrentPage, state.filters, state.search]);
   const toggleGroup = (group, value) => state.setFilters((current) => ({ ...current, [group]: toggleArrayValue(current[group], value) }));
-  const confirmBan = (reason) => { if (!state.banTarget) return; state.setBusy(true); banUser(state.banTarget.id, reason).then(() => state.setUsers((users) => banUserState(users, state.banTarget.id, reason))).catch((error) => state.setError(error?.message || "Failed to ban user.")).finally(() => { state.setBanTarget(null); state.setBusy(false); }); };
+  const confirmBan = (reason) => {
+    const trimmedReason = reason.trim();
+    if (!state.banTarget || !trimmedReason) return;
+    state.setBusy(true);
+    banUser(state.banTarget.id, trimmedReason)
+      .then(() => state.setUsers((users) => banUserState(users, state.banTarget.id, trimmedReason)))
+      .catch((error) => state.setError(error?.message || "Failed to ban user."))
+      .finally(() => { state.setBanTarget(null); state.setBusy(false); });
+  };
   const handleUnban = (user) => { state.setBusy(true); unbanUser(user.id).then(() => state.setUsers((users) => unbanUserState(users, user.id))).catch((error) => state.setError(error?.message || "Failed to unban user.")).finally(() => state.setBusy(false)); };
   return (
     <>
