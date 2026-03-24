@@ -163,6 +163,7 @@ def _seed_tasks_for_user(user, now):
 
 def _ensure_task_due_today(user, lists_by_module, now):
     """If no tasks are due today, set the first module task's due date to today."""
+
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
     has_today = Task.objects.filter(
@@ -181,6 +182,7 @@ def seed_new_user_tasks(user, now):
     but does NOT add the personal fixture tasks (those are for seeded demo users only).
     Ensures at least one task is due today.
     """
+
     if Task.objects.filter(user=user).exists():
         return 0
     _create_task_lists(user)

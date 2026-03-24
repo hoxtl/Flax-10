@@ -37,6 +37,7 @@ def _build_task_due_date(due, task_index, now):
 
 def _build_completed_task_assignments(members, status_pattern, rng):
     """Assign members to completed tasks with varied counts so contributions differ per person."""
+
     completed_indexes = [index for index, status in enumerate(status_pattern) if status == "done"]
     if not completed_indexes:
         return {}
