@@ -74,7 +74,38 @@ Registration creates a \texttt{User} record and returns a DRF auth token in the 
 
 The backend exposes a set of admin-only API endpoints under \texttt{/api/admin/}, restricted to users with the \texttt{staff} role. These allow administrators to manage user accounts, oversee registered societies, and access platform-wide analytics without going through Django's built-in \texttt{/admin/} panel. Django's default \texttt{/admin/} interface is also available for direct database-level inspection and management during development. Role-based access is enforced at the view level using a custom permission check against the \texttt{is\_staff} flag on the \texttt{User} model.
 
-\section{Data Model/ Entity Relationships}
+\section{Data Model / Entity Relationships}
+
+The data model is divided across three figures below, grouped by functional domain for legibility. Each colour represents a distinct cluster: blue (Auth \& User), yellow (Notifications), red (Socials), green (Calendar), purple (Module), pink (Tasks), magenta (Timer), orange (Groupwork), and cyan (Society).
+
+\FloatBarrier
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_1.png}
+    \caption{ER Diagram (Part 1) --- Authentication, User, Notification \& Social Models}
+    \label{fig:er_diagram_1}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_2.png}
+    \caption{ER Diagram (Part 2) --- Calendar, Module, Task \& Timer Models}
+    \label{fig:er_diagram_2}
+\end{figure}
+
+\FloatBarrier
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth, height=0.9\textheight, keepaspectratio]{figures/er_diagram_3.png}
+    \caption{ER Diagram (Part 3) --- Groupwork \& Society Models}
+    \label{fig:er_diagram_3}
+\end{figure}
+
+\FloatBarrier
 
 \section{Key Design Decisions}
 \label{sect:design-decisions}
