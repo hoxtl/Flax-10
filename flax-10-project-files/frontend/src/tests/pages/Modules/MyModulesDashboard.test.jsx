@@ -8,12 +8,31 @@ import { MemoryRouter } from "react-router-dom";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }) => {
-      const { initial: _i, animate: _a, exit: _e, transition: _t, variants: _v, ...rest } = props;
-      return <div {...rest}>{children}</div>;
+  motion: new Proxy(
+    {},
+    {
+      get: (_, tag) => {
+        const Tag = typeof tag === "string" ? tag : "div";
+        return ({ children, ...props }) => {
+          const {
+            animate: _animate,
+            exit: _exit,
+            initial: _initial,
+            layout: _layout,
+            layoutId: _layoutId,
+            layoutRoot: _layoutRoot,
+            transition: _transition,
+            variants: _variants,
+            whileHover: _whileHover,
+            whileTap: _whileTap,
+            ...rest
+          } = props;
+
+          return <Tag {...rest}>{children}</Tag>;
+        };
+      },
     },
-  },
+  ),
 }));
 
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
@@ -150,10 +169,9 @@ describe("MyModulesDashboard", () => {
       { id: 5, title: "Intro Chapter", module_name: "CS Intro", module_code: "CS101", deadline: "2026-04-10T00:00:00Z", start_page: 1, end_page: 20 },
     ]);
     renderDashboard();
-    const readingTitle = await screen.findByText("Chapter");
+    const readingTitle = await screen.findByText("Intro Chapter");
     fireEvent.click(readingTitle.closest("[class]") || readingTitle);
-    // TaskInfoModal renders null in test, just verify no error thrown
-    expect(screen.queryByText("Chapter") || true).toBeTruthy();
+    expect(screen.getByText("Intro Chapter")).toBeInTheDocument();
   });
 
   it("MyModulesDashboard shows enrolled module count in stats", async () => {
