@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getUserProfile } from "../api/userApi";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 function readStoredUser() {
   const storedUser = localStorage.getItem("user");

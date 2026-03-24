@@ -29,15 +29,15 @@
     min-height: 36px;
     padding: 0 0.95rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
-    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border));
-    color: var(--text);
-    box-shadow: 0 8px 20px color-mix(in srgb, var(--modules-accent-ink) 10%, transparent);
+    background: var(--groupwork-action-bg);
+    border-color: var(--groupwork-action-border);
+    color: var(--groupwork-action-text);
+    box-shadow: var(--groupwork-action-shadow);
 }
 
 .sortDropdownTrigger:hover {
-    background: color-mix(in srgb, var(--modules-accent-ink) 16%, var(--surface-card));
-    border-color: color-mix(in srgb, var(--modules-accent-ink) 26%, var(--border));
+    background: color-mix(in srgb, var(--modules-accent-ink) 10%, var(--groupwork-action-bg));
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 28%, var(--groupwork-action-border));
 }
 
 .sortDropdownTrigger :global(svg) {
@@ -70,6 +70,15 @@
 
 .emptyStateHint {
     max-width: 32rem;
+}
+
+:global([data-mode="dark"]) .sortDropdownTrigger {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-inner) 90%, var(--surface-card) 10%) 0%,
+        color-mix(in srgb, var(--surface-card) 86%, var(--color-bg) 14%) 100%
+    );
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border));
 }
 
 @media (max-width: 768px) {

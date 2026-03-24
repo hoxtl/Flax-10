@@ -7,6 +7,7 @@
     overflow: hidden;
     position: relative;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 8px 22px color-mix(in srgb, black 6%, transparent);
 }
 
 .projectRowContainer:hover {
@@ -78,6 +79,14 @@
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
+}
+
+.detailsButton {
+    min-height: 34px;
+    padding-inline: 14px;
+    box-shadow:
+        0 10px 20px color-mix(in srgb, black 8%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
 }
 
 .teacherAvatarTooltipWrap {
@@ -191,6 +200,61 @@
     background: rgba(123, 103, 81, 0.08);
     color: var(--primary);
     border-color: rgba(123, 103, 81, 0.16);
+}
+
+:global([data-mode="dark"]) .projectRowContainer {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%) 0%,
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%) 100%
+    );
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 14%, var(--border));
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .projectRowContainer:hover {
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 24%, var(--border));
+    box-shadow:
+        0 22px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .projectModuleBadge {
+    background: var(--modules-chip-bg);
+    color: var(--modules-chip-fg);
+    border-color: var(--modules-chip-border);
+}
+
+:global([data-mode="dark"]) .detailsButton {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 94%, var(--surface-inner) 6%),
+        color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 22%, var(--border) 78%) !important;
+    color: color-mix(in srgb, var(--text) 92%, white 8%) !important;
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+:global([data-mode="dark"]) .detailsButton:hover {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-raised, var(--surface-card)) 90%, var(--surface-inner) 10%),
+        color-mix(in srgb, var(--surface-card) 76%, var(--color-bg) 24%)
+    ) !important;
+}
+
+:global([data-mode="dark"]) .avatarWrapper {
+    background: var(--surface-inner);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 18%, var(--border));
+}
+
+:global([data-mode="dark"]) .avatarCountLabel {
+    color: color-mix(in srgb, white 78%, var(--text-secondary) 22%);
 }
 
 .projectModuleCode {

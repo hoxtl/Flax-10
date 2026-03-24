@@ -27,7 +27,7 @@ export default function CreateSocietyModal({ onClose, onCreate }) {
     const { collab, photo } = logic.modals;
     return (
         <>
-            <StandardModal title="Create Society" onClose={onClose}>
+            <StandardModal title="Create Society" onClose={onClose} modalClassName={styles.modalPanel} contentClassName={styles.modalContent}>
                 <FormFields form={logic.form} update={logic.update} setModals={logic.setModals} />
                 <ModalFooter onClose={onClose} onCreate={logic.handleSubmit} disabled={logic.isCreateDisabled} />
             </StandardModal>
@@ -195,7 +195,7 @@ function CollaboratorsField({ collaborators, onOpen, onRoleChange, onRemove }) {
 function ModalFooter({ onClose, onCreate, disabled }) {
     return (
         <div className={styles.footer}>
-            <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="ghost" pill>Cancel</PrimaryButton>
+            <PrimaryButton className={styles.cancelBtn} onClick={onClose} type="button" variant="secondary" pill>Cancel</PrimaryButton>
             <PrimaryButton className={styles.createBtn} onClick={onCreate} type="button" disabled={disabled} pill>
                 Create Society
             </PrimaryButton>

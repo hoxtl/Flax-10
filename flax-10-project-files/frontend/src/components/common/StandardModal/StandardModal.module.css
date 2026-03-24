@@ -25,9 +25,9 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(20, 14, 8, 0.42);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--color-bg, #140e08) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.05);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,16 +39,50 @@
   width: min(520px, 92vw);
   max-height: 90vh;
   overflow: hidden;
-  background: var(--surface-panel, var(--panel));
-  border: 2px solid #000 !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-panel, var(--panel)) 94%, var(--surface-inner, var(--surface-panel, var(--panel))) 6%) 0%,
+    color-mix(in srgb, var(--surface-panel, var(--panel)) 88%, var(--surface-inner, var(--surface-panel, var(--panel))) 12%) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--border) 82%, var(--color-highlight, #d0ab73) 18%);
   border-radius: var(--modal-radius);
   box-shadow:
     var(--modal-shadow),
+    0 26px 54px color-mix(in srgb, black 24%, transparent),
     0 0 0 1px rgba(255, 255, 255, 0.06) inset;
   padding: var(--modal-padding);
   display: flex;
   flex-direction: column;
   animation: modalIn 0.25s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+:global([data-mode="dark"]) .backdrop {
+  background: color-mix(in srgb, var(--color-bg, #140e08) 76%, rgba(0, 0, 0, 0.65) 24%);
+}
+
+:global([data-mode="dark"]) .modal {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-panel, var(--panel)) 90%, var(--surface-inner, var(--surface-panel, var(--panel))) 10%) 0%,
+    color-mix(in srgb, var(--surface-panel, var(--panel)) 72%, var(--color-bg, #1a1310) 28%) 100%
+  );
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 28%, var(--border) 72%);
+  box-shadow:
+    0 34px 76px rgba(0, 0, 0, 0.56),
+    0 0 0 1px color-mix(in srgb, var(--color-highlight, #d0ab73) 10%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .close {
+  background: color-mix(in srgb, var(--surface-inner, var(--surface-panel, var(--panel))) 82%, var(--color-bg) 18%);
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 16%, var(--border) 84%);
+  color: color-mix(in srgb, var(--text-secondary) 76%, white 24%);
+}
+
+:global([data-mode="dark"]) .close:hover {
+  background: color-mix(in srgb, var(--surface-inner, var(--surface-panel, var(--panel))) 74%, var(--hover) 26%);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 28%, var(--border) 72%);
 }
 
 .sizeSm {
@@ -120,8 +154,8 @@
   flex-shrink: 0;
   border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-inner, var(--surface-panel, var(--panel))) 72%, transparent);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -129,7 +163,7 @@
 }
 
 .close:hover {
-  background: var(--hover);
+  background: color-mix(in srgb, var(--surface-inner, var(--surface-panel, var(--panel))) 84%, var(--hover) 16%);
   color: var(--text);
   border-color: color-mix(in srgb, var(--primary) 20%, transparent);
 }

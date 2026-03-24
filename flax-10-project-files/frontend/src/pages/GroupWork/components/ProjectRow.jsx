@@ -2,11 +2,12 @@
  * GroupWork project row.
  */
 
+import { useContext } from "react";
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
-import { useAuth } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext";
 import {
   getDaysLeft,
   getProjectDate,
@@ -17,8 +18,7 @@ import {
 import styles from "./ProjectRow.module.css";
 
 function useIsOwner(project) {
-  const { user } = useAuth();
-  const currentUserId = user?.id;
+  const currentUserId = useContext(AuthContext)?.user?.id;
   return (project.members || []).some((m) => m.role === "owner" && m.user === currentUserId);
 }
 
@@ -35,7 +35,7 @@ function ProjectMetaArea({ project, date }) {
 
 function ViewDetailsButton({ onClick }) {
   return (
-    <PrimaryButton size="small" variant="ghost" pill onClick={onClick}>View details and schedule meeting slots</PrimaryButton>
+    <PrimaryButton size="small" variant="ghost" pill className={styles.detailsButton} onClick={onClick}>View details and schedule meeting slots</PrimaryButton>
   );
 }
 

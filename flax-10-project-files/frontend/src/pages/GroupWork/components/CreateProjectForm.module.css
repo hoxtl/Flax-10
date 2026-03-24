@@ -7,6 +7,16 @@
 .modalPanel {
     width: min(860px, 96vw);
     max-height: min(94vh, 920px);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 94%, var(--surface-inner, var(--surface-panel, var(--panel))) 6%) 0%,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 88%, var(--surface-inner, var(--surface-panel, var(--panel))) 12%) 100%
+    );
+    border-color: color-mix(in srgb, var(--groupwork-action-border) 88%, var(--border) 12%);
+    box-shadow:
+        var(--modal-shadow),
+        0 28px 58px color-mix(in srgb, black 28%, transparent),
+        inset 0 1px 0 color-mix(in srgb, white 6%, transparent);
 }
 
 .modalContent {
@@ -16,7 +26,7 @@
 }
 
 .modalSubtitle {
-    color: var(--text);
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -73,9 +83,9 @@
     width: 100%;
     min-height: var(--input-height);
     padding: var(--input-padding);
-    border: var(--input-border);
+    border: 1px solid color-mix(in srgb, var(--border) 86%, var(--modules-accent-ink) 14%);
     border-radius: var(--dropdown-radius);
-    background: var(--surface-raised);
+    background: color-mix(in srgb, var(--surface-inner, var(--surface-raised)) 94%, transparent);
     color: var(--text);
     font: inherit;
     font-size: var(--text-base);
@@ -87,10 +97,12 @@
     box-sizing: border-box;
     overflow: hidden;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
 }
 
 .dropdownTrigger:hover {
-    border-color: var(--primary);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 28%, var(--border));
+    background: color-mix(in srgb, var(--surface-raised) 76%, var(--surface-inner) 24%);
 }
 
 .dropdownTrigger:focus-visible {
@@ -125,6 +137,8 @@
     border-radius: 14px;
     box-shadow: none;
     min-height: 104px;
+    background: color-mix(in srgb, var(--surface-inner) 92%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--border) 84%, var(--modules-accent-ink) 16%);
 }
 
 .memberSearchEmptyTitle {
@@ -153,11 +167,36 @@
 
 .cancelBtn {
     min-width: 90px;
+    min-height: 38px;
 }
 
 .submitBtn {
     height: 38px;
     padding: 0 20px;
+}
+
+:global([data-mode="dark"]) .modalPanel {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 90%, var(--surface-inner, var(--surface-panel, var(--panel))) 10%) 0%,
+        color-mix(in srgb, var(--surface-panel, var(--panel)) 72%, var(--color-bg) 28%) 100%
+    );
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 26%, var(--border) 74%);
+    box-shadow:
+        var(--modal-shadow),
+        0 34px 70px rgba(0, 0, 0, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .dropdownTrigger {
+    background: color-mix(in srgb, var(--surface-inner) 88%, var(--surface-panel) 12%);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 18%, var(--border));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:global([data-mode="dark"]) .memberSearchEmptyCard {
+    background: color-mix(in srgb, var(--surface-inner) 84%, var(--color-bg) 16%);
+    border-color: color-mix(in srgb, var(--modules-accent-ink) 22%, var(--border) 78%);
 }
 
 @media (max-width: 768px) {

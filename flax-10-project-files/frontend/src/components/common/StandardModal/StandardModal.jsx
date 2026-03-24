@@ -38,11 +38,11 @@ function buildContentClasses(centerText, contentClassName) {
 export default function StandardModal({
   title, subtitle, subtitleClassName = "", onClose, children,
   size = "md", backdropClassName = "", modalClassName = "", contentClassName = "",
-  hideHeader = false, backdropRef = null, centerText = false,
+  hideHeader = false, backdropRef = null, centerText = false, dismissOnBackdrop = true,
 }) {
   const backdropClasses = backdropClassName ? `${styles.backdrop} ${backdropClassName}` : styles.backdrop;
   return createPortal(
-    <div className={backdropClasses} onMouseDown={onClose} ref={backdropRef}>
+    <div className={backdropClasses} onMouseDown={(event) => dismissOnBackdrop && onClose?.(event)} ref={backdropRef}>
       <div className={buildModalClasses(size, modalClassName)} onMouseDown={e => e.stopPropagation()}>
         {!hideHeader && title && (
           <ModalHeader title={title} subtitle={subtitle} subtitleClassName={subtitleClassName}
