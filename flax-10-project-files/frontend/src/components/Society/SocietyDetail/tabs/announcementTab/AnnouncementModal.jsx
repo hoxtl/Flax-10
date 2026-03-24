@@ -17,7 +17,7 @@ import "../../../../Calendar/EventModal/EventModal.css";
 import { useAnnouncementForm } from "./useAnnouncementForm";
 
 export default function AnnouncementModal({ onClose, onSubmit, onDelete, tags = [], announcement = null, societyId, announcements = [] }) {
-    const { form, setForm, error, submit } = useAnnounceForm(announcement, societyId, onSubmit, announcements);
+    const { form, setForm, error, submit } = useAnnouncementForm(announcement, societyId, onSubmit, announcements);
     const [showDelete, setShowDelete] = useState(false);
     const fileRef = useRef(null);
     const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }));

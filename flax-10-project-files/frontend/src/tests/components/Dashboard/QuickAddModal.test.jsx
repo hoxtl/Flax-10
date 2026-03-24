@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
+vi.mock('../../../context/ToastContext', () => ({
+    useToast: vi.fn(() => vi.fn()),
+}));
+
 vi.mock('../../../context/TagContext', () => ({
     useTags: vi.fn(() => ({
         tags: [

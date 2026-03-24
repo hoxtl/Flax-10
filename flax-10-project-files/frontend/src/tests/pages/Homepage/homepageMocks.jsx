@@ -1,10 +1,11 @@
 // Shared mock components for Homepage tests
 
-export const IntelligenceRowMock = ({ displayName, slot1TodayTasks, slot3Urgent }) => (
+export const IntelligenceRowMock = ({ displayName, slot1TodayTasks, slot3Urgent, slot6Timeline }) => (
   <div data-testid="intelligence-row">
     <div data-testid="display-name">{displayName || 'anon'}</div>
     <div data-testid="slot1">{slot1TodayTasks}</div>
     <div data-testid="slot3">{slot3Urgent}</div>
+    <div data-testid="slot6">{slot6Timeline}</div>
   </div>
 );
 
@@ -56,6 +57,37 @@ export const MiniTimelineMock = ({ sortedEvents, onQuickStart, onTaskToggle, onC
     <button type="button" onClick={() => onDelete?.({ id: 'ev-1', source: 'task', external_id: 99, title: 'Task Event' })}>timeline-delete-task</button>
     <button type="button" onClick={() => onReschedule?.({ id: 1, start_time: new Date().toISOString(), end_time: new Date().toISOString(), title: 'E' })}>reschedule</button>
     <button type="button" onClick={() => onToggleComplete?.(1)}>toggle-complete</button>
+  </div>
+);
+
+export const HomepageTimelineSectionMock = ({ sortedEvents, handleReplanDay, missedItems, overdueTasksForNow, replanLoading, handleQuickStartGap, handleTaskToggle, openTimelinePopup, openModal, handleConflictAutoMove, handleConflictPushTomorrow, handleTimelineDelete, handleReschedule, setCompletedEventIds }) => (
+  <div data-testid="homepage-timeline-section">
+    {handleReplanDay && (
+      <button
+        type="button"
+        aria-label="Re-plan overdue and missed items into free windows"
+        onClick={handleReplanDay}
+        disabled={replanLoading || (!missedItems?.length && !overdueTasksForNow?.length)}
+      >
+        {replanLoading ? 'Re-planning...' : 'Re-plan'}
+      </button>
+    )}
+    <MiniTimelineMock
+      sortedEvents={sortedEvents}
+      onQuickStart={handleQuickStartGap}
+      onTaskToggle={handleTaskToggle}
+      onCardClick={openTimelinePopup}
+      onEdit={(event) => openModal?.(event, event?.tag)}
+      onConflictAutoMove={handleConflictAutoMove}
+      onPushTomorrow={handleConflictPushTomorrow}
+      onDelete={handleTimelineDelete}
+      onReschedule={handleReschedule}
+      onToggleComplete={(eventId) => setCompletedEventIds?.((prev) => {
+        const next = new Set(prev);
+        if (next.has(eventId)) next.delete(eventId); else next.add(eventId);
+        return next;
+      })}
+    />
   </div>
 );
 

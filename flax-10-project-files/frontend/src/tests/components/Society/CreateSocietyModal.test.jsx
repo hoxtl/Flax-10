@@ -39,11 +39,11 @@ vi.mock('../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal
         </div>
     ),
 }));
-vi.mock('../../../components/Society/CategorySelector', () => ({
-    default: ({ value, onChange, label }) => (
+vi.mock('../../../components/common/TagsSelector/TagsSelector', () => ({
+    TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
         <div>
-            <label>{label}</label>
-            <button onClick={() => onChange(['Tech'])}>SelectCategory</button>
+            <span>{emptyHint}</span>
+            <button onClick={() => onSelectionChange([{ id: 'Tech', label: 'Tech' }])}>SelectCategory</button>
         </div>
     ),
 }));
@@ -73,13 +73,12 @@ describe('CreateSocietyModal', () => {
     it('renders the modal with title and subtitle', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         expect(screen.getAllByText('Create Society').length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText('Start your own society')).toBeInTheDocument();
     });
 
     it('renders the Society Name field', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         expect(screen.getByPlaceholderText('e.g. Photography Club')).toBeInTheDocument();
-        expect(screen.getByText('Society Name *')).toBeInTheDocument();
+        expect(screen.getByText(/Society Name/)).toBeInTheDocument();
     });
 
     it('renders the Bio field', () => {
@@ -89,7 +88,7 @@ describe('CreateSocietyModal', () => {
 
     it('renders Admin Emails field', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        expect(screen.getByText('Admin Emails (optional)')).toBeInTheDocument();
+        expect(screen.getByText(/Admin Emails/)).toBeInTheDocument();
     });
 
     it('renders the Create Society button disabled when name is empty', () => {
@@ -203,8 +202,8 @@ describe('CreateSocietyModal', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
         fireEvent.click(screen.getByText('+ Add Photos'));
         fireEvent.click(screen.getByText('AddPhoto'));
-        // After adding a photo, the label should show Photos (1/5)
-        expect(screen.getByText('Photos (1/5)')).toBeInTheDocument();
+        // After adding a photo, the label should show (1/5)
+        expect(screen.getByText('(1/5)')).toBeInTheDocument();
     });
 
     it('shows Manage Photos label after photo added', () => {
@@ -223,7 +222,8 @@ describe('CreateSocietyModal', () => {
 
     it('shows empty collaborators message initially', () => {
         render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        expect(screen.getByText('No collaborators added yet.')).toBeInTheDocument();
+        expect(screen.getByText('+ Add Collaborators')).toBeInTheDocument();
+        expect(screen.queryByTestId('collab-list')).not.toBeInTheDocument();
     });
 
     it('can update bio field', () => {
@@ -270,7 +270,12 @@ describe('CreateSocietyModal', () => {
     });
 
     it('shows Photos (0/5) label initially', () => {
-        render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
-        expect(screen.getByText('Photos (0/5)')).toBeInTheDocument();
+        const { container } = render(<CreateSocietyModal onClose={onClose} onCreate={onCreate} />);
+        const addPhotosBtn = screen.getByText('+ Add Photos');
+        expect(addPhotosBtn).toBeInTheDocument();
+        const labels = container.querySelectorAll('label');
+        const photosLabel = Array.from(labels).find(l => l.textContent.includes('Photos'));
+        expect(photosLabel).toBeTruthy();
+        expect(photosLabel.textContent).toContain('0');
     });
 });

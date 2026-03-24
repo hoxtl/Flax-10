@@ -12,6 +12,19 @@ function extractUrl(item) {
     return typeof url === 'string' ? url.trim() : null;
 }
 
+export function getAvailablePhotos(society) {
+    const coverUrls = new Set(getImageUrls(society?.images));
+    const available = [];
+    (society?.announcements || []).forEach(ann => {
+        getImageUrls(ann?.images).forEach(url => {
+            if (!coverUrls.has(url) && !available.includes(url)) {
+                available.push(url);
+            }
+        });
+    });
+    return available;
+}
+
 export function scrollContentToTop() {
     const scrollable = findScrollableParent();
     if (scrollable) scrollable.scrollTop = 0;

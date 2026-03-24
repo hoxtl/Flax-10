@@ -349,8 +349,8 @@ describe('TaskFeed', () => {
             task_list: 1,
         }));
         renderFeed({ tasks: manyTasks, activeFilter: 'all' });
-        expect(screen.getByText('Show all 10 →')).toBeTruthy();
-        fireEvent.click(screen.getByText('Show all 10 →'));
+        expect(screen.getByText('+ Show all 10')).toBeTruthy();
+        fireEvent.click(screen.getByText('+ Show all 10'));
         expect(screen.getByText('Show less ↑')).toBeTruthy();
     });
     it('handles active module code in header and invalid user JSON safely', () => {

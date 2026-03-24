@@ -110,7 +110,7 @@ describe('eventStyleUtils: getEventTheme', () => {
         const event = { tag_name: 'unknown' };
         const tags = { tags: [] };
         const theme = getEventTheme(event, tags);
-        expect(theme.color).toBe('#9E7E5D');
+        expect(theme.color).toBe('var(--color-caramel)');
         expect(theme.icon).toBe('🏷️');
     });
 
@@ -123,7 +123,7 @@ describe('eventStyleUtils: getEventTheme', () => {
     it('falls back to default when no tags context', () => {
         const event = { tag_name: 'study' };
         const theme = getEventTheme(event, null);
-        expect(theme.color).toBe('#9E7E5D');
+        expect(theme.color).toBe('var(--color-caramel)');
     });
 });
 

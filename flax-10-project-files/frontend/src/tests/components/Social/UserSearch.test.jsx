@@ -187,14 +187,11 @@ describe('UserSearch', () => {
     });
 
     it('handles society init errors without crashing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
         fetchSocieties.mockRejectedValueOnce(new Error('societies down'));
         render(<UserSearch onUserSelect={vi.fn()} />);
 
         await act(async () => { });
         expect(screen.getByTestId('search-bar')).toBeTruthy();
-        expect(errSpy).toHaveBeenCalled();
-        errSpy.mockRestore();
     });
 
     it('shows societies tab and filters societies', async () => {

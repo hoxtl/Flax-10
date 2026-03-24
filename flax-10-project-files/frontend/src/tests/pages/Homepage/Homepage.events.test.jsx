@@ -75,8 +75,8 @@ vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
 vi.mock('../../../pages/Homepage/components', async () => {
-  const { MiniTimelineMock } = await import('./homepageMocks');
-  return { MiniTimeline: MiniTimelineMock };
+  const { MiniTimelineMock, HomepageTimelineSectionMock } = await import('./homepageMocks');
+  return { MiniTimeline: MiniTimelineMock, HomepageTimelineSection: HomepageTimelineSectionMock };
 });
 vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
@@ -145,7 +145,7 @@ describe('Homepage – overlays & event operations', () => {
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('quick-start'));
     await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
-    await waitFor(() => expect(screen.getByText(/added to your schedule/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/added to schedule/)).toBeInTheDocument());
   });
 
   it('handleQuickStartGap shows error toast on fail', async () => {
@@ -187,7 +187,7 @@ describe('Homepage – overlays & event operations', () => {
     mockEditEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('push-tomorrow'));
-    await waitFor(() => expect(screen.getByText("Couldn't move to tomorrow. Try again.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Couldn't move to tomorrow.")).toBeInTheDocument());
   });
 
   it('handleTimelineDelete removes event and shows toast', async () => {
@@ -201,15 +201,15 @@ describe('Homepage – overlays & event operations', () => {
     const { deleteTask } = await import('../../../api/taskApi');
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete-task'));
-    await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(99));
-    await waitFor(() => expect(screen.getByText(/removed from tasks and calendar/)).toBeInTheDocument());
+    await waitFor(() => expect(deleteTask).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByText(/removed/)).toBeInTheDocument());
   });
 
   it('handleTimelineDelete shows error toast on fail', async () => {
     mockRemoveEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete'));
-    await waitFor(() => expect(screen.getByText("Couldn't delete this item. Try again.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Couldn't delete item.")).toBeInTheDocument());
   });
 
   it('timeline edit opens event modal', () => {

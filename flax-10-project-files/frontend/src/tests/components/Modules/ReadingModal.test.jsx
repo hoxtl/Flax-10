@@ -11,7 +11,7 @@ vi.mock('../../../components/Modules/hooks/useReadingModal', () => ({
     useReadingModal: vi.fn(),
 }));
 
-vi.mock('../../../components/Modules/ReadingForm', () => ({
+vi.mock('../../../components/Modules/Readings/ReadingForm', () => ({
     default: ({ onCancel}) => (
         <div>
             <span>ReadingForm</span>
@@ -20,7 +20,7 @@ vi.mock('../../../components/Modules/ReadingForm', () => ({
     ),
 }));
 
-vi.mock('../../../components/Modules/ReadingCard', () => ({
+vi.mock('../../../components/Modules/Readings/ReadingCard', () => ({
     default: ({ reading }) => (
         <div> {reading.title} </div>
     ),
@@ -90,7 +90,7 @@ describe('ReadingModal', () => {
     it('should render reading list when readings exist', () => {
         mockModal({readings : [ {id:1, title: 'Module Handbook', start_page: 13, end_page:63, deadline:'2026-04-01'}, ]});
         render(<ReadingModal module={module} onClose={vi.fn()} />);
-        expect(screen.getByText('ReadingForm')).toBeInTheDocument();
+        expect(screen.getByText('Module Handbook')).toBeInTheDocument();
     });
 
     it('should call onClose when close button is clicked', () => {

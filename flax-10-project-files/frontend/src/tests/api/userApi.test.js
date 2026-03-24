@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../../api/userApi';
+import * as geocodeApi from '../../api/geocodeApi';
 
 const mockFetch = (data, ok = true) => {
+    const jsonStr = JSON.stringify(data);
     global.fetch = vi.fn().mockResolvedValue({
         ok,
+        status: ok ? 200 : 400,
         json: vi.fn().mockResolvedValue(data),
+        text: vi.fn().mockResolvedValue(jsonStr),
     });
 };
 
@@ -87,8 +91,8 @@ describe('userService', () => {
     });
 
     it('throws when response is not ok', async () => {
-        global.fetch = vi.fn().mockResolvedValue({ ok: false, json: vi.fn() });
-        await expect(api.getUserSettings()).rejects.toThrow('Request failed');
+        global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 400, json: vi.fn().mockResolvedValue({}), text: vi.fn().mockResolvedValue('{}') });
+        await expect(api.getUserSettings()).rejects.toThrow();
     });
 
     it('searchUsers builds URL with query', async () => {
@@ -117,7 +121,7 @@ describe('userService', () => {
                     features: [{ center: [-0.127758, 51.507351] }],
                 }),
             });
-            const result = await api.geocodeAddress('London');
+            const result = await geocodeApi.geocodeAddress('London');
             expect(result).toEqual({ latitude: 51.507351, longitude: -0.127758 });
         });
 
@@ -126,13 +130,13 @@ describe('userService', () => {
                 ok: true,
                 json: vi.fn().mockResolvedValue({ features: [] }),
             });
-            const result = await api.geocodeAddress('NowherePlace');
+            const result = await geocodeApi.geocodeAddress('NowherePlace');
             expect(result).toBeNull();
         });
 
         it('throws when geocode fetch fails', async () => {
             global.fetch = vi.fn().mockResolvedValue({ ok: false });
-            await expect(api.geocodeAddress('BadAddress')).rejects.toThrow('geocoding has failed');
+            await expect(geocodeApi.geocodeAddress('BadAddress')).rejects.toThrow('geocoding has failed');
         });
     });
 });

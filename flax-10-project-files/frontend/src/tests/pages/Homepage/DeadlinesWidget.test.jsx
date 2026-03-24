@@ -108,9 +108,9 @@ describe('DeadlinesWidget', () => {
         expect(screen.getByText('1d overdue')).toBeTruthy();
     });
 
-    it('renders View my modules link', () => {
+    it('renders module code pills linking to modules page', () => {
         render(<DeadlinesWidget deadlines={mockDeadlines} />);
-        expect(screen.getByText('View my modules')).toBeTruthy();
+        expect(screen.getByText('MA2001')).toBeTruthy();
     });
 
     it('sorts overdue deadlines first', () => {

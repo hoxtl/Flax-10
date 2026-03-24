@@ -13,6 +13,7 @@ vi.mock('../../../components/Modules/utils/moduleUtils', () => ({
     formatDuration: vi.fn(() => '1h'),
     getDepartment: vi.fn(() => "King's College London"),
     getCourse: vi.fn(() => null),
+    normaliseModuleCode: vi.fn((code) => code),
 }));
 
 vi.mock('../../../components/Modules/Modules/ModulesCard.module.css', () => ({ default: { card: 'card', enrolled: 'enrolled', clickable: 'clickable' } }));
@@ -38,7 +39,7 @@ describe('ModulesCard', () => {
 
     it('should render enroll button for student', () => {
         render(<ModulesCard {...mockParameters} />);
-        expect(screen.getByText('+ Enroll')).toBeInTheDocument();
+        expect(screen.getByText('+ Enrol')).toBeInTheDocument();
     });
 
     it('should render teacher actions for teacher', () => {

@@ -95,13 +95,15 @@ describe('PlanFreeRow', () => {
     });
 
     it('renders study gap (default) with duration label', () => {
-        renderRow({ row: { ...baseRow, gapContext: { type: 'study' } } });
-        expect(screen.getByText('1h free')).toBeTruthy();
+        const { container } = renderRow({ row: { ...baseRow, gapContext: { type: 'study' } } });
+        expect(container.textContent).toContain('1h');
+        expect(container.textContent).toContain('free');
     });
 
     it('renders short study window (< 60 min) with duration label', () => {
-        renderRow({ row: { ...baseRow, minutes: 30, gapContext: { type: 'study' } } });
-        expect(screen.getByText('30m free')).toBeTruthy();
+        const { container } = renderRow({ row: { ...baseRow, minutes: 30, gapContext: { type: 'study' } } });
+        expect(container.textContent).toContain('30m');
+        expect(container.textContent).toContain('free');
     });
 
     it('renders study gap with isBestGap styling', () => {
@@ -113,10 +115,11 @@ describe('PlanFreeRow', () => {
     });
 
     it('renders duration 90 minutes as 1h 30m', () => {
-        renderRow({
+        const { container } = renderRow({
             row: { ...baseRow, minutes: 90, gapContext: { type: 'study' } },
         });
-        expect(screen.getByText('1h 30m free')).toBeTruthy();
+        expect(container.textContent).toContain('1h 30m');
+        expect(container.textContent).toContain('free');
     });
 
     it('uses deadlineSuggestions when no assignedTask', () => {

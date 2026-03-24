@@ -213,7 +213,7 @@ describe('common DateTimePicker', () => {
     const { rerender } = render(<DateTimePicker value="invalid" onChange={onChange} placeholder="Pick" />);
     expect(document.querySelector('.trigger')).toBeInTheDocument();
     rerender(<DateTimePicker value="2026-03-15T10:30" onChange={onChange} placeholder="Pick" />);
-    expect(screen.getByText(/15 Mar 2026/)).toBeInTheDocument();
+    expect(screen.getByText(/15 \/ 03 \/ 2026/)).toBeInTheDocument();
   });
 
   it('full dateTime mode emits ISO string when selecting day', () => {

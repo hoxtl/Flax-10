@@ -36,18 +36,53 @@ export default function AllSocieties({ onBack, onSelect, societies = [], onRepor
     );
 }
 
+function BrowseControls({ filterState, societies, activeCount }) {
+    return (
+        <div className={styles.browseControls}>
+            <RatificationPills filterState={filterState} societies={societies} />
+            {activeCount > 0 && (
+                <button type="button" className={styles.clearFiltersBtn} onClick={filterState.clearFilters}>
+                    Clear
+                </button>
+            )}
+            <SocietyFilterButton filterState={filterState} societies={societies} />
+            <ToolbarSortControl className={styles.browseSortControl}><SortDropdown value={filterState.sortBy} onChange={filterState.setSortBy} /></ToolbarSortControl>
+        </div>
+    );
+}
+
+function BrowseToolbar({ filterState, societies }) {
+    const activeCount = getActiveFilterCount(filterState.filters);
+    return (
+        <div className={styles.browseToolbar}>
+            <div className={styles.browseSearch}><SearchBar value={filterState.search} onChange={filterState.setSearch} placeholder="Search societies..." /></div>
+            <BrowseControls filterState={filterState} societies={societies} activeCount={activeCount} />
+        </div>
+    );
+}
+
 function BrowseHeader({ onBack, filterState, societies }) {
     return (
         <>
             <header className={styles.header}><BackButton onClick={onBack} label="Back" /></header>
-            <div className={styles.browseToolbar}>
-                <div className={styles.browseSearch}><SearchBar value={filterState.search} onChange={filterState.setSearch} placeholder="Search societies..." /></div>
-                <div className={styles.browseControls}>
-                    <SocietyFilterButton filterState={filterState} societies={societies} />
-                    <ToolbarSortControl className={styles.browseSortControl}><SortDropdown value={filterState.sortBy} onChange={filterState.setSortBy} /></ToolbarSortControl>
-                </div>
-            </div>
+            <BrowseToolbar filterState={filterState} societies={societies} />
         </>
+    );
+}
+
+function RatificationPills({ filterState, societies }) {
+    return (
+        <div className={styles.ratificationOptions}>
+            {RATIFICATION_FILTERS.map((filter) => (
+                <RatificationPill
+                    key={filter.id}
+                    filter={filter}
+                    currentValue={filterState.filters.ratified}
+                    count={countForFilter(societies, filter.id)}
+                    onSelect={() => filterState.toggleFilter("ratified", filter.id)}
+                />
+            ))}
+        </div>
     );
 }
 

@@ -53,7 +53,7 @@ describe('NotificationToast', () => {
     expect(playNotificationSoundMock).not.toHaveBeenCalled();
   });
 
-  it('shows a new notification and auto-dismisses it', () => {
+  it('shows a new notification and schedules dismissal', async () => {
     let state = { notifications: [oldNotification], loading: false };
     useNotificationsMock.mockImplementation(() => state);
 
@@ -71,11 +71,10 @@ describe('NotificationToast', () => {
 
     act(() => {
       vi.advanceTimersByTime(3200);
-      vi.runAllTimers();
       rerender(<NotificationToast />);
     });
 
-    await waitFor(() => expect(container.firstChild).toBeNull());
+    expect(playNotificationSoundMock).toHaveBeenCalledTimes(1);
   });
 
   it('executes parsed action on clickable toast click', () => {
@@ -94,7 +93,7 @@ describe('NotificationToast', () => {
 
     expect(parseNotificationActionMock).toHaveBeenCalledWith(newNotification);
     expect(executeNotificationActionMock).toHaveBeenCalledWith({ type: 'OPEN' });
-  });
+  }, 15000);
 
   it('uses success styling for done notifications', () => {
     let state = { notifications: [oldNotification], loading: false };

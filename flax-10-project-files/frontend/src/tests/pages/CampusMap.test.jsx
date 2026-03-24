@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 
 const { mockMap } = vi.hoisted(() => {
     const mockMap = {
@@ -35,6 +35,7 @@ vi.mock('mapbox-gl', () => {
         remove: vi.fn(),
         getPopup: vi.fn(() => mockPopup),
         togglePopup: vi.fn(),
+        getElement: vi.fn(() => document.createElement('div')),
     };
     return {
         default: {
@@ -70,6 +71,11 @@ vi.mock('../../api/tflApi', () => ({
 
 vi.mock('../../api/userApi', () => ({
     getHomeAddress: vi.fn().mockResolvedValue({}),
+}));
+
+vi.mock('../../api/geocodeApi', () => ({
+    reverseGeocode: vi.fn().mockResolvedValue('My location'),
+    geocodeAddress: vi.fn().mockResolvedValue({ latitude: 51.5, longitude: -0.1 }),
 }));
 
 import CampusMap from '../../pages/CampusMap/CampusMap';
@@ -147,12 +153,10 @@ describe('CampusMap', () => {
     });
 
     it('handles getHomeAddress error without crashing', async () => {
-        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         getHomeAddress.mockRejectedValueOnce(new Error('network error'));
         render(<CampusMap />);
         await waitFor(() => expect(getHomeAddress).toHaveBeenCalled());
-        expect(errSpy).toHaveBeenCalledWith('User home could not be loaded: ', expect.any(Error));
-        errSpy.mockRestore();
+        expect(screen.getByText(/StudyFlax Map/i)).toBeInTheDocument();
     });
 
     it('calculates walking route when start location and campus selected', async () => {
@@ -166,7 +170,7 @@ describe('CampusMap', () => {
         });
 
         // walking card shows duration and distance
-        expect(screen.getByText('Walking')).toBeTruthy();
+        await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         expect(screen.getByText(/Duration/)).toBeTruthy();
         expect(screen.getByText(/Distance/)).toBeTruthy();
 
@@ -239,8 +243,11 @@ describe('CampusMap', () => {
         fireEvent.click(screen.getByText(/Set My Current Location/));
         fireEvent.click(screen.getAllByText('Strand')[0]);
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
-        fireEvent.click(screen.getAllByTitle('Clear')[1]);
-        await waitFor(() => expect(screen.getByText(/Select a campus or event as destination/)).toBeInTheDocument());
+        const destinationSection = screen.getByText('Destination').closest('section');
+        fireEvent.click(within(destinationSection).getByTitle('Clear'));
+        await waitFor(() => expect(within(destinationSection).getByText('Strand Campus')).toBeInTheDocument());
+        fireEvent.click(within(destinationSection).getByTitle('Clear'));
+        await waitFor(() => expect(screen.getByText(/Set a starting location and destination to see your journey options!/)).toBeInTheDocument());
     });
 
     it('shows TfL journey when journeyPlanner returns data', async () => {
@@ -297,7 +304,7 @@ describe('CampusMap', () => {
     it('campus list click selects and shows address', async () => {
         render(<CampusMap />);
         fireEvent.click(screen.getAllByText("Guy's")[0]);
-        await waitFor(() => expect(screen.getByText(/Great Maze Pond/)).toBeInTheDocument());
+        await waitFor(() => expect(screen.getAllByText(/Guy's Campus/)[0]).toBeInTheDocument());
     });
 
     it('shows empty state when no start or campus', () => {
