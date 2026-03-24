@@ -70,6 +70,15 @@ class SeedNewUserProjectsTest(TestCase):
         self.assertTrue(created)
         self.assertIsNotNone(project.deadline)
 
+    def test_add_demo_members_does_nothing_when_no_candidates(self):
+        from studyFlax.views.modules.new_user_projects import _add_demo_members
+        module = _make_module(self.user, code='NP07')
+        project = GroupProject.objects.create(name='No Candidates Project', owner=self.user, course_code='NP07')
+        GroupMembership.objects.create(project=project, user=self.user, role='owner')
+        # Pass only the owner as demo_user — candidates list will be empty
+        _add_demo_members(project, self.user, [self.user])
+        self.assertEqual(GroupMembership.objects.filter(project=project).count(), 1)
+
     def test_add_demo_members_adds_members_to_project(self):
         from studyFlax.views.modules.new_user_projects import _add_demo_members
         module = _make_module(self.user, code='NP04')
