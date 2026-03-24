@@ -22,7 +22,7 @@ export function IntelligenceHero(props) {
 
   return (
     <div className={styles.premiumCard}>
-      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={20} intensity={2.15} speed={0.5} />
+      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={12} intensity={1.8} speed={0.5} />
       <motion.div
         className={styles.bannerBorderGlow}
         aria-hidden
