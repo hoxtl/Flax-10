@@ -25,8 +25,8 @@ function state(overrides = {}) {
     handleInputBlur: vi.fn(),
     handleInputKeyDown: vi.fn(),
     showOptions: true,
-    estimatedBlocks: 1,
-    setEstimatedBlocks: vi.fn(),
+  estimatedMinutes: 25,
+  setEstimatedMinutes: vi.fn(),
     moduleId: "",
     setModuleId: vi.fn(),
     taskListId: "",
@@ -46,6 +46,7 @@ describe("CreateTaskBar", () => {
     render(<CreateTaskBar inputRef={{ current: null }} />);
     expect(screen.getByLabelText(/Quick add task/i)).toBeInTheDocument();
     expect(screen.getByRole("group", { name: /Estimated duration/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Custom estimated minutes/i)).toBeInTheDocument();
   });
 
   it("submits and changes values", () => {
