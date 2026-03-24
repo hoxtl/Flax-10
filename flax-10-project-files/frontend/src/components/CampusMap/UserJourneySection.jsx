@@ -1,30 +1,31 @@
-/**
+/*
  * Custom journey planner section.
  */
-
 import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "../Calendar/EventModal/components/LocationAutoComplete";
 import Tooltip from "../Common/Tooltip/Tooltip";
 import { geocodeAddress } from "../../api/geocodeApi";
 import styles from "./UserJourneySection.module.css";
 
+function handleGeocode(trimmedValue, setCoords, active) {
+  const parsedCoords = parseCoordinateInput(trimmedValue);
+  if (parsedCoords) {
+    setCoords(parsedCoords);
+    return;
+  }
+  geocodeAddress(trimmedValue).then((coords) => active.current && setCoords(coords));
+}
+
 function useGeocodedLocation(value, setCoords) {
   useEffect(() => {
-    let active = true;
+    const active = { current: true };
     const trimmedValue = value.trim();
     if (!trimmedValue) {
       setCoords(null);
       return undefined;
     }
-    const parsedCoords = parseCoordinateInput(trimmedValue);
-    if (parsedCoords) {
-      setCoords(parsedCoords);
-      return undefined;
-    }
-    geocodeAddress(trimmedValue).then((coords) => active && setCoords(coords));
-    return () => {
-      active = false;
-    };
+    handleGeocode(trimmedValue, setCoords, active);
+    return () => { active.current = false; };
   }, [setCoords, value]);
 }
 
@@ -84,29 +85,28 @@ function JourneyField({ label, locating, onChange, onGeolocate, placeholder, val
 }
 
 function JourneyActions({ canCalculate, hasValue, onClear, onGo }) {
+  const btnText = canCalculate ? "Calculate Route 🚀" : "Enter both locations";
   return (
-    <div className={styles.manualButtonGroup}><button className={styles.goButton} onClick={onGo} disabled={!canCalculate}>{canCalculate ? "Calculate Route 🚀" : "Enter both locations"}</button>{hasValue && <button className={styles.clearManualButton} onClick={onClear}>Clear</button>}</div>
+    <div className={styles.manualButtonGroup}>
+      <button className={styles.goButton} onClick={onGo} disabled={!canCalculate}>{btnText}</button>
+      {hasValue && <button className={styles.clearManualButton} onClick={onClear}>Clear</button>}
+    </div>
   );
 }
 
-export function UserJourneySection({
-  manualStart,
-  setManualStart,
-  manualDestination,
-  setManualDestination,
-  onCalculate,
-  onClearAll,
-  onGeolocateStart,
-  onGeolocateDestination,
-  locating,
-}) {
-  const [startCoords, setStartCoords] = useState(null);
-  const [destCoords, setDestCoords] = useState(null);
+function SectionLabel() {
+  return (
+    <div className={styles.sectionLabel}>
+      <span className={styles.searchIcon}>🔍</span>
+      Plan Custom Journey
+    </div>
+  );
+}
+
+function JourneyInputs({ props, startCoords, destCoords, setStartCoords, setDestCoords }) {
+  const { manualStart, setManualStart, manualDestination, setManualDestination } = props;
+  const { onCalculate, onClearAll, onGeolocateStart, onGeolocateDestination, locating } = props;
   const canCalculate = manualStart.trim() && manualDestination.trim() && startCoords && destCoords;
-
-  useGeocodedLocation(manualStart, setStartCoords);
-  useGeocodedLocation(manualDestination, setDestCoords);
-
   const handleClear = () => {
     setManualStart("");
     setManualDestination("");
@@ -114,35 +114,24 @@ export function UserJourneySection({
     setDestCoords(null);
     onClearAll?.();
   };
+  return (
+    <div className={styles.manualJourneyInputs}>
+      <FromField value={manualStart} onChange={setManualStart} onGeolocate={onGeolocateStart} locating={locating} />
+      <JourneyField label="To" value={manualDestination} onChange={setManualDestination} onGeolocate={onGeolocateDestination} locating={locating} placeholder="Enter a destination" />
+      <JourneyActions canCalculate={canCalculate} hasValue={manualStart || manualDestination} onClear={handleClear} onGo={() => canCalculate && onCalculate(startCoords, destCoords)} />
+    </div>
+  );
+}
 
+export function UserJourneySection(props) {
+  const [startCoords, setStartCoords] = useState(null);
+  const [destCoords, setDestCoords] = useState(null);
+  useGeocodedLocation(props.manualStart, setStartCoords);
+  useGeocodedLocation(props.manualDestination, setDestCoords);
   return (
     <section className={styles.section}>
-      <div className={styles.sectionLabel}>
-        <span className={styles.searchIcon}>🔍</span>
-        Plan Custom Journey
-      </div>
-      <div className={styles.manualJourneyInputs}>
-        <FromField
-          value={manualStart}
-          onChange={setManualStart}
-          onGeolocate={onGeolocateStart}
-          locating={locating}
-        />
-        <JourneyField
-          label="To"
-          value={manualDestination}
-          onChange={setManualDestination}
-          onGeolocate={onGeolocateDestination}
-          locating={locating}
-          placeholder="Enter a destination"
-        />
-        <JourneyActions
-          canCalculate={canCalculate}
-          hasValue={manualStart || manualDestination}
-          onClear={handleClear}
-          onGo={() => canCalculate && onCalculate(startCoords, destCoords)}
-        />
-      </div>
+      <SectionLabel />
+      <JourneyInputs props={props} startCoords={startCoords} destCoords={destCoords} setStartCoords={setStartCoords} setDestCoords={setDestCoords} />
     </section>
   );
 }
