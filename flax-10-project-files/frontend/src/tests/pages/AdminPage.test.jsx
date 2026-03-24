@@ -250,12 +250,23 @@ describe("AdminPage – Users tab", () => {
     api.fetchAdminUsers.mockResolvedValue(buildManyUsers());
     render(<AdminPage />);
     await expectUserButton(/User1 Test/i);
-    expect(screen.queryByRole("button", { name: /User11 Test/i })).toBeNull();
-    fireEvent.click(screen.getByText("Next →"));
+    expect(screen.getByText("Page 1 of 3")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^User11 Test@user11$/i })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /Next/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Page 2 of 3")).toBeInTheDocument(),
+    );
     await expectUserButton(/User11 Test/i);
-    expect(screen.queryByRole("button", { name: /User1 Test/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: /User21 Test/i })).toBeNull();
-    fireEvent.click(screen.getByText("Next →"));
+    expect(screen.queryByRole("button", { name: /^User1 Test@user1$/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^User21 Test@user21$/i })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /Next/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Page 3 of 3")).toBeInTheDocument(),
+    );
     await expectUserButton(/User21 Test/i);
   });
 
