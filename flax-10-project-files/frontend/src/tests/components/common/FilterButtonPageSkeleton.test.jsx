@@ -4,21 +4,21 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import FilterButton from '../../../components/Common/FilterButton/FilterButton';
-import PageSkeleton from '../../../components/Common/LoadingState/PageSkeleton';
+import FilterButton from '../../../components/common/FilterButton/FilterButton';
+import PageSkeleton from '../../../components/common/LoadingState/PageSkeleton';
 
-vi.mock('../../../components/Common/FilterButton/FilterButton.module.css', () => ({
+vi.mock('../../../components/common/FilterButton/FilterButton.module.css', () => ({
   default: { filterBtn: 'filterBtn', filterBtnActive: 'filterBtnActive', badge: 'badge' },
 }));
 
-vi.mock('../../../components/Common/LoadingState/PageSkeleton.module.css', () => ({
+vi.mock('../../../components/common/LoadingState/PageSkeleton.module.css', () => ({
   default: {
     container: 'container', srOnly: 'srOnly', header: 'header',
     title: 'title', action: 'action', search: 'search', grid: 'grid', card: 'card',
   },
 }));
 
-vi.mock('../../../components/Common/LoadingState/SkeletonBlock', () => ({
+vi.mock('../../../components/common/LoadingState/SkeletonBlock', () => ({
   default: ({ className, style }) => <div className={className} style={style} data-testid="skeleton-block" />,
 }));
 
