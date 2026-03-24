@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, render } from '@testing-library/react';
+import React from 'react';
 import { useFocusCanvasAnimation } from '../../../components/Timer/focusAnimation/useFocusCanvasAnimation';
 
 // Mock treePixels
@@ -153,5 +154,54 @@ describe('useFocusCanvasAnimation', () => {
             useFocusCanvasAnimation('break', false, 0.3)
         );
         expect(result.current.animationType).toBe('tree');
+    });
+
+    it('runs the canvas animation loop when canvas element is present', () => {
+        function TestComp({ mode, isActive, progress }) {
+            const { canvasRef } = useFocusCanvasAnimation(mode, isActive, progress);
+            return React.createElement('canvas', { ref: canvasRef });
+        }
+        act(() => { render(React.createElement(TestComp, { mode: 'work', isActive: true, progress: 0.5 })); });
+        expect(mockCtx.clearRect).toHaveBeenCalled();
+    });
+
+    it('runs drawScene with break mode coloring', () => {
+        function TestComp() {
+            const { canvasRef } = useFocusCanvasAnimation('break', true, 0.8);
+            return React.createElement('canvas', { ref: canvasRef });
+        }
+        act(() => { render(React.createElement(TestComp)); });
+        expect(mockCtx.clearRect).toHaveBeenCalled();
+    });
+
+    it('runs drawScene with inactive state (low intensity)', () => {
+        function TestComp() {
+            const { canvasRef } = useFocusCanvasAnimation('work', false, 0.0);
+            return React.createElement('canvas', { ref: canvasRef });
+        }
+        act(() => { render(React.createElement(TestComp)); });
+        expect(mockCtx.clearRect).toHaveBeenCalled();
+    });
+
+    it('drawGlow falls back to fillRect when createRadialGradient is absent', () => {
+        const fillRectMock = vi.fn();
+        const ctxNoGradient = { ...mockCtx, createRadialGradient: undefined, fillRect: fillRectMock };
+        HTMLCanvasElement.prototype.getContext = vi.fn(() => ctxNoGradient);
+        function TestComp() {
+            const { canvasRef } = useFocusCanvasAnimation('work', true, 0.5);
+            return React.createElement('canvas', { ref: canvasRef });
+        }
+        act(() => { render(React.createElement(TestComp)); });
+        expect(fillRectMock).toHaveBeenCalled();
+    });
+
+    it('cancels animation frame on unmount', () => {
+        function TestComp() {
+            const { canvasRef } = useFocusCanvasAnimation('work', true, 0.5);
+            return React.createElement('canvas', { ref: canvasRef });
+        }
+        const { unmount } = render(React.createElement(TestComp));
+        unmount();
+        expect(cancelAnimationFrame).toHaveBeenCalled();
     });
 });
