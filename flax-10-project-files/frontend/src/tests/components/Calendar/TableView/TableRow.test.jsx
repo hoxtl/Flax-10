@@ -42,7 +42,17 @@ vi.mock('../../../../components/Calendar/TableView/cells/EditableCell', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/TableView/cells/TagEditCell', () => ({
-    TagEditCell: ({ event }) => <span data-testid="tag-cell">{event.tag_name || 'No tag'}</span>,
+    TagEditCell: ({ event, onEdit }) => (
+        <button type="button" data-testid="tag-cell" onClick={onEdit}>
+            {event.tag?.name || event.tag_name || 'No tag'}
+        </button>
+    ),
+}));
+
+vi.mock('../../../../components/Calendar/TableView/cells/LocationEditCell', () => ({
+    LocationEditCell: ({ value, isEditing, onChange, onSave }) => isEditing
+        ? <input data-testid="location-editor" value={value || ''} onChange={e => onChange(e.target.value)} onBlur={onSave} />
+        : <span data-testid="location-cell">{value || ''}</span>,
 }));
 
 vi.mock('../../../../components/Calendar/TableView/cells/DateTimeCell', () => ({
@@ -60,6 +70,10 @@ vi.mock('../../../../components/common/ConfirmModal/ConfirmModal', () => ({
 
 const defaultEditState = { editingCell: null, cellValue: '', startEdit: vi.fn(), updateValue: vi.fn(), saveEdit: vi.fn(), cancelEdit: vi.fn(), saveDateTimes: vi.fn(), saveWithValue: vi.fn() };
 const defaultNavState = { focusedCell: null, handleKeyDown: vi.fn(), EDITABLE_COLUMNS: ['title', 'tag', 'date', 'location', 'description'] };
+
+function getTrashButton() {
+    return screen.getAllByRole('button').find((button) => String(button.className).includes('trashBtn'));
+}
 
 describe('TableRow', () => {
     beforeEach(() => {
@@ -83,7 +97,7 @@ describe('TableRow', () => {
 
     it('shows delete button for personal events', () => {
         render(<table><tbody><TableRow event={createMockEvent()} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        expect(screen.getByRole('button')).toBeInTheDocument();
+        expect(getTrashButton()).toBeInTheDocument();
     });
 
     it('hides delete button for read-only events', () => {
@@ -95,20 +109,20 @@ describe('TableRow', () => {
 
     it('shows confirm modal when delete clicked', () => {
         render(<table><tbody><TableRow event={createMockEvent()} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(getTrashButton());
         expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
     });
 
     it('calls removeEvent on confirm delete', () => {
         render(<table><tbody><TableRow event={createMockEvent({ id: 42 })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(getTrashButton());
         fireEvent.click(screen.getByText('Confirm Delete'));
         expect(mockRemoveEvent).toHaveBeenCalledWith(42);
     });
 
     it('hides modal on cancel', () => {
         render(<table><tbody><TableRow event={createMockEvent()} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
-        fireEvent.click(screen.getByRole('button'));
+        fireEvent.click(getTrashButton());
         fireEvent.click(screen.getByText('Cancel'));
         expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
     });
@@ -137,5 +151,49 @@ describe('TableRow', () => {
         fireEvent.click(row);
         // CSS modules hash class names, so check class contains 'expanded' pattern
         expect(row.className).toMatch(/expanded/i);
+    });
+
+    it('shows society quick action for read-only events and triggers it', () => {
+        render(<table><tbody><TableRow event={createMockEvent({ society_name: 'Chess Club' })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        fireEvent.click(screen.getByText('Join'));
+        expect(mockQuickAction.onClick).toHaveBeenCalled();
+    });
+
+    it('opens inline editing from keyboard navigation and passes tag identifiers', () => {
+        const onCellClick = vi.fn();
+        const editState = { ...defaultEditState, editingCell: { eventId: 1, field: 'location' }, cellValue: 'Library' };
+        const navState = { ...defaultNavState, focusedCell: { row: 0, col: 1 } };
+
+        render(<table><tbody><TableRow event={createMockEvent({ id: 1, tag_id: 9, location: 'Old location' })} rowIndex={0} editState={editState} navState={navState} onCellClick={onCellClick} viewMode="month" /></tbody></table>);
+
+        expect(onCellClick).toHaveBeenCalledWith(1, 'tag', 9);
+        expect(screen.getByTestId('location-editor')).toHaveValue('Library');
+    });
+
+    it('uses nested tag object, supports description editing, and keeps today rows highlighted outside day view', () => {
+        const onCellClick = vi.fn();
+        const event = createMockEvent({
+            id: 1,
+            tag: { id: 4, name: 'Nested Tag' },
+            description: 'Long description',
+            start_time: new Date().toISOString(),
+        });
+        const editState = { ...defaultEditState, editingCell: { eventId: 1, field: 'description' }, cellValue: 'Edited description' };
+
+        const { container } = render(<table><tbody><TableRow event={event} rowIndex={0} editState={editState} navState={defaultNavState} onCellClick={onCellClick} viewMode="month" /></tbody></table>);
+
+        fireEvent.click(screen.getByText('Nested Tag'));
+        expect(onCellClick).toHaveBeenCalledWith(1, 'tag', { id: 4, name: 'Nested Tag' });
+        expect(screen.getByDisplayValue('Edited description')).toBeInTheDocument();
+        expect(container.querySelector('tr').className).toMatch(/todayRow/i);
+    });
+
+    it('does not mark rows as today in day view and supports hovered accent styling', () => {
+        const { container } = render(<table><tbody><TableRow event={createMockEvent({ society_name: 'Chess Club', society_color: '#123456' })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="day" /></tbody></table>);
+        const row = container.querySelector('tr');
+        fireEvent.mouseEnter(row);
+        expect(row.className).not.toMatch(/todayRow/i);
+        expect(row.style.getPropertyValue('--accent')).toBe('#7B6751');
+        expect(screen.getByText('Chess Club')).toBeInTheDocument();
     });
 });
