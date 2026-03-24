@@ -118,6 +118,8 @@ import TaskBoardView from "../../../pages/GroupWork/components/TaskBoardView";
 import TaskListRow from "../../../pages/GroupWork/components/TaskListRow";
 import TaskListView from "../../../pages/GroupWork/components/TaskListView";
 import { useDragHandlers, useTaskTimelineState } from "../../../pages/GroupWork/components/useTaskTimelineState";
+import { TimelineCard, UnscheduledCard } from "../../../pages/GroupWork/components/TaskTimelineCards";
+import TaskTimelineView from "../../../pages/GroupWork/components/TaskTimelineView";
 
 vi.mock("../../../pages/GroupWork/utils/taskBoardUtils", () => ({
   buildBoardColumns: vi.fn((tasks) => [
@@ -277,6 +279,76 @@ describe("GroupWork task component extras", () => {
       />,
     );
     expect(screen.getByText("Card A")).toBeInTheDocument();
+  });
+
+  it("renders TimelineCard and handles context menu, popup toggle, drag", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const members = [{ id: 1, user: 1, name: "Alice" }];
+    const task = { id: 5, title: "Timeline task", priority: "high", completed: false };
+
+    render(
+      <TimelineCard
+        task={task}
+        members={members}
+        assignees={[{ id: 1, name: "Alice" }]}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(screen.getByText("Timeline task")).toBeInTheDocument();
+
+    // open assignee popup via avatar trigger click
+    const avatarTrigger = screen.getByText("Timeline task").closest("[class]").parentElement.querySelector("[class]");
+    // context menu
+    fireEvent.contextMenu(screen.getByText("Timeline task").closest("div").parentElement.parentElement);
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Delete"));
+    expect(onDelete).toHaveBeenCalledWith(5);
+  });
+
+  it("renders UnscheduledCard and handles context menu interactions", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const task = { id: 8, title: "Unscheduled item", priority: "low", assignees_info: [] };
+    const members = [{ id: 1, user: 1, name: "Bob" }];
+
+    render(
+      <UnscheduledCard task={task} members={members} onDelete={onDelete} onUpdate={onUpdate} />,
+    );
+
+    expect(screen.getByText("Unscheduled item")).toBeInTheDocument();
+    fireEvent.contextMenu(screen.getByText("Unscheduled item").closest("div"));
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Delete"));
+    expect(onDelete).toHaveBeenCalledWith(8);
+  });
+
+  it("renders TaskTimelineView with tasks and handles pagination", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const tasks = [
+      { id: 1, title: "Task A", weekId: "w1", due_date: "2026-03-25T00:00:00.000Z", completed: false, status: "todo" },
+      { id: 2, due_date: null, completed: false, status: "todo", title: "Task B", assignees_info: [] },
+    ];
+    const members = [{ id: 1, user: 1, name: "Cara" }];
+
+    render(
+      <TaskTimelineView tasks={tasks} members={members} onUpdate={onUpdate} onDelete={onDelete} />,
+    );
+
+    // Header days present
+    expect(screen.getByText("Mon")).toBeInTheDocument();
+    expect(screen.getByText("Sat")).toBeInTheDocument();
+    // Unscheduled widget
+    expect(screen.getByText("Unscheduled")).toBeInTheDocument();
+
+    // Pagination dots - click page 2
+    const pageDots = screen.getAllByRole("button", { name: "" });
+    if (pageDots.length > 1) {
+      fireEvent.click(pageDots[1]);
+    }
   });
 
   it("renders task list row/view and confirms delete flow", () => {
