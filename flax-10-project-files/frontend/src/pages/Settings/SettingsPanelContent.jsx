@@ -4,7 +4,6 @@
 
 import styles from "./Settings.module.css";
 import AccountForm from "../../components/Settings/AccountForm";
-import CourseChangePanel from "../../components/Settings/CourseChangePanel";
 import HomeAddressForm from "../../components/Settings/HomeAddressForm";
 import PreferencesPanel from "../../components/Settings/PreferencesPanel";
 import SecurityForm from "../../components/Settings/SecurityForm";
@@ -24,7 +23,7 @@ function getPanelBody(activeTab, handlers, user) {
   if (activeTab === "preferences_sleep") return <PreferencesPanel onSave={handlers.handlePreferencesSave} onSleepSave={handlers.handleSleepSave} onStudyTimeSave={handlers.handleStudyTimeSave} onWeekPreferenceSave={handlers.handleWeekPreferenceSave} onWorktimePreferenceSave={handlers.handleWorktimePreferenceSave} isSaving={handlers.isSaving} activeSubTab="sleep" />;
   if (activeTab === "preferences_scheduling") return <PreferencesPanel onSave={handlers.handlePreferencesSave} onSleepSave={handlers.handleSleepSave} onStudyTimeSave={handlers.handleStudyTimeSave} onWeekPreferenceSave={handlers.handleWeekPreferenceSave} onWorktimePreferenceSave={handlers.handleWorktimePreferenceSave} isSaving={handlers.isSaving} activeSubTab="scheduling" />;
   if (activeTab === "home") return <HomeAddressForm onSave={handlers.handleHomeAddressSave} isSaving={handlers.isSaving} error={handlers.homeAddressError} />;
-  return <CourseChangePanel user={user} />;
+  return <AccountForm user={user} onSave={handlers.handleAccountSave} isSaving={handlers.isSaving} />;
 }
 
 export default function SettingsPanelContent({ activeTab, handlers, user }) {
