@@ -1,10 +1,9 @@
 """
-Orchestrates bulk creation of calendar events for all users.
+Orchestrates seeded calendar events for all users.
 """
 
 from collections import defaultdict
 import random
-from datetime import timedelta
 from django.db import transaction
 
 from studyFlax.models import CalendarEvent
@@ -12,6 +11,7 @@ from .event_helpers import (
     build_events_for_user, build_meal_events, build_today_afternoon_events,
     build_weekend_events,
 )
+from .overlap_utils import candidate_slots, event_day, event_duration, event_sort_key, fits_overlap_cap
 
 MAX_SEEDED_EVENT_OVERLAPS = 2
 SEED_EVENT_DAY_START_HOUR = 7
@@ -19,98 +19,65 @@ SEED_EVENT_DAY_END_HOUR = 23
 SEED_EVENT_SLOT_STEP_MINUTES = 30
 
 
-def _event_day(event):
-    return event.start_time.date()
+def _candidate_window(candidate, duration):
+    """Return the start and end time for a candidate slot."""
+
+    return candidate, candidate + duration
 
 
-def _event_duration(event):
-    duration = event.end_time - event.start_time
-    return max(duration, timedelta(minutes=30))
+def _slot_candidates(event, duration):
+    """Return ordered slot candidates for one event."""
 
-
-def _event_sort_key(event):
-    return (event.start_time, -_event_duration(event).total_seconds(), str(event.title or ""))
-
-
-def _event_overlap(event, start_time, end_time):
-    return event.start_time < end_time and event.end_time > start_time
-
-
-def _fits_overlap_cap(start_time, end_time, existing_events):
-    points = [(start_time, 1), (end_time, -1)]
-    for event in existing_events:
-        if not _event_overlap(event, start_time, end_time):
-            continue
-        points.append((event.start_time, 1))
-        points.append((event.end_time, -1))
-    active = 0
-    for _, delta in sorted(points, key=lambda item: (item[0], 0 if item[1] == -1 else 1)):
-        active += delta
-        if active > MAX_SEEDED_EVENT_OVERLAPS:
-            return False
-    return True
-
-
-def _candidate_slots(event, duration):
-    day_start = event.start_time.replace(
-        hour=SEED_EVENT_DAY_START_HOUR,
-        minute=0,
-        second=0,
-        microsecond=0,
+    return candidate_slots(
+        event,
+        duration,
+        SEED_EVENT_DAY_START_HOUR,
+        SEED_EVENT_DAY_END_HOUR,
+        SEED_EVENT_SLOT_STEP_MINUTES,
     )
-    day_end = event.start_time.replace(
-        hour=SEED_EVENT_DAY_END_HOUR,
-        minute=0,
-        second=0,
-        microsecond=0,
+
+
+def _candidate_window_if_available(candidate, duration, day_events):
+    """Return a candidate window when it fits the overlap cap."""
+
+    start_time, end_time = _candidate_window(candidate, duration)
+    if not fits_overlap_cap(start_time, end_time, day_events, MAX_SEEDED_EVENT_OVERLAPS):
+        return None
+    return start_time, end_time
+
+
+def _available_windows(event, duration, day_events):
+    """Yield valid windows for one event."""
+
+    return (
+        _candidate_window_if_available(candidate, duration, day_events)
+        for candidate in _slot_candidates(event, duration)
     )
-    starts = []
-    cursor = day_start
-    while cursor + duration <= day_end:
-        starts.append(cursor)
-        cursor += timedelta(minutes=SEED_EVENT_SLOT_STEP_MINUTES)
-    starts.sort(
-        key=lambda candidate: (
-            abs((candidate - event.start_time).total_seconds()),
-            candidate < event.start_time,
-            candidate,
-        )
-    )
-    return starts
+
+
+def _event_window(event, day_events):
+    """Return the scheduled window for one event."""
+
+    start_time = event.start_time
+    end_time = event.end_time
+    if fits_overlap_cap(start_time, end_time, day_events, MAX_SEEDED_EVENT_OVERLAPS):
+        return start_time, end_time
+    duration = event_duration(event)
+    return next((window for window in _available_windows(event, duration, day_events) if window), (start_time, end_time))
 
 
 def _rebalance_seeded_user_events(events):
+    """Rebalance seeded personal events within each day."""
+
     events_by_day = defaultdict(list)
-    for event in sorted(events, key=_event_sort_key):
-        day_events = events_by_day[_event_day(event)]
-        duration = _event_duration(event)
-        start_time = event.start_time
-        end_time = event.end_time
-        if not _fits_overlap_cap(start_time, end_time, day_events):
-            for candidate in _candidate_slots(event, duration):
-                candidate_end = candidate + duration
-                if not _fits_overlap_cap(candidate, candidate_end, day_events):
-                    continue
-                start_time = candidate
-                end_time = candidate_end
-                break
+    for event in sorted(events, key=event_sort_key):
+        day_events = events_by_day[event_day(event)]
+        start_time, end_time = _event_window(event, day_events)
         event.start_time = start_time
         event.end_time = end_time
         day_events.append(event)
     return events
 
-
-def _seed_events_for_single_user(user, tags, rules):
-    personal_events = build_events_for_user(user, tags, rules, 0)
-    CalendarEvent.objects.bulk_create(personal_events)
-    meal_events = build_meal_events(user, tags)
-    CalendarEvent.objects.bulk_create(meal_events)
-    today_events = build_today_afternoon_events(user, tags)
-    CalendarEvent.objects.bulk_create(today_events)
-    user_rng = random.Random(f"weekend-blocks:{user.username}")
-    weekend_events = build_weekend_events(user, tags, user_rng)
-    CalendarEvent.objects.bulk_create(weekend_events)
-    return len(personal_events) + len(meal_events) + len(today_events) + len(weekend_events)
 
 def _build_all_user_events(user, tags, rules):
     """Build all event types for a single user."""
@@ -119,6 +86,8 @@ def _build_all_user_events(user, tags, rules):
     events.extend(build_events_for_user(user, tags, rules, 0))
     events.extend(build_meal_events(user, tags))
     events.extend(build_today_afternoon_events(user, tags))
+    user_rng = random.Random(f"weekend-blocks:{user.username}")
+    events.extend(build_weekend_events(user, tags, user_rng))
     return _rebalance_seeded_user_events(events)
 
 
