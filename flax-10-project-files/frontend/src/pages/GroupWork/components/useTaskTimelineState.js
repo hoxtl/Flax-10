@@ -1,17 +1,19 @@
+/*
+ * Task timeline state hooks for drag and drop.
+ */
 import { useMemo } from "react";
 import { DAY_MS, buildWeeks, getTimelineAnchor, placeTasksIntoWeeks } from "../utils/taskTimelineUtils";
 
-export function useDragHandlers(onUpdate, styles) {
-  const onDragOver = (event) => {
-    event.preventDefault();
-    event.currentTarget.classList.add(styles.timelineCellDropTarget);
-  };
+function createDragOver(styles) {
+  return (event) => { event.preventDefault(); event.currentTarget.classList.add(styles.timelineCellDropTarget); };
+}
 
-  const onDragLeave = (event) => {
-    event.currentTarget.classList.remove(styles.timelineCellDropTarget);
-  };
+function createDragLeave(styles) {
+  return (event) => { event.currentTarget.classList.remove(styles.timelineCellDropTarget); };
+}
 
-  const onDrop = (event, timestamp) => {
+function createDrop(onUpdate, styles) {
+  return (event, timestamp) => {
     event.preventDefault();
     event.currentTarget.classList.remove(styles.timelineCellDropTarget);
     const taskId = event.dataTransfer.getData("text/plain");
@@ -19,15 +21,19 @@ export function useDragHandlers(onUpdate, styles) {
     date.setHours(12, 0, 0, 0);
     if (taskId) onUpdate(Number(taskId), { due_date: date.toISOString() });
   };
+}
 
-  const onDropWidget = (event) => {
+function createDropWidget(onUpdate, styles) {
+  return (event) => {
     event.preventDefault();
     event.currentTarget.classList.remove(styles.widgetListDropTarget);
     const taskId = event.dataTransfer.getData("text/plain");
     if (taskId) onUpdate(Number(taskId), { due_date: null });
   };
+}
 
-  return { onDragOver, onDragLeave, onDrop, onDropWidget };
+export function useDragHandlers(onUpdate, styles) {
+  return { onDragOver: createDragOver(styles), onDragLeave: createDragLeave(styles), onDrop: createDrop(onUpdate, styles), onDropWidget: createDropWidget(onUpdate, styles) };
 }
 
 export function useTaskTimelineState(tasks, page) {

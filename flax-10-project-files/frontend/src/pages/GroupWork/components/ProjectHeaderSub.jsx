@@ -24,33 +24,26 @@ function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, show
     );
 }
 
-/** Delete action button and hold-to-confirm modal for a group project. */
+function DeleteButton({ isOwner, onClick }) {
+    return (
+        <PrimaryButton type="button" size="small" variant="danger" pill className={!isOwner ? styles.deleteBtnDisabled : undefined} onClick={isOwner ? onClick : undefined} disabled={!isOwner} aria-disabled={!isOwner}>
+            <Trash2 size={14} />Delete project
+        </PrimaryButton>
+    );
+}
+
+function DeleteButtonWithTooltip({ isOwner, onClick }) {
+    const btn = <DeleteButton isOwner={isOwner} onClick={onClick} />;
+    if (isOwner) return btn;
+    return <Tooltip content="Only project owner can delete" position="bottom"><span className={styles.deleteBtnTooltipWrap}>{btn}</span></Tooltip>;
+}
 
 export default function ProjectDeleteAction({ onDelete, isOwner }) {
     const showToast = useToast();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const btn = (
-        <PrimaryButton
-            type="button"
-            size="small"
-            variant="danger"
-            pill
-            className={!isOwner ? styles.deleteBtnDisabled : undefined}
-            onClick={isOwner ? () => setShowDeleteModal(true) : undefined}
-            disabled={!isOwner}
-            aria-disabled={!isOwner}
-        >
-            <Trash2 size={14} />
-            Delete project
-        </PrimaryButton>
-    );
     return (
         <>
-            {isOwner ? btn : (
-                <Tooltip content="Only project owner can delete" position="bottom">
-                    <span className={styles.deleteBtnTooltipWrap}>{btn}</span>
-                </Tooltip>
-            )}
+            <DeleteButtonWithTooltip isOwner={isOwner} onClick={() => setShowDeleteModal(true)} />
             {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={() => {}} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
         </>
     );

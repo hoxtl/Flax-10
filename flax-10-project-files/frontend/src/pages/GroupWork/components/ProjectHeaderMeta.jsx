@@ -89,29 +89,23 @@ function MemberAvatarItem({ member, index }) {
   );
 }
 
+function TeamManagerPanelContent({ project, teamMembers, onMemberAdded, removalFlow, canManageTeam }) {
+  return (
+    <div className={styles.teamManagerPanel}>
+      <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
+      <MembersSection members={teamMembers} onRemove={removalFlow.handleRemove} canRemove={canManageTeam} allowOwnerRemove={removalFlow.allowOwnerRemove} />
+      {removalFlow.ownerModal}
+    </div>
+  );
+}
+
 function TeamManagementPanel({ project, teamMembers, onMemberAdded, onMemberRemove, canManageTeam, isEditing, removalFlow }) {
   if (!canManageTeam) return null;
   return (
     <AnimatePresence initial={false}>
       {isEditing && (
-        <motion.div
-          key="teamPanel"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.22, ease: "easeInOut" }}
-          style={{ overflow: "hidden" }}
-        >
-          <div className={styles.teamManagerPanel}>
-            <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
-            <MembersSection
-              members={teamMembers}
-              onRemove={removalFlow.handleRemove}
-              canRemove={canManageTeam}
-              allowOwnerRemove={removalFlow.allowOwnerRemove}
-            />
-            {removalFlow.ownerModal}
-          </div>
+        <motion.div key="teamPanel" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease: "easeInOut" }} style={{ overflow: "hidden" }}>
+          <TeamManagerPanelContent project={project} teamMembers={teamMembers} onMemberAdded={onMemberAdded} removalFlow={removalFlow} canManageTeam={canManageTeam} />
         </motion.div>
       )}
     </AnimatePresence>
