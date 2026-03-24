@@ -179,4 +179,13 @@ describe("GroupWork extra components", () => {
     expect(screen.getByText(/Active projects:1/)).toBeInTheDocument();
     expect(screen.getByText("Tasks tab 9")).toBeInTheDocument();
   });
+
+  it("renders the empty member-filter state and closes it again on mouse leave", () => {
+    render(<MemberFilter members={[]} selectedUsers={["1"]} onToggle={vi.fn()} />);
+    const wrapper = screen.getByText("Filter 1").parentElement;
+    fireEvent.mouseEnter(wrapper);
+    expect(screen.getByText("No members")).toBeInTheDocument();
+    fireEvent.mouseLeave(wrapper);
+    expect(screen.queryByText("No members")).not.toBeInTheDocument();
+  });
 });

@@ -88,6 +88,18 @@ describe("rescheduleEventConflicts", () => {
     expect(buildConflictResolutionToastMessage(plan)).toBe('Cleared 3 conflicts · 3 moved to tomorrow ("A", "B" +1 more).');
   });
 
+  it("summarises exactly two tomorrow moves without the extra-count suffix", () => {
+    const plan = {
+      operations: [
+        { event: { title: "A" }, movedToTomorrow: true },
+        { event: { title: "B" }, movedToTomorrow: true },
+      ],
+      unresolved: [],
+    };
+
+    expect(buildConflictResolutionToastMessage(plan)).toBe('Cleared 2 conflicts · 2 moved to tomorrow ("A", "B").');
+  });
+
   it("marks fully fixed conflicts as unresolved", () => {
     const selectedDate = new Date("2026-03-23T00:00:00Z");
     const events = [

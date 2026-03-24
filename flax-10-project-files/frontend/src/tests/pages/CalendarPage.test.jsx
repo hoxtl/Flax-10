@@ -7,6 +7,15 @@ const { mockEventPopups, mockGetAnotherUserProfile } = vi.hoisted(() => ({
     mockEventPopups: vi.fn(),
     mockGetAnotherUserProfile: vi.fn(),
 }));
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+    };
+});
 
 const mockDispatch = vi.fn();
 const mockCalendarState = {
@@ -143,5 +152,27 @@ describe('CalendarPage', () => {
         });
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_READ_ONLY', payload: true });
         expect(mockGetAnotherUserProfile).toHaveBeenCalledWith('9');
+    });
+
+    it('falls back to the shared-name query param when the shared profile request fails', async () => {
+        mockGetAnotherUserProfile.mockRejectedValueOnce(new Error('offline'));
+
+        renderCalendarPage(['/calendar?user_id=12&shared_name=Chris']);
+
+        expect(await screen.findByText("Viewing Chris' shared calendar")).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Back to Chris' profile/i })).toBeInTheDocument();
+        expect(screen.queryByText(/Contact:/i)).not.toBeInTheDocument();
+    });
+
+    it('uses the generic back label when no shared name is available and navigates to the profile', async () => {
+        mockGetAnotherUserProfile.mockResolvedValueOnce(null);
+
+        renderCalendarPage(['/calendar?user_id=17']);
+
+        const backButton = await screen.findByRole('button', { name: 'Back to profile' });
+        act(() => {
+            backButton.click();
+        });
+        expect(mockNavigate).toHaveBeenCalledWith('/profile/17');
     });
 });

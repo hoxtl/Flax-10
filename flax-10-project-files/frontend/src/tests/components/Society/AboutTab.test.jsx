@@ -42,4 +42,22 @@ describe('AboutTab edit mode', () => {
         fireEvent.click(saveBtn);
         await waitFor(() => expect(onUpdate).toHaveBeenCalled());
     });
+
+    it('shows validation errors for missing and invalid email input', () => {
+        const { rerender } = render(<AboutTab about="Old text" adminEmails="" editMode={true} onUpdate={vi.fn()} />);
+        expect(screen.getByText('Email is compulsory')).toBeTruthy();
+        expect(screen.getByText('Save Changes')).toBeDisabled();
+
+        rerender(<AboutTab about="Old text" adminEmails="admin@kcl.ac.uk" editMode={true} onUpdate={vi.fn()} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. admin@flax.com, info@flax.com'), { target: { value: 'bad-email' } });
+        expect(screen.getByText('Invalid email(s)')).toBeTruthy();
+        expect(screen.getByText('Save Changes')).toBeDisabled();
+    });
+
+    it('cancels by sending an empty update object', () => {
+        const onUpdate = vi.fn();
+        render(<AboutTab about="Old text" adminEmails="admin@kcl.ac.uk" editMode={true} onUpdate={onUpdate} />);
+        fireEvent.click(screen.getByText('Cancel'));
+        expect(onUpdate).toHaveBeenCalledWith({});
+    });
 });
