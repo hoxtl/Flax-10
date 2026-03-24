@@ -1,3 +1,6 @@
+/*
+ * Edit profile form state and submission logic.
+ */
 import { useEffect, useState } from "react";
 import { updateUserProfile } from "../../api/userApi";
 import { getResolvedUserPhoto } from "../../utils/tutorPhotoFallback";
@@ -50,16 +53,24 @@ async function submitProfileUpdate(formData, onSave, setError, onSaved) {
   }
 }
 
-export function useEditProfileForm(user) {
+function useProfileFormState(user) {
   const [username, setUsername] = useState(user?.username || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(resolveProfilePhoto(user));
   const [removePhoto, setRemovePhoto] = useState(false);
+  return { username, setUsername, bio, setBio, profilePhoto, setProfilePhoto, previewUrl, setPreviewUrl, removePhoto, setRemovePhoto };
+}
+
+function useProfileFormMeta() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saveSignal, setSaveSignal] = useState(0);
+  return { loading, setLoading, error, setError, saveSignal, setSaveSignal };
+}
 
+function useSyncProfileFormToUser(user, setters) {
+  const { setUsername, setBio, setProfilePhoto, setPreviewUrl, setRemovePhoto, setError } = setters;
   useEffect(() => {
     setUsername(user?.username || "");
     setBio(user?.bio || "");
@@ -67,55 +78,44 @@ export function useEditProfileForm(user) {
     setPreviewUrl(resolveProfilePhoto(user));
     setRemovePhoto(false);
     setError("");
-  }, [user]);
+  }, [user, setUsername, setBio, setProfilePhoto, setPreviewUrl, setRemovePhoto, setError]);
+}
 
-  return {
-    username,
-    setUsername,
-    bio,
-    setBio,
-    profilePhoto,
-    setProfilePhoto,
-    previewUrl,
-    setPreviewUrl,
-    removePhoto,
-    setRemovePhoto,
-    loading,
-    setLoading,
-    error,
-    setError,
-    saveSignal,
-    setSaveSignal,
-  };
+export function useEditProfileForm(user) {
+  const formState = useProfileFormState(user);
+  const meta = useProfileFormMeta();
+  useSyncProfileFormToUser(user, { ...formState, setError: meta.setError });
+  return { ...formState, ...meta };
+}
+
+function validateUsername(username, setError, setLoading) {
+  if (username.length < 3) {
+    setError("Username must be at least 3 characters long");
+    setLoading(false);
+    return false;
+  }
+  return true;
+}
+
+async function validateUsernameAvailability(username, currentUsername, setError, setLoading) {
+  const isAvailable = await checkUsernameAvailable(username, currentUsername);
+  if (!isAvailable) {
+    setError("Username is already taken");
+    setLoading(false);
+    return false;
+  }
+  return true;
 }
 
 export function buildEditProfileSubmitHandler(form, user, onSave) {
   const { username, bio, profilePhoto, removePhoto, setLoading, setError, setSaveSignal } = form;
-
   return async (event) => {
     event.preventDefault();
     setLoading(true);
     setError("");
-
-    if (username.length < 3) {
-      setError("Username must be at least 3 characters long");
-      setLoading(false);
-      return;
-    }
-
-    const isAvailable = await checkUsernameAvailable(username, user?.username);
-    if (!isAvailable) {
-      setError("Username is already taken");
-      setLoading(false);
-      return;
-    }
-
-    await submitProfileUpdate(
-      buildFormData(username, bio, profilePhoto, removePhoto),
-      onSave,
-      setError,
-      () => setSaveSignal((count) => count + 1),
-    );
+    if (!validateUsername(username, setError, setLoading)) return;
+    if (!(await validateUsernameAvailability(username, user?.username, setError, setLoading))) return;
+    await submitProfileUpdate(buildFormData(username, bio, profilePhoto, removePhoto), onSave, setError, () => setSaveSignal((count) => count + 1));
     setLoading(false);
   };
 }
