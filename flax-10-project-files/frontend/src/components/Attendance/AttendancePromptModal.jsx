@@ -89,7 +89,7 @@ function formatEventMeta(event) {
   return { day, date, time };
 }
 
-function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
+function QuestionContent({ event, isAnswered, onAnswer }) {
   const meta = formatEventMeta(event);
   return (
     <motion.div key="question" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25, ease: "easeOut" }}>
@@ -101,11 +101,6 @@ function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
         <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
         <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
       </div>
-      {typeof onDismiss === "function" && (
-        <button type="button" className={styles.dismissBtn} onClick={onDismiss} disabled={isAnswered}>
-          Dismiss
-        </button>
-      )}
     </motion.div>
   );
 }
@@ -166,7 +161,7 @@ function ModalContent({ event, answeredWith, displayPct, handleAnswer, onDismiss
       <div className={styles.header}><h2 className={styles.title}>Attendance Tracker</h2><KclLogo /></div>
       <AttendanceRing pct={displayPct} updating={isAnswered} />
       <AnimatePresence mode="wait">
-        {isAnswered ? <SuccessContent key="success" attended={answeredWith} /> : <QuestionContent key="question" event={event} isAnswered={isAnswered} onAnswer={handleAnswer} onDismiss={onDismiss} />}
+        {isAnswered ? <SuccessContent key="success" attended={answeredWith} /> : <QuestionContent key="question" event={event} isAnswered={isAnswered} onAnswer={handleAnswer} />}
       </AnimatePresence>
       {submitError && <p className={styles.errorText}>{submitError}</p>}
     </>
