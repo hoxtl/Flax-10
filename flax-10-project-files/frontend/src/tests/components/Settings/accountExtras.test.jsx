@@ -83,8 +83,10 @@ describe("account extras", () => {
     setCachedPendingRequest("Chemistry");
 
     const { result } = renderHook(() => useAccountFormState());
-    await waitFor(() => expect(result.current.currentCourse).toBe("Physics"));
-    expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" });
+    await waitFor(() => {
+      expect(result.current.currentCourse).toBe("Physics");
+      expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" });
+    });
 
     act(() => result.current.handleChange({ target: { name: "firstName", value: "Ava" } }));
     expect(result.current.formData.firstName).toBe("Ava");
