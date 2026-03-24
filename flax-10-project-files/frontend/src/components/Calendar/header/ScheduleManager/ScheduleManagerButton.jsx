@@ -8,9 +8,9 @@ import { Sparkles } from "lucide-react";
 import { useCalendar } from "../../../../context/CalendarContext";
 import { useToast } from "../../../../context/ToastContext";
 import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
-import Tooltip from "../../../Common/Tooltip/Tooltip";
+import Tooltip from "../../../common/Tooltip/Tooltip";
 import { useEventActions } from "../../hooks/useCalendarEvents";
-import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../Common/RescheduleEvents/rescheduleEventConflicts";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../common/RescheduleEvents/rescheduleEventConflicts";
 import styles from "../CalendarHeaderUtils.module.css";
 
 function TriggerButton({ busy, onClick }) {
