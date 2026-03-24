@@ -11,7 +11,7 @@
   height: 36px;
   border-radius: 12px;
   background: var(--widget-icon-bg);
-  border: 1px solid var(--widget-border);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
