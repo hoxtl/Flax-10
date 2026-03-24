@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle } from "lucide-react";
-import PrimaryButton from "../Common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../common/PrimaryButton/PrimaryButton";
 import { useAttendanceStats } from "../../pages/Attendance/hooks/useAttendanceStats";
 import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSummary";
 import styles from "./AttendancePromptModal.module.css";
