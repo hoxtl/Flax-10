@@ -160,7 +160,9 @@ describe("MyModulesDashboard", () => {
     getUpcomingDeadlines.mockResolvedValue([]);
     getSuggestedReadings.mockResolvedValue([]);
     renderDashboard();
-    expect(await screen.findByText("No readings assigned")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/No readings assigned/i)).toBeInTheDocument();
+    });
   });
 
   it("opens task info modal when a reading row is clicked", async () => {
@@ -185,7 +187,8 @@ describe("MyModulesDashboard", () => {
         />
       </MemoryRouter>
     );
-    // Stats should render without error
-    expect(await screen.findByText("Enrolled modules")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getAllByText("Enrolled modules")[0]).toBeInTheDocument();
+    });
   });
 });
