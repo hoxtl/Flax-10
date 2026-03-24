@@ -48,8 +48,12 @@
   white-space: nowrap;
 }
 .planTimelineCardNow {
-  background: color-mix(in srgb, var(--study) 8%, var(--panel));
-  border-color: color-mix(in srgb, var(--study) 25%, var(--border));
+  background: color-mix(
+    in srgb,
+    var(--study) 8%,
+    var(--home-timeline-card-surface, var(--panel))
+  );
+  border-color: var(--home-timeline-card-hover-border);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 0 0 1px color-mix(in srgb, var(--study) 12%, transparent);
@@ -103,16 +107,16 @@
 }
 .planTimelineCardOverlap {
   border-color: var(--home-timeline-card-border);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--home-timeline-card-shadow, 0 1px 2px rgba(0, 0, 0, 0.03));
 }
 .planTimelineCardConflict {
   border: 1px solid var(--home-timeline-card-border);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--home-timeline-card-shadow, 0 1px 2px rgba(0, 0, 0, 0.03));
   width: 100%;
   min-width: 0;
 }
 .planTimelineCardConflict:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--home-timeline-card-shadow-hover, 0 2px 6px rgba(0, 0, 0, 0.05));
 }
 .planTimelineConflictGroup {
   display: flex;
@@ -170,8 +174,10 @@
 .planTimelineCardRoutine {
   transform: none;
   transform-origin: left center;
-  background: var(--widget-card-bg-glass) !important;
-  border: 1px solid var(--color-border-base) !important;
+  background: var(--home-timeline-card-surface, var(--widget-card-bg-glass))
+    !important;
+  border: 1px solid var(--home-timeline-card-border) !important;
+  box-shadow: var(--home-timeline-card-shadow, 0 1px 2px rgba(0, 0, 0, 0.03));
   width: 100%;
   min-width: 0;
 }

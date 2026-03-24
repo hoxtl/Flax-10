@@ -81,9 +81,9 @@
   gap: 3px;
   padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid var(--home-timeline-success-border);
-  background: var(--home-timeline-success-soft);
-  color: var(--home-timeline-success-strong);
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 600;
@@ -91,13 +91,17 @@
   cursor: pointer;
   transition:
     background 0.15s,
-    border-color 0.15s;
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
   flex-shrink: 0;
   white-space: nowrap;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 .planTimelineGapStartBtn:hover {
-  background: var(--home-timeline-success-soft-strong);
-  border-color: var(--home-timeline-success-border);
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
 }
 
 .planTimelineGapStartBtnSm {
@@ -105,20 +109,27 @@
   align-items: center;
   padding: 3px 9px;
   border-radius: 9999px;
-  border: 1px solid var(--home-timeline-success-border);
-  background: var(--home-timeline-success-soft);
-  color: var(--home-timeline-success-strong);
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
   flex-shrink: 0;
   white-space: nowrap;
   margin-left: auto;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 .planTimelineGapStartBtnSm:hover {
-  background: var(--home-timeline-success-soft-strong);
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
 }
 
 .planTimelineGapSkipBtn {
@@ -129,21 +140,28 @@
   height: 20px;
   padding: 0;
   border-radius: 9999px;
-  border: 1px solid var(--home-timeline-danger-border);
-  background: var(--home-timeline-danger-soft);
-  color: var(--home-timeline-danger);
+  border: 1px solid var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg);
+  color: var(--home-timeline-gap-skip-ink);
   font-size: 0.62rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
   flex-shrink: 0;
   line-height: 1;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 
 .planTimelineGapSkipBtn:hover {
-  border-color: var(--home-timeline-danger-border);
-  background: color-mix(in srgb, var(--home-timeline-danger-soft) 120%, transparent);
-  color: var(--home-timeline-danger-strong);
+  border-color: var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg-hover);
+  color: var(--home-timeline-gap-skip-ink);
+  transform: translateY(-1px);
 }
 
 .planTimelineGapUrgencyChip {
@@ -390,13 +408,21 @@
 }
 
 [data-mode="dark"] .planTimelineCard {
-  background: color-mix(in srgb, var(--color-card) 60%, transparent);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 60%, transparent)
+  );
+  border-color: var(--home-timeline-card-border);
+  box-shadow: var(--home-timeline-card-shadow);
 }
 
 [data-mode="dark"] .planTimelineCard:hover {
-  background: color-mix(in srgb, var(--color-card) 80%, transparent);
-  border-color: var(--color-primary);
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 80%, transparent)
+  );
+  border-color: var(--home-timeline-card-hover-border, var(--color-primary));
+  box-shadow: var(--home-timeline-card-shadow-hover);
 }
 
 [data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {

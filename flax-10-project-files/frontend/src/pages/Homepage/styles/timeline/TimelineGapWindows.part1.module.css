@@ -169,7 +169,7 @@
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 500;
-  color: var(--home-timeline-success);
+  color: var(--home-timeline-success-text);
   opacity: 0.85;
   flex-shrink: 0;
   white-space: nowrap;

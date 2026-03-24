@@ -14,7 +14,7 @@
   overflow-x: hidden;
   max-height: 420px;
   background: var(--home-card-bg);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--home-mini-card-border);
   box-shadow: var(--home-card-shadow);
 }
 .miniTimelineBody {
@@ -79,12 +79,12 @@
   position: absolute;
   left: 8px;
   right: 8px;
-  border: 1px dashed rgba(0, 0, 0, 0.08);
+  border: 1px dashed var(--home-mini-gap-border);
   border-radius: var(--home-card-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--home-mini-gap-bg);
   z-index: 1;
   padding: 0 0.5rem;
   opacity: 0.22;
@@ -109,7 +109,7 @@
 .miniTimelineGapLabel {
   font-size: var(--home-font-meta);
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.35);
+  color: var(--home-mini-gap-label);
 }
 .miniTimelineGapSuggestion {
   display: none;
@@ -117,9 +117,9 @@
 .miniTimelineGapQuickStart {
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
-  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border: 1px dashed var(--home-mini-gap-border);
   background: transparent;
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--home-mini-gap-button);
   font-size: var(--home-font-meta);
   font-weight: 600;
   cursor: pointer;
@@ -129,8 +129,8 @@
     opacity 0.2s;
 }
 .miniTimelineGapQuickStart:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: rgba(0, 0, 0, 0.55);
+  background: var(--home-mini-gap-button-hover-bg);
+  color: var(--home-mini-gap-button-hover);
 }
 .miniTimelineGapText {
   font-size: var(--home-font-meta);
@@ -141,7 +141,7 @@
   left: 8px;
   right: 8px;
   border-radius: var(--home-card-radius);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--home-mini-card-border);
   border-left-width: 3px;
   border-left-style: solid;
   padding: 0.5rem 0.6rem;
@@ -187,7 +187,7 @@
 .miniTimelinePillCheck[aria-pressed="true"] {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 .miniTimelinePillCompleted {
   opacity: 0.5;
@@ -200,7 +200,7 @@
 }
 /* Events (routine/wellness): grey left border */
 .miniTimelinePillRoutine {
-  border-left-color: #6b7280 !important;
+  border-left-color: var(--home-mini-routine-border) !important;
 }
 .miniTimelinePillActive {
   box-shadow:
@@ -215,7 +215,7 @@
 .miniTimelinePillTitle {
   font-size: var(--home-font-task);
   font-weight: 700;
-  color: var(--restoration-charcoal, #2d352d);
+  color: var(--home-mini-pill-title);
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -235,7 +235,7 @@
   font-size: 11px;
   font-weight: 600;
   color: var(--home-text-meta);
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--home-mini-pill-duration-bg);
   padding: 0.12rem 0.35rem;
   border-radius: 6px;
 }
@@ -341,9 +341,9 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: #f3efea;
-  color: #8a7868;
-  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: var(--home-mini-header-icon-bg);
+  color: var(--home-mini-header-icon-ink);
+  border: 1px solid var(--home-mini-header-icon-border);
 }
 
 .timelineHeaderRight {
@@ -371,9 +371,9 @@
   align-items: center;
   font-size: 11px;
   font-weight: 500;
-  color: #8b7355;
-  background: rgba(139, 115, 85, 0.06);
-  border: 1px solid rgba(139, 115, 85, 0.13);
+  color: var(--home-mini-cta-ink);
+  background: var(--home-mini-cta-bg);
+  border: 1px solid var(--home-mini-cta-border);
   border-radius: 9999px;
   padding: 4px 12px;
   text-decoration: none;
@@ -385,7 +385,7 @@
   margin-top: 4px;
 }
 .timelineHeaderCta:hover {
-  background: rgba(139, 115, 85, 0.11);
-  color: #5a4a3a;
-  border-color: rgba(139, 115, 85, 0.2);
+  background: var(--home-mini-cta-hover-bg);
+  color: var(--home-mini-cta-hover-ink);
+  border-color: var(--home-mini-cta-border);
 }
