@@ -1,6 +1,30 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/test-utils";
 
+vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: new Proxy(
+    {},
+    {
+      get: (_, tag) => {
+        const Tag = typeof tag === "string" ? tag : "div";
+        return ({ children, ...props }) => {
+          const {
+            animate: _animate,
+            exit: _exit,
+            initial: _initial,
+            transition: _transition,
+            whileTap: _whileTap,
+            ...rest
+          } = props;
+
+          return <Tag {...rest}>{children}</Tag>;
+        };
+      },
+    },
+  ),
+}));
+
 import AttendancePrompt from "../../../components/Attendance/AttendancePrompt";
 import AttendancePromptModal from "../../../components/Attendance/AttendancePromptModal";
 import {
@@ -110,6 +134,7 @@ describe("Attendance prompt", () => {
 
     expect(screen.getByText(/at 10:00 on sunday, 1 march/i)).toBeInTheDocument();
     expect(screen.queryByText("Dismiss")).not.toBeInTheDocument();
+    fireEvent.mouseDown(document.querySelector('[class*="modal"]'));
   });
 
   it("dismisses and submits attendance prompt answers", async () => {
@@ -128,13 +153,24 @@ describe("Attendance prompt", () => {
   });
 
   it("shows an error and restores the question when submission fails", async () => {
-    const onAnswer = vi.fn().mockResolvedValue(false);
+    let resolveAnswer;
+    const onAnswer = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          resolveAnswer = resolve;
+        }),
+    );
 
     render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("No"));
+    });
+    expect(screen.getByText("Missed session noted.")).toBeInTheDocument();
+
+    await act(async () => {
       vi.advanceTimersByTime(1200);
+      resolveAnswer(false);
       await Promise.resolve();
       await Promise.resolve();
     });

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 
 vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy(
     {},
     {
@@ -17,6 +18,7 @@ vi.mock("framer-motion", () => ({
 }));
 
 import { MultiSelectDropdownTrigger } from "../../../components/UI/multi-select-dropdown/MultiSelectDropdownTrigger";
+import { MultiSelectDropdownMenu } from "../../../components/UI/multi-select-dropdown/MultiSelectDropdownMenu";
 import {
   createHoverHandlers,
   useCloseOnOutsideClick,
@@ -140,7 +142,58 @@ describe("MultiSelectDropdown internals", () => {
     fireEvent.keyDown(document.querySelector('[aria-haspopup="listbox"]'), { key: "Escape", preventDefault: vi.fn() });
     expect(updateOpen).toHaveBeenCalledTimes(2);
 
+    fireEvent.click(screen.getByText("Alpha"));
+    expect(updateOpen).toHaveBeenCalledTimes(2);
+
     fireEvent.click(screen.getByLabelText("Remove Alpha"));
     expect(onRemovePill).toHaveBeenCalledWith("alpha");
+  });
+
+  it("renders leading and trailing selection icons in the menu", () => {
+    const onToggle = vi.fn();
+    const option = { label: "Alpha", value: "alpha" };
+    const { rerender } = render(
+      <MultiSelectDropdownMenu
+        activeItemClassName=""
+        align="left"
+        hideCheckboxForValues={[]}
+        isModuleVariant={false}
+        isOpen
+        itemClassName=""
+        menuClassName=""
+        onToggle={onToggle}
+        options={[option]}
+        optionsAsPills={false}
+        selected={["alpha"]}
+        selectedSet={new Set(["alpha"])}
+        showCheckboxes
+        variant="default"
+      />,
+    );
+
+    fireEvent.click(screen.getByText("Alpha"));
+    expect(onToggle).toHaveBeenCalledWith("alpha");
+    expect(document.querySelector('input[type="checkbox"]')).toBeTruthy();
+
+    rerender(
+      <MultiSelectDropdownMenu
+        activeItemClassName=""
+        align="left"
+        hideCheckboxForValues={[]}
+        isModuleVariant={false}
+        isOpen
+        itemClassName=""
+        menuClassName=""
+        onToggle={onToggle}
+        options={[option]}
+        optionsAsPills={false}
+        selected={["alpha"]}
+        selectedSet={new Set(["alpha"])}
+        showCheckboxes={false}
+        variant="default"
+      />,
+    );
+
+    expect(document.querySelector('svg.lucide-check')).toBeTruthy();
   });
 });
