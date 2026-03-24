@@ -105,7 +105,7 @@ function SuccessContent({ attended }) {
   );
 }
 
-function QuestionContent({ event, isAnswered, onAnswer }) {
+function QuestionContent({ event, isAnswered, onAnswer, onDismiss }) {
   const meta = formatEventMeta(event);
   return (
     <motion.div
@@ -124,6 +124,12 @@ function QuestionContent({ event, isAnswered, onAnswer }) {
         <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
         <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
       </div>
+
+      {typeof onDismiss === "function" && (
+        <button type="button" className={styles.dismissBtn} onClick={onDismiss} disabled={isAnswered}>
+          Dismiss
+        </button>
+      )}
     </motion.div>
   );
 }
@@ -148,7 +154,7 @@ const glowPulse = {
   transition: { duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
 };
 
-export default function AttendancePromptModal({ event, onAnswer }) {
+export default function AttendancePromptModal({ event, onAnswer, onDismiss }) {
   const { stats, refetch } = useAttendanceStats();
   const overall = stats?.overall ?? { attended: 0, missed: 0 };
   const basePct = computeAttendancePct(overall);
@@ -223,6 +229,7 @@ export default function AttendancePromptModal({ event, onAnswer }) {
               event={event}
               isAnswered={isAnswered}
               onAnswer={handleAnswer}
+              onDismiss={onDismiss}
             />
           )}
         </AnimatePresence>

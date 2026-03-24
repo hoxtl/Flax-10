@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../../utils/test-utils';
 import { TaskPickerModal } from '../../../components/Timer/taskInput/TaskPickerModal';
 
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));

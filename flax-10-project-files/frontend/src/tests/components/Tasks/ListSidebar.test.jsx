@@ -1,6 +1,6 @@
 /* Tests for ListSidebar component rendering, selection, and list management */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../../utils/test-utils';
 import ListSidebar from '../../../pages/Tasks/components/ListSidebar';
 
 vi.mock('../../../pages/Tasks/constants/focusBlockColours', () => ({

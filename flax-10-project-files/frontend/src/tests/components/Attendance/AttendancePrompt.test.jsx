@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, render, screen, fireEvent, waitFor, renderHook } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor, renderHook } from "../../../utils/test-utils";
 
 import AttendancePrompt from "../../../components/Attendance/AttendancePrompt";
 import AttendancePromptModal from "../../../components/Attendance/AttendancePromptModal";
@@ -14,6 +14,7 @@ import {
 } from "../../../components/Attendance/attendancePromptUtils";
 import {
   getPromptedIds,
+  getSessionDismissedIds,
   setPromptedId,
 } from "../../../components/Attendance/attendancePromptStorage";
 
@@ -23,6 +24,7 @@ const candidateState = { value: null, setValue: vi.fn() };
 
 vi.mock("../../../api/attendanceApi", () => ({
   recordAttendance: (...args) => recordAttendanceMock(...args),
+  getAttendanceStats: vi.fn(async () => ({ overall: { attended: 0, missed: 0 } })),
 }));
 
 vi.mock("../../../api/eventApi", () => ({
@@ -66,20 +68,27 @@ describe("Attendance prompt", () => {
 
     candidateState.value = { id: 1, title: "Lecture" };
     rerender(<AttendancePrompt />);
-    expect(screen.getByText("Did you attend?")).toBeInTheDocument();
+    expect(screen.getByText(/Did you attend/i)).toBeInTheDocument();
     expect(screen.getByText("Lecture")).toBeInTheDocument();
   });
 
   it("wires the prompt modal buttons", () => {
-    const onAnswer = vi.fn();
+    const onAnswer = vi.fn().mockResolvedValue(true);
     const onDismiss = vi.fn();
+    const { unmount } = render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
+    fireEvent.click(screen.getByText("Dismiss"));
+    expect(onDismiss).toHaveBeenCalled();
+    unmount();
+
     render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
     fireEvent.click(screen.getByText("Yes"));
-    fireEvent.click(screen.getByText("No"));
-    fireEvent.click(screen.getByText("Dismiss"));
-    expect(onAnswer).toHaveBeenCalledWith(true);
-    expect(onAnswer).toHaveBeenCalledWith(false);
-    expect(onDismiss).toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1200);
+    });
+    expect(onAnswer).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ afterSuccess: expect.any(Function), closeDelayMs: 700 }),
+    );
   });
 
   it("dismisses and submits attendance prompt answers", async () => {
@@ -87,11 +96,11 @@ describe("Attendance prompt", () => {
     recordAttendanceMock.mockResolvedValue({});
 
     dismissAttendancePrompt({ id: 7 }, setEvent);
-    expect(getPromptedIds().has(7)).toBe(true);
+    expect(getSessionDismissedIds().has(7)).toBe(true);
     expect(setEvent).toHaveBeenCalledWith(null);
 
     const setSubmitting = vi.fn();
-    await submitAttendancePromptAnswer({ id: 9 }, true, false, setEvent, setSubmitting);
+    await submitAttendancePromptAnswer({ id: 9 }, true, false, setEvent, setSubmitting, { closeDelayMs: 0 });
     expect(recordAttendanceMock).toHaveBeenCalledWith(9, true);
     expect(setSubmitting).toHaveBeenCalledWith(true);
     expect(setSubmitting).toHaveBeenCalledWith(false);

@@ -27,7 +27,9 @@ vi.mock('../../../lib/focusPlanner', () => ({
 
 vi.mock('../../../components/Timer/taskInput/taskInputConstants', () => ({
     SORT_ALPHA: 'alpha',
+    SORT_ALPHA_DESC: 'alpha_desc',
     SORT_DATE_ADDED: 'date_added',
+    SORT_DATE_ADDED_ASC: 'date_added_asc',
     SORT_DUE: 'due',
     SORT_TIME: 'time',
 }));
@@ -308,7 +310,7 @@ describe('filterTasks', () => {
         expect(filterTasks(tasks, state)).toHaveLength(1);
     });
 
-    it('filters by module codes', () => {
+    it('filters by module codes', async () => {
         const { normalizeModuleCode } = await import('../../../utils/moduleCodeUtils');
         normalizeModuleCode.mockImplementation((code) => code ? String(code).toUpperCase() : null);
         const state = { search: '', filterListIds: [], filterModuleCodes: ['MATH101'] };
@@ -352,7 +354,7 @@ describe('mapEnrolledModules', () => {
         expect(mapEnrolledModules(undefined, undefined)).toEqual([]);
     });
 
-    it('filters modules by enrollment and maps correctly', () => {
+    it('filters modules by enrollment and maps correctly', async () => {
         const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockImplementation((id, enrollments) => enrollments.includes(id));
 
@@ -367,7 +369,7 @@ describe('mapEnrolledModules', () => {
         expect(result[0].name).toBe('Intro CS');
     });
 
-    it('filters out modules with no code', () => {
+    it('filters out modules with no code', async () => {
         const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValue(true);
         const { normalizeModuleCode } = await import('../../../utils/moduleCodeUtils');
