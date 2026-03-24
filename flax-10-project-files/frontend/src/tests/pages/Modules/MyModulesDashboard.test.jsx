@@ -6,7 +6,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-<<<<<<< HEAD
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy(
@@ -35,13 +34,12 @@ vi.mock("framer-motion", () => ({
     },
   ),
 }));
-=======
->>>>>>> 1654fb433 (Write timer and module dashboard tests)
 
 import MyModulesDashboard from "../../../pages/Modules/MyModulesDashboard";
 import { getUpcomingDeadlines } from "../../../api/deadlineApi";
 import { getSuggestedReadings, convertReadingToTask } from "../../../api/readingApi";
 import { createTask } from "../../../api/taskApi";
+import { AddReadingToTasksButton } from "../../../components/Modules/shared/taskButtons.jsx";
 
 vi.mock("../../../api/deadlineApi", () => ({
   getUpcomingDeadlines: vi.fn(),
@@ -56,7 +54,16 @@ vi.mock("../../../api/taskApi", () => ({
   createTask: vi.fn(),
 }));
 
+vi.mock("../../../components/Modules/shared/taskButtons.jsx", async () => {
+  const actual = await vi.importActual("../../../components/Modules/shared/taskButtons.jsx");
+  return {
+    ...actual,
+    AddReadingToTasksButton: vi.fn(actual.AddReadingToTasksButton),
+  };
+});
+
 const toastMock = vi.fn();
+const taskInfoModalMock = vi.fn();
 vi.mock("../../../hooks/useCountUp", () => ({
   useCountUp: () => ({ current: null }),
 }));
@@ -66,7 +73,10 @@ vi.mock("../../../context/ToastContext", () => ({
 }));
 
 vi.mock("../../../pages/Tasks/components/TaskInfoModal", () => ({
-  TaskInfoModal: () => null,
+  TaskInfoModal: (props) => {
+    taskInfoModalMock(props);
+    return <div data-testid="task-info-modal">{props.task?.title}</div>;
+  },
 }));
 
 const NUDGE_DEADLINE = {
@@ -90,6 +100,7 @@ function renderDashboard() {
 describe("MyModulesDashboard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    taskInfoModalMock.mockClear();
     convertReadingToTask.mockResolvedValue({});
     createTask.mockResolvedValue({});
   });
@@ -174,16 +185,18 @@ describe("MyModulesDashboard", () => {
       { id: 5, title: "Intro: Chapter 3", module_name: "Intro", module_code: "CS101", deadline: "2026-04-10T00:00:00Z", start_page: 1, end_page: 20 },
     ]);
     renderDashboard();
-<<<<<<< HEAD
-    const readingTitle = await screen.findByText("Intro Chapter");
-    fireEvent.click(readingTitle.closest("[class]") || readingTitle);
-    expect(screen.getByText("Intro Chapter")).toBeInTheDocument();
-=======
     const readingTitle = await screen.findByText("Chapter 3");
     fireEvent.click(readingTitle.closest("[class]") || readingTitle);
-    // TaskInfoModal renders null in test, just verify no error thrown
-    expect(readingTitle).toBeInTheDocument();
->>>>>>> 1654fb433 (Write timer and module dashboard tests)
+    expect(await screen.findByTestId("task-info-modal")).toHaveTextContent("Intro: Chapter 3");
+    expect(taskInfoModalMock).toHaveBeenCalledWith(expect.objectContaining({
+      task: expect.objectContaining({
+        title: "Intro: Chapter 3",
+        reading_start_page: 1,
+        reading_end_page: 20,
+        page_count: 20,
+      }),
+      listName: "Intro",
+    }));
   });
 
   it("MyModulesDashboard shows enrolled module count in stats", async () => {
@@ -200,5 +213,33 @@ describe("MyModulesDashboard", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Enrolled modules")[0]).toBeInTheDocument();
     });
+  });
+
+  it("removes a reading from the dashboard after it is added to tasks", async () => {
+    getUpcomingDeadlines.mockResolvedValue([]);
+    getSuggestedReadings.mockResolvedValue([
+      { id: 8, title: "Seminar Notes", module_name: "", module_code: "CS101", deadline: "2026-04-10T00:00:00Z" },
+    ]);
+
+    renderDashboard();
+
+    expect(await screen.findByText("Seminar Notes")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: /\+ add/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByText("Seminar Notes")).not.toBeInTheDocument();
+    });
+  });
+
+  it("falls back to empty dashboard data when the loaders fail", async () => {
+    getUpcomingDeadlines.mockRejectedValueOnce(new Error("deadline fail"));
+    getSuggestedReadings.mockRejectedValueOnce(new Error("reading fail"));
+
+    renderDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByText(/No readings assigned/i)).toBeInTheDocument();
+    });
+    expect(screen.getAllByText("0")).toHaveLength(3);
   });
 });
