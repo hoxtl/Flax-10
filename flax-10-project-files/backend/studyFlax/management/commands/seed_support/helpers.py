@@ -171,23 +171,19 @@ def _random_theme():
 
 
 CORE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]
-OPTIONAL_WIDGETS = [
-    "rightNow", "tinyTimeline", "semesterOverview", "studyStreak", "weeklyGoal", "photo",
-    "analyticsProductivity", "analyticsInsights", "analyticsDailyBreakdown",
-    "analyticsHeatmap", "analyticsAttendance",
-]
-
-
 def _select_widgets():
-    """Seed core widgets plus one random optional widget after the timeline."""
+    """Seed only the core homepage widgets."""
 
-    extra = random.choice(OPTIONAL_WIDGETS)
-    return CORE_WIDGETS + [extra]
+    return CORE_WIDGETS.copy()
 
 
 def _widget_size(widget_id):
     """Generate random size for a widget."""
 
+    if widget_id == "hero":
+        return {"col": 2, "row": 1}
+    if widget_id in {"deadlines", "todayTasks"}:
+        return {"col": 1, "row": 1}
     if widget_id == "bigTimeline":
         return {"col": 2, "row": 2}
     return {"col": 2 if random.random() > 0.6 else 1, "row": 2 if random.random() > 0.7 else 1}

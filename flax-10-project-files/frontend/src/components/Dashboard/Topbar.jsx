@@ -11,9 +11,11 @@ import ThemeToggle from "./ThemeToggle";
 import MiniTimer from "../Timer/MiniTimer";
 import {
   Bell,
+  BookOpen,
   ChevronDown,
   Calendar,
   Clock,
+  ClipboardCheck,
 } from "lucide-react";
 import { SegmentedControl } from "../common";
 import AnimatedDropdown from "../common/AnimatedDropdown";
@@ -42,18 +44,20 @@ function NavDropdownTrigger({ title, isOpen, hasActive, onClick }) {
   );
 }
 
-function parseRouteOption(r) {
+function parseRouteOption(r, user) {
+  const isTeacher = user?.role === "teacher";
+  const routeLabel = isTeacher && r.teacherLabel ? r.teacherLabel : r.label;
   const label = (
     <div className={styles.dropdownLabelRow}>
       <span className={styles.dropdownIcon}>{r.icon}</span>
-      <span className={styles.dropdownLabel}>{r.label}</span>
+      <span className={styles.dropdownLabel}>{routeLabel}</span>
     </div>
   );
   return { value: r.id, label };
 }
 
-function buildNavDropdownOptions(routes) {
-  return routes.map(parseRouteOption);
+function buildNavDropdownOptions(routes, user) {
+  return routes.map(r => parseRouteOption(r, user));
 }
 
 function handleNavSelection(nextId, onNavChange) {
@@ -65,7 +69,7 @@ function NavDropdownMenu(props) {
   return (
     <AnimatedDropdown
       customTrigger={<NavDropdownTrigger title={props.title} hasActive={props.routes.some((route) => route.id === props.activeNav)} />}
-      options={buildNavDropdownOptions(props.routes)}
+      options={buildNavDropdownOptions(props.routes, props.user)}
       value={props.activeNav}
       onChange={(nextId) => handleNavSelection(nextId, props.onNavChange)}
       hideCheckmark={true}
@@ -76,10 +80,10 @@ function NavDropdownMenu(props) {
   );
 }
 
-function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal }) {
+function NavDropdown({ title, routes, activeNav, onNavChange, isOpen, onOpenChange, usePortal, user }) {
   return (
     <div className={styles.navGroup}>
-      <NavDropdownMenu title={title} routes={routes} activeNav={activeNav} onNavChange={onNavChange} isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} />
+      <NavDropdownMenu title={title} routes={routes} activeNav={activeNav} onNavChange={onNavChange} isOpen={isOpen} onOpenChange={onOpenChange} usePortal={usePortal} user={user} />
     </div>
   );
 }
@@ -101,7 +105,9 @@ function useTopBarHover() {
   return { activeMenu, onEnter, onLeave, onOpenChange };
 }
 
-function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu, onEnter, onOpenChange }) {
+function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu, onEnter, onOpenChange, user }) {
+  const isTeacher = user?.role === "teacher";
+  const displayTitle = isTeacher && title === "Study" ? "Teaching" : title;
   const sub = ids
     .map((id) => routes.find((route) => route.id === id))
     .filter(Boolean);
@@ -109,20 +115,26 @@ function NavSectionItem({ title, ids, routes, activeNav, onNavChange, activeMenu
   const change = (v) => onOpenChange(title, v);
   return (
     <div onMouseEnter={() => onEnter(title)}>
-      <NavDropdown title={title} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
-        isOpen={activeMenu === title} onOpenChange={change} usePortal={true} />
+      <NavDropdown title={displayTitle} routes={sub} activeNav={activeNav} onNavChange={onNavChange}
+        isOpen={activeMenu === title} onOpenChange={change} usePortal={true} user={user} />
     </div>
   );
 }
 
+function isRouteVisible(route, user) {
+  if (route.isAdminOnly && !user?.isAdmin) return false;
+  if (route.studentOnly && user?.role === "teacher") return false;
+  return true;
+}
+
 function TopBarNav({ activeNav, onNavChange, user }) {
   const { activeMenu, onEnter, onLeave, onOpenChange } = useTopBarHover();
-  const routes = APP_ROUTES.filter(r => r.isAdminOnly ? user?.isAdmin : true);
+  const routes = APP_ROUTES.filter(r => isRouteVisible(r, user));
   return (
     <nav className={styles.navContainer} onMouseLeave={onLeave}>
       {NAV_SECTIONS.map(s => (
         <NavSectionItem key={s.title} {...s} routes={routes} activeNav={activeNav} onNavChange={onNavChange}
-          activeMenu={activeMenu} onEnter={onEnter} onOpenChange={onOpenChange} />
+          activeMenu={activeMenu} onEnter={onEnter} onOpenChange={onOpenChange} user={user} />
       ))}
     </nav>
   );
@@ -152,30 +164,40 @@ function ActionPill({ onNavChange }) {
   );
 }
 
-const TOOL_OPTIONS = [
+const STUDENT_TOOL_OPTIONS = [
   { value: 'calendar', icon: Calendar, title: 'Calendar' },
   { value: 'timer', icon: Clock, title: 'Timer' },
+  { value: 'attendance', icon: ClipboardCheck, title: 'Record my attendance' },
 ];
 
-function ToolsPill({ onNavChange, activeNav }) {
+const TEACHER_TOOL_OPTIONS = [
+  { value: 'calendar', icon: Calendar, title: 'Calendar' },
+  { value: 'timer', icon: Clock, title: 'Timer' },
+  { value: 'modules', icon: BookOpen, title: 'Manage my modules' },
+];
+
+function ToolsPill({ onNavChange, activeNav, user }) {
+  const isTeacher = user?.role === "teacher";
+  const options = isTeacher ? TEACHER_TOOL_OPTIONS : STUDENT_TOOL_OPTIONS;
   return (
     <SegmentedControl
-      options={TOOL_OPTIONS}
+      options={options}
       value={activeNav}
       onChange={(val) => onNavChange?.(val)}
+      tooltipPosition="bottom"
     />
   );
 }
 
-const TopbarTools = ({ onNavChange, activeNav }) => (
+const TopbarTools = ({ onNavChange, activeNav, user }) => (
   <div className={styles.toolsWrapper}>
     <MiniTimer onNavigate={onNavChange} activeNav={activeNav} />
-    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} />
+    <ToolsPill onNavChange={onNavChange} activeNav={activeNav} user={user} />
   </div>
 );
 
 function TopBarActions({ user, onSettingsClick, onLogoutClick, onProfileClick, onNavChange, activeNav }) {
-  const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} />;
+  const tools = <TopbarTools onNavChange={onNavChange} activeNav={activeNav} user={user} />;
   const action = <ActionPill onNavChange={onNavChange} />;
   const pDrop = <ProfileDropdown user={user} onSettingsClick={onSettingsClick} onLogoutClick={onLogoutClick} onProfileClick={onProfileClick} />;
   return <div className={styles.actions}>{tools}{action}{pDrop}</div>;

@@ -37,7 +37,7 @@
     bottom: 0;
     left: 0;
     width: 120px;
-    background: linear-gradient(to right, #f0ede8, transparent);
+    background: linear-gradient(to right, color-mix(in srgb, var(--auth-overlay-bg-end) 92%, transparent), transparent);
     pointer-events: none;
   }
   
@@ -47,6 +47,6 @@
     bottom: 0;
     right: 0;
     width: 120px;
-    background: linear-gradient(to left, #f0ede8, transparent);
+    background: linear-gradient(to left, color-mix(in srgb, var(--auth-overlay-bg-end) 92%, transparent), transparent);
     pointer-events: none;
   }

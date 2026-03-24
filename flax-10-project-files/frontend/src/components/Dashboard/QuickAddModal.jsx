@@ -4,13 +4,11 @@ import { useTags } from "../../context/TagContext";
 import Badge from "../common/Badge/Badge";
 import StandardModal from "../common/StandardModal/StandardModal";
 import { getModules } from "../../api/moduleApi";
-import { ScheduleAutoForm } from "../Schedules/ScheduleForms";
 
 const CORE_TYPES = [
   { id: 'event', icon: '📅', label: 'Event', color: 'var(--color-light-blue)' },
   { id: 'society', icon: '👨‍👨‍👧‍👧', label: 'Society', color: 'var(--personal)' },
   { id: 'task', icon: '✅', label: 'Task', color: 'var(--color-teal)' },
-  { id: 'schedule_auto', icon: '⚙️', label: 'Auto Schedule', color: 'var(--color-sky)' },
 ];
 
 //Unlock when features are implemented
@@ -97,14 +95,13 @@ function useQuickAddLogic(onSelectType, initialView = 'type') {
     else if (id === 'module') setView('module');
     else if (id === 'add_deadline') setView('module_picker');
     else if (id === 'add_reading') setView('module_picker_reading');
-    else if (id === 'schedule_auto') setView('schedule_auto');
     else onSelectType(id);
   };
   return { tags, view, handleType };
 }
 
 function normalizeQuickAddView(view) {
-  if (view === 'schedule_manual') return 'schedule_auto';
+  if (view === 'schedule_manual' || view === 'schedule_auto') return 'type';
   return view || 'type';
 }
 
@@ -113,7 +110,6 @@ function getHeader(view) {
   if (view === 'tag') return { title: 'Choose Event Tag', sub: 'What kind of event is this?' };
   if (view === 'module_picker') return { title: 'Select Module', sub: 'Which module is this deadline for?' };
   if (view === 'module_picker_reading') return { title: 'Select Module', sub: 'Which module is this reading for? '};
-  if (view === 'schedule_auto') return { title: 'Auto Schedule', sub: 'Generate schedule blocks from upcoming deadlines.' };
   return { title: 'Quick Add', sub: 'What would you like to add?' };
 }
 
@@ -122,7 +118,6 @@ export default function QuickAddModal({ onClose, onSelectType, isTeacher, initia
   const { title, sub } = getHeader(view);
   const handlePickerSelect = (m) => onSelectType('add_deadline', m);
   const handleReadingPickerSelect = (m) => onSelectType('add_reading', m);
-  const done = () => onClose?.();
   return (
     <StandardModal title={title} subtitle={sub} onClose={onClose}>
       {view === 'type' && <TypeGrid onType={handleType} isTeacher={isTeacher} />}
@@ -130,7 +125,6 @@ export default function QuickAddModal({ onClose, onSelectType, isTeacher, initia
       {view === 'module' && <ModuleOptsGrid onSelect={handleType} />}
       {view === 'module_picker' && <ModulePickerGrid onSelect={handlePickerSelect} />}
       {view === 'module_picker_reading' && <ModulePickerGrid onSelect={handleReadingPickerSelect} />}
-      {view === 'schedule_auto' && <ScheduleAutoForm onDone={done} />}
     </StandardModal>
   );
 }

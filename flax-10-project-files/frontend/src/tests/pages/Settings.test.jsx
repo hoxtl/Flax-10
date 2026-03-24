@@ -12,7 +12,6 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
-      <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -24,7 +23,6 @@ vi.mock("../../components/Settings/SettingsUI", () => ({
       <button onClick={() => onChange("home")}>Home</button>
       <button onClick={() => onChange("preferences_sleep")}>Sleep</button>
       <button onClick={() => onChange("preferences_scheduling")}>Scheduling</button>
-      <button onClick={() => onChange("course")}>Course Change</button>
       <span data-testid="active-tab">{activeTab}</span>
     </div>
   ),
@@ -71,12 +69,6 @@ vi.mock("../../components/Settings/HomeAddressForm", () => ({
 vi.mock("../../components/Settings/SleepSchedulePanel", () => ({
   SleepSchedulePanel: ({ onSave, isSaving }) => (
     <div data-testid="sleep-schedule-panel">SleepSchedulePanel</div>
-  ),
-}));
-
-vi.mock("../../components/Settings/CourseChangePanel", () => ({
-  default: ({ user }) => (
-    <div data-testid="course-change-panel">CourseChangePanel</div>
   ),
 }));
 
@@ -141,12 +133,6 @@ describe("Settings", () => {
     expect(screen.getByTestId("sleep-schedule-panel")).toBeTruthy();
   });
 
-  it("switches to CourseChangePanel when course tab selected", () => {
-    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
-    fireEvent.click(screen.getByText("Course Change"));
-    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
-  });
-
   it("renders error banner when bannerMessage is set", () => {
     useSettingsHandlers.mockReturnValueOnce({
       isSaving: false,
@@ -181,12 +167,6 @@ describe("Settings", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     fireEvent.click(screen.getByText("Scheduling"));
     expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
-  });
-
-  it("switches to CourseChangePanel when course tab selected", () => {
-    renderSettings(<Settings user={{}} onBack={vi.fn()} />);
-    fireEvent.click(screen.getByText("Course Change"));
-    expect(screen.getByTestId("course-change-panel")).toBeTruthy();
   });
 
   it("legacy scheduling tab ids still route to scheduling panel", () => {

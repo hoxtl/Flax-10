@@ -116,6 +116,7 @@ function renderAction(styles) {
         type="button"
         variant={action.variant === "secondary" ? "secondary" : "primary"}
         size="large"
+        pill
         className={styles.actionButton}
         onClick={action.onClick}
       >

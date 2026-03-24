@@ -7,20 +7,20 @@ import { useAuth } from "../../../context/AuthContext";
 import styles from "./IntelligenceRow.module.css";
 import IntelligenceGrid from "./IntelligenceGrid";
 import { renderIntelligenceWidget } from "./IntelligenceWidgetRenderer";
-import { CATALOGUE, getSemesterProgress, useIntelligenceDashboard } from "../hooks/useIntelligenceDashboard";
+import { CATALOGUE, DEFAULT_LAYOUT, getSemesterProgress, useIntelligenceDashboard } from "../hooks/useIntelligenceDashboard";
 
 export default function IntelligenceRow(props) {
   const auth = useAuth();
   const dashboard = useIntelligenceDashboard({ ...props, ...auth });
   return (
     <section className={styles.section}>
-      <IntelligenceGrid {...getGridProps(props, dashboard)} />
+      <IntelligenceGrid {...getGridProps(props, dashboard, auth.profile)} />
       <ResetModal dashboard={dashboard} />
     </section>
   );
 }
 
-function getGridProps(props, dashboard) {
+function getGridProps(props, dashboard, profile) {
   return {
     catalogue: CATALOGUE,
     edit: dashboard.edit,
@@ -32,7 +32,7 @@ function getGridProps(props, dashboard) {
     setShowAdd: dashboard.setShowAdd,
     setWidgetSize: dashboard.setWidgetSize,
     showAdd: dashboard.showAdd,
-    widgetRenderer: (id, size) => renderIntelligenceWidget(id, { ...props, dashboard }, size),
+    widgetRenderer: (id, size) => renderIntelligenceWidget(id, { ...props, dashboard, profile }, size),
     widgetSizes: dashboard.widgetSizes,
   };
 }
@@ -43,7 +43,7 @@ function ResetModal({ dashboard }) {
 }
 
 function confirmReset(dashboard) {
-  dashboard.setLayout(["hero", "deadlines", "todayTasks", "bigTimeline"]);
+  dashboard.setLayout(DEFAULT_LAYOUT);
   dashboard.setShowResetConfirm(false);
 }
 

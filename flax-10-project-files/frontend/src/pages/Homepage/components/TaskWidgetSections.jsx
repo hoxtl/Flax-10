@@ -4,9 +4,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
+import ExpandablePillButton from "../../../components/Common/ExpandablePillButton/ExpandablePillButton";
 import EmptyStateCard from "./EmptyStateCard";
 
 export function TaskWidgetAllDone({ itemCount, styles }) {
@@ -27,10 +27,6 @@ export function TaskWidgetEmpty({ styles }) {
   return <EmptyStateCard sub={null} message="No tasks need attention." action={<Link to="/tasks" className={styles.taskWidgetLink}>Add a task →</Link>} />;
 }
 
-export function TaskWidgetHiddenLink({ hiddenCount, styles }) {
-  if (hiddenCount <= 0) return null;
-  return <li><Link to="/tasks?filter=today" className={styles.taskWidgetMoreText}>+ {hiddenCount} more · View all tasks</Link></li>;
-}
 
 export function TaskWidgetCompletedSection(props) {
   if (props.visibleCompleted.length === 0) return null;
@@ -44,20 +40,12 @@ export function TaskWidgetCompletedSection(props) {
 
 function CompletedToggle({ completedTasks, setShowCompleted, showCompleted, styles }) {
   return (
-    <button type="button" className={styles.taskWidgetCompletedToggle} onClick={() => setShowCompleted((value) => !value)} aria-expanded={showCompleted}>
-      <span className={styles.taskWidgetCompletedLabel}>Completed</span>
-      <span className={styles.taskWidgetCompletedStats}><span className={styles.taskWidgetCompletedCount}>{completedTasks.length} done</span><Chevron showCompleted={showCompleted} styles={styles} /></span>
-    </button>
-  );
-}
-
-function Chevron({ showCompleted, styles }) {
-  return (
-    <span className={styles.taskWidgetCompletedChevronWrap} aria-hidden>
-      <motion.span className={styles.taskWidgetCompletedChevron} animate={{ rotate: showCompleted ? 0 : -90 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-        <ChevronDown size={14} />
-      </motion.span>
-    </span>
+    <ExpandablePillButton
+      className={styles.taskWidgetCompletedTogglePill}
+      collapsedLabel={`+ ${completedTasks.length} completed`}
+      expanded={showCompleted}
+      onToggle={() => setShowCompleted((value) => !value)}
+    />
   );
 }
 

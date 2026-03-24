@@ -7,6 +7,7 @@ import { getInitials } from '../../Authentication/utils/userUtils.js';
 import GridCard from '../../common/Card/GridCard';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
+import Tooltip from '../../common/Tooltip/Tooltip';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModulesCard.module.css';
 
@@ -236,7 +237,18 @@ function UnenrollButton({ onToggle }) {
 }
 
 function StudentAction({ enrolled, isCore, onToggle }) {
-    if (enrolled && isCore) return <span className={styles.coreTag}>📌 Core module</span>;
     if (!enrolled) return <EnrollButton onToggle={onToggle} />;
+    if (isCore) {
+        return (
+            <Tooltip content="Cannot leave a core course module" position="top">
+                <span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>
+                    <button className={styles.unenrollButton} disabled aria-disabled="true"
+                        style={{ opacity: 0.55, cursor: 'not-allowed', pointerEvents: 'none' }}>
+                        × Leave Module
+                    </button>
+                </span>
+            </Tooltip>
+        );
+    }
     return <UnenrollButton onToggle={onToggle} />;
 }

@@ -8,10 +8,10 @@ export const USER_LIST_PAGE_SIZE = 10;
 
 export const USER_FILTER_GROUPS = {
   roles: [
-    { value: "student", label: "Student" },
     { value: "teacher", label: "Teacher" },
+    { value: "student", label: "Student" },
+    { value: "admin", label: "Admin" },
   ],
-  staff: [{ value: "staff", label: "Staff" }],
   status: [
     { value: "active", label: "Active" },
     { value: "banned", label: "Banned" },

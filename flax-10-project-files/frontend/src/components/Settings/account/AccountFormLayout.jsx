@@ -37,13 +37,14 @@ function AccountFields(props) {
     isSaving,
     hasUnsaved,
     saveSignal,
+    isTeacher,
   } = props;
 
-  return <div><AccountPrimaryFields formData={formData} handleChange={handleChange} /><AccountCourseSection currentCourse={currentCourse} pendingRequest={pendingRequest} onRequestClick={onRequestClick} onCancelRequest={onCancelRequest} cancellingRequest={cancellingRequest} courseRequestNotice={courseRequestNotice} courseRequestError={courseRequestError} /><SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} /></div>;
+  return <div><AccountPrimaryFields formData={formData} handleChange={handleChange} isTeacher={isTeacher} />{!isTeacher && <AccountCourseSection currentCourse={currentCourse} pendingRequest={pendingRequest} onRequestClick={onRequestClick} onCancelRequest={onCancelRequest} cancellingRequest={cancellingRequest} courseRequestNotice={courseRequestNotice} courseRequestError={courseRequestError} />}<SubmitButton isSaving={isSaving} label="Save Changes" savingLabel="Saving..." hasUnsaved={hasUnsaved} saveSignal={saveSignal} /></div>;
 }
 
-function AccountPrimaryFields({ formData, handleChange }) {
-  return <><PersonalInfoFields formData={formData} onChange={handleChange} /><YearField value={formData.year} onChange={(event) => handleChange({ target: { name: "year", value: event.target.value } })} /></>;
+function AccountPrimaryFields({ formData, handleChange, isTeacher }) {
+  return <><PersonalInfoFields formData={formData} onChange={handleChange} />{!isTeacher && <YearField value={formData.year} onChange={(event) => handleChange({ target: { name: "year", value: event.target.value } })} />}</>;
 }
 
 function AccountCourseSection(props) {
@@ -55,7 +56,7 @@ export default function AccountFormLayout(props) {
     <form onSubmit={props.onSubmit} className={styles.form}>
       <SectionHeader title="Personal Information" description="Your profile details and current degree are shown everywhere across the app" />
       <div className={styles.twoColLayout}>
-        <AccountFields {...props} />
+        <AccountFields {...props} isTeacher={props.isTeacher} />
         <AccountSidebarCard />
       </div>
     </form>

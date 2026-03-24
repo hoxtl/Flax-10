@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from studyFlax.models.auth.user_settings_model import UserSettings
+from studyFlax.views.user.settings_view import DEFAULT_HOMEPAGE_WIDGETS
 
 User = get_user_model()
 
@@ -60,7 +61,9 @@ class RegisterViewCoverageTest(TestCase):
         }
         self.client.post(self.url, data)
         user = User.objects.get(username='regset')
-        self.assertTrue(UserSettings.objects.filter(user=user).exists())
+        settings = UserSettings.objects.get(user=user)
+        self.assertEqual(settings.homepage_widgets, DEFAULT_HOMEPAGE_WIDGETS)
+        self.assertEqual(settings.homepage_widget_sizes, {})
 
     def test_register_invalid_data_returns_400(self):
         response = self.client.post(self.url, {'username': ''})

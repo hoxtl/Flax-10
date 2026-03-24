@@ -6,7 +6,7 @@
   /* Past events */
   .pastDetails {
     border-bottom: none;
-    background: #FFFFFF;
+    background: var(--widget-card-bg-glass);
   }
   
   .pastSummary {
@@ -44,7 +44,7 @@
   .missedSection {
     padding: var(--home-space-lg);
     border-bottom: none;
-    background: color-mix(in srgb, var(--danger) 6%, #FFFFFF);
+    background: color-mix(in srgb, var(--danger) 6%, var(--color-bg));
   }
   .missedSectionHeader {
     font-size: var(--home-text-heading);
@@ -70,7 +70,7 @@
     align-items: center;
     gap: var(--home-space-sm);
     padding: 0.5rem 0.6rem;
-    background: #FFFFFF;
+    background: var(--widget-card-bg-glass);
     border-radius: 12px;
     border: none;
     box-shadow: var(--home-card-shadow);
@@ -149,7 +149,7 @@
     min-height: 52px;
     border-radius: 8px;
     border: 1px solid rgba(192, 113, 78, 0.2);
-    background: #FFFFFF;
+    background: var(--widget-card-bg-glass);
     cursor: pointer;
     transition: border-color 0.15s, box-shadow 0.15s;
     overflow: hidden;
@@ -184,7 +184,7 @@
     font-family: var(--font-body), "Inter", system-ui, sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #2d2d2d;
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -286,8 +286,8 @@
     padding: 4px 10px;
     border-radius: 9999px;
     border: 1px solid rgba(107, 83, 68, 0.25);
-    background: #fff;
-    color: #5f4b39;
+    background: var(--widget-card-bg-glass);
+    color: var(--text);
     font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
@@ -298,7 +298,7 @@
     transition: background 0.15s, border-color 0.15s;
   }
   .planTimelineConflictItemBtn:hover {
-    background: #fbf8f4;
+    background: var(--hover);
     border-color: rgba(107, 83, 68, 0.45);
   }
 

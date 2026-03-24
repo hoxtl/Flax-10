@@ -58,8 +58,6 @@ vi.mock('lucide-react', () => ({
 }));
 
 describe('common DateTimePicker', () => {
-  const originalInnerHeight = window.innerHeight;
-
   function openDropdown() {
     const trigger = document.querySelector('.trigger');
     if (!trigger) throw new Error('Trigger button not found');
@@ -230,4 +228,3 @@ describe('common DateTimePicker', () => {
     }
   });
 });
-

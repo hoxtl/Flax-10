@@ -14,6 +14,8 @@ NOTIFICATION_TYPES = [
     ('ratification_approved', 'Ratification Approved'),
     ('ratification_rejected', 'Ratification Rejected'),
     ('meeting_suggestion', 'Meeting Suggestion'),
+    ('module_deleted', 'Module Deleted'),
+    ('module_updated', 'Module Updated'),
 ]
 
 class Notification(models.Model):

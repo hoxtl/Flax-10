@@ -23,6 +23,7 @@ function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
 function buildModuleHandlers(setModules, notify, confirmFn) {
   return {
     handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, confirmFn, cb),
+    handleDirectDeleteModule: (m, cb) => confirmDelete(m, setModules, notify, cb),
     handleModuleCreated: (m) => { setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
     handleModuleUpdated: (m) => { setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },
   };
@@ -83,7 +84,11 @@ async function handleDisenrol(module, enrollments, setEnrollments, notify) {
     setEnrollments(prev => prev.filter(e => e.id !== enrollment_id));
     notify(`Unenrolled from ${module.module_name}!`, 'success');
   } catch (err) {
-    notify(err.message, 'error');
+    if (/core course|core module/i.test(err.message)) {
+      setEnrollments(prev => prev.map(e => e.module === module.id ? { ...e, is_core: true } : e));
+    } else {
+      notify(err.message, 'error');
+    }
   }
 }
 

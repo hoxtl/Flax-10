@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import DeadlineCountdown from '../../components/common/DeadlineCountdown/DeadlineCountdown';
+import urgentGlowStyles from '../../components/Common/UrgentGlow/UrgentGlow.module.css';
 import {
     TIER_ACCENT,
     getUrgencyTier,
@@ -65,7 +66,7 @@ function rowClassName(tier, urgentGlow) {
     const parts = [styles.readingRow, styles.readingRowClickable];
     if (tier === 'overdue') parts.push(styles.rowOverdue);
     if (tier === 'critical') parts.push(styles.rowCritical);
-    if (urgentGlow) parts.push(styles.rowUrgentGlow);
+    if (urgentGlow) parts.push(urgentGlowStyles.urgentGlow);
     return parts.join(' ');
 }
 

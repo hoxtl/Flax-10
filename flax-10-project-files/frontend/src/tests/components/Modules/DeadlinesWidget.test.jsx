@@ -36,7 +36,7 @@ describe('DeadlinesWidget (Homepage)', () => {
   it('renders empty state when no deadlines', () => {
     renderWidget();
     expect(screen.getByText(/No deadlines need attention/i)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /view my modules/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /go to my modules/i })).toBeInTheDocument();
   });
 
   it('renders deadlines when provided', () => {
@@ -52,10 +52,11 @@ describe('DeadlinesWidget (Homepage)', () => {
     expect(onSelect).toHaveBeenCalledWith(deadlines[0]);
   });
 
-  it('calls onSelectModule when module pill clicked', () => {
-    const onSelectModule = vi.fn();
-    renderWidget({ deadlines, onSelectModule });
+  it('does not trigger row selection when a pill is clicked', () => {
+    const onSelect = vi.fn();
+    renderWidget({ deadlines, onSelectDeadline: onSelect });
     fireEvent.click(screen.getByText('CS101'));
-    expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS101', id: 5 });
+    fireEvent.click(screen.getByText('EXAM'));
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

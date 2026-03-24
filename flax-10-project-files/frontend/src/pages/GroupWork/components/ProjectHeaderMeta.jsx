@@ -3,6 +3,7 @@
  */
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import Badge from "../../../components/common/Badge/Badge";
@@ -89,25 +90,38 @@ function MemberAvatarItem({ member, index }) {
 }
 
 function TeamManagementPanel({ project, teamMembers, onMemberAdded, onMemberRemove, canManageTeam, isEditing, removalFlow }) {
-  if (!canManageTeam || !isEditing) return null;
+  if (!canManageTeam) return null;
   return (
-    <div className={styles.teamManagerPanel}>
-      <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
-      <MembersSection
-        members={teamMembers}
-        onRemove={removalFlow.handleRemove}
-        canRemove={canManageTeam}
-        allowOwnerRemove={removalFlow.allowOwnerRemove}
-      />
-      {removalFlow.ownerModal}
-    </div>
+    <AnimatePresence initial={false}>
+      {isEditing && (
+        <motion.div
+          key="teamPanel"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.22, ease: "easeInOut" }}
+          style={{ overflow: "hidden" }}
+        >
+          <div className={styles.teamManagerPanel}>
+            <AddMemberForm projectId={project.id} members={teamMembers} onAdded={onMemberAdded} />
+            <MembersSection
+              members={teamMembers}
+              onRemove={removalFlow.handleRemove}
+              canRemove={canManageTeam}
+              allowOwnerRemove={removalFlow.allowOwnerRemove}
+            />
+            {removalFlow.ownerModal}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDeleteProject }) {
   const [isEditing, setIsEditing] = useState(false);
   const canManageTeam = currentUserIsOwner(teamMembers);
-  const teamCount = Math.max(teamMembers.length, getProjectMemberCount(project));
+  const teamCount = teamMembers.length;
   const removalFlow = useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject);
   if (!members.length && !teamMembers.length) return null;
   return (

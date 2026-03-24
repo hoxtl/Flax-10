@@ -5,7 +5,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Flame } from "lucide-react";
 import { fetchApi } from "../../../api/client";
-import baseStyles from "../styles/WidgetBase.module.css";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "../styles/StudyStreakWidget.module.css";
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -97,14 +97,7 @@ function getDayLabel(daysBack) {
 }
 
 function StudyStreakHeader() {
-  return (
-    <div className={baseStyles.widgetHeader}>
-      <div className={baseStyles.headerIconWrap}>
-        <Flame size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>Study Streak</span>
-    </div>
-  );
+  return <SharedWidgetHeader icon={Flame} title="Study Streak" />;
 }
 
 function StudyStreakBars({ dayLabels, week }) {

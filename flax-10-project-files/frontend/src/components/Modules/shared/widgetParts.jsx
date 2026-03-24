@@ -2,8 +2,7 @@
  * Shared widget primitives for module dashboard panels.
  */
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { motion as Motion } from 'framer-motion';
+import ExpandablePillButton from "../../Common/ExpandablePillButton/ExpandablePillButton";
 
 /* Shared panel header for module dashboard widgets. */
 export function WidgetHeader({ icon, title, count, styles }) {
@@ -22,10 +21,11 @@ export function WidgetHeader({ icon, title, count, styles }) {
 /* Shared expand and collapse button for module dashboard widgets. */
 export function ShowMoreButton({ expanded, hiddenCount, onToggle, styles }) {
     return (
-        <Motion.button type="button" className={styles.showMoreBtn} onClick={onToggle} whileTap={{ scale: 0.98 }}>
-            {expanded
-                ? <><ChevronUp size={14} strokeWidth={2.5} aria-hidden /> Show less</>
-                : <><ChevronDown size={14} strokeWidth={2.5} aria-hidden /> + {hiddenCount} more</>}
-        </Motion.button>
+        <ExpandablePillButton
+            className={styles?.showMoreBtn}
+            collapsedLabel={`+ ${hiddenCount} more`}
+            expanded={expanded}
+            onToggle={onToggle}
+        />
     );
 }

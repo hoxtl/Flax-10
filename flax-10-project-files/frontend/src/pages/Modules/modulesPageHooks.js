@@ -32,6 +32,7 @@ function usePageState(initialSearch, initialCreate) {
     viewing: useState(null),
     deadline: useState(null),
     reading: useState(null),
+    deleting: useState(null),
   };
 }
 
@@ -116,7 +117,8 @@ function useFormBindings(state) {
 function useModalBindings(state) {
   const [deadlineModule, setDeadlineModule] = state.deadline;
   const [readingModule, setReadingModule] = state.reading;
-  return { deadlineModule, setDeadlineModule, readingModule, setReadingModule };
+  const [deletingModule, setDeletingModule] = state.deleting;
+  return { deadlineModule, setDeadlineModule, readingModule, setReadingModule, deletingModule, setDeletingModule };
 }
 
 function useModulesPageBindings(initialSearch, initialCreate) {
@@ -177,6 +179,8 @@ function buildSecondaryStateResult(bindings) {
     setDeadlineModule: bindings.setDeadlineModule,
     readingModule: bindings.readingModule,
     setReadingModule: bindings.setReadingModule,
+    deletingModule: bindings.deletingModule,
+    setDeletingModule: bindings.setDeletingModule,
   };
 }
 

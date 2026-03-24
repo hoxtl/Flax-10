@@ -116,6 +116,13 @@ describe('EventPopover', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
+    it('applies pixel-based custom properties for popover positioning', () => {
+        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        const popover = document.querySelector('[class*="popoverContainer"]');
+        expect(popover.style.getPropertyValue('--popover-top')).toBe('100px');
+        expect(popover.style.getPropertyValue('--popover-left')).toBe('200px');
+    });
+
     it('renders moduleCode fallback for module events', () => {
         const event = createMockEvent({ moduleCode: 'COMP101' });
         render(<EventPopover event={event} anchorRect={anchor} onClose={onClose} />);

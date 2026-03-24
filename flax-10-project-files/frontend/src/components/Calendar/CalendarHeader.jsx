@@ -271,5 +271,5 @@ function MobileTitle({ isMobile, title }) {
 
 function ImportModal({ onClose, onImport, showImportModal }) {
   if (!showImportModal) return null;
-  return <TimetableImportModal onClose={onClose} onImport={onImport} />;
+  return <TimetableImportModal isOpen={showImportModal} onClose={onClose} onImport={onImport} />;
 }

@@ -16,14 +16,14 @@ function useActiveNavState() {
   return { activeNav, setActiveNav };
 }
 
-function getAuthSnapshot() {
+function useAuthSnapshot() {
   const { authenticated: authed, loading: authLoading, profile, user } = useAuth();
   return { authLoading, authed, profile, user };
 }
 
 export function useAppState() {
   const { activeNav, setActiveNav } = useActiveNavState();
-  const { authLoading, authed, profile, user } = getAuthSnapshot();
+  const { authLoading, authed, profile, user } = useAuthSnapshot();
   const [isBanned] = useState(isBannedFromStorage());
   const [showWelcome, setShowWelcome] = useState(!hasSeenWelcome());
   const { initialMode, initialTheme, isLoadingTheme } = useThemeState(authed);

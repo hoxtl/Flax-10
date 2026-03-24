@@ -35,14 +35,21 @@ def _build_task_due_date(due, task_index, now):
     lead_days = max(0, min(task_index + 1, max((due.date() - now.date()).days, 0)))
     return due - timedelta(days=lead_days)
 
-def _build_completed_task_assignments(members, status_pattern):
+def _build_completed_task_assignments(members, status_pattern, rng):
+    """Assign members to completed tasks with varied counts so contributions differ per person."""
     completed_indexes = [index for index, status in enumerate(status_pattern) if status == "done"]
     if not completed_indexes:
         return {}
     assignments = {index: [] for index in completed_indexes}
-    for member_index, member in enumerate(members):
-        task_index = completed_indexes[member_index % len(completed_indexes)]
-        assignments[task_index].append(member)
+    if len(members) <= 1:
+        for idx in completed_indexes:
+            assignments[idx] = list(members)
+        return assignments
+    # Randomly assign 1–3 members per completed task (not a uniform round-robin) so
+    # each member ends up with a different share of completed work.
+    for task_index in completed_indexes:
+        pick_count = rng.randint(1, min(3, len(members)))
+        assignments[task_index] = rng.sample(members, pick_count)
     return assignments
 
 def _get_done_assignees(task_index, status, completed_assignments):
@@ -77,7 +84,6 @@ def _build_task_defaults(template, status, task_index, due, now):
     }
 
 def _create_single_group_task(project, members, due, template, task_index, now, rng, status_pattern, completed_assignments):
-    del rng
     t_title = template[0]
     status = status_pattern[task_index % len(status_pattern)]
     defaults = _build_task_defaults(template, status, task_index, due, now)
@@ -97,7 +103,7 @@ def _seed_tasks_for_project(project, now, project_index):
     due = project.deadline or (now + timedelta(days=14))
     rng = random.Random(f"studyflax-group-project-tasks:{project.name}")
     status_pattern = _get_project_status_pattern(project, project_index)
-    completed_assignments = _build_completed_task_assignments(members, status_pattern)
+    completed_assignments = _build_completed_task_assignments(members, status_pattern, rng)
     for task_index, template in enumerate(GROUP_TASK_TEMPLATES):
         _create_single_group_task(
             project, members, due, template, task_index, now, rng, status_pattern, completed_assignments,

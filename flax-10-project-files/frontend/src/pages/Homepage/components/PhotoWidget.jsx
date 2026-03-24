@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ImageIcon, Upload } from "lucide-react";
-import baseStyles from "../styles/WidgetBase.module.css";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "../styles/PhotoWidget.module.css";
 
 const PHOTO_KEY = "homepage_photo_src";
@@ -43,7 +43,7 @@ function openEmptyUploader(fileRef, src, editMode) {
 }
 
 function PhotoHeader() {
-  return <div className={baseStyles.widgetHeader} style={headerStyle}><div className={baseStyles.headerIconWrap}><ImageIcon size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden /></div><span className={baseStyles.headerTitle}>Photos</span></div>;
+  return <div style={headerStyle}><SharedWidgetHeader icon={ImageIcon} title="Photos" /></div>;
 }
 
 const headerStyle = { position: "absolute", top: 16, left: 16, zIndex: 5 };

@@ -117,10 +117,10 @@ function getArrowStyle(pos, anchorRect) {
 }
 
 function PopoverPortal({ popoverRef, pos, arrowStyle, event, tag, actions, onClose, readOnly }) {
-  const containerPos = { '--popover-top': pos.top, '--popover-left': pos.left };
+  const containerPos = { '--popover-top': `${pos.top}px`, '--popover-left': `${pos.left}px` };
   return createPortal(
     <>
-      <div className={styles.popoverOverlay} onMouseDown={onClose} />
+      <div className={styles.popoverOverlay} onMouseDown={onClose} aria-hidden="true" />
       <div ref={popoverRef} className={styles.popoverContainer} style={containerPos}>
         <div className={`${styles.popoverArrow} ${getArrowClass(pos.placement)}`} style={arrowStyle} />
         <EventPopoverContent event={event} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />

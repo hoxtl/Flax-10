@@ -2,9 +2,15 @@
  * User filter helpers for the admin page.
  */
 
+export function getUserRoleValue(user) {
+  if (user.is_staff || user.is_superuser || user.role === "admin") return "admin";
+  return user.role;
+}
+
 const ROLE_MATCHERS = {
-  student: (user) => user.role === "student",
-  teacher: (user) => user.role === "teacher" || user.role === "pending_teacher",
+  student: (user) => getUserRoleValue(user) === "student",
+  teacher: (user) => getUserRoleValue(user) === "teacher",
+  admin: (user) => getUserRoleValue(user) === "admin",
 };
 
 const STATUS_MATCHERS = {
@@ -21,7 +27,7 @@ export function toggleArrayValue(values, value) {
 }
 
 export function createEmptyUserFilters() {
-  return { roles: [], staff: [], status: [] };
+  return { roles: [], status: [] };
 }
 
 export function hasActiveUserFilters(filters) {
@@ -32,16 +38,12 @@ export function matchesRoleFilter(user, roles) {
   return includesAny(roles, (role) => ROLE_MATCHERS[role]?.(user));
 }
 
-export function matchesStaffFilter(user, staff) {
-  return includesAny(staff, (role) => role === "staff" && (!!user.is_staff || !!user.is_superuser));
-}
-
 export function matchesStatusFilter(user, statuses) {
   return includesAny(statuses, (status) => STATUS_MATCHERS[status]?.(user));
 }
 
 export function matchesAllUserFilters(user, filters) {
-  return matchesRoleFilter(user, filters.roles) && matchesStaffFilter(user, filters.staff) && matchesStatusFilter(user, filters.status);
+  return matchesRoleFilter(user, filters.roles) && matchesStatusFilter(user, filters.status);
 }
 
 export function matchesUserSearch(user, search) {

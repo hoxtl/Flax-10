@@ -5,7 +5,6 @@
 import CourseChangeRequestsTab from "./components/CourseChangeRequestsTab";
 import RatificationsTab from "./components/RatificationsTab";
 import ReportedSocietiesTab from "./components/ReportedSocietiesTab";
-import TeacherRequestsTab from "./components/TeacherRequestsTab";
 import UsersTab from "./components/UsersTab";
 
 export function buildAdminTabs(onNavigate) {
@@ -14,6 +13,5 @@ export function buildAdminTabs(onNavigate) {
     { id: "ratifications", icon: "🤝", label: "Society Ratifications", content: <RatificationsTab /> },
     { id: "reports", icon: "🚩", label: "Reported Societies", content: <ReportedSocietiesTab /> },
     { id: "course-changes", icon: "📚", label: "Course Switch Requests", content: <CourseChangeRequestsTab onNavigate={onNavigate} /> },
-    { id: "teachers", icon: "🧑‍🏫", label: "Teacher Switch Requests", content: <TeacherRequestsTab onNavigate={onNavigate} /> },
   ];
 }

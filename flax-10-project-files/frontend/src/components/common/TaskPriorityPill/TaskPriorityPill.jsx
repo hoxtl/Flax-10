@@ -11,11 +11,11 @@ const PRIORITY_META = {
   low: { label: "Low", marks: "" },
 };
 
-export default function TaskPriorityPill({ priority = "medium", className = "" }) {
+export default function TaskPriorityPill({ priority = "medium", compact = false, className = "" }) {
   const key = String(priority || "medium").toLowerCase();
   const meta = PRIORITY_META[key] || PRIORITY_META.medium;
   return (
-    <span className={[styles.pill, styles[key] || styles.medium, className].filter(Boolean).join(" ")}>
+    <span className={[styles.pill, compact ? styles.compact : "", styles[key] || styles.medium, className].filter(Boolean).join(" ")}>
       {meta.marks ? <span className={styles.marks} aria-hidden="true">{meta.marks}</span> : null}
       <span className={styles.label}>{meta.label}</span>
     </span>

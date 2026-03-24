@@ -71,6 +71,7 @@ def serialize_event(event, idx, start_override=None, end_override=None):
         'description': event.description,
         'start_time': (start_override or event.start_time).isoformat(),
         'end_time': (end_override or event.end_time).isoformat(),
+        'all_day': event.all_day,
         'location': event.location, 'source': 'society',
         'society_id': event.society_id,
         'society_name': event.society.name,

@@ -41,7 +41,7 @@ function buildContainerProps(controller, isSaving) {
   return { showModal, setShowModal, cancellingRequest, courseRequestNotice, courseRequestError, saveSignal, isSaving };
 }
 
-function buildLayoutProps(controller, view) {
+function buildLayoutProps(controller, view, isTeacher) {
   return {
     onSubmit: createAccountSubmitHandler(controller.context),
     formData: controller.account.formData,
@@ -56,6 +56,7 @@ function buildLayoutProps(controller, view) {
     isSaving: view.isSaving,
     hasUnsaved: controller.context.hasUnsaved,
     saveSignal: view.saveSignal,
+    isTeacher,
   };
 }
 
@@ -63,18 +64,19 @@ function CourseRequestModal({ showModal, setShowModal, onSuccess }) {
   return showModal ? <CourseChangeModal onClose={() => setShowModal(false)} onSuccess={onSuccess} /> : null;
 }
 
-function AccountFormBody({ controller, view }) {
-  const layoutProps = buildLayoutProps(controller, view);
+function AccountFormBody({ controller, view, isTeacher }) {
+  const layoutProps = buildLayoutProps(controller, view, isTeacher);
   return (
     <>
       <AccountFormLayout {...layoutProps} />
-      <CourseRequestModal showModal={view.showModal} setShowModal={view.setShowModal} onSuccess={createCourseRequestSuccessHandler(controller.context)} />
+      {!isTeacher && <CourseRequestModal showModal={view.showModal} setShowModal={view.setShowModal} onSuccess={createCourseRequestSuccessHandler(controller.context)} />}
     </>
   );
 }
 
 export default function AccountFormContainer({ user, onSave, isSaving }) {
+  const isTeacher = user?.role === "teacher";
   const controller = useAccountFormController(user, onSave);
   const view = buildContainerProps(controller, isSaving);
-  return <AccountFormBody controller={controller} view={view} />;
+  return <AccountFormBody controller={controller} view={view} isTeacher={isTeacher} />;
 }

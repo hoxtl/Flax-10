@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Clock3, Plus, Star, Trash2, X } from "lucide-react";
 import ConfirmModal from "../../components/common/ConfirmModal/ConfirmModal";
 import SearchEmptyState from "../../components/common/SearchEmptyState/SearchEmptyState";
@@ -41,7 +42,14 @@ function useMeetingView(proposedSuggestions, confirmedSuggestions) {
 function MeetingToggleButton({ isActive, label, count, onClick }) {
     return (
         <button type="button" className={`${styles.meetingToggleButton} ${isActive ? styles.meetingToggleButtonActive : ""}`} onClick={onClick}>
-            <span>{label}</span>
+            {isActive && (
+                <motion.div
+                    layoutId="meetingToggleIndicator"
+                    className={styles.meetingToggleIndicator}
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                />
+            )}
+            <span className={styles.meetingToggleLabel}>{label}</span>
             <span className={styles.meetingToggleCount}>{count}</span>
         </button>
     );
@@ -219,8 +227,8 @@ function ProposedCardList({ items, currentUserId, onVote, onDelete }) {
 function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggestions, currentUserId, onVote, onDelete }) {
     const isConfirmedView = activeView === "confirmed";
     const items = isConfirmedView ? confirmedSuggestions : proposedSuggestions;
-    if (!items.length) {
-        return (
+    const content = items.length === 0
+        ? (
             <div className={meetingStyles.meetingCardsEmpty}>
                 <SearchEmptyState
                     title={isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet"}
@@ -228,10 +236,23 @@ function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggest
                     className={meetingStyles.meetingCardsEmptyState}
                 />
             </div>
-        );
-    }
-    if (isConfirmedView) return <ConfirmedCardList items={items} />;
-    return <ProposedCardList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />;
+        )
+        : isConfirmedView
+            ? <ConfirmedCardList items={items} />
+            : <ProposedCardList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />;
+    return (
+        <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+                key={activeView}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+            >
+                {content}
+            </motion.div>
+        </AnimatePresence>
+    );
 }
 
 function AvatarImage({ src, name }) {

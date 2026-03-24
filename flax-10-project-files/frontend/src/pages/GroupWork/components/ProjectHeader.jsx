@@ -6,6 +6,7 @@ import { CalendarDays, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProjectDeleteAction from "./ProjectHeaderSub";
 import { ProjectHeaderMeta, ProjectTeacherMeta } from "./ProjectHeaderMeta";
+import { getStoredViewer } from "../utils/memberAvatarUtils";
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
 import BackButton from "../../../components/common/BackButton/BackButton.jsx";
 import { formatProjectHeadlineDate, getProjectCaption, getProjectDate } from "../utils/projectRowUtils";
@@ -55,13 +56,21 @@ function ProjectHeaderSubtitle({ project }) {
 
 /** Header section for a group project, showing title, deadline, members, and delete action. */
 
+function currentUserIsOwner(teamMembers) {
+    const viewer = getStoredViewer();
+    const viewerId = String(viewer?.id ?? viewer?.user ?? "");
+    if (!viewerId) return false;
+    return (teamMembers || []).some((m) => String(m.user ?? "") === viewerId && m.role === "owner");
+}
+
 export default function ProjectHeader({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDelete, onBack }) {
     const date = getProjectDate(project.deadline);
+    const isOwner = currentUserIsOwner(teamMembers);
     return (
         <section className={styles.headerSection}>
             <div className={styles.topActions}>
                 <BackButton onClick={onBack} label="Back to all projects" />
-                <ProjectDeleteAction onDelete={onDelete} />
+                <ProjectDeleteAction onDelete={onDelete} isOwner={isOwner} />
             </div>
             <ProjectHeaderContent project={project} date={date} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} onDelete={onDelete} />
         </section>

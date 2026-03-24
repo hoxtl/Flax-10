@@ -1,8 +1,19 @@
 /* StandardModal handles overlay and container positioning */
+.onboardingPanel {
+  width: min(640px, 95vw);
+  max-height: min(540px, 82vh);
+  transition: max-height 0.24s ease, width 0.24s ease;
+}
+
+.onboardingPanelExpanded {
+  max-height: min(720px, 90vh);
+}
+
 .modal {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow: visible;
 }
 
 .title {
@@ -21,6 +32,16 @@
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 4px;
+}
+
+.submitRow {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.submitButton {
+  width: 100%;
 }
 
 .btn {
@@ -90,4 +111,14 @@
   color: var(--text);
   opacity: 0.8;
   font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .onboardingPanel {
+    max-height: min(600px, 88vh);
+  }
+
+  .onboardingPanelExpanded {
+    max-height: min(720px, 92vh);
+  }
 }

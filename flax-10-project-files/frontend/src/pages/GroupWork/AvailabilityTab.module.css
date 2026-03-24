@@ -8,7 +8,7 @@
 
 .header {
   padding: 22px 24px 18px;
-  background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 84%, white));
+  background: linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 84%, var(--surface-card)));
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -41,7 +41,7 @@
   padding: 4px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--panel) 78%, white);
+  background: color-mix(in srgb, var(--panel) 82%, var(--surface-card));
 }
 
 .meetingToggleButton {
@@ -57,7 +57,8 @@
   border-radius: 999px;
   padding: 8px 12px;
   cursor: pointer;
-  transition: background 0.14s ease, color 0.14s ease, transform 0.14s ease;
+  position: relative;
+  transition: color 0.14s ease, transform 0.14s ease;
 }
 
 .meetingToggleButton:hover {
@@ -66,9 +67,21 @@
 }
 
 .meetingToggleButtonActive {
+  color: var(--color-on-primary);
+}
+
+.meetingToggleIndicator {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 8px 18px rgba(74, 52, 33, 0.16);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 22%, transparent);
+  z-index: 0;
+}
+
+.meetingToggleLabel {
+  position: relative;
+  z-index: 1;
 }
 
 .meetingToggleCount {
@@ -80,6 +93,8 @@
   justify-content: center;
   font-size: 0.72rem;
   background: color-mix(in srgb, currentColor 14%, transparent);
+  position: relative;
+  z-index: 1;
 }
 
 .slotList {
@@ -109,7 +124,7 @@
 }
 
 .bestTimeStar {
-  color: #d7ab4c;
+  color: var(--color-highlight);
 }
 
 .memberList {
@@ -136,8 +151,8 @@
 }
 
 .avatarCircleFree {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.16);
+  border-color: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 16%, transparent);
 }
 
 .avatarCircleBusy {
@@ -161,7 +176,7 @@
   align-items: center;
   justify-content: center;
   background: var(--primary);
-  color: #fff;
+  color: var(--color-on-primary);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -181,13 +196,13 @@
 }
 
 .avatarStatusFree {
-  background: #22c55e;
-  color: #fff;
+  background: var(--sage);
+  color: var(--color-on-primary);
 }
 
 .avatarStatusBusy {
-  background: #ef4444;
-  color: #fff;
+  background: var(--danger);
+  color: var(--color-on-primary);
 }
 
 .proposePill {
@@ -221,7 +236,7 @@
 }
 
 .scoreLabelHighlight {
-  color: #355f43;
+  color: color-mix(in srgb, var(--sage) 72%, var(--text) 28%);
 }
 
 .footer {
@@ -236,7 +251,7 @@
 }
 
 .footerDot {
-  color: #22c55e;
+  color: var(--sage);
 }
 
 .loading {

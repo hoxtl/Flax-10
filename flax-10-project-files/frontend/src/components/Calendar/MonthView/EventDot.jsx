@@ -11,11 +11,11 @@ export function EventDot({ e, onEventClick, customTags, readOnly }) {
     const { color, className, onClick, dragProps } = useEventDotLogic(e, onEventClick, customTags, eventType, readOnly);
 
     return (
-        <div className={`${className} ${dotStyles.eventDotColored}`} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
+        <button type="button" className={`${className} ${dotStyles.eventDotColored}`} title={getTitle(e)} onClick={onClick} data-event-id={e.id}
             style={{ '--dot-bg': color }}
             {...(isReadOnly ? {} : dragProps)}>
             {e.title}
-        </div>
+        </button>
     );
 }
 
@@ -29,12 +29,13 @@ function useEventDotLogic(event, onEventClick, customTags, eventType, readOnly) 
     const globalTags = useTags();
     const theme = getEventTheme(event, globalTags);
     const { dragProps, isDragging } = useDrag({ type: 'EVENT', data: event });
+    const popupReadOnly = readOnly || eventType !== 'personal';
 
     const handleClick = (ev) => {
         ev.stopPropagation();
         const rect = ev.currentTarget.getBoundingClientRect();
         if (onEventClick) onEventClick(event, rect);
-        else openPopup(event, rect, readOnly);
+        else openPopup(event, rect, popupReadOnly);
     };
 
     return {
@@ -55,16 +56,16 @@ function getEventClassName(eventType, isDragging) {
 
 export function MoreEvents({ count, onClick }) {
     return (
-        <span
+        <button
+            type="button"
             className="more-events"
             onClick={(e) => {
                 e.stopPropagation();
                 onClick?.();
             }}
-            role="button"
             style={{ cursor: 'pointer' }}
         >
             +{count} more
-        </span>
+        </button>
     );
 }

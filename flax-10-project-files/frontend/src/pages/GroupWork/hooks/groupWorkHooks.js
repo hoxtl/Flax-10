@@ -32,7 +32,7 @@ export function useGroupProjects() {
 
 /** Returns the current sort key and a setter for group project sorting. */
 
-export function useGroupProjectSort(defaultValue = "due-date") {
+export function useGroupProjectSort(defaultValue = "most-members") {
   const [sortBy, setSortBy] = useState(defaultValue);
   return { sortBy, setSortBy };
 }

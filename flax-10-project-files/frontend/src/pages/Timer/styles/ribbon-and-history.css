@@ -198,7 +198,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--text) 92%, #000);
     margin-bottom: 0.45rem;
 }
 
@@ -231,6 +231,8 @@
     width: 100%;
     border-radius: inherit;
     background: linear-gradient(180deg, #9b876f 0%, #7a6650 100%);
+    box-shadow: 0 6px 16px color-mix(in srgb, #7a6650 24%, transparent);
+    transform-origin: bottom center;
 }
 
 .rightHistoryWeeklyBarLabel {
@@ -245,6 +247,15 @@
     color: color-mix(in srgb, var(--muted) 86%, transparent);
     font-weight: 600;
     line-height: 1;
+}
+
+.rightHistoryWeeklyBarLabelToday {
+    color: color-mix(in srgb, var(--text) 98%, #000);
+    font-weight: 800;
+}
+
+.rightHistoryWeeklyValueToday {
+    color: color-mix(in srgb, var(--text) 90%, var(--primary-strong));
 }
 
 .rightHistorySections {

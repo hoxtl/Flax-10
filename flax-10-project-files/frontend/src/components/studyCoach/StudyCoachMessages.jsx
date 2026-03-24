@@ -6,9 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useAuth } from "../../context/AuthContext";
 import ScheduleImportPanel from "./ScheduleImportPanel";
 import { STUDY_COACH_MARKDOWN } from "./studyCoachMarkdown.jsx";
-import { STUDY_COACH_SUGGESTIONS } from "./studyCoachSuggestions";
+import { STUDY_COACH_SUGGESTIONS, TEACHER_COACH_SUGGESTIONS } from "./studyCoachSuggestions";
 import TypingIndicator from "./TypingIndicator";
 import styles from "./studyCoachStyles";
 
@@ -31,32 +32,37 @@ export default function StudyCoachMessages({ bottomRef, error, loading, messages
 }
 
 function EmptyStateBlock({ messages, onSend }) {
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
   if (messages.length > 0) return null;
   return (
     <MotionDiv className={styles.empty} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <EmptyStateCopy />
-      <SuggestionList onSend={onSend} />
+      <EmptyStateCopy isTeacher={isTeacher} />
+      <SuggestionList onSend={onSend} isTeacher={isTeacher} />
     </MotionDiv>
   );
 }
 
-function EmptyStateCopy() {
+function EmptyStateCopy({ isTeacher }) {
   return (
     <>
       <div className={styles.emptyIcon} aria-hidden="true">
         <MessageCircle size={22} />
       </div>
       <p className={styles.emptyText}>
-        Hi, I'm Flax! I can help you plan your study time, estimate tasks, and stay on track. What would you like to know?
+        {isTeacher
+          ? "Hi, I'm Flax! I can help you plan your teaching week, prepare lectures, and stay on top of your workload. What would you like to know?"
+          : "Hi, I'm Flax! I can help you plan your study time, estimate tasks, and stay on track. What would you like to know?"}
       </p>
     </>
   );
 }
 
-function SuggestionList({ onSend }) {
+function SuggestionList({ onSend, isTeacher }) {
+  const suggestions = isTeacher ? TEACHER_COACH_SUGGESTIONS : STUDY_COACH_SUGGESTIONS;
   return (
     <div className={styles.suggestions}>
-      {STUDY_COACH_SUGGESTIONS.map((suggestion) => (
+      {suggestions.map((suggestion) => (
         <button key={suggestion} className={styles.suggestion} onClick={() => onSend(suggestion)}>
           {suggestion}
         </button>

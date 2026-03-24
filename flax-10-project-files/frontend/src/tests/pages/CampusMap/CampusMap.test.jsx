@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
+import { reverseGeocode } from "../../../api/geocodeApi";
 import { tflService } from "../../../api/tflApi";
 
 const mockMapInstance = {
@@ -26,16 +27,39 @@ function MockMap() {
   return mockMapInstance;
 }
 
+function stripMotionProps(props) {
+  const {
+    animate: _animate,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    initial: _initial,
+    transition: _transition,
+    variants: _variants,
+    ...domProps
+  } = props;
+  return domProps;
+}
+
+async function renderLoadedCampusMap() {
+  render(<CampusMap />);
+  await waitFor(
+    () => expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
+    { timeout: 2000 },
+  );
+}
+
 vi.mock("mapbox-gl", () => ({
   default: {
     Map: MockMap,
     NavigationControl: function MockNav() {},
     Marker: vi.fn().mockImplementation(function Marker() {
+      const element = document.createElement("button");
       return {
         setLngLat: vi.fn().mockReturnThis(),
         setPopup: vi.fn().mockReturnThis(),
         addTo: vi.fn().mockReturnThis(),
-        getElement: vi.fn(() => document.createElement("div")),
+        getElement: vi.fn(() => element),
         getPopup: vi.fn(() => ({ isOpen: vi.fn(() => false), togglePopup: vi.fn() })),
         togglePopup: vi.fn(),
         remove: vi.fn(),
@@ -62,22 +86,22 @@ vi.mock("../../../api/tflApi", () => ({
   },
 }));
 
+vi.mock("../../../api/geocodeApi", () => ({
+  geocodeAddress: vi.fn().mockResolvedValue({ latitude: 51.5007, longitude: -0.1246 }),
+  reverseGeocode: vi.fn().mockResolvedValue("Westminster, London"),
+}));
+
 vi.mock("../../../api/userApi", () => ({
     getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../../api/geocodeApi", () => ({
-  reverseGeocode: vi.fn().mockResolvedValue("My location"),
-  geocodeAddress: vi.fn().mockResolvedValue({ latitude: 51.5, longitude: -0.1 }),
-}));
-
 vi.mock("framer-motion", () => ({
   motion: {
-    aside: ({ children, initial, animate, exit, transition, drag, dragConstraints, dragElastic, ...p }) => (
-      <aside {...p}>{children}</aside>
+    aside: ({ children, ...p }) => (
+      <aside {...stripMotionProps(p)}>{children}</aside>
     ),
-    div: ({ children, initial, animate, exit, transition, drag, dragConstraints, dragElastic, ...p }) => <div {...p}>{children}</div>,
-    button: ({ children, initial, animate, exit, transition, drag, dragConstraints, dragElastic, ...p }) => <button {...p}>{children}</button>,
+    div: ({ children, ...p }) => <div {...stripMotionProps(p)}>{children}</div>,
+    button: ({ children, ...p }) => <button {...stripMotionProps(p)}>{children}</button>,
   },
 }));
 
@@ -85,71 +109,94 @@ describe("CampusMap", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.defineProperty(window, "innerWidth", { value: 1200, writable: true });
+    Object.defineProperty(globalThis.navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition: vi.fn((success) => {
+          success({ coords: { latitude: 51.5007, longitude: -0.1246 } });
+        }),
+      },
+    });
     mockMapInstance.on.mockImplementation(function (event, cb) {
       if (event === "load") cb();
       return mockMapInstance;
     });
   });
 
-  it("shows the shared skeleton before the map finishes loading", () => {
+  it("shows the shared skeleton before the map finishes loading", async () => {
+    tflService.getTfLDelays.mockImplementationOnce(() => new Promise(() => {}));
     mockMapInstance.on.mockImplementation(function () {
       return mockMapInstance;
     });
     render(<CampusMap />);
-    expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument());
   });
 
   it("renders StudyFlax Map title and subtitle", async () => {
-    render(<CampusMap />);
-    expect(screen.getByText(/StudyFlax Map/)).toBeInTheDocument();
+    await renderLoadedCampusMap();
+    expect(screen.getByRole("heading", { name: /studyflax map/i })).toBeInTheDocument();
     expect(screen.getByText("Never be late, plan your journeys!")).toBeInTheDocument();
   });
 
+  it("does not render the removed events today section", async () => {
+    await renderLoadedCampusMap();
+    expect(screen.queryByText("Events Today")).not.toBeInTheDocument();
+  });
+
   it("renders TfL Line Status section", async () => {
-    render(<CampusMap />);
+    await renderLoadedCampusMap();
     expect(screen.getByText("TfL Line Status")).toBeInTheDocument();
   });
 
   it("shows Good Service when no disruptions", async () => {
-    render(<CampusMap />);
+    await renderLoadedCampusMap();
     await waitFor(() => expect(screen.getByText("Good Service!")).toBeInTheDocument());
   });
 
   it("renders campus list with Strand and Guy's", async () => {
-    render(<CampusMap />);
-    await waitFor(() => expect(screen.getAllByText("Strand").length).toBeGreaterThan(0));
+    await renderLoadedCampusMap();
+    expect(screen.getAllByText("Strand").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Guy's").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Waterloo").length).toBeGreaterThan(0);
   });
 
-  it("renders Starting Location and Set My Current Location", () => {
-    render(<CampusMap />);
+  it("renders current-location buttons for both journey fields", async () => {
+    await renderLoadedCampusMap();
     expect(screen.getByText("Starting Location")).toBeInTheDocument();
-    expect(screen.getByText(/Set My Current Location/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set start to current location/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /set destination to current location/i })).toBeInTheDocument();
   });
 
   it("selecting a campus shows campus name in chip", async () => {
-    render(<CampusMap />);
-    await waitFor(() =>
-      expect(screen.queryByTestId("campus-map-skeleton")).not.toBeInTheDocument(),
-    );
+    await renderLoadedCampusMap();
     const strandButtons = await screen.findAllByRole("button", { name: /Strand/ });
     fireEvent.click(strandButtons[0]);
-    await waitFor(() => expect(screen.getAllByText("Strand Campus").length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getByPlaceholderText("Enter a destination")).toHaveValue("Strand Campus"));
+    expect(screen.getAllByText("Strand Campus").length).toBeGreaterThan(0);
   });
 
   it("shows disruptions when tflService returns disruptions", async () => {
     tflService.getTfLDelays.mockResolvedValueOnce([
       { lineName: "Northern", severityDescription: "Minor", reason: "Engineering", color: "#000" },
     ]);
-    render(<CampusMap />);
+    await renderLoadedCampusMap();
     expect(await screen.findByText(/Northern/, {}, { timeout: 2000 })).toBeInTheDocument();
   });
 
   it("handles TfL disruption fetch error", async () => {
     tflService.getTfLDelays.mockRejectedValueOnce(new Error("TfL API down"));
-    render(<CampusMap />);
+    await renderLoadedCampusMap();
     await waitFor(() => expect(tflService.getTfLDelays).toHaveBeenCalled());
-    expect(screen.getByText("TfL Line Status")).toBeInTheDocument();
+    expect(screen.getByText("Good Service!")).toBeInTheDocument();
+  });
+
+  it("sets the destination to the current location when the To location button is clicked", async () => {
+    await renderLoadedCampusMap();
+
+    fireEvent.click(screen.getByRole("button", { name: /set destination to current location/i }));
+
+    await waitFor(() => expect(reverseGeocode).toHaveBeenCalledWith(51.5007, -0.1246));
+    await waitFor(() => expect(screen.getByPlaceholderText("Enter a destination")).toHaveValue("Westminster, London"));
+    expect(screen.getByText("Current location")).toBeInTheDocument();
   });
 });

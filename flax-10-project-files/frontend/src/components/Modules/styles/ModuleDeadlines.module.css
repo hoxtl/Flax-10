@@ -52,13 +52,12 @@
 }
 
 .deadlinesType {
-    font-size: 0.7rem;
-    font-weight: 700;
-    background: color-mix(in srgb, var(--primary) 18%, var(--panel));
-    color: var(--flax-brown-strong);
-    padding: 0.12rem 0.48rem;
-    border-radius: var(--radius-pill);
+    --chip-padding: 0.1rem 0.46rem;
+    --chip-font-size: 0.66rem;
+    --chip-font-weight: 700;
     white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0.02em;
 }
 
 .deadlineTitle {

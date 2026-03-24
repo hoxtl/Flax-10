@@ -48,8 +48,7 @@
 .panelAccount,
 .panelHome,
 .panelSecurity,
-.panelPreferences,
-.panelCourse {
+.panelPreferences {
   --panelAccent: color-mix(in srgb, var(--primary) 75%, var(--warning) 25%);
 }
 

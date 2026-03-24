@@ -7,16 +7,8 @@ import { X } from "lucide-react";
 import SearchBar from "../../../components/common/SearchBar";
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 
+import { TASK_SORT_OPTIONS as SORT_OPTIONS } from "../../../lib/taskSortOptions";
 import styles from "./TaskFeedToolbar.module.css";
-
-const SORT_OPTIONS = [
-  { value: "priority", label: "Priority" },
-  { value: "due", label: "Due date" },
-  { value: "alpha", label: "A -> Z" },
-  { value: "alpha-desc", label: "Z -> A" },
-  { value: "date_added", label: "Date added" },
-  { value: "est_time", label: "Estimated time" },
-];
 
 function handleSearchKeyDown(event, onSearchChange) {
   if (event.key !== "Escape") return;

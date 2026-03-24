@@ -13,7 +13,7 @@ export function getTimeLeftBand(minutesLeft) {
   return "over30";
 }
 
-export function getCurrentBlock(sortedEvents, now) {
+export function getCurrentBlock(sortedEvents) {
   const list = Array.isArray(sortedEvents) ? sortedEvents : [];
   return list.find((e) => e.start_time && e.end_time && isNow(e.start_time, e.end_time)) || null;
 }
@@ -60,15 +60,20 @@ export function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
   const hasSevere = relevantDelays.some((d) => isSevereDisruption(d.severityDescription));
   const leaveByMs = startMs - (35 + (hasSevere ? 20 : 10)) * 60000;
   const minsUntilLeave = Math.floor((leaveByMs - nowMs) / 60000);
+  const lineName = relevantDelays[0]?.lineName || "TfL";
+  const severity = relevantDelays[0]?.severityDescription || "Delays";
+  const leaveByStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const lead = nowMs >= leaveByMs ? "Leave now" : minsUntilLeave <= 15 ? `Leave in ${minsUntilLeave} min` : `Leave by ${leaveByStr}`;
   
   return {
     urgency: nowMs >= leaveByMs ? "critical" : minsUntilLeave <= 15 ? "urgent" : "info",
-    leaveByStr: new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+    leaveByStr,
     minsUntilLeave,
     hasSevere,
-    lineName: relevantDelays[0]?.lineName || "TfL",
-    severity: relevantDelays[0]?.severityDescription || "Delays",
+    lineName,
+    severity,
     eventTime: new Date(nextEvent.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
     eventTitle: nextEvent.title || "your next event",
+    message: `${lineName}: ${severity}. ${lead} for ${nextEvent.title || "your next event"}.`,
   };
 }

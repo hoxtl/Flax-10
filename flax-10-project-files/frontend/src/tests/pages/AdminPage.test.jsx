@@ -1,26 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
+function stripMotionProps(props) {
+  const cleanProps = { ...props };
+  delete cleanProps.layoutId;
+  delete cleanProps.initial;
+  delete cleanProps.animate;
+  delete cleanProps.exit;
+  delete cleanProps.transition;
+  delete cleanProps.variants;
+  delete cleanProps.whileHover;
+  delete cleanProps.whileTap;
+  delete cleanProps.layout;
+  return cleanProps;
+}
+
 vi.mock("framer-motion", () => ({
   motion: new Proxy(
     {},
     {
-      get:
-        (_, tag) =>
-        ({ children, layoutId, ...p }) => {
-          const {
-            initial,
-            animate,
-            exit,
-            transition,
-            variants,
-            whileHover,
-            whileTap,
-            layout,
-            ...rest
-          } = p;
-          return <div {...rest}>{children}</div>;
-        },
+      get: () =>
+        ({ children, ...props }) => <div {...stripMotionProps(props)}>{children}</div>,
     },
   ),
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -30,8 +30,6 @@ vi.mock("../../api/adminApi", () => ({
   fetchAdminUsers: vi.fn(),
   banUser: vi.fn(),
   unbanUser: vi.fn(),
-  fetchTeacherRequests: vi.fn(),
-  resolveTeacherRequest: vi.fn(),
   fetchReportedSocieties: vi.fn(),
   dismissReport: vi.fn(),
   banReportedSociety: vi.fn(),
@@ -132,7 +130,6 @@ function expectUserButton(name) {
 
 function setupDefaultMocks() {
   api.fetchAdminUsers.mockResolvedValue(USERS);
-  api.fetchTeacherRequests.mockResolvedValue([]);
   api.fetchReportedSocieties.mockResolvedValue([]);
   api.fetchPendingRatifications.mockResolvedValue([]);
   api.fetchCourseChangeRequests.mockResolvedValue([]);
@@ -144,18 +141,33 @@ beforeEach(() => {
 });
 
 describe("AdminPage – shell", () => {
-  it("renders the admin dashboard heading", () => {
+  it("renders the detailed reporting heading", async () => {
     render(<AdminPage />);
-    expect(screen.getByRole("heading", { name: /Admin\s*Dashboard/i })).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Alice Smith/i })).toBeTruthy(),
+    );
+    expect(screen.getByRole("heading", { name: /View Detailed Reporting/i })).toBeTruthy();
   });
 
-  it("renders all five tab buttons", () => {
+  it("renders all four tab buttons", async () => {
     render(<AdminPage />);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Alice Smith/i })).toBeTruthy(),
+    );
     expect(screen.getByRole("button", { name: /Users Overview/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Society Ratifications/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Reported Societies/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Course Switch Requests/i })).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Teacher Switch Requests/i })).toBeTruthy();
+  });
+
+  it("renders the detailed reporting link and tooltip credentials", async () => {
+    render(<AdminPage />);
+    const link = screen.getByRole("link", { name: /Open detailed reporting in Django admin/i });
+    expect(link.getAttribute("href")).toBe("http://localhost:8000/admin/login/?next=/admin/");
+    fireEvent.mouseEnter(link.parentElement);
+    await waitFor(() => expect(screen.getByText(/Quick login/i)).toBeTruthy());
+    expect(screen.getByText("johndoe")).toBeTruthy();
+    expect(screen.getByText("1234")).toBeTruthy();
   });
 
   it("shows users tab content by default", async () => {
@@ -170,14 +182,6 @@ describe("AdminPage – shell", () => {
     fireEvent.click(screen.getByRole("button", { name: /Society Ratifications/i }));
     await waitFor(() =>
       expect(screen.getByText(/No societies awaiting ratification/i)).toBeTruthy(),
-    );
-  });
-
-  it("switches to teacher requests tab", async () => {
-    render(<AdminPage />);
-    fireEvent.click(screen.getByRole("button", { name: /Teacher Switch Requests/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/No teacher switch requests/i)).toBeTruthy(),
     );
   });
 
@@ -221,8 +225,25 @@ describe("AdminPage – Users tab", () => {
     render(<AdminPage />);
     await waitFor(() => screen.getByRole("button", { name: /Staff User/i }));
     expect(screen.queryAllByText("Ban").length).toBe(2);
-    // Avoid matching the "Staff" filter pill as well.
     expect(screen.getByRole("button", { name: /Staff User/i })).toBeTruthy();
+  });
+
+  it("shows admin filter and hides the old staff filter pill", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByRole("button", { name: /Alice Smith/i }));
+    expect(screen.getByRole("button", { name: "Admin" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Staff" })).toBeNull();
+  });
+
+  it("filters users by selected admin filter", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByRole("button", { name: /Alice Smith/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Admin" }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Staff User/i })).toBeTruthy(),
+    );
+    expect(screen.queryByRole("button", { name: /Alice Smith/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Bob Jones/i })).toBeNull();
   });
 
   it("filters users by search query", async () => {

@@ -13,7 +13,17 @@ function DoneIcon({ className }) {
   );
 }
 
+function EmptyIcon({ Icon, className }) {
+  if (!Icon) return <DoneIcon className={className} />;
+  return (
+    <div className={[styles.illustrationWrap, className].filter(Boolean).join(" ")}>
+      <Icon className={styles.customIcon} size={34} strokeWidth={1.8} aria-hidden />
+    </div>
+  );
+}
+
 export default function EmptyStateCard({
+  icon: Icon = null,
   sub = "No overdue or due-soon tasks.",
   message: messageOverride,
   action,
@@ -22,7 +32,7 @@ export default function EmptyStateCard({
 
   return (
     <div className={styles.wrap}>
-      <DoneIcon className={styles.illustration} />
+      <EmptyIcon Icon={Icon} className={styles.illustration} />
       <p className={styles.message}>{message}</p>
       {sub && <p className={styles.sub}>{sub}</p>}
       {action && <div className={styles.action}>{action}</div>}

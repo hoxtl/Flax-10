@@ -55,6 +55,11 @@
     overflow-wrap: anywhere;
 }
 
+.scheduleItemBody {
+    min-width: 0;
+    flex: 1;
+}
+
 .scheduleValueInlineWrap {
     min-width: 0;
 }
@@ -66,6 +71,7 @@
     min-width: 0;
     width: 100%;
     white-space: nowrap;
+    overflow: hidden;
 }
 
 .scheduleInlinePrimary,

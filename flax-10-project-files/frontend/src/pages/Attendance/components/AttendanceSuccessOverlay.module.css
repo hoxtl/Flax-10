@@ -1,0 +1,42 @@
+/*
+ * Attendance success flash overlay styles.
+ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+[data-mode="dark"] .card {
+  background: var(--color-card, #1e1e1e);
+}
+
+.message {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, #1a1a1a);
+  text-align: center;
+  letter-spacing: -0.01em;
+}

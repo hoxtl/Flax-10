@@ -71,7 +71,6 @@ describe("SettingsTabs", () => {
     expect(screen.getByText("Sleep Schedule")).toBeTruthy();
     expect(screen.getByText("Scheduling")).toBeTruthy();
     expect(screen.getByText("Location")).toBeTruthy();
-    expect(screen.getByText("Teacher Access")).toBeTruthy();
   });
 
   it("calls onChange when a tab is clicked", () => {

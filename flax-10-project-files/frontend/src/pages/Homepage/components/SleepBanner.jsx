@@ -2,6 +2,7 @@
  * Late-night nudge banner.
  */
 
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../../api/userApi';
 import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
@@ -28,14 +29,43 @@ export default function SleepBanner() {
     syncSleepBanner(setShow);
   }, []);
 
-  if (!show) return null;
-
   return (
-    <div className={styles.banner}>
-      <span className={styles.icon}>🌙</span>
-      <span className={styles.message}>{message}</span>
-      <button className={styles.dismiss} onClick={() => setShow(false)}>x</button>
-    </div>
+    <AnimatePresence initial={false}>
+      {show ? (
+        <Motion.div
+          className={styles.banner}
+          initial={{ opacity: 0, y: -10, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -12, scale: 0.982 }}
+          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className={styles.flow} aria-hidden />
+          <Motion.div
+            className={styles.glow}
+            aria-hidden
+            animate={{ x: ["-10%", "16%", "-4%"], opacity: [0.24, 0.38, 0.28] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <Motion.span
+            className={styles.icon}
+            aria-hidden
+            animate={{ y: [0, -2, 0], rotate: [-4, 0, 4, 0], scale: [1, 1.05, 1] }}
+            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            🌙
+          </Motion.span>
+          <span className={styles.message}>{message}</span>
+          <button
+            type="button"
+            className={styles.dismiss}
+            aria-label="Dismiss sleep banner"
+            onClick={() => setShow(false)}
+          >
+            &times;
+          </button>
+        </Motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
 

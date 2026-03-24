@@ -49,11 +49,12 @@ function SharedCalendarSection({ events }) {
   );
 }
 
-function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave }) {
+function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave, role }) {
+  const isTeacher = role === "teacher";
   return (
     <div className={styles.leftCol}>
-      <div className={styles.leftTopMetricsRow}>
-        <CompactAttendanceTile onNavigate={onNavigate} />
+      <div className={isTeacher ? styles.leftTopMetricsRowTeacher : styles.leftTopMetricsRow}>
+        {!isTeacher && <CompactAttendanceTile onNavigate={onNavigate} />}
         <div className={styles.leftTopSideCol}>
           <div className={styles.leftTopStreakCard}><CompactStreakTile streaks={summary?.streaks} /></div>
           <div className={styles.leftTopWeekCard}><ThisWeek weekly={summary?.weekly} streaks={summary?.streaks} showStreak={false} onGoalSave={onGoalSave} /></div>
@@ -122,7 +123,7 @@ function ProfileHome(props) {
   useEffect(() => onPersonaReady?.(summary?.persona || null, peakHour), [onPersonaReady, peakHour, summary?.persona]);
   useEffect(() => onSocietiesReady?.(summary?.societies || []), [onSocietiesReady, summary?.societies]);
   if (loading) return <ProfileSkeleton blocks={<SkeletonGrid />} />;
-  if (visibility.isSelf) return <SelfProfileColumns summary={summary} analyticsData={analyticsData} onNavigate={onNavigate} onGoalSave={(goal) => saveWeeklyGoal(goal, refetch)} />;
+  if (visibility.isSelf) return <SelfProfileColumns summary={summary} analyticsData={analyticsData} onNavigate={onNavigate} onGoalSave={(goal) => saveWeeklyGoal(goal, refetch)} role={role} />;
   return <OtherProfileColumns summary={summary} modules={modules} currentUserModules={currentUserModules} currentUserSummary={currentUserSummary} viewedUsername={viewedUsername} viewedUser={viewedUser} role={role} onNavigate={onNavigate} onSuggestStudySession={suggestion.submit} suggestionState={suggestion.state} />;
 }
 

@@ -6,7 +6,7 @@ import { formatTime } from "../../utils/dateFormatUtils";
 import { stripEmojiFromTitle } from "../../utils/eventUtils";
 import { getGapStartDate } from "../../utils/timelineUtils";
 import { isReadOnlyEvent } from "../../../../components/Calendar/utils/eventUtils";
-import { isDuringSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
+import { doesEventOverlapSleepWindow } from "../../../../components/Settings/hooks/useSleepWarning";
 import { getEventAccentColor } from "./helpers/eventAccent";
 import { ConflictPopover, EventDuration, EventTagSlot } from "./parts/PlanEventRowParts";
 import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "./parts/TimelineRowLayout";
@@ -20,7 +20,19 @@ function getEventMeta(row, rows, getTag, sleepWindow) {
   const startTime = item.start_time ? formatTime(item.start_time) : "";
   const endTime = item.end_time && item.end_time !== item.start_time ? formatTime(item.end_time) : "";
   const tagName = getTag?.(item.tag)?.name ?? item.tag_name ?? "";
-  return { startTime, endTime, title: stripEmojiFromTitle(item.title) || item.title, nextFreeRow: getNextFreeRow(rows, row, durationMins), accentColor: row.isOverlap ? "var(--event-accent-social)" : getEventAccentColor(item.title, tagName), isSleepTime: Boolean(item.start_time && isDuringSleepWindow(sleepWindow?.sleepTime || "23:00", sleepWindow?.wakeTime || "07:00", new Date(item.start_time))) };
+  return {
+    startTime,
+    endTime,
+    title: stripEmojiFromTitle(item.title) || item.title,
+    nextFreeRow: getNextFreeRow(rows, row, durationMins),
+    accentColor: row.isOverlap ? "var(--event-accent-social)" : getEventAccentColor(item.title, tagName),
+    isSleepTime: doesEventOverlapSleepWindow(
+      sleepWindow?.sleepTime || "23:00",
+      sleepWindow?.wakeTime || "07:00",
+      item.start_time,
+      item.end_time,
+    ),
+  };
 }
 
 function getCardClassName(styles, row) {

@@ -119,7 +119,7 @@ function buildBaseController(shared, derived, reschedule) {
 }
 
 function getControllerCore(shared, derived, reschedule) {
-  return { addEvent: shared.eventActions.addEvent, completedEventIds: shared.completedEventIds, dayTasks: shared.homeData.dayTasks, displayName: shared.displayName, getTag: shared.tags.getTag, homeDataLoading: shared.homeData.loading, modals: shared.modals, navigate: shared.navigate, now: shared.now, openModal: shared.openModal, refetchTasks: shared.homeData.refetchTasks, reschedule, selectedDate: shared.calendar.selectedDate, setCompletedEventIds: shared.setCompletedEventIds, setTaskLists: shared.resources.setTaskLists, state: derived.state };
+  return { addEvent: shared.eventActions.addEvent, calendarEvents: shared.calendar.allEvents?.length ? shared.calendar.allEvents : shared.calendar.events, completedEventIds: shared.completedEventIds, dayTasks: shared.homeData.dayTasks, displayName: shared.displayName, getTag: shared.tags.getTag, homeDataLoading: shared.homeData.loading, modals: shared.modals, navigate: shared.navigate, now: shared.now, openModal: shared.openModal, refetchTasks: shared.homeData.refetchTasks, reschedule, selectedDate: shared.calendar.selectedDate, setCompletedEventIds: shared.setCompletedEventIds, setTaskLists: shared.resources.setTaskLists, state: derived.state };
 }
 
 function getControllerResources(shared) {

@@ -42,7 +42,7 @@ export default function CreateProjectForm({ onCreated, className = "", size = "m
 function FormActions({ onClose, isSubmitting }) {
   return (
     <div className={styles.formFooter}>
-      <PrimaryButton type="button" variant="ghost" className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
+      <PrimaryButton type="button" variant="secondary" pill className={styles.cancelBtn} onClick={onClose} disabled={isSubmitting}>
         Cancel
       </PrimaryButton>
       <PrimaryButton type="submit" className={styles.submitBtn} pill disabled={isSubmitting}>

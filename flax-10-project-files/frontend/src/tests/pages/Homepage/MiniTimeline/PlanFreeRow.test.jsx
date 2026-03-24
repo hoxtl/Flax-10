@@ -31,6 +31,10 @@ function renderRow(props = {}) {
     );
 }
 
+function hasExactText(text) {
+    return (_, element) => element?.textContent === text;
+}
+
 describe('PlanFreeRow', () => {
     it('renders transit gap type', () => {
         renderRow({
@@ -95,15 +99,13 @@ describe('PlanFreeRow', () => {
     });
 
     it('renders study gap (default) with duration label', () => {
-        const { container } = renderRow({ row: { ...baseRow, gapContext: { type: 'study' } } });
-        expect(container.textContent).toContain('1h');
-        expect(container.textContent).toContain('free');
+        renderRow({ row: { ...baseRow, gapContext: { type: 'study' } } });
+        expect(screen.getByText(hasExactText('1h free'))).toBeTruthy();
     });
 
     it('renders short study window (< 60 min) with duration label', () => {
-        const { container } = renderRow({ row: { ...baseRow, minutes: 30, gapContext: { type: 'study' } } });
-        expect(container.textContent).toContain('30m');
-        expect(container.textContent).toContain('free');
+        renderRow({ row: { ...baseRow, minutes: 30, gapContext: { type: 'study' } } });
+        expect(screen.getByText(hasExactText('30m free'))).toBeTruthy();
     });
 
     it('renders study gap with isBestGap styling', () => {
@@ -118,8 +120,7 @@ describe('PlanFreeRow', () => {
         const { container } = renderRow({
             row: { ...baseRow, minutes: 90, gapContext: { type: 'study' } },
         });
-        expect(container.textContent).toContain('1h 30m');
-        expect(container.textContent).toContain('free');
+        expect(screen.getByText(hasExactText('1h 30m free'))).toBeTruthy();
     });
 
     it('uses deadlineSuggestions when no assignedTask', () => {

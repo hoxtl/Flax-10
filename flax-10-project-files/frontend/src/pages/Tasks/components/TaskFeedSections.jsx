@@ -12,6 +12,7 @@ import TaskSection from "./TaskSection";
 import { getVisibleSections } from "./taskFeedSectionConfigs";
 
 import styles from "./TaskFeedSections.module.css";
+import { useAuth } from "../../../context/AuthContext";
 
 const LIST_SWITCH_ANIM = {
   initial: { opacity: 0, y: 10 },
@@ -38,7 +39,9 @@ function TaskSectionList({ sections }) {
 }
 
 function SuggestedReadingsBlock(props) {
-  const canShow = props.readingList && !props.data.search.trim();
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === "teacher";
+  const canShow = props.readingList && !props.data.search.trim() && !isTeacher;
   if (!canShow) return null;
 
   return (
