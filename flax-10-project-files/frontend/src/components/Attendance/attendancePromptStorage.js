@@ -7,6 +7,7 @@
 
 const ANSWERED_KEY  = "flax_attendance_prompted_ids";
 const DISMISSED_KEY = "flax_attendance_session_dismissed";
+const LAST_SHOWN_AT_KEY = "flax_attendance_prompt_last_shown_at";
 
 function readSet(storage, key) {
   try {
@@ -52,4 +53,18 @@ export function setSessionDismissedId(eventId) {
 /** Combined set of event IDs to skip (answered permanently + dismissed this session). */
 export function getSkippedIds() {
   return new Set([...getPromptedIds(), ...getSessionDismissedIds()]);
+}
+
+export function getLastPromptShownAt() {
+  const raw = sessionStorage.getItem(LAST_SHOWN_AT_KEY);
+  const timestamp = Number(raw);
+  return Number.isFinite(timestamp) && timestamp > 0 ? timestamp : 0;
+}
+
+export function setLastPromptShownAt(timestamp = Date.now()) {
+  try {
+    sessionStorage.setItem(LAST_SHOWN_AT_KEY, String(timestamp));
+  } catch {
+    // storage quota or private-mode — silently ignore
+  }
 }

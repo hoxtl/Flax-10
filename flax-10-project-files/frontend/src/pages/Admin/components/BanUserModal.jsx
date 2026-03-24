@@ -3,26 +3,53 @@
  */
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { Ban } from "lucide-react";
+import StandardModal from "../../../components/Common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import styles from "../styles";
-
-function BanModalContent({ onCancel, onConfirm, reason, setReason, user }) {
-  return (
-    <motion.div className={styles.modal} initial={{ scale: 0.88, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.88, opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 320, damping: 26 }}>
-      <div className={styles.modalIcon}>🚫</div>
-      <h3 className={styles.modalTitle}>Ban {user.username}?</h3>
-      <p className={styles.modalSub}>This user will be immediately locked out of their account.</p>
-      <textarea className={styles.reasonInput} placeholder="Reason for ban (optional — shown to the user)" value={reason} onChange={(event) => setReason(event.target.value)} rows={3} />
-      <div className={styles.modalActions}><button className={styles.cancelBtn} onClick={onCancel}>Cancel</button><button className={styles.dangerBtn} onClick={() => onConfirm(reason)}>Ban User</button></div>
-    </motion.div>
-  );
-}
 
 export default function BanUserModal({ onCancel, onConfirm, user }) {
   const [reason, setReason] = useState("");
+  const trimmedReason = reason.trim();
+  const inputId = `ban-reason-${user.id}`;
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    if (!trimmedReason) return;
+    onConfirm(trimmedReason);
+  }
+
   return (
-    <motion.div className={styles.modalBackdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <BanModalContent user={user} reason={reason} setReason={setReason} onConfirm={onConfirm} onCancel={onCancel} />
-    </motion.div>
+    <StandardModal
+      title={`Ban ${user.username}?`}
+      subtitle="This user will be immediately locked out of their account."
+      onClose={onCancel}
+      size="sm"
+      modalClassName={styles.banModal}
+      contentClassName={styles.banModalContent}
+    >
+      <form className={styles.banForm} onSubmit={handleSubmit}>
+        <div className={styles.banModalIconWrap} aria-hidden="true">
+          <Ban size={20} strokeWidth={2.1} />
+        </div>
+        <label className={styles.reasonLabel} htmlFor={inputId}>
+          Reason for ban <span className={styles.requiredMark} aria-hidden="true">*</span>
+        </label>
+        <textarea
+          id={inputId}
+          className={styles.reasonInput}
+          placeholder="Explain why this user is being banned. This will be shown to the user."
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          rows={3}
+          required
+          autoFocus
+        />
+        <div className={styles.modalActions}>
+          <PrimaryButton className={styles.cancelActionBtn} variant="ghost" pill onClick={onCancel}>Cancel</PrimaryButton>
+          <PrimaryButton className={styles.confirmActionBtn} variant="danger" pill type="submit" disabled={!trimmedReason}>Ban User</PrimaryButton>
+        </div>
+      </form>
+    </StandardModal>
   );
 }
