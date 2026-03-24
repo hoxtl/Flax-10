@@ -1,7 +1,6 @@
-/**
+/*
  * Homepage view-model helpers.
  */
-
 import { isToday, overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 import { getAllFreeWindowsToday, getNavigatorContext, isNow, isRoutineOrEventTask } from "./index";
 
@@ -156,17 +155,23 @@ export function getTaskWidgetDisplayList(allTasks, now, taskWidgetItemsOnly = []
   return [...displayList, ...fillers].sort(compareTaskWidgetItems);
 }
 
+function isFillerCandidate(task, todayStart, todayEnd) {
+  if (!task?.due_date || task.completed) return false;
+  const dueDate = new Date(task.due_date);
+  if (Number.isNaN(dueDate.getTime())) return false;
+  return dueDate < todayStart || dueDate > todayEnd;
+}
+
+function classifyFillerTask(task, acc, todayStart) {
+  const dueDate = new Date(task.due_date);
+  if (dueDate < todayStart) acc.overdue.push(task);
+  else acc.upcoming.push(task);
+  return acc;
+}
+
 function buildTaskWidgetFillers(allTasks, todayStart, todayEnd) {
-  const overdue = [];
-  const upcoming = [];
-  for (const task of allTasks || []) {
-    if (!task?.due_date || task.completed) continue;
-    const dueDate = new Date(task.due_date);
-    if (Number.isNaN(dueDate.getTime())) continue;
-    if (dueDate >= todayStart && dueDate <= todayEnd) continue;
-    if (dueDate < todayStart) overdue.push(task);
-    else upcoming.push(task);
-  }
+  const candidates = (allTasks || []).filter((task) => isFillerCandidate(task, todayStart, todayEnd));
+  const { overdue, upcoming } = candidates.reduce((acc, task) => classifyFillerTask(task, acc, todayStart), { overdue: [], upcoming: [] });
   overdue.sort(compareRawTasksByDueDate);
   upcoming.sort(compareRawTasksByDueDate);
   return [...overdue, ...upcoming];
@@ -203,16 +208,17 @@ function buildTaskWidgetItem(task, todayEnd) {
   };
 }
 
+function compareOverdueItems(left, right) {
+  if (getTaskOverdueRank(left) <= 0 || getTaskOverdueRank(right) <= 0) return 0;
+  return getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
+}
+
 function compareTaskWidgetItems(left, right) {
-  if (Boolean(left.completed) !== Boolean(right.completed)) {
-    return Number(left.completed) - Number(right.completed);
-  }
+  if (Boolean(left.completed) !== Boolean(right.completed)) return Number(left.completed) - Number(right.completed);
   const overdueRankDiff = getTaskOverdueRank(right) - getTaskOverdueRank(left);
   if (overdueRankDiff) return overdueRankDiff;
-  if (getTaskOverdueRank(left) > 0 && getTaskOverdueRank(right) > 0) {
-    const overdueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
-    if (overdueDiff) return overdueDiff;
-  }
+  const overdueDiff = compareOverdueItems(left, right);
+  if (overdueDiff) return overdueDiff;
   const dueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
   if (dueDiff) return dueDiff;
   const priorityDiff = getTaskPriorityRank(left.priority) - getTaskPriorityRank(right.priority);

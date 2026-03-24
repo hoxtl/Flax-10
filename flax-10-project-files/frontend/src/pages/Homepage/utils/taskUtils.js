@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage task helpers. Pure functions only.
  */
 

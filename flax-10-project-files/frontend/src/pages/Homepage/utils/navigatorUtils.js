@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage Daily Navigator helpers. Pure functions only.
  */
 
