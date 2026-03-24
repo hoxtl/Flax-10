@@ -8,11 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run",
-    "test:ui": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs --ui",
-    "test:watch": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs",
-    "coverage": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run --coverage",
-    "coverage-report-clover": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "coverage-report-clover": "vitest run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
   },
   "dependencies": {
     "@babel/parser": "^7.29.0",
