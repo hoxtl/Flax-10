@@ -23,6 +23,8 @@ vi.mock('../../../components/Calendar/utils/eventDisplayUtils', () => ({
     }),
 }));
 
+const { getAllDayVisualRange } = await import('../../../components/Calendar/utils/eventDisplayUtils');
+
 function makeDays(startStr, count = 7) {
     const days = [];
     for (let i = 0; i < count; i++) {
@@ -86,7 +88,6 @@ describe('calculateEventLayout', () => {
     });
 
     it('handles event that starts before the week (clips to column 0)', () => {
-        const { getAllDayVisualRange } = require('../../../components/Calendar/utils/eventDisplayUtils');
         getAllDayVisualRange.mockReturnValueOnce({
             start: new Date('2026-03-10'),
             end: new Date('2026-03-17'),
@@ -98,7 +99,6 @@ describe('calculateEventLayout', () => {
     });
 
     it('handles event that ends after the week (clips to last column)', () => {
-        const { getAllDayVisualRange } = require('../../../components/Calendar/utils/eventDisplayUtils');
         getAllDayVisualRange.mockReturnValueOnce({
             start: new Date('2026-03-18'),
             end: new Date('2026-03-25'),
@@ -110,7 +110,6 @@ describe('calculateEventLayout', () => {
     });
 
     it('filters out events with null start or end index', () => {
-        const { getAllDayVisualRange } = require('../../../components/Calendar/utils/eventDisplayUtils');
         // Return a range that falls completely outside the week
         getAllDayVisualRange.mockReturnValueOnce({
             start: new Date('2026-03-01'),
@@ -122,7 +121,6 @@ describe('calculateEventLayout', () => {
     });
 
     it('sorts by startCol with wider events first', () => {
-        const { getAllDayVisualRange } = require('../../../components/Calendar/utils/eventDisplayUtils');
         // Both start on same day but one is wider
         getAllDayVisualRange
             .mockReturnValueOnce({ start: new Date('2026-03-16'), end: new Date('2026-03-17') })

@@ -83,55 +83,58 @@ describe('hasNotificationAction', () => {
 });
 
 describe('executeNotificationAction', () => {
-    let dispatchedEvents;
+    let dispatchSpy;
+
+    function getDispatchedEvents(type) {
+        return dispatchSpy.mock.calls
+            .map(([event]) => ({ type: event.type, detail: event.detail }))
+            .filter((event) => !type || event.type === type);
+    }
 
     beforeEach(() => {
         vi.useFakeTimers();
-        dispatchedEvents = [];
-        window.addEventListener('navigate', (e) => dispatchedEvents.push({ type: 'navigate', detail: e.detail }));
-        window.addEventListener('open-event-popup', (e) => dispatchedEvents.push({ type: 'open-event-popup', detail: e.detail }));
+        dispatchSpy = vi.spyOn(window, 'dispatchEvent');
     });
 
     afterEach(() => {
+        vi.runOnlyPendingTimers();
         vi.useRealTimers();
-        // clean up listeners
-        dispatchedEvents = [];
+        dispatchSpy.mockRestore();
     });
 
     it('does nothing when action is null or has no url', () => {
         executeNotificationAction(null);
         executeNotificationAction({});
-        expect(dispatchedEvents).toHaveLength(0);
+        expect(getDispatchedEvents()).toHaveLength(0);
     });
 
     it('dispatches navigate event for old underscore prefixed url', () => {
         executeNotificationAction({ url: 'societies_1' });
-        expect(dispatchedEvents).toHaveLength(1);
-        expect(dispatchedEvents[0]).toEqual({ type: 'navigate', detail: 'societies_1' });
+        expect(getDispatchedEvents('navigate')).toEqual([{ type: 'navigate', detail: 'societies_1' }]);
     });
 
     it('dispatches navigate with /url prefix for simple nav strings', () => {
         executeNotificationAction({ url: 'calendar' });
-        expect(dispatchedEvents[0]).toEqual({ type: 'navigate', detail: '/calendar' });
+        expect(getDispatchedEvents('navigate')).toEqual([{ type: 'navigate', detail: '/calendar' }]);
     });
 
     it('dispatches navigate with url as-is when it starts with /', () => {
         executeNotificationAction({ url: '/societies?id=1' });
-        expect(dispatchedEvents[0]).toEqual({ type: 'navigate', detail: '/societies?id=1' });
+        expect(getDispatchedEvents('navigate')).toEqual([{ type: 'navigate', detail: '/societies?id=1' }]);
     });
 
     it('schedules open-event-popup when openPopup is true', () => {
         executeNotificationAction({ url: 'calendar', openPopup: true, eventId: 7 });
-        expect(dispatchedEvents).toHaveLength(1); // only navigate so far
+        expect(getDispatchedEvents()).toHaveLength(1);
         vi.advanceTimersByTime(300);
-        expect(dispatchedEvents).toHaveLength(2);
-        expect(dispatchedEvents[1]).toEqual({ type: 'open-event-popup', detail: { eventId: 7 } });
+        expect(getDispatchedEvents()).toHaveLength(2);
+        expect(getDispatchedEvents('open-event-popup')).toEqual([{ type: 'open-event-popup', detail: { eventId: 7 } }]);
     });
 
     it('schedules open-event-popup when scrollToId is a numeric string', () => {
         executeNotificationAction({ url: 'calendar', scrollToId: '42' });
         vi.advanceTimersByTime(300);
-        const popup = dispatchedEvents.find((e) => e.type === 'open-event-popup');
+        const popup = getDispatchedEvents('open-event-popup')[0];
         expect(popup).toBeDefined();
         expect(popup.detail).toEqual({ eventId: '42' });
     });
