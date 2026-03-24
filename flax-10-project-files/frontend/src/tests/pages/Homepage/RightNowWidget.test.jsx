@@ -82,13 +82,13 @@ describe('RightNowWidget', () => {
         // Use a past event so eventCount > 0, skipping the "empty day" branch
         const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
-        expect(screen.getByText('Past Event')).toBeTruthy();
+        expect(screen.getByText('Nothing on right now')).toBeTruthy();
     });
 
     it('shows "No more events today" when no next event', () => {
         const pastTime = new Date(baseNow.getTime() - 3600000).toISOString();
         renderWidget({ isToday: true, sortedEvents: [{ title: 'Past Event', start_time: pastTime }] });
-        expect(screen.getByText('Past Event')).toBeTruthy();
+        expect(screen.getByText('No more events today')).toBeTruthy();
     });
 
     it('shows next event title and time', () => {
@@ -156,7 +156,7 @@ describe('RightNowWidget', () => {
             navigatorContext: { state: 'endOfDay', overlaps: [] },
             sortedEvents: [],
         });
-        expect(screen.getByText('No events for this day.')).toBeTruthy();
+        expect(screen.getByText('Day complete — nice work!')).toBeTruthy();
     });
 
     it('renders empty day when no events today', () => {
@@ -165,7 +165,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             navigatorContext: {},
         });
-        expect(screen.getByText('No events for this day.')).toBeTruthy();
+        expect(screen.getByText('Free day — enjoy it!')).toBeTruthy();
     });
 
     it('renders conflict summary when conflicts present', () => {
@@ -192,6 +192,7 @@ describe('RightNowWidget', () => {
             },
             sortedEvents: [{ title: 'E', start_time: futureTime }],
         });
+        fireEvent.click(screen.getByLabelText('Dismiss warning'));
         expect(screen.queryByLabelText('Dismiss warning')).toBeNull();
     });
 
@@ -202,7 +203,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText('No events for this day.')).toBeTruthy();
+        expect(screen.getByText('Day complete — nice work!')).toBeTruthy();
     });
 
     it('shows single event in header', () => {
@@ -231,7 +232,7 @@ describe('RightNowWidget', () => {
             },
             sortedEvents: [],
         });
-        expect(screen.getByText('No events for this day.')).toBeTruthy();
+        expect(screen.getByText('Live Now')).toBeTruthy();
     });
 
     it('shows current event when isNow returns true', () => {
@@ -276,7 +277,7 @@ describe('RightNowWidget', () => {
             navigatorContext: {},
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText('No events for this day.')).toBeTruthy();
+        expect(screen.getByText('Free day — enjoy it!')).toBeTruthy();
     });
 
     it('end of day shows completed and events attended', () => {
@@ -288,7 +289,7 @@ describe('RightNowWidget', () => {
             ],
             taskWidgetItemsOnly: [{ id: 1, title: 'Done', completed: true }],
         });
-        expect(screen.getByText('Past')).toBeTruthy();
+        expect(screen.getByText(/1 event attended/)).toBeTruthy();
     });
 
     it('shows single schedule overlap label when one conflict', () => {
