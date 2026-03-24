@@ -19,7 +19,7 @@ vi.mock("../../../components/common/InlineAlert/InlineAlert", () => ({
 }));
 
 vi.mock("../../../components/common/PrimaryButton/PrimaryButton", () => ({
-  default: ({ children, ...props }) => <button {...props}>{children}</button>,
+  default: ({ children, pill: _pill, ...props }) => <button {...props}>{children}</button>,
 }));
 
 vi.mock("../../../components/common/StandardModal/StandardModal", () => ({
@@ -65,13 +65,9 @@ vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
   YearField: ({ value, onChange }) => <input aria-label="Year" value={value} onChange={onChange} />,
 }));
 
-vi.mock("../../../components/Settings/account/accountCourseRequests", async () => {
-  const actual = await vi.importActual("../../../components/Settings/account/accountCourseRequests");
-  return {
-    ...actual,
-    groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
-  };
-});
+vi.mock("../../../components/Settings/account/accountCourseRequests", () => ({
+  groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
+}));
 
 import CourseChangeModal from "../../../components/Settings/account/CourseChangeModal";
 import CourseDisplay from "../../../components/Settings/account/CourseDisplay";
@@ -116,7 +112,7 @@ describe("account component extras", () => {
     const onSuccess = vi.fn();
     requestCourseChange.mockResolvedValueOnce({ requestedCourse: "Physics" });
 
-    render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
+    const firstModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
     fireEvent.click(screen.getByText("Submit Request"));
     expect(screen.getByText("Please tell us why you want to change course.")).toBeInTheDocument();
 
@@ -129,13 +125,14 @@ describe("account component extras", () => {
     await waitFor(() => expect(requestCourseChange).toHaveBeenCalledWith("Physics"));
     expect(onSuccess).toHaveBeenCalledWith({ requestedCourse: "Physics" }, "Physics");
 
+    firstModal.unmount();
     requestCourseChange.mockRejectedValueOnce(new Error("network failed"));
     render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
-    fireEvent.change(screen.getAllByPlaceholderText(/Tell us a bit/)[1], { target: { value: "Another reason" } });
-    fireEvent.click(screen.getAllByText("Search for a course...")[1]);
-    fireEvent.click(screen.getAllByText("Submit Request")[1]);
+    fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Another reason" } });
+    fireEvent.click(screen.getByText("Search for a course..."));
+    fireEvent.click(screen.getByText("Submit Request"));
     await waitFor(() => expect(screen.getByText("network failed")).toBeInTheDocument());
-    fireEvent.click(screen.getAllByText("close-standard-modal")[1]);
+    fireEvent.click(screen.getByText("close-standard-modal"));
     expect(onClose).toHaveBeenCalled();
   });
 

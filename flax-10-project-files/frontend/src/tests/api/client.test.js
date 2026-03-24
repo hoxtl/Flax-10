@@ -117,5 +117,67 @@ describe('fetchApi', () => {
         expect(callHeaders['Authorization']).toBeUndefined();
         expect(result).toEqual({ data: 'ok' });
     });
+
+    it('should return null when response text is blank', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: async () => '   ',
+        });
+        const data = await fetchApi('/test');
+        expect(data).toBeNull();
+    });
+
+    it('should throw error on non-ok response with message field', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ message: 'Bad request message' }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('Bad request message');
+    });
+
+    it('should use Request failed fallback when error object is empty', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 422,
+            json: async () => ({}),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow('Request failed (422)');
+    });
+
+    it('should forward custom headers provided in options', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: async () => JSON.stringify({}),
+        });
+        await fetchApi('/test', { headers: { 'X-Custom': 'yes' } });
+        const callHeaders = global.fetch.mock.calls[0][1].headers;
+        expect(callHeaders['X-Custom']).toBe('yes');
+        expect(callHeaders['Content-Type']).toBe('application/json');
+    });
+
+    it('should pass body option through to fetch', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: async () => JSON.stringify({}),
+        });
+        const body = JSON.stringify({ key: 'value' });
+        await fetchApi('/test', { method: 'PUT', body });
+        const call = global.fetch.mock.calls[0][1];
+        expect(call.method).toBe('PUT');
+        expect(call.body).toBe(body);
+    });
+
+    it('should throw error when non_field_errors is a non-array (falls through to Object.values)', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 400,
+            json: async () => ({ non_field_errors: 'not an array', field: ['error from field'] }),
+        });
+        await expect(fetchApi('/test')).rejects.toThrow();
+    });
 });
 

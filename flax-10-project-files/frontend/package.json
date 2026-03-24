@@ -8,8 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs",
+    "test": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run",
     "test:ui": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs --ui",
+    "test:watch": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs",
     "coverage": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run --coverage",
     "coverage-report-clover": "NODE_OPTIONS=--experimental-require-module /Users/hamedlatif/.nvm/versions/node/v22.17.1/bin/node ./node_modules/vitest/vitest.mjs run --coverage --coverage.reporter=clover --coverage.reportOnFailure=true"
   },

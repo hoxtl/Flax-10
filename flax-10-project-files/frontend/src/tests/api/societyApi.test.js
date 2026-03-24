@@ -241,4 +241,46 @@ describe('societyApi', () => {
             body: JSON.stringify({}),
         });
     });
+
+    it('updateAnnouncement with silent=true appends query', async () => {
+        await api.updateAnnouncement(1, 10, { text: 'Updated' }, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/announcements/10/?silent=true', {
+            method: 'PATCH',
+            body: JSON.stringify({ text: 'Updated' }),
+        });
+    });
+
+    it('deleteAnnouncement with silent=true appends query', async () => {
+        await api.deleteAnnouncement(1, 10, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/announcements/10/?silent=true', { method: 'DELETE' });
+    });
+
+    it('createSocietyEvent with silent=true appends query', async () => {
+        await api.createSocietyEvent(1, { title: 'Event' }, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/events/?silent=true', {
+            method: 'POST',
+            body: JSON.stringify({ title: 'Event' }),
+        });
+    });
+
+    it('updateSocietyEvent with silent=true appends query', async () => {
+        await api.updateSocietyEvent(1, 20, { title: 'Updated' }, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/events/20/?silent=true', {
+            method: 'PATCH',
+            body: JSON.stringify({ title: 'Updated' }),
+        });
+    });
+
+    it('deleteSocietyEvent with silent=true appends query', async () => {
+        await api.deleteSocietyEvent(1, 20, true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/events/20/?silent=true', { method: 'DELETE' });
+    });
+
+    it('addExceptionDate with silent=true appends query', async () => {
+        await api.addExceptionDate(1, 20, '2026-06-01', true);
+        expect(fetchApi).toHaveBeenCalledWith('/societies/1/events/20/exception/?silent=true', {
+            method: 'POST',
+            body: JSON.stringify({ date: '2026-06-01' }),
+        });
+    });
 });
