@@ -56,15 +56,6 @@ function formatTime(t) {
     return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
 }
 
-function SleepWarningBody({ settings }) {
-    return (
-        <div className="modal-body">
-            <p>Your sleep schedule is <strong>{formatTime(settings?.sleepTime)}</strong> to <strong>{formatTime(settings?.wakeTime)}</strong>. This event falls during your rest time.</p>
-            <p>Are you sure you want to schedule something at this hour?</p>
-        </div>
-    );
-}
-
 function SleepWarningView({ settings, onCancel, onConfirm }) {
     const sleepStr = formatTime(settings?.sleepTime);
     const wakeStr = formatTime(settings?.wakeTime);

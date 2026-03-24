@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import styles from "./Pagination.module.css";
-export { default as BackToTop } from "../Common/BackToTop/BackToTop";
+export { default as BackToTop } from "../common/BackToTop/BackToTop";
 
 const BUTTON_WIDTHS = { next: 75, previous: 99 };
 

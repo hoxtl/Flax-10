@@ -13,7 +13,7 @@ import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
-import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton.jsx';
+import PrimaryButton from '../../common/PrimaryButton/PrimaryButton.jsx';
 import Tooltip from '../../common/Tooltip/Tooltip.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';

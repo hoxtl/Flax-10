@@ -42,4 +42,26 @@ describe('useClickOutside', () => {
         expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
         removeSpy.mockRestore();
     });
+
+    it('does not register when the ref is missing and ignores clicks after the element disappears', () => {
+        const addSpy = vi.spyOn(document, 'addEventListener');
+        const onClose = vi.fn();
+        const { rerender } = renderHook(({ ref, handler }) => useClickOutside(ref, handler), {
+            initialProps: { ref: { current: null }, handler: onClose },
+        });
+
+        expect(addSpy).not.toHaveBeenCalledWith('mousedown', expect.any(Function));
+
+        const div = document.createElement('div');
+        document.body.appendChild(div);
+        const ref = { current: div };
+        rerender({ ref, handler: onClose });
+        ref.current = null;
+
+        document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+        expect(onClose).not.toHaveBeenCalled();
+
+        addSpy.mockRestore();
+        document.body.removeChild(div);
+    });
 });

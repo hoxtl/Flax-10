@@ -128,4 +128,71 @@ describe('ModuleDetails', () => {
         render(<ModuleDetails module={{ ...module, recurrence_rule: 'FREQ=WEEKLY' }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
         expect(screen.getByText(/repeats weekly/)).toBeInTheDocument();
     });
+
+    it('shows disabled Leave button with tooltip when is_core is true', () => {
+        render(<ModuleDetails module={module} is_enrolled={true} is_core={true} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        const leaveBtn = screen.getByText('Leave module');
+        expect(leaveBtn).toBeDisabled();
+    });
+
+    it('renders timeline progress when multiple deadlines exist', () => {
+        const modWithDeadlines = {
+            ...module,
+            deadlines: [
+                { id: 1, title: 'CW1', deadline_type: 'coursework', start_due_date: '2026-01-01' },
+                { id: 2, title: 'CW2', deadline_type: 'coursework', start_due_date: '2026-06-01' },
+            ],
+        };
+        render(<ModuleDetails module={modWithDeadlines} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText(/through assignment timeline|hasn't started|will appear/)).toBeInTheDocument();
+    });
+
+    it('renders reading with stripped module prefix in title', () => {
+        const modWithReading = {
+            ...module,
+            readings: [{
+                id: 1,
+                title: 'Software Engineering: Chapter 5',
+                module_name: 'Software Engineering',
+                start_page: 1,
+                end_page: 20,
+                deadline: '2026-04-01T00:00:00',
+            }],
+        };
+        render(<ModuleDetails module={modWithReading} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Chapter 5')).toBeInTheDocument();
+    });
+
+    it('shows page_count when start_page and end_page are absent', () => {
+        const modWithReading = {
+            ...module,
+            readings: [{
+                id: 2,
+                title: 'Extra Reading',
+                module_name: null,
+                start_page: null,
+                end_page: null,
+                page_count: 15,
+                deadline: '2026-04-15T00:00:00',
+            }],
+        };
+        render(<ModuleDetails module={modWithReading} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Extra Reading')).toBeInTheDocument();
+        expect(screen.getByText(/15 pages/)).toBeInTheDocument();
+    });
+
+    it('renders different urgency labels for deadline states', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2026-03-24T12:00:00Z'));
+        const modWithDeadlines = {
+            ...module,
+            deadlines: [
+                { id: 1, title: 'Overdue CW', deadline_type: 'coursework', start_due_date: '2026-01-01' },
+                { id: 2, title: 'Soon CW', deadline_type: 'exam', start_due_date: '2026-03-25' },
+            ],
+        };
+        render(<ModuleDetails module={modWithDeadlines} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.getByText('Passed')).toBeInTheDocument();
+        vi.useRealTimers();
+    });
 });

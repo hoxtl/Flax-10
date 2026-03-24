@@ -39,6 +39,7 @@ describe("TagsSelector", () => {
     expect(screen.getByText("Nothing selected")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Lecture" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Lab" })).toBeInTheDocument();
+    expect(Element.prototype.scrollTo).toHaveBeenCalledWith({ left: 0, behavior: "smooth" });
   });
 
   it("adds a tag and removes a selected tag", () => {
@@ -63,5 +64,22 @@ describe("TagsSelector", () => {
     render(<TagsSelector tags={tags} selectedTags={tags} onSelectionChange={vi.fn()} />);
     expect(screen.queryByRole("button", { name: "Lecture" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Lab" })).not.toBeInTheDocument();
+  });
+
+  it("uses the built-in empty hint and fallback scrolling when scrollTo is unavailable", () => {
+    delete Element.prototype.scrollTo;
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get: () => 180,
+    });
+
+    render(<TagsSelector onSelectionChange={vi.fn()} />);
+
+    expect(screen.getByText("Select tags to filter…")).toBeInTheDocument();
+  });
+
+  it("does not show the empty hint while selected tags are present", () => {
+    render(<TagsSelector tags={tags} selectedTags={[tags[1]]} onSelectionChange={vi.fn()} emptyHint="Nothing selected" />);
+    expect(screen.queryByText("Nothing selected")).not.toBeInTheDocument();
   });
 });

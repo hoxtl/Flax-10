@@ -17,7 +17,18 @@ const testAction = () => {
     expect(onAction).toHaveBeenCalled();
 };
 
+const testMoodPersistence = () => {
+    sessionStorage.clear();
+    const onAction = vi.fn();
+    render(<GoalModal sessions={2} workTime={1200} breakTime={300} onAction={onAction} />);
+    fireEvent.click(screen.getByText('🔥'));
+    fireEvent.click(screen.getByLabelText('Close'));
+    expect(sessionStorage.getItem('lastSessionMood')).toBe('locked_in');
+    expect(onAction).toHaveBeenCalledTimes(1);
+};
+
 describe('GoalModal', () => {
     it('renders correctly', testRender);
     it('calls onAction', testAction);
+    it('persists the selected mood before completing the goal', testMoodPersistence);
 });

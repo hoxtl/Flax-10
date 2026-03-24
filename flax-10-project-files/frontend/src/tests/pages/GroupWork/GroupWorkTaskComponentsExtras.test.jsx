@@ -206,15 +206,19 @@ describe("GroupWork task component extras", () => {
   it("renders task board card and toggles popup, due date, context menu, and drag", () => {
     const onUpdate = vi.fn();
     const onDelete = vi.fn();
+    const onDragStart = vi.fn();
     render(
       <TaskBoardCard
         task={{ id: 1, title: "Draft outline", priority: "high", due_date: "2026-03-30T00:00:00.000Z", assignees_info: [{ id: 1, name: "Alex" }], status: "todo" }}
         members={[{ id: 1, user: 1, name: "Alex" }]}
         onUpdate={onUpdate}
         onDelete={onDelete}
-        onDragStart={vi.fn()}
+        onDragStart={onDragStart}
       />,
     );
+
+    fireEvent.change(screen.getByDisplayValue("high"), { target: { value: "low" } });
+    expect(onUpdate).toHaveBeenCalledWith(1, { priority: "low" });
 
     fireEvent.change(screen.getByLabelText("No due date"), { target: { value: "2026-03-31" } });
     expect(onUpdate).toHaveBeenCalledWith(1, { due_date: new Date("2026-03-31").toISOString() });
@@ -222,10 +226,82 @@ describe("GroupWork task component extras", () => {
     fireEvent.click(screen.getByText("+"));
     expect(buildToggleAssignee).toHaveBeenCalled();
 
-    fireEvent.contextMenu(screen.getByText("Draft outline").closest("div"));
+    const card = screen.getByText("Draft outline").closest("div");
+    fireEvent.dragStart(card, { dataTransfer: {} });
+    expect(onDragStart).toHaveBeenCalledWith(expect.anything(), 1);
+
+    fireEvent.contextMenu(card);
     expect(screen.getByText("Edit")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Edit"));
+    expect(useTaskTitleEdit.mock.results[0].value.setEditing).toHaveBeenCalledWith(true);
+    expect(useTaskTitleEdit.mock.results[0].value.setEditTitle).toHaveBeenCalledWith("Draft outline");
+
+    fireEvent.contextMenu(card);
     fireEvent.click(screen.getByText("Delete"));
     expect(onDelete).toHaveBeenCalledWith(1);
+  });
+
+  it("renders the editable title textarea and handles enter/escape shortcuts", () => {
+    const saveEdit = vi.fn();
+    const setEditing = vi.fn();
+    const setEditTitle = vi.fn();
+    useTaskTitleEdit.mockReturnValueOnce({
+      editing: true,
+      setEditing,
+      editTitle: "Draft outline",
+      setEditTitle,
+      saveEdit,
+    });
+
+    render(
+      <TaskBoardCard
+        task={{ id: 2, title: "Draft outline", priority: "medium", due_date: null, assignees_info: [] }}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onDragStart={vi.fn()}
+      />,
+    );
+
+    const textarea = screen.getByDisplayValue("Draft outline");
+    fireEvent.change(textarea, { target: { value: "Updated title" } });
+    expect(setEditTitle).toHaveBeenCalledWith("Updated title");
+    fireEvent.keyDown(textarea, { key: "Enter" });
+    expect(saveEdit).toHaveBeenCalled();
+    fireEvent.keyDown(textarea, { key: "Escape" });
+    expect(setEditing).toHaveBeenCalledWith(false);
+  });
+
+  it("uses the default medium priority, toggles popup state, clears due dates, and marks done cards", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const onDragStart = vi.fn();
+
+    render(
+      <TaskBoardCard
+        task={{ id: 22, title: "Done card", priority: null, due_date: "2026-03-30T00:00:00.000Z", assignees_info: [], status: "done", completed: true }}
+        members={[]}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+        onDragStart={onDragStart}
+      />,
+    );
+
+    expect(screen.getByDisplayValue("medium")).toBeInTheDocument();
+
+    const plusButton = screen.getByText("+");
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.getByText("Assign Members")).toBeInTheDocument();
+
+    const card = screen.getByText("Done card").closest("div");
+    fireEvent.contextMenu(card, { clientX: 12, clientY: 18 });
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("No due date"), { target: { value: "" } });
+    expect(onUpdate).toHaveBeenCalledWith(22, { due_date: null });
+
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.queryByText("Assign Members")).not.toBeInTheDocument();
   });
 
   it("renders board column empty/add states and board view add flow", () => {
@@ -377,6 +453,61 @@ describe("GroupWork task component extras", () => {
     fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
   });
+
+  it("handles assigned task rows, inline edit controls, assignee toggles, and delete cancel", () => {
+    const start = vi.fn();
+    const save = vi.fn();
+    const cancel = vi.fn();
+    const toggleAssignee = vi.fn();
+    useInlineEdit.mockReturnValueOnce({
+      isEditing: false,
+      draft: "Review draft",
+      setDraft: vi.fn(),
+      start,
+      save,
+      cancel,
+    });
+    buildToggleAssignee.mockReturnValueOnce(toggleAssignee);
+
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+
+    render(
+      <TaskListRow
+        task={{
+          id: 6,
+          title: "Review draft",
+          completed: true,
+          priority: "high",
+          due_date: null,
+          assignees_info: [{ id: 1, name: "Alex" }],
+        }}
+        members={[{ id: 1, user: 1, name: "Alex" }]}
+        onToggle={vi.fn()}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(getUserColor).toHaveBeenCalledWith(1);
+
+    fireEvent.click(screen.getByText("start-inline-edit"));
+    fireEvent.click(screen.getByText("save-inline-edit"));
+    fireEvent.click(screen.getByText("cancel-inline-edit"));
+    expect(start).toHaveBeenCalled();
+    expect(save).toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalled();
+
+    fireEvent.click(screen.getAllByText("Alex")[0]);
+    const popupAlexEntries = screen.getAllByText("Alex");
+    fireEvent.click(popupAlexEntries[popupAlexEntries.length - 1]);
+    expect(buildToggleAssignee).toHaveBeenCalledWith([{ id: 1, name: "Alex" }], 6, onUpdate);
+    expect(toggleAssignee).toHaveBeenCalledWith(1);
+
+    fireEvent.click(screen.getByTitle("Delete task"));
+    fireEvent.click(screen.getByText("cancel-hold"));
+    expect(onDelete).not.toHaveBeenCalled();
+  });
 });
 
 describe("GroupWork task timeline hooks", () => {
@@ -414,5 +545,25 @@ describe("GroupWork task timeline hooks", () => {
     expect(result.current.visible).toHaveLength(1);
     expect(result.current.unscheduled).toEqual([{ id: 2, due_date: null, completed: false, status: "todo" }]);
     expect(result.current.dayMs).toBe(86400000);
+  });
+});
+
+describe("TaskListView", () => {
+  it("renders task list headers and rows for non-empty task list views", () => {
+    render(
+      <TaskListView
+        tasks={[{ id: 1, title: "Draft brief", priority: "high", due_date: "2026-03-30T00:00:00.000Z" }]}
+        members={[{ id: 1, name: "Alex" }]}
+        onToggle={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Task")).toBeInTheDocument();
+    expect(screen.getByText("Priority")).toBeInTheDocument();
+    expect(screen.getByText("Due date")).toBeInTheDocument();
+    expect(screen.getByText("Assignee")).toBeInTheDocument();
+    expect(screen.getByText("Draft brief")).toBeInTheDocument();
   });
 });

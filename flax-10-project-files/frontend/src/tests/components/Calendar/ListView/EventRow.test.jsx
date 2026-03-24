@@ -4,7 +4,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EventRow } from '../../../../components/Calendar/ListView/EventRow';
+import { ConflictRow, EventRow, TagBadge, formatEventTime, getTagBadges } from '../../../../components/Calendar/ListView/EventRow';
 import { createMockEvent } from '../mocks/calendarMocks';
 
 const mockOpenPopup = vi.fn();
@@ -73,5 +73,36 @@ describe('EventRow', () => {
     it('renders source badge for society events', () => {
         render(<EventRow event={createMockEvent({ society_name: 'Chess Club' })} />);
         expect(screen.getByText('Chess Club')).toBeInTheDocument();
+    });
+
+    it('formats time and badges using fallback fields', () => {
+        expect(formatEventTime(createMockEvent({ all_day: true }))).toBe('All day');
+        expect(formatEventTime(createMockEvent({ start_time: '2026-03-15T09:05:00Z' }))).toMatch(/9:05/);
+        expect(getTagBadges(createMockEvent({ tag: { name: 'Seminar' } }), '#123456')).toEqual([
+            { label: 'Seminar', type: 'tag', color: '#123456' },
+        ]);
+        expect(getTagBadges(createMockEvent({ society_name: 'Chess Club', society_color: '#abcdef' }), '#111111')).toContainEqual({
+            label: 'Chess Club',
+            type: 'source',
+            color: '#abcdef',
+        });
+    });
+
+    it('renders standalone badge styles for source and tag badges', () => {
+        const { rerender } = render(<TagBadge badge={{ label: 'Tag', type: 'tag', color: '#101010' }} />);
+        expect(screen.getByTestId('badge')).toHaveTextContent('Tag');
+
+        rerender(<TagBadge badge={{ label: 'Source', type: 'source' }} />);
+        expect(screen.getByTestId('badge')).toHaveTextContent('Source');
+    });
+
+    it('renders conflict rows and opens the popup for the clicked conflict event', () => {
+        const first = createMockEvent({ id: 1, title: 'First clash' });
+        const second = createMockEvent({ id: 2, title: 'Second clash', society_name: 'Debate Club' });
+
+        render(<ConflictRow events={[first, second]} />);
+
+        fireEvent.click(screen.getByText('Second clash'));
+        expect(mockOpenPopup).toHaveBeenCalledWith(second, expect.any(Object));
     });
 });

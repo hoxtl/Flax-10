@@ -7,9 +7,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventPopover } from '../../../../components/Calendar/EventPopover/EventPopover';
 import { createMockEvent, createMockTag } from '../mocks/calendarMocks';
 
+const mockCalculatePopoverPosition = vi.fn(() => ({ top: 100, left: 200, placement: 'right' }));
+const mockCalculateArrowPosition = vi.fn(() => 50);
+
 vi.mock('../../../../components/Calendar/EventPopover/popoverUtils', () => ({
-    calculatePopoverPosition: () => ({ top: 100, left: 200, placement: 'right' }),
-    calculateArrowPosition: () => 50,
+    calculatePopoverPosition: (...args) => mockCalculatePopoverPosition(...args),
+    calculateArrowPosition: (...args) => mockCalculateArrowPosition(...args),
 }));
 
 class MockResizeObserver {
@@ -26,7 +29,11 @@ describe('EventPopover', () => {
     const onClose = vi.fn();
     const tag = createMockTag();
 
-    beforeEach(() => vi.clearAllMocks());
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockCalculatePopoverPosition.mockReturnValue({ top: 100, left: 200, placement: 'right' });
+        mockCalculateArrowPosition.mockReturnValue(50);
+    });
 
     it('renders null when event is null', () => {
         const { container } = render(<EventPopover event={null} anchorRect={anchor} onClose={onClose} />);
@@ -103,6 +110,14 @@ describe('EventPopover', () => {
         expect(actionClick).toHaveBeenCalled();
     });
 
+    it('renders the raw label for unknown action types', () => {
+        const actionClick = vi.fn();
+        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} actions={[{ label: 'Share', onClick: actionClick }]} />);
+        fireEvent.click(screen.getByTitle('Share'));
+        expect(screen.getByTitle('Share')).toHaveTextContent('Share');
+        expect(actionClick).toHaveBeenCalled();
+    });
+
     it('calls onClose on Escape key', () => {
         render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
         fireEvent.keyDown(document, { key: 'Escape' });
@@ -121,6 +136,28 @@ describe('EventPopover', () => {
         const popover = document.querySelector('[class*="popoverContainer"]');
         expect(popover.style.getPropertyValue('--popover-top')).toBe('100px');
         expect(popover.style.getPropertyValue('--popover-left')).toBe('200px');
+    });
+
+    it('renders top arrow placement with a left style', () => {
+        mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 180, placement: 'top' });
+        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        const arrow = document.querySelector('[class*="popoverArrow"]');
+        expect(arrow.className).toContain('popoverArrowTop');
+        expect(arrow.style.left).toBe('50px');
+    });
+
+    it('renders left arrow placement with a top style', () => {
+        mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 20, placement: 'left' });
+        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        const arrow = document.querySelector('[class*="popoverArrow"]');
+        expect(arrow.className).toContain('popoverArrowLeft');
+        expect(arrow.style.top).toBe('50px');
+    });
+
+    it('falls back to the none arrow class for unrecognised placements', () => {
+        mockCalculatePopoverPosition.mockReturnValue({ top: 80, left: 20, placement: 'diagonal' });
+        render(<EventPopover event={createMockEvent()} anchorRect={anchor} onClose={onClose} />);
+        expect(document.querySelector('[class*="popoverArrow"]').className).toContain('popoverArrowNone');
     });
 
     it('renders moduleCode fallback for module events', () => {

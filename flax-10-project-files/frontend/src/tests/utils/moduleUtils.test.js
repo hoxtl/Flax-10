@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-    getDepartment, isEnrolledIn, getEnrollmentId, serialiseModule,
+    getCourse, getDepartment, isEnrolledIn, getEnrollmentId, normaliseModuleCode, serialiseModule,
     formatWeekdayTime, formatFullDateTime, formatTime, formatDuration,
     formatForInput, filterModules, getDepartments, sortModules, applyFiltersAndSort
 } from '../../components/Modules/utils/moduleUtils';
@@ -21,6 +21,18 @@ const enrollments = [
 ];
 
 describe('moduleUtils', () => {
+    describe('getCourse', () => {
+        it('prefers the stored course when present', () => {
+            expect(getCourse('CS1000', 'Robotics')).toBe('Robotics');
+        });
+        it('derives the course from the module prefix', () => {
+            expect(getCourse('CS1000')).toBe('Computer Science');
+        });
+        it('returns null for an unknown prefix', () => {
+            expect(getCourse('XX9999')).toBeNull();
+        });
+    });
+
     describe('getDepartment', () => {
         it('returns correct department for known prefix', () => {
             expect(getDepartment('CS1000')).toBe("Natural, Mathematical & Engineering Sciences");
@@ -33,6 +45,12 @@ describe('moduleUtils', () => {
         });
         it('handles LW prefix', () => {
             expect(getDepartment('LW1000')).toBe("Law");
+        });
+        it('keeps a specific stored department when it is not the generic fallback', () => {
+            expect(getDepartment('CS1000', 'Custom Department')).toBe('Custom Department');
+        });
+        it('replaces the generic stored department with a derived one when possible', () => {
+            expect(getDepartment('MA2000', "King's College London")).toBe('Natural, Mathematical & Engineering Sciences');
         });
     });
 
@@ -72,6 +90,27 @@ describe('moduleUtils', () => {
         it('uses false when is_recurring is false', () => {
             const form = { module_code: 'CS', module_name: 'X', description: '', start_time: '', end_time: '', location: '', is_recurring: false };
             expect(serialiseModule(form).is_recurring).toBe(false);
+        });
+        it('converts full datetime values to ISO strings while keeping bare times intact', () => {
+            const form = {
+                module_code: 'CS1000',
+                module_name: 'Intro to CS',
+                description: '',
+                department: '',
+                course: '',
+                start_time: '2026-02-15T10:00:00Z',
+                end_time: '11:00',
+                location: 'Room 1',
+            };
+            const result = serialiseModule(form);
+            expect(result.start_time).toContain('2026-02-15T10:00:00.000Z');
+            expect(result.end_time).toBe('11:00');
+        });
+    });
+
+    describe('normaliseModuleCode', () => {
+        it('uppercases and removes spaces', () => {
+            expect(normaliseModuleCode(' cs 10 00 ')).toBe('CS1000');
         });
     });
 
@@ -179,6 +218,10 @@ describe('moduleUtils', () => {
             const sorted = sortModules(modules, 'deadlines');
             expect(sorted[0].id).toBe(1); // 2 deadlines
         });
+        it('sorts descending by module name when requested', () => {
+            const sorted = sortModules(modules, 'name-desc');
+            expect(sorted[0].module_name).toBe('Linear Algebra');
+        });
     });
 
     describe('applyFiltersAndSort', () => {
@@ -190,6 +233,15 @@ describe('moduleUtils', () => {
             const result = applyFiltersAndSort(modules, 'Arts & Humanities', 'name');
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe(3);
+        });
+        it('filters by an array of selected courses', () => {
+            const result = applyFiltersAndSort(modules, ['Computer Science'], 'name');
+            expect(result).toHaveLength(1);
+            expect(result[0].id).toBe(1);
+        });
+        it('falls back to sorting when the filter input is an unsupported type', () => {
+            const result = applyFiltersAndSort(modules, { selected: 'anything' }, 'name-desc');
+            expect(result[0].module_name).toBe('Linear Algebra');
         });
     });
 });

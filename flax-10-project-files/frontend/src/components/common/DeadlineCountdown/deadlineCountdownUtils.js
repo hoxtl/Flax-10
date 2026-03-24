@@ -20,7 +20,7 @@ export function getDaysLabel(dueDate) {
   const days = getDayCount(dueDate);
   if (days < 0) {
     const over = Math.abs(days);
-    return over === 0 ? "Overdue" : over === 1 ? "1d overdue" : `${over}d overdue`;
+    return over === 1 ? "1d overdue" : `${over}d overdue`;
   }
   if (days === 0) return "Today";
   if (days === 1) return "Tomorrow";

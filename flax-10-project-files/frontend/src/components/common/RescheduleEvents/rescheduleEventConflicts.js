@@ -139,10 +139,6 @@ function getGroupKey(group) {
   return group.map((event) => String(event?.id)).sort().join(":");
 }
 
-function isOverlap(left, right) {
-  return getEndMs(left) > getStartMs(right);
-}
-
 function getMovableCandidates(group) {
   return [...group]
     .filter(isMovableEvent)

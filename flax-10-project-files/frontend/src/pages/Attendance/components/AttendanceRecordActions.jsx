@@ -4,7 +4,7 @@
  */
 
 import { Ban } from "lucide-react";
-import Tooltip from "../../../components/Common/Tooltip/Tooltip";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import { isEventInPast } from "../utils/attendanceEventDate";
 import styles from "./AttendanceList.module.css";
 

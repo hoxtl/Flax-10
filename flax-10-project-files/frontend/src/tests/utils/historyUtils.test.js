@@ -29,9 +29,21 @@ describe('historyUtils', () => {
         expect(history).toEqual([]);
     });
 
+    it('getHistory normalises paginated and nested response shapes', async () => {
+        fetchApi.mockResolvedValueOnce({ results: [{ id: 2 }] });
+        await expect(getHistory()).resolves.toEqual([{ id: 2 }]);
+
+        fetchApi.mockResolvedValueOnce({ data: [{ id: 3 }] });
+        await expect(getHistory()).resolves.toEqual([{ id: 3 }]);
+
+        fetchApi.mockResolvedValueOnce({ unexpected: true });
+        await expect(getHistory()).resolves.toEqual([]);
+    });
+
     it('saveSession calls API with correct payload', async () => {
         const mockNow = new Date('2026-02-15T12:00:00Z');
         vi.setSystemTime(mockNow);
+        const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
         await saveSession(25, 5, 1, 12345, 'Task');
 
@@ -48,10 +60,15 @@ describe('historyUtils', () => {
             study_block_id: 12345, task: 'Task', status: 'Completed',
             end_time: mockNow.toISOString()
         });
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'timerHistoryUpdated' }));
+        dispatchSpy.mockRestore();
     });
 
     it('clearHistory calls API', async () => {
+        const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
         await clearHistory();
         expect(fetchApi).toHaveBeenCalledWith('/timer/history/clear_history/', { method: 'DELETE' });
+        expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'timerHistoryUpdated' }));
+        dispatchSpy.mockRestore();
     });
 });

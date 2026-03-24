@@ -28,8 +28,7 @@ function useInlineAlertState(message, autoDismiss, onDismiss) {
   const [displayMessage, setDisplayMessage] = useState(message);
   const dismiss = useCallback(() => {
     setExiting(true);
-    const timer = setTimeout(() => { setVisible(false); setExiting(false); onDismiss?.(); }, 250);
-    return () => clearTimeout(timer);
+    setTimeout(() => { setVisible(false); setExiting(false); onDismiss?.(); }, 250);
   }, [onDismiss]);
   useMessageSync(message, visible, dismiss, setDisplayMessage, setVisible, setExiting);
   useAutoDismiss(visible, autoDismiss, message, dismiss);

@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import { Ban } from "lucide-react";
-import StandardModal from "../../../components/Common/StandardModal/StandardModal";
-import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import StandardModal from "../../../components/common/StandardModal/StandardModal";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import styles from "../styles";
 
 export default function BanUserModal({ onCancel, onConfirm, user }) {

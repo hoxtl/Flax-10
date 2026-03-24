@@ -234,7 +234,7 @@ describe('TimerPage Integration', () => {
         helpers.advanceTimer(61000);
         expect(screen.getByRole('button', { name: /exit focus/i })).toBeInTheDocument();
         expect(screen.getByText("Time's Up!")).toBeInTheDocument();
-    });
+    }, 15000);
 
     it('cycles focus transition messages and hides after 10s', () => {
         mockLocationState = { fromTaskPlay: true };

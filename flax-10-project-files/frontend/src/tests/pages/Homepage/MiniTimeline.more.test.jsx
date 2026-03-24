@@ -44,9 +44,17 @@ vi.mock("../../../pages/Homepage/components/MiniTimeline/NowStrip", () => ({
 
 vi.mock("../../../pages/Homepage/components/MiniTimeline/MiniTimelineRowRenderer", () => ({
   MiniTimelineRowRenderer: ({ row, props }) => (
-    <button type="button" onClick={() => props.onEventContextMenu?.({ id: row.id, title: row.title || "Event" }, 12, 34)}>
-      row-{row.id}
-    </button>
+    <div>
+      <button type="button" onClick={() => props.onEventContextMenu?.({ id: row.id, title: row.title || "Event" }, 12, 34)}>
+        row-{row.id}
+      </button>
+      <button type="button" onClick={() => props.onQuickStart?.(new Date("2026-03-24T12:00:00.000Z"), 30, { id: 99, title: "Essay" }, { id: 100, title: "Next" })}>
+        quick-{row.id}
+      </button>
+      <button type="button" onClick={() => props.onSkipGapTask?.(row.id, 44)}>
+        skip-{row.id}
+      </button>
+    </div>
   ),
 }));
 
@@ -158,6 +166,45 @@ describe("MiniTimeline extra coverage", () => {
     fireEvent.click(screen.getByText("row-evt-1"));
     expect(setEventCtxMenu).toHaveBeenCalledWith({ eventItem: { id: "evt-1", title: "Seminar" }, x: 12, y: 34 });
     expect(screen.getByText("Edit")).toBeInTheDocument();
+  });
+
+  it("covers quick-start, gap skipping, and read-only context-menu suppression", () => {
+    const onQuickStart = vi.fn();
+    useMiniTimelineState.mockReturnValueOnce({
+      eventCtxMenu: { eventItem: { id: 5, title: "Read only", readOnly: true }, x: 10, y: 20 },
+      setEventCtxMenu: vi.fn(),
+      attachNowRow: vi.fn(),
+    });
+    useMiniTimelineData.mockReturnValueOnce({
+      currentBlock: null,
+      rows: [{ id: "gap-1", type: "free", title: "Gap" }],
+      gapDeadlineFallbacks: {},
+      assignedGapTasks: { map: {}, nextMap: {} },
+    });
+
+    render(
+      <MiniTimeline
+        styles={styles}
+        sortedEvents={[]}
+        selectedDate="2026-03-24"
+        now={new Date("2026-03-24T10:00:00.000Z")}
+        dayTasks={[]}
+        tasksDueToday={[]}
+        suggestableTasks={[]}
+        deadlineSuggestions={[]}
+        onQuickStart={onQuickStart}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("quick-gap-1"));
+    fireEvent.click(screen.getByText("skip-gap-1"));
+    expect(onQuickStart).toHaveBeenCalledWith(
+      new Date("2026-03-24T12:00:00.000Z"),
+      30,
+      { id: 99, title: "Essay" },
+      { id: 100, title: "Next" },
+    );
+    expect(screen.queryByText("Edit")).not.toBeInTheDocument();
   });
 
   it("covers conflict resolution helper branches", () => {
