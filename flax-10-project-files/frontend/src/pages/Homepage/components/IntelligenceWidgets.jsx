@@ -22,42 +22,42 @@ export function IntelligenceHero(props) {
 
   return (
     <div className={styles.premiumCard}>
-      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={18} intensity={1.95} />
+      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={20} intensity={2.15} speed={0.5} />
       <motion.div
         className={styles.bannerBorderGlow}
         aria-hidden
         animate={reduceMotion ? {
           opacity: 0.9,
         } : {
-          opacity: [0.72, 1, 0.8],
+          opacity: [0.76, 1, 0.82],
           boxShadow: [
-            "0 0 26px color-mix(in srgb, var(--home-hero-glow-shadow) 76%, transparent), 0 0 58px color-mix(in srgb, var(--home-hero-glow-shadow) 40%, transparent)",
-            "0 0 38px color-mix(in srgb, var(--home-hero-glow-shadow) 96%, transparent), 0 0 86px color-mix(in srgb, var(--home-hero-glow-shadow) 56%, transparent)",
-            "0 0 26px color-mix(in srgb, var(--home-hero-glow-shadow) 76%, transparent), 0 0 58px color-mix(in srgb, var(--home-hero-glow-shadow) 40%, transparent)",
+            "0 0 32px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 46%, transparent)",
+            "0 0 48px color-mix(in srgb, var(--home-hero-glow-shadow) 100%, transparent), 0 0 108px color-mix(in srgb, var(--home-hero-glow-shadow) 60%, transparent)",
+            "0 0 32px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 46%, transparent)",
           ],
         }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className={styles.bannerAura}
         aria-hidden
-        initial={reduceMotion ? false : { opacity: 0.44, scale: 1, x: "-4%", y: "-2%" }}
+        initial={reduceMotion ? false : { opacity: 0.52, scale: 1, x: "-6%", y: "-3%" }}
         animate={reduceMotion ? {
-          opacity: 0.54,
+          opacity: 0.62,
         } : {
-          opacity: [0.42, 0.72, 0.5, 0.42],
-          scale: [1, 1.08, 0.98, 1],
-          x: ["-4%", "5%", "-2%", "-4%"],
-          y: ["-2%", "5%", "-3%", "-2%"],
+          opacity: [0.5, 0.86, 0.58, 0.5],
+          scale: [1, 1.12, 0.96, 1],
+          x: ["-6%", "8%", "-3%", "-6%"],
+          y: ["-3%", "7%", "-4%", "-3%"],
         }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 12.5, repeat: Infinity, ease: "easeInOut" }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 8.2, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className={styles.bannerShimmer}
         aria-hidden
         initial={reduceMotion ? false : { x: "-42%", opacity: 0 }}
-        animate={reduceMotion ? { opacity: 0.22, x: "18%" } : { x: ["-42%", "122%"], opacity: [0, 0.5, 0] }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 5.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.15 }}
+        animate={reduceMotion ? { opacity: 0.28, x: "22%" } : { x: ["-46%", "126%"], opacity: [0, 0.68, 0] }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 3.7, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.35 }}
       />
       <HeroBanners {...props} />
       <header className={getHeaderClassName(props)}>

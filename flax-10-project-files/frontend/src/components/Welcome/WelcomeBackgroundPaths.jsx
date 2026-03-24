@@ -22,28 +22,34 @@ function buildPaths(flip, count = PATH_COUNT, intensity = 1) {
 
   return Array.from({ length: count }, (_, i) => ({
     id: i,
-    strokeOpacity: clamp((0.16 + i * 0.0024) * intensity, 0.12, 0.6),
-    width: clamp((0.88 + i * 0.034) * Math.min(intensity, 1.42), 0.8, 2.3),
+    strokeOpacity: clamp((0.17 + i * 0.0028) * intensity, 0.14, 0.78),
+    width: clamp((0.92 + i * 0.038) * Math.min(intensity, 1.6), 0.9, 2.8),
     start: Math.random(),
     d: useDefaultFlip ? buildPathD(i) : buildPathD(i, flipUsed),
   }));
 }
 
 function pathInitial(start, intensity) {
-  return { pathLength: 1, pathOffset: start, opacity: clamp(0.44 * intensity, 0.34, 0.82) };
+  return { pathLength: 1, pathOffset: start, opacity: clamp(0.52 * intensity, 0.38, 0.92) };
 }
 
 function pathAnimate(start, intensity) {
-  const minOpacity = clamp(0.28 * intensity, 0.2, 0.7);
-  const peakOpacity = clamp(0.62 * intensity, 0.42, 1);
+  const minOpacity = clamp(0.34 * intensity, 0.24, 0.82);
+  const peakOpacity = clamp(0.8 * intensity, 0.52, 1);
   return { pathOffset: [start, start + 1], opacity: [minOpacity, peakOpacity, minOpacity] };
 }
 
-function pathTransition(flip) {
-  return { duration: (flip === 1 ? 7 : 10) + Math.random() * 3, repeat: Infinity, ease: "linear" };
+function pathTransition(flip, intensity, speed) {
+  const speedBoost = Math.max(0, intensity - 1);
+  const baseDuration = flip === 1 ? 7 : 10;
+  return {
+    duration: (Math.max(3.2, baseDuration - speedBoost * 1.8) + Math.random() * 1.2) / Math.max(speed, 0.1),
+    repeat: Infinity,
+    ease: "linear",
+  };
 }
 
-function PathItem({ p, flip, intensity }) {
+function PathItem({ p, flip, intensity, speed }) {
   return (
     <motion.path
       d={p.d}
@@ -52,12 +58,12 @@ function PathItem({ p, flip, intensity }) {
       strokeOpacity={p.strokeOpacity}
       initial={pathInitial(p.start, intensity)}
       animate={pathAnimate(p.start, intensity)}
-      transition={pathTransition(flip)}
+      transition={pathTransition(flip, intensity, speed)}
     />
   );
 }
 
-function FloatingPaths({ flip, count, intensity }) {
+function FloatingPaths({ flip, count, intensity, speed }) {
   const flipUsed = flip ?? 1;
   const paths = useMemo(() => buildPaths(flip, count, intensity), [count, flip, intensity]);
 
@@ -65,7 +71,7 @@ function FloatingPaths({ flip, count, intensity }) {
     <div className={styles.paths}>
       <svg className={styles.svg} viewBox="0 0 696 316" fill="none" aria-hidden="true">
         {paths.map((p) => (
-          <PathItem key={`${flipUsed}-${p.id}`} p={p} flip={flipUsed} intensity={intensity} />
+          <PathItem key={`${flipUsed}-${p.id}`} p={p} flip={flipUsed} intensity={intensity} speed={speed} />
         ))}
       </svg>
     </div>
@@ -98,7 +104,7 @@ function useParallaxMotion(reduceMotion) {
   return { x, y };
 }
 
-export default function WelcomeBackgroundPaths({ embedded = false, className = "", count = PATH_COUNT, intensity = 1 }) {
+export default function WelcomeBackgroundPaths({ embedded = false, className = "", count = PATH_COUNT, intensity = 1, speed = 1 }) {
   const reduceMotion = useReducedMotion();
   const { x, y } = useParallaxMotion(reduceMotion);
 
@@ -108,8 +114,8 @@ export default function WelcomeBackgroundPaths({ embedded = false, className = "
     <div className={bgClassName} aria-hidden="true">
       <div className={styles.glow} />
       <motion.div className={styles.parallax} style={parallaxStyle}>
-        <FloatingPaths count={count} intensity={intensity} />
-        <FloatingPaths flip={-1} count={count} intensity={intensity} />
+        <FloatingPaths count={count} intensity={intensity} speed={speed} />
+        <FloatingPaths flip={-1} count={count} intensity={intensity} speed={speed} />
       </motion.div>
       <div className={styles.fade} />
     </div>

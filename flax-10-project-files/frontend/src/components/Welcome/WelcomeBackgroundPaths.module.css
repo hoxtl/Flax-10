@@ -52,7 +52,9 @@
 
 .bgEmbedded .parallax {
   opacity: 1;
-  filter: none;
+  filter:
+    drop-shadow(0 0 6px color-mix(in srgb, var(--home-hero-glow-ring, var(--primary)) 22%, transparent))
+    drop-shadow(0 0 18px color-mix(in srgb, var(--home-hero-glow-shadow, var(--primary-strong)) 18%, transparent));
 }
 
 .parallax {
@@ -78,7 +80,7 @@
 }
 
 .bgEmbedded .svg {
-  color: color-mix(in srgb, var(--home-hero-glow-ring, var(--primary)) 96%, transparent);
+  color: color-mix(in srgb, var(--home-hero-glow-ring, var(--primary)) 100%, transparent);
 }
 
 .fade {
@@ -98,16 +100,16 @@
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 34%, transparent) 0%,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 22%, transparent) 0%,
       transparent 22%,
       transparent 78%,
-      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 32%, transparent) 100%
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 20%, transparent) 100%
     ),
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 26%, transparent) 0%,
-      transparent 10%,
-      transparent 90%,
-      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 26%, transparent) 100%
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 16%, transparent) 0%,
+      transparent 8%,
+      transparent 92%,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 16%, transparent) 100%
     );
 }
