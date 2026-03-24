@@ -66,7 +66,9 @@ vi.mock("../../../pages/CampusMap/mapHelpers", () => ({
 
 vi.mock("mapbox-gl", () => ({
   default: {
-    Map: vi.fn(() => mapInstance),
+    Map: vi.fn(function Map() {
+      return mapInstance;
+    }),
     NavigationControl: vi.fn(function NavigationControl() {}),
     LngLatBounds: vi.fn().mockImplementation(function Bounds() {
       return { extend: vi.fn().mockReturnThis() };
@@ -317,5 +319,107 @@ describe("useCampusMapModel", () => {
     await waitFor(() => expect(clearRouteSourceMock).toHaveBeenCalled());
     expect(mockState.routes.routeError).toMatch(/No walking route found/i);
     expect(mockState.routes.tflRouteError).toMatch(/Failed to calculate TfL route/i);
+  });
+
+  it("resets route state when the journey is incomplete or route layers are unavailable", async () => {
+    mockState = createMutableState({
+      selection: {
+        customDestination: null,
+        selectedCampus: null,
+        startLocation: { lat: 51.5, lng: -0.1 },
+      },
+      routes: {
+        routeInfo: { stale: true },
+        tflRouteInfo: { stale: true },
+      },
+    });
+    mockRefs.routeLayerAdded.current = false;
+
+    renderHook(() => useCampusMapModel());
+
+    await waitFor(() => expect(clearRouteSourceMock).toHaveBeenCalled());
+    expect(mockState.routes.routeInfo).toBeNull();
+    expect(mockState.routes.tflRouteInfo).toBeNull();
+    expect(fetchWalkingRouteMock).not.toHaveBeenCalled();
+  });
+
+  it("handles walking route fetch failures and leaves campus selections intact on manual journey planning", async () => {
+    fetchWalkingRouteMock.mockRejectedValueOnce(new Error("walking down"));
+    mockState = createMutableState({
+      selection: {
+        customDestination: null,
+        selectedCampus: { name: "Strand Campus", coords: [-0.116, 51.5114] },
+        startLocation: { lat: 51.5, lng: -0.1 },
+      },
+      form: {
+        manualDestination: "Somerset House",
+      },
+    });
+
+    const { result } = renderHook(() => useCampusMapModel());
+
+    await waitFor(() => expect(fetchWalkingRouteMock).toHaveBeenCalled());
+    expect(mockState.routes.routeError).toMatch(/Could not calculate the route/i);
+
+    act(() => {
+      result.current.handleUserJourneyCalculate(
+        { latitude: 51.499, longitude: -0.101 },
+        { latitude: 51.52, longitude: -0.12 },
+      );
+    });
+
+    expect(mockState.selection.startLocation).toEqual({ lat: 51.499, lng: -0.101 });
+    expect(mockState.selection.selectedCampus).toEqual({ name: "Strand Campus", coords: [-0.116, 51.5114] });
+    expect(mockState.selection.customDestination).toBeNull();
+    expect(mapInstance.fitBounds).toHaveBeenCalled();
+  });
+
+  it("creates a manual destination during journey calculation when no campus is selected", () => {
+    mockState = createMutableState({
+      selection: {
+        customDestination: null,
+        selectedCampus: null,
+        startLocation: null,
+      },
+      form: {
+        manualDestination: "Somerset House",
+      },
+    });
+
+    const { result } = renderHook(() => useCampusMapModel());
+
+    act(() => {
+      result.current.handleUserJourneyCalculate(
+        { latitude: 51.5, longitude: -0.1 },
+        { latitude: 51.51, longitude: -0.12 },
+      );
+    });
+
+    expect(mockState.selection.customDestination).toEqual({
+      address: "Somerset House",
+      lat: 51.51,
+      lng: -0.12,
+      name: "Somerset House",
+    });
+    expect(mockState.selection.startLocation).toEqual({ lat: 51.5, lng: -0.1 });
+    expect(mapInstance.fitBounds).toHaveBeenCalled();
+  });
+
+  it("does nothing when geolocation is unavailable", () => {
+    Object.defineProperty(global.navigator, "geolocation", {
+      configurable: true,
+      value: undefined,
+    });
+
+    const { result } = renderHook(() => useCampusMapModel());
+
+    act(() => {
+      result.current.handleGeolocate();
+      result.current.handleGeolocateDestination();
+      result.current.handleGeolocateStart();
+    });
+
+    expect(mockState.ui.locating).toBe(false);
+    expect(reverseGeocodeMock).not.toHaveBeenCalled();
   });
 });

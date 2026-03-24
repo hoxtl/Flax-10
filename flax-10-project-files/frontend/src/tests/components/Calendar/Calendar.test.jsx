@@ -17,18 +17,27 @@ vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
 }));
 
 vi.mock('../../../components/Calendar/DayView/DayView', () => ({
-    DayView: () => <div data-testid="day-view">Day View</div>,
+    DayView: ({ readOnly }) => <div data-testid="day-view">{`Day View ${String(readOnly)}`}</div>,
 }));
 
 vi.mock('../../../components/Calendar/WeekView/WeekView', () => ({
-    WeekView: () => <div data-testid="week-view">Week View</div>,
+    WeekView: ({ readOnly }) => <div data-testid="week-view">{`Week View ${String(readOnly)}`}</div>,
 }));
 
 vi.mock('../../../components/Calendar/MonthView/SwipeMonthView', () => ({
-    SwipeMonthView: () => <div data-testid="month-view">Month View</div>,
+    SwipeMonthView: ({ readOnly }) => <div data-testid="month-view">{`Month View ${String(readOnly)}`}</div>,
+}));
+
+vi.mock('../../../components/Calendar/ListView/ListView', () => ({
+    ListView: ({ readOnly }) => <div data-testid="list-view">{`List View ${String(readOnly)}`}</div>,
+}));
+
+vi.mock('../../../components/Calendar/TableView/TableView', () => ({
+    TableView: ({ readOnly }) => <div data-testid="table-view">{`Table View ${String(readOnly)}`}</div>,
 }));
 
 import { useCalendar } from '../../../context/CalendarContext';
+import { useCalendarEvents } from '../../../components/Calendar/hooks/useCalendarEvents';
 
 describe('Calendar', () => {
     it('renders ResizeHighlightProvider', () => {
@@ -37,27 +46,44 @@ describe('Calendar', () => {
     });
 
     it('renders MonthView when viewMode is month', () => {
-        useCalendar.mockReturnValue({ viewMode: 'month' });
+        useCalendar.mockReturnValue({ viewMode: 'month', displayMode: 'grid', readOnly: false });
         render(<Calendar />);
         expect(screen.getByTestId('month-view')).toBeTruthy();
     });
 
     it('renders WeekView when viewMode is week', () => {
-        useCalendar.mockReturnValue({ viewMode: 'week' });
+        useCalendar.mockReturnValue({ viewMode: 'week', displayMode: 'grid', readOnly: false });
         render(<Calendar />);
         expect(screen.getByTestId('week-view')).toBeTruthy();
     });
 
     it('renders DayView when viewMode is day', () => {
-        useCalendar.mockReturnValue({ viewMode: 'day' });
+        useCalendar.mockReturnValue({ viewMode: 'day', displayMode: 'grid', readOnly: true });
         render(<Calendar />);
         expect(screen.getByTestId('day-view')).toBeTruthy();
+        expect(screen.getByText('Day View true')).toBeInTheDocument();
     });
 
+    it('renders the list display mode over grid modes', () => {
+        useCalendar.mockReturnValue({ viewMode: 'month', displayMode: 'list', readOnly: true });
+        render(<Calendar />);
+        expect(screen.getByText('List View true')).toBeInTheDocument();
+    });
 
+    it('renders the table display mode over grid modes', () => {
+        useCalendar.mockReturnValue({ viewMode: 'week', displayMode: 'table', readOnly: false });
+        render(<Calendar />);
+        expect(screen.getByText('Table View false')).toBeInTheDocument();
+    });
+
+    it('subscribes to calendar events when rendering content', () => {
+        useCalendar.mockReturnValue({ viewMode: 'month', displayMode: 'grid', readOnly: false });
+        render(<Calendar />);
+        expect(useCalendarEvents).toHaveBeenCalled();
+    });
 
     it('renders nothing for unknown viewMode', () => {
-        useCalendar.mockReturnValue({ viewMode: 'unknown' });
+        useCalendar.mockReturnValue({ viewMode: 'unknown', displayMode: 'grid', readOnly: false });
         render(<Calendar />);
         expect(screen.queryByTestId('month-view')).toBeNull();
         expect(screen.queryByTestId('week-view')).toBeNull();

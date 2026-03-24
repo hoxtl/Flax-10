@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const useModulesPageStateMock = vi.fn();
 
@@ -34,6 +34,10 @@ import ModulesPage from "../../../pages/Modules/ModulesPage";
 describe("ModulesPage delete modal", () => {
   const originalEnv = process.env.NODE_ENV;
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     process.env.NODE_ENV = originalEnv;
   });
@@ -62,5 +66,45 @@ describe("ModulesPage delete modal", () => {
       state.deletingModule,
       expect.any(Function),
     );
+  });
+
+  it("closes the delete modal without deleting when cancel is clicked", () => {
+    process.env.NODE_ENV = "production";
+    const state = {
+      deletingModule: { id: 7, module_name: "Databases" },
+      viewingModule: { id: 7, module_name: "Databases" },
+      setDeletingModule: vi.fn(),
+      setViewingModule: vi.fn(),
+      hook: {
+        loading: false,
+        handleDirectDeleteModule: vi.fn(),
+      },
+    };
+    useModulesPageStateMock.mockReturnValue(state);
+
+    render(<ModulesPage />);
+    fireEvent.click(screen.getByText("cancel-delete"));
+
+    expect(state.setDeletingModule).toHaveBeenCalledWith(null);
+    expect(state.hook.handleDirectDeleteModule).not.toHaveBeenCalled();
+  });
+
+  it("passes initial search/create props into the page-state hook and renders the production shell", () => {
+    process.env.NODE_ENV = "production";
+    useModulesPageStateMock.mockReturnValue({
+      deletingModule: null,
+      viewingModule: null,
+      showForm: false,
+      hook: {
+        loading: false,
+      },
+    });
+
+    render(<ModulesPage initialSearch="algorithms" initialCreate />);
+
+    expect(useModulesPageStateMock).toHaveBeenCalledWith("algorithms", true);
+    expect(screen.getByText("Animated content")).toBeInTheDocument();
+    expect(screen.getByText("Page modals")).toBeInTheDocument();
+    expect(screen.queryByText("Delete Module")).not.toBeInTheDocument();
   });
 });

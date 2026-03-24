@@ -62,6 +62,7 @@ import {
   getProjectTeacherName,
   getProjectTeacherInitials,
   getProjectTeacherEmail,
+  getProjectTeacherPhoto,
   openTeacherProfile,
   compareProjectsBySort,
   getProjectMembers,
@@ -75,6 +76,7 @@ import {
   placeTasksIntoWeeks,
 } from '../../../pages/GroupWork/utils/taskTimelineUtils';
 import { calcCompletionSegments } from '../../../pages/GroupWork/utils/taskStatsUtils';
+import { getResolvedUserPhoto } from '../../../utils/tutorPhotoFallback.js';
 
 vi.mock('../../../pages/GroupWork/utils/memberAvatarUtils', async (importOriginal) => {
   const actual = await importOriginal();
@@ -618,6 +620,11 @@ describe('projectRowUtils – getProjectCaption', () => {
     expect(getProjectCaption({ name: 'Biology Poster', module_name: 'Bio' })).toContain('poster');
   });
 
+  it('returns tailored captions for report and research projects', () => {
+    expect(getProjectCaption({ name: 'Final Report', module_name: 'Law' })).toContain('write-up');
+    expect(getProjectCaption({ name: 'Research Sprint', module_name: 'Chemistry' })).toContain('research threads');
+  });
+
   it('returns a default caption when no keyword matches', () => {
     expect(getProjectCaption({ name: 'General Work', module_name: 'Misc' })).toContain('aligned');
   });
@@ -650,6 +657,31 @@ describe('projectRowUtils – getProjectTeacherEmail', () => {
 
   it('returns empty string when absent', () => {
     expect(getProjectTeacherEmail({})).toBe('');
+  });
+});
+
+describe('projectRowUtils – getProjectTeacherPhoto', () => {
+  it('resolves a teacher photo with fallback seed data', () => {
+    const photo = getProjectTeacherPhoto({
+      module_tutor_id: 7,
+      module_tutor_username: 'asmith',
+      module_tutor_name: 'Alice Smith',
+      module_tutor_profile_photo_url: '',
+    });
+
+    expect(getResolvedUserPhoto).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 7,
+        username: 'asmith',
+        name: 'Alice Smith',
+        role: 'teacher',
+      }),
+      expect.objectContaining({
+        seed: 'asmith',
+        allowGeneric: true,
+      }),
+    );
+    expect(photo).toBe('https://example.com/photo.jpg');
   });
 });
 
@@ -690,6 +722,11 @@ describe('projectRowUtils – compareProjectsBySort', () => {
 
   it('applies default sort when sortBy is not recognised', () => {
     expect(typeof compareProjectsBySort(alpha, beta, 'unknown')).toBe('number');
+  });
+
+  it('sorts by member count when requested', () => {
+    expect(compareProjectsBySort(alpha, beta, 'most-members')).toBeGreaterThan(0);
+    expect(compareProjectsBySort(alpha, beta, 'least-members')).toBeLessThan(0);
   });
 });
 
