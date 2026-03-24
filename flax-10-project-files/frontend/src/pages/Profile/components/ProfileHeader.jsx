@@ -60,70 +60,48 @@ function SharedCalendarPill({ user, profileData, visibility, onNavigate }) {
   );
 }
 
-function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
+function BadgeTooltip({ badge, canPin, pinned }) {
   return (
-    <motion.button
-      type="button"
-      className={`${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`}
-      onMouseEnter={() => onEnter(badge.id)}
-      onMouseLeave={onLeave}
-      onClick={() => canPin && onPinBadge?.(badge.id)}
-      layout
-      animate={pinned ? { scale: [1, 1.4, 0.9, 1.05, 1] } : { scale: 1 }}
-      transition={pinned
-        ? { duration: 0.45, ease: "easeOut" }
-        : { duration: 0.25, ease: "easeInOut" }
-      }
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.88 }}
-    >
+    <motion.div className={styles.badgeTooltip} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} transition={{ duration: 0.15 }}>
+      <span className={styles.badgeTooltipLabel}>{badge.label}</span>
+      <span className={styles.badgeTooltipDesc}>{badge.description}</span>
+      {canPin && <span className={styles.badgeTooltipPin}>{pinned ? "Tap to unpin" : "Tap to pin this badge"}</span>}
+    </motion.div>
+  );
+}
+
+function BadgeButton({ badge, canPin, onPinBadge, activeTooltip, onEnter, onLeave, pinned }) {
+  const className = `${styles.headerBadge} ${pinned ? styles.headerBadgePinned : ""}`;
+  const animate = pinned ? { scale: [1, 1.4, 0.9, 1.05, 1] } : { scale: 1 };
+  const transition = pinned ? { duration: 0.45, ease: "easeOut" } : { duration: 0.25, ease: "easeInOut" };
+  return (
+    <motion.button type="button" className={className} onMouseEnter={() => onEnter(badge.id)} onMouseLeave={onLeave} onClick={() => canPin && onPinBadge?.(badge.id)} layout animate={animate} transition={transition} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.88 }}>
       <span className={styles.headerBadgeEmoji}>{badge.emoji}</span>
       <AnimatePresence>
-        {activeTooltip === badge.id && (
-          <motion.div
-            className={styles.badgeTooltip}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            transition={{ duration: 0.15 }}
-          >
-            <span className={styles.badgeTooltipLabel}>{badge.label}</span>
-            <span className={styles.badgeTooltipDesc}>{badge.description}</span>
-            {canPin && (
-              <span className={styles.badgeTooltipPin}>
-                {pinned ? "Tap to unpin" : "Tap to pin this badge"}
-              </span>
-            )}
-          </motion.div>
-        )}
+        {activeTooltip === badge.id && <BadgeTooltip badge={badge} canPin={canPin} pinned={pinned} />}
       </AnimatePresence>
     </motion.button>
+  );
+}
+
+function FeaturedBadgeContent({ badge, canPin }) {
+  return (
+    <div className={styles.featuredBadgeMain}>
+      <div className={styles.featuredBadgeEmojiWrap}><span className={styles.featuredBadgeEmoji}>{badge.emoji}</span></div>
+      <div className={styles.featuredBadgeText}>
+        <p className={styles.featuredBadgeTitle}>{badge.label}</p>
+        {badge.description && <p className={styles.featuredBadgeDesc}>{badge.description}</p>}
+        {canPin && <p className={styles.featuredBadgeUnpin}>Tap to unpin</p>}
+      </div>
+    </div>
   );
 }
 
 function FeaturedBadgeCard({ badge, canPin, onPinBadge }) {
   if (!badge) return null;
   return (
-    <motion.button
-      type="button"
-      className={styles.featuredBadgeCard}
-      onClick={() => canPin && onPinBadge?.(badge.id)}
-      initial={{ opacity: 0, scale: 0.9, x: -8 }}
-      animate={{ opacity: 1, scale: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0.9, x: -8 }}
-      transition={{ duration: 0.28, ease: "easeOut" }}
-      whileHover={{ scale: 1.015 }}
-      whileTap={{ scale: 0.97 }}
-      layout
-    >
-      <div className={styles.featuredBadgeMain}>
-        <div className={styles.featuredBadgeEmojiWrap}><span className={styles.featuredBadgeEmoji}>{badge.emoji}</span></div>
-        <div className={styles.featuredBadgeText}>
-          <p className={styles.featuredBadgeTitle}>{badge.label}</p>
-          {badge.description && <p className={styles.featuredBadgeDesc}>{badge.description}</p>}
-          {canPin && <p className={styles.featuredBadgeUnpin}>Tap to unpin</p>}
-        </div>
-      </div>
+    <motion.button type="button" className={styles.featuredBadgeCard} onClick={() => canPin && onPinBadge?.(badge.id)} initial={{ opacity: 0, scale: 0.9, x: -8 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9, x: -8 }} transition={{ duration: 0.28, ease: "easeOut" }} whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} layout>
+      <FeaturedBadgeContent badge={badge} canPin={canPin} />
     </motion.button>
   );
 }
