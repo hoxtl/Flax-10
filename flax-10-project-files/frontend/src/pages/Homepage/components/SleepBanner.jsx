@@ -2,7 +2,7 @@
  * Late-night nudge banner.
  */
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useState, useEffect } from 'react';
 import { getUserSettings } from '../../../api/userApi';
 import { isDuringSleepWindow } from '../../../components/Settings/hooks/useSleepWarning';
@@ -32,7 +32,7 @@ export default function SleepBanner() {
   return (
     <AnimatePresence initial={false}>
       {show ? (
-        <motion.div
+        <Motion.div
           className={styles.banner}
           initial={{ opacity: 0, y: -10, scale: 0.985 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -40,20 +40,20 @@ export default function SleepBanner() {
           transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className={styles.flow} aria-hidden />
-          <motion.div
+          <Motion.div
             className={styles.glow}
             aria-hidden
             animate={{ x: ["-10%", "16%", "-4%"], opacity: [0.24, 0.38, 0.28] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
-          <motion.span
+          <Motion.span
             className={styles.icon}
             aria-hidden
             animate={{ y: [0, -2, 0], rotate: [-4, 0, 4, 0], scale: [1, 1.05, 1] }}
             transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
           >
             🌙
-          </motion.span>
+          </Motion.span>
           <span className={styles.message}>{message}</span>
           <button
             type="button"
@@ -63,7 +63,7 @@ export default function SleepBanner() {
           >
             &times;
           </button>
-        </motion.div>
+        </Motion.div>
       ) : null}
     </AnimatePresence>
   );

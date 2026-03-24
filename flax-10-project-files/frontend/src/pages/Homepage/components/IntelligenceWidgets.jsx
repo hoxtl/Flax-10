@@ -2,8 +2,9 @@
  * Intelligence hero widgets.
  */
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Calendar } from "lucide-react";
+import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
 import StatStrip from "../../../components/Common/StatStrip/StatStrip";
 import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
@@ -23,7 +24,7 @@ export function IntelligenceHero(props) {
   return (
     <div className={styles.premiumCard}>
       <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={12} intensity={1.8} speed={0.5} />
-      <motion.div
+      <Motion.div
         className={styles.bannerBorderGlow}
         aria-hidden
         animate={reduceMotion ? {
@@ -38,7 +39,7 @@ export function IntelligenceHero(props) {
         }}
         transition={reduceMotion ? { duration: 0 } : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <Motion.div
         className={styles.bannerAura}
         aria-hidden
         initial={reduceMotion ? false : { opacity: 0.52, scale: 1, x: "-6%", y: "-3%" }}
@@ -52,7 +53,7 @@ export function IntelligenceHero(props) {
         }}
         transition={reduceMotion ? { duration: 0 } : { duration: 8.2, repeat: Infinity, ease: "easeInOut" }}
       />
-      <motion.div
+      <Motion.div
         className={styles.bannerShimmer}
         aria-hidden
         initial={reduceMotion ? false : { x: "-42%", opacity: 0 }}
@@ -80,13 +81,17 @@ function CourseChangeBanner({ onDismiss, request }) {
   return <StatusBanner cta="/settings?tab=account" icon={BookOpen} onDismiss={onDismiss} text={request.requested_course ? <>Course switch pending to <strong>{request.requested_course}</strong></> : "Course switch pending"} />;
 }
 
-function StatusBanner({ cta, icon: Icon, onDismiss, text }) {
+function StatusBanner({ cta, icon, onDismiss, text }) {
   const navigate = useNavigate();
+  const statusIcon = icon;
   return (
-    <motion.div className={styles.statusBanner} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-      <div className={styles.statusBannerContent}><Icon size={14} className={styles.statusBannerIcon} /><p className={styles.statusBannerText}>{text}</p></div>
+    <Motion.div className={styles.statusBanner} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+      <div className={styles.statusBannerContent}>
+        {statusIcon ? createElement(statusIcon, { size: 14, className: styles.statusBannerIcon }) : null}
+        <p className={styles.statusBannerText}>{text}</p>
+      </div>
       <div className={styles.statusBannerActions}><button onClick={() => navigate(cta)} className={styles.statusBannerBtn}>View</button><button onClick={onDismiss} className={styles.statusBannerClose}>&times;</button></div>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -148,7 +153,7 @@ function buildHeroStatItems({ attendancePct, attendanceRef, classesCount, classR
 function OnNowCard({ liveContext }) {
   const isWarning = liveContext?.tone === "warning";
   return (
-    <motion.div
+    <Motion.div
       className={[styles.nextStepCard, isWarning ? styles.nextStepCardWarning : ""].filter(Boolean).join(" ")}
       animate={isWarning ? {
         boxShadow: [
@@ -161,7 +166,7 @@ function OnNowCard({ liveContext }) {
     >
       <div className={styles.nextStepTop}>
         <span className={styles.nextStepLabel}>{liveContext?.label || "On Now"}</span>
-        <motion.span
+        <Motion.span
           className={styles.nextStepDot}
           aria-hidden
           animate={{ scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }}
@@ -170,7 +175,7 @@ function OnNowCard({ liveContext }) {
       </div>
       <p className={styles.nextStepText}>{liveContext?.text || "Nothing on right now."}</p>
       {liveContext?.meta && <span className={styles.nextStepMeta}>{liveContext.meta}</span>}
-    </motion.div>
+    </Motion.div>
   );
 }
 

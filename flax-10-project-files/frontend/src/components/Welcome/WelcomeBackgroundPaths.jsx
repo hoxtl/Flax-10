@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { motion as Motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo } from "react";
 import styles from "./WelcomeBackgroundPaths.module.css";
 
@@ -51,7 +51,7 @@ function pathTransition(flip, intensity, speed) {
 
 function PathItem({ p, flip, intensity, speed }) {
   return (
-    <motion.path
+    <Motion.path
       d={p.d}
       stroke="currentColor"
       strokeWidth={p.width}
@@ -113,10 +113,10 @@ export default function WelcomeBackgroundPaths({ embedded = false, className = "
   return (
     <div className={bgClassName} aria-hidden="true">
       <div className={styles.glow} />
-      <motion.div className={styles.parallax} style={parallaxStyle}>
+      <Motion.div className={styles.parallax} style={parallaxStyle}>
         <FloatingPaths count={count} intensity={intensity} speed={speed} />
         <FloatingPaths flip={-1} count={count} intensity={intensity} speed={speed} />
-      </motion.div>
+      </Motion.div>
       <div className={styles.fade} />
     </div>
   );

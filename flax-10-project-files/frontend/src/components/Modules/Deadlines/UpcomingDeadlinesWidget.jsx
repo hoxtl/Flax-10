@@ -203,9 +203,11 @@ function useUpcomingDeadlineState(deadlines, initialShown) {
   };
 }
 
-export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, onSelectModule, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm.", renderEmpty = null }) {
+export function UpcomingDeadlinesWidget({ deadlines = [], title = "Upcoming Deadlines", initialShown = 4, embedded = false, interactiveRows = false, onSelectDeadline, emptyMessage = "No upcoming deadlines", emptySub = "You're all caught up — enjoy the calm.", renderEmpty = null }) {
+  const safeDeadlines = Array.isArray(deadlines) ? deadlines : [];
+  const widgetState = useUpcomingDeadlineState(safeDeadlines, initialShown);
+
   if (!Array.isArray(deadlines)) return null;
-  const widgetState = useUpcomingDeadlineState(deadlines, initialShown);
   return (
     <Motion.div className={buildWidgetClassName(embedded)} variants={containerVariants} initial="hidden" animate="visible" layout>
       {(widgetState.sorted.length > 0 || !renderEmpty) ? <WidgetHeader icon={AlertCircle} title={title} count={widgetState.sorted.length} styles={styles} /> : null}

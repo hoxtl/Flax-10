@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import FilterCheckbox from "../common/FilterCheckbox/FilterCheckbox";
 import styles from "./OnboardingModal.module.css";
 
@@ -38,7 +38,7 @@ function ConfirmCheckbox({ confirmed, onConfirm }) {
 
 export default function WarningBox({ major, confirmed, onConfirm }) {
   return (
-    <motion.div
+    <Motion.div
       style={boxStyle}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
@@ -46,6 +46,6 @@ export default function WarningBox({ major, confirmed, onConfirm }) {
     >
       <WarningText major={major} />
       <ConfirmCheckbox confirmed={confirmed} onConfirm={onConfirm} />
-    </motion.div>
+    </Motion.div>
   );
 }
