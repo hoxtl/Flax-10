@@ -1,3 +1,6 @@
+/*
+ * Group work tasks tab state hooks.
+ */
 import { useEffect, useState } from "react";
 import { getAuthHeaders } from "./hooks/groupWorkHooks";
 import { calcCompletionSegments } from "./utils/taskStatsUtils";
@@ -40,31 +43,29 @@ function useTaskActions(setTasks) {
   return { updateTask, deleteTask };
 }
 
+function buildTaskBody(title, projectId, options) {
+  const { due_date, assigned_to, status } = options;
+  const body = { title, group_project: projectId, priority: "medium", status: status || "todo" };
+  if (due_date) body.due_date = due_date;
+  if (assigned_to?.length) body.assigned_to = assigned_to;
+  return body;
+}
+
+async function createTask(title, projectId, options, setTasks) {
+  if (!title) return;
+  const body = buildTaskBody(title, projectId, options);
+  const response = await fetch(`/api/tasks/`, { method: "POST", headers: { "Content-Type": "application/json", ...getAuthHeaders() }, body: JSON.stringify(body) });
+  if (response.ok) {
+    const newTask = await response.json();
+    setTasks((prev) => [...prev, newTask]);
+  }
+}
+
 function useTasks(projectId, members, onStatsUpdate) {
   const { tasks, setTasks, loading } = useFetchTasks(projectId);
   const { updateTask, deleteTask } = useTaskActions(setTasks);
-
-  useEffect(() => {
-    onStatsUpdate?.(calcCompletionSegments(tasks, members));
-  }, [tasks, members, onStatsUpdate]);
-
-  const addTask = async (title, { due_date, assigned_to, status } = {}) => {
-    if (!title) return;
-    const body = { title, group_project: projectId, priority: "medium", status: status || "todo" };
-    if (due_date) body.due_date = due_date;
-    if (assigned_to?.length) body.assigned_to = assigned_to;
-
-    const response = await fetch(`/api/tasks/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-      body: JSON.stringify(body),
-    });
-    if (response.ok) {
-      const created = await response.json();
-      setTasks((prev) => [...prev, created]);
-    }
-  };
-
+  useEffect(() => { onStatsUpdate?.(calcCompletionSegments(tasks, members)); }, [tasks, members, onStatsUpdate]);
+  const addTask = (title, options = {}) => createTask(title, projectId, options, setTasks);
   return { tasks, loading, addTask, updateTask, deleteTask };
 }
 

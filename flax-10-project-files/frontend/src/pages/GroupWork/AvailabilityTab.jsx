@@ -224,32 +224,25 @@ function ProposedCardList({ items, currentUserId, onVote, onDelete }) {
     );
 }
 
+function MeetingCardsEmptyState({ isConfirmedView }) {
+    const title = isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet";
+    const hint = isConfirmedView ? "Once every teammate accepts a proposal, it will appear here." : "Choose a suggested time below or propose one to get things started.";
+    return <div className={meetingStyles.meetingCardsEmpty}><SearchEmptyState title={title} hint={hint} className={meetingStyles.meetingCardsEmptyState} /></div>;
+}
+
+function MeetingCardsContent({ isConfirmedView, items, currentUserId, onVote, onDelete }) {
+    if (items.length === 0) return <MeetingCardsEmptyState isConfirmedView={isConfirmedView} />;
+    if (isConfirmedView) return <ConfirmedCardList items={items} />;
+    return <ProposedCardList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />;
+}
+
 function MeetingCardsSection({ activeView, proposedSuggestions, confirmedSuggestions, currentUserId, onVote, onDelete }) {
     const isConfirmedView = activeView === "confirmed";
     const items = isConfirmedView ? confirmedSuggestions : proposedSuggestions;
-    const content = items.length === 0
-        ? (
-            <div className={meetingStyles.meetingCardsEmpty}>
-                <SearchEmptyState
-                    title={isConfirmedView ? "No confirmed meeting slots yet" : "No proposed meeting slots yet"}
-                    hint={isConfirmedView ? "Once every teammate accepts a proposal, it will appear here." : "Choose a suggested time below or propose one to get things started."}
-                    className={meetingStyles.meetingCardsEmptyState}
-                />
-            </div>
-        )
-        : isConfirmedView
-            ? <ConfirmedCardList items={items} />
-            : <ProposedCardList items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />;
     return (
         <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-                key={activeView}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-            >
-                {content}
+            <motion.div key={activeView} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+                <MeetingCardsContent isConfirmedView={isConfirmedView} items={items} currentUserId={currentUserId} onVote={onVote} onDelete={onDelete} />
             </motion.div>
         </AnimatePresence>
     );
