@@ -46,7 +46,7 @@ function resolveDisplayName(user) {
 function DropdownHeader({ user, profilePhotoUrl }) {
   const initials = getInitials(user?.name) || "?";
   const displayName = resolveDisplayName(user);
-  const major = user?.major || "Computer Science";
+  const major = user?.major || "";
   return (
     <div className={styles.dropdownHeader}>
       <HeaderAvatar profilePhotoUrl={profilePhotoUrl} initials={initials} />
@@ -145,16 +145,16 @@ function buildDisplayUser(user, profileData) {
   const merged = { ...user, ...profileData };
   return {
     ...merged,
-    major: merged.major || "Computer Science",
+    major: merged.major || "",
   };
 }
 
 function getProfilePhotoUrl(profileData, displayUser) {
-  return profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: true });
+  return profileData?.profile_photo_url || getResolvedUserPhoto(displayUser, { allowGeneric: false });
 }
 
 function buildDropdownUser(displayUser) {
-  return { ...displayUser, major: displayUser.major || "Computer Science" };
+  return { ...displayUser, major: displayUser.major || "" };
 }
 
 export default function ProfileDropdown({ user, onSettingsClick, onLogoutClick, onProfileClick }) {

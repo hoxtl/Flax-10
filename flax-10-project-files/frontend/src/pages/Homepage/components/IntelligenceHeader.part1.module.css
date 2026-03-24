@@ -3,8 +3,10 @@
   position: relative;
   border-radius: 24px;
   background: var(--home-hero-bg);
-  border: 1px solid var(--home-hero-border);
-  box-shadow: var(--home-hero-shadow);
+  border: 2px solid var(--home-hero-frame-border);
+  box-shadow:
+    var(--home-hero-shadow),
+    0 0 0 1px color-mix(in srgb, var(--home-hero-frame-border) 85%, transparent);
   overflow: hidden;
   height: 100%;
   isolation: isolate;

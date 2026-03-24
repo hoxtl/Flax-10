@@ -10,7 +10,6 @@ import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButto
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
-import { getEstTime, getUrgencyMeta } from "./TaskWidgetUtils";
 import { TaskWidgetRow } from "./TaskWidgetRow";
 import { TaskWidgetAllDone, TaskWidgetCompletedSection, TaskWidgetEmpty } from "./TaskWidgetSections";
 import { ShowMoreButton } from "../../../components/Modules/shared/widgetParts.jsx";
@@ -33,17 +32,22 @@ export function TaskWidgetSlot(props) {
 }
 
 function TaskWidgetCard(props) {
+  const { styles: taskStyles, taskWidgetItemsOnly, taskWidgetRef, ...contentProps } = props;
   return (
     <Motion.div
       key="tasks"
-      ref={props.taskWidgetRef}
-      className={props.styles.taskWidgetSlotRoot}
+      ref={taskWidgetRef}
+      className={taskStyles.taskWidgetSlotRoot}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
-      {props.taskWidgetItemsOnly.length > 0 ? <TaskWidgetContent {...props} /> : <TaskWidgetEmpty styles={props.styles} />}
+      {taskWidgetItemsOnly.length > 0 ? (
+        <TaskWidgetContent styles={taskStyles} taskWidgetItemsOnly={taskWidgetItemsOnly} {...contentProps} />
+      ) : (
+        <TaskWidgetEmpty styles={taskStyles} />
+      )}
     </Motion.div>
   );
 }
@@ -119,7 +123,6 @@ function TaskListRow(props) {
       isOverdue={props.task.taskWidgetStatus === "overdue"}
       rowAccent={getRowAccent(props.task)}
       urgentGlow={props.task.taskWidgetUrgentGlow}
-      urgency={getUrgencyMeta(props.task)}
     />
   );
 }
@@ -161,7 +164,7 @@ function useTaskWidgetState(props) {
   const [showCompleted, setShowCompleted] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const taskGroups = useMemo(() => getTaskGroups(props.taskWidgetList, props.row), [props.row, props.taskWidgetList]);
-  return { ...taskGroups, ctxMenu, setCtxMenu, expanded, setExpanded, showCompleted, setShowCompleted, estimatedLeft: getEstTime(props.taskWidgetList) };
+  return { ...taskGroups, ctxMenu, setCtxMenu, expanded, setExpanded, showCompleted, setShowCompleted };
 }
 
 function getTaskGroups(taskWidgetList, row) {

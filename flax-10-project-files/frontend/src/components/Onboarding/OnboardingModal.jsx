@@ -29,9 +29,10 @@ export default function OnboardingModal({ isOpen, onComplete }) {
   if (!isOpen) return null;
   return (
     <StandardModal
-      onClose={onComplete} 
+      onClose={onComplete}
       hideHeader
       size="md"
+      modalClassName={styles.onboardingPanel}
       contentClassName={styles.modal}
     >
       <ModalContent state={state} onComplete={onComplete} />

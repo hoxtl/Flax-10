@@ -46,14 +46,7 @@ export function ScheduleManagerButton() {
     setBusy(true);
     try {
       await applyConflictResolutionPlan(plan, editEvent);
-      showToast(buildConflictResolutionToastMessage(plan), {
-        actionLabel: "Undo",
-        durationMs: 8500,
-        onAction: async () => {
-          await undoConflictResolutionPlan(plan, editEvent);
-          showToast("Undid reschedule.");
-        },
-      });
+      showToast(buildConflictResolutionToastMessage(plan));
     } catch {
       showToast("Couldn't reschedule your events. Try again.");
     } finally {
@@ -75,7 +68,7 @@ export function ScheduleManagerButton() {
             await handleClick();
           }}
           onCancel={() => setShowConfirm(false)}
-          infoHint="Lectures, societies, exams, and fixed deadlines stay where they are."
+          infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are."
         />
       ) : null}
     </>

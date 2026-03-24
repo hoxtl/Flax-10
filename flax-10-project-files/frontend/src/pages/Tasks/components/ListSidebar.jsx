@@ -5,7 +5,7 @@
 import { getListColor } from "../utils/listColorUtils";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
-import { isReadingList, isTeachingList, parseReadingListName } from "../utils/readingListUtils";
+import { isReadingList, isTeachingList, parseReadingListName, getTeachingListDisplayName } from "../utils/readingListUtils";
 import styles from "./ListSidebar.module.css";
 import { ListContextMenu, RenameInput } from "./listSidebarParts";
 import { useListSidebarState } from "./useListSidebarState";
@@ -26,6 +26,9 @@ function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectLi
 }
 
 function ListLabel({ list }) {
+  if (isTeachingList(list)) {
+    return <span className={styles.listName}>{getTeachingListDisplayName(list)}</span>;
+  }
   if (!isReadingList(list)) {
     return <span className={styles.listName}>{list.name}</span>;
   }

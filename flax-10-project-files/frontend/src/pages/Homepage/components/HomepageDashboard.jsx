@@ -17,7 +17,6 @@ import { HomepageSkeleton } from "./HomepageSkeleton";
 import taskWidgetStyles from "../styles/TaskWidget.module.css";
 import styles from "../Homepage.module.css";
 import { HomepageTimelineSection } from ".";
-import { getTaskCategoryColor, getTaskCategoryPillMeta } from "../utils/homepageViewModel";
 
 export function HomepageDashboard(props) {
   if (props.homeDataLoading) return <HomepageSkeleton />;
@@ -104,10 +103,6 @@ function getOverlayProps(props) {
   return { enrolledModules: props.state.enrolledModules, selectedDeadline: props.modals.selectedDeadline, selectedModulePill: props.modals.selectedModulePill, setSelectedDeadline: props.modals.setSelectedDeadline, setSelectedModulePill: props.modals.setSelectedModulePill, styles };
 }
 
-function getTaskPillLabel(task, props) {
-  return getTaskCategoryPillMeta(task, props.taskLists, props.state.enrolledModules, props.getTag)?.label || null;
-}
-
 function getTimelineCoreProps(props) {
   return { completedEventIds: props.completedEventIds, dayTasks: props.dayTasks, deadlineSuggestions: props.state.deadlineSuggestions, getTag: props.getTag, hasTimerSession: props.hasTimerSession, now: props.now, selectedDate: props.selectedDate, setCompletedEventIds: props.setCompletedEventIds, sortedEvents: props.state.sortedEvents, suggestableTasks: props.state.suggestableTasks, taskLists: props.taskLists, tasksDueToday: props.state.tasksDueToday, timeLeft: props.timeLeft, timerMode: props.timerMode, timerTask: props.timerTask };
 }
@@ -125,9 +120,9 @@ function getModalActionProps(props) {
 }
 
 function getTaskSlotActions(props) {
-  return { getTaskCategoryColor: (task) => getTaskCategoryColor(task, props.getTag), getTaskCategoryPill: (task) => getTaskPillLabel(task, props), handleTaskWidgetComplete: props.handleTaskWidgetComplete, hasTimerSession: props.hasTimerSession, onDeleteTask: props.deleteTaskAndRefresh, onEditTask: props.modals.setRescheduleTask, onInlineTaskEdit: props.handleInlineTaskEdit, onStartFocus: () => props.navigate("/timer", { state: { fromTaskPlay: true } }), setShowAllTaskWidgetTasks: () => {} };
+  return { handleTaskWidgetComplete: props.handleTaskWidgetComplete, onDeleteTask: props.deleteTaskAndRefresh, onEditTask: props.modals.setRescheduleTask, onInlineTaskEdit: props.handleInlineTaskEdit };
 }
 
 function getTaskSlotData(props) {
-  return { displayName: props.displayName, isToday: isToday(props.selectedDate), showAllTaskWidgetTasks: false, styles: taskWidgetStyles, taskLists: props.taskLists, taskWidgetDueTodayCount: props.state.taskWidgetDueTodayCount, taskWidgetItemsOnly: props.state.taskWidgetItemsOnly, taskWidgetList: props.state.taskWidgetList, taskWidgetOverdueCount: props.state.taskWidgetOverdueCount, taskWidgetRef: props.taskWidgetRef, taskWidgetSpineCompletedPct: props.state.taskWidgetSpineCompletedPct };
+  return { styles: taskWidgetStyles, taskLists: props.taskLists, taskWidgetDueTodayCount: props.state.taskWidgetDueTodayCount, taskWidgetItemsOnly: props.state.taskWidgetItemsOnly, taskWidgetList: props.state.taskWidgetList, taskWidgetRef: props.taskWidgetRef };
 }

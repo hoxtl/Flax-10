@@ -157,7 +157,7 @@
   z-index: 0;
   border-radius: inherit;
   pointer-events: none;
-  border: 1px solid color-mix(in srgb, var(--home-hero-glow-ring) 92%, transparent);
+  border: 2px solid color-mix(in srgb, var(--home-hero-frame-border) 88%, transparent);
   box-shadow:
     0 0 0 1px var(--home-hero-glow-ring),
     0 0 24px var(--home-hero-glow-shadow),

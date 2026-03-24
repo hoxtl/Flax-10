@@ -46,10 +46,14 @@ async function handleSubmit(e, is_editing, module, form_data, setErrors, setSubm
 function FormBody({ form_data, errors, submitting, is_editing, onChange, onSubmit, onCancel }) {
     return (
         <form onSubmit={onSubmit} className={styles.form}>
-            <DepartmentCourseFields form_data={form_data} errors={errors} onChange={onChange} is_editing={is_editing} />
-            <NameFields form_data={form_data} errors={errors} is_editing={is_editing} onChange={onChange} />
+            <div className={styles.topRow}>
+                <DepartmentCourseFields form_data={form_data} errors={errors} onChange={onChange} is_editing={is_editing} />
+            </div>
+            <ModuleNameField form_data={form_data} errors={errors} onChange={onChange} />
             <DescriptionLocationFields form_data={form_data} onChange={onChange} />
-            <TimeFields form_data={form_data} errors={errors} onChange={onChange} />
+            <div className={styles.timeRow}>
+                <TimeFields form_data={form_data} errors={errors} onChange={onChange} />
+            </div>
             <RecurringCheckbox checked={form_data.is_recurring} onChange={(v) => onChange('is_recurring', v)} />
             {errors.submit && <div className={styles.submitError}>{errors.submit}</div>}
             <FormActions submitting={submitting} is_editing={is_editing} onCancel={onCancel} />
@@ -98,21 +102,30 @@ function LockedField({ label, value }) {
 
 function DepartmentCourseFields({ form_data, errors, onChange, is_editing }) {
     if (is_editing) {
-        return (<><LockedField label="Department" value={form_data.department} /><LockedField label="Course" value={form_data.course} /></>);
+        return (
+            <>
+                <LockedField label="Department" value={form_data.department} />
+                <LockedField label="Course" value={form_data.course} />
+                <LockedField label="Module Code" value={form_data.module_code} />
+            </>
+        );
     }
-    return (<><DepartmentDropdown value={form_data.department} error={errors.department} onChange={onChange} /><CourseDropdown value={form_data.course} error={errors.course} department={form_data.department} onChange={onChange} /></>);
-}
-
-function NameFields({ form_data, errors, is_editing, onChange }) {
     return (
         <>
+            <DepartmentDropdown value={form_data.department} error={errors.department} onChange={onChange} />
+            <CourseDropdown value={form_data.course} error={errors.course} department={form_data.department} onChange={onChange} />
             <FormGroup label="Module Code" error={errors.module_code} required>
-                <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., 5CCS2SEG" disabled={is_editing} />
-            </FormGroup>
-            <FormGroup label="Module Name" error={errors.module_name} required>
-                <input type="text" className={getInput(errors.module_name, styles)} value={form_data.module_name} onChange={(e) => onChange('module_name', e.target.value)} placeholder="e.g., Software Engineering" />
+                <input type="text" className={getInput(errors.module_code, styles)} value={form_data.module_code} onChange={(e) => onChange('module_code', e.target.value)} placeholder="e.g., 5CCS2SEG" />
             </FormGroup>
         </>
+    );
+}
+
+function ModuleNameField({ form_data, errors, onChange }) {
+    return (
+        <FormGroup label="Module Name" error={errors.module_name} required>
+            <input type="text" className={getInput(errors.module_name, styles)} value={form_data.module_name} onChange={(e) => onChange('module_name', e.target.value)} placeholder="e.g., Software Engineering" />
+        </FormGroup>
     );
 }
 function DescriptionLocationFields({ form_data, onChange }) {

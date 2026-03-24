@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import Homepage from '../../../pages/Homepage/Homepage';
 
-const { mockDispatch, mockOpenModal, mockRemoveEvent, mockAddEvent, mockEditEvent, mockLoadEvents,
+const { mockDispatch, mockOpenModal, mockOpenPopup, mockRemoveEvent, mockAddEvent, mockEditEvent, mockLoadEvents,
   mockRefetchTasks, mockUseCalendarEvents, mockNavigate, mockGetTag } = vi.hoisted(() => ({
   mockDispatch: vi.fn(), mockOpenModal: vi.fn(), mockRemoveEvent: vi.fn(), mockAddEvent: vi.fn(),
-  mockEditEvent: vi.fn(), mockLoadEvents: vi.fn(), mockRefetchTasks: vi.fn(),
+  mockEditEvent: vi.fn(), mockLoadEvents: vi.fn(), mockOpenPopup: vi.fn(), mockRefetchTasks: vi.fn(),
   mockUseCalendarEvents: vi.fn(), mockNavigate: vi.fn(), mockGetTag: vi.fn(() => ({ label: 'Academic' })),
 }));
 
@@ -30,7 +30,7 @@ vi.mock('../../../pages/Homepage/utils/index', () => ({
 vi.mock('../../../context/CalendarContext', () => ({
   useCalendar: () => ({ selectedDate: mockSelectedDate, events: mockEvents, filter: mockFilter }),
   useCalendarDispatch: () => mockDispatch, useEventModal: () => ({ openModal: mockOpenModal }),
-  useEventPopup: () => ({ openPopup: vi.fn() }),
+  useEventPopup: () => ({ openPopup: mockOpenPopup }),
 }));
 vi.mock('../../../components/Calendar/hooks/useCalendarEvents', () => ({
   useCalendarEvents: () => mockUseCalendarEvents(),
@@ -42,6 +42,9 @@ vi.mock('../../../pages/Homepage/hooks/useHomeData', () => ({
     removePendingTask: vi.fn(), refetchTasks: mockRefetchTasks, loading: false }),
 }));
 vi.mock('../../../context/TagContext', () => ({ useTags: () => ({ getTag: mockGetTag, tags: [{ id: 1, label: 'Routine' }] }) }));
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: () => ({ profile: { id: 1, role: 'student', settings: {} }, loading: false, authenticated: true, user: { role: 'student' }, refreshProfile: vi.fn() }),
+}));
 vi.mock('../../../context/TimerContext', () => ({
   useTimerContext: () => ({ setActiveTaskId: vi.fn(), isActive: mockTimerActive, timeLeft: mockTimeLeft,
     task: mockTimerActive ? 'My Task' : null, progress: 0, setIsActive: vi.fn(),
@@ -75,8 +78,8 @@ vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
 vi.mock('../../../pages/Homepage/components', async () => {
-  const { MiniTimelineMock } = await import('./homepageMocks');
-  return { MiniTimeline: MiniTimelineMock };
+  const { HomepageTimelineSectionMock } = await import('./homepageMocks');
+  return { HomepageTimelineSection: HomepageTimelineSectionMock };
 });
 vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),
@@ -109,12 +112,13 @@ beforeEach(() => {
   mockTimeLeft = 0; mockTimerActive = false; mockTimerMode = 'work';
   mockDayEvents = []; mockDayTasks = []; mockAllTasks = [];
   vi.clearAllMocks();
+  window.localStorage.clear();
   mockGetTag.mockReturnValue({ label: 'Academic' });
   mockUseCalendarEvents.mockReturnValue({ loadEvents: mockLoadEvents });
   mockAddEvent.mockResolvedValue(undefined); mockEditEvent.mockResolvedValue(undefined);
   mockRemoveEvent.mockResolvedValue(undefined); mockLoadEvents.mockResolvedValue(undefined);
   mockRefetchTasks.mockResolvedValue(undefined);
-  global.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
+  globalThis.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
 });
 
 describe('Homepage – overlays & event operations', () => {
@@ -145,7 +149,7 @@ describe('Homepage – overlays & event operations', () => {
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('quick-start'));
     await waitFor(() => expect(mockAddEvent).toHaveBeenCalled());
-    await waitFor(() => expect(screen.getByText(/added to your schedule/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/added to schedule at/i)).toBeInTheDocument());
   });
 
   it('handleQuickStartGap shows error toast on fail', async () => {
@@ -187,7 +191,7 @@ describe('Homepage – overlays & event operations', () => {
     mockEditEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('push-tomorrow'));
-    await waitFor(() => expect(screen.getByText("Couldn't move to tomorrow. Try again.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Couldn't move to tomorrow.")).toBeInTheDocument());
   });
 
   it('handleTimelineDelete removes event and shows toast', async () => {
@@ -202,14 +206,14 @@ describe('Homepage – overlays & event operations', () => {
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete-task'));
     await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(99));
-    await waitFor(() => expect(screen.getByText(/removed from tasks and calendar/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/removed\./)).toBeInTheDocument());
   });
 
   it('handleTimelineDelete shows error toast on fail', async () => {
     mockRemoveEvent.mockRejectedValueOnce(new Error('fail'));
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('timeline-delete'));
-    await waitFor(() => expect(screen.getByText("Couldn't delete this item. Try again.")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Couldn't delete item.")).toBeInTheDocument());
   });
 
   it('timeline edit opens event modal', () => {
@@ -221,7 +225,7 @@ describe('Homepage – overlays & event operations', () => {
   it('card click opens popup', () => {
     render(<MemoryRouter><Homepage /></MemoryRouter>);
     fireEvent.click(screen.getByText('card-click'));
-    expect(screen.getByTestId('mini-timeline')).toBeInTheDocument();
+    expect(mockOpenPopup).toHaveBeenCalled();
   });
 
   it('onToggleComplete toggles completed event ids', () => {

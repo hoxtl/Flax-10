@@ -10,6 +10,7 @@ from studyFlax.models import Enrollment
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.fixtures.data_fixtures import (
     module_task_templates, personal_task_fixtures, task_list_fixtures,
+    teacher_task_list_fixtures, teacher_personal_task_fixtures,
 )
 
 def _create_task_lists(user):
@@ -64,6 +65,11 @@ def _build_due_date(now, days_from_now):
         hour=23, minute=59, second=0, microsecond=0,
     )
 
+def _build_completed_at(now, due_date, completed):
+    if not completed:
+        return None
+    return min(now, due_date)
+
 def _create_module_task(user, task_list, mod, title_tmpl, description,
                         priority, estimated_blocks, days_from_now, index, now):
     days = _adjust_days(mod, index, days_from_now)
@@ -108,7 +114,42 @@ def _seed_personal_tasks(user, lists_by_name, personal_list, now):
         count += 1
     return count
 
+def _create_teacher_task_lists(user):
+    lists_by_name = {}
+    for list_name, list_category, list_emoji in teacher_task_list_fixtures:
+        tl, _ = TaskList.objects.get_or_create(
+            user=user, name=list_name,
+            defaults={"category": list_category},
+        )
+        lists_by_name[list_name] = tl
+    return lists_by_name
+
+def _seed_teacher_tasks(user, lists_by_name, now):
+    first_list = next(iter(lists_by_name.values()), None)
+    count = 0
+    for title, description, priority, blocks, days, list_name, completed in teacher_personal_task_fixtures:
+        task_list = lists_by_name.get(list_name, first_list)
+        due_date = _build_due_date(now, days)
+        Task.objects.create(
+            user=user, task_list=task_list, module=None,
+            title=title, description=description, priority=priority,
+            due_date=due_date,
+            estimated_blocks=blocks,
+            completed=completed,
+            completed_at=_build_completed_at(now, due_date, completed),
+        )
+        count += 1
+    return count
+
+def _seed_tasks_for_teacher(user, now):
+    if Task.objects.filter(user=user).exists():
+        return 0
+    lists_by_name = _create_teacher_task_lists(user)
+    return _seed_teacher_tasks(user, lists_by_name, now)
+
 def _seed_tasks_for_user(user, now):
+    if getattr(user, 'role', None) == 'teacher':
+        return _seed_tasks_for_teacher(user, now)
     if Task.objects.filter(user=user).exists():
         return 0
     lists_by_name = _create_task_lists(user)

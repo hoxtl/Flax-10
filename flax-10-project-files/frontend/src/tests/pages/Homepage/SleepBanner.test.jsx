@@ -55,7 +55,7 @@ describe('SleepBanner', () => {
         await waitFor(() => {
             expect(screen.getByText('🌙')).toBeTruthy();
         });
-        fireEvent.click(screen.getByText('x'));
+        fireEvent.click(screen.getByRole('button'));
         expect(container.firstChild).toBeNull();
     });
 

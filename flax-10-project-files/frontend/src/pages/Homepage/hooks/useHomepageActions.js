@@ -24,7 +24,9 @@ function playTaskCompleteSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.15);
-  } catch {}
+  } catch {
+    // Audio feedback is best-effort only.
+  }
 }
 
 export function useHomepageActions(props) {
@@ -58,7 +60,9 @@ function useTaskWidgetComplete(props) {
 function notifyTaskCompletion(props, task) {
   try {
     props.showCompletionToast(getCompletionMessage(task), { isRoutine: isRoutineTask(task) });
-  } catch {}
+  } catch {
+    // Completion toasts should never block the primary task update flow.
+  }
 }
 
 async function updateHomepageTask(props, taskId, patch) {
@@ -82,7 +86,9 @@ function useTaskToggle(props) {
     try {
       await updateTask(task.id, { completed });
       props.refetchTasks();
-    } catch {}
+    } catch {
+      // Leave the UI unchanged when a timeline toggle fails.
+    }
   }, [props]);
 }
 
@@ -94,8 +100,9 @@ function useTimelinePopup(openPopup) {
 }
 
 function useDeleteTaskAndRefresh(refetchTasks) {
-  return useCallback(async (task) => {
-    await deleteTask(task.id);
+  return useCallback(async (taskOrId) => {
+    const taskId = typeof taskOrId === "object" && taskOrId !== null ? taskOrId.id : taskOrId;
+    await deleteTask(taskId);
     refetchTasks();
   }, [refetchTasks]);
 }

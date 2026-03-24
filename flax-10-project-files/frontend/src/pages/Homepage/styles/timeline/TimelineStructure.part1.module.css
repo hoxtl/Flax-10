@@ -88,8 +88,7 @@
     align-self: flex-start;
   }
 
-  .scheduleActionGroup,
-  .replanActionBtn {
+  .scheduleActionGroup {
     display: none !important;
   }
 }

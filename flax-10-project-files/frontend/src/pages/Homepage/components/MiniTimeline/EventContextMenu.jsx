@@ -23,6 +23,6 @@ export function EventContextMenu({ eventItem, pos, onEdit, onDelete, onClose, st
   useMenuDismiss(menuRef, onClose);
   const handleEdit = () => (onEdit?.(eventItem), onClose?.());
   const handleDelete = async () => (await onDelete?.(eventItem), onClose?.());
-  const menuPos = { '--ctx-top': pos.y, '--ctx-left': pos.x };
+  const menuPos = { "--ctx-top": `${pos.y}px`, "--ctx-left": `${pos.x}px` };
   return createPortal(<div ref={menuRef} className={styles.contextMenu} style={menuPos} onMouseDown={(event) => event.stopPropagation()} onContextMenu={(event) => event.preventDefault()}><ContextButton styles={styles} icon={<Pencil size={14} strokeWidth={2} className={styles.contextIcon} />} label="Edit" onClick={handleEdit} /><div className={styles.contextDivider} /><ContextButton styles={styles} className={styles.contextDelete} icon={<Trash2 size={14} strokeWidth={2} className={styles.contextIcon} />} label="Delete" onClick={handleDelete} /></div>, document.body);
 }

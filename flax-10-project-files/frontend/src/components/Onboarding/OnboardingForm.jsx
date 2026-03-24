@@ -39,7 +39,7 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
 }
 
 function SubmitButton({ loading, disabled, onClick }) {
-  return <div style={{ marginTop: "1.25rem" }}><PrimaryButton onClick={onClick} disabled={disabled} loading={loading} width="100%" pill>{loading ? "Setting up your modules..." : "Set up my modules"}</PrimaryButton></div>;
+  return <div style={{ marginTop: "1.25rem", display: "flex", justifyContent: "center" }}><PrimaryButton onClick={onClick} disabled={disabled} loading={loading} style={{ width: "100%" }} pill>{loading ? "Setting up your modules..." : "Set up my modules"}</PrimaryButton></div>;
 }
 
 export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions }) {

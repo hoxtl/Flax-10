@@ -91,7 +91,7 @@ function RescheduleConfirmModal({ open, onCancel, onConfirm }) {
       cancelText="Keep plan"
       onConfirm={onConfirm}
       onCancel={onCancel}
-      infoHint="Lectures, societies, exams, and fixed deadlines stay where they are."
+      infoHint="⚠️ Lectures, societies, exams, and fixed deadlines stay where they are."
     />
   );
 }

@@ -9,8 +9,14 @@ vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
         get: (_, tag) => ({ children, ...props }) => {
             const Tag = typeof tag === 'string' ? tag : 'div';
-            const { initial, animate, exit, transition, variants, whileHover, ...rest } = props;
-            return <Tag {...rest}>{children}</Tag>;
+            delete props.initial;
+            delete props.animate;
+            delete props.exit;
+            delete props.transition;
+            delete props.variants;
+            delete props.whileHover;
+            delete props.layout;
+            return <Tag {...props}>{children}</Tag>;
         },
     }),
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -18,6 +24,7 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('lucide-react', () => ({
     AlertCircle: () => <svg />,
+    AlarmClock: () => <svg />,
     ArrowRight: () => <svg />,
     ChevronDown: () => <svg />,
     ChevronUp: () => <svg />,
@@ -47,7 +54,7 @@ describe('DeadlinesWidget', () => {
     it('renders empty state when no deadlines', () => {
         render(<DeadlinesWidget deadlines={[]} />);
         expect(screen.getByText('No deadlines need attention.')).toBeTruthy();
-        expect(screen.getByText('Upcoming coursework and exams will show up here.')).toBeTruthy();
+        expect(screen.getByText(/Go to my modules/i)).toBeTruthy();
     });
 
     it('renders deadline titles', () => {
@@ -65,8 +72,7 @@ describe('DeadlinesWidget', () => {
             deadline_type: 'coursework',
         }));
         render(<DeadlinesWidget deadlines={manyDeadlines} />);
-        // Only 3 titles should be rendered (MAX_SHOWN = 3)
-        expect(screen.getAllByText(/Task \d/).length).toBe(3);
+        expect(screen.getAllByText(/Task \d/).length).toBe(5);
     });
 
     it('renders module code pills', () => {
@@ -84,8 +90,6 @@ describe('DeadlinesWidget', () => {
     it('calls onSelectDeadline when row clicked', () => {
         const onSelectDeadline = vi.fn();
         render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
-        const rows = screen.getAllByRole('button');
-        // Click on the deadline row (first module code pill)
         fireEvent.click(screen.getByText('Essay 1'));
         expect(onSelectDeadline).toHaveBeenCalled();
     });
@@ -108,9 +112,9 @@ describe('DeadlinesWidget', () => {
         expect(screen.getByText('1d overdue')).toBeTruthy();
     });
 
-    it('renders View my modules link', () => {
+    it('does not render the empty-state modules link when deadlines exist', () => {
         render(<DeadlinesWidget deadlines={mockDeadlines} />);
-        expect(screen.getByText('View my modules')).toBeTruthy();
+        expect(screen.queryByText(/Go to my modules/i)).toBeNull();
     });
 
     it('sorts overdue deadlines first', () => {

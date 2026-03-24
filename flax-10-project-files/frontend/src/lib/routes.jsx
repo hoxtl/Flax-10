@@ -67,6 +67,7 @@ export const APP_ROUTES = [
     icon: "👥",
     path: "/societies",
     element: <SocietiesPage />,
+    studentOnly: true,
   },
   {
     id: "modules",

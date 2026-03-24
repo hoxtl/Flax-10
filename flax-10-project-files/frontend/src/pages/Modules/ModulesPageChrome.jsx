@@ -128,7 +128,7 @@ function TransitionPane({ active, viewKey, children }) {
   return <PageTransition key={viewKey}>{children}</PageTransition>;
 }
 
-function handleEditModalClose(state) {
+function handleFormModalClose(state) {
   state.setShowForm(false);
   state.setEditingModule(null);
 }
@@ -136,31 +136,47 @@ function handleEditModalClose(state) {
 function EditModuleModal({ state }) {
   const handleSuccess = (savedModule) => {
     state.hook.handleModuleUpdated(savedModule);
-    handleEditModalClose(state);
+    handleFormModalClose(state);
   };
   return (
     <StandardModal
       title="Edit Module"
       subtitle="Update the module details below"
-      onClose={() => handleEditModalClose(state)}
+      onClose={() => handleFormModalClose(state)}
       size="lg"
     >
-      <ModuleForm module={state.editingModule} onSuccess={handleSuccess} onCancel={() => handleEditModalClose(state)} hideHeader />
+      <ModuleForm module={state.editingModule} onSuccess={handleSuccess} onCancel={() => handleFormModalClose(state)} hideHeader />
+    </StandardModal>
+  );
+}
+
+function CreateModuleModal({ state }) {
+  const handleSuccess = (savedModule, isNew) => {
+    if (isNew) state.hook.handleModuleCreated(savedModule);
+    handleFormModalClose(state);
+  };
+  return (
+    <StandardModal
+      title="Create Module"
+      subtitle="Fill in the details to create a new module"
+      onClose={() => handleFormModalClose(state)}
+      size="lg"
+    >
+      <ModuleForm onSuccess={handleSuccess} onCancel={() => handleFormModalClose(state)} hideHeader />
     </StandardModal>
   );
 }
 
 export function AnimatedContent({ state, viewKey, MainView }) {
-  const isEditModal = state.showForm && Boolean(state.editingModule);
-  const isCreatePage = state.showForm && !state.editingModule;
+  const isFormModal = state.showForm;
   return (
     <>
       <AnimatePresence mode="wait" initial={false}>
-        <TransitionPane active={isCreatePage} viewKey={viewKey}><FormView state={state} /></TransitionPane>
-        <TransitionPane active={!isCreatePage && Boolean(state.viewingModule)} viewKey={viewKey}><DetailsView state={state} /></TransitionPane>
-        <TransitionPane active={!isCreatePage && !state.viewingModule} viewKey={viewKey}><MainView state={state} /></TransitionPane>
+        <TransitionPane active={!isFormModal && Boolean(state.viewingModule)} viewKey={viewKey}><DetailsView state={state} /></TransitionPane>
+        <TransitionPane active={!isFormModal && !state.viewingModule} viewKey={viewKey}><MainView state={state} /></TransitionPane>
       </AnimatePresence>
-      {isEditModal && <EditModuleModal state={state} />}
+      {isFormModal && Boolean(state.editingModule) && <EditModuleModal state={state} />}
+      {isFormModal && !state.editingModule && <CreateModuleModal state={state} />}
     </>
   );
 }

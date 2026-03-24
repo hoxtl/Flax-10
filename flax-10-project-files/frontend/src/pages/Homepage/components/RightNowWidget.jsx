@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Clock, Sparkles, Sun } from "lucide-react";
 import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import { formatTime } from "../utils/dateFormatUtils";
@@ -50,9 +50,25 @@ function timerProgress(totalMinutes, timeLeft) {
 
 function StatusHeader({ liveClock, label = "Right Now" }) {
   return (
-    <motion.div {...fadeIn(0)}>
+    <Motion.div {...fadeIn(0)}>
       <SharedWidgetHeader icon={Clock} title={label} meta={liveClock} />
-    </motion.div>
+    </Motion.div>
+  );
+}
+
+function buildTodayHeaderMeta(eventCount, taskCount) {
+  const parts = [];
+  if (eventCount > 0) parts.push(`${eventCount} event${eventCount === 1 ? "" : "s"}`);
+  if (taskCount > 0) parts.push(`${taskCount} task${taskCount === 1 ? "" : "s"} left`);
+  return parts.join(" · ");
+}
+
+function WidgetHeader({ eventCount, taskCount }) {
+  const meta = buildTodayHeaderMeta(eventCount, taskCount);
+  return (
+    <Motion.div {...fadeIn(0)}>
+      <SharedWidgetHeader icon={Clock} title="Right Now" meta={meta || null} />
+    </Motion.div>
   );
 }
 
@@ -71,23 +87,23 @@ function TimerSessionCard({ liveClock, timerMode, timerTask, timeLeft, workTime,
 
 function TimerClock({ timeLeft, isBreak, timerTask }) {
   return (
-    <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+    <Motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
       <span className={styles.clockTime}>{formatTimerLabel(timeLeft)}</span>
       <span className={styles.clockLabel}>{isBreak ? "Break" : "Focus"} · {timerTask || (isBreak ? "Break time" : "Focus session")}</span>
-    </motion.div>
+    </Motion.div>
   );
 }
 
 function TimerControls({ pct, onOpenTimer }) {
   return (
-    <motion.div className={styles.timerBlock} {...fadeIn(0.07)}>
+    <Motion.div className={styles.timerBlock} {...fadeIn(0.07)}>
       <div className={styles.progressTrack}>
         <div className={styles.progressFill} style={{ width: `${pct}%` }} />
       </div>
       <button type="button" className={styles.timerBtn} onClick={onOpenTimer}>
         Open timer →
       </button>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -95,13 +111,13 @@ function NonTodayCard({ liveClock, firstEvent }) {
   return (
     <>
       <StatusHeader liveClock={liveClock} />
-      <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+      <Motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
         <span className={styles.clockTime}>{liveClock}</span>
         <span className={styles.clockLabel}>Not today's view</span>
-      </motion.div>
-      <motion.div {...fadeIn(0.1)}>
+      </Motion.div>
+      <Motion.div {...fadeIn(0.1)}>
         {firstEvent ? <EventPreview event={firstEvent} /> : <p className={styles.nowEmpty}>No events for this day.</p>}
-      </motion.div>
+      </Motion.div>
     </>
   );
 }
@@ -119,14 +135,14 @@ function EndOfDayCard({ liveClock, completedCount, tasksLength, eventsToday, tom
   return (
     <>
       <StatusHeader liveClock={liveClock} />
-      <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+      <Motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
         <span className={styles.clockTime}>{liveClock}</span>
         <span className={styles.clockLabel}>End of day</span>
-      </motion.div>
-      <motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
+      </Motion.div>
+      <Motion.div className={styles.endOfDayWrap} {...fadeIn(0.07)}>
         <EndOfDaySummary completedCount={completedCount} tasksLength={tasksLength} eventsToday={eventsToday} />
         {tomorrowFirstEvent && <TomorrowSection event={tomorrowFirstEvent} time={tomorrowTime} />}
-      </motion.div>
+      </Motion.div>
     </>
   );
 }
@@ -134,9 +150,9 @@ function EndOfDayCard({ liveClock, completedCount, tasksLength, eventsToday, tom
 function EndOfDaySummary({ completedCount, tasksLength, eventsToday }) {
   return (
     <div className={styles.endOfDayTopRow}>
-      <motion.div animate={{ rotate: [0, 8, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
+      <Motion.div animate={{ rotate: [0, 8, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
         <Sparkles size={22} strokeWidth={1.25} color="var(--color-primary)" aria-hidden />
-      </motion.div>
+      </Motion.div>
       <div>
         <p className={styles.endOfDayTitle}>Day complete — nice work!</p>
         <p className={styles.endOfDaySub}>
@@ -171,22 +187,22 @@ function EmptyDayCard({ liveClock, tomorrowFirstEvent, tomorrowTime }) {
 
 function EmptyClock({ liveClock }) {
   return (
-    <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+    <Motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
       <span className={styles.clockTime}>{liveClock}</span>
       <span className={styles.clockLabel}>Nothing scheduled today</span>
-    </motion.div>
+    </Motion.div>
   );
 }
 
 function EmptyBody({ tomorrowFirstEvent, tomorrowTime }) {
   return (
-    <motion.div className={styles.emptyDay} {...fadeIn(0.1)}>
-      <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+    <Motion.div className={styles.emptyDay} {...fadeIn(0.1)}>
+      <Motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
         <Sun size={28} strokeWidth={1.25} color="var(--color-primary)" aria-hidden />
-      </motion.div>
+      </Motion.div>
       <p className={styles.emptyDayTitle}>Free day — enjoy it!</p>
       {tomorrowFirstEvent && tomorrowTime && <p className={styles.emptyDayTomorrow}>Tomorrow: {tomorrowFirstEvent.title} at {tomorrowTime}</p>}
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -209,10 +225,10 @@ function TflAlert({ enabled, leaveByInfo, onDismiss }) {
 
 function TodayClock({ liveClock, label }) {
   return (
-    <motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
+    <Motion.div className={styles.clockBlock} {...fadeIn(0.04)}>
       <span className={styles.clockTime}>{liveClock}</span>
       <span className={styles.clockLabel}>{label}</span>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -222,10 +238,10 @@ function TodayCurrentState({ currentBlock, currentProgressPct, timeRangeStr, tim
   }
 
   return (
-    <motion.div className={styles.nowLine} {...fadeIn(0.16)}>
+    <Motion.div className={styles.nowLine} {...fadeIn(0.16)}>
       <span className={styles.nowPill}>Now</span>
       <span className={styles.nowText}>Nothing on right now</span>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -236,12 +252,12 @@ function TodayCommute({ commuteInfo, loadingCommute, leaveByInfo, nextCampus }) 
 
 function NextEventRow({ nextEvent, countdown }) {
   return (
-    <motion.div className={styles.upNextRow} {...fadeIn(0.2)}>
+    <Motion.div className={styles.upNextRow} {...fadeIn(0.2)}>
       <div className={styles.upNextLeft}>
         <span className={styles.upNextLabel}>Up next</span>
       </div>
       {nextEvent ? <NextEventDetails nextEvent={nextEvent} countdown={countdown} /> : <NextEventEmpty />}
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -330,5 +346,5 @@ export function RightNowWidget({
 }) {
   const liveClock = useLiveClock();
   const model = useRightNowData(buildRightNowDataProps({ now, isToday, navigatorContext, sortedEvents, tflDelays, taskWidgetItemsOnly }));
-  return <RightNowView {...buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly, tomorrowFirstEvent })} {...model} hasTimerSession={hasTimerSession} timerMode={timerMode} timerTask={timerTask} timeLeft={timeLeft} workTime={workTime} breakTime={breakTime} onOpenTimer={onOpenTimer} />;
+  return <RightNowView {...buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly, tomorrowFirstEvent })} {...model} isToday={isToday} hasTimerSession={hasTimerSession} timerMode={timerMode} timerTask={timerTask} timeLeft={timeLeft} workTime={workTime} breakTime={breakTime} onOpenTimer={onOpenTimer} />;
 }

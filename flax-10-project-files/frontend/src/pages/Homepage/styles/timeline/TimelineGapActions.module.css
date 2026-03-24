@@ -381,7 +381,7 @@
     var(--color-card) 0%,
     var(--color-bg) 100%
   );
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--home-widget-frame-border);
 }
 
 [data-mode="dark"] .planTimelineStatusBar {

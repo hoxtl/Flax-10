@@ -3,23 +3,20 @@
  */
 
 import { useCallback, useState } from "react";
-import { formatTime, getAllFreeWindowsToday, getNextFreeSlotToday, isRoutineEvent } from "../utils/index";
+import { formatTime, getNextFreeSlotToday } from "../utils/index";
 import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
-import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage, undoConflictResolutionPlan } from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
 
 export function useHomepageReschedule(props) {
-  const [replanLoading, setReplanLoading] = useState(false);
   const [resolveConflictsLoading, setResolveConflictsLoading] = useState(false);
   return {
     handleConflictAutoMove: useConflictAutoMove(props),
     handleConflictPushTomorrow: useConflictPushTomorrow(props),
     handleQuickStartGap: useQuickStartGap(props),
-    handleReplanDay: useReplanDay(props, setReplanLoading),
     handleResolveTimelineConflicts: useResolveTimelineConflicts(props, setResolveConflictsLoading),
     handleReschedule: useReschedule(props),
     handleRescheduleTomorrow: useRescheduleTomorrow(props),
     handleTimelineDelete: useTimelineDelete(props),
-    replanLoading,
     resolveConflictsLoading,
   };
 }
@@ -177,99 +174,13 @@ function useResolveTimelineConflicts(props, setResolveConflictsLoading) {
       await applyConflictResolutionPlan(plan, props.editEvent);
       await props.loadEvents?.();
       props.refetchTasks();
-      props.showToast(buildConflictResolutionToastMessage(plan), {
-        actionLabel: "Undo",
-        durationMs: 8500,
-        onAction: async () => {
-          await undoConflictResolutionPlan(plan, props.editEvent);
-          await props.loadEvents?.();
-          props.refetchTasks();
-          props.showToast("Undid reschedule.");
-        },
-      });
+      props.showToast(buildConflictResolutionToastMessage(plan), { durationMs: 8500 });
     } catch {
       props.showToast("Couldn't reschedule your events. Try again.");
     } finally {
       setResolveConflictsLoading(false);
     }
   }, [props, setResolveConflictsLoading]);
-}
-
-function useReplanDay(props, setReplanLoading) {
-  return useCallback(async () => {
-    const plan = createReplanPlan(props);
-    if (!plan) return;
-    setReplanLoading(true);
-    try {
-      await executeReplan(plan, props);
-    } catch {
-      props.showToast("Couldn't re-plan.");
-    } finally {
-      setReplanLoading(false);
-    }
-  }, [props, setReplanLoading]);
-}
-
-function createReplanPlan(props) {
-  const missed = (props.missedItems || []).filter((item) => !isRoutineEvent(item));
-  const overdue = props.overdueTasksForNow || [];
-  if (!missed.length && !overdue.length) return props.showToast("Nothing to re-plan.");
-  const windows = getAllFreeWindowsToday(props.sortedEvents, props.selectedDate);
-  if (!windows.length) return props.showToast("No free windows left today.");
-  return { missed, overdue, windows: windows.map(copyWindow) };
-}
-
-function copyWindow(window) {
-  return { start: new Date(window.start), end: new Date(window.end), minutes: window.minutes };
-}
-
-async function executeReplan(plan, props) {
-  const assigned = { current: 0 };
-  await assignItems(plan.missed.sort(sortByStartTime), plan.windows, props.editEvent, assigned);
-  await assignTasks(plan.overdue, plan.windows, props.addEvent, assigned);
-  await props.loadEvents();
-  props.refetchTasks();
-  props.showToast(assigned.current > 0 ? `Re-planned ${assigned.current} items.` : "No items fit.");
-}
-
-function sortByStartTime(left, right) {
-  return new Date(left.start_time) - new Date(right.start_time);
-}
-
-async function assignItems(items, windows, editEvent, assigned) {
-  for (const item of items) await assignWindowItem(item, windows, editEvent, assigned);
-}
-
-async function assignTasks(tasks, windows, addEvent, assigned) {
-  for (const task of tasks) await assignWindowTask(task, windows, addEvent, assigned);
-}
-
-async function assignWindowItem(item, windows, editEvent, assigned) {
-  const { durationMins } = getEventDuration(item);
-  const window = windows.find((entry) => entry.minutes >= durationMins);
-  if (!window) return;
-  const slotStart = new Date(window.start);
-  const end = updateWindow(window, durationMins);
-  await editEvent(extractBaseEventId(item.id), { start_time: slotStart.toISOString(), end_time: end.toISOString() });
-  assigned.current += 1;
-}
-
-async function assignWindowTask(task, windows, addEvent, assigned) {
-  const durationMins = (task.estimated_blocks || 1) * 25;
-  const window = windows.find((entry) => entry.minutes >= durationMins);
-  if (!window) return;
-  const slotStart = new Date(window.start);
-  const end = updateWindow(window, durationMins);
-  await addEvent({ title: task.title, description: task.description || "", start_time: slotStart.toISOString(), end_time: end.toISOString() });
-  assigned.current += 1;
-}
-
-function updateWindow(window, durationMins) {
-  const start = new Date(window.start);
-  const end = new Date(start.getTime() + durationMins * 60000);
-  window.start = end;
-  window.minutes -= durationMins;
-  return end;
 }
 
 function getEventDuration(item) {

@@ -33,8 +33,11 @@
     --flax-charcoal-heading: var(--text);
     --home-text-label: var(--text-secondary);
     --home-card-padding: 12px 18px;
+    --home-widget-border: color-mix(in srgb, var(--text) 16%, var(--color-border-base) 84%);
+    --widget-border: var(--home-widget-border);
     --home-border-soft: var(--widget-border);
-    --home-widget-frame-border: color-mix(in srgb, var(--color-primary) 54%, black 32%);
+    --home-widget-frame-border: color-mix(in srgb, var(--text) 26%, var(--color-border-base) 74%);
+    --home-hero-frame-border: color-mix(in srgb, var(--text) 24%, var(--color-highlight) 76%);
     /* Glassmorphism: all widgets */
     --home-border-card: 1px solid var(--widget-border);
     --home-glass-blur: 12px;
@@ -190,5 +193,8 @@
     --home-task-checkbox-border: color-mix(in srgb, var(--widget-border) 84%, white 16%);
     --home-task-checkbox-bg: color-mix(in srgb, var(--surface-inner) 82%, var(--surface-raised, var(--color-card)) 18%);
     --home-task-checkbox-shadow: inset 0 1px 0 color-mix(in srgb, white 12%, transparent);
-    --home-widget-frame-border: color-mix(in srgb, var(--color-highlight) 56%, black 32%);
+    --home-widget-border: var(--color-border-base);
+    --widget-border: var(--home-widget-border);
+    --home-widget-frame-border: color-mix(in srgb, var(--color-highlight) 42%, var(--home-widget-border) 58%);
+    --home-hero-frame-border: color-mix(in srgb, var(--color-highlight) 58%, var(--home-widget-border) 42%);
   }

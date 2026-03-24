@@ -113,7 +113,6 @@ function buildHeroStatItems({ attendancePct, attendanceRef, classesCount, classR
     return [
       ...base,
       { key: "deadlines", label: "Teaching deadlines", value: deadlinesCount ?? 0, valueRef: deadlineRef, tone: (deadlinesCount ?? 0) > 0 ? "warning" : undefined, tooltip: "Upcoming deadlines across modules you teach." },
-      { key: "society", label: "Upcoming societies", value: upcomingSocietyEventsCount ?? 0, valueRef: societyRef, tooltip: "Society events coming up over the next 14 days." },
     ];
   }
   return [

@@ -1,4 +1,9 @@
 /* StandardModal handles overlay and container positioning */
+.onboardingPanel {
+  width: min(580px, 92vw);
+  min-height: min(460px, 80vh);
+}
+
 .modal {
   display: flex;
   flex-direction: column;

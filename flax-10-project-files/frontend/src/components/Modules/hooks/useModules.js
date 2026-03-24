@@ -23,6 +23,7 @@ function buildEnrollmentHandlers(enrollments, setEnrollments, notify) {
 function buildModuleHandlers(setModules, notify, confirmFn) {
   return {
     handleDeleteModule: (m, cb) => handleDeleteModule(m, setModules, notify, confirmFn, cb),
+    handleDirectDeleteModule: (m, cb) => confirmDelete(m, setModules, notify, cb),
     handleModuleCreated: (m) => { setModules(prev => [...prev, m]); notify('Module created successfully', 'success'); },
     handleModuleUpdated: (m) => { setModules(prev => prev.map(x => x.id === m.id ? m : x)); notify('Module updated successfully', 'success'); },
   };

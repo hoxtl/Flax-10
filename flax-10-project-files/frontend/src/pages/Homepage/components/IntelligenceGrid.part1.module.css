@@ -72,10 +72,10 @@
   border-radius: var(--card-radius, 11px);
   display: flex;
   flex-direction: column;
-  border: 1.25px solid var(--home-widget-frame-border);
+  border: 1.5px solid var(--home-widget-frame-border);
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, white 22%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--home-widget-frame-border) 86%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 18%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--home-widget-frame-border) 100%, transparent),
     0 16px 28px color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
