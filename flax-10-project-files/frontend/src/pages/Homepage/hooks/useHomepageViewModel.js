@@ -17,6 +17,7 @@ import {
   getSortedEvents,
   getSuggestableTasks,
   getTaskWidgetCompletedCount,
+  getTaskWidgetDisplayList,
   getTaskWidgetDueTodayCount,
   getTaskWidgetList,
   getTaskWidgetSpineCompletedPct,
@@ -61,8 +62,8 @@ function buildTimelineModel({ getTag, now, selectedDate, upcomingDeadlines, dayT
 }
 
 function useHomepageTaskModel({ allTasks, now }) {
-  const taskWidgetList = useMemo(() => getTaskWidgetList(allTasks, now), [allTasks, now]);
-  const taskWidgetItemsOnly = useMemo(() => taskWidgetList.filter((item) => item.type === "task"), [taskWidgetList]);
+  const taskWidgetItemsOnly = useMemo(() => getTaskWidgetList(allTasks, now), [allTasks, now]);
+  const taskWidgetList = useMemo(() => getTaskWidgetDisplayList(allTasks, now, taskWidgetItemsOnly), [allTasks, now, taskWidgetItemsOnly]);
   const taskWidgetCompletedCount = useMemo(() => getTaskWidgetCompletedCount(taskWidgetItemsOnly), [taskWidgetItemsOnly]);
   return {
     taskWidgetDueTodayCount: getTaskWidgetDueTodayCount(taskWidgetItemsOnly, now),

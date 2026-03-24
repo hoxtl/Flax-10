@@ -8,7 +8,7 @@ import { getUpcomingDeadlines } from "../../api/deadlineApi";
 import { getSuggestedReadings } from "../../api/readingApi";
 import { UpcomingDeadlinesWidget } from "../../components/Modules/Deadlines/UpcomingDeadlinesWidget";
 import { isEnrolledIn } from "../../components/Modules/utils/moduleUtils";
-import StatStrip from "../../components/common/StatStrip/StatStrip";
+import StatStrip from "../../components/Common/StatStrip/StatStrip";
 import { useCountUp } from "../../hooks/useCountUp";
 import ReadingsPanel from "./ReadingsPanel";
 import SmartNudge from "./SmartNudge";

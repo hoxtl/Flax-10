@@ -3,6 +3,7 @@
  */
 
 import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import Tooltip from '../Tooltip/Tooltip';
 import styles from './StatStrip.module.css';
 
@@ -44,8 +45,27 @@ function StatItemContent({ item }) {
   );
 }
 
+function buildItemSlotClass(item) {
+  return [
+    styles.itemSlot,
+    item.to || item.onClick ? styles.itemSlotInteractive : '',
+  ].filter(Boolean).join(' ');
+}
+
+function ItemShell({ children, item }) {
+  const className = buildItemSlotClass(item);
+  const ariaLabel = item.ariaLabel || item.tooltip || item.label;
+  if (item.to) {
+    return <Link className={className} to={item.to} aria-label={ariaLabel}>{children}</Link>;
+  }
+  if (item.onClick) {
+    return <button type="button" className={`${className} ${styles.itemButton}`.trim()} onClick={item.onClick} aria-label={ariaLabel}>{children}</button>;
+  }
+  return <div className={className}>{children}</div>;
+}
+
 function StatItem({ item }) {
-  const content = <StatItemContent item={item} />;
+  const content = <ItemShell item={item}><StatItemContent item={item} /></ItemShell>;
   if (item.tooltip) {
     return (
       <Tooltip content={item.tooltip} position={item.tooltipPosition || 'top'} wrapperClassName={`${styles.itemSlot} ${styles.itemTooltipWrap}`}>
@@ -53,15 +73,15 @@ function StatItem({ item }) {
       </Tooltip>
     );
   }
-  return <div className={styles.itemSlot}>{content}</div>;
+  return content;
 }
 
 /** Horizontal row of stats, each with a value, label, and optional colour tone. */
 
-export default function StatStrip({ items = [], className = '', compact = false, bare = false }) {
+export default function StatStrip({ items = [], className = '', compact = false, bare = false, nowrap = false }) {
   if (!items.length) return null;
   return (
-    <div className={[styles.strip, compact ? styles.stripCompact : '', bare ? styles.stripBare : '', className].filter(Boolean).join(' ')}>
+    <div className={[styles.strip, compact ? styles.stripCompact : '', bare ? styles.stripBare : '', nowrap ? styles.stripNoWrap : '', className].filter(Boolean).join(' ')}>
       {items.map((item, index) => (
         <Fragment key={item.key || item.label}>
           <StatItem item={item} />

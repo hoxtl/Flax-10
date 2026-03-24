@@ -4,16 +4,15 @@
     gap: 12px;
     margin-bottom: 8px;
 }
-.deleteError {
-    margin: 6px 4px 0;
-    color: var(--danger);
-    font-size: 13px;
-    font-weight: 500;
+.deleteBtnDisabled {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
-.deleteActionWrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+
+.deleteBtnTooltipWrap {
+    display: inline-flex;
+    cursor: not-allowed;
 }
 .topActions {
     display: flex;
@@ -108,8 +107,8 @@
     cursor: pointer;
 }
 .modulePillBtn:hover .modulePillRight {
-    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
-    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    border-color: var(--modules-chip-border-strong);
+    background: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
 }
 .modulePillBtn:focus-visible {
     outline: 2px solid var(--primary);
@@ -123,9 +122,9 @@
     min-height: 26px;
     padding: 0.18rem 0.62rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--primary) 9%, var(--surface-card));
-    color: var(--primary);
-    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    background: var(--modules-chip-bg-strong);
+    color: var(--modules-chip-fg);
+    border: 1px solid var(--modules-chip-border-strong);
     font-size: 0.78rem;
     font-weight: 500;
 }
@@ -136,8 +135,8 @@
     border-radius: 999px;
 }
 .teacherPillBtn:hover .teacherPill {
-    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
-    background: color-mix(in srgb, var(--primary) 14%, var(--surface-card));
+    border-color: var(--groupwork-teacher-badge-border);
+    background: color-mix(in srgb, var(--modules-accent-ink) 12%, var(--surface-card));
 }
 .teacherPillBtn:focus-visible {
     outline: 2px solid var(--primary);
@@ -206,9 +205,9 @@
     border-radius: 999px;
 }
 .modulePill {
-    background: rgba(123, 103, 81, 0.08);
-    color: var(--primary);
-    border-color: rgba(123, 103, 81, 0.18);
+    background: var(--modules-chip-bg-strong);
+    color: var(--modules-chip-fg);
+    border-color: var(--modules-chip-border-strong);
     min-height: 32px;
 }
 .moduleCode {
@@ -221,9 +220,10 @@
     min-height: 26px;
     padding: 0.18rem 0.62rem;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--primary) 9%, var(--surface-card));
-    color: var(--primary);
-    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+    background: var(--groupwork-teacher-badge-bg);
+    color: var(--modules-chip-fg);
+    border: 1px solid var(--groupwork-teacher-badge-border);
+    box-shadow: var(--groupwork-teacher-badge-shadow);
     font-size: 0.78rem;
     font-weight: 500;
 }
@@ -235,7 +235,7 @@
     color: color-mix(in srgb, var(--primary) 75%, #ffffff 25%);
 }
 .metaIcon {
-    color: var(--muted);
+    color: var(--modules-chip-fg);
 }
 .memberMeta {
     display: inline-flex;

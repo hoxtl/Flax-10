@@ -2,13 +2,19 @@
  * Detailed view of a single module with schedule, deadlines, and readings.
  */
 
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/moduleUtils.js';
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
+import { useAuth } from '../../../context/AuthContext.jsx';
+import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
+import PrimaryButton from '../../Common/PrimaryButton/PrimaryButton.jsx';
+import Tooltip from '../../common/Tooltip/Tooltip.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
@@ -96,17 +102,17 @@ function EmailMetaItem({ email }) {
 }
 
 function HeroTop({ module, department, course, is_enrolled }) {
-    return (
-        <div className={heroStyles.heroTop}>
-            <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
-            <span className={heroStyles.departmentChip}>{department}</span>
-            {course && <span className={heroStyles.courseChip}>{course}</span>}
-            {is_enrolled && <span className={heroStyles.enrolledBadge}>✓ Enrolled</span>}
-        </div>
-    );
+  return (
+    <div className={heroStyles.heroTop}>
+      <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
+      <Badge tone="default" className={heroStyles.departmentChip}>{department}</Badge>
+      {course && <Badge tone="muted" className={heroStyles.courseChip}>{course}</Badge>}
+      {is_enrolled && <span className={heroStyles.enrolledBadge}>✓ Enrolled</span>}
+    </div>
+  );
 }
 
-function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnenroll, tutorPhoto }) {
+function HeroSection({ module, department, course, is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll, tutorPhoto }) {
     return (
         <section className={heroStyles.hero}>
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
@@ -118,8 +124,8 @@ function HeroSection({ module, department, course, is_enrolled, onEnroll, onUnen
                     <EmailMetaItem email={module.created_by_email} />
                 </div>
                 <div className={heroStyles.heroActions}>
-                    {module.created_by_email && <a href={`mailto:${module.created_by_email}`} className={heroStyles.secondaryAction}>Email tutor</a>}
-                    <EnrollmentAction is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                    {module.created_by_email && <PrimaryButton variant="secondary" pill onClick={() => window.location.href = `mailto:${module.created_by_email}`}>Email tutor</PrimaryButton>}
+                    <EnrollmentAction is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} />
                 </div>
             </div>
         </section>
@@ -178,24 +184,72 @@ function useModuleData(module) {
     };
 }
 
+function useModuleProjects(moduleCode) {
+    const [projects, setProjects] = useState([]);
+    useEffect(() => {
+        if (!moduleCode) return;
+        const token = localStorage.getItem('token');
+        fetch('/api/group-work/projects/', { headers: token ? { Authorization: `Token ${token}` } : {} })
+            .then((res) => res.ok ? res.json() : [])
+            .then((data) => setProjects((data || []).filter((p) => p.course_code === moduleCode)))
+            .catch(() => {});
+    }, [moduleCode]);
+    return projects;
+}
+
+function ProjectRow({ project, index }) {
+    const url = `/group-work?project=${project.id}`;
+    const memberCount = project.member_count ?? 0;
+    return (
+        <Link to={url} className={deadlineStyles.deadlineItem} style={{ textDecoration: 'none' }}>
+            <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
+            <div className={deadlineStyles.deadlineBody}>
+                <div className={deadlineStyles.deadlineTitleRow}>
+                    <span className={deadlineStyles.deadlinesType}>🤝 Project</span>
+                    <span className={deadlineStyles.deadlineTitle}>{project.name}</span>
+                </div>
+                <div className={deadlineStyles.deadlineMeta}>
+                    <span className={deadlineStyles.deadlineDate}>{memberCount} member{memberCount !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+        </Link>
+    );
+}
+
+function ModuleProjectsCard({ moduleCode }) {
+    const projects = useModuleProjects(moduleCode);
+    if (!projects.length) return null;
+    return (
+        <article className={styles.sectionCard}>
+            <h2 className={styles.sectionTitle}>Study Projects</h2>
+            <div className={deadlineStyles.deadlinesList}>
+                {projects.map((p, i) => <ProjectRow key={p.id} project={p} index={i} />)}
+            </div>
+        </article>
+    );
+}
+
 function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
     return (
         <div className={styles.mainColumn}>
             <ScheduleCard module={module} nextClass={nextClass} travelTime={travelTime} />
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Assignments</h2><DeadlinesSection deadlines={sortedDeadlines} moduleCode={module.module_code} /></article>
             <article className={styles.sectionCard}><h2 className={styles.sectionTitle}>Readings</h2><ReadingsSection readings={module.readings} /></article>
+            <ModuleProjectsCard moduleCode={module.module_code} />
         </div>
     );
 }
 
-export default function ModuleDetails({ module, is_enrolled, onBack, onEnroll, onUnenroll }) {
+export default function ModuleDetails({ module, is_enrolled, is_core, onBack, onEnroll, onUnenroll }) {
+    const { profile } = useAuth();
     const data = useModuleData(module);
     const travelTime = useModuleTravelTime(module.location);
+    const isModuleOwner = profile?.role === "teacher" && String(profile?.id) === String(module.created_by);
 
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
-            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
@@ -205,7 +259,7 @@ function ScheduleItem({ icon, label, value, className = "", valueClassName = "" 
     return (
         <div className={`${scheduleStyles.scheduleItem} ${className}`.trim()}>
             <span className={scheduleStyles.scheduleIcon}>{icon}</span>
-            <div>
+            <div className={scheduleStyles.scheduleItemBody}>
                 <div className={scheduleStyles.scheduleLabel}>{label}</div>
                 <div className={`${scheduleStyles.scheduleValue} ${valueClassName}`.trim()}>{value}</div>
             </div>
@@ -233,10 +287,26 @@ function RecurringBadge() {
     );
 }
 
-function EnrollmentAction({ is_enrolled, onEnroll, onUnenroll }) {
-    return is_enrolled
-        ? <button className={styles.unenrollButton} onClick={onUnenroll}>Leave module</button>
-        : <button className={styles.enrollButton} onClick={onEnroll}>Enrol in module</button>;
+function EnrollmentAction({ is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll }) {
+    if (isModuleOwner) return null;
+    if (!is_enrolled) {
+        return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
+    }
+    const btn = (
+        <PrimaryButton variant="danger" pill onClick={is_core ? undefined : onUnenroll}
+            disabled={is_core} aria-disabled={is_core}
+            style={is_core ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}>
+            Leave module
+        </PrimaryButton>
+    );
+    if (is_core) {
+        return (
+            <Tooltip content="Cannot leave a core course module" position="bottom">
+                <span style={{ display: 'inline-flex', cursor: 'not-allowed' }}>{btn}</span>
+            </Tooltip>
+        );
+    }
+    return btn;
 }
 
 function DeadlineItem({ deadline, index }) {
@@ -246,7 +316,7 @@ function DeadlineItem({ deadline, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
-                    <span className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
+                    <Badge tone="muted" className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{deadline.title}</span>
                 </div>
                 <div className={deadlineStyles.deadlineMeta}>
@@ -284,7 +354,7 @@ function ReadingRow({ reading, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
-                    <span className={deadlineStyles.deadlinesType}>📖 Reading</span>
+                    <Badge tone="muted" className={deadlineStyles.deadlinesType}>Reading</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{cleanTitle}</span>
                 </div>
                 <span className={deadlineStyles.deadlineDate}>

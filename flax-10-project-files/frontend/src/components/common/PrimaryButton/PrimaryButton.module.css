@@ -86,6 +86,56 @@
   border-color: rgba(74, 52, 33, 0.18);
 }
 
+:global([data-mode="dark"]) .btn {
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:global([data-mode="dark"]) .btn:not(:disabled):hover {
+  box-shadow:
+    0 22px 42px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+:global([data-mode="dark"]) .secondary {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+    color-mix(in srgb, var(--surface-card) 82%, var(--color-bg) 18%)
+  );
+  color: color-mix(in srgb, var(--text) 90%, white 10%);
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 20%, var(--border) 80%);
+}
+
+:global([data-mode="dark"]) .secondary:not(:disabled):hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 88%, var(--surface-inner) 12%),
+    color-mix(in srgb, var(--surface-card) 76%, var(--color-bg) 24%)
+  );
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 30%, var(--border) 70%);
+}
+
+:global([data-mode="dark"]) .ghost {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-raised, var(--surface-card)) 94%, var(--surface-inner) 6%),
+    color-mix(in srgb, var(--surface-card) 84%, var(--color-bg) 16%)
+  );
+  color: color-mix(in srgb, var(--text) 90%, white 10%);
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%);
+}
+
+:global([data-mode="dark"]) .ghost:not(:disabled):hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-raised, var(--surface-card)) 88%, var(--surface-inner) 12%),
+    color-mix(in srgb, var(--surface-card) 78%, var(--color-bg) 22%)
+  );
+  border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 28%, var(--border) 72%);
+}
+
 .danger {
   background: var(--danger);
   color: var(--c-white);

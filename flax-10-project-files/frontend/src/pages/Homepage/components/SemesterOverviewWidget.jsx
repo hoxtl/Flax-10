@@ -4,7 +4,7 @@
 
 import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
-import baseStyles from "../styles/WidgetBase.module.css";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "../styles/SemesterOverview.module.css";
 import { useSemesterData, useSemesterRange } from "./useSemesterOverviewData";
 
@@ -148,14 +148,7 @@ function SemesterOverviewBody({ clusterWeeks, maxima, row, semesterLabel, weeks 
 
 function SemesterOverviewHeader({ semesterLabel }) {
   return (
-    <div className={baseStyles.widgetHeader}>
-      <div className={baseStyles.headerIconWrap}>
-        <CalendarDays size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>Semester Overview</span>
-      <span className={baseStyles.headerMeta}>{semesterLabel}</span>
-      <SemesterLegend />
-    </div>
+    <SharedWidgetHeader actions={<SemesterLegend />} icon={CalendarDays} meta={semesterLabel} title="Semester Overview" />
   );
 }
 

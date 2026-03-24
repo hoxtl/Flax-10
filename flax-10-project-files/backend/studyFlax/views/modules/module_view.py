@@ -2,6 +2,7 @@
 Module views for listing, creating, updating, and deleting modules.
 """
 
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -14,6 +15,8 @@ from studyFlax.views.modules.module_event_sync import sync_module_calendar_event
 from studyFlax.views.modules import module_notifications
 
 build_module_deleted_notification = module_notifications.build_module_deleted_notification
+get_changed_module_fields = module_notifications.get_changed_module_fields
+notify_module_updated = module_notifications.notify_module_updated
 notify_enrolled_students = module_notifications.notify_enrolled_students
 
 
@@ -62,8 +65,11 @@ def update_module(request, module, user):
     serialiser = ModuleSerialiser(module, data=request.data, partial=True, context={'request': request})
     if not serialiser.is_valid():
         return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    updated_module = serialiser.save()
-    sync_module_calendar_events(updated_module)
+    changed_fields = get_changed_module_fields(module, serialiser.validated_data)
+    with transaction.atomic():
+        updated_module = serialiser.save()
+        sync_module_calendar_events(updated_module)
+        notify_module_updated(updated_module, changed_fields)
     return Response(serialiser.data)
 
 
@@ -74,8 +80,9 @@ def delete_module(module, user):
 
 
 def _delete_module_and_notify(module):
-    notify_enrolled_students(module)
-    module.delete()
+    with transaction.atomic():
+        notify_enrolled_students(module)
+        module.delete()
 
 
 def _delete_module_response(module):

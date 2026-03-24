@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APIRequestFactory
 
 from ..base import BaseTestCase
-from studyFlax.models import Module, User
+from studyFlax.models import Enrollment, Module, Notification, User
 from studyFlax.serialisers import ModuleSerialiser
 
 class ModuleViewTests(BaseTestCase):
@@ -63,6 +63,45 @@ class ModuleViewTests(BaseTestCase):
         response = self.client.delete(f'/api/modules/{self.module.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Module.objects.filter(id=self.module.id).exists())
+
+    def test_teacher_delete_unenrols_students_and_notifies_them(self):
+        student = User.objects.create_user(
+            username='module_student',
+            email='module_student@example.com',
+            password='pass',
+        )
+        student.role = 'student'
+        student.save()
+        Enrollment.objects.create(student=student, module=self.module)
+
+        response = self.client.delete(f'/api/modules/{self.module.id}/')
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Enrollment.objects.filter(student=student, module=self.module).exists())
+        notification = Notification.objects.get(user=student, notification_type='module_deleted')
+        self.assertIn('unenrolled', notification.message.lower())
+        self.assertEqual(notification.action_url, '/modules')
+
+    def test_teacher_update_notifies_enrolled_students_about_changes(self):
+        student = User.objects.create_user(
+            username='updated_student',
+            email='updated_student@example.com',
+            password='pass',
+        )
+        student.role = 'student'
+        student.save()
+        Enrollment.objects.create(student=student, module=self.module)
+
+        response = self.client.put(
+            f'/api/modules/{self.module.id}/',
+            {'module_name': 'Updated module title'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        notification = Notification.objects.get(user=student, notification_type='module_updated')
+        self.assertIn('module name', notification.message.lower())
+        self.assertEqual(notification.action_url, f'/modules?code={self.module.module_code}')
 
     def test_teacher_cannot_update_module_with_duplicate_code(self):
         Module.objects.create(

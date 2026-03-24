@@ -12,3 +12,15 @@ export function isDuringSleepWindow(sleepTime, wakeTime, date = new Date()) {
     ? totalMinutes >= sleepTotal || totalMinutes < wakeTotal
     : totalMinutes >= sleepTotal && totalMinutes < wakeTotal;
 }
+
+export function doesEventOverlapSleepWindow(sleepTime, wakeTime, startDate, endDate) {
+  if (!startDate) return false;
+  const start = new Date(startDate);
+  const end = endDate ? new Date(endDate) : new Date(start.getTime() + 25 * 60000);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return false;
+  if (end <= start) return isDuringSleepWindow(sleepTime, wakeTime, start);
+  for (let cursor = new Date(start); cursor < end; cursor = new Date(cursor.getTime() + 15 * 60000)) {
+    if (isDuringSleepWindow(sleepTime, wakeTime, cursor)) return true;
+  }
+  return isDuringSleepWindow(sleepTime, wakeTime, end);
+}

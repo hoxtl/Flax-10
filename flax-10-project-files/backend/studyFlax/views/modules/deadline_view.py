@@ -59,9 +59,13 @@ def delete_deadline(request, deadline):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def upcoming_deadlines(request):
-    deadlines = Deadline.objects.filter(
-        module__enrollments__student=request.user,
+    base_queryset = Deadline.objects.select_related('module').filter(
         start_due_date__gte=timezone.now()
-    ).order_by('start_due_date')[:10]
+    )
+    if request.user.is_teacher():
+        deadlines = base_queryset.filter(module__created_by=request.user)
+    else:
+        deadlines = base_queryset.filter(module__enrollments__student=request.user)
+    deadlines = deadlines.order_by('start_due_date').distinct()[:10]
     return Response(DeadlineSerialiser(deadlines, many=True).data)
     

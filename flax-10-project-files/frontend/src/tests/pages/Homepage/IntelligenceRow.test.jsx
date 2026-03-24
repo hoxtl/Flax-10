@@ -6,6 +6,13 @@ vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
         get: (_, tag) => ({ children, ...props }) => {
             const Tag = typeof tag === 'string' ? tag : 'div';
+            delete props.animate;
+            delete props.initial;
+            delete props.exit;
+            delete props.transition;
+            delete props.layout;
+            delete props.viewport;
+            delete props.whileInView;
             return <Tag {...props}>{children}</Tag>;
         },
     }),
@@ -75,8 +82,8 @@ describe('IntelligenceRow', () => {
 
     it('renders analytics summary in the banner', () => {
         renderRow();
-        expect(screen.getByText(/weekly goal/i)).toBeTruthy();
-        expect(screen.getByText(/streak/i)).toBeTruthy();
+        expect(screen.getByText(/tasks to do/i)).toBeTruthy();
+        expect(screen.getByText(/attendance/i)).toBeTruthy();
     });
 
     it('renders slot1TodayTasks content', () => {

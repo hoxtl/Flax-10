@@ -11,7 +11,7 @@ from types import SimpleNamespace
 from django.utils import timezone
 from .recurrence_utils import add_months as _add_months, add_years as _add_years, calc_occurrence as _calc_occurrence, is_time_overlap
 
-MAX_SIMULTANEOUS_OVERLAPS = 3
+MAX_SIMULTANEOUS_OVERLAPS = 2
 
 def filter_events_by_date_range(queryset, params):
     start = parse_date_param(params.get('start'))

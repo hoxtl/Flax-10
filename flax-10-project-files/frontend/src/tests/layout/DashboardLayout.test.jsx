@@ -371,13 +371,14 @@ describe("DashboardLayout", () => {
     expect(screen.queryByTestId("deadline-modal")).toBeNull();
   });
 
-  it("opens QuickAdd modal directly in scheduler mode from the quick-add event", () => {
+  it("opens QuickAdd modal and falls back to the main chooser for legacy scheduler events", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     act(() => {
       window.dispatchEvent(new CustomEvent("quick-add:open", { detail: { view: "schedule_auto" } }));
     });
     expect(screen.getByTestId("quick-add-modal")).toBeTruthy();
     expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("schedule_auto");
+    expect(screen.getByText("Quick Add")).toBeInTheDocument();
   });
 });
 

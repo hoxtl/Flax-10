@@ -131,17 +131,46 @@
   box-shadow: 0 4px 14px rgba(123, 103, 81, 0.25);
 }
 
+.editBtnWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.editBtnTooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.editBtnWrap:hover .editBtnTooltip {
+  opacity: 1;
+}
+
 /* ── Resize Controls ── */
 .resizeControls {
-  background: #ffffff;
-  border: 1.5px solid var(--color-border-base);
+  background: var(--home-edit-control-bg);
+  border: 1.5px solid var(--home-edit-control-border);
   border-radius: 8px;
   display: flex;
   align-items: center;
   padding: 4px;
   gap: 3px;
   z-index: 30;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--home-edit-control-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .resizeGroup {
@@ -156,7 +185,7 @@
   border-radius: 5px;
   border: none !important;
   background: transparent !important;
-  color: var(--text-charcoal) !important;
+  color: var(--home-edit-control-ink) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,8 +195,8 @@
 }
 
 .resizeBtn:hover:not(:disabled) {
-  background: var(--color-highlight-soft) !important;
-  color: var(--color-primary) !important;
+  background: var(--home-edit-control-hover-bg) !important;
+  color: var(--home-edit-control-hover-ink) !important;
 }
 
 .resizeBtn:disabled {
@@ -178,7 +207,7 @@
 .resizeVal {
   font-size: 10px;
   font-weight: 800;
-  color: var(--text-charcoal);
+  color: var(--home-edit-control-ink);
   min-width: 22px;
   text-align: center;
 }
@@ -186,7 +215,7 @@
 .resizeDivider {
   width: 1px;
   height: 14px;
-  background: var(--color-border-base);
+  background: var(--home-edit-control-divider);
   margin: 0 2px;
 }
 

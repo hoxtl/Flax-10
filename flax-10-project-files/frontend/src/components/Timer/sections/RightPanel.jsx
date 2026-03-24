@@ -28,7 +28,6 @@ export function RightPanel({ t }) {
   return (
     <div className={styles.timerRightPanel}>
       <RightRailTabs t={t} />
-
       <InlineSoundPanel />
     </div>
   );

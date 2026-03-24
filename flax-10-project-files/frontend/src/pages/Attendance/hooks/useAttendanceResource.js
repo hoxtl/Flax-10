@@ -3,6 +3,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { ATTENDANCE_UPDATED_EVENT } from "../../../lib/attendanceEvents";
 
 function createInitialState(initialValue) {
   return { data: initialValue, loading: true, error: null };
@@ -21,6 +22,10 @@ async function runAttendanceLoader(loader, setState) {
 export function useAttendanceResource(loader, initialValue) {
   const [state, setState] = useState(createInitialState(initialValue));
   const refetch = useCallback(() => runAttendanceLoader(loader, setState), [loader]);
-  useEffect(() => { refetch(); }, [refetch]);
+  useEffect(() => {
+    refetch();
+    window.addEventListener(ATTENDANCE_UPDATED_EVENT, refetch);
+    return () => window.removeEventListener(ATTENDANCE_UPDATED_EVENT, refetch);
+  }, [refetch]);
   return { ...state, refetch };
 }

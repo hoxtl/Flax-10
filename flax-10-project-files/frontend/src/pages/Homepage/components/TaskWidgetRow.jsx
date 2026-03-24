@@ -2,29 +2,19 @@
  * Task widget row.
  */
 
-import { motion } from "framer-motion";
-import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
+import { motion as Motion } from "framer-motion";
+import { itemVariants } from "../../../components/Modules/shared/widgetVariants.js";
+import InlineTitleField, { useInlineEdit } from "../../../components/Common/InlineTitleField/InlineTitleField";
+import TaskPriorityPill from "../../../components/Common/TaskPriorityPill/TaskPriorityPill";
+import DeadlineCountdown from "../../../components/Common/DeadlineCountdown/DeadlineCountdown";
+import urgentGlowStyles from "../../../components/Common/UrgentGlow/UrgentGlow.module.css";
+import rowStyles from "../../Modules/DashboardRows.module.css";
 
-export const itemVariants = {
-  initial: { opacity: 0, y: 5 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] } },
-};
-
-export function TaskWidgetRow(props) {
-  const edit = useInlineEdit(props.task.title, (title) => props.onInlineTaskEdit?.(props.task, { title }));
-  return (
-    <motion.li layout variants={itemVariants} className={getRowClassName(props)} style={{ "--task-row-accent": props.rowAccent }} onContextMenu={(event) => openContextMenu(event, props)}>
-      <TaskCheckbox {...props} />
-      <TaskWidgetBody {...props} edit={edit} />
-    </motion.li>
-  );
-}
-
-function getRowClassName({ idx, isOverdue, styles }) {
-  const flags = [styles.taskWidgetTaskRow];
-  if (isOverdue) flags.push(styles.taskWidgetTaskRowOverdue);
-  if (idx === 0) flags.push(styles.taskWidgetTaskRowNext);
-  return flags.join(" ");
+function getRowClassName(isOverdue, urgentGlow) {
+  const base = rowStyles.deadlineRow;
+  const overdue = isOverdue ? rowStyles.rowOverdue : "";
+  const glow = urgentGlow ? urgentGlowStyles.urgentGlow : "";
+  return `${base} ${overdue} ${glow}`.trim();
 }
 
 function openContextMenu(event, props) {
@@ -32,11 +22,15 @@ function openContextMenu(event, props) {
   props.setCtxMenu({ task: props.task, x: event.clientX, y: event.clientY });
 }
 
-function TaskCheckbox({ handleTaskWidgetComplete, styles, task }) {
+function TaskCheckbox({ handleTaskWidgetComplete, task }) {
   return (
-    <button type="button" className={styles.taskWidgetCheckbox} onClick={(event) => handleComplete(event, handleTaskWidgetComplete, task)} aria-label={`Complete ${task.title}`}>
-      <motion.span className={styles.taskWidgetCheckboxCircle} aria-hidden animate={{ scale: 1 }} transition={{ duration: 0.2 }} />
-    </button>
+    <button
+      type="button"
+      className={rowStyles.taskCheckbox}
+      onClick={(event) => handleComplete(event, handleTaskWidgetComplete, task)}
+      aria-label={`Complete ${task.title}`}
+      aria-pressed={Boolean(task.completed)}
+    />
   );
 }
 
@@ -45,37 +39,46 @@ function handleComplete(event, handleTaskWidgetComplete, task) {
   handleTaskWidgetComplete(task);
 }
 
-function TaskWidgetBody({ categoryLabel, categoryStyle, edit, styles, task, urgency }) {
+function TaskRowLeft({ edit, task }) {
   return (
-    <div className={styles.taskWidgetTaskBody}>
-      <div className={styles.taskWidgetTaskTopRow}>
-        <CategoryPill categoryLabel={categoryLabel} categoryStyle={categoryStyle} styles={styles} />
-        <TaskTitle edit={edit} styles={styles} task={task} />
-        <UrgencyPill edit={edit} styles={styles} urgency={urgency} />
-      </div>
+    <div className={rowStyles.deadlineRowLeft}>
+      <span className={rowStyles.deadlineTitle}>
+        <InlineTitleField
+          value={task.title}
+          isEditing={edit.isEditing}
+          draft={edit.draft}
+          setDraft={edit.setDraft}
+          onStart={edit.start}
+          onSave={edit.save}
+          onCancel={edit.cancel}
+        />
+      </span>
     </div>
   );
 }
 
-function CategoryPill({ categoryLabel, categoryStyle, styles }) {
-  if (!categoryLabel) return null;
-  const pillStyle = { background: categoryStyle.bg, color: categoryStyle.text };
-  return <span className={styles.taskWidgetCategoryPill} style={pillStyle}>{categoryLabel}</span>;
-}
-
-function TaskTitle({ edit, styles, task }) {
+function TaskRowRight({ task }) {
+  if (!task.due_date) return null;
   return (
-    <span className={styles.taskWidgetTaskTitle}>
-      <InlineTitleField value={task.title} isEditing={edit.isEditing} draft={edit.draft} setDraft={edit.setDraft} onStart={edit.start} onSave={edit.save} onCancel={edit.cancel} />
-    </span>
+    <div className={rowStyles.widgetRowMeta}>
+      {task.priority ? <TaskPriorityPill priority={task.priority} compact /> : null}
+      <DeadlineCountdown dueDate={task.due_date} showPriority={false} />
+    </div>
   );
 }
 
-function UrgencyPill({ edit, styles, urgency }) {
-  if (!urgency || edit.isEditing) return null;
-  return <span className={`${styles.taskWidgetUrgencyPill} ${styles[`taskWidgetUrgencyPill${capitalize(urgency.tone)}`]}`}>{urgency.label}</span>;
-}
-
-function capitalize(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+export function TaskWidgetRow(props) {
+  const edit = useInlineEdit(props.task.title, (title) => props.onInlineTaskEdit?.(props.task, { title }));
+  return (
+    <Motion.div
+      className={getRowClassName(props.isOverdue, props.urgentGlow)}
+      style={{ "--deadline-row-accent": props.rowAccent }}
+      variants={itemVariants}
+      onContextMenu={(event) => openContextMenu(event, props)}
+    >
+      <TaskCheckbox handleTaskWidgetComplete={props.handleTaskWidgetComplete} task={props.task} />
+      <TaskRowLeft edit={edit} task={props.task} />
+      <TaskRowRight task={props.task} />
+    </Motion.div>
+  );
 }

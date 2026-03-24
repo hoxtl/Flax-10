@@ -34,11 +34,13 @@ export function useTimerPageController(t, location) {
 }
 
 function openFocus(flags) {
+  flags.setShowHistory(false);
   flags.setFocusMode(true);
   flags.setFocusFullscreenPending(true);
 }
 
 function closeTimerOverlays(flags) {
+  flags.setShowHistory(false);
   flags.setFocusMode(false);
   flags.setShowShortcuts(false);
 }

@@ -59,7 +59,7 @@ class OverlapLimitUpdateTests(BaseEventTestCase):
     def test_update_causing_overlap_limit_returns_400(self):
         start = get_datetime_str(hours_offset=10)
         end = get_datetime_str(hours_offset=11)
-        for i in range(3):
+        for i in range(2):
             self.create_event_in_db({
                 'title': f'Overlap {i}',
                 'start_time': start,

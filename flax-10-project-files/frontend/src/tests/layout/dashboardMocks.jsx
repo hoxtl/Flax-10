@@ -49,10 +49,11 @@ export const DeadlineModalMock = ({ onClose }) => (
   <div data-testid="deadline-modal"><button onClick={onClose}>Close Deadline Modal</button></div>
 );
 
-export const LeaveTimerMock = ({ onCancel, onPause, onExit }) => (
+export const LeaveTimerMock = ({ onCancel, onPause, onExit, onTakeBreak }) => (
   <div data-testid="leave-timer-modal">
     <button onClick={onCancel}>Stay</button>
     <button onClick={onPause}>Pause and Leave</button>
+    <button onClick={onTakeBreak}>Take a 5m Break instead</button>
     <button onClick={onExit}>Exit Timer</button>
   </div>
 );

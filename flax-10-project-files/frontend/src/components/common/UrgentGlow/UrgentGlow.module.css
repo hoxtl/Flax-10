@@ -1,0 +1,6 @@
+.urgentGlow {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border)) !important;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--danger) 20%, transparent),
+    0 0 8px color-mix(in srgb, var(--danger) 18%, transparent);
+}

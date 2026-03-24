@@ -1,7 +1,7 @@
 """
-Seeds admin-facing data: pending teacher requests, course change requests,
-and society reports. Fixture users (janedoe, johndoe, charlie) are excluded
-as requesters/reporters unless they request themselves.
+Seeds admin-facing data: course change requests and society reports.
+Fixture users (janedoe, johndoe, charlie) are excluded as
+requesters/reporters unless they request themselves.
 """
 
 import random
@@ -36,36 +36,10 @@ REPORT_REASONS = [
     "Organising events without proper approval",
     "Impersonating another society",
 ]
-
-
-def _non_fixture_students():
-    return list(User.objects.filter(role="student").exclude(username__in=FIXTURE_NAMES))
-
-
 def _non_fixture_users():
     return list(
         User.objects.filter(role__in=["student", "teacher"]).exclude(username__in=FIXTURE_NAMES)
     )
-
-
-def _promote_to_pending_teacher(user):
-    """Set role to pending_teacher if not already set. Returns True if updated."""
-
-    if user.role == "pending_teacher":
-        return False
-    user.role = "pending_teacher"
-    user.save(update_fields=["role"])
-    return True
-
-def seed_teacher_requests(stdout):
-    rng = random.Random("studyflax-teacher-requests-v1")
-    pool = _non_fixture_students()
-    if not pool:
-        return
-    count_target = min(10, len(pool))
-    chosen = rng.sample(pool, count_target)
-    updated = sum(1 for user in chosen if _promote_to_pending_teacher(user))
-    stdout.write(f"  \u2713  {'Teacher requests':<14} {updated} new pending")
 
 
 def _create_course_change_if_missing(user, rng):

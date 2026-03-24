@@ -6,6 +6,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ModuleDetails from '../../../components/Modules/Modules/ModuleDetails';
 
+const useAuthMock = vi.hoisted(() => vi.fn(() => ({ profile: null })));
+
 vi.mock('../../../utils/moduleUtils', () => ({
     formatTime: vi.fn(() => '09:00'),
     formatDuration: vi.fn(() => '1h'),
@@ -15,6 +17,9 @@ vi.mock('../../../components/Modules/Modules/ModuleDetails.module.css', () => ({
 vi.mock('../../../components/Modules/styles/ModuleHero.module.css', () => ({ default: {} }));
 vi.mock('../../../components/Modules/styles/ModuleSchedule.module.css', () => ({ default: {} }));
 vi.mock('../../../components/Modules/styles/ModuleDeadlines.module.css', () => ({ default: {} }));
+vi.mock('../../../context/AuthContext.jsx', () => ({
+    useAuth: useAuthMock,
+}));
 
 const module = { //values for mock module
     id: 1, module_code: '5CCS2SEG', module_name: 'Software Engineering',
@@ -24,6 +29,10 @@ const module = { //values for mock module
 };
 
 describe('ModuleDetails', () => {
+    beforeEach(() => {
+        useAuthMock.mockReturnValue({ profile: null });
+    });
+
     it('should successfully render module name and code', () => {
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
         expect(screen.getByText('5CCS2SEG')).toBeInTheDocument();
@@ -63,6 +72,12 @@ describe('ModuleDetails', () => {
         render(<ModuleDetails module={module} is_enrolled={false} onBack={vi.fn()} onEnroll={onEnroll} onUnenroll={vi.fn()} />);
         fireEvent.click(screen.getByText('Enrol in module'));
         expect(onEnroll).toHaveBeenCalled();
+    });
+
+    it('hides the enroll button when the teacher owns the module', () => {
+        useAuthMock.mockReturnValue({ profile: { id: 7, role: 'teacher' } });
+        render(<ModuleDetails module={{ ...module, created_by: 7 }} is_enrolled={false} onBack={vi.fn()} onEnroll={vi.fn()} onUnenroll={vi.fn()} />);
+        expect(screen.queryByText('Enrol in module')).not.toBeInTheDocument();
     });
 
     it('should call onUnenroll when leave button is clicked', () => {

@@ -32,11 +32,12 @@ function ReadOnlyEvent({ event, style, minWidth }) {
     const theme = getEventTheme(event, useTags());
 
     const onClick = (e) => {
+        e.stopPropagation();
         openPopup(event, e.currentTarget.getBoundingClientRect(), true);
     };
 
     return (
-        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={onClick}>
+        <div className={getReadOnlyClassName(event)} style={buildStyle(style, theme)} onClick={onClick} data-event-id={event.id}>
             <EventContent event={event} theme={theme} height={parseFloat(style?.height) || 0} width={parseWidth(style?.width)} minWidth={minWidth} />
         </div>
     );
@@ -98,6 +99,7 @@ function useEditableEventState(event) {
 function EditableEvent({ event, style, minWidthForDetails }) {
     const state = useEditableEventState(event);
     const onClick = (e) => {
+        e.stopPropagation();
         if (state.refs.resizeEnded.current) { state.refs.resizeEnded.current = false; return; }
         if (state.isDragging || state.resize.isResizing) return;
         state.openPopup(event, state.refs.event.current?.getBoundingClientRect());
@@ -130,7 +132,7 @@ function EventCard({ event, style, theme, refs, resize, isDragging, dragProps, o
     const className = `draggable-event ${isDragging ? 'dragging' : ''} ${resize.isResizing ? 'resizing' : ''}`;
 
     return (
-        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} {...dragProps}>
+        <div ref={refs.event} className={className} style={renderStyle} onClick={onClick} onContextMenu={onContextMenu} data-event-id={event.id} {...dragProps}>
             <EventContent event={event} theme={theme} height={height} width={parseWidth(style?.width)} minWidth={minWidth} />
             <div className="resize-handle" onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); resize.handleResizeStart(e); }} />
         </div>
@@ -144,11 +146,12 @@ function parseWidth(width) {
 
 function EventContent({ event, theme, height, width, minWidth }) {
     const showDetails = height >= 30 && width >= minWidth;
+    const isCompact = height < 28;
     const isSociety = event.source === 'society';
 
     return (
-        <div className="event-content">
-            <div className="event-title">{event.title}</div>
+        <div className={`event-content${isCompact ? ' compact' : ''}`}>
+            <div className={`event-title${isCompact ? ' compact' : ''}`}>{event.title}</div>
             {isSociety && showDetails && <div className="society-name">{event.society_name}</div>}
             {showDetails && <TimeDisplay event={event} />}
             {height >= 60 && width >= minWidth && event.description && <div className="event-description">{event.description}</div>}

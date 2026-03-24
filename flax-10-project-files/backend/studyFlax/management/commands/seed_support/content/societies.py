@@ -41,11 +41,23 @@ def _create_society_from_config(data, index, total):
     society, _ = Society.objects.update_or_create(name=data['name'], defaults=defaults)
     return society
 
+PASTEL_TAG_COLORS = [
+    '#F4A7B9', '#B8C8F4', '#A8D8B0', '#F9C89A', '#C5B4E3',
+    '#96CEFF', '#F7D090', '#B0D9A8', '#F2C6D0', '#9FD3D3',
+    '#D4B5C8', '#C8E6C9', '#FFD1A8', '#E1BEE7', '#B3E5FC',
+    '#F0F4C3', '#DCEDC8', '#FFDDB3', '#E8EAF6', '#FCE4EC',
+    '#C9E4CA', '#FFE4B5', '#D0E8FF', '#FFD6E0', '#D6EAD0',
+]
+
+def _tag_color_for_label(label):
+    return PASTEL_TAG_COLORS[sum(ord(c) for c in label) % len(PASTEL_TAG_COLORS)]
+
 def _seed_society_tags(society, tag_labels):
-    from faker import Faker
-    f = Faker('en_GB')
     for label in tag_labels:
-        SocietyTag.objects.get_or_create(society=society, label=label, defaults={'color': f.hex_color()})
+        SocietyTag.objects.update_or_create(
+            society=society, label=label,
+            defaults={'color': _tag_color_for_label(label)},
+        )
 
 def create_societies(stdout):
     seed_data = build_society_seed_data()
@@ -107,40 +119,47 @@ def _pick_admin(admin_counts, student_users):
     eligible = [u for u in student_users if admin_counts[u.id] < 3]
     return random.choice(eligible) if eligible else None
 
-def _ensure_seed_membership(user, society, role):
+MAX_SYNC_PER_USER = 2
+
+def _ensure_seed_membership(user, society, role, sync_counts):
+    sync_count = sync_counts.get(user.id, 0)
+    enable_sync = sync_count < MAX_SYNC_PER_USER
     membership, _ = SocietyMembership.objects.update_or_create(
         user=user,
         society=society,
-        defaults={'role': role, 'is_subscribed': True},
+        defaults={'role': role, 'is_subscribed': enable_sync},
     )
-    SocietyCalendarSync.objects.get_or_create(user=user, society=society)
+    if enable_sync:
+        SocietyCalendarSync.objects.get_or_create(user=user, society=society)
+        sync_counts[user.id] = sync_count + 1
     return membership
 
-def _add_admin_membership(society, admin, admin_counts):
-    _ensure_seed_membership(admin, society, 'admin')
+def _add_admin_membership(society, admin, admin_counts, sync_counts):
+    _ensure_seed_membership(admin, society, 'admin', sync_counts)
     society.admin_emails = admin.email
     society.save()
     admin_counts[admin.id] += 1
 
-def _seed_regular_members(society, admin, member_counts, student_users):
+def _seed_regular_members(society, admin, member_counts, student_users, sync_counts):
     eligible = [u for u in student_users if u.id != admin.id and member_counts[u.id] < 5]
     count = min(random.randint(5, 15), len(eligible))
     members = random.sample(eligible, count)
     for member in members:
-        _ensure_seed_membership(member, society, 'member')
+        _ensure_seed_membership(member, society, 'member', sync_counts)
         member_counts[member.id] += 1
 
-def _seed_society_members(society, admin_counts, member_counts, student_users):
+def _seed_society_members(society, admin_counts, member_counts, student_users, sync_counts):
     admin = _pick_admin(admin_counts, student_users)
     if not admin:
         return
-    _add_admin_membership(society, admin, admin_counts)
-    _seed_regular_members(society, admin, member_counts, student_users)
+    _add_admin_membership(society, admin, admin_counts, sync_counts)
+    _seed_regular_members(society, admin, member_counts, student_users, sync_counts)
 
 def create_society_memberships(stdout):
     SocietyMembership.objects.filter(user__role='teacher').delete()
     student_users = list(User.objects.filter(role='student'))
     admin_counts = {u.id: 0 for u in student_users}
     member_counts = {u.id: 0 for u in student_users}
+    sync_counts = {u.id: 0 for u in student_users}
     for society in Society.objects.all():
-        _seed_society_members(society, admin_counts, member_counts, student_users)
+        _seed_society_members(society, admin_counts, member_counts, student_users, sync_counts)

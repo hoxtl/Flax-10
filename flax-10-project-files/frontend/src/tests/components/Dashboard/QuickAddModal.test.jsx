@@ -160,9 +160,9 @@ describe('QuickAddModal', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it('redirects legacy manual schedule view to auto schedule', () => {
+    it('redirects legacy manual schedule view back to the main quick-add chooser', () => {
         renderModal({ initialView: 'schedule_manual' });
-        expect(screen.getByText('Auto Schedule')).toBeTruthy();
-        expect(screen.getByText(/Generate schedule blocks from upcoming deadlines/i)).toBeTruthy();
+        expect(screen.getByText('Quick Add')).toBeTruthy();
+        expect(screen.getByText(/What would you like to add/i)).toBeTruthy();
     });
 });

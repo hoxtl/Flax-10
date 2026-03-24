@@ -48,7 +48,7 @@ def _pick_time(event, data, field):
 
 def _overlap_limit_response():
     return Response(
-        {'error': 'Cannot have more than 3 overlapping events.'},
+        {'error': 'Cannot have more than 2 overlapping events.'},
         status=status.HTTP_400_BAD_REQUEST,
     )
 

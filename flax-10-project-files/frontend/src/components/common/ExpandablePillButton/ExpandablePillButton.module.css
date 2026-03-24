@@ -1,0 +1,22 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: center;
+  margin-top: 0.35rem;
+  padding: 0.4rem 0.95rem;
+  border: 0.5px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.button:hover {
+  background: var(--primary);
+  color: var(--modules-accent-on-solid);
+  border-color: var(--primary);
+}

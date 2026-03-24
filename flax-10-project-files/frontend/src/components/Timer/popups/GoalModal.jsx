@@ -23,13 +23,10 @@ function SummaryPill({ label, value, type }) {
   );
 }
 
-function GoalSummary({ sessions, workTime, breakTime, distractionCount }) {
-  const distractionText = distractionCount > 0 ? `You stayed focused, but had ${distractionCount} interruption${distractionCount > 1 ? 's' : ''}.` : 'Clean focus run — no interruptions tracked.';
-
+function GoalSummary({ sessions, workTime, breakTime }) {
   return (
     <div className={styles.goalReachedSummary}>
       <p className={styles.goalReachedSummaryText}>You've completed all your scheduled sessions. Amazing work!</p>
-      <p className={styles.goalReachedSummaryText}>{distractionText}</p>
       <div className={styles.goalReachedStats}>
         <SummaryPill label="✅ Sessions" value={sessions} type="Sessions" />
         <SummaryPill label="🔥 Focus" value={formatTime(workTime)} type="Focus" />
@@ -66,7 +63,7 @@ function MoodButton({ option, mood, setMood }) {
   );
 }
 
-export function GoalModal({ sessions, workTime, breakTime, onAction, distractionCount = 0 }) {
+export function GoalModal({ sessions, workTime, breakTime, onAction }) {
   const [mood, setMood] = useState(null);
   const handleComplete = () => completeGoal(mood, onAction);
 
@@ -74,7 +71,7 @@ export function GoalModal({ sessions, workTime, breakTime, onAction, distraction
     <StandardModal title="Goal reached" onClose={handleComplete} size="sm" backdropClassName={styles.endSessionBackdrop} modalClassName={styles.goalReachedModal} contentClassName={styles.goalReachedContent}>
       <div className={styles.goalReachedBody}>
         <div className={styles.goalReachedRecapLabel}>Session recap</div>
-        <GoalSummary sessions={sessions} workTime={workTime} breakTime={breakTime} distractionCount={distractionCount} />
+        <GoalSummary sessions={sessions} workTime={workTime} breakTime={breakTime} />
         <MoodPicker mood={mood} setMood={setMood} />
         <PrimaryButton className={styles.goalReachedButton} variant="primary" onClick={handleComplete} pill>Start New Goal</PrimaryButton>
       </div>

@@ -23,8 +23,8 @@ READING_WEEK_START = datetime(2026, 2, 23).date()
 READING_WEEK_END = datetime(2026, 2, 27).date()
 
 AFTERNOON_SLOTS = [
-    (12, 30, 30, "Review notes"),
-    (18, 30, 45, "Study at library"),
+    (14, 0, 30, "Review notes"),
+    (16, 30, 45, "Study at library"),
     (21, 0, 30, "Plan tomorrow"),
 ]
 
@@ -93,7 +93,7 @@ def _pop_title(week_titles):
     return week_titles.pop()
 
 def _build_day_events(user, tags, day_offset, week_titles):
-    non_lecture_hours = [8, 13, 17, 19, 20]
+    non_lecture_hours = [9, 11, 15, 17, 21]
     daily_count = random.randint(1, 2)
     hours = random.sample(non_lecture_hours, min(daily_count, len(non_lecture_hours)))
     return [build_event(user, _pop_title(week_titles), tags, day_offset, h) for h in hours]
@@ -276,15 +276,58 @@ def _build_single_deadline(module, deadline_type, title, description, now, used_
 def _get_deadline_templates(module):
     prefix = module.module_code[:2]
     default_list = list(deadline_fixtures[:3])
-    return module_deadline_fixtures.get(
-        module.module_code,
-        module_deadline_fixtures.get(prefix, default_list),
+    if module.module_code in module_deadline_fixtures:
+        return module_deadline_fixtures[module.module_code], "module"
+    if prefix in module_deadline_fixtures:
+        return module_deadline_fixtures[prefix], "prefix"
+    return default_list, "default"
+
+
+def _module_deadline_title(module, deadline_type, title):
+    module_label = (getattr(module, "module_name", None) or getattr(module, "module_code", "")).strip()
+    normalized = str(title or "").strip()
+    lower = normalized.lower()
+    suffixes = (
+        ("essay", "Essay"),
+        ("report", "Report"),
+        ("quiz", "Quiz"),
+        ("presentation", "Presentation"),
+        ("assignment", "Assignment"),
+        ("portfolio", "Portfolio"),
+        ("brief", "Brief"),
+        ("proposal", "Proposal"),
+        ("case study", "Case Study"),
+        ("review", "Review"),
+        ("exam", "Exam"),
+        ("test", "Test"),
     )
+    for suffix, label in suffixes:
+        if lower.endswith(suffix):
+            return f"{module_label} {label}"
+    if deadline_type == "coursework":
+        return f"{module_label} Coursework"
+    if deadline_type == "quiz":
+        return f"{module_label} Quiz"
+    if deadline_type == "presentation":
+        return f"{module_label} Presentation"
+    if deadline_type == "exam":
+        return f"{module_label} Exam"
+    return f"{module_label} {normalized}".strip()
+
+
+def _normalise_shared_deadline_templates(module, templates, template_scope):
+    if template_scope == "module":
+        return list(templates)
+    return [
+        (deadline_type, _module_deadline_title(module, deadline_type, title), description)
+        for deadline_type, title, description in templates
+    ]
 
 def build_deadlines_for_module(module):
     """Return unsaved Deadline instances for *module*."""
 
-    templates = _get_deadline_templates(module)
+    templates, template_scope = _get_deadline_templates(module)
+    templates = _normalise_shared_deadline_templates(module, templates, template_scope)
     used_offsets = set()
     now = timezone.now()
     results = [_build_single_deadline(module, *t, now, used_offsets, index=i) for i, t in enumerate(templates)]

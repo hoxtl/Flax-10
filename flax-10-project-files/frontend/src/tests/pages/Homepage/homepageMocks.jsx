@@ -9,20 +9,12 @@ export const IntelligenceRowMock = ({ displayName, slot1TodayTasks, slot3Urgent,
   </div>
 );
 
-export const TaskWidgetSlotMock = ({ handleTaskWidgetComplete, onStartFocus, getTaskCategoryPill, getTaskCategoryColor, onEditTask, onDeleteTask, onInlineTaskEdit }) => (
+export const TaskWidgetSlotMock = ({ handleTaskWidgetComplete, onEditTask, onDeleteTask, onInlineTaskEdit }) => (
   <div data-testid="task-widget-slot">
     <button type="button" onClick={() => handleTaskWidgetComplete({ id: 'task-1', title: 'Task A', completed: false, task_list: 123, tag: 1 })}>complete-task</button>
-    <button type="button" onClick={() => onStartFocus?.()}>start-focus</button>
     <button type="button" onClick={() => onEditTask?.({ id: 1 })}>edit-task</button>
     <button type="button" onClick={() => onDeleteTask?.({ id: 1 })}>delete-task</button>
     <button type="button" onClick={() => onInlineTaskEdit?.({ id: 1 }, { title: 'X' })}>inline-edit</button>
-    <div data-testid="pill">{getTaskCategoryPill?.({ task_list: 123, tag: 1 })}</div>
-    <div data-testid="pill-null">{getTaskCategoryPill?.({ task_list: 999 }) ?? 'null'}</div>
-    <div data-testid="pill-module-code">{getTaskCategoryPill?.({ module_code: 'XY1' }) ?? 'null'}</div>
-    <div data-testid="pill-module-id">{getTaskCategoryPill?.({ module_id: 10 }) ?? 'null'}</div>
-    <div data-testid="color">{getTaskCategoryColor?.({ tag: 1 })}</div>
-    <div data-testid="color-flax">{getTaskCategoryColor?.({})}</div>
-    <div data-testid="color-module">{getTaskCategoryColor?.({ module_code: 'CS101' })}</div>
   </div>
 );
 
@@ -60,18 +52,19 @@ export const MiniTimelineMock = ({ sortedEvents, onQuickStart, onTaskToggle, onC
   </div>
 );
 
-export const HomepageTimelineSectionMock = ({ sortedEvents, handleReplanDay, missedItems, overdueTasksForNow, replanLoading, handleQuickStartGap, handleTaskToggle, openTimelinePopup, openModal, handleConflictAutoMove, handleConflictPushTomorrow, handleTimelineDelete, handleReschedule, setCompletedEventIds }) => (
+export const HomepageTimelineSectionMock = ({
+  sortedEvents,
+  handleQuickStartGap,
+  handleTaskToggle,
+  openTimelinePopup,
+  openModal,
+  handleConflictAutoMove,
+  handleConflictPushTomorrow,
+  handleTimelineDelete,
+  handleReschedule,
+  setCompletedEventIds,
+}) => (
   <div data-testid="homepage-timeline-section">
-    {handleReplanDay && (
-      <button
-        type="button"
-        aria-label="Re-plan overdue and missed items into free windows"
-        onClick={handleReplanDay}
-        disabled={replanLoading || (!missedItems?.length && !overdueTasksForNow?.length)}
-      >
-        {replanLoading ? 'Re-planning...' : 'Re-plan'}
-      </button>
-    )}
     <MiniTimelineMock
       sortedEvents={sortedEvents}
       onQuickStart={handleQuickStartGap}
@@ -82,11 +75,14 @@ export const HomepageTimelineSectionMock = ({ sortedEvents, handleReplanDay, mis
       onPushTomorrow={handleConflictPushTomorrow}
       onDelete={handleTimelineDelete}
       onReschedule={handleReschedule}
-      onToggleComplete={(eventId) => setCompletedEventIds?.((prev) => {
-        const next = new Set(prev);
-        if (next.has(eventId)) next.delete(eventId); else next.add(eventId);
-        return next;
-      })}
+      onToggleComplete={(eventId) => {
+        setCompletedEventIds?.((prev) => {
+          const next = new Set(prev);
+          if (next.has(eventId)) next.delete(eventId);
+          else next.add(eventId);
+          return next;
+        });
+      }}
     />
   </div>
 );

@@ -10,6 +10,7 @@ from studyFlax.models import Enrollment
 from studyFlax.models.tasks.task_model import Task, TaskList
 from studyFlax.fixtures.data_fixtures import (
     module_task_templates, personal_task_fixtures, task_list_fixtures,
+    teacher_task_list_fixtures, teacher_personal_task_fixtures,
 )
 
 def _create_task_lists(user):
@@ -64,6 +65,11 @@ def _build_due_date(now, days_from_now):
         hour=23, minute=59, second=0, microsecond=0,
     )
 
+def _build_completed_at(now, due_date, completed):
+    if not completed:
+        return None
+    return min(now, due_date)
+
 def _create_module_task(user, task_list, mod, title_tmpl, description,
                         priority, estimated_blocks, days_from_now, index, now):
     days = _adjust_days(mod, index, days_from_now)
@@ -108,7 +114,42 @@ def _seed_personal_tasks(user, lists_by_name, personal_list, now):
         count += 1
     return count
 
+def _create_teacher_task_lists(user):
+    lists_by_name = {}
+    for list_name, list_category, list_emoji in teacher_task_list_fixtures:
+        tl, _ = TaskList.objects.get_or_create(
+            user=user, name=list_name,
+            defaults={"category": list_category},
+        )
+        lists_by_name[list_name] = tl
+    return lists_by_name
+
+def _seed_teacher_tasks(user, lists_by_name, now):
+    first_list = next(iter(lists_by_name.values()), None)
+    count = 0
+    for title, description, priority, blocks, days, list_name, completed in teacher_personal_task_fixtures:
+        task_list = lists_by_name.get(list_name, first_list)
+        due_date = _build_due_date(now, days)
+        Task.objects.create(
+            user=user, task_list=task_list, module=None,
+            title=title, description=description, priority=priority,
+            due_date=due_date,
+            estimated_blocks=blocks,
+            completed=completed,
+            completed_at=_build_completed_at(now, due_date, completed),
+        )
+        count += 1
+    return count
+
+def _seed_tasks_for_teacher(user, now):
+    if Task.objects.filter(user=user).exists():
+        return 0
+    lists_by_name = _create_teacher_task_lists(user)
+    return _seed_teacher_tasks(user, lists_by_name, now)
+
 def _seed_tasks_for_user(user, now):
+    if getattr(user, 'role', None) == 'teacher':
+        return _seed_tasks_for_teacher(user, now)
     if Task.objects.filter(user=user).exists():
         return 0
     lists_by_name = _create_task_lists(user)
@@ -118,6 +159,36 @@ def _seed_tasks_for_user(user, now):
     lists_by_module = create_module_reading_lists(user, modules)
     total = _seed_module_tasks(user, lists_by_module, now)
     total += _seed_personal_tasks(user, lists_by_name, personal_list, now)
+    return total
+
+def _ensure_task_due_today(user, lists_by_module, now):
+    """If no tasks are due today, set the first module task's due date to today."""
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    has_today = Task.objects.filter(
+        user=user, due_date__gte=today_start, due_date__lte=today_end
+    ).exists()
+    if has_today:
+        return
+    first_task = Task.objects.filter(user=user).order_by('due_date').first()
+    if first_task:
+        first_task.due_date = today_end
+        first_task.save(update_fields=['due_date'])
+
+def seed_new_user_tasks(user, now):
+    """Seed task lists and module tasks for a newly registered user.
+    Creates reading lists for each enrolled module and module-specific tasks,
+    but does NOT add the personal fixture tasks (those are for seeded demo users only).
+    Ensures at least one task is due today.
+    """
+    if Task.objects.filter(user=user).exists():
+        return 0
+    _create_task_lists(user)
+    enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
+    modules = [e.module for e in enrolled]
+    lists_by_module = create_module_reading_lists(user, modules)
+    total = _seed_module_tasks(user, lists_by_module, now)
+    _ensure_task_due_today(user, lists_by_module, now)
     return total
 
 def create_tasks(users, stdout):

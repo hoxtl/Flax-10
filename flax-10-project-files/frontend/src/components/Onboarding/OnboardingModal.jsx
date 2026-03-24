@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";
 import useOnboarding from "./hooks/useOnboarding";
@@ -13,12 +14,12 @@ function getCourseOptions() {
   }));
 }
 
-function ModalContent({ state, onComplete }) {
+function ModalContent({ state, onComplete, onDropdownOpenChange }) {
   return (
     <AnimatePresence mode="wait">
       {state.done
         ? <SuccessScreen key="success" major={state.major} onComplete={onComplete} />
-        : <OnboardingForm key="form" {...state} courseOptions={getCourseOptions()} />
+        : <OnboardingForm key="form" {...state} courseOptions={getCourseOptions()} onDropdownOpenChange={onDropdownOpenChange} />
       }
     </AnimatePresence>
   );
@@ -26,15 +27,23 @@ function ModalContent({ state, onComplete }) {
 
 export default function OnboardingModal({ isOpen, onComplete }) {
   const state = useOnboarding();
+  const [openDropdowns, setOpenDropdowns] = useState({ course: false, year: false });
   if (!isOpen) return null;
+  const isExpanded = !state.done && Object.values(openDropdowns).some(Boolean);
   return (
     <StandardModal
-      onClose={onComplete} 
+      onClose={onComplete}
       hideHeader
       size="md"
+      modalClassName={[styles.onboardingPanel, isExpanded ? styles.onboardingPanelExpanded : ""].filter(Boolean).join(" ")}
       contentClassName={styles.modal}
+      dismissOnBackdrop={false}
     >
-      <ModalContent state={state} onComplete={onComplete} />
+      <ModalContent
+        state={state}
+        onComplete={onComplete}
+        onDropdownOpenChange={(field, open) => setOpenDropdowns((current) => ({ ...current, [field]: open }))}
+      />
     </StandardModal>
   );
 }

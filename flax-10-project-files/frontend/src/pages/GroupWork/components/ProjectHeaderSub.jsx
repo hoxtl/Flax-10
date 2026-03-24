@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import Tooltip from "../../../components/common/Tooltip/Tooltip";
 import { useToast } from "../../../context/ToastContext";
 import styles from "./ProjectHeader.module.css";
 
@@ -25,35 +26,37 @@ function DeleteProjectModal({ onDelete, setDeleteError, setShowDeleteModal, show
 
 /** Delete action button and hold-to-confirm modal for a group project. */
 
-export default function ProjectDeleteAction({ onDelete }) {
+export default function ProjectDeleteAction({ onDelete, isOwner }) {
     const showToast = useToast();
-    const [deleteError, setDeleteError] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const btn = (
+        <PrimaryButton
+            type="button"
+            size="small"
+            variant="danger"
+            pill
+            className={!isOwner ? styles.deleteBtnDisabled : undefined}
+            onClick={isOwner ? () => setShowDeleteModal(true) : undefined}
+            disabled={!isOwner}
+            aria-disabled={!isOwner}
+        >
+            <Trash2 size={14} />
+            Delete project
+        </PrimaryButton>
+    );
     return (
         <>
-            <div className={styles.deleteActionWrap}>
-                <PrimaryButton type="button" size="small" variant="ghost" pill className={styles.deleteBtn} onClick={() => openDeleteModal(setDeleteError, setShowDeleteModal)}>
-                    <Trash2 size={14} />
-                    Delete project
-                </PrimaryButton>
-                {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
-            </div>
-            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={setDeleteError} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
+            {isOwner ? btn : (
+                <Tooltip content="Only project owner can delete" position="bottom">
+                    <span className={styles.deleteBtnTooltipWrap}>{btn}</span>
+                </Tooltip>
+            )}
+            {showDeleteModal && <DeleteProjectModal onDelete={onDelete} setDeleteError={() => {}} setShowDeleteModal={setShowDeleteModal} showToast={showToast} />}
         </>
     );
 }
 
-function openDeleteModal(setDeleteError, setShowDeleteModal) {
-    setDeleteError("");
-    setShowDeleteModal(true);
-}
-
 async function confirmDeleteProject(onDelete, setDeleteError, setShowDeleteModal, showToast) {
-    if (await onDelete()) {
-        showToast("Project deleted.");
-        setShowDeleteModal(false);
-        return;
-    }
     setShowDeleteModal(false);
-    setDeleteError("Only the project owner can delete this project.");
+    if (await onDelete()) showToast("Project deleted.");
 }

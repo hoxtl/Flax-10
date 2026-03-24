@@ -13,7 +13,7 @@ import { clearRightRailHistory, useRightRailHistory } from './historyPanel/useRi
 function ClearHistoryAction({ setShowClearModal }) {
     return (
         <div className={styles.rightHistoryActions}>
-            <PrimaryButton type="button" variant="ghost" pill size="small" onClick={() => setShowClearModal(true)}>Clear History</PrimaryButton>
+            <PrimaryButton type="button" variant="primary" pill size="small" onClick={() => setShowClearModal(true)}>Clear History</PrimaryButton>
         </div>
     );
 }
@@ -24,14 +24,6 @@ function ClearHistoryModal({ state }) {
     return (
         <HoldConfirmModal title="Clear History" warningText="This will permanently delete all logged sessions. This action cannot be undone." cancelLabel="Keep History" holdLabel="Hold to Clear" onConfirm={() => clearRightRailHistory(state.setHistory, state.setShowClearModal)} onCancel={() => state.setShowClearModal(false)} />
     );
-}
-
-function useHistoryEvents(refresh) {
-    useEffect(() => {
-        const evs = ['timerHistoryUpdated', 'historyCleared'];
-        evs.forEach(e => window.addEventListener(e, refresh));
-        return () => evs.forEach(e => window.removeEventListener(e, refresh));
-    }, [refresh]);
 }
 
 export default function RightRailHistoryPanel() {
@@ -48,25 +40,3 @@ export default function RightRailHistoryPanel() {
         </div>
     );
 }
-
-function FooterActions({ onClear }) {
-    return (
-        <div className={styles.rightHistoryActions}>
-            <PrimaryButton type="button" variant="ghost" pill size="small" onClick={onClear}>Clear History</PrimaryButton>
-        </div>
-    );
-}
-
-function ClearModal({ onConfirm, onCancel }) {
-    return (
-        <HoldConfirmModal
-            title="Clear History"
-            warningText="This will permanently delete all logged sessions. This action cannot be undone."
-            cancelLabel="Keep History"
-            holdLabel="Hold to Clear"
-            onConfirm={onConfirm}
-            onCancel={onCancel}
-        />
-    );
-}
-

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import SleepBanner from '../../../pages/Homepage/components/SleepBanner';
 
 vi.mock('../../../api/userApi', () => ({
@@ -51,12 +51,12 @@ describe('SleepBanner', () => {
     it('dismisses banner when x is clicked', async () => {
         getUserSettings.mockResolvedValue({ sleep_time: '23:00:00', wake_time: '07:00:00' });
         isDuringSleepWindow.mockReturnValue(true);
-        const { container } = render(<SleepBanner />);
+        render(<SleepBanner />);
         await waitFor(() => {
             expect(screen.getByText('🌙')).toBeTruthy();
         });
-        fireEvent.click(screen.getByText('x'));
-        expect(container.firstChild).toBeNull();
+        fireEvent.click(screen.getByRole('button', { name: /dismiss sleep banner/i }));
+        await waitForElementToBeRemoved(() => screen.queryByText('🌙'));
     });
 
     it('handles getUserSettings error gracefully', async () => {

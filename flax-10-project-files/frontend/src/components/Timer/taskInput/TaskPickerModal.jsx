@@ -9,7 +9,8 @@ import SkeletonBlock from '../../common/LoadingState/SkeletonBlock';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
 import StandardModal from '../../common/StandardModal/StandardModal';
 import AnimatedDropdown from '../../common/AnimatedDropdown';
-import TaskFeedFilterPanel from '../../../pages/Tasks/components/TaskFeedFilterPanel';
+import ToolbarFilterPanel from '../../../pages/Tasks/components/TaskFeedToolbarFilter';
+import taskToolbarStyles from '../../../pages/Tasks/components/TaskFeedToolbar.module.css';
 import { SORT_OPTIONS } from './taskInputConstants';
 import { TaskPickItem } from './TaskPickItem';
 
@@ -38,13 +39,32 @@ function SmartPickButton({ onPickForMe }) {
   return <PrimaryButton variant="primary" pill className={styles.taskPickSmartBtn} onClick={onPickForMe}>✦ Smart Pick — choose a task for me</PrimaryButton>;
 }
 
+function buildFilterPanelProps(state) {
+  return {
+    activeFilterTab: state.activeFilterTab,
+    onTabChange: state.setActiveFilterTab,
+    filterQuery: state.filterQuery,
+    onQueryChange: state.setFilterQuery,
+    visibleListItems: state.visibleListItems,
+    filterListIds: state.filterListIds,
+    onToggleList: (listId) => toggleList(listId, state.setFilterListIds),
+    moduleGroupKeys: state.moduleGroupKeys,
+    groupedModuleItems: state.groupedModuleItems,
+    filterModuleCodes: state.filterModuleCodes,
+    onToggleModule: (code) => toggleModule(code, state.setFilterModuleCodes),
+    onClearAll: () => clearAllFilters(state),
+  };
+}
+
 function Toolbar({ state, filterWrapRef, activeFilterCount, onPickForMe }) {
+  const filterPanelProps = buildFilterPanelProps(state);
+
   return (
     <div className={styles.taskPickFiltersBar}>
       <div className={styles.taskPickToolbarRow}>
         <SearchBar value={state.search} onChange={state.setSearch} placeholder="Search tasks…" className={styles.taskPickSearch} />
-        <div className={styles.taskPickSortWrap}><AnimatedDropdown value={state.sortBy} onChange={(value) => changeSort(value, state)} options={SORT_OPTIONS} className={styles.taskPickSortDropdown} /></div>
-        <TaskFeedFilterPanel containerRef={filterWrapRef} isOpen={state.isFilterOpen} onToggle={() => state.setIsFilterOpen((value) => !value)} activeFilterCount={activeFilterCount} activeFilterTab={state.activeFilterTab} onTabChange={state.setActiveFilterTab} filterQuery={state.filterQuery} onFilterQueryChange={state.setFilterQuery} visibleListItems={state.visibleListItems} filterListIds={state.filterListIds} onToggleList={(listId) => toggleList(listId, state.setFilterListIds)} groupedVisibleModuleItems={state.groupedModuleItems} moduleGroupKeys={state.moduleGroupKeys} filterModuleCodes={state.filterModuleCodes} onToggleModule={(code) => toggleModule(code, state.setFilterModuleCodes)} onClearAll={() => clearAllFilters(state)} />
+        <div className={styles.taskPickSortWrap}><AnimatedDropdown value={state.sortBy} onChange={(value) => changeSort(value, state)} options={SORT_OPTIONS} className={taskToolbarStyles.sortDropdown} /></div>
+        <div className={styles.taskPickFilterSlot}><ToolbarFilterPanel filterAnchor={filterWrapRef} isFilterOpen={state.isFilterOpen} onFilterOpenChange={state.setIsFilterOpen} activeFilterCount={activeFilterCount} panelProps={filterPanelProps} /></div>
       </div>
       <SmartPickButton onPickForMe={onPickForMe} />
     </div>
@@ -83,7 +103,7 @@ export function TaskPickerModal({ state, filterWrapRef, onSelect, onPickForMe })
   const modalClassName = !state.open ? styles.hidden : styles.taskPickDropdown;
 
   return (
-    <StandardModal onClose={() => state.setOpen(false)} size="md" hideHeader backdropClassName={backdropClassName} modalClassName={modalClassName} contentClassName={styles.taskPickContent}>
+    <StandardModal onClose={() => state.setOpen(false)} size="lg" hideHeader backdropClassName={backdropClassName} modalClassName={modalClassName} contentClassName={styles.taskPickContent}>
       {state.open && <div className={styles.taskPickShell} onMouseDown={(event) => closeFilterPanel(event, state, filterWrapRef)}><ModalHeader setOpen={state.setOpen} /><Toolbar state={state} filterWrapRef={filterWrapRef} activeFilterCount={activeFilterCount} onPickForMe={onPickForMe} /><TaskResults state={state} onSelect={onSelect} /></div>}
     </StandardModal>
   );

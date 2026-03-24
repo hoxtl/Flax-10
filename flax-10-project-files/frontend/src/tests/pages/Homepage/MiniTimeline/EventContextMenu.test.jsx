@@ -68,8 +68,8 @@ describe('EventContextMenu', () => {
         renderMenu({ pos: { x: 50, y: 75 } });
         // EventContextMenu uses createPortal — menu is appended to document.body
         const menu = document.body.querySelector('.contextMenu');
-        expect(menu.style.getPropertyValue('--ctx-top')).toBe('75');
-        expect(menu.style.getPropertyValue('--ctx-left')).toBe('50');
+        expect(menu.style.getPropertyValue('--ctx-top')).toBe('75px');
+        expect(menu.style.getPropertyValue('--ctx-left')).toBe('50px');
     });
 
     it('does not throw when onEdit is undefined', () => {

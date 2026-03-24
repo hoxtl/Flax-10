@@ -107,12 +107,11 @@ def create_fixture_users(stdout):
     )
     for data in ordered_fixtures:
         _create_single_fixture_user(data, stdout)
-    stdout.write("  Fixture users (password: 1234)")
     for data in ordered_fixtures:
         username = data['username']
         role = ROLE_LABELS.get(username, 'student')
         display_role = 'admin/student' if username == 'johndoe' else role
-        stdout.write(f"    {username:<12} {display_role}")
+        stdout.write(f"  \u2713  {username:<14} {display_role}")
 
 def _compute_random_counts(needed, target_teacher_count=14):
     current_teacher_count = User.objects.filter(role='teacher').count()
@@ -138,7 +137,7 @@ def _create_users_if_needed(stdout, target_teacher_count):
     student_count, teacher_count = _compute_random_counts(needed, target_teacher_count)
     new_users = _build_new_users(student_count, teacher_count)
     User.objects.bulk_create(new_users, ignore_conflicts=True)
-    stdout.write(f"  + {needed} random users (Faker-generated)")
+    stdout.write(f"  \u2713  {'Random users':<14} {needed}")
 
 
 def _ensure_user_settings(stdout):

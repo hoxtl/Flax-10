@@ -10,9 +10,9 @@
   gap: 10px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: rgba(192, 113, 78, 0.05);
-  border: 1px solid rgba(192, 113, 78, 0.2);
-  border-left: 3px solid #c0714e;
+  background: var(--home-timeline-danger-soft);
+  border: 1px solid var(--home-timeline-danger-border);
+  border-left: 3px solid var(--home-timeline-danger);
 }
 .planTimelineGapDeadlineInfo {
   display: flex;
@@ -28,8 +28,8 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c0714e;
-  background: rgba(192, 113, 78, 0.1);
+  color: var(--home-timeline-danger);
+  background: var(--home-timeline-danger-soft);
   padding: 1px 6px;
   border-radius: 99px;
   width: fit-content;
@@ -38,7 +38,7 @@
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #3d2e1e;
+  color: var(--home-timeline-ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -46,7 +46,7 @@
 .planTimelineGapDeadlineMeta {
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.57rem;
-  color: rgba(192, 113, 78, 0.65);
+  color: var(--home-timeline-muted);
   letter-spacing: 0.02em;
 }
 .planTimelineGapDeadlineBtn {
@@ -54,9 +54,9 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid rgba(192, 113, 78, 0.35);
-  background: rgba(192, 113, 78, 0.07);
-  color: #9b4a2a;
+  border: 1px solid var(--home-timeline-danger-border);
+  background: var(--home-timeline-danger-soft);
+  color: var(--home-timeline-danger-strong);
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 600;
@@ -70,8 +70,8 @@
   margin-top: 2px;
 }
 .planTimelineGapDeadlineBtn:hover {
-  background: rgba(192, 113, 78, 0.15);
-  border-color: rgba(192, 113, 78, 0.55);
+  background: color-mix(in srgb, var(--home-timeline-danger-soft) 120%, transparent);
+  border-color: var(--home-timeline-danger-border);
 }
 
 /* ── Start buttons ── */
@@ -81,9 +81,9 @@
   gap: 3px;
   padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid rgba(132, 169, 140, 0.5);
-  background: rgba(132, 169, 140, 0.1);
-  color: #5a8a65;
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 600;
@@ -91,13 +91,17 @@
   cursor: pointer;
   transition:
     background 0.15s,
-    border-color 0.15s;
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
   flex-shrink: 0;
   white-space: nowrap;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 .planTimelineGapStartBtn:hover {
-  background: rgba(132, 169, 140, 0.2);
-  border-color: rgba(132, 169, 140, 0.7);
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
 }
 
 .planTimelineGapStartBtnSm {
@@ -105,20 +109,27 @@
   align-items: center;
   padding: 3px 9px;
   border-radius: 9999px;
-  border: 1px solid rgba(132, 169, 140, 0.45);
-  background: rgba(132, 169, 140, 0.08);
-  color: #5a8a65;
+  border: 1px solid var(--home-timeline-gap-action-border);
+  background: var(--home-timeline-gap-action-bg);
+  color: var(--home-timeline-gap-action-ink);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.68rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
   flex-shrink: 0;
   white-space: nowrap;
   margin-left: auto;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 .planTimelineGapStartBtnSm:hover {
-  background: rgba(132, 169, 140, 0.18);
+  background: var(--home-timeline-gap-action-bg-hover);
+  border-color: var(--home-timeline-gap-action-border);
+  color: var(--home-timeline-gap-action-ink);
 }
 
 .planTimelineGapSkipBtn {
@@ -129,21 +140,28 @@
   height: 20px;
   padding: 0;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
-  background: transparent;
-  color: var(--muted);
+  border: 1px solid var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg);
+  color: var(--home-timeline-gap-skip-ink);
   font-size: 0.62rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
   flex-shrink: 0;
   line-height: 1;
+  box-shadow: var(--home-timeline-gap-action-shadow);
 }
 
 .planTimelineGapSkipBtn:hover {
-  border-color: color-mix(in srgb, var(--muted) 60%, transparent);
-  background: color-mix(in srgb, var(--muted) 8%, transparent);
-  color: var(--text-secondary);
+  border-color: var(--home-timeline-gap-skip-border);
+  background: var(--home-timeline-gap-skip-bg-hover);
+  color: var(--home-timeline-gap-skip-ink);
+  transform: translateY(-1px);
 }
 
 .planTimelineGapUrgencyChip {
@@ -151,9 +169,9 @@
   align-items: center;
   padding: 1px 6px;
   border-radius: 9999px;
-  border: 1px solid rgba(192, 113, 78, 0.35);
-  background: rgba(192, 113, 78, 0.08);
-  color: #a05034;
+  border: 1px solid var(--home-timeline-warning-border);
+  background: var(--home-timeline-warning-soft);
+  color: var(--home-timeline-warning);
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.62rem;
   font-weight: 700;
@@ -168,9 +186,9 @@
   height: 10px;
   min-width: 10px;
   min-height: 10px;
-  background: #c0714e;
+  background: var(--home-timeline-danger);
   font-size: 0;
-  box-shadow: 0 0 0 2px #fff;
+  box-shadow: 0 0 0 2px var(--home-timeline-node-ring);
   border: none;
 }
 
@@ -180,15 +198,15 @@
   gap: 10px;
   padding: 9px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(192, 113, 78, 0.3);
-  background: rgba(192, 113, 78, 0.06);
+  border: 1px solid var(--home-timeline-danger-border);
+  background: var(--home-timeline-danger-soft);
   flex: 1;
 }
 
 .planTimelineGapTransitIcon {
   font-style: normal;
   font-size: 0.85rem;
-  color: #c0714e;
+  color: var(--home-timeline-danger);
   flex-shrink: 0;
 }
 
@@ -203,7 +221,7 @@
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #8b4e35;
+  color: var(--home-timeline-danger-strong);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -213,7 +231,7 @@
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.62rem;
   font-weight: 500;
-  color: #c0714e;
+  color: var(--home-timeline-danger);
   opacity: 0.8;
 }
 
@@ -224,8 +242,8 @@
   gap: 7px;
   padding: 9px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(192, 113, 78, 0.28);
-  background: rgba(192, 113, 78, 0.05);
+  border: 1px solid var(--home-timeline-danger-border);
+  background: var(--home-timeline-danger-soft);
   flex: 1;
 }
 
@@ -240,7 +258,7 @@
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.6rem;
   font-weight: 500;
-  color: #84a98c;
+  color: var(--home-timeline-success);
   margin-left: auto;
   white-space: nowrap;
 }
@@ -252,8 +270,8 @@
   gap: 10px;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px dashed rgba(107, 83, 68, 0.25);
-  background: rgba(107, 83, 68, 0.04);
+  border: 1px dashed var(--home-timeline-ghost-border);
+  background: var(--home-timeline-accent-soft);
 }
 
 .planTimelineGapPersonalDur {
@@ -262,14 +280,14 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #7b6751;
+  color: var(--home-timeline-accent);
   flex-shrink: 0;
 }
 
 .planTimelineGapPersonalText {
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.75rem;
-  color: #9c8573;
+  color: var(--home-timeline-soft);
   font-style: italic;
 }
 
@@ -280,8 +298,8 @@
   gap: 10px;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px dashed rgba(180, 150, 100, 0.3);
-  background: rgba(180, 150, 100, 0.05);
+  border: 1px dashed var(--home-timeline-warning-border);
+  background: var(--home-timeline-warning-soft);
 }
 
 .planTimelineGapEveningDur {
@@ -290,14 +308,14 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b8956a;
+  color: var(--home-timeline-warning);
   flex-shrink: 0;
 }
 
 .planTimelineGapEveningText {
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.75rem;
-  color: #b8956a;
+  color: var(--home-timeline-warning);
   font-style: italic;
   opacity: 0.85;
 }
@@ -317,16 +335,28 @@
   padding: 8px 12px;
   margin: 0 2px 10px;
   border-radius: 8px;
-  background: #eef4ed;
-  border: 1px solid rgba(132, 169, 140, 0.3);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--home-timeline-success-surface-strong) 100%, white 0%),
+      color-mix(in srgb, var(--home-timeline-success-surface) 86%, white 14%)
+    ) !important;
+  border: 1px solid var(--home-timeline-success-surface-border);
+  border-left: 3px solid color-mix(in srgb, var(--home-timeline-success) 72%, white 28%);
   overflow: hidden;
+  width: calc(100% - 4px);
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    0 12px 20px var(--home-timeline-success-surface-shadow);
 }
 
 .planTimelineNowStripDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #84a98c;
+  background: var(--home-timeline-success);
   flex-shrink: 0;
   animation: nowDotPulse 2s ease-in-out infinite;
 }
@@ -337,7 +367,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #5f7c67;
+  color: var(--home-timeline-success-strong);
   flex-shrink: 0;
 }
 
@@ -345,7 +375,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #2d352d;
+  color: var(--home-timeline-ink);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -357,7 +387,7 @@
   font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 600;
-  color: #6f6a61;
+  color: var(--home-timeline-muted);
   flex-shrink: 0;
   opacity: 1;
 }
@@ -369,7 +399,7 @@
     var(--color-card) 0%,
     var(--color-bg) 100%
   );
-  border-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--home-widget-frame-border);
 }
 
 [data-mode="dark"] .planTimelineStatusBar {
@@ -378,13 +408,21 @@
 }
 
 [data-mode="dark"] .planTimelineCard {
-  background: color-mix(in srgb, var(--color-card) 60%, transparent);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 60%, transparent)
+  );
+  border-color: var(--home-timeline-card-border);
+  box-shadow: var(--home-timeline-card-shadow);
 }
 
 [data-mode="dark"] .planTimelineCard:hover {
-  background: color-mix(in srgb, var(--color-card) 80%, transparent);
-  border-color: var(--color-primary);
+  background: var(
+    --home-timeline-card-surface,
+    color-mix(in srgb, var(--color-card) 80%, transparent)
+  );
+  border-color: var(--home-timeline-card-hover-border, var(--color-primary));
+  box-shadow: var(--home-timeline-card-shadow-hover);
 }
 
 [data-mode="dark"] .planTimelineRowGap .planTimelineTinyGapLine {

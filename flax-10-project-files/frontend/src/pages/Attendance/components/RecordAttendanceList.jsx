@@ -1,37 +1,77 @@
 /*
  * Unmarked attendance list.
+ * Shows lecture-type events only (lectures, LGTs, seminars, SmG).
+ * Plays a tick/cross overlay flash after marking.
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { recordAttendance } from "../../../api/attendanceApi";
 import AttendanceEventList from "./AttendanceEventList";
 import AttendanceListSection from "./AttendanceListSection";
 import AttendanceRecordActions from "./AttendanceRecordActions";
+import AttendanceSuccessOverlay from "./AttendanceSuccessOverlay";
 
 const MAX_RECORD_EVENTS = 20;
 
-export default function RecordAttendanceList({ events, onRecorded }) {
-  const [submittingId, setSubmittingId] = useState(null);
-  return <RecordAttendanceContent events={events} onRecorded={onRecorded} submittingId={submittingId} setSubmittingId={setSubmittingId} />;
+/** Prefixes whose events should appear in the record list (attendance-relevant). */
+const ATTENDANCE_PREFIXES = ["lecture", "lgt", "smg", "seminar", "tutorial", "lab", "workshop", "practical"];
+
+function isAttendanceEvent(event) {
+  const title = (event.title || "").toLowerCase();
+  if (event.event_type && event.event_type.toLowerCase() === "coursework") return false;
+  return ATTENDANCE_PREFIXES.some((prefix) => title.startsWith(prefix));
 }
 
-function RecordAttendanceContent({ events, onRecorded, submittingId, setSubmittingId }) {
-  if (!events.length) return null;
+export default function RecordAttendanceList({ events, onRecorded }) {
+  const [submittingId, setSubmittingId] = useState(null);
+  const [successState, setSuccessState] = useState(null); // null | { attended: bool }
+  const timerRef = useRef(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  function showSuccess(attended) {
+    setSuccessState({ attended });
+    timerRef.current = setTimeout(() => setSuccessState(null), 1500);
+  }
+
+  const filteredEvents = events.filter(isAttendanceEvent);
+  if (!filteredEvents.length) return null;
+
   return (
-    <AttendanceListSection hint="Mark attendance for your timetable events to update the charts above." footer={buildRecordFooter(events.length)}>
-      <AttendanceEventList events={events.slice(0, MAX_RECORD_EVENTS)} renderActions={(event) => <AttendanceRecordActions event={event} submittingId={submittingId} onRecord={(eventId, attended) => submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded)} />} />
-    </AttendanceListSection>
+    <>
+      <AttendanceListSection
+        hint="Mark past lectures and seminars as attended or missed. Future events are locked."
+        footer={filteredEvents.length > MAX_RECORD_EVENTS ? "Showing first 20 events." : ""}
+      >
+        <AttendanceEventList
+          events={filteredEvents.slice(0, MAX_RECORD_EVENTS)}
+          renderActions={(event) => (
+            <AttendanceRecordActions
+              event={event}
+              submittingId={submittingId}
+              onRecord={(eventId, attended) =>
+                submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess)
+              }
+            />
+          )}
+        />
+      </AttendanceListSection>
+
+      <AnimatePresence>
+        {successState && (
+          <AttendanceSuccessOverlay key="success-overlay" attended={successState.attended} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
-function buildRecordFooter(total) {
-  return total > MAX_RECORD_EVENTS ? "Showing first 20 events. Use the prompt during class for more." : "";
-}
-
-async function submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded) {
+async function submitAttendanceRecord(eventId, attended, setSubmittingId, onRecorded, showSuccess) {
   setSubmittingId(eventId);
   try {
     await recordAttendance(eventId, attended);
+    showSuccess(attended);
     onRecorded?.();
   } catch {
     return null;

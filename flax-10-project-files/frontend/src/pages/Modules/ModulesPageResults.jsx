@@ -106,7 +106,7 @@ function EnrollmentsGrid({ state, sorting }) {
       onViewModule={state.setViewingModule}
       onEnrollmentToggle={state.hook.toggleEnrollment}
       onEdit={(item) => editModule(state, item)}
-      onDelete={(item) => state.hook.handleDeleteModule(item, () => state.setViewingModule(null))}
+      onDelete={(item) => state.setDeletingModule(item)}
       onManageDeadlines={state.setDeadlineModule}
       onManageReadings={state.setReadingModule}
       taskCountsByModule={state.hook.taskCountsByModule}
@@ -255,7 +255,7 @@ function ModuleGridSection({ state, sorting }) {
       onViewModule={state.setViewingModule}
       onEnrollmentToggle={state.hook.toggleEnrollment}
       onEdit={(item) => editModule(state, item)}
-      onDelete={(item) => state.hook.handleDeleteModule(item, () => state.setViewingModule(null))}
+      onDelete={(item) => state.setDeletingModule(item)}
       onManageDeadlines={state.setDeadlineModule}
       onManageReadings={state.setReadingModule}
       taskCountsByModule={state.hook.taskCountsByModule}

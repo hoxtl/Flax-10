@@ -6,7 +6,7 @@ import styles from "./DashboardLayout.module.css";
 import QuickCommandBar from "../components/common/QuickCommandBar/QuickCommandBar";
 import FloatingChat from "../components/FloatingChat";
 import { BackToTop } from "../components/Pagination/Pagination";
-import { handleLogoutClick, shouldShowBackToTop } from "./dashboardLayout/dashboardLayoutActions";
+import { handleLogoutClick, shouldBlockTimerNavigation, shouldShowBackToTop } from "./dashboardLayout/dashboardLayoutActions";
 import { useDashboardState } from "./dashboardLayout/dashboardLayoutHooks";
 import { DashboardModals, LeaveTimerActions } from "./dashboardLayout/dashboardLayoutModals";
 import { DashboardSidebars, MainArea } from "./dashboardLayout/dashboardLayoutSections";
@@ -39,8 +39,7 @@ function getMainAreaProps(state, onNavChange) {
 }
 
 function handleQuickAdd(state) {
-  const shouldPause = state.activeNav === "timer" && state.t.isActive && !state.t.isPaused;
-  if (shouldPause) return state.setPendingNav("QUICK_ADD");
+  if (shouldBlockTimerNavigation(state.activeNav, state.t)) return state.setPendingNav("QUICK_ADD");
   state.setQuickAddInitialView("type");
   state.setShowQuickAdd(true);
 }
@@ -49,7 +48,7 @@ export default function DashboardLayout({ activeNav, onNavChange, children }) {
   const state = useDashboardState(activeNav, onNavChange);
   const stateWithNav = { ...state, activeNav };
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-role={state.user?.role}>
       <DashboardSidebars {...getSidebarProps(state, activeNav)} />
       <DashboardMain state={stateWithNav} onNavChange={state.handleNavChange}>{children}</DashboardMain>
       <FloatingChat />

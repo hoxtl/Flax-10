@@ -6,8 +6,11 @@ vi.mock('framer-motion', () => ({
     motion: new Proxy({}, {
         get: (_, tag) => ({ children, ...props }) => {
             const Tag = typeof tag === 'string' ? tag : 'div';
-            const { initial, animate, transition, layout, ...rest } = props;
-            return <Tag {...rest}>{children}</Tag>;
+            delete props.initial;
+            delete props.animate;
+            delete props.transition;
+            delete props.layout;
+            return <Tag {...props}>{children}</Tag>;
         },
     }),
     AnimatePresence: ({ children }) => <>{children}</>,
@@ -261,7 +264,7 @@ describe('RightNowWidget', () => {
         renderWidget({
             isToday: true,
             sortedEvents: [{ title: 'Campus Event', start_time: futureTime, location: 'Waterloo' }],
-            tflDelays: [{}],
+            tflDelays: [{ lineName: 'Northern', severityDescription: 'Minor delays' }],
         });
         expect(screen.getByText('Campus Event')).toBeTruthy();
     });
@@ -321,7 +324,7 @@ describe('RightNowWidget', () => {
         renderWidget({
             isToday: true,
             sortedEvents: [{ title: 'Campus Class', start_time: startTime, location: 'Waterloo' }],
-            tflDelays: [{}],
+            tflDelays: [{ lineName: 'Victoria', severityDescription: 'Minor delays' }],
         });
         expect(screen.getByText('Campus Class')).toBeTruthy();
     });

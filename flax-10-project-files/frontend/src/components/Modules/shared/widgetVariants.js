@@ -3,11 +3,25 @@
  */
 
 export const expandBodyVariants = {
-    collapsed: { opacity: 0, height: 0 },
+    collapsed: {
+        opacity: 0,
+        height: 0,
+        y: -6,
+        transition: {
+            height: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+            opacity: { duration: 0.16, ease: "easeIn" },
+            y: { duration: 0.16, ease: "easeIn" },
+        },
+    },
     expanded: {
         opacity: 1,
         height: 'auto',
-        transition: { duration: 0.26, ease: [0.23, 1, 0.32, 1] },
+        y: 0,
+        transition: {
+            height: { duration: 0.32, ease: [0.23, 1, 0.32, 1] },
+            opacity: { duration: 0.2, ease: "easeOut", delay: 0.04 },
+            y: { duration: 0.22, ease: [0.23, 1, 0.32, 1] },
+        },
     },
 };
 

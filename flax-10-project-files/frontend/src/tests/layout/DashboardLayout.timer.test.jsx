@@ -12,8 +12,6 @@ vi.mock("../../context/CalendarContext", () => ({
 }));
 
 import DashboardLayout from "../../layout/DashboardLayout";
-import { authService } from "../../api/authApi";
-import { clearUserData } from "../../components/Authentication/utils/authHelpers";
 import { useEventModal, useCalendar } from "../../context/CalendarContext";
 import { useLocation } from "react-router-dom";
 
@@ -60,8 +58,8 @@ vi.mock("react-router-dom", () => ({
 }));
 
 const mockTimerContext = {
-  isActive: false, isPaused: false, timeLeft: 1500,
-  togglePause: vi.fn(), setIsActive: vi.fn(), resetTimer: vi.fn(),
+  isActive: false, isPaused: false, mode: "work", timeLeft: 1500,
+  togglePause: vi.fn(), setIsActive: vi.fn(), setMode: vi.fn(), setTimeLeft: vi.fn(), resetTimer: vi.fn(),
 };
 vi.mock("../../context/TimerContext", () => ({ useTimerContext: vi.fn(() => mockTimerContext) }));
 vi.mock("../../context/NotificationContext", () => ({ useNotifications: () => ({ addNotification: vi.fn() }) }));
@@ -93,10 +91,11 @@ describe("DashboardLayout – society, timer, global task", () => {
     useCalendar.mockReturnValue({ selectedDate: new Date() });
     mockTimerContext.isActive = false;
     mockTimerContext.isPaused = false;
+    mockTimerContext.mode = "work";
     useLocation.mockReturnValue({ pathname: "/", search: "", hash: "", state: null, key: "default" });
     localStorage.setItem("user", JSON.stringify(mockUser));
-    global.innerWidth = 1024;
-    global.dispatchEvent(new Event("resize"));
+    window.innerWidth = 1024;
+    window.dispatchEvent(new Event("resize"));
   });
 
   it("society creation error is caught and logged", async () => {
@@ -195,8 +194,8 @@ describe("DashboardLayout – society, timer, global task", () => {
     mockTimerContext.isActive = true;
     mockTimerContext.isPaused = false;
     const onNavChange = vi.fn();
-    global.innerWidth = 500;
-    global.dispatchEvent(new Event("resize"));
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
     render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
     fireEvent.click(screen.getByText("Nav to Settings"));
     expect(screen.getByTestId("leave-timer-modal")).toBeInTheDocument();
@@ -204,10 +203,40 @@ describe("DashboardLayout – society, timer, global task", () => {
     expect(onNavChange).toHaveBeenCalledWith("settings");
   });
 
+  it("Take a 5m Break instead starts a break and continues the pending navigation", () => {
+    mockTimerContext.isActive = true;
+    mockTimerContext.isPaused = false;
+    mockTimerContext.mode = "work";
+    const onNavChange = vi.fn();
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
+    render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
+    fireEvent.click(screen.getByText("Nav to Settings"));
+    expect(screen.getByTestId("leave-timer-modal")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Take a 5m Break instead"));
+    expect(mockTimerContext.setMode).toHaveBeenCalledWith("break");
+    expect(mockTimerContext.setTimeLeft).toHaveBeenCalledWith(300);
+    expect(mockTimerContext.setIsActive).toHaveBeenCalledWith(true);
+    expect(onNavChange).toHaveBeenCalledWith("settings");
+  });
+
+  it("does not block navigation while the timer is already on a break", () => {
+    mockTimerContext.isActive = true;
+    mockTimerContext.isPaused = false;
+    mockTimerContext.mode = "break";
+    const onNavChange = vi.fn();
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
+    render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
+    fireEvent.click(screen.getByText("Nav to Settings"));
+    expect(onNavChange).toHaveBeenCalledWith("settings");
+    expect(screen.queryByTestId("leave-timer-modal")).toBeNull();
+  });
+
   it("handleNavChange when nav is timer calls onNavChange without setting pending", () => {
     const onNavChange = vi.fn();
-    global.innerWidth = 500;
-    global.dispatchEvent(new Event("resize"));
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
     render(<DashboardLayout activeNav="timer" onNavChange={onNavChange}>Timer</DashboardLayout>);
     fireEvent.click(screen.getByText("Nav to Timer"));
     expect(onNavChange).toHaveBeenCalledWith("timer");
@@ -215,8 +244,8 @@ describe("DashboardLayout – society, timer, global task", () => {
   });
 
   it("user sync on auth-changed updates user", async () => {
-    global.innerWidth = 500;
-    global.dispatchEvent(new Event("resize"));
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByText("User: John Doe")).toBeInTheDocument();
     localStorage.setItem("user", JSON.stringify({ ...mockUser, first_name: "Jane", last_name: "Doe" }));
@@ -226,8 +255,8 @@ describe("DashboardLayout – society, timer, global task", () => {
 
   it("parseStoredUser includes year and major when present", () => {
     localStorage.setItem("user", JSON.stringify({ username: "u", first_name: "F", last_name: "L", year: 2, major: "CS", email: "e@e.com" }));
-    global.innerWidth = 500;
-    global.dispatchEvent(new Event("resize"));
+    window.innerWidth = 500;
+    window.dispatchEvent(new Event("resize"));
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     expect(screen.getByText("User: F L")).toBeInTheDocument();
   });

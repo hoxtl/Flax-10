@@ -11,6 +11,26 @@ import {
   TestModeContent,
 } from "./ModulesPageChrome.jsx";
 import { useModulesPageState } from "./modulesPageHooks.js";
+import HoldConfirmModal from "../../components/Common/HoldConfirmModal/HoldConfirmModal.jsx";
+
+function DeleteModuleModal({ state }) {
+  const mod = state.deletingModule;
+  if (!mod) return null;
+  return (
+    <HoldConfirmModal
+      title="Delete Module"
+      warningBanner="This will permanently remove this module and all enrolled students. This cannot be undone."
+      warningText={`Are you sure you want to delete "${mod.module_name}"? Any students currently enrolled will be immediately unenrolled. This is irreversible.`}
+      holdLabel="Hold to Delete"
+      cancelLabel="Keep Module"
+      onConfirm={() => {
+        state.setDeletingModule(null);
+        state.hook.handleDirectDeleteModule(mod, () => state.setViewingModule?.(null));
+      }}
+      onCancel={() => state.setDeletingModule(null)}
+    />
+  );
+}
 
 export default function ModulesPage({ initialSearch = "", initialCreate = false }) {
   const state = useModulesPageState(initialSearch, initialCreate);
@@ -20,6 +40,7 @@ export default function ModulesPage({ initialSearch = "", initialCreate = false 
     <>
       <AnimatedContent state={state} viewKey={getViewKey(state.showForm, state.viewingModule)} MainView={MainView} />
       <ModulesPageModals state={state} />
+      <DeleteModuleModal state={state} />
     </>
   );
 }

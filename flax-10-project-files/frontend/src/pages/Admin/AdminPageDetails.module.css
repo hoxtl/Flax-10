@@ -41,6 +41,11 @@
   color: #5b21b6;
 }
 
+.badgeAdmin {
+  background: #ede7da;
+  color: #7b6142;
+}
+
 .badgeStudent {
   background: #f3f4f6;
   color: #374151;
@@ -171,6 +176,10 @@
 
 .roleTeacher {
   background: #7c3aed;
+}
+
+.roleAdmin {
+  background: #8b7355;
 }
 
 .roleStudent {

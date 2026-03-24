@@ -88,9 +88,9 @@
   --surface-card-muted: var(--surface);
   --surface-page: var(--bg);
   --surface-search: var(--search-bg);
-  --surface-raised: color-mix(in srgb, var(--color-card) 75%, white 12%);
+  --surface-raised: color-mix(in srgb, var(--color-card) 88%, var(--color-bg) 12%);
   --surface-warm: color-mix(in srgb, var(--color-sidebar) 25%, var(--color-card));
-  --surface-inner: color-mix(in srgb, var(--color-card) 70%, white 25%);
+  --surface-inner: color-mix(in srgb, var(--color-card) 78%, var(--color-bg) 22%);
   --surface-paper: var(--color-card);
   --surface-card-glass: color-mix(in srgb, var(--color-bg) 65%, transparent);
   --color-primary-solid: var(--color-primary);
@@ -165,7 +165,7 @@
 
   /* Widget-specific semantic variables (Dark) */
   --widget-surface: var(--color-card);
-  --widget-surface-raised: color-mix(in srgb, var(--color-card) 45%, var(--color-bg));
+  --widget-surface-raised: color-mix(in srgb, var(--color-card) 78%, var(--color-bg) 22%);
   --widget-surface-secondary: color-mix(in srgb, var(--color-primary) 6%, transparent);
   --widget-border: var(--color-border-base);
   --widget-icon-bg: color-mix(in srgb, var(--color-primary) 10%, transparent);
@@ -184,8 +184,21 @@
   --widget-metric-bg: color-mix(in srgb, var(--color-primary) 3%, transparent);
   --widget-metric-label: var(--text-secondary);
   --widget-metric-value: var(--text);
-  --widget-card-bg-glass: color-mix(in srgb, var(--c-white) 8%, transparent);
-  --widget-card-bg-soft: color-mix(in srgb, var(--c-white) 10%, transparent);
+  --widget-card-bg-glass: color-mix(in srgb, var(--surface-card) 72%, var(--color-bg) 28%);
+  --widget-card-bg-soft: color-mix(in srgb, var(--surface-card) 78%, var(--surface-inner) 22%);
+  --groupwork-action-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-inner) 88%, var(--color-bg) 12%) 0%,
+    color-mix(in srgb, var(--surface-card) 92%, var(--color-bg) 8%) 100%
+  );
+  --groupwork-action-border: color-mix(in srgb, var(--modules-accent-ink) 24%, var(--border));
+  --groupwork-action-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+  --groupwork-teacher-badge-bg: color-mix(in srgb, var(--surface-inner) 78%, var(--surface-card) 22%);
+  --groupwork-teacher-badge-border: color-mix(in srgb, var(--modules-accent-ink) 24%, var(--border));
+  --groupwork-teacher-badge-shadow: 0 12px 28px color-mix(in srgb, black 26%, transparent);
+  --groupwork-progress-track: color-mix(in srgb, var(--surface-inner) 84%, var(--c-green) 16%);
+  --groupwork-progress-fill-start: color-mix(in srgb, var(--c-green) 46%, var(--surface-card));
+  --groupwork-progress-fill-end: color-mix(in srgb, var(--c-green) 62%, var(--surface-card));
 
   --segmented-bg: rgba(255, 255, 255, 0.04);
   --segmented-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
@@ -206,18 +219,26 @@
   /* Modules */
   --modules-panel-tint: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--surface-card) 82%, white 18%) 0%,
-    color-mix(in srgb, var(--surface-card) 92%, var(--color-bg) 8%) 100%
+    color-mix(in srgb, var(--surface-card) 70%, var(--color-bg) 30%) 0%,
+    color-mix(in srgb, var(--surface-card) 84%, var(--color-bg) 16%) 100%
   );
-  --modules-accent-ink: color-mix(in srgb, var(--text) 88%, var(--color-highlight) 12%);
-  --modules-accent-ink-strong: var(--text);
+  --modules-accent-ink: color-mix(in srgb, white 82%, var(--color-highlight) 18%);
+  --modules-accent-ink-strong: white;
   --modules-accent-on-solid: var(--color-bg);
-  --modules-chip-fg: color-mix(in srgb, var(--color-highlight) 62%, var(--text) 38%);
-  --modules-chip-border: color-mix(in srgb, var(--color-highlight) 18%, var(--border));
-  --modules-chip-border-strong: color-mix(in srgb, var(--color-highlight) 24%, var(--border));
-  --modules-chip-bg: color-mix(in srgb, var(--color-highlight) 10%, transparent);
-  --modules-chip-bg-strong: color-mix(in srgb, var(--color-highlight) 14%, transparent);
-  --modules-inline-surface: color-mix(in srgb, var(--modules-accent-ink) 8%, var(--surface-card));
+  --modules-chip-fg: color-mix(in srgb, white 84%, var(--color-highlight) 16%);
+  --modules-chip-border: color-mix(in srgb, var(--color-highlight) 36%, var(--border));
+  --modules-chip-border-strong: color-mix(in srgb, var(--color-highlight) 46%, var(--border));
+  --modules-chip-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-inner) 82%, var(--color-highlight) 18%) 0%,
+    color-mix(in srgb, var(--surface-inner) 90%, var(--color-bg) 10%) 100%
+  );
+  --modules-chip-bg-strong: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 76%, var(--color-highlight) 24%) 0%,
+    color-mix(in srgb, var(--surface-inner) 88%, var(--color-bg) 12%) 100%
+  );
+  --modules-inline-surface: color-mix(in srgb, var(--surface-inner) 74%, var(--color-bg) 26%);
   --modules-danger-soft: color-mix(in srgb, var(--danger) 12%, transparent);
   --modules-danger-soft-hover: color-mix(in srgb, var(--danger) 20%, transparent);
   --modules-error-soft: color-mix(in srgb, var(--danger) 14%, transparent);
@@ -229,7 +250,7 @@
   --modules-priority-critical-fg: color-mix(in srgb, var(--warning-text) 54%, white 46%);
   --modules-priority-urgent-bg: color-mix(in srgb, var(--color-highlight) 24%, transparent);
   --modules-priority-urgent-fg: color-mix(in srgb, var(--color-highlight) 54%, white 46%);
-  --modules-due-future: var(--modules-chip-fg);
+  --modules-due-future: color-mix(in srgb, white 82%, var(--color-highlight) 18%);
   --modules-enrolled-badge-bg: color-mix(in srgb, var(--sage) 32%, var(--panel));
   --modules-enrolled-badge-fg: color-mix(in srgb, var(--sage) 85%, var(--text));
   --modules-enrolled-badge-border: color-mix(in srgb, var(--sage) 42%, var(--border));

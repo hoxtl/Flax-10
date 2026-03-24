@@ -142,7 +142,6 @@ describe('useTimerLogic Hook', () => {
             'My Important Task', // Task
             expect.any(Number), // pause
             expect.any(String), // status
-            expect.any(Number), // distractions
         );
     });
 

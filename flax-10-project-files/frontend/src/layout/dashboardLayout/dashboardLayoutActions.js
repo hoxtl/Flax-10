@@ -20,6 +20,11 @@ export function shouldShowBackToTop(activeNav) {
   return !hiddenPages.includes(activeNav);
 }
 
+export function shouldBlockTimerNavigation(activeNav, timer) {
+  const mode = timer?.mode || "work";
+  return activeNav === "timer" && timer?.isActive && !timer?.isPaused && mode === "work";
+}
+
 export function resolveQuickAddModal(id, extra, actions) {
   if (id === "society") return actions.openSociety();
   if (id === "task") return actions.openTask();

@@ -17,6 +17,7 @@ import MemberDirectoryModal from "../../components/Society/SocietyDetail/MemberD
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
 
 import { getImageUrls } from "./SocietyDetailPageUtils";

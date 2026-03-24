@@ -2,29 +2,47 @@
  * Weekly history chart.
  */
 
+import { motion, useReducedMotion } from 'framer-motion';
 import styles from '../../../pages/Timer/TimerPage.module.css';
 
-function WeeklyBar({ day, maxWeeklySeconds }) {
+function WeeklyBar({ day, maxWeeklySeconds, index, todayKey, reduceMotion }) {
   const ratio = Math.max(0.04, Number(day.seconds || 0) / maxWeeklySeconds);
   const hours = (Number(day.seconds || 0) / 3600).toFixed(1);
+  const isToday = day.key === todayKey;
+  const barHeight = `${Math.round(ratio * 100)}%`;
+  const labelClassName = `${styles.rightHistoryWeeklyBarLabel} ${isToday ? styles.rightHistoryWeeklyBarLabelToday : ''}`.trim();
+  const valueClassName = `${styles.rightHistoryWeeklyValue} ${isToday ? styles.rightHistoryWeeklyValueToday : ''}`.trim();
 
   return (
     <div className={styles.rightHistoryWeeklyBarCol}>
       <div className={styles.rightHistoryWeeklyBarTrack}>
-        <span className={styles.rightHistoryWeeklyBarFill} style={{ height: `${Math.round(ratio * 100)}%` }} />
+        <motion.span
+          className={styles.rightHistoryWeeklyBarFill}
+          style={reduceMotion ? { height: barHeight } : undefined}
+          initial={reduceMotion ? false : { height: 0, opacity: 0.35, scaleY: 0.92 }}
+          animate={reduceMotion ? undefined : { height: barHeight, opacity: 1, scaleY: 1 }}
+          transition={reduceMotion ? undefined : { duration: 0.55, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+        />
       </div>
-      <span className={styles.rightHistoryWeeklyBarLabel}>{day.label}</span>
-      <span className={styles.rightHistoryWeeklyValue}>{hours}h</span>
+      <span className={labelClassName}>{day.label}</span>
+      <span className={valueClassName}>{hours}h</span>
     </div>
   );
 }
 
 export function WeeklyChart({ weeklySeries, maxWeeklySeconds }) {
+  const reduceMotion = useReducedMotion();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayKey = today.toISOString().slice(0, 10);
+
   return (
     <section className={styles.rightHistoryWeeklySummary}>
       <div className={styles.rightHistoryWeeklyHeader}>Weekly Summary</div>
       <div className={styles.rightHistoryWeeklyChart} role="img" aria-label="Focus hours per day for the last 7 days">
-        {weeklySeries.map((day) => <WeeklyBar key={day.key} day={day} maxWeeklySeconds={maxWeeklySeconds} />)}
+        {weeklySeries.map((day, index) => (
+          <WeeklyBar key={day.key} day={day} index={index} todayKey={todayKey} maxWeeklySeconds={maxWeeklySeconds} reduceMotion={reduceMotion} />
+        ))}
       </div>
     </section>
   );

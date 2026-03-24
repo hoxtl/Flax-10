@@ -15,6 +15,20 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
+.compact {
+  min-width: auto;
+  min-height: 22px;
+  gap: 0.12rem;
+  padding: 0.12rem 0.42rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.03em;
+}
+
+.compact .marks {
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+}
+
 .marks {
   font-size: 0.7rem;
   font-weight: 800;

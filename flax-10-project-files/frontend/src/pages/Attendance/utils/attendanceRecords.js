@@ -2,7 +2,13 @@
  * Attendance record derivation helpers.
  */
 
-function sortAttendanceEvents(a, b) {
+/** Ascending: upcoming / soonest-first (used for unrecorded events). */
+function sortAscending(a, b) {
+  return new Date(a.start_time) - new Date(b.start_time);
+}
+
+/** Descending: most-recent-first (used for already-marked events). */
+function sortDescending(a, b) {
   return new Date(b.start_time) - new Date(a.start_time);
 }
 
@@ -15,13 +21,13 @@ export function buildRecordsByEventId(records) {
 }
 
 export function buildUnmarkedEvents(events, recordsByEventId) {
-  return events.filter((event) => !recordsByEventId.has(event.id));
+  return events.filter((event) => !recordsByEventId.has(event.id)).sort(sortAscending);
 }
 
 export function buildMarkedEvents(events, recordsByEventId) {
-  return events.filter((event) => recordsByEventId.has(event.id)).map((event) => withAttendanceStatus(event, recordsByEventId)).sort(sortAttendanceEvents);
+  return events.filter((event) => recordsByEventId.has(event.id)).map((event) => withAttendanceStatus(event, recordsByEventId)).sort(sortDescending);
 }
 
 export function buildMarkedEventsFromRecords(records) {
-  return records.map((record) => ({ id: record.event_id, title: record.title || "Untitled Event", start_time: record.start_time, attended: record.attended, event_type: record.event_type })).sort(sortAttendanceEvents);
+  return records.map((record) => ({ id: record.event_id, title: record.title || "Untitled Event", start_time: record.start_time, attended: record.attended, event_type: record.event_type })).sort(sortDescending);
 }

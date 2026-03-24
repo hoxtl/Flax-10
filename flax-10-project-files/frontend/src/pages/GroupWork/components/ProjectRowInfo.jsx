@@ -10,25 +10,26 @@ import { getProjectTeacherInitials, getProjectTeacherName, openTeacherProfile } 
 import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
 import styles from "./ProjectRow.module.css";
 
-export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate }) {
+export default function ProjectRowInfo({ project, members, totalMembers = 0, action = null, onProjectNavigate, isOwner = false }) {
   return (
     <div className={styles.projectInfoArea}>
       <ProjectTeacherAvatar project={project} />
       <div className={styles.projectText}>
-        <ProjectRowTitle project={project} action={action} onNavigate={onProjectNavigate} />
+        <ProjectRowTitle project={project} action={action} onNavigate={onProjectNavigate} isOwner={isOwner} />
         <AvatarStack members={members} totalMembers={totalMembers} />
       </div>
     </div>
   );
 }
 
-function ProjectRowTitle({ project, action, onNavigate }) {
+function ProjectRowTitle({ project, action, onNavigate, isOwner }) {
   const label = `Open ${project.name} project details`;
   return (
     <div className={styles.projectTitleRow}>
       <button type="button" className={`${styles.projectName} ${styles.projectNameButton}`} onClick={onNavigate} aria-label={label}>
         {project.name}
       </button>
+      {isOwner && <span className={styles.ownerPill}>PROJECT OWNER</span>}
       {action && <div className={styles.projectTitleAction}>{action}</div>}
     </div>
   );

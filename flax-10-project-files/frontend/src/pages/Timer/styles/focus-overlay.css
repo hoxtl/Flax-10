@@ -136,23 +136,25 @@
 
 .focusOverlayExitBtn {
     position: fixed;
-    top: 1.25rem;
-    right: 1.25rem;
-    z-index: 1;
-    border: 1px solid color-mix(in srgb, var(--focus-accent) 24%, var(--border));
-    background: color-mix(in srgb, var(--surface-card) 92%, var(--surface-page));
-    color: var(--text);
-    border-radius: 999px;
-    padding: 0.45rem 0.95rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.15s ease, transform 0.12s ease;
+    top: 3.15rem;
+    right: 3.1rem;
+    z-index: 2;
+    min-width: 208px;
+    font-size: 0.94rem !important;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, #da7b7b 78%, white),
+        color-mix(in srgb, #c85d5d 96%, black)
+    ) !important;
+    border-color: color-mix(in srgb, #c85d5d 42%, transparent) !important;
+    color: white !important;
+    box-shadow:
+        0 20px 42px color-mix(in srgb, #c85d5d 22%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
 }
 
-.focusOverlayExitBtn:hover {
-    background: color-mix(in srgb, var(--hover) 86%, var(--surface-card));
-    transform: translateY(-1px);
+.focusOverlayExitBtn:hover:not(:disabled) {
+    filter: brightness(1.04);
 }
 
 .focusOverlayMainCard {
@@ -184,12 +186,6 @@
     transform: scale(0.82);
 }
 
-.focusOverlayMainCard .timerCirclePrimaryBtn {
-    margin-top: 0.4rem;
-    padding: 0.72rem 2.4rem;
-    font-size: 1.08rem;
-}
-
 @media (max-width: 980px) {
     .focusOverlayMainCard {
         padding: 0;
@@ -198,6 +194,12 @@
     .focusOverlayMainCard .timerCircleWrap {
         width: min(84vw, 460px);
         height: min(84vw, 460px);
+    }
+
+    .focusOverlayExitBtn {
+        top: 2rem;
+        right: 1.7rem;
+        min-width: 188px;
     }
 }
 

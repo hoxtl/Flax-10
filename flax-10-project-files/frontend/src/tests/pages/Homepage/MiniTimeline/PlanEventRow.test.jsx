@@ -26,7 +26,7 @@ vi.mock('../../../../pages/Homepage/utils/timelineUtils', () => ({
 }));
 
 vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
-    isDuringSleepWindow: vi.fn(() => false),
+    doesEventOverlapSleepWindow: vi.fn(() => false),
 }));
 
 import { PlanEventRow } from '../../../../pages/Homepage/components/MiniTimeline/PlanEventRow';
@@ -236,7 +236,7 @@ describe('PlanEventRow', () => {
     });
 
     it('shows sleep badge when isDuringSleepWindow returns true', () => {
-        vi.mocked(useSleepWarning.isDuringSleepWindow).mockReturnValueOnce(true);
+        vi.mocked(useSleepWarning.doesEventOverlapSleepWindow).mockReturnValueOnce(true);
         renderRow();
         expect(screen.getByLabelText('Scheduled during sleep hours')).toBeInTheDocument();
     });

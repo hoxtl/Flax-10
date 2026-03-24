@@ -1,8 +1,12 @@
-import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { motion as Motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo } from "react";
 import styles from "./WelcomeBackgroundPaths.module.css";
 
 const PATH_COUNT = 28;
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
 
 function buildPathD(i, flip = 1) {
   return `M-${380 - i * 5 * flip} -${189 + i * 6}
@@ -12,54 +16,62 @@ function buildPathD(i, flip = 1) {
     ${684 - i * 5 * flip} ${875 - i * 6}`;
 }
 
-function buildPaths(flip, count = PATH_COUNT) {
+function buildPaths(flip, count = PATH_COUNT, intensity = 1) {
   const useDefaultFlip = flip === undefined;
   const flipUsed = flip ?? 1;
 
   return Array.from({ length: count }, (_, i) => ({
     id: i,
-    strokeOpacity: 0.18 + i * 0.001,
-    width: 0.9 + i * 0.03,
+    strokeOpacity: clamp((0.17 + i * 0.0028) * intensity, 0.14, 0.78),
+    width: clamp((0.92 + i * 0.038) * Math.min(intensity, 1.6), 0.9, 2.8),
     start: Math.random(),
     d: useDefaultFlip ? buildPathD(i) : buildPathD(i, flipUsed),
   }));
 }
 
-function pathInitial(start) {
-  return { pathLength: 1, pathOffset: start, opacity: 0.65 };
+function pathInitial(start, intensity) {
+  return { pathLength: 1, pathOffset: start, opacity: clamp(0.52 * intensity, 0.38, 0.92) };
 }
 
-function pathAnimate(start) {
-  return { pathOffset: [start, start + 1], opacity: [0.35, 0.7, 0.35] };
+function pathAnimate(start, intensity) {
+  const minOpacity = clamp(0.34 * intensity, 0.24, 0.82);
+  const peakOpacity = clamp(0.8 * intensity, 0.52, 1);
+  return { pathOffset: [start, start + 1], opacity: [minOpacity, peakOpacity, minOpacity] };
 }
 
-function pathTransition(flip) {
-  return { duration: (flip === 1 ? 7 : 10) + Math.random() * 3, repeat: Infinity, ease: "linear" };
+function pathTransition(flip, intensity, speed) {
+  const speedBoost = Math.max(0, intensity - 1);
+  const baseDuration = flip === 1 ? 7 : 10;
+  return {
+    duration: (Math.max(3.2, baseDuration - speedBoost * 1.8) + Math.random() * 1.2) / Math.max(speed, 0.1),
+    repeat: Infinity,
+    ease: "linear",
+  };
 }
 
-function PathItem({ p, flip }) {
+function PathItem({ p, flip, intensity, speed }) {
   return (
-    <motion.path
+    <Motion.path
       d={p.d}
       stroke="currentColor"
       strokeWidth={p.width}
       strokeOpacity={p.strokeOpacity}
-      initial={pathInitial(p.start)}
-      animate={pathAnimate(p.start)}
-      transition={pathTransition(flip)}
+      initial={pathInitial(p.start, intensity)}
+      animate={pathAnimate(p.start, intensity)}
+      transition={pathTransition(flip, intensity, speed)}
     />
   );
 }
 
-function FloatingPaths({ flip }) {
+function FloatingPaths({ flip, count, intensity, speed }) {
   const flipUsed = flip ?? 1;
-  const paths = useMemo(() => buildPaths(flip), [flip]);
+  const paths = useMemo(() => buildPaths(flip, count, intensity), [count, flip, intensity]);
 
   return (
     <div className={styles.paths}>
       <svg className={styles.svg} viewBox="0 0 696 316" fill="none" aria-hidden="true">
         {paths.map((p) => (
-          <PathItem key={`${flipUsed}-${p.id}`} p={p} flip={flipUsed} />
+          <PathItem key={`${flipUsed}-${p.id}`} p={p} flip={flipUsed} intensity={intensity} speed={speed} />
         ))}
       </svg>
     </div>
@@ -92,18 +104,19 @@ function useParallaxMotion(reduceMotion) {
   return { x, y };
 }
 
-export default function WelcomeBackgroundPaths() {
+export default function WelcomeBackgroundPaths({ embedded = false, className = "", count = PATH_COUNT, intensity = 1, speed = 1 }) {
   const reduceMotion = useReducedMotion();
   const { x, y } = useParallaxMotion(reduceMotion);
 
   const parallaxStyle = { x, y };
+  const bgClassName = [styles.bg, embedded ? styles.bgEmbedded : "", className].filter(Boolean).join(" ");
   return (
-    <div className={styles.bg} aria-hidden="true">
+    <div className={bgClassName} aria-hidden="true">
       <div className={styles.glow} />
-      <motion.div className={styles.parallax} style={parallaxStyle}>
-        <FloatingPaths />
-        <FloatingPaths flip={-1} />
-      </motion.div>
+      <Motion.div className={styles.parallax} style={parallaxStyle}>
+        <FloatingPaths count={count} intensity={intensity} speed={speed} />
+        <FloatingPaths flip={-1} count={count} intensity={intensity} speed={speed} />
+      </Motion.div>
       <div className={styles.fade} />
     </div>
   );

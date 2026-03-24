@@ -4,9 +4,10 @@
 
 import React, { useMemo } from "react";
 import { Clock, Calendar, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import baseStyles from "../styles/WidgetBase.module.css";
+import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import styles from "./TinyTimelineWidget.module.css";
 import { formatTime } from "../utils/dateFormatUtils";
 import { isNow } from "../utils/eventUtils";
@@ -49,14 +50,7 @@ function getTypeLabel(event) {
 }
 
 function TinyTimelineHeader() {
-  return (
-    <div className={baseStyles.widgetHeader}>
-      <div className={baseStyles.headerIconWrap}>
-        <Clock size={16} strokeWidth={1.75} className={baseStyles.headerIcon} aria-hidden />
-      </div>
-      <span className={baseStyles.headerTitle}>Timeline</span>
-    </div>
-  );
+  return <SharedWidgetHeader icon={Clock} title="Timeline" />;
 }
 
 function EmptyTimelineState() {
@@ -136,6 +130,7 @@ export function TinyTimelineWidget({
   sortedEvents = [],
   row = 1
 }) {
+  const navigate = useNavigate();
   const safeNow = getSafeNow(now);
   const currentBlock = useMemo(() => getCurrentBlock(sortedEvents), [sortedEvents]);
   const upcomingEvents = useMemo(() => getUpcomingEvents(sortedEvents, safeNow, row), [row, safeNow, sortedEvents]);
@@ -145,9 +140,9 @@ export function TinyTimelineWidget({
     <div className={styles.root}>
       <TinyTimelineHeader />
       {timelineEvents.length ? <TimelineList currentBlock={currentBlock} events={timelineEvents} /> : <EmptyTimelineState />}
-      <Link to="#timeline-section" className={styles.viewAll}>
-        View full plan →
-      </Link>
+      <PrimaryButton type="button" size="small" pill className={styles.viewAll} onClick={() => navigate("/calendar")}>
+        View my calendar
+      </PrimaryButton>
     </div>
   );
 }
