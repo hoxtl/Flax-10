@@ -63,9 +63,11 @@ export function useSemesterData(semStart, semEnd) {
   const [events, setEvents] = useState([]);
   const [deadlines, setDeadlines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const startTime = semStart?.getTime?.() ?? new Date(semStart).getTime();
+  const endTime = semEnd?.getTime?.() ?? new Date(semEnd).getTime();
   const fetchData = useCallback(
-    async () => loadSemesterData(semStart, semEnd, setEvents, setDeadlines, setLoading),
-    [semEnd, semStart],
+    async () => loadSemesterData(new Date(startTime), new Date(endTime), setEvents, setDeadlines, setLoading),
+    [endTime, startTime],
   );
 
   useEffect(() => {
