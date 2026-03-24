@@ -16,19 +16,23 @@ export function dismissAttendancePrompt(event, setEvent) {
   setEvent(null);
 }
 
-/** Record an answer (Yes/No) — permanently marks the event as answered. */
-export async function submitAttendancePromptAnswer(event, attended, submitting, setEvent, setSubmitting, options = {}) {
+async function executeAttendanceSubmission(event, attended, options) {
   const { afterSuccess, closeDelayMs = 250 } = options;
+  await recordAttendance(event.id, attended);
+  dispatchAttendanceUpdated();
+  if (typeof afterSuccess === "function") await afterSuccess();
+  if (closeDelayMs > 0) await wait(closeDelayMs);
+  setPromptedId(event.id);
+  return true;
+}
+
+export async function submitAttendancePromptAnswer(event, attended, submitting, setEvent, setSubmitting, options = {}) {
   if (!event || submitting) return false;
   setSubmitting(true);
   try {
-    await recordAttendance(event.id, attended);
-    dispatchAttendanceUpdated();
-    if (typeof afterSuccess === "function") await afterSuccess();
-    if (closeDelayMs > 0) await wait(closeDelayMs);
-    setPromptedId(event.id);
+    const result = await executeAttendanceSubmission(event, attended, options);
     setEvent(null);
-    return true;
+    return result;
   } catch {
     return false;
   } finally {
