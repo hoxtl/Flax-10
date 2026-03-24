@@ -213,10 +213,10 @@ function compareTaskWidgetItems(left, right) {
     const overdueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
     if (overdueDiff) return overdueDiff;
   }
-  const priorityDiff = getTaskPriorityRank(left.priority) - getTaskPriorityRank(right.priority);
-  if (priorityDiff) return priorityDiff;
   const dueDiff = getTaskTimeValue(left.sortTime) - getTaskTimeValue(right.sortTime);
   if (dueDiff) return dueDiff;
+  const priorityDiff = getTaskPriorityRank(left.priority) - getTaskPriorityRank(right.priority);
+  if (priorityDiff) return priorityDiff;
   return String(left.title || "").localeCompare(String(right.title || ""));
 }
 

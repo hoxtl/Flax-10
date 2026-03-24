@@ -51,9 +51,9 @@ function PathItem({ p, flip }) {
   );
 }
 
-function FloatingPaths({ flip }) {
+function FloatingPaths({ flip, count }) {
   const flipUsed = flip ?? 1;
-  const paths = useMemo(() => buildPaths(flip), [flip]);
+  const paths = useMemo(() => buildPaths(flip, count), [count, flip]);
 
   return (
     <div className={styles.paths}>
@@ -92,17 +92,18 @@ function useParallaxMotion(reduceMotion) {
   return { x, y };
 }
 
-export default function WelcomeBackgroundPaths() {
+export default function WelcomeBackgroundPaths({ embedded = false, className = "", count = PATH_COUNT }) {
   const reduceMotion = useReducedMotion();
   const { x, y } = useParallaxMotion(reduceMotion);
 
   const parallaxStyle = { x, y };
+  const bgClassName = [styles.bg, embedded ? styles.bgEmbedded : "", className].filter(Boolean).join(" ");
   return (
-    <div className={styles.bg} aria-hidden="true">
+    <div className={bgClassName} aria-hidden="true">
       <div className={styles.glow} />
       <motion.div className={styles.parallax} style={parallaxStyle}>
-        <FloatingPaths />
-        <FloatingPaths flip={-1} />
+        <FloatingPaths count={count} />
+        <FloatingPaths flip={-1} count={count} />
       </motion.div>
       <div className={styles.fade} />
     </div>

@@ -55,9 +55,7 @@ function renderHero(props) {
       deadlinesCount={countUpcomingDeadlines(props.upcomingDeadlines)}
       upcomingSocietyEventsCount={countUpcomingSocietyEvents(props.calendarEvents?.length ? props.calendarEvents : props.slot5Data?.sortedEvents, props.profile?.summary?.societies, props.slot5Data?.now)}
       courseChangeRequest={props.dashboard.courseChangeRequest}
-      teacherRequestPending={props.dashboard.teacherRequestPending}
       onDismissCourseChange={() => props.dashboard.setShowCourseChange(false)}
-      onDismissTeacherRequest={() => props.dashboard.setShowTeacherRequest(false)}
       isTeacher={isTeacher}
     />
   );

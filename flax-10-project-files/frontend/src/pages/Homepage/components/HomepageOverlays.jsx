@@ -2,7 +2,7 @@
  * Homepage overlay collection.
  */
 
-import { X, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
 import { ModulePill, TypePill, getModulePillColors } from "./ModulePill";
@@ -62,9 +62,6 @@ function ModuleOverlayHeader(props) {
       <div className={props.styles.moduleCardColorBar} style={colorBarStyle}>
         {props.code.slice(0, 2)}
       </div>
-      <button type="button" className={props.styles.deadlineDetailClose} onClick={() => props.setSelectedModulePill(null)} aria-label="Close">
-        <X size={14} strokeWidth={2} aria-hidden />
-      </button>
     </div>
   );
 }
@@ -105,9 +102,6 @@ function DeadlineHeader(props) {
         {props.selectedDeadline.module_code && <ModulePill moduleCode={props.selectedDeadline.module_code} />}
         {props.selectedDeadline.deadline_type && <TypePill typeLabel={capitalize(props.selectedDeadline.deadline_type)} accentColor={props.selectedDeadline.module_code ? getModulePillColors(props.selectedDeadline.module_code).accent : undefined} />}
       </div>
-      <button type="button" className={props.styles.deadlineDetailClose} onClick={() => props.setSelectedDeadline(null)} aria-label="Close">
-        <X size={14} strokeWidth={2} aria-hidden />
-      </button>
     </div>
   );
 }
@@ -135,7 +129,7 @@ function DeadlineActions(props) {
     <div className={props.styles.deadlineDetailActions}>
       <PrimaryButton
         type="button"
-        variant="ghost"
+        variant="primary"
         size="small"
         pill
         className={props.styles.deadlineDetailLink}

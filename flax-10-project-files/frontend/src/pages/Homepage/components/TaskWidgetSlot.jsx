@@ -88,7 +88,7 @@ function TaskWidgetHeader({ count, taskStyles }) {
 function TaskWidgetList(props) {
   return (
     <Motion.div className={`${styles.widgetList} ${props.styles.taskWidgetWidgetList}`} initial="hidden" animate="visible" variants={listVariants}>
-      {props.initialTasks.map((task) => <TaskListRow key={task.id} task={task} {...props} />)}
+      {props.initialTasks.map((task, index) => <TaskListRow key={task.id} task={task} index={index} {...props} />)}
       <AnimatePresence initial={false}>
         {props.expanded && (
           <Motion.div
@@ -117,19 +117,20 @@ function TaskWidgetList(props) {
 }
 
 function TaskListRow(props) {
+  const isLeadTask = props.index === 0;
   return (
     <TaskWidgetRow
       {...props}
       isOverdue={props.task.taskWidgetStatus === "overdue"}
-      rowAccent={getRowAccent(props.task)}
-      urgentGlow={props.task.taskWidgetUrgentGlow}
+      rowAccent={getRowAccent(props.task, isLeadTask)}
+      urgentGlow={isLeadTask || props.task.taskWidgetUrgentGlow}
     />
   );
 }
 
-function getRowAccent(task) {
+function getRowAccent(task, isLeadTask = false) {
   const priority = String(task?.priority || "").toLowerCase();
-  if (task.taskWidgetStatus === "overdue" || priority === "urgent") return "var(--home-urgency-danger)";
+  if (isLeadTask || task.taskWidgetStatus === "overdue" || priority === "urgent") return "var(--home-urgency-danger)";
   if (priority === "high" || priority === "medium") return "var(--home-urgency-warning)";
   return "var(--home-urgency-neutral)";
 }

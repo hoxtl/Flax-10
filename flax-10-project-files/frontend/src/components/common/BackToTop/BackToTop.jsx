@@ -29,14 +29,52 @@ function useBackToTopVisibility(alwaysVisible, containerSelector) {
 
 function watchScrollVisibility(alwaysVisible, containerSelector, setVisible) {
   if (alwaysVisible) return undefined;
-  const container = document.querySelector(containerSelector);
-  if (!container) return undefined;
-  const onScroll = () => setVisible(container.scrollTop > 100);
+  const containers = resolveScrollContainers(containerSelector);
+  if (containers.length === 0) return undefined;
+  const scrollTargets = [...new Set(containers.map((container) => (isDocumentScroller(container) ? window : container)))];
+  const onScroll = () => setVisible(containers.some((container) => getScrollTop(container) > 100));
   requestAnimationFrame(onScroll);
-  container.addEventListener("scroll", onScroll);
-  return () => container.removeEventListener("scroll", onScroll);
+  scrollTargets.forEach((target) => target.addEventListener("scroll", onScroll, { passive: true }));
+  return () => scrollTargets.forEach((target) => target.removeEventListener("scroll", onScroll));
 }
 
 function scrollContainerToTop(containerSelector) {
-  document.querySelector(containerSelector)?.scrollTo({ top: 0, behavior: "smooth" });
+  const containers = resolveScrollContainers(containerSelector);
+  if (containers.length === 0) return;
+  containers.forEach(scrollTargetToTop);
+}
+
+function scrollTargetToTop(container) {
+  if (isDocumentScroller(container)) {
+    window.scrollTo?.({ top: 0, behavior: "smooth" });
+    return;
+  }
+  if (typeof container.scrollTo === "function") {
+    container.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  container.scrollTop = 0;
+}
+
+function resolveScrollContainers(containerSelector) {
+  const selectors = [
+    containerSelector,
+    "[data-dashboard-main]",
+    "[data-dashboard-main-content]",
+    '[class*="content"]',
+  ].filter(Boolean);
+  const containers = selectors
+    .map((selector) => document.querySelector(selector))
+    .filter(Boolean);
+  if (document.scrollingElement) containers.push(document.scrollingElement);
+  return [...new Set(containers)];
+}
+
+function isDocumentScroller(container) {
+  return container === document.body || container === document.documentElement || container === document.scrollingElement;
+}
+
+function getScrollTop(container) {
+  if (isDocumentScroller(container)) return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  return container.scrollTop;
 }

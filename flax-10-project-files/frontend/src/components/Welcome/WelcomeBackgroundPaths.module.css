@@ -9,6 +9,12 @@
   );
 }
 
+.bgEmbedded {
+  background: none;
+  inset: -6% -8%;
+  opacity: 0.98;
+}
+
 .glow {
   position: absolute;
   inset: 0;
@@ -26,6 +32,27 @@
     );
   filter: blur(28px);
   opacity: 0.95;
+}
+
+.bgEmbedded .glow {
+  background:
+    radial-gradient(
+      circle at 18% 24%,
+      color-mix(in srgb, var(--home-hero-glow-shadow, var(--primary)) 26%, transparent),
+      transparent 54%
+    ),
+    radial-gradient(
+      circle at 78% 62%,
+      color-mix(in srgb, var(--home-hero-glow-ring, var(--primary-strong)) 24%, transparent),
+      transparent 58%
+    );
+  filter: blur(36px);
+  opacity: 0.72;
+}
+
+.bgEmbedded .parallax {
+  opacity: 1;
+  filter: none;
 }
 
 .parallax {
@@ -50,6 +77,10 @@
   color: color-mix(in srgb, var(--primary) 70%, transparent);
 }
 
+.bgEmbedded .svg {
+  color: color-mix(in srgb, var(--home-hero-glow-ring, var(--primary)) 80%, transparent);
+}
+
 .fade {
   position: absolute;
   inset: 0;
@@ -61,4 +92,22 @@
     color-mix(in srgb, var(--surface-page) 8%, transparent),
     color-mix(in srgb, var(--surface-page) 34%, transparent)
   );
+}
+
+.bgEmbedded .fade {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 58%, transparent) 0%,
+      transparent 22%,
+      transparent 78%,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 54%, transparent) 100%
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 42%, transparent) 0%,
+      transparent 14%,
+      transparent 86%,
+      color-mix(in srgb, var(--home-hero-bg, var(--surface-card)) 42%, transparent) 100%
+    );
 }

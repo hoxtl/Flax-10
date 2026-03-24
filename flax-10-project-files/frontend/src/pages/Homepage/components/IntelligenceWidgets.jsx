@@ -2,22 +2,33 @@
  * Intelligence hero widgets.
  */
 
-import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, Calendar, GraduationCap } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { BookOpen, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import StatStrip from "../../../components/Common/StatStrip/StatStrip";
+import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
 import { useCountUp } from "../../../hooks/useCountUp";
 import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
 import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
 
+const HERO_STAT_ROUTES = {
+  societies: "/societies",
+  tasks: "/tasks?filter=today",
+};
+
 export function IntelligenceHero(props) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <div className={styles.premiumCard}>
+      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={16} />
       <motion.div
         className={styles.bannerBorderGlow}
         aria-hidden
-        animate={{
+        animate={reduceMotion ? {
+          opacity: 0.9,
+        } : {
           opacity: [0.72, 1, 0.8],
           boxShadow: [
             "0 0 0 1px var(--home-hero-glow-ring), 0 0 24px var(--home-hero-glow-shadow), 0 0 56px color-mix(in srgb, var(--home-hero-glow-shadow) 94%, transparent), inset 0 0 0 1px var(--home-hero-glow-inner), inset 0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 34%, transparent)",
@@ -25,14 +36,28 @@ export function IntelligenceHero(props) {
             "0 0 0 1px var(--home-hero-glow-ring), 0 0 24px var(--home-hero-glow-shadow), 0 0 56px color-mix(in srgb, var(--home-hero-glow-shadow) 94%, transparent), inset 0 0 0 1px var(--home-hero-glow-inner), inset 0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 34%, transparent)",
           ],
         }}
-        transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className={styles.bannerAura}
+        aria-hidden
+        initial={reduceMotion ? false : { opacity: 0.44, scale: 1, x: "-4%", y: "-2%" }}
+        animate={reduceMotion ? {
+          opacity: 0.54,
+        } : {
+          opacity: [0.42, 0.72, 0.5, 0.42],
+          scale: [1, 1.08, 0.98, 1],
+          x: ["-4%", "5%", "-2%", "-4%"],
+          y: ["-2%", "5%", "-3%", "-2%"],
+        }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 12.5, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         className={styles.bannerShimmer}
         aria-hidden
-        initial={{ x: "-42%", opacity: 0 }}
-        animate={{ x: ["-42%", "122%"], opacity: [0, 0.5, 0] }}
-        transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.15 }}
+        initial={reduceMotion ? false : { x: "-42%", opacity: 0 }}
+        animate={reduceMotion ? { opacity: 0.22, x: "18%" } : { x: ["-42%", "122%"], opacity: [0, 0.5, 0] }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 5.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.15 }}
       />
       <HeroBanners {...props} />
       <header className={getHeaderClassName(props)}>
@@ -44,19 +69,15 @@ export function IntelligenceHero(props) {
 }
 
 function HeroBanners(props) {
-  return <AnimatePresence>{props.courseChangeRequest && <CourseChangeBanner request={props.courseChangeRequest} onDismiss={props.onDismissCourseChange} />}{props.teacherRequestPending && <TeacherRequestBanner onDismiss={props.onDismissTeacherRequest} />}</AnimatePresence>;
+  return <AnimatePresence>{props.courseChangeRequest && <CourseChangeBanner request={props.courseChangeRequest} onDismiss={props.onDismissCourseChange} />}</AnimatePresence>;
 }
 
 function getHeaderClassName(props) {
-  return `${styles.header} ${(props.courseChangeRequest || props.teacherRequestPending) ? styles.hasBanners : ""}`;
+  return `${styles.header} ${props.courseChangeRequest ? styles.hasBanners : ""}`;
 }
 
 function CourseChangeBanner({ onDismiss, request }) {
   return <StatusBanner cta="/settings?tab=account" icon={BookOpen} onDismiss={onDismiss} text={request.requested_course ? <>Course switch pending to <strong>{request.requested_course}</strong></> : "Course switch pending"} />;
-}
-
-function TeacherRequestBanner({ onDismiss }) {
-  return <StatusBanner cta="/settings?tab=course" icon={GraduationCap} onDismiss={onDismiss} text="Teacher application is under review" />;
 }
 
 function StatusBanner({ cta, icon: Icon, onDismiss, text }) {
@@ -105,20 +126,21 @@ function HeroStatusStrip({ attendancePct, classesCount, deadlinesCount, upcoming
 }
 
 function buildHeroStatItems({ attendancePct, attendanceRef, classesCount, classRef, deadlinesCount, deadlineRef, upcomingSocietyEventsCount, societyRef, tasksCount, taskRef, isTeacher }) {
+  const deadlinesRoute = isTeacher ? "/modules?filter=all" : "/modules?filter=enrolled";
   const base = [
     { key: "classes", label: isTeacher ? "Teaching today" : "Classes today", value: classesCount ?? 0, valueRef: classRef, tooltip: "Lectures, labs, practicals, tutorials, and seminars on today's plan." },
-    { key: "tasks", label: "Tasks to do", value: tasksCount ?? 0, valueRef: taskRef },
+    { key: "tasks", label: "Tasks to do", value: tasksCount ?? 0, valueRef: taskRef, to: HERO_STAT_ROUTES.tasks },
   ];
   if (isTeacher) {
     return [
       ...base,
-      { key: "deadlines", label: "Teaching deadlines", value: deadlinesCount ?? 0, valueRef: deadlineRef, tone: (deadlinesCount ?? 0) > 0 ? "warning" : undefined, tooltip: "Upcoming deadlines across modules you teach." },
+      { key: "deadlines", label: "Teaching deadlines", value: deadlinesCount ?? 0, valueRef: deadlineRef, tone: (deadlinesCount ?? 0) > 0 ? "warning" : undefined, tooltip: "Upcoming deadlines across modules you teach.", to: deadlinesRoute },
     ];
   }
   return [
     ...base,
-    { key: "deadlines", label: "Upcoming deadlines", value: deadlinesCount ?? 0, valueRef: deadlineRef, tone: (deadlinesCount ?? 0) > 0 ? "warning" : undefined },
-    { key: "society", label: "Upcoming societies", value: upcomingSocietyEventsCount ?? 0, valueRef: societyRef, tooltip: "Society events coming up over the next 14 days." },
+    { key: "deadlines", label: "Upcoming deadlines", value: deadlinesCount ?? 0, valueRef: deadlineRef, tone: (deadlinesCount ?? 0) > 0 ? "warning" : undefined, to: deadlinesRoute },
+    { key: "society", label: "Upcoming societies", value: upcomingSocietyEventsCount ?? 0, valueRef: societyRef, tooltip: "Society events coming up over the next 14 days.", to: HERO_STAT_ROUTES.societies },
     { key: "attendance", label: "Attendance", value: attendancePct ?? 0, valueRef: attendanceRef, suffix: "%", tone: (attendancePct ?? 0) >= 75 ? "success" : "warning", tooltip: "View my attendance", to: "/attendance" },
   ];
 }

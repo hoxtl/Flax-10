@@ -39,6 +39,7 @@ export default function SleepBanner() {
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
+      <div className={styles.flow} aria-hidden />
       <motion.div
         className={styles.glow}
         aria-hidden

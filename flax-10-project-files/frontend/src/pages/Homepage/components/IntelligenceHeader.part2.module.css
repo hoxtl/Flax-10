@@ -22,16 +22,14 @@
   gap: 4px;
   padding: 10px 13px;
   border-radius: 16px;
-  background: color-mix(in srgb, var(--surface-raised) 92%, var(--surface-card) 8%);
-  border: 1px solid var(--widget-border);
-  box-shadow:
-    0 10px 18px color-mix(in srgb, var(--color-primary) 8%, transparent),
-    inset 0 1px 0 color-mix(in srgb, white 50%, transparent);
+  background: var(--home-now-next-card-bg);
+  border: 1px solid var(--home-now-next-card-border);
+  box-shadow: var(--home-now-next-card-shadow);
 }
 
 .nextStepCardWarning {
-  border-color: color-mix(in srgb, var(--danger) 28%, var(--widget-border));
-  background: color-mix(in srgb, var(--danger) 5%, var(--surface-raised));
+  border-color: color-mix(in srgb, var(--danger) 28%, var(--home-now-next-card-border));
+  background: color-mix(in srgb, var(--danger) 8%, var(--home-now-next-card-bg));
 }
 
 .nextStepLabel {
@@ -40,7 +38,7 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--widget-text-tertiary);
+  color: var(--home-now-muted);
 }
 
 .nextStepCardWarning .nextStepLabel {
@@ -61,7 +59,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
-  color: var(--widget-text-tertiary);
+  color: var(--home-now-time);
   letter-spacing: 0.05em;
 }
 
@@ -153,18 +151,18 @@
 
 .bannerBorderGlow {
   position: absolute;
-  inset: 0;
+  inset: 5px;
   z-index: 0;
-  border-radius: inherit;
+  border-radius: 19px;
   pointer-events: none;
-  border: 2px solid color-mix(in srgb, var(--home-hero-frame-border) 88%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--home-hero-frame-border) 72%, transparent);
   box-shadow:
-    0 0 0 1px var(--home-hero-glow-ring),
-    0 0 24px var(--home-hero-glow-shadow),
-    0 0 56px color-mix(in srgb, var(--home-hero-glow-shadow) 94%, transparent),
-    inset 0 0 0 1px var(--home-hero-glow-inner),
-    inset 0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 34%, transparent);
-  opacity: 1;
+    0 0 0 1px color-mix(in srgb, var(--home-hero-glow-ring) 72%, transparent),
+    0 0 18px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent),
+    0 0 36px color-mix(in srgb, var(--home-hero-glow-shadow) 62%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--home-hero-glow-inner) 82%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--home-hero-glow-shadow) 22%, transparent);
+  opacity: 0.92;
 }
 
 .bannerShimmer {
@@ -176,9 +174,22 @@
   z-index: 0;
   pointer-events: none;
   background: var(--home-hero-shimmer);
-  filter: blur(10px);
+  filter: blur(var(--home-hero-shimmer-blur, 10px));
   transform: skewX(-20deg);
-  mix-blend-mode: screen;
+  mix-blend-mode: var(--home-hero-shimmer-blend, screen);
+  opacity: var(--home-hero-shimmer-opacity, 1);
+}
+
+.bannerAura {
+  position: absolute;
+  inset: -18% -12%;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--home-hero-aura);
+  filter: blur(var(--home-hero-aura-blur, 24px));
+  mix-blend-mode: var(--home-hero-aura-blend, screen);
+  opacity: var(--home-hero-aura-opacity, 0.72);
+  transform-origin: center;
 }
 
 /* ── Live Context ── */
