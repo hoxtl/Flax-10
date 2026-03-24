@@ -41,7 +41,7 @@ function TimelineCell({ wk, di, tasks, members, onUpdate, onDelete, handlers }) 
             {tasks.map(t => (
                 <TimelineCard key={t.id} task={t} members={members}
                     assignees={filterVisibleAssignees(t.assignees_info || [], members)}
-                    onUpdate={onUpdate} onDelete={onDelete} onDragStart={handleDragStartTask} />
+                    onUpdate={onUpdate} onDelete={onDelete} />
             ))}
         </div>
     );
