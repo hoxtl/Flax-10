@@ -15,25 +15,21 @@ function buildLeaveState(timeLeftSeconds, sessionTotalSeconds) {
   return { minutesLeft, progressPct, minutesLabel: `${minutesLeft} min${minutesLeft === 1 ? '' : 's'}` };
 }
 
+function getProgressAnimation(reduceMotion, width) {
+  if (reduceMotion) return { style: { width }, initial: false, animate: undefined, transition: undefined };
+  return { style: undefined, initial: { width: 0, opacity: 0.55 }, animate: { width, opacity: 1 }, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } };
+}
+
 function LeaveProgress({ progressPct, minutesLeft }) {
   const reduceMotion = useReducedMotion();
   const width = `${progressPct}%`;
-
+  const anim = getProgressAnimation(reduceMotion, width);
   return (
     <div className={styles.leaveNudgeProgressCard}>
       <div className={styles.leaveNudgeProgressTrack} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPct}>
-        <motion.span
-          className={styles.leaveNudgeProgressFill}
-          style={reduceMotion ? { width } : undefined}
-          initial={reduceMotion ? false : { width: 0, opacity: 0.55 }}
-          animate={reduceMotion ? undefined : { width, opacity: 1 }}
-          transition={reduceMotion ? undefined : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        />
+        <motion.span className={styles.leaveNudgeProgressFill} style={anim.style} initial={anim.initial} animate={anim.animate} transition={anim.transition} />
       </div>
-      <div className={styles.leaveNudgeProgressMeta}>
-        <span>{progressPct}% complete</span>
-        <span>{minutesLeft}m left</span>
-      </div>
+      <div className={styles.leaveNudgeProgressMeta}><span>{progressPct}% complete</span><span>{minutesLeft}m left</span></div>
     </div>
   );
 }

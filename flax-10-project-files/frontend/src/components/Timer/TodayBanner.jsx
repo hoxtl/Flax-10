@@ -7,48 +7,28 @@ import StatStrip from '../common/StatStrip/StatStrip';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTodayBannerData } from './todayBanner/useTodayBannerData';
 
+function buildStreakItem(state, streakRef) {
+  return { key: 'streak', label: 'Current streak', value: state.streak, valueRef: streakRef, suffix: 'd', tone: state.streak > 0 ? 'success' : undefined };
+}
+
+function buildSessionsItem(state, sessionsRef) {
+  return { key: 'sessions', label: 'Sessions logged', value: state.sessions, valueRef: sessionsRef, tooltip: 'Last 30 days', tone: state.sessions > 0 ? 'accent' : undefined };
+}
+
+function buildWeeklyGoalItem(state, weeklyGoalRef) {
+  return { key: 'weekly-goal', label: 'Weekly goal', value: state.weeklyGoalDays, valueRef: weeklyGoalRef, suffix: ' / 7', tooltip: 'Active days this week', tone: 'accent' };
+}
+
+function buildFocusTimeItem(state, focusHoursRef) {
+  return { key: 'focus-time', label: 'Focus time', value: state.focusHours, valueRef: focusHoursRef, suffix: 'h', tooltip: 'Last 30 days', tone: state.focusHours > 0 ? 'accent' : undefined };
+}
+
 function useTodayBannerItems(state) {
   const streakRef = useCountUp(state.streak, 1200);
   const sessionsRef = useCountUp(state.sessions, 1200);
   const weeklyGoalRef = useCountUp(state.weeklyGoalDays, 1200);
   const focusHoursRef = useCountUp(state.focusHours, 1200);
-
-  return [
-    {
-      key: 'streak',
-      label: 'Current streak',
-      value: state.streak,
-      valueRef: streakRef,
-      suffix: 'd',
-      tone: state.streak > 0 ? 'success' : undefined,
-    },
-    {
-      key: 'sessions',
-      label: 'Sessions logged',
-      value: state.sessions,
-      valueRef: sessionsRef,
-      tooltip: 'Last 30 days',
-      tone: state.sessions > 0 ? 'accent' : undefined,
-    },
-    {
-      key: 'weekly-goal',
-      label: 'Weekly goal',
-      value: state.weeklyGoalDays,
-      valueRef: weeklyGoalRef,
-      suffix: ' / 7',
-      tooltip: 'Active days this week',
-      tone: 'accent',
-    },
-    {
-      key: 'focus-time',
-      label: 'Focus time',
-      value: state.focusHours,
-      valueRef: focusHoursRef,
-      suffix: 'h',
-      tooltip: 'Last 30 days',
-      tone: state.focusHours > 0 ? 'accent' : undefined,
-    },
-  ];
+  return [buildStreakItem(state, streakRef), buildSessionsItem(state, sessionsRef), buildWeeklyGoalItem(state, weeklyGoalRef), buildFocusTimeItem(state, focusHoursRef)];
 }
 
 export default function TodayBanner({ onStreakData }) {
