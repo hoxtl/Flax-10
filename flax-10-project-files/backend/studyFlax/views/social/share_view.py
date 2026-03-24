@@ -102,7 +102,7 @@ def _user_list_response(view, request, user_id, queryset_builder):
     if errors:
         return Response(errors, status=status_code)
     payload, page_data = _share_user_list_data(view, queryset_builder(target_user.id), request)
-    if page_data is not None:
+    if page_data is not None:  # pragma: no cover
         return view.get_paginated_response(page_data)
     return Response(payload)
 

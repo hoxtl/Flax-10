@@ -10,7 +10,10 @@ from studyFlax.serialisers.modules.reading_serialisers import ReadingSummarySeri
 
 
 def _created_by(obj):
-    return getattr(obj, "created_by", None)
+    try:
+        return getattr(obj, "created_by", None)
+    except Exception:
+        return None
 
 
 def _created_by_email(obj):

@@ -233,4 +233,16 @@ class ExceptionDateViewTests(BaseEventTestCase):
         response = self.client.post(url, {}, format='json')
         self.assert_event_response(response, status.HTTP_400_BAD_REQUEST)
 
+    def test_add_duplicate_exception_date_is_idempotent(self):
+        from studyFlax.views.calendar.event_detail_view import _append_exception_date
+        event_data = create_recurring_event()
+        response = self.client.post(self.url, event_data, format='json')
+        event = CalendarEvent.objects.get(id=response.data['id'])
+        existing_date = '2026-03-01'
+        event.recurrence_rule.exception_dates = [existing_date]
+        event.recurrence_rule.save()
+        _append_exception_date(event, existing_date)
+        event.recurrence_rule.refresh_from_db()
+        self.assertEqual(event.recurrence_rule.exception_dates.count(existing_date), 1)
+
 

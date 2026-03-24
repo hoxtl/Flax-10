@@ -1,4 +1,8 @@
+from unittest.mock import patch
+
+from django.test import TestCase
 from rest_framework import status
+from rest_framework.test import APIRequestFactory
 
 from studyFlax.models.groupwork.groupwork_model import (
     GroupMembership,
@@ -82,3 +86,32 @@ class GroupProjectMemberDetailTests(BaseTestCase):
         url = f"/api/group-work/projects/{self.project.id}/members/{owner_membership.id}/"
         res = self.client.delete(url)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class GroupworkViewServiceCoverageTest(TestCase):
+    """Tests for groupwork_view_service branches not otherwise covered."""
+
+    def setUp(self):
+        self.user = make_user('gws_user', 'gws_user@e.com')
+
+    def test_validate_users_within_project_limit_over_limit(self):
+        from studyFlax.views.groupwork.groupwork_view_service import validate_users_within_project_limit
+        with patch('studyFlax.views.groupwork.groupwork_view_service.MAX_GROUP_PROJECTS_PER_USER', 0):
+            result = validate_users_within_project_limit([self.user.id])
+        self.assertIsNotNone(result)
+        self.assertEqual(result.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_validate_project_create_input_returns_error_when_over_limit(self):
+        from studyFlax.views.groupwork.groupwork_view_service import validate_project_create_input
+        with patch('studyFlax.views.groupwork.groupwork_view_service.MAX_GROUP_PROJECTS_PER_USER', 0):
+            member_ids, errors, status_code = validate_project_create_input({'member_ids': [self.user.id]})
+        self.assertIsNone(member_ids)
+        self.assertEqual(status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_serialised_project_accepts_request_as_context(self):
+        from studyFlax.views.groupwork.groupwork_view_service import serialised_project
+        project = GroupProject.objects.create(name='Svc Project', owner=self.user)
+        GroupMembership.objects.create(project=project, user=self.user, role='owner')
+        request = APIRequestFactory().get('/')
+        result = serialised_project(project, request)
+        self.assertEqual(result['name'], 'Svc Project')

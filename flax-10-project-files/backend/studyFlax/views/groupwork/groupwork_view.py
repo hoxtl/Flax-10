@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from studyFlax.views.groupwork.groupwork_view_service import (
+    validate_member_ids,
     add_member_to_project_response,
     create_project_result,
     delete_project_response,
@@ -16,6 +17,10 @@ from studyFlax.views.groupwork.groupwork_view_service import (
     remove_project_member,
     update_project_result,
 )
+
+
+def _validate_member_ids(member_ids):
+    return validate_member_ids(member_ids)
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])

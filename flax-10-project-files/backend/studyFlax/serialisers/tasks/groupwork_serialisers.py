@@ -15,7 +15,7 @@ def build_module_tutor_photo_url(photo, request):
     photo_path = cleaned_photo_path(photo)
     if photo_path is None:
         return None
-    if photo_path is photo:
+    if hasattr(photo_path, "url"):
         return build_profile_photo_url(photo, request)
     if photo_path.startswith(("http://", "https://")):
         return photo_path
