@@ -64,4 +64,16 @@ describe("TagsSelector", () => {
     expect(screen.queryByRole("button", { name: "Lecture" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Lab" })).not.toBeInTheDocument();
   });
+
+  it("uses the built-in empty hint and fallback scrolling when scrollTo is unavailable", () => {
+    delete Element.prototype.scrollTo;
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get: () => 180,
+    });
+
+    render(<TagsSelector onSelectionChange={vi.fn()} />);
+
+    expect(screen.getByText("Select tags to filter…")).toBeInTheDocument();
+  });
 });
