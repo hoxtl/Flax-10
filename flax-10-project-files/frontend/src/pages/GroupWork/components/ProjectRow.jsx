@@ -4,7 +4,6 @@
 
 import { useContext } from "react";
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
 import { AuthContext } from "../../../context/AuthContext";
@@ -33,30 +32,36 @@ function ProjectMetaArea({ project, date }) {
   );
 }
 
-function ViewDetailsButton({ onClick }) {
-  return (
-    <PrimaryButton size="small" variant="ghost" pill className={styles.detailsButton} onClick={onClick}>View details and schedule meeting slots</PrimaryButton>
-  );
-}
-
 export default function ProjectRow({ project, onClick }) {
   const data = getProjectRowData(project);
   const isOwner = useIsOwner(project);
+  const label = `Open ${project?.name || "project"} details`;
+  const handleKeyDown = (event) => {
+    if ((event.key === "Enter" || event.key === " ") && onClick) {
+      event.preventDefault();
+      onClick();
+    }
+  };
   return (
-    <div className={buildContainerClassName(data.daysLeft)}>
+    <article
+      className={`${buildContainerClassName(data.daysLeft)} ${styles.projectRowInteractive}`}
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      aria-label={label}
+    >
       <div className={styles.projectRow}>
         <ProjectRowInfo
           project={project}
           members={data.members}
           totalMembers={data.memberCount}
-          onProjectNavigate={onClick}
           isOwner={isOwner}
-          action={<ViewDetailsButton onClick={onClick} />}
         />
         <ProjectMetaArea project={project} date={data.date} />
       </div>
       <ProjectRowAccordion percent={data.percent} />
-    </div>
+    </article>
   );
 }
 
