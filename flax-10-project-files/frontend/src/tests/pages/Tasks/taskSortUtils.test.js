@@ -50,6 +50,16 @@ describe("taskSortUtils", () => {
     expect(out[1].title).toBe("Zebra");
   });
 
+  it("sorts alphabetically descending when filter is alpha-desc", () => {
+    const tasks = [
+      { id: 1, title: "Alpha", priority: "medium" },
+      { id: 2, title: "Zebra", priority: "urgent" },
+    ];
+    const out = sortTasks(tasks, "alpha-desc", listMap);
+    expect(out[0].title).toBe("Zebra");
+    expect(out[1].title).toBe("Alpha");
+  });
+
   it("sorts by list name when filter is list", () => {
     const tasks = [
       { id: 1, title: "T1", task_list: "2" },
@@ -68,6 +78,16 @@ describe("taskSortUtils", () => {
     const out = sortTasks(tasks, "date_added", listMap);
     expect(out[0].id).toBe(20);
     expect(out[1].id).toBe(10);
+  });
+
+  it("sorts by date_added ascending when filter is date_added_asc", () => {
+    const tasks = [
+      { id: 10, title: "Old" },
+      { id: 20, title: "New" },
+    ];
+    const out = sortTasks(tasks, "date_added_asc", listMap);
+    expect(out[0].id).toBe(10);
+    expect(out[1].id).toBe(20);
   });
 
   it("sorts by estimated blocks when filter is est_time", () => {
@@ -108,6 +128,15 @@ describe("taskSortUtils", () => {
       { id: 2, title: "B", task_list: "1", priority: "urgent" },
     ];
     const out = sortTasks(tasks, "list", listMap);
+    expect(out[0].priority).toBe("urgent");
+  });
+
+  it("compareList falls back cleanly when list metadata is missing", () => {
+    const tasks = [
+      { id: 1, title: "A", task_list: "9", priority: "low" },
+      { id: 2, title: "B", task_list: "9", priority: "urgent" },
+    ];
+    const out = sortTasks(tasks, "list");
     expect(out[0].priority).toBe("urgent");
   });
 

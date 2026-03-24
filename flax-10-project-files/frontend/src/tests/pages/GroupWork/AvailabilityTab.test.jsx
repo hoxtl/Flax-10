@@ -123,6 +123,17 @@ const freeSlot = {
   total_count: 2,
 };
 
+const partialFreeSlot = {
+  free_count: 1,
+  label: "Thu 11:00",
+  members: [
+    { id: 3, initials: "CY", is_free: false, name: "Cy" },
+    { id: 4, initials: "DE", is_free: true, name: "Dee", profile_photo_url: "https://example.com/dee.jpg" },
+  ],
+  start: "2026-04-12T11:00:00.000Z",
+  total_count: 2,
+};
+
 describe("AvailabilityTab", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -202,5 +213,73 @@ describe("AvailabilityTab", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Propose")).toBeInTheDocument();
+  });
+
+  it("renders the empty state and footer guidance when no meeting cards exist yet", () => {
+    useAvailabilityMock.mockReturnValue(
+      buildModel({
+        suggestions: [freeSlot],
+      }),
+    );
+
+    render(<AvailabilityTab projectId={12} />);
+
+    expect(screen.getByText("Green rings mean free, muted rings mean busy, and starred slots are fully open for the whole team.")).toBeInTheDocument();
+    expect(screen.getByText("2/2 free")).toBeInTheDocument();
+    expect(screen.getByTitle("Alex")).toBeInTheDocument();
+    expect(screen.getByTitle("Bea")).toBeInTheDocument();
+    expect(screen.queryByText(/No proposed meeting slots yet/)).not.toBeInTheDocument();
+  });
+
+  it("hides the delete action for non-suggesters and falls back counts and status from member data", () => {
+    useAvailabilityMock.mockReturnValue(
+      buildModel({
+        active_suggestions: [
+          {
+            ...proposedSuggestion,
+            accepted_count: undefined,
+            pending_count: undefined,
+            rejected_count: undefined,
+            suggested_by: { id: 9, username: "charlie" },
+          },
+        ],
+        current_user_id: 2,
+        suggestions: [],
+      }),
+    );
+
+    render(<AvailabilityTab projectId={88} />);
+
+    expect(screen.queryByLabelText("Delete meeting suggestion")).not.toBeInTheDocument();
+    expect(screen.getAllByText("1")).not.toHaveLength(0);
+    expect(screen.getByTitle("@bea · pending")).toBeInTheDocument();
+  });
+
+  it("cancels a slot suggestion modal without submitting and shows fallback initials for members without photos", () => {
+    let availability = buildModel({
+      active_suggestions: [],
+      setSuggestingSlot: vi.fn((slot) => {
+        availability = { ...availability, suggestingSlot: slot };
+      }),
+      suggestions: [partialFreeSlot],
+    });
+
+    useAvailabilityMock.mockImplementation(() => availability);
+
+    const { rerender } = render(<AvailabilityTab projectId={77} />);
+
+    expect(screen.getByText("1/2 free")).toBeInTheDocument();
+    expect(screen.getByText("CY")).toBeInTheDocument();
+    expect(screen.getByTitle("@Cy · busy")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Propose"));
+    rerender(<AvailabilityTab projectId={77} />);
+
+    expect(screen.getByTestId("confirm-modal")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Cancel"));
+
+    expect(availability.setSuggestingSlot).toHaveBeenCalledWith(partialFreeSlot);
+    expect(availability.setSuggestingSlot).toHaveBeenCalledWith(null);
+    expect(availability.handleSuggestTime).not.toHaveBeenCalled();
   });
 });
