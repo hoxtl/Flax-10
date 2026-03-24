@@ -13,7 +13,7 @@ from studyFlax.models.modules.enrollment_model import Enrollment
 MIN_PROJECT_MEMBER_TOTAL = 5
 MAX_PROJECT_MEMBER_TOTAL = 10
 MIN_PROJECTS_PER_STUDENT = 4
-MAX_PROJECTS_PER_STUDENT = 8
+MAX_PROJECTS_PER_STUDENT = 12
 FIXTURE_USERNAMES = ["janedoe", "johndoe", "charlie"]
 FIXTURE_OWNER_MIN_PROJECTS = 2
 

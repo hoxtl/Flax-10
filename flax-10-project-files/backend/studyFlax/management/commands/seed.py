@@ -49,7 +49,7 @@ from .seed_support.content.societies import (
 )
 from .seed_support.readings.readings import create_readings
 from .seed_support.events.attendance import seed_attendance
-from .seed_support.users.admin import seed_teacher_requests, seed_course_change_requests, seed_society_reports
+from .seed_support.users.admin import seed_course_change_requests, seed_society_reports
 
 User = get_user_model()
 LEGACY_WIDGET_SIZES_COLUMN = "homepage_widget_sizes"
@@ -277,7 +277,6 @@ class Command(BaseCommand):
         self._seed_admin_data()
 
     def _seed_admin_data(self):
-        seed_teacher_requests(self.stdout)
         seed_course_change_requests(self.stdout)
         seed_society_reports(self.stdout)
 

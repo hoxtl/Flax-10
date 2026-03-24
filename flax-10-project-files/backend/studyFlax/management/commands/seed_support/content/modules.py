@@ -408,9 +408,25 @@ def _update_timetable_external_id(event, start_time):
         event.external_id = f"{prefix}-{start_time.strftime('%Y%m%dT%H%M')}"
 
 
-def _rebalance_seeded_fixed_events(events):
+def _prefetch_existing_calendar_events(users):
+    """Fetch already-seeded events grouped by user for overlap-aware module scheduling."""
+
+    existing = (
+        CalendarEvent.objects.filter(user__in=users)
+        .only('user_id', 'start_time', 'end_time', 'source', 'external_id', 'title')
+    )
+    grouped = defaultdict(list)
+    for event in existing:
+        grouped[event.user_id].append(event)
+    return grouped
+
+
+def _rebalance_seeded_fixed_events(events, baseline_events=None):
     fixed_by_day = defaultdict(list)
     movable_sessions_by_day = defaultdict(list)
+    baseline_by_day = defaultdict(list)
+    for event in baseline_events or []:
+        baseline_by_day[_event_day(event)].append(event)
     for event in events:
         if _is_seeded_timetable_event(event):
             movable_sessions_by_day[_event_day(event)].append(event)
@@ -418,7 +434,10 @@ def _rebalance_seeded_fixed_events(events):
         if _is_fixed_seed_event(event):
             fixed_by_day[_event_day(event)].append(event)
     for day, day_sessions in movable_sessions_by_day.items():
-        placed = sorted(fixed_by_day.get(day, []), key=_event_sort_key)
+        placed = sorted(
+            baseline_by_day.get(day, []) + fixed_by_day.get(day, []),
+            key=_event_sort_key,
+        )
         for session in sorted(day_sessions, key=_event_sort_key):
             duration = _event_duration(session)
             start_time = session.start_time
@@ -455,7 +474,7 @@ def _collect_module_result(enrollment, module_events, enrollments, events):
     events.extend(module_events)
 
 
-def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
+def _build_user_module_events(user, modules, tags, now, deadlines_by_module, baseline_events=None):
     """Build all events for a user's enrolled modules."""
 
     core, extras = get_user_modules(user, modules)
@@ -463,7 +482,7 @@ def _build_user_module_events(user, modules, tags, now, deadlines_by_module):
     for module in core + extras:
         enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
         _collect_module_result(enrollment, module_events, enrollments, events)
-    return enrollments, _rebalance_seeded_fixed_events(events)
+    return enrollments, _rebalance_seeded_fixed_events(events, baseline_events=baseline_events)
 
 def _find_user_tag(user, tags, name):
     """Find a tag by name for a user, falling back to default tags."""
@@ -495,9 +514,17 @@ def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_
     """Collect enrollments and events for all users."""
 
     all_enrollments, all_events = [], []
+    existing_events_by_user = _prefetch_existing_calendar_events(users)
     for user in users:
         user_tags = _get_user_module_tags(user, tags)
-        enrollments, events = _build_user_module_events(user, modules, user_tags, now, deadlines_by_module)
+        enrollments, events = _build_user_module_events(
+            user,
+            modules,
+            user_tags,
+            now,
+            deadlines_by_module,
+            baseline_events=existing_events_by_user.get(user.id, []),
+        )
         all_enrollments.extend(enrollments)
         all_events.extend(events)
     return all_enrollments, all_events
