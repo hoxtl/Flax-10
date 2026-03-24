@@ -33,10 +33,7 @@
   white-space: nowrap;
 }
 
-.taskWidgetHeaderCount {
-  margin-left: 0 !important;
-  flex-shrink: 0;
-}
+
 
 .taskWidgetWidgetList {
   padding-top: 0.35rem;
