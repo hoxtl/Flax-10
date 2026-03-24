@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildConflictResolutionPlan,
   buildConflictResolutionToastMessage,
-} from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
+} from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
 
 function iso(dateString) {
   return new Date(dateString).toISOString();
