@@ -72,6 +72,15 @@ describe("Attendance prompt", () => {
     expect(screen.getByText("Lecture")).toBeInTheDocument();
   });
 
+  it("hides the prompt for teacher profiles", () => {
+    localStorage.setItem("user", JSON.stringify({ role: "teacher" }));
+    candidateState.value = { id: 3, title: "Lecture" };
+
+    const { container } = render(<AttendancePrompt />);
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it("wires the prompt modal buttons", () => {
     const onAnswer = vi.fn().mockResolvedValue(true);
     const onDismiss = vi.fn();
@@ -91,6 +100,18 @@ describe("Attendance prompt", () => {
     );
   });
 
+  it("renders event metadata and hides the dismiss button when it is not provided", () => {
+    render(
+      <AttendancePromptModal
+        event={{ title: "Seminar", start_time: "2026-03-01T10:00:00Z" }}
+        onAnswer={vi.fn().mockResolvedValue(true)}
+      />,
+    );
+
+    expect(screen.getByText(/at 10:00 on sunday, 1 march/i)).toBeInTheDocument();
+    expect(screen.queryByText("Dismiss")).not.toBeInTheDocument();
+  });
+
   it("dismisses and submits attendance prompt answers", async () => {
     const setEvent = vi.fn();
     recordAttendanceMock.mockResolvedValue({});
@@ -104,6 +125,32 @@ describe("Attendance prompt", () => {
     expect(recordAttendanceMock).toHaveBeenCalledWith(9, true);
     expect(setSubmitting).toHaveBeenCalledWith(true);
     expect(setSubmitting).toHaveBeenCalledWith(false);
+  });
+
+  it("shows an error and restores the question when submission fails", async () => {
+    const onAnswer = vi.fn().mockResolvedValue(false);
+
+    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("No"));
+      vi.advanceTimersByTime(1200);
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      false,
+      expect.objectContaining({ afterSuccess: expect.any(Function), closeDelayMs: 700 }),
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("Could not update attendance. Please try again.")).toBeInTheDocument();
+    expect(screen.getByText(/Did you attend/i)).toBeInTheDocument();
   });
 
   it("handles prompt utilities and candidate polling", async () => {
