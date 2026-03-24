@@ -15,6 +15,7 @@ export function getDisplayName(user) {
 export function getRoleLabel(role) {
     if (role === "teacher") return "Teacher";
     if (role === "student") return "Student";
+    if (role === "pending_teacher") return "Teacher applicant";
     return "User";
 }
 

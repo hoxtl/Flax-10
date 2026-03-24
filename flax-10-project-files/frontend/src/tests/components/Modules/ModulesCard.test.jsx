@@ -92,11 +92,11 @@ describe('ModulesCard', () => {
         expect(screen.getByText('📌 Core')).toBeInTheDocument();
     });
 
-    it('shows Core module tag in actions when enrolled in core', async () => {
+    it('shows the core badge when enrolled in a core module', async () => {
         const { isEnrolledIn } = await import('../../../components/Modules/utils/moduleUtils');
         isEnrolledIn.mockReturnValueOnce(true);
         render(<ModulesCard {...mockParameters} enrollments={[{ module: 1, is_core: true }]} />);
-        expect(screen.getByText('📌 Core module')).toBeInTheDocument();
+        expect(screen.getAllByText('📌 Core').length).toBeGreaterThan(0);
     });
 
     it('renders long description text directly', () => {

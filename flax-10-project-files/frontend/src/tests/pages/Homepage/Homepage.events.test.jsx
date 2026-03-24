@@ -141,7 +141,7 @@ describe('Homepage – overlays & event operations', () => {
     fireEvent.click(screen.getByText('select-module'));
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText('AB1')).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText('Close'));
+    fireEvent.click(dialog);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 

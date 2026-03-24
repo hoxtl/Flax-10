@@ -40,6 +40,10 @@ vi.mock("../../../components/Timer/focusAnimation/TreeScene", () => ({
   TreeScene: ({ progress }) => <div>tree-scene-{progress}</div>,
 }));
 
+vi.mock("../../../hooks/useCountUp", () => ({
+  useCountUp: () => null,
+}));
+
 import { useFocusCanvasAnimation as useFocusCanvasAnimationImpl } from "../../../components/Timer/focusAnimation/useFocusCanvasAnimation";
 import { useTodayBannerData } from "../../../components/Timer/todayBanner/useTodayBannerData";
 import TodayBanner from "../../../components/Timer/TodayBanner";
@@ -97,7 +101,6 @@ describe("Timer focus and banner", () => {
   });
 
   it("loads today banner data, computes metrics, and reacts to history refreshes", async () => {
-    localStorage.setItem("timerDailyGoalHours", "5");
     let refreshHistory;
     listenToTimerHistoryEvents.mockImplementation((refresh) => {
       refreshHistory = refresh;
@@ -105,30 +108,34 @@ describe("Timer focus and banner", () => {
     });
     getSummary
       .mockResolvedValueOnce({ summary: { total_sessions: 4, total_study_hours: 2.5, current_streak_days: 8 } })
+      .mockResolvedValueOnce({ summary: { active_days: 5 } })
       .mockResolvedValueOnce({ summary: { total_sessions: 97, current_streak_days: 8, total_study_hours: 60 } });
 
     const onStreakData = vi.fn();
     const { result } = renderHook(() => useTodayBannerData(onStreakData));
 
     await waitFor(() => expect(result.current.loading).toBe(false));
-    expect(result.current.goalHours).toBe(5);
-    expect(result.current.sessions).toBe(4);
-    expect(result.current.goalSessions).toBe(12);
-    expect(result.current.formattedHours).toBe("2h 30m");
-    expect(result.current.weeklyGoalText).toContain("1/7");
-    expect(result.current.tickCount).toBeGreaterThanOrEqual(2);
-    expect(onStreakData).toHaveBeenCalled();
+    expect(getSummary).toHaveBeenCalledWith(1);
+    expect(getSummary).toHaveBeenCalledWith(7);
+    expect(getSummary).toHaveBeenCalledWith(30);
+    expect(result.current.streak).toBe(8);
+    expect(result.current.sessions).toBe(97);
+    expect(result.current.weeklyGoalDays).toBe(5);
+    expect(result.current.focusHours).toBe(60);
+    expect(onStreakData).toHaveBeenCalledWith({ current_streak_days: 8, total_sessions: 4 });
 
     getSummary
       .mockResolvedValueOnce({ summary: { total_sessions: 5, total_study_hours: 3, current_streak_days: 9 } })
+      .mockResolvedValueOnce({ summary: { active_days: 6 } })
       .mockResolvedValueOnce({ summary: { total_sessions: 98, current_streak_days: 9, total_study_hours: 61 } });
 
     await act(async () => {
       refreshHistory();
     });
 
-    await waitFor(() => expect(result.current.sessions).toBe(5));
+    await waitFor(() => expect(result.current.sessions).toBe(98));
     expect(result.current.streak).toBe(9);
+    expect(result.current.weeklyGoalDays).toBe(6);
   });
 
   it("renders today banner metrics and focus animation picker behavior", () => {
@@ -136,20 +143,20 @@ describe("Timer focus and banner", () => {
       loading: false,
       streak: 7,
       sessions: 3,
-      goalSessions: 8,
-      fillAnimating: false,
-      activePulseLeft: 20,
-      tickCount: 8,
-      sessionPct: 37,
-      goalHours: 4,
-      formattedHours: "1h 45m",
-      timePct: 44,
+      weeklyGoalDays: 5,
+      focusHours: 1.75,
+      streakData: { current_streak_days: 7, total_sessions: 3 },
     });
 
-    render(<TodayBanner onStreakData={vi.fn()} isStudying />);
-    expect(screen.getByText("7 days")).toBeInTheDocument();
-    expect(screen.getByText("3 / 8")).toBeInTheDocument();
-    expect(screen.getByText("1h 45m")).toBeInTheDocument();
+    const { container } = render(<TodayBanner onStreakData={vi.fn()} isStudying />);
+    expect(screen.getByText("Current streak")).toBeInTheDocument();
+    expect(screen.getByText("Sessions logged")).toBeInTheDocument();
+    expect(screen.getByText("Weekly goal")).toBeInTheDocument();
+    expect(screen.getByText("Focus time")).toBeInTheDocument();
+    expect(container.textContent).toContain("7d");
+    expect(container.textContent).toContain("3");
+    expect(container.textContent).toContain("5 / 7");
+    expect(container.textContent).toContain("1.75h");
 
     vi.spyOn(focusCanvasModule, "useFocusCanvasAnimation").mockReturnValue({
       canvasRef: { current: null },

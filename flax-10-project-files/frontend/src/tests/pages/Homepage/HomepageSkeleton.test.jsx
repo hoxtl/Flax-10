@@ -1,20 +1,17 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { HomepageSkeleton } from '../../../pages/Homepage/components/HomepageSkeleton';
+import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-vi.mock('../../../components/common/LoadingState/SkeletonBlock', () => ({
+vi.mock("../../../components/common/LoadingState/SkeletonBlock", () => ({
   default: ({ className }) => <div data-testid="skeleton-block" className={className} />,
 }));
 
-describe('HomepageSkeleton', () => {
-  it('renders skeleton blocks while loading', () => {
-    render(<HomepageSkeleton />);
-    const blocks = screen.getAllByTestId('skeleton-block');
-    expect(blocks.length).toBeGreaterThan(0);
-  });
+import { HomepageSkeleton } from "../../../pages/Homepage/components/HomepageSkeleton";
 
-  it('has aria-busy attribute for accessibility', () => {
-    const { container } = render(<HomepageSkeleton />);
-    expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument();
+describe("HomepageSkeleton", () => {
+  it("renders the homepage loading layout with timeline rows", () => {
+    render(<HomepageSkeleton />);
+
+    expect(screen.getByRole("generic", { busy: true })).toBeInTheDocument();
+    expect(screen.getAllByTestId("skeleton-block")).toHaveLength(16);
   });
 });

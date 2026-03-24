@@ -104,7 +104,7 @@ function StudyStreakBars({ dayLabels, week }) {
   return (
     <div className={styles.bars}>
       {week.map((active, index) => (
-        <div key={dayLabels[index]} className={styles.barCol}>
+        <div key={`${dayLabels[index]}-${index}`} className={styles.barCol}>
           <div className={`${styles.bar} ${active ? styles.barActive : ""}`} />
           <span className={styles.barLabel}>{dayLabels[index]}</span>
         </div>

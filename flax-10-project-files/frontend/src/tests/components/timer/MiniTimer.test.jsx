@@ -63,53 +63,52 @@ describe('MiniTimer', () => {
     });
 
     it('shows tooltip on mouse enter', () => {
-        const { container } = render(<MiniTimer activeNav="home" />);
-        const wrapper = container.firstChild;
+        render(<MiniTimer activeNav="home" />);
+        const wrapper = screen.getByRole('button').parentElement;
         fireEvent.mouseEnter(wrapper);
-        expect(wrapper.querySelector('[class*="tooltip"]')).toBeTruthy();
+        expect(screen.getByRole('tooltip')).toBeTruthy();
     });
 
     it('hides tooltip on mouse leave', () => {
-        const { container } = render(<MiniTimer activeNav="home" />);
-        const wrapper = container.firstChild;
+        render(<MiniTimer activeNav="home" />);
+        const wrapper = screen.getByRole('button').parentElement;
         fireEvent.mouseEnter(wrapper);
         fireEvent.mouseLeave(wrapper);
-        const tooltip = wrapper.querySelector('[class*="tooltip"]');
-        expect(tooltip.className).not.toContain('visible');
+        expect(screen.queryByRole('tooltip')).toBeNull();
     });
 
     it('shows Focus label in work mode', () => {
-        const { container } = render(<MiniTimer activeNav="home" />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.textContent).toContain('Focus');
+        render(<MiniTimer activeNav="home" />);
+        fireEvent.mouseEnter(screen.getByRole('button').parentElement);
+        expect(screen.getByRole('tooltip').textContent).toContain('Focus');
     });
 
     it('shows Overtime label when isOvertime', () => {
         useTimerContext.mockReturnValue({ ...baseTimerState, isOvertime: true });
-        const { container } = render(<MiniTimer activeNav="home" />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.textContent).toContain('Overtime');
+        render(<MiniTimer activeNav="home" />);
+        fireEvent.mouseEnter(screen.getByRole('button').parentElement);
+        expect(screen.getByRole('tooltip').textContent).toContain('Overtime');
     });
 
     it('shows Paused label when isPaused', () => {
         useTimerContext.mockReturnValue({ ...baseTimerState, isPaused: true });
-        const { container } = render(<MiniTimer activeNav="home" />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.textContent).toContain('Paused');
+        render(<MiniTimer activeNav="home" />);
+        fireEvent.mouseEnter(screen.getByRole('button').parentElement);
+        expect(screen.getByRole('tooltip').textContent).toContain('Paused');
     });
 
     it('shows Break Time label in break mode', () => {
         useTimerContext.mockReturnValue({ ...baseTimerState, mode: 'break' });
-        const { container } = render(<MiniTimer activeNav="home" />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.textContent).toContain('Break');
+        render(<MiniTimer activeNav="home" />);
+        fireEvent.mouseEnter(screen.getByRole('button').parentElement);
+        expect(screen.getByRole('tooltip').textContent).toContain('Break');
     });
 
     it('shows Break Overtime when isBreakOvertime', () => {
         useTimerContext.mockReturnValue({ ...baseTimerState, mode: 'break', isBreakOvertime: true });
-        const { container } = render(<MiniTimer activeNav="home" />);
-        fireEvent.mouseEnter(container.firstChild);
-        expect(container.textContent).toContain('Overtime');
+        render(<MiniTimer activeNav="home" />);
+        fireEvent.mouseEnter(screen.getByRole('button').parentElement);
+        expect(screen.getByRole('tooltip').textContent).toContain('Overtime');
     });
 
     it('does not throw when onNavigate is not provided', () => {

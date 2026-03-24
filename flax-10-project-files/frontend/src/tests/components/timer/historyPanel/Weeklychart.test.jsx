@@ -3,6 +3,14 @@ import { render, screen } from '@testing-library/react';
 import { WeeklyChart } from '../../../../components/Timer/historyPanel/WeeklyChart';
 
 vi.mock('../../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
+vi.mock('framer-motion', () => ({
+  motion: {
+    span: ({ children, initial: _initial, animate: _animate, transition: _transition, ...props }) => (
+      <span {...props}>{children}</span>
+    ),
+  },
+  useReducedMotion: vi.fn(() => true),
+}));
 
 const WEEK_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 

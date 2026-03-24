@@ -2,6 +2,7 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 
+const navigateMock = vi.fn();
 const createTask = vi.fn();
 const createTaskList = vi.fn();
 const fetchTaskLists = vi.fn();
@@ -14,6 +15,7 @@ const extractBaseEventId = vi.fn((value) => `base-${value}`);
 
 vi.mock("react-router-dom", () => ({
   Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
+  useNavigate: () => navigateMock,
 }));
 
 vi.mock("../../../components/Calendar/utils/dateUtils", () => ({
@@ -215,13 +217,17 @@ describe("Homepage modal, overlay, and semester-data extras", () => {
 
     expect(screen.getAllByText("CS101").length).toBeGreaterThan(0);
     expect(screen.getByText(/Leader: Dr Ada/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /View module/ })).toHaveAttribute("href", "/modules?moduleId=7");
-    fireEvent.click(screen.getByLabelText("Close"));
+    fireEvent.click(screen.getAllByRole("dialog")[0]);
     expect(setSelectedModulePill).toHaveBeenCalledWith(null);
+    fireEvent.click(screen.getByRole("button", { name: /View module/i }));
+    expect(setSelectedModulePill).toHaveBeenCalledWith(null);
+    expect(navigateMock).toHaveBeenCalledWith("/modules?moduleId=7");
 
     expect(screen.getByText("Essay")).toBeInTheDocument();
     expect(screen.getByText("Submit online")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Go to module/ })).toHaveAttribute("href", "/modules?moduleId=7");
+    fireEvent.click(screen.getByRole("button", { name: /Go to module/i }));
+    expect(setSelectedDeadline).toHaveBeenCalledWith(null);
+    expect(navigateMock).toHaveBeenCalledWith("/modules?moduleId=7");
     fireEvent.click(screen.getAllByRole("dialog")[1]);
     expect(setSelectedDeadline).toHaveBeenCalledWith(null);
   });

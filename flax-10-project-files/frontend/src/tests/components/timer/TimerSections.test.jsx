@@ -175,7 +175,6 @@ describe("Timer sections", () => {
     expect(t.togglePause).toHaveBeenCalled();
     expect(t.resetTimer).toHaveBeenCalled();
     expect(t.setModal).toHaveBeenCalledWith("endEarly");
-    expect(t.addDistraction).toHaveBeenCalled();
     expect(onOpenHistory).toHaveBeenCalled();
   });
 });

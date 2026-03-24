@@ -10,7 +10,6 @@ import {
   createEmptyUserFilters,
   hasActiveUserFilters,
   matchesRoleFilter,
-  matchesStaffFilter,
   matchesStatusFilter,
   matchesAllUserFilters,
   matchesUserSearch,
@@ -86,18 +85,18 @@ describe('userFilters – toggleArrayValue', () => {
 });
 
 describe('userFilters – createEmptyUserFilters', () => {
-  it('returns an object with empty roles, staff, and status arrays', () => {
-    expect(createEmptyUserFilters()).toEqual({ roles: [], staff: [], status: [] });
+  it('returns an object with empty roles and status arrays', () => {
+    expect(createEmptyUserFilters()).toEqual({ roles: [], status: [] });
   });
 });
 
 describe('userFilters – hasActiveUserFilters', () => {
   it('returns false when all arrays are empty', () => {
-    expect(hasActiveUserFilters({ roles: [], staff: [], status: [] })).toBe(false);
+    expect(hasActiveUserFilters({ roles: [], status: [] })).toBe(false);
   });
 
   it('returns true when any array has entries', () => {
-    expect(hasActiveUserFilters({ roles: ['student'], staff: [], status: [] })).toBe(true);
+    expect(hasActiveUserFilters({ roles: ['student'], status: [] })).toBe(true);
   });
 });
 
@@ -120,24 +119,6 @@ describe('userFilters – matchesRoleFilter', () => {
 
   it('does not match student against teacher filter', () => {
     expect(matchesRoleFilter({ role: 'student' }, ['teacher'])).toBe(false);
-  });
-});
-
-describe('userFilters – matchesStaffFilter', () => {
-  it('returns true when staff array is empty', () => {
-    expect(matchesStaffFilter({ is_staff: false }, [])).toBe(true);
-  });
-
-  it('matches staff user with is_staff true', () => {
-    expect(matchesStaffFilter({ is_staff: true }, ['staff'])).toBe(true);
-  });
-
-  it('matches superuser with is_superuser true', () => {
-    expect(matchesStaffFilter({ is_superuser: true }, ['staff'])).toBe(true);
-  });
-
-  it('does not match non-staff user', () => {
-    expect(matchesStaffFilter({ is_staff: false, is_superuser: false }, ['staff'])).toBe(false);
   });
 });
 
@@ -167,7 +148,7 @@ describe('userFilters – matchesAllUserFilters', () => {
   });
 
   it('returns false when role filter excludes the user', () => {
-    expect(matchesAllUserFilters(user, { roles: ['teacher'], staff: [], status: [] })).toBe(false);
+    expect(matchesAllUserFilters(user, { roles: ['teacher'], status: [] })).toBe(false);
   });
 });
 
@@ -206,7 +187,7 @@ describe('userFilters – filterUsers', () => {
   });
 
   it('filters by role', () => {
-    const result = filterUsers(users, '', { roles: ['teacher'], staff: [], status: [] });
+    const result = filterUsers(users, '', { roles: ['teacher'], status: [] });
     expect(result).toHaveLength(1);
     expect(result[0].username).toBe('bob');
   });

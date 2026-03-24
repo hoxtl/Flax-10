@@ -181,6 +181,7 @@ vi.mock("../../../hooks/useCountUp", () => ({
 }));
 
 vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
   },
@@ -286,6 +287,8 @@ describe("GroupWork pages and header extras", () => {
   });
 
   it("renders project header branches, teacher/module pills, delete flow, and progress stats", async () => {
+    const toast = vi.fn();
+    useToast.mockReturnValue(toast);
     const onDelete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
     const onBack = vi.fn();
     const onMemberRemove = vi.fn();
@@ -302,7 +305,7 @@ describe("GroupWork pages and header extras", () => {
           onDelete={onDeleteProject}
           onBack={onBack}
         />
-        <ProjectDeleteAction onDelete={onDelete} />
+        <ProjectDeleteAction onDelete={onDelete} isOwner />
         <ProjectProgress taskStats={{ percent: 40, total: 5, completed: 2, segments: [{ id: "owner", name: "Owner", percentage: 40 }] }} />
       </>,
     );
@@ -322,10 +325,15 @@ describe("GroupWork pages and header extras", () => {
     fireEvent.click(screen.getByText("confirm-hold"));
     await waitFor(() => expect(onDeleteProject).toHaveBeenCalled());
 
-    // Open ProjectHeader's delete modal (isOwner=true) and confirm
-    fireEvent.click(screen.getAllByText("Delete project")[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
     fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(onDeleteProject).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
+    expect(toast).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
+    fireEvent.click(screen.getByText("confirm-hold"));
+    await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
+    expect(toast).toHaveBeenCalledWith("Project deleted.");
     expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
   });
 });

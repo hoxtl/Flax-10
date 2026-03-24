@@ -31,6 +31,15 @@ vi.mock('framer-motion', () => ({
     get: (_, tag) => (props) => {
       const { children, ...rest } = props || {};
       const Tag = typeof tag === 'string' ? tag : 'div';
+      delete rest.animate;
+      delete rest.exit;
+      delete rest.initial;
+      delete rest.layout;
+      delete rest.layoutId;
+      delete rest.layoutRoot;
+      delete rest.transition;
+      delete rest.whileHover;
+      delete rest.whileTap;
       return <Tag {...rest}>{children}</Tag>;
     },
   }),

@@ -64,6 +64,7 @@ vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
 vi.mock("framer-motion", () => ({
   motion: {
     button: ({ children, ...props }) => <button {...props}>{children}</button>,
+    span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
 }));
 

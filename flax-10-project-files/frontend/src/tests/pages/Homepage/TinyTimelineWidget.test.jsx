@@ -1,11 +1,14 @@
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import TinyTimelineWidget from "../../../pages/Homepage/components/TinyTimelineWidget";
 
+const navigateMock = vi.fn();
+
 vi.mock("react-router-dom", () => ({
   Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
+  useNavigate: () => navigateMock,
 }));
 
 vi.mock("framer-motion", () => ({
@@ -22,6 +25,7 @@ vi.mock("lucide-react", () => ({
 
 describe("TinyTimelineWidget", () => {
   beforeEach(() => {
+    navigateMock.mockReset();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-24T10:30:00.000Z"));
   });
@@ -49,7 +53,8 @@ describe("TinyTimelineWidget", () => {
     expect(screen.queryByText("Too Late")).not.toBeInTheDocument();
     expect(screen.getByText("Library")).toBeInTheDocument();
     expect(screen.getByText("Task")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /view full plan/i })).toHaveAttribute("href", "#timeline-section");
+    fireEvent.click(screen.getByRole("button", { name: /view my calendar/i }));
+    expect(navigateMock).toHaveBeenCalledWith("/calendar");
   });
 
   it("renders the empty state when there are no remaining events", () => {

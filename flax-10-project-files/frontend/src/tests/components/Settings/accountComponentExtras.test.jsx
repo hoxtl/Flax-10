@@ -53,7 +53,7 @@ vi.mock("../../../components/Settings/SettingsContextCard", () => ({
 
 vi.mock("../../../components/Settings/SettingsUI", () => ({
   SectionHeader: ({ title, description }) => <div>{title}:{description}</div>,
-  SubmitButton: ({ label, savingLabel, isSaving }) => <button type="button">{isSaving ? savingLabel : label}</button>,
+  SubmitButton: ({ label, savingLabel, isSaving }) => <button type="submit">{isSaving ? savingLabel : label}</button>,
 }));
 
 vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
@@ -65,9 +65,13 @@ vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
   YearField: ({ value, onChange }) => <input aria-label="Year" value={value} onChange={onChange} />,
 }));
 
-vi.mock("../../../components/Settings/account/accountCourseRequests", () => ({
-  groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
-}));
+vi.mock("../../../components/Settings/account/accountCourseRequests", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
+  };
+});
 
 import CourseChangeModal from "../../../components/Settings/account/CourseChangeModal";
 import CourseDisplay from "../../../components/Settings/account/CourseDisplay";
@@ -113,24 +117,24 @@ describe("account component extras", () => {
     requestCourseChange.mockResolvedValueOnce({ requestedCourse: "Physics" });
 
     const firstModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
-    fireEvent.click(screen.getByText("Submit Request"));
-    expect(screen.getByText("Please tell us why you want to change course.")).toBeInTheDocument();
+    fireEvent.submit(firstModal.container.querySelector("form"));
+    expect(await screen.findByText("Please tell us why you want to change course.")).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Better fit" } });
-    fireEvent.click(screen.getByText("Submit Request"));
-    expect(screen.getByText("Please select a course.")).toBeInTheDocument();
+    fireEvent.submit(firstModal.container.querySelector("form"));
+    expect(await screen.findByText("Please select a course.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Search for a course..."));
-    fireEvent.click(screen.getByText("Submit Request"));
+    fireEvent.submit(firstModal.container.querySelector("form"));
     await waitFor(() => expect(requestCourseChange).toHaveBeenCalledWith("Physics"));
     expect(onSuccess).toHaveBeenCalledWith({ requestedCourse: "Physics" }, "Physics");
 
     firstModal.unmount();
     requestCourseChange.mockRejectedValueOnce(new Error("network failed"));
-    render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
+    const secondModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
     fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Another reason" } });
     fireEvent.click(screen.getByText("Search for a course..."));
-    fireEvent.click(screen.getByText("Submit Request"));
+    fireEvent.submit(secondModal.container.querySelector("form"));
     await waitFor(() => expect(screen.getByText("network failed")).toBeInTheDocument());
     fireEvent.click(screen.getByText("close-standard-modal"));
     expect(onClose).toHaveBeenCalled();
@@ -138,7 +142,8 @@ describe("account component extras", () => {
 
   it("renders account form layout and pending-request fetch fallback paths", async () => {
     getMyCourseChangeRequest.mockResolvedValueOnce([{ status: "pending", desired_course: "Physics" }]);
-    const state = renderHook(() => useAccountFormState({ first_name: "Ava", last_name: "Ng", email: "ava@example.com", year: "Year 2", major: "Maths" }));
+    const externalUser = { first_name: "Ava", last_name: "Ng", email: "ava@example.com", year: "Year 2", major: "Maths" };
+    const state = renderHook(() => useAccountFormState(externalUser));
     await waitFor(() => expect(state.result.current.pendingRequest?.requested_course).toBe("Physics"));
 
     const onSubmit = vi.fn((event) => event.preventDefault());
@@ -165,7 +170,7 @@ describe("account component extras", () => {
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("First name"), { target: { value: "Eve" } });
     fireEvent.change(screen.getByLabelText("Year"), { target: { value: "Year 3" } });
-    fireEvent.click(screen.getByText("Save Changes"));
+    fireEvent.submit(screen.getByText("Save Changes").closest("form"));
     expect(onSubmit).toHaveBeenCalled();
   });
 });

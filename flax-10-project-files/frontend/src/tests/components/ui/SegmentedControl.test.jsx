@@ -39,8 +39,9 @@ describe('SegmentedControl', () => {
       { value: 'icon', label: '', icon: MockIcon, title: 'Icon option' },
     ];
     render(<SegmentedControl options={options} value="icon" onChange={vi.fn()} />);
+    fireEvent.mouseEnter(screen.getByRole('button'));
     expect(screen.getByTestId('icon')).toBeInTheDocument();
-    expect(screen.getByTitle('Icon option')).toBeInTheDocument();
+    expect(screen.getByRole('tooltip')).toHaveTextContent('Icon option');
   });
 
   it('renders option with both icon and label', () => {

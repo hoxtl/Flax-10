@@ -203,7 +203,7 @@ describe('RightNowWidget', () => {
             sortedEvents: [],
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
+        expect(screen.getByText(/Tomorrow Meeting/)).toBeTruthy();
     });
 
     it('shows single event in header', () => {
@@ -278,7 +278,7 @@ describe('RightNowWidget', () => {
             navigatorContext: {},
             tomorrowFirstEvent: { title: 'Tomorrow Meeting', start_time: '2024-03-09T09:00:00Z' },
         });
-        expect(screen.getByText('Tomorrow Meeting')).toBeTruthy();
+        expect(screen.getByText(/Tomorrow: Tomorrow Meeting/)).toBeTruthy();
     });
 
     it('end of day shows completed and events attended', () => {

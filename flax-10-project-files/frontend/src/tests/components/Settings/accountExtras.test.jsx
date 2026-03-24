@@ -83,8 +83,10 @@ describe("account extras", () => {
     setCachedPendingRequest("Chemistry");
 
     const { result } = renderHook(() => useAccountFormState());
-    await waitFor(() => expect(result.current.currentCourse).toBe("Physics"));
-    expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" });
+    await waitFor(() => {
+      expect(result.current.currentCourse).toBe("Physics");
+      expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Chemistry" });
+    });
 
     act(() => result.current.handleChange({ target: { name: "firstName", value: "Ava" } }));
     expect(result.current.formData.firstName).toBe("Ava");
@@ -96,7 +98,8 @@ describe("account extras", () => {
     });
     getMyCourseChangeRequest.mockResolvedValueOnce({ status: "approved", requested_course: "Physics" });
 
-    const { result } = renderHook(() => useAccountFormState({ first_name: "Ben", major: "History" }));
+    const externalUser = { first_name: "Ben", major: "History" };
+    const { result } = renderHook(() => useAccountFormState(externalUser));
     await waitFor(() => expect(result.current.currentCourse).toBe("History"));
     expect(result.current.pendingRequest).toBeNull();
   });
