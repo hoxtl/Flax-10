@@ -17,24 +17,15 @@ function SkeletonCards({ count }) {
   );
 }
 
-export default function PageSkeleton({
-  label = "Loading page",
-  showAction = false,
-  showSearch = false,
-  cardCount = 3,
-  testId,
-}) {
+function SkeletonHeader({ showAction }) {
+  return <div className={styles.header}><SkeletonBlock className={styles.title} />{showAction && <SkeletonBlock className={styles.action} />}</div>;
+}
+
+export default function PageSkeleton({ label = "Loading page", showAction = false, showSearch = false, cardCount = 3, testId }) {
   return (
-    <div
-      className={styles.container}
-      aria-busy="true"
-      data-testid={testId}
-    >
+    <div className={styles.container} aria-busy="true" data-testid={testId}>
       <span className={styles.srOnly}>{label}</span>
-      <div className={styles.header}>
-        <SkeletonBlock className={styles.title} />
-        {showAction && <SkeletonBlock className={styles.action} />}
-      </div>
+      <SkeletonHeader showAction={showAction} />
       {showSearch && <SkeletonBlock className={styles.search} />}
       <SkeletonCards count={cardCount} />
     </div>

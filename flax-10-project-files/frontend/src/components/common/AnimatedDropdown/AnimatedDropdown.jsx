@@ -180,44 +180,29 @@ function DropdownTrigger({ customTrigger, handleToggle, openOnHover, selectedLab
   return <DropdownButton selectedLabel={selectedLabel} value={value} isOpen={isOpen} onClick={handleToggle} triggerClassName={triggerClassName} />;
 }
 
-/** Animated dropdown with optional search and grouped option support. */
-
-export default function AnimatedDropdown({
-  value, onChange, placeholder, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className,
-  customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true, triggerClassName = ""
-}) {
-  const {
-    containerRef,
-    menuRef,
-    isOpen,
-    query,
-    setQuery,
-    selectedLabel,
-    handleSelect,
-    handleToggle,
-    openUpward,
-    coords,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useAnimatedDropdownState({
-    options,
-    grouped,
-    placeholder,
-    value,
-    onChange,
-    openOnHover,
-    isOpen: forceOpen,
-    onOpenChange,
-    menuMaxHeight,
-    allowFlipUpward,
+function useDropdownConfig(props) {
+  return useAnimatedDropdownState({
+    options: props.options,
+    grouped: props.grouped,
+    placeholder: props.placeholder,
+    value: props.value,
+    onChange: props.onChange,
+    openOnHover: props.openOnHover,
+    isOpen: props.forceOpen,
+    onOpenChange: props.onOpenChange,
+    menuMaxHeight: props.menuMaxHeight,
+    allowFlipUpward: props.allowFlipUpward,
   });
+}
+
+export default function AnimatedDropdown(props) {
+  const { value, options, grouped = false, searchable = false, searchPlaceholder = "Search...", emptyMessage = "Nothing found", menuMaxHeight, className, customTrigger, hideCheckmark = false, openOnHover = false, isOpen: forceOpen, onOpenChange, align = 'left', usePortal = false, allowFlipUpward = true, triggerClassName = "" } = props;
+  const state = useDropdownConfig({ ...props, forceOpen, allowFlipUpward });
+  const { containerRef, menuRef, isOpen, query, setQuery, selectedLabel, handleSelect, handleToggle, openUpward, coords, handleMouseEnter, handleMouseLeave } = state;
   return (
     <div ref={containerRef} className={className} style={{ position: 'relative' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <DropdownTrigger customTrigger={customTrigger} handleToggle={handleToggle} openOnHover={openOnHover} selectedLabel={selectedLabel} value={value} isOpen={isOpen} triggerClassName={triggerClassName} />
-      <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect}
-        searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder}
-        emptyMessage={emptyMessage} openUpward={openUpward} menuMaxHeight={menuMaxHeight}
-        hideCheckmark={hideCheckmark} align={align} usePortal={usePortal} coords={coords} menuRef={menuRef} />
+      <DropdownMenu isOpen={isOpen} grouped={grouped} options={options} value={value} onSelect={handleSelect} searchable={searchable} query={query} setQuery={setQuery} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} openUpward={openUpward} menuMaxHeight={menuMaxHeight} hideCheckmark={hideCheckmark} align={align} usePortal={usePortal} coords={coords} menuRef={menuRef} />
     </div>
   );
 }
