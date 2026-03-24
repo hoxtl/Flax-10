@@ -70,9 +70,10 @@ const baseProps = {
   timelineProps: { sortedEvents: [{ id: 1 }] },
   dashboard: {
     edit: true,
+    attendance: { pct: 87 },
     live: {
       liveContext: "Focused",
-      eventsCount: 2,
+      classesCount: 2,
       tasksCount: 3,
       nextStep: "Read",
       nextStepMeta: "Soon",
@@ -108,7 +109,8 @@ describe("IntelligenceWidgetRenderer", () => {
   it("renders the hero widget with live dashboard props", () => {
     renderWidget("hero");
     expect(screen.getByTestId("hero").textContent).toContain('"displayName":"Ava"');
-    expect(screen.getByTestId("hero").textContent).toContain('"eventsCount":2');
+    expect(screen.getByTestId("hero").textContent).toContain('"attendancePct":87');
+    expect(screen.getByTestId("hero").textContent).toContain('"tasksCount":3');
   });
 
   it("renders the right-now widget with slot data and tfl delays", () => {

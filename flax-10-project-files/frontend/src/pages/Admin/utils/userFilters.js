@@ -9,7 +9,7 @@ export function getUserRoleValue(user) {
 
 const ROLE_MATCHERS = {
   student: (user) => getUserRoleValue(user) === "student",
-  teacher: (user) => getUserRoleValue(user) === "teacher",
+  teacher: (user) => ["teacher", "pending_teacher"].includes(getUserRoleValue(user)),
   admin: (user) => getUserRoleValue(user) === "admin",
 };
 

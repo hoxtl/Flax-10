@@ -44,9 +44,20 @@ export function GoalEditor(props) {
 }
 
 function loadStudiedHours(setStudiedHours) {
-  import('../../../api/analyticsApi').then((module) => {
-    module.default.getSummary(1).then((result) => setStudiedHours(result?.summary?.total_study_hours ?? 0)).catch(() => setStudiedHours(0));
-  });
+  let cancelled = false;
+
+  import('../../../api/analyticsApi')
+    .then((module) => module.default.getSummary(1))
+    .then((result) => {
+      if (!cancelled) setStudiedHours(result?.summary?.total_study_hours ?? 0);
+    })
+    .catch(() => {
+      if (!cancelled) setStudiedHours(0);
+    });
+
+  return () => {
+    cancelled = true;
+  };
 }
 
 export function DailyGoalWidget() {
@@ -59,7 +70,7 @@ export function DailyGoalWidget() {
   const studiedText = studiedHours === null ? '…' : `${fmtDuration(Math.round((studiedHours || 0) * 3600))} of ${goalHours}h (${pct}%)`;
 
   useEffect(() => {
-    loadStudiedHours(setStudiedHours);
+    return loadStudiedHours(setStudiedHours);
   }, []);
   return <DailyGoalWidgetView goalHours={goalHours} studiedText={studiedText} pct={pct} editingGoal={editingGoal} goalInput={goalInput} setGoalInput={setGoalInput} setEditingGoal={setEditingGoal} setGoalHours={setGoalHours} />;
 }

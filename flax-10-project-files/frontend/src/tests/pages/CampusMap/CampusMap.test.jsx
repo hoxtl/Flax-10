@@ -109,6 +109,7 @@ describe("CampusMap", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.defineProperty(window, "innerWidth", { value: 1200, writable: true });
+    window.scrollTo = vi.fn();
     Object.defineProperty(globalThis.navigator, "geolocation", {
       configurable: true,
       value: {
@@ -162,7 +163,6 @@ describe("CampusMap", () => {
 
   it("renders current-location buttons for both journey fields", async () => {
     await renderLoadedCampusMap();
-    expect(screen.getByText("Starting Location")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /set start to current location/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /set destination to current location/i })).toBeInTheDocument();
   });

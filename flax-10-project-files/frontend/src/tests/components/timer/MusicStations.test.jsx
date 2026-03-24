@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MusicStations } from '../../../components/Timer/soundPanel/MusicStations';
 
 vi.mock('../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
@@ -57,8 +57,9 @@ describe('MusicStations', () => {
   it('renders MusicEmbed when a station is active', () => {
     const activeStation = { id: 'yt-lofi', label: 'Lo-fi Beats', provider: 'youtube', embedUrl: 'https://youtube.com/embed/1', externalUrl: 'https://youtube.com/1' };
     render(<MusicStations activeStation={activeStation} toggleStation={vi.fn()} closeStation={vi.fn()} />);
-    expect(screen.getByTestId('music-embed')).toBeTruthy();
-    expect(screen.getByText('Lo-fi Beats')).toBeTruthy();
+    const embed = screen.getByTestId('music-embed');
+    expect(embed).toBeTruthy();
+    expect(within(embed).getByText('Lo-fi Beats')).toBeTruthy();
   });
 
   it('calls closeStation when MusicEmbed close button is clicked', () => {

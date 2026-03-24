@@ -50,6 +50,7 @@ vi.mock("../../../pages/Homepage/components/IntelligenceWidgetRenderer", () => (
 
 vi.mock("../../../pages/Homepage/hooks/useIntelligenceDashboard", () => ({
   CATALOGUE: ["hero", "rightNow", "todayTasks"],
+  DEFAULT_LAYOUT: ["hero", "deadlines", "todayTasks", "bigTimeline"],
   getSemesterProgress: (...args) => dashboardState.getSemesterProgress(...args),
   useIntelligenceDashboard: () => dashboardState.dashboard,
 }));

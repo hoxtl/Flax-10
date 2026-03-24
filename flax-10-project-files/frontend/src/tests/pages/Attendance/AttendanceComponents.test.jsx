@@ -133,7 +133,7 @@ describe("Attendance components", () => {
     const onRecorded = vi.fn();
     const manyEvents = Array.from({ length: 21 }, (_, index) => ({
       id: index + 1,
-      title: `Event ${index + 1}`,
+      title: `Lecture ${index + 1}`,
       start_time: "2026-03-01T09:00:00Z",
       attended: index % 2 === 0,
       event_type: "Lecture",
@@ -143,27 +143,26 @@ describe("Attendance components", () => {
     expect(container).toBeEmptyDOMElement();
 
     rerender(<RecordAttendanceList events={manyEvents} onRecorded={onRecorded} />);
-    fireEvent.click(screen.getAllByText("Attended")[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Attended" })[0]);
     await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(1, true));
     expect(onRecorded).toHaveBeenCalled();
-    expect(screen.getByText("Showing first 20 events. Use the prompt during class for more.")).toBeInTheDocument();
+    expect(screen.getByText("Showing first 20 events.")).toBeInTheDocument();
 
     const manyMarkedEvents = Array.from({ length: 31 }, (_, index) => ({
-      id: index + 1,
-      title: `Marked ${index + 1}`,
+      id: index + 101,
+      title: `Lecture ${index + 1}`,
       start_time: "2026-03-01T09:00:00Z",
       attended: index % 2 === 0,
       event_type: "Lecture",
     }));
-    rerender(<MarkedAttendanceList markedEvents={manyMarkedEvents} onRecorded={onRecorded} />);
-    fireEvent.click(screen.getAllByText("Change")[0]);
-    await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalled());
+    rerender(<MarkedAttendanceList markedEvents={manyMarkedEvents} />);
+    expect(screen.queryByRole("button", { name: "Change" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
     expect(screen.getByText(/Showing 30 most recent/)).toBeInTheDocument();
   });
 
   it("renders event info, record actions, marked actions, and segment detail rows", async () => {
     const onRecord = vi.fn();
-    const onChange = vi.fn();
     const onToggleStatus = vi.fn().mockResolvedValue(undefined);
 
     render(
@@ -173,8 +172,8 @@ describe("Attendance components", () => {
           renderActions={(event) => <button>{event.id}</button>}
         />
         <AttendanceEventInfo event={{ title: "Biology", start_time: "2026-03-01T10:00:00Z" }} />
-        <AttendanceRecordActions event={{ id: 2 }} submittingId={null} onRecord={onRecord} />
-        <AttendanceMarkedActions event={{ id: 3, attended: true }} submittingId={null} onChange={onChange} />
+        <AttendanceRecordActions event={{ id: 2, start_time: "2026-03-01T12:00:00Z" }} submittingId={null} onRecord={onRecord} />
+        <AttendanceMarkedActions event={{ id: 3, attended: true }} />
         <SegmentDetailHeader segmentLabel="Lecture" count={2} onClose={vi.fn()} />
         <SegmentDetailList events={[]} toggling={{}} onToggleStatus={vi.fn()} />
         <SegmentDetailPanel
@@ -189,13 +188,12 @@ describe("Attendance components", () => {
 
     expect(screen.getByText("Algebra")).toBeInTheDocument();
     expect(screen.getByText("Biology")).toBeInTheDocument();
-    fireEvent.click(screen.getAllByText("Attended")[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Attended" })[0]);
     expect(onRecord).toHaveBeenCalledWith(2, true);
-    fireEvent.click(screen.getAllByText("Change")[0]);
-    expect(onChange).toHaveBeenCalledWith(3, false);
     expect(screen.getByText("2 events")).toBeInTheDocument();
     expect(screen.getByText("No records found for this segment.")).toBeInTheDocument();
-    fireEvent.click(screen.getAllByText("Missed").at(-1));
+    expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
+    fireEvent.click(screen.getAllByRole("button", { name: "Missed" }).at(-1));
     await waitFor(() => expect(onToggleStatus).toHaveBeenCalledWith(4, true));
   });
 });

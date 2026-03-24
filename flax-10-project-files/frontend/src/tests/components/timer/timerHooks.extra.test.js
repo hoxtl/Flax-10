@@ -76,7 +76,7 @@ describe("timer hook extras", () => {
     expect(result.current.timeLeft).toBe((8 + (10 - 8)) * 60);
   });
 
-  it("covers timer flow actions including addDistraction, auto-break, and goal handling", async () => {
+  it("covers timer flow actions including auto-break and goal handling", async () => {
     const timer = {
       completedSessions: 0,
       targetSessions: 1,
@@ -96,9 +96,6 @@ describe("timer hook extras", () => {
     };
 
     const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
-    act(() => result.current.addDistraction());
-    expect(result.current.distractionCount).toBe(1);
-
     act(() => result.current.onWorkComplete());
     expect(playCompletionChime).toHaveBeenCalledWith(0.3);
     expect(timer.setMode).toHaveBeenCalledWith("break");

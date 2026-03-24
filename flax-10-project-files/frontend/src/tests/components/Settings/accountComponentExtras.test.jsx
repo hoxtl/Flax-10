@@ -65,9 +65,13 @@ vi.mock("../../../components/Settings/account/AccountInfoFields", () => ({
   YearField: ({ value, onChange }) => <input aria-label="Year" value={value} onChange={onChange} />,
 }));
 
-vi.mock("../../../components/Settings/account/accountCourseRequests", () => ({
-  groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
-}));
+vi.mock("../../../components/Settings/account/accountCourseRequests", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    groupedCourses: [{ label: "Science", options: [{ value: "Physics", label: "Physics" }] }],
+  };
+});
 
 import CourseChangeModal from "../../../components/Settings/account/CourseChangeModal";
 import CourseDisplay from "../../../components/Settings/account/CourseDisplay";
@@ -114,11 +118,11 @@ describe("account component extras", () => {
 
     const firstModal = render(<CourseChangeModal onClose={onClose} onSuccess={onSuccess} />);
     fireEvent.click(screen.getByText("Submit Request"));
-    expect(screen.getByText("Please tell us why you want to change course.")).toBeInTheDocument();
+    expect(await screen.findByText("Please tell us why you want to change course.")).toBeInTheDocument();
 
     fireEvent.change(screen.getByPlaceholderText(/Tell us a bit/), { target: { value: "Better fit" } });
     fireEvent.click(screen.getByText("Submit Request"));
-    expect(screen.getByText("Please select a course.")).toBeInTheDocument();
+    expect(await screen.findByText("Please select a course.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Search for a course..."));
     fireEvent.click(screen.getByText("Submit Request"));
