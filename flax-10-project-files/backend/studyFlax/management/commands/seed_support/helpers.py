@@ -170,7 +170,7 @@ def _random_theme():
     return random.choice(['light', 'dark'])
 
 
-CORE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]
+CORE_WIDGETS = ["deadlines", "todayTasks", "bigTimeline"]
 def _select_widgets():
     """Seed only the core homepage widgets."""
 

@@ -92,6 +92,18 @@ class SeedNewUserProjectsTest(TestCase):
         _add_demo_members(project, self.user, [demo1, demo2, demo3])
         self.assertGreater(GroupMembership.objects.filter(project=project).count(), 1)
 
+    def test_get_demo_users_returns_list(self):
+        from studyFlax.views.modules.new_user_projects import _get_demo_users
+        result = _get_demo_users()
+        self.assertIsInstance(result, list)
+
+    def test_seed_project_for_module_returns_false_when_no_spec(self):
+        from studyFlax.views.modules.new_user_projects import _seed_project_for_module
+        module = _make_module(self.user, code='NP08')
+        with patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', return_value=[]):
+            result = _seed_project_for_module(module, self.user, self.now, [])
+        self.assertFalse(result)
+
     def test_stops_when_remaining_slots_reached(self):
         from studyFlax.views.modules.new_user_projects import seed_new_user_projects
         module1 = _make_module(self.user, code='NP05', name='Module One')
