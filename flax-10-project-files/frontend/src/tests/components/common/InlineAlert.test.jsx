@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import InlineAlert from '../../../components/Common/InlineAlert/InlineAlert';
+import InlineAlert from '../../../components/common/InlineAlert/InlineAlert';
 
-vi.mock('../../../components/Common/InlineAlert/InlineAlert.module.css', () => ({
+vi.mock('../../../components/common/InlineAlert/InlineAlert.module.css', () => ({
   default: {
     alert: 'alert', success: 'success', error: 'error', warning: 'warning', info: 'info',
     icon: 'icon', message: 'message',
