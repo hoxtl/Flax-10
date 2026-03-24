@@ -1,3 +1,6 @@
+/*
+ * Schedule manager state hook and handlers.
+ */
 import { useEffect, useState } from "react";
 import { deleteSchedule, getSchedules, renameSchedule } from "../../../../api/scheduleApi";
 
@@ -48,42 +51,48 @@ function useResetOnClose(open, state) {
   }, [open, resetters]);
 }
 
-function useDialogFields() {
+function useDialogCoreState() {
   const [loading, setLoading] = useState(false);
   const [schedules, setSchedules] = useState([]);
+  return { loading, schedules, setLoading, setSchedules };
+}
+
+function useDialogEditState() {
   const [editingId, setEditingId] = useState(null);
   const [renameDraft, setRenameDraft] = useState("");
   const [removeId, setRemoveId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  return { editingId, renameDraft, removeId, isSaving, isDeleting, setEditingId, setRenameDraft, setRemoveId, setIsSaving, setIsDeleting };
+}
 
-  return {
-    loading,
-    schedules,
-    editingId,
-    renameDraft,
-    removeId,
-    isSaving,
-    isDeleting,
-    setLoading,
-    setSchedules,
-    setEditingId,
-    setRenameDraft,
-    setRemoveId,
-    setIsSaving,
-    setIsDeleting,
-  };
+function useDialogFields() {
+  const core = useDialogCoreState();
+  const edit = useDialogEditState();
+  return { ...core, ...edit };
+}
+
+function applyScheduleData(data, setSchedules, shouldIgnore) {
+  if (!shouldIgnore()) setSchedules(getScheduleList(data));
+}
+
+function handleScheduleLoadError(error, showToast, shouldIgnore) {
+  if (!shouldIgnore()) showToast(error.message, { variant: "error" });
+}
+
+function finishScheduleLoad(setLoading, shouldIgnore) {
+  if (!shouldIgnore()) setLoading(false);
 }
 
 async function loadSchedules(setLoading, setSchedules, showToast, shouldIgnore) {
   setLoading(true);
   try {
     const data = await getSchedules();
-    if (!shouldIgnore()) setSchedules(getScheduleList(data));
+    applyScheduleData(data, setSchedules, shouldIgnore);
   } catch (error) {
-    if (!shouldIgnore()) showToast(error.message, { variant: "error" });
+    handleScheduleLoadError(error, showToast, shouldIgnore);
   } finally {
-    if (!shouldIgnore()) setLoading(false);
+    finishScheduleLoad(setLoading, shouldIgnore);
   }
 }
 

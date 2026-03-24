@@ -47,14 +47,9 @@ function validateReadingPageRange(form, setError) {
 
 function runReadingValidators(form, setError) {
     const validators = [validateReadingDeadline, validateReadingChapter, validateReadingPageRange];
-    for (const validator of validators) {
-        if (!validator(form, setError)) {
-            return false;
-        }
-    }
-
-    setError('');
-    return true;
+    const allValid = validators.every((validator) => validator(form, setError));
+    if (allValid) setError('');
+    return allValid;
 }
 
 function Field({label, children}) {
@@ -121,28 +116,26 @@ function useReadingFormValidation() {
     return buildValidationState(error, validate);
 }
 
-export default function ReadingForm({ initial, onSubmit, onCancel }) {
-    const [form, setForm] = useState(initial || EMPTY_FORM);
-    const {error, validate} =  useReadingFormValidation();
-    const onChange = (field, value) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-    };
-    const submitReading = () => {
-        if (validate(form)) {
-            onSubmit(buildFormData(form));
-        }
-    };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        submitReading();
-    };
+function ReadingFormFields({ form, onChange }) {
     return (
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <>
             <TitleField value={form.title} onChange={onChange} />
             <ChapterField value={form.chapter} onChange={onChange} />
             <PageFields start={form.start_page} end={form.end_page} onChange={onChange} />
             <DeadlineField value={form.deadline} onChange={onChange} />
             <EstimatedMinutesField value={form.estimated_minutes} onChange={onChange} />
+        </>
+    );
+}
+
+export default function ReadingForm({ initial, onSubmit, onCancel }) {
+    const [form, setForm] = useState(initial || EMPTY_FORM);
+    const { error, validate } = useReadingFormValidation();
+    const onChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+    const handleSubmit = (e) => { e.preventDefault(); if (validate(form)) onSubmit(buildFormData(form)); };
+    return (
+        <form className={styles.form} onSubmit={handleSubmit}>
+            <ReadingFormFields form={form} onChange={onChange} />
             {error && <div className={styles.error}>{error}</div>}
             <ModuleFormActions onCancel={onCancel} isEditing={!!initial} createLabel="Add Reading" styles={styles} />
         </form>

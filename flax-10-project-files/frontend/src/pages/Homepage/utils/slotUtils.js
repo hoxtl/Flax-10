@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage slot/window helpers. Pure functions only.
  */
 

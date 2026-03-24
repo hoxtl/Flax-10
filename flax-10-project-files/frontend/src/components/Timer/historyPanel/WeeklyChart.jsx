@@ -5,25 +5,22 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import styles from '../../../pages/Timer/TimerPage.module.css';
 
+function getBarAnimation(reduceMotion, barHeight, index) {
+  if (reduceMotion) return { style: { height: barHeight }, initial: false, animate: undefined, transition: undefined };
+  return { style: undefined, initial: { height: 0, opacity: 0.35, scaleY: 0.92 }, animate: { height: barHeight, opacity: 1, scaleY: 1 }, transition: { duration: 0.55, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] } };
+}
+
 function WeeklyBar({ day, maxWeeklySeconds, index, todayKey, reduceMotion }) {
   const ratio = Math.max(0.04, Number(day.seconds || 0) / maxWeeklySeconds);
   const hours = (Number(day.seconds || 0) / 3600).toFixed(1);
   const isToday = day.key === todayKey;
   const barHeight = `${Math.round(ratio * 100)}%`;
+  const anim = getBarAnimation(reduceMotion, barHeight, index);
   const labelClassName = `${styles.rightHistoryWeeklyBarLabel} ${isToday ? styles.rightHistoryWeeklyBarLabelToday : ''}`.trim();
   const valueClassName = `${styles.rightHistoryWeeklyValue} ${isToday ? styles.rightHistoryWeeklyValueToday : ''}`.trim();
-
   return (
     <div className={styles.rightHistoryWeeklyBarCol}>
-      <div className={styles.rightHistoryWeeklyBarTrack}>
-        <motion.span
-          className={styles.rightHistoryWeeklyBarFill}
-          style={reduceMotion ? { height: barHeight } : undefined}
-          initial={reduceMotion ? false : { height: 0, opacity: 0.35, scaleY: 0.92 }}
-          animate={reduceMotion ? undefined : { height: barHeight, opacity: 1, scaleY: 1 }}
-          transition={reduceMotion ? undefined : { duration: 0.55, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-        />
-      </div>
+      <div className={styles.rightHistoryWeeklyBarTrack}><motion.span className={styles.rightHistoryWeeklyBarFill} style={anim.style} initial={anim.initial} animate={anim.animate} transition={anim.transition} /></div>
       <span className={labelClassName}>{day.label}</span>
       <span className={valueClassName}>{hours}h</span>
     </div>

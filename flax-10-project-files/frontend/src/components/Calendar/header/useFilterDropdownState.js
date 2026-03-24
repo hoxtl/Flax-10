@@ -1,3 +1,6 @@
+/*
+ * Filter dropdown state hook for calendar header.
+ */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTags } from "../../../context/TagContext";
 import styles from "./CalendarHeaderUtils.module.css";
@@ -92,6 +95,22 @@ function createPopupProps(allowManageTags, data, onChange, setIsOpen, setShowMan
   };
 }
 
+function buildFilterDropdownResult(data, state, hover, isMobile, allowManageTags, onChange, shift) {
+  const { isOpen, setIsOpen, showManager, setShowManager, wrapRef } = state;
+  return {
+    activeCount: data.selectedValues.length,
+    allowManageTags,
+    isOpen,
+    onCloseManager: () => setShowManager(false),
+    onMouseEnter: !isMobile ? hover.open : undefined,
+    onMouseLeave: !isMobile ? hover.close : undefined,
+    onToggle: () => setIsOpen((open) => !open),
+    popupProps: createPopupProps(allowManageTags, data, onChange, setIsOpen, setShowManager, shift),
+    showManager,
+    wrapRef,
+  };
+}
+
 export function useFilterDropdownState(active, allowManageTags, isMobile, onChange) {
   const { tags } = useTags();
   const wrapRef = useRef(null);
@@ -101,24 +120,5 @@ export function useFilterDropdownState(active, allowManageTags, isMobile, onChan
   const shift = usePopupShift(isOpen, wrapRef);
   const data = useFilterData(active, tags);
   useOutsideClose(isOpen, wrapRef, () => setIsOpen(false));
-
-  return {
-    activeCount: data.selectedValues.length,
-    allowManageTags,
-    isOpen,
-    onCloseManager: () => setShowManager(false),
-    onMouseEnter: !isMobile ? hover.open : undefined,
-    onMouseLeave: !isMobile ? hover.close : undefined,
-    onToggle: () => setIsOpen((open) => !open),
-    popupProps: createPopupProps(
-      allowManageTags,
-      data,
-      onChange,
-      setIsOpen,
-      setShowManager,
-      shift,
-    ),
-    showManager,
-    wrapRef,
-  };
+  return buildFilterDropdownResult(data, { isOpen, setIsOpen, showManager, setShowManager, wrapRef }, hover, isMobile, allowManageTags, onChange, shift);
 }

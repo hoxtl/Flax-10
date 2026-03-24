@@ -1,7 +1,6 @@
-/**
+/*
  * Intelligence hero widgets.
  */
-
 import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";
@@ -13,53 +12,39 @@ import baseStyles from "../styles/WidgetBase.module.css";
 import styles from "./IntelligenceHeader.module.css";
 import { getGreeting, getTodayLabel } from "./IntelligenceUtils";
 
-const HERO_STAT_ROUTES = {
-  societies: "/societies",
-  tasks: "/tasks?filter=today",
-};
+const HERO_STAT_ROUTES = { societies: "/societies", tasks: "/tasks?filter=today" };
+
+const GLOW_SHADOW_BASE = "0 0 32px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 46%, transparent)";
+const GLOW_SHADOW_PEAK = "0 0 48px color-mix(in srgb, var(--home-hero-glow-shadow) 100%, transparent), 0 0 108px color-mix(in srgb, var(--home-hero-glow-shadow) 60%, transparent)";
+
+function BorderGlow({ reduceMotion }) {
+  const animate = reduceMotion ? { opacity: 0.9 } : { opacity: [0.76, 1, 0.82], boxShadow: [GLOW_SHADOW_BASE, GLOW_SHADOW_PEAK, GLOW_SHADOW_BASE] };
+  const transition = reduceMotion ? { duration: 0 } : { duration: 3.8, repeat: Infinity, ease: "easeInOut" };
+  return <Motion.div className={styles.bannerBorderGlow} aria-hidden animate={animate} transition={transition} />;
+}
+
+function BannerAura({ reduceMotion }) {
+  const initial = reduceMotion ? false : { opacity: 0.52, scale: 1, x: "-6%", y: "-3%" };
+  const animate = reduceMotion ? { opacity: 0.62 } : { opacity: [0.5, 0.86, 0.58, 0.5], scale: [1, 1.12, 0.96, 1], x: ["-6%", "8%", "-3%", "-6%"], y: ["-3%", "7%", "-4%", "-3%"] };
+  const transition = reduceMotion ? { duration: 0 } : { duration: 8.2, repeat: Infinity, ease: "easeInOut" };
+  return <Motion.div className={styles.bannerAura} aria-hidden initial={initial} animate={animate} transition={transition} />;
+}
+
+function BannerShimmer({ reduceMotion }) {
+  const initial = reduceMotion ? false : { x: "-42%", opacity: 0 };
+  const animate = reduceMotion ? { opacity: 0.28, x: "22%" } : { x: ["-46%", "126%"], opacity: [0, 0.68, 0] };
+  const transition = reduceMotion ? { duration: 0 } : { duration: 3.7, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.35 };
+  return <Motion.div className={styles.bannerShimmer} aria-hidden initial={initial} animate={animate} transition={transition} />;
+}
 
 export function IntelligenceHero(props) {
   const reduceMotion = useReducedMotion();
-
   return (
     <div className={styles.premiumCard}>
       <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={12} intensity={1.8} speed={0.5} />
-      <Motion.div
-        className={styles.bannerBorderGlow}
-        aria-hidden
-        animate={reduceMotion ? {
-          opacity: 0.9,
-        } : {
-          opacity: [0.76, 1, 0.82],
-          boxShadow: [
-            "0 0 32px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 46%, transparent)",
-            "0 0 48px color-mix(in srgb, var(--home-hero-glow-shadow) 100%, transparent), 0 0 108px color-mix(in srgb, var(--home-hero-glow-shadow) 60%, transparent)",
-            "0 0 32px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 46%, transparent)",
-          ],
-        }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <Motion.div
-        className={styles.bannerAura}
-        aria-hidden
-        initial={reduceMotion ? false : { opacity: 0.52, scale: 1, x: "-6%", y: "-3%" }}
-        animate={reduceMotion ? {
-          opacity: 0.62,
-        } : {
-          opacity: [0.5, 0.86, 0.58, 0.5],
-          scale: [1, 1.12, 0.96, 1],
-          x: ["-6%", "8%", "-3%", "-6%"],
-          y: ["-3%", "7%", "-4%", "-3%"],
-        }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 8.2, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <Motion.div
-        className={styles.bannerShimmer}
-        aria-hidden
-        initial={reduceMotion ? false : { x: "-42%", opacity: 0 }}
-        animate={reduceMotion ? { opacity: 0.28, x: "22%" } : { x: ["-46%", "126%"], opacity: [0, 0.68, 0] }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 3.7, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.35 }}
-      />
+      <BorderGlow reduceMotion={reduceMotion} />
+      <BannerAura reduceMotion={reduceMotion} />
+      <BannerShimmer reduceMotion={reduceMotion} />
       <HeroBanners {...props} />
       <header className={getHeaderClassName(props)}>
         <HeroLeftColumn displayName={props.displayName} isTeacher={props.isTeacher} />
@@ -150,28 +135,24 @@ function buildHeroStatItems({ attendancePct, attendanceRef, classesCount, classR
   ];
 }
 
+const WARNING_SHADOW_BASE = "0 0 0 1px rgba(185, 65, 42, 0.12), 0 8px 18px rgba(185, 65, 42, 0.06)";
+const WARNING_SHADOW_PEAK = "0 0 0 1px rgba(185, 65, 42, 0.2), 0 0 20px rgba(185, 65, 42, 0.14)";
+const NORMAL_SHADOW = "0 4px 12px rgba(0, 0, 0, 0.03)";
+
+function PulseDot() {
+  return <Motion.span className={styles.nextStepDot} aria-hidden animate={{ scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />;
+}
+
 function OnNowCard({ liveContext }) {
   const isWarning = liveContext?.tone === "warning";
+  const className = [styles.nextStepCard, isWarning ? styles.nextStepCardWarning : ""].filter(Boolean).join(" ");
+  const animate = isWarning ? { boxShadow: [WARNING_SHADOW_BASE, WARNING_SHADOW_PEAK, WARNING_SHADOW_BASE] } : { boxShadow: NORMAL_SHADOW };
+  const transition = isWarning ? { duration: 2.1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 };
   return (
-    <Motion.div
-      className={[styles.nextStepCard, isWarning ? styles.nextStepCardWarning : ""].filter(Boolean).join(" ")}
-      animate={isWarning ? {
-        boxShadow: [
-          "0 0 0 1px rgba(185, 65, 42, 0.12), 0 8px 18px rgba(185, 65, 42, 0.06)",
-          "0 0 0 1px rgba(185, 65, 42, 0.2), 0 0 20px rgba(185, 65, 42, 0.14)",
-          "0 0 0 1px rgba(185, 65, 42, 0.12), 0 8px 18px rgba(185, 65, 42, 0.06)",
-        ],
-      } : { boxShadow: "0 4px 12px rgba(0, 0, 0, 0.03)" }}
-      transition={isWarning ? { duration: 2.1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
-    >
+    <Motion.div className={className} animate={animate} transition={transition}>
       <div className={styles.nextStepTop}>
         <span className={styles.nextStepLabel}>{liveContext?.label || "On Now"}</span>
-        <Motion.span
-          className={styles.nextStepDot}
-          aria-hidden
-          animate={{ scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <PulseDot />
       </div>
       <p className={styles.nextStepText}>{liveContext?.text || "Nothing on right now."}</p>
       {liveContext?.meta && <span className={styles.nextStepMeta}>{liveContext.meta}</span>}

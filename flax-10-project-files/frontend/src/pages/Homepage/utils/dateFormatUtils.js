@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage date/time formatting helpers. Pure functions only.
  */
 

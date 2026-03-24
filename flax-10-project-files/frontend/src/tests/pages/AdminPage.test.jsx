@@ -102,6 +102,17 @@ const USERS = [
     is_staff: true,
     is_superuser: false,
   },
+  {
+    id: 4,
+    username: "janedoe",
+    email: "jane@kcl.ac.uk",
+    first_name: "Jane",
+    last_name: "Doe",
+    role: "student",
+    is_active: true,
+    is_staff: false,
+    is_superuser: false,
+  },
 ];
 
 function buildUser(index) {
@@ -216,6 +227,13 @@ describe("AdminPage – Users tab", () => {
     await waitFor(() => expect(screen.getAllByText("Ban").length).toBeGreaterThan(0));
   });
 
+  it("shows Protected badge instead of a ban button for fixture users", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getByRole("button", { name: /Jane Doe/i }));
+    expect(screen.getAllByText("Protected").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Ban janedoe\?/i)).toBeNull();
+  });
+
   it("shows Unban button for inactive user", async () => {
     render(<AdminPage />);
     await waitFor(() => expect(screen.getAllByText("Unban").length).toBeGreaterThan(0));
@@ -315,13 +333,23 @@ describe("AdminPage – Users tab", () => {
     expect(screen.queryByText(/Ban alice\?/i)).toBeNull();
   });
 
-  it("calls banUser with userId and reason on confirm", async () => {
+  it("requires a reason before allowing the ban to be submitted", async () => {
+    render(<AdminPage />);
+    await waitFor(() => screen.getAllByText("Ban"));
+    fireEvent.click(screen.getAllByText("Ban")[0]);
+    expect(screen.getByRole("button", { name: "Ban User" })).toBeDisabled();
+  });
+
+  it("calls banUser with userId and trimmed reason on confirm", async () => {
     api.banUser.mockResolvedValue({});
     render(<AdminPage />);
     await waitFor(() => screen.getAllByText("Ban"));
     fireEvent.click(screen.getAllByText("Ban")[0]);
+    fireEvent.change(screen.getByLabelText(/Reason for ban/i), {
+      target: { value: "  Repeated abuse  " },
+    });
     fireEvent.click(screen.getByText("Ban User"));
-    await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(1, ""));
+    await waitFor(() => expect(api.banUser).toHaveBeenCalledWith(1, "Repeated abuse"));
   });
 
   it("calls unbanUser with correct userId", async () => {

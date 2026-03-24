@@ -33,41 +33,33 @@ function DjangoAdminTooltip() {
   );
 }
 
-function ReportingHero() {
-  const title = `Username: ${DJANGO_ADMIN_TOOLTIP.username}, Password: ${DJANGO_ADMIN_TOOLTIP.password}`;
+function ReportingHeroCopy() {
+  return (
+    <div className={styles.reportingHeroCopy}>
+      <span className={styles.adminActionBadge}><Shield size={14} strokeWidth={2.2} aria-hidden />Flax admin</span>
+      <h1 className={styles.reportingHeroTitle}>View Detailed Reporting</h1>
+      <p className={styles.reportingHeroText}>Open the full Django admin console for deeper moderation, reporting, and platform review tools.</p>
+    </div>
+  );
+}
 
+function AdminLaunchLink() {
+  const title = `Username: ${DJANGO_ADMIN_TOOLTIP.username}, Password: ${DJANGO_ADMIN_TOOLTIP.password}`;
+  return (
+    <a className={styles.adminLaunchButton} href={DJANGO_ADMIN_URL} title={title} aria-label="Open detailed reporting in Django admin">
+      <span className={styles.adminLaunchBody}><span className={styles.adminLaunchTitle}>Open Flax Admin</span><span className={styles.adminLaunchCopy}>Hover for login details</span></span>
+      <span className={styles.adminLaunchArrow}>Launch<ArrowUpRight size={18} strokeWidth={2.2} aria-hidden /></span>
+      <span className={styles.adminLaunchMeta}><KeyRound size={15} strokeWidth={2.1} aria-hidden />Username `johndoe`, password `1234`</span>
+    </a>
+  );
+}
+
+function ReportingHero() {
   return (
     <section className={styles.reportingHero}>
-      <div className={styles.reportingHeroCopy}>
-        <span className={styles.adminActionBadge}>
-          <Shield size={14} strokeWidth={2.2} aria-hidden />
-          Flax admin
-        </span>
-        <h1 className={styles.reportingHeroTitle}>View Detailed Reporting</h1>
-        <p className={styles.reportingHeroText}>
-          Open the full Django admin console for deeper moderation, reporting, and platform review tools.
-        </p>
-      </div>
+      <ReportingHeroCopy />
       <Tooltip content={<DjangoAdminTooltip />} position="bottom" wrapperClassName={styles.adminActionWrap}>
-        <a
-          className={styles.adminLaunchButton}
-          href={DJANGO_ADMIN_URL}
-          title={title}
-          aria-label="Open detailed reporting in Django admin"
-        >
-          <span className={styles.adminLaunchBody}>
-            <span className={styles.adminLaunchTitle}>Open Flax Admin</span>
-            <span className={styles.adminLaunchCopy}>Hover for login details</span>
-          </span>
-          <span className={styles.adminLaunchArrow}>
-            Launch
-            <ArrowUpRight size={18} strokeWidth={2.2} aria-hidden />
-          </span>
-          <span className={styles.adminLaunchMeta}>
-            <KeyRound size={15} strokeWidth={2.1} aria-hidden />
-            Username `johndoe`, password `1234`
-          </span>
-        </a>
+        <AdminLaunchLink />
       </Tooltip>
     </section>
   );

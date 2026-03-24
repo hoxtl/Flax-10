@@ -39,25 +39,23 @@ function buildBannerMetrics(todaySummary, weekSummary, monthSummary) {
   };
 }
 
-export function useTodayBannerData(onStreakData) {
-  const [state, setState] = useState({ loading: true, ...buildBannerMetrics(EMPTY_SUMMARY, EMPTY_SUMMARY, EMPTY_SUMMARY) });
+async function fetchBannerSummaries() {
+  const [todaySummary, weekSummary, monthSummary] = await Promise.all([loadSummary(1), loadSummary(7), loadSummary(30)]);
+  return buildBannerMetrics(todaySummary, weekSummary, monthSummary);
+}
 
-  const refresh = useCallback(async () => {
-    const [todaySummary, weekSummary, monthSummary] = await Promise.all([
-      loadSummary(1),
-      loadSummary(7),
-      loadSummary(30),
-    ]);
-    const nextState = buildBannerMetrics(todaySummary, weekSummary, monthSummary);
+function useBannerRefresh(setState, onStreakData) {
+  return useCallback(async () => {
+    const nextState = await fetchBannerSummaries();
     setState({ loading: false, ...nextState });
     onStreakData?.(nextState.streakData);
-  }, [onStreakData]);
+  }, [setState, onStreakData]);
+}
 
+export function useTodayBannerData(onStreakData) {
+  const [state, setState] = useState({ loading: true, ...buildBannerMetrics(EMPTY_SUMMARY, EMPTY_SUMMARY, EMPTY_SUMMARY) });
+  const refresh = useBannerRefresh(setState, onStreakData);
   useEffect(() => listenToTimerHistoryEvents(refresh), [refresh]);
-  useEffect(() => {
-    const id = window.setTimeout(refresh, 0);
-    return () => window.clearTimeout(id);
-  }, [refresh]);
-
+  useEffect(() => { const id = window.setTimeout(refresh, 0); return () => window.clearTimeout(id); }, [refresh]);
   return state;
 }

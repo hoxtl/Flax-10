@@ -1,4 +1,4 @@
-/**
+/*
  * Homepage utils barrel export.
  */
 

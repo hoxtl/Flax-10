@@ -1,50 +1,51 @@
+/*
+ * Event conflict resolution planning utilities.
+ */
 import { overlapsDay } from "../../Calendar/utils/dateUtils";
 import { extractBaseEventId, isReadOnlyEvent } from "../../Calendar/utils/eventUtils";
 
 const DAY_START_HOUR = 7;
 const TOMORROW_START_HOUR = 9;
 
+function handleNoMovableCandidates(group, lockedGroups, unresolved) {
+  lockedGroups.add(getGroupKey(group));
+  unresolved.push({ group, reason: "fixed" });
+}
+
+function handleNoResolution(group, movableCandidates, lockedGroups, unresolved) {
+  lockedGroups.add(getGroupKey(group));
+  unresolved.push({ movable: movableCandidates[0], group, reason: "no-slot" });
+}
+
+function applyResolution(resolution, workingEvents, tomorrowEvents, operations) {
+  const target = workingEvents.find((event) => String(event.id) === String(resolution.movable.id));
+  target.start_time = resolution.slot.start.toISOString();
+  target.end_time = resolution.slot.end.toISOString();
+  if (resolution.slot.movedToTomorrow) tomorrowEvents.push(cloneEvent(target));
+  operations.push({ event: resolution.movable, start: resolution.slot.start, end: resolution.slot.end, movedToTomorrow: resolution.slot.movedToTomorrow, originalStart: resolution.movable.start_time, originalEnd: resolution.movable.end_time || resolution.movable.start_time });
+}
+
+function processOverlapGroup(ctx) {
+  const { workingEvents, lockedGroups, unresolved, operations, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents } = ctx;
+  workingEvents.sort(compareByStartTime);
+  const group = findFirstOverlapGroup(workingEvents, lockedGroups);
+  if (!group) return false;
+  const movableCandidates = getMovableCandidates(group);
+  if (!movableCandidates.length) { handleNoMovableCandidates(group, lockedGroups, unresolved); return true; }
+  const resolution = buildGroupResolution(group, movableCandidates, workingEvents, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents);
+  if (!resolution) { handleNoResolution(group, movableCandidates, lockedGroups, unresolved); return true; }
+  applyResolution(resolution, workingEvents, tomorrowEvents, operations);
+  return true;
+}
+
 export function buildConflictResolutionPlan(events = [], selectedDate = new Date()) {
   const workingEvents = getDayEvents(events, selectedDate).map(cloneEvent);
   const tomorrowDate = getRelativeDate(selectedDate, 1);
   const tomorrowEvents = getDayEvents(events, tomorrowDate).map(cloneEvent);
-  const operations = [];
-  const unresolved = [];
-  const lockedGroups = new Set();
+  const operations = [], unresolved = [], lockedGroups = new Set();
   const tomorrowCursor = getTomorrowStart(selectedDate);
-  let guard = 0;
-
-  while (guard < 80) {
-    guard += 1;
-    workingEvents.sort(compareByStartTime);
-    const group = findFirstOverlapGroup(workingEvents, lockedGroups);
-    if (!group) break;
-    const movableCandidates = getMovableCandidates(group);
-    if (!movableCandidates.length) {
-      lockedGroups.add(getGroupKey(group));
-      unresolved.push({ group, reason: "fixed" });
-      continue;
-    }
-    const resolution = buildGroupResolution(group, movableCandidates, workingEvents, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents);
-    if (!resolution) {
-      lockedGroups.add(getGroupKey(group));
-      unresolved.push({ movable: movableCandidates[0], group, reason: "no-slot" });
-      continue;
-    }
-    const target = workingEvents.find((event) => String(event.id) === String(resolution.movable.id));
-    target.start_time = resolution.slot.start.toISOString();
-    target.end_time = resolution.slot.end.toISOString();
-    if (resolution.slot.movedToTomorrow) tomorrowEvents.push(cloneEvent(target));
-    operations.push({
-      event: resolution.movable,
-      start: resolution.slot.start,
-      end: resolution.slot.end,
-      movedToTomorrow: resolution.slot.movedToTomorrow,
-      originalStart: resolution.movable.start_time,
-      originalEnd: resolution.movable.end_time || resolution.movable.start_time,
-    });
-  }
-
+  const ctx = { workingEvents, lockedGroups, unresolved, operations, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents };
+  for (let guard = 0; guard < 80; guard += 1) { if (!processOverlapGroup(ctx)) break; }
   return { operations, unresolved };
 }
 
@@ -100,31 +101,37 @@ function compareByStartTime(left, right) {
   return new Date(left.start_time) - new Date(right.start_time);
 }
 
+function isValidOverlapGroup(group, lockedGroups) {
+  if (group.length < 2) return false;
+  return !lockedGroups.has(getGroupKey(group));
+}
+
+function processOverlapCandidate(events, lockedGroups, index) {
+  const group = buildOverlapGroup(events, index);
+  if (isValidOverlapGroup(group, lockedGroups)) return { group, skip: 0 };
+  return { group: null, skip: group.length >= 2 ? group.length - 2 : 0 };
+}
+
 function findFirstOverlapGroup(events, lockedGroups) {
-  for (let index = 0; index < events.length - 1; index += 1) {
-    const group = buildOverlapGroup(events, index);
-    if (group.length < 2) continue;
-    const groupKey = getGroupKey(group);
-    if (lockedGroups.has(groupKey)) {
-      index += group.length - 2;
-      continue;
-    }
-    return group;
-  }
+  let index = 0;
+  while (index < events.length - 1) { const result = processOverlapCandidate(events, lockedGroups, index); if (result.group) return result.group; index += 1 + result.skip; }
   return null;
+}
+
+function shouldExtendGroup(next, maxEndRef) {
+  return getStartMs(next) < maxEndRef.value;
+}
+
+function extendOverlapGroup(events, startIndex, group, maxEndRef) {
+  for (let index = startIndex + 1; index < events.length && shouldExtendGroup(events[index], maxEndRef); index += 1) { group.push(events[index]); maxEndRef.value = Math.max(maxEndRef.value, getEndMs(events[index])); }
 }
 
 function buildOverlapGroup(events, startIndex) {
   const seed = events[startIndex];
   if (!seed) return [];
   const group = [seed];
-  let maxEnd = getEndMs(seed);
-  for (let index = startIndex + 1; index < events.length; index += 1) {
-    const next = events[index];
-    if (getStartMs(next) >= maxEnd) break;
-    group.push(next);
-    maxEnd = Math.max(maxEnd, getEndMs(next));
-  }
+  const maxEndRef = { value: getEndMs(seed) };
+  extendOverlapGroup(events, startIndex, group, maxEndRef);
   return group.length > 1 ? group : [];
 }
 
@@ -152,17 +159,17 @@ function compareMovableCandidates(left, right) {
   return String(left.title || "").localeCompare(String(right.title || ""));
 }
 
+function tryResolveMovable(movable, group, workingEvents, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents) {
+  const anchor = getGroupAnchor(group, movable);
+  const durationMs = getDurationMs(movable);
+  const remainingEvents = workingEvents.filter((event) => String(event.id) !== String(movable.id));
+  const after = anchor ? new Date(anchor.end_time || anchor.start_time) : getDayStart(selectedDate);
+  const slot = findAvailableDaySlot(remainingEvents, selectedDate, durationMs, after) || getTomorrowSlot(tomorrowCursor, tomorrowDate, tomorrowEvents, durationMs);
+  return slot ? { movable, slot } : null;
+}
+
 function buildGroupResolution(group, movableCandidates, workingEvents, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents) {
-  for (const movable of movableCandidates) {
-    const anchor = getGroupAnchor(group, movable);
-    const durationMs = getDurationMs(movable);
-    const remainingEvents = workingEvents.filter((event) => String(event.id) !== String(movable.id));
-    const after = anchor ? new Date(anchor.end_time || anchor.start_time) : getDayStart(selectedDate);
-    const slot = findAvailableDaySlot(remainingEvents, selectedDate, durationMs, after)
-      || getTomorrowSlot(tomorrowCursor, tomorrowDate, tomorrowEvents, durationMs);
-    if (slot) return { movable, slot };
-  }
-  return null;
+  return movableCandidates.reduce((found, movable) => found || tryResolveMovable(movable, group, workingEvents, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents), null);
 }
 
 function getGroupAnchor(group, movable) {
@@ -189,22 +196,25 @@ function getEndMs(event) {
   return new Date(event.end_time || event.start_time).getTime();
 }
 
+function tryFitBeforeEvent(cursor, event, durationMs) {
+  const eventStart = new Date(event.start_time).getTime();
+  const eventEnd = new Date(event.end_time || event.start_time).getTime();
+  if (eventEnd <= cursor) return { cursor, slot: null };
+  if (eventStart - cursor >= durationMs) return { cursor, slot: buildSlot(cursor, durationMs, false) };
+  return { cursor: Math.max(cursor, eventEnd), slot: null };
+}
+
+function scanEventsForSlot(sorted, cursor, durationMs) {
+  return sorted.reduce((acc, event) => { if (acc.slot) return acc; const result = tryFitBeforeEvent(acc.cursor, event, durationMs); return result.slot ? { cursor: result.cursor, slot: result.slot } : { cursor: result.cursor, slot: null }; }, { cursor, slot: null });
+}
+
 function findAvailableDaySlot(events, selectedDate, durationMs, after) {
   const dayStart = getDayStart(selectedDate);
   const dayEnd = getDayEnd(selectedDate);
-  let cursor = Math.max(dayStart.getTime(), after?.getTime?.() || dayStart.getTime());
-  const sorted = [...events].sort(compareByStartTime);
-  for (const event of sorted) {
-    const eventStart = new Date(event.start_time).getTime();
-    const eventEnd = new Date(event.end_time || event.start_time).getTime();
-    if (eventEnd <= cursor) continue;
-    if (eventStart - cursor >= durationMs) {
-      return buildSlot(cursor, durationMs, false);
-    }
-    cursor = Math.max(cursor, eventEnd);
-  }
-  if (dayEnd.getTime() - cursor >= durationMs) return buildSlot(cursor, durationMs, false);
-  return null;
+  const cursor = Math.max(dayStart.getTime(), after?.getTime?.() || dayStart.getTime());
+  const result = scanEventsForSlot([...events].sort(compareByStartTime), cursor, durationMs);
+  if (result.slot) return result.slot;
+  return dayEnd.getTime() - result.cursor >= durationMs ? buildSlot(result.cursor, durationMs, false) : null;
 }
 
 function buildSlot(startMs, durationMs, movedToTomorrow) {

@@ -1,8 +1,7 @@
-/**
+/*
  * Compact timeline widget for upcoming events.
  */
-
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Clock, Calendar, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -125,24 +124,21 @@ function TimelineLocation({ location }) {
   );
 }
 
-export function TinyTimelineWidget({
-  now = new Date(),
-  sortedEvents = [],
-  row = 1
-}) {
-  const navigate = useNavigate();
+function useTimelineData(now, sortedEvents, row) {
   const safeNow = getSafeNow(now);
   const currentBlock = useMemo(() => getCurrentBlock(sortedEvents), [sortedEvents]);
   const upcomingEvents = useMemo(() => getUpcomingEvents(sortedEvents, safeNow, row), [row, safeNow, sortedEvents]);
-  const timelineEvents = getTimelineEvents(currentBlock, upcomingEvents);
+  return { currentBlock, timelineEvents: getTimelineEvents(currentBlock, upcomingEvents) };
+}
 
+export function TinyTimelineWidget({ now = new Date(), sortedEvents = [], row = 1 }) {
+  const navigate = useNavigate();
+  const { currentBlock, timelineEvents } = useTimelineData(now, sortedEvents, row);
   return (
     <div className={styles.root}>
       <TinyTimelineHeader />
       {timelineEvents.length ? <TimelineList currentBlock={currentBlock} events={timelineEvents} /> : <EmptyTimelineState />}
-      <PrimaryButton type="button" size="small" pill className={styles.viewAll} onClick={() => navigate("/calendar")}>
-        View my calendar
-      </PrimaryButton>
+      <PrimaryButton type="button" size="small" pill className={styles.viewAll} onClick={() => navigate("/calendar")}>View my calendar</PrimaryButton>
     </div>
   );
 }
