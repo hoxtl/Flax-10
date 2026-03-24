@@ -72,7 +72,7 @@ export default function ProjectHeader({ project, members, teamMembers, onMemberA
                 <BackButton onClick={onBack} label="Back to all projects" />
                 <ProjectDeleteAction onDelete={onDelete} isOwner={isOwner} />
             </div>
-            <ProjectHeaderContent project={project} date={date} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} />
+            <ProjectHeaderContent project={project} date={date} members={members} teamMembers={teamMembers} onMemberAdded={onMemberAdded} onMemberRemove={onMemberRemove} onDelete={onDelete} />
         </section>
     );
 }

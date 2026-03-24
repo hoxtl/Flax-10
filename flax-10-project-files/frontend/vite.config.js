@@ -18,6 +18,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
     css: true,
+    pool: 'threads',
     coverage: {
       provider: 'istanbul',
       reporter: ["text", "text-summary", "html", "lcov"],

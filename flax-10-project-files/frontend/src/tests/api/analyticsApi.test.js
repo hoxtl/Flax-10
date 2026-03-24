@@ -64,4 +64,28 @@ describe('analyticsService', () => {
             body: JSON.stringify({ messages, days: 30 }),
         });
     });
+
+    it('getProgress calls with custom days', async () => {
+        await analyticsService.getProgress(14);
+        expect(fetchApi).toHaveBeenCalledWith('/analytics/progress/?days=14');
+    });
+
+    it('getThemeStats calls with custom days', async () => {
+        await analyticsService.getThemeStats(7);
+        expect(fetchApi).toHaveBeenCalledWith('/analytics/theme-stats/?days=7');
+    });
+
+    it('getSummary returns the value from fetchApi', async () => {
+        const mockResult = { summary: { total_study_hours: 5 } };
+        fetchApi.mockResolvedValueOnce(mockResult);
+        const result = await analyticsService.getSummary(30);
+        expect(result).toEqual(mockResult);
+    });
+
+    it('getAiInsights returns the value from fetchApi', async () => {
+        const mockResult = { insights: ['Great work!'] };
+        fetchApi.mockResolvedValueOnce(mockResult);
+        const result = await analyticsService.getAiInsights(30);
+        expect(result).toEqual(mockResult);
+    });
 });

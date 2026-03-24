@@ -41,10 +41,15 @@ export function useDiscoverFetch(query, filterState, sortBy) {
     const joinedFilters = getJoinedFilterValues(filterState);
     const { currentPage, setCurrentPage } = usePaginationReset(query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles);
     useEffect(() => {
-        const filters = { courses: filterState.props.selectedCourses, years: filterState.props.selectedYears, socs: filterState.props.selectedSocieties, roles: filterState.props.selectedRoles || [] };
+        const filters = {
+            courses: filterState.props.selectedCourses,
+            years: filterState.props.selectedYears,
+            socs: filterState.props.selectedSocieties,
+            roles: filterState.props.selectedRoles || []
+        };
         const timer = setTimeout(() => loadUsers(query, filters, currentPage, setUsers, setTotalPages, setLoading, sortBy), 300);
         return () => clearTimeout(timer);
-    }, [query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles, currentPage, sortBy, filterState.props.selectedCourses, filterState.props.selectedSocieties, filterState.props.selectedYears, filterState.props.selectedRoles]);
+    }, [query, joinedFilters.filterCourses, joinedFilters.filterSocs, joinedFilters.filterYears, joinedFilters.filterRoles, currentPage, sortBy]);
     return { loading, users, currentPage, setCurrentPage, totalPages };
 }
 

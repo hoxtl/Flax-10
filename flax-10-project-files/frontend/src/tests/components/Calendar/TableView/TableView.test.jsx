@@ -10,10 +10,11 @@ import { createMockEvent } from '../mocks/calendarMocks';
 let mockEvents = [];
 const mockEditState = { editingCell: null, cellValue: '', startEdit: vi.fn(), updateValue: vi.fn(), saveEdit: vi.fn(), cancelEdit: vi.fn(), saveDateTimes: vi.fn(), saveWithValue: vi.fn() };
 const mockNavState = { focusedCell: null, handleKeyDown: vi.fn(), EDITABLE_COLUMNS: ['title', 'tag', 'date', 'location', 'description'] };
+const mockUseCalendar = vi.fn(() => ({ readOnly: false }));
 
 vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarData: ({ events }) => ({ events: events || mockEvents, viewMode: 'month', selectedDate: new Date(2026, 2, 15) }),
-    useCalendar: () => ({ readOnly: false }),
+    useCalendar: () => mockUseCalendar(),
 }));
 
 vi.mock('../../../../context/TagContext', () => ({
@@ -116,5 +117,28 @@ describe('TableView', () => {
         const propEvents = [createMockEvent({ id: 1, title: 'Prop Event' })];
         render(<TableView events={propEvents} />);
         expect(screen.getByText('Prop Event')).toBeInTheDocument();
+    });
+
+    it('passes readOnly through when prop or context enables it', () => {
+        const propEvents = [createMockEvent({ id: 1, title: 'Read Only Event' })];
+        const { rerender } = render(<TableView events={propEvents} readOnly />);
+        expect(screen.getByTestId('table-row')).toHaveTextContent('Read Only Event');
+
+        mockUseCalendar.mockReturnValueOnce({ readOnly: true });
+        rerender(<TableView events={propEvents} />);
+        expect(screen.getByTestId('table-row')).toBeInTheDocument();
+    });
+
+    it('does not save when click occurs inside the table and removes listener on cleanup', () => {
+        mockEditState.editingCell = { eventId: 1, field: 'title' };
+        const events = [createMockEvent({ id: 1, title: 'Internal Click Event' })];
+        const removeSpy = vi.spyOn(document, 'removeEventListener');
+
+        const { container, unmount } = render(<TableView events={events} />);
+        fireEvent.mouseDown(container.querySelector('table'));
+        expect(mockEditState.saveEdit).not.toHaveBeenCalled();
+
+        unmount();
+        expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
     });
 });

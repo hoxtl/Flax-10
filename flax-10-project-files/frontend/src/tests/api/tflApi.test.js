@@ -186,4 +186,83 @@ describe('tflService', () => {
             expect(result.length).toBeGreaterThanOrEqual(1);
         });
     });
+
+    describe('getTfLDelays – additional branches', () => {
+        it('returns empty array on 429 rate-limit status', async () => {
+            global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 429 });
+            const delays = await tflService.getTfLDelays();
+            expect(delays).toEqual([]);
+        });
+
+        it('returns empty array when fetch throws a network error', async () => {
+            global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+            const delays = await tflService.getTfLDelays();
+            expect(delays).toEqual([]);
+        });
+
+        it('uses LINE_COLOURS for known line id in buildDelay', async () => {
+            const mockData = [{
+                id: 'victoria',
+                name: 'Victoria',
+                modeName: 'tube',
+                lineStatuses: [{ statusSeverity: 3, statusSeverityDescription: 'Delayed', reason: 'Engineering works' }],
+            }];
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue(mockData),
+            });
+            const delays = await tflService.getTfLDelays();
+            expect(delays[0].color).toBe('#0098D4');
+        });
+
+        it('uses FALLBACK_COLOUR for unknown line id in buildDelay', async () => {
+            const mockData = [{
+                id: 'unknown-xyz',
+                name: 'Unknown',
+                modeName: 'bus',
+                lineStatuses: [{ statusSeverity: 3, statusSeverityDescription: 'Delayed', reason: 'Incident' }],
+            }];
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue(mockData),
+            });
+            const delays = await tflService.getTfLDelays();
+            expect(delays[0].color).toBe('#a5a5a5');
+        });
+    });
+
+    describe('journeyPlanner – additional branches', () => {
+        it('returns null when journeys key is missing', async () => {
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue({}),
+            });
+            const result = await tflService.journeyPlanner(51.5, -0.1, 51.52, -0.12);
+            expect(result).toBeNull();
+        });
+
+        it('rethrows error when fetch throws', async () => {
+            global.fetch = vi.fn().mockRejectedValue(new Error('Connection refused'));
+            await expect(tflService.journeyPlanner(51.5, -0.1, 51.52, -0.12)).rejects.toThrow('Connection refused');
+        });
+
+        it('handles leg with path.lineString present (path null when no lineString)', async () => {
+            const mockData = {
+                journeys: [{
+                    duration: 10,
+                    legs: [{
+                        mode: { name: 'walking' },
+                        duration: 10,
+                        path: { lineString: null },
+                    }],
+                }],
+            };
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                json: vi.fn().mockResolvedValue(mockData),
+            });
+            const result = await tflService.journeyPlanner(51.5, -0.1, 51.52, -0.12);
+            expect(result.legs[0].path).toBeNull();
+        });
+    });
 });
