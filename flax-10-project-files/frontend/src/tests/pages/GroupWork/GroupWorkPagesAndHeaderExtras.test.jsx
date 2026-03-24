@@ -185,6 +185,7 @@ vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
   },
+  AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
 vi.mock("../../../components/common/StatStrip/StatStrip", () => ({
