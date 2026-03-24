@@ -5,18 +5,21 @@
 import styles from "../styles";
 
 const ROLE_BADGE_STYLES = {
-  pending_teacher: styles.badgePending,
+  admin: styles.badgeAdmin,
   student: styles.badgeStudent,
   teacher: styles.badgeTeacher,
 };
 
 const MOBILE_ROLE_STYLES = {
-  pending_teacher: styles.rolePending,
+  admin: styles.roleAdmin,
   student: styles.roleStudent,
   teacher: styles.roleTeacher,
 };
 
 function formatRole(role) {
+  if (role === "admin") return "Admin";
+  if (role === "teacher") return "Teacher";
+  if (role === "student") return "Student";
   return role.replace("_", " ");
 }
 

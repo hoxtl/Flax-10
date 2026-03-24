@@ -24,10 +24,10 @@ function BackRow({ onBack, backLabel }) {
 
 /** Page shell that wraps content with an optional header and toolbar. */
 
-export default function AppPage({ title, subtitle, action, onBack, backLabel = "Back", backPlacement = "inline", toolbar, width = "xl", className = "", contentClassName = "", children, ...props }) {
+export default function AppPage({ title, subtitle, action, onBack, backLabel = "Back", backPlacement = "inline", toolbar, width = "xl", className = "", contentClassName = "", header = true, children, ...props }) {
   const widthClass = buildWidthClass(width);
   const showBackAboveHeader = onBack && backPlacement === "above";
-  const hasHeader = title || subtitle || action || onBack;
+  const hasHeader = header && (title || subtitle || action || onBack);
   return (
     <section className={joinClassNames(styles.page, widthClass, className)} {...props}>
       {showBackAboveHeader && <BackRow onBack={onBack} backLabel={backLabel} />}
