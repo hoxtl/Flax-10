@@ -1,7 +1,6 @@
-/**
+/*
  * Homepage overlay collection.
  */
-
 import { MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
@@ -23,33 +22,31 @@ export function HomepageOverlays(props) {
   );
 }
 
-function ModuleOverlay(props) {
+function getModuleUrl(moduleInfo) {
+  return moduleInfo.id ? `/modules?moduleId=${moduleInfo.id}` : `/modules?code=${encodeURIComponent(moduleInfo.code)}`;
+}
+
+function ModuleOverlayActions({ styles, setSelectedModulePill, moduleUrl }) {
   const navigate = useNavigate();
+  const handleClick = () => { setSelectedModulePill(null); navigate(moduleUrl); };
+  return (
+    <div className={styles.moduleCardActions}>
+      <PrimaryButton type="button" variant="ghost" size="small" pill className={styles.moduleCardLink} onClick={handleClick}>View module</PrimaryButton>
+    </div>
+  );
+}
+
+function ModuleOverlay(props) {
   if (!props.selectedModulePill) return null;
   const moduleInfo = getModuleInfo(props.selectedModulePill, props.enrolledModules);
-  const moduleUrl = moduleInfo.id ? `/modules?moduleId=${moduleInfo.id}` : `/modules?code=${encodeURIComponent(moduleInfo.code)}`;
-
+  const moduleUrl = getModuleUrl(moduleInfo);
   return (
     <div className={props.styles.deadlineDetailOverlay} onClick={() => props.setSelectedModulePill(null)} role="dialog" aria-modal aria-labelledby="module-card-title">
       <div className={props.styles.moduleCardCard} onClick={(event) => event.stopPropagation()}>
         <ModuleOverlayHeader {...props} colors={moduleInfo.colors} code={moduleInfo.code} />
         <ModuleOverlayBody moduleInfo={moduleInfo} styles={props.styles} />
         <div className={props.styles.moduleCardDivider} />
-        <div className={props.styles.moduleCardActions}>
-          <PrimaryButton
-            type="button"
-            variant="ghost"
-            size="small"
-            pill
-            className={props.styles.moduleCardLink}
-            onClick={() => {
-              props.setSelectedModulePill(null);
-              navigate(moduleUrl);
-            }}
-          >
-            View module
-          </PrimaryButton>
-        </div>
+        <ModuleOverlayActions styles={props.styles} setSelectedModulePill={props.setSelectedModulePill} moduleUrl={moduleUrl} />
       </div>
     </div>
   );
@@ -125,21 +122,10 @@ function DeadlineActions(props) {
   const navigate = useNavigate();
   const href = getDeadlineModuleUrl(props.selectedDeadline);
   if (!href) return null;
+  const handleClick = () => { props.setSelectedDeadline(null); navigate(href); };
   return (
     <div className={props.styles.deadlineDetailActions}>
-      <PrimaryButton
-        type="button"
-        variant="primary"
-        size="small"
-        pill
-        className={props.styles.deadlineDetailLink}
-        onClick={() => {
-          props.setSelectedDeadline(null);
-          navigate(href);
-        }}
-      >
-        Go to module
-      </PrimaryButton>
+      <PrimaryButton type="button" variant="primary" size="small" pill className={props.styles.deadlineDetailLink} onClick={handleClick}>Go to module</PrimaryButton>
     </div>
   );
 }

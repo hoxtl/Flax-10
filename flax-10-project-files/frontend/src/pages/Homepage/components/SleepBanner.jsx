@@ -21,50 +21,37 @@ function randomMessage() {
   return MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
 }
 
+const BANNER_TRANSITION = { duration: 0.32, ease: [0.22, 1, 0.36, 1] };
+const GLOW_ANIMATION = { x: ["-10%", "16%", "-4%"], opacity: [0.24, 0.38, 0.28] };
+const ICON_ANIMATION = { y: [0, -2, 0], rotate: [-4, 0, 4, 0], scale: [1, 1.05, 1] };
+
+function BannerGlow() {
+  return <Motion.div className={styles.glow} aria-hidden animate={GLOW_ANIMATION} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />;
+}
+
+function BannerIcon() {
+  return <Motion.span className={styles.icon} aria-hidden animate={ICON_ANIMATION} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}>🌙</Motion.span>;
+}
+
+function BannerContent({ message, onDismiss }) {
+  return (
+    <Motion.div className={styles.banner} initial={{ opacity: 0, y: -10, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -12, scale: 0.982 }} transition={BANNER_TRANSITION}>
+      <div className={styles.flow} aria-hidden />
+      <BannerGlow />
+      <BannerIcon />
+      <span className={styles.message}>{message}</span>
+      <button type="button" className={styles.dismiss} aria-label="Dismiss sleep banner" onClick={onDismiss}>&times;</button>
+    </Motion.div>
+  );
+}
+
 export default function SleepBanner() {
   const [show, setShow] = useState(false);
   const [message] = useState(randomMessage);
-
-  useEffect(() => {
-    syncSleepBanner(setShow);
-  }, []);
-
+  useEffect(() => { syncSleepBanner(setShow); }, []);
   return (
     <AnimatePresence initial={false}>
-      {show ? (
-        <Motion.div
-          className={styles.banner}
-          initial={{ opacity: 0, y: -10, scale: 0.985 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -12, scale: 0.982 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className={styles.flow} aria-hidden />
-          <Motion.div
-            className={styles.glow}
-            aria-hidden
-            animate={{ x: ["-10%", "16%", "-4%"], opacity: [0.24, 0.38, 0.28] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <Motion.span
-            className={styles.icon}
-            aria-hidden
-            animate={{ y: [0, -2, 0], rotate: [-4, 0, 4, 0], scale: [1, 1.05, 1] }}
-            transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            🌙
-          </Motion.span>
-          <span className={styles.message}>{message}</span>
-          <button
-            type="button"
-            className={styles.dismiss}
-            aria-label="Dismiss sleep banner"
-            onClick={() => setShow(false)}
-          >
-            &times;
-          </button>
-        </Motion.div>
-      ) : null}
+      {show ? <BannerContent message={message} onDismiss={() => setShow(false)} /> : null}
     </AnimatePresence>
   );
 }

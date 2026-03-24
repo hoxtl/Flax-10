@@ -1,8 +1,6 @@
-/**
+/*
  * Right Now data helpers.
  */
-
-import React from "react";
 import { isNow } from "../utils/eventUtils";
 import { getTflLinesForLocation, isSevereDisruption } from "../utils/kclTflMapping";
 
@@ -54,26 +52,22 @@ export function getJourneySummary(journey) {
   };
 }
 
+function computeLeaveByTiming(startMs, hasSevere, nowMs) {
+  const leaveByMs = startMs - (35 + (hasSevere ? 20 : 10)) * 60000;
+  const minsUntilLeave = Math.floor((leaveByMs - nowMs) / 60000);
+  const leaveByStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const urgency = nowMs >= leaveByMs ? "critical" : minsUntilLeave <= 15 ? "urgent" : "info";
+  const lead = nowMs >= leaveByMs ? "Leave now" : minsUntilLeave <= 15 ? `Leave in ${minsUntilLeave} min` : `Leave by ${leaveByStr}`;
+  return { leaveByMs, minsUntilLeave, leaveByStr, urgency, lead };
+}
+
 export function getLeaveByInfo(nextEvent, relevantDelays, nowMs) {
   if (!nextEvent?.start_time || !relevantDelays.length) return null;
   const startMs = new Date(nextEvent.start_time).getTime();
   const hasSevere = relevantDelays.some((d) => isSevereDisruption(d.severityDescription));
-  const leaveByMs = startMs - (35 + (hasSevere ? 20 : 10)) * 60000;
-  const minsUntilLeave = Math.floor((leaveByMs - nowMs) / 60000);
+  const timing = computeLeaveByTiming(startMs, hasSevere, nowMs);
   const lineName = relevantDelays[0]?.lineName || "TfL";
   const severity = relevantDelays[0]?.severityDescription || "Delays";
-  const leaveByStr = new Date(leaveByMs).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  const lead = nowMs >= leaveByMs ? "Leave now" : minsUntilLeave <= 15 ? `Leave in ${minsUntilLeave} min` : `Leave by ${leaveByStr}`;
-  
-  return {
-    urgency: nowMs >= leaveByMs ? "critical" : minsUntilLeave <= 15 ? "urgent" : "info",
-    leaveByStr,
-    minsUntilLeave,
-    hasSevere,
-    lineName,
-    severity,
-    eventTime: new Date(nextEvent.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
-    eventTitle: nextEvent.title || "your next event",
-    message: `${lineName}: ${severity}. ${lead} for ${nextEvent.title || "your next event"}.`,
-  };
+  const eventTitle = nextEvent.title || "your next event";
+  return { urgency: timing.urgency, leaveByStr: timing.leaveByStr, minsUntilLeave: timing.minsUntilLeave, hasSevere, lineName, severity, eventTime: new Date(nextEvent.start_time).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }), eventTitle, message: `${lineName}: ${severity}. ${timing.lead} for ${eventTitle}.` };
 }
