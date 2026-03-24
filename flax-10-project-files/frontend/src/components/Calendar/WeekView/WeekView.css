@@ -116,6 +116,7 @@
   position: relative;
   flex: 1;
   min-height: 1440px;
+  overflow: hidden;
 }
 
 /* Hour cells — ultra-thin lines for clean Apple feel */
