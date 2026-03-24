@@ -22,9 +22,10 @@ vi.mock("../../components/Society/SocietyDetail/SocietyHero", () => ({
 }));
 
 vi.mock("../../components/Society/SocietyDetail/SocietyInfo", () => ({
-  default: ({ onViewMembers }) => (
+  default: ({ onViewMembers, onToggleEditMode }) => (
     <div data-testid="info">
       <button type="button" onClick={onViewMembers}>view-members</button>
+      <button type="button" onClick={onToggleEditMode}>toggle-edit-mode</button>
     </div>
   ),
 }));
@@ -74,6 +75,7 @@ vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/Announcemen
     <div data-testid="announcement-modal">
       <button type="button" onClick={onClose}>close-announcement</button>
       <button type="button" onClick={() => onSubmit({ id: 7, title: "Updated announcement" }, null)}>submit-announcement</button>
+      <button type="button" onClick={() => onSubmit({ title: "Fresh announcement" }, null)}>submit-new-announcement</button>
       <button type="button" onClick={() => onSubmit({ id: 7, title: "Pinned announcement" }, { id: 4, pinned: true, title: "Existing pinned" })}>submit-conflict</button>
       <button type="button" onClick={() => onDelete(7)}>delete-announcement</button>
     </div>
@@ -305,9 +307,11 @@ describe("SocietyDetailPage", () => {
     expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
 
     fireEvent.click(screen.getByText("submit-announcement"));
+    fireEvent.click(screen.getByText("submit-new-announcement"));
     fireEvent.click(screen.getByText("submit-conflict"));
     fireEvent.click(screen.getByText("delete-announcement"));
     expect(data.updateAnnouncement).toHaveBeenCalledWith(7, { id: 7, title: "Updated announcement" }, false);
+    expect(data.addAnnouncement).toHaveBeenCalledWith({ title: "Fresh announcement" }, false);
     expect(data.updateAnnouncement).toHaveBeenCalledWith(4, { id: 4, pinned: false, title: "Existing pinned" }, false);
     expect(data.deleteAnnouncement).toHaveBeenCalledWith(7, false);
 
@@ -318,5 +322,29 @@ describe("SocietyDetailPage", () => {
     await waitFor(() => expect(data.deleteSociety).toHaveBeenCalledTimes(1));
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  it("publishes tracked changes before leaving edit mode", async () => {
+    const data = buildPageData({
+      modals: {
+        editMode: true,
+        setEditMode: vi.fn(),
+      },
+      tracker: {
+        hasChanges: vi.fn(() => true),
+        getChangeSummary: vi.fn(() => ["updated-announcement"]),
+        resetChanges: vi.fn(),
+      },
+      publishChanges: vi.fn().mockResolvedValue({}),
+    });
+    useSocietyPageDataMock.mockReturnValue(data);
+
+    renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+
+    fireEvent.click(screen.getByText("toggle-edit-mode"));
+
+    await waitFor(() => expect(data.publishChanges).toHaveBeenCalledWith(["updated-announcement"]));
+    expect(data.tracker.resetChanges).toHaveBeenCalledTimes(1);
+    expect(data.modals.setEditMode).toHaveBeenCalledWith(false);
   });
 });

@@ -1,13 +1,24 @@
 /* Tests for useTaskFeedData hook filtering, sorting, and navigation logic */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 
 const navigateMock = vi.hoisted(() => vi.fn());
+const getModulesMock = vi.hoisted(() => vi.fn());
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return { ...actual, useNavigate: () => navigateMock };
 });
+
+vi.mock("../../../../api/moduleApi", () => ({
+  getModules: (...args) => getModulesMock(...args),
+}));
+
+vi.mock("../../../../components/Timer/taskInput/taskInputUtils", () => ({
+  buildListItems: (lists) => lists.map((list) => ({ value: list.id, label: list.name })),
+  filterListItems: (items) => items,
+  groupModuleItems: (items) => ({ All: items }),
+}));
 
 vi.mock("../../../../lib/allTasksCompleteMessages", () => ({
   getClearMessage: () => "Great job",
@@ -46,6 +57,7 @@ describe("useTaskFeedData", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(1);
+    getModulesMock.mockResolvedValue([]);
   });
 
   it("builds sections and header", () => {
@@ -88,5 +100,50 @@ describe("useTaskFeedData", () => {
     vi.mocked(taskFeedDataUtils.getCompletedTodayCount).mockReturnValue(0);
     const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "today", activeListId: null, filterListIds: [] }));
     expect(result.current.todayEmptyCardProps.sub).toBe("No tasks due today.");
+  });
+
+  it("builds module filter labels from loaded module metadata", async () => {
+    getModulesMock.mockResolvedValueOnce([
+      { module_code: "cs101", module_name: "Computer Science" },
+      { module_code: "ma202", title: "Linear Algebra" },
+      { module_code: "", module_name: "Ignored" },
+    ]);
+
+    const tasks = [
+      { id: 1, completed: false, module_code: "CS101", module_name: "" },
+      { id: 2, completed: false, module_code: "MA202", module_name: "" },
+    ];
+
+    const { result } = renderHook(() => useTaskFeedData({ tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([
+      { value: "CS101", label: "CS101 — Computer Science" },
+      { value: "MA202", label: "MA202 — Linear Algebra" },
+    ]));
+  });
+
+  it("searches within the selected list ids when a search query is active", async () => {
+    const tasks = [
+      { id: 1, completed: false, task_list: 9, module_code: "CS101" },
+      { id: 2, completed: false, task_list: 10, module_code: "MA202" },
+      { id: 3, completed: true, task_list: 9, module_code: "CS101" },
+    ];
+    const { result } = renderHook(() => useTaskFeedData({
+      tasks,
+      allTasks: tasks,
+      lists: [{ id: 9, name: "Inbox" }],
+      activeFilter: "all",
+      activeListId: null,
+      filterListIds: [9],
+    }));
+
+    act(() => {
+      result.current.setSearch("report");
+    });
+
+    await waitFor(() => {
+      expect(result.current.pending).toEqual([{ id: 1, completed: false, task_list: 9, module_code: "CS101" }]);
+      expect(result.current.completed).toEqual([{ id: 3, completed: true, task_list: 9, module_code: "CS101" }]);
+    });
   });
 });

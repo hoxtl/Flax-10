@@ -272,6 +272,38 @@ describe("GroupWork task component extras", () => {
     expect(setEditing).toHaveBeenCalledWith(false);
   });
 
+  it("uses the default medium priority, toggles popup state, clears due dates, and marks done cards", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const onDragStart = vi.fn();
+
+    render(
+      <TaskBoardCard
+        task={{ id: 22, title: "Done card", priority: null, due_date: "2026-03-30T00:00:00.000Z", assignees_info: [], status: "done", completed: true }}
+        members={[]}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+        onDragStart={onDragStart}
+      />,
+    );
+
+    expect(screen.getByDisplayValue("medium")).toBeInTheDocument();
+
+    const plusButton = screen.getByText("+");
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.getByText("Assign Members")).toBeInTheDocument();
+
+    const card = screen.getByText("Done card").closest("div");
+    fireEvent.contextMenu(card, { clientX: 12, clientY: 18 });
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("No due date"), { target: { value: "" } });
+    expect(onUpdate).toHaveBeenCalledWith(22, { due_date: null });
+
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.queryByText("Assign Members")).not.toBeInTheDocument();
+  });
+
   it("renders board column empty/add states and board view add flow", () => {
     const onUpdate = vi.fn();
     const onDelete = vi.fn();
