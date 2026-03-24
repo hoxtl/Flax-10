@@ -31,4 +31,13 @@ describe("common useClickOutside", () => {
     expect(removeSpy).toHaveBeenCalledWith("mousedown", expect.any(Function));
     removeSpy.mockRestore();
   });
+
+  it("does not attach listeners when the ref is not ready", () => {
+    const addSpy = vi.spyOn(document, "addEventListener");
+
+    renderHook(() => useClickOutside({ current: null }, vi.fn()));
+
+    expect(addSpy).not.toHaveBeenCalledWith("mousedown", expect.any(Function));
+    addSpy.mockRestore();
+  });
 });

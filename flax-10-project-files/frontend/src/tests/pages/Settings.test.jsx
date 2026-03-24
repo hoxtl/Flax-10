@@ -96,7 +96,8 @@ describe("Settings", () => {
     vi.clearAllMocks();
   });
 
-  const renderSettings = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+  const renderSettings = (ui, initialEntries = ["/settings"]) =>
+    render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 
   it("renders Settings title", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
@@ -173,5 +174,17 @@ describe("Settings", () => {
     renderSettings(<Settings user={{}} onBack={vi.fn()} />);
     fireEvent.click(screen.getByText("Scheduling"));
     expect(screen.getByTestId("scheduling-panel")).toBeTruthy();
+  });
+
+  it("reads a valid tab id from the url search params", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />, ["/settings?tab=security"]);
+    expect(screen.getByTestId("active-tab")).toHaveTextContent("security");
+    expect(screen.getByTestId("security-form")).toBeTruthy();
+  });
+
+  it("falls back to account when the url tab id is invalid", () => {
+    renderSettings(<Settings user={{}} onBack={vi.fn()} />, ["/settings?tab=not-real"]);
+    expect(screen.getByTestId("active-tab")).toHaveTextContent("account");
+    expect(screen.getByTestId("account-form")).toBeTruthy();
   });
 });

@@ -60,4 +60,18 @@ describe("useReadingModal", () => {
     expect(deleteReadingMock).toHaveBeenCalledWith(9, 1);
     expect(getReadingsMock).toHaveBeenCalledTimes(4);
   });
+
+  it("normalizes empty reading responses to an empty list and resets edit state on create", async () => {
+    getReadingsMock.mockResolvedValueOnce(null);
+    const { result } = renderHook(() => useReadingModal(11));
+
+    await waitFor(() => expect(result.current.readings).toEqual([]));
+
+    act(() => result.current.openEdit({ id: 1, title: "Old reading" }));
+    expect(result.current.editing).toEqual({ id: 1, title: "Old reading" });
+
+    act(() => result.current.openCreate());
+    expect(result.current.editing).toBeNull();
+    expect(result.current.showForm).toBe(true);
+  });
 });

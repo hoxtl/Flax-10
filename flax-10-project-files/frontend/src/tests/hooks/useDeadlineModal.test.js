@@ -41,6 +41,13 @@ describe('useDeadlineModal', () => {
     expect(result.current.editing).toBeNull();
   });
 
+  it('starts with the form open when creating from a launcher flow', async () => {
+    const { result } = renderHook(() => useDeadlineModal(5, true));
+
+    expect(result.current.showForm).toBe(true);
+    await waitFor(() => expect(result.current.deadlines).toEqual([{ id: 1, title: 'CW' }]));
+  });
+
   it('submits new deadline with end_due_date normalized to null', async () => {
     const { result } = renderHook(() => useDeadlineModal(7, true));
 

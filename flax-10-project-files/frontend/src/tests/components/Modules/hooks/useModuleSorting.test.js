@@ -69,4 +69,22 @@ describe('useModuleSorting', () => {
         act(() => result.current.toggleCourse(1));
         expect(result.current.selectedCourses).toEqual([]);
     });
+
+    it('clearFilters clears selections and resets paging', () => {
+        const { result } = renderHook(() => useModuleSorting(mockModules));
+
+        act(() => {
+            result.current.toggleCourse('Science');
+            result.current.setCurrentPage(3);
+        });
+        expect(result.current.selectedCourses).toEqual(['Science']);
+        expect(result.current.currentPage).toBe(3);
+
+        act(() => {
+            result.current.clearFilters();
+        });
+
+        expect(result.current.selectedCourses).toEqual([]);
+        expect(result.current.currentPage).toBe(1);
+    });
 });
