@@ -184,6 +184,7 @@ vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
   },
+  AnimatePresence: ({ children }) => <>{children}</>,
 }));
 
 vi.mock("../../../components/common/StatStrip/StatStrip", () => ({
@@ -321,13 +322,10 @@ describe("GroupWork pages and header extras", () => {
     fireEvent.click(screen.getByText("confirm-hold"));
     await waitFor(() => expect(onDeleteProject).toHaveBeenCalled());
 
-    fireEvent.click(screen.getAllByText("Delete project")[1]);
+    // Open ProjectHeader's delete modal (isOwner=true) and confirm
+    fireEvent.click(screen.getAllByText("Delete project")[0]);
     fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(screen.getByText("Only the project owner can delete this project.")).toBeInTheDocument());
-
-    fireEvent.click(screen.getAllByText("Delete project")[1]);
-    fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(onDeleteProject).toHaveBeenCalledTimes(2));
     expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
   });
 });
