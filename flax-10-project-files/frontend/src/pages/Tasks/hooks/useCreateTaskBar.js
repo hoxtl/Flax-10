@@ -7,7 +7,7 @@ import { getModules, getEnrollments } from "../../../api/moduleApi";
 import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { useSleepWarning } from "../../../components/Settings/hooks/useSleepWarning";
 import { getUserSettings } from "../../../api/userApi";
-import { runQuickAdd } from "../utils/createTaskBarUtils";
+import { POMODORO_BLOCK_MINUTES, runQuickAdd } from "../utils/createTaskBarUtils";
 import { isReadingList as isReadingTaskList } from "../utils/readingListUtils";
 
 function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
@@ -16,7 +16,7 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
     [lists]
   );
   const [title, setTitle] = useState("");
-  const [estimatedBlocks, setEstimatedBlocks] = useState(1);
+  const [estimatedMinutes, setEstimatedMinutes] = useState(POMODORO_BLOCK_MINUTES);
   const [taskListId, setTaskListId] = useState(() => (defaultListId || sortedLists[0]?.id) ?? "");
   const [moduleId, setModuleId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -27,7 +27,7 @@ function useCreateTaskBarFormState(lists, defaultListId, defaultDueDate) {
   const cardRef = useRef(null);
   const { sleepWarning, checkSleepAndRun, sleepWarningProps } = useSleepWarning(sleepSettings);
   const [pageCount, setPageCount] = useState(null);
-  return { sortedLists, title, setTitle, estimatedBlocks, setEstimatedBlocks, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
+  return { sortedLists, title, setTitle, estimatedMinutes, setEstimatedMinutes, taskListId, setTaskListId, moduleId, setModuleId, saving, setSaving, inputFocused, setInputFocused, enrolledModules, setEnrolledModules, sleepSettings, setSleepSettings, inputRef, cardRef, sleepWarning, checkSleepAndRun, sleepWarningProps, defaultListId, defaultDueDate, pageCount, setPageCount };
 }
 
 function useEnrolledModulesEffect(setEnrolledModules) {
