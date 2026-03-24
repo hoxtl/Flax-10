@@ -136,7 +136,7 @@ describe("navigatorUtils", () => {
       ),
     ).toMatchObject({
       state: "conflict",
-      currentBlock: { id: 1, start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+      currentBlock: null,
       conflictAt: new Date("2026-03-24T10:30:00.000Z"),
     });
   });

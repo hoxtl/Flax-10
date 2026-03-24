@@ -6,11 +6,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useModules from '../../components/Modules/hooks/useModules';
 
-vi.mock('../../context/NotificationContext', () => ({
+vi.mock('../../context/NotificationContext.jsx', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
 }));
 
-vi.mock('../../api/moduleApi', () => ({
+vi.mock('../../api/moduleApi.js', () => ({
     getModules: vi.fn(),
     getEnrollments: vi.fn(),
     enrollInModule: vi.fn(),
@@ -18,29 +18,30 @@ vi.mock('../../api/moduleApi', () => ({
     deleteModule: vi.fn(),
 }));
 
-vi.mock('../../api/taskApi', () => ({
+vi.mock('../../api/taskApi.js', () => ({
     fetchTasks: vi.fn(),
 }));
 
-vi.mock('../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../components/Modules/utils/moduleUtils.js', () => ({
     isEnrolledIn: vi.fn(),
     getEnrollmentId: vi.fn(),
+    normaliseModuleCode: vi.fn((value) => String(value || "").trim().toUpperCase()),
 }));
 
-vi.mock('../../components/Modules/utils/notifyHelper', () => ({
+vi.mock('../../components/Modules/utils/notifyHelper.js', () => ({
     createNotify: vi.fn(() => vi.fn()),
 }));
 
-vi.mock('../../context/ConfirmContext', () => ({
+vi.mock('../../context/ConfirmContext.jsx', () => ({
     useConfirm: vi.fn(() => vi.fn()),
 }));
 
-import { useNotifications } from '../../context/NotificationContext';
-import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi';
-import { fetchTasks } from '../../api/taskApi';
-import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils';
-import { createNotify } from '../../components/Modules/utils/notifyHelper';
-import { useConfirm } from '../../context/ConfirmContext';
+import { useNotifications } from '../../context/NotificationContext.jsx';
+import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi.js';
+import { fetchTasks } from '../../api/taskApi.js';
+import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils.js';
+import { createNotify } from '../../components/Modules/utils/notifyHelper.js';
+import { useConfirm } from '../../context/ConfirmContext.jsx';
 
 const mockModules = [
     { id: 1, module_name: 'Math', module_code: 'MATH101' },

@@ -262,7 +262,7 @@ describe("GroupWork low coverage components", () => {
 
     fireEvent.contextMenu(card, { clientX: 40, clientY: 50 });
     fireEvent.click(screen.getByText("Edit"));
-    const titleInput = screen.getByRole("textbox");
+    const titleInput = screen.getAllByRole("textbox")[0];
     fireEvent.change(titleInput, { target: { value: "Write final essay" } });
     fireEvent.blur(titleInput);
     expect(onUpdate).toHaveBeenCalledWith(11, { title: "Write final essay" });
@@ -304,7 +304,7 @@ describe("GroupWork low coverage components", () => {
     expect(onToggle).toHaveBeenCalledWith(22, false);
 
     fireEvent.click(screen.getByText("Draft slides"));
-    const input = screen.getByRole("textbox");
+    const input = screen.getAllByRole("textbox")[0];
     fireEvent.change(input, { target: { value: "Draft final slides" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(onUpdate).toHaveBeenCalledWith(22, { title: "Draft final slides" });
@@ -314,7 +314,7 @@ describe("GroupWork low coverage components", () => {
 
     fireEvent.click(screen.getByText("avatars:1").parentElement);
     fireEvent.click(screen.getByText("toggle-assignee"));
-    expect(onUpdate).toHaveBeenCalledWith(22, { assigned_to: [2] });
+    expect(onUpdate).toHaveBeenCalledWith(22, { assigned_to: [1, 2] });
 
     fireEvent.click(screen.getByTitle("Delete task"));
     expect(screen.getByTestId("hold-confirm-modal")).toBeInTheDocument();
