@@ -62,8 +62,14 @@ class AdminBanUserTest(TestCase):
         self.assertEqual(self.target.ban_reason, 'Spam')
 
     def test_ban_returns_200(self):
-        response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': ''}, format='json')
+        response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': 'Spam'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_ban_requires_reason(self):
+        response = authed_client(self.admin).post(self.url, {'action': 'ban', 'reason': '   '}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.target.refresh_from_db()
+        self.assertTrue(self.target.is_active)
 
     def test_unban_restores_active(self):
         self.target.is_active = False
@@ -86,8 +92,34 @@ class AdminBanUserTest(TestCase):
             username='staff2', email='staff2@example.com', password='pass', is_staff=True,
         )
         url = f'/api/admin/users/{staff.id}/ban/'
-        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': ''}, format='json')
+        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': 'Spam'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_ban_protected_fixture_user(self):
+        protected = make_user('janedoe')
+        url = f'/api/admin/users/{protected.id}/ban/'
+        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': 'Spam'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        protected.refresh_from_db()
+        self.assertTrue(protected.is_active)
+
+    def test_fixture_protection_is_case_insensitive(self):
+        protected = make_user('Charlie')
+        url = f'/api/admin/users/{protected.id}/ban/'
+        response = authed_client(self.admin).post(url, {'action': 'ban', 'reason': 'Spam'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_protected_fixture_user_can_still_be_unbanned(self):
+        protected = make_user('amiller')
+        protected.is_active = False
+        protected.ban_reason = 'Old reason'
+        protected.save()
+        url = f'/api/admin/users/{protected.id}/ban/'
+        response = authed_client(self.admin).post(url, {'action': 'unban'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        protected.refresh_from_db()
+        self.assertTrue(protected.is_active)
+        self.assertEqual(protected.ban_reason, '')
 
     def test_ban_nonexistent_user_returns_404(self):
         url = '/api/admin/users/999999/ban/'
