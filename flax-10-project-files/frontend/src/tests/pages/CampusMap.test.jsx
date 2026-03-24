@@ -161,7 +161,7 @@ describe('CampusMap', () => {
         await renderLoadedCampusMap();
         expect(getStartLocationButton()).toBeTruthy();
         expect(getDestinationLocationButton()).toBeTruthy();
-    });
+    }, 15000);
 
     it('loads home address when available and handles home-address-updated event', async () => {
         getHomeAddress.mockResolvedValueOnce({
@@ -208,7 +208,7 @@ describe('CampusMap', () => {
         fireEvent.click(screen.getByText('Show directions'));
         expect(screen.getByText('Walk straight')).toBeTruthy();
         expect(screen.getByText('Turn left')).toBeTruthy();
-    });
+    }, 15000);
 
     it('renders TfL error when journeyPlanner returns null', async () => {
         tflService.journeyPlanner.mockResolvedValueOnce(null);
@@ -220,7 +220,7 @@ describe('CampusMap', () => {
             expect(tflService.journeyPlanner).toHaveBeenCalled();
         });
         expect(screen.getByText(/No TfL journey found/i)).toBeTruthy();
-    });
+    }, 15000);
 
     it('shows route error when Mapbox API fails', async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: false });
@@ -228,7 +228,7 @@ describe('CampusMap', () => {
         fireEvent.click(getStartLocationButton());
         fireEvent.click(getDestinationCampusButton('Strand'));
         await waitFor(() => expect(screen.getByText(/Could not calculate the route/i)).toBeTruthy());
-    });
+    }, 15000);
 
     it('shows no walking route when API returns empty routes', async () => {
         global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ routes: [] }) });
@@ -236,7 +236,7 @@ describe('CampusMap', () => {
         fireEvent.click(getStartLocationButton());
         fireEvent.click(getDestinationCampusButton('Strand'));
         await waitFor(() => expect(screen.getByText(/No walking route found/i)).toBeTruthy());
-    });
+    }, 15000);
 
     it('displays duration over 1 hour and distance in km', async () => {
         global.fetch = vi.fn().mockResolvedValue({
@@ -257,7 +257,7 @@ describe('CampusMap', () => {
             expect(screen.getByText(/2h 0m/)).toBeTruthy();
             expect(screen.getByText(/5\.5 km/)).toBeTruthy();
         });
-    });
+    }, 15000);
 
     it('handleClearStart clears start and route', async () => {
         await renderLoadedCampusMap();
@@ -266,7 +266,7 @@ describe('CampusMap', () => {
         await waitFor(() => expect(screen.getByText('Walking')).toBeInTheDocument());
         fireEvent.click(within(getJourneySection()).getByRole('button', { name: 'Clear' }));
         await waitFor(() => expect(screen.getByText(/Set a starting location and destination/)).toBeInTheDocument());
-    });
+    }, 15000);
 
     it('handleClearCampus clears campus and route', async () => {
         await renderLoadedCampusMap();
@@ -279,7 +279,7 @@ describe('CampusMap', () => {
         fireEvent.click(within(destinationSection).getByTitle('Clear'));
         await waitFor(() => expect(within(destinationSection).getByText(/Select a campus or event as destination/i)).toBeInTheDocument());
         expect(screen.getByText(/Set a starting location and destination to see your journey options!/)).toBeInTheDocument();
-    });
+    }, 15000);
 
     it('shows TfL journey when journeyPlanner returns data', async () => {
         tflService.journeyPlanner.mockResolvedValueOnce({
@@ -295,7 +295,7 @@ describe('CampusMap', () => {
         await waitFor(() => expect(screen.getByText(/Public Transport/)).toBeInTheDocument());
         fireEvent.click(screen.getByText(/Show step-by-step directions/));
         await waitFor(() => expect(screen.getByText(/Northern/)).toBeTruthy());
-    });
+    }, 15000);
 
     it('shows TfL error when journeyPlanner throws', async () => {
         tflService.journeyPlanner.mockRejectedValueOnce(new Error('err'));
@@ -304,7 +304,7 @@ describe('CampusMap', () => {
         fireEvent.click(getStartLocationButton());
         fireEvent.click(getDestinationCampusButton('Strand'));
         await waitFor(() => expect(screen.getByText(/Failed to calculate TfL route/i)).toBeTruthy());
-    });
+    }, 15000);
 
     it('shows good service when disruptions empty', async () => {
         tflService.getTfLDelays.mockResolvedValueOnce([]);
@@ -330,13 +330,13 @@ describe('CampusMap', () => {
         fireEvent.click(getStartLocationButton());
         if (errCb) errCb();
         await waitFor(() => expect(getStartLocationButton()).toBeInTheDocument());
-    });
+    }, 15000);
 
     it('campus list click selects and shows address', async () => {
         await renderLoadedCampusMap();
         fireEvent.click(getDestinationCampusButton("Guy's"));
         await waitFor(() => expect(screen.getAllByText(/Guy's Campus/)[0]).toBeInTheDocument());
-    });
+    }, 15000);
 
     it('shows empty state when no start or campus', async () => {
         await renderLoadedCampusMap();

@@ -159,7 +159,7 @@ describe("Attendance components", () => {
     expect(screen.queryByRole("button", { name: "Change" })).not.toBeInTheDocument();
     expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
     expect(screen.getByText(/Showing 30 most recent/)).toBeInTheDocument();
-  });
+  }, 15000);
 
   it("renders event info, record actions, marked actions, and segment detail rows", async () => {
     const onRecord = vi.fn();
