@@ -67,24 +67,14 @@ export function AddReadingToTasksButton({ readingId, onAdded, className = '', va
     return <TaskActionButton state={state} className={className} variant={variant} onClick={handleAdd} addedLabel="✓ Added" styles={styles} />;
 }
 
+function handleDeadlineAdd(event, state, setState, onAdded, toast, deadline) {
+    event.stopPropagation();
+    if (state === 'idle') submitAsTask(setState, onAdded, toast, deadline?.id, 'Deadline added to tasks!', 'Failed to add deadline.', () => createTask(deadlineToTask(deadline)));
+}
+
 export function AddDeadlineToTasksButton({ deadline, onAdded, className = '', variant = 'secondary', styles }) {
     const [state, setState] = useState('idle');
     const toast = useToast();
-
-    const handleAdd = (event) => {
-        event.stopPropagation();
-        if (state === 'idle') {
-            submitAsTask(
-                setState,
-                onAdded,
-                toast,
-                deadline?.id,
-                'Deadline added to tasks!',
-                'Failed to add deadline.',
-                () => createTask(deadlineToTask(deadline)),
-            );
-        }
-    };
-
+    const handleAdd = (event) => handleDeadlineAdd(event, state, setState, onAdded, toast, deadline);
     return <TaskActionButton state={state} className={className} variant={variant} onClick={handleAdd} addedLabel="✓ Added" styles={styles} />;
 }
