@@ -38,11 +38,12 @@
   border-radius: 20px;
   /* More modern, smoother radius */
   background: var(--widget-card-bg-glass);
-  border: 1px solid var(--widget-border);
+  border: none;
   padding: 20px;
   box-sizing: border-box;
   backdrop-filter: var(--widget-glass-blur);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 /* [Highlight gradient removed for flatter look] */

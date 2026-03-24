@@ -8,7 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from studyFlax.models.auth.user_settings_model import UserSettings
 from studyFlax.serialisers.user.user_settings_serialisers import UserSettingsSerialiser
+from django.utils import timezone
 from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get_modules_for_major
+from studyFlax.management.commands.seed_support.content.tasks import seed_new_user_tasks
+from studyFlax.views.modules.new_user_projects import seed_new_user_projects
 
 DEFAULT_SETTINGS = {
     "theme": "light",
@@ -44,6 +47,9 @@ def _onboarding_response(request, year, major):
     settings = get_or_create_user_settings(request.user)
     _save_onboarding_settings(settings, year, major)
     enrolled_count = enroll_user_in_modules(request.user, get_modules_for_major(major))
+    now = timezone.now()
+    seed_new_user_tasks(request.user, now)
+    seed_new_user_projects(request.user, now)
     return Response({'enrolled_modules': enrolled_count, 'year': year, 'major': major})
 
 @api_view(['GET', 'PUT', 'PATCH'])

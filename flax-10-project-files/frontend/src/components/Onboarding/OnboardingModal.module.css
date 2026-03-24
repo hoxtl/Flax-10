@@ -1,7 +1,6 @@
 /* StandardModal handles overlay and container positioning */
 .onboardingPanel {
-  width: min(580px, 92vw);
-  min-height: min(460px, 80vh);
+  width: min(640px, 95vw);
 }
 
 .modal {

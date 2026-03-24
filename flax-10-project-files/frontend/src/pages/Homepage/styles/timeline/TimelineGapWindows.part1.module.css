@@ -242,7 +242,6 @@
 .planTimelineGapRail {
   flex: 1;
   min-width: 14px;
-  border-top: 1px dashed var(--home-timeline-divider);
   height: 0;
 }
 

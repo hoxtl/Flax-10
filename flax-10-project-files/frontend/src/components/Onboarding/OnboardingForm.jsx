@@ -18,9 +18,9 @@ function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptio
   return (
     <>
       <label className={styles.label}>Year of Study</label>
-      <AnimatedDropdown value={year} onChange={setYear} placeholder="Select your year" options={YEARS} grouped={false} />
+      <AnimatedDropdown value={year} onChange={setYear} placeholder="Select your year" options={YEARS} grouped={false} allowFlipUpward />
       <label className={styles.label} style={{ marginTop: "1rem" }}>Course</label>
-      <AnimatedDropdown value={major} onChange={handleMajorChange} placeholder="Select your course" options={courseOptions} grouped searchable />
+      <AnimatedDropdown value={major} onChange={handleMajorChange} placeholder="Select your course" options={courseOptions} grouped searchable allowFlipUpward />
     </>
   );
 }

@@ -43,7 +43,7 @@ function buildSharedCalendarRoute(user, profileData) {
 
 function resolvePhoto(user, profileData) {
   const resolvedUser = { ...user, ...profileData };
-  return getResolvedUserPhoto(resolvedUser, { allowGeneric: true, seed: resolvedUser?.username || resolvedUser?.id || resolvedUser?.name });
+  return getResolvedUserPhoto(resolvedUser, { allowGeneric: false });
 }
 
 function HeaderAction({ visibility, handlers, user, mobile = false }) {

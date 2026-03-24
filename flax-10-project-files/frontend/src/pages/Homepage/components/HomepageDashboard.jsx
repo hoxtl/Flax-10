@@ -24,7 +24,7 @@ export function HomepageDashboard(props) {
 }
 
 function HomepageDashboardContent(props) {
-  return <><div><SleepBanner /><HomepageDashboardRow {...props} /><HomepageOverlays {...getOverlayProps(props)} /></div><BackToTop containerSelector="[data-dashboard-main]" /><HomepageDashboardModals {...props} /><EventPopups /></>;
+  return <><div className={styles.page}><SleepBanner /><HomepageDashboardRow {...props} /><HomepageOverlays {...getOverlayProps(props)} /></div><BackToTop containerSelector="[data-dashboard-main]" /><HomepageDashboardModals {...props} /><EventPopups /></>;
 }
 
 function HomepageDashboardRow(props) {

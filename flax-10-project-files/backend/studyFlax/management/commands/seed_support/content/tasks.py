@@ -161,6 +161,36 @@ def _seed_tasks_for_user(user, now):
     total += _seed_personal_tasks(user, lists_by_name, personal_list, now)
     return total
 
+def _ensure_task_due_today(user, lists_by_module, now):
+    """If no tasks are due today, set the first module task's due date to today."""
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    has_today = Task.objects.filter(
+        user=user, due_date__gte=today_start, due_date__lte=today_end
+    ).exists()
+    if has_today:
+        return
+    first_task = Task.objects.filter(user=user).order_by('due_date').first()
+    if first_task:
+        first_task.due_date = today_end
+        first_task.save(update_fields=['due_date'])
+
+def seed_new_user_tasks(user, now):
+    """Seed task lists and module tasks for a newly registered user.
+    Creates reading lists for each enrolled module and module-specific tasks,
+    but does NOT add the personal fixture tasks (those are for seeded demo users only).
+    Ensures at least one task is due today.
+    """
+    if Task.objects.filter(user=user).exists():
+        return 0
+    _create_task_lists(user)
+    enrolled = list(Enrollment.objects.filter(student=user).select_related('module'))
+    modules = [e.module for e in enrolled]
+    lists_by_module = create_module_reading_lists(user, modules)
+    total = _seed_module_tasks(user, lists_by_module, now)
+    _ensure_task_due_today(user, lists_by_module, now)
+    return total
+
 def create_tasks(users, stdout):
     now = timezone.now()
     total = sum(_seed_tasks_for_user(user, now) for user in users)

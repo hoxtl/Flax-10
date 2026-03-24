@@ -3,6 +3,7 @@
  */
 
 import { Check, Minus, Pencil, Plus, RotateCcw, Shuffle } from "lucide-react";
+import { motion as Motion } from "framer-motion";
 import styles from "./IntelligenceGrid.module.css";
 
 export function DeleteButton({ onClick }) {
@@ -72,7 +73,20 @@ export function GridActions({ edit, onRandomize, onReset, onToggleEdit }) {
 }
 
 function EditButton({ edit, onToggleEdit }) {
-  return <button onClick={onToggleEdit} className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`} title={edit ? "Done" : "Edit Layout"} aria-label={edit ? "Done editing layout" : "Edit dashboard layout"}>{edit ? <Check size={26} /> : <Pencil size={24} />}</button>;
+  return (
+    <div className={styles.editBtnWrap}>
+      <Motion.button
+        onClick={onToggleEdit}
+        className={`${styles.iconActionBtn} ${edit ? styles.editBtnActive : ""}`}
+        aria-label={edit ? "Done editing layout" : "Edit dashboard layout"}
+        animate={edit ? { scale: 1 } : { scale: [1, 1.08, 1] }}
+        transition={edit ? {} : { duration: 1.8, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
+      >
+        {edit ? <Check size={26} /> : <Pencil size={24} />}
+      </Motion.button>
+      {!edit && <span className={styles.editBtnTooltip}>Edit your widgets</span>}
+    </div>
+  );
 }
 
 function ExtraActions({ onRandomize, onReset }) {

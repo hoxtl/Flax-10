@@ -196,14 +196,12 @@
     position: relative;
   }
   .planTimelineFreeWindowDashed {
-    border: 1.5px dashed rgba(132, 169, 140, 0.45);
     border-radius: 8px;
     background: rgba(132, 169, 140, 0.04);
     box-shadow: none;
   }
   .planTimelineFreeWindowDashed:hover {
     background: rgba(132, 169, 140, 0.08);
-    border-color: rgba(132, 169, 140, 0.65);
     animation: planTimelineGapPulse 2s ease-in-out infinite;
   }
   @keyframes planTimelineGapPulse {
@@ -284,7 +282,7 @@
     right: 0;
     margin-top: 4px;
     padding: 10px 12px;
-    background: #F9F8F6;
+    background: var(--widget-card-bg-glass);
     border: 1px solid rgba(210, 180, 140, 0.55);
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(74, 52, 33, 0.08);

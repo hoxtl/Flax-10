@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CampusMap from "../../../pages/CampusMap/CampusMap";
+import { reverseGeocode } from "../../../api/geocodeApi";
 import { tflService } from "../../../api/tflApi";
 
 const mockMapInstance = {
@@ -63,6 +64,11 @@ vi.mock("../../../api/tflApi", () => ({
   },
 }));
 
+vi.mock("../../../api/geocodeApi", () => ({
+  geocodeAddress: vi.fn().mockResolvedValue({ latitude: 51.5007, longitude: -0.1246 }),
+  reverseGeocode: vi.fn().mockResolvedValue("Westminster, London"),
+}));
+
 vi.mock("../../../api/userApi", () => ({
     getHomeAddress: vi.fn().mockResolvedValue({}),
 }));
@@ -81,6 +87,14 @@ describe("CampusMap", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.defineProperty(window, "innerWidth", { value: 1200, writable: true });
+    Object.defineProperty(global.navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition: vi.fn((success) => {
+          success({ coords: { latitude: 51.5007, longitude: -0.1246 } });
+        }),
+      },
+    });
     mockMapInstance.on.mockImplementation(function (event, cb) {
       if (event === "load") cb();
       return mockMapInstance;
@@ -154,5 +168,15 @@ describe("CampusMap", () => {
     await waitFor(() => expect(tflService.getTfLDelays).toHaveBeenCalled());
     expect(errSpy).toHaveBeenCalledWith("TfL disruption fetch error: ", expect.any(Error));
     errSpy.mockRestore();
+  });
+
+  it("sets the destination to the current location when the To location button is clicked", async () => {
+    render(<CampusMap />);
+
+    fireEvent.click(screen.getByRole("button", { name: /set destination to current location/i }));
+
+    await waitFor(() => expect(reverseGeocode).toHaveBeenCalledWith(51.5007, -0.1246));
+    await waitFor(() => expect(screen.getByPlaceholderText("Enter a destination")).toHaveValue("Westminster, London"));
+    expect(screen.getByText("Current location")).toBeInTheDocument();
   });
 });

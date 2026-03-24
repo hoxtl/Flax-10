@@ -170,8 +170,8 @@
 .planTimelineCardRoutine {
   transform: none;
   transform-origin: left center;
-  background: rgba(250, 249, 246, 0.6) !important;
-  border: 1px solid #e5e4e2 !important;
+  background: var(--widget-card-bg-glass) !important;
+  border: 1px solid var(--color-border-base) !important;
   width: 100%;
   min-width: 0;
 }
