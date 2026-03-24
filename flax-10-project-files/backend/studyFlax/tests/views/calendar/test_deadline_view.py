@@ -88,6 +88,35 @@ class DeadlineViewTests(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
+    def test_teacher_upcoming_deadlines_only_include_owned_modules(self):
+        other_teacher = self.user.__class__.objects.create_user(
+            username='other_teacher',
+            email='other_teacher@example.com',
+            password='pass1234',
+            first_name='Other',
+            last_name='Teacher',
+            role='teacher',
+        )
+        other_module = Module.objects.create(
+            module_code='GN4101',
+            module_name='Engineering Mathematics',
+            created_by=other_teacher,
+            start_time=timezone.now(),
+            end_time=timezone.now() + timedelta(hours=1),
+        )
+        Deadline.objects.create(
+            module=other_module,
+            title='Presentation',
+            deadline_type='presentation',
+            start_due_date=timezone.now() + timedelta(days=3),
+        )
+
+        response = self.client.get('/api/deadlines/upcoming/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['module_code'], '5CCS2SEG')
+
     def test_create_deadline_creates_events_for_enrolled_students(self):
         self.user.role = 'student'
         self.user.save()

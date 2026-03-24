@@ -94,12 +94,12 @@ describe('DeadlinesWidget', () => {
         expect(onSelectDeadline).toHaveBeenCalled();
     });
 
-    it('calls onSelectModule when module pill clicked', () => {
-        const onSelectModule = vi.fn();
-        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectModule={onSelectModule} />);
-        const pill = screen.getByText('CS3001');
-        fireEvent.click(pill);
-        expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS3001', id: null });
+    it('does not open the deadline card when a pill is clicked', () => {
+        const onSelectDeadline = vi.fn();
+        render(<DeadlinesWidget deadlines={mockDeadlines} onSelectDeadline={onSelectDeadline} />);
+        fireEvent.click(screen.getByText('CS3001'));
+        fireEvent.click(screen.getByText('COURSEWORK'));
+        expect(onSelectDeadline).not.toHaveBeenCalled();
     });
 
     it('shows "Tomorrow" for deadline due tomorrow', () => {
@@ -159,11 +159,9 @@ describe('DeadlinesWidget', () => {
         expect(screen.getByText('Assignment')).toBeTruthy();
     });
 
-    it('calls onSelectModule with module_id when present', () => {
-        const onSelectModule = vi.fn();
-        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'T', start_due_date: nextWeek.toISOString(), module_code: 'CS3001', module_id: 42, deadline_type: 'assessment' }]} onSelectModule={onSelectModule} />);
-        fireEvent.click(screen.getByText('CS3001'));
-        expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS3001', id: 42 });
+    it('keeps the module code pill visible when module_id is present', () => {
+        render(<DeadlinesWidget deadlines={[{ id: 1, assessment_title: 'T', start_due_date: nextWeek.toISOString(), module_code: 'CS3001', module_id: 42, deadline_type: 'assessment' }]} />);
+        expect(screen.getByText('CS3001')).toBeTruthy();
     });
 
     it('calls onSelect when row activated via Enter key', () => {

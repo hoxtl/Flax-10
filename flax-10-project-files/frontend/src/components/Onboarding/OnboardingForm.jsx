@@ -14,13 +14,13 @@ const WARNING_ANIMATION = { initial: { opacity: 0, y: 8, height: 0 }, animate: {
 const STAR_ANIMATION = { rotate: [0, 20, -20, 12, -12, 0], scale: [1, 1.2, 1] };
 const STAR_TRANSITION = { duration: 1.8, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" };
 
-function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptions }) {
+function YearCourseFields({ year, setYear, major, handleMajorChange, courseOptions, onDropdownOpenChange }) {
   return (
     <>
       <label className={styles.label}>Year of Study</label>
-      <AnimatedDropdown value={year} onChange={setYear} placeholder="Select your year" options={YEARS} grouped={false} allowFlipUpward />
+      <AnimatedDropdown value={year} onChange={setYear} placeholder="Select your year" options={YEARS} grouped={false} allowFlipUpward onOpenChange={(open) => onDropdownOpenChange?.("year", open)} />
       <label className={styles.label} style={{ marginTop: "1rem" }}>Course</label>
-      <AnimatedDropdown value={major} onChange={handleMajorChange} placeholder="Select your course" options={courseOptions} grouped searchable allowFlipUpward />
+      <AnimatedDropdown value={major} onChange={handleMajorChange} placeholder="Select your course" options={courseOptions} grouped searchable allowFlipUpward onOpenChange={(open) => onDropdownOpenChange?.("course", open)} />
     </>
   );
 }
@@ -39,16 +39,16 @@ function WarningSection({ year, major, confirmed, setConfirmed }) {
 }
 
 function SubmitButton({ loading, disabled, onClick }) {
-  return <div style={{ marginTop: "1.25rem", display: "flex", justifyContent: "center" }}><PrimaryButton onClick={onClick} disabled={disabled} loading={loading} style={{ width: "100%" }} pill>{loading ? "Setting up your modules..." : "Set up my modules"}</PrimaryButton></div>;
+  return <div className={styles.submitRow}><PrimaryButton onClick={onClick} disabled={disabled} className={styles.submitButton} pill>{loading ? "Setting up your modules..." : "Set up my modules"}</PrimaryButton></div>;
 }
 
-export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions }) {
+export default function OnboardingForm({ year, setYear, major, handleMajorChange, confirmed, setConfirmed, loading, handleSubmit, courseOptions, onDropdownOpenChange }) {
   const isSubmitDisabled = !year || !major || !confirmed || loading;
   return (
     <motion.div key="form" {...FORM_ANIMATION}>
       <FormTitle />
       <FormSubtitle />
-      <YearCourseFields year={year} setYear={setYear} major={major} handleMajorChange={handleMajorChange} courseOptions={courseOptions} />
+      <YearCourseFields year={year} setYear={setYear} major={major} handleMajorChange={handleMajorChange} courseOptions={courseOptions} onDropdownOpenChange={onDropdownOpenChange} />
       <WarningSection year={year} major={major} confirmed={confirmed} setConfirmed={setConfirmed} />
       <SubmitButton loading={loading} disabled={isSubmitDisabled} onClick={handleSubmit} />
     </motion.div>

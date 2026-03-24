@@ -14,6 +14,7 @@ from studyFlax.models.modules.enrollment_model import Enrollment
 from studyFlax.management.commands.seed_support.groups.projects import (
     _build_module_project_specs,
 )
+from studyFlax.views.groupwork.groupwork_limits import MAX_GROUP_PROJECTS_PER_USER
 
 DEMO_USERNAMES = ["janedoe", "johndoe", "charlie"]
 MAX_MEMBERS_PER_PROJECT = 4
@@ -52,7 +53,9 @@ def _add_demo_members(project, owner, demo_users):
 
 
 def seed_new_user_projects(user, now=None):
-    if GroupMembership.objects.filter(user=user).exists():
+    existing_count = GroupMembership.objects.filter(user=user).count()
+    remaining_slots = MAX_GROUP_PROJECTS_PER_USER - existing_count
+    if remaining_slots <= 0:
         return 0
     now = now or timezone.now()
     demo_users = _get_demo_users()
@@ -61,11 +64,13 @@ def seed_new_user_projects(user, now=None):
     if not modules:
         return 0
     count = 0
-    for module in modules:
+    for module in modules[:remaining_slots]:
         specs = _build_module_project_specs(module, now)
         for spec in specs[:1]:
             project, created = _create_project_for_spec(spec, user, now)
             if created and demo_users:
                 _add_demo_members(project, user, demo_users)
                 count += 1
+            if count >= remaining_slots:
+                return count
     return count

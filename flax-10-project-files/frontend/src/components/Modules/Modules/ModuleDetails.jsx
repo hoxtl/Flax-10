@@ -8,6 +8,8 @@ import { formatDuration, formatTime, getDepartment, getCourse } from '../utils/m
 import { DEADLINE_LABELS, formatDeadlineDateTime } from '../utils/deadlineUtils.js';
 import { formatDate } from '../../Calendar/utils/dateUtils.js';
 import { getInitials } from '../../Authentication/utils/userUtils.js';
+import { useAuth } from '../../../context/AuthContext.jsx';
+import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
 import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
@@ -100,17 +102,17 @@ function EmailMetaItem({ email }) {
 }
 
 function HeroTop({ module, department, course, is_enrolled }) {
-    return (
-        <div className={heroStyles.heroTop}>
-            <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
-            <span className={heroStyles.departmentChip}>{department}</span>
-            {course && <span className={heroStyles.courseChip}>{course}</span>}
-            {is_enrolled && <span className={heroStyles.enrolledBadge}>✓ Enrolled</span>}
-        </div>
-    );
+  return (
+    <div className={heroStyles.heroTop}>
+      <EntityLinkChip to="/modules" className={heroStyles.moduleCode}>{module.module_code}</EntityLinkChip>
+      <Badge tone="default" className={heroStyles.departmentChip}>{department}</Badge>
+      {course && <Badge tone="muted" className={heroStyles.courseChip}>{course}</Badge>}
+      {is_enrolled && <span className={heroStyles.enrolledBadge}>✓ Enrolled</span>}
+    </div>
+  );
 }
 
-function HeroSection({ module, department, course, is_enrolled, is_core, onEnroll, onUnenroll, tutorPhoto }) {
+function HeroSection({ module, department, course, is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll, tutorPhoto }) {
     return (
         <section className={heroStyles.hero}>
             <HeroTop module={module} department={department} course={course} is_enrolled={is_enrolled} />
@@ -123,7 +125,7 @@ function HeroSection({ module, department, course, is_enrolled, is_core, onEnrol
                 </div>
                 <div className={heroStyles.heroActions}>
                     {module.created_by_email && <PrimaryButton variant="secondary" pill onClick={() => window.location.href = `mailto:${module.created_by_email}`}>Email tutor</PrimaryButton>}
-                    <EnrollmentAction is_enrolled={is_enrolled} is_core={is_core} onEnroll={onEnroll} onUnenroll={onUnenroll} />
+                    <EnrollmentAction is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} />
                 </div>
             </div>
         </section>
@@ -239,13 +241,15 @@ function MainColumn({ module, sortedDeadlines, nextClass, travelTime }) {
 }
 
 export default function ModuleDetails({ module, is_enrolled, is_core, onBack, onEnroll, onUnenroll }) {
+    const { profile } = useAuth();
     const data = useModuleData(module);
     const travelTime = useModuleTravelTime(module.location);
+    const isModuleOwner = profile?.role === "teacher" && String(profile?.id) === String(module.created_by);
 
     return (
         <div className={styles.container}>
             <div className={styles.backButtonHeader}><BackButton onClick={onBack} label="Back to All Modules" /></div>
-            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} is_core={is_core} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
+            <HeroSection module={module} department={data.department} course={data.course} is_enrolled={is_enrolled} is_core={is_core} isModuleOwner={isModuleOwner} onEnroll={onEnroll} onUnenroll={onUnenroll} tutorPhoto={getModuleTutorPhoto(module)} />
             <section className={styles.layout}><MainColumn module={module} sortedDeadlines={data.sortedDeadlines} nextClass={data.nextClass} travelTime={travelTime} /><SideColumn nextClass={data.nextClass} nextDeadline={data.nextDeadline} timelineProgress={data.timelineProgress} /></section>
         </div>
     );
@@ -283,7 +287,8 @@ function RecurringBadge() {
     );
 }
 
-function EnrollmentAction({ is_enrolled, is_core, onEnroll, onUnenroll }) {
+function EnrollmentAction({ is_enrolled, is_core, isModuleOwner, onEnroll, onUnenroll }) {
+    if (isModuleOwner) return null;
     if (!is_enrolled) {
         return <PrimaryButton variant="primary" pill onClick={onEnroll}>Enrol in module</PrimaryButton>;
     }
@@ -311,7 +316,7 @@ function DeadlineItem({ deadline, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
-                    <span className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</span>
+                    <Badge tone="muted" className={deadlineStyles.deadlinesType}>{DEADLINE_LABELS[deadline.deadline_type]}</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{deadline.title}</span>
                 </div>
                 <div className={deadlineStyles.deadlineMeta}>
@@ -349,7 +354,7 @@ function ReadingRow({ reading, index }) {
             <span className={deadlineStyles.deadlineIndex}>{index + 1}</span>
             <div className={deadlineStyles.deadlineBody}>
                 <div className={deadlineStyles.deadlineTitleRow}>
-                    <span className={deadlineStyles.deadlinesType}>📖 Reading</span>
+                    <Badge tone="muted" className={deadlineStyles.deadlinesType}>Reading</Badge>
                     <span className={deadlineStyles.deadlineTitle}>{cleanTitle}</span>
                 </div>
                 <span className={deadlineStyles.deadlineDate}>

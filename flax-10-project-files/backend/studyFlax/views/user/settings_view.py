@@ -13,9 +13,12 @@ from studyFlax.views.modules.enrollment_logic import enroll_user_in_modules, get
 from studyFlax.management.commands.seed_support.content.tasks import seed_new_user_tasks
 from studyFlax.views.modules.new_user_projects import seed_new_user_projects
 
+DEFAULT_HOMEPAGE_WIDGETS = ["hero", "deadlines", "todayTasks", "bigTimeline"]
 DEFAULT_SETTINGS = {
     "theme": "light",
     "timezone": "Europe/London",
+    "homepage_widgets": DEFAULT_HOMEPAGE_WIDGETS,
+    "homepage_widget_sizes": {},
 }
 
 def get_or_create_user_settings(user, defaults=None):

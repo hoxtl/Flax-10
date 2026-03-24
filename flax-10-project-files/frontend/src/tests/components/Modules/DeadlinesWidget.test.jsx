@@ -52,10 +52,11 @@ describe('DeadlinesWidget (Homepage)', () => {
     expect(onSelect).toHaveBeenCalledWith(deadlines[0]);
   });
 
-  it('calls onSelectModule when module pill clicked', () => {
-    const onSelectModule = vi.fn();
-    renderWidget({ deadlines, onSelectModule });
+  it('does not trigger row selection when a pill is clicked', () => {
+    const onSelect = vi.fn();
+    renderWidget({ deadlines, onSelectDeadline: onSelect });
     fireEvent.click(screen.getByText('CS101'));
-    expect(onSelectModule).toHaveBeenCalledWith({ code: 'CS101', id: 5 });
+    fireEvent.click(screen.getByText('EXAM'));
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

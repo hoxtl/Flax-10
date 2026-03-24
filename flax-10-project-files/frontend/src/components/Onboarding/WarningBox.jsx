@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import FilterCheckbox from "../common/FilterCheckbox/FilterCheckbox";
 import styles from "./OnboardingModal.module.css";
 
 const boxStyle = {
@@ -29,7 +30,7 @@ function WarningText({ major }) {
 function ConfirmCheckbox({ confirmed, onConfirm }) {
   return (
     <label className={styles.confirmLabel}>
-      <input type="checkbox" checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
+      <FilterCheckbox checked={confirmed} onChange={e => onConfirm(e.target.checked)} />
       Yes, this is my course
     </label>
   );
