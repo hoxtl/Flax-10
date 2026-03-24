@@ -169,3 +169,42 @@
     border-radius: 6px;
     color: var(--muted);
 }
+
+:global([data-mode="dark"]) .presetListItem {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+        color-mix(in srgb, var(--surface-card) 80%, var(--color-bg) 20%)
+    );
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%);
+    box-shadow:
+        0 14px 26px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:global([data-mode="dark"]) .presetListItem:hover:not(:disabled) {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 88%, var(--surface-inner) 12%),
+        color-mix(in srgb, var(--surface-card) 74%, var(--color-bg) 26%)
+    );
+}
+
+:global([data-mode="dark"]) .presetListItemActive {
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 26%, var(--primary) 74%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--primary) 56%, var(--surface-card) 44%),
+        color-mix(in srgb, var(--primary) 40%, black 60%)
+    );
+}
+
+:global([data-mode="dark"]) .presetDurationTag {
+    background: color-mix(in srgb, white 7%, var(--surface-inner));
+    color: color-mix(in srgb, var(--text-secondary) 76%, white 24%);
+}
+
+:global([data-mode="dark"]) .presetListItemActive .presetDurationTag {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.88);
+}

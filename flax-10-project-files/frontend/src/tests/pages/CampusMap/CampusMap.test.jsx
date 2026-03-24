@@ -123,12 +123,13 @@ describe("CampusMap", () => {
     });
   });
 
-  it("shows the shared skeleton before the map finishes loading", () => {
+  it("shows the shared skeleton before the map finishes loading", async () => {
+    tflService.getTfLDelays.mockImplementationOnce(() => new Promise(() => {}));
     mockMapInstance.on.mockImplementation(function () {
       return mockMapInstance;
     });
     render(<CampusMap />);
-    expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId("campus-map-skeleton")).toBeInTheDocument());
   });
 
   it("renders StudyFlax Map title and subtitle", async () => {

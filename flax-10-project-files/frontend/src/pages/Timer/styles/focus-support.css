@@ -74,6 +74,28 @@
     border-color: color-mix(in srgb, var(--focus-accent) 42%, transparent) !important;
 }
 
+:global([data-mode="dark"]) .fullFocusInlineBtn {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+        color-mix(in srgb, var(--surface-card) 78%, var(--color-bg) 22%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 24%, var(--border) 76%) !important;
+    color: color-mix(in srgb, var(--text) 92%, white 8%) !important;
+    box-shadow:
+        0 16px 30px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+:global([data-mode="dark"]) .fullFocusInlineBtn:hover:not(:disabled) {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 88%, var(--surface-inner) 12%),
+        color-mix(in srgb, var(--surface-card) 72%, var(--color-bg) 28%)
+    ) !important;
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 34%, var(--border) 66%) !important;
+}
+
 .focusPageSkeletonCanvas {
     width: min(1120px, 100%);
     display: grid;

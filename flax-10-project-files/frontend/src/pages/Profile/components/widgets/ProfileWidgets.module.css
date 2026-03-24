@@ -1,7 +1,7 @@
 /* ── Shared glass card (used across all widgets) ── */
 .glassCard {
   position: relative;
-  background: #ffffff;
+  background: var(--surface-card);
   border: 1px solid var(--surface-glass-card-border);
   border-radius: 16px;
   overflow: hidden;
@@ -10,12 +10,16 @@
 }
 
 [data-mode="dark"] .glassCard {
-  background: var(--color-card);
-  border-color: var(--color-border-base);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%) 0%,
+    color-mix(in srgb, var(--surface-card) 80%, var(--color-bg) 20%) 100%
+  );
+  border-color: color-mix(in srgb, var(--color-highlight) 18%, var(--color-border-base) 82%);
   box-shadow:
-    0 2px 8px rgba(0,0,0,0.3),
-    0 8px 32px rgba(0,0,0,0.2),
-    inset 0 1px 0 color-mix(in srgb, var(--color-primary-strong) 8%, transparent);
+    0 16px 34px rgba(0,0,0,0.3),
+    0 26px 58px rgba(0,0,0,0.22),
+    inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
 }
 
 .glassCard:hover {
@@ -25,23 +29,23 @@
 
 [data-mode="dark"] .glassCard:hover {
   box-shadow:
-    0 4px 16px rgba(0,0,0,0.4),
-    0 16px 48px rgba(0,0,0,0.3),
-    inset 0 1px 0 color-mix(in srgb, var(--color-primary-strong) 12%, transparent);
+    0 18px 40px rgba(0,0,0,0.34),
+    0 30px 62px rgba(0,0,0,0.26),
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
 }
 
 .glassCard::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+  background: linear-gradient(135deg, color-mix(in srgb, white 18%, transparent) 0%, transparent 60%);
   pointer-events: none;
   border-radius: inherit;
 }
 
 [data-mode="dark"] .glassCard::before {
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--color-primary-strong) 10%, transparent) 0%,
+    color-mix(in srgb, var(--color-highlight) 8%, transparent) 0%,
     transparent 60%);
 }
 
@@ -50,11 +54,7 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #212121;
-}
-
-[data-mode="dark"] .cardLabel {
-  color: var(--text);
+  color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
 }
 
 /* ── Widget Layout ── */
@@ -72,7 +72,7 @@
 }
 
 [data-mode="dark"] .widgetHeader {
-  border-bottom-color: var(--color-border-base);
+  border-bottom-color: color-mix(in srgb, var(--color-highlight) 14%, var(--color-border-base) 86%);
 }
 
 .widgetTitleArea {
@@ -120,8 +120,12 @@
 }
 
 [data-mode="dark"] .personaLeft {
-  border-right-color: var(--color-border-base);
-  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-right-color: color-mix(in srgb, var(--color-highlight) 14%, var(--color-border-base) 86%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-inner) 88%, var(--color-primary) 12%) 0%,
+    color-mix(in srgb, var(--surface-card) 92%, var(--color-bg) 8%) 100%
+  );
 }
 
 .personaEmoji {
@@ -204,12 +208,8 @@
 }
 
 .dnaLegendLabelDark {
-  color: #212121;
-  font-weight: 600;
-}
-
-[data-mode="dark"] .dnaLegendLabelDark {
   color: var(--text);
+  font-weight: 600;
 }
 
 .dnaLegendPct {
@@ -256,6 +256,12 @@
   border-radius: 100px;
   padding: 3px 8px 3px 10px;
   pointer-events: none;
+}
+
+[data-mode="dark"] .heatmapLinkBtn {
+  background: color-mix(in srgb, var(--color-highlight) 18%, var(--surface-inner));
+  border-color: color-mix(in srgb, var(--color-highlight) 32%, var(--color-border-base));
+  color: color-mix(in srgb, white 84%, var(--color-highlight) 16%);
 }
 
 .miniHeatmap {

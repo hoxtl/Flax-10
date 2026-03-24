@@ -23,7 +23,7 @@ function buildHeaderVars(user, profileData) {
   const isTeacher = role === "teacher" || fullName.startsWith("Dr.");
   const year = !isTeacher && role === "student" ? profileData?.year || user?.year || "" : "";
   const major = profileData?.major || user?.major || (isTeacher ? "Teaching staff" : "");
-  return { isTeacher, roleLabel: isTeacher ? "Professor" : role === "pending_teacher" ? "Teacher applicant" : "Student", description: buildHeaderDescription(isTeacher, major, year) };
+  return { isTeacher, roleLabel: isTeacher ? "Professor" : "Student", description: buildHeaderDescription(isTeacher, major, year) };
 }
 
 function buildShareUser(user, handlers) {

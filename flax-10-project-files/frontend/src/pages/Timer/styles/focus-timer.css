@@ -208,6 +208,40 @@
     cursor: not-allowed;
 }
 
+:global([data-mode="dark"]) .rightRailTabBtn {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+        color-mix(in srgb, var(--surface-card) 80%, var(--color-bg) 20%)
+    );
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%);
+    color: color-mix(in srgb, var(--text-secondary) 78%, white 22%);
+}
+
+:global([data-mode="dark"]) .rightRailTabBtnActive {
+    color: color-mix(in srgb, var(--text) 92%, white 8%);
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 30%, var(--border) 70%);
+    background: color-mix(in srgb, var(--color-highlight, #d0ab73) 12%, var(--surface-card));
+}
+
+:global([data-mode="dark"]) .quickAdjustBtn {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 92%, var(--surface-inner) 8%),
+        color-mix(in srgb, var(--surface-card) 80%, var(--color-bg) 20%)
+    );
+    border-color: color-mix(in srgb, var(--color-highlight, #d0ab73) 18%, var(--border) 82%);
+    color: color-mix(in srgb, var(--text) 88%, white 12%);
+}
+
+:global([data-mode="dark"]) .quickAdjustBtn:hover:not(:disabled) {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface-card) 88%, var(--surface-inner) 12%),
+        color-mix(in srgb, var(--surface-card) 74%, var(--color-bg) 26%)
+    );
+}
+
 .timerCirclePrimaryBtn:hover {
     background: color-mix(in srgb, var(--focus-accent) 90%, black);
     transform: scale(1.04);

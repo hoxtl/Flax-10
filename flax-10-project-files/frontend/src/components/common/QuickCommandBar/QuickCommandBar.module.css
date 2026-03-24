@@ -2,24 +2,35 @@
   position: fixed;
   inset: 0;
   z-index: 1200;
-  background: color-mix(in srgb, var(--surface-overlay) 82%, transparent);
+  background: color-mix(in srgb, var(--surface-overlay) 56%, transparent);
   display: grid;
   place-items: start center;
-  padding-top: max(14vh, 88px);
+  padding-top: max(11vh, 72px);
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
 }
 
 .shell {
   width: min(640px, 92vw);
-  border-radius: var(--radius-xl);
-  border: 1px solid color-mix(in srgb, var(--feature-accent, var(--primary)) 28%, var(--border));
-  background: var(--surface-card);
-  box-shadow: var(--shadow-xl);
+  border-radius: calc(var(--radius-xl) + 2px);
+  border: 1px solid color-mix(in srgb, var(--feature-accent, var(--primary)) 18%, var(--border) 82%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-card) 92%, var(--surface-raised, var(--surface-card)) 8%),
+    color-mix(in srgb, var(--surface-card) 96%, var(--surface-inner, var(--surface-card)) 4%)
+  );
+  box-shadow:
+    0 28px 60px color-mix(in srgb, var(--surface-overlay) 30%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--border) 76%, transparent);
   overflow: hidden;
+  backdrop-filter: blur(18px) saturate(1.02);
+  -webkit-backdrop-filter: blur(18px) saturate(1.02);
 }
 
 .header {
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-raised, var(--surface-card)) 76%, transparent);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,35 +48,51 @@
 .closeBtn {
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: var(--surface-card);
-  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-raised, var(--surface-card)) 92%, transparent);
+  color: var(--text-secondary);
   padding: 4px 10px;
   font-size: var(--text-xs);
   cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.closeBtn:hover {
+  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 10%, var(--surface-card));
+  border-color: color-mix(in srgb, var(--feature-accent, var(--primary)) 24%, var(--border));
+  color: var(--text);
 }
 
 .input {
   width: 100%;
   border: none;
   border-bottom: 1px solid var(--border);
-  background: var(--surface-card);
+  background: color-mix(in srgb, var(--surface-raised, var(--surface-card)) 88%, transparent);
   color: var(--text);
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-md);
   outline: none;
 }
 
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.input:focus {
+  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 7%, var(--surface-card));
+}
+
 .list {
   max-height: 320px;
   overflow: auto;
   padding: var(--space-2);
+  background: color-mix(in srgb, var(--surface-card) 96%, transparent);
 }
 
 .item {
   width: 100%;
-  border: 1px solid transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   border-radius: var(--radius-md);
-  background: transparent;
+  background: color-mix(in srgb, var(--surface-card) 76%, transparent);
   color: var(--text);
   display: flex;
   align-items: center;
@@ -73,13 +100,15 @@
   text-align: left;
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+  margin-bottom: 6px;
 }
 
 .item:hover {
-  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 9%, var(--surface-card));
+  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 12%, var(--surface-card));
   border-color: color-mix(in srgb, var(--feature-accent, var(--primary)) 28%, var(--border));
-  transform: translateX(2px);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--feature-accent, var(--primary)) 10%, transparent);
 }
 
 .itemIcon {
@@ -90,7 +119,8 @@
   align-items: center;
   justify-content: center;
   color: var(--feature-accent, var(--primary));
-  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 12%, transparent);
+  background: color-mix(in srgb, var(--feature-accent, var(--primary)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--feature-accent, var(--primary)) 18%, transparent);
 }
 
 .itemText {
@@ -108,5 +138,4 @@
   font-size: var(--text-xs);
   color: var(--muted);
 }
-
 
