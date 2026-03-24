@@ -3,7 +3,7 @@
   font-family: var(--font-body), "Inter", system-ui, sans-serif;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #2d2d2d;
+  color: var(--home-timeline-card-title);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -102,11 +102,11 @@
   opacity: 0.7;
 }
 .planTimelineCardOverlap {
-  border-color: #e5e4e2;
+  border-color: var(--home-timeline-card-border);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 .planTimelineCardConflict {
-  border: 1px solid #e5e4e2;
+  border: 1px solid var(--home-timeline-card-border);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   width: 100%;
   min-width: 0;

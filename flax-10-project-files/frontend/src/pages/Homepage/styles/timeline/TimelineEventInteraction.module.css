@@ -5,7 +5,7 @@
   .planTimelineConflictPopoverTitle {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #2D2D2D;
+    color: var(--home-timeline-card-title);
     margin: 0 0 2px;
   }
   .planTimelineConflictPopoverBtn {

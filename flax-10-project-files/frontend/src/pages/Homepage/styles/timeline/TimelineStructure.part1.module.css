@@ -20,7 +20,7 @@
   font-family: var(--font-body), "Lexend", system-ui, sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: #6d6157;
+  color: var(--home-timeline-link-color);
   letter-spacing: 0.01em;
   text-decoration: none;
   white-space: nowrap;
@@ -33,7 +33,7 @@
 }
 
 .timelineHeaderActionLink:hover {
-  color: #3e3328;
+  color: var(--home-timeline-link-hover);
 }
 
 @media (max-width: 580px) {
@@ -99,13 +99,13 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #a89279;
+  color: var(--home-timeline-muted);
   text-decoration: none;
   margin-top: 2px;
   transition: color 0.15s ease;
 }
 .timelineHeaderSub:hover {
-  color: #8b7355;
+  color: var(--home-timeline-link-hover);
 }
 
 .timelineSub {

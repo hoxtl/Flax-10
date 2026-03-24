@@ -117,6 +117,10 @@
     --home-timeline-panel-bg: color-mix(in srgb, var(--surface-card) 94%, transparent);
     --home-timeline-panel-border: color-mix(in srgb, var(--widget-border) 68%, transparent);
     --home-timeline-panel-strong: color-mix(in srgb, var(--surface-card) 98%, transparent);
+    --home-timeline-card-title: var(--text);
+    --home-timeline-card-border: color-mix(in srgb, var(--widget-border) 72%, transparent);
+    --home-timeline-link-color: var(--text-secondary);
+    --home-timeline-link-hover: var(--text);
     --home-task-checkbox-border: color-mix(in srgb, var(--widget-border) 86%, white 14%);
     --home-task-checkbox-bg: color-mix(in srgb, var(--surface-raised, var(--surface-card)) 90%, transparent);
     --home-task-checkbox-shadow: inset 0 1px 0 color-mix(in srgb, white 70%, transparent);
