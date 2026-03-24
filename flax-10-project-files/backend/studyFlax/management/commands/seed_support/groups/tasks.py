@@ -1,5 +1,5 @@
 """
-Task seeding helpers for group projects.
+Seeds group project tasks and assignments.
 """
 
 import random
@@ -35,22 +35,42 @@ def _build_task_due_date(due, task_index, now):
     lead_days = max(0, min(task_index + 1, max((due.date() - now.date()).days, 0)))
     return due - timedelta(days=lead_days)
 
+def _completed_task_indexes(status_pattern):
+    """Return the indexes for completed tasks."""
+
+    return [index for index, status in enumerate(status_pattern) if status == "done"]
+
+
+def _single_member_assignments(members, completed_indexes):
+    """Assign the same member list to each completed task."""
+
+    return {index: list(members) for index in completed_indexes}
+
+
+def _completed_pick_count(members, rng):
+    """Return the number of members to assign to a completed task."""
+
+    return rng.randint(1, min(3, len(members)))
+
+
+def _multi_member_assignments(members, completed_indexes, rng):
+    """Assign varied members to completed tasks."""
+
+    assignments = {}
+    for task_index in completed_indexes:
+        assignments[task_index] = rng.sample(members, _completed_pick_count(members, rng))
+    return assignments
+
+
 def _build_completed_task_assignments(members, status_pattern, rng):
     """Assign members to completed tasks with varied counts so contributions differ per person."""
-    completed_indexes = [index for index, status in enumerate(status_pattern) if status == "done"]
+
+    completed_indexes = _completed_task_indexes(status_pattern)
     if not completed_indexes:
         return {}
-    assignments = {index: [] for index in completed_indexes}
     if len(members) <= 1:
-        for idx in completed_indexes:
-            assignments[idx] = list(members)
-        return assignments
-    # Randomly assign 1–3 members per completed task (not a uniform round-robin) so
-    # each member ends up with a different share of completed work.
-    for task_index in completed_indexes:
-        pick_count = rng.randint(1, min(3, len(members)))
-        assignments[task_index] = rng.sample(members, pick_count)
-    return assignments
+        return _single_member_assignments(members, completed_indexes)
+    return _multi_member_assignments(members, completed_indexes, rng)
 
 def _get_done_assignees(task_index, status, completed_assignments):
     if status != "done":

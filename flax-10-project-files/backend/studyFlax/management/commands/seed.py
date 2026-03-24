@@ -1,14 +1,5 @@
 """
-Django management command for seeding the database.
-
-Run with::
-
-    python manage.py seed
-
-Creates fixture users, random users, categories, tags, recurrence rules,
-calendar events, modules, deadlines, enrolments, study sessions and theme
-sessions.  All operations are idempotent — running the command on an
-already-seeded database will not produce duplicates.
+Seeds development data for the StudyFlax backend.
 """
 
 import random
@@ -35,6 +26,11 @@ from studyFlax.fixtures.data_fixtures import (
 from .seed_support.users.users import (
     FIXTURE_USERS, ROLE_LABELS,
     create_admin_user, create_fixture_users, create_random_users,
+)
+from .seed_support.users.calendar_shares import (
+    build_calendar_share_pairs,
+    create_calendar_shares,
+    seed_shares_with_fixtures,
 )
 from .seed_support.events.events import create_events_for_users
 from .seed_support.content.modules import create_modules, create_deadlines, create_enrollments
@@ -104,86 +100,6 @@ def _is_already_seeded():
     return len(existing) >= 2
 
 
-def _initial_share_pairs(users, rng):
-    """Build initial round-robin share pairs."""
-
-    shuffled = users[:]
-    rng.shuffle(shuffled)
-    return {(owner.id, shuffled[(i + 1) % len(shuffled)].id) for i, owner in enumerate(shuffled)}
-
-
-def _find_new_pairs(owner_id, candidates, planned_pairs, limit):
-    """Find new pairs that aren't already planned."""
-
-    new_pairs = [(owner_id, t.id) for t in candidates if (owner_id, t.id) not in planned_pairs]
-    return new_pairs[:limit]
-
-
-def _add_extra_pairs_for_owner(owner, users, rng, planned_pairs):
-    """Add extra random share pairs for one owner."""
-
-    candidates = [t for t in users if t.id != owner.id]
-    rng.shuffle(candidates)
-    target_count = rng.randint(0, min(3, len(candidates) - 1))
-    new_pairs = _find_new_pairs(owner.id, candidates, planned_pairs, target_count)
-    planned_pairs.update(new_pairs)
-
-
-def _build_calendar_share_pairs(users):
-    """Build all calendar share pairs for users."""
-
-    rng = random.Random("studyflax-calendar-shares")
-    planned_pairs = _initial_share_pairs(users, rng)
-    for owner in users:
-        _add_extra_pairs_for_owner(owner, users, rng, planned_pairs)
-    return planned_pairs
-
-
-def _create_share_if_valid(owner, target):
-    """Create share between users if both exist. Returns 1 if created, 0 otherwise."""
-
-    if not (owner and target):
-        return 0
-    _, was_created = CalendarShare.objects.get_or_create(owner=owner, shared_with=target)
-    return int(was_created)
-
-
-def _create_calendar_shares(users, planned_pairs):
-    """Create CalendarShare objects from pairs."""
-
-    user_by_id = {u.id: u for u in users}
-    pairs_with_users = [(user_by_id.get(oid), user_by_id.get(tid)) for oid, tid in sorted(planned_pairs)]
-    return sum(_create_share_if_valid(owner, target) for owner, target in pairs_with_users)
-
-
-def _seed_inbound_for_fixture(target, all_users):
-    rng = random.Random(f"studyflax-{target.username}-shares-v2")
-    potential = [u for u in all_users if u.username != target.username]
-    shuffled = potential[:]
-    rng.shuffle(shuffled)
-    non_sharers = {u.username for u in shuffled[:5]}
-    sharers = [u for u in potential if u.username not in non_sharers]
-    for sharer in sharers:
-        CalendarShare.objects.get_or_create(owner=sharer, shared_with=target)
-
-
-def _seed_outbound_for_fixture(owner, all_users):
-    rng = random.Random(f"studyflax-{owner.username}-outbound-v1")
-    potential = [u for u in all_users if u.username != owner.username]
-    shuffled = potential[:]
-    rng.shuffle(shuffled)
-    for viewer in shuffled[:len(shuffled) // 2]:
-        CalendarShare.objects.get_or_create(owner=owner, shared_with=viewer)
-
-
-def _seed_viewer_shares_for_user(user, all_users):
-    rng = random.Random(f"studyflax-{user.username}-viewers-v1")
-    pool = [u for u in all_users if u.username != user.username]
-    rng.shuffle(pool)
-    for viewer in pool[:5]:
-        CalendarShare.objects.get_or_create(owner=user, shared_with=viewer)
-
-
 class Command(BaseCommand):
     """Seeds the database with a structured, realistic dataset."""
 
@@ -250,24 +166,36 @@ class Command(BaseCommand):
         self._create_categories()
         self._create_tags()
 
-    def _seed_content(self):
-        self.stdout.write("")
-        self.stdout.write("  Events & Content")
-        create_events_for_users(self.users, self.tags, self.rules, self.stdout)
-        create_modules(self.stdout)
-        self.modules = list(Module.objects.all())
-        create_deadlines(self.modules, self.stdout)
-        create_enrollments(self.modules, self.tags, self.stdout)
+    def _print_module_counts(self):
         self.stdout.write(
             f"  \u2713  {'Modules':<14} {Module.objects.count():,}"
             f"  \u00b7  Deadlines {Deadline.objects.count():,}"
             f"  \u00b7  Enrolments {Enrollment.objects.count():,}"
         )
+
+    def _seed_events_and_modules(self):
+        create_events_for_users(self.users, self.tags, self.rules, self.stdout)
+        create_modules(self.stdout)
+        self.modules = list(Module.objects.all())
+        create_deadlines(self.modules, self.stdout)
+        create_enrollments(self.modules, self.tags, self.stdout)
+        self._print_module_counts()
+
+    def _seed_tasks_sessions_and_readings(self):
         create_tasks(self.users, self.stdout)
         create_study_sessions(self.stdout)
         students = list(User.objects.filter(role='student'))
         create_readings(self.modules, students, self.stdout)
         seed_attendance(self.stdout)
+
+    def _seed_content_sections(self):
+        self._seed_events_and_modules()
+        self._seed_tasks_sessions_and_readings()
+
+    def _seed_content(self):
+        self.stdout.write("")
+        self.stdout.write("  Events & Content")
+        self._seed_content_sections()
         self.stdout.write("")
         self.stdout.write("  Societies & Groups")
         self._seed_societies_and_groups()
@@ -299,24 +227,10 @@ class Command(BaseCommand):
         if len(users) < 2:
             return
         non_fixture = [u for u in users if u.username not in fixture_names]
-        planned_pairs = _build_calendar_share_pairs(non_fixture)
-        _create_calendar_shares(non_fixture, planned_pairs)
-        self._seed_shares_with_fixtures(users, fixture_names)
+        planned_pairs = build_calendar_share_pairs(non_fixture)
+        create_calendar_shares(non_fixture, planned_pairs)
+        seed_shares_with_fixtures(users, fixture_names)
         self.stdout.write(f"  \u2713  {'Shares':<14} {CalendarShare.objects.count():,}")
-
-    def _seed_shares_with_fixtures(self, all_users, fixture_names):
-        """Everyone except 5 random users shares their calendar with each fixture user.
-        Also, each fixture user shares their calendar with ~half the other users.
-        And every non-fixture user gets ~5 random viewers of their calendar."""
-
-        fixture_users = {u.username: u for u in all_users if u.username in fixture_names}
-        non_fixture = [u for u in all_users if u.username not in fixture_names]
-        for target in fixture_users.values():
-            _seed_inbound_for_fixture(target, all_users)
-        for owner in fixture_users.values():
-            _seed_outbound_for_fixture(owner, all_users)
-        for user in non_fixture:
-            _seed_viewer_shares_for_user(user, all_users)
 
     def _create_recurrence_rules(self):
         for freq, interval in recurrence_fixtures:

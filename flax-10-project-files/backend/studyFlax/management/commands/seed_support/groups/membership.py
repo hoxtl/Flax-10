@@ -298,6 +298,7 @@ def _fill_project_to_target(project, target, students, module_students, membersh
 
 def ensure_member_count_spread(projects, students, module_students, membership_counts, rng):
     """Guarantee one project at each member count from MIN to MAX, random counts for the rest."""
+
     if not projects:
         return
     member_sets = _project_member_sets(projects)
