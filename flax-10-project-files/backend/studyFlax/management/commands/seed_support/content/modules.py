@@ -3,9 +3,10 @@ Orchestrates creation of modules, enrolments and deadlines.
 """
 
 from collections import defaultdict
-from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.db import transaction
+from django.utils import timezone
 
 from studyFlax.models import (
     Module, Enrollment, Deadline, RecurrenceRule, UserSettings,
@@ -21,17 +22,9 @@ from ..helpers import (
     build_settings_for_new_users,
     build_users_list,
 )
-from django.db import transaction
-from django.utils import timezone
-
 from studyFlax.models import CalendarEvent
-from ..events.event_helpers import (
-    build_module_event, get_user_modules, build_deadlines_for_module,
-    build_deadline_event,
-)
-from ..events.session_events import (
-    build_module_sessions, build_session_event, session_tag,
-)
+from ..events.event_helpers import build_deadlines_for_module, build_module_event
+from .module_event_builders import collect_all_enrollments_and_events
 
 User = get_user_model()
 
@@ -39,10 +32,6 @@ FIXED_TEACHER_DEPARTMENTS = {
     "amiller": {"Arts & Humanities"},
 }
 MAX_MODULES_PER_TEACHER = 5
-MAX_FIXED_EVENT_OVERLAPS = 2
-FIXED_EVENT_DAY_START_HOUR = 8
-FIXED_EVENT_DAY_END_HOUR = 20
-FIXED_EVENT_SLOT_STEP_MINUTES = 30
 
 def _register_course_prefixes(mapping, course, prefixes):
     for prefix in prefixes:
@@ -295,210 +284,6 @@ def create_deadlines(modules, stdout):
         deadlines_to_create.extend(build_deadlines_for_module(module))
     Deadline.objects.bulk_create(deadlines_to_create, ignore_conflicts=True)
 
-def _should_enroll(user, module):
-    return not Enrollment.objects.filter(student=user, module=module).exists()
-
-def _enroll_if_needed(user, module, enrollments):
-    if _should_enroll(user, module):
-        enrollments.append(Enrollment(student=user, module=module))
-
-def _deadline_tag(deadline, deadline_tag, exam_tag):
-    """Return Exam tag for exams, Deadline tag for other types."""
-
-    return exam_tag if deadline.deadline_type == 'exam' else deadline_tag
-
-
-def _build_user_session_events(user, module, tags, now):
-    """Build unsaved session events for a user's module."""
-
-    lecture_tag, _, _, schedule_tag = tags
-    events = []
-    for session in build_module_sessions(module, now):
-        tag = session_tag(session, lecture_tag, schedule_tag)
-        events.append(build_session_event(user, session, tag))
-    return events
-
-
-def _build_user_deadline_events(user, module, tags, deadlines_by_module):
-    """Build unsaved deadline events for a user's module."""
-
-    _, deadline_tag, exam_tag, _ = tags
-    events = []
-    for deadline in deadlines_by_module.get(module.id, []):
-        tag = _deadline_tag(deadline, deadline_tag, exam_tag)
-        events.append(build_deadline_event(user, deadline, tag))
-    return events
-
-
-def _is_seeded_timetable_event(event):
-    return (getattr(event, 'source', '') or '').lower() == 'timetable'
-
-
-def _is_fixed_seed_event(event):
-    source = (getattr(event, 'source', '') or '').lower()
-    return source == 'timetable' or source.startswith('module_') or source == 'society'
-
-
-def _event_day(event):
-    return event.start_time.date()
-
-
-def _event_duration(event):
-    duration = event.end_time - event.start_time
-    return max(duration, timedelta(minutes=30))
-
-
-def _event_sort_key(event):
-    return (event.start_time, -_event_duration(event).total_seconds(), str(event.title or ''))
-
-
-def _event_overlap(event, start_time, end_time):
-    return event.start_time < end_time and event.end_time > start_time
-
-
-def _fits_fixed_overlap_cap(start_time, end_time, existing_events):
-    points = [(start_time, 1), (end_time, -1)]
-    for event in existing_events:
-        if not _event_overlap(event, start_time, end_time):
-            continue
-        points.append((event.start_time, 1))
-        points.append((event.end_time, -1))
-    active = 0
-    for _, delta in sorted(points, key=lambda item: (item[0], 0 if item[1] == -1 else 1)):
-        active += delta
-        if active > MAX_FIXED_EVENT_OVERLAPS:
-            return False
-    return True
-
-
-def _candidate_fixed_slots(event, duration):
-    day_start = event.start_time.replace(
-        hour=FIXED_EVENT_DAY_START_HOUR,
-        minute=0,
-        second=0,
-        microsecond=0,
-    )
-    day_end = event.start_time.replace(
-        hour=FIXED_EVENT_DAY_END_HOUR,
-        minute=0,
-        second=0,
-        microsecond=0,
-    )
-    starts = []
-    cursor = day_start
-    while cursor + duration <= day_end:
-        starts.append(cursor)
-        cursor += timedelta(minutes=FIXED_EVENT_SLOT_STEP_MINUTES)
-    starts.sort(
-        key=lambda candidate: (
-            abs((candidate - event.start_time).total_seconds()),
-            candidate < event.start_time,
-            candidate,
-        )
-    )
-    return starts
-
-
-def _update_timetable_external_id(event, start_time):
-    external_id = getattr(event, 'external_id', None)
-    if not external_id:
-        return
-    prefix, separator, _ = str(external_id).rpartition('-')
-    if prefix and separator:
-        event.external_id = f"{prefix}-{start_time.strftime('%Y%m%dT%H%M')}"
-
-
-def _prefetch_existing_calendar_events(users):
-    """Fetch already-seeded events grouped by user for overlap-aware module scheduling."""
-
-    existing = (
-        CalendarEvent.objects.filter(user__in=users)
-        .only('user_id', 'start_time', 'end_time', 'source', 'external_id', 'title')
-    )
-    grouped = defaultdict(list)
-    for event in existing:
-        grouped[event.user_id].append(event)
-    return grouped
-
-
-def _rebalance_seeded_fixed_events(events, baseline_events=None):
-    fixed_by_day = defaultdict(list)
-    movable_sessions_by_day = defaultdict(list)
-    baseline_by_day = defaultdict(list)
-    for event in baseline_events or []:
-        baseline_by_day[_event_day(event)].append(event)
-    for event in events:
-        if _is_seeded_timetable_event(event):
-            movable_sessions_by_day[_event_day(event)].append(event)
-            continue
-        if _is_fixed_seed_event(event):
-            fixed_by_day[_event_day(event)].append(event)
-    for day, day_sessions in movable_sessions_by_day.items():
-        placed = sorted(
-            baseline_by_day.get(day, []) + fixed_by_day.get(day, []),
-            key=_event_sort_key,
-        )
-        for session in sorted(day_sessions, key=_event_sort_key):
-            duration = _event_duration(session)
-            start_time = session.start_time
-            end_time = session.end_time
-            if not _fits_fixed_overlap_cap(start_time, end_time, placed):
-                for candidate in _candidate_fixed_slots(session, duration):
-                    candidate_end = candidate + duration
-                    if not _fits_fixed_overlap_cap(candidate, candidate_end, placed):
-                        continue
-                    start_time = candidate
-                    end_time = candidate_end
-                    break
-            session.start_time = start_time
-            session.end_time = end_time
-            _update_timetable_external_id(session, start_time)
-            placed.append(session)
-    return events
-
-
-def _process_single_module(user, module, tags, now, deadlines_by_module):
-    """Build enrollment and events for a single module."""
-
-    enrollment = Enrollment(student=user, module=module) if _should_enroll(user, module) else None
-    session_events = _build_user_session_events(user, module, tags, now)
-    deadline_events = _build_user_deadline_events(user, module, tags, deadlines_by_module)
-    return enrollment, session_events + deadline_events
-
-
-def _collect_module_result(enrollment, module_events, enrollments, events):
-    """Append enrollment (if any) and events to the accumulators."""
-
-    if enrollment:
-        enrollments.append(enrollment)
-    events.extend(module_events)
-
-
-def _build_user_module_events(user, modules, tags, now, deadlines_by_module, baseline_events=None):
-    """Build all events for a user's enrolled modules."""
-
-    core, extras = get_user_modules(user, modules)
-    enrollments, events = [], []
-    for module in core + extras:
-        enrollment, module_events = _process_single_module(user, module, tags, now, deadlines_by_module)
-        _collect_module_result(enrollment, module_events, enrollments, events)
-    return enrollments, _rebalance_seeded_fixed_events(events, baseline_events=baseline_events)
-
-def _find_user_tag(user, tags, name):
-    """Find a tag by name for a user, falling back to default tags."""
-
-    return next((t for t in tags if t.name == name and (t.user_id == user.id or t.is_default)), None)
-
-def _get_user_module_tags(user, tags):
-    """Return (lecture_tag, deadline_tag, exam_tag, schedule_tag) for a user."""
-
-    return (
-        _find_user_tag(user, tags, 'Lecture'),
-        _find_user_tag(user, tags, 'Deadline'),
-        _find_user_tag(user, tags, 'Exam'),
-        _find_user_tag(user, tags, 'Schedule'),
-    )
-
 def _prefetch_deadlines_by_module(modules):
     """Prefetch all deadlines grouped by module ID."""
 
@@ -508,28 +293,6 @@ def _prefetch_deadlines_by_module(modules):
     for d in deadlines:
         by_module[d.module_id].append(d)
     return by_module
-
-
-def _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module):
-    """Collect enrollments and events for all users."""
-
-    all_enrollments, all_events = [], []
-    existing_events_by_user = _prefetch_existing_calendar_events(users)
-    for user in users:
-        user_tags = _get_user_module_tags(user, tags)
-        enrollments, events = _build_user_module_events(
-            user,
-            modules,
-            user_tags,
-            now,
-            deadlines_by_module,
-            baseline_events=existing_events_by_user.get(user.id, []),
-        )
-        all_enrollments.extend(enrollments)
-        all_events.extend(events)
-    return all_enrollments, all_events
-
-
 @transaction.atomic
 def create_enrollments(modules, tags, stdout):
     """Create enrollments and all module events for all users."""
