@@ -4,6 +4,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 
 import AttendanceCharts from "../../../../pages/Profile/components/widgets/attendance/AttendanceCharts";
 import {
+  AttendanceWidget,
+  CompactAttendanceTile,
+  CompactStreakTile,
+} from "../../../../pages/Profile/components/widgets/AttendanceWidgets";
+import {
   AttendanceWarningBadge,
   CompactOverallDonut,
   CompactByTypeDonut,
@@ -116,5 +121,44 @@ describe("Profile attendance widgets", () => {
     unmount();
     const { container } = render(<CompactByTypeDonut byTypeData={[]} onSegmentClick={vi.fn()} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders compact streak values and attendance widget branches", () => {
+    const { rerender } = render(<CompactStreakTile streaks={{ current: 4, longest: 12 }} />);
+    expect(screen.getByText("4")).toBeInTheDocument();
+    expect(screen.getByText("12")).toBeInTheDocument();
+
+    rerender(<CompactStreakTile streaks={null} />);
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+  });
+
+  it("covers attendance widget loading, hidden error state, and compact warning state", () => {
+    useAttendanceStatsMock.mockReturnValue({
+      stats: null,
+      loading: true,
+      error: null,
+      refetch: vi.fn(),
+    });
+    useAttendanceRecordsMock.mockReturnValue({ records: [], refetch: vi.fn() });
+    const { rerender, container } = render(<AttendanceWidget />);
+    expect(screen.getByText("Loading metrics...")).toBeInTheDocument();
+
+    useAttendanceStatsMock.mockReturnValue({
+      stats: null,
+      loading: false,
+      error: new Error("nope"),
+      refetch: vi.fn(),
+    });
+    rerender(<AttendanceWidget />);
+    expect(container).toBeEmptyDOMElement();
+
+    useAttendanceStatsMock.mockReturnValue({
+      stats: { overall: { attended: 2, missed: 3 }, by_type: {} },
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    rerender(<CompactAttendanceTile onNavigate={vi.fn()} />);
+    expect(screen.getByText(/Low Attendance/)).toBeInTheDocument();
   });
 });

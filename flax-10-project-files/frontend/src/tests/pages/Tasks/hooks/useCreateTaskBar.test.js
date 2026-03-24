@@ -43,4 +43,39 @@ describe("useCreateTaskBar", () => {
     act(() => result.current.handleInputKeyDown({ key: "Escape", preventDefault: vi.fn(), currentTarget: { blur } }));
     expect(blur).toHaveBeenCalled();
   });
+
+  it("falls back when module or sleep settings requests fail", async () => {
+    getModules.mockRejectedValueOnce(new Error("modules down"));
+    getEnrollments.mockRejectedValueOnce(new Error("enrollments down"));
+    getUserSettings.mockRejectedValueOnce(new Error("settings down"));
+
+    const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 11, name: "Reading List - History" }], onAddTask: vi.fn() }));
+
+    await waitFor(() => expect(result.current.moduleOptions).toEqual([{ value: "", label: "None" }]));
+    expect(result.current.sleepSettings).toEqual({ sleep_time: "23:00", wake_time: "07:00" });
+  });
+
+  it("syncs default list ids, supports reading lists, and ignores invalid submits", async () => {
+    const onAddTask = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ defaultListId }) => useCreateTaskBar({
+        lists: [{ id: 2, name: "Reading List - History" }, { id: 9, name: "Inbox" }],
+        defaultListId,
+        onAddTask,
+      }),
+      { initialProps: { defaultListId: 9 } },
+    );
+
+    await waitFor(() => expect(result.current.listOptions).toHaveLength(2));
+    expect(result.current.taskListId).toBe(9);
+
+    act(() => result.current.setTaskListId("2"));
+    expect(result.current.isReadingList).toBe(true);
+
+    await act(async () => result.current.handleSubmit({ preventDefault: vi.fn() }));
+    expect(runQuickAdd).not.toHaveBeenCalled();
+
+    rerender({ defaultListId: 2 });
+    expect(result.current.taskListId).toBe(2);
+  });
 });

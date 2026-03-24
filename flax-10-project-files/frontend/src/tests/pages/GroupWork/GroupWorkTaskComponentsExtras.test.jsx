@@ -416,3 +416,23 @@ describe("GroupWork task timeline hooks", () => {
     expect(result.current.dayMs).toBe(86400000);
   });
 });
+
+describe("TaskListView", () => {
+  it("renders task list headers and rows for non-empty task list views", () => {
+    render(
+      <TaskListView
+        tasks={[{ id: 1, title: "Draft brief", priority: "high", due_date: "2026-03-30T00:00:00.000Z" }]}
+        members={[{ id: 1, name: "Alex" }]}
+        onToggle={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Task")).toBeInTheDocument();
+    expect(screen.getByText("Priority")).toBeInTheDocument();
+    expect(screen.getByText("Due date")).toBeInTheDocument();
+    expect(screen.getByText("Assignee")).toBeInTheDocument();
+    expect(screen.getByText("Draft brief")).toBeInTheDocument();
+  });
+});

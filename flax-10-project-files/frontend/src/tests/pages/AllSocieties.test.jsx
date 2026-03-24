@@ -262,4 +262,25 @@ describe('AllSocieties', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} />);
         expect(screen.getByText('No societies found')).toBeTruthy();
     });
+
+    it('opens and closes the filter popup from hover and outside click', () => {
+        vi.useFakeTimers();
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
+        const wrapper = filterToggle.parentElement;
+
+        fireEvent.mouseEnter(wrapper);
+        expect(screen.getByText('Status')).toBeInTheDocument();
+
+        fireEvent.mouseLeave(wrapper);
+        vi.advanceTimersByTime(200);
+        expect(screen.queryByText('Status')).not.toBeInTheDocument();
+
+        fireEvent.click(filterToggle);
+        expect(screen.getByText('Category')).toBeInTheDocument();
+        fireEvent.mouseDown(document.body);
+        expect(screen.queryByText('Category')).not.toBeInTheDocument();
+        vi.useRealTimers();
+    });
 });
