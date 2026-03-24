@@ -17,7 +17,9 @@ const makeSubscribe = (societyId, updateLocalSociety) =>
         try {
             await apiToggle(societyId, true);
             updateLocalSociety({ is_subscribed: true });
-        } catch {}
+        } catch (err) {
+            console.error('Subscription failed:', err);
+        }
     };
 
 const doUnsubscribe = async (societyId, updateLocalSociety, confirm, name) => {
@@ -30,7 +32,7 @@ const doUnsubscribe = async (societyId, updateLocalSociety, confirm, name) => {
 const makeUnsubscribe = (societyId, updateLocalSociety, confirm, name) =>
     async () => {
         try { await doUnsubscribe(societyId, updateLocalSociety, confirm, name); }
-        catch {}
+        catch (err) { console.error('Unsubscription failed:', err); }
     };
 
 export function useSocietySubscription(societyId, society, updateLocalSociety) {

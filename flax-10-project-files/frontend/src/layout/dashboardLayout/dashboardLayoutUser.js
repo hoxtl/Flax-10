@@ -29,5 +29,7 @@ export function getStoredUser() {
   if (!rawUser) return undefined;
   try {
     return parseStoredUser(JSON.parse(rawUser));
-  } catch {}
+  } catch (e) {
+    console.error("Failed to parse stored user:", e);
+  }
 }

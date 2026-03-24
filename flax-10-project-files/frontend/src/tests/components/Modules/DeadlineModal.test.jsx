@@ -22,7 +22,7 @@ vi.mock('../../../components/Modules/hooks/useDeadlineModal', () => ({
     useDeadlineModal: () => mockModal,
 }));
 
-vi.mock('../../../components/Modules/DeadlineForm', () => ({
+vi.mock('../../../components/Modules/Deadlines/DeadlineForm', () => ({
     default: ({ onCancel, onSubmit }) => (
         <div>
             <button onClick={onCancel}>Cancel</button>
@@ -31,7 +31,7 @@ vi.mock('../../../components/Modules/DeadlineForm', () => ({
     ),
 }));
 
-vi.mock('../DeadlineCard', () => ({
+vi.mock('../../../components/Modules/Deadlines/DeadlineCard', () => ({
     default: ({ deadline, onEdit, onDelete }) => (
         <div>
             <span>{deadline.title}</span>
@@ -41,7 +41,7 @@ vi.mock('../DeadlineCard', () => ({
     ),
 }));
 
-vi.mock('../DeadlineModal.module.css', () => ({ default: {} }));
+vi.mock('../../../components/Modules/Deadlines/DeadlineModal.module.css', () => ({ default: {} }));
 
 const module = { id: 1, module_code: '5CCS2SEG' };
 

@@ -59,6 +59,15 @@ vi.mock('../../../pages/Tasks/components/CreateTaskModal', () => ({
 vi.mock('../../../components/TaskCelebration/CheckBurst', () => ({
     CheckBurst: ({ children }) => <div data-testid="check-burst">{children}</div>,
 }));
+vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options }) => (
+        <div data-testid="animated-dropdown">
+            {(options || []).map(o => (
+                <button key={o.value} onClick={() => onChange(o.value)}>{o.label}</button>
+            ))}
+        </div>
+    ),
+}));
 const defaultTask = {
     id: 1, title: 'Buy groceries', completed: false, due_date: null, priority: 'medium', task_list: 1, estimated_blocks: 1,
 };

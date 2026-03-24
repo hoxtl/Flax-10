@@ -117,7 +117,7 @@ describe('PlanFreeRow', () => {
     });
 
     it('renders duration 90 minutes as 1h 30m', () => {
-        renderRow({
+        const { container } = renderRow({
             row: { ...baseRow, minutes: 90, gapContext: { type: 'study' } },
         });
         expect(screen.getByText(hasExactText('1h 30m free'))).toBeTruthy();

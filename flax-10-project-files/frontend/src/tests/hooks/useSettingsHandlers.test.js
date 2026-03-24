@@ -5,7 +5,6 @@ import useSettingsHandlers from '../../components/Settings/hooks/useSettingsHand
 vi.mock('../../api/userApi', () => ({
     updateUserSettings: vi.fn(),
     saveHomeAddress: vi.fn(),
-    geocodeAddress: vi.fn(),
 }));
 
 vi.mock('../../api/settingsApi', () => ({
@@ -15,8 +14,13 @@ vi.mock('../../api/settingsApi', () => ({
     hasToken: vi.fn(),
 }));
 
-import { updateUserSettings, saveHomeAddress, geocodeAddress } from '../../api/userApi';
+vi.mock('../../api/geocodeApi', () => ({
+    geocodeAddress: vi.fn(),
+}));
+
+import { updateUserSettings, saveHomeAddress } from '../../api/userApi';
 import { patchSettings, saveUserToStorage, clearAuthAndRedirect, hasToken } from '../../api/settingsApi';
+import { geocodeAddress } from '../../api/geocodeApi';
 
 describe('useSettingsHandlers', () => {
     beforeEach(() => {
@@ -193,7 +197,7 @@ describe('useSettingsHandlers', () => {
             await act(async () => {
                 await result.current.handleSleepSave({ sleep_time: '22:00', wake_time: '07:00' });
             });
-            expect(patchSettings).toHaveBeenCalledWith({ sleep_time: '22:00', wake_time: '07:00' });
+            expect(updateUserSettings).toHaveBeenCalledWith({ sleep_time: '22:00', wake_time: '07:00' });
         });
 
         it('returns early when not logged in', async () => {
@@ -202,11 +206,11 @@ describe('useSettingsHandlers', () => {
             await act(async () => {
                 await result.current.handleSleepSave({ sleep_time: '22:00', wake_time: '07:00' });
             });
-            expect(patchSettings).not.toHaveBeenCalled();
+            expect(updateUserSettings).not.toHaveBeenCalled();
         });
 
         it('shows error when sleep save fails', async () => {
-            patchSettings.mockResolvedValueOnce({ ok: false, data: {} });
+            updateUserSettings.mockResolvedValueOnce(null);
             const { result } = renderHook(() => useSettingsHandlers());
             await act(async () => {
                 await result.current.handleSleepSave({ sleep_time: '22:00', wake_time: '07:00' });
@@ -221,7 +225,7 @@ describe('useSettingsHandlers', () => {
             await act(async () => {
                 await result.current.handleStudyTimeSave({ preferred_study_minutes_per_day: 150 });
             });
-            expect(patchSettings).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 150 });
+            expect(updateUserSettings).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 150 });
         });
 
         it('returns early when not logged in', async () => {

@@ -49,6 +49,16 @@ vi.mock('../../../../context/TagContext', () => ({
     useTags: () => mockTagsState,
 }));
 
+vi.mock('../../../../components/common/TagsSelector/TagsSelector', () => ({
+    TagsSelector: ({ tags, selectedTags, onSelectionChange, emptyHint }) => (
+        <div data-testid="tags-selector">
+            {tags.map(t => (
+                <button key={t.id} onClick={() => onSelectionChange([t])}>{t.label}</button>
+            ))}
+        </div>
+    ),
+}));
+
 describe('EventModal', () => {
     const mockOnClose = vi.fn();
 

@@ -35,7 +35,7 @@ vi.mock("../../components/Society/CreateSocietyModal", async () => {
   const { CreateSocietyMock } = await import("./dashboardMocks");
   return { default: CreateSocietyMock };
 });
-vi.mock("../../components/Modules/DeadlineModal", async () => {
+vi.mock("../../components/Modules/Deadlines/DeadlineModal", async () => {
   const { DeadlineModalMock } = await import("./dashboardMocks");
   return { default: DeadlineModalMock };
 });

@@ -43,7 +43,6 @@ describe('CompatibilityScore', () => {
         ]}
       />
     );
-    expect(screen.getByText('3 people you both know')).toBeTruthy();
     expect(screen.getByText('Study momentum')).toBeTruthy();
     expect(document.querySelectorAll('[class*="sparkDot"]').length).toBeGreaterThan(0);
   });

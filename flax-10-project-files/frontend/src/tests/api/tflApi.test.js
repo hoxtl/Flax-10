@@ -159,7 +159,7 @@ describe('tflService', () => {
         });
 
         it('returns fallback color for unknown line', () => {
-            expect(tflService.getDelayLineColor('unknown-line')).toBe('#a5a5a5ff');
+            expect(tflService.getDelayLineColor('unknown-line')).toBe('#a5a5a5');
         });
     });
 

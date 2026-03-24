@@ -55,7 +55,7 @@ function BioEditor({ initialValue, onSave }) {
         <div className={styles.bioEditor}>
             <textarea className={styles.bioInput} value={value} onChange={(e) => setValue(e.target.value)}
                 placeholder="Describe your society..." rows={2} autoFocus />
-            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
         </div>
     );
 }
@@ -73,7 +73,7 @@ function CategoryEditor({ initialValue, onSave }) {
     return (
         <div className={styles.categoryEditor}>
             <CategorySelector value={value} onChange={setValue} label="" multiple />
-            <PrimaryButton className={styles.saveBtn} pill onClick={onSave}>Save</PrimaryButton>
+            <PrimaryButton className={styles.saveBtn} pill onClick={() => onSave(value)}>Save</PrimaryButton>
         </div>
     );
 }

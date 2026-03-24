@@ -2,8 +2,33 @@
  * Badge, module, and society profile widget tests.
  */
 
-import { describe, it } from "vitest";
-import { BadgesSection, expect, fireEvent, ModulesSection, render, screen, SocietiesSection, vi, waitFor } from "./ProfileWidgets.shared";
+import { describe, it, vi } from "vitest";
+
+vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
+}));
+
+vi.mock("../../../../api/moduleApi", () => ({
+  getModules: vi.fn().mockResolvedValue([
+    { module_code: "CS101", module_name: "Intro to CS" },
+    { module_code: "MA102", module_name: "Calculus" },
+  ]),
+}));
+
+vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+  useAttendanceWidgetData: vi.fn(),
+}));
+
+vi.mock("@mui/x-charts/PieChart", () => ({
+  PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? "true" : "false"} />,
+}));
+
+vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
+  default: () => <div data-testid="segment-detail-panel" />,
+}));
+
+import { BadgesSection, expect, fireEvent, ModulesSection, render, screen, SocietiesSection, waitFor } from "./ProfileWidgets.shared";
 
 describe("BadgesSection", () => {
   it("renders badge count and grid", () => {

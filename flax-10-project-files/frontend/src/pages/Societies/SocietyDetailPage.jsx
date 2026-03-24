@@ -21,6 +21,7 @@ import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
 
 import { getImageUrls } from "./SocietyDetailPageUtils";
+import { useLocation } from "react-router-dom";
 
 function usePageStateHandlers(data, onBack, onDeleteCallback) {
     const { modals, updateSociety, updateLocalSociety, fetchMembers, removeMember, deleteSociety } = data;

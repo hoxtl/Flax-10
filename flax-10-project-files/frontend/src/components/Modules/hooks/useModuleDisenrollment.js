@@ -12,7 +12,7 @@ function handleSuccess(onSuccess, notify) {
 }
 
 function disenrollFromModule(moduleId, onSuccess, notify) {
-    disenrolByModuleId(moduleId)
+    return disenrolByModuleId(moduleId)
         .then(() => handleSuccess(onSuccess, notify))
         .catch(err => notify(err.message, 'error'));
 }

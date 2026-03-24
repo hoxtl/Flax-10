@@ -78,8 +78,8 @@ vi.mock('../../../pages/Tasks/components/TaskCard', async () => {
   return { ...actual, EditTaskModal: EditTaskModalMock };
 });
 vi.mock('../../../pages/Homepage/components', async () => {
-  const { HomepageTimelineSectionMock } = await import('./homepageMocks');
-  return { HomepageTimelineSection: HomepageTimelineSectionMock };
+  const { MiniTimelineMock, HomepageTimelineSectionMock } = await import('./homepageMocks');
+  return { MiniTimeline: MiniTimelineMock, HomepageTimelineSection: HomepageTimelineSectionMock };
 });
 vi.mock('../../../api/taskApi', () => ({
   updateTask: vi.fn().mockResolvedValue({}), createTask: vi.fn(),

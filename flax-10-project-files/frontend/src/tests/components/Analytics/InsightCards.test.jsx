@@ -50,8 +50,8 @@ describe('ConsistencyScore', () => {
     });
 
     it('renders explanation text', () => {
-        render(<ConsistencyScore data={mockData} />);
-        expect(screen.getByText(/Studied \d+ of \d+ days/)).toBeTruthy();
+        const { container } = render(<ConsistencyScore data={mockData} />);
+        expect(container.firstChild).toHaveAttribute('data-tooltip', expect.stringMatching(/Studied \d+ of \d+ days/));
     });
 });
 

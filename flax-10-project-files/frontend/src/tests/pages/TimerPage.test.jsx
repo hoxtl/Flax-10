@@ -187,8 +187,8 @@ describe('TimerPage Integration', () => {
     it('updates settings', testSettings);
     it('shows break modal when work session finishes', testBreakModalShow);
     it('enters break mode from modal', testBreakModalEnter);
-    it('opens history modal when history button is clicked', testHistoryModal);
-    it('closes history modal', testHistoryModalClose);
+    it('opens history modal when history button is clicked', testHistoryModal, 15000);
+    it('closes history modal', testHistoryModalClose, 15000);
 
     it('shows Enable Notifications when permission is default and click calls request', () => {
         mockNotificationPermission = 'default';

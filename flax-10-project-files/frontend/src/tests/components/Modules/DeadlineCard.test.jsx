@@ -58,6 +58,7 @@ describe('DeadlineCard', () => {
         const onDelete = vi.fn();
         render(<DeadlineCard deadline={deadline} is_teacher={true} onEdit={vi.fn()} onDelete={onDelete} />);
         fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getAllByText('Delete')[1]);
         expect(onDelete).toHaveBeenCalled();
     });
 

@@ -162,6 +162,7 @@ describe("CampusMap", () => {
 
   it("renders current-location buttons for both journey fields", async () => {
     await renderLoadedCampusMap();
+    expect(screen.getByText("Starting Location")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /set start to current location/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /set destination to current location/i })).toBeInTheDocument();
   });

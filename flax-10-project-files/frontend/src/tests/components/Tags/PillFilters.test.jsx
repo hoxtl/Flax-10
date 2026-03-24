@@ -32,6 +32,48 @@ vi.mock('../../../components/Tags/utils/pillUtils', () => ({
     })),
 }));
 
+// Mock pillFilterOptions helpers so labels are plain (no counts)
+vi.mock('../../../components/Tags/pillFilters/pillFilterOptions', () => ({
+    createPillFilterOptions: (tags, counts) => [
+        { value: 'all', label: 'All' },
+        ...(tags || []).map(t => ({ value: t.label.toLowerCase(), label: t.label })),
+    ],
+    getActiveFilterLabel: (active, options) => {
+        const found = options.find(o => {
+            if (Array.isArray(active)) return active.includes(o.value);
+            return o.value === active;
+        });
+        return found?.label || 'Filter';
+    },
+}));
+
+// Mock AnimatedDropdown to render options as individual pill buttons
+vi.mock('../../../components/common/AnimatedDropdown/AnimatedDropdown', () => ({
+    default: ({ value, onChange, options, className }) => (
+        <div>
+            {(options || []).map(o => {
+                const isActive = Array.isArray(value)
+                    ? value.includes(o.value)
+                    : value === o.value;
+                return (
+                    <button
+                        key={o.value}
+                        className={isActive ? 'active' : 'inactive'}
+                        onClick={() => onChange(o.value)}
+                    >
+                        {o.label}
+                    </button>
+                );
+            })}
+        </div>
+    ),
+}));
+
+// Mock lucide-react Filter icon used in FilterTriggerButton
+vi.mock('lucide-react', () => ({
+    Filter: () => <span data-testid="filter-icon" />,
+}));
+
 import { useTags } from '../../../context/TagContext';
 import { countByType } from '../../../components/Tags/utils/pillUtils';
 

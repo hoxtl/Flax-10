@@ -62,6 +62,7 @@ describe('ReadingCard', () => {
         const onDelete = vi.fn();
         render(<ReadingCard reading={reading} isTeacher={true} onEdit={vi.fn()} onDelete={onDelete}  />);
         fireEvent.click(screen.getByText('Delete'));
+        fireEvent.click(screen.getAllByText('Delete')[1]);
         expect(onDelete).toHaveBeenCalled();
     });
 });

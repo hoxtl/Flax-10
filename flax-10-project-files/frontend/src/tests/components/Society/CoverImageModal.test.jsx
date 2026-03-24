@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CoverImageModal from '../../../components/Society/SocietyDetail/imageHandlers/CoverImageModal';
 
 vi.mock('../../../components/Society/SocietyDetail/imageHandlers/ImageManagerComponents.module.css', () => ({
@@ -68,18 +68,22 @@ describe('CoverImageModal', () => {
     expect(fullAddBtn).toBeDisabled();
   });
 
-  it('adds image from photos tab', () => {
+  it('adds image via file upload', async () => {
+    class MockFileReader {
+      readAsDataURL(file) {
+        this.onload({ target: { result: `data:${file.name}` } });
+      }
+    }
+    vi.stubGlobal('FileReader', MockFileReader);
+
     const onUpdate = vi.fn();
-    renderModal({ images: ['1.jpg', '2.jpg'], availablePhotos: ['x.jpg'], onUpdate });
+    renderModal({ images: ['1.jpg', '2.jpg'], onUpdate });
     const addBtn = document.body.querySelector('button[title="Add image"]');
     expect(addBtn).toBeTruthy();
-    fireEvent.click(addBtn);
-    fireEvent.click(screen.getByText('From Photos'));
-    const photoCard = document.body.querySelector('.photoSelectCard');
-    expect(photoCard).toBeTruthy();
-    fireEvent.click(photoCard);
-    fireEvent.click(screen.getByText('Add Selected'));
-    expect(onUpdate).toHaveBeenCalledWith(['1.jpg', '2.jpg', 'x.jpg']);
+    const fileInput = document.body.querySelector('input[type="file"]');
+    expect(fileInput).toBeTruthy();
+    fireEvent.change(fileInput, { target: { files: [new File(['x'], 'x.png', { type: 'image/png' })] } });
+    await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(['1.jpg', '2.jpg', 'data:x.png']));
   });
 });
 

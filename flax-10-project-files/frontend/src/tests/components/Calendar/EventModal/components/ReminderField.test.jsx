@@ -36,26 +36,23 @@ describe('ReminderField', () => {
 
     it('should call onChange when toggling reminder', () => {
         render(<ReminderField value={[]} onChange={mockOnChange} />);
-        fireEvent.click(screen.getByText('No reminders')); // Open dropdown
-
-        fireEvent.click(screen.getByText('5 minutes before'));
-
+        fireEvent.click(screen.getByText('No reminders'));
+        fireEvent.click(screen.getByText('5 min before'));
         expect(mockOnChange).toHaveBeenCalledWith([5]);
     });
 
     it('should sort reminders when adding', () => {
         render(<ReminderField value={[10]} onChange={mockOnChange} />);
-        fireEvent.click(screen.getByText('10 min before')); 
-
-        // Add 5 min (from checkbox)
-        fireEvent.click(screen.getByText('5 minutes before'));
+        fireEvent.click(screen.getByText('10 min before'));
+        fireEvent.click(screen.getAllByText('5 min before')[0]);
         expect(mockOnChange).toHaveBeenCalledWith([5, 10]);
     });
 
     it('should call onChange when removing reminder', () => {
         render(<ReminderField value={[5]} onChange={mockOnChange} />);
-        fireEvent.click(screen.getByText('5 min before')); 
-        const checkbox = screen.getByLabelText('5 minutes before');
+        fireEvent.click(screen.getByText('5 min before'));
+        const allCheckboxes = screen.getAllByRole('checkbox');
+        const checkbox = allCheckboxes.find(c => c.checked);
         expect(checkbox).toBeChecked();
         fireEvent.click(checkbox);
         expect(mockOnChange).toHaveBeenCalledWith([]);
@@ -64,7 +61,7 @@ describe('ReminderField', () => {
     it('should add custom reminder', () => {
         render(<ReminderField value={[]} onChange={mockOnChange} />);
         fireEvent.click(screen.getByText('No reminders'));
-        const input = screen.getByPlaceholderText('Custom (minutes)');
+        const input = screen.getByPlaceholderText('Custom (min)');
         fireEvent.change(input, { target: { value: '20' } });
         fireEvent.click(screen.getByText('Add'));
         expect(mockOnChange).toHaveBeenCalledWith([20]);
@@ -73,7 +70,7 @@ describe('ReminderField', () => {
     it('should not add invalid custom reminder', () => {
         render(<ReminderField value={[]} onChange={mockOnChange} />);
         fireEvent.click(screen.getByText('No reminders'));
-        const input = screen.getByPlaceholderText('Custom (minutes)');
+        const input = screen.getByPlaceholderText('Custom (min)');
         fireEvent.change(input, { target: { value: '-5' } });
         fireEvent.click(screen.getByText('Add'));
         expect(mockOnChange).not.toHaveBeenCalled();
@@ -102,8 +99,8 @@ describe('ReminderField', () => {
             permission: 'default'
         });
         render(<ReminderField value={[]} onChange={mockOnChange} />);
-        fireEvent.click(screen.getByText('No reminders')); 
-        const checkbox = screen.getByText('5 minutes before');
+        fireEvent.click(screen.getByText('No reminders'));
+        const checkbox = screen.getByText('5 min before');
         fireEvent.click(checkbox);
         expect(requestPermission).toHaveBeenCalled();
         vi.unstubAllGlobals();

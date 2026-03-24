@@ -62,6 +62,22 @@ vi.mock('../../../components/Notifications/hooks/useReminderNotifications', () =
     useReminderNotifications: vi.fn(),
 }));
 
+vi.mock('../../../components/TimetableImportModal', () => {
+    const React = require('react');
+    function MockTimetableImportModal({ onClose, onImport }) {
+        const [url, setUrl] = React.useState('');
+        return (
+            <div>
+                <h2>Import Timetable</h2>
+                <input placeholder="https://example.com/timetable.ics" value={url} onChange={e => setUrl(e.target.value)} />
+                <button type="button" onClick={onClose}>Close</button>
+                <button type="button" onClick={() => onImport(url)}>Import</button>
+            </div>
+        );
+    }
+    return { default: MockTimetableImportModal };
+});
+
 const mockDispatch = vi.fn();
 const mockOpenModal = vi.fn();
 
@@ -251,6 +267,7 @@ describe('CalendarHeader', () => {
     });
 
     it('should dispatch SET_SELECTED_DATE and SET_VIEW_MODE when clicking a date card in day view on mobile', () => {
+        const originalInnerWidth = window.innerWidth;
         Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 500 });
         setup({ ...defaultState, viewMode: 'day' });
         const dateCards = document.querySelectorAll('.date-card');
@@ -258,7 +275,7 @@ describe('CalendarHeader', () => {
         fireEvent.click(dateCards[0]);
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'SET_SELECTED_DATE' }));
         expect(mockDispatch).toHaveBeenCalledWith({ type: 'SET_VIEW_MODE', payload: 'day' });
-        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1024 });
+        Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: originalInnerWidth });
     });
 
     it('hides Today button when the selected date is today', () => {

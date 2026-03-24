@@ -138,7 +138,6 @@ describe("TaskWidgetSlot", () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-
     expect(screen.getByRole("button", { name: /\+ 1 more/i })).toBeTruthy();
   });
 
@@ -153,7 +152,6 @@ describe("TaskWidgetSlot", () => {
       taskWidgetItemsOnly: tasks,
       taskWidgetList: tasks,
     });
-
     expect(screen.queryByText("Task 7")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /\+ 1 more/i }));
     expect(screen.getByText("Task 7")).toBeTruthy();

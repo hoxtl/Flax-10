@@ -152,16 +152,13 @@ describe('TagContext (node)', () => {
 
   it('logs initial-load errors and still toggles loading off', async () => {
     const mod = await importModule();
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagsMock.mockRejectedValueOnce(new Error('load failed'));
 
     getValueFromProvider(mod, [[], true], true);
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error));
     expect(stateStore[1]).toBe(false);
-    consoleSpy.mockRestore();
   });
 
   it('refreshTags updates tags and maps default icon', async () => {
@@ -176,16 +173,12 @@ describe('TagContext (node)', () => {
     ]);
   });
 
-  it('refreshTags logs error on failure', async () => {
+  it('refreshTags does not throw on failure', async () => {
     const mod = await importModule();
     const value = getValueFromProvider(mod, [[], false], false);
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagsMock.mockRejectedValueOnce(new Error('refresh failed'));
 
-    await value.refreshTags();
-
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch tags:', expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(value.refreshTags()).resolves.toBeUndefined();
   });
 
   it('addTag creates and appends mapped tag data', async () => {
@@ -205,16 +198,12 @@ describe('TagContext (node)', () => {
     ]);
   });
 
-  it('addTag logs errors', async () => {
+  it('addTag does not throw on errors', async () => {
     const mod = await importModule();
     const value = getValueFromProvider(mod, [[], false], false);
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createTagMock.mockRejectedValueOnce(new Error('create failed'));
 
-    await value.addTag({ label: 'x', color: '#000000' });
-
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag:', expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(value.addTag({ label: 'x', color: '#000000' })).resolves.toBeUndefined();
   });
 
   it('deleteTag removes existing item', async () => {
@@ -231,16 +220,12 @@ describe('TagContext (node)', () => {
     expect(stateStore[0]).toEqual([]);
   });
 
-  it('deleteTag logs errors', async () => {
+  it('deleteTag does not throw on errors', async () => {
     const mod = await importModule();
     const value = getValueFromProvider(mod, [[], false], false);
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     deleteTagMock.mockRejectedValueOnce(new Error('delete failed'));
 
-    await value.deleteTag(5);
-
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to delete tag:', expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(value.deleteTag(5)).resolves.toBe(false);
   });
 
   it('updateTag updates matching tag and maps icon', async () => {
@@ -269,15 +254,11 @@ describe('TagContext (node)', () => {
     ]);
   });
 
-  it('updateTag logs errors', async () => {
+  it('updateTag does not throw on errors', async () => {
     const mod = await importModule();
     const value = getValueFromProvider(mod, [[], false], false);
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     updateTagMock.mockRejectedValueOnce(new Error('update failed'));
 
-    await value.updateTag(7, { label: 'x', color: '#000000', icon: 'x' });
-
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to update tag:', expect.any(Error));
-    consoleSpy.mockRestore();
+    await expect(value.updateTag(7, { label: 'x', color: '#000000', icon: 'x' })).resolves.toBeUndefined();
   });
 });

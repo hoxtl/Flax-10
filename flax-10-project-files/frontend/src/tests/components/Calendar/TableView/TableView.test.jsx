@@ -13,6 +13,7 @@ const mockNavState = { focusedCell: null, handleKeyDown: vi.fn(), EDITABLE_COLUM
 
 vi.mock('../../../../context/CalendarContext', () => ({
     useCalendarData: ({ events }) => ({ events: events || mockEvents, viewMode: 'month', selectedDate: new Date(2026, 2, 15) }),
+    useCalendar: () => ({ readOnly: false }),
 }));
 
 vi.mock('../../../../context/TagContext', () => ({

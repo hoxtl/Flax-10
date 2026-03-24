@@ -36,6 +36,15 @@ vi.mock("../../../../components/common/inputs/DateTimePicker", () => ({
 vi.mock("../../../../components/TaskCelebration/CheckBurst", () => ({ CheckBurst: ({ children }) => <>{children}</> }));
 vi.mock("../../../../pages/Tasks/components/CreateTaskModal", () => ({ default: () => <div data-testid="edit-modal" /> }));
 vi.mock("../../../../pages/Tasks/components/TaskInfoModal", () => ({ TaskInfoModal: () => <div data-testid="info-modal" /> }));
+vi.mock("../../../../components/common/AnimatedDropdown/AnimatedDropdown", () => ({
+  default: ({ value, onChange, options }) => (
+    <div data-testid="animated-dropdown">
+      {(options || []).map(o => (
+        <button key={o.value} onClick={() => onChange(o.value)}>{o.label}</button>
+      ))}
+    </div>
+  ),
+}));
 vi.mock("../../../../pages/Tasks/utils/taskCardUtils", () => ({
   formatDueDate: () => ({ label: "Today", status: "today" }),
   getCompletedDueLabel: () => "Completed",

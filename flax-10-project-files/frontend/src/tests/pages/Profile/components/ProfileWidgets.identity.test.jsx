@@ -2,8 +2,30 @@
  * Persona, study DNA, and heatmap profile widget tests.
  */
 
-import { describe, it } from "vitest";
-import { expect, fireEvent, MiniHeatmap, PersonaCard, render, screen, StudyDNA, vi } from "./ProfileWidgets.shared";
+import { describe, it, vi } from "vitest";
+
+vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: { div: ({ children, ...props }) => <div {...props}>{children}</div> },
+}));
+
+vi.mock("../../../../api/moduleApi", () => ({
+  getModules: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("../../../../pages/Profile/components/widgets/attendance/useAttendanceWidgetData", () => ({
+  useAttendanceWidgetData: vi.fn(),
+}));
+
+vi.mock("@mui/x-charts/PieChart", () => ({
+  PieChart: (props) => <div data-testid="pie-chart" data-hide-legend={props.hideLegend ? "true" : "false"} />,
+}));
+
+vi.mock("../../../../pages/Attendance/components/SegmentDetailPanel", () => ({
+  default: () => <div data-testid="segment-detail-panel" />,
+}));
+
+import { expect, fireEvent, MiniHeatmap, PersonaCard, render, screen, StudyDNA } from "./ProfileWidgets.shared";
 
 describe("PersonaCard", () => {
   it("returns null when persona is null", () => {

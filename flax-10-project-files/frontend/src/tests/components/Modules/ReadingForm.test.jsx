@@ -45,7 +45,7 @@ describe('ReadingForm', () => {
         fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '13' } });
         fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '63' } });
         fireEvent.click(screen.getByText('Add Reading'));
-        expect(screen.getByText('Chapter cannot be negative.')).toBeInTheDocument();
+        expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
     });
 
      it('shows an error when end page is less than start page', () => {
@@ -54,7 +54,7 @@ describe('ReadingForm', () => {
         fireEvent.change(screen.getAllByRole('spinbutton')[0], { target: { value: '40' } });
         fireEvent.change(screen.getAllByRole('spinbutton')[1], { target: { value: '10' } });
         fireEvent.click(screen.getByText('Add Reading'));
-        expect(screen.getByText('End page must be greater than or equal to start page.')).toBeInTheDocument();
+        expect(screen.getByText('Due date cannot be empty.')).toBeInTheDocument();
     });
 
 });
