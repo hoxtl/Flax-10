@@ -20,7 +20,7 @@ vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
-vi.mock("../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
+vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
 
 describe("useHomepageReschedule", () => {
   beforeEach(() => {
