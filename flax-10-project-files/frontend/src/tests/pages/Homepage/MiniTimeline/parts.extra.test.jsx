@@ -192,6 +192,23 @@ describe("mini timeline parts extras", () => {
       <div onClick={outerClick}>
         <PlanFreeRowContent
           styles={styles}
+          gapContext={{ type: "transit-partial", prevCampus: "strand", nextCampus: "guys", transitMins: 10, freeAfterTransit: 0 }}
+          durationLabel="10m"
+          assignedTask={null}
+          candidateTask={null}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.queryByRole('button', { name: /Start /i })).toBeNull();
+    expect(screen.getByText(/0m free after/i)).toBeInTheDocument();
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
           gapContext={{ type: "transit", prevCampus: "strand", nextCampus: "waterloo", transitMins: 12 }}
           durationLabel="30m"
           assignedTask={null}
@@ -206,6 +223,108 @@ describe("mini timeline parts extras", () => {
     expect(outerClick).toHaveBeenCalled();
     expect(screen.getByText(/12m travel · 30m gap/i)).toBeInTheDocument();
 
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "transit", prevCampus: "unknown", nextCampus: "mystery", transitMins: 8 }}
+          durationLabel="18m"
+          assignedTask={null}
+          candidateTask={null}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText(/campus → next campus/i)).toBeInTheDocument();
+    expect(screen.getByText(/8m travel · 18m gap/i)).toBeInTheDocument();
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "evening" }}
+          durationLabel="60m"
+          assignedTask={null}
+          candidateTask={null}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "personal" }}
+          durationLabel="15m"
+          assignedTask={null}
+          candidateTask={null}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText("Short breather")).toBeInTheDocument();
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "study" }}
+          durationLabel="35m"
+          assignedTask={null}
+          candidateTask={{ title: "Late essay", due_date: "2000-01-01T00:00:00Z", estimated_minutes: 35 }}
+          isBestGap
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText(/Late essay/)).toHaveAttribute('title', '❗ Late essay');
+    expect(screen.getByText('(25m)')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Skip Late essay')).toBeNull();
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "study" }}
+          durationLabel="22m"
+          assignedTask={null}
+          candidateTask={{ id: 17, title: "Reading", priority: "low", estimated_minutes: 20 }}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText('Reading')).toHaveAttribute('title', 'Reading');
+    fireEvent.click(screen.getByLabelText('Skip Reading'));
+    expect(onSkipTask).toHaveBeenCalledWith(17);
+
+    rerender(
+      <div onClick={outerClick}>
+        <PlanFreeRowContent
+          styles={styles}
+          gapContext={{ type: "study" }}
+          durationLabel="12m"
+          assignedTask={null}
+          candidateTask={null}
+          isBestGap={false}
+          onSkipTask={onSkipTask}
+          onStartTask={onStartTask}
+        />
+      </div>,
+    );
+    expect(screen.getByText('12m')).toBeInTheDocument();
+    expect(screen.getByText('Short breather')).toHaveAttribute('title', 'Short breather');
+
     const { container, rerender: rerenderLayout } = render(
       <TimelineRowLayout row={{ spacingBeforePx: 12 }} styles={styles} minHeight={44} rowClassName="extra-row">
         <span>child</span>
@@ -218,7 +337,17 @@ describe("mini timeline parts extras", () => {
     rerenderLayout(<TimelineGutter row={{ hideTimeLabel: true }} styles={styles} timeLabel="10:00" />);
     expect(container.querySelector(`.${styles.planTimelineTime}`)).toBeNull();
 
+    rerenderLayout(<TimelineGutter row={{ hideTimeLabel: false }} styles={styles} timeLabel="10:00" />);
+    expect(screen.getByText('10:00')).toBeInTheDocument();
+
     rerenderLayout(<TimelineSpineCell styles={styles} />);
     expect(container.querySelector(`.${styles.planTimelineSpineCell}`)).toBeTruthy();
+
+    rerenderLayout(
+      <TimelineRowLayout row={{}} styles={styles} minHeight={20}>
+        <span>plain</span>
+      </TimelineRowLayout>,
+    );
+    expect(container.firstChild).toHaveStyle({ marginTop: '0px', minHeight: '20px' });
   });
 });
