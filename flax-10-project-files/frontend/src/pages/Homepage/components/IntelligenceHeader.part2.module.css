@@ -151,18 +151,14 @@
 
 .bannerBorderGlow {
   position: absolute;
-  inset: 5px;
+  inset: 0;
   z-index: 0;
-  border-radius: 19px;
+  border-radius: inherit;
   pointer-events: none;
-  border: 1.5px solid color-mix(in srgb, var(--home-hero-frame-border) 72%, transparent);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--home-hero-glow-ring) 72%, transparent),
-    0 0 18px color-mix(in srgb, var(--home-hero-glow-shadow) 82%, transparent),
-    0 0 36px color-mix(in srgb, var(--home-hero-glow-shadow) 62%, transparent),
-    inset 0 0 0 1px color-mix(in srgb, var(--home-hero-glow-inner) 82%, transparent),
-    inset 0 0 16px color-mix(in srgb, var(--home-hero-glow-shadow) 22%, transparent);
-  opacity: 0.92;
+    0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 72%, transparent),
+    0 0 54px color-mix(in srgb, var(--home-hero-glow-shadow) 38%, transparent);
+  opacity: 0.88;
 }
 
 .bannerShimmer {

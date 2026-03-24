@@ -22,7 +22,7 @@ export function IntelligenceHero(props) {
 
   return (
     <div className={styles.premiumCard}>
-      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={16} />
+      <WelcomeBackgroundPaths embedded className={styles.heroPaths} count={18} intensity={1.95} />
       <motion.div
         className={styles.bannerBorderGlow}
         aria-hidden
@@ -31,9 +31,9 @@ export function IntelligenceHero(props) {
         } : {
           opacity: [0.72, 1, 0.8],
           boxShadow: [
-            "0 0 0 1px var(--home-hero-glow-ring), 0 0 24px var(--home-hero-glow-shadow), 0 0 56px color-mix(in srgb, var(--home-hero-glow-shadow) 94%, transparent), inset 0 0 0 1px var(--home-hero-glow-inner), inset 0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 34%, transparent)",
-            "0 0 0 1px color-mix(in srgb, var(--home-hero-glow-ring) 100%, transparent), 0 0 36px color-mix(in srgb, var(--home-hero-glow-shadow) 118%, transparent), 0 0 74px color-mix(in srgb, var(--home-hero-glow-shadow) 118%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--home-hero-glow-inner) 128%, transparent), inset 0 0 30px color-mix(in srgb, var(--home-hero-glow-shadow) 42%, transparent)",
-            "0 0 0 1px var(--home-hero-glow-ring), 0 0 24px var(--home-hero-glow-shadow), 0 0 56px color-mix(in srgb, var(--home-hero-glow-shadow) 94%, transparent), inset 0 0 0 1px var(--home-hero-glow-inner), inset 0 0 22px color-mix(in srgb, var(--home-hero-glow-shadow) 34%, transparent)",
+            "0 0 26px color-mix(in srgb, var(--home-hero-glow-shadow) 76%, transparent), 0 0 58px color-mix(in srgb, var(--home-hero-glow-shadow) 40%, transparent)",
+            "0 0 38px color-mix(in srgb, var(--home-hero-glow-shadow) 96%, transparent), 0 0 86px color-mix(in srgb, var(--home-hero-glow-shadow) 56%, transparent)",
+            "0 0 26px color-mix(in srgb, var(--home-hero-glow-shadow) 76%, transparent), 0 0 58px color-mix(in srgb, var(--home-hero-glow-shadow) 40%, transparent)",
           ],
         }}
         transition={reduceMotion ? { duration: 0 } : { duration: 4.8, repeat: Infinity, ease: "easeInOut" }}

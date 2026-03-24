@@ -15,7 +15,7 @@
 .heroPaths {
   z-index: 1;
   pointer-events: none;
-  opacity: 0.92;
+  opacity: 1;
   mix-blend-mode: multiply;
 }
 
@@ -30,7 +30,7 @@
 }
 
 :global([data-mode="dark"]) .heroPaths {
-  opacity: 0.78;
+  opacity: 0.92;
   mix-blend-mode: screen;
 }
 
