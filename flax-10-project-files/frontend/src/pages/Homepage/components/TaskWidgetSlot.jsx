@@ -5,7 +5,7 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";

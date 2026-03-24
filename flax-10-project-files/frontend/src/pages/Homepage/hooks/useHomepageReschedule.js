@@ -5,7 +5,7 @@
 import { useCallback, useState } from "react";
 import { formatTime, getNextFreeSlotToday } from "../utils/index";
 import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
-import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
 
 export function useHomepageReschedule(props) {
   const [resolveConflictsLoading, setResolveConflictsLoading] = useState(false);

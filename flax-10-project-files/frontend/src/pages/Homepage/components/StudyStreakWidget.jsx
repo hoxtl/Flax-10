@@ -5,7 +5,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Flame } from "lucide-react";
 import { fetchApi } from "../../../api/client";
-import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
 import styles from "../styles/StudyStreakWidget.module.css";
 
 const DAYS = ["M", "T", "W", "T", "F", "S", "S"];

@@ -30,8 +30,8 @@ function getClippedEventRange(event, currentDate) {
 function clipToDay(start, end, currentDate) {
     const { dayStart, dayEnd } = getDayBounds(currentDate);
     return {
-        start: start < dayStart ? dayStart : start,
-        end: end > dayEnd ? dayEnd : end
+        start: new Date(Math.max(start.getTime(), dayStart.getTime())),
+        end: new Date(Math.min(end.getTime(), dayEnd.getTime()))
     };
 }
 

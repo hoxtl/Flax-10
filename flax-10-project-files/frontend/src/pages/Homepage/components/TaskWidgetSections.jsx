@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import AllTasksCompleteCard from "../../Tasks/components/AllTasksCompleteCard";
 import { getClearMessage } from "../../../lib/allTasksCompleteMessages";
-import ExpandablePillButton from "../../../components/Common/ExpandablePillButton/ExpandablePillButton";
+import ExpandablePillButton from "../../../components/common/ExpandablePillButton/ExpandablePillButton";
 import EmptyStateCard from "./EmptyStateCard";
 
 export function TaskWidgetAllDone({ itemCount, styles }) {

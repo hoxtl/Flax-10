@@ -2,7 +2,7 @@
  * Shared widget primitives for module dashboard panels.
  */
 
-import ExpandablePillButton from "../../Common/ExpandablePillButton/ExpandablePillButton";
+import ExpandablePillButton from "../../common/ExpandablePillButton/ExpandablePillButton";
 
 /* Shared panel header for module dashboard widgets. */
 export function WidgetHeader({ icon, title, count, styles }) {

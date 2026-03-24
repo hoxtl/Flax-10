@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Target } from "lucide-react";
-import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
 import styles from "../styles/WeeklyGoalWidget.module.css";
 
 const GOAL_KEY = "weeklyStudyGoalHours";

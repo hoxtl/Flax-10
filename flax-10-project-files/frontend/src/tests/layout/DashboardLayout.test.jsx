@@ -41,6 +41,10 @@ vi.mock("../../components/Modules/Deadlines/DeadlineModal", async () => {
   const { DeadlineModalMock } = await import("./dashboardMocks");
   return { default: DeadlineModalMock };
 });
+vi.mock("../../components/Modules/Readings/ReadingModal", async () => {
+  const { ReadingModalMock } = await import("./dashboardMocks");
+  return { default: ReadingModalMock };
+});
 vi.mock("../../components/Timer/TimerPopups", async () => {
   const { LeaveTimerMock } = await import("./dashboardMocks");
   return { LeaveTimerModal: LeaveTimerMock };
@@ -261,7 +265,7 @@ describe("DashboardLayout", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Event"));
-    expect(mockOpenModal).toHaveBeenCalled();
+    expect(mockOpenModal).toHaveBeenCalledWith(null, "event", expect.any(Date));
   });
 
   it("shows EventModal when isModalOpen is true", () => {
@@ -371,6 +375,15 @@ describe("DashboardLayout", () => {
     expect(screen.queryByTestId("deadline-modal")).toBeNull();
   });
 
+  it("onSelectType add_reading opens ReadingModal", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    fireEvent.click(screen.getByText("Quick Add"));
+    fireEvent.click(screen.getByText("Add Reading"));
+    expect(screen.getByTestId("reading-modal")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Close Reading Modal"));
+    expect(screen.queryByTestId("reading-modal")).toBeNull();
+  });
+
   it("opens QuickAdd modal and falls back to the main chooser for legacy scheduler events", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     act(() => {
@@ -379,6 +392,14 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("quick-add-modal")).toBeTruthy();
     expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("schedule_auto");
     expect(screen.getByText("Quick Add")).toBeInTheDocument();
+  });
+
+  it("defaults quick-add listener events without a detail payload to the type chooser", () => {
+    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
+    act(() => {
+      window.dispatchEvent(new CustomEvent("quick-add:open"));
+    });
+    expect(screen.getByTestId("quick-add-initial-view")).toHaveTextContent("type");
   });
 });
 

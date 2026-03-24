@@ -7,7 +7,7 @@ import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 import Badge from '../../common/Badge/Badge';
 import DeadlineCountdown from '../../common/DeadlineCountdown/DeadlineCountdown';
-import urgentGlowStyles from '../../Common/UrgentGlow/UrgentGlow.module.css';
+import urgentGlowStyles from '../../common/UrgentGlow/UrgentGlow.module.css';
 import {
   containerVariants,
   expandBodyVariants,

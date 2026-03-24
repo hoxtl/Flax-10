@@ -11,7 +11,7 @@ import {
   TestModeContent,
 } from "./ModulesPageChrome.jsx";
 import { useModulesPageState } from "./modulesPageHooks.js";
-import HoldConfirmModal from "../../components/Common/HoldConfirmModal/HoldConfirmModal.jsx";
+import HoldConfirmModal from "../../components/common/HoldConfirmModal/HoldConfirmModal.jsx";
 
 function DeleteModuleModal({ state }) {
   const mod = state.deletingModule;

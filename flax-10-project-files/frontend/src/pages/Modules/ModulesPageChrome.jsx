@@ -6,7 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import { BackToTop } from "../../components/Pagination/Pagination.jsx";
 import ModuleForm from "../../components/Modules/Modules/ModuleForm.jsx";
 import ModuleDetails from "../../components/Modules/Modules/ModuleDetails.jsx";
-import StandardModal from "../../components/Common/StandardModal/StandardModal.jsx";
+import StandardModal from "../../components/common/StandardModal/StandardModal.jsx";
 import DeadlineModal from "../../components/Modules/Deadlines/DeadlineModal.jsx";
 import ReadingModal from "../../components/Modules/Readings/ReadingModal.jsx";
 import PageTransition from "../../components/common/PageTransition/PageTransition.jsx";

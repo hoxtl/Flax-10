@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import InlineAlert from '../../../components/Common/InlineAlert/InlineAlert';
+import InlineAlert from '../../../components/common/InlineAlert/InlineAlert';
 
-vi.mock('../../../components/Common/InlineAlert/InlineAlert.module.css', () => ({
+vi.mock('../../../components/common/InlineAlert/InlineAlert.module.css', () => ({
   default: {
     alert: 'alert', success: 'success', error: 'error', warning: 'warning', info: 'info',
     icon: 'icon', message: 'message',
@@ -83,5 +83,10 @@ describe('InlineAlert', () => {
     render(<InlineAlert message="Note" className="myClass" />);
     const el = screen.getByRole('status');
     expect(el.className).toContain('myClass');
+  });
+
+  it('falls back to success styling for unknown variants', () => {
+    render(<InlineAlert message="Fallback" variant="mystery" />);
+    expect(screen.getByRole('status').className).toContain('success');
   });
 });
