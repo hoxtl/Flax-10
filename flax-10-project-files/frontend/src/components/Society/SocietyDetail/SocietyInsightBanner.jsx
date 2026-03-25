@@ -11,7 +11,6 @@ import { getEnrollments, getModules } from "../../../api/moduleApi";
 
 import styles from "./SocietyInsightBanner.module.css";
 
-const INITIAL_STATE = { insight: null };
 const EMPTY_HEATMAP = Array.from({ length: 7 }, () => Array(24).fill(0));
 
 function isValidDate(value) {
@@ -189,68 +188,43 @@ function getFulfilledValue(result, fallback) {
   return result.status === "fulfilled" ? result.value : fallback;
 }
 
-export default function SocietyInsightBanner({ society }) {
-  const [state, setState] = useState(INITIAL_STATE);
-  const eventSignature = useMemo(
-    () => (society?.events || []).map((event) => `${event.id}:${event.start_time}:${event.end_time}`).join("|"),
-    [society?.events],
-  );
+async function loadSocietyInsightData() {
+  return Promise.allSettled([analyticsApi.getSummary(30), getModules(), getEnrollments()]);
+}
 
+function getInsightParams(res, society) {
+  const [a, m, e] = res;
+  return {
+    analytics: getFulfilledValue(a, null),
+    events: getUpcomingEvents(society),
+    modules: getEnrolledModules(getFulfilledValue(m, []), getFulfilledValue(e, [])),
+    moduleContextAvailable: m.status === "fulfilled" && e.status === "fulfilled",
+  };
+}
+
+function useSocietyInsight(society) {
+  const [insight, setInsight] = useState(null);
+  const sig = useMemo(() => (society?.events || []).map((ev) => `${ev.id}:${ev.start_time}:${ev.end_time}`).join("|"), [society?.events]);
   useEffect(() => {
     let cancelled = false;
-
-    async function loadInsight() {
-      const results = await Promise.allSettled([
-        analyticsApi.getSummary(30),
-        getModules(),
-        getEnrollments(),
-      ]);
-
-      if (cancelled) return;
-
-      const analytics = getFulfilledValue(results[0], null);
-      const modules = getFulfilledValue(results[1], []);
-      const enrollments = getFulfilledValue(results[2], []);
-      const moduleContextAvailable = results[1].status === "fulfilled" && results[2].status === "fulfilled";
-
-      setState({
-        insight: buildInsight({
-          analytics,
-          events: getUpcomingEvents(society),
-          modules: getEnrolledModules(modules, enrollments),
-          moduleContextAvailable,
-        }),
-      });
-    }
-
-    loadInsight().catch(() => {
-      if (!cancelled) {
-        setState({
-          insight: buildInsight({
-            analytics: null,
-            events: getUpcomingEvents(society),
-            modules: [],
-            moduleContextAvailable: false,
-          }),
-        });
-      }
+    loadSocietyInsightData().then((res) => {
+      if (!cancelled) setInsight(buildInsight(getInsightParams(res, society)));
+    }).catch(() => {
+      if (!cancelled) setInsight(buildInsight({ analytics: null, events: getUpcomingEvents(society), modules: [], moduleContextAvailable: false }));
     });
+    return () => { cancelled = true; };
+  }, [society?.id, sig]);
+  return insight;
+}
 
-    return () => {
-      cancelled = true;
-    };
-  }, [society?.id, eventSignature]);
+export default function SocietyInsightBanner({ society }) {
+  const insight = useSocietyInsight(society);
+  if (!insight) return null;
 
-  if (!state.insight) return null;
-
-  const { insight } = state;
   const Icon = insight.icon;
-
   return (
     <section className={`${styles.banner} ${styles[insight.tone]}`} aria-live="polite">
-      <div className={styles.iconWrap}>
-        <Icon size={18} strokeWidth={2.1} />
-      </div>
+      <div className={styles.iconWrap}><Icon size={18} strokeWidth={2.1} /></div>
       <div className={styles.content}>
         <p className={styles.title}>{insight.title}</p>
         <p className={styles.description}>{insight.description}</p>
