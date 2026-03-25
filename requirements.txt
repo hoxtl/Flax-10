@@ -16,3 +16,4 @@ faker==40.4.0
 python-dotenv==1.2.1
 openai==2.21.0
 requests==2.32.5
+coverage==7.9.2
