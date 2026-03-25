@@ -80,30 +80,10 @@ describe('EventsSummaryModal', () => {
     });
 
     it('resets range to today when reopened', () => {
+        const props = { onClose: vi.fn(), allEvents: events, baseDate, isMutualOrSelf: true };
         const { rerender } = renderModal({ isOpen: false });
-        rerender(
-            <MemoryRouter>
-                <EventsSummaryModal
-                    isOpen={false}
-                    onClose={vi.fn()}
-                    allEvents={events}
-                    baseDate={baseDate}
-                    isMutualOrSelf={true}
-                />
-            </MemoryRouter>
-        );
-        rerender(
-            <MemoryRouter>
-                <EventsSummaryModal
-                    isOpen={true}
-                    onClose={vi.fn()}
-                    allEvents={events}
-                    baseDate={baseDate}
-                    isMutualOrSelf={true}
-                />
-            </MemoryRouter>
-        );
-        // range should be reset to 'today'
+        rerender(<MemoryRouter><EventsSummaryModal isOpen={false} {...props} /></MemoryRouter>);
+        rerender(<MemoryRouter><EventsSummaryModal isOpen={true} {...props} /></MemoryRouter>);
         expect(screen.getByText(/Events - Today/)).toBeTruthy();
     });
 });

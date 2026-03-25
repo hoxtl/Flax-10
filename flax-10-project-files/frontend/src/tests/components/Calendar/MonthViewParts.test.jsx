@@ -85,21 +85,12 @@ describe("MonthView parts", () => {
   it("renders a fresh readonly day cell and forwards the more-events click", () => {
     const onDateSelect = vi.fn();
     const onMoreClick = vi.fn();
-    const events = [1, 2, 3, 4].map((id) => ({
-      id,
-      title: `Event ${id}`,
-      start_time: new Date("2026-03-24T10:00:00.000Z"),
-      end_time: new Date("2026-03-24T11:00:00.000Z"),
-    }));
+    const events = [1, 2, 3, 4].map((id) => ({ id, title: `Event ${id}`, start_time: new Date("2026-03-24T10:00:00.000Z"), end_time: new Date("2026-03-24T11:00:00.000Z") }));
 
     render(
       <DayCell
         day={new Date("2026-03-24T00:00:00.000Z")}
-        events={events}
-        isCur
-        onDateSelect={onDateSelect}
-        onMoreClick={onMoreClick}
-        readOnly
+        events={events} isCur onDateSelect={onDateSelect} onMoreClick={onMoreClick} readOnly
       />,
     );
 

@@ -176,82 +176,27 @@ describe("CalendarContext extras", () => {
   });
 
   it("filters by nested tag values and search query while keeping allEvents intact", () => {
-    render(
-      <CalendarProvider>
-        <ProviderWithState />
-      </CalendarProvider>,
-    );
-
-    act(() => {
-      screen.getByText("set events").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft,Gym");
-    expect(screen.getByTestId("all-provider-events")).toHaveTextContent("Essay Draft,Gym");
-
-    act(() => {
-      screen.getByText("filter nested").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
-    expect(screen.getByTestId("all-provider-events")).toHaveTextContent("Essay Draft,Gym");
-
-    act(() => {
-      screen.getByText("search description").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
-
-    act(() => {
-      screen.getByText("search location").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
-
-    act(() => {
-      screen.getByText("search title").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
-
-    act(() => {
-      screen.getByText("clear search").click();
-    });
-    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
-
-    act(() => {
-      screen.getByText("set sparse events").click();
-      screen.getByText("search sparse").click();
-    });
+    render(<CalendarProvider><ProviderWithState /></CalendarProvider>);
+    const verify = (btn, expFilt, expAll = "Essay Draft,Gym") => { act(() => { screen.getByText(btn).click(); }); expect(screen.getByTestId("filtered-events")).toHaveTextContent(expFilt); expect(screen.getByTestId("all-provider-events")).toHaveTextContent(expAll); };
+    verify("set events", "Essay Draft,Gym");
+    verify("filter nested", "Essay Draft");
+    verify("search description", "Essay Draft");
+    verify("search location", "Essay Draft");
+    verify("search title", "Essay Draft");
+    verify("clear search", "Essay Draft");
+    act(() => { screen.getByText("set sparse events").click(); screen.getByText("search sparse").click(); });
     expect(screen.getByTestId("filtered-events")).toHaveTextContent("");
   });
 
   it("supports override props plus popup, modal, and delete actions inside the provider", () => {
     render(<ProviderHarness />);
-
-    expect(screen.getByTestId("provider-data-events")).toHaveTextContent("Override Event");
-    expect(screen.getByTestId("provider-data-selected-date")).toHaveTextContent("override-date");
-    expect(screen.getByTestId("provider-data-view-mode")).toHaveTextContent("day");
-    expect(screen.getByTestId("provider-data-display-mode")).toHaveTextContent("list");
-
-    act(() => {
-      screen.getByText("provider modal").click();
-      screen.getByText("provider popup explicit").click();
-      screen.getByText("provider delete").click();
-    });
-
-    expect(screen.getByTestId("provider-modal-type")).toHaveTextContent("edit");
-    expect(screen.getByTestId("provider-popup-view-mode")).toHaveTextContent("list");
-    expect(screen.getByTestId("provider-popup-read-only")).toHaveTextContent("true");
-    expect(screen.getByTestId("provider-delete-type")).toHaveTextContent("all");
-
-    act(() => {
-      screen.getByText("provider popup close").click();
-      screen.getByText("provider delete close").click();
-      screen.getByText("provider modal defaults").click();
-      screen.getByText("provider popup defaults").click();
-      screen.getByText("provider delete default").click();
-    });
-
-    expect(screen.getByTestId("provider-modal-type")).toHaveTextContent("");
-    expect(screen.getByTestId("provider-popup-view-mode")).toHaveTextContent("week");
-    expect(screen.getByTestId("provider-popup-read-only")).toHaveTextContent("false");
-    expect(screen.getByTestId("provider-delete-type")).toHaveTextContent("");
+    const verify = (evts, date, view, disp) => { expect(screen.getByTestId("provider-data-events")).toHaveTextContent(evts); expect(screen.getByTestId("provider-data-selected-date")).toHaveTextContent(date); expect(screen.getByTestId("provider-data-view-mode")).toHaveTextContent(view); expect(screen.getByTestId("provider-data-display-mode")).toHaveTextContent(disp); };
+    const verifyState = (mType, pView, pRead, dType) => { expect(screen.getByTestId("provider-modal-type")).toHaveTextContent(mType); expect(screen.getByTestId("provider-popup-view-mode")).toHaveTextContent(pView); expect(screen.getByTestId("provider-popup-read-only")).toHaveTextContent(pRead); expect(screen.getByTestId("provider-delete-type")).toHaveTextContent(dType); };
+    verify("Override Event", "override-date", "day", "list");
+    act(() => { screen.getByText("provider modal").click(); screen.getByText("provider popup explicit").click(); screen.getByText("provider delete").click(); });
+    verifyState("edit", "list", "true", "all");
+    act(() => { screen.getByText("provider popup close").click(); screen.getByText("provider delete close").click(); screen.getByText("provider modal defaults").click(); screen.getByText("provider popup defaults").click(); screen.getByText("provider delete default").click(); });
+    verifyState("", "week", "false", "");
   });
 
   it("inherits readOnly for popup state when no override is passed", () => {
