@@ -2,7 +2,7 @@
  * GroupWork project header metadata.
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -13,7 +13,8 @@ import { getProjectMemberCount, getProjectTeacherName, openTeacherProfile } from
 import AddMemberForm from "./AddMemberForm";
 import MembersSection from "./MembersSection";
 import MemberAvatar from "./MemberAvatar";
-import { getDisplayName, openMemberProfile, getStoredViewer } from "../utils/memberAvatarUtils";
+import { getDisplayName, openMemberProfile } from "../utils/memberAvatarUtils";
+import { useAuth } from "../../../context/AuthContext";
 import styles from "./ProjectHeader.module.css";
 
 export function ProjectHeaderMeta({ project, members, teamMembers = [], onMemberAdded, onMemberRemove, onDeleteProject }) {
@@ -63,11 +64,12 @@ export function ProjectTeacherMeta({ project }) {
   );
 }
 
-function currentUserIsOwner(members) {
-  const viewer = getStoredViewer();
-  const viewerId = String(viewer.id ?? viewer.user ?? "");
-  if (!viewerId) return false;
-  return members.some((m) => String(m.user ?? "") === viewerId && m.role === "owner");
+function useIsOwner(members) {
+  const { profile } = useAuth();
+  return useMemo(() => {
+    if (!profile?.id) return false;
+    return members.some((m) => String(m.user ?? "") === String(profile.id) && m.role === "owner");
+  }, [members, profile?.id]);
 }
 
 function TeamAvatarStrip({ members }) {
@@ -114,7 +116,7 @@ function TeamManagementPanel({ project, teamMembers, onMemberAdded, onMemberRemo
 
 function ProjectMembersMeta({ project, members, teamMembers, onMemberAdded, onMemberRemove, onDeleteProject }) {
   const [isEditing, setIsEditing] = useState(false);
-  const canManageTeam = currentUserIsOwner(teamMembers);
+  const canManageTeam = useIsOwner(teamMembers);
   const teamCount = teamMembers.length;
   const removalFlow = useMemberRemovalFlow(teamMembers, onMemberRemove, onDeleteProject);
   if (!members.length && !teamMembers.length) return null;
