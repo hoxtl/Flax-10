@@ -1,43 +1,137 @@
-/*
- * Tests for TaskInfoModal.
- */
-
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { TaskInfoModal } from "../../../../pages/Tasks/components/TaskInfoModal";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("../../../../api/readingApi", () => ({
-  getReadingSpeed: vi.fn().mockResolvedValue({ avg_min_per_page: 1.7, is_personalised: true }),
+  getReadingSpeed: vi.fn(),
 }));
 
-describe("TaskInfoModal", () => {
-  const task = { id: 1, title: "Read ch 3", priority: "high", due_date: "2026-03-15", estimated_blocks: 2 };
+import { TaskInfoModal } from "../../../../pages/Tasks/components/TaskInfoModal";
+import { getReadingSpeed } from "../../../../api/readingApi";
 
-  it("renders task title", () => {
-    render(<TaskInfoModal task={task} onClose={vi.fn()} />);
-    expect(screen.getByText("Read ch 3")).toBeInTheDocument();
+describe("TaskInfoModal coverage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("calls onClose when Close clicked", () => {
+  it("does not request reading speed when there is no reading context", () => {
+    render(
+      <TaskInfoModal
+        task={{ id: 1, title: "Essay", priority: "medium", estimated_blocks: 2, due_date: null }}
+        listName="Inbox"
+        onClose={vi.fn()}
+      />,
+    );
+
+    expect(getReadingSpeed).not.toHaveBeenCalled();
+    expect(screen.queryByText("Chapter")).not.toBeInTheDocument();
+  });
+
+  it("shows page ranges and module-name fallbacks for reading tasks", async () => {
+    getReadingSpeed.mockResolvedValue({ avg_min_per_page: 2, is_personalised: false });
+
+    render(
+      <TaskInfoModal
+        task={{
+          id: 2,
+          title: "Read chapter",
+          description: "",
+          priority: "urgent",
+          due_date: "2026-03-15T10:00:00Z",
+          estimated_blocks: 3,
+          module_name: "Machine Learning",
+          reading_chapter: "Week 4",
+          reading_start_page: 10,
+          reading_end_page: 18,
+        }}
+        listName="Reading List - Machine Learning"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
+    expect(screen.getByText("Week 4")).toBeInTheDocument();
+    expect(screen.getByText("pp. 10–18")).toBeInTheDocument();
+    expect(screen.getByText("Speed")).toBeInTheDocument();
+    expect(screen.getByText("2.0 min/page")).toBeInTheDocument();
+    expect(screen.getByText("Machine Learning")).toBeInTheDocument();
+  });
+
+  it("handles reading-speed failures and missing-value fallbacks outside reading lists", async () => {
     const onClose = vi.fn();
-    render(<TaskInfoModal task={task} onClose={onClose} />);
-    const closeBtns = screen.getAllByRole("button", { name: /Close/i });
-    fireEvent.click(closeBtns[closeBtns.length - 1]);
+    getReadingSpeed.mockRejectedValueOnce(new Error("offline"));
+
+    render(
+      <TaskInfoModal
+        task={{
+          id: 3,
+          title: "",
+          description: "Bring notes",
+          priority: null,
+          due_date: null,
+          estimated_blocks: 1,
+          module_code: "CS300",
+          module_name: "Compilers",
+          page_count: 12,
+        }}
+        listName="Inbox"
+        onClose={onClose}
+      />,
+    );
+
+    await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+    expect(screen.getByText("Bring notes")).toBeInTheDocument();
+    expect(screen.getByText("12 pages")).toBeInTheDocument();
+    expect(screen.queryByText("Speed")).not.toBeInTheDocument();
+    expect(screen.getByText("CS300 — Compilers")).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Close" })[0]);
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("shows chapter, pages, and speed fields for tasks inside a reading list", async () => {
+  it("shows optional chapter pills without pages when the task is not in a reading list", () => {
     render(
       <TaskInfoModal
-        task={{ ...task, title: "LW4202 essay" }}
-        listName="LW4202 - Constitutional Law"
+        task={{
+          id: 4,
+          title: "Skim notes",
+          description: "",
+          priority: "medium",
+          due_date: null,
+          estimated_blocks: 1,
+          reading_chapter: "Week 6",
+        }}
+        listName="Inbox"
         onClose={vi.fn()}
-      />
+      />,
     );
 
-    expect(screen.getByText("Chapter")).toBeInTheDocument();
-    expect(screen.getByText("Pages")).toBeInTheDocument();
+    expect(screen.getByText("Week 6")).toBeInTheDocument();
+    expect(screen.queryByText("Pages")).not.toBeInTheDocument();
+  });
+
+  it("shows reading speed outside reading lists when page counts are present", async () => {
+    getReadingSpeed.mockResolvedValueOnce({ avg_min_per_page: 1.5 });
+
+    render(
+      <TaskInfoModal
+        task={{
+          id: 5,
+          title: "Read handout",
+          description: "",
+          priority: "medium",
+          due_date: null,
+          estimated_blocks: 1,
+          page_count: 12,
+          module_code: "CS111",
+        }}
+        listName="Inbox"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
     expect(screen.getByText("Speed")).toBeInTheDocument();
-    expect(await screen.findByText("1.7 min/page")).toBeInTheDocument();
+    expect(screen.getByText("1.5 min/page")).toBeInTheDocument();
   });
 });

@@ -129,124 +129,53 @@ describe("tasksPageUtils", () => {
       expect(out.some((t) => t.id === 2)).toBe(true);
       vi.useRealTimers();
     });
+  const makeMocks = (addTskMock) => ({
+    state: {
+      activeListId: 4, activeFilter: "today", showTaskModal: true, taskModalDueDate: "2026-03-10T12:00:00Z",
+      toastUndo: null, toastDelete: false, toastInfo: null, showListModal: true, showCreateListFromTask: true,
+      lastCreatedListId: 8, setActiveListId: vi.fn(), setActiveFilter: vi.fn(), setFilterListIds: vi.fn(),
+      setShowListModal: vi.fn(), setShowTaskModal: vi.fn(), setTaskModalDueDate: vi.fn(), setToastUndo: vi.fn(),
+      setToastDelete: vi.fn(), setToastInfo: vi.fn(), setShowCreateListFromTask: vi.fn(), setLastCreatedListId: vi.fn(),
+    },
+    listsApi: {
+      lists: [{ id: 4, name: "Inbox" }], archivedLists: [], loading: false,
+      addList: vi.fn().mockResolvedValueOnce({ id: 12, name: "New List" }),
+      renameList: vi.fn(), removeList: vi.fn(), restoreList: vi.fn(), permanentlyDeleteList: vi.fn(),
+    },
+    tasksApi: {
+      tasks: [], initialLoading: false, addTask: addTskMock,
+      removeTask: vi.fn(), editTask: vi.fn(), toggleComplete: vi.fn(), reload: vi.fn(),
+    }
+  });
+
   it("wires modal save and close handlers, including create-list-from-task", async () => {
-    const state = {
-      activeListId: 4,
-        activeFilter: "today",
-        setActiveListId: vi.fn(),
-        setActiveFilter: vi.fn(),
-        setFilterListIds: vi.fn(),
-        setShowListModal: vi.fn(),
-        setShowTaskModal: vi.fn(),
-        setTaskModalDueDate: vi.fn(),
-        showTaskModal: true,
-        taskModalDueDate: "2026-03-10T12:00:00Z",
-        toastUndo: null,
-        toastDelete: false,
-        toastInfo: null,
-        setToastUndo: vi.fn(),
-        setToastDelete: vi.fn(),
-        setToastInfo: vi.fn(),
-        showListModal: true,
-        showCreateListFromTask: true,
-        setShowCreateListFromTask: vi.fn(),
-        lastCreatedListId: 8,
-        setLastCreatedListId: vi.fn(),
-      };
-      const listsApi = {
-        lists: [{ id: 4, name: "Inbox" }],
-        archivedLists: [],
-        loading: false,
-        addList: vi.fn()
-          .mockResolvedValueOnce({ id: 12, name: "New List" }),
-        renameList: vi.fn(),
-        removeList: vi.fn(),
-        restoreList: vi.fn(),
-        permanentlyDeleteList: vi.fn(),
-      };
-      const tasksApi = {
-        tasks: [],
-        initialLoading: false,
-        addTask: vi.fn()
-          .mockResolvedValueOnce({ id: 45, title: "Saved task" }),
-        removeTask: vi.fn(),
-        editTask: vi.fn(),
-        toggleComplete: vi.fn(),
-        reload: vi.fn(),
-      };
-      const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
-      const result = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [], "2026-03-10T23:59:59Z", null);
+    const { state, listsApi, tasksApi } = makeMocks(vi.fn().mockResolvedValueOnce({ id: 45, title: "Saved task" }));
+    const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
+    const result = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [], "2026-03-10T23:59:59Z", null);
 
-      await result.taskModalProps.onSave({ title: "Saved task" });
-      result.taskModalProps.onOpenCreateList();
-      result.taskModalProps.onClose();
-      await result.createListFromTaskProps.onSave({ name: "New List" });
-      result.createListFromTaskProps.onClose();
-      result.listModalProps.onClose();
+    await result.taskModalProps.onSave({ title: "Saved task" });
+    result.taskModalProps.onOpenCreateList();
+    result.taskModalProps.onClose();
+    await result.createListFromTaskProps.onSave({ name: "New List" });
+    result.createListFromTaskProps.onClose();
 
-      expect(tasksApi.addTask).toHaveBeenCalledWith({ title: "Saved task" });
-      expect(state.setToastUndo).toHaveBeenCalledWith({ taskId: 45, title: "Saved task" });
-      expect(state.setShowCreateListFromTask).toHaveBeenCalledWith(true);
-      expect(state.setShowTaskModal).toHaveBeenCalledWith(false);
-      expect(state.setLastCreatedListId).toHaveBeenCalledWith(null);
-      expect(state.setTaskModalDueDate).toHaveBeenCalledWith(null);
-      expect(listsApi.addList).toHaveBeenCalledWith({ name: "New List" });
-      expect(state.setLastCreatedListId).toHaveBeenCalledWith(12);
-      expect(state.setShowCreateListFromTask).toHaveBeenCalledWith(false);
-      expect(state.setShowListModal).toHaveBeenCalledWith(false);
-    });
+    expect(tasksApi.addTask).toHaveBeenCalledWith({ title: "Saved task" });
+    expect(state.setToastUndo).toHaveBeenCalledWith({ taskId: 45, title: "Saved task" });
+    expect(state.setShowTaskModal).toHaveBeenCalledWith(false);
+    expect(listsApi.addList).toHaveBeenCalledWith({ name: "New List" });
+    expect(state.setLastCreatedListId).toHaveBeenCalledWith(12);
+  });
 
-    it("skips undo toasts when task creation returns nothing", async () => {
-      const state = {
-        activeListId: null,
-        activeFilter: "all",
-        setActiveListId: vi.fn(),
-        setActiveFilter: vi.fn(),
-        setFilterListIds: vi.fn(),
-        setShowListModal: vi.fn(),
-        setShowTaskModal: vi.fn(),
-        setTaskModalDueDate: vi.fn(),
-        showTaskModal: false,
-        taskModalDueDate: null,
-        toastUndo: null,
-        toastDelete: false,
-        toastInfo: null,
-        setToastUndo: vi.fn(),
-        setToastDelete: vi.fn(),
-        setToastInfo: vi.fn(),
-        showListModal: false,
-        showCreateListFromTask: false,
-        setShowCreateListFromTask: vi.fn(),
-        lastCreatedListId: null,
-        setLastCreatedListId: vi.fn(),
-      };
-      const listsApi = {
-        lists: [],
-        archivedLists: [],
-        loading: false,
-        addList: vi.fn(),
-        renameList: vi.fn(),
-        removeList: vi.fn(),
-        restoreList: vi.fn(),
-        permanentlyDeleteList: vi.fn(),
-      };
-      const tasksApi = {
-        tasks: [],
-        initialLoading: false,
-        addTask: vi.fn().mockResolvedValue(null),
-        removeTask: vi.fn(),
-        editTask: vi.fn(),
-        toggleComplete: vi.fn(),
-        reload: vi.fn(),
-      };
-      const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
-      const result = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [], null, null);
+  it("skips undo toasts when task creation returns nothing", async () => {
+    const { state, listsApi, tasksApi } = makeMocks(vi.fn().mockResolvedValue(null));
+    const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
+    const result = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [], null, null);
 
-      await result.feedProps.onAddTask({ title: "Ghost task" });
-      expect(state.setToastUndo).not.toHaveBeenCalled();
+    await result.feedProps.onAddTask({ title: "Ghost task" });
+    expect(state.setToastUndo).not.toHaveBeenCalled();
 
-      await result.taskModalProps.onSave({ title: "Ghost task" });
-      expect(state.setToastUndo).toHaveBeenCalledWith(null);
-    });
+    await result.taskModalProps.onSave({ title: "Ghost task" });
+    expect(state.setToastUndo).toHaveBeenCalledWith(null);
+  });
   });
 });

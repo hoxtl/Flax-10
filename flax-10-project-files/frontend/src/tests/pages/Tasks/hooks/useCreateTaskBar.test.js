@@ -143,12 +143,7 @@ describe("useCreateTaskBar", () => {
 
   it("uses the internal input ref for blur and ignores settings results after unmount", async () => {
     let resolveSettings;
-    getUserSettings.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveSettings = resolve;
-      }),
-    );
-
+    getUserSettings.mockReturnValueOnce(new Promise((r) => { resolveSettings = r; }));
     const { result, unmount } = renderHook(() => useCreateTaskBar({ onAddTask: vi.fn() }));
     const blur = vi.fn();
     const outsideNode = document.createElement("button");
@@ -159,19 +154,11 @@ describe("useCreateTaskBar", () => {
       result.current.cardRef.current = { contains: () => false };
       result.current.setInputFocused(true);
     });
-
-    act(() => {
-      outsideNode.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    });
-
+    act(() => { outsideNode.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
     expect(blur).toHaveBeenCalled();
 
     unmount();
-    await act(async () => {
-      resolveSettings({ sleep_time: "22:30", wake_time: "06:30" });
-      await Promise.resolve();
-    });
-
+    await act(async () => { resolveSettings({ sleep_time: "22:30", wake_time: "06:30" }); });
     outsideNode.remove();
   });
 
