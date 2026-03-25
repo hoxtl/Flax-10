@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
@@ -25,7 +25,11 @@ vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
 }));
 
 vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
-  default: ({ children, ...props }) => <button {...props}>{children}</button>,
+  default: ({ children, disabled, onClick, ...props }) => (
+    <button {...props} data-disabled={String(Boolean(disabled))} onClick={onClick}>
+      {children}
+    </button>
+  ),
 }));
 
 vi.mock("../../../../pages/Tasks/components/AllTasksCompleteCard", () => ({
@@ -193,5 +197,37 @@ describe("SuggestedReadingsSectionParts", () => {
     );
 
     expect(screen.getByText("Expanded body")).toBeInTheDocument();
+  });
+
+  it("uses fallback reading-speed estimates and ignores repeat add attempts", async () => {
+    let resolveAdd;
+    convertReadingToTask.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveAdd = resolve;
+      }),
+    );
+
+    render(
+      <SuggestedReadingCard
+        reading={{ id: 11, title: "Fallback estimate", page_count: 20 }}
+        onAdded={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("40 min to read")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("+ Add as task"));
+    await waitFor(() => expect(screen.getByText("Adding…")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Adding…"));
+    expect(convertReadingToTask).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveAdd({});
+      await Promise.resolve();
+    });
+
+    fireEvent.click(screen.getByText("✓ Added"));
+    expect(convertReadingToTask).toHaveBeenCalledTimes(1);
   });
 });

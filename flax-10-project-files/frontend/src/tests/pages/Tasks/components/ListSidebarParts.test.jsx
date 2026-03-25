@@ -19,6 +19,10 @@ describe("ListSidebarParts", () => {
     expect(onSave).toHaveBeenCalledWith("Study");
 
     fireEvent.change(input, { target: { value: "   " } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(onSave).toHaveBeenCalledWith("Inbox");
+
+    fireEvent.change(input, { target: { value: "   " } });
     fireEvent.blur(input);
     expect(onSave).toHaveBeenCalledWith("Inbox");
 
@@ -36,6 +40,9 @@ describe("ListSidebarParts", () => {
     const menu = screen.getByRole("button", { name: /rename/i }).parentElement;
     expect(menu.style.getPropertyValue("--ctx-top")).toBe("42px");
     expect(menu.style.getPropertyValue("--ctx-left")).toBe("28px");
+
+    fireEvent.mouseDown(menu);
+    expect(onClose).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: /rename/i }));
     expect(onRename).toHaveBeenCalled();

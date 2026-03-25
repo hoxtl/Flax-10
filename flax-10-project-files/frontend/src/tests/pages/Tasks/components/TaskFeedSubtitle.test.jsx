@@ -29,5 +29,8 @@ describe("TaskFeedSubtitle", () => {
 
     rerender(<div>{getTaskFeedSubtitle({ name: "Seminar notes" }, true)}</div>);
     expect(screen.getByText(/seminar notes/i)).toBeInTheDocument();
+
+    rerender(<div>{getTaskFeedSubtitle({ name: "" }, true)}</div>);
+    expect(screen.getByText(/this module/i)).toBeInTheDocument();
   });
 });

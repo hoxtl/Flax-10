@@ -78,4 +78,21 @@ describe("TaskFeedToolbarFilter", () => {
     expect(screen.getByRole("dialog", { name: "Task filters" })).toBeInTheDocument();
     expect(screen.getByTestId("task-filter-panel")).toBeInTheDocument();
   });
+
+  it("does not reopen the panel on hover when it is already open", () => {
+    const onFilterOpenChange = vi.fn();
+
+    render(
+      <ToolbarFilterPanel
+        filterAnchor={{ current: null }}
+        isFilterOpen
+        onFilterOpenChange={onFilterOpenChange}
+        activeFilterCount={0}
+        panelProps={{}}
+      />,
+    );
+
+    fireEvent.mouseEnter(screen.getByRole("button", { name: /filter/i }).parentElement);
+    expect(onFilterOpenChange).not.toHaveBeenCalledWith(true);
+  });
 });

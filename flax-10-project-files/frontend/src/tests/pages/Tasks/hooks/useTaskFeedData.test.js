@@ -15,7 +15,7 @@ vi.mock("../../../../api/moduleApi", () => ({
 }));
 
 vi.mock("../../../../components/Timer/taskInput/taskInputUtils", () => ({
-  buildListItems: (lists) => lists.map((list) => ({ value: list.id, label: list.name })),
+  buildListItems: (lists = []) => lists.map((list) => ({ value: list.id, label: list.name })),
   filterListItems: (items) => items,
   groupModuleItems: (items) => ({ All: items }),
 }));
@@ -303,6 +303,34 @@ describe("useTaskFeedData", () => {
     });
   });
 
+  it("uses plural wording for generic all-complete cards with multiple completed tasks", () => {
+    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([]);
+
+    const completedTasks = [
+      { id: 8, title: "Finished", completed: true },
+      { id: 9, title: "Finished again", completed: true },
+    ];
+
+    const { result } = renderHook(() =>
+      useTaskFeedData({
+        tasks: completedTasks,
+        allTasks: completedTasks,
+        lists: [{ id: 8, name: "Inbox" }],
+        activeFilter: "all",
+        activeListId: 8,
+        filterListIds: [],
+      }),
+    );
+
+    expect(result.current.allTasksEmptyCardProps).toEqual({
+      message: "Great job",
+      sub: "2 tasks completed. Take a moment — you earned it.",
+    });
+  });
+
   it("focuses the task input for the n shortcut and blurs editable targets on escape", () => {
     const focus = vi.fn();
     const blur = vi.fn();
@@ -359,5 +387,124 @@ describe("useTaskFeedData", () => {
 
     inside.remove();
     outside.remove();
+  });
+
+  it("handles missing tasks, lists, and module metadata defaults", async () => {
+    getModulesMock.mockResolvedValueOnce(undefined);
+
+    const { result } = renderHook(() =>
+      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all" }),
+    );
+
+    await waitFor(() => expect(result.current.visibleListItems).toEqual([]));
+    expect(result.current.groupedVisibleModuleItems.All).toEqual([]);
+    expect(result.current.listMap).toEqual({});
+    expect(result.current.headerTitle).toBe("Header");
+  });
+
+  it("uses default task and list collections when the hook props omit them", async () => {
+    const { result } = renderHook(() =>
+      useTaskFeedData({ activeFilter: "all", activeListId: 999 }),
+    );
+
+    await waitFor(() => expect(result.current.listMap).toEqual({}));
+    expect(result.current.pending).toEqual([]);
+    expect(result.current.completed).toEqual([]);
+  });
+
+  it("ignores late module metadata responses after unmount", async () => {
+    let resolveModules;
+    getModulesMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveModules = resolve;
+      }),
+    );
+
+    const { unmount } = renderHook(() =>
+      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null }),
+    );
+
+    unmount();
+
+    await act(async () => {
+      resolveModules([{ module_code: "CS1", module_name: "Late module" }]);
+      await Promise.resolve();
+    });
+  });
+
+  it("ignores rejected module metadata responses after unmount", async () => {
+    let rejectModules;
+    getModulesMock.mockReturnValueOnce(
+      new Promise((_, reject) => {
+        rejectModules = reject;
+      }),
+    );
+
+    const { unmount } = renderHook(() =>
+      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null }),
+    );
+
+    unmount();
+
+    await act(async () => {
+      rejectModules(new Error("late metadata failure"));
+      await Promise.resolve();
+    });
+  });
+
+  it("filters tasks with missing module codes when the empty code is selected", async () => {
+    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(
+      (_filterListIds, _onFilterByList, setFilterModuleCodes, setFilterQuery) => ({
+        toggleListFilter: vi.fn(),
+        toggleModuleFilter: (code) => setFilterModuleCodes((prev) => (prev.includes(code) ? [] : [code])),
+        clearAllFilters: () => {
+          setFilterModuleCodes([]);
+          setFilterQuery("");
+        },
+      }),
+    );
+
+    const tasks = [
+      { id: 1, title: "No module", completed: false, module_code: null },
+      { id: 2, title: "Has module", completed: false, module_code: "CS101" },
+    ];
+
+    const { result } = renderHook(() =>
+      useTaskFeedData({
+        tasks,
+        allTasks: tasks,
+        lists: [],
+        activeFilter: "all",
+        activeListId: null,
+        filterListIds: [],
+      }),
+    );
+
+    act(() => {
+      result.current.toggleModuleFilter("");
+    });
+
+    await waitFor(() => {
+      expect(result.current.pending).toEqual([{ id: 1, title: "No module", completed: false, module_code: null }]);
+      expect(result.current.completed).toEqual([]);
+    });
+  });
+
+  it("builds module labels from code-only metadata when names are unavailable", async () => {
+    getModulesMock.mockResolvedValueOnce([
+      { module_code: "ph101" },
+    ]);
+
+    const tasks = [
+      { id: 1, completed: false, module_code: "PH101", module_name: "" },
+    ];
+
+    const { result } = renderHook(() =>
+      useTaskFeedData({ tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
+    );
+
+    await waitFor(() => expect(result.current.groupedVisibleModuleItems.All).toEqual([
+      { value: "PH101", label: "PH101" },
+    ]));
   });
 });

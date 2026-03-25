@@ -28,6 +28,21 @@ describe("createTaskBarUtils", () => {
       const out = buildQuickAddPayload(state, "T");
       expect(out.module).toBe(10);
     });
+
+    it("uses reading page counts to derive estimated blocks and page_count", () => {
+      const state = {
+        sortedLists: [{ id: 4 }],
+        taskListId: "",
+        estimatedBlocks: 1,
+        moduleId: null,
+        defaultDueDate: null,
+        pageCount: 30,
+      };
+      const out = buildQuickAddPayload(state, "Read");
+      expect(out.task_list).toBe(4);
+      expect(out.estimated_blocks).toBe(3);
+      expect(out.page_count).toBe(30);
+    });
   });
 
   describe("runQuickAdd", () => {

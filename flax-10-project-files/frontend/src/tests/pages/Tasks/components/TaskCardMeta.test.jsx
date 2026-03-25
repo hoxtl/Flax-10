@@ -73,4 +73,50 @@ describe("TaskCardMeta", () => {
     expect(screen.queryByRole("link", { name: /Open users/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Open .* society/i })).not.toBeInTheDocument();
   });
+
+  it("uses group-member counts and search routes for society names without ids", () => {
+    renderMeta(
+      <TaskCardMeta
+        task={{
+          module_code: "CS404",
+          society_name: "Debate Club",
+          group_member_count: 4,
+        }}
+      />,
+    );
+
+    expect(screen.getByTitle("Open Debate Club")).toHaveAttribute("href", "/societies?search=Debate%20Club");
+    expect(screen.getByTitle("Open users")).toHaveTextContent("4 people");
+  });
+
+  it("stops propagation from society and people links", () => {
+    const onParentClick = vi.fn();
+
+    renderMeta(
+      <div onClick={onParentClick}>
+        <TaskCardMeta
+          task={{
+            module_code: "CS505",
+            society_name: "Robotics Club",
+            people_count: 2,
+          }}
+        />
+      </div>,
+    );
+
+    const dispatchWithStop = (element) => {
+      const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+      const stopPropagation = vi.fn();
+      Object.defineProperty(event, "stopPropagation", { value: stopPropagation });
+      element.dispatchEvent(event);
+      return stopPropagation;
+    };
+
+    const societyStop = dispatchWithStop(screen.getByTitle("Open Robotics Club"));
+    const peopleStop = dispatchWithStop(screen.getByTitle("Open users"));
+
+    expect(societyStop).toHaveBeenCalled();
+    expect(peopleStop).toHaveBeenCalled();
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
 });

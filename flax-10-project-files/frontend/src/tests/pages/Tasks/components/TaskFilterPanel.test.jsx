@@ -54,4 +54,21 @@ describe("TaskFilterPanel", () => {
     render(<TaskFilterPanel {...defaultProps} visibleListItems={[]} />);
     expect(screen.getByText(/No lists found/i)).toBeInTheDocument();
   });
+
+  it("treats missing selected list ids as an empty selection", () => {
+    render(<TaskFilterPanel {...defaultProps} filterListIds={undefined} />);
+    expect(screen.getByRole("checkbox", { name: "Work" })).not.toBeChecked();
+  });
+
+  it("renders empty module groups safely when a group key has no items", () => {
+    render(
+      <TaskFilterPanel
+        {...defaultProps}
+        activeFilterTab="modules"
+        groupedModuleItems={{}}
+      />,
+    );
+    expect(screen.getByText("CS")).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "CS101" })).not.toBeInTheDocument();
+  });
 });

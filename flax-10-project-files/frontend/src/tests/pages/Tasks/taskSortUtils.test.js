@@ -157,4 +157,15 @@ describe("taskSortUtils", () => {
     const out = sortTasks(tasks, "priority", listMap);
     expect(out[0].title).toBe("E");
   });
+
+  it("compareList falls back to the default priority rank when priorities are missing", () => {
+    const tasks = [
+      { id: 1, title: "A", task_list: "1" },
+      { id: 2, title: "B", task_list: "1", priority: "urgent" },
+      { id: 3, title: "C", task_list: "1" },
+    ];
+    const out = sortTasks(tasks, "list", listMap);
+    expect(out[0].priority).toBe("urgent");
+    expect(out.at(-1).priority).toBeUndefined();
+  });
 });
