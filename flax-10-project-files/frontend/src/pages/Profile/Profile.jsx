@@ -4,8 +4,10 @@
 
 import { useEffect } from "react";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import EmptyState from "../../components/common/EmptyState/EmptyState";
 import ScrollToTop from "../../components/common/ScrollToTop/ScrollToTop";
+import PrimaryButton from "../../components/common/PrimaryButton/PrimaryButton";
 import { useAuth } from "../../context/AuthContext";
 import AchievementsModal from "./AchievementsModal";
 import { ProfileCalendar } from "./ProfileCalendar";
@@ -49,8 +51,25 @@ function SharedCalendarSection({ events }) {
   );
 }
 
+function ProfileNewUserBanner({ onNavigate }) {
+  return (
+    <EmptyState
+      icon="🎓"
+      title="Your Venio profile is ready"
+      description="Log your first study session with the Timer to unlock focus heatmaps, streaks, study patterns, and more insights about how you learn best."
+      action={
+        <PrimaryButton pill onClick={() => onNavigate?.("timer")}>
+          Start your first session
+        </PrimaryButton>
+      }
+    />
+  );
+}
+
 function SelfProfileColumns({ summary, analyticsData, onNavigate, onGoalSave, role }) {
   const isTeacher = role === "teacher";
+  const hasNoSessions = !isTeacher && Number(summary?.session_count ?? 0) === 0 && summary !== undefined && summary !== null;
+  if (hasNoSessions) return <ProfileNewUserBanner onNavigate={onNavigate} />;
   return (
     <div className={styles.leftCol}>
       <div className={isTeacher ? styles.leftTopMetricsRowTeacher : styles.leftTopMetricsRow}>
@@ -150,9 +169,14 @@ function ProfileBody({ user, state, visibility, onNavigate }) {
 function ProfileFrame({ user, state, visibility, onNavigate, backLabel, onBack }) {
   if (state.loading) return <ProfileSkeleton blocks={<SkeletonGrid />} />;
   if (!state.profileData && !user) return <EmptyState title="Profile unavailable" message="We couldn't load this profile right now." />;
+  const profileName = state.profileData?.display_name || state.profileData?.username || user?.display_name || user?.username;
+  const crumbs = onBack
+    ? [{ label: "Profiles", navKey: "profile" }, { label: profileName || "Profile" }]
+    : [{ label: "Profile" }];
   return (
     <div className={styles.container}>
       <ScrollToTop />
+      <Breadcrumb crumbs={crumbs} />
       {onBack && <div className={styles.backButtonWrapper}><BackButton label={backLabel} onClick={onBack} /></div>}
       <div className={styles.content}><ProfileBody user={user} state={state} visibility={visibility} onNavigate={onNavigate} /></div>
     </div>
