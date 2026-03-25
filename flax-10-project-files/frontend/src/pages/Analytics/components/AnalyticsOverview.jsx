@@ -3,6 +3,8 @@
  */
 
 import { motion } from 'framer-motion';
+import { BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import AttendanceChart from '../../../components/Analytics/AttendanceChart';
 import DailyBreakdownChart from '../../../components/Analytics/DailyBreakdownChart';
 import { ConsistencyScore, PeakHoursCard } from '../../../components/Analytics/InsightCards';
@@ -12,6 +14,7 @@ import StudyHeatmap from '../../../components/Analytics/StudyHeatmap';
 import StudyHoursChart from '../../../components/Analytics/StudyHoursChart';
 import SummaryCards from '../../../components/Analytics/SummaryCards';
 import ThemeUsageChart from '../../../components/Analytics/ThemeUsageChart';
+import EmptyState from '../../../components/common/EmptyState/EmptyState';
 import { fadeUp } from '../pageConfig';
 import styles from '../AnalyticsPage.module.css';
 
@@ -93,7 +96,31 @@ function ChartsGrid({ data, progressData, themeStats, isTeacher }) {
   );
 }
 
+function hasStudyData(data) {
+  const summary = data?.summary ?? {};
+  return Number(summary.total_sessions || 0) > 0 || Number(summary.total_study_hours || 0) > 0;
+}
+
+function AnalyticsEmptyState() {
+  return (
+    <div className={`${styles.card} ${styles.emptyOverviewCard}`}>
+      <EmptyState
+        icon={<BarChart3 size={22} strokeWidth={2} />}
+        title="No analytics yet"
+        description="Analytics turns Timer sessions into study trends, focus heatmaps, and planning insights. Start a study session and this page will fill in automatically."
+        action={(
+          <div className={styles.emptyOverviewActions}>
+            <Link to="/timer" className={styles.emptyOverviewLink}>Open Timer</Link>
+            <Link to="/calendar" className={`${styles.emptyOverviewLink} ${styles.emptyOverviewLinkSecondary}`}>See Calendar</Link>
+          </div>
+        )}
+      />
+    </div>
+  );
+}
+
 export default function AnalyticsOverview({ data, progressData, themeStats, isTeacher }) {
+  if (!hasStudyData(data)) return <AnalyticsEmptyState />;
   return (
     <div className={styles.overviewWrap}>
       <AnimatedSection index={0}><SummaryCards data={data} /></AnimatedSection>

@@ -86,6 +86,15 @@ describe('ListSidebar', () => {
         expect(screen.getByText('Constitutional Law (LW4202)')).toBeTruthy();
     });
 
+    it('renders society lists in a dedicated societies section', () => {
+        const lists = [
+            { id: 12, name: 'Chess Society Admin', category: 'society', society_name: 'Chess Society' },
+        ];
+        render(<ListSidebar {...defaultProps} lists={lists} />);
+        expect(screen.getByText('SOCIETIES')).toBeTruthy();
+        expect(screen.getByText('Chess Society')).toBeTruthy();
+    });
+
     it('calls onNewList when "+ Add list" is clicked', () => {
         const onNewList = vi.fn();
         render(<ListSidebar {...defaultProps} onNewList={onNewList} />);

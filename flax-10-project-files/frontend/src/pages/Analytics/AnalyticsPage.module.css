@@ -149,6 +149,46 @@
   gap: 1.25rem;
 }
 
+.emptyOverviewCard {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.emptyOverviewActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.emptyOverviewLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.emptyOverviewLink:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--primary) 16%, white);
+  border-color: color-mix(in srgb, var(--primary) 32%, transparent);
+}
+
+.emptyOverviewLinkSecondary {
+  background: transparent;
+}
+
 .twoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -208,6 +248,15 @@
 
   .insightRow {
     gap: 0.7rem;
+  }
+
+  .emptyOverviewActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .emptyOverviewLink {
+    width: 100%;
   }
 
   .overviewWrap :global(.MuiChartsWrapper-root),

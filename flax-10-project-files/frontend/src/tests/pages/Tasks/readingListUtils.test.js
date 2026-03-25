@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getSocietyDisplayName,
   getReadingListLabel,
   getTeachingListDisplayName,
   isReadingList,
   isReadingListName,
+  isSocietyList,
   isTeachingList,
   matchesReadingList,
   parseReadingListName,
@@ -18,6 +20,14 @@ describe("readingListUtils", () => {
     expect(isTeachingList({ name: "Reading List - Pharmacology" })).toBe(false);
     expect(isTeachingList({})).toBe(false);
     expect(getTeachingListDisplayName({})).toBe("");
+  });
+
+  it("detects society lists and formats their display names", () => {
+    expect(isSocietyList({ category: "society" })).toBe(true);
+    expect(isSocietyList({ category: "personal", society_id: 4 })).toBe(true);
+    expect(isSocietyList({ category: "personal" })).toBe(false);
+    expect(getSocietyDisplayName({ society_name: "Chess Society", name: "Chess Society Admin" })).toBe("Chess Society");
+    expect(getSocietyDisplayName({ name: "Debate Society Admin" })).toBe("Debate Society");
   });
 
   it("detects modern and legacy reading-list names", () => {

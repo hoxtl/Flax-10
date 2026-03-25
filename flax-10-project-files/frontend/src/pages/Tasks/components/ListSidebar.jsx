@@ -5,7 +5,14 @@
 import { getListColor } from "../utils/listColorUtils";
 import EmptyState from "../../../components/common/EmptyState/EmptyState";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
-import { isReadingList, isTeachingList, parseReadingListName, getTeachingListDisplayName } from "../utils/readingListUtils";
+import {
+  getSocietyDisplayName,
+  getTeachingListDisplayName,
+  isReadingList,
+  isSocietyList,
+  isTeachingList,
+  parseReadingListName,
+} from "../utils/readingListUtils";
 import styles from "./ListSidebar.module.css";
 import { ListContextMenu, RenameInput } from "./listSidebarParts";
 import { useListSidebarState } from "./useListSidebarState";
@@ -26,6 +33,9 @@ function ListSidebarViews({ smartFilters, activeListId, activeFilter, onSelectLi
 }
 
 function ListLabel({ list }) {
+  if (isSocietyList(list)) {
+    return <span className={styles.listName}>{getSocietyDisplayName(list)}</span>;
+  }
   if (isTeachingList(list)) {
     return <span className={styles.listName}>{getTeachingListDisplayName(list)}</span>;
   }
@@ -75,12 +85,14 @@ function ListSidebarListItems({ lists, listCounts, activeListId, renamingId, set
   const isTeacher = profile?.role === "teacher";
   const readingLists = lists.filter(isReadingList);
   const teachingLists = lists.filter(isTeachingList);
-  const lifeLists = lists.filter((list) => !isReadingList(list) && !isTeachingList(list));
+  const societyLists = lists.filter(isSocietyList);
+  const lifeLists = lists.filter((list) => !isReadingList(list) && !isTeachingList(list) && !isSocietyList(list));
   const shared = { listCounts, activeListId, renamingId, setRenamingId, onSelectList, onSelectFilter, onRenameList, onCtxMenu };
   return (
     <>
       {!isTeacher && <ListSection label="READING LISTS" lists={readingLists} {...shared} />}
       {isTeacher && <ListSection label="MY TEACHING" lists={teachingLists} emptyState={<EmptyState icon="📋" title="No teaching lists yet" description="Create a list for meetings, planning, or admin." />} {...shared} />}
+      <ListSection label="SOCIETIES" lists={societyLists} {...shared} />
       <ListSection label="LIFE" lists={lifeLists} emptyState={<EmptyState icon="🗂️" title="No lists yet" description="Create a list to organise your tasks." />} {...shared} />
     </>
   );

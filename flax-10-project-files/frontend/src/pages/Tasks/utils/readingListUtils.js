@@ -14,6 +14,15 @@ export function getTeachingListDisplayName(list) {
   return (list?.name || "").replace(TEACHING_LIST_PATTERN, "");
 }
 
+export function isSocietyList(list) {
+  return list?.category === "society" || Boolean(list?.society_id);
+}
+
+export function getSocietyDisplayName(list) {
+  const label = list?.society_name || list?.name || "Society";
+  return label.replace(/\s+Admin$/i, "").trim() || "Society";
+}
+
 export function isReadingListName(name) {
   const normalized = String(name || "").trim();
   return READING_LIST_PATTERN.test(normalized) || LEGACY_READING_LIST_PATTERN.test(normalized);

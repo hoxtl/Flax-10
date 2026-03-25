@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("framer-motion", () => ({
@@ -94,12 +95,14 @@ describe("Analytics components", () => {
 
   it("renders all overview cards for students when progress and theme stats exist", () => {
     render(
-      <AnalyticsOverview
-        data={analyticsData}
-        progressData={{ daily_progress: [1, 2] }}
-        themeStats={{ light: 3 }}
-        isTeacher={false}
-      />,
+      <MemoryRouter>
+        <AnalyticsOverview
+          data={analyticsData}
+          progressData={{ daily_progress: [1, 2] }}
+          themeStats={{ light: 3 }}
+          isTeacher={false}
+        />
+      </MemoryRouter>,
     );
 
     expect(screen.getByTestId("summary-cards")).toBeInTheDocument();
@@ -116,16 +119,35 @@ describe("Analytics components", () => {
 
   it("omits optional charts for teachers when progress or theme data is absent", () => {
     render(
-      <AnalyticsOverview
-        data={analyticsData}
-        progressData={null}
-        themeStats={null}
-        isTeacher
-      />,
+      <MemoryRouter>
+        <AnalyticsOverview
+          data={analyticsData}
+          progressData={null}
+          themeStats={null}
+          isTeacher
+        />
+      </MemoryRouter>,
     );
 
     expect(screen.queryByTestId("planned-vs-actual-chart")).not.toBeInTheDocument();
     expect(screen.queryByTestId("theme-usage-chart")).not.toBeInTheDocument();
     expect(screen.queryByTestId("attendance-chart")).not.toBeInTheDocument();
+  });
+
+  it("shows the onboarding empty state when no study data exists yet", () => {
+    render(
+      <MemoryRouter>
+        <AnalyticsOverview
+          data={{ summary: { total_study_hours: 0, total_sessions: 0 }, daily_breakdown: [], heatmap: { data: [[0]], hours: ["09"] } }}
+          progressData={null}
+          themeStats={null}
+          isTeacher={false}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("No analytics yet")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open Timer" })).toHaveAttribute("href", "/timer");
+    expect(screen.queryByTestId("summary-cards")).not.toBeInTheDocument();
   });
 });
