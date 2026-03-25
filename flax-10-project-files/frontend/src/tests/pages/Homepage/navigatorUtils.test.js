@@ -31,6 +31,24 @@ describe("navigatorUtils", () => {
     expect(pairs[0].a.id).toBe(1);
     expect(pairs[0].b.id).toBe(2);
     expect(getOverlappingPairs([])).toEqual([]);
+    expect(getOverlappingPairs(null)).toEqual([]);
+    expect(
+      getOverlappingPairs([
+        { id: 1, start_time: "2026-03-24T10:00:00.000Z" },
+        { id: 2, start_time: "2026-03-24T10:30:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+      ]),
+    ).toEqual([]);
+    expect(
+      getOverlappingPairs([
+        { id: 4, start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+        { id: 5, start_time: "2026-03-24T10:30:00.000Z" },
+      ])[0],
+    ).toMatchObject({
+      a: { id: 4, start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+      b: { id: 5, start_time: "2026-03-24T10:30:00.000Z" },
+      overlapStart: new Date("2026-03-24T10:30:00.000Z"),
+      overlapEnd: new Date("2026-03-24T10:30:00.000Z"),
+    });
   });
 
   it("falls back to the default context when the date is not today or there are no events", () => {
@@ -137,6 +155,28 @@ describe("navigatorUtils", () => {
     ).toMatchObject({
       state: "conflict",
       currentBlock: null,
+      conflictAt: new Date("2026-03-24T10:30:00.000Z"),
+    });
+  });
+
+  it("keeps the current block during an active conflict", () => {
+    getAllFreeWindowsTodayMock.mockReturnValue([]);
+    isNowMock.mockImplementation((start, end) => start === "2026-03-24T10:00:00.000Z" && end === "2026-03-24T11:00:00.000Z");
+
+    expect(
+      getNavigatorContext(
+        new Date("2026-03-24T10:45:00.000Z"),
+        "2026-03-24",
+        [
+          { id: 1, start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+          { id: 2, start_time: "2026-03-24T10:30:00.000Z", end_time: "2026-03-24T11:30:00.000Z" },
+        ],
+        () => true,
+      ),
+    ).toMatchObject({
+      state: "conflict",
+      currentBlock: { id: 1, start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" },
+      firstGapWindow: null,
       conflictAt: new Date("2026-03-24T10:30:00.000Z"),
     });
   });

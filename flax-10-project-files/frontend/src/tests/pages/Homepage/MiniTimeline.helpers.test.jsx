@@ -60,7 +60,15 @@ vi.mock("../../../pages/Homepage/components/MiniTimeline/PlanEventRow", () => ({
 }));
 
 vi.mock("../../../pages/Homepage/components/MiniTimeline/PlanFreeRow", () => ({
-  PlanFreeRow: ({ row }) => <div>Plan free {row.id}</div>,
+  PlanFreeRow: ({ row, deadlineSuggestions = [], assignedTask, nextAssignedTask, onSkipTask }) => (
+    <div>
+      <div>Plan free {row.id}</div>
+      <div>{deadlineSuggestions[0]?.title || "No deadline suggestion"}</div>
+      <div>{assignedTask?.title || "No assigned task"}</div>
+      <div>{nextAssignedTask?.title || "No next task"}</div>
+      <button type="button" onClick={() => onSkipTask?.("task-1")}>Skip free row task</button>
+    </div>
+  ),
 }));
 
 vi.mock("../../../pages/Homepage/components/MiniTimeline/TinyGapRow", () => ({
@@ -138,10 +146,17 @@ describe("MiniTimeline helpers and parts", () => {
     expect(getEventAccentColor("Tutor meeting", "")).toBeTruthy();
     expect(getEventAccentColor("Tesco run", "admin")).toBeTruthy();
     expect(getEventAccentColor("Plain event", "")).toBeTruthy();
+    expect(getEventAccentColor(null, null)).toBeTruthy();
 
     expect(buildDeadlineTask({ minutes: 50 }, { assessment_title: "Exam", start_due_date: "2026-03-30" })).toEqual({
       title: "Revision: Exam",
       estimated_blocks: 2,
+      due_date: "2026-03-30",
+      priority: "urgent",
+    });
+    expect(buildDeadlineTask({ minutes: 25 }, { title: "Essay", start_due_date: "2026-03-30" })).toEqual({
+      title: "Revision: Essay",
+      estimated_blocks: 1,
       due_date: "2026-03-30",
       priority: "urgent",
     });
@@ -150,10 +165,12 @@ describe("MiniTimeline helpers and parts", () => {
     expect(formatGapDuration(130)).toBe("2h 10m");
     expect(formatGapDuration(45)).toBe("45m");
     expect(getGapMinHeight(90, 30)).toBeGreaterThanOrEqual(56);
+    expect(getGapMinHeight()).toBe(56);
     expect(getTinyGapMinHeight(10)).toBeGreaterThanOrEqual(24);
     expect(getGapTimeLabel(60)).toBeTruthy();
     expect(getTinyGapTimeLabel(5)).toMatch(/^\d{2}:\d{2}$/);
     expect(getGapRecommendationTitle({ title: "Read chapter" })).toBe("Read chapter");
+    expect(getGapRecommendationTitle(null)).toBe("");
   });
 
   it("renders the now strip states and row layout pieces", () => {
@@ -163,12 +180,29 @@ describe("MiniTimeline helpers and parts", () => {
     expect(screen.getByText("Focus")).toBeInTheDocument();
     expect(screen.getByText("02:05")).toBeInTheDocument();
 
+    rerender(<NowStrip hasTimerSession={true} timerMode="break" timerTask="" timeLeft={65} styles={styles} />);
+    expect(screen.getByText("Break")).toBeInTheDocument();
+    expect(screen.getByText("Session in progress")).toBeInTheDocument();
+
     rerender(<NowStrip hasTimerSession={false} currentBlock={{ title: "📚 Lecture", end_time: "2026-03-24T14:00:00Z" }} styles={styles} />);
     expect(screen.getByText("Now")).toBeInTheDocument();
     expect(screen.getByText("Lecture")).toBeInTheDocument();
 
+    rerender(
+      <NowStrip
+        hasTimerSession={false}
+        currentBlock={{ title: "😴 Late study", start_time: "2026-03-24T23:30:00Z", end_time: "2026-03-24T23:45:00Z" }}
+        sleepWindow={{ sleepTime: "23:00", wakeTime: "07:00" }}
+        styles={styles}
+      />,
+    );
+    expect(screen.getByText(/Late study 😴/)).toBeInTheDocument();
+
     rerender(<NowStrip hasTimerSession={false} currentBlock={null} styles={styles} />);
     expect(container.textContent).not.toContain("Focus");
+
+    rerender(<NowStrip hasTimerSession={true} timerMode="focus" timerTask="Essay" styles={styles} />);
+    expect(screen.getByText("00:00")).toBeInTheDocument();
 
     render(
       <TimelineRowLayout row={{ spacingBeforePx: 12 }} styles={styles} minHeight={40}>
@@ -294,6 +328,25 @@ describe("MiniTimeline helpers and parts", () => {
     expect(onEdit).toHaveBeenCalled();
     expect(onToggleConflictPopover).toHaveBeenCalledWith("row-1");
 
+    const parentClick = vi.fn();
+    render(
+      <div onClick={parentClick}>
+        <EventTagSlot
+          styles={styles}
+          isOverlap={false}
+          isReadOnly={false}
+          rowId="row-2"
+          moduleCode={null}
+          matchTask={{ task_list: 99 }}
+          taskLists={[]}
+          accentColor="#0f0"
+          onToggleConflictPopover={onToggleConflictPopover}
+        />
+      </div>,
+    );
+    fireEvent.click(screen.getByText("List"));
+    expect(parentClick).not.toHaveBeenCalled();
+
     const { rerender } = render(
       <MiniTimelineRowRenderer row={{ id: "h1", type: "hourMark" }} rows={[]} props={{ styles }} />
     );
@@ -302,8 +355,12 @@ describe("MiniTimeline helpers and parts", () => {
     expect(screen.getByText("Tiny gap g1")).toBeInTheDocument();
     rerender(<MiniTimelineRowRenderer row={{ id: "n1", type: "now" }} rows={[]} props={{ styles }} />);
     expect(screen.getByText("Now row n1")).toBeInTheDocument();
-    rerender(<MiniTimelineRowRenderer row={{ id: "f1", type: "free" }} rows={[]} props={{ styles, gapDeadlineFallbacks: {}, onQuickStart: vi.fn(), selectedDate: "2026-03-24", slotPopoverRef: null, slotPopoverRowId: null, setSlotPopoverRowId: vi.fn(), bestFreeRowId: null, assignedGapTasks: { map: {}, nextMap: {} }, onSkipGapTask: vi.fn() }} />);
+    const onSkipGapTask = vi.fn();
+    rerender(<MiniTimelineRowRenderer row={{ id: "f1", type: "free" }} rows={[]} props={{ styles, gapDeadlineFallbacks: { f1: { title: "Gap fallback" } }, onQuickStart: vi.fn(), selectedDate: "2026-03-24", slotPopoverRef: null, slotPopoverRowId: null, setSlotPopoverRowId: vi.fn(), bestFreeRowId: null, assignedGapTasks: { map: { f1: { title: "Assigned task" } }, nextMap: { f1: { title: "Next task" } } }, onSkipGapTask }} />);
     expect(screen.getByText("Plan free f1")).toBeInTheDocument();
+    expect(screen.getByText("Gap fallback")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Skip free row task"));
+    expect(onSkipGapTask).toHaveBeenCalledWith("f1", "task-1");
     rerender(<MiniTimelineRowRenderer row={{ id: "c1", type: "eventGroup" }} rows={[]} props={{ styles, onConflictAutoMove: vi.fn(), onPushTomorrow: vi.fn(), onCardClick: vi.fn(), onEventContextMenu: vi.fn(), onEdit: vi.fn(), getTag: vi.fn(), selectedDate: "2026-03-24", sleepWindow: null }} />);
     expect(screen.getByText("Conflict pair c1")).toBeInTheDocument();
     rerender(<MiniTimelineRowRenderer row={{ id: "e1", type: "event" }} rows={[]} props={{ styles, taskLists: [], conflictPopoverRowId: null, conflictPopoverRef: null, setConflictPopoverRowId: vi.fn(), onConflictAutoMove: vi.fn(), onPushTomorrow: vi.fn(), onEdit: vi.fn(), onCardClick: vi.fn(), onEventContextMenu: vi.fn(), getTag: vi.fn(), sleepWindow: null, selectedDate: "2026-03-24" }} />);
