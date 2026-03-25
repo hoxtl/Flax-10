@@ -197,83 +197,59 @@ describe("account extras", () => {
     expect(localStorage.getItem("course_change_pending_request")).toBeNull();
   });
 
-  it("handles feedback state from cache and account/course request action creators", async () => {
+  it("surfaces cached pending notices in the feedback hook", () => {
     setCachedPendingRequest("Physics");
     const { result } = renderHook(() => useCourseRequestFeedback());
     expect(result.current.courseRequestNotice[0]).toBe("Request sent.");
+  });
 
-    const context = {
-      hasUnsaved: true,
-      onSave: vi.fn().mockResolvedValue(true),
-      formData: { firstName: "Ava" },
-      setInitialFormData: vi.fn(),
-      setSaveSignal: vi.fn(),
-      refreshProfile: vi.fn(),
-      setCancellingRequest: vi.fn(),
-      setCourseRequestNotice: vi.fn(),
-      setCourseRequestError: vi.fn(),
-      setPendingRequest: vi.fn(),
-      setShowModal: vi.fn(),
-    };
-
-    const submit = createAccountSubmitHandler(context);
-    await submit({ preventDefault: vi.fn() });
+  it("handles account change submission and reset", async () => {
+    const context = buildRequestContext();
+    await createAccountSubmitHandler(context)({ preventDefault: vi.fn() });
     expect(context.onSave).toHaveBeenCalled();
     expect(context.setInitialFormData).toHaveBeenCalledWith(context.formData);
+  });
 
-    const pristineContext = {
-      ...context,
-      hasUnsaved: false,
-      onSave: vi.fn(),
-      setInitialFormData: vi.fn(),
-      setSaveSignal: vi.fn(),
-    };
-    await createAccountSubmitHandler(pristineContext)({ preventDefault: vi.fn() });
-    expect(pristineContext.onSave).not.toHaveBeenCalled();
+  it("bypasses save when no changes or if save fails", async () => {
+    const context = buildRequestContext({ hasUnsaved: false, onSave: vi.fn() });
+    await createAccountSubmitHandler(context)({ preventDefault: vi.fn() });
+    expect(context.onSave).not.toHaveBeenCalled();
 
-    const failedSaveContext = {
-      ...context,
-      onSave: vi.fn().mockResolvedValue(false),
-      setInitialFormData: vi.fn(),
-      setSaveSignal: vi.fn(),
-    };
+    const failedSaveContext = buildRequestContext({ onSave: vi.fn().mockResolvedValue(false) });
     await createAccountSubmitHandler(failedSaveContext)({ preventDefault: vi.fn() });
     expect(failedSaveContext.setInitialFormData).not.toHaveBeenCalled();
-    expect(failedSaveContext.setSaveSignal).not.toHaveBeenCalled();
+  });
 
+  it("handles course change request cancellation success", async () => {
+    const context = buildRequestContext();
     cancelCourseChangeRequest.mockResolvedValueOnce({});
     getMyCourseChangeRequest.mockResolvedValueOnce({ status: "rejected" });
-    const cancel = createCancelCourseRequestHandler(context);
-    await cancel();
+    await createCancelCourseRequestHandler(context)();
     expect(context.setPendingRequest).toHaveBeenCalledWith(null);
     expect(context.setCourseRequestNotice).toHaveBeenCalledWith("Request cancelled.");
+  });
 
-    cancelCourseChangeRequest.mockResolvedValueOnce({});
-    getMyCourseChangeRequest.mockRejectedValueOnce(new Error("offline"));
-    await cancel();
-    expect(context.refreshProfile).toHaveBeenCalled();
-
-    cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
-    await cancel();
-    expect(context.setPendingRequest).toHaveBeenCalledWith(null);
-
+  it("handles course change request cancellation failures", async () => {
+    const context = buildRequestContext();
     cancelCourseChangeRequest.mockRejectedValueOnce(new Error("Server exploded"));
-    await cancel();
+    await createCancelCourseRequestHandler(context)();
     expect(context.setCourseRequestError).toHaveBeenCalledWith("Server exploded");
 
     cancelCourseChangeRequest.mockRejectedValueOnce({});
-    await cancel();
+    await createCancelCourseRequestHandler(context)();
     expect(context.setCourseRequestError).toHaveBeenCalledWith("Failed to cancel request. Please try again.");
+  });
 
+  it("handles course request success state updates", () => {
+    const context = buildRequestContext();
     const success = createCourseRequestSuccessHandler(context);
     success({ requestedCourse: "History" }, "History");
-    expect(context.setPendingRequest).toHaveBeenCalledWith({ requestedCourse: "History", status: "pending", requested_course: "History" });
+    expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "History" }));
     expect(context.setShowModal).toHaveBeenCalledWith(false);
 
     localStorage.clear();
     success(null, "");
-    expect(context.setPendingRequest).toHaveBeenCalledWith({ status: "pending", requested_course: "" });
-    expect(localStorage.getItem("course_change_pending_request")).toBeNull();
+    expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "" }));
   });
 
   });

@@ -11,6 +11,7 @@ function wait(delayMs) {
 }
 
 /** Dismiss for this session only — will re-prompt on next login. */
+
 export function dismissAttendancePrompt(event, setEvent) {
   if (event) setSessionDismissedId(event.id);
   setEvent(null);

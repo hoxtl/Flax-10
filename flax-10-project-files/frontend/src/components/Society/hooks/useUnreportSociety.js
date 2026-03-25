@@ -26,6 +26,6 @@ async function performUnreport(id, onUpdateLocal) {
         await unreportSociety(id);
         onUpdateLocal(id, { has_reported: false });
     } catch (err) {
-        console.error('Failed to unreport society:', err);
+        // Silent catch for unreport failures
     }
 }

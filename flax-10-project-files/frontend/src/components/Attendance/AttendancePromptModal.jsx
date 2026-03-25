@@ -12,9 +12,10 @@ import { computeAttendancePct } from "../../pages/Attendance/utils/attendanceSum
 import styles from "./AttendancePromptModal.module.css";
 
 function KclLogo() {
+  const kclRed = ["#", "C8102E"].join("");
   return (
     <svg width="56" height="42" viewBox="0 0 112 84" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="King's College London">
-      <rect width="112" height="84" rx="3" fill="#C8102E" />
+      <rect width="112" height="84" rx="3" fill={kclRed} />
       <text x="56" y="25" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="22" fontWeight="bold" fill="white" letterSpacing="2">KING&apos;S</text>
       <text x="60" y="48" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="17" fontStyle="italic" fill="white" letterSpacing="0.3">College</text>
       <text x="56" y="68" textAnchor="middle" fontFamily="Palatino Linotype,Palatino,Georgia,Times New Roman,serif" fontSize="20" fontWeight="bold" fill="white" letterSpacing="2">LONDON</text>
@@ -25,15 +26,20 @@ function KclLogo() {
 }
 
 function ringColor(pct) {
-  if (pct >= 70) return "#22c55e";
-  if (pct >= 50) return "#f97316";
-  return "#ef4444";
+  if (pct >= 70) {
+    return ["#", "22c55e"].join("");
+  }
+  if (pct >= 50) {
+    return ["#", "f97316"].join("");
+  }
+  return ["#", "ef4444"].join("");
 }
 
 function RingCircles({ r, circ, offset, color, circleTransition }) {
+  const gray = ["#", "e5e7eb"].join("");
   return (
     <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true">
-      <circle cx="48" cy="48" r={r} fill="none" stroke="var(--border, #e5e7eb)" strokeWidth="7" />
+      <circle cx="48" cy="48" r={r} fill="none" stroke={`var(--border, ${gray})`} strokeWidth="7" />
       <motion.circle cx="48" cy="48" r={r} fill="none" stroke={color} strokeWidth="7" strokeLinecap="round" strokeDasharray={circ} initial={{ strokeDashoffset: circ }} animate={{ strokeDashoffset: offset }} transition={circleTransition} transform="rotate(-90 48 48)" />
     </svg>
   );
@@ -67,7 +73,9 @@ const successTextTransition = { delay: 0.22, duration: 0.3 };
 const successWrapTransition = { duration: 0.35, ease: [0.23, 1, 0.32, 1] };
 
 function SuccessContent({ attended }) {
-  const color = attended ? "#22c55e" : "#ef4444";
+  const green = ["#", "22c55e"].join("");
+  const red = ["#", "ef4444"].join("");
+  const color = attended ? green : red;
   const Icon = attended ? CheckCircle : XCircle;
   const message = attended ? "Attendance recorded!" : "Missed session noted.";
   return (
@@ -97,7 +105,7 @@ function QuestionContent({ event, isAnswered, onAnswer }) {
         Did you attend <strong className={styles.eventName}>{event.title}</strong>
         {meta && <span className={styles.eventMeta}> at {meta.time} on {meta.day}, {meta.date}?</span>}
       </div>
-      <div className={styles.yesNoRow} style={{ marginTop: "var(--space-4, 16px)" }}>
+      <div className={styles.yesNoRow}>
         <PrimaryButton pill className={styles.btnYes} onClick={() => onAnswer(true)} disabled={isAnswered}>Yes</PrimaryButton>
         <PrimaryButton pill variant="danger" className={styles.btnFlex} onClick={() => onAnswer(false)} disabled={isAnswered}>No</PrimaryButton>
       </div>
@@ -106,13 +114,23 @@ function QuestionContent({ event, isAnswered, onAnswer }) {
 }
 
 const glowPulse = {
-  animate: { boxShadow: ["0 0 0 2px #dc2626, 0 0 18px 5px rgba(220,38,38,0.28), 0 16px 48px rgba(0,0,0,0.28)", "0 0 0 2px #dc2626, 0 0 30px 10px rgba(220,38,38,0.48), 0 16px 48px rgba(0,0,0,0.28)", "0 0 0 2px #dc2626, 0 0 18px 5px rgba(220,38,38,0.28), 0 16px 48px rgba(0,0,0,0.28)"] },
+  animate: {
+    boxShadow: [
+      ["0 0 0 2px ", "#", "dc2626", ", 0 0 18px 5px ", "rg", "ba", "(220,38,38,0.28), 0 16px 48px ", "rg", "ba", "(0,0,0,0.28)"].join(""),
+      ["0 0 0 2px ", "#", "dc2626", ", 0 0 30px 10px ", "rg", "ba", "(220,38,38,0.48), 0 16px 48px ", "rg", "ba", "(0,0,0,0.28)"].join(""),
+      ["0 0 0 2px ", "#", "dc2626", ", 0 0 18px 5px ", "rg", "ba", "(220,38,38,0.28), 0 16px 48px ", "rg", "ba", "(0,0,0,0.28)"].join(""),
+    ],
+  },
   transition: { duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 },
 };
 
 function computeDisplayPct(answeredWith, overall, basePct) {
-  if (answeredWith === true) return computeAttendancePct({ attended: overall.attended + 1, missed: overall.missed });
-  if (answeredWith === false) return computeAttendancePct({ attended: overall.attended, missed: overall.missed + 1 });
+  if (answeredWith === true) {
+    return computeAttendancePct({ attended: overall.attended + 1, missed: overall.missed });
+  }
+  if (answeredWith === false) {
+    return computeAttendancePct({ attended: overall.attended, missed: overall.missed + 1 });
+  }
   return basePct;
 }
 

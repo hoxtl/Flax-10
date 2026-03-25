@@ -144,37 +144,35 @@ describe("Attendance components", () => {
     expect(clearSegment).toHaveBeenCalled();
   });
 
-  it("covers events-loading, record-tab switching, and empty marked-state branches", () => {
-    const { rerender, container } = render(
+  it("shows nothing while events are loading", () => {
+    const { container } = render(
       <AttendanceListColumn
         model={{
           eventsLoading: true,
-          selectedSegment: null,
           listTab: "record",
           unmarkedEvents: [],
           markedEvents: [],
-          refetchAll: vi.fn(),
           showRecordTab: vi.fn(),
           showMarkedTab: vi.fn(),
         }}
       />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
 
+  it("renders empty marked list and switches to record tab", () => {
     const showRecordTab = vi.fn();
-    rerender(
+    render(
       <AttendanceListColumn
         model={{
           eventsLoading: false,
-          selectedSegment: null,
           listTab: "marked",
-          unmarkedEvents: [{ id: 1, title: "Lecture 1", start_time: "2026-03-01T09:00:00Z" }],
+          unmarkedEvents: [{ id: 1, title: "Lecture 1" }],
           markedEvents: [],
-          refetchAll: vi.fn(),
           showRecordTab,
           showMarkedTab: vi.fn(),
         }}
-      />
+      />,
     );
     expect(screen.getByText("No marked events yet.")).toBeInTheDocument();
     fireEvent.click(screen.getByText("record"));

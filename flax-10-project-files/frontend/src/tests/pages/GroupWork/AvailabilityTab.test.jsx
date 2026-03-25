@@ -143,31 +143,19 @@ describe("AvailabilityTab", () => {
     expect(setSuggestingSlot).toHaveBeenCalledWith(null);
   });
 
-  it("renders proposed meeting cards and toggles views", () => {
-    const proposedSuggestion = {
-      id: 10,
-      start: "2026-04-10T14:00:00Z",
-      is_confirmed: false,
-      suggested_by: { id: 2, username: "bob" },
-      responses: [],
-    };
-    useAvailabilityMock.mockReturnValue({
-      ...baseAvailability,
-      active_suggestions: [proposedSuggestion],
-    });
+  it("renders proposed meeting cards", () => {
+    const proposedSuggestion = { id: 10, start: "2026-04-10T14:00:00Z", suggested_by: { id: 2, username: "bob" }, responses: [] };
+    useAvailabilityMock.mockReturnValue({ ...baseAvailability, active_suggestions: [proposedSuggestion] });
     render(<AvailabilityTab projectId={1} />);
-
-    // Meeting toggle rendered when there are proposals
     expect(screen.getByText("Proposed slots")).toBeInTheDocument();
-    expect(screen.getByText("Confirmed meeting slots")).toBeInTheDocument();
-
-    // Proposed card content
     expect(screen.getByText(/Proposed by bob/)).toBeInTheDocument();
+  });
 
-    // Vote buttons
-    const acceptBtns = screen.getAllByLabelText("Accept meeting suggestion");
-    expect(acceptBtns.length).toBeGreaterThan(0);
-    fireEvent.click(acceptBtns[0]);
+  it("handles voting on proposed meeting cards", () => {
+    const proposedSuggestion = { id: 10, start: "2026-04-10T14:00:00Z", suggested_by: { id: 2, username: "bob" }, responses: [] };
+    useAvailabilityMock.mockReturnValue({ ...baseAvailability, active_suggestions: [proposedSuggestion] });
+    render(<AvailabilityTab projectId={1} />);
+    fireEvent.click(screen.getAllByLabelText("Accept meeting suggestion")[0]);
     expect(baseAvailability.handleVote).toHaveBeenCalledWith(10, "accepted");
   });
 

@@ -1,6 +1,7 @@
 /*
  * Event conflict resolution planning utilities.
  */
+
 import { overlapsDay } from "../../Calendar/utils/dateUtils";
 import { extractBaseEventId, isReadOnlyEvent } from "../../Calendar/utils/eventUtils";
 

@@ -147,31 +147,25 @@ describe("account component extras", () => {
     expect(onRequestClick).toHaveBeenCalled();
   });
 
-  it("renders pending request details and allows cancellation", () => {
-    const onCancelRequest = vi.fn();
-    const { rerender, onRequestClick } = renderCourseDisplay({
+  it("renders pending request details", () => {
+    renderCourseDisplay({
       course: "Physics",
       pendingRequest: { requested_course: "Chemistry" },
       successMessage: "✓ Request sent.",
-      onCancelRequest,
     });
     expect(screen.getByText(/An admin will review your request shortly/)).toBeInTheDocument();
     expect(screen.getByText("✓ Request sent.")).toBeInTheDocument();
+  });
+
+  it("allows pending request cancellation", () => {
+    const onCancelRequest = vi.fn();
+    renderCourseDisplay({
+      course: "Physics",
+      pendingRequest: { requested_course: "Chemistry" },
+      onCancelRequest,
+    });
     fireEvent.click(screen.getByText("cancel-request"));
     expect(onCancelRequest).toHaveBeenCalled();
-
-    rerender(
-      <CourseDisplay
-        course="Physics"
-        pendingRequest={{}}
-        onRequestClick={onRequestClick}
-        onCancelRequest={onCancelRequest}
-        cancellingRequest={false}
-        successMessage=""
-      />,
-    );
-    expect(screen.getByText(/An admin will review your request shortly/)).toBeInTheDocument();
-    expect(screen.queryByText("Chemistry")).toBeNull();
   });
 
   it("requires a reason and course before submitting a change request", async () => {

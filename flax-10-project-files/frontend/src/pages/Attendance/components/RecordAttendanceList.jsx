@@ -15,6 +15,7 @@ import AttendanceSuccessOverlay from "./AttendanceSuccessOverlay";
 const MAX_RECORD_EVENTS = 20;
 
 /** Prefixes whose events should appear in the record list (attendance-relevant). */
+
 const ATTENDANCE_PREFIXES = ["lecture", "lgt", "smg", "seminar", "tutorial", "lab", "workshop", "practical"];
 
 function isAttendanceEvent(event) {
