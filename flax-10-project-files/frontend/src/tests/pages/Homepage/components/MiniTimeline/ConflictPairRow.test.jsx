@@ -265,35 +265,18 @@ describe('ConflictPairRow', () => {
     expect(onEventContextMenu).not.toHaveBeenCalled();
   });
 
-  it('builds auto-arrange, tomorrow, and null conflict plans from exported helpers', () => {
-    const autoPlan = getConflictResolutionPlan({
-      row,
-      rows: rowsWithFreeGap,
-      selectedDate,
-    });
+  it('builds auto-arrange plans when free gaps exist', () => {
+    const autoPlan = getConflictResolutionPlan({ row, rows: rowsWithFreeGap, selectedDate });
     expect(autoPlan.type).toBe('auto-arrange');
+  });
 
-    const tomorrowPlan = getConflictResolutionPlan({
-      row,
-      rows: rowsNoFree,
-      selectedDate,
-    });
+  it('builds tomorrow relocation plans when no free gap exists', () => {
+    const tomorrowPlan = getConflictResolutionPlan({ row, rows: rowsNoFree, selectedDate });
     expect(tomorrowPlan.event.id).toBe(2);
+  });
 
-    const nullPlan = getConflictResolutionPlan({
-      row: {
-        ...row,
-        items: [
-          row.items[0],
-          {
-            ...row.items[1],
-            item: { ...row.items[1].item, tag_name: 'lecture' },
-          },
-        ],
-      },
-      rows: rowsNoFree,
-      selectedDate,
-    });
+  it('declines generating resolution plans for immutable events', () => {
+    const nullPlan = getConflictResolutionPlan({ row: { ...row, items: [row.items[0], { ...row.items[1], item: { ...row.items[1].item, tag_name: 'lecture' } }] }, rows: rowsNoFree, selectedDate });
     expect(nullPlan).toBeNull();
   });
 
@@ -309,25 +292,13 @@ describe('ConflictPairRow', () => {
   it('uses fallback defaults when sleep window and tag metadata are missing', () => {
     const customRow = {
       ...row,
-      items: [
-        {
-          ...row.items[1],
-          item: {
-            ...row.items[1].item,
-            tag_name: undefined,
-            tag: undefined,
-          },
-        },
-      ],
+      items: [{ ...row.items[1], item: { ...row.items[1].item, tag_name: undefined, tag: undefined } }],
     };
 
     render(
       <ConflictPairRow
-        row={customRow}
-        rows={rowsNoFree}
-        styles={mockStyles}
-        selectedDate={selectedDate}
-        getTag={undefined}
+        row={customRow} rows={rowsNoFree} styles={mockStyles}
+        selectedDate={selectedDate} getTag={undefined}
       />
     );
 
