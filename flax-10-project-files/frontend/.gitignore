@@ -27,3 +27,7 @@ coverage
 coverage-fresh/
 jscpd-report/
 coverage-*/
+
+# Test output
+vitest-results.json
+test-output.txt
