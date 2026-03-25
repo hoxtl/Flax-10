@@ -77,6 +77,15 @@
   margin-top: 0;
 }
 
+.durationControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
 .focusBlocksLabel {
   font-family: var(--font-body);
   font-size: 0.8rem;
@@ -100,6 +109,11 @@
   gap: 0.5rem;
   flex: 1;
   min-width: 0;
+}
+
+.durationChips {
+  flex: 0 1 auto;
+  gap: 8px;
 }
 
 .chipGroupSingleRow {
@@ -185,6 +199,49 @@
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.customDurationInput {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.customDurationInputField {
+  height: 36px;
+  border-radius: 9999px;
+  border-width: 1.5px;
+  border-color: rgba(74, 52, 33, 0.2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 44px;
+}
+.customDurationInputField::-webkit-outer-spin-button,
+.customDurationInputField::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.customDurationInputField[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.customDurationLeading {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted, #8d7d6c);
+}
+
+.customDurationTrailing {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted, #8d7d6c);
+}
+
+.customDurationActive .customDurationInputField {
+  border-color: var(--primary, #7B6751);
+  box-shadow: 0 0 0 2px rgba(123, 103, 81, 0.12);
 }
 
 @media (max-width: 420px) {

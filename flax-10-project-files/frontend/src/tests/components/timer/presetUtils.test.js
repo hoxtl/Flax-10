@@ -51,43 +51,20 @@ describe("presetUtils", () => {
     expect(getPresetDurationTag({ work: 45, brk: 10 })).toBe("45/10");
   });
 
-  it("applies a task to the timer and persists enriched task metadata", () => {
-    const timer = {
-      setTask: vi.fn(),
-      updateTime: vi.fn(),
-      setTimeLeft: vi.fn(),
-      setActiveTaskId: vi.fn(),
-    };
-    const task = {
-      id: 7,
-      title: "Lab report draft",
-      list_color: "#f97316",
-      module_code: "CS101",
-      due_date: "2026-04-01T12:00:00.000Z",
-      list_name: "Coursework",
-      estimated_blocks: 13,
-    };
-
+  it("applies task timings and labels to the timer", () => {
+    const timer = { updateTime: vi.fn(), setTimeLeft: vi.fn(), setTask: vi.fn(), setActiveTaskId: vi.fn() };
+    const task = { id: 7, title: "Lab report", estimated_blocks: 13 };
     applyTaskToTimer(task, timer);
-
-    expect(timer.setTask).toHaveBeenCalledWith("Lab report draft");
-    expect(timer.updateTime).toHaveBeenNthCalledWith(1, "work", 325);
-    expect(timer.updateTime).toHaveBeenNthCalledWith(2, "sessions", 1);
+    expect(timer.setTask).toHaveBeenCalledWith("Lab report");
+    expect(timer.updateTime).toHaveBeenCalledWith("work", 325);
     expect(timer.setTimeLeft).toHaveBeenCalledWith(325 * 60);
-    expect(timer.setActiveTaskId).toHaveBeenCalledWith(
-      7,
-      expect.objectContaining({
-        title: "Lab report draft",
-        categoryColor: "#f97316",
-        moduleCode: "CS101",
-        dueDate: "2026-04-01T12:00:00.000Z",
-        listName: "Coursework",
-        taskType: "lab",
-        estimatedBlocks: 13,
-        estimatedSessionCount: 1,
-        estimatedWorkMinutes: 325,
-      }),
-    );
+  });
+
+  it("persists enriched task metadata to active-task state and session storage", () => {
+    const timer = { setActiveTaskId: vi.fn(), updateTime: vi.fn(), setTimeLeft: vi.fn(), setTask: vi.fn() };
+    const task = { id: 7, title: "Lab report", module_code: "CS1", due_date: "2026-04-01", list_color: "#f00" };
+    applyTaskToTimer(task, timer);
+    expect(timer.setActiveTaskId).toHaveBeenCalledWith(7, expect.objectContaining({ title: "Lab report", moduleCode: "CS1", categoryColor: "#f00" }));
     expect(sessionStorage.getItem("timerTaskId")).toBe("7");
   });
 

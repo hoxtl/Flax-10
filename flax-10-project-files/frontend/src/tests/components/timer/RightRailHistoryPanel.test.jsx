@@ -67,31 +67,18 @@ describe("RightRailHistoryPanel", () => {
     expect(screen.queryByText("Clear History")).not.toBeInTheDocument();
   });
 
-  it("renders grouped history content and opens the clear modal", () => {
-    const setShowClearModal = vi.fn();
-
-    useRightRailHistoryMock.mockReturnValue({
-      history: [{ id: 1 }],
-      setHistory: vi.fn(),
-      showClearModal: false,
-      setShowClearModal,
-      visibleBlocks: [{ id: 1 }],
-      groupedByHorizon: [
-        { label: "Today", items: [{ id: "a" }] },
-        { label: "This week", items: [{ id: "b" }, { id: "c" }] },
-      ],
-      weeklySeries: [{ seconds: 600 }, { seconds: 300 }],
-      maxWeeklySeconds: 600,
-    });
-
+  it("renders history content and weekly chart", () => {
+    useRightRailHistoryMock.mockReturnValue({ history: [{ id: 1 }], showClearModal: false, setShowClearModal: vi.fn(), visibleBlocks: [{ id: 1 }], groupedByHorizon: [{ label: "Today", items: [{ id: "a" }] }], weeklySeries: [{ seconds: 600 }], maxWeeklySeconds: 600 });
     render(<RightRailHistoryPanel />);
-
-    expect(screen.getByText("Weekly chart 2:600")).toBeInTheDocument();
+    expect(screen.getByText("Weekly chart 1:600")).toBeInTheDocument();
     expect(screen.getByText("Today:1")).toBeInTheDocument();
-    expect(screen.getByText("This week:2")).toBeInTheDocument();
+  });
 
+  it("opens the clear history modal", () => {
+    const setShowClearModal = vi.fn();
+    useRightRailHistoryMock.mockReturnValue({ history: [{ id: 1 }], showClearModal: false, setShowClearModal, visibleBlocks: [{ id: 1 }], groupedByHorizon: [], weeklySeries: [], maxWeeklySeconds: 60 });
+    render(<RightRailHistoryPanel />);
     fireEvent.click(screen.getByText("Clear History"));
-
     expect(setShowClearModal).toHaveBeenCalledWith(true);
   });
 

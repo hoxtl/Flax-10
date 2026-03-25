@@ -122,7 +122,7 @@ function DateCell({ event, state, editState, isRowHovered }) {
 function LocationCell({ event, state, editState, navState, rowIndex, isRowHovered }) {
   const isEditing = state.isEditing('location');
   return (
-    <td className={styles.LocationCell} onClick={e => state.onEdit(e, 'location')}>
+  <td className={styles.locationCell} onClick={e => state.onEdit(e, 'location')}>
       <div className={styles.cellWrapper}>
         <LocationEditCell
           value={isEditing ? editState.cellValue : event.location}

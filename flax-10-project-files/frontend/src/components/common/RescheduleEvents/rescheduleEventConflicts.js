@@ -38,6 +38,17 @@ function processOverlapGroup(ctx) {
   return true;
 }
 
+function runPlanningStep(ctx) {
+  return processOverlapGroup(ctx);
+}
+
+function runPlanningLoop(ctx) {
+  let guard = 0;
+  while (guard < 80 && runPlanningStep(ctx)) {
+    guard += 1;
+  }
+}
+
 export function buildConflictResolutionPlan(events = [], selectedDate = new Date()) {
   const workingEvents = getDayEvents(events, selectedDate).map(cloneEvent);
   const tomorrowDate = getRelativeDate(selectedDate, 1);
@@ -45,17 +56,27 @@ export function buildConflictResolutionPlan(events = [], selectedDate = new Date
   const operations = [], unresolved = [], lockedGroups = new Set();
   const tomorrowCursor = getTomorrowStart(selectedDate);
   const ctx = { workingEvents, lockedGroups, unresolved, operations, selectedDate, tomorrowCursor, tomorrowDate, tomorrowEvents };
-  for (let guard = 0; guard < 80; guard += 1) { if (!processOverlapGroup(ctx)) break; }
+  runPlanningLoop(ctx);
   return { operations, unresolved };
 }
 
-export async function applyConflictResolutionPlan(plan, editEvent) {
-  for (const operation of plan.operations) {
+async function executeOperation(operation, editEvent, failures) {
+  try {
     await editEvent(extractBaseEventId(operation.event.id, operation.event), {
       start_time: operation.start.toISOString(),
       end_time: operation.end.toISOString(),
     });
+  } catch {
+    failures.push(operation);
   }
+}
+
+export async function applyConflictResolutionPlan(plan, editEvent) {
+  const failures = [];
+  for (const operation of plan.operations) {
+    await executeOperation(operation, editEvent, failures);
+  }
+  return { failures };
 }
 
 export async function undoConflictResolutionPlan(plan, editEvent) {
@@ -70,7 +91,7 @@ export async function undoConflictResolutionPlan(plan, editEvent) {
 export function buildConflictResolutionToastMessage(plan) {
   const fixedUnresolvedCount = plan.unresolved.filter((item) => item.reason === "fixed").length;
   const noSlotCount = plan.unresolved.filter((item) => item.reason === "no-slot").length;
-  if (!plan.operations.length && !plan.unresolved.length) return "No overlaps to clear.";
+  if (!plan.operations.length && !plan.unresolved.length) return "No overlap events.";
   if (!plan.operations.length && fixedUnresolvedCount && !noSlotCount) return "These overlaps are fixed lectures, societies, or deadline items, so they stay in place.";
   if (!plan.operations.length && noSlotCount && !fixedUnresolvedCount) return "Couldn't find a conflict-free slot for some events.";
   const movedCount = plan.operations.length;
@@ -112,10 +133,24 @@ function processOverlapCandidate(events, lockedGroups, index) {
   return { group: null, skip: group.length >= 2 ? group.length - 2 : 0 };
 }
 
-function findFirstOverlapGroup(events, lockedGroups) {
+function processSearchStep(events, lockedGroups, index) {
+  const result = processOverlapCandidate(events, lockedGroups, index);
+  return { group: result.group, nextIndex: index + 1 + result.skip };
+}
+
+function searchForGroup(events, lockedGroups) {
   let index = 0;
-  while (index < events.length - 1) { const result = processOverlapCandidate(events, lockedGroups, index); if (result.group) return result.group; index += 1 + result.skip; }
-  return null;
+  let foundGroup = null;
+  while (index < events.length - 1 && !foundGroup) {
+    const { group, nextIndex } = processSearchStep(events, lockedGroups, index);
+    foundGroup = group;
+    index = nextIndex;
+  }
+  return foundGroup;
+}
+
+function findFirstOverlapGroup(events, lockedGroups) {
+  return searchForGroup(events, lockedGroups);
 }
 
 function shouldExtendGroup(next, maxEndRef) {
@@ -175,7 +210,8 @@ function getGroupAnchor(group, movable) {
 }
 
 function isMovableEvent(event) {
-  return Boolean(event?.id) && !isReadOnlyEvent(event);
+  if (!event?.id) return false;
+  return !isReadOnlyEvent(event);
 }
 
 function getDurationMs(event) {

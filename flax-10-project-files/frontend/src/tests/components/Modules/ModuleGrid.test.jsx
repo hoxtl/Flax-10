@@ -37,30 +37,15 @@ describe('ModuleGrid', () => {
         expect(container.firstChild.children).toHaveLength(0);
     });
 
-    it('forwards module actions and task counts to each module card', () => {
-        const modules = [{ id: 7, module_code: 'CS7', module_name: 'Compilers' }];
-        const taskCountsByModule = { 7: 3 };
+    it('passes module and enrollment props to each card', () => {
+        const modules = [{ id: 7, module_name: 'C' }];
+        render(<ModuleGrid {...mockParameters} modules={modules} />);
+        expect(modulesCardMock).toHaveBeenCalledWith(expect.objectContaining({ module: modules[0], isTeacher: false }));
+    });
 
-        render(
-            <ModuleGrid
-                {...mockParameters}
-                modules={modules}
-                taskCountsByModule={taskCountsByModule}
-                onManageReadings={mockParameters.onManageDeadlines}
-            />
-        );
-
-        expect(modulesCardMock).toHaveBeenCalledWith(expect.objectContaining({
-            module: modules[0],
-            enrollments: [],
-            isTeacher: false,
-            onViewModule: mockParameters.onViewModule,
-            onEnrollmentToggle: mockParameters.onEnrollmentToggle,
-            onEdit: mockParameters.onEdit,
-            onDelete: mockParameters.onDelete,
-            onManageDeadlines: mockParameters.onManageDeadlines,
-            onManageReadings: mockParameters.onManageDeadlines,
-            taskCountsByModule,
-        }));
+    it('passes task counts and reading handlers to each card', () => {
+        const counts = { 7: 3 };
+        render(<ModuleGrid {...mockParameters} modules={[{ id: 7, module_name: 'C' }]} taskCountsByModule={counts} onManageReadings={mockParameters.onManageDeadlines} />);
+        expect(modulesCardMock).toHaveBeenCalledWith(expect.objectContaining({ taskCountsByModule: counts, onManageReadings: mockParameters.onManageDeadlines }));
     });
 });

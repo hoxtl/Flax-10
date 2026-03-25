@@ -13,7 +13,17 @@ function JourneySection({ props }) {
 }
 
 function DestinationSectionWrapper({ props }) {
-  return <DestinationSection selectedCampus={props.selection.selectedCampus} customDestination={props.selection.customDestination} onClearCampus={props.handleClearCampus} onClearCustomDest={props.clearCustomDestination} onSelectCampus={props.handleSelectCampus} />;
+  return (
+    <DestinationSection
+      selectedCampus={props.selection.selectedCampus}
+      customDestination={props.selection.customDestination}
+      onClearCampus={props.handleClearCampus}
+      onClearCustomDest={props.clearCustomDestination}
+      onSelectCampus={props.handleSelectCampus}
+      upcomingEvents={props.upcomingEvents}
+      onSelectEvent={props.handleSelectUpcomingEvent}
+    />
+  );
 }
 
 function TransportSection({ props }) {

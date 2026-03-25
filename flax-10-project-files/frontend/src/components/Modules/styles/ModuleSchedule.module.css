@@ -90,6 +90,26 @@
     white-space: nowrap;
 }
 
+.scheduleLocationLink {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.scheduleLocationIcon {
+    color: var(--muted);
+}
+
+.scheduleLocationLink {
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.scheduleLocationIcon {
+    color: var(--muted);
+}
+
 .recurringBadge {
     margin-top: 0.75rem;
     display: flex;

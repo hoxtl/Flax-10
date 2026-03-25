@@ -82,16 +82,8 @@ describe("useCreateTaskBar", () => {
     expect(result.current.taskListId).toBe(2);
   });
 
-  it("closes on outside clicks and blurs the external input ref", () => {
-    const externalInputRef = { current: { blur: vi.fn() } };
-    const { result } = renderHook(() =>
-      useCreateTaskBar({
-        lists: [{ id: 9, name: "Inbox" }],
-        onAddTask: vi.fn(),
-        inputRef: externalInputRef,
-      }),
-    );
-
+  it("closes on outside clicks", () => {
+    const { result } = renderHook(() => useCreateTaskBar({ lists: [{ id: 9, name: "Inbox" }], onAddTask: vi.fn() }));
     const insideNode = document.createElement("div");
     const outsideNode = document.createElement("button");
     document.body.appendChild(insideNode);
@@ -102,20 +94,27 @@ describe("useCreateTaskBar", () => {
       result.current.setInputFocused(true);
     });
 
-    act(() => {
-      insideNode.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    });
+    act(() => { insideNode.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
     expect(result.current.showOptions).toBe(true);
 
-    act(() => {
-      outsideNode.dispatchEvent(new Event("touchstart", { bubbles: true }));
-    });
-
+    act(() => { outsideNode.dispatchEvent(new Event("touchstart", { bubbles: true })); });
     expect(result.current.showOptions).toBe(false);
-    expect(externalInputRef.current.blur).toHaveBeenCalled();
 
     insideNode.remove();
     outsideNode.remove();
+  });
+
+  it("blurs the external input ref on outside click", () => {
+    const externalInputRef = { current: { blur: vi.fn() } };
+    const { result } = renderHook(() => useCreateTaskBar({ lists: [], onAddTask: vi.fn(), inputRef: externalInputRef }));
+
+    act(() => {
+      result.current.cardRef.current = { contains: () => false };
+      result.current.setInputFocused(true);
+    });
+
+    act(() => { document.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
+    expect(externalInputRef.current.blur).toHaveBeenCalled();
   });
 
   it("blurs from the input blur handler when focus leaves the card", async () => {

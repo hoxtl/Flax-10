@@ -42,38 +42,36 @@ describe("ProjectRowInfo", () => {
     vi.clearAllMocks();
   });
 
-  it("renders navigation, teacher profile, module badge, and member avatars", () => {
+  it("handles project and user profile navigation", () => {
     const onProjectNavigate = vi.fn();
     renderWithRouter(
-      <>
-        <ProjectRowInfo
-          project={{
-            id: 1,
-            name: "Capstone Project",
-            course_code: "CS101",
-            module_name: "Software Engineering",
-            module_tutor_id: 22,
-          }}
-          members={[{ id: 1, name: "Alex" }, { id: 2, name: "Bea" }]}
-          totalMembers={4}
-          action={<button type="button">Open action</button>}
-          onProjectNavigate={onProjectNavigate}
-          isOwner
-        />
-        <ProjectModuleBadge project={{ course_code: "CS101", module_name: "Software Engineering" }} />
-      </>,
+      <ProjectRowInfo
+        project={{ id: 1, name: "Capstone", course_code: "CS101", module_name: "SE", module_tutor_id: 22 }}
+        members={[{ id: 1, name: "Alex" }]}
+        onProjectNavigate={onProjectNavigate}
+      />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /Open Capstone Project project details/i }));
-    fireEvent.click(screen.getByRole("button", { name: /View Ada Byron's profile/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Open Alex profile/i }));
+    fireEvent.click(screen.getByRole("button", { name: /details/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Ada Byron's profile/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Alex profile/i }));
 
-    expect(onProjectNavigate).toHaveBeenCalledTimes(1);
+    expect(onProjectNavigate).toHaveBeenCalled();
     expect(openTeacherProfile).toHaveBeenCalled();
     expect(openMemberProfile).toHaveBeenCalled();
+  });
+
+  it("renders owner badge and member counts", () => {
+    renderWithRouter(
+      <ProjectRowInfo project={{ id: 1, name: "P1" }} members={[]} totalMembers={4} isOwner />
+    );
     expect(screen.getByText("PROJECT OWNER")).toBeInTheDocument();
     expect(screen.getByText("4 members")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open Software Engineering module/i })).toHaveAttribute("href", "/modules?code=CS101");
+  });
+
+  it("renders correct module badge link", () => {
+    renderWithRouter(<ProjectModuleBadge project={{ course_code: "CS101", module_name: "SE" }} />);
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/modules?code=CS101");
   });
 
   it("renders fallback teacher shell and hides module/member extras when data is absent", () => {

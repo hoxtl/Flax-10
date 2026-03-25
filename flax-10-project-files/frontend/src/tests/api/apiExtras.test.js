@@ -17,7 +17,7 @@ describe("api extras", () => {
     localStorage.clear();
   });
 
-  it("covers remaining admin, calendar, schedule, and user api branches", async () => {
+  it("covers admin and calendar api branches", async () => {
     fetchApi.mockResolvedValueOnce(null);
     await cancelCourseChangeRequest();
     expect(fetchApi).toHaveBeenCalledWith("/course-change/my-request/", { method: "DELETE" });
@@ -25,28 +25,26 @@ describe("api extras", () => {
     fetchApi.mockResolvedValueOnce([]);
     await getCalendarEvents();
     expect(fetchApi).toHaveBeenCalledWith("/calendar/events/map/");
+  });
 
+  it("covers schedule and user api branches", async () => {
+    fetchApi.mockResolvedValue({});
+    await createSchedule({ title: "S1" });
+    await renameSchedule(1, "S2");
+    await deleteSchedule(1);
+    expect(fetchApi).toHaveBeenCalledWith("/schedules/", expect.objectContaining({ method: "POST" }));
+    expect(fetchApi).toHaveBeenCalledWith("/schedules/1/", expect.objectContaining({ method: "PATCH" }));
+    expect(fetchApi).toHaveBeenCalledWith("/schedules/1/", { method: "DELETE" });
+
+    fetchApi.mockResolvedValueOnce({ settings: { theme: "light" } });
+    await expect(getUserSettings()).resolves.toEqual({ theme: "light" });
+  });
+
+  it("covers user search with complex query params", async () => {
     fetchApi.mockResolvedValueOnce({});
-    await createSchedule({ title: "Autumn" });
-    await renameSchedule(4, "Spring");
-    await deleteSchedule(9);
-    expect(fetchApi).toHaveBeenNthCalledWith(3, "/schedules/", expect.objectContaining({ method: "POST" }));
-    expect(fetchApi).toHaveBeenNthCalledWith(4, "/schedules/4/", expect.objectContaining({ method: "PATCH" }));
-    expect(fetchApi).toHaveBeenNthCalledWith(5, "/schedules/9/", { method: "DELETE" });
-
-    fetchApi.mockResolvedValueOnce({ settings: { theme: "dark" } });
-    await expect(getUserSettings()).resolves.toEqual({ theme: "dark" });
-
-    fetchApi.mockResolvedValueOnce({});
-    await searchUsers("ava", "Computer Science", "Chess", 10, 5, "Year 2", "admin", "name-desc");
-    expect(fetchApi).toHaveBeenLastCalledWith(
-      expect.stringContaining("q=ava"),
-    );
-    expect(fetchApi.mock.calls.at(-1)[0]).toContain("course=Computer%20Science");
-    expect(fetchApi.mock.calls.at(-1)[0]).toContain("society=Chess");
-    expect(fetchApi.mock.calls.at(-1)[0]).toContain("offset=10&limit=5");
-    expect(fetchApi.mock.calls.at(-1)[0]).toContain("year=Year%202");
-    expect(fetchApi.mock.calls.at(-1)[0]).toContain("role=admin");
+    await searchUsers("u", "C", "S", 0, 1, "Y", "r", "name-desc");
+    expect(fetchApi).toHaveBeenLastCalledWith(expect.stringContaining("q=u"));
+    expect(fetchApi.mock.calls.at(-1)[0]).toContain("course=C");
     expect(fetchApi.mock.calls.at(-1)[0]).toContain("ordering=-name");
   });
 

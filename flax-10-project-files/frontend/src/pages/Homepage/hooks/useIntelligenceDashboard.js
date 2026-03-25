@@ -32,6 +32,7 @@ export const CATALOGUE = [
 
 export const DEFAULT_LAYOUT = ["hero", "deadlines", "todayTasks", "bigTimeline"];
 const CATALOGUE_IDS = new Set(CATALOGUE.map((widget) => widget.id));
+const HERO_ID = "hero";
 
 export function useIntelligenceDashboard(props) {
   const [layout, setLayout] = usePersistedLayout(props.profile);
@@ -179,7 +180,12 @@ function shouldPreferServerSettings(profile, storageKeys) {
 }
 
 function sanitizeLayout(layout) {
-  return (Array.isArray(layout) ? layout : DEFAULT_LAYOUT).filter((id) => CATALOGUE_IDS.has(id));
+  return ensureHero((Array.isArray(layout) ? layout : DEFAULT_LAYOUT).filter((id) => CATALOGUE_IDS.has(id)));
+}
+
+function ensureHero(layout) {
+  const next = layout.includes(HERO_ID) ? layout : [HERO_ID, ...layout];
+  return Array.from(new Set(next));
 }
 
 function randomizeLayout(prev) {

@@ -27,7 +27,8 @@ export function buildScheduleAutoForm({ deadlines = [] } = {}) {
   if (!prefs.length) return null;
   return {
     title: `Homepage auto schedule ${new Date().toLocaleDateString('en-GB')}`,
-    clear_existing: false,
+    // Allow the scheduler to adjust existing study blocks beyond the currently visible plan
+    clear_existing: true,
     deadline_preferences: prefs,
   };
 }

@@ -10,6 +10,7 @@ import { isEnrolledIn } from "../../../components/Modules/utils/moduleUtils";
 import { getListColor } from "../utils/listColorUtils";
 import { runCreateTaskSave } from "../utils/createTaskModalUtils";
 import { isReadingList } from "../utils/readingListUtils";
+import { POMODORO_BLOCK_MINUTES, clampEstimateMinutes, minutesToEstimateBlocks } from "../utils/createTaskBarUtils";
 
 const ALLOWED_PRIORITIES = new Set(["medium", "high", "urgent"]);
 
@@ -17,13 +18,17 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
   const task = initialTask || {};
   const taskDue = task.due_date ? String(task.due_date).slice(0, 16) : "";
   const taskModuleId = task.module_id ?? task.module ?? task.moduleId ?? "";
+  const providedMinutes = Number(task.estimated_minutes);
+  const fallbackBlocks = Number(task.estimated_blocks) || 1;
+  const estimatedMinutes = clampEstimateMinutes(!Number.isNaN(providedMinutes) && providedMinutes > 0 ? providedMinutes : fallbackBlocks * POMODORO_BLOCK_MINUTES);
   return {
     title: task.title ?? "",
     description: task.description ?? "",
     priority: ALLOWED_PRIORITIES.has(task.priority) ? task.priority : "",
     due_date: taskDue || (defaultDueDate ?? ""),
     task_list: String(task.task_list ?? defaultListId ?? sortedLists[0]?.id ?? ""),
-    estimated_blocks: task.estimated_blocks ?? 1,
+    estimated_blocks: minutesToEstimateBlocks(estimatedMinutes),
+    estimated_minutes: estimatedMinutes,
     module: taskModuleId ? String(taskModuleId) : "",
     page_count: task.page_count ?? null,
   };

@@ -147,6 +147,9 @@ describe("StudyCoach extras", () => {
     await waitFor(() => expect(screen.getByText("Failed")).toBeInTheDocument());
   });
 
+<<<<<<< HEAD
+  it("renders study coach message suggestions", () => {
+=======
   it("hides the footer for empty imports and shows the done state after the last import", async () => {
     const dispatch = vi.fn();
     useCalendarDispatch.mockReturnValue(dispatch);
@@ -175,30 +178,22 @@ describe("StudyCoach extras", () => {
   });
 
   it("renders study coach messages states and suggestion actions", () => {
+>>>>>>> main
     const onSend = vi.fn();
-    const bottomRef = { current: null };
-    const { rerender } = render(
-      <StudyCoachMessages bottomRef={bottomRef} error={null} loading={false} messages={[]} onSend={onSend} />,
-    );
-
+    render(<StudyCoachMessages messages={[]} onSend={onSend} />);
     fireEvent.click(screen.getByText("Help me plan"));
     expect(onSend).toHaveBeenCalledWith("Help me plan");
+  });
 
-    rerender(
-      <StudyCoachMessages
-        bottomRef={bottomRef}
-        error="Oops"
-        loading
-        messages={[
-          { role: "user", content: "Hi" },
-          { role: "assistant", content: "Reply", suggested_events: [{ title: "Lecture", start_time: "2026-03-24T10:00:00.000Z", end_time: "2026-03-24T11:00:00.000Z" }] },
-        ]}
-        onSend={onSend}
-      />,
-    );
+  it("renders assistant replies and typing indicators", () => {
+    render(<StudyCoachMessages loading messages={[{ role: "user", content: "Hi" }, { role: "assistant", content: "Reply" }]} onSend={vi.fn()} />);
     expect(screen.getByText("Hi")).toBeInTheDocument();
     expect(screen.getByText("Reply")).toBeInTheDocument();
     expect(screen.getByText("typing-indicator")).toBeInTheDocument();
+  });
+
+  it("renders study coach error states", () => {
+    render(<StudyCoachMessages error="Oops" messages={[]} onSend={vi.fn()} />);
     expect(screen.getByText("Oops")).toBeInTheDocument();
   });
 
@@ -233,31 +228,23 @@ describe("useStudyCoachPanel", () => {
     Element.prototype.scrollIntoView = scrollIntoView;
   });
 
-  it("auto-sends the initial message, clears messages, handles enter, and stores assistant replies", async () => {
+  it("auto-sends the initial message and stores assistant replies", async () => {
     aiChat.mockResolvedValue({ reply: "Plan created", suggested_events: [{ title: "Revision" }] });
     vi.useFakeTimers();
     const { result } = renderHook(() => useStudyCoachPanel("Draft a plan", 14));
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(450);
-    });
-
+    await act(async () => { await vi.advanceTimersByTimeAsync(450); });
     vi.useRealTimers();
     expect(aiChat).toHaveBeenCalled();
-    expect(result.current.messages.at(-1)).toEqual({
-      role: "assistant",
-      content: "Plan created",
-      suggested_events: [{ title: "Revision" }],
-    });
+    expect(result.current.messages.at(-1)).toEqual({ role: "assistant", content: "Plan created", suggested_events: [{ title: "Revision" }] });
+  });
 
+  it("clears messages and handles keyboard input", async () => {
+    const { result } = renderHook(() => useStudyCoachPanel("", 30));
     act(() => result.current.clearMessages());
     expect(result.current.messages).toEqual([]);
-
     act(() => result.current.setInput("Type this"));
     const preventDefault = vi.fn();
-    await act(async () => {
-      result.current.handleKeyDown({ key: "Enter", shiftKey: false, preventDefault });
-    });
+    await act(async () => { result.current.handleKeyDown({ key: "Enter", shiftKey: false, preventDefault }); });
     expect(preventDefault).toHaveBeenCalled();
   });
 

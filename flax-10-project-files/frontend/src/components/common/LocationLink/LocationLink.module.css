@@ -1,0 +1,25 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: var(--text);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.text {
+  min-width: 0;
+  white-space: normal;
+}

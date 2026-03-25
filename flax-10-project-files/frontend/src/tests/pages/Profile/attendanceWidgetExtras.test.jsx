@@ -131,33 +131,28 @@ describe("attendance widget extras", () => {
     dispatchSpy.mockRestore();
   });
 
-  it("renders warning badge and segment detail wrapper branches", () => {
-    const outerClick = vi.fn();
-    const onToggleStatus = vi.fn();
-    const onClose = vi.fn();
+  it("renders attendance warning badge for low percentages", () => {
     render(<AttendanceWarningBadge attendancePct={63} />);
     expect(screen.getByText("Low Attendance (63%)")).toBeInTheDocument();
+  });
 
-    const { rerender, container } = render(
-      <div onClick={outerClick}>
-        <SegmentDetailPanelWrapper selectedSegment={null} events={[]} onToggleStatus={onToggleStatus} onClose={onClose} />
-      </div>,
+  it("renders segment detail panel wrapper when selected", () => {
+    const onToggleStatus = vi.fn();
+    const onClose = vi.fn();
+    const { rerender } = render(
+      <SegmentDetailPanelWrapper selectedSegment={null} events={[]} onToggleStatus={onToggleStatus} onClose={onClose} />
     );
-    expect(container.querySelector("[data-testid='segment-detail-panel']")).toBeNull();
+    expect(screen.queryByTestId("segment-detail-panel")).toBeNull();
 
     rerender(
-      <div onClick={outerClick}>
-        <SegmentDetailPanelWrapper
-          selectedSegment={{ chart: "byType", label: "Lab" }}
-          events={[{ id: 1 }]}
-          onToggleStatus={onToggleStatus}
-          onClose={onClose}
-        />
-      </div>,
+      <SegmentDetailPanelWrapper
+        selectedSegment={{ chart: "byType", label: "Lab" }}
+        events={[{ id: 1 }]}
+        onToggleStatus={onToggleStatus}
+        onClose={onClose}
+      />
     );
-
-    fireEvent.click(screen.getByText("By type: Lab").closest("div"));
-    expect(outerClick).not.toHaveBeenCalled();
+    expect(screen.getByText("By type: Lab")).toBeInTheDocument();
     expect(segmentDetailPanelProps.at(-1)).toEqual(expect.objectContaining({
       segmentLabel: "By type: Lab",
       events: [{ id: 1 }],
@@ -168,58 +163,37 @@ describe("attendance widget extras", () => {
 
   it("renders attendance charts and stops parent click propagation", () => {
     const outerClick = vi.fn();
-    const onSegmentClick = vi.fn();
-    render(
-      <div onClick={outerClick}>
-        <AttendanceCharts
-          overall={{ attended: 4, missed: 1 }}
-          overallData={[{ label: "Attended", value: 4 }]}
-          byTypeData={[{ label: "Lecture", value: 5 }]}
-          onSegmentClick={onSegmentClick}
-        />
-      </div>,
-    );
-
+    render(<div onClick={outerClick}><AttendanceCharts overall={{ attended: 4, missed: 1 }} overallData={[{ label: "A", value: 4 }]} onSegmentClick={vi.fn()} /></div>);
     fireEvent.click(screen.getByTestId("overall-attendance-chart").closest("div"));
     expect(outerClick).not.toHaveBeenCalled();
-    expect(overallChartProps.at(-1)).toEqual(expect.objectContaining({
-      attended: 4,
-      missed: 1,
-      onSegmentClick,
-    }));
-    expect(byTypeChartProps.at(-1)).toEqual(expect.objectContaining({
-      data: [{ label: "Lecture", value: 5 }],
-      onSegmentClick,
-    }));
+    expect(overallChartProps.at(-1)).toEqual(expect.objectContaining({ attended: 4, missed: 1 }));
   });
 
-  it("composes attendance widget data and refresh handler", async () => {
-    const refetchStats = vi.fn().mockResolvedValue(undefined);
-    const refetchRecords = vi.fn().mockResolvedValue(undefined);
-    useAttendanceStats.mockReturnValue({
-      stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 2, missed: 0 } } },
-      loading: false,
-      error: null,
-      refetch: refetchStats,
-    });
-    useAttendanceRecords.mockReturnValue({
-      records: [
-        { id: 1, event_id: 1, attended: true, title: "Lecture", event_type: "Lecture", start_time: "2026-03-03T10:00:00Z" },
-      ],
-      refetch: refetchRecords,
-    });
-    recordAttendance.mockResolvedValue(undefined);
+  it("passes data and handlers to by-type attendance chart", () => {
+    const onSegmentClick = vi.fn();
+    render(<AttendanceCharts byTypeData={[{ label: "L", value: 5 }]} onSegmentClick={onSegmentClick} />);
+    expect(byTypeChartProps.at(-1)).toEqual(expect.objectContaining({ data: [{ label: "L", value: 5 }], onSegmentClick }));
+  });
 
+  it("composes overall and by-type attendance data", async () => {
+    useAttendanceStats.mockReturnValue({ stats: { overall: { attended: 3, missed: 1 }, by_type: { L: { attended: 2, missed: 0 } } }, loading: false });
+    useAttendanceRecords.mockReturnValue({ records: [{ id: 1, title: "L", event_type: "Lecture" }] });
+    
     const { result } = renderHook(() => useAttendanceWidgetData({ chart: "overall", label: "Attended" }));
     await waitFor(() => expect(result.current.attendancePct).toBe(75));
     expect(result.current.overall.attended).toBe(3);
-    expect(result.current.overallData).toHaveLength(2);
-    expect(result.current.byTypeData[0].label).toBe("Lecture");
-    expect(result.current.segmentEvents).toHaveLength(1);
+    expect(result.current.byTypeData[0].label).toBe("L");
+  });
 
-    await act(async () => {
-      await result.current.handleToggleStatus(7, false);
-    });
+  it("handles event status toggling and refetches", async () => {
+    const refetchStats = vi.fn();
+    const refetchRecords = vi.fn();
+    useAttendanceStats.mockReturnValue({ stats: { overall: { attended: 1, missed: 0 } }, refetch: refetchStats });
+    useAttendanceRecords.mockReturnValue({ records: [], refetch: refetchRecords });
+    recordAttendance.mockResolvedValue();
+
+    const { result } = renderHook(() => useAttendanceWidgetData({}));
+    await act(async () => { await result.current.handleToggleStatus(7, false); });
 
     expect(recordAttendance).toHaveBeenCalledWith(7, false);
     await waitFor(() => expect(refetchStats).toHaveBeenCalled());

@@ -7,17 +7,28 @@ import { useState, useEffect } from "react";
 import GenericSummaryModal from "../../common/GenericSummaryModal/GenericSummaryModal";
 import SummaryItem from "../../common/GenericSummaryModal/SummaryItem";
 import { RANGE_OPTIONS, getRangeLabel, DATE_FORMAT, TIME_FORMAT, getFilteredEvents } from "../../../pages/Profile/utils/profileHelpers";
+import LocationLink from "../../common/LocationLink/LocationLink";
 import styles from "./EventsSummaryModal.module.css";
 
-function formatEventMeta(ev) {
-    const date = new Date(ev.start_time);
+function EventMeta({ event }) {
+    const date = new Date(event.start_time);
     const dateStr = date.toLocaleDateString('en-GB', DATE_FORMAT);
     const timeStr = date.toLocaleTimeString('en-GB', TIME_FORMAT);
-    return `${dateStr} at ${timeStr} ${ev.location ? `• ${ev.location}` : ''}`;
+    return (
+        <span className={styles.eventMeta}>
+            <span>{`${dateStr} at ${timeStr}`}</span>
+            {event.location && (
+                <>
+                    <span className={styles.metaDivider}>•</span>
+                    <LocationLink location={event.location} className={styles.locationLink} textClassName={styles.locationText} />
+                </>
+            )}
+        </span>
+    );
 }
 
 function EventItem({ event, index }) {
-    return <SummaryItem key={index} avatar="📅" title={event.title} subtitle={formatEventMeta(event)} />;
+    return <SummaryItem key={index} avatar="📅" title={event.title} subtitle={<EventMeta event={event} />} />;
 }
 
 function useEventsSummaryState(isOpen) {

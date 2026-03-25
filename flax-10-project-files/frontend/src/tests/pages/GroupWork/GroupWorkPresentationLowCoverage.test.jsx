@@ -64,31 +64,19 @@ describe("GroupWork presentation low-coverage components", () => {
     );
   });
 
-  it("renders project progress stats and segment hover states", () => {
-    render(
-      <ProjectProgress
-        taskStats={{
-          percent: 60,
-          completed: 6,
-          total: 10,
-          segments: [
-            { id: "done", name: "Done", percentage: 60, color: "green" },
-            { id: "todo", name: "Todo", percentage: 40 },
-          ],
-        }}
-      />,
-    );
+  it("renders project progress stats from task stats", () => {
+    render(<ProjectProgress taskStats={{ percent: 60, completed: 6, total: 10, segments: [{ id: "d", name: "D", percentage: 60 }] }} />);
+    expect(screen.getByTestId("stat-strip")).toHaveTextContent("Overall:60%|Tasks complete:6|Remaining:4");
+  });
 
-    expect(screen.getByTestId("stat-strip")).toHaveTextContent(
-      "Overall:60%|Tasks complete:6|Remaining:4",
-    );
-
-    const segments = screen.getAllByLabelText(/segment/);
-    expect(segments[0]).toHaveStyle({ background: "green", opacity: "1" });
-    fireEvent.mouseEnter(segments[0]);
-    expect(segments[1]).toHaveStyle({ opacity: "0.65" });
-    fireEvent.mouseLeave(segments[0]);
-    expect(segments[1]).toHaveStyle({ opacity: "1" });
+  it("handles progress segment hover interactions", () => {
+    render(<ProjectProgress taskStats={{ segments: [{ id: "d", name: "D", percentage: 50, color: "red" }, { id: "t", name: "T", percentage: 50 }] }} />);
+    const segs = screen.getAllByLabelText(/segment/);
+    expect(segs[0]).toHaveStyle({ background: "red", opacity: "1" });
+    fireEvent.mouseEnter(segs[0]);
+    expect(segs[1]).toHaveStyle({ opacity: "0.65" });
+    fireEvent.mouseLeave(segs[0]);
+    expect(segs[1]).toHaveStyle({ opacity: "1" });
   });
 
   it("renders avatar stacks with overflow and opens member profiles", () => {

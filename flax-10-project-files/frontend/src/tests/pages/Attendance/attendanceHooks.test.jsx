@@ -124,33 +124,26 @@ describe("attendance hooks", () => {
 });
 
 describe("useAttendancePageModel", () => {
-  it("builds the page model from the composed hook state", async () => {
+  it("builds the page model from composed hooks", async () => {
     vi.resetModules();
-
     const buildAttendancePageModel = vi.fn(() => ({ ready: true }));
-    const useAttendanceStats = vi.fn(() => ({ stats: { overall: {} } }));
-    const useAttendanceRecords = vi.fn(() => ({ records: [] }));
-    const useTimetableEvents = vi.fn(() => ({ events: [] }));
-
-    vi.doMock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({ useAttendanceStats }));
-    vi.doMock("../../../pages/Attendance/hooks/useAttendanceRecords", () => ({ useAttendanceRecords }));
-    vi.doMock("../../../pages/Attendance/hooks/useTimetableEvents", () => ({ useTimetableEvents }));
+    vi.doMock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({ useAttendanceStats: () => ({}) }));
+    vi.doMock("../../../pages/Attendance/hooks/useAttendanceRecords", () => ({ useAttendanceRecords: () => ({}) }));
+    vi.doMock("../../../pages/Attendance/hooks/useTimetableEvents", () => ({ useTimetableEvents: () => ({}) }));
     vi.doMock("../../../pages/Attendance/utils/attendancePageModel", () => ({ buildAttendancePageModel }));
 
     const { useAttendancePageModel } = await import("../../../pages/Attendance/hooks/useAttendancePageModel");
     const { result } = renderHook(() => useAttendancePageModel());
+    expect(result.current.ready).toBe(true);
+    expect(buildAttendancePageModel).toHaveBeenCalled();
+  });
 
-    expect(result.current).toEqual({ ready: true });
-    expect(buildAttendancePageModel).toHaveBeenCalledWith(
-      expect.objectContaining({
-        listTab: "record",
-        selectedSegment: null,
-        setListTab: expect.any(Function),
-        setSelectedSegment: expect.any(Function),
-      }),
-      { stats: { overall: {} } },
-      { records: [] },
-      { events: [] },
-    );
+  it("passes correct initial state to page model", async () => {
+    vi.resetModules();
+    const buildAttendancePageModel = vi.fn();
+    vi.doMock("../../../pages/Attendance/utils/attendancePageModel", () => ({ buildAttendancePageModel }));
+    const { useAttendancePageModel } = await import("../../../pages/Attendance/hooks/useAttendancePageModel");
+    renderHook(() => useAttendancePageModel());
+    expect(buildAttendancePageModel).toHaveBeenCalledWith(expect.objectContaining({ listTab: "record", selectedSegment: null }), expect.anything(), expect.anything(), expect.anything());
   });
 });

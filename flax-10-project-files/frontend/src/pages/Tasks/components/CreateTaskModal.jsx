@@ -9,8 +9,10 @@ import { SleepWarningModal } from "../../../components/common/SleepWarningModal"
 import StandardModal from "../../../components/common/StandardModal/StandardModal";
 import { Trash2, X } from "lucide-react";
 import TextInput from "../../../components/common/TextInput/TextInput";
+import EstimatedDurationControl from "../../../components/common/EstimatedDurationControl/EstimatedDurationControl";
 
 import { useCreateTaskModal } from "../hooks/useCreateTaskModal";
+import { POMODORO_BLOCK_MINUTES, minutesToEstimateBlocks } from "../utils/createTaskBarUtils";
 
 import layoutStyles from "./CreateTaskModalLayout.module.css";
 import formStyles from "./CreateTaskModalForm.module.css";
@@ -21,12 +23,19 @@ const PRIORITY_OPTIONS = [
   { value: "high", label: "High" },
   { value: "urgent", label: "Urgent" },
 ];
-const STUDY_BLOCK_OPTIONS = [
-  { value: 1, label: "25m" },
-  { value: 2, label: "50m" },
-  { value: 3, label: "1h 15m" },
-  { value: 4, label: "1h 40m" },
+const DURATION_PRESETS = [
+  { value: 25, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
+  { value: 50, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
+  { value: 75, label: "1h 15m", ariaLabel: "75 minutes (3 Pomodoro blocks)" },
+  { value: 100, label: "1h 40m", ariaLabel: "100 minutes (4 Pomodoro blocks)" },
 ];
+
+function getMinutesFromForm(form) {
+  const parsedMinutes = Number(form.estimated_minutes);
+  if (!Number.isNaN(parsedMinutes) && parsedMinutes > 0) return parsedMinutes;
+  if (form.estimated_blocks) return form.estimated_blocks * POMODORO_BLOCK_MINUTES;
+  return POMODORO_BLOCK_MINUTES;
+}
 
 function CreateTaskModalHeader({ isEditMode, onClose }) {
   return (
@@ -83,28 +92,47 @@ function CreateTaskModalDateTime({ form, set }) {
   );
 }
 
-function StudyBlockOptions({ form, setForm }) {
-  return (
-    <div className={styles.chipGroup}>
-        {STUDY_BLOCK_OPTIONS.map(({ value, label }) => (
-          <button key={value} type="button" className={`${styles.chip} ${form.estimated_blocks === value ? styles.chipActive : ""}`}
-            onClick={() => setForm((p) => ({ ...p, estimated_blocks: value }))}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-  );
-}
-
 function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   if (isReadingList) return null;
+  const duration = useModalDurationControl(form, setForm);
   return (
     <div className={styles.durationRow}>
       <span className={styles.focusBlocksLabel}>Est. time</span>
-        <StudyBlockOptions form={form} setForm={setForm} />
+      <EstimatedDurationControl
+        valueMinutes={duration.minutesValue}
+        onChangeMinutes={duration.handleMinutesChange}
+        presets={DURATION_PRESETS}
+        ariaLabel="Estimated duration"
+        classes={buildModalDurationClasses()}
+      />
     </div>
   );
+}
+
+function useModalDurationControl(form, setForm) {
+  const minutesValue = getMinutesFromForm(form);
+  const handleMinutesChange = (minutes) => {
+    setForm((prev) => ({
+      ...prev,
+      estimated_minutes: minutes,
+      estimated_blocks: minutesToEstimateBlocks(minutes),
+    }));
+  };
+  return { minutesValue, handleMinutesChange };
+}
+
+function buildModalDurationClasses() {
+  return {
+    root: styles.durationControls,
+    buttonGroup: `${styles.chipGroup} ${styles.durationChips}`,
+    button: styles.chip,
+    buttonActive: styles.chipActive,
+    customInput: styles.customDurationInput,
+    customInputActive: styles.customDurationActive,
+    customInputField: styles.customDurationInputField,
+    leading: styles.customDurationLeading,
+    trailing: styles.customDurationTrailing,
+  };
 }
 
 

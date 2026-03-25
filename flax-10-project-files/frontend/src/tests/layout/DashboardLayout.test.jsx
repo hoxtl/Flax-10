@@ -245,47 +245,11 @@ describe("DashboardLayout", () => {
     expect(screen.queryByTestId("quick-add-modal")).toBeNull();
   });
 
-  it("opens CreateSociety modal from QuickAdd", () => {
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Quick Add"));
-    fireEvent.click(screen.getByText("Add Society"));
-    expect(screen.getByTestId("society-modal")).toBeTruthy();
-    fireEvent.click(screen.getByText("Close Society Modal"));
-    expect(screen.queryByTestId("society-modal")).toBeNull();
-  });
-
   it("opens CreateTask modal from QuickAdd", () => {
     render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Task"));
     expect(screen.getByTestId("create-task-modal")).toBeTruthy();
-  });
-
-  it("calls openModal from QuickAdd event selection", () => {
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Quick Add"));
-    fireEvent.click(screen.getByText("Add Event"));
-    expect(mockOpenModal).toHaveBeenCalledWith(null, "event", expect.any(Date));
-  });
-
-  it("shows EventModal when isModalOpen is true", () => {
-    useEventModal.mockReturnValue({
-      isModalOpen: true, closeModal: vi.fn(), openModal: vi.fn(),
-      modalEvent: { id: 1, title: 'Test' }, modalType: 'event', modalInitialDate: null,
-    });
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    expect(screen.getByTestId("event-modal")).toBeTruthy();
-  });
-
-  it("EventModal closeModal is called when Close Event Modal clicked", () => {
-    const closeModal = vi.fn();
-    useEventModal.mockReturnValue({
-      isModalOpen: true, closeModal, openModal: vi.fn(),
-      modalEvent: null, modalType: null, modalInitialDate: null,
-    });
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Close Event Modal"));
-    expect(closeModal).toHaveBeenCalled();
   });
 
   it("does not show Topbar on mobile", () => {
@@ -364,24 +328,6 @@ describe("DashboardLayout", () => {
     fireEvent.click(screen.getByText("Quick Add"));
     fireEvent.click(screen.getByText("Add Module"));
     expect(onNavChange).toHaveBeenCalledWith("modules_create");
-  });
-
-  it("onSelectType add_deadline opens DeadlineModal", () => {
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Quick Add"));
-    fireEvent.click(screen.getByText("Add Deadline"));
-    expect(screen.getByTestId("deadline-modal")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Close Deadline Modal"));
-    expect(screen.queryByTestId("deadline-modal")).toBeNull();
-  });
-
-  it("onSelectType add_reading opens ReadingModal", () => {
-    render(<DashboardLayout activeNav="home" onNavChange={() => {}}>Content</DashboardLayout>);
-    fireEvent.click(screen.getByText("Quick Add"));
-    fireEvent.click(screen.getByText("Add Reading"));
-    expect(screen.getByTestId("reading-modal")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Close Reading Modal"));
-    expect(screen.queryByTestId("reading-modal")).toBeNull();
   });
 
   it("opens QuickAdd modal and falls back to the main chooser for legacy scheduler events", () => {

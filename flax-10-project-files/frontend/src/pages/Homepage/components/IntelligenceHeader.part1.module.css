@@ -3,10 +3,8 @@
   position: relative;
   border-radius: 24px;
   background: var(--home-hero-bg);
-  border: 2px solid var(--home-hero-frame-border);
-  box-shadow:
-    var(--home-hero-shadow),
-    0 0 0 1px color-mix(in srgb, var(--home-hero-frame-border) 85%, transparent);
+  border: none;
+  box-shadow: var(--home-hero-shadow);
   overflow: hidden;
   height: 100%;
   isolation: isolate;
@@ -71,20 +69,12 @@
 
   .headerLeft,
   .headerRight,
-  .headerPlannerPanel,
-  .liveContextCard {
+  .headerPlannerPanel {
     width: 100%;
     max-width: 100%;
     min-width: 0;
   }
 
-  .liveContextText {
-    max-width: none;
-  }
-
-  .metricRail {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
 }
 
 .headerLeft {
@@ -98,28 +88,8 @@
   align-self: center;
 }
 
-.headerLabel {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--widget-text-tertiary);
-}
-
-.headerDateRow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.headerDateIcon {
-  color: var(--widget-text-tertiary);
-  flex-shrink: 0;
-}
-
 .headerTitle {
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-heading);
   font-size: clamp(1.38rem, 2.2vw, 1.78rem);
   font-weight: 700;
   letter-spacing: -0.035em;
@@ -165,25 +135,9 @@
     padding: 5px;
     border-radius: 16px;
   }
-
-  .metricRail {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .metricChip {
-    min-width: 0;
-    padding: 10px;
-    border-radius: 12px;
-  }
 }
 
 @media (max-width: 520px) {
-  .metricRail {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 5px;
-  }
-
   .nextStepCard {
     padding: 12px;
   }
@@ -208,64 +162,6 @@
     width: 100%;
     max-width: 100%;
   }
-}
-
-.metricRail {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.metricChip {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  min-width: 0;
-  border-radius: 18px;
-  background: var(--surface-inner);
-  border: 1px solid var(--widget-border);
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease;
-}
-
-@media (max-width: 767px) {
-  .metricRail {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .metricChip {
-    padding: 8px;
-  }
-
-  .metricLabel {
-    font-size: 0.56rem;
-    letter-spacing: 0.05em;
-  }
-
-  .metricValue {
-    font-size: 0.9rem;
-  }
-}
-
-.metricLabel {
-  color: var(--widget-metric-label);
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.metricValue {
-  color: var(--widget-metric-value);
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
-  font-size: 1.02rem;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
 }
 
 @keyframes heroWelcomeGlow {

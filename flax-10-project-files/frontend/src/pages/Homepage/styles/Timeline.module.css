@@ -9,3 +9,4 @@
 @import "./timeline/TimelinePastAndMissed.module.css";
 @import "./timeline/TimelineGapWindows.module.css";
 @import "./timeline/TimelineGapActions.module.css";
+@import "./timeline/TimelineGapTransit.module.css";

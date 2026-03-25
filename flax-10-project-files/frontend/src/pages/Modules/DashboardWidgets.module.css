@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   border-radius: var(--card-radius-token);
-  background: var(--modules-panel-tint);
-  border: 1.5px solid var(--home-widget-frame-border, var(--border));
+  border: var(--card-border);
+  background: var(--surface-card);
   padding: var(--card-padding-lg);
   gap: 0.85rem;
   min-height: 0;
@@ -135,10 +135,10 @@
   align-self: center;
   margin-top: 0.35rem;
   padding: 0.4rem 0.95rem;
-  border: 0.5px solid var(--border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text);
+  border: var(--card-border);
+  border-radius: 28px;
+  background: var(--surface-card);
+  box-shadow: var(--card-shadow-rest);
   font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;

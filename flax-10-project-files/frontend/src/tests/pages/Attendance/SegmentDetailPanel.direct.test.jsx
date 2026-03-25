@@ -48,35 +48,21 @@ describe("SegmentDetailPanel", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("tracks toggling state while onToggleStatus runs and resets it afterwards", async () => {
-    let resolveToggle;
-    const onToggleStatus = vi.fn(
-      () =>
-        new Promise((resolve) => {
-          resolveToggle = resolve;
-        }),
-    );
-
-    render(
-      <SegmentDetailPanel
-        segmentLabel="Lab"
-        events={[{ id: 4, title: "Chemistry", attended: true }]}
-        onToggleStatus={onToggleStatus}
-      />,
-    );
-
+  it("tracks toggling state while onToggleStatus runs", async () => {
+    const onToggleStatus = vi.fn(() => new Promise((resolve) => { setTimeout(resolve, 50); }));
+    render(<SegmentDetailPanel segmentLabel="Lab" events={[{ id: 4, title: "Lab", attended: true }]} onToggleStatus={onToggleStatus} />);
     fireEvent.click(screen.getByRole("button", { name: /toggle-first/i }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId("toggling-json")).toHaveTextContent('"4":true'),
-    );
+    await waitFor(() => expect(screen.getByTestId("toggling-json")).toHaveTextContent('"4":true'));
     expect(onToggleStatus).toHaveBeenCalledWith(4, false);
+  });
 
+  it("resets toggling state after onToggleStatus completes", async () => {
+    let resolveToggle;
+    const onToggleStatus = vi.fn(() => new Promise((resolve) => { resolveToggle = resolve; }));
+    render(<SegmentDetailPanel segmentLabel="Lab" events={[{ id: 4, title: "Lab", attended: true }]} onToggleStatus={onToggleStatus} />);
+    fireEvent.click(screen.getByRole("button", { name: /toggle-first/i }));
     resolveToggle();
-
-    await waitFor(() =>
-      expect(screen.getByTestId("toggling-json")).toHaveTextContent('"4":false'),
-    );
+    await waitFor(() => expect(screen.getByTestId("toggling-json")).toHaveTextContent('"4":false'));
   });
 
   it("resets toggling state even when no status callback is provided", async () => {

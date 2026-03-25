@@ -33,7 +33,7 @@
 }
 
 .nextStepLabel {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -48,7 +48,7 @@
 .nextStepText {
   margin: 0;
   color: var(--widget-text-primary);
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-heading);
   font-size: 0.89rem;
   font-weight: 700;
   line-height: 1.24;
@@ -56,7 +56,7 @@
 }
 
 .nextStepMeta {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.64rem;
   font-weight: 700;
   color: var(--home-now-time);
@@ -65,50 +65,6 @@
 
 .nextStepCardWarning .nextStepMeta {
   color: color-mix(in srgb, var(--widget-text-primary) 72%, var(--danger) 28%);
-}
-
-.nextStepFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.analyticsInline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.analyticsPill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 0 9px;
-  border-radius: 999px;
-  background: rgba(243, 239, 234, 0.72);
-  border: 1px solid rgba(139, 115, 85, 0.12);
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--widget-text-secondary);
-}
-
-.analyticsLink {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--widget-accent);
-  text-decoration: none;
-}
-
-.analyticsLink:hover {
-  color: #4a3421;
 }
 
 .heroStatStrip {
@@ -186,106 +142,6 @@
   mix-blend-mode: var(--home-hero-aura-blend, screen);
   opacity: var(--home-hero-aura-opacity, 0.72);
   transform-origin: center;
-}
-
-/* ── Live Context ── */
-.liveContextCard {
-  display: grid;
-  gap: 8px;
-  width: fit-content;
-  max-width: min(100%, 34rem);
-  padding: 14px 16px;
-  background: var(--widget-card-bg-glass);
-  border: 1px solid var(--widget-border);
-  border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.025);
-  backdrop-filter: var(--widget-glass-blur);
-}
-
-.liveContextInlineAlert {
-  position: relative;
-}
-
-.liveContextTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 18px;
-}
-
-.liveContextLabel {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--widget-text-tertiary);
-}
-
-.liveContextIcon {
-  color: rgba(192, 113, 78, 0.78);
-  flex-shrink: 0;
-}
-
-.liveContextDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: radial-gradient(
-    circle at 35% 35%,
-    #f0b29d 0%,
-    #c0714e 55%,
-    #b83232 100%
-  );
-  box-shadow:
-    0 0 0 4px rgba(192, 113, 78, 0.1),
-    0 0 14px rgba(192, 113, 78, 0.42);
-  animation: liveAlertDotPulse 2s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-.liveContextBody {
-  display: grid;
-  gap: 5px;
-}
-
-.liveContextText {
-  margin: 0;
-  font-family: "Lexend", system-ui, sans-serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--widget-text-primary);
-  max-width: 35ch;
-}
-
-.liveContextMeta {
-  font-family: var(--font-body), "Lexend", system-ui, sans-serif;
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--widget-text-tertiary);
-}
-
-.liveContextInlineAlert .liveContextTop {
-  justify-content: flex-start;
-}
-
-@keyframes liveAlertDotPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow:
-      0 0 0 4px rgba(192, 113, 78, 0.1),
-      0 0 14px rgba(192, 113, 78, 0.42);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow:
-      0 0 0 6px rgba(192, 113, 78, 0.08),
-      0 0 18px rgba(192, 113, 78, 0.5);
-  }
 }
 
 /* ── Status Banners (Pending Requests) ── */

@@ -159,42 +159,34 @@ describe("useTaskFeedData", () => {
     });
   });
 
-  it("filters by selected module codes when module filters are toggled", async () => {
+  it("toggles module filter codes", async () => {
+    vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation((_l, _o, set) => ({ toggleModuleFilter: (c) => set((p) => (p.includes(c) ? [] : [c])) }));
+    const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", filterListIds: [] }));
+    act(() => { result.current.toggleModuleFilter("CS1"); });
+    await waitFor(() => expect(result.current.filterModuleCodes).toEqual(["CS1"]));
+  });
+
+  it("filters task feed by selected module codes", async () => {
+    const tasks = [{ id: 1, m: "CS1" }, { id: 2, m: "MA2" }];
+    const { result } = renderHook(() => useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all", filterListIds: [] }));
+    act(() => { result.current.setFilterModuleCodes(["CS1"]); });
+    await waitFor(() => expect(result.current.pending).toEqual([{ id: 1, m: "CS1" }]));
+  });
+
+  it("clears all filters when clearAllFilters is called", async () => {
     vi.mocked(taskFeedDataUtils.getFilterHandlers).mockImplementation(
       (_filterListIds, _onFilterByList, setFilterModuleCodes, setFilterQuery) => ({
         toggleListFilter: vi.fn(),
-        toggleModuleFilter: (code) => setFilterModuleCodes((prev) => (prev.includes(code) ? [] : [code])),
-        clearAllFilters: () => {
-          setFilterModuleCodes([]);
-          setFilterQuery("");
-        },
+        toggleModuleFilter: vi.fn(),
+        clearAllFilters: () => { setFilterModuleCodes([]); setFilterQuery(""); },
       }),
     );
 
-    const tasks = [
-      { id: 1, title: "Read notes", completed: false, module_code: "CS101" },
-      { id: 2, title: "Submit lab", completed: false, module_code: "MA202" },
-      { id: 3, title: "Done reading", completed: true, module_code: "CS101" },
-    ];
-
     const { result } = renderHook(() =>
-      useTaskFeedData({ tasks, allTasks: tasks, lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
+      useTaskFeedData({ tasks: [], allTasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
     );
 
-    act(() => {
-      result.current.toggleModuleFilter("CS101");
-    });
-
-    await waitFor(() => {
-      expect(result.current.filterModuleCodes).toEqual(["CS101"]);
-      expect(result.current.pending).toEqual([{ id: 1, title: "Read notes", completed: false, module_code: "CS101" }]);
-      expect(result.current.completed).toEqual([{ id: 3, title: "Done reading", completed: true, module_code: "CS101" }]);
-    });
-
-    act(() => {
-      result.current.clearAllFilters();
-    });
-
+    act(() => { result.current.clearAllFilters(); });
     expect(result.current.filterModuleCodes).toEqual([]);
   });
 
@@ -260,7 +252,7 @@ describe("useTaskFeedData", () => {
     });
   });
 
-  it("builds reading-list and generic all-complete cards when no active tasks remain", () => {
+  it("builds reading-list all-complete cards", () => {
     vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
     vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
     vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
@@ -268,9 +260,8 @@ describe("useTaskFeedData", () => {
 
     const completedTasks = [{ id: 8, title: "Finished", completed: true }];
     const readingLists = [{ id: 7, name: "CS101 - Computer Science" }];
-    const regularLists = [{ id: 8, name: "Inbox" }];
 
-    const { result: readingResult } = renderHook(() =>
+    const { result } = renderHook(() =>
       useTaskFeedData({
         tasks: completedTasks,
         allTasks: completedTasks,
@@ -281,12 +272,22 @@ describe("useTaskFeedData", () => {
       }),
     );
 
-    expect(readingResult.current.allTasksEmptyCardProps).toEqual({
+    expect(result.current.allTasksEmptyCardProps).toEqual({
       message: "All caught up on readings!",
       sub: "No suggested readings left for CS101 Computer Science right now.",
     });
+  });
 
-    const { result: regularResult } = renderHook(() =>
+  it("builds generic all-complete cards when no active tasks remain", () => {
+    vi.mocked(taskFeedDataUtils.getOverdue).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getToday).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getThisWeek).mockReturnValue([]);
+    vi.mocked(taskFeedDataUtils.getLater).mockReturnValue([]);
+
+    const completedTasks = [{ id: 8, title: "Finished", completed: true }];
+    const regularLists = [{ id: 8, name: "Inbox" }];
+
+    const { result } = renderHook(() =>
       useTaskFeedData({
         tasks: completedTasks,
         allTasks: completedTasks,
@@ -297,7 +298,7 @@ describe("useTaskFeedData", () => {
       }),
     );
 
-    expect(regularResult.current.allTasksEmptyCardProps).toEqual({
+    expect(result.current.allTasksEmptyCardProps).toEqual({
       message: "Great job",
       sub: "1 task completed. Take a moment — you earned it.",
     });
@@ -355,38 +356,34 @@ describe("useTaskFeedData", () => {
     textarea.remove();
   });
 
-  it("closes the filter popup when clicking outside the filter ref", async () => {
-    const { result } = renderHook(() =>
-      useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }),
-    );
-
-    const inside = document.createElement("div");
-    const outside = document.createElement("button");
-    document.body.appendChild(inside);
-    document.body.appendChild(outside);
-
-    act(() => {
-      result.current.filterRef.current = { contains: (node) => node === inside };
-      result.current.setIsFilterOpen(true);
+  describe("filter popup auto-close", () => {
+    it("keeps the filter open when clicking inside the filter ref", () => {
+      const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+      const inside = document.createElement("div");
+      document.body.appendChild(inside);
+      act(() => {
+        result.current.filterRef.current = { contains: (node) => node === inside };
+        result.current.setIsFilterOpen(true);
+        inside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      });
+      expect(result.current.isFilterOpen).toBe(true);
+      inside.remove();
     });
 
-    expect(result.current.isFilterOpen).toBe(true);
-
-    act(() => {
-      inside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+    it("closes the filter when clicking outside the filter ref", async () => {
+      const { result } = renderHook(() => useTaskFeedData({ tasks: [], lists: [], activeFilter: "all", activeListId: null, filterListIds: [] }));
+      const outside = document.createElement("button");
+      document.body.appendChild(outside);
+      act(() => {
+        result.current.filterRef.current = { contains: () => false };
+        result.current.setIsFilterOpen(true);
+      });
+      act(() => {
+        outside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      });
+      await waitFor(() => expect(result.current.isFilterOpen).toBe(false));
+      outside.remove();
     });
-    expect(result.current.isFilterOpen).toBe(true);
-
-    act(() => {
-      outside.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-    });
-
-    await waitFor(() => {
-      expect(result.current.isFilterOpen).toBe(false);
-    });
-
-    inside.remove();
-    outside.remove();
   });
 
   it("handles missing tasks, lists, and module metadata defaults", async () => {

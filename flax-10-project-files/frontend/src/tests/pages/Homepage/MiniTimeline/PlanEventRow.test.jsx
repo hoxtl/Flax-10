@@ -364,8 +364,8 @@ describe('PlanEventRow', () => {
     });
 
     it('renders end time when different from start', async () => {
-        const { formatTime } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
-        formatTime.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
+        const { formatTime12h } = await import('../../../../pages/Homepage/utils/dateFormatUtils');
+        formatTime12h.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
         renderRow();
         expect(screen.getByText(/10:00 am/)).toBeTruthy();
     });

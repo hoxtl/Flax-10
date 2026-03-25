@@ -45,13 +45,11 @@ describe("TagField", () => {
     });
   });
 
-  it("deduplicates custom tags, maps selection changes, and toggles the manager modal", () => {
-    const onChange = vi.fn();
-
+  it("deduplicates custom tags correctly", () => {
     render(
       <TagField
         value="2"
-        onChange={onChange}
+        onChange={vi.fn()}
         customTags={[
           { id: "1", label: "Study" },
           { id: "2", label: "study" },
@@ -59,19 +57,27 @@ describe("TagField", () => {
         ]}
       />,
     );
-
     const selectorProps = tagsSelectorSpy.mock.calls.at(-1)[0];
     expect(selectorProps.tags).toEqual([
       { id: "2", label: "study" },
       { id: "3", label: "Meeting" },
     ]);
     expect(selectorProps.selectedTags).toEqual([{ id: "2", label: "study" }]);
+  });
+
+  it("handles tag selection changes", () => {
+    const onChange = vi.fn();
+    render(<TagField value="" onChange={onChange} />);
 
     fireEvent.click(screen.getByText("choose-study"));
     expect(onChange).toHaveBeenCalledWith({ target: { value: "2" } });
 
     fireEvent.click(screen.getByText("clear-tags"));
     expect(onChange).toHaveBeenCalledWith({ target: { value: "" } });
+  });
+
+  it("toggles the tag manager modal", () => {
+    render(<TagField value="" onChange={vi.fn()} />);
 
     fireEvent.click(screen.getByText("Manage tags…"));
     expect(screen.getByText("close-manager")).toBeInTheDocument();

@@ -30,41 +30,24 @@ describe('ImageManagerComponents', () => {
     expect(onDelete).toHaveBeenCalled();
   });
 
-  it('renders grid and handles add button in normal/full states', async () => {
-    const onDelete = vi.fn();
-    const onPin = vi.fn();
+  it('allows adding images via file input when below capacity', async () => {
     const onAdd = vi.fn();
-
-    class MockFileReader {
-      readAsDataURL(file) {
-        this.onload({ target: { result: `data:${file.name}` } });
-      }
-    }
+    class MockFileReader { readAsDataURL(file) { this.onload({ target: { result: `data:${file.name}` } }); } }
     vi.stubGlobal('FileReader', MockFileReader);
 
-    const { rerender } = render(
-      <ImageGrid images={['a.jpg']} onDelete={onDelete} onPin={onPin} onAdd={onAdd} />,
-    );
-
-    const addBtn = screen.getByRole('button', { name: '+' });
-    expect(addBtn).toBeTruthy();
-    expect(addBtn).not.toBeDisabled();
-
-    // Simulate file selection through the hidden input
+    render(<ImageGrid images={['a.jpg']} onDelete={vi.fn()} onPin={vi.fn()} onAdd={onAdd} />);
     const fileInput = document.querySelector('input[type="file"]');
-    expect(fileInput).toBeTruthy();
     fireEvent.change(fileInput, { target: { files: [new File(['x'], 'img.png', { type: 'image/png' })] } });
     await waitFor(() => expect(onAdd).toHaveBeenCalledWith('data:img.png'));
+  });
 
-    rerender(
-      <ImageGrid
+  it('disables the add button when at image capacity', () => {
+    render(
+      <ImageGrid 
         images={['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg']}
-        onDelete={onDelete}
-        onPin={onPin}
-        onAdd={onAdd}
-      />,
+        onDelete={vi.fn()} onPin={vi.fn()} onAdd={vi.fn()}
+      />
     );
-
     expect(screen.getByRole('button', { name: '+' })).toBeDisabled();
   });
 

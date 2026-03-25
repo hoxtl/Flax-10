@@ -300,6 +300,6 @@ def create_enrollments(modules, tags, stdout):
     now = timezone.now()
     deadlines_by_module = _prefetch_deadlines_by_module(modules)
     users = list(User.objects.all().select_related('settings'))
-    all_enrollments, all_events = _collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
+    all_enrollments, all_events = collect_all_enrollments_and_events(users, modules, tags, now, deadlines_by_module)
     Enrollment.objects.bulk_create(all_enrollments, ignore_conflicts=True, batch_size=500)
     CalendarEvent.objects.bulk_create(all_events, ignore_conflicts=True, batch_size=500)

@@ -73,6 +73,9 @@ describe("Dashboard sidebar extras", () => {
     expect(result.current).toBe(false);
   });
 
+<<<<<<< HEAD
+  it("renders desktop sidebar navigation and hover styling", () => {
+=======
   it("treats non-array deadline payloads as no pressure", async () => {
     getUpcomingDeadlines.mockResolvedValueOnce({ results: [] });
 
@@ -86,26 +89,20 @@ describe("Dashboard sidebar extras", () => {
   });
 
   it("renders desktop interactions including hover, user menu actions, and pressure styling", () => {
+>>>>>>> main
     const onChange = vi.fn();
-    const onSettingsClick = vi.fn();
-    const onLogoutClick = vi.fn();
-    const onProfileClick = vi.fn();
-
     const { container } = render(
       <SidebarDesktop
         active="tasks"
         onChange={onChange}
         user={{ name: "Alice", email: "alice@example.com", isAdmin: true }}
-        onSettingsClick={onSettingsClick}
-        onLogoutClick={onLogoutClick}
-        onProfileClick={onProfileClick}
-        hasPressure
       />,
     );
-
     fireEvent.mouseEnter(container.firstChild);
     fireEvent.click(screen.getByText("Tasks"));
     expect(onChange).toHaveBeenCalledWith("tasks");
+<<<<<<< HEAD
+=======
 
     fireEvent.click(screen.getByText("Alice"));
     expect(screen.getByText("Profile")).toBeInTheDocument();
@@ -118,10 +115,14 @@ describe("Dashboard sidebar extras", () => {
 
     fireEvent.click(document.querySelector('[class*="menuBackdrop"]'));
 
+>>>>>>> main
     fireEvent.mouseLeave(container.firstChild);
     expect(container.textContent).not.toContain("alice@example.com");
   });
 
+<<<<<<< HEAD
+  it("handles desktop sidebar user menu actions", () => {
+=======
   it("falls back to a default avatar label when the user has no name", () => {
     render(
       <SidebarDesktop
@@ -137,33 +138,51 @@ describe("Dashboard sidebar extras", () => {
   it("renders mobile drawer actions, active states, and closes even when a footer action is missing", () => {
     const onToggle = vi.fn();
     const onChange = vi.fn();
+>>>>>>> main
     const onSettingsClick = vi.fn();
     const onLogoutClick = vi.fn();
+    const onProfileClick = vi.fn();
 
     render(
-      <SidebarMobile
-        isOpen
-        onToggle={onToggle}
-        user={{ isAdmin: false }}
+      <SidebarDesktop
         active="home"
-        onChange={onChange}
+        onChange={vi.fn()}
+        user={{ name: "Alice", email: "a@a.com" }}
         onSettingsClick={onSettingsClick}
         onLogoutClick={onLogoutClick}
+        onProfileClick={onProfileClick}
       />,
     );
 
-    fireEvent.click(screen.getAllByText("Tasks")[0]);
-    expect(onChange).toHaveBeenCalledWith("tasks");
-
-    fireEvent.click(screen.getByLabelText("Close menu"));
-    expect(onToggle).toHaveBeenCalled();
-
+    fireEvent.click(screen.getByText("Alice"));
+    expect(screen.getByText("Profile")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Settings"));
     fireEvent.click(screen.getByText("Log out"));
     fireEvent.click(screen.getByText("Profile"));
     expect(onSettingsClick).toHaveBeenCalled();
     expect(onLogoutClick).toHaveBeenCalled();
-    expect(onToggle).toHaveBeenCalledTimes(5);
+    expect(onProfileClick).toHaveBeenCalled();
+  });
+
+  it("handles mobile drawer navigation and toggling", () => {
+    const onToggle = vi.fn();
+    const onChange = vi.fn();
+    render(<SidebarMobile isOpen onToggle={onToggle} active="home" onChange={onChange} user={{ isAdmin: false }} />);
+    fireEvent.click(screen.getAllByText("Tasks")[0]);
+    expect(onChange).toHaveBeenCalledWith("tasks");
+    fireEvent.click(screen.getByLabelText("Close menu"));
+    expect(onToggle).toHaveBeenCalled();
+  });
+
+  it("handles mobile footer actions and closes on click", () => {
+    const onToggle = vi.fn();
+    const onSettingsClick = vi.fn();
+    render(<SidebarMobile isOpen onToggle={onToggle} user={{ isAdmin: false }} onSettingsClick={onSettingsClick} />);
+    fireEvent.click(screen.getByText("Settings"));
+    expect(onSettingsClick).toHaveBeenCalled();
+    expect(onToggle).toHaveBeenCalled();
+    fireEvent.click(screen.getByText("Profile"));
+    expect(onToggle).toHaveBeenCalledTimes(2);
   });
 
   it("fires bottom-bar navigation clicks when the drawer is closed", () => {

@@ -34,6 +34,22 @@
   position: relative;
 }
 
+.week-view .draggable-event {
+  min-width: 0;
+}
+
+.week-view .event-title,
+.week-view .event-time,
+.week-view .society-name {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  max-width: 100%;
+  display: block;
+}
+
 .time-gutter {
   width: 60px;
   flex-shrink: 0;

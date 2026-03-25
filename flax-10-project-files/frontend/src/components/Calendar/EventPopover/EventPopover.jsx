@@ -7,6 +7,7 @@ import { isAllDayEvent } from '../utils/eventDisplayUtils';
 import { formatTimeRange } from '../utils/dateUtils';
 import Badge from '../../common/Badge/Badge';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton';
+import LocationLink from '../../common/LocationLink/LocationLink';
 import styles from './EventPopover.module.css';
 
 const EVENT_ACCENTS = { module: "var(--sage)", society: "var(--primary)" };
@@ -48,7 +49,7 @@ function PopoverHeader({ title, tag, actions, onClose, readOnly, event }) {
 }
 
 function EventDetail({ icon, text }) {
-  if (!text) return null;
+  if (text == null || text === '') return null;
   return <div className={styles.detailRow}><span className={styles.detailIcon}>{icon}</span><span>{text}</span></div>;
 }
 
@@ -98,7 +99,17 @@ function EventPopoverContent({ event, tag, actions, onClose, readOnly }) {
     <div className={styles.popoverContent}>
       <PopoverHeader event={event} title={event.title} tag={tag} actions={actions} onClose={onClose} readOnly={readOnly} />
       <EventDetail icon={<Clock size={14} />} text={formatTimeRange(event.start_time, event.end_time, isAllDayEvent(event))} />
-      <EventDetail icon={<MapPin size={14} />} text={event.location} />
+      <EventDetail
+        icon={<MapPin size={14} />}
+        text={event.location ? (
+          <LocationLink
+            location={event.location}
+            className={styles.locationLink}
+            textClassName={styles.locationLinkText}
+            showIcon={false}
+          />
+        ) : null}
+      />
       <DescriptionDetail text={event.description} />
     </div>
   );

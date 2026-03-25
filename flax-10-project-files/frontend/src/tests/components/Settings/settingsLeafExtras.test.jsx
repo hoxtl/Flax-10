@@ -1,5 +1,5 @@
 import React from "react";
-import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const updateUserSettings = vi.fn();
@@ -108,12 +108,66 @@ import {
 } from "../../../components/Settings/hooks/settingsHandlerHelpers";
 import { getSleepDuration, getSleepMinutes, getSleepQuality } from "../../../components/Settings/preferences/sleepUtils";
 
+const renderSettingsUiShowcase = () => {
+  const onChange = vi.fn();
+  render(
+    <>
+      <SuccessBanner message="Saved!" />
+      <ErrorMessage message="Oops" />
+      <SectionHeader title="Account" />
+      <FormInput id="bio" label="Bio" value="hello" onChange={vi.fn()} maxLength={10} />
+      <FormSelect id="theme" label="Theme" value="light" onChange={onChange} options={[{ value: "light", label: "Light" }]} grouped />
+      <SubmitButton isSaving={false} label="Save" savingLabel="Saving..." hasUnsaved saveSignal={1} />
+      <TabButton id="x" label="Go" isActive onClick={onChange} />
+      <ThemeGridSelector value="flax" onChange={onChange} />
+      <SettingsSidebar activeTab="account" onChange={onChange} user={{ first_name: "Ava" }} />
+    </>,
+  );
+  return { onChange };
+};
+
+const buildSaveActions = () => ({
+  setPasswordError: vi.fn(),
+  setBannerMessage: vi.fn(),
+  setIsSaving: vi.fn(),
+  setHomeAddressError: vi.fn(),
+});
+
+const buildCourseContext = () => ({
+  refreshProfile: vi.fn(),
+  setCancellingRequest: vi.fn(),
+  setCourseRequestNotice: vi.fn(),
+  setCourseRequestError: vi.fn(),
+  setPendingRequest: vi.fn(),
+  setShowModal: vi.fn(),
+});
+
 describe("settings leaf extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
   });
 
+<<<<<<< HEAD
+  describe("settings UI atoms", () => {
+    it("renders banners and form helpers", () => {
+      renderSettingsUiShowcase();
+      expect(screen.getByText("success:Saved!")).toBeInTheDocument();
+      expect(screen.getByText("error:Oops")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Account" })).toBeInTheDocument();
+      expect(screen.getByText("(5 characters remaining)")).toBeInTheDocument();
+      expect(screen.getByText("Profile")).toBeInTheDocument();
+    });
+
+    it("routes select and sidebar interactions", () => {
+      const { onChange } = renderSettingsUiShowcase();
+      fireEvent.click(screen.getByText("Select"));
+      expect(onChange).toHaveBeenCalledWith({ target: { name: "theme", value: "dark" } });
+      expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
+      fireEvent.click(screen.getByText("Appearance"));
+      expect(onChange).toHaveBeenCalledWith("preferences_themes");
+    });
+=======
   it("covers small settings UI components and sidebar states", () => {
     const onChange = vi.fn();
     render(
@@ -142,6 +196,7 @@ describe("settings leaf extras", () => {
     expect(onChange).toHaveBeenCalledWith("flax");
     fireEvent.click(screen.getByText("Appearance"));
     expect(onChange).toHaveBeenCalledWith("preferences_themes");
+>>>>>>> main
   });
 
   it("hides profile completion when user details are complete", () => {
@@ -164,89 +219,102 @@ describe("settings leaf extras", () => {
     expect(getCachedPendingRequest()).toBeNull();
   });
 
-  it("covers cancel and success course-request action branches", async () => {
-    const context = {
-      refreshProfile: vi.fn(),
-      setCancellingRequest: vi.fn(),
-      setCourseRequestNotice: vi.fn(),
-      setCourseRequestError: vi.fn(),
-      setPendingRequest: vi.fn(),
-      setShowModal: vi.fn(),
-    };
+  describe("course request actions", () => {
+    it("loads pending requests after cancelling", async () => {
+      const context = buildCourseContext();
+      cancelCourseChangeRequest.mockResolvedValueOnce({});
+      getMyCourseChangeRequest.mockResolvedValueOnce({ status: "pending", requested_course: "Physics" });
+      await createCancelCourseRequestHandler(context)();
+      expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "Physics" }));
+    });
 
-    cancelCourseChangeRequest.mockResolvedValueOnce({});
-    getMyCourseChangeRequest.mockResolvedValueOnce({ status: "pending", requested_course: "Physics" });
-    await createCancelCourseRequestHandler(context)();
-    expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "Physics" }));
+    it("notifies when cancel has nothing to remove", async () => {
+      const context = buildCourseContext();
+      cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
+      await createCancelCourseRequestHandler(context)();
+      expect(context.setCourseRequestNotice).toHaveBeenCalledWith("Request cancelled.");
+    });
 
-    cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
-    await createCancelCourseRequestHandler(context)();
-    expect(context.setCourseRequestNotice).toHaveBeenCalledWith("Request cancelled.");
-
-    createCourseRequestSuccessHandler(context)({ requestedCourse: "Chemistry" }, "Chemistry");
-    expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "Chemistry" }));
-    expect(context.setShowModal).toHaveBeenCalledWith(false);
+    it("marks success responses as pending", () => {
+      const context = buildCourseContext();
+      createCourseRequestSuccessHandler(context)({ requestedCourse: "Chemistry" }, "Chemistry");
+      expect(context.setPendingRequest).toHaveBeenCalledWith(expect.objectContaining({ requested_course: "Chemistry" }));
+      expect(context.setShowModal).toHaveBeenCalledWith(false);
+    });
   });
 
-  it("covers save helpers success and failure paths", async () => {
-    const actions = {
-      setPasswordError: vi.fn(),
-      setBannerMessage: vi.fn(),
-      setIsSaving: vi.fn(),
-      setHomeAddressError: vi.fn(),
-    };
+  describe("save helpers", () => {
+    it("requires auth and handles failed account saves", async () => {
+      const actions = buildSaveActions();
+      hasToken.mockReturnValue(false);
+      await expect(saveAccount({ firstName: "A" }, actions)).resolves.toBe(false);
+      expect(actions.setPasswordError).toHaveBeenCalled();
+      hasToken.mockReturnValue(true);
+      patchSettings.mockResolvedValueOnce({ ok: false, data: { error: "bad save" } });
+      await expect(saveAccount({ firstName: "A" }, actions)).resolves.toBe(false);
+    });
 
-    hasToken.mockReturnValue(false);
-    await expect(saveAccount({ firstName: "A" }, actions)).resolves.toBe(false);
-    expect(actions.setPasswordError).toHaveBeenCalled();
+    it("persists profile updates when account save succeeds", async () => {
+      const actions = buildSaveActions();
+      localStorage.setItem("user", JSON.stringify({ first_name: "Old", year: "1" }));
+      hasToken.mockReturnValue(true);
+      patchSettings.mockResolvedValueOnce({ ok: true, data: { user: { first_name: "New", year: 2 } } });
+      await expect(saveAccount({ firstName: "New", lastName: "B", email: "x", year: 2 }, actions)).resolves.toBe(true);
+      expect(saveUserToStorage).toHaveBeenCalledWith(expect.objectContaining({ first_name: "New", year: "Year 2" }));
+    });
 
-    hasToken.mockReturnValue(true);
-    patchSettings.mockResolvedValueOnce({ ok: false, data: { error: "bad save" } });
-    await expect(saveAccount({ firstName: "A" }, actions)).resolves.toBe(false);
+    it("validates password updates before saving", async () => {
+      const actions = buildSaveActions();
+      await expect(savePassword({ newPassword: "short", confirmPassword: "short" }, actions)).resolves.toBe(false);
+      await expect(savePassword({ newPassword: "long-enough", confirmPassword: "mismatch" }, actions)).resolves.toBe(false);
+      patchSettings.mockResolvedValueOnce({ ok: true, data: {} });
+      await expect(savePassword({ newPassword: "long-enough", confirmPassword: "long-enough" }, actions)).resolves.toBe(true);
+    });
 
-    localStorage.setItem("user", JSON.stringify({ first_name: "Old", year: "1" }));
-    patchSettings.mockResolvedValueOnce({ ok: true, data: { user: { first_name: "New", year: 2 } } });
-    await expect(saveAccount({ firstName: "New", lastName: "B", email: "x", year: 2 }, actions)).resolves.toBe(true);
-    expect(saveUserToStorage).toHaveBeenCalledWith(expect.objectContaining({ first_name: "New", year: "Year 2" }));
+    it("updates theme preferences and surfaces errors", async () => {
+      const actions = buildSaveActions();
+      updateUserSettings.mockResolvedValueOnce({ user: { id: 1 } });
+      await expect(savePreferences({ theme: "flax", mode: "dark" }, actions)).resolves.toBe(true);
+      expect(saveUserToStorage).toHaveBeenCalledWith({ id: 1 });
+      updateUserSettings.mockRejectedValueOnce(new Error("nope"));
+      await expect(savePreferences({ theme: "flax", mode: "dark" }, actions)).resolves.toBe(false);
+    });
 
-    await expect(savePassword({ newPassword: "short", confirmPassword: "short" }, actions)).resolves.toBe(false);
-    await expect(savePassword({ newPassword: "long-enough", confirmPassword: "mismatch" }, actions)).resolves.toBe(false);
-    patchSettings.mockResolvedValueOnce({ ok: true, data: {} });
-    await expect(savePassword({ newPassword: "long-enough", confirmPassword: "long-enough" }, actions)).resolves.toBe(true);
+    it("saves sleep and scheduling preferences", async () => {
+      const actions = buildSaveActions();
+      hasToken.mockReturnValue(true);
+      updateUserSettings.mockResolvedValueOnce({ settings: { sleep_time: "23:00" } });
+      await expect(saveSleep({ sleep_time: "23:00" }, actions)).resolves.toEqual({ sleep_time: "23:00" });
+      updateUserSettings.mockResolvedValueOnce({ preferred_study_minutes_per_day: 120 });
+      await expect(saveStudyTime({ preferred_study_minutes_per_day: 120 }, actions)).resolves.toEqual({ preferred_study_minutes_per_day: 120 });
+      updateUserSettings.mockResolvedValueOnce({ week_preference: "balanced" });
+      await expect(saveWeekPreference({ week_preference: "balanced" }, actions)).resolves.toEqual({ week_preference: "balanced" });
+      updateUserSettings.mockResolvedValueOnce({ worktime_preference: "morning" });
+      await expect(saveWorktimePreference({ worktime_preference: "morning" }, actions)).resolves.toEqual({ worktime_preference: "morning" });
+      updateUserSettings.mockResolvedValueOnce({ settings: { sleep_time: "22:00", wake_time: "06:00" } });
+      await expect(saveSleepWindow({ sleep_time: "22:00", wake_time: "06:00" }, actions)).resolves.toEqual({ sleep_time: "22:00", wake_time: "06:00" });
+    });
 
-    updateUserSettings.mockResolvedValueOnce({ user: { id: 1 } });
-    await expect(savePreferences({ theme: "flax", mode: "dark" }, actions)).resolves.toBe(true);
-    expect(saveUserToStorage).toHaveBeenCalledWith({ id: 1 });
+    it("stores a geocoded address and dispatches updates", async () => {
+      const actions = buildSaveActions();
+      geocodeAddress.mockResolvedValueOnce({ latitude: 1, longitude: 2 });
+      saveHomeAddress.mockResolvedValueOnce({});
+      const dispatchSpy = vi.spyOn(window, "dispatchEvent");
+      await expect(saveAddress("10 Downing St", actions)).resolves.toBe(true);
+      expect(saveHomeAddress).toHaveBeenCalledWith("10 Downing St", 1, 2);
+      expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "home-address-updated" }));
+      dispatchSpy.mockRestore();
+    });
 
-    updateUserSettings.mockRejectedValueOnce(new Error("nope"));
-    await expect(savePreferences({ theme: "flax", mode: "dark" }, actions)).resolves.toBe(false);
-
-    hasToken.mockReturnValue(true);
-    updateUserSettings.mockResolvedValueOnce({ settings: { sleep_time: "23:00" } });
-    await expect(saveSleep({ sleep_time: "23:00" }, actions)).resolves.toEqual({ sleep_time: "23:00" });
-    updateUserSettings.mockResolvedValueOnce({ preferred_study_minutes_per_day: 120 });
-    await expect(saveStudyTime({ preferred_study_minutes_per_day: 120 }, actions)).resolves.toEqual({ preferred_study_minutes_per_day: 120 });
-    updateUserSettings.mockResolvedValueOnce({ week_preference: "balanced" });
-    await expect(saveWeekPreference({ week_preference: "balanced" }, actions)).resolves.toEqual({ week_preference: "balanced" });
-    updateUserSettings.mockResolvedValueOnce({ worktime_preference: "morning" });
-    await expect(saveWorktimePreference({ worktime_preference: "morning" }, actions)).resolves.toEqual({ worktime_preference: "morning" });
-    updateUserSettings.mockResolvedValueOnce({ settings: { sleep_time: "22:00", wake_time: "06:00" } });
-    await expect(saveSleepWindow({ sleep_time: "22:00", wake_time: "06:00" }, actions)).resolves.toEqual({ sleep_time: "22:00", wake_time: "06:00" });
-
-    geocodeAddress.mockResolvedValueOnce({ latitude: 1, longitude: 2 });
-    saveHomeAddress.mockResolvedValueOnce({});
-    const dispatchSpy = vi.spyOn(window, "dispatchEvent");
-    await expect(saveAddress("10 Downing St", actions)).resolves.toBe(true);
-    expect(saveHomeAddress).toHaveBeenCalledWith("10 Downing St", 1, 2);
-    expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: "home-address-updated" }));
-    dispatchSpy.mockRestore();
-
-    await expect(saveAddress("   ", actions)).resolves.toBe(false);
-    geocodeAddress.mockRejectedValueOnce(new Error("offline"));
-    saveHomeAddress.mockResolvedValueOnce({});
-    await expect(saveAddress("Fallback address", actions)).resolves.toBe(true);
-    saveHomeAddress.mockRejectedValueOnce(new Error("bad save"));
-    await expect(saveAddress("Broken address", actions)).resolves.toBe(false);
+    it("handles blank and fallback address saves", async () => {
+      const actions = buildSaveActions();
+      await expect(saveAddress("   ", actions)).resolves.toBe(false);
+      geocodeAddress.mockRejectedValueOnce(new Error("offline"));
+      saveHomeAddress.mockResolvedValueOnce({});
+      await expect(saveAddress("Fallback address", actions)).resolves.toBe(true);
+      saveHomeAddress.mockRejectedValueOnce(new Error("bad save"));
+      await expect(saveAddress("Broken address", actions)).resolves.toBe(false);
+    });
   });
 
   it("covers temporary messages and sleep utility thresholds", async () => {

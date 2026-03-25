@@ -102,6 +102,7 @@
 }
 
 @media (max-width: 900px) {
+
   .analyticsWidgetShell,
   .analyticsInsightsRow,
   .analyticsScrollable {
@@ -170,16 +171,12 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(
-      circle at top right,
+    radial-gradient(circle at top right,
       var(--widget-accent-soft),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at bottom left,
+      transparent 24%),
+    radial-gradient(circle at bottom left,
       rgba(255, 255, 255, 0.08),
-      transparent 22%
-    ),
+      transparent 22%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 52%);
 }
 
@@ -321,6 +318,7 @@
   gap: 5px;
   margin-bottom: 10px;
 }
+
 .intRowAlertsContainer:has(> *) {
   background: var(--widget-accent-soft);
   border-left: 3px solid var(--widget-accent);

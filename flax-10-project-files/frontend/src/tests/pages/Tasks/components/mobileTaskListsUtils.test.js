@@ -20,34 +20,31 @@ describe("mobileTaskListsUtils", () => {
     });
   });
 
-  it("returns section props with titles, counts, ids, and empty messages", () => {
+  it("returns reading list section props", () => {
     const onSelectList = vi.fn();
-    const lists = [
-      { id: "reading-1", name: "CS1010 - Algorithms" },
-      { id: "life-1", name: "Groceries" },
-    ];
-    const listCounts = { "reading-1": 3, "life-1": 1 };
-
-    const { readingProps, lifeProps } = getMobileListSectionProps(
-      lists,
-      listCounts,
-      "reading-1",
-      onSelectList,
-    );
-
+    const lists = [{ id: "r1", name: "CS101" }];
+    const counts = { "r1": 3 };
+    const { readingProps } = getMobileListSectionProps(lists, counts, "r1", onSelectList);
     expect(readingProps).toEqual({
       title: "READING LISTS",
-      lists: [lists[0]],
-      listCounts,
-      activeListId: "reading-1",
+      lists,
+      listCounts: counts,
+      activeListId: "r1",
       onSelectList,
       emptyMessage: "No reading lists",
     });
+  });
+
+  it("returns life list section props", () => {
+    const onSelectList = vi.fn();
+    const lists = [{ id: "l1", name: "Groceries" }];
+    const counts = { "l1": 1 };
+    const { lifeProps } = getMobileListSectionProps(lists, counts, "l1", onSelectList);
     expect(lifeProps).toEqual({
       title: "LIFE LISTS",
-      lists: [lists[1]],
-      listCounts,
-      activeListId: "reading-1",
+      lists,
+      listCounts: counts,
+      activeListId: "l1",
       onSelectList,
       emptyMessage: "No life lists",
     });

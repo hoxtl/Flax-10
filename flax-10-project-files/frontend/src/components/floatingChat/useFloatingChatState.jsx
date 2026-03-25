@@ -15,11 +15,13 @@ const MODULE_PROMPT_MESSAGE = "Hey! I'm not sure which modules to pick next seme
 const TEACHER_MODULE_PROMPT_MESSAGE = "Hey! I need help editing my modules on Flax. Can you walk me through how to update module details like the name, description, location, and schedule? Ask me which module I'm working on and I'll describe what I need to change.";
 const SOCIETY_PROMPT_MESSAGE = "Hey! I want to join some King's societies, but I don't know where to start. Can you ask me a few questions about my interests, personality, time commitment, and whether I want something social, sporty, creative, cultural, or career-focused, then suggest some societies that would suit me?";
 const ANALYTICS_PROMPT_MESSAGE = "Hey! I'm looking at my analytics and I want help understanding what my results actually mean. Can you talk me through the patterns you notice, what seems to be going well, what might need attention, and a few practical changes I could try next?";
+const SETTINGS_PROMPT_MESSAGE = "Hey! I'm exploring settings and want help using the app. Can you show me where to find key features and how to customise my experience? Ask me what I'm trying to do and guide me step by step.";
 const ROUTE_PROMPTS = [
   { key: "tasks", path: "/tasks", message: TASK_PROMPT_MESSAGE, text: "Not sure how long a task will take? Ask me!" },
   { key: "modules", path: "/modules", message: MODULE_PROMPT_MESSAGE, text: "Curious about new modules? Let Flax help you pick!", teacherMessage: TEACHER_MODULE_PROMPT_MESSAGE, teacherText: "Need help with editing? Talk to Flax" },
   { key: "societies", path: "/societies", message: SOCIETY_PROMPT_MESSAGE, text: "Don't know what societies to pick? Ask Flax." },
   { key: "analytics", path: "/analytics", message: ANALYTICS_PROMPT_MESSAGE, text: "Need help understanding your results? Ask Flax." },
+  { key: "settings", path: "/settings", message: SETTINGS_PROMPT_MESSAGE, text: "Need help using the app? Ask Flax." },
 ];
 
 function getSharedCalendarPrompt(search = "") {

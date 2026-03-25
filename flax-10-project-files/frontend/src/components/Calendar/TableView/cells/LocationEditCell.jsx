@@ -4,10 +4,19 @@
  */
 
 import { LocationAutocomplete } from "../../EventModal/components/LocationAutoComplete";
+import LocationLink from "../../../common/LocationLink/LocationLink";
 import styles from "../TableView.module.css";
 
 function LocationValue({ value }) {
-  return <span className={styles.cellText}>{value || ""}</span>;
+  if (!value) return <span className={styles.cellText}>{value || ""}</span>;
+  return (
+    <LocationLink
+      location={value}
+      className={styles.locationLink}
+      textClassName={styles.locationLinkText}
+      onClick={(event) => event.stopPropagation()}
+    />
+  );
 }
 
 function LocationEditor({ onChange, onSave, value }) {

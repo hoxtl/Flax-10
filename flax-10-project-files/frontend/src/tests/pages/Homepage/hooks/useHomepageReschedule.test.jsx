@@ -20,7 +20,7 @@ vi.mock("../../../../components/Calendar/utils/eventUtils", () => ({
   extractBaseEventId: vi.fn((id) => id),
 }));
 
-vi.mock("../../../../components/Common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
+vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => conflictMocks);
 
 describe("useHomepageReschedule", () => {
   beforeEach(() => {
@@ -33,34 +33,22 @@ describe("useHomepageReschedule", () => {
     conflictMocks.applyConflictResolutionPlan.mockResolvedValue(undefined);
   });
 
-  it("shows a confirmation toast without undo after clearing conflicts", async () => {
-    const showToast = vi.fn();
+  it("resolves timeline conflicts and reloads events", async () => {
     const loadEvents = vi.fn().mockResolvedValue(undefined);
     const refetchTasks = vi.fn();
-
-    const { result } = renderHook(() =>
-      useHomepageReschedule({
-        editEvent: vi.fn().mockResolvedValue(undefined),
-        loadEvents,
-        refetchTasks,
-        selectedDate: new Date("2026-03-24T09:00:00Z"),
-        showToast,
-        sortedEvents: [],
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleResolveTimelineConflicts();
-    });
-
+    const { result } = renderHook(() => useHomepageReschedule({ editEvent: vi.fn(), loadEvents, refetchTasks, selectedDate: new Date(), showToast: vi.fn(), sortedEvents: [] }));
+    await act(async () => { await result.current.handleResolveTimelineConflicts(); });
     expect(conflictMocks.applyConflictResolutionPlan).toHaveBeenCalled();
     expect(loadEvents).toHaveBeenCalled();
     expect(refetchTasks).toHaveBeenCalled();
+  });
+
+  it("shows a confirmation toast after clearing conflicts", async () => {
+    const showToast = vi.fn();
+    const { result } = renderHook(() => useHomepageReschedule({ editEvent: vi.fn(), loadEvents: vi.fn(), refetchTasks: vi.fn(), selectedDate: new Date(), showToast, sortedEvents: [] }));
+    await act(async () => { await result.current.handleResolveTimelineConflicts(); });
     expect(showToast).toHaveBeenCalledWith("Cleared 1 conflict.", { durationMs: 8500 });
-    expect(showToast).not.toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ actionLabel: "Undo" })
-    );
+    expect(showToast).not.toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ actionLabel: "Undo" }));
   });
 
   it("skips conflict resolution when there are no operations", async () => {

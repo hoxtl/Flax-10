@@ -57,36 +57,35 @@ describe("Auth hooks", () => {
     });
   });
 
-  it("manages auth page state and submit handlers", () => {
+  it("initializes auth page state and form fields", () => {
     const { result } = renderHook(() => useAuthPage(false));
     expect(result.current.signIn).toBe(false);
-    expect(result.current.error).toBe("");
-    expect(result.current.loading).toBe(false);
     expect(result.current.signUpData.first_name).toBe("A");
     expect(result.current.signInData.username).toBe("b");
     expect(result.current.updateSignUpField).toBe(signUpUpdateField);
-    expect(result.current.updateSignInField).toBe(signInUpdateField);
+  });
 
+  it("handles auth mode toggling and form prevention", () => {
+    const { result } = renderHook(() => useAuthPage(false));
     act(() => result.current.handleToggle(true));
     expect(result.current.signIn).toBe(true);
 
     const preventDefault = vi.fn();
-    act(() => result.current.handleSignUp({ preventDefault }));
-    act(() => result.current.handleSignIn({ preventDefault }));
-
+    act(() => {
+      result.current.handleSignUp({ preventDefault });
+      result.current.handleSignIn({ preventDefault });
+    });
     expect(preventDefault).toHaveBeenCalledTimes(2);
-    expect(submitSignUpMock).toHaveBeenCalled();
-    expect(submitSignInMock).toHaveBeenCalled();
-    expect(submitSignUpMock).toHaveBeenCalledWith(
-      result.current.signUpData,
-      expect.any(Function),
-      expect.any(Function),
-    );
-    expect(submitSignInMock).toHaveBeenCalledWith(
-      result.current.signInData,
-      expect.any(Function),
-      expect.any(Function),
-    );
+  });
+
+  it("calls sign-up and sign-in submission handlers with correct data", () => {
+    const { result } = renderHook(() => useAuthPage(false));
+    act(() => {
+      result.current.handleSignUp({ preventDefault: vi.fn() });
+      result.current.handleSignIn({ preventDefault: vi.fn() });
+    });
+    expect(submitSignUpMock).toHaveBeenCalledWith(result.current.signUpData, expect.any(Function), expect.any(Function));
+    expect(submitSignInMock).toHaveBeenCalledWith(result.current.signInData, expect.any(Function), expect.any(Function));
   });
 
   it("defaults to sign-in mode and clears any existing error when toggling", () => {

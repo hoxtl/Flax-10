@@ -12,9 +12,10 @@ function ListPill({ taskLists, taskListId }) {
   return <Link to={`/tasks?list=${taskListId}`} onClick={(event) => event.stopPropagation()}><Badge tone="default" pill>{label}</Badge></Link>;
 }
 
-function ModulePill({ styles, moduleCode, accentColor }) {
+function ModulePill({ styles, moduleCode, matchTask, accentColor }) {
   const style = { background: `${accentColor}22`, borderColor: `${accentColor}55`, color: accentColor };
-  return <span className={styles.planTimelineModulePill} style={style}>{moduleCode}</span>;
+  if (matchTask?.task_list == null) return <span className={styles.planTimelineModulePill} style={style}>{moduleCode}</span>;
+  return <Link to={`/tasks?list=${matchTask.task_list}&module=${moduleCode}`} onClick={(event) => event.stopPropagation()}><Badge tone="default" pill>{moduleCode}</Badge></Link>;
 }
 
 export function EventTagSlot({ styles, isOverlap, isReadOnly, rowId, moduleCode, matchTask, taskLists, accentColor, onToggleConflictPopover }) {

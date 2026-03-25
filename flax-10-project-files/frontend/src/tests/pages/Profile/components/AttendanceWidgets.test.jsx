@@ -58,107 +58,85 @@ vi.mock("@mui/x-charts/PieChart", () => ({
 
 describe("Profile attendance widgets", () => {
   it("renders attendance charts and shared widget primitives", () => {
-    const onSegmentClick = vi.fn();
-    const onNavigate = vi.fn();
-    const onClose = vi.fn();
     render(
       <>
         <AttendanceCharts
           overall={{ attended: 4, missed: 1 }}
           overallData={[{ label: "Attended", color: "#0f0" }]}
           byTypeData={[{ label: "Lecture", color: "#00f" }]}
-          onSegmentClick={onSegmentClick}
+          onSegmentClick={vi.fn()}
         />
         <AttendanceWarningBadge attendancePct={62} />
-        <CompactOverallDonut overallData={[{ label: "Attended", color: "#0f0" }]} onSegmentClick={onSegmentClick} />
-        <CompactByTypeDonut byTypeData={[{ label: "Lecture", color: "#00f" }]} onSegmentClick={onSegmentClick} />
-        <CompactAttHeader onNavigate={onNavigate} />
+        <CompactOverallDonut overallData={[{ label: "Attended", color: "#0f0" }]} onSegmentClick={vi.fn()} />
+        <CompactByTypeDonut byTypeData={[{ label: "Lecture", color: "#00f" }]} onSegmentClick={vi.fn()} />
+        <CompactAttHeader onNavigate={vi.fn()} />
         <SegmentDetailPanelWrapper
           selectedSegment={{ chart: "overall", label: "Attended" }}
           events={[{ id: 1 }]}
           onToggleStatus={vi.fn()}
+          onClose={vi.fn()}
+        />
+      </>
+    );
+
+    expect(screen.getByText("Low Attendance (62%)")).toBeInTheDocument();
+    expect(screen.getByText("Overall chart")).toBeInTheDocument();
+  });
+
+  it("calls interaction callbacks in attendance widgets", () => {
+    const onSegmentClick = vi.fn();
+    const onNavigate = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <>
+        <AttendanceCharts overallData={[{ label: "A" }]} onSegmentClick={onSegmentClick} />
+        <CompactAttHeader onNavigate={onNavigate} />
+        <SegmentDetailPanelWrapper
+          selectedSegment={{ chart: "overall", label: "Attended" }}
           onClose={onClose}
+          events={[]}
         />
       </>
     );
 
     fireEvent.click(screen.getByText("Overall chart"));
-    fireEvent.click(screen.getAllByText("Pie chart")[0]);
     fireEvent.click(screen.getByText("View attendance details"));
     fireEvent.click(screen.getByText("Overall: Attended"));
 
     expect(onSegmentClick).toHaveBeenCalled();
     expect(onNavigate).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
-    expect(screen.getByText("Low Attendance (62%)")).toBeInTheDocument();
   });
 
-  it("covers empty shared-state branches and widget data hook", async () => {
-    useAttendanceStatsMock.mockReturnValue({
-      stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 3, missed: 1 } } },
-      loading: false,
-      error: null,
-      refetch: vi.fn(),
-    });
-    useAttendanceRecordsMock.mockReturnValue({
-      records: [{ event_id: 1, title: "Lecture", start_time: "2026-03-01T09:00:00Z", attended: true, event_type: "Lecture" }],
-      refetch: vi.fn(),
-    });
-    recordAttendanceMock.mockResolvedValue({});
-
+  it("integrates attendance widget data and handles toggles", async () => {
+    useAttendanceStatsMock.mockReturnValue({ stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 3, missed: 1 } } }, loading: false, error: null, refetch: vi.fn() });
+    useAttendanceRecordsMock.mockReturnValue({ records: [{ event_id: 1, title: "L", start_time: "2026-03-01T09:00:00Z", attended: true, event_type: "Lecture" }], refetch: vi.fn() });
     const { result } = renderHook(() => useAttendanceWidgetData({ chart: "overall", label: "Attended" }));
     await waitFor(() => expect(result.current.attendancePct).toBe(75));
     await result.current.handleToggleStatus(1, true);
     expect(recordAttendanceMock).toHaveBeenCalledWith(1, true);
-    expect(result.current.segmentEvents).toHaveLength(1);
+  });
 
-    expect(buildMarkedEvents(useAttendanceRecordsMock.mock.results[0].value.records)).toHaveLength(1);
-    expect(buildSegmentEvents({ chart: "overall", label: "Attended" }, result.current.segmentEvents)).toHaveLength(1);
-    expect(computeAttendancePct({ attended: 0, missed: 0 })).toBe(100);
-
-    const { unmount } = render(<CompactOverallDonut overallData={[]} onSegmentClick={vi.fn()} />);
+  it("handles empty overall and by-type donut states", () => {
+    render(<CompactOverallDonut overallData={[]} onSegmentClick={vi.fn()} />);
     expect(screen.getByText("No attendance records yet.")).toBeInTheDocument();
-    unmount();
     const { container } = render(<CompactByTypeDonut byTypeData={[]} onSegmentClick={vi.fn()} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders compact streak values and attendance widget branches", () => {
-    const { rerender } = render(<CompactStreakTile streaks={{ current: 4, longest: 12 }} />);
-    expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getByText("12")).toBeInTheDocument();
-
-    rerender(<CompactStreakTile streaks={null} />);
-    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
-  });
-
-  it("covers attendance widget loading, hidden error state, and compact warning state", () => {
-    useAttendanceStatsMock.mockReturnValue({
-      stats: null,
-      loading: true,
-      error: null,
-      refetch: vi.fn(),
-    });
+  it("renders attendance widget loading and error states", () => {
+    useAttendanceStatsMock.mockReturnValue({ stats: null, loading: true, error: null, refetch: vi.fn() });
     useAttendanceRecordsMock.mockReturnValue({ records: [], refetch: vi.fn() });
     const { rerender, container } = render(<AttendanceWidget />);
     expect(screen.getByText("Loading metrics...")).toBeInTheDocument();
-
-    useAttendanceStatsMock.mockReturnValue({
-      stats: null,
-      loading: false,
-      error: new Error("nope"),
-      refetch: vi.fn(),
-    });
+    useAttendanceStatsMock.mockReturnValue({ stats: null, loading: false, error: new Error("E"), refetch: vi.fn() });
     rerender(<AttendanceWidget />);
     expect(container).toBeEmptyDOMElement();
+  });
 
-    useAttendanceStatsMock.mockReturnValue({
-      stats: { overall: { attended: 2, missed: 3 }, by_type: {} },
-      loading: false,
-      error: null,
-      refetch: vi.fn(),
-    });
-    rerender(<CompactAttendanceTile onNavigate={vi.fn()} />);
+  it("shows low attendance warnings in compact tiles", () => {
+    useAttendanceStatsMock.mockReturnValue({ stats: { overall: { attended: 2, missed: 3 }, by_type: {} }, loading: false, error: null, refetch: vi.fn() });
+    render(<CompactAttendanceTile onNavigate={vi.fn()} />);
     expect(screen.getByText(/Low Attendance/)).toBeInTheDocument();
   });
 

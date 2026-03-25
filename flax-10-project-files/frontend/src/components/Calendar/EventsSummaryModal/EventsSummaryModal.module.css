@@ -27,3 +27,41 @@
   color: var(--c-white);
   font-weight: 600;
 }
+
+.eventMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.metaDivider {
+  color: var(--muted);
+}
+
+.locationLink {
+  color: var(--text);
+}
+
+.locationText {
+  font-weight: 600;
+}
+
+.eventMeta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metaDivider {
+  color: var(--muted);
+}
+
+.locationLink {
+  font-size: 0.85rem;
+}
+
+.locationText {
+  white-space: nowrap;
+}

@@ -2,9 +2,8 @@
  * GroupWork project row.
  */
 
-import { useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
-import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import ProjectRowInfo, { ProjectModuleBadge } from "./ProjectRowInfo";
 import ProjectRowAccordion from "./ProjectRowAccordion";
 import { AuthContext } from "../../../context/AuthContext";
@@ -33,29 +32,72 @@ function ProjectMetaArea({ project, date }) {
   );
 }
 
-function ViewDetailsButton({ onClick }) {
-  return (
-    <PrimaryButton size="small" variant="ghost" pill className={styles.detailsButton} onClick={onClick}>View details and schedule meeting slots</PrimaryButton>
+function useProjectRowViewModel(project, onClick) {
+  const data = useMemo(() => getProjectRowData(project), [project]);
+  const isOwner = useIsOwner(project);
+  const label = useMemo(() => `Open ${project?.name || "project"} details`, [project?.name]);
+  const handleKeyDown = useCallback(
+    (event) => {
+      if ((event.key === "Enter" || event.key === " ") && onClick) {
+        event.preventDefault();
+        onClick();
+      }
+    },
+    [onClick],
   );
+  const containerClassName = useMemo(() => buildContainerClassName(data.daysLeft), [data.daysLeft]);
+  return { data, isOwner, label, handleKeyDown, containerClassName };
 }
 
 export default function ProjectRow({ project, onClick }) {
-  const data = getProjectRowData(project);
-  const isOwner = useIsOwner(project);
+  const { data, isOwner, label, handleKeyDown, containerClassName } = useProjectRowViewModel(
+    project,
+    onClick,
+  );
   return (
-    <div className={buildContainerClassName(data.daysLeft)}>
-      <div className={styles.projectRow}>
-        <ProjectRowInfo
-          project={project}
-          members={data.members}
-          totalMembers={data.memberCount}
-          onProjectNavigate={onClick}
-          isOwner={isOwner}
-          action={<ViewDetailsButton onClick={onClick} />}
-        />
-        <ProjectMetaArea project={project} date={data.date} />
-      </div>
+    <ProjectRowCard
+      project={project}
+      onClick={onClick}
+      data={data}
+      isOwner={isOwner}
+      label={label}
+      handleKeyDown={handleKeyDown}
+      containerClassName={containerClassName}
+    />
+  );
+}
+
+function ProjectRowCard({ project, onClick, data, isOwner, label, handleKeyDown, containerClassName }) {
+  const articleProps = buildProjectRowArticleProps(onClick, handleKeyDown, label, containerClassName);
+  return (
+    <article {...articleProps}>
+      <ProjectRowContent project={project} data={data} isOwner={isOwner} />
       <ProjectRowAccordion percent={data.percent} />
+    </article>
+  );
+}
+
+function buildProjectRowArticleProps(onClick, handleKeyDown, label, containerClassName) {
+  return {
+    className: `${containerClassName} ${styles.projectRowInteractive}`,
+    role: "button",
+    tabIndex: 0,
+    onClick,
+    onKeyDown: handleKeyDown,
+    "aria-label": label,
+  };
+}
+
+function ProjectRowContent({ project, data, isOwner }) {
+  return (
+    <div className={styles.projectRow}>
+      <ProjectRowInfo
+        project={project}
+        members={data.members}
+        totalMembers={data.memberCount}
+        isOwner={isOwner}
+      />
+      <ProjectMetaArea project={project} date={data.date} />
     </div>
   );
 }

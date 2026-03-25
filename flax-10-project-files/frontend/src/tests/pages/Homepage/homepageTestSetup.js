@@ -190,7 +190,7 @@ vi.mock("../../../components/Calendar/EventPopups", () => ({
   EventPopups: () => <div data-testid="event-popups" />,
 }));
 
-vi.mock("../../../components/Common/BackToTop/BackToTop", () => ({
+vi.mock("../../../components/common/BackToTop/BackToTop", () => ({
   __esModule: true,
   default: () => <div data-testid="back-to-top" />,
 }));

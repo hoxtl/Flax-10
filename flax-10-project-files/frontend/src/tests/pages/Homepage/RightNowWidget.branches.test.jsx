@@ -20,6 +20,7 @@ vi.mock("lucide-react", () => ({
   Clock: () => <svg aria-hidden="true" />,
   Sparkles: () => <svg aria-hidden="true" />,
   Sun: () => <svg aria-hidden="true" />,
+  MapPin: () => <svg aria-hidden="true" />,
 }));
 
 vi.mock("../../../pages/Homepage/hooks/useRightNowData", () => ({
@@ -48,8 +49,8 @@ vi.mock("../../../pages/Homepage/components/RightNowSubComponents", () => ({
 
 import { RightNowWidget } from "../../../pages/Homepage/components/RightNowWidget";
 
-function renderWidget(props = {}, model = {}) {
-  useRightNowData.mockReturnValue({
+function buildModel(overrides = {}) {
+  return {
     conflicts: [],
     countdown: { text: "" },
     currentBlock: null,
@@ -71,21 +72,42 @@ function renderWidget(props = {}, model = {}) {
     timeLeftStr: null,
     timeRangeStr: null,
     commuteInfo: null,
-    ...model,
-  });
+    ...overrides,
+  };
+}
 
+function renderWidget(props = {}, model = {}) {
+  useRightNowData.mockReturnValue(buildModel(model));
+  const defaultProps = {
+    now: new Date("2026-03-24T12:00:00.000Z"),
+    isToday: true,
+    navigatorContext: {},
+    sortedEvents: [],
+    tflDelays: [],
+    tomorrowFirstEvent: null,
+    taskWidgetItemsOnly: [],
+  };
   return render(
     <MemoryRouter>
-      <RightNowWidget
-        now={new Date("2026-03-24T12:00:00.000Z")}
-        isToday
-        navigatorContext={{}}
-        sortedEvents={[]}
-        tflDelays={[]}
-        tomorrowFirstEvent={null}
-        taskWidgetItemsOnly={[]}
-        {...props}
-      />
+      <RightNowWidget {...defaultProps} {...props} />
+    </MemoryRouter>,
+  );
+}
+
+function rerenderWidget(rerender, props = {}, model = {}) {
+  useRightNowData.mockReturnValue(buildModel(model));
+  const defaultProps = {
+    now: new Date("2026-03-24T12:00:00.000Z"),
+    isToday: true,
+    navigatorContext: {},
+    sortedEvents: [],
+    tflDelays: [],
+    tomorrowFirstEvent: null,
+    taskWidgetItemsOnly: [],
+  };
+  rerender(
+    <MemoryRouter>
+      <RightNowWidget {...defaultProps} {...props} />
     </MemoryRouter>,
   );
 }
@@ -112,152 +134,71 @@ describe("RightNowWidget branch coverage", () => {
     expect(onOpenTimer).toHaveBeenCalledOnce();
   });
 
-  it("renders non-today preview and fallback copy", () => {
-    const { rerender } = render(
-      <MemoryRouter>
-        <RightNowWidget
-          now={new Date("2026-03-24T12:00:00.000Z")}
-          isToday={false}
-          navigatorContext={{}}
-          sortedEvents={[{ title: "Seminar", start_time: "2026-03-25T09:00:00.000Z" }]}
-          tflDelays={[]}
-        />
-      </MemoryRouter>,
-    );
-    useRightNowData.mockReturnValue({
-      conflicts: [],
-      countdown: { text: "" },
-      currentBlock: null,
-      currentProgressPct: null,
-      eventCount: 1,
-      isEmptyDay: false,
-      isEndOfDay: false,
-      isToday: false,
-      leaveByInfo: null,
-      loadingCommute: false,
-      nextCampus: null,
-      nextEvent: null,
-      showConflictAlert: true,
-      setShowConflictAlert: vi.fn(),
-      showTfl: false,
-      showTflAlert: true,
-      setShowTflAlert: vi.fn(),
-      tasksPending: 0,
-      timeLeftStr: null,
-      timeRangeStr: null,
-      commuteInfo: null,
+  describe("non-today and tomorrow previews", () => {
+    it("renders a preview when a future event exists", () => {
+      const { rerender } = renderWidget({ isToday: false, sortedEvents: [{ title: "Seminar", start_time: "2026-03-25T09:00:00.000Z" }] });
+      rerenderWidget(rerender, { isToday: false });
+      expect(screen.getByText("No events for this day.")).toBeInTheDocument();
     });
-    rerender(
-      <MemoryRouter>
-        <RightNowWidget
-          now={new Date("2026-03-24T12:00:00.000Z")}
-          isToday={false}
-          navigatorContext={{}}
-          sortedEvents={[]}
-          tflDelays={[]}
-        />
-      </MemoryRouter>,
-    );
 
-    expect(screen.getByText("No events for this day.")).toBeInTheDocument();
+    it("shows end-of-day summary with tomorrow event details", () => {
+      const tomorrowFirstEvent = { title: "Morning Lab", start_time: "2026-03-25T09:00:00.000Z" };
+      const { rerender } = renderWidget(
+        { tomorrowFirstEvent, taskWidgetItemsOnly: [{ completed: true }], sortedEvents: [{ start_time: "2026-03-24T09:00:00.000Z" }] },
+        { isEndOfDay: true },
+      );
+      expect(screen.getByText(/Day complete/)).toBeInTheDocument();
+      expect(screen.getByText("Morning Lab")).toBeInTheDocument();
+      rerenderWidget(rerender, { tomorrowFirstEvent });
+    });
+
+    it("renders empty-day copy with tomorrow preview", () => {
+      const tomorrowFirstEvent = { title: "Morning Lab", start_time: "2026-03-25T09:00:00.000Z" };
+      const { rerender } = renderWidget({ tomorrowFirstEvent });
+      rerenderWidget(rerender, { tomorrowFirstEvent }, { isEmptyDay: true, eventCount: 0 });
+      expect(screen.getByText(/Free day/)).toBeInTheDocument();
+      expect(screen.getByText(/Tomorrow: Morning Lab at/)).toBeInTheDocument();
+    });
   });
 
-  it("renders end-of-day and empty-day summaries with tomorrow previews", () => {
-    const tomorrowFirstEvent = { title: "Morning Lab", start_time: "2026-03-25T09:00:00.000Z" };
-    const { rerender } = renderWidget(
-      { tomorrowFirstEvent, taskWidgetItemsOnly: [{ completed: true }], sortedEvents: [{ start_time: "2026-03-24T09:00:00.000Z" }] },
-      { isEndOfDay: true },
-    );
-
-    expect(screen.getByText(/Day complete/)).toBeInTheDocument();
-    expect(screen.getByText("Morning Lab")).toBeInTheDocument();
-
-    rerender(
-      <MemoryRouter>
-        <RightNowWidget
-          now={new Date("2026-03-24T12:00:00.000Z")}
-          isToday
-          navigatorContext={{}}
-          sortedEvents={[]}
-          tflDelays={[]}
-          tomorrowFirstEvent={tomorrowFirstEvent}
-        />
-      </MemoryRouter>,
-    );
-    useRightNowData.mockReturnValue({
-      conflicts: [],
-      countdown: { text: "" },
-      currentBlock: null,
-      currentProgressPct: null,
-      eventCount: 0,
-      isEmptyDay: true,
-      isEndOfDay: false,
-      isToday: true,
-      leaveByInfo: null,
-      loadingCommute: false,
-      nextCampus: null,
-      nextEvent: null,
-      showConflictAlert: true,
-      setShowConflictAlert: vi.fn(),
-      showTfl: false,
-      showTflAlert: true,
-      setShowTflAlert: vi.fn(),
-      tasksPending: 0,
-      timeLeftStr: null,
-      timeRangeStr: null,
-      commuteInfo: null,
+  describe("today alerts and commute info", () => {
+    it("renders stats for events, tasks, and active block", () => {
+      renderWidget(
+        { sortedEvents: [{ title: "Stats Review", start_time: "2026-03-24T13:00:00.000Z", location: "Waterloo" }], taskWidgetItemsOnly: [{ completed: false }] },
+        {
+          currentBlock: { title: "Deep Work" },
+          eventCount: 1,
+          tasksPending: 1,
+          timeLeftStr: "20m left",
+          timeRangeStr: "12:00 - 12:30",
+        },
+      );
+      expect(screen.getByText(/1 event · 1 task left/)).toBeInTheDocument();
+      expect(screen.getByText(/Active Deep Work 20m left/)).toBeInTheDocument();
     });
-    rerender(
-      <MemoryRouter>
-        <RightNowWidget
-          now={new Date("2026-03-24T12:00:00.000Z")}
-          isToday
-          navigatorContext={{}}
-          sortedEvents={[]}
-          tflDelays={[]}
-          tomorrowFirstEvent={tomorrowFirstEvent}
-        />
-      </MemoryRouter>,
-    );
 
-    expect(screen.getByText(/Free day/)).toBeInTheDocument();
-    expect(screen.getByText(/Tomorrow: Morning Lab at/)).toBeInTheDocument();
-  });
-
-  it("renders today-state alerts, active sessions, next event, and commute info", () => {
-    const setShowConflictAlert = vi.fn();
-    const setShowTflAlert = vi.fn();
-    renderWidget(
-      { sortedEvents: [{ title: "Stats Review", start_time: "2026-03-24T13:00:00.000Z", location: "Waterloo" }], taskWidgetItemsOnly: [{ completed: false }] },
-      {
-        conflicts: [{ a: {}, b: {} }],
-        currentBlock: { title: "Deep Work" },
-        currentProgressPct: 50,
-        eventCount: 1,
-        leaveByInfo: { message: "Leave in 10 minutes" },
-        loadingCommute: false,
-        nextCampus: { shortName: "WAT" },
-        nextEvent: { title: "Stats Review", start_time: "2026-03-24T13:00:00.000Z", location: "Waterloo" },
-        showTfl: true,
-        setShowConflictAlert,
-        setShowTflAlert,
-        tasksPending: 1,
-        timeLeftStr: "20m left",
-        timeRangeStr: "12:00 - 12:30",
-      },
-    );
-
-    expect(screen.getByText(/1 event · 1 task left/)).toBeInTheDocument();
-    expect(screen.getByText(/Active Deep Work 20m left/)).toBeInTheDocument();
-    expect(screen.getByText("conflicts:1")).toBeInTheDocument();
-    expect(screen.getByText("Leave in 10 minutes")).toBeInTheDocument();
-    expect(screen.getByText("Stats Review")).toBeInTheDocument();
-    expect(screen.getByText(/WAT Leave in 10 minutes/)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByLabelText("Dismiss warning"));
-    fireEvent.click(screen.getByLabelText("Dismiss delay alert"));
-    expect(setShowConflictAlert).toHaveBeenCalledWith(false);
-    expect(setShowTflAlert).toHaveBeenCalledWith(false);
+    it("renders conflict and TFL alerts with dismiss actions", () => {
+      const setShowConflictAlert = vi.fn();
+      const setShowTflAlert = vi.fn();
+      renderWidget(
+        { sortedEvents: [{ title: "Stats Review", start_time: "2026-03-24T13:00:00.000Z", location: "Waterloo" }] },
+        {
+          conflicts: [{ a: {}, b: {} }],
+          leaveByInfo: { message: "Leave in 10 minutes" },
+          nextCampus: { shortName: "WAT" },
+          nextEvent: { title: "Stats Review", start_time: "2026-03-24T13:00:00.000Z", location: "Waterloo" },
+          showTfl: true,
+          setShowConflictAlert,
+          setShowTflAlert,
+        },
+      );
+      expect(screen.getByText("conflicts:1")).toBeInTheDocument();
+      expect(screen.getByText("Leave in 10 minutes")).toBeInTheDocument();
+      fireEvent.click(screen.getByLabelText("Dismiss warning"));
+      fireEvent.click(screen.getByLabelText("Dismiss delay alert"));
+      expect(setShowConflictAlert).toHaveBeenCalledWith(false);
+      expect(setShowTflAlert).toHaveBeenCalledWith(false);
+    });
   });
 
   it("renders free-now state and no-more-events copy when there is no current block", () => {

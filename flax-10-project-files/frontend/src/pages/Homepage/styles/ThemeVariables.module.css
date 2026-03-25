@@ -1,0 +1,148 @@
+/* Theme color variables and mode overrides */
+
+:global([data-mode="dark"]) .page {
+  --home-student-surface-page: #1a1310;
+  --home-student-surface-card: #45372E;
+  --home-student-surface-inner: color-mix(in srgb, var(--home-student-surface-card) 70%, white 25%);
+  --home-hero-bg:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--color-highlight) 18%, transparent) 0%, transparent 34%),
+    radial-gradient(circle at bottom left, color-mix(in srgb, var(--color-primary) 16%, transparent) 0%, transparent 40%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-card) 94%, #1c140f 6%) 0%,
+      color-mix(in srgb, var(--color-card) 88%, var(--color-highlight) 12%) 52%,
+      color-mix(in srgb, var(--color-card) 90%, var(--color-primary) 10%) 100%
+    );
+  --home-hero-border: color-mix(in srgb, var(--color-highlight) 30%, var(--widget-border));
+  --home-hero-shadow:
+    0 24px 46px rgba(0, 0, 0, 0.38),
+    0 0 0 1px color-mix(in srgb, var(--color-highlight) 26%, transparent),
+    0 0 30px color-mix(in srgb, var(--color-highlight) 12%, transparent);
+  --home-hero-panel-bg: color-mix(in srgb, var(--color-card) 90%, var(--surface-inner) 10%);
+  --home-hero-panel-border: color-mix(in srgb, var(--widget-border) 58%, var(--color-highlight) 42%);
+  --home-hero-panel-shadow:
+    0 22px 36px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+  --home-hero-glow-ring: color-mix(in srgb, var(--color-highlight) 62%, transparent);
+  --home-hero-glow-shadow: color-mix(in srgb, var(--color-highlight) 30%, transparent);
+  --home-hero-glow-inner: color-mix(in srgb, white 18%, transparent);
+  --home-hero-aura:
+    radial-gradient(circle at 20% 24%, color-mix(in srgb, var(--color-highlight) 20%, transparent) 0%, transparent 34%),
+    radial-gradient(circle at 76% 22%, color-mix(in srgb, white 12%, transparent) 0%, transparent 30%),
+    radial-gradient(circle at 50% 76%, color-mix(in srgb, var(--color-primary) 18%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 88% 70%, color-mix(in srgb, var(--danger) 12%, transparent) 0%, transparent 28%);
+  --home-hero-aura-opacity: 0.62;
+  --home-hero-aura-blur: 34px;
+  --home-hero-aura-blend: screen;
+  --home-hero-shimmer: linear-gradient(
+    115deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-highlight) 12%, transparent) 16%,
+    color-mix(in srgb, var(--color-highlight) 26%, transparent) 48%,
+    color-mix(in srgb, white 12%, transparent) 58%,
+    transparent 100%
+  );
+  --home-hero-shimmer-blend: screen;
+  --home-hero-shimmer-opacity: 1;
+  --home-hero-shimmer-blur: 10px;
+  --home-timeline-accent-soft: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --home-timeline-accent-border: color-mix(in srgb, var(--color-primary) 42%, transparent);
+  --home-timeline-success-soft: color-mix(in srgb, var(--home-urgency-success) 20%, transparent);
+  --home-timeline-success-soft-strong: color-mix(in srgb, var(--home-urgency-success) 28%, transparent);
+  --home-timeline-success-border: color-mix(in srgb, var(--home-urgency-success) 48%, transparent);
+  --home-timeline-success-surface: color-mix(in srgb, var(--home-urgency-success) 30%, var(--surface-inner) 70%);
+  --home-timeline-success-surface-strong: color-mix(in srgb, var(--home-urgency-success) 38%, var(--surface-inner) 62%);
+  --home-timeline-success-surface-border: color-mix(in srgb, var(--home-urgency-success) 54%, var(--widget-border) 46%);
+  --home-timeline-success-surface-shadow: color-mix(in srgb, var(--home-urgency-success) 26%, transparent);
+  --home-timeline-warning-soft: color-mix(in srgb, var(--home-urgency-warning) 16%, transparent);
+  --home-timeline-warning-border: color-mix(in srgb, var(--home-urgency-warning) 40%, transparent);
+  --home-timeline-danger-soft: color-mix(in srgb, var(--home-urgency-danger) 16%, transparent);
+  --home-timeline-danger-border: color-mix(in srgb, var(--home-urgency-danger) 42%, transparent);
+  --home-timeline-divider: color-mix(in srgb, var(--widget-border) 80%, transparent);
+  --home-timeline-node-ring: color-mix(in srgb, var(--color-card) 94%, transparent);
+  --home-timeline-ghost-bg: color-mix(in srgb, var(--surface-inner) 88%, transparent);
+  --home-timeline-ghost-border: color-mix(in srgb, var(--widget-border) 90%, transparent);
+  --home-timeline-ghost-hover: color-mix(in srgb, var(--widget-border) 30%, transparent);
+  --home-timeline-ghost-text: color-mix(in srgb, var(--widget-text-secondary) 96%, transparent);
+  --home-timeline-panel-bg: color-mix(in srgb, var(--surface-inner) 90%, var(--color-bg) 10%);
+  --home-timeline-panel-border: color-mix(in srgb, var(--widget-border) 92%, transparent);
+  --home-timeline-panel-strong: color-mix(in srgb, var(--surface-raised, var(--color-card)) 94%, transparent);
+  --home-timeline-card-surface: color-mix(in srgb, var(--surface-inner) 90%, var(--color-bg) 10%);
+  --home-timeline-card-border: color-mix(in srgb, var(--color-highlight) 28%, var(--widget-border) 72%);
+  --home-timeline-card-hover-border: color-mix(in srgb, var(--color-highlight) 34%, white 20%);
+  --home-timeline-card-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --home-timeline-card-shadow-hover:
+    0 18px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --home-timeline-success-text: color-mix(in srgb, white 90%, var(--home-urgency-success) 10%);
+  --home-timeline-success-meta: color-mix(in srgb, white 78%, var(--home-urgency-success) 22%);
+  --home-timeline-gap-action-bg: color-mix(in srgb, var(--home-urgency-success) 16%, var(--surface-card) 84%);
+  --home-timeline-gap-action-bg-hover: color-mix(in srgb, var(--home-urgency-success) 24%, var(--surface-card) 76%);
+  --home-timeline-gap-action-border: color-mix(in srgb, var(--home-urgency-success) 40%, var(--widget-border) 60%);
+  --home-timeline-gap-action-ink: color-mix(in srgb, white 88%, var(--home-urgency-success) 12%);
+  --home-timeline-gap-action-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+  --home-timeline-gap-skip-bg: color-mix(in srgb, var(--home-urgency-danger) 14%, var(--surface-card) 86%);
+  --home-timeline-gap-skip-bg-hover: color-mix(in srgb, var(--home-urgency-danger) 22%, var(--surface-card) 78%);
+  --home-timeline-gap-skip-border: color-mix(in srgb, var(--home-urgency-danger) 40%, var(--widget-border) 60%);
+  --home-timeline-gap-skip-ink: color-mix(in srgb, white 86%, var(--home-urgency-danger) 14%);
+  --home-overlay-shadow-strong: rgba(0, 0, 0, 0.36);
+  --home-overlay-shadow-soft: rgba(0, 0, 0, 0.22);
+  --home-overlay-close-bg: color-mix(in srgb, var(--surface-inner) 84%, transparent);
+  --home-overlay-close-hover-bg: color-mix(in srgb, var(--widget-border) 28%, var(--surface-inner) 72%);
+  --home-overlay-date: color-mix(in srgb, var(--color-highlight) 46%, white 54%);
+  --home-overlay-date-dot: color-mix(in srgb, var(--color-highlight) 38%, white 62%);
+  --home-overlay-action-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-highlight) 14%, var(--color-primary) 86%) 0%,
+    color-mix(in srgb, var(--color-primary) 88%, black 12%) 100%
+  );
+  --home-overlay-action-bg-hover: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-highlight) 18%, var(--color-primary) 82%) 0%,
+    color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%
+  );
+  --home-overlay-action-border: color-mix(in srgb, var(--color-highlight) 36%, var(--widget-border) 64%);
+  --home-overlay-action-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+  --home-overlay-action-shadow-hover: 0 16px 34px rgba(0, 0, 0, 0.36);
+  --home-now-next-card-bg: color-mix(in srgb, var(--surface-inner) 86%, var(--color-bg) 14%);
+  --home-now-next-card-border: color-mix(in srgb, var(--color-highlight) 24%, var(--widget-border) 76%);
+  --home-now-next-card-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --home-now-time: color-mix(in srgb, white 80%, var(--widget-text-secondary) 20%);
+  --home-now-muted: color-mix(in srgb, white 64%, var(--widget-text-secondary) 36%);
+  --home-now-countdown-bg: color-mix(in srgb, var(--color-highlight) 18%, transparent);
+  --home-now-countdown-border: color-mix(in srgb, var(--color-highlight) 42%, transparent);
+  --home-now-countdown-ink: color-mix(in srgb, var(--color-highlight) 42%, white 58%);
+  --home-mini-gap-bg: color-mix(in srgb, var(--widget-border) 16%, transparent);
+  --home-mini-gap-label: color-mix(in srgb, var(--widget-text-secondary) 88%, white 12%);
+  --home-mini-gap-button: color-mix(in srgb, var(--widget-text-secondary) 78%, white 22%);
+  --home-mini-gap-button-hover: color-mix(in srgb, var(--widget-text-primary) 88%, white 12%);
+  --home-mini-pill-duration-bg: color-mix(in srgb, var(--widget-border) 24%, transparent);
+  --home-edit-control-bg: color-mix(in srgb, var(--surface-card) 78%, var(--color-bg) 22%);
+  --home-edit-control-border: color-mix(in srgb, var(--widget-border) 96%, transparent);
+  --home-edit-control-ink: color-mix(in srgb, white 76%, var(--widget-text-secondary) 24%);
+  --home-edit-control-hover-bg: color-mix(in srgb, var(--color-highlight) 16%, var(--surface-card) 84%);
+  --home-edit-control-hover-ink: white;
+  --home-edit-control-divider: color-mix(in srgb, var(--widget-border) 92%, transparent);
+  --home-edit-control-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+  --home-task-checkbox-border: color-mix(in srgb, var(--color-highlight) 34%, var(--widget-border) 66%);
+  --home-task-checkbox-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface-inner) 88%, var(--surface-card) 12%) 0%,
+    color-mix(in srgb, var(--color-bg) 82%, var(--surface-inner) 18%) 100%
+  );
+  --home-task-checkbox-shadow:
+    0 8px 16px color-mix(in srgb, black 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
+  --home-widget-border: color-mix(in srgb, var(--color-highlight) 24%, var(--color-border-base) 76%);
+  --widget-border: var(--home-widget-border);
+  --home-widget-frame-border: color-mix(in srgb, var(--color-highlight) 42%, var(--home-widget-border) 58%);
+  --home-hero-frame-border: color-mix(in srgb, var(--color-highlight) 58%, var(--home-widget-border) 42%);
+  --widget-surface: color-mix(in srgb, var(--surface-card) 84%, var(--color-bg) 16%);
+  --widget-surface-raised: color-mix(in srgb, var(--surface-inner) 88%, var(--color-bg) 12%);
+  --widget-card-bg-glass: color-mix(in srgb, var(--surface-inner) 78%, var(--color-bg) 22%);
+  --widget-card-bg-soft: color-mix(in srgb, var(--surface-inner) 84%, var(--surface-card) 16%);
+}

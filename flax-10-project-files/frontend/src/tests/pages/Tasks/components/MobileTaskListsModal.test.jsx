@@ -41,11 +41,7 @@ describe("MobileTaskListsModal", () => {
     expect(onNewList).toHaveBeenCalledTimes(1);
   });
 
-  it("renders reading and life sections and selects a list through the shared handler", () => {
-    const onSelectList = vi.fn();
-    const onSelectFilter = vi.fn();
-    const onClose = vi.fn();
-
+  it("renders reading and life sections with correct task counts", () => {
     render(
       <MobileTaskListsModal
         lists={[
@@ -58,9 +54,7 @@ describe("MobileTaskListsModal", () => {
           { id: "c", task_list: 2, completed: false },
         ]}
         activeListId={2}
-        onSelectList={onSelectList}
-        onSelectFilter={onSelectFilter}
-        onClose={onClose}
+        onClose={vi.fn()}
       />,
     );
 
@@ -70,6 +64,21 @@ describe("MobileTaskListsModal", () => {
     expect(screen.getByText("Groceries")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
+  });
+
+  it("selects a list and closes the modal on click", () => {
+    const onSelectList = vi.fn();
+    const onSelectFilter = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <MobileTaskListsModal
+        lists={[{ id: 1, name: "CS1010 - Algorithms" }]}
+        onSelectList={onSelectList}
+        onSelectFilter={onSelectFilter}
+        onClose={onClose}
+      />,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /CS1010 - Algorithms/i }));
 

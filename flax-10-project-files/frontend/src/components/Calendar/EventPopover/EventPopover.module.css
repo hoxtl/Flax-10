@@ -115,6 +115,14 @@
     color: var(--text-secondary, #555);
 }
 
+.locationLink {
+    color: var(--text-secondary, #555);
+}
+
+.locationLinkText {
+    white-space: normal;
+}
+
 .detailIcon {
     color: var(--muted, #888);
     flex-shrink: 0;

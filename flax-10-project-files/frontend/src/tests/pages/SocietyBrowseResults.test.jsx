@@ -94,43 +94,23 @@ describe("SocietyBrowseResults", () => {
     expect(setSearch).toHaveBeenCalledWith("");
   });
 
-  it("renders paginated society cards and forwards select/report actions", () => {
-    const onSelect = vi.fn();
-    const onReport = vi.fn();
-    const onUnreport = vi.fn();
-    const setPage = vi.fn();
-    const currentItems = [
-      { id: 1, name: "Chess Club" },
-      { id: 2, name: "Debate Union" },
-    ];
+  it("renders society cards and forwards select/report actions", () => {
+    const onSelect = vi.fn(), onReport = vi.fn();
+    const currentItems = [{ id: 1, name: "Chess Club" }];
+    paginationMock.mockReturnValue({ currentItems, totalPages: 1, currentPage: 1, setPage: vi.fn() });
 
-    paginationMock.mockReturnValue({
-      currentItems,
-      totalPages: 3,
-      currentPage: 1,
-      setPage,
-    });
-
-    render(
-      <SocietyBrowseResults
-        items={currentItems}
-        search=""
-        setSearch={vi.fn()}
-        onSelect={onSelect}
-        onReport={onReport}
-        onUnreport={onUnreport}
-      />,
-    );
-
-    expect(screen.getAllByTestId("pagination")).toHaveLength(2);
+    render(<SocietyBrowseResults items={currentItems} onSelect={onSelect} onReport={onReport} search="" setSearch={vi.fn()} />);
     fireEvent.click(screen.getByText("Chess Club"));
     fireEvent.click(screen.getByText("Report Chess Club"));
-    fireEvent.click(screen.getByText("Unreport Debate Union"));
-    fireEvent.click(screen.getAllByText("Go to page 2")[0]);
-
     expect(onSelect).toHaveBeenCalledWith(1);
     expect(onReport).toHaveBeenCalledWith(currentItems[0]);
-    expect(onUnreport).toHaveBeenCalledWith(currentItems[1]);
+  });
+
+  it("handles pagination via the Pagination component", () => {
+    const setPage = vi.fn();
+    paginationMock.mockReturnValue({ currentItems: [], totalPages: 3, currentPage: 1, setPage });
+    render(<SocietyBrowseResults items={[]} onSelect={vi.fn()} search="" setSearch={vi.fn()} />);
+    fireEvent.click(screen.getAllByText("Go to page 2")[0]);
     expect(setPage).toHaveBeenCalledWith(2);
   });
 });

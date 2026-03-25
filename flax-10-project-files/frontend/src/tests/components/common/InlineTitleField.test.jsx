@@ -59,37 +59,25 @@ describe("InlineTitleField", () => {
     expect(onStart).toHaveBeenCalledOnce();
   });
 
-  it("saves on blur, saves on Enter, and cancels on Escape", () => {
-    const setDraft = vi.fn();
+  it("saves the draft on blur", () => {
     const onSave = vi.fn();
+    render(<InlineTitleField isEditing value="T" draft="Updated" onSave={onSave} setDraft={vi.fn()} onStart={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.blur(screen.getByRole("textbox"));
+    expect(onSave).toHaveBeenCalled();
+  });
+
+  it("saves the draft on Enter", () => {
+    const onSave = vi.fn();
+    render(<InlineTitleField isEditing value="T" draft="Updated" onSave={onSave} setDraft={vi.fn()} onStart={vi.fn()} onCancel={vi.fn()} />);
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+    expect(onSave).toHaveBeenCalled();
+  });
+
+  it("cancels the edit on Escape", () => {
     const onCancel = vi.fn();
-
-    render(
-      <InlineTitleField
-        value="Task title"
-        isEditing={true}
-        draft="Changed title"
-        setDraft={setDraft}
-        onStart={vi.fn()}
-        onSave={onSave}
-        onCancel={onCancel}
-        textareaClassName="editor"
-        placeholder="Rename task"
-      />
-    );
-
-    const textarea = screen.getByPlaceholderText("Rename task");
-    fireEvent.change(textarea, { target: { value: "Another" } });
-    expect(setDraft).toHaveBeenCalledWith("Another");
-
-    fireEvent.keyDown(textarea, { key: "Enter", preventDefault: vi.fn() });
-    expect(onSave).toHaveBeenCalled();
-
-    fireEvent.keyDown(textarea, { key: "Escape" });
+    render(<InlineTitleField isEditing value="T" draft="Updated" onCancel={onCancel} setDraft={vi.fn()} onStart={vi.fn()} onSave={vi.fn()} />);
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Escape" });
     expect(onCancel).toHaveBeenCalled();
-
-    fireEvent.blur(textarea);
-    expect(onSave).toHaveBeenCalled();
   });
 
   it("does not save unchanged or blank values", () => {

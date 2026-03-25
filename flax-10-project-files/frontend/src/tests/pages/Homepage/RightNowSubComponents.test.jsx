@@ -101,7 +101,7 @@ describe("RightNowSubComponents", () => {
     expect(screen.getByText("2 schedule overlaps today")).toBeInTheDocument();
   });
 
-  it("renders commute context for loading, leave-by, duration, and fallback states", () => {
+  it("renders commute context card in loading and success states", () => {
     const { rerender } = render(
       <MemoryRouter>
         <CommuteContextCard campus={{ shortName: "WAT", name: "Waterloo" }} journey={{ duration: "28 min", lines: ["Northern"] }} loading leaveByInfo={null} />
@@ -119,16 +119,20 @@ describe("RightNowSubComponents", () => {
     expect(screen.getByText("Circle")).toBeInTheDocument();
     expect(screen.getByText("District")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Open map/i })).toHaveAttribute("href", "/map");
+  });
 
-    rerender(
+  it("renders commute context card with secondary campus fallbacks", () => {
+    render(
       <MemoryRouter>
         <CommuteContextCard campus={null} journey={{ duration: "35 min", lines: [] }} loading={false} leaveByInfo={null} />
       </MemoryRouter>,
     );
     expect(screen.getByText("Campus commute")).toBeInTheDocument();
     expect(screen.getByText("35 min from home.")).toBeInTheDocument();
+  });
 
-    rerender(
+  it("renders commute context card in empty or error states", () => {
+    render(
       <MemoryRouter>
         <CommuteContextCard campus={null} journey={null} loading={false} leaveByInfo={null} />
       </MemoryRouter>,

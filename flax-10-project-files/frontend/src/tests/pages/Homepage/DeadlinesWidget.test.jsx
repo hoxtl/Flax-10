@@ -72,7 +72,7 @@ describe('DeadlinesWidget', () => {
             deadline_type: 'coursework',
         }));
         render(<DeadlinesWidget deadlines={manyDeadlines} />);
-        expect(screen.getAllByText(/Task \d/).length).toBe(5);
+        expect(screen.getAllByText(/Task \d/).length).toBe(3);
     });
 
     it('renders module code pills', () => {

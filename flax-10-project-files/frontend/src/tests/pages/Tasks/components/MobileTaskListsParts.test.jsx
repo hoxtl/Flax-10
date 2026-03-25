@@ -74,31 +74,18 @@ describe("MobileTaskListsParts", () => {
     expect(screen.getByText("No reading lists")).toBeInTheDocument();
   });
 
-  it("renders list rows and selects the clicked list using string id matching", () => {
-    const onSelectList = vi.fn();
+  it("activates list rows using string id matching", () => {
+    const lists = [{ id: 1, name: "G" }, { id: 2, name: "E" }];
+    render(<MobileListSection lists={lists} listCounts={{ 1: 2 }} activeListId="1" onSelectList={vi.fn()} />);
+    expect(screen.getByRole("button", { name: /G/i }).className).toMatch(/listRowActive/);
+    expect(screen.getByRole("button", { name: /E/i }).className).not.toMatch(/listRowActive/);
+  });
 
-    render(
-      <MobileListSection
-        title="LIFE LISTS"
-        lists={[
-          { id: 1, name: "Groceries" },
-          { id: 2, name: "Errands" },
-        ]}
-        listCounts={{ 1: 2, 2: 0 }}
-        activeListId="1"
-        onSelectList={onSelectList}
-        emptyMessage="No life lists"
-      />,
-    );
-
-    const groceries = screen.getByRole("button", { name: /Groceries/i });
-    const errands = screen.getByRole("button", { name: /Errands/i });
-
-    expect(groceries.className).toMatch(/listRowActive/);
-    expect(errands.className).not.toMatch(/listRowActive/);
-
-    fireEvent.click(errands);
-    expect(onSelectList).toHaveBeenCalledWith(2);
+  it("triggers selection handler on list click", () => {
+    const onSelect = vi.fn();
+    render(<MobileListSection lists={[{ id: 2, name: "E" }]} listCounts={{}} onSelectList={onSelect} />);
+    fireEvent.click(screen.getByRole("button", { name: /E/i }));
+    expect(onSelect).toHaveBeenCalledWith(2);
   });
 
   it("renders the empty lists state copy", () => {

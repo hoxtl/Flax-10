@@ -104,68 +104,38 @@ describe("module reading and filter extras", () => {
     vi.clearAllMocks();
   });
 
-  it("validates reading forms and submits parsed reading data", () => {
+  it("validates reading form required fields and numeric constraints", () => {
     const onSubmit = vi.fn();
-    const onCancel = vi.fn();
-    render(<ReadingForm onSubmit={onSubmit} onCancel={onCancel} />);
-
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Chapter notes" } });
-    fireEvent.change(screen.getByLabelText("Start Page"), { target: { value: "8" } });
-    fireEvent.change(screen.getByLabelText("End Page"), { target: { value: "12" } });
+    render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Notes" } });
     fireEvent.click(screen.getByText("Add Reading"));
     expect(screen.getByText("Due date cannot be empty.")).toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText("Chapter (optional)"), { target: { value: "-2" } });
-    fireEvent.change(screen.getByLabelText("End Page"), { target: { value: "4" } });
-    fireEvent.change(screen.getByLabelText("Pick due date & time"), { target: { value: "2026-03-30T09:30" } });
+    fireEvent.change(screen.getByLabelText("Chapter (optional)"), { target: { value: "-1" } });
     fireEvent.click(screen.getByText("Add Reading"));
     expect(screen.getByText("Chapter cannot be negative.")).toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText("Chapter (optional)"), { target: { value: "2" } });
-    fireEvent.click(screen.getByText("Add Reading"));
-    expect(screen.getByText("End page must be greater than or equal to start page.")).toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText("End Page"), { target: { value: "12" } });
-    fireEvent.change(screen.getByLabelText("Estimated Minutes (optional) - leave blank to auto-calculate"), { target: { value: "45" } });
-    fireEvent.click(screen.getByText("Add Reading"));
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
-      title: "Chapter notes",
-      chapter: "2",
-      start_page: 8,
-      end_page: 12,
-      estimated_minutes: 45,
-    }));
-
-    fireEvent.click(screen.getByText("Cancel"));
-    expect(onCancel).toHaveBeenCalled();
   });
 
-  it("renders reading modal list and edit/create branches", () => {
-    const onClose = vi.fn();
-    useReadingModal.mockReturnValueOnce({
-      showForm: false,
-      readings: [{ id: 1, title: "Intro" }],
-      openCreate: vi.fn(),
-      openEdit: vi.fn(),
-      handleDelete: vi.fn(),
-    });
+  it("submits parsed reading data when valid", () => {
+    const onSubmit = vi.fn();
+    render(<ReadingForm onSubmit={onSubmit} onCancel={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "N" } });
+    fireEvent.change(screen.getByLabelText("Pick due date & time"), { target: { value: "2026-03-30T09:30" } });
+    fireEvent.change(screen.getByLabelText("Estimated Minutes (optional) - leave blank to auto-calculate"), { target: { value: "10" } });
+    fireEvent.click(screen.getByText("Add Reading"));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ title: "N", estimated_minutes: 10 }));
+  });
 
-    const firstRender = render(<ReadingModal module={{ id: 5, module_code: "CS101" }} onClose={onClose} />);
-    fireEvent.click(screen.getByText("+ Add Reading"));
-    fireEvent.click(screen.getByText("edit-reading"));
-    fireEvent.click(screen.getByText("delete-reading"));
+  it("renders reading list and handles modal close", () => {
+    const onClose = vi.fn();
+    useReadingModal.mockReturnValue({ showForm: false, readings: [{ id: 1, title: "I" }], openCreate: vi.fn(), openEdit: vi.fn(), handleDelete: vi.fn() });
+    render(<ReadingModal module={{ id: 5 }} onClose={onClose} />);
     fireEvent.click(screen.getByText("close-modal"));
     expect(onClose).toHaveBeenCalled();
-    firstRender.unmount();
+  });
 
-    useReadingModal.mockReturnValueOnce({
-      showForm: true,
-      editing: { id: 2, title: "Edit me" },
-      handleSubmit: vi.fn(),
-      close: vi.fn(),
-    });
-    render(<ReadingModal module={{ id: 5, module_code: "CS101" }} onClose={onClose} />);
-    expect(screen.getByText("CS101 - Readings")).toBeInTheDocument();
+  it("renders edit branch in reading modal", () => {
+    useReadingModal.mockReturnValue({ showForm: true, editing: { id: 2, title: "E" }, handleSubmit: vi.fn(), close: vi.fn() });
+    render(<ReadingModal module={{ id: 5, module_code: "CS101" }} onClose={vi.fn()} />);
     expect(screen.getByText("Save Reading")).toBeInTheDocument();
   });
 

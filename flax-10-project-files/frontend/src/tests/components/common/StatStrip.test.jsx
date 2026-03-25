@@ -18,41 +18,29 @@ describe("StatStrip", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders values, prefixes, suffixes, meta, separators, tones, and tooltips", () => {
-    const valueRef = { current: null };
+  it("renders labels, meta text, and custom class names", () => {
     render(
       <StatStrip
-        items={[
-          {
-            key: "1",
-            label: "Focus",
-            value: 25,
-            prefix: "~",
-            suffix: "m",
-            meta: "today",
-            tone: "success",
-            valueClassName: "custom-value",
-            metaClassName: "custom-meta",
-            valueRef,
-          },
-          {
-            key: "2",
-            label: "Deadlines",
-            value: "--",
-            tooltip: "Upcoming project deadline",
-            tooltipPosition: "bottom",
-          },
-        ]}
-        compact
-        bare
+        items={[{ key: "1", label: "Focus", value: 25, meta: "today", metaClassName: "custom-meta" }]}
         className="extra-strip"
       />
     );
-
     expect(screen.getByText("Focus")).toBeInTheDocument();
     expect(screen.getByText("today")).toHaveClass("custom-meta");
-    expect(screen.getByText("Upcoming project deadline")).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument();
     expect(document.querySelector(".extra-strip")).toBeTruthy();
+  });
+
+  it("renders values with prefixes/suffixes and tooltips", () => {
+    render(
+      <StatStrip
+        items={[
+          { key: "1", value: 25, prefix: "~", suffix: "m" },
+          { key: "2", value: "--", tooltip: "Upcoming project deadline" },
+        ]}
+      />
+    );
+    expect(screen.getByText("~")).toBeInTheDocument();
+    expect(screen.getByText("m")).toBeInTheDocument();
+    expect(screen.getByText("Upcoming project deadline")).toBeInTheDocument();
   });
 });

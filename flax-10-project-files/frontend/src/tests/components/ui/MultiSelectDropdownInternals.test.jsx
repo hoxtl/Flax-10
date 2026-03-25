@@ -26,6 +26,55 @@ import {
   useDropdownRootRef,
 } from "../../../components/UI/multi-select-dropdown/useDropdownInteractions";
 
+const buildTriggerProps = (overrides = {}) => ({
+  customTrigger: null,
+  displayAsPills: false,
+  isOpen: false,
+  onRemovePill: vi.fn(),
+  options: [],
+  placeholder: "Pick",
+  selected: [],
+  triggerLabel: "Pick",
+  updateOpen: vi.fn(),
+  ...overrides,
+});
+
+const renderTrigger = (overrides = {}) => {
+  const props = buildTriggerProps(overrides);
+  const utils = render(<MultiSelectDropdownTrigger {...props} />);
+  const rerenderTrigger = (next) => {
+    Object.assign(props, next);
+    utils.rerender(<MultiSelectDropdownTrigger {...props} />);
+  };
+  return { ...utils, props, rerenderTrigger };
+};
+
+const renderMenu = (overrides = {}) => {
+  const props = {
+    activeItemClassName: "",
+    align: "left",
+    hideCheckboxForValues: [],
+    isModuleVariant: false,
+    isOpen: true,
+    itemClassName: "",
+    menuClassName: "",
+    onToggle: vi.fn(),
+    options: [{ label: "Alpha", value: "alpha" }],
+    optionsAsPills: false,
+    selected: ["alpha"],
+    selectedSet: new Set(["alpha"]),
+    showCheckboxes: true,
+    variant: "default",
+    ...overrides,
+  };
+  const utils = render(<MultiSelectDropdownMenu {...props} />);
+  const rerenderMenu = (next) => {
+    Object.assign(props, next);
+    utils.rerender(<MultiSelectDropdownMenu {...props} />);
+  };
+  return { ...utils, props, rerenderMenu };
+};
+
 function OutsideClickHarness({ isOpen, updateOpen }) {
   const rootRef = useDropdownRootRef();
   useCloseOnOutsideClick(isOpen, rootRef, updateOpen);
@@ -91,109 +140,42 @@ describe("MultiSelectDropdown internals", () => {
     expect(openSpy).toHaveBeenCalledWith(false);
   });
 
-  it("renders custom, default, and pills triggers with their interaction branches", () => {
-    const updateOpen = vi.fn();
-    const onRemovePill = vi.fn();
-
-    const { rerender } = render(
-      <MultiSelectDropdownTrigger
-        customTrigger={<span>Custom trigger</span>}
-        isOpen={false}
-        onRemovePill={onRemovePill}
-        options={[]}
-        placeholder="Pick"
-        selected={[]}
-        triggerLabel="Pick"
-        updateOpen={updateOpen}
-      />,
-    );
-
+  it("opens a custom trigger when clicked", () => {
+    const { props } = renderTrigger({ customTrigger: <span>Custom trigger</span> });
     fireEvent.click(screen.getByText("Custom trigger"));
-    expect(updateOpen).toHaveBeenCalledWith(expect.any(Function));
-
-    rerender(
-      <MultiSelectDropdownTrigger
-        isOpen={false}
-        onRemovePill={onRemovePill}
-        options={[]}
-        placeholder="Pick"
-        selected={[]}
-        triggerLabel="Pick"
-        updateOpen={updateOpen}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: /pick/i }));
-    expect(updateOpen).toHaveBeenCalledTimes(2);
-
-    rerender(
-      <MultiSelectDropdownTrigger
-        displayAsPills
-        isOpen={false}
-        onRemovePill={onRemovePill}
-        options={[{ label: "Alpha", value: "alpha" }]}
-        placeholder="Pick"
-        selected={["alpha"]}
-        triggerLabel="Pick"
-        updateOpen={updateOpen}
-      />,
-    );
-
-    fireEvent.keyDown(document.querySelector('[aria-haspopup="listbox"]'), { key: "Escape", preventDefault: vi.fn() });
-    expect(updateOpen).toHaveBeenCalledTimes(2);
-
-    fireEvent.click(screen.getByText("Alpha"));
-    expect(updateOpen).toHaveBeenCalledTimes(2);
-
-    fireEvent.click(screen.getByLabelText("Remove Alpha"));
-    expect(onRemovePill).toHaveBeenCalledWith("alpha");
+    expect(props.updateOpen).toHaveBeenCalledWith(expect.any(Function));
   });
 
-  it("renders leading and trailing selection icons in the menu", () => {
-    const onToggle = vi.fn();
-    const option = { label: "Alpha", value: "alpha" };
-    const { rerender } = render(
-      <MultiSelectDropdownMenu
-        activeItemClassName=""
-        align="left"
-        hideCheckboxForValues={[]}
-        isModuleVariant={false}
-        isOpen
-        itemClassName=""
-        menuClassName=""
-        onToggle={onToggle}
-        options={[option]}
-        optionsAsPills={false}
-        selected={["alpha"]}
-        selectedSet={new Set(["alpha"])}
-        showCheckboxes
-        variant="default"
-      />,
-    );
+  it("toggles the default trigger button", () => {
+    const { props } = renderTrigger();
+    fireEvent.click(screen.getByRole("button", { name: /pick/i }));
+    expect(props.updateOpen).toHaveBeenCalledTimes(1);
+  });
 
+  it("handles pill trigger keyboard and removal interactions", () => {
+    const { props, rerenderTrigger } = renderTrigger({
+      displayAsPills: true,
+      options: [{ label: "Alpha", value: "alpha" }],
+      selected: ["alpha"],
+    });
+    rerenderTrigger({ displayAsPills: true });
+    fireEvent.keyDown(document.querySelector('[aria-haspopup="listbox"]'), { key: "Escape", preventDefault: vi.fn() });
     fireEvent.click(screen.getByText("Alpha"));
-    expect(onToggle).toHaveBeenCalledWith("alpha");
+    fireEvent.click(screen.getByLabelText("Remove Alpha"));
+    expect(props.updateOpen).not.toHaveBeenCalled();
+    expect(props.onRemovePill).toHaveBeenCalledWith("alpha");
+  });
+
+  it("toggles checkbox selections inside the menu", () => {
+    const { props } = renderMenu();
+    fireEvent.click(screen.getByText("Alpha"));
+    expect(props.onToggle).toHaveBeenCalledWith("alpha");
     expect(document.querySelector('input[type="checkbox"]')).toBeTruthy();
+  });
 
-    rerender(
-      <MultiSelectDropdownMenu
-        activeItemClassName=""
-        align="left"
-        hideCheckboxForValues={[]}
-        isModuleVariant={false}
-        isOpen
-        itemClassName=""
-        menuClassName=""
-        onToggle={onToggle}
-        options={[option]}
-        optionsAsPills={false}
-        selected={["alpha"]}
-        selectedSet={new Set(["alpha"])}
-        showCheckboxes={false}
-        variant="default"
-      />,
-    );
-
-    expect(document.querySelector('svg.lucide-check')).toBeTruthy();
+  it("shows the trailing check icon when checkboxes are hidden", () => {
+    const { rerenderMenu } = renderMenu();
+    rerenderMenu({ showCheckboxes: false });
+    expect(document.querySelector("svg.lucide-check")).toBeTruthy();
   });
 });

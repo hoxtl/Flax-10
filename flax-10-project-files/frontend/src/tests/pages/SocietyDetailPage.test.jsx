@@ -200,6 +200,41 @@ function renderPage(ui, { routeState } = {}) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
 
+function renderDetailPageWithData(overrides = {}, props = {}) {
+  const base = buildPageData();
+  const data = {
+    ...base,
+    ...overrides,
+    modals: { ...base.modals, ...overrides.modals },
+    society: { ...base.society, ...overrides.society },
+    page: { ...base.page, ...overrides.page },
+    subscription: { ...base.subscription, ...overrides.subscription },
+    tracker: { ...base.tracker, ...overrides.tracker },
+  };
+  useSocietyPageDataMock.mockReturnValue(data);
+  renderPage(<SocietyDetailPage societyId={1} {...props} />);
+  return data;
+}
+
+const interactiveOverrides = {
+  modals: {
+    showSettings: true,
+    showReportModal: true,
+    galleryOpen: { index: 1 },
+    showCoverModal: true,
+    showMembersModal: true,
+    editingAnnouncement: { id: 7 },
+  },
+  society: {
+    announcements: [{ id: 7, title: "Pinned announcement" }],
+    tags: ["important"],
+  },
+};
+
+function clickByText(text) {
+  fireEvent.click(screen.getByText(text));
+}
+
 describe("SocietyDetailPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -264,24 +299,21 @@ describe("SocietyDetailPage", () => {
     expect(memberData.handleUnreport).toHaveBeenCalledWith(memberData.society);
   });
 
-  it("wires hero, members, and modal workflows through page handlers", async () => {
-    const onBack = vi.fn();
-    const onDelete = vi.fn();
-    const data = buildPageData({
-      modals: {
-        showSettings: true,
-        showReportModal: true,
-        galleryOpen: { index: 1 },
-        showCoverModal: true,
-        showMembersModal: true,
-        editingAnnouncement: { id: 7 },
-      },
-      society: {
-        announcements: [{ id: 7, title: "Pinned announcement" }],
-        tags: ["important"],
-      },
+  describe("modal workflows", () => {
+    it("handles hero, gallery, and member entry points", () => {
+      const data = renderDetailPageWithData(interactiveOverrides);
+      clickByText("rename-society");
+      clickByText("open-gallery");
+      clickByText("edit-images");
+      clickByText("view-members");
+      clickByText("edit-announcement");
+
+      expect(data.updateSociety).toHaveBeenCalledWith({ name: "Renamed Society" });
+      expect(data.modals.setGalleryOpen).toHaveBeenCalledWith({ index: 1 });
+      expect(data.modals.setShowCoverModal).toHaveBeenCalledWith(true);
+      expect(data.modals.setShowMembersModal).toHaveBeenCalledWith(true);
+      expect(data.modals.setEditingAnnouncement).toHaveBeenCalledWith({ id: 7 });
     });
-    useSocietyPageDataMock.mockReturnValue(data);
 
     renderPage(<SocietyDetailPage societyId={1} onBack={onBack} onDelete={onDelete} />);
 

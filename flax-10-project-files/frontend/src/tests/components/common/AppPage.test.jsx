@@ -20,31 +20,19 @@ vi.mock("../../../components/common/PageHeader/PageHeader", () => ({
 }));
 
 describe("AppPage", () => {
-  it("renders inline back controls through the header with toolbar and width classes", () => {
-    const onBack = vi.fn();
-    render(
-      <AppPage
-        title="Dashboard"
-        subtitle="Summary"
-        action={<span>Action</span>}
-        onBack={onBack}
-        toolbar={<span>Toolbar</span>}
-        width="sm"
-        className="page-x"
-        contentClassName="content-x"
-        data-testid="page"
-      >
-        <div>Body</div>
-      </AppPage>,
-    );
+  it("applies width and custom classes to the page container", () => {
+    render(<AppPage width="sm" className="p-x" data-testid="p">Body</AppPage>);
+    const page = screen.getByTestId("p");
+    expect(page.className).toContain("p-x");
+    expect(page.className.split(" ").length).toBeGreaterThan(1);
+  });
 
-    const page = screen.getByTestId("page");
-    expect(page.className).toContain("page-x");
-    expect(page.className.split(" ").filter(Boolean).length).toBeGreaterThan(1);
-    expect(screen.getByText("Toolbar")).toBeInTheDocument();
+  it("renders toolbar and fires back-click from header", () => {
+    const onBack = vi.fn();
+    render(<AppPage toolbar={<span>T</span>} onBack={onBack}>Body</AppPage>);
+    expect(screen.getByText("T")).toBeInTheDocument();
     fireEvent.click(screen.getByText("header-back"));
-    expect(onBack).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Body").parentElement.className).toContain("content-x");
+    expect(onBack).toHaveBeenCalled();
   });
 
   it("renders the back button above the header when requested", () => {

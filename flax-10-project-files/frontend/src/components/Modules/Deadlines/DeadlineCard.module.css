@@ -51,6 +51,10 @@
     color: var(--muted);
     margin: 0;
 }
+
+.locationLink {
+    font-weight: 600;
+}
 .cardActions {
     display: flex;
     gap: 8px;

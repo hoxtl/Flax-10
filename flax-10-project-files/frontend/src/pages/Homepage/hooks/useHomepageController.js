@@ -86,6 +86,7 @@ function createRescheduleProps(shared, state, actions) {
     selectedDate: shared.calendar.selectedDate,
     showToast: shared.toast.showToast,
     sortedEvents: state.state.sortedEvents,
+    upcomingDeadlines: shared.resources.upcomingDeadlines,
   };
 }
 

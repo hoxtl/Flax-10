@@ -2,7 +2,7 @@
  * Attendance prompt modal — KCL branding, progress ring, and animated glow border.
  */
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -117,30 +117,33 @@ function computeDisplayPct(answeredWith, overall, basePct) {
 }
 
 function useAttendancePromptState(event, onAnswer) {
+  const { overall, refetch } = useOverallAttendance();
+  const answerState = useAnswerState(event);
+  const displayPct = useDisplayPercentage(answerState.answeredWith, overall);
+  const handleAnswer = useAnswerHandler({ answerState, onAnswer, overall, refetch });
+  return { answeredWith: answerState.answeredWith, displayPct, handleAnswer, submitError: answerState.submitError };
+}
+
+function useOverallAttendance() {
   const { stats, refetch } = useAttendanceStats();
-  const overall = stats?.overall ?? { attended: 0, missed: 0 };
+  return { overall: stats?.overall ?? { attended: 0, missed: 0 }, refetch };
+}
+
+function useAnswerState(event) {
   const [answeredWith, setAnsweredWith] = useState(null);
   const [submitError, setSubmitError] = useState("");
   const timerRef = useRef(null);
-
-  useEffect(() => () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-  }, []);
-
+  useEffect(() => () => timerRef.current && clearTimeout(timerRef.current), []);
   useEffect(() => {
     setAnsweredWith(null);
     setSubmitError("");
   }, [event?.id]);
+  return { answeredWith, setAnsweredWith, submitError, setSubmitError, timerRef };
+}
 
-  const displayPct = useMemo(() => computeDisplayPct(answeredWith, overall, computeAttendancePct(overall)), [answeredWith, overall]);
-
-  const runAnswer = async (attended) => {
-    const success = await onAnswer(attended, { afterSuccess: refetch, closeDelayMs: 700 });
-    if (!success) {
-      setAnsweredWith(null);
-      setSubmitError("Could not update attendance. Please try again.");
-    }
-  };
+function useDisplayPercentage(answeredWith, overall) {
+  return useMemo(() => computeDisplayPct(answeredWith, overall, computeAttendancePct(overall)), [answeredWith, overall]);
+}
 
   const handleAnswer = (attended) => {
     setSubmitError("");
@@ -150,7 +153,11 @@ function useAttendancePromptState(event, onAnswer) {
     }, 1200);
   };
 
-  return { answeredWith, displayPct, handleAnswer, submitError };
+async function handleSubmitAnswer(attended, context) {
+  const success = await context.onAnswer(attended, { afterSuccess: context.refetch, closeDelayMs: 700 });
+  if (success) return;
+  context.answerState.setAnsweredWith(null);
+  context.answerState.setSubmitError("Could not update attendance. Please try again.");
 }
 
 function ModalContent({ event, answeredWith, displayPct, handleAnswer, onDismiss, submitError }) {

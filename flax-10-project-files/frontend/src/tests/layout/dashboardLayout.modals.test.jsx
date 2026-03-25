@@ -91,20 +91,30 @@ describe("dashboard layout modal helpers", () => {
     expect(screen.getByTestId("leave-timer-time-left")).toHaveTextContent("0");
   });
 
-  it("falls back to a 25-minute work session and clears pending navigation after pause", () => {
+  it("falls back to a 25-minute work session total for work mode", () => {
+    render(
+      <LeaveTimerActions
+        pendingNav={null}
+        setPendingNav={vi.fn()}
+        setShowQuickAdd={vi.fn()}
+        onNavChange={vi.fn()}
+        t={{
+          mode: "work", workTime: 0, timeLeft: 120,
+          togglePause: vi.fn(), setMode: vi.fn(), setTimeLeft: vi.fn(),
+          setIsActive: vi.fn(), resetTimer: vi.fn(),
+        }}
+      />,
+    );
+    expect(screen.getByTestId("leave-timer-session-total")).toHaveTextContent("1500");
+  });
+
+  it("handles the pause action and clears pending navigation", () => {
     const setPendingNav = vi.fn();
     const setShowQuickAdd = vi.fn();
-    const onNavChange = vi.fn();
     const timer = {
-      mode: "work",
-      timeLeft: 120,
-      workTime: 0,
-      isPaused: false,
-      togglePause: vi.fn(),
-      setMode: vi.fn(),
-      setTimeLeft: vi.fn(),
-      setIsActive: vi.fn(),
-      resetTimer: vi.fn(),
+      mode: "work", timeLeft: 120, workTime: 25, isPaused: false,
+      togglePause: vi.fn(), setMode: vi.fn(), setTimeLeft: vi.fn(),
+      setIsActive: vi.fn(), resetTimer: vi.fn(),
     };
 
     render(
@@ -112,17 +122,14 @@ describe("dashboard layout modal helpers", () => {
         pendingNav="QUICK_ADD"
         setPendingNav={setPendingNav}
         setShowQuickAdd={setShowQuickAdd}
-        onNavChange={onNavChange}
+        onNavChange={vi.fn()}
         t={timer}
       />,
     );
 
-    expect(screen.getByTestId("leave-timer-time-left")).toHaveTextContent("120");
-    expect(screen.getByTestId("leave-timer-session-total")).toHaveTextContent("1500");
     fireEvent.click(screen.getByText("Pause"));
     expect(timer.togglePause).toHaveBeenCalled();
     expect(setShowQuickAdd).toHaveBeenCalledWith(true);
     expect(setPendingNav).toHaveBeenCalledWith(null);
-    expect(onNavChange).not.toHaveBeenCalled();
   });
 });

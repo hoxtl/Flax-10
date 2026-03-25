@@ -11,10 +11,11 @@ import { getInitials } from '../../Authentication/utils/userUtils.js';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import Badge from '../../common/Badge/Badge.jsx';
 import EntityLinkChip from '../../common/EntityLinkChip/EntityLinkChip.jsx';
-import { getUrgencyTier } from '../../common/DeadlineCountdown/deadlineCountdownUtils.js';
+import { getUrgencyTier } from '../../Common/DeadlineCountdown/deadlineCountdownUtils.js';
 import BackButton from '../../common/BackButton/BackButton.jsx';
 import PrimaryButton from '../../common/PrimaryButton/PrimaryButton.jsx';
 import Tooltip from '../../common/Tooltip/Tooltip.jsx';
+import LocationLink from '../../common/LocationLink/LocationLink.jsx';
 import { getModuleTutorPhoto, hideBrokenTutorImage } from './moduleTutorUtils';
 import styles from './ModuleDetails.module.css';
 import heroStyles from '../styles/ModuleHero.module.css';
@@ -273,7 +274,16 @@ function ScheduleSummary({ nextClass, location }) {
         <span className={scheduleStyles.scheduleValueInline}>
             <span className={scheduleStyles.scheduleInlinePrimary}>{nextClass}</span>
             <span className={scheduleStyles.scheduleValueSeparator} aria-hidden="true">·</span>
-            <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
+            {location ? (
+                <LocationLink
+                    location={location}
+                    className={scheduleStyles.scheduleLocationLink}
+                    textClassName={scheduleStyles.scheduleInlineLocation}
+                    iconClassName={scheduleStyles.scheduleLocationIcon}
+                />
+            ) : (
+                <span className={scheduleStyles.scheduleInlineLocation} title={resolvedLocation}>{resolvedLocation}</span>
+            )}
         </span>
     );
 }

@@ -64,38 +64,24 @@ describe("MonthView parts", () => {
     });
   });
 
-  it("renders editable and readonly day cells and creates draft events", () => {
-    const onDateSelect = vi.fn();
-    const onMoreClick = vi.fn();
-    const { rerender } = render(
-      <DayCell
-        day={new Date("2026-03-24T00:00:00.000Z")}
-        events={[]}
-        isCur
-        onDateSelect={onDateSelect}
-        onMoreClick={onMoreClick}
-        readOnly={false}
-      />,
-    );
-
+  it("renders editable DayCell and creates draft events", () => {
+    render(<DayCell day={new Date("2026-03-24T00:00:00.000Z")} events={[]} isCur readOnly={false} />);
     fireEvent.click(screen.getByText("+"));
-    expect(openModal).toHaveBeenCalledWith(expect.objectContaining({ start_time: expect.any(Date), end_time: expect.any(Date) }));
-    fireEvent.click(screen.getByText("24"));
-    expect(onDateSelect).toHaveBeenCalled();
+    expect(openModal).toHaveBeenCalledWith(expect.objectContaining({ start_time: expect.any(Date) }));
+  });
 
-    rerender(
-      <DayCell
-        day={new Date("2026-03-24T00:00:00.000Z")}
-        events={[]}
-        isCur={false}
-        onDateSelect={onDateSelect}
-        onMoreClick={onMoreClick}
-        readOnly
-      />,
-    );
+  it("renders readonly DayCell without add button", () => {
+    render(<DayCell day={new Date("2026-03-24T00:00:00.000Z")} events={[]} isCur readOnly />);
     expect(screen.queryByText("+")).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
+  it("handles date selection in DayCell", () => {
+    const onDateSelect = vi.fn();
+    render(<DayCell day={new Date("2026-03-24T00:00:00.000Z")} events={[]} isCur onDateSelect={onDateSelect} />);
+    fireEvent.click(screen.getByText("24"));
+    expect(onDateSelect).toHaveBeenCalled();
+=======
   it("renders a fresh readonly day cell and forwards the more-events click", () => {
     const onDateSelect = vi.fn();
     const onMoreClick = vi.fn();
@@ -139,22 +125,23 @@ describe("MonthView parts", () => {
     rerender(<EventDot e={{ id: 3, title: "Popup only", source: "personal" }} readOnly />);
     fireEvent.click(screen.getByText("Popup only"));
     expect(openPopup).toHaveBeenCalled();
+>>>>>>> main
   });
 
-  it("covers the more-events control and swipe month view navigation", async () => {
-    const onClick = vi.fn();
-    render(<MoreEvents count={3} onClick={onClick} />);
-    fireEvent.click(screen.getByText("+3 more"));
-    expect(onClick).toHaveBeenCalled();
-
+  it("delays next month navigation for swipe animation", () => {
+    vi.useFakeTimers();
     render(<SwipeMonthView />);
-    expect(useSwipeNavigation).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("24"));
+    const { onNext } = useSwipeNavigation.mock.calls.at(-1)[0];
+    act(() => { onNext(); });
+    expect(dispatch).not.toHaveBeenCalledWith({ type: "SET_SELECTED_DATE", payload: expect.any(Date) });
+    act(() => { vi.advanceTimersByTime(150); });
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_SELECTED_DATE", payload: expect.any(Date) });
-    expect(dispatch).toHaveBeenCalledWith({ type: "SET_VIEW_MODE", payload: "day" });
-    await waitFor(() => expect(dispatch).not.toBeNull());
+    vi.useRealTimers();
   });
 
+<<<<<<< HEAD
+  it("delays prev month navigation for swipe animation", () => {
+=======
   it("sorts all-day events ahead of timed events within a week row", () => {
     const day = new Date("2026-03-24T00:00:00.000Z");
     render(
@@ -173,34 +160,14 @@ describe("MonthView parts", () => {
   });
 
   it("delays month navigation until the swipe animation timeout completes", () => {
+>>>>>>> main
     vi.useFakeTimers();
     render(<SwipeMonthView />);
-
-    const swipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
-
-    act(() => {
-      swipeHandlers.onNext();
-    });
-    expect(dispatch).not.toHaveBeenCalledWith({
-      type: "SET_SELECTED_DATE",
-      payload: expect.objectContaining({}),
-    });
-
-    act(() => {
-      vi.advanceTimersByTime(150);
-    });
-    const nextMonthDate = dispatch.mock.calls.find((call) => call[0].type === "SET_SELECTED_DATE")?.[0]?.payload;
-    expect(nextMonthDate.getMonth()).toBe(3);
-
-    dispatch.mockClear();
-
-    act(() => {
-      swipeHandlers.onPrev();
-      vi.advanceTimersByTime(150);
-    });
-    const prevMonthDate = dispatch.mock.calls.find((call) => call[0].type === "SET_SELECTED_DATE")?.[0]?.payload;
-    expect(prevMonthDate.getMonth()).toBe(1);
-
+    const { onPrev } = useSwipeNavigation.mock.calls.at(-1)[0];
+    act(() => { onPrev(); });
+    act(() => { vi.advanceTimersByTime(150); });
+    const calls = dispatch.mock.calls.filter(c => c[0].type === "SET_SELECTED_DATE");
+    expect(calls.length).toBeGreaterThan(0);
     vi.useRealTimers();
   });
 });

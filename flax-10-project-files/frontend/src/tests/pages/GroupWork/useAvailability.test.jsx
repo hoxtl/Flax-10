@@ -30,43 +30,49 @@ function AvailabilityHarness() {
   );
 }
 
+function createApiPayload(overrides = {}) {
+  return {
+    suggestions: [{ id: 1 }],
+    active_suggestions: [],
+    current_user_id: 3,
+    project_members: [{ id: 2 }],
+    team_size: 2,
+    ...overrides,
+  };
+}
+
+function stubFetch(payload) {
+  return vi.fn().mockResolvedValue({
+    ok: true,
+    json: vi.fn().mockResolvedValue(payload ?? createApiPayload()),
+  });
+}
+
+function renderAvailability() {
+  return render(<AvailabilityHarness />);
+}
+
 describe("useAvailability", () => {
   beforeEach(() => {
     toastMock.mockReset();
     confirmMock.mockReset();
-    vi.stubGlobal("fetch", vi.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          suggestions: [{ id: 1 }],
-          active_suggestions: [],
-          current_user_id: 3,
-          project_members: [{ id: 2 }],
-          team_size: 2,
-        }),
-      })
-      .mockResolvedValue({
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          suggestions: [{ id: 1 }],
-          active_suggestions: [],
-          current_user_id: 3,
-          project_members: [{ id: 2 }],
-          team_size: 2,
-        }),
-      }));
+    vi.stubGlobal("fetch", stubFetch());
   });
 
-  it("loads availability data and handles suggest, delete, and vote actions", async () => {
-    confirmMock.mockResolvedValue(true);
-    render(<AvailabilityHarness />);
-
+  it("loads availability data on mount", async () => {
+    renderAvailability();
     await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
     expect(screen.getByTestId("suggestions").textContent).toContain('"id":1');
+  });
 
+  it("updates the suggesting slot when the setter is used", async () => {
+    renderAvailability();
     fireEvent.click(screen.getByText("set slot"));
-    expect(screen.getByTestId("slot").textContent).toBe("2026-04-10T09:00:00.000Z");
+    await waitFor(() => expect(screen.getByTestId("slot").textContent).toBe("2026-04-10T09:00:00.000Z"));
+  });
 
+  it("submits a new meeting suggestion", async () => {
+    renderAvailability();
     fireEvent.click(screen.getByText("suggest"));
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       "/api/group-work/projects/77/suggestions/",
@@ -78,14 +84,32 @@ describe("useAvailability", () => {
         }),
       })
     ));
+  });
 
+  it("deletes a suggestion after confirmation", async () => {
+    confirmMock.mockResolvedValue(true);
+    renderAvailability();
     fireEvent.click(screen.getByText("delete"));
     await waitFor(() => expect(confirmMock).toHaveBeenCalled());
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       "/api/group-work/suggestions/9/",
       expect.objectContaining({ method: "DELETE" })
     ));
+  });
 
+  it("skips deleting when confirmation is rejected", async () => {
+    confirmMock.mockResolvedValue(false);
+    renderAvailability();
+    fireEvent.click(screen.getByText("delete"));
+    await waitFor(() => expect(confirmMock).toHaveBeenCalled());
+    expect(fetch).not.toHaveBeenCalledWith(
+      "/api/group-work/suggestions/9/",
+      expect.objectContaining({ method: "DELETE" })
+    );
+  });
+
+  it("posts an accepted vote", async () => {
+    renderAvailability();
     fireEvent.click(screen.getByText("accept"));
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       "/api/group-work/suggestions/9/respond/",
@@ -94,25 +118,14 @@ describe("useAvailability", () => {
         body: JSON.stringify({ status: "accepted" }),
       })
     ));
+  });
 
+  it("shows a toast when declining a suggestion", async () => {
+    renderAvailability();
     fireEvent.click(screen.getByText("decline"));
     await waitFor(() => expect(toastMock).toHaveBeenCalledWith(
       "You declined the meeting slot.",
       { variant: "neutral" }
     ));
-  });
-
-  it("skips deleting when confirmation is rejected", async () => {
-    confirmMock.mockResolvedValue(false);
-    render(<AvailabilityHarness />);
-
-    await waitFor(() => expect(screen.getByTestId("loading").textContent).toBe("false"));
-    fireEvent.click(screen.getByText("delete"));
-
-    await waitFor(() => expect(confirmMock).toHaveBeenCalled());
-    expect(fetch).not.toHaveBeenCalledWith(
-      "/api/group-work/suggestions/9/",
-      expect.objectContaining({ method: "DELETE" })
-    );
   });
 });

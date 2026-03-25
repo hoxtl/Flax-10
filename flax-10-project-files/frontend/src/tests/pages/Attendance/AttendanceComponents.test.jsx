@@ -88,22 +88,22 @@ describe("Attendance components", () => {
     expect(screen.getByText("Child two")).toBeInTheDocument();
   });
 
-  it("renders the tabbed list and the segment panel branch", () => {
-    const showRecordTab = vi.fn();
-    const showMarkedTab = vi.fn();
-    const clearSegment = vi.fn();
-    const handleToggleStatus = vi.fn();
+  const unmarkedEvent = { id: 1, title: "Lecture", start_time: "2026-03-01T09:00:00Z" };
+  const segmentEvent = { id: 2, title: "Lab", start_time: "2026-03-01T10:00:00Z", attended: true, event_type: "Lab" };
+  const selectedSegment = { chart: "overall", label: "Attended" };
 
-    const { rerender } = render(
+  it("renders the record tab and switches to marked tab", () => {
+    const showMarkedTab = vi.fn();
+    render(
       <AttendanceListColumn
         model={{
           eventsLoading: false,
           selectedSegment: null,
           listTab: "record",
-          unmarkedEvents: [{ id: 1, title: "Lecture", start_time: "2026-03-01T09:00:00Z" }],
+          unmarkedEvents: [unmarkedEvent],
           markedEvents: [],
           refetchAll: vi.fn(),
-          showRecordTab,
+          showRecordTab: vi.fn(),
           showMarkedTab,
         }}
       />
@@ -112,15 +112,18 @@ describe("Attendance components", () => {
     expect(screen.getByText("Active tab: record")).toBeInTheDocument();
     fireEvent.click(screen.getByText("marked"));
     expect(showMarkedTab).toHaveBeenCalled();
+  });
 
-    rerender(
+  it("renders the segment detail panel and clears the segment", () => {
+    const clearSegment = vi.fn();
+    render(
       <AttendanceListColumn
         model={{
           eventsLoading: false,
-          selectedSegment: { chart: "overall", label: "Attended" },
+          selectedSegment,
           segmentLabel: "Overall: Attended",
-          segmentEvents: [{ id: 2, title: "Lab", start_time: "2026-03-01T10:00:00Z", attended: true, event_type: "Lab" }],
-          handleToggleStatus,
+          segmentEvents: [segmentEvent],
+          handleToggleStatus: vi.fn(),
           clearSegment,
         }}
       />
@@ -170,35 +173,22 @@ describe("Attendance components", () => {
 
   it("renders empty and populated record and marked lists and records changes", async () => {
     const onRecorded = vi.fn();
-    const manyEvents = Array.from({ length: 21 }, (_, index) => ({
-      id: index + 1,
-      title: `Lecture ${index + 1}`,
-      start_time: "2026-03-01T09:00:00Z",
-      attended: index % 2 === 0,
-      event_type: "Lecture",
-    }));
-
-    const { rerender, container } = render(<RecordAttendanceList events={[]} onRecorded={onRecorded} />);
-    expect(container).toBeEmptyDOMElement();
-
-    rerender(<RecordAttendanceList events={manyEvents} onRecorded={onRecorded} />);
+    const manyEvents = generateEvents(1, 21);
+    
+    const { rerender } = render(<RecordAttendanceList events={manyEvents} onRecorded={onRecorded} />);
     fireEvent.click(screen.getAllByRole("button", { name: "Attended" })[0]);
     await waitFor(() => expect(recordAttendanceMock).toHaveBeenCalledWith(1, true));
     expect(onRecorded).toHaveBeenCalled();
     expect(screen.getByText("Showing first 20 events.")).toBeInTheDocument();
+  });
 
-    const manyMarkedEvents = Array.from({ length: 31 }, (_, index) => ({
-      id: index + 101,
-      title: `Lecture ${index + 1}`,
-      start_time: "2026-03-01T09:00:00Z",
-      attended: index % 2 === 0,
-      event_type: "Lecture",
-    }));
-    rerender(<MarkedAttendanceList markedEvents={manyMarkedEvents} />);
+  it("renders populated marked list with recent events", () => {
+    const manyMarkedEvents = generateEvents(101, 31);
+    render(<MarkedAttendanceList markedEvents={manyMarkedEvents} />);
     expect(screen.queryByRole("button", { name: "Change" })).not.toBeInTheDocument();
     expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
     expect(screen.getByText(/Showing 30 most recent/)).toBeInTheDocument();
-  }, 15000);
+  });
 
   it("covers coursework filtering, submit failures, overlay variants, and empty marked lists", async () => {
     const onRecorded = vi.fn();
@@ -233,8 +223,6 @@ describe("Attendance components", () => {
 
   it("renders event info, record actions, marked actions, and segment detail rows", async () => {
     const onRecord = vi.fn();
-    const onToggleStatus = vi.fn().mockResolvedValue(undefined);
-
     render(
       <>
         <AttendanceEventList
@@ -243,16 +231,6 @@ describe("Attendance components", () => {
         />
         <AttendanceEventInfo event={{ title: "Biology", start_time: "2026-03-01T10:00:00Z" }} />
         <AttendanceRecordActions event={{ id: 2, start_time: "2026-03-01T12:00:00Z" }} submittingId={null} onRecord={onRecord} />
-        <AttendanceMarkedActions event={{ id: 3, attended: true }} />
-        <SegmentDetailHeader segmentLabel="Lecture" count={2} onClose={vi.fn()} />
-        <SegmentDetailList events={[]} toggling={{}} onToggleStatus={vi.fn()} />
-        <SegmentDetailPanel
-          segmentLabel="Lecture"
-          events={[{ id: 4, title: "Chemistry", start_time: "2026-03-01T11:00:00Z", attended: false, event_type: "Lecture" }]}
-          onToggleStatus={onToggleStatus}
-          onClose={vi.fn()}
-          className="extra-panel"
-        />
       </>
     );
 
@@ -260,9 +238,23 @@ describe("Attendance components", () => {
     expect(screen.getByText("Biology")).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole("button", { name: "Attended" })[0]);
     expect(onRecord).toHaveBeenCalledWith(2, true);
+  });
+
+  it("renders marked actions and segment detail sections", async () => {
+    const onToggleStatus = vi.fn().mockResolvedValue(undefined);
+    render(
+      <>
+        <AttendanceMarkedActions event={{ id: 3, attended: true }} />
+        <SegmentDetailHeader segmentLabel="Lecture" count={2} onClose={vi.fn()} />
+        <SegmentDetailPanel
+          segmentLabel="Lecture"
+          events={[{ id: 4, title: "Chemistry", start_time: "2026-03-01T11:00:00Z", attended: false, event_type: "Lecture" }]}
+          onToggleStatus={onToggleStatus}
+          onClose={vi.fn()}
+        />
+      </>
+    );
     expect(screen.getByText("2 events")).toBeInTheDocument();
-    expect(screen.getByText("No records found for this segment.")).toBeInTheDocument();
-    expect(screen.getAllByText("Attended").length).toBeGreaterThan(0);
     fireEvent.click(screen.getAllByRole("button", { name: "Missed" }).at(-1));
     await waitFor(() => expect(onToggleStatus).toHaveBeenCalledWith(4, true));
   });

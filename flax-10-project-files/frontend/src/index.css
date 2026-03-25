@@ -21,7 +21,7 @@ html {
 
 /* Design system: Lexend for all headers and task titles */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading), "Lexend", system-ui, sans-serif;
+  font-family: var(--font-heading);
 }
 
 * {

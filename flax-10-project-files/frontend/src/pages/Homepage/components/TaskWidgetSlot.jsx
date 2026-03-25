@@ -1,11 +1,9 @@
-/*
- * Task widget slot.
- */
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import WidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
 import { TaskContextMenu } from "../../Tasks/components/TaskCard";
@@ -54,7 +52,7 @@ function TaskWidgetCard(props) {
 function TaskWidgetContent(props) {
   return (
     <div className={props.styles.taskWidgetContent}>
-      <TaskWidgetHeader count={props.taskWidgetDueTodayCount} taskStyles={props.styles} />
+      <TaskWidgetHeaderSection styles={props.styles} count={props.taskWidgetDueTodayCount} />
       <TaskWidgetList {...props} />
       <TaskWidgetCompletedSection {...props} />
       <TaskWidgetMenu {...props} />
@@ -62,15 +60,30 @@ function TaskWidgetContent(props) {
   );
 }
 
-function TaskWidgetHeader({ count, taskStyles }) {
+function TaskWidgetHeaderSection({ styles: s, count }) {
+  return (
+    <WidgetHeader
+      icon={CheckSquare}
+      title="Today's Tasks"
+      count={count}
+      actions={<GoToTasksButton styles={s} />}
+      className={s.taskWidgetWidgetHeader}
+    />
+  );
+}
+
+function GoToTasksButton({ styles: s }) {
   const navigate = useNavigate();
   return (
-    <div className={`${styles.widgetHeader} ${taskStyles.taskWidgetWidgetHeader}`}>
-      <div className={styles.widgetIconWrap}><CheckSquare size={17} strokeWidth={1.85} aria-hidden /></div>
-      <span className={styles.widgetTitle}>Today&apos;s Tasks</span>
-      <PrimaryButton type="button" size="small" pill onClick={() => navigate("/tasks?filter=today")} className={taskStyles.taskWidgetHeaderButton}>Go to all tasks</PrimaryButton>
-      {count > 0 && <span className={`${styles.widgetCount} ${taskStyles.taskWidgetHeaderCount}`}>{count}</span>}
-    </div>
+    <PrimaryButton
+      type="button"
+      size="small"
+      pill
+      onClick={() => navigate("/tasks?filter=today")}
+      className={s.taskWidgetHeaderButton}
+    >
+      Go to all tasks
+    </PrimaryButton>
   );
 }
 
@@ -148,10 +161,10 @@ function useTaskWidgetState(props) {
   return { ...taskGroups, ctxMenu, setCtxMenu, expanded, setExpanded, showCompleted, setShowCompleted };
 }
 
-function getTaskGroups(taskWidgetList, row) {
+function getTaskGroups(taskWidgetList, _row) {
   const incompleteTasks = taskWidgetList.filter((task) => !task.completed);
   const completedTasks = taskWidgetList.filter((task) => task.completed);
-  const visibleLimit = row === 1 ? 5 : 6;
+  const visibleLimit = 3;
   return {
     allTasksDone: taskWidgetList.length > 0 && taskWidgetList.every((task) => task.completed),
     completedTasks,
@@ -160,3 +173,4 @@ function getTaskGroups(taskWidgetList, row) {
     visibleCompleted: completedTasks,
   };
 }
+

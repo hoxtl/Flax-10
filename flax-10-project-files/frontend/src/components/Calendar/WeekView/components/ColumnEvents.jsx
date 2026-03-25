@@ -1,5 +1,6 @@
 import { DraggableEvent } from '../../DraggableEvent';
 import { calculateEventStyle } from '../../DayView/dayViewHelpers';
+import { getEventKey } from '../../utils/overlapUtils';
 import { SLOT_HEIGHT } from '../../calendarConstants';
 
 export function ColumnEvents({ events, date, readOnly }) {
@@ -7,7 +8,7 @@ export function ColumnEvents({ events, date, readOnly }) {
         <div className="column-events">
             {events.map(event => (
                 <DraggableEvent
-                    key={event.id}
+                    key={getEventKey(event)}
                     event={event}
                     style={calculateEventStyle(event, SLOT_HEIGHT, events, date)}
                     readOnly={readOnly}

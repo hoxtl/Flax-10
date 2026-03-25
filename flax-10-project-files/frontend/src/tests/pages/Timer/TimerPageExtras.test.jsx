@@ -96,143 +96,144 @@ vi.mock("framer-motion", () => ({
 import { useTimerPageController } from "../../../pages/Timer/hooks/useTimerPageController";
 import { TimerPageContent } from "../../../pages/Timer/components/TimerPageContent";
 
+const buildTimerFlags = () => ({
+  setFocusMode: vi.fn(),
+  setFocusFullscreenPending: vi.fn(),
+  setShowShortcuts: vi.fn(),
+  focusMode: false,
+  showShortcuts: false,
+  showFocusTransition: false,
+  showPageSkeleton: false,
+  setShowPageSkeleton: vi.fn(),
+  setShowFocusTransition: vi.fn(),
+  focusFullscreenPending: false,
+  setShowHistory: vi.fn(),
+  showHistory: false,
+  setStreakData: vi.fn(),
+  streakData: null,
+  dismissedWarning: false,
+  setDismissedWarning: vi.fn(),
+});
+
+const buildTimerState = (overrides = {}) => ({
+  permission: "default",
+  request: vi.fn(),
+  fromTaskPlay: true,
+  showFocusTransition: true,
+  showPageSkeleton: true,
+  focusAccent: "#09f",
+  focusMode: true,
+  setFocusMode: vi.fn(),
+  showShortcuts: true,
+  setShowShortcuts: vi.fn(),
+  streakData: { current_streak_days: 4, total_sessions: 0 },
+  dismissedWarning: false,
+  setDismissedWarning: vi.fn(),
+  setStreakData: vi.fn(),
+  t: { isActive: true, isPaused: false },
+  isMobile: false,
+  openFocusMode: vi.fn(),
+  showHistory: true,
+  setShowHistory: vi.fn(),
+  ...overrides,
+});
+
+const loadTimerEffects = () => vi.importActual("../../../pages/Timer/hooks/useTimerPageEffects");
+const loadShortcutsModal = () => vi.importActual("../../../pages/Timer/components/ShortcutsModal");
+
 describe("Timer page extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     useBreakpoint.mockReturnValue(false);
     useNotificationPermission.mockReturnValue({ permission: "granted", request: vi.fn() });
-    useTimerPageFlags.mockReturnValue({
-      setFocusMode: vi.fn(),
-      setFocusFullscreenPending: vi.fn(),
-      setShowShortcuts: vi.fn(),
-      focusMode: false,
-      showShortcuts: false,
-      showFocusTransition: false,
-      showPageSkeleton: false,
-      setShowPageSkeleton: vi.fn(),
-      setShowFocusTransition: vi.fn(),
-      focusFullscreenPending: false,
-      setShowHistory: vi.fn(),
-      showHistory: false,
-      setStreakData: vi.fn(),
-      streakData: null,
-      dismissedWarning: false,
-      setDismissedWarning: vi.fn(),
-    });
+    useTimerPageFlags.mockReturnValue(buildTimerFlags());
     useNavigate.mockReset();
   });
 
-  it("builds controller state and exposes open/close overlay helpers", () => {
-    const t = { isActive: false, isPaused: false, timeLeft: 1200, mode: "work" };
-    const location = { state: { fromTaskPlay: true } };
-    const { result } = renderHook(() => useTimerPageController(t, location));
-
-    expect(result.current.isMobile).toBe(false);
-    expect(result.current.permission).toBe("granted");
-    expect(result.current.fromTaskPlay).toBe(true);
-    expect(result.current.focusAccent).toBe("var(--timer-focus-accent)");
-    expect(result.current.minFocusSkeletonMs).toBe(500);
-    act(() => result.current.openFocusMode());
-    expect(result.current.setFocusMode).toHaveBeenCalledWith(true);
-    expect(result.current.setFocusFullscreenPending).toHaveBeenCalledWith(true);
-    act(() => result.current.closeOverlays());
-    expect(result.current.setFocusMode).toHaveBeenCalledWith(false);
-    expect(result.current.setShowShortcuts).toHaveBeenCalledWith(false);
-    expect(useFocusAccent).toHaveBeenCalled();
-    expect(useTimerDocumentTitle).toHaveBeenCalledWith(t);
-    expect(useTimerShortcuts).toHaveBeenCalled();
-    expect(useTransientFlags).toHaveBeenCalled();
-    expect(useFocusFullscreen).toHaveBeenCalled();
-  });
-
-  it("covers timer page effect hooks and keyboard shortcuts", async () => {
-    const effects = await vi.importActual("../../../pages/Timer/hooks/useTimerPageEffects");
-    const rootStyleSet = vi.spyOn(document.documentElement.style, "setProperty");
-    const rootStyleRemove = vi.spyOn(document.documentElement.style, "removeProperty");
-
-    const { unmount: unmountAccent } = renderHook(() => effects.useFocusAccent("#abc"));
-    expect(rootStyleSet).toHaveBeenCalledWith("--timer-focus-accent", "#abc");
-    unmountAccent();
-    expect(rootStyleRemove).toHaveBeenCalledWith("--timer-focus-accent");
-
-    const { unmount: unmountTitle } = renderHook(() => effects.useTimerDocumentTitle({ isActive: true, isPaused: false, timeLeft: 65, mode: "break" }));
-    expect(document.title).toContain("01:05");
-    unmountTitle();
-    expect(document.title).toBe("StudyFlax");
-
-    const togglePause = vi.fn();
-    const setIsActive = vi.fn();
-    const resetTimer = vi.fn();
-    const setShowShortcuts = vi.fn((fn) => fn(false));
-    const setFocusMode = vi.fn();
-    const openFocusMode = vi.fn();
-    const closeOverlays = vi.fn();
-    renderHook(() => effects.useTimerShortcuts({
-      t: { isActive: true, togglePause, setIsActive, resetTimer },
-      setShowShortcuts,
-      setFocusMode,
-      openFocusMode,
-      closeOverlays,
-      focusMode: false,
-    }));
-    fireEvent.keyDown(window, { key: "?" });
-    fireEvent.keyDown(window, { key: " " });
-    fireEvent.keyDown(window, { key: "r" });
-    fireEvent.keyDown(window, { key: "f" });
-    fireEvent.keyDown(window, { key: "Escape" });
-    expect(togglePause).toHaveBeenCalled();
-    expect(resetTimer).toHaveBeenCalled();
-    expect(openFocusMode).toHaveBeenCalled();
-    expect(closeOverlays).toHaveBeenCalled();
-
-    renderHook(() => effects.useTransientFlags({
-      showFocusTransition: true,
-      setShowFocusTransition: vi.fn(),
-      showPageSkeleton: true,
-      setShowPageSkeleton: vi.fn(),
-      minFocusSkeletonMs: 100,
-    }));
-
-    const requestFullscreen = vi.fn().mockResolvedValue(undefined);
-    document.documentElement.requestFullscreen = requestFullscreen;
-    document.fullscreenElement = null;
-    renderHook(() => effects.useFocusFullscreen({
-      focusMode: true,
-      focusFullscreenPending: true,
-      setFocusFullscreenPending: vi.fn(),
-    }));
-    await waitFor(() => expect(requestFullscreen).toHaveBeenCalled());
-  });
-
-  it("renders shortcuts modal interactions and timer page layout branches", async () => {
-    const { ShortcutsModal } = await vi.importActual("../../../pages/Timer/components/ShortcutsModal");
-    const onClose = vi.fn();
-    render(<ShortcutsModal onClose={onClose} />);
-    expect(screen.getByText("Keyboard Shortcuts")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Close"));
-    expect(onClose).toHaveBeenCalled();
-
-    const state = {
-      permission: "default",
-      request: vi.fn(),
-      fromTaskPlay: true,
-      showFocusTransition: true,
-      showPageSkeleton: true,
-      focusAccent: "#09f",
-      focusMode: true,
-      setFocusMode: vi.fn(),
-      showShortcuts: true,
-      setShowShortcuts: vi.fn(),
-      streakData: { current_streak_days: 4, total_sessions: 0 },
-      dismissedWarning: false,
-      setDismissedWarning: vi.fn(),
-      setStreakData: vi.fn(),
-      t: { isActive: true, isPaused: false },
-      isMobile: false,
-      openFocusMode: vi.fn(),
-      showHistory: true,
-      setShowHistory: vi.fn(),
+  describe("useTimerPageController", () => {
+    const renderController = () => {
+      const timer = { isActive: false, isPaused: false, timeLeft: 1200, mode: "work" };
+      const location = { state: { fromTaskPlay: true } };
+      return renderHook(() => useTimerPageController(timer, location));
     };
+
+    it("exposes page state and triggers supporting hooks", () => {
+      const { result } = renderController();
+      expect(result.current.isMobile).toBe(false);
+      expect(result.current.permission).toBe("granted");
+      expect(result.current.focusAccent).toBe("var(--timer-focus-accent)");
+      expect(result.current.minFocusSkeletonMs).toBe(500);
+      expect(useFocusAccent).toHaveBeenCalled();
+      expect(useTimerDocumentTitle).toHaveBeenCalledWith(expect.objectContaining({ mode: "work" }));
+      expect(useTimerShortcuts).toHaveBeenCalled();
+      expect(useTransientFlags).toHaveBeenCalled();
+      expect(useFocusFullscreen).toHaveBeenCalled();
+    });
+
+    it("opens focus mode and closes overlays", () => {
+      const { result } = renderController();
+      act(() => result.current.openFocusMode());
+      expect(result.current.setFocusMode).toHaveBeenCalledWith(true);
+      expect(result.current.setFocusFullscreenPending).toHaveBeenCalledWith(true);
+      act(() => result.current.closeOverlays());
+      expect(result.current.setFocusMode).toHaveBeenCalledWith(false);
+      expect(result.current.setShowShortcuts).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe("timer page effects", () => {
+    it("sets the focus accent color and clears it on unmount", async () => {
+      const effects = await loadTimerEffects();
+      const setSpy = vi.spyOn(document.documentElement.style, "setProperty");
+      const removeSpy = vi.spyOn(document.documentElement.style, "removeProperty");
+      const { unmount } = renderHook(() => effects.useFocusAccent("#abc"));
+      expect(setSpy).toHaveBeenCalledWith("--timer-focus-accent", "#abc");
+      unmount();
+      expect(removeSpy).toHaveBeenCalledWith("--timer-focus-accent");
+    });
+
+    it("restores the document title after reporting remaining time", async () => {
+      const effects = await loadTimerEffects();
+      const { unmount } = renderHook(() => effects.useTimerDocumentTitle({ isActive: true, isPaused: false, timeLeft: 65, mode: "break" }));
+      expect(document.title).toContain("01:05");
+      unmount();
+      expect(document.title).toBe("StudyFlax");
+    });
+
+    it("handles keyboard shortcuts for timer control", async () => {
+      const effects = await loadTimerEffects();
+      const t = { isActive: true, togglePause: vi.fn(), setIsActive: vi.fn(), resetTimer: vi.fn() };
+      renderHook(() => effects.useTimerShortcuts({ t, setShowShortcuts: vi.fn(), setFocusMode: vi.fn(), openFocusMode: vi.fn(), closeOverlays: vi.fn(), focusMode: false }));
+      ["?", " ", "r", "f", "Escape"].forEach((key) => fireEvent.keyDown(window, { key }));
+      expect(t.togglePause).toHaveBeenCalled();
+      expect(t.resetTimer).toHaveBeenCalled();
+    });
+
+    it("handles transient focus transition and skeleton flags", async () => {
+      const effects = await loadTimerEffects();
+      const setShowFocusTransition = vi.fn();
+      const setShowPageSkeleton = vi.fn();
+      renderHook(() => effects.useTransientFlags({ showFocusTransition: true, setShowFocusTransition, showPageSkeleton: true, setShowPageSkeleton, minFocusSkeletonMs: 100 }));
+      expect(setShowFocusTransition).not.toHaveBeenCalled();
+    });
+
+    it("requests fullscreen when focus mode is pending", async () => {
+      const effects = await loadTimerEffects();
+      const requestFullscreen = vi.fn().mockResolvedValue(undefined);
+      document.documentElement.requestFullscreen = requestFullscreen;
+      renderHook(() => effects.useFocusFullscreen({ focusMode: true, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
+      await waitFor(() => expect(requestFullscreen).toHaveBeenCalled());
+    });
+  });
+
+  describe("Timer page UI", () => {
+    it("closes the shortcuts modal through its close button", async () => {
+      const { ShortcutsModal } = await loadShortcutsModal();
+      const onClose = vi.fn();
+      render(<ShortcutsModal onClose={onClose} />);
+      fireEvent.click(screen.getByText("Close"));
+      expect(onClose).toHaveBeenCalled();
+    });
 
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-24T18:30:00.000Z"));

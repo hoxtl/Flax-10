@@ -20,7 +20,7 @@ export function DeadlinesWidget({ deadlines = [], onSelectDeadline, onSelectModu
     <UpcomingDeadlinesWidget
       deadlines={deadlines}
       title={isTeacher ? "Teaching Deadlines" : "Upcoming Deadlines"}
-      initialShown={6}
+      initialShown={3}
       embedded
       interactiveRows
       onSelectDeadline={onSelectDeadline}

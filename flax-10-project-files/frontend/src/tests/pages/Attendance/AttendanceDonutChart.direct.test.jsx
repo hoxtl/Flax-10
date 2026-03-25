@@ -27,37 +27,26 @@ vi.mock("../../../pages/Attendance/utils/attendanceChartUtils", () => ({
 }));
 
 describe("AttendanceDonutChart", () => {
-  it("passes the built series and shared chart props into PieChart", () => {
+  it("calls buildDonutSeries and buildPieClickHandler with correct arguments", () => {
     const onSegmentClick = vi.fn();
     const valueFormatter = vi.fn();
-    const clickHandler = vi.fn();
-    const builtSeries = [{ data: [{ label: "Attended", value: 3 }] }];
+    const data = [{ label: "Attended", value: 3 }];
+    
+    render(<AttendanceDonutChart chart="overall" data={data} onSegmentClick={onSegmentClick} valueFormatter={valueFormatter} />);
+    
+    expect(buildDonutSeriesMock).toHaveBeenCalledWith(data, valueFormatter);
+    expect(buildPieClickHandlerMock).toHaveBeenCalledWith(onSegmentClick, "overall", data);
+  });
 
-    buildDonutSeriesMock.mockReturnValue(builtSeries);
-    buildPieClickHandlerMock.mockReturnValue(clickHandler);
-
-    render(
-      <AttendanceDonutChart
-        chart="overall"
-        data={[{ label: "Attended", value: 3 }]}
-        onSegmentClick={onSegmentClick}
-        valueFormatter={valueFormatter}
-      />,
-    );
-
-    expect(buildDonutSeriesMock).toHaveBeenCalledWith(
-      [{ label: "Attended", value: 3 }],
-      valueFormatter,
-    );
-    expect(buildPieClickHandlerMock).toHaveBeenCalledWith(
-      onSegmentClick,
-      "overall",
-      [{ label: "Attended", value: 3 }],
-    );
+  it("passes correct height and legend settings to PieChart", () => {
+    render(<AttendanceDonutChart chart="overall" data={[]} />);
     expect(screen.getByTestId("height")).toHaveTextContent("220");
-    expect(screen.getByTestId("series")).toHaveTextContent("Attended");
-    expect(screen.getByTestId("margin")).toHaveTextContent('"top":10');
     expect(screen.getByTestId("legend-hidden")).toHaveTextContent("true");
+  });
+
+  it("passes correct margin and styles to PieChart", () => {
+    render(<AttendanceDonutChart chart="overall" data={[]} />);
+    expect(screen.getByTestId("margin")).toHaveTextContent('"top":10');
     expect(screen.getByTestId("sx")).toHaveTextContent("MuiChartsLegend-label");
   });
 

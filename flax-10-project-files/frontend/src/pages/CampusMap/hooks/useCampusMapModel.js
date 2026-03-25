@@ -2,9 +2,12 @@
  * Campus map page model.
  */
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import { reverseGeocode } from "../../../api/geocodeApi";
+import { geocodeAddress } from "../../../api/geocodeApi";
+import { getEvents } from "../../../api/eventApi";
 import { tflService } from "../../../api/tflApi";
 import { useCampusMapRefs } from "./useCampusMapRefs";
 import { useCampusMapState } from "./useCampusMapState";
@@ -15,6 +18,8 @@ import { clearRouteSource, cleanupMap, createMapClickHandler, displayRoute, fetc
 
 const GEOLOCATION_TARGET_START = "start";
 const GEOLOCATION_TARGET_DESTINATION = "destination";
+const UPCOMING_WINDOW_HOURS = 2;
+const UPCOMING_REFRESH_MS = 60000;
 
 function resetRouteState(setRoutes) {
   setRoutes((current) => ({ ...current, routeInfo: null, tflRouteInfo: null }));
@@ -123,6 +128,59 @@ function handleJourneyCalculate(manualDestination, map, selectedCampus, setSelec
   };
 }
 
+function isUpcomingEvent(event, now, horizon) {
+  const start = new Date(event?.start_time);
+  if (Number.isNaN(start.getTime())) return false;
+  if (start > horizon) return false;
+  if (start >= now) return true;
+  const end = event?.end_time ? new Date(event.end_time) : null;
+  if (end && !Number.isNaN(end.getTime())) return end >= now;
+  return false;
+}
+
+function sortByStartTime(a, b) {
+  return new Date(a.start_time) - new Date(b.start_time);
+}
+
+function selectUpcomingEvents(events, now) {
+  const horizon = new Date(now.getTime() + UPCOMING_WINDOW_HOURS * 60 * 60 * 1000);
+  return (events || [])
+    .filter((event) => event?.location && isUpcomingEvent(event, now, horizon))
+    .sort(sortByStartTime)
+    .slice(0, 5);
+}
+
+function getUpcomingRange(now) {
+  const horizon = new Date(now.getTime() + UPCOMING_WINDOW_HOURS * 60 * 60 * 1000);
+  return { start: now.toISOString(), end: horizon.toISOString() };
+}
+
+function loadUpcomingEvents(setUpcomingEvents, activeRef) {
+  const now = new Date();
+  return getEvents(getUpcomingRange(now))
+    .then((events = []) => {
+      if (!activeRef.current) return;
+      setUpcomingEvents(selectUpcomingEvents(events, now));
+    });
+}
+
+function useUpcomingEvents(setUpcomingEvents) {
+  useEffect(() => {
+    const activeRef = { current: true };
+    const run = () => loadUpcomingEvents(setUpcomingEvents, activeRef)
+      .catch(() => activeRef.current && setUpcomingEvents([]));
+    run();
+    const interval = window.setInterval(run, UPCOMING_REFRESH_MS);
+    const onVisible = () => document.visibilityState === "visible" && run();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      activeRef.current = false;
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [setUpcomingEvents]);
+}
+
 function useMapSetup(refs, setForm, setSelection, setUi) {
   useEffect(() => {
     const mapRef = refs.map, containerRef = refs.mapContainer;
@@ -154,7 +212,147 @@ function useRoutes(refs, selection, setRoutes) {
 }
 
 export function useCampusMapModel() {
-  const refs = useCampusMapRefs(), state = useCampusMapState(), { disruptions, loading: loadingDisruptions } = useDisruptions(), { userHome } = useHomeAddress();
-  useResponsiveCampusMap(state.setUi, state.ui.isMobile); useMapSetup(refs, state.setForm, state.setSelection, state.setUi); useMapResize(state.ui.mapLoaded, state.ui.isMobile, refs.map); useMarkerSync(refs, state.selection, state.setForm, state.setSelection, state.ui, userHome); useRoutes(refs, state.selection, state.setRoutes);
-  return { clearAllSelections: () => clearAllSelections(refs, state.setForm, state.setRoutes, state.setSelection), clearCustomDestination: () => state.setSelection((current) => ({ ...current, customDestination: null })), disruptions, flyToCampus: (campus) => flyToCampus(refs.map, campus), form: state.form, handleClearCampus: () => clearCampus(refs, state.setForm, state.setRoutes, state.setSelection), handleClearStart: () => clearStart(refs, state.setForm, state.setRoutes, state.setSelection), handleGeolocate: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi), handleGeolocateDestination: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi, GEOLOCATION_TARGET_DESTINATION), handleGeolocateStart: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi, GEOLOCATION_TARGET_START), handleSelectCampus: (campus) => selectCampus(refs.map, campus, state.setForm, state.setSelection), handleUserJourneyCalculate: handleJourneyCalculate(state.form.manualDestination, refs.map, state.selection.selectedCampus, state.setSelection), loadingDisruptions, mapContainer: refs.mapContainer, routes: state.routes, selection: state.selection, setManualDestination: (value) => setManualState("manualDestination", value, state.setForm), setManualStart: (value) => setManualState("manualStart", value, state.setForm), showInitialSkeleton: !state.ui.mapLoaded || !state.ui.minSkeletonElapsed, toggleTflInstructions: () => togglePanel("tflInstructions", state.setUi), toggleWalkingInstructions: () => togglePanel("walkingInstructions", state.setUi), ui: state.ui };
+  const context = useCampusMapContext();
+  useCampusMapLifecycles(context);
+  useDestinationQuerySync(context);
+  const handleSelectUpcomingEvent = useUpcomingEventHandler(context);
+  return buildCampusMapApi(context, handleSelectUpcomingEvent);
+}
+
+function useCampusMapContext() {
+  const refs = useCampusMapRefs();
+  const state = useCampusMapState();
+  const { disruptions, loading: loadingDisruptions } = useDisruptions();
+  const { userHome } = useHomeAddress();
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const { search } = useLocation();
+  const lastDestinationRef = useRef(null);
+  return { disruptions, lastDestinationRef, loadingDisruptions, refs, search, setUpcomingEvents, state, upcomingEvents, userHome };
+}
+
+function useCampusMapLifecycles(context) {
+  const { refs, setUpcomingEvents, state, userHome } = context;
+  useResponsiveCampusMap(state.setUi, state.ui.isMobile);
+  useMapSetup(refs, state.setForm, state.setSelection, state.setUi);
+  useMapResize(state.ui.mapLoaded, state.ui.isMobile, refs.map);
+  useMarkerSync(refs, state.selection, state.setForm, state.setSelection, state.ui, userHome);
+  useRoutes(refs, state.selection, state.setRoutes);
+  useUpcomingEvents(setUpcomingEvents);
+}
+
+function useDestinationQuerySync(context) {
+  const { lastDestinationRef, refs, search, state } = context;
+  const destinationQuery = getDestinationQuery(search);
+  useEffect(() => {
+    const trimmed = destinationQuery.trim();
+    if (!trimmed || trimmed === lastDestinationRef.current) return;
+    lastDestinationRef.current = trimmed;
+    state.setForm((current) => ({ ...current, manualDestination: trimmed }));
+    applyGeocodeLookup(trimmed, trimmed, state.setSelection, refs.map);
+  }, [destinationQuery, lastDestinationRef, refs.map, state.setForm, state.setSelection]);
+}
+
+function useUpcomingEventHandler(context) {
+  const { refs, state } = context;
+  return useCallback((event) => {
+    const trimmed = getEventLocation(event);
+    if (!trimmed) return;
+    state.setForm((current) => ({ ...current, manualDestination: trimmed }));
+    applyGeocodeLookup(trimmed, event?.title || trimmed, state.setSelection, refs.map);
+  }, [refs.map, state.setForm, state.setSelection]);
+}
+
+function buildCampusMapApi(context, handleSelectUpcomingEvent) {
+  return {
+    ...createSelectionActions(context, handleSelectUpcomingEvent),
+    ...createGeolocationActions(context),
+    ...createManualInputActions(context),
+    ...createUiSnapshot(context),
+  };
+}
+
+function createSelectionActions(context, handleSelectUpcomingEvent) {
+  const { refs, state } = context;
+  return {
+    clearAllSelections: () => clearAllSelections(refs, state.setForm, state.setRoutes, state.setSelection),
+    clearCustomDestination: () => state.setSelection((current) => ({ ...current, customDestination: null })),
+    flyToCampus: (campus) => flyToCampus(refs.map, campus),
+    handleClearCampus: () => clearCampus(refs, state.setForm, state.setRoutes, state.setSelection),
+    handleClearStart: () => clearStart(refs, state.setForm, state.setRoutes, state.setSelection),
+    handleSelectCampus: (campus) => selectCampus(refs.map, campus, state.setForm, state.setSelection),
+    handleSelectUpcomingEvent,
+    handleUserJourneyCalculate: handleJourneyCalculate(state.form.manualDestination, refs.map, state.selection.selectedCampus, state.setSelection),
+  };
+}
+
+function createGeolocationActions(context) {
+  const { refs, state } = context;
+  return {
+    handleGeolocate: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi),
+    handleGeolocateDestination: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi, GEOLOCATION_TARGET_DESTINATION),
+    handleGeolocateStart: () => handleGeolocate(refs.map, state.setForm, state.setSelection, state.setUi, GEOLOCATION_TARGET_START),
+  };
+}
+
+function createManualInputActions(context) {
+  const { state } = context;
+  return {
+    setManualDestination: (value) => setManualState("manualDestination", value, state.setForm),
+    setManualStart: (value) => setManualState("manualStart", value, state.setForm),
+  };
+}
+
+function createUiSnapshot(context) {
+  const { disruptions, loadingDisruptions, refs, state, upcomingEvents } = context;
+  return {
+    disruptions,
+    form: state.form,
+    loadingDisruptions,
+    mapContainer: refs.mapContainer,
+    routes: state.routes,
+    selection: state.selection,
+    showInitialSkeleton: !state.ui.mapLoaded || !state.ui.minSkeletonElapsed,
+    toggleTflInstructions: () => togglePanel("tflInstructions", state.setUi),
+    toggleWalkingInstructions: () => togglePanel("walkingInstructions", state.setUi),
+    ui: state.ui,
+    upcomingEvents,
+  };
+}
+
+function getDestinationQuery(search) {
+  return new URLSearchParams(search).get("destination") || "";
+}
+
+function getEventLocation(event) {
+  if (!event?.location) return "";
+  return String(event.location).trim();
+}
+
+function applyGeocodeLookup(query, title, setSelection, mapRef) {
+  geocodeAddress(query)
+    .then((coords) => handleGeocodeCoords(coords, query, title, setSelection, mapRef))
+    .catch(() => {});
+}
+
+function handleGeocodeCoords(coords, query, title, setSelection, mapRef) {
+  if (!coords) return;
+  setSelection((current) => ({
+    ...current,
+    customDestination: buildCustomDestination(query, coords, title),
+    selectedCampus: null,
+  }));
+  focusMapOnCoords(mapRef, coords);
+}
+
+function buildCustomDestination(address, coords, title) {
+  return {
+    address,
+    lat: coords.latitude,
+    lng: coords.longitude,
+    name: title,
+  };
+}
+
+function focusMapOnCoords(mapRef, coords) {
+  mapRef.current?.flyTo({ center: [coords.longitude, coords.latitude], duration: 1200, pitch: 55, zoom: 15 });
 }

@@ -17,40 +17,37 @@ describe("history panel extras", () => {
     expect(filterVisibleBlocks([{ totalDuration: 299, sessions: [{ status: "Complete" }, { status: "Incomplete" }] }])).toHaveLength(1);
   });
 
-  it("covers history rail fallbacks for partial and completed states", () => {
+  it("renders history rail with partial session fallback", () => {
     render(
       <HistoryRailSection
         group={{
           label: "Earlier",
-          entries: [
-            {
-              id: "x",
-              task: "",
-              totalDuration: 0,
-              totalBreak: 0,
-              startTime: null,
-              endTime: null,
-              sessions: [],
-            },
-            {
-              id: "y",
-              task: "Complete block",
-              totalDuration: 60,
-              totalBreak: 0,
-              startTime: null,
-              endTime: null,
-              sessions: [{ status: "Complete" }],
-            },
-          ],
+          entries: [{
+            id: "x", task: "", totalDuration: 0, totalBreak: 0,
+            startTime: null, endTime: null, sessions: [],
+          }],
         }}
       />,
     );
-
     expect(screen.getByText("Focus Session")).toBeInTheDocument();
     expect(screen.getByText("Partial")).toBeInTheDocument();
-    expect(screen.getByText("Completed")).toBeInTheDocument();
     expect(screen.getByText("0/1 sessions")).toBeInTheDocument();
-    expect(screen.getAllByText("General")).toHaveLength(2);
+  });
+
+  it("renders history rail with completed session state", () => {
+    render(
+      <HistoryRailSection
+        group={{
+          label: "Recent",
+          entries: [{
+            id: "y", task: "Complete block", totalDuration: 60, totalBreak: 0,
+            startTime: null, endTime: null, sessions: [{ status: "Complete" }],
+          }],
+        }}
+      />,
+    );
+    expect(screen.getByText("Completed")).toBeInTheDocument();
+    expect(screen.getByText("General")).toBeInTheDocument();
   });
 
   it("shows break duration badges when a block includes break time", () => {

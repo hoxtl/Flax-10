@@ -104,6 +104,9 @@ describe("SearchBar", () => {
     unregisterTarget(high);
   });
 
+<<<<<<< HEAD
+  it("ignores hidden and disabled targets", () => {
+=======
   it("breaks ties by the left-most visible target when items share the same top position", () => {
     const left = makeVisibleInput(10, 20);
     const right = makeVisibleInput(10, 90);
@@ -122,41 +125,42 @@ describe("SearchBar", () => {
   });
 
   it("ignores hidden, disconnected, disabled, and readOnly targets and cleans up on unmount", () => {
+>>>>>>> main
     const hidden = makeVisibleInput();
     Object.defineProperty(hidden, "offsetParent", { configurable: true, get: () => null });
     hidden.focus = vi.fn();
-
     const disabled = makeVisibleInput();
     disabled.disabled = true;
     disabled.focus = vi.fn();
 
-    const readonly = makeVisibleInput();
-    readonly.readOnly = true;
-    readonly.focus = vi.fn();
-
-    const detached = document.createElement("input");
-    detached.focus = vi.fn();
-
     registerTarget(hidden);
     registerTarget(disabled);
-    registerTarget(readonly);
-    registerTarget(detached);
-
     fireEvent.keyDown(document, { key: "/", target: document.body });
     expect(hidden.focus).not.toHaveBeenCalled();
     expect(disabled.focus).not.toHaveBeenCalled();
-    expect(readonly.focus).not.toHaveBeenCalled();
-    expect(detached.focus).not.toHaveBeenCalled();
-
     unregisterTarget(hidden);
     unregisterTarget(disabled);
+  });
+
+  it("ignores readonly and detached targets", () => {
+    const readonly = makeVisibleInput();
+    readonly.readOnly = true;
+    readonly.focus = vi.fn();
+    const detached = document.createElement("input");
+    detached.focus = vi.fn();
+
+    registerTarget(readonly);
+    registerTarget(detached);
+    fireEvent.keyDown(document, { key: "/", target: document.body });
+    expect(readonly.focus).not.toHaveBeenCalled();
+    expect(detached.focus).not.toHaveBeenCalled();
     unregisterTarget(readonly);
     unregisterTarget(detached);
+  });
 
-    const addSpy = vi.spyOn(document, "addEventListener");
+  it("removes document keydown listener on unmount", () => {
     const removeSpy = vi.spyOn(document, "removeEventListener");
     const { unmount } = render(<SearchBar value="" enableSlashShortcut />);
-    expect(screen.getByTestId("search-input")).toBeInTheDocument();
     unmount();
     expect(removeSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
   });

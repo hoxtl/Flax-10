@@ -118,10 +118,10 @@
     font-size: 0.65rem;
     font-weight: 600;
     padding: 1px 2px;
-    background-color: transparent;
+    background-color: var(--dot-bg, transparent);
     border: none;
     border-radius: 0;
-    color: var(--text);
+    color: var(--dot-text, var(--text));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -156,26 +156,25 @@ describe("Timer sections", () => {
     expect(screen.queryByText("Break modal")).not.toBeInTheDocument();
   });
 
-  it("renders focus overlay, right panel tabs, and main section actions", () => {
+  it("renders and interacts with the focus overlay", () => {
     const onExitFocus = vi.fn();
-    const onOpenHistory = vi.fn();
-    const onOpenFocus = vi.fn();
-
-    render(
-      <>
-        <FocusOverlayContent t={t} onExitFocus={onExitFocus} />
-        <RightPanel t={t} />
-        <MainSection t={t} onOpenHistory={onOpenHistory} onOpenFocus={onOpenFocus} isMobile={true} />
-      </>
-    );
-
+    render(<FocusOverlayContent t={t} onExitFocus={onExitFocus} />);
     fireEvent.click(screen.getByText("Exit Focus"));
     expect(onExitFocus).toHaveBeenCalled();
+  });
 
+  it("renders and interacts with the right panel tabs", () => {
+    render(<RightPanel t={t} />);
     fireEvent.click(screen.getByText("Configuration"));
     fireEvent.click(screen.getByText("History"));
     expect(screen.getByText("Inline sound panel")).toBeInTheDocument();
+  });
 
+  it("renders and interacts with main section actions", () => {
+    const onOpenHistory = vi.fn();
+    const onOpenFocus = vi.fn();
+    render(<MainSection t={t} onOpenHistory={onOpenHistory} onOpenFocus={onOpenFocus} isMobile={true} />);
+    
     fireEvent.click(screen.getByText("Open focus"));
     fireEvent.click(screen.getByText("Pause timer"));
     fireEvent.click(screen.getByText("Reset timer"));

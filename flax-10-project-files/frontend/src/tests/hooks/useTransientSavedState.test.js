@@ -32,31 +32,23 @@ describe("useTransientSavedState", () => {
     expect(result.current).toBe(false);
   });
 
-  it("cleans up the previous timer when the save signal changes again", () => {
+  it("refreshes the timeout when a new signal is provided", () => {
     vi.useFakeTimers();
-
-    const { result, rerender } = renderHook(
-      ({ signal, duration }) => useTransientSavedState(signal, duration),
-      { initialProps: { signal: 1, duration: 100 } },
-    );
-
+    const { result, rerender } = renderHook(({ s }) => useTransientSavedState(s, 100), { initialProps: { s: 1 } });
     expect(result.current).toBe(true);
-
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
-
-    rerender({ signal: 2, duration: 100 });
+    act(() => { vi.advanceTimersByTime(50); });
+    rerender({ s: 2 });
     expect(result.current).toBe(true);
-
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
+    act(() => { vi.advanceTimersByTime(50); });
     expect(result.current).toBe(true);
+  });
 
-    act(() => {
-      vi.advanceTimersByTime(50);
-    });
+  it("clears the state after the refreshed timeout expires", () => {
+    vi.useFakeTimers();
+    const { result, rerender } = renderHook(({ s }) => useTransientSavedState(s, 100), { initialProps: { s: 1 } });
+    act(() => { vi.advanceTimersByTime(50); });
+    rerender({ s: 2 });
+    act(() => { vi.advanceTimersByTime(100); });
     expect(result.current).toBe(false);
   });
 });

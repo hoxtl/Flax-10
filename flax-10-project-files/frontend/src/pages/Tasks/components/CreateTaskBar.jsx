@@ -5,12 +5,13 @@
 import AnimatedDropdown from "../../../components/common/AnimatedDropdown";
 import { SleepWarningModal } from "../../../components/common/SleepWarningModal";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
+import EstimatedDurationControl from "../../../components/common/EstimatedDurationControl/EstimatedDurationControl";
 import useCreateTaskBar from "../hooks/useCreateTaskBar";
 import styles from "./CreateTaskBar.module.css";
 
-const DURATION_OPTIONS = [
-  { value: 1, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
-  { value: 2, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
+const DURATION_PRESETS = [
+  { value: 25, label: "25m", ariaLabel: "25 minutes (1 Pomodoro block)" },
+  { value: 50, label: "50m", ariaLabel: "50 minutes (2 Pomodoro blocks)" },
 ];
 
 function CreateTaskBarInput({ styles: s, title, setTitle, saving, inputRef, externalInputRef, setInputFocused, onBlur, onKeyDown }) {
@@ -19,19 +20,6 @@ function CreateTaskBarInput({ styles: s, title, setTitle, saving, inputRef, exte
       <input ref={externalInputRef ?? inputRef} type="text" className={s.input} placeholder="Quick add: what needs to be done?" value={title} onChange={(e) => setTitle(e.target.value)} onFocus={() => setInputFocused(true)} onBlur={onBlur} onKeyDown={onKeyDown} aria-label="Quick add task" />
       {title.trim() && <PrimaryButton type="submit" className={s.addBtn} disabled={saving || !title.trim()} aria-label="Add task">{saving ? "…" : "Add"}</PrimaryButton>}
     </div>
-  );
-}
-
-function DurationGroup({ styles: s, estimatedBlocks, setEstimatedBlocks }) {
-  return (
-    <>
-      <span className={s.optionsRowLabel}>Est. time</span>
-      <div className={s.durationGroup} role="group" aria-label="Estimated duration">
-        {DURATION_OPTIONS.map(({ value, label, ariaLabel }) => (
-          <button key={value} type="button" className={`${s.durationBtn} ${estimatedBlocks === value ? s.durationBtnActive : ""}`} onClick={() => setEstimatedBlocks(value)} aria-label={ariaLabel} aria-pressed={estimatedBlocks === value}>{label}</button>
-        ))}
-      </div>
-    </>
   );
 }
 
@@ -61,24 +49,95 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }
   );
 }
 
-function CreateTaskBarOptions({ styles: s, showOptions, estimatedBlocks, setEstimatedBlocks, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
+function CreateTaskBarOptions(props) {
+  const vm = buildOptionsRowViewModel(props);
   return (
-    <div className={s.optionsRowWrapper}>
-      <div className={`${s.optionsRow} ${showOptions ? s.optionsRowOpen : ""}`}>
-        {!isReadingList && (
-          <DurationGroup styles={s} estimatedBlocks={estimatedBlocks} setEstimatedBlocks={setEstimatedBlocks} />
-        )}
-        {isReadingList && (
-          <PageCountField styles={s} pageCount={pageCount} setPageCount={setPageCount} />
-        )}
-        <span className={s.optionsRowDivider} aria-hidden />
-        <span className={s.optionsRowLabel}>Module</span>
-        <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
-          <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
-        </div>
-        <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
-        </div>
+    <div className={props.styles.optionsRowWrapper}>
+      <div className={vm.rowClass}>
+        {vm.primaryField}
+        <TaskBarDropdownFields {...props} />
+      </div>
     </div>
+  );
+}
+
+function TaskBarDropdownFields(props) {
+  return (
+    <>
+      <ModuleDropdownField
+        moduleId={props.moduleId}
+        setModuleId={props.setModuleId}
+        moduleOptions={props.moduleOptions}
+        styles={props.styles}
+      />
+      <ListDropdown
+        s={props.styles}
+        taskListId={props.taskListId}
+        setTaskListId={props.setTaskListId}
+        sortedLists={props.sortedLists}
+        listOptions={props.listOptions}
+      />
+    </>
+  );
+}
+
+function buildOptionsRowViewModel(props) {
+  const primaryField = props.isReadingList
+    ? <PageCountField styles={props.styles} pageCount={props.pageCount} setPageCount={props.setPageCount} />
+    : <EstimatedDurationField minutes={props.estimatedMinutes} setMinutes={props.setEstimatedMinutes} styles={props.styles} />;
+  return {
+    primaryField,
+    rowClass: buildOptionsRowClass(props.styles, props.showOptions),
+  };
+}
+
+function buildOptionsRowClass(stylesObj, showOptions) {
+  return `${stylesObj.optionsRow} ${showOptions ? stylesObj.optionsRowOpen : ""}`.trim();
+}
+
+function EstimatedDurationField({ minutes, setMinutes, styles: s }) {
+  return (
+    <>
+      <span className={s.optionsRowLabel}>Est. time</span>
+      <EstimatedDurationControl
+        valueMinutes={minutes}
+        onChangeMinutes={setMinutes}
+        presets={DURATION_PRESETS}
+        ariaLabel="Estimated duration"
+        classes={buildDurationClasses(s)}
+      />
+    </>
+  );
+}
+
+function buildDurationClasses(s) {
+  return {
+    root: s.durationGroup,
+    button: s.durationBtn,
+    buttonActive: s.durationBtnActive,
+    customInput: s.customDurationInput,
+    customInputActive: s.customDurationActive,
+    customInputField: s.customDurationInputField,
+    leading: s.customDurationLeading,
+    trailing: s.customDurationTrailing,
+  };
+}
+
+function ModuleDropdownField({ moduleId, setModuleId, moduleOptions, styles: s }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>Module</span>
+      <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
+        <AnimatedDropdown
+          value={moduleId ?? ""}
+          onChange={(value) => setModuleId(value === "" ? null : value)}
+          placeholder="Module"
+          options={moduleOptions}
+          className={s.moduleListDropdown}
+        />
+      </div>
+    </>
   );
 }
 
@@ -88,7 +147,7 @@ export default function CreateTaskBar(props) {
     <>
       <form className={styles.card} onSubmit={handleSubmit} ref={cardRef} data-create-task-bar-card>
         <CreateTaskBarInput styles={styles} title={bar.title} setTitle={bar.setTitle} saving={bar.saving} inputRef={inputRef} externalInputRef={props.inputRef} setInputFocused={bar.setInputFocused} onBlur={handleInputBlur} onKeyDown={handleInputKeyDown} />
-        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedBlocks={bar.estimatedBlocks} setEstimatedBlocks={bar.setEstimatedBlocks} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
+        <CreateTaskBarOptions styles={styles} showOptions={bar.showOptions} estimatedMinutes={bar.estimatedMinutes} setEstimatedMinutes={bar.setEstimatedMinutes} moduleId={bar.moduleId} setModuleId={bar.setModuleId} taskListId={bar.taskListId} setTaskListId={bar.setTaskListId} 
          sortedLists={bar.sortedLists} moduleOptions={bar.moduleOptions} listOptions={bar.listOptions}
          isReadingList={bar.isReadingList} pageCount={bar.pageCount} setPageCount={bar.setPageCount}
         />

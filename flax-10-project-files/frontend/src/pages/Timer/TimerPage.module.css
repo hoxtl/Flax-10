@@ -13,6 +13,7 @@
 @import './styles/today-banner.css';
 @import './styles/today-banner-metrics.css';
 @import './styles/focus-timer.css';
+@import './styles/FocusTimerOverlay.css';
 @import './styles/sound-and-animation.css';
 @import './styles/focus-support.css';
 @import './styles/calm-mode.css';

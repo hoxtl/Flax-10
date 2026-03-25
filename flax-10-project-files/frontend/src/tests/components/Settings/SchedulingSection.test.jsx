@@ -81,6 +81,11 @@ describe("useSchedulingState", () => {
     expect(result.current.studyTimeProps.hasUnsaved).toBe(false);
   });
 
+<<<<<<< HEAD
+  it("updates and saves week preferences", async () => {
+    const onWeekSave = vi.fn().mockResolvedValue(null);
+    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: onWeekSave, onWorktimePreferenceSave: vi.fn() }));
+=======
   it("preserves study input when the save response is empty and falls back to the default value for invalid input", async () => {
     const onStudyTimeSave = vi.fn().mockResolvedValue(null);
     const { result } = renderHook(() => useSchedulingState({
@@ -113,21 +118,21 @@ describe("useSchedulingState", () => {
       onWorktimePreferenceSave,
     }));
 
+>>>>>>> main
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    act(() => {
-      result.current.weekPreferenceProps.onWeekPreferenceChange("weekends");
-      result.current.worktimeProps.onWorktimePreferenceChange("day");
-    });
-
-    await act(async () => {
-      await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() });
-      await result.current.worktimeProps.onSubmit({ preventDefault: vi.fn() });
-    });
-
-    expect(onWeekPreferenceSave).toHaveBeenCalledWith({ week_preference: "weekends" });
-    expect(onWorktimePreferenceSave).toHaveBeenCalledWith({ worktime_preference: "day" });
+    act(() => { result.current.weekPreferenceProps.onWeekPreferenceChange("weekends"); });
+    await act(async () => { await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() }); });
+    expect(onWeekSave).toHaveBeenCalledWith({ week_preference: "weekends" });
     expect(result.current.weekPreferenceProps.weekPreference).toBe("weekends");
+  });
+
+  it("updates and saves worktime preferences", async () => {
+    const onWorktimeSave = vi.fn().mockResolvedValue({ worktime_preference: "" });
+    const { result } = renderHook(() => useSchedulingState({ onStudyTimeSave: vi.fn(), onWeekPreferenceSave: vi.fn(), onWorktimePreferenceSave: onWorktimeSave }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    act(() => { result.current.worktimeProps.onWorktimePreferenceChange("day"); });
+    await act(async () => { await result.current.worktimeProps.onSubmit({ preventDefault: vi.fn() }); });
+    expect(onWorktimeSave).toHaveBeenCalledWith({ worktime_preference: "day" });
     expect(result.current.worktimeProps.worktimePreference).toBe("day");
   });
 
@@ -164,6 +169,48 @@ describe("SchedulingSection components", () => {
     onSubmit: vi.fn((event) => event.preventDefault()),
   };
 
+  const renderSchedulingPanel = () => {
+    const handlers = {
+      onMinutesChange: vi.fn(),
+      onWeekPreferenceChange: vi.fn(),
+      onWorktimePreferenceChange: vi.fn(),
+      onStudySubmit: vi.fn((event) => event.preventDefault()),
+      onWeekSubmit: vi.fn((event) => event.preventDefault()),
+      onWorktimeSubmit: vi.fn((event) => event.preventDefault()),
+    };
+
+    render(
+      <SchedulingPanel
+        studyTimeProps={{
+          minutesPerDay: "120",
+          onMinutesChange: handlers.onMinutesChange,
+          onSubmit: handlers.onStudySubmit,
+          isSaving: false,
+          hasUnsaved: true,
+          saveSignal: 0,
+        }}
+        weekPreferenceProps={{
+          weekPreference: "both",
+          onWeekPreferenceChange: handlers.onWeekPreferenceChange,
+          onSubmit: handlers.onWeekSubmit,
+          isSaving: false,
+          hasUnsaved: true,
+          saveSignal: 0,
+        }}
+        worktimeProps={{
+          worktimePreference: "night",
+          onWorktimePreferenceChange: handlers.onWorktimePreferenceChange,
+          onSubmit: handlers.onWorktimeSubmit,
+          isSaving: false,
+          hasUnsaved: true,
+          saveSignal: 0,
+        }}
+      />,
+    );
+
+    return handlers;
+  };
+
   it("renders each standalone section with the full layout", () => {
     render(
       <>
@@ -179,62 +226,27 @@ describe("SchedulingSection components", () => {
     expect(screen.getAllByText("Quick guide").length).toBeGreaterThan(0);
   });
 
-  it("renders the compact scheduling panel and submits through each form", async () => {
-    const onMinutesChange = vi.fn();
-    const onWeekPreferenceChange = vi.fn();
-    const onWorktimePreferenceChange = vi.fn();
-    const onStudySubmit = vi.fn((event) => event.preventDefault());
-    const onWeekSubmit = vi.fn((event) => event.preventDefault());
-    const onWorktimeSubmit = vi.fn((event) => event.preventDefault());
-
-    render(
-      <SchedulingPanel
-        studyTimeProps={{
-          minutesPerDay: "120",
-          onMinutesChange,
-          onSubmit: onStudySubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-        weekPreferenceProps={{
-          weekPreference: "both",
-          onWeekPreferenceChange,
-          onSubmit: onWeekSubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-        worktimeProps={{
-          worktimePreference: "night",
-          onWorktimePreferenceChange,
-          onSubmit: onWorktimeSubmit,
-          isSaving: false,
-          hasUnsaved: true,
-          saveSignal: 0,
-        }}
-      />,
-    );
-
+  it("renders the compact scheduling panel and exposes change handlers", () => {
+    const handlers = renderSchedulingPanel();
     fireEvent.change(screen.getByTestId("Choose a target"), { target: { value: "150" } });
     fireEvent.change(screen.getByTestId("Choose days"), { target: { value: "weekdays" } });
     fireEvent.change(screen.getByTestId("Choose a time"), { target: { value: "day" } });
+    expect(handlers.onMinutesChange).toHaveBeenCalledWith("150");
+    expect(handlers.onWeekPreferenceChange).toHaveBeenCalledWith("weekdays");
+    expect(handlers.onWorktimePreferenceChange).toHaveBeenCalledWith("day");
+    expect(screen.getByText("Scheduling setup")).toBeInTheDocument();
+  });
 
-    expect(onMinutesChange).toHaveBeenCalledWith("150");
-    expect(onWeekPreferenceChange).toHaveBeenCalledWith("weekdays");
-    expect(onWorktimePreferenceChange).toHaveBeenCalledWith("day");
-
+  it("submits each scheduling form via save buttons", async () => {
+    const handlers = renderSchedulingPanel();
     fireEvent.click(screen.getByRole("button", { name: "Save target" }));
     fireEvent.click(screen.getByRole("button", { name: "Save days" }));
     fireEvent.click(screen.getByRole("button", { name: "Save study time" }));
-
     await waitFor(() => {
-      expect(onStudySubmit).toHaveBeenCalled();
-      expect(onWeekSubmit).toHaveBeenCalled();
-      expect(onWorktimeSubmit).toHaveBeenCalled();
+      expect(handlers.onStudySubmit).toHaveBeenCalled();
+      expect(handlers.onWeekSubmit).toHaveBeenCalled();
+      expect(handlers.onWorktimeSubmit).toHaveBeenCalled();
     });
-
-    expect(screen.getByText("Scheduling setup")).toBeInTheDocument();
   });
 
   it("stops loading and preserves defaults when settings are empty", async () => {

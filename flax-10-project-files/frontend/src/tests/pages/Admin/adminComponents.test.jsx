@@ -7,7 +7,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { FilterToggleGroup } from '../../../pages/Admin/components/AdminFilters';
 import { AnimatedList, ListRow, ListInfo, ListActions } from '../../../pages/Admin/components/AdminList';
 import { SectionCard, CardHeader, LoadingSpinner, EmptyMessage, ErrorMessage } from '../../../pages/Admin/components/AdminSurface';
-import HoldConfirmModal from '../../../components/Common/HoldConfirmModal/HoldConfirmModal';
+import HoldConfirmModal from '../../../components/common/HoldConfirmModal/HoldConfirmModal';
 
 vi.mock('../../../pages/Admin/styles', () => ({
   default: {
@@ -38,7 +38,7 @@ vi.mock('../../../components/common/Badge/Badge', () => ({
   default: ({ children, tone, className }) => <span className={className} data-tone={tone}>{children}</span>,
 }));
 
-vi.mock('../../../components/Common/StandardModal/StandardModal', () => ({
+vi.mock('../../../components/common/StandardModal/StandardModal', () => ({
   default: ({ children, title, onClose }) => (
     <div role="dialog" aria-label={title}>
       <button onClick={onClose}>close</button>
@@ -47,11 +47,11 @@ vi.mock('../../../components/Common/StandardModal/StandardModal', () => ({
   ),
 }));
 
-vi.mock('../../../components/Common/PrimaryButton/PrimaryButton', () => ({
+vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
   default: ({ children, onClick }) => <button onClick={onClick}>{children}</button>,
 }));
 
-vi.mock('../../../components/Common/HoldConfirmModal/HoldConfirmModal.module.css', () => ({
+vi.mock('../../../components/common/HoldConfirmModal/HoldConfirmModal.module.css', () => ({
   default: {
     modal: 'modal', body: 'body', buttons: 'buttons',
     holdBtn: 'holdBtn', holdBtnBar: 'holdBtnBar', holdBtnLabel: 'holdBtnLabel',

@@ -131,6 +131,18 @@
     cursor: pointer;
 }
 
+.locationLink {
+    max-width: 100%;
+}
+
+.locationLinkText {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
 .descCell {
     color: var(--text);
     min-width: 200px;

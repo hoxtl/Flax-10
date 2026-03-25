@@ -3,8 +3,7 @@ import {
   applyConflictResolutionPlan,
   buildConflictResolutionPlan,
   buildConflictResolutionToastMessage,
-  undoConflictResolutionPlan,
-} from "../../../components/Common/RescheduleEvents/rescheduleEventConflicts";
+} from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
 
 function iso(dateString) {
   return new Date(dateString).toISOString();
