@@ -130,9 +130,17 @@ def _submit_society_report(request, society):
 def _society_report_result(request, society):
     reason = _clean_report_reason(request)
     if not reason:
-        response = _report_reason_required_response()
-        return None, response.data, response.status_code
-    _create_society_report(society, request.user, reason)
+        return _society_report_error_result()
+    return _society_report_success_result(request.user, society, reason)
+
+
+def _society_report_error_result():
+    response = _report_reason_required_response()
+    return None, response.data, response.status_code
+
+
+def _society_report_success_result(user, society, reason):
+    _create_society_report(society, user, reason)
     _notify_admins_of_report(society, reason)
     response = _report_submitted_response()
     return response.data, None, response.status_code

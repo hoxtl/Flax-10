@@ -46,6 +46,13 @@ def notify_society_ban(creator, society_name, reason):
     Notification.objects.create(user=creator, title=f'Society banned: {society_name}', message=message, notification_type='general', action_url='societies')
 
 
+def _ban_society(report, reason):
+    creator = find_society_creator(report.society)
+    if creator:
+        notify_society_ban(creator, report.society.name, reason)
+    report.society.delete()
+
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def reported_societies(request):
@@ -70,8 +77,5 @@ def ban_reported_society(request, report_id):
     if error:
         return error
     reason = (request.data.get('reason') or '').strip()
-    creator = find_society_creator(report.society)
-    if creator:
-        notify_society_ban(creator, report.society.name, reason)
-    report.society.delete()
+    _ban_society(report, reason)
     return Response({'message': 'Society banned and deleted successfully.'}, status=status.HTTP_200_OK)

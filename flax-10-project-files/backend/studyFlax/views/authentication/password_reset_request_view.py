@@ -46,6 +46,29 @@ def _email_error_response(exc):
     logger.debug("Error details", exc_info=exc)
     return Response({'error': "Error when sending reset password email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+def _dispatch_reset_email(serialiser):
+    _send_reset_email(serialiser.validated_data['email'])
+    logger.info("Password reset link sent successfully")
+
+
+def _handle_missing_user():
+    logger.warning("No user with such email found")
+
+
+def _reset_password_result(serialiser):
+    try:
+        _dispatch_reset_email(serialiser)
+    except ValidationError as exc:
+        return _validation_error_response(exc)
+    except User.DoesNotExist:
+        _handle_missing_user()
+    except EMAIL_SEND_ERRORS as exc:
+        return _email_error_response(exc)
+    except Exception as exc:
+        return _email_error_response(exc)
+    return Response({'message': "Reset password email sent."}, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def reset_password_view(request):
     """Send a password reset email if an account with the given address exists."""
@@ -53,15 +76,4 @@ def reset_password_view(request):
     serialiser, error_response = _validated_reset_serialiser(request)
     if error_response:
         return error_response
-    try:
-        _send_reset_email(serialiser.validated_data['email'])
-        logger.info("Password reset link sent successfully")
-    except ValidationError as exc:
-        return _validation_error_response(exc)
-    except User.DoesNotExist:
-        logger.warning("No user with such email found")
-    except EMAIL_SEND_ERRORS as exc:
-        return _email_error_response(exc)
-    except Exception as exc:
-        return _email_error_response(exc)
-    return Response({'message': "Reset password email sent."}, status=status.HTTP_200_OK)
+    return _reset_password_result(serialiser)
