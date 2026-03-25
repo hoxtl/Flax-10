@@ -72,48 +72,46 @@ function getEnrolledModules(modules, enrollments) {
   return (modules || []).filter((module) => enrolledIds.has(module.id) && isValidDate(module.start_time));
 }
 
+function getEventTimes(event) {
+  const start = new Date(event.start_time);
+  const end = new Date(event.end_time || event.start_time);
+  return {
+    day: getMondayIndex(start),
+    startMinutes: toMinutes(start),
+    endMinutes: toMinutes(end),
+  };
+}
+
+function isTimeConflict(eventTimes, module) {
+  const moduleTimes = getEventTimes(module);
+  if (eventTimes.day !== moduleTimes.day) return false;
+  return eventTimes.startMinutes < moduleTimes.endMinutes && eventTimes.endMinutes > moduleTimes.startMinutes;
+}
+
+function findConflictForEvent(event, modules) {
+  const eventTimes = getEventTimes(event);
+  const conflictModule = modules.find((module) => isTimeConflict(eventTimes, module));
+  return conflictModule ? { event, module: conflictModule } : null;
+}
+
 function findModuleConflict(events, modules) {
-  for (const event of events) {
-    const eventStart = new Date(event.start_time);
-    const eventEnd = new Date(event.end_time || event.start_time);
-    const eventDay = getMondayIndex(eventStart);
-    const eventStartMinutes = toMinutes(eventStart);
-    const eventEndMinutes = toMinutes(eventEnd);
+  const conflicts = events.map((event) => findConflictForEvent(event, modules));
+  return conflicts.find(Boolean) || null;
+}
 
-    for (const module of modules) {
-      const moduleStart = new Date(module.start_time);
-      const moduleEnd = new Date(module.end_time || module.start_time);
-      const moduleDay = getMondayIndex(moduleStart);
-      const moduleStartMinutes = toMinutes(moduleStart);
-      const moduleEndMinutes = toMinutes(moduleEnd);
-      const overlaps = eventStartMinutes < moduleEndMinutes && eventEndMinutes > moduleStartMinutes;
-
-      if (eventDay === moduleDay && overlaps) {
-        return { event, module };
-      }
-    }
-  }
-  return null;
+function isPeakStudyConflict(event, maxMinutes, heatmap) {
+  const start = new Date(event.start_time);
+  const end = new Date(event.end_time || event.start_time);
+  const dayRow = heatmap?.data?.[getMondayIndex(start)] || EMPTY_HEATMAP[getMondayIndex(start)];
+  const threshold = Math.max(30, maxMinutes * 0.8);
+  return getHoursForRange(start, end).some((hour) => dayRow[hour] >= threshold);
 }
 
 function findPeakStudyConflict(events, analytics) {
-  const heatmap = analytics?.heatmap;
-  const maxMinutes = getHeatmapPeak(heatmap);
+  const maxMinutes = getHeatmapPeak(analytics?.heatmap);
   if (!maxMinutes) return null;
-
-  for (const event of events) {
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time || event.start_time);
-    const dayIndex = getMondayIndex(start);
-    const dayRow = heatmap?.data?.[dayIndex] || EMPTY_HEATMAP[dayIndex];
-    const eventHours = getHoursForRange(start, end);
-    const overlapsPeakHour = eventHours.some((hour) => dayRow[hour] >= Math.max(30, maxMinutes * 0.8));
-
-    if (overlapsPeakHour) {
-      return { event };
-    }
-  }
-  return null;
+  const event = events.find((evt) => isPeakStudyConflict(evt, maxMinutes, analytics?.heatmap));
+  return event ? { event } : null;
 }
 
 function buildInsight({ analytics, events, modules, moduleContextAvailable }) {
