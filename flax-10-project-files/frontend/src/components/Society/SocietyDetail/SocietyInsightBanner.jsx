@@ -113,75 +113,83 @@ function findPeakStudyConflict(events, analytics) {
   return event ? { event } : null;
 }
 
-function buildInsight({ analytics, events, modules, moduleContextAvailable }) {
-  if (!events.length) {
-    return {
-      tone: "info",
-      title: "No society sessions scheduled yet",
-      description: "Once this society adds events, we will compare them against your analytics and module timetable.",
-      primary: { to: "/calendar", label: "Open Calendar" },
-      secondary: { to: "/modules", label: "View Modules" },
-      icon: CalendarClock,
-    };
-  }
+function buildNoEventsInsight() {
+  return {
+    tone: "info",
+    title: "No society sessions scheduled yet",
+    description: "Once this society adds events, we will compare them against your analytics and module timetable.",
+    primary: { to: "/calendar", label: "Open Calendar" },
+    secondary: { to: "/modules", label: "View Modules" },
+    icon: CalendarClock,
+  };
+}
 
-  const moduleConflict = moduleContextAvailable ? findModuleConflict(events, modules) : null;
-  const studyPeakConflict = hasStudyData(analytics) ? findPeakStudyConflict(events, analytics) : null;
+function buildDoubleConflictInsight(moduleConflict) {
+  return {
+    tone: "warning",
+    title: "This society could squeeze your best study window",
+    description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture and one of the hours you study most.`,
+    primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
+    secondary: { to: "/analytics", label: "View Analytics" },
+    icon: AlertTriangle,
+  };
+}
 
-  if (moduleConflict && studyPeakConflict) {
-    return {
-      tone: "warning",
-      title: "This society could squeeze your best study window",
-      description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture and one of the hours you study most.`,
-      primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
-      secondary: { to: "/analytics", label: "View Analytics" },
-      icon: AlertTriangle,
-    };
-  }
+function buildModuleConflictInsight(moduleConflict) {
+  return {
+    tone: "warning",
+    title: "Timetable clash detected",
+    description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture.`,
+    primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
+    secondary: { to: "/calendar", label: "Open Calendar" },
+    icon: AlertTriangle,
+  };
+}
 
-  if (moduleConflict) {
-    return {
-      tone: "warning",
-      title: "Timetable clash detected",
-      description: `${moduleConflict.event.title} at ${formatSlot(moduleConflict.event)} overlaps with your ${moduleConflict.module.module_code} lecture.`,
-      primary: { to: `/modules?moduleId=${moduleConflict.module.id}`, label: `Open ${moduleConflict.module.module_code}` },
-      secondary: { to: "/calendar", label: "Open Calendar" },
-      icon: AlertTriangle,
-    };
-  }
+function buildStudyPeakConflictInsight(studyPeakConflict) {
+  return {
+    tone: "warning",
+    title: "This lands in one of your strongest study slots",
+    description: `Based on your analytics, ${studyPeakConflict.event.title} at ${formatSlot(studyPeakConflict.event)} overlaps with a time you usually study most consistently.`,
+    primary: { to: "/analytics", label: "View Analytics" },
+    secondary: { to: "/calendar", label: "Open Calendar" },
+    icon: AlertTriangle,
+  };
+}
 
-  if (studyPeakConflict) {
-    return {
-      tone: "warning",
-      title: "This lands in one of your strongest study slots",
-      description: `Based on your analytics, ${studyPeakConflict.event.title} at ${formatSlot(studyPeakConflict.event)} overlaps with a time you usually study most consistently.`,
-      primary: { to: "/analytics", label: "View Analytics" },
-      secondary: { to: "/calendar", label: "Open Calendar" },
-      icon: AlertTriangle,
-    };
-  }
+function buildNoDataInsight() {
+  return {
+    tone: "info",
+    title: "We can personalise this once you use Timer",
+    description: "Track a few study sessions and we will compare this society's meeting times against your focus heatmap and module timetable.",
+    primary: { to: "/timer", label: "Open Timer" },
+    secondary: { to: "/modules", label: "View Modules" },
+    icon: TimerReset,
+  };
+}
 
-  if (!hasStudyData(analytics)) {
-    return {
-      tone: "info",
-      title: "We can personalise this once you use Timer",
-      description: "Track a few study sessions and we will compare this society's meeting times against your focus heatmap and module timetable.",
-      primary: { to: "/timer", label: "Open Timer" },
-      secondary: { to: "/modules", label: "View Modules" },
-      icon: TimerReset,
-    };
-  }
-
+function buildSuccessInsight(hasExtendedContext) {
   return {
     tone: "positive",
     title: "This looks like a good fit for your week",
-    description: moduleContextAvailable && modules.length
+    description: hasExtendedContext
       ? "Upcoming sessions sit outside your busiest study hours and we did not spot a clash with your enrolled modules."
       : "Upcoming sessions sit outside your busiest study hours, so they should fit more comfortably around your usual routine.",
     primary: { to: "/analytics", label: "View Analytics" },
     secondary: { to: "/calendar", label: "Open Calendar" },
     icon: CalendarCheck2,
   };
+}
+
+function buildInsight({ analytics, events, modules, moduleContextAvailable }) {
+  if (!events.length) return buildNoEventsInsight();
+  const moduleConflict = moduleContextAvailable ? findModuleConflict(events, modules) : null;
+  const studyPeakConflict = hasStudyData(analytics) ? findPeakStudyConflict(events, analytics) : null;
+  if (moduleConflict && studyPeakConflict) return buildDoubleConflictInsight(moduleConflict);
+  if (moduleConflict) return buildModuleConflictInsight(moduleConflict);
+  if (studyPeakConflict) return buildStudyPeakConflictInsight(studyPeakConflict);
+  if (!hasStudyData(analytics)) return buildNoDataInsight();
+  return buildSuccessInsight(moduleContextAvailable && modules.length);
 }
 
 function getFulfilledValue(result, fallback) {
