@@ -7,7 +7,7 @@
     background: var(--panel);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
+    z-index: 10001;
     overflow: hidden;
     margin-top: 8px;
     border: 1px solid var(--border);
