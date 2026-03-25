@@ -159,6 +159,19 @@ describe('SocietyDetail/SettingsModal', () => {
     });
   });
 
+  it('handles add workflow when members is omitted', async () => {
+    const props = baseProps({ members: undefined });
+    render(<SettingsModal {...props} />);
+
+    fireEvent.click(screen.getByText('+ Add Collaborators'));
+    fireEvent.click(await screen.findByText('submit-add'));
+
+    await waitFor(() => {
+      expect(props.onAddCollaborator).toHaveBeenCalledWith('existingUser', 'editor');
+      expect(props.onAddCollaborator).toHaveBeenCalledWith('newUser', 'editor');
+    });
+  });
+
   it('stops propagation when modal content is clicked', () => {
     const props = baseProps();
     render(<SettingsModal {...props} />);

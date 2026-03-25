@@ -186,4 +186,17 @@ describe('SocietyInfo', () => {
         rerender(<SocietyInfo society={{ ...baseSociety, categories: ['Arts'] }} editMode={true} />);
         expect(screen.getByTestId('category-display')).toBeTruthy();
     });
+
+    it('initialises an empty bio editor value when the bio is null', () => {
+        render(<SocietyInfo society={{ ...baseSociety, bio: null }} editMode onUpdateSociety={vi.fn()} />);
+        const editIcons = document.querySelectorAll('[title="Edit"]');
+        fireEvent.click(editIcons[0]);
+        expect(document.querySelector('textarea').value).toBe('');
+    });
+
+    it('normalises null categories to an empty array when opening the category editor', () => {
+        render(<SocietyInfo society={{ ...baseSociety, categories: null }} editMode onUpdateSociety={vi.fn()} />);
+        fireEvent.click(screen.getByTestId('edit-category'));
+        expect(screen.getByTestId('category-selector')).toBeInTheDocument();
+    });
 });

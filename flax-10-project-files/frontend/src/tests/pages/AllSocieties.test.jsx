@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import AllSocieties from '../../pages/Societies/AllSocieties';
 
 vi.mock('../../components/Society/SocietyCard', () => ({
@@ -36,6 +36,18 @@ vi.mock('../../components/common/AnimatedDropdown', () => ({
     ),
 }));
 
+vi.mock('framer-motion', () => {
+    const stripMotionProps = ({ animate, exit, initial, layout, layoutId, transition, ...props }) => props;
+    return {
+        AnimatePresence: ({ children }) => <>{children}</>,
+        motion: {
+            div: ({ children, ...props }) => <div {...stripMotionProps(props)}>{children}</div>,
+            button: ({ children, ...props }) => <button {...stripMotionProps(props)}>{children}</button>,
+            span: ({ children, ...props }) => <span {...stripMotionProps(props)}>{children}</span>,
+        },
+    };
+});
+
 vi.mock('../../components/Pagination/Pagination', () => ({
     Pagination: ({ currentPage, totalPages, onPageChange }) => (
         <div data-testid="pagination">
@@ -56,6 +68,10 @@ const mockSocieties = [
 describe('AllSocieties', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('renders the back button', () => {
@@ -267,14 +283,65 @@ describe('AllSocieties', () => {
         render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
 
         const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
+        fireEvent.click(filterToggle);
+        expect(screen.getByText('Category')).toBeInTheDocument();
+        fireEvent.mouseDown(document.body);
+        await waitFor(() => expect(screen.queryByText('Category')).not.toBeInTheDocument());
+    });
+
+    it('schedules hover-close after mouse leave delay', () => {
+        const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
         const wrapper = filterToggle.parentElement;
 
         fireEvent.mouseEnter(wrapper);
         expect(screen.getByText('Status')).toBeInTheDocument();
 
+        fireEvent.mouseLeave(wrapper);
+        expect(setTimeoutSpy).toHaveBeenCalled();
+    });
+
+    it('shows the filter badge when a category filter is active', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
         fireEvent.click(filterToggle);
-        expect(screen.getByText('Category')).toBeInTheDocument();
-        fireEvent.mouseDown(document.body);
-        await waitFor(() => expect(screen.queryByText('Category')).not.toBeInTheDocument());
+        fireEvent.click(screen.getByText('Arts'));
+
+        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('Art Society')).toBeInTheDocument();
+    });
+
+    it('keeps the popup open for inside clicks and closes it after the hover timeout elapses', async () => {
+        vi.useFakeTimers();
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        const filterToggle = screen.getByRole('button', { name: /Filter societies/i });
+        const wrapper = filterToggle.parentElement;
+
+        fireEvent.mouseEnter(wrapper);
+        expect(screen.getByText('Status')).toBeInTheDocument();
+
+        fireEvent.mouseDown(wrapper);
+        expect(screen.getByText('Status')).toBeInTheDocument();
+
+        fireEvent.mouseLeave(wrapper);
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(250);
+        });
+
+        expect(screen.queryByText('Status')).not.toBeInTheDocument();
+    });
+
+    it('applies ratification filters from the popup controls', () => {
+        render(<AllSocieties onBack={vi.fn()} onSelect={vi.fn()} societies={mockSocieties} />);
+
+        fireEvent.click(screen.getByRole('button', { name: /Filter societies/i }));
+        fireEvent.click(screen.getAllByRole('button', { name: /Unratified/i }).at(-1));
+
+        expect(screen.getByText('Art Society')).toBeInTheDocument();
+        expect(screen.queryByText('Chess Club')).toBeNull();
     });
 });

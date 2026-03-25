@@ -26,7 +26,15 @@ vi.mock('../../../components/Society/SocietyDetail/tabs/announcementTab/Announce
   handleFileSelect: (...args) => handleFileSelectMock(...args),
 }));
 
-vi.mock('../../../components/Calendar/EventModal/components/TimeRow', () => ({ TimeRow: () => <div>time-row</div> }));
+vi.mock('../../../components/Calendar/EventModal/components/TimeRow', () => ({
+  TimeRow: ({ update }) => (
+    <div>
+      <div>time-row</div>
+      <button type="button" onClick={() => update('start_time')({ target: { value: '2026-03-09T10:00' } })}>set-start-time</button>
+      <button type="button" onClick={() => update('end_time')({ target: { value: '2026-03-09T11:00' } })}>set-end-time</button>
+    </div>
+  ),
+}));
 vi.mock('../../../components/Calendar/EventModal/components/RecurrenceField', () => ({
   RecurrenceField: ({ onChange }) => <button onClick={() => onChange('weekly')}>set-weekly</button>,
 }));
@@ -70,6 +78,11 @@ describe('AnnouncementModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
     expect(screen.getByText('Title required')).toBeTruthy();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('renders safely with default optional props', () => {
+    render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: 'Add Announcement' })).toBeInTheDocument();
   });
 
   it('triggers file input when clicking add image button', () => {
@@ -133,6 +146,19 @@ describe('AnnouncementModal', () => {
     expect(onDelete).toHaveBeenCalledWith(5);
   });
 
+  it('closes the delete confirm modal without deleting when cancellation is chosen', async () => {
+    const onDelete = vi.fn();
+    render(<AnnouncementModal onClose={vi.fn()} onSubmit={vi.fn()} onDelete={onDelete}
+      announcement={{ id: 6, title: 'Cancelable', content: 'Body', pinned: false }} societyId={1} announcements={[]} />);
+
+    fireEvent.click(screen.getByText('Delete'));
+    expect(screen.getByText('Delete Announcement')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('cancel-delete'));
+    await waitFor(() => expect(screen.queryByText('Delete Announcement')).not.toBeInTheDocument());
+    expect(onDelete).not.toHaveBeenCalled();
+  });
+
   it('submit with no pinned conflict calls onSubmit', () => {
     const onSubmit = vi.fn();
     render(<AnnouncementModal onClose={vi.fn()} onSubmit={onSubmit} announcement={{ id: 3, title: 'New Pin', content: '', pinned: true }} announcements={[]} />);
@@ -157,8 +183,15 @@ describe('AnnouncementModal', () => {
     fireEvent.change(screen.getByLabelText('Title *'), { target: { value: 'T' } });
     fireEvent.click(screen.getByLabelText('Also add as event'));
     expect(screen.getByText('time-row')).toBeTruthy();
+    fireEvent.click(screen.getByText('set-start-time'));
+    fireEvent.click(screen.getByText('set-end-time'));
     fireEvent.click(screen.getByText('set-weekly'));
     fireEvent.click(screen.getByRole('button', { name: 'Add Announcement' }));
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ addAsEvent: true, recurrence: 'weekly' }));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      addAsEvent: true,
+      recurrence: 'weekly',
+      start_time: '2026-03-09T10:00',
+      end_time: '2026-03-09T11:00',
+    }));
   });
 });

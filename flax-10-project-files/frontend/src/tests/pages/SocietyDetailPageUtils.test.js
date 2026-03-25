@@ -9,6 +9,7 @@ describe('SocietyDetailPageUtils', () => {
     it('getImageUrls handles various inputs', () => {
         expect(getImageUrls([{ url: 'u1' }, 'u2'])).toEqual(['u1', 'u2']);
         expect(getImageUrls(null)).toEqual([]);
+        expect(getImageUrls([{ url: '  trimmed  ' }, 42, { url: null }, ' plain '])).toEqual(['trimmed', 'plain']);
     });
 
     it('getAvailablePhotos filters used covers', () => {
@@ -16,11 +17,13 @@ describe('SocietyDetailPageUtils', () => {
             images: [{ url: 'c1' }],
             announcements: [
                 { images: [{ url: 'c1' }, { url: 'a1' }] },
+                { images: [{ url: 'a1' }, 'a2'] },
                 { images: null }
             ]
         };
         const avail = getAvailablePhotos(society);
-        expect(avail).toEqual(['a1']);
+        expect(avail).toEqual(['a1', 'a2']);
+        expect(getAvailablePhotos({ images: [], announcements: null })).toEqual([]);
     });
 
     it('scrollContentToTop handles missing scrollable', () => {
@@ -36,7 +39,7 @@ describe('SocietyDetailPageUtils', () => {
     it('findScrollableParent finds a scrollable element', () => {
         const el = { scrollHeight: 200, clientHeight: 100, scrollTop: 0 };
         const spy = vi.spyOn(document, 'querySelectorAll').mockReturnValue([el]);
-        const styleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ overflowY: 'auto' });
+        const styleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ overflow: 'hidden', overflowY: 'auto' });
         const windowSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
         
         scrollContentToTop();
@@ -82,13 +85,26 @@ describe('SocietyDetailPageUtils', () => {
         expect(track).toHaveBeenCalledWith('Deleted', 'E');
     });
 
+    it('delete wrappers use their default titles when none are provided', async () => {
+        const track = vi.fn();
+        const original = vi.fn().mockResolvedValue('res');
+
+        await wrapDeleteEvent(original, true, track)(2);
+        await wrapDeleteAnnouncement(original, true, track)(3);
+
+        expect(track).toHaveBeenCalledWith('Deleted', 'Event');
+        expect(track).toHaveBeenCalledWith('Deleted', 'Ann');
+    });
+
     it('wrappers handled non-silent mode', async () => {
         const track = vi.fn();
         const original = vi.fn().mockResolvedValue('res');
-        
+
+        await wrapAddEvent(original, false, track)({ title: 'Silent add' });
         const upd = wrapUpdateAnnouncement(original, false, track);
         await upd(1, { title: 'T' });
-        expect(track).not.toHaveBeenCalled();
+        await wrapDeleteEvent(original, false, track)(2, 'Event');
+        await wrapAddAnnouncement(original, false, track)({ title: 'Announcement' });
 
         const del = wrapDeleteAnnouncement(original, false, track);
         await del(1, 'Title');

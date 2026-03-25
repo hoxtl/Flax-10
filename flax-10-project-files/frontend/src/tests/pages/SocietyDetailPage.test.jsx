@@ -48,6 +48,7 @@ vi.mock("../../components/Society/SocietyDetail/imageHandlers/CoverImageModal", 
     <div data-testid="cover-modal">
       <button type="button" onClick={onClose}>close-cover</button>
       <button type="button" onClick={() => onUpdate(["img-1", "img-2"])}>save-cover</button>
+      <button type="button" onClick={() => onUpdate([])}>save-empty-cover</button>
     </div>
   ),
 }));
@@ -312,6 +313,8 @@ describe("SocietyDetailPage", () => {
 
     fireEvent.click(screen.getByText("save-cover"));
     expect(data.updateSociety).toHaveBeenCalledWith({ images: ["img-1", "img-2"], image: "img-1" });
+    fireEvent.click(screen.getByText("save-empty-cover"));
+    expect(data.updateSociety).toHaveBeenCalledWith({ images: [], image: null });
 
     fireEvent.click(screen.getByText("submit-announcement"));
     fireEvent.click(screen.getByText("submit-new-announcement"));
@@ -353,5 +356,27 @@ describe("SocietyDetailPage", () => {
     await waitFor(() => expect(data.publishChanges).toHaveBeenCalledWith(["updated-announcement"]));
     expect(data.tracker.resetChanges).toHaveBeenCalledTimes(1);
     expect(data.modals.setEditMode).toHaveBeenCalledWith(false);
+  });
+
+  it("toggles edit mode without publishing when it is not already editing", () => {
+    const data = buildPageData({
+      modals: {
+        editMode: false,
+        setEditMode: vi.fn(),
+      },
+      tracker: {
+        hasChanges: vi.fn(() => true),
+        getChangeSummary: vi.fn(() => ["updated-announcement"]),
+        resetChanges: vi.fn(),
+      },
+      publishChanges: vi.fn(),
+    });
+    useSocietyPageDataMock.mockReturnValue(data);
+
+    renderPage(<SocietyDetailPage societyId={1} onBack={vi.fn()} />);
+    fireEvent.click(screen.getByText("toggle-edit-mode"));
+
+    expect(data.publishChanges).not.toHaveBeenCalled();
+    expect(data.modals.setEditMode).toHaveBeenCalledWith(true);
   });
 });

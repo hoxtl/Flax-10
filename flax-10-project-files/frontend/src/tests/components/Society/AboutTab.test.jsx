@@ -60,4 +60,13 @@ describe('AboutTab edit mode', () => {
         fireEvent.click(screen.getByText('Cancel'));
         expect(onUpdate).toHaveBeenCalledWith({});
     });
+
+    it('starts from empty values when about and emails are null', async () => {
+        const onUpdate = vi.fn();
+        render(<AboutTab about={null} adminEmails={null} editMode={true} onUpdate={onUpdate} />);
+        fireEvent.change(screen.getByPlaceholderText('e.g. admin@flax.com, info@flax.com'), { target: { value: 'admin@kcl.ac.uk' } });
+        fireEvent.change(document.querySelector('textarea'), { target: { value: 'Fresh copy' } });
+        fireEvent.click(screen.getByText('Save Changes'));
+        await waitFor(() => expect(onUpdate).toHaveBeenCalledWith({ about: 'Fresh copy', admin_emails: 'admin@kcl.ac.uk' }));
+    });
 });
