@@ -236,41 +236,36 @@ describe('TableRow', () => {
         expect(container.querySelector('tr').getAttribute('style')).toBeNull();
     });
 
-    it('shows editable hover icons, handles td propagation, and forwards keydown handlers', () => {
+    it('handles td propagation and forwards keydown handlers', () => {
         const stopSpy = vi.spyOn(Event.prototype, 'stopPropagation');
-        const onCellClick = vi.fn();
         const navState = { ...defaultNavState, handleKeyDown: vi.fn() };
-        const editState = { ...defaultEditState, editingCell: { eventId: 12, field: 'title' }, cellValue: 'Editable title' };
+        const editState = { ...defaultEditState, editingCell: { eventId: 12, field: 'title' } };
+        const evt = createMockEvent({ id: 12, title: 'A', description: 'B' });
+        const { rerender } = render(<table><tbody><TableRow event={evt} rowIndex={0} editState={editState} navState={navState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
 
-        const { container, rerender } = render(
-            <table>
-                <tbody>
-                    <TableRow event={createMockEvent({ id: 12, title: 'Editable title', description: 'Editable description' })} rowIndex={0} editState={editState} navState={navState} onCellClick={onCellClick} viewMode="month" />
-                </tbody>
-            </table>,
-        );
-
-        const row = container.querySelector('tr');
-        fireEvent.mouseEnter(row);
         fireEvent.click(screen.getByTestId('tag-cell').closest('td'));
         fireEvent.click(screen.getByTestId('date-cell').closest('td'));
         fireEvent.keyDown(screen.getByTestId('editable-input'), { key: 'Enter' });
 
-        rerender(
-            <table>
-                <tbody>
-                    <TableRow event={createMockEvent({ id: 12, title: 'Editable title', description: 'Editable description' })} rowIndex={0} editState={{ ...defaultEditState, editingCell: { eventId: 12, field: 'description' }, cellValue: 'Editable description' }} navState={navState} onCellClick={onCellClick} viewMode="month" />
-                </tbody>
-            </table>,
-        );
-
+        const nextEditState = { ...defaultEditState, editingCell: { eventId: 12, field: 'description' } };
+        rerender(<table><tbody><TableRow event={evt} rowIndex={0} editState={nextEditState} navState={navState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
         fireEvent.keyDown(screen.getByTestId('editable-input'), { key: 'Tab' });
-        fireEvent.mouseLeave(container.querySelector('tr'));
 
         expect(stopSpy).toHaveBeenCalled();
         expect(navState.handleKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key: 'Enter' }), 0, 0);
         expect(navState.handleKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key: 'Tab' }), 0, 3);
-        expect(container.querySelector('tr').querySelector('svg')?.className.baseVal || container.querySelector('tr').querySelector('svg')?.getAttribute('class')).not.toMatch(/editIconVisible/i);
         stopSpy.mockRestore();
+    });
+
+    it('shows editable hover icons on enter and hides on leave', () => {
+        const evt = createMockEvent({ id: 12, title: 'A', description: 'B' });
+        const { container } = render(<table><tbody><TableRow event={evt} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        const row = container.querySelector('tr');
+        
+        fireEvent.mouseEnter(row);
+        fireEvent.mouseLeave(row);
+        
+        const svgClass = row.querySelector('svg')?.className.baseVal || row.querySelector('svg')?.getAttribute('class');
+        expect(svgClass).not.toMatch(/editIconVisible/i);
     });
 });

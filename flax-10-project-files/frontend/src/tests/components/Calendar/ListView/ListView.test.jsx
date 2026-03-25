@@ -209,22 +209,11 @@ describe('ListView', () => {
     it('does not reset the current page when month view rerenders with the same mode', () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date('2026-03-08T12:00:00Z'));
-        const firstEvents = Array.from({ length: 7 }, (_, index) =>
-            createMockEvent({
-                id: index + 1,
-                title: `Initial ${index + 1}`,
-                start_time: `2026-03-0${index + 2}T10:00:00Z`,
-                end_time: `2026-03-0${index + 2}T11:00:00Z`,
-            }),
+        const genEvents = (idOffset, titlePrefix, dayOffset) => Array.from({ length: 7 }, (_, i) =>
+            createMockEvent({ id: i + idOffset, title: `${titlePrefix} ${i + 1}`, start_time: `2026-03-0${i + dayOffset}T10:00:00Z`, end_time: `2026-03-0${i + dayOffset}T11:00:00Z` })
         );
-        const nextEvents = Array.from({ length: 7 }, (_, index) =>
-            createMockEvent({
-                id: index + 21,
-                title: `Updated ${index + 1}`,
-                start_time: `2026-03-0${index + 1}T10:00:00Z`,
-                end_time: `2026-03-0${index + 1}T11:00:00Z`,
-            }),
-        );
+        const firstEvents = genEvents(1, 'Initial', 2);
+        const nextEvents = genEvents(21, 'Updated', 1);
 
         const { rerender } = render(<ListView events={firstEvents} />);
         expect(screen.getByTestId('pagination')).toHaveTextContent('2/2');
