@@ -153,26 +153,21 @@ describe("ModulesPageChrome", () => {
 
   it("covers test-mode and animated content branches", () => {
     const MainView = ({ state }) => <div>{`Main ${state.viewingModule ? "details" : "list"}`}</div>;
-
     const createState = buildState({ showForm: true, viewingModule: null, editingModule: null });
     const { rerender } = render(<TestModeContent state={createState} MainView={MainView} />);
     expect(screen.getByText("New module")).toBeInTheDocument();
-
-    const detailsState = buildState({ showForm: false, viewingModule: { id: 2, module_code: "CS202", module_name: "Algorithms" } });
+    const detailsState = buildState({ showForm: false, viewingModule: { id: 2, module_code: "CS2" } });
     rerender(<TestModeContent state={detailsState} MainView={MainView} />);
-    expect(screen.getByText("CS202")).toBeInTheDocument();
-
-    const listState = buildState({ showForm: false, viewingModule: null, deadlineModule: { module_code: "CS303" } });
+    expect(screen.getByText("CS2")).toBeInTheDocument();
+    const listState = buildState({ showForm: false, viewingModule: null, deadlineModule: { module_code: "CS3" } });
     rerender(<TestModeContent state={listState} MainView={MainView} />);
     expect(screen.getByText("Main list")).toBeInTheDocument();
-    expect(screen.getByText("Deadline CS303")).toBeInTheDocument();
-
-    const editState = buildState({ showForm: true, viewingModule: null, editingModule: { id: 3, module_code: "CS303" } });
+    expect(screen.getByText("Deadline CS3")).toBeInTheDocument();
+    const editState = buildState({ showForm: true, viewingModule: null, editingModule: { id: 3 } });
     rerender(<AnimatedContent state={editState} viewKey="edit" MainView={MainView} />);
     fireEvent.click(screen.getByText("Save module"));
     expect(editState.hook.handleModuleUpdated).toHaveBeenCalledWith({ id: 9, module_code: "CS9" });
     expect(editState.setEditingModule).toHaveBeenCalledWith(null);
-
     const freshState = buildState({ showForm: true, viewingModule: null, editingModule: null });
     rerender(<AnimatedContent state={freshState} viewKey="create" MainView={MainView} />);
     fireEvent.click(screen.getByText("Cancel module form"));

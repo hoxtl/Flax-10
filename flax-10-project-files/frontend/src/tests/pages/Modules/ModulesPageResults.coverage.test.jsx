@@ -154,6 +154,20 @@ function buildSorting(overrides = {}) {
   };
 }
 
+function buildTestState(overrides = {}) {
+  return {
+    isTeacher: true,
+    hook: { enrollments: [{ module: 1 }], toggleEnrollment: vi.fn(), taskCountsByModule: {} },
+    setEditingModule: vi.fn(),
+    setShowForm: vi.fn(),
+    setViewingModule: vi.fn(),
+    setDeletingModule: vi.fn(),
+    setDeadlineModule: vi.fn(),
+    setReadingModule: vi.fn(),
+    ...overrides,
+  };
+}
+
 describe("ModulesPageResults coverage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -217,34 +231,18 @@ describe("ModulesPageResults coverage", () => {
   });
 
   it("renders module results with pagination and passes delete/edit actions through", () => {
-    const state = {
-      hook: {
-        enrollments: [{ module: 1 }],
-        toggleEnrollment: vi.fn(),
-        taskCountsByModule: {},
-      },
-      isTeacher: true,
-      setEditingModule: vi.fn(),
-      setShowForm: vi.fn(),
-      setViewingModule: vi.fn(),
-      setDeletingModule: vi.fn(),
-      setDeadlineModule: vi.fn(),
-      setReadingModule: vi.fn(),
-    };
+    const state = buildTestState();
     const sorting = buildSorting({
       results: [{ id: 1, module_code: "CS101" }],
       pageModules: [{ id: 1, module_code: "CS101" }],
       currentPage: 2,
       totalPages: 5,
     });
-
     render(<ModuleResults state={state} search={{ query: "", filter: "all" }} sorting={sorting} />);
-
     expect(screen.getAllByText("Page 2 / 5")).toHaveLength(2);
     fireEvent.click(screen.getByRole("button", { name: "delete" }));
     fireEvent.click(screen.getByRole("button", { name: "edit" }));
     fireEvent.click(screen.getByRole("button", { name: "view" }));
-
     expect(state.setDeletingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
     expect(state.setViewingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
     expect(state.setEditingModule).toHaveBeenCalledWith({ id: 1, module_code: "CS101" });
@@ -274,33 +272,15 @@ describe("ModulesPageResults coverage", () => {
   it("shows the my-modules toolbar placeholder and student transition wrapper in production mode", () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
-
     render(<ModuleToolbar search={{ query: "", onQueryChange: vi.fn() }} sorting={buildSorting()} isTeacher={false} isMyModules />);
     expect(screen.getByPlaceholderText("Search your modules by name or code...")).toBeInTheDocument();
-
     useMainModuleViewMock.mockReturnValueOnce({
       search: { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() },
       sorting: buildSorting(),
     });
-    render(
-      <MainView
-        state={{
-          isTeacher: false,
-          hook: {
-            enrollments: [],
-            toggleEnrollment: vi.fn(),
-            taskCountsByModule: {},
-          },
-          setViewingModule: vi.fn(),
-          setDeletingModule: vi.fn(),
-          setDeadlineModule: vi.fn(),
-          setReadingModule: vi.fn(),
-        }}
-      />,
-    );
-
+    const state = buildTestState({ isTeacher: false, hook: { enrollments: [], toggleEnrollment: vi.fn(), taskCountsByModule: {} } });
+    render(<MainView state={state} />);
     expect(screen.getByTestId("page-transition")).toBeInTheDocument();
-
     process.env.NODE_ENV = originalEnv;
   });
 });
