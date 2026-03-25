@@ -122,17 +122,28 @@ describe("SocietyInsightBanner", () => {
 
     renderBanner({
       ...baseSociety,
-      events: [
-        {
-          id: 18,
-          title: "Late Study Circle",
-          start_time: "2026-04-06T18:30:00Z",
-        },
-      ],
+      events: [{ id: 18, title: "Late Study Circle", start_time: "2026-04-06T18:30:00Z" }],
     });
 
     await waitFor(() => expect(screen.getByText("This lands in one of your strongest study slots")).toBeInTheDocument());
-    expect(screen.getByRole("link", { name: "View Analytics" })).toHaveAttribute("href", "/analytics");
+  });
+
+  it("links to analytics from the peak-study slot warning", async () => {
+    const heatmap = Array.from({ length: 7 }, () => Array(24).fill(0));
+    heatmap[0][18] = 45;
+    heatmap[0][19] = 45;
+
+    getSummary.mockResolvedValue({
+      summary: { total_sessions: 6, total_study_hours: 9 },
+      heatmap: { data: heatmap },
+    });
+
+    renderBanner({
+      ...baseSociety,
+      events: [{ id: 18, title: "Late Study Circle", start_time: "2026-04-06T18:30:00Z" }],
+    });
+
+    await waitFor(() => expect(screen.getByRole("link", { name: "View Analytics" })).toHaveAttribute("href", "/analytics"));
   });
 
   it("shows a positive fit when sessions avoid conflicts and enrolled modules are available", async () => {
@@ -174,35 +185,29 @@ describe("SocietyInsightBanner", () => {
     ).toBeInTheDocument();
   });
 
-  it("sorts multiple upcoming events and stays positive when the heatmap peak is elsewhere", async () => {
+  it("sorts multiple upcoming events efficiently", async () => {
+    getSummary.mockResolvedValue({
+      summary: { total_sessions: 5, total_study_hours: 8 },
+      heatmap: { data: Array.from({ length: 7 }, () => Array(24).fill(0)) },
+    });
+    renderBanner({
+      ...baseSociety,
+      events: [
+        { id: 20, title: "Later social", start_time: "2026-04-06T20:30:00Z" },
+        { id: 19, title: "Earlier social", start_time: "2026-04-06T18:30:00Z" },
+      ],
+    });
+    await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
+  });
+
+  it("stays positive when the heatmap peak is elsewhere", async () => {
     const heatmap = Array.from({ length: 7 }, () => Array(24).fill(0));
     heatmap[0][7] = 60;
-
     getSummary.mockResolvedValue({
       summary: { total_sessions: 5, total_study_hours: 8 },
       heatmap: { data: heatmap },
     });
-    getModules.mockResolvedValue([]);
-    getEnrollments.mockResolvedValue([]);
-
-    renderBanner({
-      ...baseSociety,
-      events: [
-        {
-          id: 20,
-          title: "Later social",
-          start_time: "2026-04-06T20:30:00Z",
-          end_time: "2026-04-06T21:30:00Z",
-        },
-        {
-          id: 19,
-          title: "Earlier social",
-          start_time: "2026-04-06T18:30:00Z",
-          end_time: "2026-04-06T19:30:00Z",
-        },
-      ],
-    });
-
+    renderBanner();
     await waitFor(() => expect(screen.getByText("This looks like a good fit for your week")).toBeInTheDocument());
   });
 
