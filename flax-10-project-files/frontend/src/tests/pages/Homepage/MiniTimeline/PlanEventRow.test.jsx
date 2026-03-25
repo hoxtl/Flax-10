@@ -31,6 +31,7 @@ vi.mock('../../../../components/Settings/hooks/useSleepWarning', () => ({
 
 import { PlanEventRow } from '../../../../pages/Homepage/components/MiniTimeline/PlanEventRow';
 import * as useSleepWarning from '../../../../components/Settings/hooks/useSleepWarning';
+import * as homepageEventUtils from '../../../../pages/Homepage/utils/eventUtils';
 
 const mockStyles = {
     planTimelineRow: 'row',
@@ -138,6 +139,18 @@ describe('PlanEventRow', () => {
         renderRow({ row: { ...baseRow, isPast: true, active: false } });
         const card = document.querySelector('[role="button"]');
         expect(card).toBeTruthy();
+    });
+
+    it('renders active styling when the row is active', () => {
+        renderRow({ row: { ...baseRow, active: true } });
+        const card = document.querySelector('[role="button"]');
+        expect(card.className).toContain(mockStyles.planTimelineCardNow);
+    });
+
+    it('renders routine styling when the row is marked as routine', () => {
+        renderRow({ row: { ...baseRow, isRoutine: true } });
+        const card = document.querySelector('[role="button"]');
+        expect(card.className).toContain(mockStyles.planTimelineCardRoutine);
     });
 
     it('opens conflict popover on click when isOverlap', () => {
@@ -345,7 +358,9 @@ describe('PlanEventRow', () => {
         });
         const card = document.querySelector('[role="button"]');
         fireEvent.click(card);
-        expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
+        const updater = setConflictPopoverRowId.mock.calls[0][0];
+        expect(updater(baseRow.id)).toBeNull();
+        expect(updater('other-row')).toBe(baseRow.id);
     });
 
     it('renders end time when different from start', async () => {
@@ -353,5 +368,42 @@ describe('PlanEventRow', () => {
         formatTime.mockReturnValueOnce('9:00 am').mockReturnValueOnce('10:00 am');
         renderRow();
         expect(screen.getByText(/10:00 am/)).toBeTruthy();
+    });
+
+    it('applies the active row class when the event is happening now', () => {
+        renderRow({ row: { ...baseRow, active: true } });
+        const card = document.querySelector('[role="button"]');
+        expect(card?.className).toContain('now');
+    });
+
+    it('falls back to the original title and suppresses edit/context actions for read-only events', () => {
+        vi.mocked(homepageEventUtils.stripEmojiFromTitle).mockReturnValueOnce('');
+        const onEdit = vi.fn();
+        const onEventContextMenu = vi.fn();
+        renderRow({
+            row: {
+                ...baseRow,
+                isOverlap: true,
+                item: {
+                    ...baseRow.item,
+                    title: 'Society fallback title',
+                    start_time: '',
+                    end_time: '',
+                    source: 'society',
+                },
+            },
+            conflictPopoverRowId: baseRow.id,
+            onCardClick: undefined,
+            onEdit,
+            onEventContextMenu,
+        });
+
+        const card = document.querySelector('[role="button"]');
+        fireEvent.click(card);
+        fireEvent.contextMenu(card, { clientX: 12, clientY: 24 });
+
+        expect(screen.getByText('Society fallback title')).toBeInTheDocument();
+        expect(onEdit).not.toHaveBeenCalled();
+        expect(onEventContextMenu).not.toHaveBeenCalled();
     });
 });

@@ -76,8 +76,13 @@ function ProviderScenario() {
       <span data-testid="provider-popup-read-only">{String(popup.readOnly)}</span>
       <span data-testid="provider-delete-type">{deletion.deleteType ?? ""}</span>
       <button onClick={() => modal.openModal({ id: 2 }, "edit", "2026-04-01")}>provider modal</button>
+      <button onClick={() => modal.openModal()}>provider modal defaults</button>
       <button onClick={() => popup.openPopup({ id: 3 }, { left: 2 }, true, "list")}>provider popup explicit</button>
+      <button onClick={() => popup.openPopup({ id: 6 }, { left: 4 })}>provider popup defaults</button>
       <button onClick={() => deletion.openDelete({ id: 7 }, "all")}>provider delete</button>
+      <button onClick={() => deletion.openDelete({ id: 8 })}>provider delete default</button>
+      <button onClick={popup.closePopup}>provider popup close</button>
+      <button onClick={deletion.closeDelete}>provider delete close</button>
     </div>
   );
 }
@@ -105,12 +110,42 @@ function ProviderWithState() {
       >
         set events
       </button>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "SET_EVENTS",
+            payload: [
+              { id: 3, title: null, description: null, location: null, tag_name: "study" },
+            ],
+          })
+        }
+      >
+        set sparse events
+      </button>
       <button onClick={() => dispatch({ type: "SET_FILTER", payload: [["study"], "__manage__", " "] })}>filter nested</button>
       <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "library" })}>search description</button>
       <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "guy" })}>search location</button>
+      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "essay" })}>search title</button>
+      <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "missing" })}>search sparse</button>
       <button onClick={() => dispatch({ type: "SET_SEARCH_QUERY", payload: "   " })}>clear search</button>
       <button onClick={() => dispatch({ type: "SET_READ_ONLY", payload: true })}>read only</button>
       <button onClick={() => dispatch({ type: "OPEN_POPUP", payload: { event: { id: 5 }, anchorRect: { x: 1 }, readOnly: false, viewModeOverride: null } })}>popup from state</button>
+    </div>
+  );
+}
+
+function ProviderWithFallbackData() {
+  const dispatch = useCalendarDispatch();
+  const data = useCalendarData({ selectedDate: null, events: null, viewMode: null, displayMode: null });
+  return (
+    <div>
+      <span data-testid="fallback-selected-date-type">{Object.prototype.toString.call(data.selectedDate)}</span>
+      <span data-testid="fallback-events-count">{data.events.length}</span>
+      <span data-testid="fallback-view-mode">{data.viewMode}</span>
+      <span data-testid="fallback-display-mode">{data.displayMode}</span>
+      <button onClick={() => dispatch({ type: "SET_VIEW_MODE", payload: "week" })}>set week</button>
+      <button onClick={() => dispatch({ type: "SET_DISPLAY_MODE", payload: "list" })}>set list</button>
+      <button onClick={() => dispatch({ type: "SET_EVENTS", payload: [{ id: 77, title: "Fallback Event" }] })}>set fallback events</button>
     </div>
   );
 }
@@ -170,9 +205,20 @@ describe("CalendarContext extras", () => {
     expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
 
     act(() => {
+      screen.getByText("search title").click();
+    });
+    expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
+
+    act(() => {
       screen.getByText("clear search").click();
     });
     expect(screen.getByTestId("filtered-events")).toHaveTextContent("Essay Draft");
+
+    act(() => {
+      screen.getByText("set sparse events").click();
+      screen.getByText("search sparse").click();
+    });
+    expect(screen.getByTestId("filtered-events")).toHaveTextContent("");
   });
 
   it("supports override props plus popup, modal, and delete actions inside the provider", () => {
@@ -193,6 +239,19 @@ describe("CalendarContext extras", () => {
     expect(screen.getByTestId("provider-popup-view-mode")).toHaveTextContent("list");
     expect(screen.getByTestId("provider-popup-read-only")).toHaveTextContent("true");
     expect(screen.getByTestId("provider-delete-type")).toHaveTextContent("all");
+
+    act(() => {
+      screen.getByText("provider popup close").click();
+      screen.getByText("provider delete close").click();
+      screen.getByText("provider modal defaults").click();
+      screen.getByText("provider popup defaults").click();
+      screen.getByText("provider delete default").click();
+    });
+
+    expect(screen.getByTestId("provider-modal-type")).toHaveTextContent("");
+    expect(screen.getByTestId("provider-popup-view-mode")).toHaveTextContent("week");
+    expect(screen.getByTestId("provider-popup-read-only")).toHaveTextContent("false");
+    expect(screen.getByTestId("provider-delete-type")).toHaveTextContent("");
   });
 
   it("inherits readOnly for popup state when no override is passed", () => {
@@ -208,5 +267,24 @@ describe("CalendarContext extras", () => {
     });
 
     expect(screen.getByTestId("provider-state-popup-read-only")).toHaveTextContent("true");
+  });
+
+  it("falls back to calendar state when nullable overrides are passed to useCalendarData", () => {
+    render(
+      <CalendarProvider>
+        <ProviderWithFallbackData />
+      </CalendarProvider>,
+    );
+
+    act(() => {
+      screen.getByText("set week").click();
+      screen.getByText("set list").click();
+      screen.getByText("set fallback events").click();
+    });
+
+    expect(screen.getByTestId("fallback-selected-date-type")).toHaveTextContent("[object Date]");
+    expect(screen.getByTestId("fallback-events-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("fallback-view-mode")).toHaveTextContent("week");
+    expect(screen.getByTestId("fallback-display-mode")).toHaveTextContent("list");
   });
 });

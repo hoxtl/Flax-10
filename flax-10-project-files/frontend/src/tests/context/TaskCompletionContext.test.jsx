@@ -3,6 +3,17 @@ import { screen, act, waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { TaskCompletionProvider, useTaskCompletion } from '../../context/TaskCompletionContext';
 
+vi.mock('framer-motion', () => ({
+    AnimatePresence: ({ children }) => <>{children}</>,
+    motion: new Proxy({}, {
+        get: (_, tag) => ({ children, ...props }) => {
+            const Tag = typeof tag === 'string' ? tag : 'div';
+            const { animate, exit, initial, transition, ...rest } = props;
+            return <Tag {...rest}>{children}</Tag>;
+        },
+    }),
+}));
+
 describe('TaskCompletionContext', () => {
     let mockPlay;
 
@@ -39,13 +50,12 @@ describe('TaskCompletionContext', () => {
         const { result } = renderHook(() => useTaskCompletion(), { wrapper });
         act(() => { result.current.showCompletionToast('Done!'); });
         expect(screen.queryByText('Done!')).toBeTruthy();
-        await act(async () => {
+        act(() => {
             vi.advanceTimersByTime(2200);
             vi.runAllTimers();
         });
-        // Restore real timers before waitFor so DOM polling can work
+        expect(screen.queryByText('Done!')).toBeNull();
         vi.useRealTimers();
-        await waitFor(() => expect(screen.queryByText('Done!')).toBeNull(), { timeout: 3000 });
     });
 
     it('plays sound for non-routine tasks', () => {
@@ -96,5 +106,37 @@ describe('TaskCompletionContext', () => {
         act(() => { result.current.showCompletionToast('Test'); });
         unmount();
         vi.useRealTimers();
+    });
+
+    it('falls back to the backup sound when the primary sound playback rejects', async () => {
+        const playCalls = [];
+        vi.stubGlobal('Audio', function(src) {
+            this.src = src;
+            this.volume = 0;
+            this.play = vi.fn(() => {
+                playCalls.push(src);
+                return Promise.reject(new Error(`failed: ${src}`));
+            });
+        });
+
+        const wrapper = ({ children }) => <TaskCompletionProvider>{children}</TaskCompletionProvider>;
+        const { result } = renderHook(() => useTaskCompletion(), { wrapper });
+
+        await act(async () => {
+            result.current.showCompletionToast('Fallback');
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        expect(playCalls).toEqual([
+            '/completion-pop.mp3',
+            'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+        ]);
+    });
+
+    it('unmounts cleanly even when no completion timer has been created', () => {
+        const wrapper = ({ children }) => <TaskCompletionProvider>{children}</TaskCompletionProvider>;
+        const { unmount } = renderHook(() => useTaskCompletion(), { wrapper });
+        expect(() => unmount()).not.toThrow();
     });
 });
