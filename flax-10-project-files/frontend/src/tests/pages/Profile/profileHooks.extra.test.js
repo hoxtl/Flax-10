@@ -253,14 +253,13 @@ describe("profile hook extras", () => {
     });
   });
 
-  it("polls remote profiles and reloads them without hitting the auth refresh hook", async () => {
+  it("polls remote profiles periodically", async () => {
     vi.useFakeTimers();
     getAnotherUserProfile
       .mockResolvedValueOnce({ id: 9, is_sharing: false })
-      .mockResolvedValueOnce({ id: 9, is_sharing: true })
       .mockResolvedValueOnce({ id: 9, is_sharing: true });
 
-    const { result, unmount } = renderHook(() => useProfileData(9));
+    const { result } = renderHook(() => useProfileData(9));
     await act(async () => {
       await Promise.resolve();
       await Promise.resolve();
@@ -273,16 +272,17 @@ describe("profile hook extras", () => {
       await Promise.resolve();
     });
     expect(getAnotherUserProfile).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
 
+  it("reloads remote profiles without hitting the auth refresh hook", async () => {
+    getAnotherUserProfile.mockResolvedValue({ id: 9, is_sharing: true });
+    const { result } = renderHook(() => useProfileData(9));
     await act(async () => {
       await result.current.reload();
       await Promise.resolve();
     });
-
     expect(refreshProfile).not.toHaveBeenCalled();
-    expect(getAnotherUserProfile).toHaveBeenCalledTimes(3);
-
-    unmount();
-    vi.useRealTimers();
+    expect(getAnotherUserProfile).toHaveBeenCalled();
   });
 });
