@@ -6,11 +6,12 @@ vi.mock("../../api/userApi", () => ({
   getUserSettings: (...args) => getUserSettings(...args),
 }));
 
-import { loadTheme } from "../../app/theme";
+import { loadTheme, readStoredThemePrefs } from "../../app/theme";
 
 describe("loadTheme", () => {
   beforeEach(() => {
     getUserSettings.mockReset();
+    localStorage.clear();
   });
 
   it("stops loading immediately when the user is not authenticated", async () => {
@@ -66,5 +67,20 @@ describe("loadTheme", () => {
     expect(setInitialTheme).toHaveBeenCalledWith("flax");
     expect(setInitialMode).toHaveBeenCalledWith("light");
     expect(setIsLoadingTheme).toHaveBeenCalledWith(false);
+  });
+
+  it("reads valid stored theme preferences directly from the current keys", () => {
+    localStorage.setItem("colorTheme", "ocean");
+    localStorage.setItem("mode", "dark");
+
+    expect(readStoredThemePrefs()).toEqual({ theme: "ocean", mode: "dark" });
+  });
+
+  it("falls back to the legacy theme key and defaults when stored values are invalid", () => {
+    localStorage.setItem("colorTheme", "invalid-theme");
+    localStorage.setItem("mode", "invalid-mode");
+    localStorage.setItem("theme", "forest");
+
+    expect(readStoredThemePrefs()).toEqual({ theme: "forest", mode: "light" });
   });
 });

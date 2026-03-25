@@ -34,7 +34,16 @@ vi.mock('../../../../components/Calendar/hooks/useKeyboardNav', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/TableView/TableRow', () => ({
-    TableRow: ({ event }) => <tr data-testid="table-row"><td>{event.title}</td></tr>,
+    TableRow: ({ event, onCellClick, readOnly }) => (
+        <tr data-testid="table-row" data-read-only={String(readOnly)}>
+            <td>{event.title}</td>
+            <td>
+                <button type="button" onClick={() => onCellClick(event.id, 'title', event.title)}>
+                    edit-{event.id}
+                </button>
+            </td>
+        </tr>
+    ),
 }));
 
 vi.mock('../../../../components/Pagination/Pagination', () => ({
@@ -119,14 +128,20 @@ describe('TableView', () => {
         expect(screen.getByText('Prop Event')).toBeInTheDocument();
     });
 
+    it('falls back to an empty array when calendar data returns null events', () => {
+        mockEvents = null;
+        render(<TableView />);
+        expect(screen.getByText('No events to display')).toBeInTheDocument();
+    });
+
     it('passes readOnly through when prop or context enables it', () => {
         const propEvents = [createMockEvent({ id: 1, title: 'Read Only Event' })];
         const { rerender } = render(<TableView events={propEvents} readOnly />);
-        expect(screen.getByTestId('table-row')).toHaveTextContent('Read Only Event');
+        expect(screen.getByTestId('table-row')).toHaveAttribute('data-read-only', 'true');
 
         mockUseCalendar.mockReturnValueOnce({ readOnly: true });
         rerender(<TableView events={propEvents} />);
-        expect(screen.getByTestId('table-row')).toBeInTheDocument();
+        expect(screen.getByTestId('table-row')).toHaveAttribute('data-read-only', 'true');
     });
 
     it('does not save when click occurs inside the table and removes listener on cleanup', () => {
@@ -140,5 +155,14 @@ describe('TableView', () => {
 
         unmount();
         expect(removeSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
+    });
+
+    it('forwards table row cell clicks into startEdit', () => {
+        const event = createMockEvent({ id: 5, title: 'Editable Row' });
+        render(<TableView events={[event]} />);
+
+        fireEvent.click(screen.getByText('edit-5'));
+
+        expect(mockEditState.startEdit).toHaveBeenCalledWith(5, 'title', 'Editable Row');
     });
 });
