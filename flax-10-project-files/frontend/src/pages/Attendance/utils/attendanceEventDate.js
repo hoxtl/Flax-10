@@ -21,6 +21,7 @@ export function formatAttendanceDetailDate(startTime) {
 }
 
 /** "Monday, 30 March" — used as the date group header in attendance lists. */
+
 export function formatDateGroupHeader(startTime) {
   if (!startTime) return "Unknown date";
   return new Date(startTime).toLocaleDateString("en-GB", {
@@ -31,12 +32,14 @@ export function formatDateGroupHeader(startTime) {
 }
 
 /** "HH:MM" time only — used inside a date-grouped row. */
+
 export function formatEventTime(startTime) {
   if (!startTime) return "";
   return new Date(startTime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 /** True if the event's start time is in the past (or right now). */
+
 export function isEventInPast(startTime) {
   if (!startTime) return false;
   return new Date(startTime) <= new Date();

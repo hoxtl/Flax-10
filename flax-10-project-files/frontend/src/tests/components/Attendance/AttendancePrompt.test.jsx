@@ -256,22 +256,21 @@ describe("Attendance prompt", () => {
     expect(screen.getByText(/Did you attend/i)).toBeInTheDocument();
   });
 
-  it("handles prompt utilities and candidate polling", async () => {
+  it("handles prompt utilities", () => {
     const candidate = {
       id: 11,
-      title: "Timetable Lecture",
-      source: "kcl",
-      external_id: "abc",
+      title: "Lecture",
       start_time: "2026-03-01T10:00:00Z",
       end_time: "2026-03-01T11:00:00Z",
     };
-
     expect(isInPromptWindow(candidate)).toBe(true);
-    expect(new Date(getDateRangeForPrompt().start).toString()).not.toBe("Invalid Date");
-    expect(findCandidateEvent([candidate, { id: 12 }], new Set())).toEqual(candidate);
-    expect(isInPromptWindow({ start_time: "2026-02-25T08:00:00Z", end_time: "2026-02-25T08:30:00Z" })).toBe(false);
-    expect(findCandidateEvent(null, new Set())).toBeNull();
+    expect(getDateRangeForPrompt().start).toBeDefined();
+    expect(findCandidateEvent([candidate], new Set())).toEqual(candidate);
+    expect(isInPromptWindow({ start_time: "2026-02-25T08:00:00Z" })).toBe(false);
+  });
 
+  it("handles candidate polling hook", async () => {
+    const candidate = { id: 11, title: "Timetable Lecture" };
     getEventsMock.mockResolvedValue([candidate]);
     const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
 

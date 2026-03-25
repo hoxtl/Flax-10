@@ -106,11 +106,13 @@ function normalizeQuickAddView(view) {
 }
 
 function getHeader(view) {
-  if (view === 'module') return { title: 'Module Options', sub: 'Create a module, add a deadline or reading ' };
-  if (view === 'tag') return { title: 'Choose Event Tag', sub: 'What kind of event is this?' };
-  if (view === 'module_picker') return { title: 'Select Module', sub: 'Which module is this deadline for?' };
-  if (view === 'module_picker_reading') return { title: 'Select Module', sub: 'Which module is this reading for? '};
-  return { title: 'Quick Add', sub: 'What would you like to add?' };
+  const titles = {
+    module: { title: 'Module Options', sub: 'Create a module, add a deadline or reading ' },
+    tag: { title: 'Choose Event Tag', sub: 'What kind of event is this?' },
+    module_picker: { title: 'Select Module', sub: 'Which module is this deadline for?' },
+    module_picker_reading: { title: 'Select Module', sub: 'Which module is this reading for? ' }
+  };
+  return titles[view] || { title: 'Quick Add', sub: 'What would you like to add?' };
 }
 
 export default function QuickAddModal({ onClose, onSelectType, isTeacher, initialView = 'type' }) {

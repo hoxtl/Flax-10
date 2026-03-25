@@ -23,8 +23,14 @@ function CampusList({ onSelectCampus, selectedCampus }) {
 }
 
 function DestinationChip({ customDestination, onClearCampus, onClearCustomDest, selectedCampus }) {
-  if (customDestination) return <LocationChip dotColor="var(--color-destination-red)" title={customDestination.name} subtitle={customDestination.address} onClear={onClearCustomDest} />;
-  if (selectedCampus) return <LocationChip dotColor={selectedCampus.color} title={selectedCampus.name} subtitle={selectedCampus.address} onClear={onClearCampus} />;
+  if (customDestination) {
+    return <LocationChip dotColor="var(--color-destination-red)" title={customDestination.name} subtitle={customDestination.address} onClear={onClearCustomDest} />;
+  }
+
+  if (selectedCampus) {
+    return <LocationChip dotColor={selectedCampus.color} title={selectedCampus.name} subtitle={selectedCampus.address} onClear={onClearCampus} />;
+  }
+
   return <p className={styles.hintText}>Select a campus or event as destination</p>;
 }
 

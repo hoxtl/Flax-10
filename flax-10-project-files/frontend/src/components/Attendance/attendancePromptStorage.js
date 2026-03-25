@@ -27,11 +27,13 @@ function writeSet(storage, key, ids) {
 }
 
 /** IDs of events the user has answered (Yes/No). Persists across logins. */
+
 export function getPromptedIds() {
   return readSet(localStorage, ANSWERED_KEY);
 }
 
 /** Mark an event as permanently answered (Yes/No). */
+
 export function setPromptedId(eventId) {
   const ids = getPromptedIds();
   ids.add(eventId);
@@ -39,11 +41,13 @@ export function setPromptedId(eventId) {
 }
 
 /** IDs of events dismissed this session. Cleared when the browser session ends. */
+
 export function getSessionDismissedIds() {
   return readSet(sessionStorage, DISMISSED_KEY);
 }
 
 /** Mark an event as dismissed for this session only. */
+
 export function setSessionDismissedId(eventId) {
   const ids = getSessionDismissedIds();
   ids.add(eventId);
@@ -51,6 +55,7 @@ export function setSessionDismissedId(eventId) {
 }
 
 /** Combined set of event IDs to skip (answered permanently + dismissed this session). */
+
 export function getSkippedIds() {
   return new Set([...getPromptedIds(), ...getSessionDismissedIds()]);
 }

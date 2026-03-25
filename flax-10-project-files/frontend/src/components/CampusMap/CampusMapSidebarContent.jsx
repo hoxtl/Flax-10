@@ -1,6 +1,7 @@
 /*
  * Campus map sidebar content.
  */
+
 import styles from "../../pages/CampusMap/CampusMap.module.css";
 import { DestinationSection } from "./DestinationSection";
 import { SidebarHeader } from "./SidebarHeader";

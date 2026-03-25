@@ -325,32 +325,21 @@ describe("mapHelpers", () => {
     expect(setForm).not.toHaveBeenCalled();
   });
 
-  it("closes home popup after setting home as start when popup was already open", async () => {
+  it("closes home popup after setting home as start", async () => {
     vi.useFakeTimers();
     reverseGeocode.mockResolvedValueOnce("Home Street");
     const refs = createRefs();
-    const setSelection = vi.fn((updater) => updater({ startLocation: null }));
-    const setForm = vi.fn((updater) => updater({ manualStart: "" }));
+    const setSelection = vi.fn();
     const userHome = { address: "", lat: 51.49, lng: -0.12 };
-
-    syncHomeMarker(refs, true, null, userHome, setSelection, setForm);
-
-    // Make the popup appear open so wireHomeButton closes it
-    const homePointerCurrent = refs.homePointer.current;
-    const popupMock = homePointerCurrent._popup;
-    if (popupMock) popupMock.isOpen.mockReturnValue(true);
-
+    syncHomeMarker(refs, true, null, userHome, setSelection, vi.fn());
+    const pointer = refs.homePointer.current;
+    pointer._popup.isOpen.mockReturnValue(true);
     vi.advanceTimersByTime(100);
-
     document.getElementById("setHomeAsStart").click();
     await Promise.resolve();
     await Promise.resolve();
-
     expect(setSelection).toHaveBeenCalled();
-    // togglePopup should have been called to close the popup
-    if (homePointerCurrent.togglePopup) {
-      expect(homePointerCurrent.togglePopup).toHaveBeenCalled();
-    }
+    expect(pointer.togglePopup).toHaveBeenCalled();
   });
 
   it("cleans up markers, popups, and the map instance", () => {

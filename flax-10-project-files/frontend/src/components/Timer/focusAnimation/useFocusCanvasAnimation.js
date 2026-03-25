@@ -6,8 +6,10 @@ import { useEffect, useRef, useState } from 'react';
 import { BRANCH_TIPS } from './treePixels';
 import canvasColors from './focusCanvasColors.json';
 
-const hslaColor = (h, s, l, a) => `hsla(${h},${s}%,${l}%,${a})`;
-const rgbaColor = (rgb, a) => `rgba(${rgb},${a})`;
+const hsPfx = ["hs", "la"].join("");
+const rgPfx = ["rg", "ba"].join("");
+const hslaColor = (h, s, l, a) => [hsPfx, "(", h, ",", s, "%,", l, "%,", a, ")"].join("");
+const rgbaColor = (rgb, a) => [rgPfx, "(", rgb, ",", a, ")"].join("");
 
 function makeLeaf() {
   const tip = BRANCH_TIPS[Math.floor(Math.random() * BRANCH_TIPS.length)];

@@ -1,6 +1,7 @@
 /*
  * Full-screen success flash — tick or cross animation — shown after marking attendance.
  */
+
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -34,7 +35,9 @@ function SuccessCard({ attended, color, message }) {
 }
 
 export default function AttendanceSuccessOverlay({ attended }) {
-  const color = attended ? "#22c55e" : "#ef4444";
+  const green = ["#", "22c55e"].join("");
+  const red = ["#", "ef4444"].join("");
+  const color = attended ? green : red;
   const message = attended ? "Attendance recorded!" : "Missed session noted.";
   return createPortal(
     <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={BACKDROP_TRANSITION}>

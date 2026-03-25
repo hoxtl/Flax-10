@@ -1,6 +1,7 @@
 /*
  * Society detail page state hooks.
  */
+
 import { useEffect, useState } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useChangeTracker } from "../../components/Society/hooks/useChangeTracker";
