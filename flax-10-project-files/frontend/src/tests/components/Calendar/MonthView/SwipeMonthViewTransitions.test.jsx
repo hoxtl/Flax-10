@@ -39,35 +39,18 @@ describe("SwipeMonthView coverage", () => {
   it("resets scroll position and applies both animation directions", () => {
     vi.useFakeTimers();
     const { container, rerender } = render(<SwipeMonthView />);
-
     const root = container.firstChild;
-    const content = root.firstChild;
-    const swipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
+    act(() => { useSwipeNavigation.mock.calls.at(-1)[0].onNext(); });
+    expect(root.firstChild.className).toContain(styles.slideUp);
 
-    act(() => {
-      swipeHandlers.onNext();
-    });
-    expect(content.className).toContain(styles.slideUp);
-
-    act(() => {
-      vi.advanceTimersByTime(150);
-    });
-
+    act(() => { vi.advanceTimersByTime(150); });
     root.scrollTop = 40;
-    calendarState = {
-      ...calendarState,
-      selectedDate: new Date("2026-04-15T00:00:00.000Z"),
-    };
+    calendarState = { ...calendarState, selectedDate: new Date("2026-04-15T00:00:00.000Z") };
     rerender(<SwipeMonthView />);
     expect(root.scrollTop).toBe(0);
 
-    const nextSwipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
-    const nextContent = container.firstChild.firstChild;
-    act(() => {
-      nextSwipeHandlers.onPrev();
-    });
-    expect(nextContent.className).toContain(styles.slideDown);
-
+    act(() => { useSwipeNavigation.mock.calls.at(-1)[0].onPrev(); });
+    expect(container.firstChild.firstChild.className).toContain(styles.slideDown);
     vi.useRealTimers();
   });
 });

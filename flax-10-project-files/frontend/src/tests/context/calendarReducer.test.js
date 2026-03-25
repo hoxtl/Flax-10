@@ -205,30 +205,21 @@ describe('calendarReducer', () => {
     });
 
     it('should handle shared calendar and delete confirm branches', () => {
-        const sharedState = calendarReducer(initialState, {
-            type: 'SET_SHARED_CALENDAR_VIEW',
-            payload: { userId: 99, userName: 'Casey' },
-        });
+        const sharedState = calendarReducer(initialState, { type: 'SET_SHARED_CALENDAR_VIEW', payload: { userId: 99, userName: 'Casey' } });
         expect(sharedState.sharedCalendarUserId).toBe(99);
         expect(sharedState.sharedCalendarName).toBe('Casey');
 
-        const resetSharedState = calendarReducer(sharedState, {
-            type: 'SET_SHARED_CALENDAR_VIEW',
-            payload: null,
-        });
+        const resetSharedState = calendarReducer(sharedState, { type: 'SET_SHARED_CALENDAR_VIEW', payload: null });
         expect(resetSharedState.sharedCalendarUserId).toBeNull();
         expect(resetSharedState.sharedCalendarName).toBe('');
 
-        const deleteState = calendarReducer(initialState, {
-            type: 'OPEN_DELETE_CONFIRM',
-            payload: { event: { id: 10 } },
-        });
+        const deleteState = calendarReducer(initialState, { type: 'OPEN_DELETE_CONFIRM', payload: { event: { id: 10 } } });
         expect(deleteState.isDeleteConfirmOpen).toBe(true);
         expect(deleteState.deleteConfirmType).toBeNull();
 
-        const closedDeleteState = calendarReducer(deleteState, { type: 'CLOSE_DELETE_CONFIRM' });
-        expect(closedDeleteState.isDeleteConfirmOpen).toBe(false);
-        expect(closedDeleteState.deleteConfirmEvent).toBeNull();
+        const closedState = calendarReducer(deleteState, { type: 'CLOSE_DELETE_CONFIRM' });
+        expect(closedState.isDeleteConfirmOpen).toBe(false);
+        expect(closedState.deleteConfirmEvent).toBeNull();
     });
 
     it('should handle SET_SEARCH_QUERY', () => {

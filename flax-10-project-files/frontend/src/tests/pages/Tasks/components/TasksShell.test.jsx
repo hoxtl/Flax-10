@@ -44,24 +44,8 @@ describe("Tasks shell coverage", () => {
   it("renders the create-list-from-task modal branch", () => {
     render(
       <TasksPageContent
-        page={{
-          sidebarProps: {},
-          feedProps: {},
-          showTaskModal: false,
-          taskModalProps: {},
-          toastUndo: null,
-          toastDelete: false,
-          toastInfo: null,
-          handleUndoAddTask: vi.fn(),
-          setToastUndo: vi.fn(),
-          setToastDelete: vi.fn(),
-          setToastInfo: vi.fn(),
-          showListModal: false,
-          listModalProps: {},
-          showCreateListFromTask: true,
-          createListFromTaskProps: {},
-        }}
-      />,
+        page={{ sidebarProps: {}, feedProps: {}, showTaskModal: false, taskModalProps: {}, toastUndo: null, toastDelete: false, toastInfo: null, handleUndoAddTask: vi.fn(), setToastUndo: vi.fn(), setToastDelete: vi.fn(), setToastInfo: vi.fn(), showListModal: false, listModalProps: {}, showCreateListFromTask: true, createListFromTaskProps: {} }}
+      />
     );
 
     expect(screen.getByTestId("create-list-modal")).toBeInTheDocument();
@@ -69,16 +53,7 @@ describe("Tasks shell coverage", () => {
   });
 
   it("renders toast variants and wires undo and close handlers", () => {
-    const props = {
-      toastUndo: { taskId: 1, title: "Essay" },
-      toastDelete: true,
-      toastInfo: "List deleted successfully.",
-      handleUndoAddTask: vi.fn(),
-      setToastUndo: vi.fn(),
-      setToastDelete: vi.fn(),
-      setToastInfo: vi.fn(),
-    };
-
+    const props = { toastUndo: { taskId: 1, title: "Essay" }, toastDelete: true, toastInfo: "List deleted successfully.", handleUndoAddTask: vi.fn(), setToastUndo: vi.fn(), setToastDelete: vi.fn(), setToastInfo: vi.fn() };
     render(<TasksPageToasts {...props} />);
 
     expect(screen.getAllByTestId("toast-success")).toHaveLength(3);

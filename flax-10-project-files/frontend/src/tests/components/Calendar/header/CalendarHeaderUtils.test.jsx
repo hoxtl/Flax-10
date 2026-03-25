@@ -195,5 +195,15 @@ describe('CalendarHeaderUtils', () => {
             fireEvent.mouseEnter(screen.getByLabelText('Filter events'));
             expect(screen.queryByText(/Manage tags/i)).not.toBeInTheDocument();
         });
+
+        it('shows the active filter count and opens the tag manager modal', () => {
+            render(<FilterDropdownButton active={['lecture']} onChange={vi.fn()} />);
+            const trigger = screen.getByLabelText('Filter events');
+            expect(trigger.textContent).toContain('1');
+
+            fireEvent.mouseEnter(trigger);
+            fireEvent.click(screen.getByText(/Manage tags/i));
+            expect(screen.getByTestId('tag-manager-modal')).toBeInTheDocument();
+        });
     });
 });

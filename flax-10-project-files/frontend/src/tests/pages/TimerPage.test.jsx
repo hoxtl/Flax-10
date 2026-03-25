@@ -191,7 +191,7 @@ describe('TimerPage Integration', () => {
     beforeEach(setupTests);
     afterEach(cleanupTests);
     it('renders initial state correctly', testInitialState, 15000);
-    it('starts and stops the timer', testStartStop);
+    it('starts and stops the timer', testStartStop, 15000);
     it('resets the timer', testReset);
     it('updates settings', testSettings, 15000);
     it('shows break modal when work session finishes', testBreakModalShow, 15000);

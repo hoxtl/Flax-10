@@ -37,7 +37,7 @@ describe("TagsSelector null ref handling", () => {
       };
     });
 
-    const { TagsSelector } = await import("../../../components/Common/TagsSelector/TagsSelector");
+    const { TagsSelector } = await import("../../../components/common/TagsSelector/TagsSelector");
 
     render(
       <TagsSelector

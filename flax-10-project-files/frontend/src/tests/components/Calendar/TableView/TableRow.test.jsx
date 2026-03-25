@@ -19,7 +19,7 @@ vi.mock('../../../../components/Calendar/hooks/useCalendarEvents', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/hooks/useQuickActions', () => ({
-    useQuickActions: (event) => event.society_name ? mockQuickAction : null,
+    useQuickActions: (event) => event.noQuickAction ? null : event.society_name ? mockQuickAction : null,
 }));
 
 vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
@@ -28,7 +28,7 @@ vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
-    getEventTheme: () => ({ color: '#7B6751' }),
+    getEventTheme: (event) => ({ color: event.noAccent ? undefined : '#7B6751' }),
 }));
 
 vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
@@ -36,8 +36,8 @@ vi.mock('../../../../components/Calendar/utils/dateUtils', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/TableView/cells/EditableCell', () => ({
-    EditableCell: ({ value, isEditing, onChange }) => isEditing
-        ? <input data-testid="editable-input" value={value} onChange={e => onChange(e.target.value)} />
+    EditableCell: ({ value, isEditing, onChange, onKeyDown }) => isEditing
+        ? <input data-testid="editable-input" value={value} onChange={e => onChange(e.target.value)} onKeyDown={onKeyDown} />
         : <span data-testid="cell-text">{value || '—'}</span>,
 }));
 
@@ -56,7 +56,11 @@ vi.mock('../../../../components/Calendar/TableView/cells/LocationEditCell', () =
 }));
 
 vi.mock('../../../../components/Calendar/TableView/cells/DateTimeCell', () => ({
-    DateTimeCell: ({ event }) => <span data-testid="date-cell">{event.start_time}</span>,
+    DateTimeCell: ({ event, onSave }) => (
+        <button type="button" data-testid="date-cell" onClick={() => onSave('2026-03-16T09:00:00Z')}>
+            {event.start_time}
+        </button>
+    ),
 }));
 
 vi.mock('../../../../components/common/ConfirmModal/ConfirmModal', () => ({
@@ -145,6 +149,11 @@ describe('TableRow', () => {
         expect(screen.getByText('Chess Club')).toBeInTheDocument();
     });
 
+    it('applies society badge colours when provided', () => {
+        render(<table><tbody><TableRow event={createMockEvent({ society_name: 'Chess Club', society_color: '#123456' })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        expect(screen.getByText('Chess Club').getAttribute('style')).toContain('background-color: rgb(18, 52, 86)');
+    });
+
     it('toggles expansion on row click for read-only events', () => {
         const { container } = render(<table><tbody><TableRow event={createMockEvent({ module: { id: 1, name: 'CS' } })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
         const row = container.querySelector('tr');
@@ -157,6 +166,11 @@ describe('TableRow', () => {
         render(<table><tbody><TableRow event={createMockEvent({ society_name: 'Chess Club' })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
         fireEvent.click(screen.getByText('Join'));
         expect(mockQuickAction.onClick).toHaveBeenCalled();
+    });
+
+    it('renders a read-only row without a quick action when none is returned', () => {
+        render(<table><tbody><TableRow event={createMockEvent({ society_name: 'Chess Club', noQuickAction: true })} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        expect(screen.queryByText('Join')).not.toBeInTheDocument();
     });
 
     it('opens inline editing from keyboard navigation and passes tag identifiers', () => {
@@ -195,5 +209,63 @@ describe('TableRow', () => {
         expect(row.className).not.toMatch(/todayRow/i);
         expect(row.style.getPropertyValue('--accent')).toBe('#7B6751');
         expect(screen.getByText('Chess Club')).toBeInTheDocument();
+    });
+
+    it('covers tag, date, location, description, and style fallbacks', () => {
+        const stopPropagation = vi.fn();
+        const onCellClick = vi.fn();
+        const event = createMockEvent({
+            id: 7,
+            module: { id: 1, name: 'CS101' },
+            location: 'Library',
+            noAccent: true,
+        });
+        const editState = { ...defaultEditState, editingCell: { eventId: 7, field: 'location' }, cellValue: 'Edited library' };
+
+        const { container } = render(<table><tbody><TableRow event={event} rowIndex={0} editState={editState} navState={defaultNavState} onCellClick={onCellClick} viewMode="month" /></tbody></table>);
+
+        fireEvent.click(screen.getByTestId('tag-cell').closest('td'), { stopPropagation });
+        fireEvent.click(screen.getByTestId('date-cell'));
+        fireEvent.click(screen.getByTestId('location-editor').closest('td'));
+        fireEvent.click(screen.getByText('—').closest('td'));
+
+        expect(defaultEditState.saveDateTimes).toHaveBeenCalledWith(7, '2026-03-16T09:00:00Z');
+        expect(onCellClick).not.toHaveBeenCalled();
+        expect(stopPropagation).not.toHaveBeenCalled();
+        expect(screen.getByText('CS101').getAttribute('style')).toBeNull();
+        expect(container.querySelector('tr').getAttribute('style')).toBeNull();
+    });
+
+    it('handles td propagation and forwards keydown handlers', () => {
+        const stopSpy = vi.spyOn(Event.prototype, 'stopPropagation');
+        const navState = { ...defaultNavState, handleKeyDown: vi.fn() };
+        const editState = { ...defaultEditState, editingCell: { eventId: 12, field: 'title' } };
+        const evt = createMockEvent({ id: 12, title: 'A', description: 'B' });
+        const { rerender } = render(<table><tbody><TableRow event={evt} rowIndex={0} editState={editState} navState={navState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+
+        fireEvent.click(screen.getByTestId('tag-cell').closest('td'));
+        fireEvent.click(screen.getByTestId('date-cell').closest('td'));
+        fireEvent.keyDown(screen.getByTestId('editable-input'), { key: 'Enter' });
+
+        const nextEditState = { ...defaultEditState, editingCell: { eventId: 12, field: 'description' } };
+        rerender(<table><tbody><TableRow event={evt} rowIndex={0} editState={nextEditState} navState={navState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        fireEvent.keyDown(screen.getByTestId('editable-input'), { key: 'Tab' });
+
+        expect(stopSpy).toHaveBeenCalled();
+        expect(navState.handleKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key: 'Enter' }), 0, 0);
+        expect(navState.handleKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key: 'Tab' }), 0, 3);
+        stopSpy.mockRestore();
+    });
+
+    it('shows editable hover icons on enter and hides on leave', () => {
+        const evt = createMockEvent({ id: 12, title: 'A', description: 'B' });
+        const { container } = render(<table><tbody><TableRow event={evt} rowIndex={0} editState={defaultEditState} navState={defaultNavState} onCellClick={vi.fn()} viewMode="month" /></tbody></table>);
+        const row = container.querySelector('tr');
+        
+        fireEvent.mouseEnter(row);
+        fireEvent.mouseLeave(row);
+        
+        const svgClass = row.querySelector('svg')?.className.baseVal || row.querySelector('svg')?.getAttribute('class');
+        expect(svgClass).not.toMatch(/editIconVisible/i);
     });
 });

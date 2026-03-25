@@ -40,13 +40,24 @@ describe('ListView', () => {
         mockEvents = [];
         mockViewMode = 'month';
         Element.prototype.scrollIntoView = vi.fn();
+        vi.stubGlobal('requestAnimationFrame', (callback) => {
+            callback();
+            return 1;
+        });
     });
 
     afterEach(() => {
         vi.useRealTimers();
+        vi.unstubAllGlobals();
     });
 
     it('renders empty state when no events', () => {
+        render(<ListView />);
+        expect(screen.getByText('No events to display')).toBeInTheDocument();
+    });
+
+    it('renders empty state when calendar data returns null events', () => {
+        mockEvents = null;
         render(<ListView />);
         expect(screen.getByText('No events to display')).toBeInTheDocument();
     });
@@ -161,5 +172,93 @@ describe('ListView', () => {
 
         expect(screen.getByTestId('conflict-row')).toHaveTextContent('Overlap A, Overlap B');
         expect(screen.getByText('All day')).toBeInTheDocument();
+    });
+
+    it('renders non-overlapping day events as separate rows', () => {
+        mockViewMode = 'day';
+        const events = [
+            createMockEvent({ id: 1, title: 'Morning', start_time: '2026-03-15T09:00:00Z', end_time: '2026-03-15T10:00:00Z' }),
+            createMockEvent({ id: 2, title: 'Afternoon', start_time: '2026-03-15T11:30:00Z', end_time: '2026-03-15T12:00:00Z' }),
+        ];
+
+        render(<ListView events={events} />);
+
+        expect(screen.getAllByTestId('event-row')).toHaveLength(2);
+        expect(screen.queryByTestId('conflict-row')).not.toBeInTheDocument();
+    });
+
+    it('opens the page containing today when month view spans multiple day pages', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2026-03-08T12:00:00Z'));
+        const events = Array.from({ length: 7 }, (_, index) =>
+            createMockEvent({
+                id: index + 1,
+                title: `Event ${index + 1}`,
+                start_time: `2026-03-0${index + 2}T10:00:00Z`,
+                end_time: `2026-03-0${index + 2}T11:00:00Z`,
+            }),
+        );
+
+        render(<ListView events={events} />);
+
+        expect(screen.getByText('Event 7')).toBeInTheDocument();
+        expect(screen.queryByText('Event 1')).not.toBeInTheDocument();
+        expect(screen.getByTestId('pagination')).toHaveTextContent('2/2');
+    });
+
+    it('does not reset the current page when month view rerenders with the same mode', () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2026-03-08T12:00:00Z'));
+        const genEvents = (idOffset, titlePrefix, dayOffset) => Array.from({ length: 7 }, (_, i) =>
+            createMockEvent({ id: i + idOffset, title: `${titlePrefix} ${i + 1}`, start_time: `2026-03-0${i + dayOffset}T10:00:00Z`, end_time: `2026-03-0${i + dayOffset}T11:00:00Z` })
+        );
+        const firstEvents = genEvents(1, 'Initial', 2);
+        const nextEvents = genEvents(21, 'Updated', 1);
+
+        const { rerender } = render(<ListView events={firstEvents} />);
+        expect(screen.getByTestId('pagination')).toHaveTextContent('2/2');
+
+        rerender(<ListView events={nextEvents} />);
+
+        expect(screen.getByTestId('pagination')).toHaveTextContent('2/2');
+        expect(screen.getByText('Updated 6')).toBeInTheDocument();
+        expect(screen.queryByText('Updated 1')).not.toBeInTheDocument();
+    });
+
+    it('auto-scrolls to today in grouped views when today is present', () => {
+        vi.setSystemTime(new Date('2026-03-15T12:00:00Z'));
+        const events = [
+            createMockEvent({ id: 1, title: 'Yesterday', start_time: '2026-03-14T10:00:00Z', end_time: '2026-03-14T11:00:00Z' }),
+            createMockEvent({ id: 2, title: 'Today event', start_time: '2026-03-15T10:00:00Z', end_time: '2026-03-15T11:00:00Z' }),
+        ];
+
+        render(<ListView events={events} />);
+
+        expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'start' });
+    });
+
+    it('keeps shorter overlapping events in the same conflict group without extending max end time', () => {
+        mockViewMode = 'day';
+        const events = [
+            createMockEvent({ id: 1, title: 'Long overlap', start_time: '2026-03-15T10:00:00Z', end_time: '2026-03-15T12:00:00Z' }),
+            createMockEvent({ id: 2, title: 'Short overlap', start_time: '2026-03-15T10:30:00Z', end_time: '2026-03-15T11:00:00Z' }),
+        ];
+
+        render(<ListView events={events} />);
+
+        expect(screen.getByTestId('conflict-row')).toHaveTextContent('Long overlap, Short overlap');
+    });
+
+    it('renders all-day day-view events without leaving an unfinished trailing group', () => {
+        mockViewMode = 'day';
+        const events = [
+            createMockEvent({ id: 1, title: 'Timed event', start_time: '2026-03-15T10:00:00Z', end_time: '2026-03-15T11:00:00Z' }),
+            createMockEvent({ id: 2, title: 'Late all day', all_day: true, start_time: '2026-03-15T23:59:00Z', end_time: '2026-03-16T23:59:00Z' }),
+        ];
+
+        render(<ListView events={events} />);
+
+        expect(screen.getAllByTestId('event-row')).toHaveLength(2);
+        expect(screen.queryByTestId('conflict-row')).not.toBeInTheDocument();
     });
 });
