@@ -3,11 +3,13 @@
  */
 
 /** Ascending: upcoming / soonest-first (used for unrecorded events). */
+
 function sortAscending(a, b) {
   return new Date(a.start_time) - new Date(b.start_time);
 }
 
 /** Descending: most-recent-first (used for already-marked events). */
+
 function sortDescending(a, b) {
   return new Date(b.start_time) - new Date(a.start_time);
 }

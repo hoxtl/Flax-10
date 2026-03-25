@@ -1,6 +1,7 @@
 /*
  * Reusable widget header with icon, title, meta, count, and actions.
  */
+
 import styles from "./WidgetHeader.module.css";
 
 function HeaderIcon({ Icon }) {

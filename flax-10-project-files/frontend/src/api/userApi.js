@@ -41,13 +41,17 @@ export function saveHomeAddress(address, latitude, longitude) {
 }
 
 function buildSearchUrl(query, courseFilter, societyFilter, offset, limit, yearFilter, roleFilter, sortBy) {
-  let url = `/users/search/?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`;
-  if (courseFilter) url += `&course=${encodeURIComponent(courseFilter)}`;
-  if (societyFilter) url += `&society=${encodeURIComponent(societyFilter)}`;
-  if (yearFilter) url += `&year=${encodeURIComponent(yearFilter)}`;
-  if (roleFilter) url += `&role=${encodeURIComponent(roleFilter)}`;
-  url += `&ordering=${sortBy === 'name-desc' ? '-name' : 'name'}`;
-  return url;
+  const params = new URLSearchParams({
+    q: query,
+    offset,
+    limit,
+    ordering: sortBy === 'name-desc' ? '-name' : 'name',
+  });
+  if (courseFilter) params.append('course', courseFilter);
+  if (societyFilter) params.append('society', societyFilter);
+  if (yearFilter) params.append('year', yearFilter);
+  if (roleFilter) params.append('role', roleFilter);
+  return `/users/search/?${params.toString()}`;
 }
 
 export function searchUsers(query, courseFilter = '', societyFilter = '', offset = 0, limit = 20, yearFilter = '', roleFilter = '', sortBy = 'name') {

@@ -1,6 +1,7 @@
 /*
  * Group work tasks tab state hooks.
  */
+
 import { useEffect, useState } from "react";
 import { getAuthHeaders } from "./hooks/groupWorkHooks";
 import { calcCompletionSegments } from "./utils/taskStatsUtils";

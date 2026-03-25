@@ -28,10 +28,23 @@ function RouteCards(props) {
 }
 
 function TransportContent(props) {
-  if (!props.startLocation || !(props.selectedCampus || props.customDestination)) return <EmptyState />;
-  if (props.loadingRoute) return <div className={styles.loadingRoute}><span className={styles.spinner} /><span>Calculating route...</span></div>;
-  if (props.routeError) return <div className={styles.routeError}>{props.routeError}</div>;
-  if (!props.routeInfo) return null;
+  const hasDest = props.selectedCampus || props.customDestination;
+  if (!props.startLocation || !hasDest) {
+    return <EmptyState />;
+  }
+
+  if (props.loadingRoute) {
+    return <div className={styles.loadingRoute}><span className={styles.spinner} /><span>Calculating route...</span></div>;
+  }
+
+  if (props.routeError) {
+    return <div className={styles.routeError}>{props.routeError}</div>;
+  }
+
+  if (!props.routeInfo) {
+    return null;
+  }
+
   return <RouteCards {...props} />;
 }
 

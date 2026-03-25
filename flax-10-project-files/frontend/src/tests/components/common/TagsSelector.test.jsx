@@ -66,11 +66,16 @@ describe("TagsSelector", () => {
     expect(screen.queryByRole("button", { name: "Lab" })).not.toBeInTheDocument();
   });
 
-  it("uses the built-in empty hint and fallback scrolling when scrollTo is unavailable", () => {
+  it("uses the built-in empty hint", () => {
+    render(<TagsSelector onSelectionChange={vi.fn()} />);
+    expect(screen.getByText("Select tags to filter…")).toBeInTheDocument();
+  });
+
+  it("handles fallback scrolling when scrollTo is unavailable", () => {
     const originalScrollTo = HTMLElement.prototype.scrollTo;
-    const originalScrollLeft = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollLeft");
     const scrollLeftSet = vi.fn();
     HTMLElement.prototype.scrollTo = undefined;
+    
     Object.defineProperty(HTMLElement.prototype, "scrollLeft", {
       configurable: true,
       get: () => 0,
@@ -82,16 +87,10 @@ describe("TagsSelector", () => {
     });
 
     render(<TagsSelector onSelectionChange={vi.fn()} />);
-
-    expect(screen.getByText("Select tags to filter…")).toBeInTheDocument();
     expect(scrollLeftSet).toHaveBeenCalledWith(180);
 
     HTMLElement.prototype.scrollTo = originalScrollTo;
-    if (originalScrollLeft) {
-      Object.defineProperty(HTMLElement.prototype, "scrollLeft", originalScrollLeft);
-    } else {
-      delete HTMLElement.prototype.scrollLeft;
-    }
+    delete HTMLElement.prototype.scrollLeft;
   });
 
   it("does not show the empty hint while selected tags are present", () => {

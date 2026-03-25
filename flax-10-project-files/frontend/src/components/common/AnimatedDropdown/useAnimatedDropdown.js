@@ -1,6 +1,7 @@
 /*
  * Animated dropdown state hooks.
  */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { buildMenuStyle, computeOpenDirection, filterFlat, filterGrouped, makeOutsideClickListener } from "./animatedDropdownUtils";
 

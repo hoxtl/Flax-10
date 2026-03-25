@@ -3,9 +3,18 @@ import Profile from "../../pages/Profile/Profile";
 import { resolveRouteContent } from "../navigation/helpers";
 
 export function DashboardContent({ activeNav, setActiveNav, user, onNavChange }) {
-  if (activeNav === "settings") return <Settings user={user} onBack={() => setActiveNav("home")} />;
-  if (activeNav === "profile") return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={onNavChange} />;
-  if (activeNav.startsWith("profile_")) return renderProfileView(activeNav, setActiveNav, user, onNavChange);
+  if (activeNav === "settings") {
+    return <Settings user={user} onBack={() => setActiveNav("home")} />;
+  }
+
+  if (activeNav === "profile") {
+    return <Profile user={user} onBack={() => setActiveNav("home")} onNavigate={onNavChange} />;
+  }
+
+  if (activeNav.startsWith("profile_")) {
+    return renderProfileView(activeNav, setActiveNav, user, onNavChange);
+  }
+
   return resolveRouteContent(activeNav, user, setActiveNav);
 }
 
