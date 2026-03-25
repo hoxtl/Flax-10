@@ -11,6 +11,10 @@ vi.mock('../../../components/Society/CategorySelector', () => ({
     ),
 }));
 
+vi.mock('../../../components/Society/SocietyDetail/SocietyInsightBanner', () => ({
+    default: ({ society }) => <div data-testid="society-insight-banner">{society.name}</div>,
+}));
+
 import SocietyInfo from '../../../components/Society/SocietyDetail/SocietyInfo';
 
 const baseSociety = {
@@ -31,6 +35,11 @@ describe('SocietyInfo', () => {
     it('renders member count', () => {
         render(<SocietyInfo society={baseSociety} editMode={false} />);
         expect(screen.getByText(/10.*members/)).toBeTruthy();
+    });
+
+    it('renders the society insight banner for non-admin viewers', () => {
+        render(<SocietyInfo society={baseSociety} editMode={false} />);
+        expect(screen.getByTestId('society-insight-banner')).toHaveTextContent('Chess Society');
     });
 
     it('renders Join Society button when not a member', () => {
@@ -136,6 +145,11 @@ describe('SocietyInfo', () => {
         );
         fireEvent.click(screen.getByText('Edit Society'));
         expect(onToggleEditMode).toHaveBeenCalledOnce();
+    });
+
+    it('does not render the insight banner for admins editing the society', () => {
+        render(<SocietyInfo society={{ ...baseSociety, is_admin: true }} editMode={false} canEdit onToggleEditMode={vi.fn()} />);
+        expect(screen.queryByTestId('society-insight-banner')).not.toBeInTheDocument();
     });
 
     it('canEdit shows Exit Editor when in edit mode', () => {

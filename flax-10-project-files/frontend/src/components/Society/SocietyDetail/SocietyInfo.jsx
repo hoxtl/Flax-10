@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import Badge from "../../common/Badge/Badge";
 import PrimaryButton from "../../common/PrimaryButton/PrimaryButton";
+import SocietyInsightBanner from "./SocietyInsightBanner.jsx";
 import styles from "./SocietyInfo.module.css";
 import CategorySelector, { CategoryDisplay } from "../CategorySelector";
 
@@ -19,6 +20,7 @@ export default function SocietyInfo({ society, editMode, onUpdateSociety, onJoin
             <CategorySection categories={categories} editMode={editMode} onSave={(cats) => onUpdateSociety?.({ categories: cats })} />
             <Stats society={society} onViewMembers={onViewMembers}
                 isSubscribed={isSubscribed} onToggleSubscription={onToggleSubscription} />
+            {!canEdit && !society.is_admin && <SocietyInsightBanner society={society} />}
             <ActionButton isMember={society.is_member} editMode={editMode} canEdit={canEdit}
                 onJoin={onJoin} onLeave={onLeave} onToggleEditMode={onToggleEditMode} />
         </div>

@@ -1,0 +1,107 @@
+.banner {
+  flex: 1 1 320px;
+  min-width: min(100%, 320px);
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--surface-card) 82%, white);
+}
+
+.warning {
+  background: color-mix(in srgb, #f59e0b 12%, white);
+  border-color: color-mix(in srgb, #f59e0b 24%, transparent);
+}
+
+.positive {
+  background: color-mix(in srgb, #10b981 11%, white);
+  border-color: color-mix(in srgb, #10b981 24%, transparent);
+}
+
+.info {
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.iconWrap {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text);
+}
+
+.content {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.title {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.description {
+  margin: 0;
+  color: color-mix(in srgb, var(--text) 82%, var(--muted) 18%);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.actions {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.15rem;
+}
+
+.primaryLink,
+.secondaryLink {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.83rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.primaryLink {
+  color: white;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.secondaryLink {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.primaryLink:hover,
+.secondaryLink:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .banner {
+    flex-basis: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
