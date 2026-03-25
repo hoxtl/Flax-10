@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { act, fireEvent, renderHook, waitFor } from "@testing-library/react";
+import { act, fireEvent, renderHook } from "@testing-library/react";
 
 import {
   useFocusFullscreen,
@@ -94,122 +94,67 @@ describe("timer effect extra coverage", () => {
     expect(exitFullscreen).toHaveBeenCalled();
   });
 
-  it("swallows fullscreen request and exit failures", async () => {
+  it("swallows fullscreen request failures", async () => {
     vi.useFakeTimers();
-
     const requestFullscreen = vi.fn().mockRejectedValue(new Error("denied"));
-    const exitFullscreen = vi.fn().mockRejectedValue(new Error("exit denied"));
     document.documentElement.requestFullscreen = requestFullscreen;
-    document.exitFullscreen = exitFullscreen;
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: null,
-    });
-
-    renderHook(() => useFocusFullscreen({
-      focusMode: true,
-      focusFullscreenPending: true,
-      setFocusFullscreenPending: vi.fn(),
-    }));
-
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
+    renderHook(() => useFocusFullscreen({ focusMode: true, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
     await act(async () => {
       vi.advanceTimersByTime(221);
       await Promise.resolve();
     });
     expect(requestFullscreen).toHaveBeenCalled();
+  });
 
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: document.body,
-    });
-
-    renderHook(() => useFocusFullscreen({
-      focusMode: false,
-      focusFullscreenPending: false,
-      setFocusFullscreenPending: vi.fn(),
-    }));
-
-    await act(async () => {
-      await Promise.resolve();
-    });
+  it("swallows fullscreen exit failures", async () => {
+    const exitFullscreen = vi.fn().mockRejectedValue(new Error("exit denied"));
+    document.exitFullscreen = exitFullscreen;
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: document.body });
+    renderHook(() => useFocusFullscreen({ focusMode: false, focusFullscreenPending: false, setFocusFullscreenPending: vi.fn() }));
+    await act(async () => { await Promise.resolve(); });
     expect(exitFullscreen).toHaveBeenCalled();
   });
 
-  it("does not start timers or fullscreen work when the flags are inactive", () => {
+  it("does not trigger transient flags when inactive", () => {
     vi.useFakeTimers();
-    const setShowFocusTransition = vi.fn();
-    const setShowPageSkeleton = vi.fn();
+    const setShowFocusTransition = vi.fn(), setShowPageSkeleton = vi.fn();
     renderHook(() => useTransientFlags({
-      showFocusTransition: false,
-      setShowFocusTransition,
-      showPageSkeleton: false,
-      setShowPageSkeleton,
+      showFocusTransition: false, setShowFocusTransition,
+      showPageSkeleton: false, setShowPageSkeleton,
       minFocusSkeletonMs: 150,
     }));
-
-    act(() => {
-      vi.advanceTimersByTime(5000);
-    });
+    act(() => { vi.advanceTimersByTime(5000); });
     expect(setShowFocusTransition).not.toHaveBeenCalled();
     expect(setShowPageSkeleton).not.toHaveBeenCalled();
+  });
 
+  it("avoids redundant fullscreen requests when already in fullscreen", () => {
     const requestFullscreen = vi.fn();
     document.documentElement.requestFullscreen = requestFullscreen;
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: document.body,
-    });
-
-    renderHook(() => useFocusFullscreen({
-      focusMode: true,
-      focusFullscreenPending: true,
-      setFocusFullscreenPending: vi.fn(),
-    }));
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: document.body });
+    renderHook(() => useFocusFullscreen({ focusMode: true, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
     expect(requestFullscreen).not.toHaveBeenCalled();
+  });
 
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: null,
-    });
+  it("avoids redundant exitFullscreen calls when not in fullscreen", () => {
     document.exitFullscreen = vi.fn();
-
-    renderHook(() => useFocusFullscreen({
-      focusMode: true,
-      focusFullscreenPending: false,
-      setFocusFullscreenPending: vi.fn(),
-    }));
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
+    renderHook(() => useFocusFullscreen({ focusMode: true, focusFullscreenPending: false, setFocusFullscreenPending: vi.fn() }));
     expect(document.exitFullscreen).not.toHaveBeenCalled();
   });
 
-  it("returns early when fullscreen APIs are unavailable", () => {
+  it("returns early when requestFullscreen is unavailable", () => {
     vi.useFakeTimers();
-
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: null,
-    });
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
     document.documentElement.requestFullscreen = undefined;
+    renderHook(() => useFocusFullscreen({ focusMode: true, focusFullscreenPending: true, setFocusFullscreenPending: vi.fn() }));
+    act(() => { vi.advanceTimersByTime(221); });
+  });
 
-    renderHook(() => useFocusFullscreen({
-      focusMode: true,
-      focusFullscreenPending: true,
-      setFocusFullscreenPending: vi.fn(),
-    }));
-
-    act(() => {
-      vi.advanceTimersByTime(221);
-    });
-
-    Object.defineProperty(document, "fullscreenElement", {
-      configurable: true,
-      value: document.body,
-    });
+  it("returns early when exitFullscreen is unavailable", () => {
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, value: document.body });
     document.exitFullscreen = undefined;
-
-    renderHook(() => useFocusFullscreen({
-      focusMode: false,
-      focusFullscreenPending: false,
-      setFocusFullscreenPending: vi.fn(),
-    }));
+    renderHook(() => useFocusFullscreen({ focusMode: false, focusFullscreenPending: false, setFocusFullscreenPending: vi.fn() }));
   });
 });
