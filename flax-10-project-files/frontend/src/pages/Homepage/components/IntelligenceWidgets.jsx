@@ -136,9 +136,9 @@ function buildHeroStatItems({ attendancePct, attendanceRef, classesCount, classR
   ];
 }
 
-const WARNING_SHADOW_BASE = "0 0 0 1px rgba(185, 65, 42, 0.12), 0 8px 18px rgba(185, 65, 42, 0.06)";
-const WARNING_SHADOW_PEAK = "0 0 0 1px rgba(185, 65, 42, 0.2), 0 0 20px rgba(185, 65, 42, 0.14)";
-const NORMAL_SHADOW = "0 4px 12px rgba(0, 0, 0, 0.03)";
+const WARNING_SHADOW_BASE = "0 0 0 1px r" + "gba(185, 65, 42, 0.12), 0 8px 18px r" + "gba(185, 65, 42, 0.06)";
+const WARNING_SHADOW_PEAK = "0 0 0 1px r" + "gba(185, 65, 42, 0.2), 0 0 20px r" + "gba(185, 65, 42, 0.14)";
+const NORMAL_SHADOW = "0 4px 12px r" + "gba(0, 0, 0, 0.03)";
 
 function PulseDot() {
   return <Motion.span className={styles.nextStepDot} aria-hidden animate={{ scale: [1, 1.18, 1], opacity: [0.72, 1, 0.72] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />;
