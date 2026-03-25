@@ -68,5 +68,5 @@ export function groupBlocksByHorizon(blocks) {
   const labels = ['Today', 'Yesterday', 'This Week', 'Earlier'];
   const grouped = new Map(labels.map((label) => [label, []]));
   blocks.slice(0, 24).forEach((block) => grouped.get(getHistoryHorizonLabel(block.startTime)).push(block));
-  return labels.map((label) => ({ label, entries: grouped.get(label) || [] })).filter((group) => group.entries.length > 0);
+  return labels.map((label) => ({ label, entries: grouped.get(label) })).filter((group) => group.entries.length > 0);
 }

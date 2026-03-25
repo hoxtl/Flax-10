@@ -62,12 +62,11 @@ function AvailablePills({ unselected, onAdd }) {
 function useScrollToEnd(scrollRef, deps) {
   useEffect(() => {
     const node = scrollRef.current;
-    if (!node) return;
-    if (typeof node.scrollTo === "function") {
+    if (typeof node?.scrollTo === "function") {
       node.scrollTo({ left: node.scrollWidth, behavior: "smooth" });
-      return;
+    } else if (node) {
+      node.scrollLeft = node.scrollWidth;
     }
-    node.scrollLeft = node.scrollWidth;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

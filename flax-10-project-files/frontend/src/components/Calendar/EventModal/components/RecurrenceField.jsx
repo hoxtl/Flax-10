@@ -74,7 +74,7 @@ function EndRepeatField({ endDate, onChange }) {
 function DateInput({ endDate, onChange }) {
     return (
         <DateTimePicker
-            value={endDate || ''}
+            value={endDate}
             onChange={(val) => onChange('end_date', val || null)}
             dateOnly
             placeholder="Select end date"

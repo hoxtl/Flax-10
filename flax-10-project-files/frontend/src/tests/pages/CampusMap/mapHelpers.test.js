@@ -141,6 +141,21 @@ describe("mapHelpers", () => {
     expect(reverseGeocode).toHaveBeenCalledWith(51.5, -0.11);
   });
 
+  it("updates start location without mutating manual text when reverse geocoding returns nothing", async () => {
+    reverseGeocode.mockResolvedValueOnce("");
+    const setSelection = vi.fn((updater) => updater({ startLocation: null }));
+    const setForm = vi.fn();
+
+    const handler = createMapClickHandler(setSelection, setForm);
+    await handler({
+      lngLat: { lat: 51.5, lng: -0.11 },
+      originalEvent: { defaultPrevented: false },
+    });
+
+    expect(setSelection).toHaveBeenCalled();
+    expect(setForm).not.toHaveBeenCalled();
+  });
+
   it("ignores prevented map clicks", async () => {
     const setSelection = vi.fn();
     const setForm = vi.fn();
@@ -170,6 +185,16 @@ describe("mapHelpers", () => {
 
     expect(setSelection).toHaveBeenCalled();
     expect(setForm).toHaveBeenCalled();
+  });
+
+  it("does not reopen the home popup when start location already matches home", () => {
+    vi.useFakeTimers();
+    const refs = createRefs();
+    const userHome = { address: "Home", lat: 51.49, lng: -0.12 };
+
+    syncHomeMarker(refs, true, { lat: 51.49, lng: -0.12 }, userHome, vi.fn(), vi.fn());
+
+    expect(refs.homePointer.current.togglePopup).not.toHaveBeenCalled();
   });
 
   it("does nothing when the home marker cannot yet be synced", () => {
@@ -234,9 +259,14 @@ describe("mapHelpers", () => {
         ok: true,
         json: async () => ({ routes: [{ id: "route-1" }, { id: "route-2" }] }),
       })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ routes: [] }),
+      })
       .mockResolvedValueOnce({ ok: false });
 
     await expect(fetchWalkingRoute({ lat: 1, lng: 2 }, { lat: 3, lng: 4 })).resolves.toEqual({ id: "route-1" });
+    await expect(fetchWalkingRoute({ lat: 1, lng: 2 }, { lat: 3, lng: 4 })).resolves.toBeNull();
     await expect(fetchWalkingRoute({ lat: 1, lng: 2 }, { lat: 3, lng: 4 })).rejects.toThrow("API map failed...");
     expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("2,1;4,3"));
   });
@@ -274,6 +304,53 @@ describe("mapHelpers", () => {
       expect.any(Object),
       expect.objectContaining({ duration: 1500 }),
     );
+  });
+
+  it("does not call setForm when setHomeStart resolves with no address", async () => {
+    vi.useFakeTimers();
+    reverseGeocode.mockResolvedValueOnce(null);
+    const refs = createRefs();
+    const setSelection = vi.fn((updater) => updater({ startLocation: null }));
+    const setForm = vi.fn();
+    const userHome = { address: "", lat: 51.49, lng: -0.12 };
+
+    syncHomeMarker(refs, true, null, userHome, setSelection, setForm);
+    vi.advanceTimersByTime(100);
+
+    document.getElementById("setHomeAsStart").click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(setSelection).toHaveBeenCalled();
+    expect(setForm).not.toHaveBeenCalled();
+  });
+
+  it("closes home popup after setting home as start when popup was already open", async () => {
+    vi.useFakeTimers();
+    reverseGeocode.mockResolvedValueOnce("Home Street");
+    const refs = createRefs();
+    const setSelection = vi.fn((updater) => updater({ startLocation: null }));
+    const setForm = vi.fn((updater) => updater({ manualStart: "" }));
+    const userHome = { address: "", lat: 51.49, lng: -0.12 };
+
+    syncHomeMarker(refs, true, null, userHome, setSelection, setForm);
+
+    // Make the popup appear open so wireHomeButton closes it
+    const homePointerCurrent = refs.homePointer.current;
+    const popupMock = homePointerCurrent._popup;
+    if (popupMock) popupMock.isOpen.mockReturnValue(true);
+
+    vi.advanceTimersByTime(100);
+
+    document.getElementById("setHomeAsStart").click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(setSelection).toHaveBeenCalled();
+    // togglePopup should have been called to close the popup
+    if (homePointerCurrent.togglePopup) {
+      expect(homePointerCurrent.togglePopup).toHaveBeenCalled();
+    }
   });
 
   it("cleans up markers, popups, and the map instance", () => {

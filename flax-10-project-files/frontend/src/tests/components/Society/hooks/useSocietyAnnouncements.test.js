@@ -44,7 +44,7 @@ describe('useSocietyAnnouncements', () => {
     });
 
     it('updateAnnouncement and setEventId coverage', async () => {
-        mockSoc.announcements = [{ id: 10, title: 'Old', event_id: 100 }];
+        mockSoc.announcements = [{ id: 10, title: 'Old', event_id: 100 }, { id: 99, title: 'Keep', event_id: null }];
         const updated = { id: 10, title: 'New', event_id: 100 };
         api.updateAnnouncement.mockResolvedValue(updated);
         const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
@@ -54,6 +54,7 @@ describe('useSocietyAnnouncements', () => {
         });
         expect(api.updateAnnouncement).toHaveBeenCalledWith(mockId, 10, { title: 'New' }, false);
         expect(mockSoc.announcements[0].title).toBe('New');
+        expect(mockSoc.announcements[1].title).toBe('Keep');
 
         // Test handleSync path where addAsEvent is false but event_id exists (deleteLinked)
         const updatedNoEvent = { id: 10, title: 'A', event_id: 100 }; // The updated object returned from API
@@ -105,5 +106,19 @@ describe('useSocietyAnnouncements', () => {
         await act(async () => { await result.current.addAnnouncement({ addAsEvent: true }); });
         expect(spy).toHaveBeenCalledWith('Failed to sync announcement with event:', expect.any(Error));
         spy.mockRestore();
+    });
+
+    it('deleteAnnouncement skips linked-event deletion when no event is attached', async () => {
+        mockSoc.announcements = [{ id: 11, title: 'Detached announcement', event_id: null }];
+        api.fetchSociety.mockResolvedValue({ announcements: mockSoc.announcements });
+        api.deleteAnnouncement.mockResolvedValue({});
+
+        const { result } = renderHook(() => useSocietyAnnouncements(mockId, setSociety, eventOps));
+        await act(async () => {
+            await result.current.deleteAnnouncement(11);
+        });
+
+        expect(eventOps.deleteEvent).not.toHaveBeenCalled();
+        expect(api.deleteAnnouncement).toHaveBeenCalledWith(mockId, 11, false);
     });
 });

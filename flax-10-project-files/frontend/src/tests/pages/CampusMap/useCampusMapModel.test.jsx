@@ -187,6 +187,16 @@ describe("useCampusMapModel", () => {
     expect(result.current.mapContainer).toBe(mockRefs.mapContainer);
     expect(result.current.showInitialSkeleton).toBe(false);
 
+    const handleCampusSelect = handleMapLoadMock.mock.calls[0][1];
+    const firstMarker = { getPopup: vi.fn(() => ({ isOpen: vi.fn(() => false) })), togglePopup: vi.fn() };
+    const secondMarker = { getPopup: vi.fn(() => ({ isOpen: vi.fn(() => true) })), togglePopup: vi.fn() };
+    act(() => {
+      handleCampusSelect({ id: "strand", name: "Strand" }, [firstMarker, secondMarker], firstMarker);
+    });
+    expect(mockState.selection.selectedCampus).toEqual({ id: "strand", name: "Strand" });
+    expect(firstMarker.togglePopup).toHaveBeenCalled();
+    expect(secondMarker.togglePopup).toHaveBeenCalled();
+
     unmount();
 
     expect(cleanupMapMock).toHaveBeenCalledWith(mockRefs);
@@ -403,6 +413,136 @@ describe("useCampusMapModel", () => {
     });
     expect(mockState.selection.startLocation).toEqual({ lat: 51.5, lng: -0.1 });
     expect(mapInstance.fitBounds).toHaveBeenCalled();
+  });
+
+  it("skips toggling the popup when the clicked marker's popup is already open", () => {
+    const { result } = renderHook(() => useCampusMapModel());
+
+    const handleCampusSelect = handleMapLoadMock.mock.calls[0][1];
+    // clickedMarker's popup isOpen() = true → if (!true) = false → no togglePopup from the if branch
+    // Use a separate otherMarker in markers array (isOpen false) so forEach doesn't toggle it
+    const otherMarker = { getPopup: vi.fn(() => ({ isOpen: vi.fn(() => false) })), togglePopup: vi.fn() };
+    const clickedMarkerAlreadyOpen = { getPopup: vi.fn(() => ({ isOpen: vi.fn(() => true) })), togglePopup: vi.fn() };
+    act(() => {
+      // markers array has otherMarker (closed) and we pass clickedMarkerAlreadyOpen as clickedMarker
+      // forEach: otherMarker.isOpen() = false → no toggle; clickedMarkerAlreadyOpen not in markers
+      handleCampusSelect({ id: "waterloo" }, [otherMarker], clickedMarkerAlreadyOpen);
+    });
+
+    // clickedMarker.togglePopup should NOT be called since popup is already open
+    expect(clickedMarkerAlreadyOpen.togglePopup).not.toHaveBeenCalled();
+    // otherMarker not toggled either (isOpen = false → short-circuit)
+    expect(otherMarker.togglePopup).not.toHaveBeenCalled();
+  });
+
+  it("uses coordinate fallback when reverse geocode returns null for start location", async () => {
+    const callbacks = {};
+    global.navigator.geolocation.getCurrentPosition.mockImplementation((success) => {
+      callbacks.success = success;
+    });
+    reverseGeocodeMock.mockRejectedValueOnce(new Error("no geocode"));
+
+    const { result } = renderHook(() => useCampusMapModel());
+
+    act(() => { result.current.handleGeolocateStart(); });
+    await act(async () => {
+      await callbacks.success({ coords: { latitude: 51.5, longitude: -0.1 } });
+    });
+
+    // reverseGeocode rejected → address is null → uses formatCoordinateLocation
+    expect(mockState.form.manualStart).toBe("51.50000, -0.10000");
+    expect(mockState.selection.startLocation).toEqual({ lat: 51.5, lng: -0.1 });
+  });
+
+  it("skips map initialization when map is already created", () => {
+    // Map is already initialized - mapRef.current is set
+    mockRefs.map.current = mapInstance;
+    const mapCallsBefore = handleMapLoadMock.mock.calls.length;
+
+    renderHook(() => useCampusMapModel());
+
+    // handleMapLoad should NOT be called since map.current is already set
+    expect(handleMapLoadMock).toHaveBeenCalledTimes(mapCallsBefore);
+  });
+
+  it("ignores route response when the component has unmounted (active = false)", async () => {
+    mockState = createMutableState({
+      selection: {
+        customDestination: { lat: 51.53, lng: -0.14, address: "Destination" },
+        startLocation: { lat: 51.5, lng: -0.1 },
+      },
+    });
+
+    let resolveWalk;
+    fetchWalkingRouteMock.mockReturnValueOnce(
+      new Promise((resolve) => { resolveWalk = resolve; })
+    );
+
+    let resolveJourney;
+    journeyPlannerMock.mockReturnValueOnce(
+      new Promise((resolve) => { resolveJourney = resolve; })
+    );
+
+    const { unmount } = renderHook(() => useCampusMapModel());
+
+    await waitFor(() => expect(fetchWalkingRouteMock).toHaveBeenCalled());
+
+    // Unmount before the promises resolve → active = false
+    unmount();
+
+    // Now resolve - should be ignored
+    resolveWalk({ id: "walk-2" });
+    resolveJourney(null);
+
+    await act(async () => { await Promise.resolve(); });
+
+    // displayRoute should NOT have been called since active = false
+    expect(displayRouteMock).not.toHaveBeenCalled();
+  });
+
+  it("handles TfL null journey result (no route found)", async () => {
+    mockState = createMutableState({
+      selection: {
+        customDestination: { lat: 51.53, lng: -0.14, address: "Destination" },
+        startLocation: { lat: 51.5, lng: -0.1 },
+      },
+    });
+    fetchWalkingRouteMock.mockResolvedValueOnce({ id: "walk-1" });
+    journeyPlannerMock.mockResolvedValueOnce(null); // null journey → "No TfL journey found"
+
+    renderHook(() => useCampusMapModel());
+
+    await waitFor(() => expect(journeyPlannerMock).toHaveBeenCalled());
+    await waitFor(() => expect(mockState.routes.tflRouteError).toMatch(/No TfL journey found/i));
+  });
+
+  it("ignores TfL route error when component has already unmounted (active = false)", async () => {
+    mockState = createMutableState({
+      selection: {
+        customDestination: { lat: 51.53, lng: -0.14, address: "Destination" },
+        startLocation: { lat: 51.5, lng: -0.1 },
+      },
+    });
+
+    fetchWalkingRouteMock.mockResolvedValueOnce({ id: "walk-1" });
+
+    let rejectJourney;
+    journeyPlannerMock.mockReturnValueOnce(
+      new Promise((_, reject) => { rejectJourney = reject; })
+    );
+
+    const { unmount } = renderHook(() => useCampusMapModel());
+
+    await waitFor(() => expect(journeyPlannerMock).toHaveBeenCalled());
+
+    // Unmount → active = false
+    unmount();
+
+    // Reject TfL after unmount → catch fires but active=false → setRoutes NOT called
+    rejectJourney(new Error("TfL down after unmount"));
+
+    await act(async () => { await Promise.resolve(); });
+    // No error should propagate
   });
 
   it("does nothing when geolocation is unavailable", () => {

@@ -80,4 +80,16 @@ describe('RecurrenceField', () => {
         render(<RecurrenceField value={null} onChange={mockOnChange} />);
         expect(screen.getByText('Repeat')).toBeInTheDocument();
     });
+
+    it('returns null when hideFrequency is enabled without recurrence', () => {
+        const { container } = render(<RecurrenceField value={{ frequency: 'none' }} hideFrequency onChange={mockOnChange} />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('clears the end date when switching back to never', () => {
+        render(<RecurrenceField value={{ frequency: 'daily', end_date: '2025-02-01' }} onChange={mockOnChange} />);
+        const endTypeSelect = screen.getAllByRole('combobox')[1];
+        fireEvent.change(endTypeSelect, { target: { value: 'never' } });
+        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ end_date: null }));
+    });
 });

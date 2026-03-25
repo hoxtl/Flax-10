@@ -101,4 +101,27 @@ describe("BackToTop", () => {
 
     expect(dashboardContentNoScrollTo.scrollTop).toBe(0);
   });
+
+  it("returns undefined from watchScrollVisibility when no containers found (not alwaysVisible)", () => {
+    // Render with a selector that won't match any element and no scrollingElement
+    Object.defineProperty(document, "scrollingElement", {
+      configurable: true,
+      value: null,
+    });
+    // No matching containers, not alwaysVisible -> watchScrollVisibility returns undefined
+    const { container } = render(<BackToTop containerSelector=".definitely-missing-selector" />);
+    // Should render null (button not in DOM)
+    expect(container.querySelector("button")).toBeNull();
+  });
+
+  it("handles missing document.scrollingElement in resolveScrollContainers", () => {
+    Object.defineProperty(document, "scrollingElement", {
+      configurable: true,
+      value: null,
+    });
+    render(<BackToTop alwaysVisible containerSelector=".page-content" />);
+    fireEvent.click(screen.getByRole("button", { name: /back to top/i }));
+    // scrollTo called on page-content container (not document.scrollingElement)
+    expect(contentContainer.scrollTo).toHaveBeenCalled();
+  });
 });

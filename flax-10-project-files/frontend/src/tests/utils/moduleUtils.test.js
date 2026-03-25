@@ -106,11 +106,28 @@ describe('moduleUtils', () => {
             expect(result.start_time).toContain('2026-02-15T10:00:00.000Z');
             expect(result.end_time).toBe('11:00');
         });
+        it('returns empty strings for missing datetime fields', () => {
+            const result = serialiseModule({
+                module_code: 'CS1000',
+                module_name: 'Intro to CS',
+                description: '',
+                department: '',
+                course: '',
+                start_time: '',
+                end_time: '',
+                location: 'Room 1',
+            });
+            expect(result.start_time).toBe('');
+            expect(result.end_time).toBe('');
+        });
     });
 
     describe('normaliseModuleCode', () => {
         it('uppercases and removes spaces', () => {
             expect(normaliseModuleCode(' cs 10 00 ')).toBe('CS1000');
+        });
+        it('returns an empty string for nullish values', () => {
+            expect(normaliseModuleCode(null)).toBe('');
         });
     });
 
@@ -193,10 +210,18 @@ describe('moduleUtils', () => {
             const result = filterModules(modules, enrollments, '', 'enrolled');
             expect(result).toHaveLength(2);
         });
+        it('keeps all modules when browse mode explicitly disables excludeEnrolled', () => {
+            const result = filterModules(modules, enrollments, '', 'all', { excludeEnrolled: false });
+            expect(result).toHaveLength(3);
+        });
         it('can exclude enrolled modules in browse mode', () => {
             const result = filterModules(modules, enrollments, '', 'all', { excludeEnrolled: true });
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe(3);
+        });
+        it('treats non-all filters as enrolled-only mode', () => {
+            const result = filterModules(modules, enrollments, '', 'enrolled', { excludeEnrolled: true });
+            expect(result.map((module) => module.id)).toEqual([1, 2]);
         });
     });
 
@@ -218,6 +243,10 @@ describe('moduleUtils', () => {
             const sorted = sortModules(modules, 'deadlines');
             expect(sorted[0].id).toBe(1); // 2 deadlines
         });
+        it('treats missing deadline arrays as zero when sorting by deadlines', () => {
+            const sorted = sortModules([...modules, { id: 4, module_code: 'BI1000', module_name: 'Biology' }], 'deadlines');
+            expect(sorted.at(-1)?.id).toBe(4);
+        });
         it('sorts descending by module name when requested', () => {
             const sorted = sortModules(modules, 'name-desc');
             expect(sorted[0].module_name).toBe('Linear Algebra');
@@ -238,6 +267,14 @@ describe('moduleUtils', () => {
             const result = applyFiltersAndSort(modules, ['Computer Science'], 'name');
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe(1);
+        });
+        it('keeps all modules when the selected courses array is empty', () => {
+            const result = applyFiltersAndSort(modules, [], 'name');
+            expect(result).toHaveLength(3);
+        });
+        it('falls back to sorting when no filters are selected', () => {
+            const result = applyFiltersAndSort(modules, null, 'name');
+            expect(result[0].module_name).toBe('History of Art');
         });
         it('falls back to sorting when the filter input is an unsupported type', () => {
             const result = applyFiltersAndSort(modules, { selected: 'anything' }, 'name-desc');

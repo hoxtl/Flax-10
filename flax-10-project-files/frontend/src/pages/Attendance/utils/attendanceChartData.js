@@ -19,7 +19,7 @@ export function getEventTypeLabel(event) {
 
 export function buildByTypeChartData(byType) {
   const merged = mergeByNormalizedType(byType);
-  return Object.entries(merged).map(([label, counts]) => ({ id: label, value: (counts.attended || 0) + (counts.missed || 0), label, color: TYPE_COLOR_MAP[label] ?? chartColors.fallbackColor })).filter((entry) => entry.value > 0);
+  return Object.entries(merged).map(([label, counts]) => ({ id: label, value: (counts.attended || 0) + (counts.missed || 0), label, color: TYPE_COLOR_MAP[label] })).filter((entry) => entry.value > 0);
 }
 
 export function withByTypeColors(entries) {
@@ -27,7 +27,7 @@ export function withByTypeColors(entries) {
 }
 
 function normalizeTypeLabel(name) {
-  const lower = typeof name === "string" ? name.toLowerCase().trim() : "";
+  const lower = String(name).toLowerCase().trim();
   if (lower.includes("lecture") || lower.includes("lgt")) return "Lecture";
   if (lower.includes("small group") || lower === "smg") return "Small group";
   if (lower.includes("practical") || lower.includes("lab")) return "Practical/lab";

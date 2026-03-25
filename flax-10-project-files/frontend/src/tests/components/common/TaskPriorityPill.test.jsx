@@ -22,4 +22,15 @@ describe("TaskPriorityPill", () => {
     expect(screen.queryByText("!!!")).not.toBeInTheDocument();
     expect(container.firstChild).toHaveClass("extra");
   });
+
+  it("falls back to the default medium priority when the value is null and supports compact mode", () => {
+    const { container } = render(<TaskPriorityPill priority={null} compact />);
+    expect(screen.getByText("Medium")).toBeInTheDocument();
+    expect(container.firstChild.className).toContain("compact");
+  });
+
+  it("uses the default medium priority when no priority prop is provided", () => {
+    render(<TaskPriorityPill />);
+    expect(screen.getByText("Medium")).toBeInTheDocument();
+  });
 });

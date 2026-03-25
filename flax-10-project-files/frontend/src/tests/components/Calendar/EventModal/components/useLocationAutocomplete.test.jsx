@@ -83,6 +83,21 @@ describe("useLocationAutocomplete", () => {
     expect(screen.getByTestId("suggestion-count")).toHaveTextContent("0");
   });
 
+  it("falls back to an empty suggestion array when the API response has no features list", async () => {
+    fetch.mockResolvedValue({
+      json: async () => ({}),
+    });
+
+    render(<LocationAutocompleteHarness onChangeSpy={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText("location-input"), { target: { value: "Strand" } });
+    await delay(320);
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByTestId("loading-state")).toHaveTextContent("false"));
+    expect(screen.getByTestId("suggestion-count")).toHaveTextContent("0");
+  });
+
   it("prevents immediate reopen after selection, then reopens and closes outside", async () => {
     const onChangeSpy = vi.fn();
     fetch.mockResolvedValue({

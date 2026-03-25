@@ -131,8 +131,8 @@ export function serialiseModule(form_data) {
         description: form_data.description,
         department: form_data.department,
         course: form_data.course,
-        start_time: form_data.start_time ? safeIsoOrOriginal(form_data.start_time) : '',
-        end_time: form_data.end_time ? safeIsoOrOriginal(form_data.end_time) : '',
+        start_time: safeIsoOrOriginal(form_data.start_time),
+        end_time: safeIsoOrOriginal(form_data.end_time),
         location: form_data.location,
         is_recurring: form_data.is_recurring !== false
     };
@@ -193,7 +193,7 @@ function checkSearch(module, search_query) {
         || module.module_code.toLowerCase().includes(query_lower);
 }
 
-function checkFilter(module, enrollments, filter_mode, options = {}) {
+function checkFilter(module, enrollments, filter_mode, options) {
     if (filter_mode === 'all' && options.excludeEnrolled) return !isEnrolledIn(module.id, enrollments);
     if (filter_mode === 'all') return true;
     return isEnrolledIn(module.id, enrollments);

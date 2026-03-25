@@ -74,6 +74,12 @@ describe('TagEditCell', () => {
         expect(badge).toHaveStyle({ backgroundColor: '#ff0000' });
     });
 
+    it('renders tags without inline colors when no theme color is provided', () => {
+        const { container } = render(<TagEditCell event={createMockEvent({ tag_name: 'Work' })} tags={mockTags} theme={{}} isReadOnly={false} isEditing={false} editValue="" onEdit={vi.fn()} onSave={vi.fn()} />);
+        const badge = container.querySelector('span[class*="tagBadge"]');
+        expect(badge).not.toHaveStyle({ color: 'white' });
+    });
+
     it('hides edit icon when read-only', () => {
         const { container } = render(<TagEditCell event={createMockEvent({ tag_name: 'Work' })} tags={mockTags} theme={defaultTheme} isReadOnly={true} isEditing={false} editValue="" onEdit={vi.fn()} onSave={vi.fn()} />);
         expect(container.querySelector('svg')).not.toBeInTheDocument();
@@ -82,5 +88,13 @@ describe('TagEditCell', () => {
     it('shows edit icon when not read-only', () => {
         const { container } = render(<TagEditCell event={createMockEvent({ tag_name: 'Work' })} tags={mockTags} theme={defaultTheme} isReadOnly={false} isEditing={false} editValue="" onEdit={vi.fn()} onSave={vi.fn()} />);
         expect(container.querySelector('svg')).toBeInTheDocument();
+    });
+
+    it('applies the hovered icon class for filled and empty tag cells', () => {
+        const { container, rerender } = render(<TagEditCell event={createMockEvent({ tag_name: 'Work' })} tags={mockTags} theme={defaultTheme} isReadOnly={false} isEditing={false} editValue="" onEdit={vi.fn()} onSave={vi.fn()} isRowHovered={true} />);
+        expect(container.querySelector('svg')?.getAttribute('class')).toContain('tagEditIconVisible');
+
+        rerender(<TagEditCell event={createMockEvent({ tag_name: null, tag: null })} tags={mockTags} theme={defaultTheme} isReadOnly={false} isEditing={false} editValue="" onEdit={vi.fn()} onSave={vi.fn()} isRowHovered={true} />);
+        expect(container.querySelector('svg')?.getAttribute('class')).toContain('tagEditIconVisible');
     });
 });

@@ -101,4 +101,22 @@ describe('ModalContent', () => {
         fireEvent.click(screen.getByText('x'));
         expect(props.handleCancelSave).toHaveBeenCalledTimes(2);
     });
+
+    it('formats midnight and noon correctly in the sleep warning copy', () => {
+        render(
+            <ModalContent
+                {...defaultProps}
+                sleepWarning={true}
+                sleepSettings={{ sleepTime: '00:00', wakeTime: '12:00' }}
+            />,
+        );
+
+        expect(screen.getByText('12:00 AM')).toBeInTheDocument();
+        expect(screen.getByText('12:00 PM')).toBeInTheDocument();
+    });
+
+    it('does not crash when sleep settings are missing', () => {
+        render(<ModalContent {...defaultProps} sleepWarning={true} sleepSettings={null} />);
+        expect(screen.getByText('You should be resting!')).toBeInTheDocument();
+    });
 });

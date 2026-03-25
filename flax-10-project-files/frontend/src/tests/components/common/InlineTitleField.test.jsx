@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, renderHook, act } from "@testing-library/react";
 
 import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
 
@@ -90,5 +90,23 @@ describe("InlineTitleField", () => {
 
     fireEvent.blur(textarea);
     expect(onSave).toHaveBeenCalled();
+  });
+
+  it("does not save unchanged or blank values", () => {
+    const onSave = vi.fn();
+    const { result } = renderHook(() => useInlineEdit("Original", onSave));
+
+    act(() => {
+      result.current.start();
+      result.current.save();
+    });
+    expect(onSave).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.start();
+      result.current.setDraft("   ");
+      result.current.save();
+    });
+    expect(onSave).not.toHaveBeenCalled();
   });
 });

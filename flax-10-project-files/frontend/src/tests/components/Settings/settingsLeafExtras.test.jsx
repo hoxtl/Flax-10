@@ -138,6 +138,8 @@ describe("settings leaf extras", () => {
     expect(onChange).toHaveBeenCalledWith({ target: { name: "theme", value: "dark" } });
     expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
     expect(screen.getByText("Classic")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Flax"));
+    expect(onChange).toHaveBeenCalledWith("flax");
     fireEvent.click(screen.getByText("Appearance"));
     expect(onChange).toHaveBeenCalledWith("preferences_themes");
   });

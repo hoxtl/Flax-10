@@ -90,4 +90,14 @@ describe("TagField", () => {
     ]);
     expect(selectorProps.selectedTags).toEqual([{ id: "11", label: "Workshop" }]);
   });
+
+  it("falls back to an empty list when global tags are unavailable", () => {
+    useTagsMock.mockReturnValue({});
+
+    render(<TagField value="" onChange={vi.fn()} />);
+
+    const selectorProps = tagsSelectorSpy.mock.calls.at(-1)[0];
+    expect(selectorProps.tags).toEqual([]);
+    expect(selectorProps.selectedTags).toEqual([]);
+  });
 });

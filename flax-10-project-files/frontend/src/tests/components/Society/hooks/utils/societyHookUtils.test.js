@@ -52,6 +52,20 @@ describe('societyHookUtils', () => {
         expect(res.evData.description).toBe('Body');
     });
 
+    it('normalises announcement/event payloads when optional fields are falsy', () => {
+        expect(utils.transformAnnouncementData({ title: 'Ann', content: '', tag: 0 }).ann.tag).toBeNull();
+        expect(utils.transformAnnouncementData({ title: 'Ann', content: '', tag: 0 }).evData.tag).toBeNull();
+        expect(
+            utils.transformEventData({
+                start_time: '2025-01-01T10:00',
+                end_time: '2025-01-01T11:00',
+                tag: '',
+                recurrence: null,
+                announcement: 0,
+            }),
+        ).toEqual(expect.objectContaining({ tag: null, recurrence: 'none', announcement: null }));
+    });
+
     it('transformLegacyEventData with all fields', () => {
         const data = { title: 'T', date: '2025-01-01', startTime: '09:00', endTime: '10:00',
             description: 'Desc', location: 'Place', allDay: true, tag: '5', recurrence: 'weekly' };

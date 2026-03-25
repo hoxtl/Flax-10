@@ -41,6 +41,12 @@ describe("common motion helpers", () => {
       transition: { duration: 0.15, delay: 0.06, ease: STANDARD_EASE },
     });
 
+    expect(getDropdownItemMotion()).toEqual({
+      initial: { opacity: 0, x: -10 },
+      animate: { opacity: 1, x: 0 },
+      transition: { duration: 0.15, delay: 0, ease: STANDARD_EASE },
+    });
+
     expect(fadeInMotion.transition.ease).toBe(STANDARD_EASE);
     expect(tabContentMotion.transition.ease).toBe(STANDARD_EASE);
     expect(viewSwapMotion.transition.ease).toBe(STANDARD_EASE);

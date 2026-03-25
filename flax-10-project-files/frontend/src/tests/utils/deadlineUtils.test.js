@@ -102,6 +102,9 @@ describe('deadlineUtils', () => {
         it('due in 1 day (singular)', () => {
             expect(getDueInPhrase('2026-03-02T10:00:00')).toBe('Due in 1 day');
         });
+        it('due in multiple days (plural)', () => {
+            expect(getDueInPhrase('2026-03-03T10:00:00')).toBe('Due in 2 days');
+        });
         it('due in hours and minutes', () => {
             expect(getDueInPhrase('2026-03-01T12:30:00')).toMatch(/Due in 2h 30m/);
         });

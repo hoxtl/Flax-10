@@ -46,6 +46,12 @@ describe('getSevenDayFocusSeries', () => {
     expect(getSevenDayFocusSeries([], now)).toHaveLength(7);
   });
 
+  it('uses the default current date when no now argument is provided', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    expect(getSevenDayFocusSeries([])[6].key).toBe(todayKey);
+  });
+
   it('last entry key equals today in local time', () => {
     expect(getSevenDayFocusSeries([], now)[6].key).toBe(todayKey);
   });
@@ -184,5 +190,10 @@ describe('groupBlocksByHorizon', () => {
 
   it('returns an empty array for empty input', () => {
     expect(groupBlocksByHorizon([])).toHaveLength(0);
+  });
+
+  it('ignores blocks whose computed horizon is not in the visible map', () => {
+    const groups = groupBlocksByHorizon([{ startTime: undefined }]);
+    expect(groups.find((group) => group.label === 'Earlier')?.entries).toHaveLength(1);
   });
 });

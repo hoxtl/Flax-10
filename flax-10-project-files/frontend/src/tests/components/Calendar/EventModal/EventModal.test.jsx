@@ -1,9 +1,9 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { EventModal } from '../../../../components/Calendar/EventModal/EventModal';
 import { TagProvider } from '../../../../context/TagContext';
 
-const { mockFormLogic } = vi.hoisted(() => ({
+const { mockFormLogic, useEventFormMock } = vi.hoisted(() => ({
     mockFormLogic: {
         isEditing: false,
         form: { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] },
@@ -14,10 +14,11 @@ const { mockFormLogic } = vi.hoisted(() => ({
         handleSubmit: vi.fn(e => e?.preventDefault?.()),
         handleDelete: vi.fn(),
     },
+    useEventFormMock: vi.fn(),
 }));
 
 vi.mock('../../../../components/Calendar/EventModal/useEventForm', () => ({
-    useEventForm: () => mockFormLogic,
+    useEventForm: (...args) => useEventFormMock(...args),
 }));
 
 vi.mock('../../../../context/CalendarContext', async (importOriginal) => {
@@ -78,6 +79,7 @@ describe('EventModal', () => {
         mockFormLogic.form = { title: '', description: '', tag: '', start_time: '', end_time: '', reminder: [] };
         mockTagsState.tags = [{ id: 1, label: 'Work', color: '#000' }, { id: 2, label: 'Other', color: '#fff' }];
         mockTagsState.loading = false;
+        useEventFormMock.mockImplementation(() => mockFormLogic);
     });
 
     it('should render new event title', () => {
@@ -151,14 +153,33 @@ describe('EventModal', () => {
 
     it('uses initialType over default tag when provided', () => {
         renderModal({ initialType: 99 });
-        // useEventForm is mocked; we just ensure component renders without crashing
         expect(screen.getByText('New Event')).toBeInTheDocument();
+        expect(useEventFormMock).toHaveBeenCalledWith(
+            undefined,
+            mockOnClose,
+            expect.objectContaining({ initialTag: 99 }),
+        );
     });
 
     it('uses customTags and does not fall back to global tags', () => {
         const customTags = [{ id: 10, label: 'Custom', color: '#123' }];
         renderModal({ customTags });
         expect(screen.getByText('New Event')).toBeInTheDocument();
+        expect(useEventFormMock).toHaveBeenCalledWith(
+            undefined,
+            mockOnClose,
+            expect.objectContaining({ initialTag: null }),
+        );
+    });
+
+    it('falls back to the first tag when no Other tag exists', () => {
+        mockTagsState.tags = [{ id: 7, label: 'Work', color: '#000' }];
+        renderModal();
+        expect(useEventFormMock).toHaveBeenCalledWith(
+            undefined,
+            mockOnClose,
+            expect.objectContaining({ initialTag: 7 }),
+        );
     });
 
     it('hides reminder field when showReminder is false', () => {
