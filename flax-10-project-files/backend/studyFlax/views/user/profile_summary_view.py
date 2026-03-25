@@ -9,6 +9,8 @@ from rest_framework.response import Response
 
 from studyFlax.models.timer.session_model import StudySession
 
+from .profile_summary_badges import compute_badges, derive_persona, get_weekly_study_hours
+from .profile_summary_badges import compute_streaks  # re-exported from session_analytics_service
 from .profile_summary_payload import build_profile_summary, resolve_user
 
 
