@@ -31,9 +31,9 @@ describe('popoverUtils', () => {
         });
 
         it('uses none placement when no room left or right', () => {
-            const narrowWin = 200;
-            const pos = calculatePopoverPosition(anchor, popWidth, popHeight, narrowWin, winHeight);
-            expect(['left', 'none']).toContain(pos.placement);
+            const crampedAnchor = { ...anchor, left: 8, right: 58 };
+            const pos = calculatePopoverPosition(crampedAnchor, popWidth, popHeight, 240, winHeight);
+            expect(pos.placement).toBe('none');
         });
 
         it('positions above in day view', () => {

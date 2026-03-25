@@ -108,7 +108,77 @@ vi.mock("../../../components/Modules/Deadlines/upcomingDeadlinesUtils", () => ({
   getDayCount: (...args) => getDayCountMock(...args),
 }));
 
+vi.mock("../../../components/Modules/Modules/ModuleGrid.jsx", () => ({
+  default: ({ modules }) => <div data-testid="module-grid">{modules.map(m => <div key={m.id}>{m.module_code}</div>)}</div>,
+}));
+
+vi.mock("../../../components/Modules/Modules/ModuleCourseFilter", () => ({
+  default: () => <div>CourseFilter</div>,
+}));
+
+vi.mock("../../../components/common/AppPage/AppPage", () => ({
+  default: ({ children, title }) => <div><h1>{title}</h1>{children}</div>,
+}));
+
+vi.mock("../../../components/common/Tabs/Tabs", () => ({
+  default: ({ tabs, activeTab, onTabChange }) => (
+    <div>
+      {tabs.map(tab => (
+        <button key={tab.id} onClick={() => onTabChange(tab.id)}>{tab.label}</button>
+      ))}
+      {tabs.find(t => t.id === activeTab)?.content}
+    </div>
+  ),
+}));
+
+vi.mock("../../../pages/Modules/MyModulesDashboard.jsx", () => ({
+  default: () => <div>MyModulesDashboard</div>,
+}));
+
+vi.mock("../../../components/Common/HoldConfirmModal/HoldConfirmModal.jsx", () => ({
+  default: ({ onConfirm, onCancel, title }) => (
+    <div>
+      <div>{title}</div>
+      <button onClick={onConfirm}>Hold confirm</button>
+      <button onClick={onCancel}>Cancel delete</button>
+    </div>
+  ),
+}));
+
+vi.mock("../../../components/common/SearchEmptyState/SearchEmptyState.jsx", () => ({
+  default: ({ query, itemLabel, onClear, title, clearLabel }) => (
+    <div>
+      <div>{title || `No ${itemLabel} found`}</div>
+      {(query || clearLabel) && <button onClick={onClear}>{clearLabel || "Clear"}</button>}
+    </div>
+  ),
+}));
+
+vi.mock("../../../components/common/EmptyState/EmptyState", () => ({
+  default: ({ title }) => <div>{title}</div>,
+}));
+
+vi.mock("../../../components/common/SegmentedControl/SegmentedControl", () => ({
+  SegmentedControl: ({ options, value, onChange }) => (
+    <div>
+      {options.map(o => <button key={o.value} onClick={() => onChange(o.value)}>{o.label}</button>)}
+    </div>
+  ),
+}));
+
+vi.mock("../../../components/common/PageToolbar/PageToolbar", () => ({
+  default: ({ searchSlot, controlsSlot }) => <div>{searchSlot}{controlsSlot}</div>,
+  ToolbarSortControl: ({ children }) => <div>{children}</div>,
+}));
+
+vi.mock("../../../components/common/SearchBar/SearchBar.jsx", () => ({
+  default: ({ value, onChange, placeholder }) => (
+    <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
+  ),
+}));
+
 import SmartNudge from "../../../pages/Modules/SmartNudge";
+import ReadingsPanel from "../../../pages/Modules/ReadingsPanel";
 import {
   AnimatedContent,
   DetailsView,
@@ -119,6 +189,13 @@ import {
   TestModeContent,
 } from "../../../pages/Modules/ModulesPageChrome";
 import { useMainModuleView, useModulesPageState } from "../../../pages/Modules/modulesPageHooks";
+import ModulesPage from "../../../pages/Modules/ModulesPage";
+import {
+  EmptyResults,
+  MainView,
+  ModuleToolbar,
+  MyEnrollmentsTabContent,
+} from "../../../pages/Modules/ModulesPageResults";
 
 function wrapper({ children }) {
   return <MemoryRouter>{children}</MemoryRouter>;
@@ -305,6 +382,103 @@ describe("modules page extras", () => {
     expect(state.setSearchQuery).toHaveBeenCalledWith("next");
     expect(state.setFilterMode).toHaveBeenCalledWith("all");
     expect(setCurrentPage).toHaveBeenCalledTimes(2);
+  });
+
+  it("ModulesPage renders skeleton while loading", () => {
+    useModulesMock.mockReturnValue({ loading: true, modules: [], enrollments: [] });
+    render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+    expect(screen.getByTestId("modules-skeleton")).toBeInTheDocument();
+  });
+
+  it("ModulesPage renders test-mode content (not skeleton) when loaded", () => {
+    useModulesMock.mockReturnValue({ loading: false, modules: [], enrollments: [] });
+    filterModulesMock.mockReturnValue([]);
+    render(<MemoryRouter><ModulesPage /></MemoryRouter>);
+    // In test env, should not show skeleton
+    expect(screen.queryByTestId("modules-skeleton")).not.toBeInTheDocument();
+  });
+
+  it("EmptyResults: search query shows SearchResultEmpty", () => {
+    const search = { query: "test", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    const sorting = { selectedCourses: [], clearFilters: vi.fn() };
+    render(<EmptyResults search={search} sorting={sorting} isTeacher={false} />);
+    expect(screen.getByText(/No your modules found|No modules found/)).toBeInTheDocument();
+  });
+
+  it("EmptyResults: active filter shows FilterResultEmpty", () => {
+    const search = { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    const sorting = { selectedCourses: ["CS"], clearFilters: vi.fn() };
+    render(<EmptyResults search={search} sorting={sorting} isTeacher={false} />);
+    expect(screen.getByText("No modules matched your filters")).toBeInTheDocument();
+  });
+
+  it("EmptyResults: teacher empty state", () => {
+    const search = { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    const sorting = { selectedCourses: [], clearFilters: vi.fn() };
+    render(<EmptyResults search={search} sorting={sorting} isTeacher={true} />);
+    expect(screen.getByText("No modules yet")).toBeInTheDocument();
+  });
+
+  it("EmptyResults: student enrolled empty state", () => {
+    const search = { query: "", filter: "enrolled", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    const sorting = { selectedCourses: [], clearFilters: vi.fn() };
+    render(<EmptyResults search={search} sorting={sorting} isTeacher={false} />);
+    expect(screen.getByText("You're not enrolled in any modules yet")).toBeInTheDocument();
+  });
+
+  it("EmptyResults: fallback state when no modules and no conditions", () => {
+    const search = { query: "", filter: "all", onQueryChange: vi.fn(), onFilterChange: vi.fn() };
+    const sorting = { selectedCourses: [], clearFilters: vi.fn() };
+    render(<EmptyResults search={search} sorting={sorting} isTeacher={false} />);
+    expect(screen.getByText("No modules found")).toBeInTheDocument();
+  });
+
+  it("ModuleToolbar renders with course filter for student browse view", () => {
+    const search = { query: "", onQueryChange: vi.fn() };
+    const sorting = { sortBy: "name", handleNewSort: vi.fn(), selectedCourses: [], toggleCourse: vi.fn() };
+    render(<ModuleToolbar search={search} sorting={sorting} isTeacher={false} isMyModules={false} />);
+    expect(screen.getByText("CourseFilter")).toBeInTheDocument();
+  });
+
+  it("ModuleToolbar hides course filter for teacher", () => {
+    const search = { query: "", onQueryChange: vi.fn() };
+    const sorting = { sortBy: "name", handleNewSort: vi.fn(), selectedCourses: [], toggleCourse: vi.fn() };
+    render(<ModuleToolbar search={search} sorting={sorting} isTeacher={true} isMyModules={false} />);
+    expect(screen.queryByText("CourseFilter")).not.toBeInTheDocument();
+  });
+
+  it("MyEnrollmentsTabContent shows empty state when no enrolled modules", () => {
+    filterModulesMock.mockReturnValue([]);
+    useModuleSortingMock.mockReturnValue({ results: [], pageModules: [], currentPage: 1, totalPages: 1, setCurrentPage: vi.fn(), sortBy: "name", handleNewSort: vi.fn(), selectedCourses: [], clearFilters: vi.fn(), toggleCourse: vi.fn() });
+    const state = buildState({ hook: { modules: [], enrollments: [], toggleEnrollment: vi.fn(), taskCountsByModule: {} } });
+    render(<MyEnrollmentsTabContent state={state} />);
+    expect(screen.getByText(/No your modules found|No modules found/)).toBeInTheDocument();
+  });
+
+  it("MyEnrollmentsTabContent renders grid when enrolled modules exist", () => {
+    filterModulesMock.mockReturnValue([{ id: 1, module_code: "CS101" }]);
+    useModuleSortingMock.mockReturnValue({
+      results: [{ id: 1, module_code: "CS101" }],
+      pageModules: [{ id: 1, module_code: "CS101" }],
+      currentPage: 1, totalPages: 1, setCurrentPage: vi.fn(),
+      sortBy: "name", handleNewSort: vi.fn(), selectedCourses: [], clearFilters: vi.fn(), toggleCourse: vi.fn(),
+    });
+    const state = buildState({ hook: { modules: [{ id: 1, module_code: "CS101" }], enrollments: [{ module: 1 }], toggleEnrollment: vi.fn(), taskCountsByModule: {} } });
+    render(<MyEnrollmentsTabContent state={state} />);
+    expect(screen.getByTestId("module-grid")).toBeInTheDocument();
+  });
+
+  it("MainView renders browse modules toolbar for teacher", () => {
+    filterModulesMock.mockReturnValue([{ id: 1, module_code: "CS101" }]);
+    useModuleSortingMock.mockReturnValue({
+      results: [{ id: 1, module_code: "CS101" }],
+      pageModules: [{ id: 1, module_code: "CS101" }],
+      currentPage: 1, totalPages: 1, setCurrentPage: vi.fn(),
+      sortBy: "name", handleNewSort: vi.fn(), selectedCourses: [], clearFilters: vi.fn(), toggleCourse: vi.fn(),
+    });
+    const state = buildState({ filterMode: "all", isTeacher: true, hook: { modules: [{ id: 1, module_code: "CS101" }], enrollments: [], toggleEnrollment: vi.fn(), taskCountsByModule: {}, handleModuleCreated: vi.fn(), handleModuleUpdated: vi.fn(), handleEnrollment: vi.fn(), handleDisenrol: vi.fn() } });
+    render(<MemoryRouter><MainView state={state} /></MemoryRouter>);
+    expect(screen.getByTestId("module-grid")).toBeInTheDocument();
   });
 
   it("smart nudge prioritizes imminent deadlines and readings and dismisses them after add", () => {

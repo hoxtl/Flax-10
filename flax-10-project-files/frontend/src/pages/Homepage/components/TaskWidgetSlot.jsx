@@ -2,7 +2,7 @@ import { AnimatePresence, motion as Motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import PrimaryButton from "../../../components/Common/PrimaryButton/PrimaryButton";
+import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";
 import WidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
 import widgetStyles from "../../Modules/DashboardWidgets.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
@@ -50,32 +50,40 @@ function TaskWidgetCard(props) {
 }
 
 function TaskWidgetContent(props) {
+  return (
+    <div className={props.styles.taskWidgetContent}>
+      <TaskWidgetHeaderSection styles={props.styles} count={props.taskWidgetDueTodayCount} />
+      <TaskWidgetList {...props} />
+      <TaskWidgetCompletedSection {...props} />
+      <TaskWidgetMenu {...props} />
+    </div>
+  );
+}
+
+function TaskWidgetHeaderSection({ styles: s, count }) {
+  return (
+    <WidgetHeader
+      icon={CheckSquare}
+      title="Today's Tasks"
+      count={count}
+      actions={<GoToTasksButton styles={s} />}
+      className={s.taskWidgetWidgetHeader}
+    />
+  );
+}
+
+function GoToTasksButton({ styles: s }) {
   const navigate = useNavigate();
-  const headerActions = (
+  return (
     <PrimaryButton
       type="button"
       size="small"
       pill
       onClick={() => navigate("/tasks?filter=today")}
-      className={props.styles.taskWidgetHeaderButton}
+      className={s.taskWidgetHeaderButton}
     >
       Go to all tasks
     </PrimaryButton>
-  );
-
-  return (
-    <div className={props.styles.taskWidgetContent}>
-      <WidgetHeader
-        icon={CheckSquare}
-        title="Today's Tasks"
-        count={props.taskWidgetDueTodayCount}
-        actions={headerActions}
-        className={props.styles.taskWidgetWidgetHeader}
-      />
-      <TaskWidgetList {...props} />
-      <TaskWidgetCompletedSection {...props} />
-      <TaskWidgetMenu {...props} />
-    </div>
   );
 }
 

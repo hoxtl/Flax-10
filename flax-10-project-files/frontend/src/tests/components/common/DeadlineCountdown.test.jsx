@@ -29,6 +29,7 @@ describe("DeadlineCountdown", () => {
     expect(getUrgencyTier("2026-05-10T12:00:00Z")).toBe("distant");
 
     expect(getDaysLabel("2026-03-23T12:00:00Z")).toBe("1d overdue");
+    expect(getDaysLabel("2026-03-22T12:00:00Z")).toBe("2d overdue");
     expect(getDaysLabel("2026-03-24T18:00:00Z")).toBe("Today");
     expect(getDaysLabel("2026-03-25T12:00:00Z")).toBe("Tomorrow");
     expect(getDaysLabel("2026-03-29T12:00:00Z")).toBe("5d");
@@ -59,5 +60,19 @@ describe("DeadlineCountdown", () => {
 
     rerender(<DeadlineCountdown />);
     expect(container.firstChild).toBeNull();
+  });
+
+  it("renders a label-only distant state without the priority pill or clock icon", () => {
+    const { container } = render(<DeadlineCountdown label="Anytime" showPriority={false} />);
+    expect(screen.getByText("Anytime")).toBeInTheDocument();
+    expect(screen.queryByText(/Overdue|Urgent/)).not.toBeInTheDocument();
+    expect(container.querySelector("svg")).toBeNull();
+  });
+
+  it("omits the priority pill for non-pill tiers", () => {
+    render(<DeadlineCountdown dueDate="2026-04-02T12:00:00Z" />);
+    expect(screen.getByText("9d")).toBeInTheDocument();
+    expect(screen.queryByText("!! Overdue")).not.toBeInTheDocument();
+    expect(screen.queryByText("!!! Urgent")).not.toBeInTheDocument();
   });
 });

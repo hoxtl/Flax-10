@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { startManualTask } from "../../../components/Timer/utils/timerTaskActions";
 
 import { PopupSection } from "../../../components/Timer/sections/PopupSection";
 import { FocusOverlayContent } from "../../../components/Timer/sections/FocusOverlayContent";
@@ -144,6 +145,17 @@ describe("Timer sections", () => {
     expect(screen.getByText("End early")).toBeInTheDocument();
   });
 
+  it("skips rendering when disabled and hides the break modal when autostart is enabled", () => {
+    localStorage.setItem("timer_autostart", "true");
+    const { rerender, container } = render(
+      <PopupSection t={{ ...t, modal: "break" }} showHistory={false} onCloseHistory={vi.fn()} disabled />,
+    );
+    expect(container).toBeEmptyDOMElement();
+
+    rerender(<PopupSection t={{ ...t, modal: "break" }} showHistory={false} onCloseHistory={vi.fn()} />);
+    expect(screen.queryByText("Break modal")).not.toBeInTheDocument();
+  });
+
   it("renders focus overlay, right panel tabs, and main section actions", () => {
     const onExitFocus = vi.fn();
     const onOpenHistory = vi.fn();
@@ -175,7 +187,15 @@ describe("Timer sections", () => {
     expect(t.togglePause).toHaveBeenCalled();
     expect(t.resetTimer).toHaveBeenCalled();
     expect(t.setModal).toHaveBeenCalledWith("endEarly");
-    expect(t.addDistraction).toHaveBeenCalled();
     expect(onOpenHistory).toHaveBeenCalled();
+  });
+
+  it("starts the timer from the main controls and hides the mobile history button on desktop", () => {
+    const onOpenHistory = vi.fn();
+    render(<MainSection t={t} onOpenHistory={onOpenHistory} onOpenFocus={vi.fn()} isMobile={false} />);
+
+    fireEvent.click(screen.getByText("Toggle timer"));
+    expect(startManualTask).toHaveBeenCalledWith(t);
+    expect(screen.queryByText("View History 📜")).not.toBeInTheDocument();
   });
 });

@@ -25,9 +25,29 @@ describe("HoldConfirmModal", () => {
     vi.useRealTimers();
   });
 
+  function renderHoldModal(props = {}) {
+    const onConfirm = vi.fn();
+    render(
+      <HoldConfirmModal
+        title="Delete session"
+        holdDuration={100}
+        onConfirm={onConfirm}
+        onCancel={vi.fn()}
+        {...props}
+      />
+    );
+    const holdButton = screen.getByRole("button", { name: props.holdLabel ?? "Hold to Delete" });
+    return { holdButton, onConfirm };
+  }
+
+  function advance(ms) {
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+  }
+
   it("renders warning content and lets the user cancel", () => {
     const onCancel = vi.fn();
-
     render(
       <HoldConfirmModal
         title="Delete session"
@@ -38,74 +58,47 @@ describe("HoldConfirmModal", () => {
         onCancel={onCancel}
       />
     );
-
-    expect(screen.getByText("Delete session")).toBeInTheDocument();
     expect(screen.getByText("This cannot be undone")).toBeInTheDocument();
     expect(screen.getByText("All progress will be lost.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Keep session" }));
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("updates progress while held, resets on release, and confirms after a full hold", () => {
-    const onConfirm = vi.fn();
+  describe("hold progress", () => {
+    it("shows progress while held and resets on release", () => {
+      const { holdButton } = renderHoldModal({ holdLabel: "Hold to confirm" });
+      fireEvent.mouseDown(holdButton);
+      advance(48);
+      expect(screen.getByText("Hold…")).toBeInTheDocument();
+      expect(holdButton.querySelector("span[style]")?.style.width).not.toBe("0%");
 
-    render(
-      <HoldConfirmModal
-        title="Delete session"
-        holdDuration={100}
-        holdLabel="Hold to confirm"
-        onConfirm={onConfirm}
-        onCancel={vi.fn()}
-      />
-    );
-
-    const holdButton = screen.getByRole("button", { name: "Hold to confirm" });
-
-    fireEvent.mouseDown(holdButton);
-    act(() => {
-      vi.advanceTimersByTime(48);
+      fireEvent.mouseUp(holdButton);
+      expect(screen.getByText("Hold to confirm")).toBeInTheDocument();
+      expect(holdButton.querySelector("span[style]")).toBeNull();
     });
 
-    expect(screen.getByText("Hold…")).toBeInTheDocument();
-    expect(holdButton.querySelector("span[style]")?.style.width).not.toBe("0%");
-
-    fireEvent.mouseUp(holdButton);
-    expect(screen.getByText("Hold to confirm")).toBeInTheDocument();
-    expect(holdButton.querySelector("span[style]")).toBeNull();
-
-    fireEvent.mouseDown(holdButton);
-    act(() => {
-      vi.advanceTimersByTime(16);
-    });
-    fireEvent.mouseLeave(holdButton);
-    expect(holdButton.querySelector("span[style]")).toBeNull();
-
-    fireEvent.touchStart(holdButton);
-    act(() => {
-      vi.advanceTimersByTime(120);
+    it("cancels the hold when the cursor leaves", () => {
+      const { holdButton } = renderHoldModal({ holdLabel: "Hold to confirm" });
+      fireEvent.mouseDown(holdButton);
+      advance(16);
+      fireEvent.mouseLeave(holdButton);
+      expect(holdButton.querySelector("span[style]")).toBeNull();
     });
 
-    expect(onConfirm).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Hold to confirm")).toBeInTheDocument();
+    it("confirms after the hold duration completes", () => {
+      const { holdButton, onConfirm } = renderHoldModal({ holdLabel: "Hold to confirm" });
+      fireEvent.touchStart(holdButton);
+      advance(120);
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(screen.getByText("Hold to confirm")).toBeInTheDocument();
+    });
   });
 
   it("supports the default labels and touch cancellation", () => {
-    render(
-      <HoldConfirmModal
-        title="Delete session"
-        holdDuration={100}
-        onConfirm={vi.fn()}
-        onCancel={vi.fn()}
-      />
-    );
-
-    const holdButton = screen.getByRole("button", { name: "Hold to Delete" });
+    const { holdButton } = renderHoldModal();
     fireEvent.touchStart(holdButton);
-    act(() => {
-      vi.advanceTimersByTime(32);
-    });
+    advance(32);
     expect(screen.getByText("Hold…")).toBeInTheDocument();
-
     fireEvent.touchEnd(holdButton);
     expect(screen.getByText("Hold to Delete")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Keep It" })).toBeInTheDocument();

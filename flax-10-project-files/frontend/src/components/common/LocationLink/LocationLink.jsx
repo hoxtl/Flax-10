@@ -8,46 +8,23 @@ import styles from "./LocationLink.module.css";
 
 const buildMapLink = (location) => `/map?destination=${encodeURIComponent(location)}`;
 
-export default function LocationLink({
-  location,
-  className = "",
-  textClassName = "",
-  iconClassName = "",
-  onClick,
-  showIcon = true,
-  iconSize = 14,
-  to,
-}) {
-  if (!location) return null;
-  const href = to || buildMapLink(location);
-  const content = (
-    <>
-      {showIcon && (
-        <MapPin size={iconSize} className={`${styles.icon} ${iconClassName}`.trim()} aria-hidden="true" />
-      )}
-      <span className={`${styles.text} ${textClassName}`.trim()}>{location}</span>
-    </>
-  );
-  if (to) {
-    return (
-      <Link
-        to={href}
-        className={`${styles.link} ${className}`.trim()}
-        aria-label={`Open UniMap for ${location}`}
-        onClick={onClick}
-      >
-        {content}
-      </Link>
-    );
-  }
+export default function LocationLink(props) {
+  if (!props.location) return null;
   return (
     <Link
-      to={href}
-      className={`${styles.link} ${className}`.trim()}
-      aria-label={`Open UniMap for ${location}`}
-      onClick={onClick}
+      to={props.to || buildMapLink(props.location)}
+      className={`${styles.link} ${props.className ?? ""}`.trim()}
+      aria-label={`Open UniMap for ${props.location}`}
+      onClick={props.onClick}
     >
-      {content}
+      {props.showIcon !== false && (
+        <MapPin
+          size={props.iconSize ?? 14}
+          className={`${styles.icon} ${props.iconClassName ?? ""}`.trim()}
+          aria-hidden="true"
+        />
+      )}
+      <span className={`${styles.text} ${props.textClassName ?? ""}`.trim()}>{props.location}</span>
     </Link>
   );
 }

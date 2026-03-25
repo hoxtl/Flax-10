@@ -158,7 +158,7 @@ describe('ToastContext', () => {
         );
         // showToast without actionLabel — onAction should be null
         await act(async () => { screen.getByText('Show Default').click(); });
-        expect(screen.getByTestId('toast')).toHaveAttribute('data-action', '');
+        expect(screen.getByTestId('toast')).not.toHaveAttribute('data-action');
     });
 
     it('should use null icon when no icon provided', async () => {
@@ -168,8 +168,7 @@ describe('ToastContext', () => {
             </ToastProvider>
         );
         await act(async () => { screen.getByText('Show Default').click(); });
-        // data-icon attribute will be empty string when null
-        expect(screen.getByTestId('toast')).toHaveAttribute('data-icon', '');
+        expect(screen.getByTestId('toast')).not.toHaveAttribute('data-icon');
     });
 
     it('useToast returns the showToast function', () => {

@@ -18,6 +18,8 @@ vi.mock('../../../components/Calendar/utils/overlapUtils', () => ({
     }),
 }));
 
+const { calculateEventColumns } = await import('../../../components/Calendar/utils/overlapUtils');
+
 describe('getHoursOfDay', () => {
     it('returns array of 24 hours', () => {
         const hours = getHoursOfDay();
@@ -130,10 +132,10 @@ describe('calculateEventStyle', () => {
     });
 
     it('does not apply layout adjustment when totalColumns is 1', () => {
-        const { calculateEventColumns } = require('../../../components/Calendar/utils/overlapUtils');
-        calculateEventColumns.mockReturnValueOnce(new Map([[1, { column: 0, totalColumns: 1 }]]));
         const event = { id: 1, start_time: '2026-03-15T10:00:00', end_time: '2026-03-15T11:00:00' };
-        const style = calculateEventStyle(event, slotHeight, [event]);
+        const otherEvent = { id: 2, start_time: '2026-03-15T12:00:00', end_time: '2026-03-15T13:00:00' };
+        calculateEventColumns.mockReturnValueOnce(new Map([[1, { column: 0, totalColumns: 1 }]]));
+        const style = calculateEventStyle(event, slotHeight, [event, otherEvent]);
         expect(style.width).toBe('100%');
     });
 });

@@ -4,6 +4,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 
 import AttendanceCharts from "../../../../pages/Profile/components/widgets/attendance/AttendanceCharts";
 import {
+  AttendanceWidget,
+  CompactAttendanceTile,
+  CompactStreakTile,
+} from "../../../../pages/Profile/components/widgets/AttendanceWidgets";
+import {
   AttendanceWarningBadge,
   CompactOverallDonut,
   CompactByTypeDonut,
@@ -116,5 +121,81 @@ describe("Profile attendance widgets", () => {
     unmount();
     const { container } = render(<CompactByTypeDonut byTypeData={[]} onSegmentClick={vi.fn()} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders compact streak values and attendance widget branches", () => {
+    const { rerender } = render(<CompactStreakTile streaks={{ current: 4, longest: 12 }} />);
+    expect(screen.getByText("4")).toBeInTheDocument();
+    expect(screen.getByText("12")).toBeInTheDocument();
+
+    rerender(<CompactStreakTile streaks={null} />);
+    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+  });
+
+  it("covers attendance widget loading, hidden error state, and compact warning state", () => {
+    useAttendanceStatsMock.mockReturnValue({
+      stats: null,
+      loading: true,
+      error: null,
+      refetch: vi.fn(),
+    });
+    useAttendanceRecordsMock.mockReturnValue({ records: [], refetch: vi.fn() });
+    const { rerender, container } = render(<AttendanceWidget />);
+    expect(screen.getByText("Loading metrics...")).toBeInTheDocument();
+
+    useAttendanceStatsMock.mockReturnValue({
+      stats: null,
+      loading: false,
+      error: new Error("nope"),
+      refetch: vi.fn(),
+    });
+    rerender(<AttendanceWidget />);
+    expect(container).toBeEmptyDOMElement();
+
+    useAttendanceStatsMock.mockReturnValue({
+      stats: { overall: { attended: 2, missed: 3 }, by_type: {} },
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    rerender(<CompactAttendanceTile onNavigate={vi.fn()} />);
+    expect(screen.getByText(/Low Attendance/)).toBeInTheDocument();
+  });
+
+  it("dispatches attendance navigation when the compact header has no callback", () => {
+    const onNavigate = vi.fn();
+    window.addEventListener("navigate", onNavigate);
+
+    render(<CompactAttHeader />);
+    fireEvent.click(screen.getByText("View attendance details"));
+
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+    expect(onNavigate.mock.calls[0][0].detail).toBe("attendance");
+
+    window.removeEventListener("navigate", onNavigate);
+  });
+
+  it("renders healthy attendance without a warning and opens segment details", async () => {
+    useAttendanceStatsMock.mockReturnValue({
+      stats: {
+        overall: { attended: 4, missed: 1 },
+        by_type: { lecture: { attended: 3, missed: 0 } },
+      },
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+    useAttendanceRecordsMock.mockReturnValue({
+      records: [{ event_id: 1, title: "Lecture", start_time: "2026-03-01T09:00:00Z", attended: true, event_type: "Lecture" }],
+      refetch: vi.fn(),
+    });
+
+    render(<AttendanceWidget />);
+
+    expect(screen.queryByText(/Low Attendance/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Overall chart"));
+    await waitFor(() => expect(screen.getByText("Overall: Attended")).toBeInTheDocument());
+    fireEvent.click(screen.getByText("Overall: Attended"));
+    await waitFor(() => expect(screen.queryByText("Overall: Attended")).not.toBeInTheDocument());
   });
 });

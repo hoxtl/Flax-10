@@ -1,5 +1,5 @@
 """
-Factories for building calendar events, lectures, meals and deadlines.
+Builds seeded calendar events and related records.
 """
 
 import random
@@ -15,6 +15,7 @@ from studyFlax.fixtures.data_fixtures import (
     module_deadline_fixtures, deadline_fixtures,
     get_course_prefixes,
 )
+from .deadline_titles import build_module_deadline_title
 
 SEED_START = datetime(2026, 1, 15, 0, 0, 0, tzinfo=dt_timezone.utc)
 SEED_DAYS = 365
@@ -283,43 +284,11 @@ def _get_deadline_templates(module):
     return default_list, "default"
 
 
-def _module_deadline_title(module, deadline_type, title):
-    module_label = (getattr(module, "module_name", None) or getattr(module, "module_code", "")).strip()
-    normalized = str(title or "").strip()
-    lower = normalized.lower()
-    suffixes = (
-        ("essay", "Essay"),
-        ("report", "Report"),
-        ("quiz", "Quiz"),
-        ("presentation", "Presentation"),
-        ("assignment", "Assignment"),
-        ("portfolio", "Portfolio"),
-        ("brief", "Brief"),
-        ("proposal", "Proposal"),
-        ("case study", "Case Study"),
-        ("review", "Review"),
-        ("exam", "Exam"),
-        ("test", "Test"),
-    )
-    for suffix, label in suffixes:
-        if lower.endswith(suffix):
-            return f"{module_label} {label}"
-    if deadline_type == "coursework":
-        return f"{module_label} Coursework"
-    if deadline_type == "quiz":
-        return f"{module_label} Quiz"
-    if deadline_type == "presentation":
-        return f"{module_label} Presentation"
-    if deadline_type == "exam":
-        return f"{module_label} Exam"
-    return f"{module_label} {normalized}".strip()
-
-
 def _normalise_shared_deadline_templates(module, templates, template_scope):
     if template_scope == "module":
         return list(templates)
     return [
-        (deadline_type, _module_deadline_title(module, deadline_type, title), description)
+        (deadline_type, build_module_deadline_title(module, deadline_type, title), description)
         for deadline_type, title, description in templates
     ]
 

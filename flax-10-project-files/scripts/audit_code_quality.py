@@ -134,7 +134,8 @@ EMOJI_RE = re.compile(
 
 CONTROL_FLOW_NODES = (
     ast.If, ast.For, ast.While, ast.Try,
-    ast.ExceptHandler, ast.With, ast.Match,
+    ast.ExceptHandler, ast.With,
+    *([ast.Match] if hasattr(ast, "Match") else []),
 )
 
 

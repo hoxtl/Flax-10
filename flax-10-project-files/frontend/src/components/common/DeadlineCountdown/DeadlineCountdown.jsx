@@ -22,7 +22,6 @@ function PriorityPillBadge({ pill }) {
 }
 
 function DaysLabelBadge({ daysLabel, forceClock, tier }) {
-  if (!daysLabel) return null;
   return (
     <span className={buildClassName([styles.daysLabel, styles[getDueStatusClass(tier)]])}>
       {(forceClock || isUrgentTier(tier)) ? <Clock size={12} className={styles.icon} /> : null}

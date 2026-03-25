@@ -7,6 +7,10 @@ import { parseNotificationAction } from "../components/Notifications/utils/notif
 const POLL_INTERVAL = 30000;
 
 const ROLE_CHANGE_TITLES = new Set([
+  "teacher role approved",
+  "teacher role rejected",
+  "teacher request approved",
+  "teacher request rejected",
   "course change approved",
   "course change rejected",
 ]);

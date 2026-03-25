@@ -3,7 +3,7 @@
  */
 
 import { useRef, useState } from "react";
-import { Check, Calendar, Trash2 } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
 import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
 import HoldConfirmModal from "../../../components/common/HoldConfirmModal/HoldConfirmModal";
@@ -11,7 +11,7 @@ import TaskAssigneePopup from "./TaskAssigneePopup";
 import TaskAvatarStack from "./TaskAvatarStack";
 import DateTimePicker from "../../../components/common/inputs/DateTimePicker";
 import { getUserColor } from "../utils/priorityUtils";
-import { buildToggleAssignee, filterVisibleAssignees, formatTaskDueDate, getDueDateStr } from "../utils/taskUtils";
+import { buildToggleAssignee, filterVisibleAssignees, getDueDateStr } from "../utils/taskUtils";
 import styles from "./TaskListView.module.css";
 
 function TaskCheckbox({ isDone, color, onToggle }) {
@@ -41,7 +41,7 @@ function AssignCell({ task, members, onUpdate }) {
   );
 }
 
-function PrioritySelect({ priority, onUpdate, taskId }) {
+function PrioritySelect({ priority }) {
   return <TaskPriorityPill priority={priority || "medium"} className={styles.priorityPill} />;
 }
 
@@ -118,7 +118,7 @@ export default function TaskListRow({ task, members, onToggle, onUpdate, onDelet
         <TaskCheckbox isDone={task.completed} color={color} onToggle={() => onToggle(task.id, !task.completed)} />
         <TaskRowTitle task={task} onUpdate={onUpdate} />
       </div>
-      <PrioritySelect priority={task.priority} onUpdate={onUpdate} taskId={task.id} />
+      <PrioritySelect priority={task.priority} />
       <DateCell task={task} onUpdate={onUpdate} />
       <AssignCell task={task} members={members} onUpdate={onUpdate} />
       <ActionCell taskId={task.id} onDelete={onDelete} />

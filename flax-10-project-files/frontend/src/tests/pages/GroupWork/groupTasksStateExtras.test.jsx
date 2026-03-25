@@ -58,91 +58,128 @@ import TaskListView from "../../../pages/GroupWork/components/TaskListView";
 import TaskBoardView from "../../../pages/GroupWork/components/TaskBoardView";
 import { useDragHandlers, useTaskTimelineState } from "../../../pages/GroupWork/components/useTaskTimelineState";
 
+const defaultTasksResponse = [{ id: 2, title: "B", assignees_info: [{ id: 4 }], status: "todo" }];
+const mockJsonResponse = (payload) => ({ ok: true, json: async () => payload });
+const mockOkResponse = () => ({ ok: true });
+
+const renderTasksHook = async (extraResponses = []) => {
+  global.fetch.mockReset?.();
+  [mockJsonResponse(defaultTasksResponse), ...extraResponses].forEach((response) => {
+    global.fetch.mockResolvedValueOnce(response);
+  });
+  const onStatsUpdate = vi.fn();
+  const hook = renderHook(() => useGroupTasksTabState(9, [{ id: 4 }], onStatsUpdate));
+  await waitFor(() => expect(hook.result.current.taskActions.loading).toBe(false));
+  return { hook, onStatsUpdate };
+};
+
+const buildDragEvent = () => {
+  const target = document.createElement("div");
+  return {
+    target,
+    event: {
+      preventDefault: vi.fn(),
+      currentTarget: target,
+      dataTransfer: { getData: vi.fn(() => "11") },
+    },
+  };
+};
+
 describe("group tasks state extras", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     global.fetch = vi.fn();
   });
 
-  it("loads, filters, updates, adds, and deletes group tasks", async () => {
-    const members = [{ id: 4 }];
-    const onStatsUpdate = vi.fn();
-    global.fetch
-      .mockResolvedValueOnce({ ok: true, json: async () => [{ id: 2, title: "B", assignees_info: [{ id: 4 }], status: "todo" }] })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 2, title: "Updated", assignees_info: [{ id: 4 }], status: "todo" }) })
-      .mockResolvedValueOnce({ ok: true })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 3, title: "New", assignees_info: [], status: "todo" }) });
-
-    const { result } = renderHook(() => useGroupTasksTabState(9, members, onStatsUpdate));
-    await waitFor(() => expect(result.current.taskActions.loading).toBe(false));
-    expect(onStatsUpdate).toHaveBeenCalledWith({ complete: 1 });
-    expect(result.current.sortedTasks).toHaveLength(1);
-
-    await act(async () => {
-      await result.current.taskActions.updateTask(2, { completed: true });
-      await result.current.taskActions.deleteTask(2);
-      await result.current.taskActions.addTask("New", { due_date: "2026-04-01", assigned_to: [4] });
+  describe("useGroupTasksTabState", () => {
+    it("loads tasks and updates completion stats", async () => {
+      const { hook, onStatsUpdate } = await renderTasksHook();
+      expect(onStatsUpdate).toHaveBeenCalledWith({ complete: 1 });
+      expect(hook.result.current.sortedTasks).toHaveLength(1);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "PATCH" }));
-    expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "DELETE" }));
-    expect(global.fetch).toHaveBeenCalledWith("/api/tasks/", expect.objectContaining({ method: "POST" }));
-
-    act(() => {
-      result.current.setFilterUsers(["4"]);
-      result.current.setTaskView("board");
-      result.current.setShowAddModal(true);
+    it("performs update, delete, and add actions", async () => {
+      const { hook } = await renderTasksHook([
+        mockJsonResponse({ id: 2, title: "Updated", assignees_info: [{ id: 4 }], status: "todo" }),
+        mockOkResponse(),
+        mockJsonResponse({ id: 3, title: "New", assignees_info: [], status: "todo" }),
+      ]);
+      await act(async () => {
+        await hook.result.current.taskActions.updateTask(2, { completed: true });
+        await hook.result.current.taskActions.deleteTask(2);
+        await hook.result.current.taskActions.addTask("New", { due_date: "2026-04-01", assigned_to: [4] });
+      });
+      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "PATCH" }));
+      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/2/", expect.objectContaining({ method: "DELETE" }));
+      expect(global.fetch).toHaveBeenCalledWith("/api/tasks/", expect.objectContaining({ method: "POST" }));
     });
-    expect(result.current.taskView).toBe("board");
-    expect(result.current.showAddModal).toBe(true);
+
+    it("toggles filters, view, and modal state", async () => {
+      const { hook } = await renderTasksHook();
+      act(() => {
+        hook.result.current.setFilterUsers(["4"]);
+        hook.result.current.setTaskView("board");
+        hook.result.current.setShowAddModal(true);
+      });
+      expect(hook.result.current.taskView).toBe("board");
+      expect(hook.result.current.showAddModal).toBe(true);
+    });
   });
 
-  it("covers task title edit helpers, list empty state, board actions, and timeline drag state", async () => {
-    const onUpdate = vi.fn();
-    const { result } = renderHook(() => useTaskTitleEdit({ id: 8, title: " Draft " }, onUpdate));
-    act(() => result.current.setEditTitle(" Polished draft "));
-    act(() => result.current.saveEdit());
-    expect(onUpdate).toHaveBeenCalledWith(8, { title: "Polished draft" });
+  describe("task helpers and timeline state", () => {
+    it("trims titles before saving from useTaskTitleEdit", () => {
+      const onUpdate = vi.fn();
+      const { result } = renderHook(() => useTaskTitleEdit({ id: 8, title: " Draft " }, onUpdate));
+      act(() => result.current.setEditTitle(" Polished draft "));
+      act(() => result.current.saveEdit());
+      expect(onUpdate).toHaveBeenCalledWith(8, { title: "Polished draft" });
+    });
 
-    const saveEdit = vi.fn();
-    const setEditing = vi.fn();
-    const preventDefault = vi.fn();
-    handleTaskTitleKeyDown({ key: "Enter", shiftKey: false, preventDefault }, saveEdit, setEditing);
-    handleTaskTitleKeyDown({ key: "Escape", preventDefault }, saveEdit, setEditing);
-    expect(saveEdit).toHaveBeenCalled();
-    expect(setEditing).toHaveBeenCalledWith(false);
+    it("handles Enter and Escape shortcuts for inline titles", () => {
+      const saveEdit = vi.fn();
+      const setEditing = vi.fn();
+      const preventDefault = vi.fn();
+      handleTaskTitleKeyDown({ key: "Enter", shiftKey: false, preventDefault }, saveEdit, setEditing);
+      handleTaskTitleKeyDown({ key: "Escape", preventDefault }, saveEdit, setEditing);
+      expect(saveEdit).toHaveBeenCalled();
+      expect(setEditing).toHaveBeenCalledWith(false);
+    });
 
-    render(<TaskListView tasks={[]} members={[]} onToggle={vi.fn()} onUpdate={vi.fn()} onDelete={vi.fn()} />);
-    expect(screen.getByText(/No tasks yet/)).toBeInTheDocument();
+    it("renders the empty list state", () => {
+      render(<TaskListView tasks={[]} members={[]} onToggle={vi.fn()} onUpdate={vi.fn()} onDelete={vi.fn()} />);
+      expect(screen.getByText(/No tasks yet/)).toBeInTheDocument();
+    });
 
-    const onAdd = vi.fn();
-    render(<TaskBoardView tasks={[{ id: 1 }]} members={[]} onUpdate={vi.fn()} onDelete={vi.fn()} onAdd={onAdd} />);
-    fireEvent.click(screen.getByText("submit-todo"));
-    expect(onAdd).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByText("escape-todo"));
+    it("ignores board submissions without a title", () => {
+      const onAdd = vi.fn();
+      render(<TaskBoardView tasks={[{ id: 1 }]} members={[]} onUpdate={vi.fn()} onDelete={vi.fn()} onAdd={onAdd} />);
+      fireEvent.click(screen.getByText("submit-todo"));
+      fireEvent.click(screen.getByText("escape-todo"));
+      expect(onAdd).not.toHaveBeenCalled();
+    });
 
-    const styles = { timelineCellDropTarget: "drop", widgetListDropTarget: "widget" };
-    const drag = renderHook(() => useDragHandlers(onUpdate, styles));
-    const target = document.createElement("div");
-    const event = {
-      preventDefault: vi.fn(),
-      currentTarget: target,
-      dataTransfer: { getData: vi.fn(() => "11") },
-    };
-    act(() => drag.result.current.onDragOver(event));
-    expect(target.classList.contains("drop")).toBe(true);
-    act(() => drag.result.current.onDrop(event, new Date("2026-03-29T00:00:00.000Z").getTime()));
-    expect(onUpdate).toHaveBeenCalledWith(11, expect.objectContaining({ due_date: expect.stringContaining("2026-03-29") }));
-    act(() => drag.result.current.onDropWidget({ ...event, currentTarget: target }));
-    expect(onUpdate).toHaveBeenCalledWith(11, { due_date: null });
+    it("updates tasks through drag handlers", () => {
+      const onUpdate = vi.fn();
+      const styles = { timelineCellDropTarget: "drop", widgetListDropTarget: "widget" };
+      const { result } = renderHook(() => useDragHandlers(onUpdate, styles));
+      const { target, event } = buildDragEvent();
+      act(() => result.current.onDragOver(event));
+      expect(target.classList.contains("drop")).toBe(true);
+      act(() => result.current.onDrop(event, new Date("2026-03-29T00:00:00.000Z").getTime()));
+      expect(onUpdate).toHaveBeenCalledWith(11, expect.objectContaining({ due_date: expect.stringContaining("2026-03-29") }));
+      act(() => result.current.onDropWidget({ ...event, currentTarget: target }));
+      expect(onUpdate).toHaveBeenCalledWith(11, { due_date: null });
+    });
 
-    const timeline = renderHook(() => useTaskTimelineState([
-      { id: 1, title: "A", due_date: null, completed: false, status: "todo" },
-      { id: 2, title: "B", due_date: "2026-03-30", completed: false, status: "todo" },
-      { id: 3, title: "C", due_date: null, completed: true, status: "done" },
-    ], 0));
-    expect(timeline.result.current.unscheduled).toHaveLength(1);
-    expect(timeline.result.current.visible).toHaveLength(3);
-    expect(timeline.result.current.dayMs).toBe(86400000);
+    it("builds task timeline state with unscheduled tasks", () => {
+      const { result } = renderHook(() => useTaskTimelineState([
+        { id: 1, title: "A", due_date: null, completed: false, status: "todo" },
+        { id: 2, title: "B", due_date: "2026-03-30", completed: false, status: "todo" },
+        { id: 3, title: "C", due_date: null, completed: true, status: "done" },
+      ], 0));
+      expect(result.current.unscheduled).toHaveLength(1);
+      expect(result.current.visible).toHaveLength(3);
+      expect(result.current.dayMs).toBe(86400000);
+    });
   });
 });

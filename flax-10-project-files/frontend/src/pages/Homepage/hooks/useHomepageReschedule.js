@@ -4,11 +4,11 @@
 
 import { useCallback, useState } from "react";
 import { formatTime, getNextFreeSlotToday } from "../utils/index";
-import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
-import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
-import { loadScheduleSettings, submitAutoScheduleWithPrefs } from "../../../components/Schedules/auto/autoScheduleActions";
-import { overlapsDay, isToday } from "../../../components/Calendar/utils/dateUtils";
 import { buildScheduleAutoForm } from "../utils/ScheduleAutoForm";
+import { overlapsDay, isToday } from "../../../components/Calendar/utils/dateUtils";
+import { extractBaseEventId } from "../../../components/Calendar/utils/eventUtils";
+import { loadScheduleSettings, submitAutoScheduleWithPrefs } from "../../../components/Schedules/auto/autoScheduleActions";
+import { applyConflictResolutionPlan, buildConflictResolutionPlan, buildConflictResolutionToastMessage } from "../../../components/common/RescheduleEvents/rescheduleEventConflicts";
 
 export function useHomepageReschedule(props) {
   const [resolveConflictsLoading, setResolveConflictsLoading] = useState(false);
@@ -50,24 +50,15 @@ async function runAutoSchedule(props) {
 }
 
 function shouldBlockAutoSchedule(props) {
-  const dayEvents = filterDayEvents(props.sortedEvents, props.selectedDate);
-  const freeWindows = getDayFreeWindows(dayEvents, props.selectedDate);
-  if (!freeWindows.length) {
-    props.showToast("Can't auto schedule today — there are no free windows.");
-    return true;
+  const context = buildAutoScheduleContext(props);
+  if (!context.freeWindows.length) {
+    return announceAutoScheduleIssue(props, "Can't auto schedule today — there are no free windows.");
   }
-  const blockNeeds = getBlockNeeds(props.upcomingDeadlines);
-  const requiredMinutes = blockNeeds.reduce((sum, mins) => sum + mins, 0);
-  const availableMinutes = freeWindows.reduce((sum, win) => sum + (win.minutes || 0), 0);
-  // Require at least 25% margin to ensure no overlaps occur
-  const requiredWithMargin = requiredMinutes * 1.25;
-  if (requiredMinutes > 0 && availableMinutes < requiredWithMargin) {
-    props.showToast("Can't auto schedule today — not enough free time to avoid overlaps.");
-    return true;
+  if (!hasEnoughMargin(context)) {
+    return announceAutoScheduleIssue(props, "Can't auto schedule today — not enough free time to avoid overlaps.");
   }
-  if (blockNeeds.length && !canFitBlocks(freeWindows, blockNeeds)) {
-    props.showToast("Can't auto schedule today — no single window fits the required study blocks.");
-    return true;
+  if (context.blockNeeds.length && !canFitBlocks(context.freeWindows, context.blockNeeds)) {
+    return announceAutoScheduleIssue(props, "Can't auto schedule today — no single window fits the required study blocks.");
   }
   return false;
 }
@@ -82,23 +73,67 @@ function getBlockNeeds(deadlines = []) {
   return prefs.map((pref) => pref.ideal_minutes_per_day || 0).filter((mins) => mins > 0);
 }
 
-function canFitBlocks(windows, blocks) {
-  const sortedWindows = windows.map((win) => ({ ...win })).sort((a, b) => b.minutes - a.minutes);
-  const sortedBlocks = [...blocks].sort((a, b) => b - a);
-  for (const block of sortedBlocks) {
-    const targetIndex = sortedWindows.findIndex((win) => win.minutes >= block);
-    if (targetIndex === -1) return false;
-    sortedWindows[targetIndex].minutes -= block;
-  }
+function buildAutoScheduleContext(props) {
+  const dayEvents = filterDayEvents(props.sortedEvents, props.selectedDate);
+  const freeWindows = getDayFreeWindows(dayEvents, props.selectedDate);
+  const blockNeeds = getBlockNeeds(props.upcomingDeadlines);
+  return {
+    freeWindows,
+    blockNeeds,
+    requiredMinutes: sumMinutes(blockNeeds),
+    availableMinutes: sumMinutes(freeWindows.map((win) => win.minutes || 0)),
+  };
+}
+
+function hasEnoughMargin(context) {
+  if (!context.requiredMinutes) return true;
+  return context.availableMinutes >= context.requiredMinutes * 1.25;
+}
+
+function announceAutoScheduleIssue(props, message) {
+  props.showToast(message);
   return true;
 }
 
+function sumMinutes(values) {
+  return values.reduce((sum, value) => sum + (value || 0), 0);
+}
+
+function canFitBlocks(windows, blocks) {
+  const available = windows.map((win) => ({ ...win })).sort((a, b) => b.minutes - a.minutes);
+  return [...blocks].sort((a, b) => b - a).every((block) => assignBlockToWindow(available, block));
+}
+
 function getDayFreeWindows(events = [], selectedDate) {
-  const dayStart = new Date(selectedDate); dayStart.setHours(0, 0, 0, 0);
-  const dayEnd = new Date(dayStart); dayEnd.setHours(23, 59, 59, 999);
+  const bounds = buildDayBounds(selectedDate);
+  if (bounds.cursorStart >= bounds.dayEndMs) return [];
+  return collectFreeWindows(events, bounds.cursorStart, bounds.dayEndMs)
+    .map(windowWithMinutes)
+    .filter(windowHasMinimumLength);
+}
+
+function buildWindow(startMs, endMs) {
+  return { start: new Date(startMs), end: new Date(endMs) };
+}
+
+function assignBlockToWindow(windows, block) {
+  const index = windows.findIndex((win) => win.minutes >= block);
+  if (index === -1) return false;
+  windows[index].minutes -= block;
+  return true;
+}
+
+function buildDayBounds(selectedDate) {
+  const dayStart = new Date(selectedDate);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setHours(23, 59, 59, 999);
   const now = new Date();
   const cursorStart = isToday(selectedDate) ? Math.max(dayStart.getTime(), now.getTime()) : dayStart.getTime();
-  if (cursorStart >= dayEnd.getTime()) return [];
+  return { cursorStart, dayEndMs: dayEnd.getTime() };
+}
+
+function collectFreeWindows(events, cursorStart, dayEndMs) {
   const windows = [];
   let cursor = cursorStart;
   const sorted = [...events].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
@@ -109,16 +144,17 @@ function getDayFreeWindows(events = [], selectedDate) {
     if (eventStart > cursor) windows.push(buildWindow(cursor, eventStart));
     cursor = Math.max(cursor, eventEnd);
   });
-  if (cursor < dayEnd.getTime()) windows.push(buildWindow(cursor, dayEnd.getTime()));
-  return windows.map(({ start, end }) => ({
-    start,
-    end,
-    minutes: Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000))
-  })).filter((win) => win.minutes >= 15);
+  if (cursor < dayEndMs) windows.push(buildWindow(cursor, dayEndMs));
+  return windows;
 }
 
-function buildWindow(startMs, endMs) {
-  return { start: new Date(startMs), end: new Date(endMs) };
+function windowWithMinutes(window) {
+  const minutes = Math.max(0, Math.round((window.end.getTime() - window.start.getTime()) / 60000));
+  return { ...window, minutes };
+}
+
+function windowHasMinimumLength(window) {
+  return window.minutes >= 15;
 }
 
 async function refreshAutoSchedule(props) {
@@ -274,23 +310,7 @@ function useResolveTimelineConflicts(props, setResolveConflictsLoading) {
       props.showToast(buildConflictResolutionToastMessage(plan));
       return;
     }
-    setResolveConflictsLoading(true);
-    try {
-      const result = await applyConflictResolutionPlan(plan, props.editEvent);
-      const failureCount = result?.failures?.length ?? 0;
-      if (failureCount === plan.operations.length) {
-        props.showToast("Couldn't reschedule your events. Some conflicts are read-only.");
-        return;
-      }
-      await props.loadEvents?.();
-      props.refetchTasks();
-      const message = buildConflictResolutionToastMessage(plan);
-      props.showToast(failureCount ? `${message} ${failureCount} couldn't be moved.` : message, { durationMs: 8500 });
-    } catch {
-      props.showToast("Couldn't reschedule your events. Try again.");
-    } finally {
-      setResolveConflictsLoading(false);
-    }
+    await executeConflictResolutionPlan(plan, props, setResolveConflictsLoading);
   }, [props, setResolveConflictsLoading]);
 }
 
@@ -299,4 +319,46 @@ function getEventDuration(item) {
   const fallbackEnd = new Date(start.getTime() + 25 * 60000);
   const end = item.end_time ? new Date(item.end_time) : fallbackEnd;
   return { durationMins: Math.round((end - start) / 60000) || 25, end, start };
+}
+
+async function executeConflictResolutionPlan(plan, props, setLoading) {
+  await withLoading(setLoading, () => runPlanWithToasts(plan, props));
+}
+
+async function withLoading(setLoading, task) {
+  setLoading(true);
+  try {
+    await task();
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function runPlanWithToasts(plan, props) {
+  try {
+    const failureCount = await runConflictResolution(plan, props.editEvent);
+    if (failureCount === plan.operations.length) {
+      props.showToast("Couldn't reschedule your events. Some conflicts are read-only.");
+      return;
+    }
+    await refreshConflictState(props);
+    props.showToast(buildResolutionMessage(plan, failureCount), { durationMs: 8500 });
+  } catch {
+    props.showToast("Couldn't reschedule your events. Try again.");
+  }
+}
+
+async function runConflictResolution(plan, editEvent) {
+  const result = await applyConflictResolutionPlan(plan, editEvent);
+  return result?.failures?.length ?? 0;
+}
+
+async function refreshConflictState(props) {
+  await props.loadEvents?.();
+  await props.refetchTasks?.();
+}
+
+function buildResolutionMessage(plan, failureCount) {
+  const message = buildConflictResolutionToastMessage(plan);
+  return failureCount ? `${message} ${failureCount} couldn't be moved.` : message;
 }

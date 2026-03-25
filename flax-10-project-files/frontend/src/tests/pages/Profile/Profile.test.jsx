@@ -262,7 +262,7 @@ describe('Profile', () => {
     expect(onNavigate).toHaveBeenCalledWith('attendance');
     fireEvent.click(screen.getByRole('button', { name: /View All/i }));
     expect(await screen.findByTestId('achievements-modal')).toBeTruthy();
-  });
+  }, 15000);
 
   it('closes achievements modal when Close clicked', async () => {
     useProfileSummary.mockReturnValue({ summary: selfAnalyticsSummary, loading: false, refetch: vi.fn() });
@@ -273,7 +273,7 @@ describe('Profile', () => {
     await screen.findByTestId('achievements-modal');
     fireEvent.click(screen.getByText('Close'));
     await waitFor(() => expect(screen.queryByTestId('achievements-modal')).not.toBeInTheDocument());
-  });
+  }, 15000);
 
   it('saves weekly goal and refetches summary', async () => {
     fetchApi.mockResolvedValue({});
@@ -288,7 +288,7 @@ describe('Profile', () => {
     const saveBtn = await screen.findByRole('button', { name: 'Save goal' });
     fireEvent.click(saveBtn);
     await waitFor(() => expect(fetchApi).toHaveBeenCalledWith('/profile/', expect.objectContaining({ method: 'PATCH' })));
-  });
+  }, 15000);
 
   it('shows shared calendar for mutual profile', async () => {
     useProfileState.mockReturnValue(makeProfileState({

@@ -31,7 +31,7 @@ describe('fmtDuration', () => {
     it('returns hours and minutes when both are > 0', () => {
         expect(fmtDuration(3660)).toBe('1h 1m');
         expect(fmtDuration(7320)).toBe('2h 2m');
-        expect(fmtDuration(3601)).toBe('1h 0m');
+        expect(fmtDuration(3601)).toBe('1h');
     });
 });
 
@@ -179,8 +179,7 @@ describe('extractTime', () => {
     });
 
     it('returns null when value throws', () => {
-        // passing an object that Date() can't parse cleanly
-        expect(extractTime({})).not.toBeNull(); // Date({}) = Invalid Date => null
+        expect(extractTime({})).toBeNull();
     });
 });
 

@@ -89,4 +89,15 @@ describe("Module extras", () => {
     expect(screen.getByTestId("query")).toHaveTextContent("cs");
     expect(screen.getByTestId("expanded")).toHaveTextContent('"group":true');
   });
+
+  it("falls back cleanly when travel loading fails or location is missing", async () => {
+    getHomeAddressMock.mockRejectedValueOnce(new Error("no home"));
+
+    const { rerender } = render(<TravelHarness location="Guy's Campus" />);
+    expect(await screen.findByTestId("travel")).toHaveTextContent("null");
+    const callCountBeforeRerender = getHomeAddressMock.mock.calls.length;
+
+    rerender(<TravelHarness location={null} />);
+    expect(getHomeAddressMock.mock.calls.length).toBe(callCountBeforeRerender);
+  });
 });

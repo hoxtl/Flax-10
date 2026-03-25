@@ -156,7 +156,8 @@ function EventContent({ event, theme, height, width, minWidth }) {
             {showDetails && <TimeDisplay event={event} />}
             {height >= 60 && width >= minWidth && event.description && <div className="event-description">{event.description}</div>}
         </div>
-    );
+    )
+    ;
 }
 
 function TimeDisplay({ event }) {

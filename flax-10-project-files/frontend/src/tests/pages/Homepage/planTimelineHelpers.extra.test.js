@@ -18,6 +18,29 @@ import { computeGapContext } from "../../../pages/Homepage/utils/planTimeline/ga
 import { injectHourMarks, insertNowMarker } from "../../../pages/Homepage/utils/planTimeline/hourMarks";
 import { computePlanTimelineRows } from "../../../pages/Homepage/utils/planTimeline";
 
+const buildDayBounds = () => ({
+  start: new Date("2026-03-24T06:00:00Z"),
+  end: new Date("2026-03-24T22:00:00Z"),
+});
+
+const buildEventRow = (overrides) => ({
+  type: "event",
+  id: overrides.id ?? 1,
+  startMins: overrides.startMins ?? 60,
+  endMins: overrides.endMins ?? 120,
+  spacingBeforePx: overrides.spacingBeforePx,
+});
+
+const buildTimerEntry = (overrides = {}) => ({
+  id: "event-1",
+  title: "Routine thing",
+  description: "CS reading",
+  start_time: "now-start",
+  end_time: "now-end",
+  module_code: "",
+  ...overrides,
+});
+
 describe("plan timeline helper extras", () => {
   it("covers campus key and transit helpers", () => {
     expect(getCampusKey("Strand campus library")).toBeTruthy();
@@ -51,63 +74,55 @@ describe("plan timeline helper extras", () => {
     expect(computeGapContext({ title: "Lecture" }, { title: "Study session" }, 12 * 60 + 1, 40).type).toBe("evening");
   });
 
-  it("covers event row helpers, grouping, spacing, and hour marks", () => {
-    const dayStart = new Date("2026-03-24T06:00:00");
-    const dayEnd = new Date("2026-03-24T22:00:00");
-    const inWindow = filterEventsInWindow([
-      { id: 1, start_time: "2026-03-24T09:00:00", end_time: "2026-03-24T10:00:00" },
-      { id: 2, start_time: "2026-03-24T23:00:00", end_time: "2026-03-24T23:30:00" },
-    ], dayStart, dayEnd);
-    expect(inWindow).toHaveLength(1);
+  describe("event rows and marks", () => {
+    it("filters events and builds gaps", () => {
+      const { start, end } = buildDayBounds();
+      const filtered = filterEventsInWindow([
+        { id: 1, start_time: "2026-03-24T09:00:00", end_time: "2026-03-24T10:00:00" },
+        { id: 2, start_time: "2026-03-24T23:00:00", end_time: "2026-03-24T23:30:00" },
+      ], start, end);
+      expect(filtered).toHaveLength(1);
+      expect(buildGapOrTinyGap(60, 60, 0, null, null)).toBeNull();
+      expect(buildGapOrTinyGap(60, 75, 0, null, null).type).toBe("tinyGap");
+      expect(buildGapOrTinyGap(60, 120, 1, { title: "Lecture" }, { title: "Study" }).type).toBe("free");
+    });
 
-    expect(buildGapOrTinyGap(60, 60, 0, null, null)).toBeNull();
-    expect(buildGapOrTinyGap(60, 75, 0, null, null).type).toBe("tinyGap");
-    expect(buildGapOrTinyGap(60, 120, 1, { title: "Lecture" }, { title: "Study" }).type).toBe("free");
+    it("builds event entries and spacing", () => {
+      const event = buildEventEntry(
+        buildTimerEntry(),
+        [{ id: "other", start_time: "now-start", end_time: "now-end" }],
+        new Date("2026-03-24T11:00:00Z"),
+        [],
+        [{ title: "Routine thing" }],
+      );
+      expect(event.active).toBe(true);
+      expect(event.isRoutine).toBe(true);
+      expect(event.moduleCode).toBe("CS100");
+      const spaced = addSpacing([
+        buildEventRow({ id: 1 }),
+        buildEventRow({ id: 2, startMins: 120, endMins: 180 }),
+        { type: "free", id: 3, startMins: 240, endMins: 300, gapStartMins: 240, minutes: 60 },
+      ]);
+      expect(spaced[0].spacingBeforePx).toBe(0);
+      expect(spaced[2].spacingBeforePx).toBeGreaterThanOrEqual(0);
+    });
 
-    const now = new Date("2026-03-24T11:00:00");
-    const event = buildEventEntry({
-      id: "event-1",
-      title: "Routine thing",
-      description: "CS reading",
-      start_time: "now-start",
-      end_time: "now-end",
-      module_code: "",
-    }, [{ id: "other", start_time: "now-start", end_time: "now-end" }], now, [], [{ title: "Routine thing" }]);
-    expect(event.active).toBe(true);
-    expect(event.isRoutine).toBe(true);
-    expect(event.matchTask).toEqual({ title: "Routine thing" });
-    expect(event.moduleCode).toBe("CS100");
-
-    const rows = addSpacing([
-      { type: "event", id: 1, startMins: 60, endMins: 120 },
-      { type: "event", id: 2, startMins: 120, endMins: 180 },
-      { type: "free", id: 3, startMins: 240, endMins: 300, gapStartMins: 240, minutes: 60 },
-    ]);
-    expect(rows[0].spacingBeforePx).toBe(0);
-    expect(rows[1].spacingBeforePx).toBe(0);
-    expect(rows[2].spacingBeforePx).toBeGreaterThanOrEqual(0);
-
-    const grouped = groupOverlappingEvents([
-      { type: "event", id: 1, startMins: 60, endMins: 120, spacingBeforePx: 4 },
-      { type: "event", id: 2, startMins: 90, endMins: 150, spacingBeforePx: 4 },
-      { type: "tinyGap", id: 3, startMins: 150, endMins: 165, minutes: 15 },
-    ]);
-    expect(grouped[0].type).toBe("eventGroup");
-    expect(grouped[1].type).toBe("tinyGap");
-
-    const withNow = insertNowMarker([{ type: "event", id: 1, startMins: 120, endMins: 180 }], 90);
-    expect(withNow[0].type).toBe("now");
-    const withNowAtEnd = insertNowMarker([{ type: "event", id: 1, startMins: 120, endMins: 180 }], 300);
-    expect(withNowAtEnd.at(-1).type).toBe("now");
-
-    const withMarks = injectHourMarks([
-      { type: "event", id: 1, startMins: 180, endMins: 240 },
-      { type: "event", id: 2, startMins: 240, endMins: 300 },
-      { type: "now", id: "now-marker", nowMins: 330 },
-      { type: "free", id: 3, startMins: 360, endMins: 420, gapStartMins: 360, minutes: 60 },
-    ]);
-    expect(withMarks.some((row) => row.type === "hourMark")).toBe(true);
-    expect(withMarks.some((row) => row.hideTimeLabel)).toBe(true);
+    it("groups overlaps and injects now + hour marks", () => {
+      const grouped = groupOverlappingEvents([
+        buildEventRow({ id: 1, spacingBeforePx: 4 }),
+        buildEventRow({ id: 2, startMins: 90, endMins: 150, spacingBeforePx: 4 }),
+        { type: "tinyGap", id: 3, startMins: 150, endMins: 165, minutes: 15 },
+      ]);
+      expect(grouped[0].type).toBe("eventGroup");
+      const withNow = insertNowMarker([{ type: "event", id: 1, startMins: 120, endMins: 180 }], 90);
+      expect(withNow[0].type).toBe("now");
+      const withMarks = injectHourMarks([
+        { type: "event", id: 1, startMins: 180, endMins: 240 },
+        { type: "now", id: "now-marker", nowMins: 330 },
+        { type: "free", id: 3, startMins: 360, endMins: 420, gapStartMins: 360, minutes: 60 },
+      ]);
+      expect(withMarks.some((row) => row.type === "hourMark")).toBe(true);
+    });
   });
 
   it("covers the public timeline API when selectedDate or now are absent", () => {

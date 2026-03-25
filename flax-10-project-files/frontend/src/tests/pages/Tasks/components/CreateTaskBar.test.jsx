@@ -13,6 +13,16 @@ vi.mock("../../../../components/common/SleepWarningModal", () => ({
   SleepWarningModal: () => <div data-testid="sleep-warning" />,
 }));
 
+vi.mock("../../../../components/common/AnimatedDropdown", () => ({
+  default: ({ value, onChange, options, placeholder }) => (
+    <select aria-label={placeholder} value={value} onChange={(event) => onChange(event.target.value)}>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
+    </select>
+  ),
+}));
+
 function state(overrides = {}) {
   return {
     handleSubmit: vi.fn((e) => e?.preventDefault?.()),
@@ -63,5 +73,32 @@ describe("CreateTaskBar", () => {
     hookMock.mockReturnValue(state({ sleepWarning: true }));
     render(<CreateTaskBar inputRef={{ current: null }} />);
     expect(screen.getByTestId("sleep-warning")).toBeInTheDocument();
+  });
+
+  it("shows reading-list page options and normalizes empty module/list/page values", () => {
+    const s = state({
+      isReadingList: true,
+      pageCount: 12,
+      setPageCount: vi.fn(),
+      setModuleId: vi.fn(),
+      setTaskListId: vi.fn(),
+      sortedLists: [],
+      moduleId: "CS101",
+      taskListId: "1",
+      moduleOptions: [{ value: "", label: "Any module" }],
+      listOptions: [{ value: "", label: "Auto" }],
+    });
+    hookMock.mockReturnValue(s);
+
+    render(<CreateTaskBar inputRef={{ current: null }} />);
+
+    expect(screen.queryByRole("group", { name: /Estimated duration/i })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Page count"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("Module"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("Select list"), { target: { value: "" } });
+
+    expect(s.setPageCount).toHaveBeenCalledWith(null);
+    expect(s.setModuleId).toHaveBeenCalledWith(null);
+    expect(s.setTaskListId).toHaveBeenCalledWith("");
   });
 });

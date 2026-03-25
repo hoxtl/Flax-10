@@ -5,7 +5,12 @@ import SuccessScreen from '../../../components/Onboarding/SuccessScreen';
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
+}));
+
+vi.mock('../../../components/common/PrimaryButton/PrimaryButton', () => ({
+  default: ({ children, onClick }) => <button type="button" onClick={onClick}>{children}</button>,
 }));
 
 describe('SuccessScreen', () => {

@@ -5,7 +5,7 @@ import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-moti
 import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
-import StatStrip from "../../../components/Common/StatStrip/StatStrip";
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
 import WelcomeBackgroundPaths from "../../../components/Welcome/WelcomeBackgroundPaths";
 import { useCountUp } from "../../../hooks/useCountUp";
 import baseStyles from "../styles/WidgetBase.module.css";

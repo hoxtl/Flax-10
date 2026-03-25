@@ -73,6 +73,28 @@ describe("attendancePromptActions", () => {
     expect(setEvent).not.toHaveBeenCalled();
     expect(setSubmitting.mock.calls).toEqual([[true], [false]]);
   });
+
+  it("waits for the configured close delay before resolving", async () => {
+    vi.useFakeTimers();
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+
+    recordAttendance.mockResolvedValue({});
+
+    const promise = submitAttendancePromptAnswer(
+      { id: 21 },
+      true,
+      false,
+      setEvent,
+      setSubmitting,
+      { closeDelayMs: 5 },
+    );
+
+    await Promise.resolve();
+    vi.advanceTimersByTime(5);
+    await expect(promise).resolves.toBe(true);
+    vi.useRealTimers();
+  });
 });
 
 describe("useAttendanceResource", () => {

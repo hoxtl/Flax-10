@@ -134,4 +134,32 @@ describe('useReminderNotifications', () => {
     act(() => vi.advanceTimersByTime(10000));
     expect(mockAddNotification).not.toHaveBeenCalled();
   });
+
+  it('should ignore events that do not have a start time', () => {
+    vi.setSystemTime(new Date('2024-03-15T09:59:00Z'));
+    mockEvents.push({ id: 3, title: 'No start', reminder_minutes: [5] });
+    renderHook(() => useReminderNotifications(mockEvents));
+    act(() => vi.advanceTimersByTime(120000));
+    expect(mockAddNotification).not.toHaveBeenCalled();
+  });
+
+  it('should send a "Starting now!" message for zero-minute reminders and include descriptions', () => {
+    vi.setSystemTime(new Date('2024-03-15T10:00:00Z'));
+    mockEvents.push({
+      id: 4,
+      title: 'Standup',
+      description: 'Bring blockers',
+      start_time: '2024-03-15T10:00:00Z',
+      reminder_minutes: [0],
+    });
+    renderHook(() => useReminderNotifications(mockEvents));
+    act(() => vi.advanceTimersByTime(10000));
+    expect(mockAddNotification).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Reminder: Standup',
+      message: expect.stringContaining('Starting now!'),
+    }));
+    expect(mockAddNotification).toHaveBeenCalledWith(expect.objectContaining({
+      message: expect.stringContaining('Bring blockers'),
+    }));
+  });
 });

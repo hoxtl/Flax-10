@@ -1,5 +1,5 @@
 """
-Enrollment business rules for module enrollment flows.
+Enrolment rules for module registration flows.
 """
 
 from datetime import timedelta
@@ -22,10 +22,15 @@ _LECTURE_HOURS = [9, 10, 11, 14, 15, 16]
 
 
 def _log_create_failure(user, module, exc):
+    """Log event creation failures outside test runs."""
+
     if not _is_running_tests():
         logger.debug("Failed to create events for %s / %s: %s", user, module, exc)
 
+
 def _safe_create_enrollment_events(user, module):
+    """Create enrollment events without failing the enrollment flow."""
+
     try:
         create_enrollment_events(user, module)
     except OperationalError as exc:
@@ -33,15 +38,21 @@ def _safe_create_enrollment_events(user, module):
 
 
 def _get_major_prefixes(major):
+    """Return module prefixes for the given major."""
+
     return get_course_prefixes(major)
 
 
 def _get_created_count(result):
+    """Return whether a get-or-create call created a new row."""
+
     _, created = result
     return int(created)
 
 
 def enroll_user_in_module(user, module):
+    """Enroll a user in a module and create related events."""
+
     enrollment, created = Enrollment.objects.get_or_create(student=user, module=module)
     if created:
         _safe_create_enrollment_events(user, module)
@@ -49,48 +60,118 @@ def enroll_user_in_module(user, module):
 
 
 def _get_system_teacher():
+    """Return the teacher used for seeded modules."""
+
     User = get_user_model()
     return (
         User.objects.filter(role='teacher').first()
         or User.objects.filter(is_staff=True).first()
     )
 
+
 def _get_weekly_rule():
+    """Return the shared weekly recurrence rule."""
+
     rule, _ = RecurrenceRule.objects.get_or_create(frequency='weekly', interval=1)
     return rule
 
-def _module_start_time(code):
-    now = timezone.now()
-    weekday = abs(hash(code)) % 5
-    hour = _LECTURE_HOURS[abs(hash(code + 'h')) % len(_LECTURE_HOURS)]
-    days_ahead = (weekday - now.weekday()) % 7 or 7
+
+def _module_weekday(code):
+    """Return a deterministic weekday for a module."""
+
+    return abs(hash(code)) % 5
+
+
+def _module_hour(code):
+    """Return a deterministic lecture hour for a module."""
+
+    return _LECTURE_HOURS[abs(hash(f'{code}h')) % len(_LECTURE_HOURS)]
+
+
+def _days_until_weekday(now, weekday):
+    """Return the days until the next matching weekday."""
+
+    return (weekday - now.weekday()) % 7 or 7
+
+
+def _next_module_start(now, code):
+    """Return the next scheduled start time for a module."""
+
+    days_ahead = _days_until_weekday(now, _module_weekday(code))
     return (now + timedelta(days=days_ahead)).replace(
-        hour=hour, minute=0, second=0, microsecond=0
+        hour=_module_hour(code),
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
+
+def _module_start_time(code):
+    """Return the seeded start time for a module."""
+
+    now = timezone.now()
+    return _next_module_start(now, code)
+
+
+def _matches_major_prefix(code, prefix_set):
+    """Return whether the module belongs to the major."""
+
+    return code[:2] in prefix_set
+
+
+def _module_already_exists(code):
+    """Return whether the module already exists."""
+
+    return Module.objects.filter(module_code=code).exists()
+
+
+def _seed_module_payload(code, name, description, teacher, weekly_rule):
+    """Build the create payload for a seeded module."""
+
+    start = _module_start_time(code)
+    return {
+        'module_code': code,
+        'module_name': name,
+        'description': description,
+        'created_by': teacher,
+        'start_time': start,
+        'end_time': start + timedelta(hours=2),
+        'recurrence_rule': weekly_rule,
+    }
+
+
+def _seedable_module_fixtures(prefixes):
+    """Yield fixture modules that match the selected major."""
+
+    prefix_set = set(prefixes)
+    return [
+        fixture
+        for fixture in module_fixtures
+        if _matches_major_prefix(fixture[0], prefix_set)
+    ]
+
+
+def _create_seed_module(code, name, description, teacher, weekly_rule):
+    """Create a seeded module when it does not already exist."""
+
+    if _module_already_exists(code):
+        return
+    Module.objects.create(**_seed_module_payload(code, name, description, teacher, weekly_rule))
+
+
 def _ensure_modules_exist_for_major(prefixes):
+    """Create missing seeded modules for the selected major."""
+
     teacher = _get_system_teacher()
     if not teacher:
         return
     weekly_rule = _get_weekly_rule()
-    prefix_set = set(prefixes)
-    for code, name, description in module_fixtures:
-        if code[:2] not in prefix_set:
-            continue
-        if Module.objects.filter(module_code=code).exists():
-            continue
-        start = _module_start_time(code)
-        Module.objects.create(
-            module_code=code,
-            module_name=name,
-            description=description,
-            created_by=teacher,
-            start_time=start,
-            end_time=start + timedelta(hours=2),
-            recurrence_rule=weekly_rule,
-        )
+    for code, name, description in _seedable_module_fixtures(prefixes):
+        _create_seed_module(code, name, description, teacher, weekly_rule)
 
 def get_modules_for_major(major):
+    """Return modules that match the student major."""
+
     prefixes = _get_major_prefixes(major)
     if not prefixes:
         return []
@@ -103,6 +184,8 @@ def get_modules_for_major(major):
 
 
 def enroll_user_in_modules(user, modules):
+    """Enroll a user in each module and count new enrollments."""
+
     count = 0
     for module in modules:
         count += _get_created_count(enroll_user_in_module(user, module))
@@ -110,6 +193,8 @@ def enroll_user_in_modules(user, modules):
 
 
 def is_core_module(user, module):
+    """Return whether the module is part of the user's core major."""
+
     user_course = getattr(getattr(user, 'settings', None), 'major', None)
     if not user_course:
         return False

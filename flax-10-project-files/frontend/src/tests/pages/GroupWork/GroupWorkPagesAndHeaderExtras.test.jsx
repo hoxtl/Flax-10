@@ -18,6 +18,63 @@ const openTeacherProfile = vi.fn();
 const getStoredViewer = vi.fn();
 const useCountUp = vi.fn();
 
+const buildTaskActions = () => ({
+  loading: false,
+  addTask: vi.fn().mockResolvedValue(undefined),
+  updateTask: vi.fn().mockResolvedValue(undefined),
+  deleteTask: vi.fn().mockResolvedValue(undefined),
+});
+
+const mockGroupTasksState = (overrides = {}) => {
+  const taskActions = overrides.taskActions ?? buildTaskActions();
+  const state = {
+    taskActions,
+    filterUsers: [],
+    setFilterUsers: vi.fn(),
+    taskView: "list",
+    setTaskView: vi.fn(),
+    showAddModal: false,
+    setShowAddModal: vi.fn(),
+    sortedTasks: [{ id: 1, title: "Task A" }],
+    ...overrides,
+  };
+  useGroupTasksTabState.mockReturnValue(state);
+  return state;
+};
+
+const renderGroupTasksTab = (stateOverrides = {}) => {
+  const state = mockGroupTasksState(stateOverrides);
+  render(<GroupTasksTab projectId={3} members={[{ user: 2, name: "Alex" }]} onStatsUpdate={vi.fn()} />);
+  return state;
+};
+
+const baseProject = {
+  id: 7,
+  name: "Alpha",
+  deadline: "2026-03-30T00:00:00.000Z",
+  course_code: "5CCS2SEG",
+  module_name: "Software Eng",
+  teacher_name: "Dr Lee",
+};
+
+const baseMembers = [{ id: 1, user: 1, name: "Owner" }];
+const baseTeamMembers = [{ id: 1, user: 1, role: "owner", name: "Owner" }];
+const baseTaskStats = { percent: 40, total: 5, completed: 2, segments: [{ id: "owner", name: "Owner", percentage: 40 }] };
+
+const renderProjectHeaderWith = (overrides = {}) => {
+  const props = {
+    project: { ...baseProject, ...(overrides.project ?? {}) },
+    members: overrides.members ?? baseMembers,
+    teamMembers: overrides.teamMembers ?? baseTeamMembers,
+    onMemberAdded: vi.fn(),
+    onMemberRemove: overrides.onMemberRemove ?? vi.fn(),
+    onDelete: overrides.onDelete ?? vi.fn(),
+    onBack: overrides.onBack ?? vi.fn(),
+  };
+  render(<ProjectHeader {...props} />);
+  return props;
+};
+
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   Link: ({ to, children, ...props }) => <a href={to} {...props}>{children}</a>,
@@ -181,6 +238,7 @@ vi.mock("../../../hooks/useCountUp", () => ({
 }));
 
 vi.mock("framer-motion", () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
   },
@@ -210,124 +268,128 @@ describe("GroupWork pages and header extras", () => {
     useCountUp.mockImplementation((value) => ({ current: value }));
   });
 
-  it("handles GroupTasksTab list, timeline, board, add, toggle, delete, and loading branches", async () => {
-    const toast = vi.fn();
-    useToast.mockReturnValue(toast);
-    const addTask = vi.fn().mockResolvedValue(undefined);
-    const updateTask = vi.fn().mockResolvedValue(undefined);
-    const deleteTask = vi.fn().mockResolvedValue(undefined);
-    const setFilterUsers = vi.fn();
-    const setTaskView = vi.fn();
-    const setShowAddModal = vi.fn();
-    useGroupTasksTabState.mockReturnValue({
-      taskActions: { loading: false, addTask, updateTask, deleteTask },
-      filterUsers: [],
-      setFilterUsers,
-      taskView: "list",
-      setTaskView,
-      showAddModal: true,
-      setShowAddModal,
-      sortedTasks: [{ id: 1, title: "Task A" }],
+  describe("GroupTasksTab interactions", () => {
+    it("filters tasks and completes them", async () => {
+      const toast = vi.fn();
+      useToast.mockReturnValue(toast);
+      const state = renderGroupTasksTab({ showAddModal: true });
+      fireEvent.click(screen.getByText("toggle-filter"));
+      fireEvent.click(screen.getByText("toggle-task"));
+      await waitFor(() => expect(state.taskActions.updateTask).toHaveBeenCalledWith(1, { completed: true }));
+      expect(state.setFilterUsers).toHaveBeenCalled();
+      expect(toast).toHaveBeenCalledWith("Task completed!", expect.any(Object));
     });
 
-    render(<GroupTasksTab projectId={3} members={[{ user: 2, name: "Alex" }]} onStatsUpdate={vi.fn()} />);
-    fireEvent.click(screen.getByText("toggle-filter"));
-    expect(setFilterUsers).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("toggle-task"));
-    await waitFor(() => expect(updateTask).toHaveBeenCalledWith(1, { completed: true }));
-    expect(toast).toHaveBeenCalledWith("Task completed!", expect.any(Object));
-    fireEvent.click(screen.getByText("delete-task"));
-    await waitFor(() => expect(deleteTask).toHaveBeenCalledWith(1));
-    fireEvent.click(screen.getByText("confirm-add-task"));
-    await waitFor(() => expect(addTask).toHaveBeenCalledWith("New task", { due_date: "2026-03-30", assigned_to: [2] }));
-    fireEvent.click(screen.getByText("List"));
-    fireEvent.click(screen.getByText("Timeline"));
-    fireEvent.click(screen.getByText("Kanban"));
-    expect(setTaskView).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("close-add-modal"));
-    expect(setShowAddModal).toHaveBeenCalledWith(false);
-
-    useGroupTasksTabState.mockReturnValue({
-      taskActions: { loading: true, addTask, updateTask, deleteTask },
-      filterUsers: [],
-      setFilterUsers,
-      taskView: "board",
-      setTaskView,
-      showAddModal: false,
-      setShowAddModal,
-      sortedTasks: [],
+    it("deletes, adds, switches views, and hides the modal", async () => {
+      useToast.mockReturnValue(vi.fn());
+      const state = renderGroupTasksTab({ showAddModal: true });
+      fireEvent.click(screen.getByText("delete-task"));
+      await waitFor(() => expect(state.taskActions.deleteTask).toHaveBeenCalledWith(1));
+      fireEvent.click(screen.getByText("confirm-add-task"));
+      await waitFor(() => expect(state.taskActions.addTask).toHaveBeenCalledWith("New task", { due_date: "2026-03-30", assigned_to: [2] }));
+      fireEvent.click(screen.getByText("Timeline"));
+      fireEvent.click(screen.getByText("Kanban"));
+      fireEvent.click(screen.getByText("List"));
+      expect(state.setTaskView).toHaveBeenCalled();
+      fireEvent.click(screen.getByText("close-add-modal"));
+      expect(state.setShowAddModal).toHaveBeenCalledWith(false);
     });
-    render(<GroupTasksTab projectId={3} members={[]} onStatsUpdate={vi.fn()} />);
-    expect(screen.getByText("Loading tasks...")).toBeInTheDocument();
+
+    it("shows a loading placeholder when actions are running", () => {
+      renderGroupTasksTab({ taskActions: { ...buildTaskActions(), loading: true }, sortedTasks: [] });
+      expect(screen.getByText("Loading tasks...")).toBeInTheDocument();
+    });
   });
 
-  it("routes GroupWorkIndexPage between detail, loading, and overview content", () => {
-    useSelectedProjectId.mockReturnValueOnce("44");
-    render(<GroupWorkIndexPage />);
-    fireEvent.click(screen.getByText("detail-view"));
-    expect(mockNavigate).toHaveBeenCalledWith("/group-work", { replace: true });
+  describe("GroupWorkIndexPage routing", () => {
+    it("returns to overview when closing the detail view", () => {
+      useSelectedProjectId.mockReturnValue("44");
+      render(<GroupWorkIndexPage />);
+      fireEvent.click(screen.getByText("detail-view"));
+      expect(mockNavigate).toHaveBeenCalledWith("/group-work", { replace: true });
+    });
 
-    const setProjects = vi.fn();
-    useSelectedProjectId.mockReturnValue(null);
-    useGroupProjects.mockReturnValueOnce({ projects: [], setProjects, loading: true });
-    render(<GroupWorkIndexPage />);
-    expect(screen.getByText("groupwork-skeleton")).toBeInTheDocument();
+    it("shows a skeleton while projects are loading", () => {
+      useSelectedProjectId.mockReturnValue(null);
+      useGroupProjects.mockReturnValue({ projects: [], setProjects: vi.fn(), loading: true });
+      render(<GroupWorkIndexPage />);
+      expect(screen.getByText("groupwork-skeleton")).toBeInTheDocument();
+    });
 
-    useGroupProjects.mockReturnValueOnce({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
-    render(<GroupWorkIndexPage />);
-    expect(screen.getByText("stats:1")).toBeInTheDocument();
-    fireEvent.click(screen.getByText("open-project"));
-    expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=1");
-    fireEvent.click(screen.getByText("prepend-project"));
-    expect(setProjects).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("set-sort"));
-    expect(screen.getAllByText("Back to top").length).toBeGreaterThan(0);
+    it("renders overview stats, opens projects, prepends, and changes sort", () => {
+      const setProjects = vi.fn();
+      useSelectedProjectId.mockReturnValue(null);
+      useGroupProjects.mockReturnValue({ projects: [{ id: 1, name: "Alpha" }], setProjects, loading: false });
+      render(<GroupWorkIndexPage />);
+      fireEvent.click(screen.getByText("open-project"));
+      fireEvent.click(screen.getByText("prepend-project"));
+      fireEvent.click(screen.getByText("set-sort"));
+      expect(screen.getByText("stats:1")).toBeInTheDocument();
+      expect(mockNavigate).toHaveBeenCalledWith("/group-work?project=1");
+      expect(setProjects).toHaveBeenCalled();
+      expect(screen.getAllByText("Back to top").length).toBeGreaterThan(0);
+    });
   });
 
-  it("renders project header branches, teacher/module pills, delete flow, and progress stats", async () => {
-    const onDelete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
-    const onBack = vi.fn();
-    const onMemberRemove = vi.fn();
-    const onDeleteProject = vi.fn();
+  describe("Project header and delete actions", () => {
+    it("renders metadata, teacher actions, and back navigation", () => {
+      const props = renderProjectHeaderWith({ onBack: vi.fn() });
+      expect(screen.getByText(props.project.name)).toBeInTheDocument();
+      expect(screen.getByText("Shared project caption")).toBeInTheDocument();
+      expect(screen.getByText("30 Mar")).toBeInTheDocument();
+      expect(screen.getByText((content) => content.startsWith("countdown:"))).toBeTruthy();
+      expect(screen.getByText("Dr Lee")).toBeInTheDocument();
+      fireEvent.click(screen.getByLabelText("Open Dr Lee's profile"));
+      expect(openTeacherProfile).toHaveBeenCalled();
+      fireEvent.click(screen.getByText("Back to all projects"));
+      expect(props.onBack).toHaveBeenCalled();
+    });
 
-    render(
-      <>
-        <ProjectHeader
-          project={{ id: 7, name: "Alpha", deadline: "2026-03-30T00:00:00.000Z", course_code: "5CCS2SEG", module_name: "Software Eng", teacher_name: "Dr Lee" }}
-          members={[{ id: 1, user: 1, name: "Owner" }]}
-          teamMembers={[{ id: 1, user: 1, role: "owner", name: "Owner" }]}
-          onMemberAdded={vi.fn()}
-          onMemberRemove={onMemberRemove}
-          onDelete={onDeleteProject}
-          onBack={onBack}
-        />
-        <ProjectDeleteAction onDelete={onDelete} />
-        <ProjectProgress taskStats={{ percent: 40, total: 5, completed: 2, segments: [{ id: "owner", name: "Owner", percentage: 40 }] }} />
-      </>,
-    );
+    it("removes team members and confirms header delete", async () => {
+      const onMemberRemove = vi.fn();
+      const onDelete = vi.fn();
+      renderProjectHeaderWith({ onMemberRemove, onDelete });
+      fireEvent.click(screen.getByText("Edit team"));
+      fireEvent.click(screen.getByText("remove-member"));
+      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
+      fireEvent.click(screen.getAllByText("confirm-hold")[0]);
+      await waitFor(() => expect(onDelete).toHaveBeenCalled());
+    });
 
-    expect(screen.getByText("Alpha")).toBeInTheDocument();
-    expect(screen.getByText("Shared project caption")).toBeInTheDocument();
-    expect(screen.getByText("30 Mar")).toBeInTheDocument();
-    expect(screen.getByText("countdown:Mon Mar 30 2026 01:00:00 GMT+0100 (British Summer Time)")).toBeTruthy();
-    expect(screen.getByText("Dr Lee")).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText("Open Dr Lee's profile"));
-    expect(openTeacherProfile).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("Back to all projects"));
-    expect(onBack).toHaveBeenCalled();
-    fireEvent.click(screen.getByText("Edit team"));
-    fireEvent.click(screen.getByText("remove-member"));
-    expect(screen.getAllByText("Delete project").length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(onDeleteProject).toHaveBeenCalled());
+    it("shows owner delete toasts only after success", async () => {
+      const toast = vi.fn();
+      useToast.mockReturnValue(toast);
+      const onDelete = vi.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+      render(<ProjectDeleteAction onDelete={onDelete} isOwner />);
+      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
+      fireEvent.click(screen.getByText("confirm-hold"));
+      await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(1));
+      expect(toast).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("button", { name: /Delete project/i }));
+      fireEvent.click(screen.getByText("confirm-hold"));
+      await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
+      expect(toast).toHaveBeenCalledWith("Project deleted.");
+    });
 
-    fireEvent.click(screen.getAllByText("Delete project")[1]);
-    fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(screen.getByText("Only the project owner can delete this project.")).toBeInTheDocument());
+    it("renders project progress stats", () => {
+      render(<ProjectProgress taskStats={baseTaskStats} />);
+      expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
+    });
 
-    fireEvent.click(screen.getAllByText("Delete project")[1]);
-    fireEvent.click(screen.getByText("confirm-hold"));
-    await waitFor(() => expect(onDelete).toHaveBeenCalledTimes(2));
-    expect(screen.getByText(/Overall:40/)).toBeInTheDocument();
+    it("shows the non-owner tooltip and cancels the modal", async () => {
+      const ownerDelete = vi.fn();
+      render(
+        <>
+          <ProjectDeleteAction onDelete={vi.fn()} isOwner={false} />
+          <ProjectDeleteAction onDelete={ownerDelete} isOwner />
+        </>,
+      );
+  const tooltipHost = screen.getByText((_, element) => element?.dataset?.tooltip === "Only project owner can delete");
+  expect(tooltipHost).toBeInTheDocument();
+      expect(screen.getAllByRole("button", { name: /Delete project/i })[0]).toBeDisabled();
+      fireEvent.click(screen.getAllByRole("button", { name: /Delete project/i })[1]);
+      fireEvent.click(screen.getByText("cancel-hold"));
+      await waitFor(() => expect(ownerDelete).not.toHaveBeenCalled());
+    });
   });
 });

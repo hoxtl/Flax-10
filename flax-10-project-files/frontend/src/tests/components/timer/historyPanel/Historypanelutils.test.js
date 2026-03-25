@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import {
   getHistoryHorizonLabel,
   getSevenDayFocusSeries,
@@ -9,6 +9,10 @@ import {
 
 const localDaysAgo = (base, daysBack, hour = 10) =>
   new Date(base.getFullYear(), base.getMonth(), base.getDate() - daysBack, hour);
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe('getHistoryHorizonLabel', () => {
   const now = new Date(2024, 5, 12, 15, 0, 0);
@@ -61,6 +65,12 @@ describe('getSevenDayFocusSeries', () => {
     expect(getSevenDayFocusSeries([block], now).every((d) => d.seconds === 0)).toBe(true);
   });
 
+  it('falls back to the current day when both timestamps are absent', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    expect(getSevenDayFocusSeries([{ totalDuration: 90 }], now)[6].seconds).toBe(90);
+  });
+
   it('ignores a block that falls outside the 7-day window', () => {
     const block = { startTime: new Date(2024, 3, 1, 10).toISOString(), totalDuration: 3600 };
     expect(getSevenDayFocusSeries([block], now).every((d) => d.seconds === 0)).toBe(true);
@@ -96,6 +106,10 @@ describe('getModuleLabel', () => {
     expect(getModuleLabel({ sessions: [{ list: 'Reading List' }] })).toBe('Reading List');
   });
 
+  it('skips empty sessions until it finds a labelled one', () => {
+    expect(getModuleLabel({ sessions: [{}, { moduleCode: 'BIO100' }] })).toBe('BIO100');
+  });
+
   it('returns null when no label fields exist on the session', () => {
     expect(getModuleLabel({ sessions: [{}] })).toBeNull();
   });
@@ -124,6 +138,10 @@ describe('filterVisibleBlocks', () => {
 
   it('handles a block with no sessions property', () => {
     expect(filterVisibleBlocks([{ totalDuration: 500 }])).toHaveLength(1);
+  });
+
+  it('treats a block with a missing session status as completed', () => {
+    expect(filterVisibleBlocks([{ totalDuration: 0, sessions: [{}] }])).toHaveLength(1);
   });
 
   it('returns an empty array for empty input', () => {

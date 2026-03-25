@@ -34,26 +34,36 @@ function formatUpcomingTime(startTime) {
 }
 
 function UpcomingEventsList({ upcomingEvents, onSelectEvent }) {
-  if (!upcomingEvents?.length) return null;
+  if (!hasUpcomingEvents(upcomingEvents)) return null;
   return (
     <div className={styles.upcomingSection}>
       <div className={styles.subsectionLabel}>Upcoming events</div>
       <div className={styles.upcomingList}>
         {upcomingEvents.map((event) => (
-          <button
-            key={event.id || `${event.title}-${event.start_time}`}
-            className={styles.upcomingBtn}
-            onClick={() => onSelectEvent?.(event)}
-          >
-            <div className={styles.upcomingTitleRow}>
-              <span className={styles.upcomingTitle}>{event.title || "Upcoming event"}</span>
-              <span className={styles.upcomingTime}>{formatUpcomingTime(event.start_time)}</span>
-            </div>
-            <div className={styles.upcomingMeta}>{event.location}</div>
-          </button>
+          <UpcomingEventButton key={getUpcomingEventKey(event)} event={event} onSelectEvent={onSelectEvent} />
         ))}
       </div>
     </div>
+  );
+}
+
+function hasUpcomingEvents(events) {
+  return Array.isArray(events) && events.length > 0;
+}
+
+function getUpcomingEventKey(event) {
+  return event.id || `${event.title}-${event.start_time}`;
+}
+
+function UpcomingEventButton({ event, onSelectEvent }) {
+  return (
+    <button className={styles.upcomingBtn} onClick={() => onSelectEvent?.(event)}>
+      <div className={styles.upcomingTitleRow}>
+        <span className={styles.upcomingTitle}>{event.title || "Upcoming event"}</span>
+        <span className={styles.upcomingTime}>{formatUpcomingTime(event.start_time)}</span>
+      </div>
+      <div className={styles.upcomingMeta}>{event.location}</div>
+    </button>
   );
 }
 

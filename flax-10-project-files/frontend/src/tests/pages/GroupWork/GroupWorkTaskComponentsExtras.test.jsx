@@ -118,6 +118,123 @@ import TaskBoardView from "../../../pages/GroupWork/components/TaskBoardView";
 import TaskListRow from "../../../pages/GroupWork/components/TaskListRow";
 import TaskListView from "../../../pages/GroupWork/components/TaskListView";
 import { useDragHandlers, useTaskTimelineState } from "../../../pages/GroupWork/components/useTaskTimelineState";
+import { TimelineCard, UnscheduledCard } from "../../../pages/GroupWork/components/TaskTimelineCards";
+import TaskTimelineView from "../../../pages/GroupWork/components/TaskTimelineView";
+
+const defaultMembers = [
+  { id: 1, user: 1, name: "Alex" },
+  { id: 2, user: 2, name: "Bea" },
+];
+
+const renderAvatarStackAndPopup = () => {
+  const onClose = vi.fn();
+  const onToggleAssignee = vi.fn();
+  const triggerRef = { current: document.createElement("div") };
+  document.body.appendChild(triggerRef.current);
+  render(
+    <>
+      <TaskAvatarStack assignees={[{ id: 1, name: "Alex" }, { id: 2, name: "Bea" }, { id: 3, name: "Cara" }, { id: 4, name: "Drew" }]} />
+      <TaskAssigneePopup
+        isOpen
+        onClose={onClose}
+        members={defaultMembers}
+        assignees={[{ id: 1 }]}
+        onToggleAssignee={onToggleAssignee}
+        triggerRef={triggerRef}
+      />
+    </>,
+  );
+  return { onClose, onToggleAssignee };
+};
+
+const renderTaskContextMenu = () => {
+  const onClose = vi.fn();
+  render(
+    <TaskContextMenu pos={{ x: 10, y: 20 }} task={{ id: 11 }} onDelete={vi.fn()} onClose={onClose} onEditStart={vi.fn()} />,
+  );
+  return { onClose };
+};
+
+const renderTaskBoardCard = (overrides = {}) => {
+  const props = {
+    task: {
+      id: 1,
+      title: "Draft outline",
+      priority: "high",
+      due_date: "2026-03-30T00:00:00.000Z",
+      assignees_info: [{ id: 1, name: "Alex" }],
+      status: "todo",
+      ...overrides.task,
+    },
+    members: overrides.members ?? defaultMembers,
+    onUpdate: overrides.onUpdate ?? vi.fn(),
+    onDelete: overrides.onDelete ?? vi.fn(),
+    onDragStart: overrides.onDragStart ?? vi.fn(),
+  };
+  render(<TaskBoardCard {...props} />);
+  return props;
+};
+
+const getTaskCard = (title = "Draft outline") => screen.getByText(title).closest("div");
+
+const renderBoardColumn = (overrides = {}) => {
+  const props = {
+    column: overrides.column ?? { id: "todo", title: "To do", tasks: [], className: "col", dotClass: "dot", textClass: "text" },
+    members: overrides.members ?? [],
+    onUpdate: overrides.onUpdate ?? vi.fn(),
+    onDelete: overrides.onDelete ?? vi.fn(),
+    adding: overrides.adding ?? {
+      addingToCol: null,
+      setAddingToCol: vi.fn(),
+      newCardTitle: "",
+      setNewCardTitle: vi.fn(),
+      onSubmit: vi.fn(),
+      onKeyDown: vi.fn(),
+    },
+  };
+  render(<TaskBoardColumn {...props} />);
+  return props;
+};
+
+const renderBoardView = (tasks = [{ id: 1, title: "Card A", status: "todo" }, { id: 2, title: "Card B", status: "done" }]) => {
+  const handlers = { onUpdate: vi.fn(), onDelete: vi.fn(), onAdd: vi.fn() };
+  const { rerender } = render(<TaskBoardView tasks={tasks} members={[]} {...handlers} />);
+  return { rerender, handlers };
+};
+
+const setupInlineEditHandlers = (overrides = {}) => {
+  const handlers = {
+    isEditing: false,
+    draft: "Review draft",
+    setDraft: vi.fn(),
+    start: vi.fn(),
+    save: vi.fn(),
+    cancel: vi.fn(),
+    ...overrides,
+  };
+  useInlineEdit.mockReturnValueOnce(handlers);
+  return handlers;
+};
+
+const renderAssignedTaskRow = (overrides = {}) => {
+  const props = {
+    task: {
+      id: 6,
+      title: "Review draft",
+      completed: true,
+      priority: "high",
+      due_date: null,
+      assignees_info: [{ id: 1, name: "Alex" }],
+      ...overrides.task,
+    },
+    members: overrides.members ?? [{ id: 1, user: 1, name: "Alex" }],
+    onToggle: overrides.onToggle ?? vi.fn(),
+    onUpdate: overrides.onUpdate ?? vi.fn(),
+    onDelete: overrides.onDelete ?? vi.fn(),
+  };
+  render(<TaskListRow {...props} />);
+  return props;
+};
 
 vi.mock("../../../pages/GroupWork/utils/taskBoardUtils", () => ({
   buildBoardColumns: vi.fn((tasks) => [
@@ -160,123 +277,209 @@ describe("GroupWork task component extras", () => {
     });
   });
 
-  it("renders avatar stack, popup, and context menu interactions", async () => {
-    const onClose = vi.fn();
-    const onToggleAssignee = vi.fn();
-    const triggerRef = { current: document.createElement("div") };
-    document.body.appendChild(triggerRef.current);
+  describe("Task avatar helpers", () => {
+    it("shows overflow counts and opens member profiles", () => {
+      renderAvatarStackAndPopup();
+      expect(screen.getByText("+1")).toBeInTheDocument();
+      fireEvent.click(screen.getByLabelText("Open Alex profile"));
+      expect(openMemberProfile).toHaveBeenCalled();
+    });
 
-    render(
-      <>
-        <TaskAvatarStack assignees={[{ id: 1, name: "Alex" }, { id: 2, name: "Bea" }, { id: 3, name: "Cara" }, { id: 4, name: "Drew" }]} />
-        <TaskAssigneePopup
-          isOpen
-          onClose={onClose}
-          members={[{ id: 1, user: 1, name: "Alex" }, { id: 2, user: 2, name: "Bea" }]}
-          assignees={[{ id: 1 }]}
-          onToggleAssignee={onToggleAssignee}
-          triggerRef={triggerRef}
-        />
-      </>,
-    );
+    it("toggles assignees and dismisses the popup", () => {
+      const { onClose, onToggleAssignee } = renderAvatarStackAndPopup();
+      fireEvent.click(screen.getAllByText("Bea")[1]);
+      expect(onToggleAssignee).toHaveBeenCalledWith(2);
+      fireEvent.click(screen.getByText("x-icon"));
+      expect(onClose).toHaveBeenCalled();
+    });
+  });
 
-    expect(screen.getByText("+1")).toBeInTheDocument();
-    fireEvent.click(screen.getByLabelText("Open Alex profile"));
-    expect(openMemberProfile).toHaveBeenCalled();
-    fireEvent.click(screen.getAllByText("Bea")[1]);
-    expect(onToggleAssignee).toHaveBeenCalledWith(2);
-    fireEvent.click(screen.getByText("x-icon"));
-    expect(onClose).toHaveBeenCalled();
-
-    render(
-      <TaskContextMenu
-        pos={{ x: 10, y: 20 }}
-        task={{ id: 11 }}
-        onDelete={vi.fn()}
-        onClose={onClose}
-        onEditStart={vi.fn()}
-      />,
-    );
+  it("closes the task context menu on outside click", () => {
+    const { onClose } = renderTaskContextMenu();
     fireEvent.mouseDown(document.body);
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("renders task board card and toggles popup, due date, context menu, and drag", () => {
-    const onUpdate = vi.fn();
-    const onDelete = vi.fn();
-    render(
-      <TaskBoardCard
-        task={{ id: 1, title: "Draft outline", priority: "high", due_date: "2026-03-30T00:00:00.000Z", assignees_info: [{ id: 1, name: "Alex" }], status: "todo" }}
-        members={[{ id: 1, user: 1, name: "Alex" }]}
-        onUpdate={onUpdate}
-        onDelete={onDelete}
-        onDragStart={vi.fn()}
-      />,
-    );
-
+  it("updates priority and due date on board cards", () => {
+    const { onUpdate } = renderTaskBoardCard();
+    fireEvent.change(screen.getByDisplayValue("HIGH"), { target: { value: "low" } });
     fireEvent.change(screen.getByLabelText("No due date"), { target: { value: "2026-03-31" } });
+    expect(onUpdate).toHaveBeenCalledWith(1, { priority: "low" });
     expect(onUpdate).toHaveBeenCalledWith(1, { due_date: new Date("2026-03-31").toISOString() });
+  });
 
+  it("opens the assignee popup from the board card", () => {
+    renderTaskBoardCard();
     fireEvent.click(screen.getByText("+"));
     expect(buildToggleAssignee).toHaveBeenCalled();
+  });
 
-    fireEvent.contextMenu(screen.getByText("Draft outline").closest("div"));
-    expect(screen.getByText("Edit")).toBeInTheDocument();
+  it("drags board cards with their data id", () => {
+    const { onDragStart } = renderTaskBoardCard();
+    fireEvent.dragStart(getTaskCard(), { dataTransfer: {} });
+    expect(onDragStart).toHaveBeenCalledWith(expect.anything(), 1);
+  });
+
+  it("starts editing and deletes via the context menu", () => {
+    const { onDelete } = renderTaskBoardCard();
+    fireEvent.contextMenu(getTaskCard());
+    fireEvent.click(screen.getByText("Edit"));
+    const editState = useTaskTitleEdit.mock.results.at(-1).value;
+    expect(editState.setEditing).toHaveBeenCalledWith(true);
+    expect(editState.setEditTitle).toHaveBeenCalledWith("Draft outline");
+    fireEvent.contextMenu(getTaskCard());
     fireEvent.click(screen.getByText("Delete"));
     expect(onDelete).toHaveBeenCalledWith(1);
   });
 
-  it("renders board column empty/add states and board view add flow", () => {
+  it("renders the editable title textarea and handles enter/escape shortcuts", () => {
+    const saveEdit = vi.fn();
+    const setEditing = vi.fn();
+    const setEditTitle = vi.fn();
+    useTaskTitleEdit.mockReturnValueOnce({
+      editing: true,
+      setEditing,
+      editTitle: "Draft outline",
+      setEditTitle,
+      saveEdit,
+    });
+
+    render(
+      <TaskBoardCard
+        task={{ id: 2, title: "Draft outline", priority: "medium", due_date: null, assignees_info: [] }}
+        members={[]}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+        onDragStart={vi.fn()}
+      />,
+    );
+
+    const textarea = screen.getByDisplayValue("Draft outline");
+    fireEvent.change(textarea, { target: { value: "Updated title" } });
+    expect(setEditTitle).toHaveBeenCalledWith("Updated title");
+    fireEvent.keyDown(textarea, { key: "Enter" });
+    expect(saveEdit).toHaveBeenCalled();
+    fireEvent.keyDown(textarea, { key: "Escape" });
+    expect(setEditing).toHaveBeenCalledWith(false);
+  });
+
+  it("uses the default medium priority, toggles popup state, clears due dates, and marks done cards", () => {
     const onUpdate = vi.fn();
     const onDelete = vi.fn();
-    const adding = {
-      addingToCol: null,
-      setAddingToCol: vi.fn(),
-      newCardTitle: "",
-      setNewCardTitle: vi.fn(),
-      onSubmit: vi.fn(),
-      onKeyDown: vi.fn(),
-    };
+    const onDragStart = vi.fn();
 
-    const dataTransfer = { getData: vi.fn(() => "12") };
     render(
-      <TaskBoardColumn
-        column={{ id: "todo", title: "To do", tasks: [], className: "col", dotClass: "dot", textClass: "text" }}
+      <TaskBoardCard
+        task={{ id: 22, title: "Done card", priority: null, due_date: "2026-03-30T00:00:00.000Z", assignees_info: [], status: "done", completed: true }}
         members={[]}
         onUpdate={onUpdate}
         onDelete={onDelete}
-        adding={adding}
+        onDragStart={onDragStart}
       />,
     );
 
+  expect(screen.getByDisplayValue("MEDIUM")).toBeInTheDocument();
+
+    const plusButton = screen.getByText("+");
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.getByText("Assign Members")).toBeInTheDocument();
+
+    const card = screen.getByText("Done card").closest("div");
+    fireEvent.contextMenu(card, { clientX: 12, clientY: 18 });
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("No due date"), { target: { value: "" } });
+    expect(onUpdate).toHaveBeenCalledWith(22, { due_date: null });
+
+    fireEvent.click(plusButton, { stopPropagation: vi.fn() });
+    expect(screen.queryByText("Assign Members")).not.toBeInTheDocument();
+  });
+
+  it("handles empty board columns and drag drops", () => {
+    const props = renderBoardColumn();
+    const dataTransfer = { getData: vi.fn(() => "12") };
     expect(screen.getByText("No tasks")).toBeInTheDocument();
     fireEvent.click(screen.getByText("+ Add card"));
-    expect(adding.setAddingToCol).toHaveBeenCalledWith("todo");
+    expect(props.adding.setAddingToCol).toHaveBeenCalledWith("todo");
     fireEvent.drop(screen.getByText("To do").closest("div").parentElement, { dataTransfer });
-    expect(onUpdate).toHaveBeenCalledWith(12, { status: "todo" });
+    expect(props.onUpdate).toHaveBeenCalledWith(12, { status: "todo" });
+  });
 
-    const onAdd = vi.fn();
-    const { rerender } = render(
-      <TaskBoardView
-        tasks={[{ id: 1, title: "Card A", status: "todo" }, { id: 2, title: "Card B", status: "done" }]}
-        members={[]}
+  it("renders board views and keeps cards after rerender", () => {
+    const { rerender, handlers } = renderBoardView();
+    expect(screen.getByText("Card A")).toBeInTheDocument();
+    rerender(<TaskBoardView tasks={[{ id: 1, title: "Card A", status: "todo" }]} members={[]} {...handlers} />);
+    expect(screen.getByText("Card A")).toBeInTheDocument();
+  });
+
+  it("renders TimelineCard and handles context menu, popup toggle, drag", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const members = [{ id: 1, user: 1, name: "Alice" }];
+    const task = { id: 5, title: "Timeline task", priority: "high", completed: false };
+
+    render(
+      <TimelineCard
+        task={task}
+        members={members}
+        assignees={[{ id: 1, name: "Alice" }]}
         onUpdate={onUpdate}
         onDelete={onDelete}
-        onAdd={onAdd}
       />,
     );
-    expect(screen.getByText("Card A")).toBeInTheDocument();
 
-    rerender(
-      <TaskBoardView
-        tasks={[{ id: 1, title: "Card A", status: "todo" }]}
-        members={[]}
-        onUpdate={onUpdate}
-        onDelete={onDelete}
-        onAdd={onAdd}
-      />,
+    expect(screen.getByText("Timeline task")).toBeInTheDocument();
+
+    // open assignee popup via avatar trigger click
+    const avatarTrigger = screen.getByText("Timeline task").closest("[class]").parentElement.querySelector("[class]");
+    // context menu
+    fireEvent.contextMenu(screen.getByText("Timeline task").closest("div").parentElement.parentElement);
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Delete"));
+    expect(onDelete).toHaveBeenCalledWith(5);
+  });
+
+  it("renders UnscheduledCard and handles context menu interactions", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const task = { id: 8, title: "Unscheduled item", priority: "low", assignees_info: [] };
+    const members = [{ id: 1, user: 1, name: "Bob" }];
+
+    render(
+      <UnscheduledCard task={task} members={members} onDelete={onDelete} onUpdate={onUpdate} />,
     );
-    expect(screen.getByText("Card A")).toBeInTheDocument();
+
+    expect(screen.getByText("Unscheduled item")).toBeInTheDocument();
+    fireEvent.contextMenu(screen.getByText("Unscheduled item").closest("div"));
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Delete"));
+    expect(onDelete).toHaveBeenCalledWith(8);
+  });
+
+  it("renders TaskTimelineView with tasks and handles pagination", () => {
+    const onUpdate = vi.fn();
+    const onDelete = vi.fn();
+    const tasks = [
+      { id: 1, title: "Task A", weekId: "w1", due_date: "2026-03-25T00:00:00.000Z", completed: false, status: "todo" },
+      { id: 2, due_date: null, completed: false, status: "todo", title: "Task B", assignees_info: [] },
+    ];
+    const members = [{ id: 1, user: 1, name: "Cara" }];
+
+    render(
+      <TaskTimelineView tasks={tasks} members={members} onUpdate={onUpdate} onDelete={onDelete} />,
+    );
+
+    // Header days present
+    expect(screen.getByText("Mon")).toBeInTheDocument();
+    expect(screen.getByText("Sat")).toBeInTheDocument();
+    // Unscheduled widget
+    expect(screen.getByText("Unscheduled")).toBeInTheDocument();
+
+    // Pagination dots - click page 2
+    const pageDots = screen.getAllByRole("button", { name: "" });
+    if (pageDots.length > 1) {
+      fireEvent.click(pageDots[1]);
+    }
   });
 
   it("renders task list row/view and confirms delete flow", () => {
@@ -304,6 +507,37 @@ describe("GroupWork task component extras", () => {
     fireEvent.click(screen.getByTitle("Delete task"));
     fireEvent.click(screen.getByText("confirm-hold"));
     expect(onDelete).toHaveBeenCalledWith(5);
+  });
+
+  describe("Task list row interactions", () => {
+    it("runs inline edit handlers for completed rows", () => {
+      const handlers = setupInlineEditHandlers();
+      renderAssignedTaskRow();
+      fireEvent.click(screen.getByText("start-inline-edit"));
+      fireEvent.click(screen.getByText("save-inline-edit"));
+      fireEvent.click(screen.getByText("cancel-inline-edit"));
+      expect(getUserColor).toHaveBeenCalledWith(1);
+      expect(handlers.start).toHaveBeenCalled();
+      expect(handlers.save).toHaveBeenCalled();
+      expect(handlers.cancel).toHaveBeenCalled();
+    });
+
+    it("builds an assignee toggler and opens the popup", () => {
+      setupInlineEditHandlers();
+      buildToggleAssignee.mockReturnValueOnce(vi.fn());
+      renderAssignedTaskRow();
+      fireEvent.click(screen.getAllByText("Alex")[0]);
+      fireEvent.click(screen.getAllByText("Alex").at(-1));
+      expect(buildToggleAssignee).toHaveBeenCalledWith([{ id: 1, name: "Alex" }], 6, expect.any(Function));
+    });
+
+    it("cancels the delete hold without removing the task", () => {
+      setupInlineEditHandlers();
+      const { onDelete } = renderAssignedTaskRow();
+      fireEvent.click(screen.getByTitle("Delete task"));
+      fireEvent.click(screen.getByText("cancel-hold"));
+      expect(onDelete).not.toHaveBeenCalled();
+    });
   });
 });
 
@@ -342,5 +576,25 @@ describe("GroupWork task timeline hooks", () => {
     expect(result.current.visible).toHaveLength(1);
     expect(result.current.unscheduled).toEqual([{ id: 2, due_date: null, completed: false, status: "todo" }]);
     expect(result.current.dayMs).toBe(86400000);
+  });
+});
+
+describe("TaskListView", () => {
+  it("renders task list headers and rows for non-empty task list views", () => {
+    render(
+      <TaskListView
+        tasks={[{ id: 1, title: "Draft brief", priority: "high", due_date: "2026-03-30T00:00:00.000Z" }]}
+        members={[{ id: 1, name: "Alex" }]}
+        onToggle={vi.fn()}
+        onUpdate={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Task")).toBeInTheDocument();
+    expect(screen.getByText("Priority")).toBeInTheDocument();
+    expect(screen.getByText("Due date")).toBeInTheDocument();
+    expect(screen.getByText("Assignee")).toBeInTheDocument();
+    expect(screen.getByText("Draft brief")).toBeInTheDocument();
   });
 });

@@ -15,6 +15,7 @@ vi.mock('../../../api/analyticsApi', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockGetSummary.mockReset();
   localStorage.clear();
   mockGetSummary.mockResolvedValue({ summary: { total_study_hours: 2 } });
 });
@@ -43,7 +44,7 @@ describe('DailyGoalWidget', () => {
     mockGetSummary.mockRejectedValueOnce(new Error('fail'));
     render(<DailyGoalWidget />);
     await waitFor(() => expect(screen.queryByText(/…/)).toBeNull());
-    expect(screen.getByText(/0%/)).toBeTruthy();
+    expect(screen.getByText('0h 0m of 4h (0%)')).toBeTruthy();
   });
 
   it('falls back to 0 when getSummary returns null summary', async () => {
@@ -58,13 +59,13 @@ describe('DailyGoalWidget', () => {
     mockGetSummary.mockResolvedValueOnce({ summary: { total_study_hours: 0 } });
     render(<DailyGoalWidget />);
     await waitFor(() => expect(screen.queryByText(/…/)).toBeNull());
-    expect(screen.getByText(/8h/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: /8h/i })).toBeTruthy();
   });
 
   it('defaults to 4h goal when localStorage has no value', async () => {
     render(<DailyGoalWidget />);
     await waitFor(() => expect(screen.queryByText(/…/)).toBeNull());
-    expect(screen.getByText(/4h/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: /4h/i })).toBeTruthy();
   });
 
   it('renders the progress bar fill element', async () => {

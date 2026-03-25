@@ -94,7 +94,22 @@ function CreateTaskModalDateTime({ form, set }) {
 
 function CreateTaskModalDuration({ form, setForm, isReadingList }) {
   if (isReadingList) return null;
+  const duration = useModalDurationControl(form, setForm);
+  return (
+    <div className={styles.durationRow}>
+      <span className={styles.focusBlocksLabel}>Est. time</span>
+      <EstimatedDurationControl
+        valueMinutes={duration.minutesValue}
+        onChangeMinutes={duration.handleMinutesChange}
+        presets={DURATION_PRESETS}
+        ariaLabel="Estimated duration"
+        classes={buildModalDurationClasses()}
+      />
+    </div>
+  );
+}
 
+function useModalDurationControl(form, setForm) {
   const minutesValue = getMinutesFromForm(form);
   const handleMinutesChange = (minutes) => {
     setForm((prev) => ({
@@ -103,29 +118,21 @@ function CreateTaskModalDuration({ form, setForm, isReadingList }) {
       estimated_blocks: minutesToEstimateBlocks(minutes),
     }));
   };
+  return { minutesValue, handleMinutesChange };
+}
 
-  return (
-    <div className={styles.durationRow}>
-      <span className={styles.focusBlocksLabel}>Est. time</span>
-      <EstimatedDurationControl
-        valueMinutes={minutesValue}
-        onChangeMinutes={handleMinutesChange}
-        presets={DURATION_PRESETS}
-        ariaLabel="Estimated duration"
-        classes={{
-          root: styles.durationControls,
-          buttonGroup: `${styles.chipGroup} ${styles.durationChips}`,
-          button: styles.chip,
-          buttonActive: styles.chipActive,
-          customInput: styles.customDurationInput,
-          customInputActive: styles.customDurationActive,
-          customInputField: styles.customDurationInputField,
-          leading: styles.customDurationLeading,
-          trailing: styles.customDurationTrailing,
-        }}
-      />
-    </div>
-  );
+function buildModalDurationClasses() {
+  return {
+    root: styles.durationControls,
+    buttonGroup: `${styles.chipGroup} ${styles.durationChips}`,
+    button: styles.chip,
+    buttonActive: styles.chipActive,
+    customInput: styles.customDurationInput,
+    customInputActive: styles.customDurationActive,
+    customInputField: styles.customDurationInputField,
+    leading: styles.customDurationLeading,
+    trailing: styles.customDurationTrailing,
+  };
 }
 
 

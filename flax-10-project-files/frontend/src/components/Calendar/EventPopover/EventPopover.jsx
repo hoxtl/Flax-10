@@ -15,7 +15,6 @@ const EVENT_ACCENTS = { module: "var(--sage)", society: "var(--primary)" };
 const makeBadgeStyle = (color) => ({ '--badge-color': color });
 
 function ContextBadge({ event }) {
-  if (!event) return null;
   if (event.module_name || event.moduleCode || event.module) {
     const label = event.module_name || event.moduleCode || `Module ${event.module}`;
     return <Badge className={`${styles.contextBadge} ${styles.coloredBadge}`} style={makeBadgeStyle(EVENT_ACCENTS.module)}>{label}</Badge>;
@@ -71,7 +70,6 @@ function usePopoverPosition(popoverRef, anchorRect, event, viewMode) {
     if (!popoverRef.current || !anchorRect) return;
     let currentTop = null;
     const update = () => {
-      if (!popoverRef.current) return;
       const pos = calculatePopoverPosition(anchorRect, popoverRef.current.offsetWidth, popoverRef.current.offsetHeight, window.innerWidth, window.innerHeight, currentTop, viewMode);
       currentTop = pos.top;
       setPosition(pos);

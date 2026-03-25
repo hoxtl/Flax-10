@@ -137,29 +137,96 @@ function UsersContent({ busy, items, onBan, onNavigate, onUnban, pagination }) {
 }
 
 export default function UsersTab({ onNavigate }) {
+  const viewModel = useUsersTabViewModel();
+  return <UsersTabLayout {...viewModel} onNavigate={onNavigate} />;
+}
+
+function useUsersTabViewModel() {
   const state = useUsersTabState();
-  const filteredUsers = useMemo(() => filterUsers(state.users, state.search, state.filters), [state.filters, state.search, state.users]);
-  const pagination = usePaginatedItems(filteredUsers, USER_LIST_PAGE_SIZE);
-  useEffect(() => { pagination.setCurrentPage(1); }, [pagination.setCurrentPage, state.filters, state.search]);
-  const toggleGroup = (group, value) => state.setFilters((current) => ({ ...current, [group]: toggleArrayValue(current[group], value) }));
-  const confirmBan = (reason) => {
-    const trimmedReason = reason.trim();
-    if (!state.banTarget || !trimmedReason) return;
-    state.setBusy(true);
-    banUser(state.banTarget.id, trimmedReason)
-      .then(() => state.setUsers((users) => banUserState(users, state.banTarget.id, trimmedReason)))
-      .catch((error) => state.setError(error?.message || "Failed to ban user."))
-      .finally(() => { state.setBanTarget(null); state.setBusy(false); });
+  const filteredUsers = useFilteredUsers(state);
+  const pagination = useUsersPagination(filteredUsers);
+  useResetPageOnFilterChange(pagination.setCurrentPage, state.filters, state.search);
+  return {
+    state,
+    filteredUsers,
+    pagination,
+    toggleGroup: (group, value) => toggleFilterGroup(state.setFilters, group, value),
+    confirmBan: (reason) => confirmBanHandler(state, reason),
+    handleUnban: (user) => unbanHandler(state, user),
   };
-  const handleUnban = (user) => { state.setBusy(true); unbanUser(user.id).then(() => state.setUsers((users) => unbanUserState(users, user.id))).catch((error) => state.setError(error?.message || "Failed to unban user.")).finally(() => state.setBusy(false)); };
+}
+
+function useFilteredUsers(state) {
+  return useMemo(() => filterUsers(state.users, state.search, state.filters), [state.filters, state.search, state.users]);
+}
+
+function useUsersPagination(filteredUsers) {
+  return usePaginatedItems(filteredUsers, USER_LIST_PAGE_SIZE);
+}
+
+function useResetPageOnFilterChange(setPage, filters, search) {
+  useEffect(() => { setPage(1); }, [setPage, filters, search]);
+}
+
+function toggleFilterGroup(setFilters, group, value) {
+  setFilters((current) => ({ ...current, [group]: toggleArrayValue(current[group], value) }));
+}
+
+function confirmBanHandler(state, reason) {
+  const trimmedReason = reason.trim();
+  if (!state.banTarget || !trimmedReason) return;
+  state.setBusy(true);
+  banUser(state.banTarget.id, trimmedReason)
+    .then(() => state.setUsers((users) => banUserState(users, state.banTarget.id, trimmedReason)))
+    .catch((error) => state.setError(error?.message || "Failed to ban user."))
+    .finally(() => {
+      state.setBanTarget(null);
+      state.setBusy(false);
+    });
+}
+
+function unbanHandler(state, user) {
+  state.setBusy(true);
+  unbanUser(user.id)
+    .then(() => state.setUsers((users) => unbanUserState(users, user.id)))
+    .catch((error) => state.setError(error?.message || "Failed to unban user."))
+    .finally(() => state.setBusy(false));
+}
+
+function UsersTabLayout({ state, filteredUsers, pagination, toggleGroup, confirmBan, handleUnban, onNavigate }) {
   return (
     <>
       <SectionCard>
-        <CardHeader title="All Users"><UsersHeader filters={state.filters} onToggle={toggleGroup} search={state.search} onSearchChange={state.setSearch} /></CardHeader>
+        <CardHeader title="All Users">
+          <UsersHeader filters={state.filters} onToggle={toggleGroup} search={state.search} onSearchChange={state.setSearch} />
+        </CardHeader>
         <ErrorMessage message={state.error} />
-        {state.loading ? <LoadingSpinner /> : filteredUsers.length ? <UsersContent items={filteredUsers} busy={state.busy} onNavigate={onNavigate} onBan={state.setBanTarget} onUnban={handleUnban} pagination={pagination} /> : state.search ? <SearchEmptyState query={state.search} itemLabel="users" /> : <EmptyState icon="👥" title="No users found" description="New accounts will appear here once people join the platform." />}
+        {renderUsersBody({ state, filteredUsers, pagination, onNavigate, handleUnban })}
       </SectionCard>
-      <AnimatePresence>{state.banTarget ? <BanUserModal user={state.banTarget} onConfirm={confirmBan} onCancel={() => state.setBanTarget(null)} /> : null}</AnimatePresence>
+      <AnimatePresence>{renderBanModal(state, confirmBan)}</AnimatePresence>
     </>
   );
+}
+
+function renderUsersBody({ state, filteredUsers, pagination, onNavigate, handleUnban }) {
+  if (state.loading) return <LoadingSpinner />;
+  if (filteredUsers.length) {
+    return (
+      <UsersContent
+        items={filteredUsers}
+        busy={state.busy}
+        onNavigate={onNavigate}
+        onBan={state.setBanTarget}
+        onUnban={handleUnban}
+        pagination={pagination}
+      />
+    );
+  }
+  if (state.search) return <SearchEmptyState query={state.search} itemLabel="users" />;
+  return <EmptyState icon="👥" title="No users found" description="New accounts will appear here once people join the platform." />;
+}
+
+function renderBanModal(state, confirmBan) {
+  if (!state.banTarget) return null;
+  return <BanUserModal user={state.banTarget} onConfirm={confirmBan} onCancel={() => state.setBanTarget(null)} />;
 }

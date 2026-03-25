@@ -24,8 +24,8 @@ describe('Card', () => {
   });
 
   it('applies custom variant class', () => {
-    const { container } = render(<Card variant="outlined">Outlined</Card>);
-    expect(container.firstChild.className).toContain('outlined');
+    const { container } = render(<Card variant="subtle">Subtle</Card>);
+    expect(container.firstChild.className).toContain('subtle');
   });
 
   it('applies default medium padding class', () => {

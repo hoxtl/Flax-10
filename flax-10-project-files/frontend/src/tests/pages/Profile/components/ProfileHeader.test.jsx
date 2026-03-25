@@ -347,8 +347,7 @@ describe('ProfileHeader', () => {
         onPinBadge={onPinBadge}
       />
     );
-    const badgeButtons = document.querySelectorAll('button[title="Tap to pin this badge"]');
-    fireEvent.click(badgeButtons[0]);
+    fireEvent.click(screen.getByText('🎯').closest('button'));
     expect(onPinBadge).toHaveBeenCalledWith('goal_getter');
   });
 });

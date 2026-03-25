@@ -54,7 +54,19 @@ async function executeReschedule(events, selectedDate, editEvent, showToast, set
     showToast(buildConflictResolutionToastMessage(plan));
     return;
   }
+  await withBusyState(setBusy, () => runReschedulePlan(plan, editEvent, showToast));
+}
+
+async function withBusyState(setBusy, task) {
   setBusy(true);
+  try {
+    await task();
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function runReschedulePlan(plan, editEvent, showToast) {
   try {
     const result = await applyConflictResolutionPlan(plan, editEvent);
     const failureCount = result?.failures?.length ?? 0;
@@ -62,13 +74,15 @@ async function executeReschedule(events, selectedDate, editEvent, showToast, set
       showToast("Couldn't reschedule your events. Some conflicts are read-only.");
       return;
     }
-    const message = buildConflictResolutionToastMessage(plan);
-    showToast(failureCount ? `${message} ${failureCount} couldn't be moved.` : message);
+    showToast(buildScheduleMessage(plan, failureCount));
   } catch {
     showToast("Couldn't reschedule your events. Try again.");
-  } finally {
-    setBusy(false);
   }
+}
+
+function buildScheduleMessage(plan, failureCount) {
+  const message = buildConflictResolutionToastMessage(plan);
+  return failureCount ? `${message} ${failureCount} couldn't be moved.` : message;
 }
 
 async function executeAutoSchedule(showToast, loadEvents, setBusy) {

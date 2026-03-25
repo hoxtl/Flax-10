@@ -93,10 +93,6 @@ function createStartMarkerEl() {
   return element;
 }
 
-export function initMapInstance(container) {
-  return new mapboxgl.Map({ antialias: true, bearing: -12, center: [-0.105, 51.502], container, pitch: 55, style: "mapbox://styles/mapbox/streets-v12", zoom: 13 });
-}
-
 export function handleMapLoad(refs, onCampusMarkerSelect) {
   add3dBuildingsLayer(refs.map.current);
   addRouteLayers(refs.map.current);

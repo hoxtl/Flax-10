@@ -84,4 +84,9 @@ describe('InlineAlert', () => {
     const el = screen.getByRole('status');
     expect(el.className).toContain('myClass');
   });
+
+  it('falls back to success styling for unknown variants', () => {
+    render(<InlineAlert message="Fallback" variant="mystery" />);
+    expect(screen.getByRole('status').className).toContain('success');
+  });
 });

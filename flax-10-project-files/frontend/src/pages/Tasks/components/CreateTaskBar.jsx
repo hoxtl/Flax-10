@@ -49,42 +49,95 @@ function ListDropdown({ s, taskListId, setTaskListId, sortedLists, listOptions }
   );
 }
 
-function CreateTaskBarOptions({ styles: s, showOptions, estimatedMinutes, setEstimatedMinutes, moduleId, setModuleId, taskListId, setTaskListId, sortedLists, moduleOptions, listOptions, isReadingList, pageCount, setPageCount }) {
+function CreateTaskBarOptions(props) {
+  const vm = buildOptionsRowViewModel(props);
   return (
-    <div className={s.optionsRowWrapper}>
-      <div className={`${s.optionsRow} ${showOptions ? s.optionsRowOpen : ""}`}>
-        {!isReadingList && (
-          <>
-            <span className={s.optionsRowLabel}>Est. time</span>
-            <EstimatedDurationControl
-              valueMinutes={estimatedMinutes}
-              onChangeMinutes={setEstimatedMinutes}
-              presets={DURATION_PRESETS}
-              ariaLabel="Estimated duration"
-              classes={{
-                root: s.durationGroup,
-                button: s.durationBtn,
-                buttonActive: s.durationBtnActive,
-                customInput: s.customDurationInput,
-                customInputActive: s.customDurationActive,
-                customInputField: s.customDurationInputField,
-                leading: s.customDurationLeading,
-                trailing: s.customDurationTrailing,
-              }}
-            />
-          </>
-        )}
-        {isReadingList && (
-          <PageCountField styles={s} pageCount={pageCount} setPageCount={setPageCount} />
-        )}
-        <span className={s.optionsRowDivider} aria-hidden />
-        <span className={s.optionsRowLabel}>Module</span>
-        <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
-          <AnimatedDropdown value={moduleId ?? ""} onChange={(v) => setModuleId(v === "" ? null : v)} placeholder="Module" options={moduleOptions} className={s.moduleListDropdown} />
-        </div>
-        <ListDropdown s={s} taskListId={taskListId} setTaskListId={setTaskListId} sortedLists={sortedLists} listOptions={listOptions}/>
-        </div>
+    <div className={props.styles.optionsRowWrapper}>
+      <div className={vm.rowClass}>
+        {vm.primaryField}
+        <TaskBarDropdownFields {...props} />
+      </div>
     </div>
+  );
+}
+
+function TaskBarDropdownFields(props) {
+  return (
+    <>
+      <ModuleDropdownField
+        moduleId={props.moduleId}
+        setModuleId={props.setModuleId}
+        moduleOptions={props.moduleOptions}
+        styles={props.styles}
+      />
+      <ListDropdown
+        s={props.styles}
+        taskListId={props.taskListId}
+        setTaskListId={props.setTaskListId}
+        sortedLists={props.sortedLists}
+        listOptions={props.listOptions}
+      />
+    </>
+  );
+}
+
+function buildOptionsRowViewModel(props) {
+  const primaryField = props.isReadingList
+    ? <PageCountField styles={props.styles} pageCount={props.pageCount} setPageCount={props.setPageCount} />
+    : <EstimatedDurationField minutes={props.estimatedMinutes} setMinutes={props.setEstimatedMinutes} styles={props.styles} />;
+  return {
+    primaryField,
+    rowClass: buildOptionsRowClass(props.styles, props.showOptions),
+  };
+}
+
+function buildOptionsRowClass(stylesObj, showOptions) {
+  return `${stylesObj.optionsRow} ${showOptions ? stylesObj.optionsRowOpen : ""}`.trim();
+}
+
+function EstimatedDurationField({ minutes, setMinutes, styles: s }) {
+  return (
+    <>
+      <span className={s.optionsRowLabel}>Est. time</span>
+      <EstimatedDurationControl
+        valueMinutes={minutes}
+        onChangeMinutes={setMinutes}
+        presets={DURATION_PRESETS}
+        ariaLabel="Estimated duration"
+        classes={buildDurationClasses(s)}
+      />
+    </>
+  );
+}
+
+function buildDurationClasses(s) {
+  return {
+    root: s.durationGroup,
+    button: s.durationBtn,
+    buttonActive: s.durationBtnActive,
+    customInput: s.customDurationInput,
+    customInputActive: s.customDurationActive,
+    customInputField: s.customDurationInputField,
+    leading: s.customDurationLeading,
+    trailing: s.customDurationTrailing,
+  };
+}
+
+function ModuleDropdownField({ moduleId, setModuleId, moduleOptions, styles: s }) {
+  return (
+    <>
+      <span className={s.optionsRowDivider} aria-hidden />
+      <span className={s.optionsRowLabel}>Module</span>
+      <div className={`${s.dropdownWrap} ${s.moduleDropdownWrap}`}>
+        <AnimatedDropdown
+          value={moduleId ?? ""}
+          onChange={(value) => setModuleId(value === "" ? null : value)}
+          placeholder="Module"
+          options={moduleOptions}
+          className={s.moduleListDropdown}
+        />
+      </div>
+    </>
   );
 }
 

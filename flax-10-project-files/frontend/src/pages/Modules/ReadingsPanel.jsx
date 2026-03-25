@@ -6,7 +6,7 @@ import { useState, useMemo } from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import DeadlineCountdown from '../../components/common/DeadlineCountdown/DeadlineCountdown';
-import urgentGlowStyles from '../../components/Common/UrgentGlow/UrgentGlow.module.css';
+import urgentGlowStyles from '../../components/common/UrgentGlow/UrgentGlow.module.css';
 import {
     TIER_ACCENT,
     getUrgencyTier,

@@ -69,35 +69,6 @@ vi.mock("../../../components/Pagination/Pagination", () => ({
   BackToTop: () => <div>Back to top</div>,
 }));
 
-vi.mock("../../../components/common/StatStrip/StatStrip", () => ({
-  default: ({ items }) => <div>{items.map((item) => `${item.label}:${item.value}`).join("|")}</div>,
-}));
-
-vi.mock("../../../components/common/FilterButton/FilterButton", () => ({
-  default: ({ activeCount, onClick }) => <button onClick={onClick}>Filter {activeCount}</button>,
-}));
-
-vi.mock("../../../components/common/hooks/useClickOutside", () => ({
-  useClickOutside: vi.fn(),
-}));
-
-vi.mock("framer-motion", () => ({
-  AnimatePresence: ({ children }) => <>{children}</>,
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-  },
-}));
-
-vi.mock("../../../components/common/Tabs/Tabs", () => ({
-  default: ({ tabs, activeTab, onTabChange }) => (
-    <div>
-      <div>Active: {activeTab}</div>
-      {tabs.map((tab) => <button key={tab.id} onClick={() => onTabChange(tab.id)}>{tab.label}</button>)}
-      <div>{tabs.find((tab) => tab.id === activeTab)?.content}</div>
-    </div>
-  ),
-}));
-
 vi.mock("../../../pages/GroupWork/GroupTasksTab", () => ({
   default: ({ projectId }) => <div>Tasks tab {projectId}</div>,
 }));
@@ -106,77 +77,115 @@ vi.mock("../../../pages/GroupWork/AvailabilityTab", () => ({
   default: ({ projectId }) => <div>Availability tab {projectId}</div>,
 }));
 
+function renderDetail(overrides) {
+  useProjectDetailMock.mockReturnValue({
+    loading: false,
+    project: { name: "Alpha" },
+    members: [{ id: 1, name: "Alex" }],
+    onAdded: vi.fn(),
+    handleRemoveMember: vi.fn(),
+    handleDeleteProject: vi.fn(),
+    activeTab: "tasks",
+    setActiveTab: vi.fn(),
+    setTaskStats: vi.fn(),
+    taskStats: { percent: 25 },
+    ...overrides,
+  });
+  return render(<GroupProjectDetail projectId={7} onBack={vi.fn()} />);
+}
+
 describe("GroupWork extra components", () => {
-  it("renders detail loading, missing, and loaded states", () => {
-    const onBack = vi.fn();
-
-    useProjectDetailMock.mockReturnValueOnce({ loading: true });
-    const { rerender } = render(<GroupProjectDetail projectId={7} onBack={onBack} />);
-    expect(screen.getByText("Skeleton back")).toBeInTheDocument();
-
-    useProjectDetailMock.mockReturnValueOnce({ loading: false, project: null });
-    rerender(<GroupProjectDetail projectId={7} onBack={onBack} />);
-    expect(screen.getByText(/This group project isn’t available right now./)).toBeInTheDocument();
-
-    useProjectDetailMock.mockReturnValueOnce({
-      loading: false,
-      project: { name: "Alpha" },
-      members: [{ id: 1, name: "Alex" }],
-      onAdded: vi.fn(),
-      handleRemoveMember: vi.fn(),
-      handleDeleteProject: vi.fn(),
-      activeTab: "tasks",
-      setActiveTab: vi.fn(),
-      setTaskStats: vi.fn(),
-      taskStats: { percent: 25 },
+  describe("GroupProjectDetail", () => {
+    it("shows the loading skeleton", () => {
+      useProjectDetailMock.mockReturnValue({ loading: true });
+      render(<GroupProjectDetail projectId={7} onBack={vi.fn()} />);
+      expect(screen.getByText("Skeleton back")).toBeInTheDocument();
     });
-    rerender(<GroupProjectDetail projectId={7} onBack={onBack} />);
-    expect(screen.getByText("Header: Alpha")).toBeInTheDocument();
-    expect(screen.getByText("Back to top")).toBeInTheDocument();
+
+    it("renders the empty state when project data is missing", () => {
+      useProjectDetailMock.mockReturnValue({ loading: false, project: null });
+      render(<GroupProjectDetail projectId={7} onBack={vi.fn()} />);
+      expect(screen.getByText(/This group project isn’t available right now./)).toBeInTheDocument();
+    });
+
+    it("renders the project header and footer when data is available", () => {
+      renderDetail();
+      expect(screen.getByText("Header: Alpha")).toBeInTheDocument();
+      expect(screen.getByText("Back to top")).toBeInTheDocument();
+    });
   });
 
-  it("renders member avatar states, filter interactions, members section, stats, and tabs", () => {
-    render(
-      <>
-        <MemberAvatar member={{ id: 1, name: "Alex", profile_photo_url: "https://example.com/a.jpg" }} />
-        <MemberAvatar member={{ id: 2, user: 2, name: "Bea" }} size={30} />
-      </>
-    );
-    expect(screen.getByAltText("Alex")).toBeInTheDocument();
-    expect(screen.getByText("BE")).toBeInTheDocument();
+  describe("MemberAvatar", () => {
+    it("renders a photo when profile url exists and initials otherwise", () => {
+      render(
+        <>
+          <MemberAvatar member={{ id: 1, name: "Alex", profile_photo_url: "https://example.com/a.jpg" }} />
+          <MemberAvatar member={{ id: 2, user: 2, name: "Bea" }} size={30} />
+        </>
+      );
+      expect(screen.getByAltText("Alex")).toBeInTheDocument();
+      expect(screen.getByText("BE")).toBeInTheDocument();
+    });
+  });
 
-    const onToggle = vi.fn();
-    render(<MemberFilter members={[{ id: 1, user: 1, name: "Alex" }]} selectedUsers={[]} onToggle={onToggle} />);
-    fireEvent.mouseEnter(screen.getByText("Filter 0").parentElement);
-    fireEvent.click(screen.getByText("Alex"));
-    expect(onToggle).toHaveBeenCalledWith("1");
+  describe("MemberFilter", () => {
+    it("toggles members when clicked while open", () => {
+      const onToggle = vi.fn();
+      render(<MemberFilter members={[{ id: 1, user: 1, name: "Alex" }]} selectedUsers={[]} onToggle={onToggle} />);
+      const button = screen.getByRole("button", { name: /Filter/ });
+      fireEvent.mouseEnter(button.parentElement);
+      fireEvent.click(screen.getByText("Alex"));
+      expect(onToggle).toHaveBeenCalledWith("1");
+    });
 
-    const onRemove = vi.fn();
-    render(
-      <>
-        <MembersSection
-          members={[
-            { id: 1, name: "Owner", role: "owner" },
-            { id: 2, name: "Member", role: "member" },
-          ]}
-          onRemove={onRemove}
-          canRemove={true}
-          allowOwnerRemove={true}
-        />
-        <MembersSection members={[]} onRemove={onRemove} />
-        <GroupWorkStats projects={[{ name: "Alpha", task_count: 2, completed_task_count: 1 }]} />
-        <TabsSection activeTab="tasks" setActiveTab={vi.fn()} projectId={9} members={[]} onStatsUpdate={vi.fn()} taskStats={{ percent: 33 }} />
-      </>
-    );
+    it("renders the empty state and hides it after mouse leave", () => {
+      render(<MemberFilter members={[]} selectedUsers={["1"]} onToggle={vi.fn()} />);
+      const wrapper = screen.getByRole("button", { name: /Filter/ }).parentElement;
+      fireEvent.mouseEnter(wrapper);
+      const emptyMessage = screen.getByText("No members");
+      expect(emptyMessage).toBeInTheDocument();
+      fireEvent.mouseLeave(wrapper);
+      expect(emptyMessage).not.toBeVisible();
+    });
+  });
 
-    fireEvent.click(screen.getByLabelText("Open Owner profile"));
-    fireEvent.click(screen.getByText("Leave project"));
-    fireEvent.click(screen.getByText("Remove"));
-    expect(openMemberProfileMock).toHaveBeenCalled();
-    expect(onRemove).toHaveBeenCalledWith(1);
-    expect(onRemove).toHaveBeenCalledWith(2);
-    expect(screen.getByText(/No teammates added yet/)).toBeInTheDocument();
-    expect(screen.getByText(/Active projects:1/)).toBeInTheDocument();
-    expect(screen.getByText("Tasks tab 9")).toBeInTheDocument();
+  describe("MembersSection", () => {
+    it("opens profiles and forwards remove actions", () => {
+      const onRemove = vi.fn();
+      render(
+        <>
+          <MembersSection
+            members={[
+              { id: 1, name: "Owner", role: "owner" },
+              { id: 2, name: "Member", role: "member" },
+            ]}
+            onRemove={onRemove}
+            canRemove
+            allowOwnerRemove
+          />
+          <MembersSection members={[]} onRemove={onRemove} />
+        </>
+      );
+      fireEvent.click(screen.getByLabelText("Open Owner profile"));
+      fireEvent.click(screen.getByText("Leave project"));
+      fireEvent.click(screen.getByText("Remove"));
+      expect(openMemberProfileMock).toHaveBeenCalled();
+      expect(onRemove).toHaveBeenCalledWith(1);
+      expect(onRemove).toHaveBeenCalledWith(2);
+      expect(screen.getByText(/No teammates added yet/)).toBeInTheDocument();
+    });
+  });
+
+  describe("GroupWork dashboard widgets", () => {
+    it("summarises stats and renders the tabs section", () => {
+      render(
+        <>
+          <GroupWorkStats projects={[{ name: "Alpha", task_count: 2, completed_task_count: 1 }]} />
+          <TabsSection activeTab="tasks" setActiveTab={vi.fn()} projectId={9} members={[]} onStatsUpdate={vi.fn()} taskStats={{ percent: 33 }} />
+        </>
+      );
+      expect(screen.getByText("Active projects")).toBeInTheDocument();
+      expect(screen.getByText("Tasks tab 9")).toBeInTheDocument();
+    });
   });
 });

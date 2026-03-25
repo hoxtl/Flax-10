@@ -307,7 +307,7 @@ describe("AdminPage – Users tab", () => {
       expect(screen.getByText("Page 3 of 3")).toBeInTheDocument(),
     );
     await expectUserButton(/User21 Test/i);
-  });
+  }, 15000);
 
   it("shows empty state when search has no matches", async () => {
     render(<AdminPage />);

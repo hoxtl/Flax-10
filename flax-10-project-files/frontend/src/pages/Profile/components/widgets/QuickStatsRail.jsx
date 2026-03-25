@@ -1,4 +1,4 @@
-import StatStrip from '../../../../components/Common/StatStrip/StatStrip';
+import StatStrip from '../../../../components/common/StatStrip/StatStrip';
 import { useCountUp } from '../../../../hooks/useCountUp';
 
 export function QuickStatsRail({ totalHours, sessionCount, moduleCount, hideZeroItems = false }) {

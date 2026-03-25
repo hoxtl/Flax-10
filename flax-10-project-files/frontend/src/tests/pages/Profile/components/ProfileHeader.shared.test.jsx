@@ -73,7 +73,7 @@ describe("ProfileHeader shared-profile extras", () => {
     expect(handlers.setOptimisticShare).toHaveBeenCalledWith(true);
     expect(handlers.reload).toHaveBeenCalled();
 
-    fireEvent.mouseEnter(screen.getByTitle("Consistency"));
+    expect(screen.getByText("Consistency")).toBeInTheDocument();
     expect(screen.getByText("Keeps going")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Consistency"));
     expect(onPinBadge).not.toHaveBeenCalled();

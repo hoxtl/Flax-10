@@ -20,6 +20,7 @@ vi.mock('../../../../hooks/usePagination', () => ({
 
 vi.mock('../../../../components/Calendar/ListView/EventRow', () => ({
     EventRow: ({ event }) => <div data-testid="event-row">{event.title}</div>,
+    ConflictRow: ({ events }) => <div data-testid="conflict-row">{events.map((event) => event.title).join(', ')}</div>,
 }));
 
 vi.mock('../../../../components/Pagination/Pagination', () => ({
@@ -135,5 +136,30 @@ describe('ListView', () => {
         const propEvents = [createMockEvent({ id: 1, title: 'Prop Event' })];
         render(<ListView events={propEvents} />);
         expect(screen.getByText('Prop Event')).toBeInTheDocument();
+    });
+
+    it('hides pagination helpers for day and week views', () => {
+        mockViewMode = 'day';
+        render(<ListView events={[createMockEvent({ id: 1, title: 'Day Event' })]} />);
+        expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('back-to-top')).not.toBeInTheDocument();
+
+        mockViewMode = 'week';
+        render(<ListView events={[createMockEvent({ id: 2, title: 'Week Event' })]} />);
+        expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+    });
+
+    it('renders overlapping day events as a conflict row and keeps all-day rows separate', () => {
+        mockViewMode = 'day';
+        const events = [
+            createMockEvent({ id: 1, title: 'Overlap A', start_time: '2026-03-15T10:00:00Z', end_time: '2026-03-15T11:00:00Z' }),
+            createMockEvent({ id: 2, title: 'Overlap B', start_time: '2026-03-15T10:30:00Z', end_time: '2026-03-15T11:30:00Z' }),
+            createMockEvent({ id: 3, title: 'All day', all_day: true, start_time: '2026-03-15T00:00:00Z', end_time: '2026-03-16T00:00:00Z' }),
+        ];
+
+        render(<ListView events={events} />);
+
+        expect(screen.getByTestId('conflict-row')).toHaveTextContent('Overlap A, Overlap B');
+        expect(screen.getByText('All day')).toBeInTheDocument();
     });
 });

@@ -242,11 +242,7 @@ describe('validateAndSubmit', () => {
         const event = makeEvent({ id: 5, recurrence: 'weekly' });
         const actions = makeActions();
         const onClose = vi.fn();
-        // First confirm (overlap) returns true, second (recurring choice) returns false
-        const confirmFn = vi.fn()
-            .mockResolvedValueOnce(true)  // overlap check
-            .mockResolvedValueOnce(false); // recurring choice - edit single
-        checkOverlapWithConfirm.mockImplementation((ev, others, fn) => fn({ title: '' }));
+        const confirmFn = vi.fn().mockResolvedValue(false);
         checkOverlapWithConfirm.mockResolvedValue(true);
         await validateAndSubmit(null, makeForm(), event, actions, onClose, vi.fn(), confirmFn, []);
         // addException should be called for single occurrence

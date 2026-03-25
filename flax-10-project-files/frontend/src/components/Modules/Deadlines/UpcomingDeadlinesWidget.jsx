@@ -14,7 +14,7 @@ import {
   itemVariants,
   listVariants,
 } from '../shared/widgetVariants.js';
-import WidgetHeader from '../../common/WidgetHeader/WidgetHeader';
+import WidgetHeader from '../../Common/WidgetHeader/WidgetHeader';
 import {
   ShowMoreButton,
 } from '../shared/widgetParts.jsx';

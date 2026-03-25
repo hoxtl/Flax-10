@@ -5,7 +5,7 @@
 import React from "react";
 import { BarChart3, LayoutGrid, Presentation, TrendingUp, Zap } from "lucide-react";
 import { getEventType } from "../../../components/Calendar/utils/eventUtils";
-import SharedWidgetHeader from "../../../components/Common/WidgetHeader/WidgetHeader";
+import SharedWidgetHeader from "../../../components/common/WidgetHeader/WidgetHeader";
 import styles from "./IntelligenceRow.module.css";
 import { IntelligenceHero } from "./IntelligenceWidgets";
 import { RightNowWidget } from "./RightNowWidget";

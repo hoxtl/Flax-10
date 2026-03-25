@@ -38,6 +38,41 @@ import {
 } from "../../../pages/Attendance/utils/attendanceRecords";
 import { buildAttendancePageModel } from "../../../pages/Attendance/utils/attendancePageModel";
 
+const baseStatsState = {
+  stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 2, missed: 1 } } },
+  loading: false,
+  error: null,
+  refetch: vi.fn(),
+};
+
+const buildStatsState = (overrides = {}) => ({ ...baseStatsState, ...overrides });
+const buildRecordsState = (overrides = {}) => ({ recordsByEventId: new Map([[1, true], [2, false]]), refetch: vi.fn(), ...overrides });
+const buildEventsState = (overrides = {}) => ({
+  events: [
+    { id: 1, title: "Lecture 1", start_time: "2026-03-03T10:00:00Z" },
+    { id: 2, title: "Lecture 2", start_time: "2026-03-04T10:00:00Z" },
+    { id: 3, title: "Lab", start_time: "2026-03-05T10:00:00Z", tag_name: "lab" },
+  ],
+  loading: false,
+  ...overrides,
+});
+const buildSelectionState = (overrides = {}) => ({
+  selectedSegment: { chart: "overall", label: "Attended" },
+  setSelectedSegment: vi.fn(),
+  listTab: "record",
+  setListTab: vi.fn(),
+  ...overrides,
+});
+
+const renderAttendanceModel = ({ statsState, recordsState, eventsState, selection } = {}) => {
+  const stats = buildStatsState(statsState);
+  const records = buildRecordsState(recordsState);
+  const events = buildEventsState(eventsState);
+  const selectionState = buildSelectionState(selection);
+  const model = buildAttendancePageModel(selectionState, stats, records, events);
+  return { model, stats, records, events, selection: selectionState };
+};
+
 const recordAttendanceMock = vi.fn();
 
 vi.mock("../../../api/attendanceApi", () => ({
@@ -82,58 +117,61 @@ describe("attendance utils", () => {
     expect(buildSegmentEvents({ chart: "other", label: "Anything" }, events)).toEqual([]);
   });
 
-  it("builds chart data, labels, and fallback colors", () => {
-    expect(buildOverallChartData({ attended: 3, missed: 0 })).toHaveLength(1);
-    expect(buildOverallChartData({ attended: 3, missed: 2 })).toHaveLength(2);
-    expect(getEventTypeLabel({ title: "Large group lecture" })).toBe("Lecture");
-    expect(getEventTypeLabel({ description: "small group work" })).toBe("Small group");
-    expect(getEventTypeLabel({ tag_name: "lab" })).toBe("Practical/lab");
-    expect(getEventTypeLabel({ title: "briefing session" })).toBe("Other");
-    expect(getEventTypeLabel({ tag: "unknown" })).toBe("Other");
-
-    const byType = buildByTypeChartData({
-      lecture: { attended: 2, missed: 1 },
-      lgt: { attended: 1, missed: 0 },
-      lab: { attended: 0, missed: 2 },
-      misc: { attended: 0, missed: 0 },
+  describe("chart label helpers", () => {
+    it("builds overall slices and normalizes event type labels", () => {
+      expect(buildOverallChartData({ attended: 3, missed: 0 })).toHaveLength(1);
+      expect(buildOverallChartData({ attended: 3, missed: 2 })).toHaveLength(2);
+      expect(getEventTypeLabel({ title: "Large group lecture" })).toBe("Lecture");
+      expect(getEventTypeLabel({ description: "small group work" })).toBe("Small group");
+      expect(getEventTypeLabel({ tag_name: "lab" })).toBe("Practical/lab");
+      expect(getEventTypeLabel({ title: "briefing session" })).toBe("Other");
+      expect(getEventTypeLabel({ tag: "unknown" })).toBe("Other");
     });
 
-    expect(byType.find((entry) => entry.label === "Lecture").value).toBe(4);
-    expect(byType.find((entry) => entry.label === "Practical/lab").value).toBe(2);
-    expect(withByTypeColors([{ label: "A" }, { label: "B", color: "#fff" }])[0].id).toBe(0);
+    it("maps type stats into chart entries with fallback colors", () => {
+      const byType = buildByTypeChartData({
+        lecture: { attended: 2, missed: 1 },
+        lgt: { attended: 1, missed: 0 },
+        lab: { attended: 0, missed: 2 },
+        misc: { attended: 0, missed: 0 },
+      });
+      expect(byType.find((entry) => entry.label === "Lecture").value).toBe(4);
+      expect(byType.find((entry) => entry.label === "Practical/lab").value).toBe(2);
+      expect(withByTypeColors([{ label: "A" }, { label: "B", color: "#fff" }])[0].id).toBe(0);
+    });
   });
 
-  it("builds donut helpers and click handlers", () => {
-    const formatter = buildValueFormatter([{ value: 3 }], 6);
-    expect(buildDonutSeries([{ value: 1 }], formatter)[0].innerRadius).toBe(40);
-    expect(buildDonutSeries([{ value: 1 }], formatter)[0].outerRadius).toBe(90);
-    expect(formatter({ value: 3 }, {})).toBe("50%");
-    expect(formatter(0, {})).toBe("0%");
-    expect(formatter(99, { dataIndex: 0 })).toBe("50%");
+  describe("donut chart helpers", () => {
+    it("formats values and builds consistent donut radii", () => {
+      const formatter = buildValueFormatter([{ value: 3 }], 6);
+      const donut = buildDonutSeries([{ value: 1 }], formatter)[0];
+      expect(donut.innerRadius).toBe(40);
+      expect(donut.outerRadius).toBe(90);
+      expect(formatter({ value: 3 }, {})).toBe("50%");
+      expect(formatter(99, { dataIndex: 0 })).toBe("50%");
+    });
 
-    const objectFormatter = buildValueFormatter([{ value: 4 }], 8);
-    expect(objectFormatter({ value: 4 }, { dataIndex: "bad" })).toBe("50%");
+    it("falls back to blanks for invalid totals or payloads", () => {
+      const zeroTotalFormatter = buildValueFormatter([{ value: 1 }], 0);
+      expect(zeroTotalFormatter(1, {})).toBe("");
+      const invalidFormatter = buildValueFormatter([{ value: 2 }], 8);
+      expect(invalidFormatter("oops", {})).toBe("");
+      const objectFormatter = buildValueFormatter([{ value: 4 }], 8);
+      expect(objectFormatter({ value: 4 }, { dataIndex: "bad" })).toBe("50%");
+    });
 
-    const zeroTotalFormatter = buildValueFormatter([{ value: 1 }], 0);
-    expect(zeroTotalFormatter(1, {})).toBe("");
-
-    const invalidFormatter = buildValueFormatter([{ value: 2 }], 8);
-    expect(invalidFormatter("oops", {})).toBe("");
-
-    const onSegmentClick = vi.fn();
-    const handler = buildPieClickHandler(onSegmentClick, "overall", [{ label: "Attended" }]);
-    handler({}, { dataIndex: 0 }, {});
-    expect(onSegmentClick).toHaveBeenCalledWith("overall", "Attended");
-
-    const fallbackHandler = buildPieClickHandler(onSegmentClick, "byType", [{ label: "Lecture" }]);
-    fallbackHandler({}, {}, { label: "Custom label" });
-    expect(onSegmentClick).toHaveBeenCalledWith("byType", "Custom label");
-
-    const noEmitHandler = buildPieClickHandler(onSegmentClick, "byType", []);
-    noEmitHandler({}, {}, {});
-    expect(onSegmentClick).toHaveBeenCalledTimes(2);
-
-    expect(buildPieClickHandler(null, "overall", [])).toBeUndefined();
+    it("invokes click handlers with chart and label context", () => {
+      const onSegmentClick = vi.fn();
+      const handler = buildPieClickHandler(onSegmentClick, "overall", [{ label: "Attended" }]);
+      handler({}, { dataIndex: 0 }, {});
+      expect(onSegmentClick).toHaveBeenCalledWith("overall", "Attended");
+      const fallbackHandler = buildPieClickHandler(onSegmentClick, "byType", [{ label: "Lecture" }]);
+      fallbackHandler({}, {}, { label: "Custom label" });
+      expect(onSegmentClick).toHaveBeenCalledWith("byType", "Custom label");
+      buildPieClickHandler(onSegmentClick, "byType", [])({}, {}, {});
+      expect(onSegmentClick).toHaveBeenCalledTimes(2);
+      expect(buildPieClickHandler(null, "overall", [])).toBeUndefined();
+    });
   });
 
   it("formats attendance dates and timetable helpers", () => {
@@ -168,52 +206,34 @@ describe("attendance utils", () => {
     expect(buildMarkedEventsFromRecords(records)[0].title).toBe("Untitled Event");
   });
 
-  it("builds the attendance page model and refetch handlers", async () => {
-    const statsState = {
-      stats: { overall: { attended: 3, missed: 1 }, by_type: { lecture: { attended: 2, missed: 1 } } },
-      loading: false,
-      error: null,
-      refetch: vi.fn(),
-    };
-    const recordsState = {
-      recordsByEventId: new Map([[1, true], [2, false]]),
-      refetch: vi.fn(),
-    };
-    const eventsState = {
-      events: [
-        { id: 1, title: "Lecture 1", start_time: "2026-03-03T10:00:00Z" },
-        { id: 2, title: "Lecture 2", start_time: "2026-03-04T10:00:00Z" },
-        { id: 3, title: "Lab", start_time: "2026-03-05T10:00:00Z", tag_name: "lab" },
-      ],
-      loading: true,
-    };
-    const selection = {
-      selectedSegment: { chart: "overall", label: "Attended" },
-      setSelectedSegment: vi.fn(),
-      listTab: "record",
-      setListTab: vi.fn(),
-    };
+  describe("attendance page model", () => {
+    it("builds summary data and segment selections", () => {
+      const { model } = renderAttendanceModel({ eventsState: { loading: true } });
+      expect(model.summary.pct).toBe(75);
+      expect(model.unmarkedEvents).toHaveLength(1);
+      expect(model.segmentEvents).toHaveLength(1);
+      expect(model.segmentLabel).toBe("Overall: Attended");
+      expect(model.eventsLoading).toBe(true);
+    });
 
-    const model = buildAttendancePageModel(selection, statsState, recordsState, eventsState);
+    it("records attendance and refetches stats", async () => {
+      const { model, stats, records } = renderAttendanceModel();
+      await model.handleToggleStatus(11, true);
+      expect(recordAttendanceMock).toHaveBeenCalledWith(11, true);
+      expect(stats.refetch).toHaveBeenCalled();
+      expect(records.refetch).toHaveBeenCalled();
+    });
 
-    expect(model.summary.pct).toBe(75);
-    expect(model.unmarkedEvents).toHaveLength(1);
-    expect(model.segmentEvents).toHaveLength(1);
-    expect(model.segmentLabel).toBe("Overall: Attended");
-    expect(model.eventsLoading).toBe(true);
-
-    await model.handleToggleStatus(11, true);
-    expect(recordAttendanceMock).toHaveBeenCalledWith(11, true);
-    expect(statsState.refetch).toHaveBeenCalled();
-    expect(recordsState.refetch).toHaveBeenCalled();
-
-    model.selectSegment("byType", "Lecture");
-    expect(selection.setSelectedSegment).toHaveBeenCalledWith({ chart: "byType", label: "Lecture" });
-    model.clearSegment();
-    expect(selection.setSelectedSegment).toHaveBeenCalledWith(null);
-    model.showRecordTab();
-    model.showMarkedTab();
-    expect(selection.setListTab).toHaveBeenCalledWith("record");
-    expect(selection.setListTab).toHaveBeenCalledWith("marked");
+    it("updates selection state and list tabs", () => {
+      const { model, selection } = renderAttendanceModel();
+      model.selectSegment("byType", "Lecture");
+      expect(selection.setSelectedSegment).toHaveBeenCalledWith({ chart: "byType", label: "Lecture" });
+      model.clearSegment();
+      expect(selection.setSelectedSegment).toHaveBeenCalledWith(null);
+      model.showRecordTab();
+      model.showMarkedTab();
+      expect(selection.setListTab).toHaveBeenCalledWith("record");
+      expect(selection.setListTab).toHaveBeenCalledWith("marked");
+    });
   });
 });

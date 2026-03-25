@@ -16,6 +16,18 @@ import {
   TflDelayCard,
   fadeIn,
 } from "./RightNowSubComponents";
+import {
+  buildAlertState,
+  buildRightNowDataProps,
+  buildRightNowViewProps,
+  buildTimerSessionViewModel,
+  buildTodayHeaderMeta,
+  buildTodayViewModel,
+  buildViewContext,
+  buildWidgetProps,
+  formatTimerLabel,
+  timerProgress,
+} from "./RightNowWidget.viewmodel";
 import styles from "./RightNowWidget.module.css";
 
 function useLiveClock() {
@@ -37,31 +49,12 @@ function useLiveClock() {
   return clock;
 }
 
-function formatTimerLabel(seconds) {
-  const safe = Math.max(0, seconds);
-  const minutes = String(Math.floor(safe / 60)).padStart(2, "0");
-  const secs = String(safe % 60).padStart(2, "0");
-  return `${minutes}:${secs}`;
-}
-
-function timerProgress(totalMinutes, timeLeft) {
-  const totalSeconds = totalMinutes * 60;
-  return Math.max(0, Math.min(100, ((totalSeconds - Math.max(0, timeLeft)) / totalSeconds) * 100));
-}
-
 function StatusHeader({ liveClock, label = "Right Now" }) {
   return (
     <Motion.div {...fadeIn(0)}>
       <SharedWidgetHeader icon={Clock} title={label} meta={liveClock} />
     </Motion.div>
   );
-}
-
-function buildTodayHeaderMeta(eventCount, taskCount) {
-  const parts = [];
-  if (eventCount > 0) parts.push(`${eventCount} event${eventCount === 1 ? "" : "s"}`);
-  if (taskCount > 0) parts.push(`${taskCount} task${taskCount === 1 ? "" : "s"} left`);
-  return parts.join(" · ");
 }
 
 function WidgetHeader({ eventCount, taskCount }) {
@@ -73,15 +66,13 @@ function WidgetHeader({ eventCount, taskCount }) {
   );
 }
 
-function TimerSessionCard({ liveClock, timerMode, timerTask, timeLeft, workTime, breakTime, onOpenTimer }) {
-  const isBreak = timerMode === "break";
-  const totalMinutes = isBreak ? breakTime || 5 : workTime || 25;
-  const pct = timerProgress(totalMinutes, timeLeft);
+function TimerSessionCard(props) {
+  const vm = buildTimerSessionViewModel(props);
   return (
     <>
-      <StatusHeader liveClock={liveClock} />
-      <TimerClock timeLeft={timeLeft} isBreak={isBreak} timerTask={timerTask} />
-      <TimerControls pct={pct} onOpenTimer={onOpenTimer} />
+      <StatusHeader liveClock={vm.liveClock} />
+      <TimerClock timeLeft={vm.timeLeft} isBreak={vm.isBreak} timerTask={vm.timerTask} />
+      <TimerControls pct={vm.progressPct} onOpenTimer={vm.onOpenTimer} />
     </>
   );
 }
@@ -130,16 +121,7 @@ function EventPreview({ event }) {
       {event.start_time && (
         <p className={styles.upNextDetails}>
           {formatTime(event.start_time)}
-          {event.location && (
-            <>
-              <span className={styles.nextMetaDivider}>·</span>
-              <LocationLink
-                location={event.location}
-                className={styles.nextLocationLink}
-                textClassName={styles.nextLocationText}
-              />
-            </>
-          )}
+          <EventLocationMeta location={event.location} />
         </p>
       )}
     </>
@@ -222,10 +204,11 @@ function EmptyBody({ tomorrowFirstEvent, tomorrowTime }) {
 }
 
 function TodayAlerts({ conflicts, leaveByInfo, showConflictAlert, showTflAlert, setShowConflictAlert, setShowTflAlert, showTfl }) {
+  const vm = buildAlertState({ showConflictAlert, showTflAlert, showTfl, leaveByInfo });
   return (
     <>
-      <ConflictAlert enabled={showConflictAlert} conflicts={conflicts} onDismiss={() => setShowConflictAlert(false)} />
-      <TflAlert enabled={showTflAlert && showTfl && !!leaveByInfo} leaveByInfo={leaveByInfo} onDismiss={() => setShowTflAlert(false)} />
+      <ConflictAlert enabled={vm.showConflicts} conflicts={conflicts} onDismiss={vm.onDismissConflict(setShowConflictAlert)} />
+      <TflAlert enabled={vm.showTflAlert} leaveByInfo={leaveByInfo} onDismiss={vm.onDismissTfl(setShowTflAlert)} />
     </>
   );
 }
@@ -283,18 +266,23 @@ function NextEventDetails({ nextEvent, countdown }) {
       <span className={styles.nextMeta}>
         at {formatTime(nextEvent.start_time)}
         {countdown.text ? ` · ${countdown.text}` : ""}
-        {nextEvent.location && (
-          <>
-            <span className={styles.nextMetaDivider}>·</span>
-            <LocationLink
-              location={nextEvent.location}
-              className={styles.nextLocationLink}
-              textClassName={styles.nextLocationText}
-            />
-          </>
-        )}
+        <EventLocationMeta location={nextEvent.location} />
       </span>
     </div>
+  );
+}
+
+function EventLocationMeta({ location }) {
+  if (!location) return null;
+  return (
+    <>
+      <span className={styles.nextMetaDivider}>·</span>
+      <LocationLink
+        location={location}
+        className={styles.nextLocationLink}
+        textClassName={styles.nextLocationText}
+      />
+    </>
   );
 }
 
@@ -303,72 +291,62 @@ function NextEventEmpty() {
 }
 
 function TodayView(props) {
+  const vm = buildTodayViewModel(props);
   return (
     <>
-      <WidgetHeader eventCount={props.eventCount} taskCount={props.tasksPending} />
-      <TodayClock liveClock={props.liveClock} label={props.currentBlock ? "In session" : props.nextEvent ? "Up next" : "Free now"} />
-      <TodayAlerts conflicts={props.conflicts} leaveByInfo={props.leaveByInfo} showConflictAlert={props.showConflictAlert} showTflAlert={props.showTflAlert} setShowConflictAlert={props.setShowConflictAlert} setShowTflAlert={props.setShowTflAlert} showTfl={props.showTfl} />
-      <TodayCurrentState currentBlock={props.currentBlock} currentProgressPct={props.currentProgressPct} timeRangeStr={props.timeRangeStr} timeLeftStr={props.timeLeftStr} />
-      <NextEventRow nextEvent={props.nextEvent} countdown={props.countdown} />
-      <TodayCommute commuteInfo={props.commuteInfo} loadingCommute={props.loadingCommute} leaveByInfo={props.leaveByInfo} nextCampus={props.nextCampus} />
+      <WidgetHeader eventCount={vm.eventCount} taskCount={vm.taskCount} />
+      <TodayClock liveClock={vm.liveClock} label={vm.label} />
+      <TodayAlerts {...vm.alertProps} />
+      <TodayCurrentState {...vm.currentStateProps} />
+      <NextEventRow nextEvent={vm.nextEvent} countdown={vm.countdown} />
+      <TodayCommute {...vm.commuteProps} />
     </>
   );
 }
 
 function RightNowView(props) {
-  const body = props.hasTimerSession
-    ? <TimerSessionCard {...props} />
-    : !props.isToday
-      ? <NonTodayCard liveClock={props.liveClock} firstEvent={props.sortedEvents?.[0]} />
-      : props.isEndOfDay
-        ? <EndOfDayCard liveClock={props.liveClock} completedCount={props.completedCount} tasksLength={props.tasksLength} eventsToday={props.eventsToday} tomorrowFirstEvent={props.tomorrowFirstEvent} tomorrowTime={props.tomorrowTime} />
-        : props.isEmptyDay
-          ? <EmptyDayCard liveClock={props.liveClock} tomorrowFirstEvent={props.tomorrowFirstEvent} tomorrowTime={props.tomorrowTime} />
-          : <TodayView {...props} />;
-
-  return <div className={styles.root}>{body}</div>;
+  const view = selectRightNowView(props);
+  return <div className={styles.root}>{view}</div>;
 }
 
-function buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly, tomorrowFirstEvent }) {
-  return {
-    liveClock,
-    sortedEvents,
-    completedCount: taskWidgetItemsOnly.filter((task) => task.completed).length,
-    tasksLength: taskWidgetItemsOnly.length,
-    eventsToday: (sortedEvents || []).filter((event) => event.start_time && new Date(event.start_time).getTime() < new Date(now).getTime()).length,
-    tomorrowFirstEvent,
-    tomorrowTime: tomorrowFirstEvent?.start_time ? formatTime(tomorrowFirstEvent.start_time) : null,
-  };
+function selectRightNowView(props) {
+  if (props.hasTimerSession) return <TimerSessionCard {...props} />;
+  if (!props.isToday) return renderNonToday(props);
+  if (props.isEndOfDay) return renderEndOfDay(props);
+  if (props.isEmptyDay) return renderEmptyDay(props);
+  return <TodayView {...props} />;
 }
 
-function buildRightNowDataProps(props) {
-  return {
-    now: props.now,
-    isToday: props.isToday,
-    navigatorContext: props.navigatorContext,
-    sortedEvents: props.sortedEvents,
-    tflDelays: props.tflDelays,
-    taskWidgetItemsOnly: props.taskWidgetItemsOnly,
-  };
+function renderNonToday({ liveClock, sortedEvents }) {
+  return <NonTodayCard liveClock={liveClock} firstEvent={sortedEvents?.[0]} />;
 }
 
-export function RightNowWidget({
-  now,
-  isToday,
-  navigatorContext,
-  sortedEvents,
-  tflDelays = [],
-  hasTimerSession,
-  timerMode,
-  timeLeft,
-  workTime,
-  breakTime,
-  timerTask,
-  onOpenTimer,
-  tomorrowFirstEvent,
-  taskWidgetItemsOnly = [],
-}) {
+function renderEndOfDay(props) {
+  return (
+    <EndOfDayCard
+      liveClock={props.liveClock}
+      completedCount={props.completedCount}
+      tasksLength={props.tasksLength}
+      eventsToday={props.eventsToday}
+      tomorrowFirstEvent={props.tomorrowFirstEvent}
+      tomorrowTime={props.tomorrowTime}
+    />
+  );
+}
+
+function renderEmptyDay(props) {
+  return (
+    <EmptyDayCard
+      liveClock={props.liveClock}
+      tomorrowFirstEvent={props.tomorrowFirstEvent}
+      tomorrowTime={props.tomorrowTime}
+    />
+  );
+}
+
+export function RightNowWidget(props) {
   const liveClock = useLiveClock();
-  const model = useRightNowData(buildRightNowDataProps({ now, isToday, navigatorContext, sortedEvents, tflDelays, taskWidgetItemsOnly }));
-  return <RightNowView {...buildRightNowViewProps({ liveClock, now, sortedEvents, taskWidgetItemsOnly, tomorrowFirstEvent })} {...model} isToday={isToday} hasTimerSession={hasTimerSession} timerMode={timerMode} timerTask={timerTask} timeLeft={timeLeft} workTime={workTime} breakTime={breakTime} onOpenTimer={onOpenTimer} />;
+  const model = useRightNowData(buildRightNowDataProps(props));
+  const viewProps = buildRightNowViewProps(buildViewContext(props, liveClock));
+  return <RightNowView {...buildWidgetProps({ viewProps, model, props })} />;
 }

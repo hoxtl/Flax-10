@@ -1,4 +1,6 @@
-"""Tests for new_user_projects seed helper."""
+"""
+Tests starter project seeding for new users.
+"""
 
 from datetime import timedelta
 from types import SimpleNamespace
@@ -102,8 +104,10 @@ class SeedNewUserProjectsTest(TestCase):
         def fake_specs(module, now):
             return [spec1] if module == module1 else [spec2]
 
-        with patch('studyFlax.views.modules.new_user_projects.MAX_GROUP_PROJECTS_PER_USER', 1):
-            with patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[]):
-                with patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', side_effect=fake_specs):
-                    result = seed_new_user_projects(self.user, now=self.now)
+        with (
+            patch('studyFlax.views.modules.new_user_projects.MAX_GROUP_PROJECTS_PER_USER', 1),
+            patch('studyFlax.views.modules.new_user_projects._get_demo_users', return_value=[]),
+            patch('studyFlax.views.modules.new_user_projects._build_module_project_specs', side_effect=fake_specs),
+        ):
+            result = seed_new_user_projects(self.user, now=self.now)
         self.assertEqual(result, 1)

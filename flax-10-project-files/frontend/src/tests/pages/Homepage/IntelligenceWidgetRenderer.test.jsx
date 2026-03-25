@@ -2,8 +2,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import React from "react";
 
+const getEventTypeMock = vi.fn((event) => event.kind || "other");
+
 vi.mock("../../../pages/Homepage/components/IntelligenceWidgets", () => ({
-  IntelligenceHero: (props) => <div data-testid="hero">{JSON.stringify(props)}</div>,
+  IntelligenceHero: (props) => (
+    <div data-testid="hero">
+      <button type="button" onClick={props.onDismissCourseChange}>dismiss-course-change</button>
+      {JSON.stringify(props)}
+    </div>
+  ),
 }));
 
 vi.mock("../../../pages/Homepage/components/RightNowWidget", () => ({
@@ -55,6 +62,10 @@ vi.mock("../../../pages/Homepage/components/TinyTimelineWidget", () => ({
   TinyTimelineWidget: (props) => <div data-testid="tiny-timeline">{JSON.stringify(props)}</div>,
 }));
 
+vi.mock("../../../components/Calendar/utils/eventUtils", () => ({
+  getEventType: (...args) => getEventTypeMock(...args),
+}));
+
 import { renderIntelligenceWidget } from "../../../pages/Homepage/components/IntelligenceWidgetRenderer";
 
 function Slot6Marker(props) {
@@ -65,14 +76,18 @@ const baseProps = {
   displayName: "Ava",
   slot1TodayTasks: <div data-testid="slot1-base">slot1</div>,
   slot3Urgent: <div data-testid="slot3-base">slot3</div>,
-  slot5Data: { now: "2024-03-08T10:00:00Z" },
+  slot5Data: { now: "2024-03-08T10:00:00Z", sortedEvents: [] },
   slot6Timeline: <Slot6Marker />,
   timelineProps: { sortedEvents: [{ id: 1 }] },
+  upcomingDeadlines: [],
+  calendarEvents: [],
+  profile: { role: "student", summary: { societies: [] } },
   dashboard: {
     edit: true,
+    attendance: { pct: 87 },
     live: {
       liveContext: "Focused",
-      eventsCount: 2,
+      classesCount: 2,
       tasksCount: 3,
       nextStep: "Read",
       nextStepMeta: "Soon",
@@ -108,7 +123,35 @@ describe("IntelligenceWidgetRenderer", () => {
   it("renders the hero widget with live dashboard props", () => {
     renderWidget("hero");
     expect(screen.getByTestId("hero").textContent).toContain('"displayName":"Ava"');
-    expect(screen.getByTestId("hero").textContent).toContain('"eventsCount":2');
+    expect(screen.getByTestId("hero").textContent).toContain('"attendancePct":87');
+    expect(screen.getByTestId("hero").textContent).toContain('"tasksCount":3');
+  });
+
+  it("counts upcoming deadlines and society events for the hero widget", () => {
+    const props = {
+      ...baseProps,
+      profile: {
+        role: "teacher",
+        summary: { societies: [{ society_id: 5, name: "Chess Club" }] },
+      },
+      upcomingDeadlines: [
+        { id: 1, start_due_date: "2026-03-09T10:00:00Z" },
+        { id: 2 },
+        { id: 3, start_due_date: "2026-03-11T10:00:00Z" },
+      ],
+      calendarEvents: [
+        { id: 10, kind: "society", society_id: 5, society_name: "Chess Club", start_time: "2024-03-10T10:00:00Z" },
+        { id: 11, kind: "society", society_id: 8, society_name: "Other Club", start_time: "2024-03-10T10:00:00Z" },
+        { id: 12, kind: "lecture", start_time: "2024-03-10T10:00:00Z" },
+      ],
+    };
+
+    renderWidget("hero", props);
+    expect(screen.getByTestId("hero").textContent).toContain('"deadlinesCount":2');
+    expect(screen.getByTestId("hero").textContent).toContain('"upcomingSocietyEventsCount":1');
+    expect(screen.getByTestId("hero").textContent).toContain('"isTeacher":true');
+    screen.getByText("dismiss-course-change").click();
+    expect(props.dashboard.setShowCourseChange).toHaveBeenCalledWith(false);
   });
 
   it("renders the right-now widget with slot data and tfl delays", () => {
@@ -183,5 +226,23 @@ describe("IntelligenceWidgetRenderer", () => {
 
     rerender(<>{renderIntelligenceWidget("does-not-exist", baseProps, { row: 2 })}</>);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders analytics empty states when summary or heatmap data is absent", () => {
+    const { rerender } = render(
+      <>{renderIntelligenceWidget("analyticsProductivity", {
+        ...baseProps,
+        dashboard: { ...baseProps.dashboard, analytics: { ...baseProps.dashboard.analytics, data: null } },
+      }, { row: 2 })}</>,
+    );
+    expect(screen.getByText("No productivity data yet.")).toBeTruthy();
+
+    rerender(
+      <>{renderIntelligenceWidget("analyticsHeatmap", {
+        ...baseProps,
+        dashboard: { ...baseProps.dashboard, analytics: { ...baseProps.dashboard.analytics, data: { heatmap: { data: [] } } } },
+      }, { row: 2 })}</>,
+    );
+    expect(screen.getByText("No focus heatmap data yet.")).toBeTruthy();
   });
 });

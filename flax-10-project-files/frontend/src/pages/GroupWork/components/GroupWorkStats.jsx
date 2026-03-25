@@ -2,7 +2,7 @@
  * GroupWork overview stats cards.
  */
 
-import StatStrip from "../../../components/Common/StatStrip/StatStrip";
+import StatStrip from "../../../components/common/StatStrip/StatStrip";
 import { useCountUp } from "../../../hooks/useCountUp";
 import styles from "./GroupWorkStats.module.css";
 import { getNextDeadline, getProgressStats } from "../utils/projectStatsUtils";

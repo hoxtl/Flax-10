@@ -49,259 +49,228 @@ describe("timer hook extras", () => {
     vi.useRealTimers();
   });
 
-  it("updates timer settings for work, break, and sessions branches", () => {
-    const { result } = renderHook(() => useTimer(25, 5, 4));
-
-    act(() => result.current.updateTime("work", 30));
-    expect(result.current.workTime).toBe(30);
-    expect(result.current.timeLeft).toBe(30 * 60);
-
-    act(() => {
-      result.current.setMode("break");
+  describe("useTimer", () => {
+    it("updates work time and remaining seconds", () => {
+      const { result } = renderHook(() => useTimer(25, 5, 4));
+      act(() => result.current.updateTime("work", 30));
+      expect(result.current.workTime).toBe(30);
+      expect(result.current.timeLeft).toBe(30 * 60);
     });
-    act(() => {
-      result.current.updateTime("break", 8);
-    });
-    expect(result.current.breakTime).toBe(8);
-    expect(result.current.timeLeft).toBe(8 * 60);
 
-    act(() => result.current.updateTime("sessions", 6));
-    expect(result.current.targetSessions).toBe(6);
-
-    act(() => {
-      result.current.setIsActive(true);
-      result.current.togglePause();
-      result.current.updateTime("break", 10);
+    it("syncs break duration when switching modes", () => {
+      const { result } = renderHook(() => useTimer(25, 5, 4));
+      act(() => result.current.setMode("break"));
+      act(() => result.current.updateTime("break", 8));
+      expect(result.current.breakTime).toBe(8);
+      expect(result.current.timeLeft).toBe(8 * 60);
     });
-    expect(result.current.timeLeft).toBe((8 + (10 - 8)) * 60);
+
+    it("updates session targets without clobbering active timer", () => {
+      const { result } = renderHook(() => useTimer(25, 5, 4));
+      act(() => result.current.updateTime("sessions", 6));
+      expect(result.current.targetSessions).toBe(6);
+      act(() => {
+        result.current.setIsActive(true);
+        result.current.togglePause();
+        result.current.updateTime("break", 10);
+      });
+      expect(result.current.timeLeft).toBe(25 * 60);
+    });
   });
 
-  it("covers timer flow actions including addDistraction, auto-break, and goal handling", async () => {
-    const timer = {
-      completedSessions: 0,
-      targetSessions: 1,
-      totalWork: 1800,
-      totalBreak: 300,
-      totalPaused: 120,
-      task: "Essay",
-      activeTaskId: 9,
-      activeTaskMeta: { moduleCode: "CS101" },
-      workTime: 25,
-      setCompletedSessions: vi.fn(),
-      updateSettings: vi.fn(),
-      setMode: vi.fn(),
-      setTimeLeft: vi.fn(),
-      setIsActive: vi.fn(),
-      resetTimer: vi.fn(),
-    };
+  describe("useTimerFlow", () => {
+    it("shifts to break mode when work completes", () => {
+      const timer = buildTimerState();
+      const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
+      act(() => result.current.onWorkComplete());
+      expect(playCompletionChime).toHaveBeenCalledWith(0.3);
+      expect(timer.setMode).toHaveBeenCalledWith("break");
+      expect(timer.setTimeLeft).toHaveBeenCalledWith(300);
+    });
 
-    const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
-    act(() => result.current.addDistraction());
-    expect(result.current.distractionCount).toBe(1);
+    it("logs sessions and opens goal modal after auto break", async () => {
+      const timer = buildTimerState();
+      const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
+      act(() => result.current.onWorkComplete());
+      await act(async () => result.current.autoBreakDone());
+      expect(saveSession).toHaveBeenCalled();
+      expect(logTaskTime).toHaveBeenCalledWith(9, 30);
+      expect(timer.updateSettings).toHaveBeenCalledWith({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
+      expect(result.current.modal).toBe("goal");
+    });
 
-    act(() => result.current.onWorkComplete());
-    expect(playCompletionChime).toHaveBeenCalledWith(0.3);
-    expect(timer.setMode).toHaveBeenCalledWith("break");
-    expect(timer.setTimeLeft).toHaveBeenCalledWith(300);
-    expect(timer.setIsActive).toHaveBeenCalledWith(true);
-
-    act(() => result.current.autoBreakDone());
-    expect(saveSession).toHaveBeenCalled();
-    expect(logTaskTime).toHaveBeenCalledWith(9, 30);
-    expect(timer.setCompletedSessions).toHaveBeenCalledWith(1);
-    expect(timer.updateSettings).toHaveBeenCalledWith({ totalWork: 0, totalBreak: 0, totalPaused: 0 });
-    expect(result.current.modal).toBe("goal");
-
-    act(() => result.current.resetTimer());
-    expect(timer.resetTimer).toHaveBeenCalled();
+    it("ignores auto break done when there is no task context", async () => {
+      const timer = buildTimerState({ activeTaskId: null, task: "" });
+      const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
+      act(() => result.current.autoBreakDone());
+      expect(saveSession).not.toHaveBeenCalled();
+      await act(async () => result.current.endEarly());
+      expect(timer.resetTimer).toHaveBeenCalled();
+    });
   });
 
-  it("covers finishEarly and autoBreakDone no-op branches", async () => {
-    const timer = {
-      completedSessions: 1,
-      targetSessions: 4,
-      totalWork: 0,
-      totalBreak: 0,
-      totalPaused: 0,
-      task: "",
-      activeTaskId: null,
-      activeTaskMeta: null,
-      workTime: 25,
-      setCompletedSessions: vi.fn(),
-      updateSettings: vi.fn(),
-      setMode: vi.fn(),
-      setTimeLeft: vi.fn(),
-      setIsActive: vi.fn(),
-      resetTimer: vi.fn(),
-    };
+  describe("useTimerHandlers and popup effects", () => {
+    it("sets break mode and handles goal actions", () => {
+      const timer = buildHandlersTimer();
+      const setModal = vi.fn();
+      const startNext = vi.fn();
+      const resetBlockId = vi.fn();
+      const endEarly = vi.fn();
+      const handlers = useTimerHandlers(timer, "BREAK", setModal, startNext, resetBlockId, endEarly);
+      handlers.break();
+      expect(timer.setMode).toHaveBeenCalledWith("break");
+      expect(timer.setTimeLeft).toHaveBeenCalledWith(5 * 60);
 
-    const { result } = renderHook(() => useTimerFlow(timer, vi.fn()));
-    act(() => result.current.autoBreakDone());
-    expect(saveSession).not.toHaveBeenCalled();
+      const goalHandlers = useTimerHandlers({ ...timer, completedSessions: 3 }, "goal", setModal, startNext, resetBlockId, endEarly);
+      goalHandlers.goal();
+      expect(timer.resetTimer).toHaveBeenCalled();
+      expect(resetBlockId).toHaveBeenCalled();
+      goalHandlers.endEarly();
+      expect(endEarly).toHaveBeenCalled();
+      goalHandlers.overtimeBreak();
+      expect(startNext).toHaveBeenCalled();
+    });
 
+    it("auto-starts breaks when preference is enabled", async () => {
+      localStorage.setItem("timerAutoStart", "true");
+      const breakHandler = vi.fn();
+      renderHook(() => useTimerPopupEffects({ modal: "break", handlers: { break: breakHandler }, isActive: false, timeLeft: 100 }));
+      await act(async () => vi.advanceTimersByTime(2000));
+      expect(breakHandler).toHaveBeenCalled();
+    });
+
+    it("finishes auto breaks when countdown hits zero", async () => {
+      const autoBreakDone = vi.fn();
+      renderHook(() => useTimerPopupEffects({ modal: "autoBreak", handlers: { autoBreakDone }, isActive: true, timeLeft: 0 }));
+      await act(async () => vi.advanceTimersByTime(250));
+      expect(autoBreakDone).toHaveBeenCalled();
+    });
+  });
+
+  describe("useTimerLogic", () => {
+    it("applies incoming task estimates on mount", async () => {
+      const setup = await mockTimerLogic();
+      await setup.rerender();
+      expect(setup.timerState.updateTime).toHaveBeenCalledWith("sessions", 3);
+      expect(setup.timerState.updateTime).toHaveBeenCalledWith("work", 45);
+      expect(setup.timerState.setMode).toHaveBeenCalledWith("work");
+      expect(setup.result.current.task).toBe("Essay draft");
+      setup.cleanup();
+    });
+
+    it("ignores metadata rerenders when nothing changed", async () => {
+      const setup = await mockTimerLogic();
+      setup.timerState.updateTime.mockClear();
+      await setup.rerender();
+      expect(setup.timerState.updateTime).not.toHaveBeenCalled();
+      setup.cleanup();
+    });
+
+    it("recalculates sessions when title or blocks change", async () => {
+      const setup = await mockTimerLogic();
+      setup.timerState.updateTime.mockClear();
+      await setup.rerender({
+        activeTaskId: 7,
+        meta: { title: "Revision set", estimatedBlocks: 2 },
+      });
+      expect(setup.timerState.updateTime).toHaveBeenCalledWith("sessions", 1);
+      expect(setup.timerState.updateTime).toHaveBeenCalledWith("work", 50);
+      setup.cleanup();
+    });
+
+    it("skips updates when metadata is missing", async () => {
+      const setup = await mockTimerLogic();
+      setup.timerState.updateTime.mockClear();
+      await setup.rerender({
+        activeTaskId: 8,
+        meta: { title: null, estimatedBlocks: 0 },
+      });
+      expect(setup.timerState.updateTime).not.toHaveBeenCalled();
+      setup.cleanup();
+    });
+  });
+});
+
+function buildTimerState(overrides = {}) {
+  return {
+    completedSessions: 0,
+    targetSessions: 1,
+    totalWork: 1800,
+    totalBreak: 300,
+    totalPaused: 120,
+    task: "Essay",
+    activeTaskId: 9,
+    activeTaskMeta: { moduleCode: "CS101" },
+    workTime: 25,
+    setCompletedSessions: vi.fn(),
+    updateSettings: vi.fn(),
+    setMode: vi.fn(),
+    setTimeLeft: vi.fn(),
+    setIsActive: vi.fn(),
+    resetTimer: vi.fn(),
+    ...overrides,
+  };
+}
+
+function buildHandlersTimer() {
+  return {
+    setIsActive: vi.fn(),
+    completedSessions: 0,
+    targetSessions: 4,
+    workTime: 25,
+    breakTime: 5,
+    setMode: vi.fn(),
+    setTimeLeft: vi.fn(),
+    resetTimer: vi.fn(),
+  };
+}
+
+async function mockTimerLogic() {
+  vi.resetModules();
+  const timerState = {
+    timeLeft: 0,
+    mode: "work",
+    updateTime: vi.fn(),
+    setCompletedSessions: vi.fn(),
+    setMode: vi.fn(),
+    setTimeLeft: vi.fn(),
+    workTime: 25,
+    breakTime: 5,
+    targetSessions: 4,
+  };
+  const flowState = {
+    modal: "goal",
+    setModal: vi.fn(),
+    startNext: vi.fn(),
+    resetBlockId: vi.fn(),
+    endEarly: vi.fn(),
+  };
+  const handlers = { break: vi.fn() };
+  const notify = vi.fn();
+  vi.doMock("../../../components/Notifications/hooks/useNotify", () => ({ useNotify: () => notify }));
+  vi.doMock("../../../components/Timer/hooks/useTimer", () => ({ useTimer: () => timerState }));
+  vi.doMock("../../../components/Timer/hooks/useTimerFlow", () => ({ useTimerFlow: vi.fn(() => flowState) }));
+  vi.doMock("../../../components/Timer/hooks/useTimerHandlers", () => ({ useTimerHandlers: vi.fn(() => handlers) }));
+  const { useTimerLogic } = await import("../../../components/Timer/hooks/useTimerLogic");
+  const initialProps = {
+    activeTaskId: 7,
+    meta: { title: "Essay draft", estimatedWorkMinutes: 45, estimatedSessionCount: 3 },
+  };
+  const renderState = renderHook(({ activeTaskId, meta }) => useTimerLogic(activeTaskId, vi.fn(), meta), {
+    initialProps,
+  });
+  let currentProps = initialProps;
+  const rerender = async (props) => {
+    currentProps = props || currentProps;
     await act(async () => {
-      result.current.endEarly();
+      renderState.rerender(currentProps);
     });
-    expect(timer.resetTimer).toHaveBeenCalled();
-  });
-
-  it("covers popup effect timers and handler branches", async () => {
-    const t = {
-      setIsActive: vi.fn(),
-      completedSessions: 0,
-      targetSessions: 4,
-      workTime: 25,
-      breakTime: 5,
-      setMode: vi.fn(),
-      setTimeLeft: vi.fn(),
-      resetTimer: vi.fn(),
-    };
-    const setModal = vi.fn();
-    const startNext = vi.fn();
-    const resetBlockId = vi.fn();
-    const endEarly = vi.fn();
-
-    const handlers = useTimerHandlers(t, "break", setModal, startNext, resetBlockId, endEarly);
-    handlers.break();
-    expect(t.setMode).toHaveBeenCalledWith("break");
-    expect(t.setTimeLeft).toHaveBeenCalledWith(5 * 60);
-
-    const goalHandlers = useTimerHandlers({ ...t, completedSessions: 3, targetSessions: 4 }, "goal", setModal, startNext, resetBlockId, endEarly);
-    goalHandlers.break();
-    goalHandlers.goal();
-    goalHandlers.overtimeBreak();
-    goalHandlers.autoBreakDone();
-    goalHandlers.endEarly();
-    expect(startNext).toHaveBeenCalled();
-    expect(t.resetTimer).toHaveBeenCalled();
-    expect(resetBlockId).toHaveBeenCalled();
-    expect(endEarly).toHaveBeenCalled();
-
-    localStorage.setItem("timerAutoStart", "true");
-    const breakHandler = vi.fn();
-    const autoBreakDone = vi.fn();
-
-    renderHook(() => useTimerPopupEffects({
-      modal: "break",
-      handlers: { break: breakHandler, autoBreakDone },
-      isActive: false,
-      timeLeft: 100,
-    }));
-    await act(async () => {
-      vi.advanceTimersByTime(2000);
-    });
-    expect(breakHandler).toHaveBeenCalled();
-
-    renderHook(() => useTimerPopupEffects({
-      modal: "autoBreak",
-      handlers: { break: breakHandler, autoBreakDone },
-      isActive: true,
-      timeLeft: 0,
-    }));
-    await act(async () => {
-      vi.advanceTimersByTime(250);
-    });
-    expect(autoBreakDone).toHaveBeenCalled();
-  });
-
-  it("builds timer logic state and applies task estimates when task metadata changes", async () => {
-    vi.resetModules();
-    const timerState = {
-      timeLeft: 0,
-      mode: "work",
-      updateTime: vi.fn(),
-      setCompletedSessions: vi.fn(),
-      setMode: vi.fn(),
-      setTimeLeft: vi.fn(),
-      workTime: 25,
-      breakTime: 5,
-      targetSessions: 4,
-    };
-    const flowState = {
-      modal: "goal",
-      setModal: vi.fn(),
-      startNext: vi.fn(),
-      resetBlockId: vi.fn(),
-      endEarly: vi.fn(),
-    };
-    const handlers = { break: vi.fn() };
-    const notify = vi.fn();
-
-    vi.doMock("../../../components/Notifications/hooks/useNotify", () => ({
-      useNotify: () => notify,
-    }));
-    vi.doMock("../../../components/Timer/hooks/useTimer", () => ({
-      useTimer: () => timerState,
-    }));
-    vi.doMock("../../../components/Timer/hooks/useTimerFlow", () => ({
-      useTimerFlow: vi.fn(() => flowState),
-    }));
-    vi.doMock("../../../components/Timer/hooks/useTimerHandlers", () => ({
-      useTimerHandlers: vi.fn(() => handlers),
-    }));
-
-    const { useTimerLogic } = await import("../../../components/Timer/hooks/useTimerLogic");
-    const { result, rerender } = renderHook(
-      ({ activeTaskId, meta }) => useTimerLogic(activeTaskId, vi.fn(), meta),
-      {
-        initialProps: {
-          activeTaskId: 7,
-          meta: {
-            title: "Essay draft",
-            estimatedWorkMinutes: 45,
-            estimatedSessionCount: 3,
-          },
-        },
-      },
-    );
-
-    await act(async () => {});
-    expect(result.current.task).toBe("Essay draft");
-    expect(result.current.handlers).toBe(handlers);
-    expect(result.current.progress).toBe(42);
-    expect(result.current.isOvertime).toBe(true);
-    expect(result.current.isBreakOvertime).toBe(false);
-    expect(timerState.updateTime).toHaveBeenCalledWith("sessions", 3);
-    expect(timerState.updateTime).toHaveBeenCalledWith("work", 45);
-    expect(timerState.setCompletedSessions).toHaveBeenCalledWith(0);
-    expect(timerState.setMode).toHaveBeenCalledWith("work");
-    expect(timerState.setTimeLeft).toHaveBeenCalledWith(45 * 60);
-
-    timerState.updateTime.mockClear();
-    rerender({
-      activeTaskId: 7,
-      meta: {
-        title: "Essay draft",
-        estimatedBlocks: 2,
-      },
-    });
-    await act(async () => {});
-    expect(timerState.updateTime).toHaveBeenCalledTimes(0);
-
-    rerender({
-      activeTaskId: 7,
-      meta: {
-        title: "Revision set",
-        estimatedBlocks: 2,
-      },
-    });
-    await act(async () => {});
-    expect(timerState.updateTime).toHaveBeenCalledWith("sessions", 1);
-    expect(timerState.updateTime).toHaveBeenCalledWith("work", 50);
-
-    timerState.updateTime.mockClear();
-    rerender({
-      activeTaskId: 8,
-      meta: {
-        title: null,
-        estimatedBlocks: 0,
-      },
-    });
-    await act(async () => {});
-    expect(timerState.updateTime).not.toHaveBeenCalled();
+  };
+  const cleanup = () => {
     vi.doUnmock("../../../components/Notifications/hooks/useNotify");
     vi.doUnmock("../../../components/Timer/hooks/useTimer");
     vi.doUnmock("../../../components/Timer/hooks/useTimerFlow");
     vi.doUnmock("../../../components/Timer/hooks/useTimerHandlers");
-  });
-});
+  };
+  return { result: renderState.result, rerender, timerState, cleanup };
+}

@@ -199,15 +199,22 @@ describe('useTaskPickerData – state setters', () => {
 });
 
 describe('useTaskPickerData – outside close', () => {
-  it('closes the picker when a mousedown occurs outside the ref element', () => {
+  it('closes the picker when a mousedown occurs outside the mounted ref element', () => {
     const { result } = renderHook(() => useTaskPickerData());
-    act(() => result.current.setOpen(true));
+    const wrap = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.appendChild(wrap);
+    document.body.appendChild(outside);
+    result.current.ref.current = wrap;
 
-    // ref.current is null (no DOM), so any mousedown should trigger close
+    act(() => result.current.setOpen(true));
     act(() => {
-      document.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     });
     expect(result.current.open).toBe(false);
+
+    wrap.remove();
+    outside.remove();
   });
 
   it('does not add a mousedown listener when open is false', () => {

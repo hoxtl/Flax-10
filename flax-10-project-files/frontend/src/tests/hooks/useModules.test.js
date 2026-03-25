@@ -18,6 +18,10 @@ vi.mock('../../api/moduleApi', () => ({
     deleteModule: vi.fn(),
 }));
 
+vi.mock('../../api/taskApi', () => ({
+    fetchTasks: vi.fn(),
+}));
+
 vi.mock('../../components/Modules/utils/moduleUtils', () => ({
     isEnrolledIn: vi.fn(),
     getEnrollmentId: vi.fn(),
@@ -33,6 +37,7 @@ vi.mock('../../context/ConfirmContext', () => ({
 
 import { useNotifications } from '../../context/NotificationContext';
 import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi';
+import { fetchTasks } from '../../api/taskApi';
 import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils';
 import { createNotify } from '../../components/Modules/utils/notifyHelper';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -61,6 +66,12 @@ describe('useModules', () => {
         enrollInModule.mockResolvedValue({ id: 11, module: 2 });
         disenrolFromModule.mockResolvedValue({});
         deleteModule.mockResolvedValue({});
+        fetchTasks.mockResolvedValue([
+            { id: 1, module_code: 'math101', completed: false },
+            { id: 2, module_code: 'MATH101', completed: true },
+            { id: 3, module_code: 'PHYS101', completed: false },
+            { id: 4, module_code: '', completed: false },
+        ]);
     });
 
     it('starts with loading=true', () => {
@@ -73,6 +84,7 @@ describe('useModules', () => {
         await waitFor(() => expect(result.current.loading).toBe(false));
         expect(result.current.modules).toEqual(mockModules);
         expect(result.current.enrollments).toEqual(mockEnrollments);
+        expect(result.current.taskCountsByModule).toEqual({ MATH101: 1, PHYS101: 1 });
     });
 
     it('notifies on load error', async () => {
@@ -196,5 +208,56 @@ describe('useModules', () => {
             await result.current.handleDeleteModule(mockModules[0]);
         });
         expect(deleteModule).not.toHaveBeenCalled();
+    });
+
+    it('keeps loading successful modules even when task loading fails', async () => {
+        fetchTasks.mockRejectedValueOnce(new Error('tasks failed'));
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        expect(result.current.modules).toEqual(mockModules);
+        expect(result.current.enrollments).toEqual(mockEnrollments);
+        expect(result.current.taskCountsByModule).toEqual({});
+    });
+
+    it('marks matching enrollments as core when disenrolment is blocked by a core-module error', async () => {
+        disenrolFromModule.mockRejectedValueOnce(new Error('This is a core module'));
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        await act(async () => {
+            await result.current.handleDisenrol(mockModules[0]);
+        });
+
+        expect(result.current.enrollments).toEqual([{ id: 10, module: 1, is_core: true }]);
+        expect(mockNotify).not.toHaveBeenCalledWith('This is a core module', 'error');
+    });
+
+    it('directly deletes modules and runs the success callback', async () => {
+        const onSuccess = vi.fn();
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        await act(async () => {
+            await result.current.handleDirectDeleteModule(mockModules[0], onSuccess);
+        });
+
+        expect(deleteModule).toHaveBeenCalledWith(1);
+        expect(result.current.modules).toEqual([{ id: 2, module_name: 'Physics', module_code: 'PHYS101' }]);
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+        expect(mockNotify).toHaveBeenCalledWith('Module deleted successfully', 'success');
+    });
+
+    it('reports direct delete failures', async () => {
+        deleteModule.mockRejectedValueOnce(new Error('delete failed'));
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        await act(async () => {
+            await result.current.handleDirectDeleteModule(mockModules[0]);
+        });
+
+        expect(mockNotify).toHaveBeenCalledWith('delete failed', 'error');
     });
 });

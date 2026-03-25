@@ -15,7 +15,7 @@ function buildRequestConfig(options) {
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Token ${token}`;
-  return { headers, ...options };
+  return { ...options, headers };
 }
 
 async function handleResponse(response) {

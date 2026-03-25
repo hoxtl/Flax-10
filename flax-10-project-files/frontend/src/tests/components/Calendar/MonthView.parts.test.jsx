@@ -1,6 +1,6 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const useMonthDayDrop = vi.fn();
 const openModal = vi.fn();
@@ -125,5 +125,37 @@ describe("MonthView parts", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_SELECTED_DATE", payload: expect.any(Date) });
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_VIEW_MODE", payload: "day" });
     await waitFor(() => expect(dispatch).not.toBeNull());
+  });
+
+  it("delays month navigation until the swipe animation timeout completes", () => {
+    vi.useFakeTimers();
+    render(<SwipeMonthView />);
+
+    const swipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
+
+    act(() => {
+      swipeHandlers.onNext();
+    });
+    expect(dispatch).not.toHaveBeenCalledWith({
+      type: "SET_SELECTED_DATE",
+      payload: expect.objectContaining({}),
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    const nextMonthDate = dispatch.mock.calls.find((call) => call[0].type === "SET_SELECTED_DATE")?.[0]?.payload;
+    expect(nextMonthDate.getMonth()).toBe(3);
+
+    dispatch.mockClear();
+
+    act(() => {
+      swipeHandlers.onPrev();
+      vi.advanceTimersByTime(150);
+    });
+    const prevMonthDate = dispatch.mock.calls.find((call) => call[0].type === "SET_SELECTED_DATE")?.[0]?.payload;
+    expect(prevMonthDate.getMonth()).toBe(1);
+
+    vi.useRealTimers();
   });
 });

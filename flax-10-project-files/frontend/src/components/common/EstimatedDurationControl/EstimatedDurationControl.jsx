@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TextInput from "../TextInput/TextInput";
 import {
   MAX_ESTIMATE_MINUTES,
@@ -12,91 +12,125 @@ const DEFAULT_PRESETS = [
   { value: 50, label: "50m", ariaLabel: "50 minutes" },
 ];
 
-export default function EstimatedDurationControl({
-  valueMinutes,
-  onChangeMinutes,
-  presets = DEFAULT_PRESETS,
-  ariaLabel = "Estimated duration",
-  customInputAriaLabel = "Custom estimated minutes",
-  classes = {},
-}) {
-  const [customMinutes, setCustomMinutes] = useState(String(valueMinutes ?? POMODORO_BLOCK_MINUTES));
-  const [isEditing, setIsEditing] = useState(false);
+export default function EstimatedDurationControl(props) {
+  const ui = useEstimatedDurationUI(props);
+  return (
+    <div className={ui.classes.root} role="group" aria-label={ui.ariaLabel}>
+      {ui.renderPresetButtons()}
+      <TextInput {...ui.inputProps} />
+    </div>
+  );
+}
 
+function useEstimatedDurationUI(props) {
+  const config = useMemo(() => normalizeProps(props), [props]);
+  const state = useCustomMinutesState(config.valueMinutes, config.onChangeMinutes);
+  return {
+    ariaLabel: config.ariaLabel,
+    classes: config.classes,
+    renderPresetButtons: () => renderPresetButtons(config, state),
+    inputProps: buildCustomInputProps(config, state),
+  };
+}
+
+function normalizeProps(props) {
+  return {
+    valueMinutes: props.valueMinutes,
+    onChangeMinutes: props.onChangeMinutes,
+    presets: props.presets ?? DEFAULT_PRESETS,
+    ariaLabel: props.ariaLabel ?? "Estimated duration",
+    customInputAriaLabel: props.customInputAriaLabel ?? "Custom estimated minutes",
+    classes: props.classes ?? {},
+  };
+}
+
+function useCustomMinutesState(valueMinutes, onChangeMinutes) {
+  const baseValue = valueMinutes ?? POMODORO_BLOCK_MINUTES;
+  const [customMinutes, setCustomMinutes] = useState(String(baseValue));
+  const [isEditing, setIsEditing] = useState(false);
+  useSyncedCustomMinutes(isEditing, valueMinutes, setCustomMinutes);
+  const commit = () => commitCustomMinutes(customMinutes, valueMinutes, onChangeMinutes, setCustomMinutes, setIsEditing);
+  return buildCustomState({ customMinutes, setCustomMinutes, setIsEditing, onChangeMinutes, commit, baseValue, isEditing });
+}
+
+function useSyncedCustomMinutes(isEditing, valueMinutes, setCustomMinutes) {
   useEffect(() => {
     if (isEditing) return;
-    setCustomMinutes(String(valueMinutes ?? POMODORO_BLOCK_MINUTES));
-  }, [valueMinutes, isEditing]);
+    const fallback = valueMinutes ?? POMODORO_BLOCK_MINUTES;
+    setCustomMinutes(String(fallback));
+  }, [valueMinutes, isEditing, setCustomMinutes]);
+}
 
-  const commitCustomValue = () => {
-    const normalized = normalizeEstimateMinutesInput(customMinutes, valueMinutes);
-    setIsEditing(false);
-    setCustomMinutes(String(normalized));
-    onChangeMinutes?.(normalized);
-  };
+function commitCustomMinutes(customMinutes, valueMinutes, onChangeMinutes, setCustomMinutes, setIsEditing) {
+  const normalized = normalizeEstimateMinutesInput(customMinutes, valueMinutes);
+  setIsEditing(false);
+  setCustomMinutes(String(normalized));
+  onChangeMinutes?.(normalized);
+}
 
-  const handleCustomChange = (event) => {
-    setIsEditing(true);
-    setCustomMinutes(event.target.value);
-  };
-
-  const handleCustomBlur = () => {
-    commitCustomValue();
-  };
-
-  const handleCustomKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      commitCustomValue();
-    }
-  };
-
-  const handlePresetClick = (value) => {
+function buildCustomState({ customMinutes, setCustomMinutes, setIsEditing, onChangeMinutes, commit, baseValue, isEditing }) {
+  const numericMinutes = Number(baseValue);
+  const handlePreset = (value) => {
     setIsEditing(false);
     setCustomMinutes(String(value));
     onChangeMinutes?.(value);
   };
+  return {
+    customMinutes,
+    isEditing,
+    numericMinutes,
+    commit,
+    handlePreset,
+    handleChange: (event) => {
+      setIsEditing(true);
+      setCustomMinutes(event.target.value);
+    },
+  };
+}
 
-  const numericMinutes = Number(valueMinutes ?? POMODORO_BLOCK_MINUTES);
-  const presetSelected = presets.some(({ value }) => value === numericMinutes);
-  const customActive = isEditing || !presetSelected;
+function renderPresetButtons(config, state) {
+  const buttons = config.presets.map((preset) => buildPresetButton(preset, state, config.classes));
+  return config.classes.buttonGroup ? <div className={config.classes.buttonGroup}>{buttons}</div> : buttons;
+}
 
-  const buttons = presets.map(({ value, label, ariaLabel: presetAriaLabel }) => (
-    <button
-      key={value}
-      type="button"
-      className={`${classes.button ?? ""} ${numericMinutes === value ? classes.buttonActive ?? "" : ""}`.trim()}
-      onClick={() => handlePresetClick(value)}
-      aria-label={presetAriaLabel}
-      aria-pressed={numericMinutes === value}
-    >
-      {label}
-    </button>
-  ));
-
+function buildPresetButton(preset, state, classes) {
+  const isActive = state.numericMinutes === preset.value;
+  const buttonClass = `${classes.button ?? ""} ${isActive ? classes.buttonActive ?? "" : ""}`.trim();
   return (
-    <div className={classes.root} role="group" aria-label={ariaLabel}>
-      {classes.buttonGroup ? (
-        <div className={classes.buttonGroup}>
-          {buttons}
-        </div>
-      ) : (
-        buttons
-      )}
-      <TextInput
-        type="number"
-        min={MIN_ESTIMATE_MINUTES}
-        max={MAX_ESTIMATE_MINUTES}
-        value={customMinutes}
-        onChange={handleCustomChange}
-        onBlur={handleCustomBlur}
-        onKeyDown={handleCustomKeyDown}
-        className={`${classes.customInput ?? ""} ${customActive ? classes.customInputActive ?? "" : ""}`.trim()}
-        inputClassName={classes.customInputField}
-        leading={<span className={classes.leading}>Custom</span>}
-        trailing={<span className={classes.trailing}>min</span>}
-        aria-label={customInputAriaLabel}
-      />
-    </div>
+    <button
+      key={preset.value}
+      type="button"
+      className={buttonClass}
+      onClick={() => state.handlePreset(preset.value)}
+      aria-label={preset.ariaLabel}
+      aria-pressed={isActive}
+    >
+      {preset.label}
+    </button>
   );
+}
+
+function buildCustomInputProps(config, state) {
+  const customActive = state.isEditing || !config.presets.some(({ value }) => value === state.numericMinutes);
+  const classes = `${config.classes.customInput ?? ""} ${customActive ? config.classes.customInputActive ?? "" : ""}`.trim();
+  return {
+    type: "number",
+    min: MIN_ESTIMATE_MINUTES,
+    max: MAX_ESTIMATE_MINUTES,
+    value: state.customMinutes,
+    onChange: state.handleChange,
+    onBlur: state.commit,
+    onKeyDown: (event) => handleCustomKey(event, state.commit),
+    className: classes,
+    inputClassName: config.classes.customInputField,
+    leading: <span className={config.classes.leading}>Custom</span>,
+    trailing: <span className={config.classes.trailing}>min</span>,
+    "aria-label": config.customInputAriaLabel,
+  };
+}
+
+function handleCustomKey(event, commit) {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  commit();
 }

@@ -1,5 +1,5 @@
 """
-Service helpers for group project view flows.
+Service helpers for group project workflows.
 """
 
 from django.contrib.auth import get_user_model
@@ -22,10 +22,14 @@ User = get_user_model()
 
 
 def serialiser_context(request):
+    """Return DRF serialiser context for the request."""
+
     return {"request": request}
 
 
 def parse_member_id(value):
+    """Parse a member ID from request data."""
+
     try:
         return int(value)
     except (TypeError, ValueError):
@@ -33,6 +37,8 @@ def parse_member_id(value):
 
 
 def collect_unique_ids(raw_ids):
+    """Return unique member IDs while preserving order."""
+
     parsed = [parse_member_id(value) for value in raw_ids]
     if None in parsed:
         return None
@@ -40,6 +46,8 @@ def collect_unique_ids(raw_ids):
 
 
 def normalise_member_ids(raw_member_ids):
+    """Normalise raw member IDs into a clean list."""
+
     if raw_member_ids in (None, "", []):
         return []
     if not isinstance(raw_member_ids, list):
@@ -47,36 +55,69 @@ def normalise_member_ids(raw_member_ids):
     return collect_unique_ids(raw_member_ids)
 
 
+def member_ids_response(message):
+    """Return a member ID validation response."""
+
+    return Response({"member_ids": [message]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def missing_members_response(missing_ids):
+    """Return a response for missing selected users."""
+
+    missing = ", ".join(str(member_id) for member_id in missing_ids)
+    return member_ids_response(f"Some selected users were not found: {missing}.")
+
+
 def validate_member_ids(member_ids):
+    """Validate that each supplied member ID exists."""
+
     if member_ids is None:
-        return Response({"member_ids": ["Provide member IDs as a list of user IDs."]}, status=status.HTTP_400_BAD_REQUEST)
+        return member_ids_response("Provide member IDs as a list of user IDs.")
     existing_ids = set(User.objects.filter(id__in=member_ids).values_list("id", flat=True))
     missing_ids = [member_id for member_id in member_ids if member_id not in existing_ids]
     if missing_ids:
-        missing = ", ".join(str(member_id) for member_id in missing_ids)
-        return Response({"member_ids": [f"Some selected users were not found: {missing}."]}, status=status.HTTP_400_BAD_REQUEST)
+        return missing_members_response(missing_ids)
     return None
 
 
-def validate_users_within_project_limit(user_ids):
-    if not user_ids:
-        return None
-    over_limit = (
+def users_over_project_limit(user_ids):
+    """Return users who have reached the project limit."""
+
+    return (
         User.objects.filter(id__in=user_ids)
         .annotate(project_total=Count("group_memberships"))
         .filter(project_total__gte=MAX_GROUP_PROJECTS_PER_USER)
         .order_by("username")
     )
+
+
+def over_limit_member_names(users):
+    """Return usernames for over-limit members."""
+
+    return ", ".join(user.username for user in users)
+
+
+def member_limit_response(names):
+    """Return a response for members over the project limit."""
+
+    message = f"{group_project_limit_message()} Over limit: {names}."
+    return member_ids_response(message)
+
+
+def validate_users_within_project_limit(user_ids):
+    """Validate that selected users can join another project."""
+
+    if not user_ids:
+        return None
+    over_limit = users_over_project_limit(user_ids)
     if not over_limit.exists():
         return None
-    names = ", ".join(user.username for user in over_limit)
-    return Response(
-        {"member_ids": [f"{group_project_limit_message()} Over limit: {names}."]},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
+    return member_limit_response(over_limit_member_names(over_limit))
 
 
 def validate_user_within_project_limit(user):
+    """Validate that a single user can join another project."""
+
     if GroupMembership.objects.filter(user=user).count() < MAX_GROUP_PROJECTS_PER_USER:
         return None
     return Response({"detail": group_project_limit_message()}, status=status.HTTP_400_BAD_REQUEST)
@@ -198,31 +239,74 @@ def save_project_with_members(serialiser, owner, member_ids):
 
 
 def get_project_for_user(user, project_id):
+    """Return a project that belongs to the user."""
+
     return get_object_or_404(GroupProject.objects.filter(memberships__user=user), id=project_id)
 
 
 def list_project_members_response(project, request):
+    """Return the membership list for a project."""
+
     memberships = project.memberships.select_related("user").order_by("joined_at")
     return Response(GroupMembershipSerialiser(memberships, many=True, context=serialiser_context(request)).data)
 
 
-def add_member_to_project_response(project, request):
-    if project.owner_id != request.user.id:
-        return Response({"detail": "Only the project owner can edit team members."}, status=status.HTTP_403_FORBIDDEN)
-    serialiser = GroupMembershipSerialiser(data=request.data, context=serialiser_context(request))
-    if not serialiser.is_valid():
-        return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
-    target_user = serialiser.validated_data["user"]
+def project_owner_error(project, user):
+    """Return an error when a non-owner edits members."""
+
+    if project.owner_id == user.id:
+        return None
+    return Response({"detail": "Only the project owner can edit team members."}, status=status.HTTP_403_FORBIDDEN)
+
+
+def membership_serialiser(request):
+    """Build the membership input serialiser."""
+
+    return GroupMembershipSerialiser(data=request.data, context=serialiser_context(request))
+
+
+def membership_error_response(serialiser):
+    """Return serialiser errors for membership creation."""
+
+    return Response(serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def member_add_limit_error(project, target_user):
+    """Return an error when a new member is already at the limit."""
+
     is_existing_member = GroupMembership.objects.filter(project=project, user=target_user).exists()
-    if not is_existing_member:
-        limit_error = validate_user_within_project_limit(target_user)
-        if limit_error:
-            return limit_error
+    if is_existing_member:
+        return None
+    return validate_user_within_project_limit(target_user)
+
+
+def created_membership_response(membership, request):
+    """Return the created membership payload."""
+
+    payload = GroupMembershipSerialiser(membership, context=serialiser_context(request)).data
+    return Response(payload, status=status.HTTP_201_CREATED)
+
+
+def add_member_to_project_response(project, request):
+    """Add a member to a project when the owner is allowed to do so."""
+
+    owner_error = project_owner_error(project, request.user)
+    if owner_error:
+        return owner_error
+    serialiser = membership_serialiser(request)
+    if not serialiser.is_valid():
+        return membership_error_response(serialiser)
+    target_user = serialiser.validated_data["user"]
+    limit_error = member_add_limit_error(project, target_user)
+    if limit_error:
+        return limit_error
     membership = save_project_member(project, serialiser.validated_data)
-    return Response(GroupMembershipSerialiser(membership, context=serialiser_context(request)).data, status=status.HTTP_201_CREATED)
+    return created_membership_response(membership, request)
 
 
 def save_project_member(project, validated_data):
+    """Create a membership unless it already exists."""
+
     return GroupMembership.objects.get_or_create(
         project=project,
         user=validated_data["user"],

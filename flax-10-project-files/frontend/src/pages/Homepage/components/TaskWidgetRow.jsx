@@ -4,10 +4,10 @@
 
 import { motion as Motion } from "framer-motion";
 import { itemVariants } from "../../../components/Modules/shared/widgetVariants.js";
-import InlineTitleField, { useInlineEdit } from "../../../components/Common/InlineTitleField/InlineTitleField";
-import TaskPriorityPill from "../../../components/Common/TaskPriorityPill/TaskPriorityPill";
-import DeadlineCountdown from "../../../components/Common/DeadlineCountdown/DeadlineCountdown";
-import urgentGlowStyles from "../../../components/Common/UrgentGlow/UrgentGlow.module.css";
+import InlineTitleField, { useInlineEdit } from "../../../components/common/InlineTitleField/InlineTitleField";
+import TaskPriorityPill from "../../../components/common/TaskPriorityPill/TaskPriorityPill";
+import DeadlineCountdown from "../../../components/common/DeadlineCountdown/DeadlineCountdown";
+import urgentGlowStyles from "../../../components/common/UrgentGlow/UrgentGlow.module.css";
 import rowStyles from "../../Modules/DashboardRows.module.css";
 
 function getRowClassName(isOverdue, urgentGlow) {

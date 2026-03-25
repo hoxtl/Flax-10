@@ -111,7 +111,7 @@ describe('PreferencesPanel', () => {
     await waitFor(() => expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 180 }));
   });
 
-  it('shows saved tick after a successful appearance save', async () => {
+  it('keeps the selected appearance after a successful appearance save', async () => {
     const onSave = vi.fn().mockResolvedValue(true);
     mockStatefulTheme();
     const { container } = render(<PreferencesPanel onSave={onSave} isSaving={false} />);
@@ -119,7 +119,8 @@ describe('PreferencesPanel', () => {
     const interfaceModeGroup = screen.getByText('Interface Mode').closest('div');
     fireEvent.click(within(interfaceModeGroup).getByText('Dark').closest('button'));
     fireEvent.submit(container.querySelector('form'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy());
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ mode: 'dark', theme: 'flax' }));
+    expect(within(interfaceModeGroup).getByText('✓')).toBeInTheDocument();
   });
 
   it('shows saved tick after a successful sleep save', async () => {
