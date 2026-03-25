@@ -99,7 +99,7 @@ function ActivePill() {
 
 function NavItem({ item, isActive, open, onClick, hasPressure }) {
   return (
-    <Motion.button onClick={onClick} className={getNavItemClass(isActive, hasPressure, item.id)} style={{ justifyContent: open ? "flex-start" : "center" }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={NAV_SPRING}>
+    <Motion.button data-tour={item.id} onClick={onClick} className={getNavItemClass(isActive, hasPressure, item.id)} style={{ justifyContent: open ? "flex-start" : "center" }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={NAV_SPRING}>
       <span className={sharedStyles.icon}>{item.icon}</span>
       <AnimatePresence>{open && <NavLabel label={item.label} />}</AnimatePresence>
       {isActive && <ActivePill />}
