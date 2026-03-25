@@ -17,6 +17,7 @@ import MemberDirectoryModal from "../../components/Society/SocietyDetail/MemberD
 import { Flag } from "lucide-react";
 import { SocietyDetailSkeleton } from "./SocietySkeletons";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { useLocation } from "react-router-dom";
 import { useSocietyInit, useSocietyPageData } from "./useSocietyDetailPageState";
 import { getImageUrls } from "./SocietyDetailPageUtils";
@@ -69,7 +70,8 @@ const TabSection = ({ data }) => (
 const DetailLayout = ({ data, handlers, onBack, isAdmin }) => (
     <div className={styles.page}>
         <TopBar onBack={onBack} onSettings={() => handlers.setS(true)} isAdmin={isAdmin}
-            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)} />
+            onReport={() => handlers.onReport()} hasReported={data.society.has_reported} onUnreport={() => data.handleUnreport(data.society)}
+            societyName={data.society.name} />
         <SocietyHero society={data.society} editMode={data.modals.editMode} onUpdateName={(name) => data.updateSociety({ name })}
             onImageClick={(index) => handlers.setG({ index })} onEditImages={() => handlers.setCE(true)} />
         <SocietyInfo society={data.society} editMode={data.modals.editMode} onUpdateSociety={data.updateSociety}
@@ -125,10 +127,17 @@ function ReportButton({ hasReported, onReport, onUnreport }) {
 
 /** Common header for the detail view including navigation and settings. */
 
-function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported }) {
+function TopBar({ onBack, isAdmin, onSettings, onReport, onUnreport, hasReported, societyName }) {
+    const crumbs = [
+        { label: "Societies", navKey: "societies" },
+        { label: societyName || "Society" },
+    ];
     return (
         <div className={styles.topBar}>
-            <BackButton onClick={onBack} label="Back to All Societies" />
+            <div>
+                <Breadcrumb crumbs={crumbs} />
+                <BackButton onClick={onBack} label="Back to All Societies" />
+            </div>
             <div className={styles.topBarActions}>
                 <ReportButton hasReported={hasReported} onReport={onReport} onUnreport={onUnreport} />
                 {isAdmin && <button className={styles.settingsBtn} onClick={onSettings} title="Settings">⚙</button>}

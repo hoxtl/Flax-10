@@ -10,6 +10,7 @@ import GroupWorkDetailSkeleton from "./components/GroupWorkDetailSkeleton";
 import ProjectHeader from "./components/ProjectHeader";
 import TabsSection from "./components/TabsSection";
 import BackButton from "../../components/common/BackButton/BackButton.jsx";
+import Breadcrumb from "../../components/common/Breadcrumb/Breadcrumb.jsx";
 import { BackToTop } from "../../components/Pagination/Pagination";
 import { getVisibleMembers } from "./utils/projectRowUtils";
 import styles from "./GroupWorkDetail.module.css";
@@ -42,10 +43,15 @@ function MissingProjectState({ onBack }) {
 
 function ProjectDetailContent({ detail, projectId, onBack }) {
     const visibleMembers = getVisibleMembers(detail.members);
+    const crumbs = [
+        { label: "Group Work", navKey: "group-work" },
+        { label: detail.project.name },
+    ];
     return (
         <>
             <AppPage className={styles.page} contentClassName={styles.pageContent}>
                 <div className={styles.surface}>
+                    <Breadcrumb crumbs={crumbs} />
                     <ProjectHeader project={detail.project} members={visibleMembers} teamMembers={detail.members} onMemberAdded={detail.onAdded} onMemberRemove={detail.handleRemoveMember} onDelete={detail.handleDeleteProject} onBack={onBack} />
                     <TabsSection activeTab={detail.activeTab} setActiveTab={detail.setActiveTab} projectId={projectId} members={detail.members} onStatsUpdate={detail.setTaskStats} taskStats={detail.taskStats} />
                 </div>
