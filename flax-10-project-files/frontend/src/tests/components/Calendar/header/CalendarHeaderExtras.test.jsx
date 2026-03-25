@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-import { MobileDateStrip } from "../../../../components/calendar/header/MobileDateStrip";
-import { SearchButton } from "../../../../components/calendar/header/SearchButton";
-import { ViewModeButton } from "../../../../components/calendar/header/ViewModeButton";
-import { ScheduleManagerButton } from "../../../../components/calendar/header/schedule_manager/ScheduleManagerButton";
+import { MobileDateStrip } from "../../../../components/Calendar/header/MobileDateStrip";
+import { SearchButton } from "../../../../components/Calendar/header/SearchButton";
+import { ViewModeButton } from "../../../../components/Calendar/header/ViewModeButton";
+import { ScheduleManagerButton } from "../../../../components/Calendar/header/ScheduleManager/ScheduleManagerButton";
 
 const mockToast = vi.fn();
 const mockEditEvent = vi.fn();
@@ -12,7 +12,7 @@ const mockBuildPlan = vi.fn();
 const mockApplyPlan = vi.fn();
 const mockToastMessage = vi.fn();
 
-vi.mock("../../../../components/calendar/utils/dateUtils", () => ({
+vi.mock("../../../../components/Calendar/utils/dateUtils", () => ({
   getStartOfWeek: vi.fn(() => new Date("2026-03-23T00:00:00.000Z")),
   addDays: vi.fn((date, days) => {
     const next = new Date(date);
@@ -38,7 +38,7 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
+vi.mock("../../../../components/common/SearchBar/SearchBar", () => ({
   default: ({ value, onChange, onBlur, placeholder }) => (
     <input
       aria-label={placeholder}
@@ -49,7 +49,7 @@ vi.mock("../../../../components/common/search_bar/SearchBar", () => ({
   ),
 }));
 
-vi.mock("../../../../components/common/animated_dropdown", () => ({
+vi.mock("../../../../components/common/AnimatedDropdown", () => ({
   default: ({ customTrigger, options = [], onChange, value, openOnHover }) => (
     <div data-testid="dropdown" data-open-on-hover={String(openOnHover)} data-value={value}>
       {customTrigger}
@@ -62,7 +62,7 @@ vi.mock("../../../../components/common/animated_dropdown", () => ({
   ),
 }));
 
-vi.mock("../../../../components/calendar/header/schedule_manager/ScheduleManagerDialog", () => ({
+vi.mock("../../../../components/Calendar/header/ScheduleManager/ScheduleManagerDialog", () => ({
   ScheduleManagerDialog: ({ open, onClose }) => (
     <div>
       <span>{open ? "dialog-open" : "dialog-closed"}</span>
@@ -82,19 +82,19 @@ vi.mock("../../../../context/ToastContext", () => ({
   useToast: () => mockToast,
 }));
 
-vi.mock("../../../../components/calendar/hooks/useCalendarEvents", () => ({
+vi.mock("../../../../components/Calendar/hooks/useCalendarEvents", () => ({
   useEventActions: () => ({ editEvent: mockEditEvent }),
   useCalendarEvents: () => ({ loadEvents: vi.fn() }),
 }));
 
-vi.mock("../../../../components/common/reschedule_events/rescheduleEventConflicts", () => ({
+vi.mock("../../../../components/common/RescheduleEvents/rescheduleEventConflicts", () => ({
   buildConflictResolutionPlan: (...args) => mockBuildPlan(...args),
   applyConflictResolutionPlan: (...args) => mockApplyPlan(...args),
   buildConflictResolutionToastMessage: (...args) => mockToastMessage(...args),
   undoConflictResolutionPlan: vi.fn(),
 }));
 
-vi.mock("../../../../components/common/confirm_modal/ConfirmModal", () => ({
+vi.mock("../../../../components/common/ConfirmModal/ConfirmModal", () => ({
   default: ({ title, onConfirm, onCancel, confirmText, cancelText, message }) => (
     <div>
       <div>{title}</div>
@@ -122,7 +122,7 @@ describe("Calendar header extras", () => {
     fireEvent.click(screen.getByLabelText("Reschedule my events"));
     fireEvent.click(screen.getByText("Reschedule now"));
 
-    await waitFor(() => expect(mockBuildPlan).toHaveBeenCalled());
+    expect(mockBuildPlan).toHaveBeenCalled();
     await waitFor(() => expect(mockApplyPlan).toHaveBeenCalledWith({ operations: [{ id: "move-1" }] }, mockEditEvent));
     await waitFor(() => expect(mockToast).toHaveBeenCalledWith("Rescheduled 1 event"));
   });
