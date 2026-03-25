@@ -259,6 +259,7 @@ describe("settings leaf extras", () => {
     vi.useRealTimers();
 
     expect(getSleepMinutes("23:30", "06:15")).toBe(405);
+    expect(getSleepMinutes("22:00", "23:30")).toBe(90);
     expect(getSleepDuration("23:30", "06:15")).toEqual(expect.objectContaining({ label: "6h 45m", totalMinutes: 405 }));
     expect(getSleepQuality(600).label).toBe("Too much");
     expect(getSleepQuality(480).label).toBe("Great");

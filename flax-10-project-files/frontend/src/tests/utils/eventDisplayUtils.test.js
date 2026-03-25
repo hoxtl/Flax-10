@@ -73,6 +73,12 @@ describe('getAllDayVisualRange', () => {
         expect(range.end.toISOString().slice(0, 10)).toBe('2026-01-02');
     });
 
+    it('keeps the visual end date when an all-day event ends after midnight', () => {
+        const event = makeEvent('2026-01-01T00:00:00', '2026-01-03T12:00:00', { all_day: true });
+        const range = getAllDayVisualRange(event);
+        expect(range.end.toISOString().slice(0, 10)).toBe('2026-01-03');
+    });
+
     it('returns null when visual start > visual end for timed multi-day events', () => {
         // Timed event that starts and ends on same day (non-all-day)
         // start 09:00, vStart = Jan 2 midnight; end 10:00, vEnd = Jan 1 midnight (-1 day) = Jan 0 — null

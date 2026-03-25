@@ -72,4 +72,20 @@ describe("tutorPhotoFallback", () => {
       getResolvedUserPhoto({ first_name: "Mystery", last_name: "Person", role: "teacher" }, { allowGeneric: true }),
     ).toContain("i.pravatar.cc/96?img=");
   });
+
+  it("uses the internal user seed when no generic fallback seed is provided", () => {
+    expect(
+      getTutorPhotoFallback({ role: "teacher", allowGeneric: true, seed: null, username: "", fullName: "" }),
+    ).toContain("i.pravatar.cc/96?img=");
+  });
+
+  it("normalises null and titled values before resolving generic teacher avatars", () => {
+    expect(
+      getTutorPhotoFallback({ fullName: "Dr. Sarah Example", role: "teacher", seed: "teacher-dr", allowGeneric: true }),
+    ).toContain("randomuser.me/api/portraits/women/");
+
+    expect(
+      getTutorPhotoFallback({ fullName: null, username: null, role: "teacher", seed: "teacher-null", allowGeneric: true }),
+    ).toContain("i.pravatar.cc/96?img=");
+  });
 });

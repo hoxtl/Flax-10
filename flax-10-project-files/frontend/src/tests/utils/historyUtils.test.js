@@ -71,4 +71,20 @@ describe('historyUtils', () => {
         expect(dispatchSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'timerHistoryUpdated' }));
         dispatchSpy.mockRestore();
     });
+
+    it('uses the default task value and skips window events when window is unavailable', async () => {
+        vi.stubGlobal('window', undefined);
+
+        await saveSession(15, 3, 2, 222);
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/', {
+            method: 'POST',
+            body: expect.stringContaining('"task":""')
+        });
+
+        fetchApi.mockClear();
+        await clearHistory();
+        expect(fetchApi).toHaveBeenCalledWith('/timer/history/clear_history/', { method: 'DELETE' });
+
+        vi.unstubAllGlobals();
+    });
 });

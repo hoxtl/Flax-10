@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, afterEach } from 'vitest';
-import { useSleepWarning, isDuringSleepWindow } from '../../components/Settings/hooks/useSleepWarning';
+import { useSleepWarning, isDuringSleepWindow, doesEventOverlapSleepWindow } from '../../components/Settings/hooks/useSleepWarning';
 
 const makeDate = (h, m = 0) => { const d = new Date(); d.setHours(h, m, 0, 0); return d; };
 
@@ -32,6 +32,23 @@ describe('isDuringSleepWindow', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-03-24T10:00:00.000Z'));
     expect(isDuringSleepWindow('09:30', '17:15')).toBe(true);
+  });
+});
+
+describe('doesEventOverlapSleepWindow', () => {
+  it('uses a default 25-minute duration when no end date is provided', () => {
+    expect(doesEventOverlapSleepWindow('23:00', '07:00', '2026-03-24T23:05:00.000Z')).toBe(true);
+  });
+
+  it('returns false for invalid dates', () => {
+    expect(doesEventOverlapSleepWindow('23:00', '07:00', 'bad-date', '2026-03-24T23:30:00.000Z')).toBe(false);
+    expect(doesEventOverlapSleepWindow('23:00', '07:00', '2026-03-24T23:30:00.000Z', 'bad-date')).toBe(false);
+  });
+
+  it('checks reversed ranges against the start timestamp only', () => {
+    expect(
+      doesEventOverlapSleepWindow('23:00', '07:00', '2026-03-24T23:30:00.000Z', '2026-03-24T22:30:00.000Z'),
+    ).toBe(true);
   });
 });
 

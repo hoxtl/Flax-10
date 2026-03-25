@@ -99,4 +99,24 @@ describe('SleepSchedulePanel', () => {
             expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy();
         });
     });
+
+    it('falls back to default bedtime when the picker clears its value', async () => {
+        const onSave = vi.fn().mockResolvedValue(true);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        expect(onSave).toHaveBeenCalledWith({ sleep_time: '23:00', wake_time: '07:00' });
+    });
+
+    it('does not mark the panel as saved when onSave resolves false', async () => {
+        const onSave = vi.fn().mockResolvedValue(false);
+        render(<SleepSchedulePanel onSave={onSave} isSaving={false} />);
+        const bedtimeInput = await screen.findByTestId('Pick bedtime');
+        fireEvent.change(bedtimeInput, { target: { value: '22:45' } });
+        fireEvent.submit(bedtimeInput.closest('form'));
+        await waitFor(() => expect(onSave).toHaveBeenCalledWith({ sleep_time: '22:45', wake_time: '07:00' }));
+        expect(screen.queryByRole('button', { name: /saved!/i })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Save Sleep Schedule' })).toBeTruthy();
+    });
 });
