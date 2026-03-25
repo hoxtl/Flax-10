@@ -39,6 +39,10 @@ Thumbs.db
 
 # Node
 node_modules/
+/package-lock.json
+
+# Windows metadata copied as files on non-NTFS filesystems
+*:Zone.Identifier
 
 # LaTeX build artifacts
 *.aux

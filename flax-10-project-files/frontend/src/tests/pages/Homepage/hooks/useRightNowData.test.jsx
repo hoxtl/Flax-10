@@ -53,52 +53,46 @@ describe("useRightNowData", () => {
     journeyPlannerMock.mockResolvedValue({ duration: 22 });
   });
 
-  it("derives timeline state and commute information for today", async () => {
-    const currentBlock = {
-      id: "current",
-      start_time: "2026-03-25T09:00:00Z",
-      end_time: "2026-03-25T10:00:00Z",
-    };
-    const nextEvent = {
-      id: "next",
-      title: "Lecture",
-      location: "Strand Campus",
-      start_time: "2026-03-25T11:00:00Z",
-      end_time: "2026-03-25T12:00:00Z",
-    };
-    getCurrentBlockMock.mockReturnValue(currentBlock);
-    getNextEventMock.mockReturnValue(nextEvent);
+  const setupCtx = () => {
+    const cb = { id: "current", start_time: "2026-03-25T09:00:00Z", end_time: "2026-03-25T10:00:00Z" };
+    const ne = { id: "next", title: "Lecture", location: "Strand Campus", start_time: "2026-03-25T11:00:00Z", end_time: "2026-03-25T12:00:00Z" };
+    getCurrentBlockMock.mockReturnValue(cb);
+    getNextEventMock.mockReturnValue(ne);
+    return { cb, ne };
+  };
 
-    const now = new Date("2026-03-25T09:30:00Z");
-    const { result } = renderHook(() =>
-      useRightNowData({
-        isToday: true,
-        navigatorContext: { overlaps: [{ id: 1 }], state: "now" },
-        now,
-        sortedEvents: [currentBlock, nextEvent],
-        taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }],
-        tflDelays: [{ lineName: "Northern" }],
-      }),
-    );
-
+  it("derives timeline state securely mapping current gaps to next events", async () => {
+    const { cb, ne } = setupCtx();
+    const { result } = renderHook(() => useRightNowData({ isToday: true, navigatorContext: { overlaps: [{ id: 1 }], state: "now" }, now: new Date("2026-03-25T09:30:00Z"), sortedEvents: [cb, ne], taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }], tflDelays: [{ lineName: "Northern" }] }));
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(result.current.currentBlock).toEqual(currentBlock);
-    expect(result.current.nextEvent).toEqual(nextEvent);
+    expect(result.current.currentBlock).toEqual(cb);
+    expect(result.current.nextEvent).toEqual(ne);
     expect(result.current.countdown).toBe("45m");
     expect(result.current.timeLeftStr).toBe("20m left");
     expect(result.current.timeRangeStr).toBe("09:00 – 10:00");
+  });
+
+  it("computes accurate transit commute bounds targeting the active campus", async () => {
+    const { cb, ne } = setupCtx();
+    const { result } = renderHook(() => useRightNowData({ isToday: true, navigatorContext: { overlaps: [{ id: 1 }], state: "now" }, now: new Date("2026-03-25T09:30:00Z"), sortedEvents: [cb, ne], taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }], tflDelays: [{ lineName: "Northern" }] }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.currentProgressPct).toBe(50);
     expect(result.current.commuteInfo).toEqual({ duration: 22 });
     expect(result.current.nextCampus).toEqual({ name: "Strand", coords: [-0.116, 51.511] });
     expect(result.current.leaveByInfo).toEqual({ leaveBy: "09:10" });
+    expect(journeyPlannerMock).toHaveBeenCalledWith(51.5, -0.12, 51.511, -0.116);
+  });
+
+  it("collects operational summaries across events tasks and warnings", async () => {
+    const { cb, ne } = setupCtx();
+    const { result } = renderHook(() => useRightNowData({ isToday: true, navigatorContext: { overlaps: [{ id: 1 }], state: "now" }, now: new Date("2026-03-25T09:30:00Z"), sortedEvents: [cb, ne], taskWidgetItemsOnly: [{ id: 1, completed: false }, { id: 2, completed: true }], tflDelays: [{ lineName: "Northern" }] }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.showTfl).toBe(true);
     expect(result.current.conflicts).toEqual([{ id: 1 }]);
     expect(result.current.eventCount).toBe(2);
     expect(result.current.tasksPending).toBe(1);
     expect(result.current.isEmptyDay).toBe(false);
     expect(result.current.isEndOfDay).toBe(false);
-    expect(journeyPlannerMock).toHaveBeenCalledWith(51.5, -0.12, 51.511, -0.116);
   });
 
   it("handles non-today and failing commute data without showing transport alerts", async () => {

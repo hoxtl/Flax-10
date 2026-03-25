@@ -109,37 +109,17 @@ describe("modulesPageHooks coverage", () => {
 
   it("filters out enrolled modules for student browse mode and resets pagination on search changes", () => {
     localStorage.setItem("user", JSON.stringify({ role: "student" }));
-
+    const hook = { modules: [{ id: 1 }, { id: 2 }], enrollments: [{ module: 1 }] };
     const state = {
-      hook: {
-        modules: [
-          { id: 1, module_code: "CS101" },
-          { id: 2, module_code: "AA200" },
-        ],
-        enrollments: [{ module: 1 }],
-      },
-      searchQuery: "",
-      setSearchQuery: vi.fn(),
-      filterMode: "all",
-      setFilterMode: vi.fn(),
-      isTeacher: false,
+      hook, searchQuery: "", setSearchQuery: vi.fn(),
+      filterMode: "all", setFilterMode: vi.fn(), isTeacher: false,
     };
-
     const { result } = renderHook(() => useMainModuleView(state), { wrapper });
-
-    expect(filterModulesMock).toHaveBeenCalledWith(
-      state.hook.modules,
-      state.hook.enrollments,
-      "",
-      "all",
-      { excludeEnrolled: true },
-    );
-
+    expect(filterModulesMock).toHaveBeenCalledWith(hook.modules, hook.enrollments, "", "all", { excludeEnrolled: true });
     result.current.search.onQueryChange("AA");
     result.current.search.onFilterChange("enrolled");
-
     expect(state.setSearchQuery).toHaveBeenCalledWith("AA");
     expect(state.setFilterMode).toHaveBeenCalledWith("enrolled");
-    expect(useModuleSortingMock).toHaveBeenCalledWith(state.hook.modules);
+    expect(useModuleSortingMock).toHaveBeenCalledWith(hook.modules);
   });
 });

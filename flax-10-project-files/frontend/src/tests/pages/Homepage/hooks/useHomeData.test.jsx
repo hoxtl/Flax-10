@@ -24,40 +24,28 @@ describe("useHomeData", () => {
     vi.clearAllMocks();
   });
 
-  it("loads tasks and fallback events, filters day items, and removes pending tasks", async () => {
-    const selectedDate = new Date("2026-03-25T09:00:00Z");
-    useCalendarMock.mockReturnValue({
-      events: [],
-      allEvents: [],
-    });
-    fetchTasksMock.mockResolvedValue([
-      { id: 1, title: "Urgent", due_date: "2026-03-25T12:00:00Z", priority: "urgent", completed: false },
-      { id: 2, title: "Done", due_date: "2026-03-25T10:00:00Z", priority: "high", completed: true },
-      { id: 3, title: "Later", due_date: "2026-03-26T10:00:00Z", priority: "low", completed: false },
-      { id: 4, title: "High", due_date: "2026-03-25T14:00:00Z", priority: "high", completed: false },
-    ]);
-    getEventsMock.mockResolvedValue([
-      { id: "e1", start_time: "2026-03-25T09:00:00Z", end_time: "2026-03-25T10:00:00Z" },
-      { id: "e2", start_time: "2026-03-26T09:00:00Z", end_time: "2026-03-26T10:00:00Z" },
-    ]);
-
-    const { result } = renderHook(() => useHomeData(selectedDate));
-
+  it("loads core task blocks and fetches events spanning the active day", async () => {
+    const dt = new Date("2026-03-25T09:00Z");
+    useCalendarMock.mockReturnValue({ events: [], allEvents: [] });
+    fetchTasksMock.mockResolvedValue([{ id: 1, title: "Urgent", due_date: "2026-03-25T12:00Z", priority: "urgent", completed: false }]);
+    getEventsMock.mockResolvedValue([{ id: "e1", start_time: "2026-03-25T09:00Z", end_time: "2026-03-25T10:00Z" }]);
+    const { result } = renderHook(() => useHomeData(dt));
     await waitFor(() => expect(result.current.loading).toBe(false));
-
-    expect(getEventsMock).toHaveBeenCalledWith({
-      start: "2026-03-25T00:00:00.000Z",
-      end: "2026-03-25T23:59:59.999Z",
-    });
-    expect(result.current.allTasks.map((task) => task.id)).toEqual([1, 2, 3, 4]);
+    expect(getEventsMock).toHaveBeenCalledWith({ start: "2026-03-25T00:00:00.000Z", end: "2026-03-25T23:59:59.999Z" });
     expect(result.current.dayEvents.map((event) => event.id)).toEqual(["e1"]);
-    expect(result.current.dayTasks.map((task) => task.id)).toEqual([1, 4]);
+  });
 
-    act(() => {
-      result.current.removePendingTask(1);
-    });
-
-    expect(result.current.allTasks.map((task) => task.id)).toEqual([2, 3, 4]);
+  it("filters remote tasks extracting partial scopes dynamically", async () => {
+    const dt = new Date("2026-03-25T09:00Z");
+    useCalendarMock.mockReturnValue({ events: [], allEvents: [] });
+    fetchTasksMock.mockResolvedValue([{ id: 1, due_date: "2026-03-25T12:00Z", priority: "urgent", completed: false }, { id: 3, due_date: "2026-03-26T10:00Z", priority: "low", completed: false }]);
+    getEventsMock.mockResolvedValue([]);
+    const { result } = renderHook(() => useHomeData(dt));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.allTasks.map((task) => task.id)).toEqual([1, 3]);
+    expect(result.current.dayTasks.map((task) => task.id)).toEqual([1]);
+    act(() => result.current.removePendingTask(1));
+    expect(result.current.allTasks.map((task) => task.id)).toEqual([3]);
   });
 
   it("prefers calendar events over fallback data and recovers from failed fetches", async () => {

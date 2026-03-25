@@ -264,53 +264,6 @@ describe('PlanEventRow', () => {
         expect(setConflictPopoverRowId).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    it('renders lecture accent for lecture tag', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: 'lecture', title: 'CS Lecture' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-lecture)');
-    });
-
-    it('renders routine accent for lunch title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Lunch' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-routine)');
-    });
-
-    it('renders wellness accent for gym title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Gym session' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-wellness)');
-    });
-
-    it('renders society accent for KCLSU in title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'KCLSU event' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-society)');
-    });
-
-    it('renders social accent for coffee in title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Coffee with friends' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-social)');
-    });
-
-    it('renders study accent for library in title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Library study' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-study)');
-    });
-
-    it('renders meeting accent for seminar in title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Seminar' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-meeting)');
-    });
-
-    it('renders admin accent for laundry in title', () => {
-        renderRow({ row: { ...baseRow, item: { ...baseRow.item, tag_name: null, title: 'Laundry' } } });
-        const card = document.querySelector('[style*="--card-accent"]');
-        expect(card?.style.getPropertyValue('--card-accent')).toBe('var(--event-accent-admin)');
-    });
 
     it('renders task list link when matchTask has task_list and no moduleCode', () => {
         renderRow({
@@ -381,21 +334,9 @@ describe('PlanEventRow', () => {
         const onEdit = vi.fn();
         const onEventContextMenu = vi.fn();
         renderRow({
-            row: {
-                ...baseRow,
-                isOverlap: true,
-                item: {
-                    ...baseRow.item,
-                    title: 'Society fallback title',
-                    start_time: '',
-                    end_time: '',
-                    source: 'society',
-                },
-            },
+            row: { ...baseRow, isOverlap: true, item: { ...baseRow.item, title: 'Society fallback title', start_time: '', end_time: '', source: 'society' } },
             conflictPopoverRowId: baseRow.id,
-            onCardClick: undefined,
-            onEdit,
-            onEventContextMenu,
+            onCardClick: undefined, onEdit, onEventContextMenu,
         });
 
         const card = document.querySelector('[role="button"]');

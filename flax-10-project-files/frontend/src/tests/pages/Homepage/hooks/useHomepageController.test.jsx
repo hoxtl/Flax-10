@@ -156,65 +156,47 @@ describe("useHomepageController", () => {
     useHomepageRescheduleMock.mockReturnValue({ handleReschedule: vi.fn() });
   });
 
-  it("wires shared state, actions, resources, and reschedule props into the returned controller", () => {
-    const { result } = renderHook(() => useHomepageController(true, { id: "read-1" }));
-
+  it("wires independent hook dependencies with provided configuration", () => {
+    renderHook(() => useHomepageController(true, { id: "read-1" }));
     expect(useHomepageModalsMock).toHaveBeenCalledWith(true, { id: "read-1" });
     expect(useHomeDataMock).toHaveBeenCalledWith(new Date("2026-03-25T00:00:00Z"));
     expect(useHomepageToastMock).toHaveBeenCalledWith({ push: expect.any(Function) });
     expect(useHomepageSelectionMock).toHaveBeenCalled();
     expect(useHomepageEventBootstrapMock).toHaveBeenCalledWith([{ id: "event-1" }], expect.any(Function), new Date("2026-03-25T00:00:00Z"));
     expect(useTimerCompletionSoundMock).toHaveBeenCalledWith(true, 120, "work");
-    expect(useHomepageViewModelMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        allCalEvents: [{ id: "event-1" }],
-        allTasks: [{ id: 1 }],
-        dayEvents: [{ id: "day-1" }],
-        dayTasks: [{ id: 2 }],
-        enrollments: [{ id: 1 }],
-        modulesList: [{ id: 2 }],
-        upcomingDeadlines: [{ id: 4 }],
-      }),
-    );
-    expect(useHomepageActionsMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        addEvent: expect.any(Function),
-        loadEvents: expect.any(Function),
-        refetchTasks: expect.any(Function),
-        removePendingTask: expect.any(Function),
-        selectedDate: new Date("2026-03-25T00:00:00Z"),
-      }),
-    );
-    expect(useHomepageRescheduleMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        addEvent: expect.any(Function),
-        deleteTask: expect.any(Function),
-        editEvent: expect.any(Function),
-        loadEvents: expect.any(Function),
-        missedItems: ["missed"],
-        overdueTasksForNow: ["overdue"],
-        removeEvent: expect.any(Function),
-        sortedEvents: ["sorted"],
-      }),
-    );
+  });
 
-    expect(result.current).toEqual(
-      expect.objectContaining({
-        displayName: "Alice",
-        dayTasks: [{ id: 2 }],
-        homeDataLoading: false,
-        modals: { showCreateTaskModal: true },
-        state: { sortedEvents: ["sorted"], missedItems: ["missed"], overdueTasksForNow: ["overdue"] },
-        reschedule: { handleReschedule: expect.any(Function) },
-        tags: [{ id: 1, name: "Academic" }],
-        taskLists: [{ id: 3 }],
-        upcomingDeadlines: [{ id: 4 }],
-        breakTime: 5,
-        hasTimerSession: true,
-        timerMode: "work",
-        timerTask: "Essay",
-        workTime: 25,
-      }),
-    );
+  it("constructs the homepage view model using aggregated api resources", () => {
+    renderHook(() => useHomepageController(true, { id: "read-1" }));
+    expect(useHomepageViewModelMock).toHaveBeenCalledWith(expect.objectContaining({
+      allCalEvents: [{ id: "event-1" }],
+      allTasks: [{ id: 1 }],
+      dayEvents: [{ id: "day-1" }],
+      dayTasks: [{ id: 2 }],
+      enrollments: [{ id: 1 }],
+      modulesList: [{ id: 2 }],
+      upcomingDeadlines: [{ id: 4 }],
+    }));
+  });
+
+  it("binds action handlers mapping events and tasks onto utilities", () => {
+    renderHook(() => useHomepageController(true, { id: "read-1" }));
+    expect(useHomepageActionsMock).toHaveBeenCalledWith(expect.objectContaining({
+      addEvent: expect.any(Function), loadEvents: expect.any(Function), refetchTasks: expect.any(Function), removePendingTask: expect.any(Function), selectedDate: new Date("2026-03-25T00:00:00Z"),
+    }));
+    expect(useHomepageRescheduleMock).toHaveBeenCalledWith(expect.objectContaining({
+      addEvent: expect.any(Function), deleteTask: expect.any(Function), editEvent: expect.any(Function), loadEvents: expect.any(Function), missedItems: ["missed"], overdueTasksForNow: ["overdue"], removeEvent: expect.any(Function), sortedEvents: ["sorted"],
+    }));
+  });
+
+  it("returns the composed controller payload matching all dimensions", () => {
+    const { result } = renderHook(() => useHomepageController(true, { id: "read-1" }));
+    expect(result.current).toEqual(expect.objectContaining({
+      displayName: "Alice", dayTasks: [{ id: 2 }], homeDataLoading: false, modals: { showCreateTaskModal: true },
+      state: { sortedEvents: ["sorted"], missedItems: ["missed"], overdueTasksForNow: ["overdue"] },
+      reschedule: { handleReschedule: expect.any(Function) }, tags: [{ id: 1, name: "Academic" }],
+      taskLists: [{ id: 3 }], upcomingDeadlines: [{ id: 4 }], breakTime: 5, hasTimerSession: true,
+      timerMode: "work", timerTask: "Essay", workTime: 25,
+    }));
   });
 });
