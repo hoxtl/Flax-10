@@ -35,18 +35,21 @@ import { TimelineGutter, TimelineRowLayout, TimelineSpineCell } from "../../../.
 describe("mini timeline parts extras", () => {
   it("covers tag slot list pill, overlap controls, and duration helper", () => {
     const onToggleConflictPopover = vi.fn();
+    const outerClick = vi.fn();
     const { rerender } = render(
-      <EventTagSlot
-        styles={styles}
-        isOverlap
-        isReadOnly={false}
-        rowId="row-1"
-        moduleCode=""
-        matchTask={{ task_list: 2 }}
-        taskLists={[{ id: 2, name: "Urgent" }]}
-        accentColor="#00aa00"
-        onToggleConflictPopover={onToggleConflictPopover}
-      />,
+      <div onClick={outerClick}>
+        <EventTagSlot
+          styles={styles}
+          isOverlap
+          isReadOnly={false}
+          rowId="row-1"
+          moduleCode=""
+          matchTask={{ task_list: 2 }}
+          taskLists={[{ id: 2, name: "Urgent" }]}
+          accentColor="#00aa00"
+          onToggleConflictPopover={onToggleConflictPopover}
+        />
+      </div>,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Reschedule to next free window" }));
@@ -68,6 +71,24 @@ describe("mini timeline parts extras", () => {
     );
     expect(screen.queryByRole("button", { name: "Reschedule to next free window" })).toBeNull();
     expect(screen.getByText("CS101")).toBeInTheDocument();
+
+    rerender(
+      <div onClick={outerClick}>
+        <EventTagSlot
+          styles={styles}
+          isOverlap={false}
+          isReadOnly={false}
+          rowId="row-3"
+          moduleCode=""
+          matchTask={{ task_list: 999 }}
+          taskLists={null}
+          accentColor="#663399"
+          onToggleConflictPopover={onToggleConflictPopover}
+        />
+      </div>,
+    );
+    fireEvent.click(screen.getByText("List"));
+    expect(outerClick).not.toHaveBeenCalled();
 
     const { rerender: rerenderDuration, container } = render(<EventDuration styles={styles} durationMins={0} />);
     expect(container.firstChild).toBeNull();
@@ -145,6 +166,33 @@ describe("mini timeline parts extras", () => {
     expect(onMoveTomorrow).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText("Scheduled during sleep hours")).toBeInTheDocument();
     expect(screen.getByText("10:00–11:30")).toBeInTheDocument();
+  });
+
+  it("covers blank conflict-card times and edit actions without a handler", () => {
+    render(
+      <>
+        <ConflictCard
+          itemRow={{ item: { title: "🔥 Untimed clash", start_time: "", end_time: "" } }}
+          styles={styles}
+          accent="#ff0000"
+          isSleepTime={false}
+          onContextMenu={vi.fn()}
+          onActivate={vi.fn()}
+          onMoveTomorrow={vi.fn()}
+          canMoveTomorrow={false}
+        />
+        <ConflictActions
+          styles={styles}
+          items={[{ id: "a", item: { title: "🔥 Untimed clash", tag: null }, isReadOnly: false }]}
+          freeRow={{ id: "gap-1" }}
+          movable={{ item: { title: "Untimed clash" } }}
+          onAutoMove={vi.fn()}
+        />
+      </>,
+    );
+
+    expect(screen.getAllByText("Untimed clash")).toHaveLength(2);
+    fireEvent.click(screen.getByTitle("Edit Untimed clash"));
   });
 
   it("covers free-row content variants and layout helpers", () => {

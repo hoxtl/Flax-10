@@ -36,7 +36,7 @@ export default function DeadlineCountdown({ dueDate, className = "", align = "en
   if (!dueDate && !label) return null;
   const tier = forcedTier || (dueDate ? getUrgencyTier(dueDate) : "distant");
   const pill = showPriority ? PRIORITY_PILL[tier] : null;
-  const daysLabel = label || (dueDate ? getDaysLabel(dueDate) : "");
+  const daysLabel = label || getDaysLabel(dueDate);
   const alignClass = align === "start" ? styles.alignStart : styles.alignEnd;
   return (
     <div className={buildClassName([styles.wrapper, alignClass, className])}>

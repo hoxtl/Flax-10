@@ -6,11 +6,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useModules from '../../components/Modules/hooks/useModules';
 
-vi.mock('../../context/NotificationContext', () => ({
+vi.mock('../../context/NotificationContext.jsx', () => ({
     useNotifications: vi.fn(() => ({ addNotification: vi.fn() })),
 }));
 
-vi.mock('../../api/moduleApi', () => ({
+vi.mock('../../api/moduleApi.js', () => ({
     getModules: vi.fn(),
     getEnrollments: vi.fn(),
     enrollInModule: vi.fn(),
@@ -18,29 +18,30 @@ vi.mock('../../api/moduleApi', () => ({
     deleteModule: vi.fn(),
 }));
 
-vi.mock('../../api/taskApi', () => ({
+vi.mock('../../api/taskApi.js', () => ({
     fetchTasks: vi.fn(),
 }));
 
-vi.mock('../../components/Modules/utils/moduleUtils', () => ({
+vi.mock('../../components/Modules/utils/moduleUtils.js', () => ({
     isEnrolledIn: vi.fn(),
     getEnrollmentId: vi.fn(),
+    normaliseModuleCode: vi.fn((value) => String(value || "").trim().toUpperCase()),
 }));
 
-vi.mock('../../components/Modules/utils/notifyHelper', () => ({
+vi.mock('../../components/Modules/utils/notifyHelper.js', () => ({
     createNotify: vi.fn(() => vi.fn()),
 }));
 
-vi.mock('../../context/ConfirmContext', () => ({
+vi.mock('../../context/ConfirmContext.jsx', () => ({
     useConfirm: vi.fn(() => vi.fn()),
 }));
 
-import { useNotifications } from '../../context/NotificationContext';
-import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi';
-import { fetchTasks } from '../../api/taskApi';
-import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils';
-import { createNotify } from '../../components/Modules/utils/notifyHelper';
-import { useConfirm } from '../../context/ConfirmContext';
+import { useNotifications } from '../../context/NotificationContext.jsx';
+import { getModules, getEnrollments, enrollInModule, disenrolFromModule, deleteModule } from '../../api/moduleApi.js';
+import { fetchTasks } from '../../api/taskApi.js';
+import { isEnrolledIn, getEnrollmentId } from '../../components/Modules/utils/moduleUtils.js';
+import { createNotify } from '../../components/Modules/utils/notifyHelper.js';
+import { useConfirm } from '../../context/ConfirmContext.jsx';
 
 const mockModules = [
     { id: 1, module_name: 'Math', module_code: 'MATH101' },
@@ -92,6 +93,26 @@ describe('useModules', () => {
         const { result } = renderHook(() => useModules());
         await waitFor(() => expect(result.current.loading).toBe(false));
         expect(mockNotify).toHaveBeenCalledWith('API error', 'error');
+    });
+
+    it('notifies when enrollments fail to load', async () => {
+        getEnrollments.mockRejectedValueOnce(new Error('enrollments failed'));
+        const { result } = renderHook(() => useModules());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(mockNotify).toHaveBeenCalledWith('enrollments failed', 'error');
+    });
+
+    it('normalizes nullish module, enrollment, and task payloads to empty collections', async () => {
+        getModules.mockResolvedValueOnce(null);
+        getEnrollments.mockResolvedValueOnce(null);
+        fetchTasks.mockResolvedValueOnce(undefined);
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+
+        expect(result.current.modules).toEqual([]);
+        expect(result.current.enrollments).toEqual([]);
+        expect(result.current.taskCountsByModule).toEqual({});
     });
 
     it('handleEnrollment enrolls user in a module', async () => {
@@ -223,6 +244,7 @@ describe('useModules', () => {
 
     it('marks matching enrollments as core when disenrolment is blocked by a core-module error', async () => {
         disenrolFromModule.mockRejectedValueOnce(new Error('This is a core module'));
+        getEnrollments.mockResolvedValueOnce([{ id: 10, module: 1 }, { id: 11, module: 2 }]);
         const { result } = renderHook(() => useModules());
 
         await waitFor(() => expect(result.current.loading).toBe(false));
@@ -230,8 +252,20 @@ describe('useModules', () => {
             await result.current.handleDisenrol(mockModules[0]);
         });
 
-        expect(result.current.enrollments).toEqual([{ id: 10, module: 1, is_core: true }]);
+        expect(result.current.enrollments).toEqual([{ id: 10, module: 1, is_core: true }, { id: 11, module: 2 }]);
         expect(mockNotify).not.toHaveBeenCalledWith('This is a core module', 'error');
+    });
+
+    it('reports generic disenrolment failures', async () => {
+        disenrolFromModule.mockRejectedValueOnce(new Error('Nope'));
+        const { result } = renderHook(() => useModules());
+
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        await act(async () => {
+            await result.current.handleDisenrol(mockModules[0]);
+        });
+
+        expect(mockNotify).toHaveBeenCalledWith('Nope', 'error');
     });
 
     it('directly deletes modules and runs the success callback', async () => {

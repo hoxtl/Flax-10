@@ -31,7 +31,7 @@ const renderDefaultItem = (item, index, selectedIndex) => (
 const getItemContent = (renderItem, item, index, selectedIndex) =>
   (renderItem ? renderItem(item, index, selectedIndex === index) : renderDefaultItem(item, index, selectedIndex));
 
-const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }) => {
+const AnimatedItem = ({ children, delay, index, onMouseEnter, onClick }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.5, triggerOnce: false });
   return (

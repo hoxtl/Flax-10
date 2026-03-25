@@ -108,6 +108,45 @@ describe('NotificationToast', () => {
     expect(document.querySelector('[class*="success"]')).toBeTruthy();
   });
 
+  it('uses error styling for failed notifications', () => {
+    let state = { notifications: [oldNotification], loading: false };
+    useNotificationsMock.mockImplementation(() => state);
+
+    const { rerender } = render(<NotificationToast />);
+    state = { notifications: [oldNotification, { id: 10, title: 'Request failed', message: 'Denied.' }], loading: false };
+    act(() => {
+      rerender(<NotificationToast />);
+    });
+
+    expect(document.querySelector('[class*="error"]')).toBeTruthy();
+  });
+
+  it('uses info styling for neutral notifications', () => {
+    let state = { notifications: [oldNotification], loading: false };
+    useNotificationsMock.mockImplementation(() => state);
+
+    const { rerender } = render(<NotificationToast />);
+    state = { notifications: [oldNotification, { id: 11, title: 'Heads up', message: 'FYI.' }], loading: false };
+    act(() => {
+      rerender(<NotificationToast />);
+    });
+
+    expect(document.querySelector('[class*="info"]')).toBeTruthy();
+  });
+
+  it('falls back to info styling when a notification title is missing', () => {
+    let state = { notifications: [oldNotification], loading: false };
+    useNotificationsMock.mockImplementation(() => state);
+
+    const { rerender } = render(<NotificationToast />);
+    state = { notifications: [oldNotification, { id: 12, title: null, message: 'Untitled.' }], loading: false };
+    act(() => {
+      rerender(<NotificationToast />);
+    });
+
+    expect(document.querySelector('[class*="info"]')).toBeTruthy();
+  });
+
   it('queues multiple new notifications and shows the next toast after timeout', () => {
     const newerNotification = { id: 3, title: 'Newest', message: 'Queued' };
     let state = { notifications: [oldNotification], loading: false };

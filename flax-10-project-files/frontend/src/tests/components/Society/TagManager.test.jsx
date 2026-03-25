@@ -102,16 +102,36 @@ describe('TagManager', () => {
     it('allows choosing custom color', () => {
         render(<TagManager tags={[]} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
         const colorInput = document.querySelector('input[type="color"]');
-        fireEvent.change(colorInput, { target: { value: '#000000' } });
-        expect(colorInput.value).toBe('#000000');
+        fireEvent.change(colorInput, { target: { value: '#123456' } });
+        expect(colorInput.value).toBe('#123456');
+    });
+
+    it('submits a tag using a custom color', async () => {
+        const onAddTag = vi.fn().mockResolvedValue(true);
+        render(<TagManager tags={[]} onAddTag={onAddTag} onDeleteTag={vi.fn()} />);
+
+        const colorInput = document.querySelector('input[type="color"]');
+        fireEvent.change(colorInput, { target: { value: '#123456' } });
+        fireEvent.change(screen.getByPlaceholderText('Tag name'), { target: { value: 'Custom' } });
+        await act(async () => {
+            fireEvent.click(screen.getByText('Add'));
+        });
+
+        expect(onAddTag).toHaveBeenCalledWith({ label: 'Custom', color: '#123456' });
     });
 
     it('getNextColor falls back to first color if all taken', () => {
         const fullTags = [
-            "#3b82f6", "#ef4444", "#22c55e", "#f97316", "#8b5cf6", "#ec4899", "#14b8a6", "#eab308"
+            "var(--color-light-blue)",
+            "var(--color-error)",
+            "var(--gw-priority-low)",
+            "var(--color-amber)",
+            "var(--chart-accent-purple)",
+            "var(--chart-accent-pink)",
+            "var(--color-teal)",
+            "var(--chart-accent-amber)",
         ].map((c, i) => ({ id: i, label: `Tag ${i}`, color: c }));
         render(<TagManager tags={fullTags} onAddTag={vi.fn()} onDeleteTag={vi.fn()} />);
-        // This is harder to test directly via UI since the form is hidden, but internal logic is tested
-        // We could export getNextColor, but let's just trust the branch coverage for now or add a test that triggers it
+        expect(screen.getByText('8/7')).toBeInTheDocument();
     });
 });

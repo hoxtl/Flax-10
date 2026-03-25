@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Tabs from '../../../components/common/Tabs/Tabs';
 
-vi.mock('../../../components/common/Tabs/Tabs.module.css', () => ({ default: { container: 'container', tabBar: 'tabBar', tab: 'tab', active: 'active', content: 'content' } }));
+vi.mock('../../../components/common/Tabs/Tabs.module.css', () => ({ default: { container: 'container', compact: 'compact', tabBar: 'tabBar', tab: 'tab', active: 'active', headingTab: 'headingTab', tabIndicator: 'tabIndicator', content: 'content' } }));
 
 describe('Tabs', () => {
   it('returns null when tabs is empty or null', () => {
@@ -36,5 +36,30 @@ describe('Tabs', () => {
     render(<Tabs tabs={tabs} activeTab="y" onTabChange={vi.fn()} />);
     expect(screen.getByText('Y content')).toBeInTheDocument();
     expect(screen.queryByText('X content')).not.toBeInTheDocument();
+  });
+
+  it('supports compact layout, heading tabs, icons, custom classes, and middle content', () => {
+    const tabs = [
+      { id: 'one', label: 'One', icon: <span>1</span>, content: <span>Content One</span> },
+      { id: 'two', label: 'Two', content: <span>Content Two</span> },
+    ];
+    const { container } = render(
+      <Tabs
+        tabs={tabs}
+        activeTab="one"
+        onTabChange={vi.fn()}
+        compact
+        className="outer"
+        tabClassName="tab-extra"
+        tabVariant="heading"
+        middle={<div>Middle block</div>}
+      />
+    );
+
+    expect(container.firstChild.className).toContain('compact');
+    expect(container.firstChild.className).toContain('outer');
+    expect(screen.getByText('Middle block')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '1One' }).className).toContain('tab-extra');
+    expect(screen.getByRole('button', { name: '1One' }).className).toContain('headingTab');
   });
 });

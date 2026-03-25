@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import { BRANCH_TIPS } from './treePixels';
 import canvasColors from './focusCanvasColors.json';
 
-const hslaColor = (h, s, l, a) => `hsl${a < 1 ? 'a' : ''}(${h},${s}%,${l}%${a < 1 ? `,${a}` : ''})`;
-const rgbaColor = (rgb, a) => `rgb${a < 1 ? 'a' : ''}(${rgb}${a < 1 ? `,${a}` : ''})`;
+const hslaColor = (h, s, l, a) => `hsla(${h},${s}%,${l}%,${a})`;
+const rgbaColor = (rgb, a) => `rgba(${rgb},${a})`;
 
 function makeLeaf() {
   const tip = BRANCH_TIPS[Math.floor(Math.random() * BRANCH_TIPS.length)];
@@ -123,11 +123,7 @@ function useAnimationType() {
 }
 
 function loadAnimationType() {
-  try {
-    return localStorage.getItem('focusAnimationType') || 'tree';
-  } catch {
-    return 'tree';
-  }
+  return localStorage.getItem('focusAnimationType') || 'tree';
 }
 
 function persistAnimationType(nextType, setAnimationType) {

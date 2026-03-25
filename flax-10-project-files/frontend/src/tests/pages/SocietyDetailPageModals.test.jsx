@@ -63,7 +63,7 @@ vi.mock("../../components/Society/SocietyDetail/MemberDirectoryModal", () => ({
 }));
 
 vi.mock("../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementModal", () => ({
-  default: ({ societyId, tags }) => (
+  default: ({ societyId, tags = [] }) => (
     <div data-testid="announcement-modal">
       <span>{societyId}</span>
       <span>{tags.join(",")}</span>
@@ -86,7 +86,7 @@ function buildData(overrides = {}) {
       role: "editor",
       is_admin: true,
       has_reported: false,
-      images: [{ image_url: "cover-1" }, { image_url: "cover-2" }],
+      images: [{ url: "cover-1" }, { url: "cover-2" }],
       announcements: [],
       tags: ["arts", "events"],
       ratification_status: "pending",

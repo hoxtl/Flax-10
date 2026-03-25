@@ -132,4 +132,56 @@ describe('PreferencesPanel', () => {
     fireEvent.submit(bedtimeInput.closest('form'));
     await waitFor(() => expect(screen.getByRole('button', { name: /saved!/i })).toBeTruthy());
   });
+
+  it('skips appearance saves when nothing changed and renders scheduling subtabs', async () => {
+    const onSave = vi.fn();
+    useTheme.mockReturnValue({ mode: 'light', setMode: vi.fn(), theme: 'flax', setTheme: vi.fn() });
+
+    const { rerender, container } = render(<PreferencesPanel onSave={onSave} isSaving={false} />);
+    await screen.findByText('Appearance');
+    fireEvent.submit(container.querySelector('form'));
+    expect(onSave).not.toHaveBeenCalled();
+
+    rerender(<PreferencesPanel onSave={vi.fn()} isSaving={false} activeSubTab="scheduling" />);
+    expect(screen.getByText(/Daily Study Time/i)).toBeInTheDocument();
+
+    rerender(<PreferencesPanel onSave={vi.fn()} isSaving={false} activeSubTab="week" />);
+    expect(screen.getByRole('button', { name: /Save scheduling days/i })).toBeInTheDocument();
+
+    rerender(<PreferencesPanel onSave={vi.fn()} isSaving={false} activeSubTab="daynight" />);
+    expect(screen.getByRole('button', { name: /Save study time preference/i })).toBeInTheDocument();
+  });
+
+  it('does not fire the saved appearance signal when appearance saving fails', async () => {
+    const onSave = vi.fn().mockResolvedValue(false);
+    useTheme.mockReturnValue({ mode: '', setMode: vi.fn(), theme: 'flax', setTheme: vi.fn() });
+    const bootstrap = render(<PreferencesPanel onSave={vi.fn()} isSaving={false} />);
+    await screen.findByText('Appearance');
+    bootstrap.unmount();
+
+    mockStatefulTheme();
+    const { container } = render(<PreferencesPanel onSave={onSave} isSaving={false} />);
+
+    await screen.findByText('Appearance');
+    const interfaceModeGroup = screen.getByText('Interface Mode').closest('div');
+    fireEvent.click(within(interfaceModeGroup).getByText('Dark').closest('button'));
+    fireEvent.submit(container.querySelector('form'));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith({ mode: 'dark', theme: 'flax' }));
+    expect(screen.getByRole('button', { name: 'Save Appearance' })).toBeInTheDocument();
+  });
+
+  it('does not mark sleep settings as saved when the sleep save fails', async () => {
+    const onSleepSave = vi.fn().mockResolvedValue(false);
+    useTheme.mockReturnValue({ mode: 'light', setMode: vi.fn(), theme: 'flax', setTheme: vi.fn() });
+
+    render(<PreferencesPanel onSave={vi.fn()} onSleepSave={onSleepSave} isSaving={false} activeSubTab="sleep" />);
+
+    const bedtimeInput = await screen.findByTestId('Pick bedtime');
+    fireEvent.change(bedtimeInput, { target: { value: '22:45' } });
+    fireEvent.submit(bedtimeInput.closest('form'));
+
+    await waitFor(() => expect(onSleepSave).toHaveBeenCalledWith({ sleep_time: '22:45', wake_time: '07:00' }));
+    expect(screen.queryByRole('button', { name: /saved!/i })).not.toBeInTheDocument();
+  });
 });

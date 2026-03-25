@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { useReducedMotion } from 'framer-motion';
 import { WeeklyChart } from '../../../../components/Timer/historyPanel/WeeklyChart';
 
 vi.mock('../../../../pages/Timer/TimerPage.module.css', () => ({ default: {} }));
@@ -79,5 +80,30 @@ describe('WeeklyChart', () => {
   it('renders the chart container without errors when series is empty', () => {
     const { container } = render(<WeeklyChart weeklySeries={[]} maxWeeklySeconds={60} />);
     expect(container.querySelector('[role="img"]')).toBeTruthy();
+  });
+
+  it('renders animated bars when reduced motion is disabled', () => {
+    useReducedMotion.mockReturnValue(false);
+    const { container } = render(<WeeklyChart weeklySeries={makeSeries([3600])} maxWeeklySeconds={3600} />);
+    expect(container.querySelector('span[style]').style.height).toBe('100%');
+    useReducedMotion.mockReturnValue(true);
+  });
+
+  it('applies the today classes and guards against a zero max value', () => {
+    const todayKey = new Date();
+    todayKey.setHours(0, 0, 0, 0);
+
+    // CSS module is mocked to return empty object so class names are undefined;
+    // we just verify the chart renders without errors for a today key with zero max
+    const { container } = render(
+      <WeeklyChart
+        weeklySeries={[{ key: todayKey.toISOString().slice(0, 10), label: 'Today', seconds: 0 }]}
+        maxWeeklySeconds={0}
+      />,
+    );
+
+    expect(screen.getByText('Today')).toBeTruthy();
+    expect(screen.getByText('0.0h')).toBeTruthy();
+    expect(container.querySelector('span[style]')).toBeTruthy();
   });
 });

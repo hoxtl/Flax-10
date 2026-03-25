@@ -25,3 +25,4 @@ pnpm-debug.log*
 # Coverage Report
 coverage
 coverage-fresh/
+coverage-*/

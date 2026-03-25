@@ -19,14 +19,17 @@ export function RenameInput({ value, onSave, onCancel }) {
 
 function useCtxMenuOutsideClick(ref, onClose) {
   useEffect(() => {
-    const handler = (event) => { if (ref.current && !ref.current.contains(event.target)) onClose(); };
+    const handler = (event) => { if (!ref.current.contains(event.target)) onClose(); };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [ref, onClose]);
 }
 
 function useCtxMenuPosition(ref, x, y) {
-  useEffect(() => { if (ref.current) { ref.current.style.setProperty("--ctx-top", `${y}px`); ref.current.style.setProperty("--ctx-left", `${x}px`); } }, [ref, x, y]);
+  useEffect(() => {
+    ref.current.style.setProperty("--ctx-top", `${y}px`);
+    ref.current.style.setProperty("--ctx-left", `${x}px`);
+  }, [ref, x, y]);
 }
 
 export function ListContextMenu({ x, y, onRename, onDelete, onClose }) {

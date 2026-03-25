@@ -105,4 +105,77 @@ describe("authSubmitHandlers", () => {
     expect(setLoading).toHaveBeenLastCalledWith(false);
     expect(setError).not.toHaveBeenCalled();
   });
+
+  it("stores an empty ban reason when the backend omits it", async () => {
+    const setError = vi.fn();
+    const setLoading = vi.fn();
+    authService.login.mockResolvedValue({
+      response: { status: 403, ok: false },
+      data: { is_banned: true },
+    });
+
+    await submitSignIn({ username: "u", password: "p" }, setError, setLoading);
+
+    expect(localStorage.getItem("ban_reason")).toBe("");
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("handles rejected signup requests with the generic error message", async () => {
+    const setError = vi.fn();
+    const setLoading = vi.fn();
+    authService.register.mockRejectedValueOnce(new Error("offline"));
+
+    await submitSignUp({ password: "a", password2: "a" }, setError, setLoading);
+
+    expect(setError).toHaveBeenCalledWith("There has been an error, please try again...");
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("saves user data after a successful sign in", async () => {
+    const setError = vi.fn();
+    const setLoading = vi.fn();
+    authService.login.mockResolvedValueOnce({
+      response: { ok: true, status: 200 },
+      data: { token: "token-2", user: { id: 2 } },
+    });
+
+    const promise = submitSignIn({ username: "u", password: "p" }, setError, setLoading);
+    await vi.advanceTimersByTimeAsync(180);
+    await promise;
+
+    expect(saveUserData).toHaveBeenCalledWith("token-2", { id: 2 });
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("shows backend sign-in errors and falls back when the backend omits the message", async () => {
+    const setError = vi.fn();
+    const setLoading = vi.fn();
+    authService.login.mockResolvedValueOnce({
+      response: { ok: false, status: 401 },
+      data: { error: "Wrong password" },
+    });
+
+    await submitSignIn({ username: "u", password: "p" }, setError, setLoading);
+    expect(setError).toHaveBeenCalledWith("Wrong password");
+
+    setError.mockClear();
+    authService.login.mockResolvedValueOnce({
+      response: { ok: false, status: 401 },
+      data: {},
+    });
+
+    await submitSignIn({ username: "u", password: "p" }, setError, setLoading);
+    expect(setError).toHaveBeenCalledWith("Invalid username or password");
+  });
+
+  it("handles rejected sign-in requests with the generic error message", async () => {
+    const setError = vi.fn();
+    const setLoading = vi.fn();
+    authService.login.mockRejectedValueOnce(new Error("offline"));
+
+    await submitSignIn({ username: "u", password: "p" }, setError, setLoading);
+
+    expect(setError).toHaveBeenCalledWith("There has been an error, please try again...");
+    expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
 });

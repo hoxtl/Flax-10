@@ -58,4 +58,17 @@ describe("Tooltip", () => {
     fireEvent.mouseEnter(rightWrapper);
     expect(screen.getByRole("tooltip")).toHaveTextContent("Right tip");
   });
+
+  it("does not render a tooltip when the content is empty even after hover", () => {
+    render(
+      <Tooltip content={null}>
+        <span>No tip</span>
+      </Tooltip>
+    );
+
+    const wrapper = screen.getByText("No tip").parentElement;
+    wrapper.getBoundingClientRect = () => ({ top: 100, bottom: 120, left: 50, right: 150, width: 100, height: 20 });
+    fireEvent.mouseEnter(wrapper);
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
 });

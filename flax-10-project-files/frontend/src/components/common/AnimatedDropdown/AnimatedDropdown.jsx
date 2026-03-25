@@ -106,7 +106,7 @@ function FlatOptions({ options, value, onSelect, hideCheckmark }) {
   });
 }
 
-function DropdownButton({ selectedLabel, value, isOpen, onClick, triggerClassName = "" }) {
+function DropdownButton({ selectedLabel, value, isOpen, onClick, triggerClassName }) {
   return (
     <motion.button type="button" whileTap={{ scale: 0.99 }} onClick={onClick} className={triggerClassName ? `${styles.dropdownBtn} ${triggerClassName}` : styles.dropdownBtn}>
       <span style={{ color: value ? 'inherit' : 'var(--muted)' }}>{selectedLabel}</span>

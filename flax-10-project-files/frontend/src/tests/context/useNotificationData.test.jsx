@@ -263,7 +263,7 @@ describe('useNotificationPolling', () => {
     });
 
     it('should not call refreshProfile when refreshProfile is undefined', async () => {
-        const fresh = [{ id: 11, title: 'Teacher role approved', notification_type: 'info' }];
+      const fresh = [{ id: 11, title: 'Teacher role approved', notification_type: 'info' }];
         api.fetchNotifications.mockResolvedValue(fresh);
         const knownIds = { current: new Set() };
 
@@ -274,7 +274,23 @@ describe('useNotificationPolling', () => {
             );
         }).not.toThrow();
 
+      act(() => { vi.advanceTimersByTime(30000); });
+      await act(async () => { await Promise.resolve(); });
+    });
+
+    it('ignores role-refresh logic when a notification has no title', async () => {
+        const fresh = [{ id: 12, message: 'Untitled', notification_type: 'info' }];
+        api.fetchNotifications.mockResolvedValue(fresh);
+        const knownIds = { current: new Set() };
+        const refreshProfile = vi.fn();
+
+        renderHook(() =>
+            useNotificationPolling([], vi.fn(), knownIds, refreshProfile)
+        );
+
         act(() => { vi.advanceTimersByTime(30000); });
         await act(async () => { await Promise.resolve(); });
+
+        expect(refreshProfile).not.toHaveBeenCalled();
     });
 });

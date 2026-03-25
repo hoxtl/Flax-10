@@ -63,9 +63,10 @@ describe('useDeadlineModal', () => {
   });
 
   it('submits edit deadline and updates list', async () => {
+    getDeadlinesMock.mockResolvedValueOnce([{ id: 1, title: 'CW' }, { id: 3, title: 'Exam' }]);
     const { result } = renderHook(() => useDeadlineModal(7, false));
 
-    await waitFor(() => expect(result.current.deadlines.length).toBe(1));
+    await waitFor(() => expect(result.current.deadlines.length).toBe(2));
     act(() => result.current.openEdit({ id: 1, title: 'CW' }));
 
     await act(async () => {
@@ -73,7 +74,7 @@ describe('useDeadlineModal', () => {
     });
 
     expect(updateDeadlineMock).toHaveBeenCalledWith(7, 1, { title: 'CW updated', end_due_date: '2026-03-11' });
-    expect(result.current.deadlines).toEqual([{ id: 1, title: 'CW updated' }]);
+    expect(result.current.deadlines).toEqual([{ id: 1, title: 'CW updated' }, { id: 3, title: 'Exam' }]);
   });
 
   it('deletes deadline and removes from list', async () => {

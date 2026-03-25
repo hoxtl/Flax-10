@@ -53,9 +53,15 @@ describe("account extras", () => {
       requested_course: "Physics",
     });
     expect(normaliseCourseRequest({ requestedCourse: "History", status: "pending" }).requested_course).toBe("History");
+    expect(normaliseCourseRequest([{ status: "approved", requested_course: "Chemistry" }, { status: "rejected" }])).toEqual(
+      expect.objectContaining({ status: "approved", requested_course: "Chemistry" }),
+    );
+    expect(normaliseCourseRequest(["bad-data"])).toBeNull();
 
     setCachedPendingRequest("Physics");
     expect(getCachedPendingRequest()).toEqual({ status: "pending", requested_course: "Physics" });
+    localStorage.setItem("course_change_pending_request", JSON.stringify({ created_at: 1 }));
+    expect(getCachedPendingRequest()).toBeNull();
     localStorage.setItem("course_change_pending_request", "bad-json");
     expect(getCachedPendingRequest()).toBeNull();
     clearCachedPendingRequest();
@@ -70,6 +76,7 @@ describe("account extras", () => {
       email: "a@b.com",
       year: "Year 2",
     });
+    expect(getInitialAccountData()).toEqual({ firstName: "", lastName: "", email: "", year: "" });
     expect(hasAccountChanges({ firstName: "A", lastName: "B", email: "c", year: "1" }, { firstName: "A", lastName: "B", email: "d", year: "1" })).toBe(true);
   });
 
@@ -104,6 +111,36 @@ describe("account extras", () => {
     expect(result.current.pendingRequest).toBeNull();
   });
 
+  it("keeps empty profile state while auth is loading and caches pending API requests", async () => {
+    useAuth.mockReturnValue({
+      profile: null,
+      loading: true,
+      refreshProfile: vi.fn(),
+    });
+    getMyCourseChangeRequest.mockResolvedValueOnce({ status: "pending", requested_course: "Physics" });
+
+    const { result } = renderHook(() => useAccountFormState());
+
+    await waitFor(() => expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "Physics" }));
+    expect(result.current.currentCourse).toBe("");
+    expect(result.current.formData).toEqual({ firstName: "", lastName: "", email: "", year: "" });
+    expect(localStorage.getItem("course_change_pending_request")).toContain("Physics");
+  });
+
+  it("keeps pending requests without a requested course out of the cache", async () => {
+    useAuth.mockReturnValue({
+      profile: { first_name: "Ava", major: "Physics" },
+      loading: false,
+      refreshProfile: vi.fn(),
+    });
+    getMyCourseChangeRequest.mockResolvedValueOnce({ status: "pending" });
+
+    const { result } = renderHook(() => useAccountFormState());
+
+    await waitFor(() => expect(result.current.pendingRequest).toEqual({ status: "pending", requested_course: "" }));
+    expect(localStorage.getItem("course_change_pending_request")).toBeNull();
+  });
+
   it("handles feedback state from cache and account/course request action creators", async () => {
     setCachedPendingRequest("Physics");
     const { result } = renderHook(() => useCourseRequestFeedback());
@@ -128,12 +165,37 @@ describe("account extras", () => {
     expect(context.onSave).toHaveBeenCalled();
     expect(context.setInitialFormData).toHaveBeenCalledWith(context.formData);
 
+    const pristineContext = {
+      ...context,
+      hasUnsaved: false,
+      onSave: vi.fn(),
+      setInitialFormData: vi.fn(),
+      setSaveSignal: vi.fn(),
+    };
+    await createAccountSubmitHandler(pristineContext)({ preventDefault: vi.fn() });
+    expect(pristineContext.onSave).not.toHaveBeenCalled();
+
+    const failedSaveContext = {
+      ...context,
+      onSave: vi.fn().mockResolvedValue(false),
+      setInitialFormData: vi.fn(),
+      setSaveSignal: vi.fn(),
+    };
+    await createAccountSubmitHandler(failedSaveContext)({ preventDefault: vi.fn() });
+    expect(failedSaveContext.setInitialFormData).not.toHaveBeenCalled();
+    expect(failedSaveContext.setSaveSignal).not.toHaveBeenCalled();
+
     cancelCourseChangeRequest.mockResolvedValueOnce({});
     getMyCourseChangeRequest.mockResolvedValueOnce({ status: "rejected" });
     const cancel = createCancelCourseRequestHandler(context);
     await cancel();
     expect(context.setPendingRequest).toHaveBeenCalledWith(null);
     expect(context.setCourseRequestNotice).toHaveBeenCalledWith("Request cancelled.");
+
+    cancelCourseChangeRequest.mockResolvedValueOnce({});
+    getMyCourseChangeRequest.mockRejectedValueOnce(new Error("offline"));
+    await cancel();
+    expect(context.refreshProfile).toHaveBeenCalled();
 
     cancelCourseChangeRequest.mockRejectedValueOnce(new Error("No pending request to cancel"));
     await cancel();
@@ -143,9 +205,18 @@ describe("account extras", () => {
     await cancel();
     expect(context.setCourseRequestError).toHaveBeenCalledWith("Server exploded");
 
+    cancelCourseChangeRequest.mockRejectedValueOnce({});
+    await cancel();
+    expect(context.setCourseRequestError).toHaveBeenCalledWith("Failed to cancel request. Please try again.");
+
     const success = createCourseRequestSuccessHandler(context);
     success({ requestedCourse: "History" }, "History");
     expect(context.setPendingRequest).toHaveBeenCalledWith({ requestedCourse: "History", status: "pending", requested_course: "History" });
     expect(context.setShowModal).toHaveBeenCalledWith(false);
+
+    localStorage.clear();
+    success(null, "");
+    expect(context.setPendingRequest).toHaveBeenCalledWith({ status: "pending", requested_course: "" });
+    expect(localStorage.getItem("course_change_pending_request")).toBeNull();
   });
 });

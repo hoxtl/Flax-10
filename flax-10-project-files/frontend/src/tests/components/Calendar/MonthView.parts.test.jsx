@@ -46,6 +46,7 @@ vi.mock("../../../components/Calendar/hooks/useSwipeNavigation", () => ({
 
 import { DayCell } from "../../../components/Calendar/MonthView/DayCell";
 import { EventDot, MoreEvents } from "../../../components/Calendar/MonthView/EventDot";
+import { WeekRow } from "../../../components/Calendar/MonthView/WeekRow";
 import { SwipeMonthView } from "../../../components/Calendar/MonthView/SwipeMonthView";
 
 describe("MonthView parts", () => {
@@ -95,6 +96,33 @@ describe("MonthView parts", () => {
     expect(screen.queryByText("+")).not.toBeInTheDocument();
   });
 
+  it("renders a fresh readonly day cell and forwards the more-events click", () => {
+    const onDateSelect = vi.fn();
+    const onMoreClick = vi.fn();
+    const events = [1, 2, 3, 4].map((id) => ({
+      id,
+      title: `Event ${id}`,
+      start_time: new Date("2026-03-24T10:00:00.000Z"),
+      end_time: new Date("2026-03-24T11:00:00.000Z"),
+    }));
+
+    render(
+      <DayCell
+        day={new Date("2026-03-24T00:00:00.000Z")}
+        events={events}
+        isCur
+        onDateSelect={onDateSelect}
+        onMoreClick={onMoreClick}
+        readOnly
+      />,
+    );
+
+    fireEvent.click(screen.getByText("24"));
+    fireEvent.click(screen.getByText("+1 more"));
+    expect(onDateSelect).toHaveBeenCalledWith(new Date("2026-03-24T00:00:00.000Z"));
+    expect(onMoreClick).toHaveBeenCalledWith(new Date("2026-03-24T00:00:00.000Z"));
+  });
+
   it("renders event dots for personal and readonly variants", () => {
     const onEventClick = vi.fn();
     const { rerender } = render(
@@ -125,6 +153,23 @@ describe("MonthView parts", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_SELECTED_DATE", payload: expect.any(Date) });
     expect(dispatch).toHaveBeenCalledWith({ type: "SET_VIEW_MODE", payload: "day" });
     await waitFor(() => expect(dispatch).not.toBeNull());
+  });
+
+  it("sorts all-day events ahead of timed events within a week row", () => {
+    const day = new Date("2026-03-24T00:00:00.000Z");
+    render(
+      <WeekRow
+        days={[day]}
+        cur={day}
+        events={[
+          { id: 1, title: "Timed", start_time: new Date("2026-03-24T10:00:00.000Z"), end_time: new Date("2026-03-24T11:00:00.000Z") },
+          { id: 2, title: "All day", all_day: true, start_time: new Date("2026-03-24T00:00:00.000Z"), end_time: new Date("2026-03-25T00:00:00.000Z") },
+        ]}
+      />,
+    );
+
+    const buttonTexts = screen.getAllByRole("button").map((button) => button.textContent);
+    expect(buttonTexts.indexOf("All day")).toBeLessThan(buttonTexts.indexOf("Timed"));
   });
 
   it("delays month navigation until the swipe animation timeout completes", () => {

@@ -58,4 +58,11 @@ describe("listColorUtils", () => {
     const color = getListColor({ name: "L" }, 2);
     expect(color).toBeDefined();
   });
+
+  it("falls back to the first palette colour when idx is null", () => {
+    globalThis.localStorage.getItem = vi.fn(() => null);
+    const color = getListColor({ id: 7, name: "L" }, null);
+    expect(color).toBeDefined();
+    expect(typeof color).toBe("string");
+  });
 });

@@ -32,7 +32,7 @@ function useNotificationActions(set, knownIds) {
 }
 
 function trackKnownId(knownIds, id) {
-    if (knownIds?.current) knownIds.current.add(id);
+    knownIds.current.add(id);
 }
 
 async function createNotify(notification, set, knownIds) {

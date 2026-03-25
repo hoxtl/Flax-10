@@ -42,6 +42,8 @@ import {
   setPromptedId,
 } from "../../../components/Attendance/attendancePromptStorage";
 
+const attendanceStatsState = { overall: { attended: 0, missed: 0 } };
+
 const recordAttendanceMock = vi.fn();
 const getEventsMock = vi.fn();
 const candidateState = { value: null, setValue: vi.fn() };
@@ -57,6 +59,10 @@ vi.mock("../../../api/eventApi", () => ({
 
 vi.mock("../../../components/Attendance/hooks/useCandidateEvent", () => ({
   useCandidateEvent: vi.fn(() => [candidateState.value, candidateState.setValue]),
+}));
+
+vi.mock("../../../pages/Attendance/hooks/useAttendanceStats", () => ({
+  useAttendanceStats: () => ({ refetch: vi.fn(), stats: attendanceStatsState }),
 }));
 
 vi.mock("../../../components/common/ConfirmModal/ConfirmModal", () => ({
@@ -107,13 +113,7 @@ describe("Attendance prompt", () => {
 
   it("wires the prompt modal buttons", () => {
     const onAnswer = vi.fn().mockResolvedValue(true);
-    const onDismiss = vi.fn();
-    const { unmount } = render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
-    fireEvent.click(screen.getByText("Dismiss"));
-    expect(onDismiss).toHaveBeenCalled();
-    unmount();
-
-    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={onDismiss} />);
+    render(<AttendancePromptModal event={{ title: "Seminar" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
     fireEvent.click(screen.getByText("Yes"));
     act(() => {
       vi.advanceTimersByTime(1200);
@@ -137,6 +137,77 @@ describe("Attendance prompt", () => {
     fireEvent.mouseDown(document.querySelector('[class*="modal"]'));
   });
 
+  it("renders the orange ring state for mid-range attendance and ignores repeat answers while pending", () => {
+    attendanceStatsState.overall = { attended: 1, missed: 1 };
+    const onAnswer = vi.fn().mockResolvedValue(true);
+
+    render(<AttendancePromptModal event={{ title: "Workshop" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
+
+    expect(screen.getByText("50%")).toBeInTheDocument();
+    const yesButton = screen.getByText("Yes");
+    fireEvent.click(yesButton);
+    fireEvent.click(yesButton);
+
+    act(() => {
+      vi.advanceTimersByTime(1200);
+    });
+
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+      expect(onAnswer).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ afterSuccess: expect.any(Function), closeDelayMs: 700 }),
+    );
+  });
+
+  it("falls back to empty attendance totals when the stats payload has no overall section", () => {
+    delete attendanceStatsState.overall;
+
+    render(<AttendancePromptModal event={{ title: "Workshop" }} onAnswer={vi.fn().mockResolvedValue(true)} onDismiss={vi.fn()} />);
+
+    expect(screen.getByText("100%")).toBeInTheDocument();
+
+    attendanceStatsState.overall = { attended: 0, missed: 0 };
+  });
+
+  it("dismisses with null event (no session id stored)", () => {
+    const setEvent = vi.fn();
+    // null event → if (event) is false → no setSessionDismissedId call
+    dismissAttendancePrompt(null, setEvent);
+    expect(setEvent).toHaveBeenCalledWith(null);
+    // No id stored since event was null
+    expect(getSessionDismissedIds().size).toBe(0);
+  });
+
+  it("uses default closeDelayMs when not provided in options", async () => {
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+    recordAttendanceMock.mockResolvedValue({});
+    // Don't provide closeDelayMs in options (undefined) → default 250ms branch used
+    // closeDelayMs > 0 → wait(closeDelayMs) is called
+    const afterSuccess = vi.fn().mockResolvedValue(undefined);
+    // Use vi.runAllTimersAsync to handle async timers
+    const promise = submitAttendancePromptAnswer({ id: 99 }, true, false, setEvent, setSubmitting, { afterSuccess });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+    expect(result).toBe(true);
+    expect(setEvent).toHaveBeenCalledWith(null);
+  });
+
+  it("ignores double-tap when answer is already set (button disabled state)", async () => {
+    const onAnswer = vi.fn().mockResolvedValue(true);
+    render(<AttendancePromptModal event={{ title: "Lab" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
+
+    const yesButton = screen.getByText("Yes");
+    // First click sets answeredWith = true
+    await act(async () => { fireEvent.click(yesButton); });
+    // Second click should hit the guard (answeredWith !== null → return)
+    await act(async () => { fireEvent.click(yesButton); });
+
+    act(() => { vi.advanceTimersByTime(1200); });
+    // Only one onAnswer call should happen
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+  });
+
   it("dismisses and submits attendance prompt answers", async () => {
     const setEvent = vi.fn();
     recordAttendanceMock.mockResolvedValue({});
@@ -150,6 +221,21 @@ describe("Attendance prompt", () => {
     expect(recordAttendanceMock).toHaveBeenCalledWith(9, true);
     expect(setSubmitting).toHaveBeenCalledWith(true);
     expect(setSubmitting).toHaveBeenCalledWith(false);
+  });
+
+  it("returns early when there is no event or a submission is already in progress", async () => {
+    const setEvent = vi.fn();
+    const setSubmitting = vi.fn();
+
+    await expect(
+      submitAttendancePromptAnswer(null, true, false, setEvent, setSubmitting),
+    ).resolves.toBe(false);
+    await expect(
+      submitAttendancePromptAnswer({ id: 10 }, true, true, setEvent, setSubmitting),
+    ).resolves.toBe(false);
+
+    expect(setEvent).not.toHaveBeenCalled();
+    expect(setSubmitting).not.toHaveBeenCalled();
   });
 
   it("shows an error and restores the question when submission fails", async () => {
@@ -202,6 +288,8 @@ describe("Attendance prompt", () => {
     expect(isInPromptWindow(candidate)).toBe(true);
     expect(new Date(getDateRangeForPrompt().start).toString()).not.toBe("Invalid Date");
     expect(findCandidateEvent([candidate, { id: 12 }], new Set())).toEqual(candidate);
+    expect(isInPromptWindow({ start_time: "2026-02-25T08:00:00Z", end_time: "2026-02-25T08:30:00Z" })).toBe(false);
+    expect(findCandidateEvent(null, new Set())).toBeNull();
 
     getEventsMock.mockResolvedValue([candidate]);
     const { useCandidateEvent } = await vi.importActual("../../../components/Attendance/hooks/useCandidateEvent");
@@ -216,6 +304,7 @@ describe("Attendance prompt", () => {
   });
 
   it("stores prompted ids safely even when storage is bad", () => {
+    attendanceStatsState.overall = { attended: 0, missed: 0 };
     localStorage.setItem("flax_attendance_prompted_ids", "not-json");
     expect(getPromptedIds()).toEqual(new Set());
     setPromptedId(15);

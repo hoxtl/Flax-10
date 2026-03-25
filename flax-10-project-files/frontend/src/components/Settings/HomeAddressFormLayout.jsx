@@ -9,7 +9,7 @@ import SettingsContextCard from "./SettingsContextCard";
 import { SectionHeader, SubmitButton } from "./SettingsUI";
 
 function isLookupMiss(error) {
-  return String(error || "").toLowerCase().startsWith("address not found");
+  return `${error}`.toLowerCase().startsWith("address not found");
 }
 
 function AddressField({ homeAddress, setHomeAddress, error, isSaving, hasUnsaved, saveSignal }) {

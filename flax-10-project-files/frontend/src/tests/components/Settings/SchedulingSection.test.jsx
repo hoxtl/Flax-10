@@ -81,6 +81,29 @@ describe("useSchedulingState", () => {
     expect(result.current.studyTimeProps.hasUnsaved).toBe(false);
   });
 
+  it("preserves study input when the save response is empty and falls back to the default value for invalid input", async () => {
+    const onStudyTimeSave = vi.fn().mockResolvedValue(null);
+    const { result } = renderHook(() => useSchedulingState({
+      onStudyTimeSave,
+      onWeekPreferenceSave: vi.fn(),
+      onWorktimePreferenceSave: vi.fn(),
+    }));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.studyTimeProps.onMinutesChange("abc");
+    });
+
+    await act(async () => {
+      await result.current.studyTimeProps.onSubmit({ preventDefault: vi.fn() });
+    });
+
+    expect(onStudyTimeSave).toHaveBeenCalledWith({ preferred_study_minutes_per_day: 120 });
+    expect(result.current.studyTimeProps.minutesPerDay).toBe("abc");
+    expect(result.current.studyTimeProps.hasUnsaved).toBe(true);
+  });
+
   it("saves week and worktime preferences and keeps current values when APIs return nullish settings", async () => {
     const onWeekPreferenceSave = vi.fn().mockResolvedValue(null);
     const onWorktimePreferenceSave = vi.fn().mockResolvedValue({ worktime_preference: "" });
@@ -106,6 +129,30 @@ describe("useSchedulingState", () => {
     expect(onWorktimePreferenceSave).toHaveBeenCalledWith({ worktime_preference: "day" });
     expect(result.current.weekPreferenceProps.weekPreference).toBe("weekends");
     expect(result.current.worktimeProps.worktimePreference).toBe("day");
+  });
+
+  it("bumps the week save signal when the API returns a saved preference", async () => {
+    const onWeekPreferenceSave = vi.fn().mockResolvedValue({ week_preference: "weekends" });
+    const { result } = renderHook(() => useSchedulingState({
+      onStudyTimeSave: vi.fn(),
+      onWeekPreferenceSave,
+      onWorktimePreferenceSave: vi.fn(),
+    }));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.weekPreferenceProps.onWeekPreferenceChange("weekends");
+    });
+
+    await act(async () => {
+      await result.current.weekPreferenceProps.onSubmit({ preventDefault: vi.fn() });
+    });
+
+    expect(onWeekPreferenceSave).toHaveBeenCalledWith({ week_preference: "weekends" });
+    expect(result.current.weekPreferenceProps.weekPreference).toBe("weekends");
+    expect(result.current.weekPreferenceProps.saveSignal).toBe(1);
+    expect(result.current.weekPreferenceProps.hasUnsaved).toBe(false);
   });
 });
 

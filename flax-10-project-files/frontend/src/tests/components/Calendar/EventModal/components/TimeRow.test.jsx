@@ -59,4 +59,19 @@ describe("TimeRow", () => {
     expect(allDayUpdater({ all_day: true }).all_day).toBe(false);
     expect(screen.getAllByRole("button").slice(0, 2).every((button) => button.dataset.dateOnly === "true")).toBe(true);
   });
+
+  it("renders empty date-only values without crashing", () => {
+    render(
+      <TimeRow
+        form={{ all_day: true, end_time: "", start_time: "" }}
+        recurrenceValue={{ frequency: "daily" }}
+        onRecurrenceChange={vi.fn()}
+        setForm={vi.fn()}
+        update={vi.fn(() => vi.fn())}
+      />,
+    );
+
+    expect(screen.getAllByRole("button").slice(0, 2).every((button) => button.dataset.dateOnly === "true")).toBe(true);
+    expect(screen.getAllByRole("button")[0]).toHaveTextContent("Select start:");
+  });
 });

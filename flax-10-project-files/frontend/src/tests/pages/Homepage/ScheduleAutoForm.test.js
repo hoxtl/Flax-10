@@ -20,6 +20,10 @@ describe('ScheduleAutoForm', () => {
   });
 
   it('returns null when no eligible deadlines are provided', () => {
+    expect(buildScheduleAutoForm()).toBeNull();
+    expect(buildScheduleAutoForm({ deadlines: null })).toBeNull();
+    expect(buildScheduleAutoForm({ deadlines: 'invalid' })).toBeNull();
+
     const payload = buildScheduleAutoForm({
       deadlines: [{ id: 1, start_due_date: new Date(Date.now() - 86400000).toISOString() }],
     });
@@ -36,6 +40,7 @@ describe('ScheduleAutoForm', () => {
     expect(getUrgencyTier('2026-01-05T00:00:00.000Z')).toBe('urgent');
     expect(getUrgencyTier('2026-01-10T00:00:00.000Z')).toBe('upcoming');
     expect(getUrgencyTier('2026-02-10T00:00:00.000Z')).toBe('distant');
+    expect(getUrgencyTier('not-a-date')).toBeNull();
 
     vi.useRealTimers();
   });

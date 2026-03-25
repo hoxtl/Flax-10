@@ -29,10 +29,10 @@ function getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists)
   };
 }
 
-function useAvailableModules(modules) {
+function useAvailableModules(modules = []) {
   const [loadedModules, setLoadedModules] = useState([]);
   useEffect(() => {
-    if ((modules || []).length > 0) return;
+    if (modules.length > 0) return;
     let cancelled = false;
     Promise.all([getModules(), getEnrollments()])
       .then(([moduleList, enrollments]) => {
@@ -43,13 +43,13 @@ function useAvailableModules(modules) {
       .catch(() => { if (!cancelled) setLoadedModules([]); });
     return () => { cancelled = true; };
   }, [modules]);
-  const availableModules = (modules || []).length > 0 ? modules : loadedModules;
+  const availableModules = modules.length > 0 ? modules : loadedModules;
   return useMemo(() => [...availableModules].sort((a, b) => (a.module_code || "").localeCompare(b.module_code || "")), [availableModules]);
 }
 
 function useCreateTaskModalFormState(props) {
-  const { lists, defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
-  const sortedLists = useMemo(() => [...(lists || [])].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
+  const { lists = [], defaultListId, defaultDueDate, modules, initialTask, newListIdCreated } = props;
+  const sortedLists = useMemo(() => [...lists].sort((a, b) => (a.name || "").localeCompare(b.name || "")), [lists]);
   const sortedModules = useAvailableModules(modules);
   const [form, setForm] = useState(() => getInitialForm(initialTask, defaultListId, defaultDueDate, sortedLists));
   const [addToSchedule, setAddToSchedule] = useState(false);

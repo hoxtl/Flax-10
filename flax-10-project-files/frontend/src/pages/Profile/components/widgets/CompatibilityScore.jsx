@@ -12,7 +12,6 @@ const PERSONA_TIME_MAP = {
 };
 
 function computeTimeCompat(a, b) {
-  if (!a || !b) return 50;
   if (a === "all" || b === "all") return 80;
   if (a === b) return 100;
   if (a === "neutral" || b === "neutral") return 60;

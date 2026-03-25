@@ -1,0 +1,73 @@
+import React from "react";
+import { act, render } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import styles from "../../../../components/Calendar/MonthView/SwipeMonthView.module.css";
+import { SwipeMonthView } from "../../../../components/Calendar/MonthView/SwipeMonthView";
+
+let calendarState;
+const dispatch = vi.fn();
+const useSwipeNavigation = vi.fn();
+
+vi.mock("../../../../context/CalendarContext", () => ({
+  useCalendar: () => calendarState,
+  useCalendarDispatch: () => dispatch,
+}));
+
+vi.mock("../../../../components/Calendar/hooks/useSwipeNavigation", () => ({
+  useSwipeNavigation: (...args) => useSwipeNavigation(...args),
+}));
+
+vi.mock("../../../../components/Calendar/MonthView/WeekdayHeader", () => ({
+  WeekdayHeader: () => <div>weekday-header</div>,
+}));
+
+vi.mock("../../../../components/Calendar/MonthView/WeekRow", () => ({
+  WeekRow: () => <div>week-row</div>,
+}));
+
+describe("SwipeMonthView coverage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    calendarState = {
+      selectedDate: new Date("2026-03-15T00:00:00.000Z"),
+      events: [],
+      readOnly: false,
+    };
+  });
+
+  it("resets scroll position and applies both animation directions", () => {
+    vi.useFakeTimers();
+    const { container, rerender } = render(<SwipeMonthView />);
+
+    const root = container.firstChild;
+    const content = root.firstChild;
+    const swipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
+
+    act(() => {
+      swipeHandlers.onNext();
+    });
+    expect(content.className).toContain(styles.slideUp);
+
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+
+    root.scrollTop = 40;
+    calendarState = {
+      ...calendarState,
+      selectedDate: new Date("2026-04-15T00:00:00.000Z"),
+    };
+    rerender(<SwipeMonthView />);
+    expect(root.scrollTop).toBe(0);
+
+    const nextSwipeHandlers = useSwipeNavigation.mock.calls.at(-1)[0];
+    const nextContent = container.firstChild.firstChild;
+    act(() => {
+      nextSwipeHandlers.onPrev();
+    });
+    expect(nextContent.className).toContain(styles.slideDown);
+
+    vi.useRealTimers();
+  });
+});

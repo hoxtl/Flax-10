@@ -93,4 +93,9 @@ describe("WelcomeBackgroundPaths", () => {
     unmount();
     expect(removeSpy).not.toHaveBeenCalledWith("mousemove", expect.any(Function));
   });
+
+  it("applies embedded and custom class names", () => {
+    const { container } = render(<WelcomeBackgroundPaths embedded className="extra" count={2} intensity={1.4} speed={0.05} />);
+    expect(container.firstChild.className).toContain("extra");
+  });
 });

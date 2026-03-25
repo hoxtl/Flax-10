@@ -117,6 +117,11 @@ describe("MiniHeatmap", () => {
     fireEvent.keyDown(screen.getByRole("button"), { key: " " });
     expect(onNavigate).toHaveBeenCalledWith("analytics");
   });
+
+  it("renders activity cells for non-zero study data", () => {
+    render(<MiniHeatmap heatmap={{ data: [Array.from({ length: 24 }, (_, hour) => (hour === 2 ? 30 : 0))] }} onNavigate={vi.fn()} />);
+    expect(document.querySelectorAll('[class*="heatmapCell"]').length).toBeGreaterThan(0);
+  });
 });
 
 function buildHeatmap() {

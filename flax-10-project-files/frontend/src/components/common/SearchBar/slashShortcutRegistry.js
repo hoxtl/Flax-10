@@ -19,7 +19,7 @@ function pickPrimaryTarget(targets) {
   if (!targets.length) return null;
   return targets
     .map((el) => ({ el, rect: el.getBoundingClientRect() }))
-    .sort((a, b) => (a.rect.top - b.rect.top) || (a.rect.left - b.rect.left))[0]?.el || null;
+    .sort((a, b) => (a.rect.top - b.rect.top) || (a.rect.left - b.rect.left))[0].el;
 }
 
 function handleSlashShortcut(event) {

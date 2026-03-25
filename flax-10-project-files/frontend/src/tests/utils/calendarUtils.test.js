@@ -207,4 +207,54 @@ describe('recurrenceUtils: expandRecurringEvents', () => {
         const march = result.find(e => e.start_time.startsWith('2026-03'));
         expect(march).toBeTruthy();
     });
+
+    it('handles yearly recurrence and recurrence-rule exception dates', () => {
+        const event = {
+            id: 7,
+            start_time: '2025-03-15T10:00:00',
+            end_time: '2025-03-15T11:00:00',
+            recurrence: 'yearly',
+            recurrence_rule: { exception_dates: ['2026-03-15'] },
+        };
+        const skippedYear = expandRecurringEvents([event], new Date('2026-03-01'));
+        const includedYear = expandRecurringEvents([event], new Date('2027-03-01'));
+        expect(skippedYear.find((item) => item.start_time.startsWith('2026-03-15'))).toBeFalsy();
+        expect(includedYear.find((item) => item.start_time.startsWith('2027-03-15'))).toBeTruthy();
+    });
+
+    it('falls back to a single base-date occurrence for unknown recurrence values', () => {
+        const event = {
+            id: 8,
+            start_time: '2026-03-20T10:00:00',
+            end_time: '2026-03-20T11:00:00',
+            recurrence: 'mystery',
+        };
+        const result = expandRecurringEvents([event], new Date('2026-03-01'));
+        expect(result).toHaveLength(1);
+        expect(result[0].id).toBe('8_0');
+    });
+
+    it('returns no fallback occurrence when an unknown recurrence falls outside the visible range', () => {
+        const event = {
+            id: 9,
+            start_time: '2026-05-20T10:00:00',
+            end_time: '2026-05-20T11:00:00',
+            recurrence: 'mystery',
+        };
+
+        expect(expandRecurringEvents([event], new Date('2026-03-01'))).toEqual([]);
+    });
+
+    it('handles biweekly recurrence intervals', () => {
+        const event = {
+            id: 10,
+            start_time: '2026-03-01T10:00:00',
+            end_time: '2026-03-01T11:00:00',
+            recurrence: 'biweekly',
+            recurrence_end_date: '2026-03-29',
+        };
+
+        const dates = expandRecurringEvents([event], new Date('2026-03-01')).map((item) => item.start_time.slice(0, 10));
+        expect(dates).toEqual(['2026-03-01', '2026-03-15', '2026-03-29']);
+    });
 });

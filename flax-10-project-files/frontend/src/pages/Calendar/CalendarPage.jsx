@@ -58,7 +58,7 @@ function formatPossessive(name) {
   return name.endsWith("s") ? `${name}'` : `${name}'s`;
 }
 
-function getSharedCalendarParams(search = "") {
+function getSharedCalendarParams(search) {
   const params = new URLSearchParams(search);
   return {
     userId: params.get("user_id"),

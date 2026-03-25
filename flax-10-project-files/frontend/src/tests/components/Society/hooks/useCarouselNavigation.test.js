@@ -45,6 +45,34 @@ describe('useCarouselGestures', () => {
         expect(mockEl.removeEventListener).toHaveBeenCalled();
     });
 
+    it('triggers prev/next only for large swipes and ignores missing touch data', () => {
+        const handlers = {};
+        const mockEl = {
+            addEventListener: vi.fn((name, fn) => {
+                handlers[name] = fn;
+            }),
+            removeEventListener: vi.fn(),
+        };
+        const prev = vi.fn();
+        const next = vi.fn();
+        const ref = { current: mockEl };
+
+        renderHook(() => useCarouselGestures(ref, { prev, next }));
+
+        handlers.touchstart({ changedTouches: [{ clientX: 100 }] });
+        handlers.touchend({ changedTouches: [{ clientX: 10 }] });
+        expect(next).toHaveBeenCalledTimes(1);
+
+        handlers.touchstart({ changedTouches: [{ clientX: 10 }] });
+        handlers.touchend({ changedTouches: [{ clientX: 100 }] });
+        expect(prev).toHaveBeenCalledTimes(1);
+
+        handlers.touchstart({});
+        handlers.touchend({});
+        expect(prev).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalledTimes(1);
+    });
+
     it('handles null ref gracefully', () => {
         const ref = { current: null };
         expect(() => renderHook(() => useCarouselGestures(ref, { prev: vi.fn(), next: vi.fn() }))).not.toThrow();

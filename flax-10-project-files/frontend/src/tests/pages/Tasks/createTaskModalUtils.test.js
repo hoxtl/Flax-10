@@ -27,6 +27,22 @@ describe("createTaskModalUtils", () => {
       expect(out.module).toBe(12);
     });
 
+    it("derives estimated_blocks from page_count when present", () => {
+      const out = buildCreateTaskPayload({
+        title: "T",
+        description: "",
+        priority: "medium",
+        due_date: "2026-03-15",
+        task_list: "3",
+        estimated_blocks: 9,
+        module: "7",
+        page_count: "50",
+      });
+
+      expect(out.page_count).toBe(50);
+      expect(out.estimated_blocks).toBe(4);
+    });
+
     it("defaults priority to medium when empty", () => {
       const form = { title: "T", description: "", priority: "", due_date: "2026-03-15", task_list: null, estimated_blocks: 1, module: null };
       const out = buildCreateTaskPayload(form);
@@ -73,6 +89,20 @@ describe("createTaskModalUtils", () => {
       const form = { title: "T", description: "", priority: "medium", due_date: "2026-03-15", task_list: null, estimated_blocks: 1, module: null };
       await runCreateTaskSave(form, true, "create", true, onSave, onClose, vi.fn());
       expect(onSave).toHaveBeenCalledWith(expect.any(Object), { addToSchedule: true });
+    });
+
+    it("omits addToSchedule meta outside create mode and falls back to the default error message", async () => {
+      const onSave = vi.fn().mockRejectedValue({});
+      const onClose = vi.fn();
+      const setSaveError = vi.fn();
+      const form = { title: "T", description: "", priority: "", due_date: "2026-03-15", task_list: "", estimated_blocks: 0, module: "" };
+
+      await runCreateTaskSave(form, true, "edit", true, onSave, onClose, setSaveError);
+
+      expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ priority: "medium" }));
+      expect(onSave).not.toHaveBeenCalledWith(expect.anything(), expect.anything());
+      expect(setSaveError).toHaveBeenCalledWith("Couldn't save task. Please try again.");
+      expect(onClose).not.toHaveBeenCalled();
     });
   });
 });

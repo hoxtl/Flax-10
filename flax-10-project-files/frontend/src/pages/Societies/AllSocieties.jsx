@@ -119,7 +119,7 @@ function useHoverClose(isOpen, setIsOpen) {
     return {
         onMouseEnter: () => {
             clearTimeout(hoverTimer.current);
-            if (!isOpen) setIsOpen(true);
+            setIsOpen(true);
         },
         onMouseLeave: () => {
             hoverTimer.current = setTimeout(() => setIsOpen(false), 200);

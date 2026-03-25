@@ -17,7 +17,7 @@ function normalizeHeatmapData(heatmap) {
     : DEFAULT_HEATMAP_DAYS.slice(0, data.length);
   return {
     data,
-    days: days.length ? days : DEFAULT_HEATMAP_DAYS,
+    days,
     hours: Array.isArray(heatmap?.hours) && heatmap.hours.length ? heatmap.hours : DEFAULT_HEATMAP_HOURS,
   };
 }

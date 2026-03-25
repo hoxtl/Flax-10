@@ -52,6 +52,12 @@ describe('calendarReducer', () => {
         expect(newState.selectedDate).toBe(date);
     });
 
+    it('should handle SET_DISPLAY_MODE', () => {
+        const action = { type: 'SET_DISPLAY_MODE', payload: 'agenda' };
+        const newState = calendarReducer(initialState, action);
+        expect(newState.displayMode).toBe('agenda');
+    });
+
     it('should handle OPEN_MODAL with event', () => {
         const event = { id: 1 };
         const action = { type: 'OPEN_MODAL', payload: { event, type: 'edit' } };
@@ -154,6 +160,17 @@ describe('calendarReducer', () => {
         expect(state.popupAnchorRect).toEqual(rect);
     });
 
+    it('should handle OPEN_POPUP with explicit read-only and override view mode', () => {
+        const event = { id: 2, title: 'Read only pop' };
+        const rect = { top: 15, left: 25 };
+        const state = calendarReducer(initialState, {
+            type: 'OPEN_POPUP',
+            payload: { event, anchorRect: rect, readOnly: true, viewModeOverride: 'month' },
+        });
+        expect(state.popupReadOnly).toBe(true);
+        expect(state.popupViewMode).toBe('month');
+    });
+
     it('should handle CLOSE_POPUP', () => {
         const openState = { ...initialState, popupEvent: { id: 1 }, popupAnchorRect: {} };
         const state = calendarReducer(openState, { type: 'CLOSE_POPUP' });
@@ -164,6 +181,59 @@ describe('calendarReducer', () => {
     it('should handle SET_READ_ONLY', () => {
         const state = calendarReducer(initialState, { type: 'SET_READ_ONLY', payload: true });
         expect(state.readOnly).toBe(true);
+    });
+
+    it('should normalize non-string and manage-only filter payloads back to all', () => {
+        const state = calendarReducer(initialState, {
+            type: 'SET_FILTER',
+            payload: [['__manage__'], 7, null],
+        });
+        expect(state.filter).toEqual(['all']);
+    });
+
+    it('should preserve non-string payload values in the filter set', () => {
+        let state = calendarReducer(initialState, { type: 'SET_FILTER', payload: 3 });
+        expect(state.filter).toEqual([3]);
+        state = calendarReducer(state, { type: 'SET_FILTER', payload: 3 });
+        expect(state.filter).toEqual([3]);
+    });
+
+    it('should normalize scalar filter state values when toggling a string payload', () => {
+        const scalarFilterState = { ...initialState, filter: 'work' };
+        const state = calendarReducer(scalarFilterState, { type: 'SET_FILTER', payload: 'study' });
+        expect(state.filter).toEqual(['work', 'study']);
+    });
+
+    it('should handle shared calendar and delete confirm branches', () => {
+        const sharedState = calendarReducer(initialState, {
+            type: 'SET_SHARED_CALENDAR_VIEW',
+            payload: { userId: 99, userName: 'Casey' },
+        });
+        expect(sharedState.sharedCalendarUserId).toBe(99);
+        expect(sharedState.sharedCalendarName).toBe('Casey');
+
+        const resetSharedState = calendarReducer(sharedState, {
+            type: 'SET_SHARED_CALENDAR_VIEW',
+            payload: null,
+        });
+        expect(resetSharedState.sharedCalendarUserId).toBeNull();
+        expect(resetSharedState.sharedCalendarName).toBe('');
+
+        const deleteState = calendarReducer(initialState, {
+            type: 'OPEN_DELETE_CONFIRM',
+            payload: { event: { id: 10 } },
+        });
+        expect(deleteState.isDeleteConfirmOpen).toBe(true);
+        expect(deleteState.deleteConfirmType).toBeNull();
+
+        const closedDeleteState = calendarReducer(deleteState, { type: 'CLOSE_DELETE_CONFIRM' });
+        expect(closedDeleteState.isDeleteConfirmOpen).toBe(false);
+        expect(closedDeleteState.deleteConfirmEvent).toBeNull();
+    });
+
+    it('should handle SET_SEARCH_QUERY', () => {
+        const state = calendarReducer(initialState, { type: 'SET_SEARCH_QUERY', payload: 'essay' });
+        expect(state.searchQuery).toBe('essay');
     });
 
     it('should handle TRIGGER_RELOAD', () => {

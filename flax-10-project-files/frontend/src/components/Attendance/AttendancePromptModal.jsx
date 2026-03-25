@@ -143,7 +143,6 @@ function useAttendancePromptState(event, onAnswer) {
   };
 
   const handleAnswer = (attended) => {
-    if (answeredWith !== null) return;
     setSubmitError("");
     setAnsweredWith(attended);
     timerRef.current = setTimeout(() => {

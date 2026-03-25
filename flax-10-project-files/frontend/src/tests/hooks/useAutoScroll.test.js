@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 vi.mock('../../components/Calendar/calendarConstants', () => ({
@@ -11,26 +11,30 @@ describe('useAutoScroll', () => {
     let mockRef;
 
     beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-03-04T10:30:00Z'));
         vi.stubGlobal('requestAnimationFrame', (cb) => { cb(); return 1; });
         mockRef = { current: { scrollTop: 0 } };
     });
 
-    it('scrolls to earliest event time', () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it('scrolls to the current time position on mount', () => {
         const events = [
             { start_time: '2024-03-04T09:30:00Z' }, // 9:30 = 570 mins
         ];
         renderHook(() => useAutoScroll(mockRef, events, '2024-03-04'));
-        // scrollY = (570/60) * 60 - 10 = 570 - 10 = 560
+        // scrollY = (630 / 60) * 60 - 120 = 510
         expect(mockRef.current.scrollTop).toBeGreaterThan(0);
     });
 
     it('scrolls to 9am (540 mins) when no events', () => {
-        vi.useFakeTimers();
         vi.setSystemTime(new Date('2024-03-04T09:00:00Z'));
         renderHook(() => useAutoScroll(mockRef, [], '2024-03-04'));
         // scrollY = (540/60)*60 - 120 = 420
         expect(mockRef.current.scrollTop).toBeGreaterThanOrEqual(0);
-        vi.useRealTimers();
     });
 
     it('does not scroll if ref.current is null', () => {

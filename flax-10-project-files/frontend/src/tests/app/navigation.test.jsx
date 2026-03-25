@@ -50,6 +50,7 @@ describe("navigation helpers", () => {
     const user = { id: 9, name: "Ava" };
 
     expect(resolveRouteContent("home", user, setActiveNav)).toBe("HOME");
+    expect(resolveRouteContent("unknown", user, setActiveNav)).toBe("HOME");
 
     const createRoute = resolveRouteContent("modules_create", user, setActiveNav);
     expect(createRoute.props.user).toEqual(user);
@@ -92,8 +93,14 @@ describe("useNavHandler", () => {
     expect(setActiveNav).toHaveBeenLastCalledWith("societies");
     expect(navigate).toHaveBeenLastCalledWith("/societies?id=17&tab=events");
 
+    act(() => result.current("societies_17"));
+    expect(navigate).toHaveBeenLastCalledWith("/societies?id=17");
+
     act(() => result.current("group-work_31_board"));
     expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31&tab=board");
+
+    act(() => result.current("group-work_31"));
+    expect(navigate).toHaveBeenLastCalledWith("/group-work?project=31");
 
     act(() => result.current("profile"));
     expect(setActiveNav).toHaveBeenLastCalledWith("profile");

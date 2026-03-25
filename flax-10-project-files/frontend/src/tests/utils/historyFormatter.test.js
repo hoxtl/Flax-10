@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
     formatTimeRange,
     formatDate,
@@ -102,6 +102,31 @@ describe('historyFormatter', () => {
             ];
             const blocks = groupHistoryByBlock(history);
             expect(blocks[0].totalPause).toBe(5);
+        });
+
+        it('falls back from invalid end times and preserves the earliest valid session start', () => {
+            vi.useFakeTimers();
+            vi.setSystemTime(new Date('2026-01-01T12:00:00.000Z'));
+
+            const history = [
+                { id: 1, studyBlockId: 'blk', endTime: 'not-a-date', duration: 0, status: 'Completed' },
+                { id: 2, studyBlockId: 'blk', startTime: '2026-01-01T09:00:00Z', endTime: '2026-01-01T10:00:00Z', duration: 3600, status: 'Completed' },
+            ];
+
+            const [block] = groupHistoryByBlock(history);
+            expect(block.sessions[0].startTime).toBe('2026-01-01T12:00:00.000Z');
+            expect(block.startTime).toBe('2026-01-01T09:00:00Z');
+
+            vi.useRealTimers();
+        });
+
+        it('defaults missing durations to zero when grouping sessions', () => {
+            const [block] = groupHistoryByBlock([
+                { id: 7, endTime: '2026-01-03T10:00:00Z', studyBlockId: 'zero-duration', status: 'Completed' }
+            ]);
+
+            expect(block.totalDuration).toBe(0);
+            expect(block.sessions[0].duration).toBe(0);
         });
     });
 });

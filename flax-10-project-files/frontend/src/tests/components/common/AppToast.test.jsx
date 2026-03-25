@@ -92,4 +92,12 @@ describe('AppToast', () => {
     render(<AppToast message="msg" onClose={vi.fn()} />);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
+
+  it('falls back to the success styling and omits subcopy when only a title is provided', () => {
+    render(<AppToast title="Only title" variant="mystery" onClose={vi.fn()} />);
+
+    expect(screen.getByText('Only title')).toBeInTheDocument();
+    expect(screen.queryByText(/desc|msg/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('status').className).toContain('success');
+  });
 });

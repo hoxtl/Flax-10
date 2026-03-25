@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ReminderField } from '../../../../../components/Calendar/EventModal/components/ReminderField';
+import { CustomReminderInput, PermissionStatus } from '../../../../../components/Calendar/EventModal/components/ReminderFieldParts';
 
 describe('ReminderField', () => {
     const mockOnChange = vi.fn();
@@ -18,9 +19,19 @@ describe('ReminderField', () => {
         expect(screen.getByText('No reminders')).toBeInTheDocument();
     });
 
+    it('treats non-array reminder values as empty', () => {
+        render(<ReminderField value={null} onChange={mockOnChange} />);
+        expect(screen.getByText('No reminders')).toBeInTheDocument();
+    });
+
     it('should render with one reminder', () => {
         render(<ReminderField value={[5]} onChange={mockOnChange} />);
         expect(screen.getByText('5 min before')).toBeInTheDocument();
+    });
+
+    it('formats zero-minute reminders as the event start time', () => {
+        render(<ReminderField value={[0]} onChange={mockOnChange} />);
+        expect(screen.getByText('At time of event')).toBeInTheDocument();
     });
 
     it('should render with multiple reminders', () => {
@@ -104,5 +115,65 @@ describe('ReminderField', () => {
         fireEvent.click(checkbox);
         expect(requestPermission).toHaveBeenCalled();
         vi.unstubAllGlobals();
+    });
+
+    it('renders denied permission status', () => {
+        vi.stubGlobal('Notification', {
+            requestPermission: vi.fn(),
+            permission: 'denied',
+        });
+
+        render(<PermissionStatus />);
+        expect(screen.getByText('Notifications blocked')).toBeInTheDocument();
+
+        vi.unstubAllGlobals();
+    });
+
+    it('requests permission from the enable button and updates the status', async () => {
+        const requestPermission = vi.fn().mockResolvedValue('granted');
+        vi.stubGlobal('Notification', {
+            requestPermission,
+            permission: 'default',
+        });
+
+        render(<PermissionStatus />);
+        fireEvent.click(screen.getByRole('button', { name: 'Enable notifications' }));
+
+        await waitFor(() => expect(screen.getByText('Notifications enabled')).toBeInTheDocument());
+        expect(requestPermission).toHaveBeenCalled();
+
+        vi.unstubAllGlobals();
+    });
+
+    it('shows not supported when the Notification API is unavailable', () => {
+        const originalWindowNotification = Object.getOwnPropertyDescriptor(window, 'Notification');
+        const originalGlobalNotification = Object.getOwnPropertyDescriptor(globalThis, 'Notification');
+
+        delete window.Notification;
+        delete globalThis.Notification;
+
+        render(<PermissionStatus />);
+        expect(screen.getByText('Not supported')).toBeInTheDocument();
+
+        if (originalWindowNotification) {
+            Object.defineProperty(window, 'Notification', originalWindowNotification);
+        }
+        if (originalGlobalNotification) {
+            Object.defineProperty(globalThis, 'Notification', originalGlobalNotification);
+        }
+    });
+
+    it('uses the Enter shortcut for custom reminders and ignores duplicates', () => {
+        const onChange = vi.fn();
+        render(<CustomReminderInput selected={[20]} onChange={onChange} />);
+
+        const input = screen.getByPlaceholderText('Custom (min)');
+        fireEvent.change(input, { target: { value: '20' } });
+        fireEvent.keyDown(input, { key: 'Enter', preventDefault: vi.fn() });
+        expect(onChange).not.toHaveBeenCalled();
+
+        fireEvent.change(input, { target: { value: '25' } });
+        fireEvent.keyDown(input, { key: 'Enter', preventDefault: vi.fn() });
+        expect(onChange).toHaveBeenCalledWith([20, 25]);
     });
 });

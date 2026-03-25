@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AnnouncementsTab from '../../../components/Society/SocietyDetail/tabs/announcementTab/AnnouncementsTab';
 import * as Mocks from './societyTestMocks';
@@ -61,6 +61,9 @@ describe('AnnouncementsTab', () => {
     vi.useFakeTimers();
     renderTab({ announcements: [{ id: 99, title: 'F', content: 'x' }], focusAnnouncementId: 99 });
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
     vi.useRealTimers();
   });
 
@@ -77,5 +80,10 @@ describe('AnnouncementsTab', () => {
     fireEvent.click(screen.getByAltText('Image 2'));
     expect(screen.getByTestId('gallery-modal')).toBeTruthy();
     expect(screen.queryByTitle('Edit')).toBeNull();
+  });
+
+  it('uses the default empty announcements prop when none is provided', () => {
+    render(<AnnouncementsTab editMode={false} tags={[]} />);
+    expect(screen.getByText('No announcements yet.')).toBeInTheDocument();
   });
 });

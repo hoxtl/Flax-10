@@ -113,6 +113,16 @@ describe("Auth hooks", () => {
     expect(scrollIntoView).toHaveBeenCalledTimes(2);
   });
 
+  it("gracefully skips scrolling when the auth form card is missing", () => {
+    const handleToggle = vi.fn();
+    vi.spyOn(document, "getElementById").mockReturnValue(null);
+
+    const { result } = renderHook(() => useAuthPageScroll(handleToggle));
+    act(() => result.current.showSignIn());
+
+    expect(handleToggle).toHaveBeenCalledWith(true);
+  });
+
   it("memoizes landing section data", () => {
     buildAuthLandingSectionsMock.mockReturnValue(["section"]);
     const state = { signIn: true };

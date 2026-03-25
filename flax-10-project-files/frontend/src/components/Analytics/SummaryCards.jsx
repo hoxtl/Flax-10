@@ -41,7 +41,7 @@ function StatCard({ icon, label, value, unit, color, delay, tooltip }) {
   return (
     <MotionDiv
       className={styles.card}
-      data-tooltip={tooltip || undefined}
+      data-tooltip={tooltip}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={CARD_TRANSITION(delay)}

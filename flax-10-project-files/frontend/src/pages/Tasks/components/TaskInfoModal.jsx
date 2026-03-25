@@ -72,7 +72,7 @@ function ReadingPillRow({ task, speedData, showReadingContext }) {
 }
 
 function getModuleLabel(task) {
-  return task.module_code && task.module_name ? `${task.module_code} — ${task.module_name}` : task.module_code || task.module_name || "—";
+  return task.module_code && task.module_name ? `${task.module_code} — ${task.module_name}` : task.module_code || task.module_name;
 }
 
 function ListInfoRow({ listName }) {

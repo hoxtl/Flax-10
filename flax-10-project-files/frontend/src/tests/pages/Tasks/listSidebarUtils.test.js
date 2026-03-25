@@ -60,4 +60,20 @@ describe("listSidebarUtils", () => {
     expect(overdue).toBeUndefined();
     vi.useRealTimers();
   });
+
+  it("ignores out-of-range due dates for today and this-week counts", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 15, 12, 0));
+    const tasks = [
+      { id: 1, task_list: "1", completed: false, due_date: "2026-03-15T08:00:00", title: "Earlier today" },
+      { id: 2, task_list: "2", completed: false, due_date: "2026-03-30T12:00:00", title: "Much later" },
+    ];
+
+    const out = computeListSidebarCounts(tasks, lists);
+
+    expect(out.smartFilters.find((f) => f.id === "today")?.count).toBe(0);
+    expect(out.smartFilters.find((f) => f.id === "this_week")?.count).toBe(1);
+    expect(out.smartFilters.find((f) => f.id === "later")?.count).toBe(1);
+    vi.useRealTimers();
+  });
 });

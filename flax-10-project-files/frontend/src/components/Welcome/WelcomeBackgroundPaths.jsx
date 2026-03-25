@@ -8,7 +8,7 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function buildPathD(i, flip = 1) {
+function buildPathD(i, flip) {
   return `M-${380 - i * 5 * flip} -${189 + i * 6}
     C-${380 - i * 5 * flip} -${189 + i * 6} -${312 - i * 5 * flip} ${216 - i * 6}
     ${152 - i * 5 * flip} ${343 - i * 6}
@@ -16,16 +16,13 @@ function buildPathD(i, flip = 1) {
     ${684 - i * 5 * flip} ${875 - i * 6}`;
 }
 
-function buildPaths(flip, count = PATH_COUNT, intensity = 1) {
-  const useDefaultFlip = flip === undefined;
-  const flipUsed = flip ?? 1;
-
+function buildPaths(flip, count, intensity) {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     strokeOpacity: clamp((0.17 + i * 0.0028) * intensity, 0.14, 0.78),
     width: clamp((0.92 + i * 0.038) * Math.min(intensity, 1.6), 0.9, 2.8),
     start: Math.random(),
-    d: useDefaultFlip ? buildPathD(i) : buildPathD(i, flipUsed),
+    d: buildPathD(i, flip),
   }));
 }
 

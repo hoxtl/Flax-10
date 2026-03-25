@@ -41,4 +41,12 @@ describe("readingSpeedUtils", () => {
       tasks[3],
     ]);
   });
+
+  it("falls back to zero pages when completed readings do not include page counts", () => {
+    expect(
+      getAvgMinPerPage([
+        { completed: true, reading_id: 1, time_spent_minutes: 25 },
+      ]),
+    ).toBe(2);
+  });
 });

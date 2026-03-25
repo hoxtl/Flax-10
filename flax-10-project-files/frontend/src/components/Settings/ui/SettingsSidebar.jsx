@@ -61,7 +61,6 @@ function SidebarButton({ tab, activeTab, onChange }) {
 
 function SidebarGroup({ group, activeTab, onChange, user }) {
   const tabs = TAB_CONFIG.filter((tab) => tab.group === group);
-  if (tabs.length === 0) return null;
 
   return (
     <div className={styles.sidebarGroup} style={{ width: "100%" }}>

@@ -118,21 +118,21 @@ const SHAPES = [
   },
 ];
 
-function ShapesLayer() {
+function ShapesLayer({ shapes }) {
   return (
     <div className={styles.layer}>
-      {SHAPES.map((p) => (
+      {shapes.map((p) => (
         <ElegantShape key={p.classNameKey} {...p} className={styles[p.classNameKey]} />
       ))}
     </div>
   );
 }
 
-export default function AuthHeroGeometric() {
+export default function AuthHeroGeometric({ shapes = SHAPES }) {
   return (
     <div className={styles.hero} aria-hidden="true">
       <div className={styles.glow} />
-      <ShapesLayer />
+      <ShapesLayer shapes={shapes} />
       <div className={styles.fade} />
     </div>
   );

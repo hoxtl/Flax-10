@@ -241,6 +241,10 @@ describe("Timer page extras", () => {
     expect(screen.getByText("focus,lock in,you've got this")).toBeInTheDocument();
     expect(screen.getByText("focus-skeleton")).toBeInTheDocument();
     expect(screen.getByText(/Study today to keep your 4-day streak/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText("open-history"));
+    expect(state.setShowHistory).toHaveBeenCalledWith(true);
+    fireEvent.click(screen.getByText("open-focus"));
+    expect(state.openFocusMode).toHaveBeenCalled();
     fireEvent.click(screen.getByText("✕"));
     expect(state.setDismissedWarning).toHaveBeenCalledWith(true);
     fireEvent.click(screen.getByText("shortcuts"));
@@ -261,6 +265,88 @@ describe("Timer page extras", () => {
     rerender(<TimerPageContent state={nonFocusState} />);
     fireEvent.click(screen.getByText("Back"));
     expect(useNavigate).toHaveBeenCalledWith(-1);
+    vi.useRealTimers();
+  });
+
+  it("hides the streak warning when the user already studied today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
+
+    render(
+      <TimerPageContent
+        state={{
+          permission: "default",
+          request: vi.fn(),
+          fromTaskPlay: false,
+          showFocusTransition: false,
+          showPageSkeleton: false,
+          focusAccent: "#09f",
+          focusMode: false,
+          setFocusMode: vi.fn(),
+          showShortcuts: false,
+          setShowShortcuts: vi.fn(),
+          streakData: { current_streak_days: 4, total_sessions: 2 },
+          dismissedWarning: false,
+          setDismissedWarning: vi.fn(),
+          setStreakData: vi.fn(),
+          t: { isActive: true, isPaused: false },
+          isMobile: false,
+          openFocusMode: vi.fn(),
+          showHistory: false,
+          setShowHistory: vi.fn(),
+        }}
+      />
+    );
+
+    expect(screen.queryByText(/Study today to keep your 4-day streak/i)).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("hides the streak warning before evening and when the streak is zero", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-24T12:00:00.000Z"));
+
+    const baseState = {
+      permission: "default",
+      request: vi.fn(),
+      fromTaskPlay: false,
+      showFocusTransition: false,
+      showPageSkeleton: false,
+      focusAccent: "#09f",
+      focusMode: false,
+      setFocusMode: vi.fn(),
+      showShortcuts: false,
+      setShowShortcuts: vi.fn(),
+      dismissedWarning: false,
+      setDismissedWarning: vi.fn(),
+      setStreakData: vi.fn(),
+      t: { isActive: true, isPaused: false },
+      isMobile: false,
+      openFocusMode: vi.fn(),
+      showHistory: false,
+      setShowHistory: vi.fn(),
+    };
+
+    const { rerender } = render(
+      <TimerPageContent state={{ ...baseState, streakData: { current_streak_days: 4, total_sessions: 0 } }} />
+    );
+    expect(screen.queryByText(/Study today to keep your 4-day streak/i)).not.toBeInTheDocument();
+
+    vi.setSystemTime(new Date("2026-03-24T20:00:00.000Z"));
+    rerender(
+      <TimerPageContent state={{ ...baseState, streakData: { current_streak_days: 0, total_sessions: 0 } }} />
+    );
+    expect(screen.queryByText(/Study today to keep your/i)).not.toBeInTheDocument();
+
+    rerender(
+      <TimerPageContent state={{ ...baseState, streakData: {} }} />
+    );
+    expect(screen.queryByText(/Study today to keep your/i)).not.toBeInTheDocument();
+
+    rerender(
+      <TimerPageContent state={{ ...baseState, streakData: { current_streak_days: 4 } }} />
+    );
+    expect(screen.getByText(/Study today to keep your 4-day streak/i)).toBeInTheDocument();
     vi.useRealTimers();
   });
 });

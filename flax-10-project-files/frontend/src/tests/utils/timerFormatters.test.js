@@ -179,7 +179,11 @@ describe('extractTime', () => {
     });
 
     it('returns null when value throws', () => {
-        expect(extractTime({})).toBeNull();
+        expect(extractTime({
+            toString() {
+                throw new Error('bad coercion');
+            },
+        })).toBeNull();
     });
 });
 

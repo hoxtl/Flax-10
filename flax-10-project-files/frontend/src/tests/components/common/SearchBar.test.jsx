@@ -104,6 +104,23 @@ describe("SearchBar", () => {
     unregisterTarget(high);
   });
 
+  it("breaks ties by the left-most visible target when items share the same top position", () => {
+    const left = makeVisibleInput(10, 20);
+    const right = makeVisibleInput(10, 90);
+    left.focus = vi.fn();
+    right.focus = vi.fn();
+
+    registerTarget(right);
+    registerTarget(left);
+
+    fireEvent.keyDown(document, { key: "/", target: document.body });
+    expect(left.focus).toHaveBeenCalledTimes(1);
+    expect(right.focus).not.toHaveBeenCalled();
+
+    unregisterTarget(left);
+    unregisterTarget(right);
+  });
+
   it("ignores hidden, disconnected, disabled, and readOnly targets and cleans up on unmount", () => {
     const hidden = makeVisibleInput();
     Object.defineProperty(hidden, "offsetParent", { configurable: true, get: () => null });

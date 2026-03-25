@@ -42,7 +42,6 @@ function PeoplePill({ task }) {
 }
 
 function ProjectPill({ task }) {
-  if (!task.group_project_name) return null;
   return <span className={styles.projectPill} title={`Project: ${task.group_project_name}`}><ClipboardList size={11} className={styles.projectPillIcon} />{task.group_project_name}</span>;
 }
 

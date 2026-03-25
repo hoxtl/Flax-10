@@ -372,5 +372,58 @@ describe("tasksPageUtils", () => {
       expect(state.setShowCreateListFromTask).toHaveBeenCalledWith(false);
       expect(state.setShowListModal).toHaveBeenCalledWith(false);
     });
+
+    it("skips undo toasts when task creation returns nothing", async () => {
+      const state = {
+        activeListId: null,
+        activeFilter: "all",
+        setActiveListId: vi.fn(),
+        setActiveFilter: vi.fn(),
+        setFilterListIds: vi.fn(),
+        setShowListModal: vi.fn(),
+        setShowTaskModal: vi.fn(),
+        setTaskModalDueDate: vi.fn(),
+        showTaskModal: false,
+        taskModalDueDate: null,
+        toastUndo: null,
+        toastDelete: false,
+        toastInfo: null,
+        setToastUndo: vi.fn(),
+        setToastDelete: vi.fn(),
+        setToastInfo: vi.fn(),
+        showListModal: false,
+        showCreateListFromTask: false,
+        setShowCreateListFromTask: vi.fn(),
+        lastCreatedListId: null,
+        setLastCreatedListId: vi.fn(),
+      };
+      const listsApi = {
+        lists: [],
+        archivedLists: [],
+        loading: false,
+        addList: vi.fn(),
+        renameList: vi.fn(),
+        removeList: vi.fn(),
+        restoreList: vi.fn(),
+        permanentlyDeleteList: vi.fn(),
+      };
+      const tasksApi = {
+        tasks: [],
+        initialLoading: false,
+        addTask: vi.fn().mockResolvedValue(null),
+        removeTask: vi.fn(),
+        editTask: vi.fn(),
+        toggleComplete: vi.fn(),
+        reload: vi.fn(),
+      };
+      const handlers = buildTasksPageHandlers(state, listsApi, tasksApi);
+      const result = buildTasksPageViewProps(state, listsApi, tasksApi, handlers, [], null, null);
+
+      await result.feedProps.onAddTask({ title: "Ghost task" });
+      expect(state.setToastUndo).not.toHaveBeenCalled();
+
+      await result.taskModalProps.onSave({ title: "Ghost task" });
+      expect(state.setToastUndo).toHaveBeenCalledWith(null);
+    });
   });
 });

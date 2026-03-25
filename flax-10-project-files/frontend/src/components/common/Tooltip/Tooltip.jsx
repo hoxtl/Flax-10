@@ -16,8 +16,9 @@ function getFixedStyle(position, rect) {
   }
 }
 
-function TooltipPortal({ content, position, rect, className = "" }) {
-  if (!rect || !content) return null;
+function TooltipPortal({ content, position, rect, className }) {
+  if (!rect) return null;
+  if (!content) return null;
   const posStyle = getFixedStyle(position, rect);
   return createPortal(
     <div className={`${styles.tooltip} ${styles.tooltipFixed} ${styles[position]} ${className}`.trim()} role="tooltip"

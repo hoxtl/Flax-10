@@ -79,7 +79,7 @@ function withSpacing(row, previousRow, index) {
 function buildEventGroup(items, baseRow, chunkIndex) {
   const startMins = Math.min(...items.map((item) => item.startMins));
   const endMins = Math.max(...items.map((item) => item.endMins));
-  return { type: "eventGroup", id: `group-${baseRow.id}-${chunkIndex}`, items, startMins, endMins, spacingBeforePx: chunkIndex === 0 ? baseRow.spacingBeforePx : 0 };
+  return { type: "eventGroup", id: `group-${baseRow.id}-${chunkIndex}`, items, startMins, endMins, spacingBeforePx: baseRow.spacingBeforePx };
 }
 
 function collectOverlappingGroup(rows, startIndex) {

@@ -33,7 +33,7 @@ function getSessionFields(session) {
         breakDuration: session.breakDuration ?? session.break_duration ?? 0,
         pauseDuration: session.pauseDuration ?? session.pause_duration ?? 0,
         studyBlockId: session.studyBlockId || session.study_block_id,
-        duration: session.duration || 0,
+        duration: session.duration ?? 0,
         date: session.date || null,
     };
 }

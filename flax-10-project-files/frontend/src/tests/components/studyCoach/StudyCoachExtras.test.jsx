@@ -6,6 +6,7 @@ const createEvent = vi.fn();
 const useCalendarDispatch = vi.fn();
 const aiChat = vi.fn();
 const scrollIntoView = vi.fn();
+const authProfile = { current: { role: "student" } };
 
 vi.mock("../../../api/eventApi", () => ({
   createEvent: (...args) => createEvent(...args),
@@ -14,6 +15,14 @@ vi.mock("../../../api/eventApi", () => ({
 vi.mock("../../../context/CalendarContext", () => ({
   useCalendarDispatch: (...args) => useCalendarDispatch(...args),
 }));
+
+vi.mock("../../../context/AuthContext", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useAuth: () => ({ profile: authProfile.current }),
+  };
+});
 
 vi.mock("../../../api/analyticsApi", () => ({
   default: { aiChat: (...args) => aiChat(...args) },
@@ -46,6 +55,7 @@ vi.mock("../../../components/studyCoach/studyCoachMarkdown.jsx", () => ({
 
 vi.mock("../../../components/studyCoach/studyCoachSuggestions", () => ({
   STUDY_COACH_SUGGESTIONS: ["Help me plan", "What should I revise?"],
+  TEACHER_COACH_SUGGESTIONS: ["Plan my next lesson", "Help me prep a lecture"],
 }));
 
 vi.mock("../../../components/studyCoach/TypingIndicator", () => ({
@@ -96,6 +106,7 @@ describe("StudyCoach extras", () => {
     vi.useRealTimers();
     useCalendarDispatch.mockReturnValue(vi.fn());
     Element.prototype.scrollIntoView = scrollIntoView;
+    authProfile.current = { role: "student" };
   });
 
   it("covers study coach helper functions", () => {
@@ -136,6 +147,33 @@ describe("StudyCoach extras", () => {
     await waitFor(() => expect(screen.getByText("Failed")).toBeInTheDocument());
   });
 
+  it("hides the footer for empty imports and shows the done state after the last import", async () => {
+    const dispatch = vi.fn();
+    useCalendarDispatch.mockReturnValue(dispatch);
+    createEvent.mockResolvedValueOnce({ ok: true });
+
+    const { unmount } = render(<ScheduleImportPanel events={[]} />);
+    expect(screen.queryByText(/Import All/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/All events added to your calendar/i)).not.toBeInTheDocument();
+
+    unmount();
+    render(
+      <ScheduleImportPanel
+        events={[
+          {
+            title: "Seminar",
+            start_time: "2026-03-24T09:00:00.000Z",
+            end_time: "2026-03-24T10:00:00.000Z",
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Add Seminar to calendar"));
+    await waitFor(() => expect(screen.getByText(/All events added to your calendar/i)).toBeInTheDocument());
+    expect(screen.queryByText(/Import All/i)).not.toBeInTheDocument();
+  });
+
   it("renders study coach messages states and suggestion actions", () => {
     const onSend = vi.fn();
     const bottomRef = { current: null };
@@ -164,11 +202,27 @@ describe("StudyCoach extras", () => {
     expect(screen.getByText("Oops")).toBeInTheDocument();
   });
 
+  it("renders the teacher empty state and teacher suggestions", () => {
+    authProfile.current = { role: "teacher" };
+    const onSend = vi.fn();
+
+    render(<StudyCoachMessages bottomRef={{ current: null }} error={null} loading={false} messages={[]} onSend={onSend} />);
+
+    expect(screen.getByText(/plan your teaching week/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Plan my next lesson"));
+    expect(onSend).toHaveBeenCalledWith("Plan my next lesson");
+  });
+
   it("assembles the panel view and proxies clear/close/send actions", () => {
     render(<StudyCoachPanelView initialMessage="Hello" title="Flax Bot" subtitle="Ask me" onClose={vi.fn()} />);
     expect(screen.getByText("Flax Bot")).toBeInTheDocument();
     expect(screen.getByText("Ask me")).toBeInTheDocument();
     expect(screen.getByLabelText("Ask me anything…")).toBeInTheDocument();
+  });
+
+  it("uses the default subtitle when one is not provided", () => {
+    render(<StudyCoachPanelView initialMessage="" title="Flax Bot" onClose={vi.fn()} />);
+    expect(screen.getByText("Ask me anything")).toBeInTheDocument();
   });
 });
 

@@ -58,6 +58,11 @@ describe("taskFeedUtils", () => {
       expect(getHeaderTitle("all", { name: "Work" }, "CS101")).toBe("Work: CS101");
     });
 
+    it("falls back to a generic label when the active list has no name", () => {
+      expect(getHeaderTitle("all", {}, "CS101")).toBe("List: CS101");
+      expect(getHeaderTitle("all", {}, null)).toBe("List");
+    });
+
     it("returns All tasks when no list and no module", () => {
       expect(getHeaderTitle("all", null, null)).toBe("All tasks");
     });

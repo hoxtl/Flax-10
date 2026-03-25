@@ -65,13 +65,14 @@ function handleDonutClick(event) {
 }
 
 function buildSegmentHandler(chart, onSegmentClick) {
-  return (label) => label && onSegmentClick({ chart, label });
+  return (label) => label && onSegmentClick?.({ chart, label });
 }
 
 function CompactDonutLayout({ canvasClassName, chart, data, chartProps, legendTone, onSegmentClick }) {
+  const onSelect = onSegmentClick ? buildSegmentHandler(chart, onSegmentClick) : undefined;
   return (
     <div className={styles.compactDonutRow}>
-      <div className={canvasClassName}><DonutChart data={data} {...chartProps} onSelect={buildSegmentHandler(chart, onSegmentClick)} /></div>
+      <div className={canvasClassName}><DonutChart data={data} {...chartProps} onSelect={onSelect} /></div>
       <CompactLegend items={data} tone={legendTone} />
     </div>
   );

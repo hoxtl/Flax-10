@@ -44,4 +44,14 @@ describe("ErrorBoundary", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try Again" }));
     expect(reload).toHaveBeenCalledOnce();
   });
+
+  it("shows debug details in development mode", () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
+
+    render(<ErrorBoundary><ProblemChild /></ErrorBoundary>);
+
+    expect(screen.getByText("Error: boom")).toBeInTheDocument();
+    process.env.NODE_ENV = originalEnv;
+  });
 });

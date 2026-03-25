@@ -118,6 +118,20 @@ describe('DateTimeCell', () => {
         fireEvent.change(pickers[1], { target: { value: '2026-03-16T18:00' } });
         expect(pickers[1]).toHaveValue('2026-03-16T18:00');
     });
+
+    it('resets missing event times to empty inputs when editing', () => {
+        render(<DateTimeCell event={createMockEvent({ start_time: null, end_time: null })} isReadOnly={false} onSave={vi.fn()} />);
+        fireEvent.click(screen.getByText(/Jan 1/));
+        const pickers = screen.getAllByTestId('datetime-picker');
+        expect(pickers[0]).toHaveValue('');
+        expect(pickers[1]).toHaveValue('');
+    });
+
+    it('applies the hovered edit-icon class when the row is hovered', () => {
+        const { container } = render(<DateTimeCell event={createMockEvent()} isReadOnly={false} isRowHovered={true} onSave={vi.fn()} />);
+        const svg = container.querySelector('svg');
+        expect(svg?.getAttribute('class')).toContain('editIconVisible');
+    });
 });
 
 describe('formatTimeRange', () => {

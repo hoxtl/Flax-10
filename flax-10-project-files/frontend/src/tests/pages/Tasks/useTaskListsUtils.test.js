@@ -41,6 +41,19 @@ describe("useTaskListsUtils", () => {
       const out = mergeListColors([{ id: 1, name: "L", color: "#fff" }]);
       expect(out[0].color).toBe("#fff");
     });
+
+    it("skips stored colours when the list id or window is unavailable", () => {
+      const originalWindow = globalThis.window;
+      Object.defineProperty(globalThis, "window", { value: undefined, configurable: true });
+      globalThis.localStorage.getItem = vi.fn(() => "#abc");
+
+      const out = mergeListColors([{ name: "Nameless" }]);
+
+      expect(out[0].color).toBeUndefined();
+      expect(globalThis.localStorage.getItem).not.toHaveBeenCalled();
+
+      Object.defineProperty(globalThis, "window", { value: originalWindow, configurable: true });
+    });
   });
 
   describe("addListImpl", () => {
