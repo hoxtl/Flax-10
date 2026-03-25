@@ -1,3 +1,3 @@
 /* Homepage CSS barrel for components/IntelligenceGrid.module.css */
-@import "./IntelligenceGrid.part1.module.css";
-@import "./IntelligenceGrid.part2.module.css";
+@import "./IntelligenceGrid.bento-layout.module.css";
+@import "./IntelligenceGrid.add-sheet-and-controls.module.css";

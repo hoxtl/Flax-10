@@ -1,5 +1,5 @@
 /* Homepage CSS barrel for components/IntelligenceRow.module.css */
-@import "./IntelligenceRow.part1.module.css";
-@import "./IntelligenceRow.part2.module.css";
-@import "./IntelligenceRow.part3.module.css";
-@import "./IntelligenceRow.part4.module.css";
+@import "./IntelligenceRow.hero-and-shell.module.css";
+@import "./IntelligenceRow.alerts-and-status.module.css";
+@import "./IntelligenceRow.metrics-and-context.module.css";
+@import "./IntelligenceRow.bento-and-travel.module.css";
