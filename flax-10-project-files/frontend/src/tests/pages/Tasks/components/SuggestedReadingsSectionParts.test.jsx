@@ -25,7 +25,7 @@ vi.mock("../../../../components/common/EmptyState/EmptyState", () => ({
 }));
 
 vi.mock("../../../../components/common/PrimaryButton/PrimaryButton", () => ({
-  default: ({ children, disabled, onClick, ...props }) => (
+  default: ({ children, disabled, onClick, pill, variant, size, ...props }) => (
     <button {...props} data-disabled={String(Boolean(disabled))} onClick={onClick}>
       {children}
     </button>
@@ -170,18 +170,8 @@ describe("SuggestedReadingsSectionParts", () => {
 
   it("uses fallback reading-speed estimates and ignores repeat add attempts", async () => {
     let resolveAdd;
-    convertReadingToTask.mockReturnValueOnce(
-      new Promise((resolve) => {
-        resolveAdd = resolve;
-      }),
-    );
-
-    render(
-      <SuggestedReadingCard
-        reading={{ id: 11, title: "Fallback estimate", page_count: 20 }}
-        onAdded={vi.fn()}
-      />,
-    );
+    convertReadingToTask.mockReturnValueOnce(new Promise((r) => { resolveAdd = r; }));
+    render(<SuggestedReadingCard reading={{ id: 11, title: "Fallback estimate", page_count: 20 }} onAdded={vi.fn()} />);
 
     expect(screen.getByText("40 min to read")).toBeInTheDocument();
 
@@ -191,10 +181,7 @@ describe("SuggestedReadingsSectionParts", () => {
     fireEvent.click(screen.getByText("Adding…"));
     expect(convertReadingToTask).toHaveBeenCalledTimes(1);
 
-    await act(async () => {
-      resolveAdd({});
-      await Promise.resolve();
-    });
+    await act(async () => { resolveAdd({}); });
 
     fireEvent.click(screen.getByText("✓ Added"));
     expect(convertReadingToTask).toHaveBeenCalledTimes(1);

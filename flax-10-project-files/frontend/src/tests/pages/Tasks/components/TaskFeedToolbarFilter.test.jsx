@@ -38,17 +38,11 @@ describe("TaskFeedToolbarFilter", () => {
   });
 
   it("opens on hover and closes after the hover timeout", async () => {
-    vi.useFakeTimers();
-    const onFilterOpenChange = vi.fn();
-
+    vi.useFakeTimers(); const onFilterOpenChange = vi.fn();
     render(
       <ToolbarFilterPanel
-        filterAnchor={{ current: null }}
-        isFilterOpen={false}
-        onFilterOpenChange={onFilterOpenChange}
-        activeFilterCount={0}
-        panelProps={{}}
-      />,
+        filterAnchor={{ current: null }} isFilterOpen={false} onFilterOpenChange={onFilterOpenChange} activeFilterCount={0} panelProps={{}}
+      />
     );
 
     fireEvent.mouseEnter(screen.getByRole("button", { name: /filter/i }).parentElement);
@@ -57,10 +51,7 @@ describe("TaskFeedToolbarFilter", () => {
     onFilterOpenChange.mockClear();
     fireEvent.mouseLeave(screen.getByRole("button", { name: /filter/i }).parentElement);
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(200);
-    });
-
+    await act(async () => { await vi.advanceTimersByTimeAsync(200); });
     expect(onFilterOpenChange).toHaveBeenCalledWith(false);
   });
 

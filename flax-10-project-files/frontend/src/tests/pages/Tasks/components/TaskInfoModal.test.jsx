@@ -28,24 +28,11 @@ describe("TaskInfoModal coverage", () => {
 
   it("shows page ranges and module-name fallbacks for reading tasks", async () => {
     getReadingSpeed.mockResolvedValue({ avg_min_per_page: 2, is_personalised: false });
-
     render(
       <TaskInfoModal
-        task={{
-          id: 2,
-          title: "Read chapter",
-          description: "",
-          priority: "urgent",
-          due_date: "2026-03-15T10:00:00Z",
-          estimated_blocks: 3,
-          module_name: "Machine Learning",
-          reading_chapter: "Week 4",
-          reading_start_page: 10,
-          reading_end_page: 18,
-        }}
-        listName="Reading List - Machine Learning"
-        onClose={vi.fn()}
-      />,
+        task={{ id: 2, title: "Read chapter", description: "", priority: "urgent", due_date: "2026-03-15T10:00:00Z", estimated_blocks: 3, module_name: "Machine Learning", reading_chapter: "Week 4", reading_start_page: 10, reading_end_page: 18 }}
+        listName="Reading List - Machine Learning" onClose={vi.fn()}
+      />
     );
 
     await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
@@ -57,25 +44,12 @@ describe("TaskInfoModal coverage", () => {
   });
 
   it("handles reading-speed failures and missing-value fallbacks outside reading lists", async () => {
-    const onClose = vi.fn();
-    getReadingSpeed.mockRejectedValueOnce(new Error("offline"));
-
+    const onClose = vi.fn(); getReadingSpeed.mockRejectedValueOnce(new Error("offline"));
     render(
       <TaskInfoModal
-        task={{
-          id: 3,
-          title: "",
-          description: "Bring notes",
-          priority: null,
-          due_date: null,
-          estimated_blocks: 1,
-          module_code: "CS300",
-          module_name: "Compilers",
-          page_count: 12,
-        }}
-        listName="Inbox"
-        onClose={onClose}
-      />,
+        task={{ id: 3, title: "", description: "Bring notes", priority: null, due_date: null, estimated_blocks: 1, module_code: "CS300", module_name: "Compilers", page_count: 12 }}
+        listName="Inbox" onClose={onClose}
+      />
     );
 
     await waitFor(() => expect(getReadingSpeed).toHaveBeenCalled());
