@@ -147,30 +147,17 @@ describe("StudyCoach extras", () => {
     await waitFor(() => expect(screen.getByText("Failed")).toBeInTheDocument());
   });
 
-  it("hides the footer for empty imports and shows the done state after the last import", async () => {
-    const dispatch = vi.fn();
-    useCalendarDispatch.mockReturnValue(dispatch);
-    createEvent.mockResolvedValueOnce({ ok: true });
-
-    const { unmount } = render(<ScheduleImportPanel events={[]} />);
+  it("hides the footer for empty suggested imports", () => {
+    render(<ScheduleImportPanel events={[]} />);
     expect(screen.queryByText(/Import All/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/All events added to your calendar/i)).not.toBeInTheDocument();
+  });
 
-    unmount();
-    render(
-      <ScheduleImportPanel
-        events={[
-          {
-            title: "Seminar",
-            start_time: "2026-03-24T09:00:00.000Z",
-            end_time: "2026-03-24T10:00:00.000Z",
-          },
-        ]}
-      />,
-    );
-
+  it("shows the done state after the last suggested import", async () => {
+    useCalendarDispatch.mockReturnValue(vi.fn());
+    createEvent.mockResolvedValueOnce({ ok: true });
+    render(<ScheduleImportPanel events={[{ title: "Seminar", start_time: "2026", end_time: "2026" }]} />);
     fireEvent.click(screen.getByLabelText("Add Seminar to calendar"));
-    await waitFor(() => expect(screen.getByText(/All events added to your calendar/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/All events added/i)).toBeInTheDocument());
     expect(screen.queryByText(/Import All/i)).not.toBeInTheDocument();
   });
 

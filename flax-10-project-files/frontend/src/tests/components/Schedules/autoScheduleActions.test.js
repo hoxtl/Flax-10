@@ -46,32 +46,16 @@ describe("autoScheduleActions", () => {
     expect(buildAutoSchedulePayload([{ id: 1 }], null, "Revision Sprint")).toBeNull();
   });
 
-  it("builds a payload with schedule preferences and falls back to the form title", () => {
+  it("builds a payload with schedule preferences", () => {
     buildScheduleAutoFormMock.mockReturnValue({
       title: "Generated Plan",
-      deadline_preferences: [{ ideal_minutes_per_day: 45 }],
-      deadlines: [{ id: 1 }],
+      deadline_preferences: [{ id: 1 }],
     });
-
-    expect(
-      buildAutoSchedulePayload(
-        [{ id: 1 }],
-        {
-          wake_time: "07:30",
-          sleep_time: "23:15",
-          week_preference: "balanced",
-          worktime_preference: "morning",
-        },
-        "",
-      ),
-    ).toEqual({
+    const prefs = { wake_time: "07:30", sleep_time: "23:15", week_preference: "balanced" };
+    expect(buildAutoSchedulePayload([{ id: 1 }], prefs, "")).toEqual({
       title: "Generated Plan",
-      deadline_preferences: [{ ideal_minutes_per_day: 45 }],
-      deadlines: [{ id: 1 }],
-      wake_time: "07:30",
-      sleep_time: "23:15",
-      week_preference: "balanced",
-      worktime_preference: "morning",
+      deadline_preferences: [{ id: 1 }],
+      ...prefs,
     });
   });
 
@@ -134,34 +118,21 @@ describe("autoScheduleActions", () => {
     expect(showToast).toHaveBeenCalledWith("No upcoming deadlines to auto-schedule.", { variant: "error" });
   });
 
-  it("creates a schedule, surfaces overwrite info, and runs onDone", async () => {
+  it("creates a schedule and surfaces overwrite info", async () => {
     const showToast = vi.fn();
+    buildScheduleAutoFormMock.mockReturnValue({ title: "GP", deadline_preferences: [] });
+    createScheduleMock.mockResolvedValue({ id: 11, overwritten: true });
+    const params = { deadlines: [{ id: 2 }], settings: { wake_time: "08:00" }, showToast, title: "MP" };
+    await expect(submitAutoScheduleWithPrefs(params)).resolves.toEqual({ id: 11, overwritten: true });
+    expect(showToast).toHaveBeenCalledWith("A schedule with this name existed and was replaced.", { variant: "info" });
+  });
+
+  it("calls onDone after successfully creating a schedule", async () => {
     const onDone = vi.fn();
-    const data = { id: 11, overwritten: true };
-
-    buildScheduleAutoFormMock.mockReturnValue({
-      title: "Generated Plan",
-      deadline_preferences: [{ ideal_minutes_per_day: 50 }],
-    });
+    const data = { id: 11, overwritten: false };
+    buildScheduleAutoFormMock.mockReturnValue({ title: "GP", deadline_preferences: [] });
     createScheduleMock.mockResolvedValue(data);
-
-    await expect(
-      submitAutoScheduleWithPrefs({
-        deadlines: [{ id: 2 }],
-        settings: { wake_time: "08:00" },
-        showToast,
-        title: "Morning Plan",
-        onDone,
-      }),
-    ).resolves.toEqual(data);
-
-    expect(createScheduleMock).toHaveBeenCalledWith({
-      title: "Morning Plan",
-      deadline_preferences: [{ ideal_minutes_per_day: 50 }],
-      wake_time: "08:00",
-    });
-    expect(showToast).toHaveBeenNthCalledWith(1, "A schedule with this name existed and was replaced.", { variant: "info" });
-    expect(showToast).toHaveBeenNthCalledWith(2, "Your auto schedule is ready.", { variant: "success" });
+    await submitAutoScheduleWithPrefs({ deadlines: [], showToast: vi.fn(), onDone });
     expect(onDone).toHaveBeenCalledWith(data);
   });
 

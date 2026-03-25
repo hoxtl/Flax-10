@@ -44,33 +44,27 @@ describe("HomeAddressFormLayout", () => {
     expect(screen.getByText("Home Address")).toBeInTheDocument();
   });
 
-  it("suppresses lookup-miss alerts but shows other errors", () => {
-    const { rerender } = render(
+  it("suppresses lookup-miss alerts", () => {
+    render(
       <HomeAddressFormLayout
         onSubmit={vi.fn()}
         homeAddress="1 Strand"
         setHomeAddress={vi.fn()}
         error="Address not found in lookup"
-        isSaving={false}
-        hasUnsaved={false}
-        saveSignal={0}
       />,
     );
-
     expect(screen.queryByText(/warning:/i)).toBeNull();
+  });
 
-    rerender(
+  it("shows non-lookup-miss errors as warnings", () => {
+    render(
       <HomeAddressFormLayout
         onSubmit={vi.fn()}
         homeAddress="1 Strand"
         setHomeAddress={vi.fn()}
         error="Something else went wrong"
-        isSaving={false}
-        hasUnsaved={false}
-        saveSignal={0}
       />,
     );
-
     expect(screen.getByText("warning:Something else went wrong")).toBeInTheDocument();
   });
 

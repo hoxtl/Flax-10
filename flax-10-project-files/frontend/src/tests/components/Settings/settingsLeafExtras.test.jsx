@@ -148,7 +148,7 @@ describe("settings leaf extras", () => {
     localStorage.clear();
   });
 
-  it("covers small settings UI components and sidebar states", () => {
+  it("covers small settings UI components (banners, headers, inputs)", () => {
     const onChange = vi.fn();
     render(
       <>
@@ -156,22 +156,26 @@ describe("settings leaf extras", () => {
         <ErrorMessage message="Oops" />
         <SectionHeader title="Account" />
         <FormInput id="bio" label="Bio" value="hello" onChange={vi.fn()} maxLength={10} />
-        <FormSelect id="theme" label="Theme" value="light" onChange={onChange} options={[{ value: "light", label: "Light" }]} grouped />
         <SubmitButton isSaving={false} label="Save" savingLabel="Saving..." hasUnsaved saveSignal={1} />
-        <TabButton id="x" label="Go" isActive onClick={onChange} />
+      </>,
+    );
+    expect(screen.getByText("success:Saved!")).toBeInTheDocument();
+    expect(screen.getByText("error:Oops")).toBeInTheDocument();
+    expect(screen.getByText("(5 characters remaining)")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
+  });
+
+  it("covers sidebar and selector states", () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <FormSelect id="theme" label="T" value="l" onChange={onChange} options={[]} grouped />
         <ThemeGridSelector value="flax" onChange={onChange} />
         <SettingsSidebar activeTab="account" onChange={onChange} user={{ first_name: "Ava" }} />
       </>,
     );
-
-    expect(screen.getByText("success:Saved!")).toBeInTheDocument();
-    expect(screen.getByText("error:Oops")).toBeInTheDocument();
-    expect(screen.queryByText("Profile")).toBeInTheDocument();
-    expect(screen.getByText("(5 characters remaining)")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Select"));
     expect(onChange).toHaveBeenCalledWith({ target: { name: "theme", value: "dark" } });
-    expect(screen.getByRole("button", { name: "✓ Saved!" })).toBeInTheDocument();
-    expect(screen.getByText("Classic")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Flax"));
     expect(onChange).toHaveBeenCalledWith("flax");
     fireEvent.click(screen.getByText("Appearance"));

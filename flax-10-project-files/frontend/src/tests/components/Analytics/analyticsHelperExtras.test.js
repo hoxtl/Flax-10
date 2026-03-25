@@ -61,18 +61,18 @@ describe('Analytics helper coverage extras', () => {
     expect(formatPercentage(Number.NaN)).toBe('0%');
     expect(formatPercentage(12)).toBe('12%');
     expect(formatPercentage(12.34)).toBe('12.3%');
-
     expect(getBadge(60)).toBe('🦉 Night Owl');
     expect(getBadge(30)).toBe('🌗 Mixed');
     expect(getBadge(10)).toBe('☀️ Day Worker');
+  });
 
+  it('covers theme-usage pie series generation', () => {
     const series = getPieSeries({
       light_minutes: 50,
       dark_minutes: 25,
       light_percentage: undefined,
       dark_percentage: 33.3,
     });
-
     expect(series[0].data[0]).toEqual({
       id: 0,
       value: 50,
@@ -85,13 +85,7 @@ describe('Analytics helper coverage extras', () => {
       label: 'Dark Mode 33.3%',
       color: DARK_COLOR,
     });
-
-    const fallbackSeries = getPieSeries({
-      light_minutes: 10,
-      dark_minutes: 5,
-      light_percentage: 50,
-      dark_percentage: undefined,
-    });
-    expect(fallbackSeries[0].data[1].label).toBe('Dark Mode 0%');
+    const fallback = getPieSeries({ light_minutes: 10, dark_minutes: 5, light_percentage: 50 });
+    expect(fallback[0].data[1].label).toBe('Dark Mode 0%');
   });
 });
