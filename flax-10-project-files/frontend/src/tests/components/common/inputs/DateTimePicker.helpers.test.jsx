@@ -25,6 +25,7 @@ import {
   useSyncValue,
   useClickOutside,
   useDerivedCalendarState,
+  useDropdownPosition,
 } from '../../../../components/common/inputs/useDateTimePicker';
 
 vi.mock(
@@ -109,6 +110,7 @@ describe('DateTimePicker helpers', () => {
     expect(getDropdownHeight(true, false)).toBe(90);
     expect(getDropdownHeight(false, true)).toBe(290);
     expect(getDropdownHeight(false, false)).toBe(330);
+    expect(getDisplayValue(null, false, false)).toBe('');
     expect(getDisplayValue(date, true, false)).toBe('09:05');
     expect(getDisplayValue(date, false, true)).toBe('12 / 03 / 2026');
     expect(isBeforeMinDate('2026-03-09', '2026-03-10')).toBe(true);
@@ -118,7 +120,9 @@ describe('DateTimePicker helpers', () => {
     expect(Number.isNaN(parseIncomingValue('not-a-date', false, false)?.getTime())).toBe(true);
 
     emitDateTimeChange(date, 14, 45, false, true, onChange);
-    expect(onChange).toHaveBeenCalledWith('2026-03-12');
+    emitDateTimeChange(null, 14, 45, false, false, onChange);
+    expect(onChange).toHaveBeenNthCalledWith(1, '2026-03-12');
+    expect(onChange).toHaveBeenNthCalledWith(2, '');
     expect(formatIncomingForInput('2026-03-12T09:05')).toBe('formatted:2026-03-12T09:05');
 
     handleDaySelect(18, 2026, 2, setSelDate, emitChange, 9, 30);
@@ -143,7 +147,7 @@ describe('DateTimePicker helpers', () => {
   });
 
   it('renders picker parts and covers keyboard, clear, disabled day, and portal click branches', () => {
-    const setOpen = vi.fn();
+    const setOpen = vi.fn((next) => (typeof next === 'function' ? next(false) : next));
     const setSelDate = vi.fn();
     const onChange = vi.fn();
     const prevMonth = vi.fn();
@@ -167,6 +171,7 @@ describe('DateTimePicker helpers', () => {
     const trigger = document.querySelector('[role="button"]');
     fireEvent.keyDown(trigger, { key: 'Enter' });
     fireEvent.keyDown(trigger, { key: ' ' });
+    fireEvent.keyDown(trigger, { key: 'Escape' });
     fireEvent.click(screen.getByLabelText('Clear date'));
     expect(setOpen).toHaveBeenCalled();
     expect(setSelDate).toHaveBeenCalledWith(null);
@@ -287,6 +292,7 @@ describe('DateTimePicker helpers', () => {
 
     fireEvent.pointerDown(document.body);
     fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent.keyDown(document, { key: 'Enter' });
     expect(setOpen).toHaveBeenCalledTimes(3);
   });
 
@@ -318,5 +324,28 @@ describe('DateTimePicker helpers', () => {
     expect(result.current.isSel(10)).toBe(true);
     expect(result.current.isDisabled(9)).toBe(true);
     expect(result.current.days).toContain(31);
+  });
+
+  it('ignores dropdown position work when open is false or the trigger ref is missing', () => {
+    const setDropdownPos = vi.fn();
+    const ref = { current: null };
+
+    renderHook(() => useDropdownPosition(false, ref, false, false, setDropdownPos));
+    renderHook(() => useDropdownPosition(true, ref, true, false, setDropdownPos));
+
+    expect(setDropdownPos).not.toHaveBeenCalled();
+  });
+
+  it('invokes month navigation updater callbacks for previous and next month transitions', () => {
+    const setViewM = vi.fn((updater) => (typeof updater === 'function' ? updater(5) : updater));
+    const setViewY = vi.fn((updater) => (typeof updater === 'function' ? updater(2026) : updater));
+
+    expect(navigateMonth(-1, 0, setViewM, setViewY)).toBeUndefined();
+    expect(navigateMonth(-1, 5, setViewM, setViewY)).toBeUndefined();
+    expect(navigateMonth(1, 11, setViewM, setViewY)).toBeUndefined();
+    expect(navigateMonth(1, 4, setViewM, setViewY)).toBeUndefined();
+
+    expect(setViewY).toHaveBeenCalled();
+    expect(setViewM).toHaveBeenCalled();
   });
 });

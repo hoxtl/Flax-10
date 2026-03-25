@@ -153,10 +153,20 @@ describe("Attendance prompt", () => {
     });
 
     expect(onAnswer).toHaveBeenCalledTimes(1);
-    expect(onAnswer).toHaveBeenCalledWith(
+      expect(onAnswer).toHaveBeenCalledWith(
       true,
       expect.objectContaining({ afterSuccess: expect.any(Function), closeDelayMs: 700 }),
     );
+  });
+
+  it("falls back to empty attendance totals when the stats payload has no overall section", () => {
+    delete attendanceStatsState.overall;
+
+    render(<AttendancePromptModal event={{ title: "Workshop" }} onAnswer={vi.fn().mockResolvedValue(true)} onDismiss={vi.fn()} />);
+
+    expect(screen.getByText("100%")).toBeInTheDocument();
+
+    attendanceStatsState.overall = { attended: 0, missed: 0 };
   });
 
   it("dismisses with null event (no session id stored)", () => {
@@ -183,7 +193,7 @@ describe("Attendance prompt", () => {
     expect(setEvent).toHaveBeenCalledWith(null);
   });
 
-  it("ignores double-tap when answer is already set (handleAnswer guard)", async () => {
+  it("ignores double-tap when answer is already set (button disabled state)", async () => {
     const onAnswer = vi.fn().mockResolvedValue(true);
     render(<AttendancePromptModal event={{ title: "Lab" }} onAnswer={onAnswer} onDismiss={vi.fn()} />);
 

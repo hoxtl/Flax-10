@@ -250,6 +250,34 @@ describe('AnimatedDropdown', () => {
     expect(onChange).toHaveBeenCalledWith('a2');
   });
 
+  it('renders the selected checkmark for flat and grouped selected options', () => {
+    const { container, rerender } = render(
+      <AnimatedDropdown
+        value="a1"
+        onChange={vi.fn()}
+        placeholder="Select"
+        options={OPTIONS}
+      />
+    );
+
+    fireEvent.click(screen.getByText('Option A1'));
+    expect(container.querySelectorAll('svg').length).toBeGreaterThan(1);
+
+    rerender(
+      <AnimatedDropdown
+        value="b1"
+        onChange={vi.fn()}
+        placeholder="Grouped"
+        options={GROUPED_OPTIONS}
+        grouped
+        isOpen
+        onOpenChange={vi.fn()}
+      />
+    );
+
+    expect(container.querySelectorAll('svg').length).toBeGreaterThan(1);
+  });
+
   it('supports customTrigger', () => {
     render(
       <AnimatedDropdown
@@ -263,6 +291,25 @@ describe('AnimatedDropdown', () => {
     expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('custom-trigger'));
     expect(screen.getByText('Option A1')).toBeInTheDocument();
+  });
+
+  it('supports portal rendering and hover-style custom triggers', () => {
+    render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Portal"
+        options={OPTIONS}
+        usePortal
+        customTrigger={<span data-testid="portal-trigger">Portal trigger</span>}
+        openOnHover
+      />
+    );
+
+    const trigger = screen.getByTestId('portal-trigger').parentElement;
+    expect(trigger).toHaveStyle({ cursor: 'default' });
+    fireEvent.mouseEnter(trigger);
+    expect(document.body).toHaveTextContent('Option A1');
   });
 
   it('controlled closed state hides options', () => {
@@ -382,5 +429,21 @@ describe('AnimatedDropdown', () => {
     act(() => vi.advanceTimersByTime(200));
     expect(screen.queryByText('Option A1')).not.toBeInTheDocument();
     vi.useRealTimers();
+  });
+
+  it('renders right-aligned flat options even when an option value is missing', () => {
+    const { container } = render(
+      <AnimatedDropdown
+        value=""
+        onChange={vi.fn()}
+        placeholder="Aligned"
+        options={[{ label: 'Missing value' }]}
+        align="right"
+      />
+    );
+
+    fireEvent.click(screen.getByText('Aligned'));
+    expect(screen.getByText('Missing value')).toBeInTheDocument();
+    expect(container.querySelector('[class*="alignRight"]')).not.toBeNull();
   });
 });

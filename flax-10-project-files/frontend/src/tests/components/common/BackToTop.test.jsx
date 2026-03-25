@@ -114,6 +114,19 @@ describe("BackToTop", () => {
     expect(container.querySelector("button")).toBeNull();
   });
 
+  it("returns early when no scroll containers exist for click handling", () => {
+    document.body.innerHTML = "";
+    Object.defineProperty(document, "scrollingElement", {
+      configurable: true,
+      value: null,
+    });
+
+    render(<BackToTop alwaysVisible containerSelector=".missing-container" />);
+    fireEvent.click(screen.getByRole("button", { name: /back to top/i }));
+
+    expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+
   it("handles missing document.scrollingElement in resolveScrollContainers", () => {
     Object.defineProperty(document, "scrollingElement", {
       configurable: true,
