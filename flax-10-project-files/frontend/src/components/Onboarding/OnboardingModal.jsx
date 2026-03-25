@@ -1,6 +1,7 @@
 /*
  * Onboarding modal with course selection.
  */
+
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { KCL_DEPARTMENTS } from "../../lib/kclCourses";

@@ -1,6 +1,7 @@
 /*
  * Homepage view-model helpers.
  */
+
 import { isToday, overlapsDay } from "../../../components/Calendar/utils/dateUtils";
 import { getAllFreeWindowsToday, getNavigatorContext, isNow, isRoutineOrEventTask } from "./index";
 

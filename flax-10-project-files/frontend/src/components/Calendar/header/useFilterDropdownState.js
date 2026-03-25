@@ -1,6 +1,7 @@
 /*
  * Filter dropdown state hook for calendar header.
  */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTags } from "../../../context/TagContext";
 import styles from "./CalendarHeaderUtils.module.css";

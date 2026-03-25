@@ -1,6 +1,7 @@
 /*
  * Calendar list view event row components.
  */
+
 import { useRef } from 'react';
 import { getEventType, isReadOnlyEvent, isAllDay } from '../utils/eventUtils';
 import { useEventPopup } from '../../../context/CalendarContext';
