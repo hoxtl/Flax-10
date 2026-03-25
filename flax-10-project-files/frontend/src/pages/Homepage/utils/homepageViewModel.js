@@ -194,15 +194,15 @@ function isDueToday(task, todayStart, todayEnd) {
 }
 
 function buildTaskWidgetItem(task, todayEnd) {
-  const dueDate = task.due_date ? new Date(task.due_date) : null;
+  const dueDate = new Date(task.due_date);
   const todayStart = new Date(todayEnd);
   todayStart.setHours(0, 0, 0, 0);
   return {
     type: "task",
     id: `task-${task.id}`,
-    sortTime: dueDate || todayEnd,
-    endTime: dueDate ? new Date(dueDate.getTime() + (task.estimated_blocks || 1) * 25 * 60000) : todayEnd,
-    taskWidgetStatus: task.completed ? "completed" : (dueDate && dueDate < todayStart ? "overdue" : "upcoming"),
+    sortTime: dueDate,
+    endTime: new Date(dueDate.getTime() + (task.estimated_blocks || 1) * 25 * 60000),
+    taskWidgetStatus: task.completed ? "completed" : (dueDate < todayStart ? "overdue" : "upcoming"),
     ...task,
     priority: normalizeTaskWidgetPriority(task.priority),
   };
@@ -236,7 +236,7 @@ function getTaskPriorityRank(priority) {
     medium: 1,
     high: 2,
   };
-  return order[normalizeTaskWidgetPriority(priority)] ?? 3;
+  return order[normalizeTaskWidgetPriority(priority)];
 }
 
 function getTaskTimeValue(dateLike) {
@@ -301,7 +301,7 @@ function buildDeadlineTaskRecommendation(deadline, pendingTasks) {
 function buildRelativeDueMeta(deadline) {
   const diffDays = Math.floor((new Date(deadline.start_due_date).getTime() - Date.now()) / 86400000);
   const dueLabel = diffDays <= 0 ? "due today" : diffDays === 1 ? "due tomorrow" : `due in ${diffDays}d`;
-  return `${deadline.module_code || "Module"}${dueLabel ? ` · ${dueLabel}` : ""}`;
+  return `${deadline.module_code || "Module"} · ${dueLabel}`;
 }
 
 function buildWindowRecommendation(task, freeWindowLabel) {

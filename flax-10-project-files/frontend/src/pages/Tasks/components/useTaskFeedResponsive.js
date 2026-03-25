@@ -5,8 +5,7 @@
 import { useEffect, useState } from "react";
 
 function isMobileViewport() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia?.("(max-width: 900px)")?.matches ?? false;
+  return globalThis.window?.matchMedia?.("(max-width: 900px)")?.matches ?? false;
 }
 
 export default function useTaskFeedResponsive() {

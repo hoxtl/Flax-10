@@ -24,12 +24,12 @@ function buildCommonGroundData(viewedModules, viewedSocieties, currentUserModule
 
 function buildModuleCard(data) {
   if (!data.sharedModules.length && !data.otherModules.length) return null;
-  return { key: "modules", icon: "📚", color: COMMON_GROUND_COLORS.modules, label: "Modules", value: data.sharedModules.length, unit: "in common", subtitle: null };
+  return { key: "modules", icon: "📚", color: COMMON_GROUND_COLORS.modules, label: "Modules", value: data.sharedModules.length, unit: "in common" };
 }
 
 function buildSocietyCard(data) {
   if (!data.sharedSocieties.length && !data.otherSocieties.length) return null;
-  return { key: "societies", icon: "👥", color: COMMON_GROUND_COLORS.societies, label: "Societies", value: data.sharedSocieties.length, unit: "in common", subtitle: null };
+  return { key: "societies", icon: "👥", color: COMMON_GROUND_COLORS.societies, label: "Societies", value: data.sharedSocieties.length, unit: "in common" };
 }
 
 function buildInsightCards(data) {
@@ -62,7 +62,7 @@ function SocietyPills({ sharedSocieties, otherSocieties, onNavigate }) {
   );
 }
 
-function CommonGroundInsightCard({ icon, color, label, value, unit, subtitle, content }) {
+function CommonGroundInsightCard({ icon, color, label, value, unit, content }) {
   return (
     <div className={compatStyles.commonInsightCard} style={{ borderLeftColor: color }}>
       <div className={compatStyles.commonInsightTop}>
@@ -75,7 +75,6 @@ function CommonGroundInsightCard({ icon, color, label, value, unit, subtitle, co
             <span className={compatStyles.commonInsightValue}>{value}</span>
             <span className={compatStyles.commonInsightUnit}>{unit}</span>
           </div>
-          {subtitle && <p className={compatStyles.commonInsightSubtitle}>{subtitle}</p>}
         </div>
       </div>
       <div className={compatStyles.commonInsightPills}>{content}</div>

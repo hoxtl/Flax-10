@@ -18,7 +18,7 @@ function createDefaultContext() {
 }
 
 function getSortedEvents(sortedEvents) {
-  return [...(sortedEvents || [])].sort((left, right) => new Date(left.start_time) - new Date(right.start_time));
+  return [...sortedEvents].sort((left, right) => new Date(left.start_time) - new Date(right.start_time));
 }
 
 function buildOverlapPair(current, next) {
@@ -26,7 +26,7 @@ function buildOverlapPair(current, next) {
     a: current,
     b: next,
     overlapStart: new Date(next.start_time),
-    overlapEnd: new Date(Math.min(new Date(current.end_time || current.start_time).getTime(), new Date(next.end_time || next.start_time).getTime())),
+    overlapEnd: new Date(Math.min(new Date(current.end_time).getTime(), new Date(next.end_time || next.start_time).getTime())),
   };
 }
 

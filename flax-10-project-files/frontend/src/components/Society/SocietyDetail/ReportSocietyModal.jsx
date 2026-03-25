@@ -20,7 +20,6 @@ const FormContent = ({ reason, onTextChange, error, submitting }) => (
 
 const makeOnSubmit = (reason, setState, societyId, onReportSuccess, onClose) =>
     async () => {
-        if (!reason.trim()) return setState(s => ({ ...s, error: "Please provide a reason." }));
         setState({ submitting: true, error: "" });
         try {
             await reportSociety(societyId, reason.trim());

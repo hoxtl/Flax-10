@@ -59,7 +59,7 @@ export function calculateEventColumns(events) {
 function processEventGroups(sortedEvents) {
     const ctx = { columns: new Map(), group: [], end: null };
     sortedEvents.forEach(event => processEventInContext(event, ctx));
-    if (ctx.group.length) processGroup(ctx.group, ctx.columns);
+    processGroup(ctx.group, ctx.columns);
     return ctx.columns;
 }
 
@@ -82,4 +82,3 @@ function updateGroupEnd(event, currentGroupEnd) {
     const end = new Date(event.end_time);
     return !currentGroupEnd || end > currentGroupEnd ? end : currentGroupEnd;
 }
-

@@ -43,7 +43,7 @@ function applyFilters(events, filter, searchQuery) {
 }
 
 function filterEventsByTag(events, filter) {
-    const currentFilter = (Array.isArray(filter) ? filter.flat(Infinity) : [filter])
+    const currentFilter = [filter].flat(Infinity)
         .filter((value) => typeof value === 'string')
         .map((value) => value.trim().toLowerCase())
         .filter(Boolean);
@@ -67,10 +67,10 @@ function matchesSearch(event, query) {
 export function useCalendarData(props = {}) {
     const calendarState = useCalendar();
     return useMemo(() => ({
-        selectedDate: props.selectedDate ?? calendarState.selectedDate ?? new Date(),
-        events: props.events ?? calendarState.events ?? [],
-        viewMode: props.viewMode ?? calendarState.viewMode ?? 'month',
-        displayMode: props.displayMode ?? calendarState.displayMode ?? 'grid',
+        selectedDate: props.selectedDate ?? calendarState.selectedDate,
+        events: props.events ?? calendarState.events,
+        viewMode: props.viewMode ?? calendarState.viewMode,
+        displayMode: props.displayMode ?? calendarState.displayMode,
     }), [props.selectedDate, props.events, props.viewMode, props.displayMode, calendarState]);
 }
 

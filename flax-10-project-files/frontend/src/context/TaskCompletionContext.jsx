@@ -9,9 +9,7 @@ import AppToast from "../components/common/AppToast/AppToast";
 
 const TaskCompletionContext = createContext(null);
 const DEFAULT_MESSAGE = "Task complete.";
-const COMPLETION_MESSAGES = [DEFAULT_MESSAGE, "Well done. Keep the momentum.", "Focus rewarded. Nice work."];
-
-function playVictorySound(volume = 0.4) {
+function playVictorySound(volume) {
   try {
     const audio = new Audio("/completion-pop.mp3");
     audio.volume = volume;

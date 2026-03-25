@@ -16,7 +16,7 @@ export function getInitialForm(event, options = {}) {
     return getDefaultForm(options);
 }
 
-function getFormFromEvent(event, options = {}) {
+function getFormFromEvent(event, options) {
     return {
         title: event.title || '',
         description: event.description || '',

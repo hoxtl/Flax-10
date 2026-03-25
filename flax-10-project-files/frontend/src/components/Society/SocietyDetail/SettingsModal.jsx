@@ -15,8 +15,8 @@ import { useConfirm } from "../../../context/ConfirmContext";
 
 /** Common logic for collaborator management updates. */
 
-async function syncCollaborator(user, members, onUpdate, onAdd) {
-  const existing = (members || []).find(m => m.username === user.username);
+async function syncCollaborator(user, members = [], onUpdate, onAdd) {
+  const existing = members.find(m => m.username === user.username);
   if (existing) return onUpdate?.(existing.user, "editor");
   return onAdd?.(user.username, "editor");
 }

@@ -20,7 +20,7 @@ function withHourMark(finalRows, row, lastInjectedHour, prevEventEndMins, passed
   const startMins = getStartMins(row);
   if (startMins == null) {
     const nextPassedNowMins = row.type === "now" ? row.nowMins : passedNowMins;
-    return { finalRows: [...finalRows, row], lastInjectedHour, prevEventEndMins: row.type === "event" ? row.endMins : row.type === "now" ? prevEventEndMins : null, passedNowMins: nextPassedNowMins };
+    return { finalRows: [...finalRows, row], lastInjectedHour, prevEventEndMins: row.type === "now" ? prevEventEndMins : null, passedNowMins: nextPassedNowMins };
   }
   const rowHour = DAY_START_HOUR + Math.floor(startMins / 60);
   const adjacentToPrevious = prevEventEndMins != null && prevEventEndMins >= startMins;

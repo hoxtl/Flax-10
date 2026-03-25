@@ -96,9 +96,10 @@ function ColorPicker({ color, onChange }) {
 
 function CustomColorInput({ color, onChange }) {
     const isCustom = !DEFAULT_COLORS.includes(color);
+    const inputValue = isCustom ? color : "#000000";
     return (
         <label className={`${styles.customColor} ${isCustom ? styles.selected : ""}`}>
-            <input type="color" value={color} onChange={(e) => onChange(e.target.value)} />
+            <input type="color" value={inputValue} onChange={(e) => onChange(e.target.value)} />
         </label>
     );
 }

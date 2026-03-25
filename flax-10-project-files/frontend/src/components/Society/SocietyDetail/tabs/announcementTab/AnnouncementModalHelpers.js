@@ -33,7 +33,9 @@ function mapAnnouncementToForm(base, announcement) {
 
 export function getImageList(ann) {
     const raw = Array.isArray(ann?.images) ? ann.images : (ann?.image ? [ann.image] : []);
-    return raw.map(img => (typeof img === 'object' && img.url) ? img.url : img).filter(Boolean);
+    return raw
+        .map(img => (img && typeof img === 'object' ? img.url || null : img))
+        .filter(Boolean);
 }
 
 export function validateForm(form) {
