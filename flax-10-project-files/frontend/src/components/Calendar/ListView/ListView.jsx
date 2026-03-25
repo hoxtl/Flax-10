@@ -36,7 +36,6 @@ function formatMonthYear(date) {
 }
 
 function getInitialDayPage(dateKeys) {
-  if (!dateKeys.length) return 1;
   const todayKey = getTodayKey();
   const dayIndex = dateKeys.indexOf(todayKey);
   return dayIndex === -1 ? 1 : Math.floor(dayIndex / DAYS_PER_PAGE) + 1;
@@ -194,4 +193,3 @@ export function ListView({ selectedDate: propDate, events: propEvents }) {
     </div>
   );
 }
-

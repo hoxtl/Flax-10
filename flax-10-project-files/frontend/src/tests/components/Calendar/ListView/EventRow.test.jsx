@@ -26,7 +26,7 @@ vi.mock('../../../../components/Calendar/utils/eventUtils', () => ({
 }));
 
 vi.mock('../../../../components/Calendar/utils/eventStyleUtils', () => ({
-    getEventTheme: () => ({ color: '#7B6751' }),
+    getEventTheme: (event) => ({ color: event.noAccent ? undefined : '#7B6751' }),
 }));
 
 vi.mock('../../../../components/common/Badge/Badge', () => ({
@@ -88,12 +88,42 @@ describe('EventRow', () => {
         });
     });
 
+    it('covers badge fallbacks when optional source data is missing', () => {
+        expect(getTagBadges(createMockEvent({}), '#123456')).toEqual([]);
+        expect(getTagBadges(createMockEvent({ module: {} }), '#123456')).toEqual([]);
+        expect(getTagBadges(createMockEvent({ society_name: 'Chess Club' }), '#111111')).toContainEqual({
+            label: 'Chess Club',
+            type: 'source',
+            color: '#111111',
+        });
+    });
+
     it('renders standalone badge styles for source and tag badges', () => {
         const { rerender } = render(<TagBadge badge={{ label: 'Tag', type: 'tag', color: '#101010' }} />);
         expect(screen.getByTestId('badge')).toHaveTextContent('Tag');
 
         rerender(<TagBadge badge={{ label: 'Source', type: 'source' }} />);
         expect(screen.getByTestId('badge')).toHaveTextContent('Source');
+    });
+
+    it('renders editable events without the read-only styling', () => {
+        const { container } = render(<EventRow event={createMockEvent({ title: 'Editable Event' })} />);
+        expect(container.querySelector('[data-event-id="1"]')).not.toHaveClass('readOnly');
+    });
+
+    it('renders rows without an inline accent style when no theme color is available', () => {
+        const editable = createMockEvent({ id: 10, title: 'No Accent Event', noAccent: true });
+        const readonly = createMockEvent({ id: 11, title: 'No Accent Conflict', noAccent: true, society_name: 'Debate Club' });
+
+        const { container } = render(
+            <>
+                <EventRow event={editable} />
+                <ConflictRow events={[readonly]} />
+            </>,
+        );
+
+        expect(container.querySelector('[data-event-id="10"]').getAttribute('style')).toBeNull();
+        expect(container.querySelector('[data-event-id="11"]').getAttribute('style')).toBeNull();
     });
 
     it('renders conflict rows and opens the popup for the clicked conflict event', () => {
