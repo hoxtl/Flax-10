@@ -1,6 +1,7 @@
 /*
  * Location autocomplete hook with Mapbox geocoding.
  */
+
 import { useEffect, useRef, useState } from "react";
 import { useClickOutside } from "../../../common/hooks/useClickOutside";
 

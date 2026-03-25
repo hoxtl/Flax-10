@@ -1,6 +1,7 @@
 /*
  * Right Now data helpers.
  */
+
 import { isNow } from "../utils/eventUtils";
 import { getTflLinesForLocation, isSevereDisruption } from "../utils/kclTflMapping";
 

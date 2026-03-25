@@ -1,6 +1,7 @@
 /*
  * List sidebar UI parts.
  */
+
 import { useEffect, useRef, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import styles from "./ListSidebar.module.css";

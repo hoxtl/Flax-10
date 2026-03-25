@@ -1,6 +1,7 @@
 /*
  * Month view week row component.
  */
+
 import { memo } from 'react';
 import { isSameMonth, overlapsDay, startOfDay } from '../utils/dateUtils';
 import { getAllDayVisualRange, isAllDayEvent } from '../utils/eventDisplayUtils';

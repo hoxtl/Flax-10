@@ -1,6 +1,7 @@
 /*
  * Homepage overlay collection.
  */
+
 import { MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../../../components/common/PrimaryButton/PrimaryButton";

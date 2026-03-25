@@ -1,6 +1,7 @@
 /*
  * Intelligence hero widgets.
  */
+
 import { AnimatePresence, motion as Motion, useReducedMotion } from "framer-motion";
 import { BookOpen, Calendar } from "lucide-react";
 import { createElement } from "react";

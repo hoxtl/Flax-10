@@ -1,6 +1,7 @@
 /*
  * Month view event dot component.
  */
+
 import { useDrag } from '../hooks/useDragDrop';
 import { useEventPopup } from '../../../context/CalendarContext';
 import { useTags } from '../../../context/TagContext';
